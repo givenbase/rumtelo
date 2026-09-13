@@ -55,7 +55,7 @@ export function SoulPortalHubClient() {
         cards: [
             {
                 name: 'Stillness',
-                value: streak === null || streak === undefined ? '—' : `${streak}d`,
+                value: streak === null || streak === undefined ? '—' : String(streak),
                 note: 'days in a row',
                 color: 'var(--color-portal-soul)',
                 chart: {

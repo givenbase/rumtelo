@@ -59,7 +59,7 @@ export default function MindPage() {
                         <div className="flex items-baseline gap-2">
                             <Eyebrow>In a row</Eyebrow>
                             <span className="font-display text-xl leading-none font-semibold tracking-tight text-accent">
-                                {streak + (markedToday ? 1 : 0)}d
+                                {streak + (markedToday ? 1 : 0)}
                             </span>
                         </div>
                     </div>
