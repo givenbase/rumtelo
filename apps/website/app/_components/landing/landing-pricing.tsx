@@ -10,10 +10,7 @@ import { PLANS, PRICING_SECTION } from '@/lib/landing-content';
 import { appHomeUrl, appPlanSettingsUrl, webSignUpPath } from '@/lib/portal-urls';
 
 import { Cta, SectionHeading } from './landing-primitives';
-
-function fmt(value: number) {
-    return '€' + Number(value).toLocaleString('en-IE');
-}
+import { formatCatalogMajor, formatCatalogMajorExact } from './landing-money';
 
 const PLAN_NAMES = { BASIC: 'Basic', PLUS: 'Plus', MAX: 'Max' } as const;
 
@@ -149,7 +146,7 @@ export function LandingPricing() {
                     const sub = free
                         ? 'no card needed'
                         : yearly
-                          ? `€${(plan.yearly / 12).toFixed(2)}/month billed yearly`
+                          ? `${formatCatalogMajorExact(plan.yearly / 12)}/month billed yearly`
                           : 'cancel any month';
                     const action = ctaForPlan({
                         planKey: plan.key,
@@ -203,7 +200,7 @@ export function LandingPricing() {
                             <div className="px-6 pt-4">
                                 <span className="flex flex-wrap items-baseline gap-1.5">
                                     <span className="font-display text-4xl leading-none font-semibold tracking-tight text-accent">
-                                        {fmt(price)}
+                                        {formatCatalogMajor(price)}
                                     </span>
                                     <span className="font-mono text-xs font-medium text-fg-faint">
                                         {per}

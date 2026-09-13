@@ -16,12 +16,9 @@ import {
 import { appHomeUrl, appPlanSettingsUrl, webSignUpPath } from '@/lib/portal-urls';
 
 import { Cta, Eyebrow } from './landing-primitives';
+import { formatCatalogMajor } from './landing-money';
 
 const PLAN_SHORT = { BASIC: 'Basic', PLUS: 'Plus', MAX: 'Max' } as const;
-
-function fmt(value: number) {
-    return '€' + Number(value).toLocaleString('en-IE');
-}
 
 function ease(value: number) {
     const clamped = Math.min(1, Math.max(0, value));
@@ -90,7 +87,7 @@ export function LandingHero() {
         };
     }, []);
 
-    const demoIncome = fmt(Math.round(income * landP));
+    const demoIncome = formatCatalogMajor(Math.round(income * landP));
     const demoPct = Math.round(100 * splitP) + '%';
     const demoStage =
         splitP >= 1
@@ -265,7 +262,7 @@ export function LandingHero() {
                                         {j.pct}%
                                     </span>
                                     <span className="font-mono text-sm font-medium text-fg">
-                                        {fmt(Math.round(((income * j.pct) / 100) * splitP))}
+                                        {formatCatalogMajor(Math.round(((income * j.pct) / 100) * splitP))}
                                     </span>
                                 </span>
                             ))}
