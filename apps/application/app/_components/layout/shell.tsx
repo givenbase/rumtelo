@@ -18,6 +18,7 @@ import {
     resolveNavChildForPath,
     resolveNavGroupForPath,
 } from '@/app/_lib/nav';
+import { PLAN_LABELS } from '@/app/_lib/plan';
 import { settingsHrefForPathname } from '@/app/_lib/settings-tabs';
 import { accountThemeFromCss } from '@/app/_lib/theme';
 import { useAccountTheme } from '@/components/features/shell/account-theme-sync';
@@ -100,7 +101,7 @@ function AppShellInner({ children }: { children: ReactNode }) {
     const [portalOpen, setPortalOpen] = useState(false);
     const [subOpen, setSubOpen] = useState(false);
     const [signingOut, setSigningOut] = useState(false);
-    const { toggleLocale, locale } = useAppShell();
+    const { toggleLocale, locale, plan } = useAppShell();
     const { setAccountTheme } = useAccountTheme();
     const { resolvedTheme } = useTheme();
     const { isCapabilityLocked, accessForPath } = usePlanCapabilities();
@@ -108,6 +109,7 @@ function AppShellInner({ children }: { children: ReactNode }) {
 
     const isDark = resolvedTheme === 'dark';
     const localeLabel = locale === Locale.NL ? 'NL' : 'EN';
+    const planLabel = PLAN_LABELS[plan];
 
     const userName = session?.user?.name?.trim() || 'Guest';
     const userEmail = session?.user?.email ?? '';
@@ -335,18 +337,28 @@ function AppShellInner({ children }: { children: ReactNode }) {
 
                                     <div className="grid gap-0.5 p-2">
                                         {MENU_ITEMS.map(item => {
+                                            const isPlan = item.href === '/settings/general/plan';
                                             const inner = (
                                                 <>
-                                                    <span
-                                                        className={cn(
-                                                            'text-sm',
-                                                            item.danger ? 'text-danger' : 'text-fg'
-                                                        )}>
-                                                        {item.label}
+                                                    <span className="grid min-w-0 flex-1 gap-0.5">
+                                                        <span
+                                                            className={cn(
+                                                                'text-sm',
+                                                                item.danger
+                                                                    ? 'text-danger'
+                                                                    : 'text-fg'
+                                                            )}>
+                                                            {item.label}
+                                                        </span>
+                                                        <span className="text-xs leading-tight text-fg-faint">
+                                                            {item.sub}
+                                                        </span>
                                                     </span>
-                                                    <span className="text-xs leading-tight text-fg-faint">
-                                                        {item.sub}
-                                                    </span>
+                                                    {isPlan ? (
+                                                        <span className="shrink-0 rounded-full border border-line px-2.5 py-1 font-mono text-xs font-semibold tracking-wide text-fg-muted">
+                                                            {planLabel}
+                                                        </span>
+                                                    ) : null}
                                                 </>
                                             );
 
@@ -360,7 +372,12 @@ function AppShellInner({ children }: { children: ReactNode }) {
                                                         key={item.label}
                                                         href={href}
                                                         onClick={() => setMenuOpen(false)}
-                                                        className="grid gap-0.5 rounded-lg px-3 py-2.5 transition-colors hover:bg-raised">
+                                                        className={cn(
+                                                            'rounded-lg px-3 py-2.5 transition-colors hover:bg-raised',
+                                                            isPlan
+                                                                ? 'flex items-center justify-between gap-3'
+                                                                : 'grid gap-0.5'
+                                                        )}>
                                                         {inner}
                                                     </Link>
                                                 );

@@ -1,6 +1,8 @@
 import { Suspense } from 'react';
 
-import { AppShell } from '@/components/layout/shell';
+import { BrandLoader } from '@rumtelo/ui';
+
+import { AppBootGate } from '@/components/layout/app-boot-gate';
 
 export default function AppLayout({
     children,
@@ -10,11 +12,8 @@ export default function AppLayout({
     modal: React.ReactNode;
 }) {
     return (
-        <Suspense fallback={null}>
-            <AppShell>
-                {children}
-                {modal}
-            </AppShell>
+        <Suspense fallback={<BrandLoader fullScreen label="Loading" />}>
+            <AppBootGate modal={modal}>{children}</AppBootGate>
         </Suspense>
     );
 }

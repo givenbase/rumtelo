@@ -4,7 +4,7 @@
  * categories:
  * - forms      controls + RHF Form helpers
  * - cards      Card / AccentCard
- * - feedback   Badge, EmptyState, StatusPage, toasts, notices
+ * - feedback   Badge, EmptyState, StatusPage, BrandLoader, toasts, notices
  * - layout     Section, Sheet, Dialog, Tabs
  * - display    Meter, StatTile, HeroNumber
  * - navigation DropdownMenu

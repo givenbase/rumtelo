@@ -3,7 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Suspense, useEffect, useState, type ReactNode } from 'react';
 
-import { ThemeProvider } from '@rumtelo/ui';
+import { ThemeProvider, BrandLoader } from '@rumtelo/ui';
 
 import { setClientHouseholdId } from '@/app/_lib/household-api-context';
 import { AccountThemeProvider } from '@/components/features/shell/account-theme-sync';
@@ -40,7 +40,7 @@ export function Providers({ children }: { children: ReactNode }) {
     return (
         <ThemeProvider>
             <QueryClientProvider client={queryClient}>
-                <Suspense fallback={null}>
+                <Suspense fallback={<BrandLoader fullScreen label="Loading" />}>
                     <PlanIntentProvider>
                         <AuthProvider>
                             <HouseholdHeaderSync>

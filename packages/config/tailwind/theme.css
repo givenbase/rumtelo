@@ -65,6 +65,8 @@
 
     --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
     --animate-rise: rise 380ms var(--ease-out) both;
+    --animate-brand-spin: brand-spin 0.9s linear infinite;
+    --animate-brand-breathe: brand-breathe 1.6s var(--ease-out) infinite;
 
     --gradient-accent: linear-gradient(
         135deg,
@@ -103,6 +105,24 @@
         to {
             opacity: 1;
             transform: none;
+        }
+    }
+
+    @keyframes brand-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @keyframes brand-breathe {
+        0%,
+        100% {
+            opacity: 0.55;
+            transform: scale(0.96);
+        }
+        50% {
+            opacity: 1;
+            transform: scale(1);
         }
     }
 

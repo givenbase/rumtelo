@@ -43,6 +43,8 @@ interface AppShellCtx {
     resetOnboardingFlow: () => void;
     setOnboardingStep: (step: number) => void;
     plan: PlanKey;
+    /** False until auth + household settings resolve — do not trust plan locks yet. */
+    planReady: boolean;
     setPlan: (plan: PlanKey) => void;
     period: Period;
     setPeriod: (period: Period) => void;
@@ -53,7 +55,7 @@ interface AppShellCtx {
 const AppShellContext = createContext<AppShellCtx | null>(null);
 
 export function AppShellProvider({ children }: { children: ReactNode }) {
-    const { householdId } = useAuth();
+    const { householdId, isPending: authPending, isAuthenticated } = useAuth();
     const [toast, setToast] = useState<Toast | null>(null);
     const toastTimer = useRef<ReturnType<typeof setTimeout>>(null);
     const toastId = useRef(0);
@@ -87,6 +89,17 @@ export function AppShellProvider({ children }: { children: ReactNode }) {
         (next: PlanKey) => setPlanBump({ key: settingsPlanKey, plan: next }),
         [settingsPlanKey]
     );
+
+    /**
+     * Auth / household / settings still settling → plan is not authoritative.
+     * Using DEFAULT_PLAN (Basic) here would flash LockedGate on Plus/Max routes.
+     */
+    const planReady = useMemo(() => {
+        if (authPending) return false;
+        if (isAuthenticated && !householdId) return false;
+        if (!householdId) return true;
+        return settingsQuery.isFetched || settingsQuery.isError;
+    }, [authPending, isAuthenticated, householdId, settingsQuery.isFetched, settingsQuery.isError]);
 
     const showToast = useCallback((message: string, type: Toast['type'] = 'info') => {
         if (toastTimer.current) clearTimeout(toastTimer.current);
@@ -147,6 +160,7 @@ export function AppShellProvider({ children }: { children: ReactNode }) {
             resetOnboardingFlow,
             setOnboardingStep,
             plan,
+            planReady,
             setPlan,
             period,
             setPeriod,
@@ -166,6 +180,7 @@ export function AppShellProvider({ children }: { children: ReactNode }) {
             resetOnboardingFlow,
             setOnboardingStep,
             plan,
+            planReady,
             setPlan,
             period,
             setPeriod,

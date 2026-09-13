@@ -22,12 +22,13 @@ import { useAppShell } from '@/components/features/shell/app-shell-context';
  * Plan capability checks — plan → product → feature.
  */
 export function usePlanCapabilities() {
-    const { plan } = useAppShell();
+    const { plan, planReady } = useAppShell();
     const caps = capabilitiesFor(plan);
 
     return useMemo(
         () => ({
             plan,
+            planReady,
             caps,
             access: PLAN_ACCESS[plan],
             grantedKeys: caps.capabilityKeys,
@@ -35,18 +36,20 @@ export function usePlanCapabilities() {
             featuresForProduct: (product: Parameters<typeof featuresForProduct>[1]) =>
                 featuresForProduct(plan, product),
             hasCapability: (capabilityKey: string | null | undefined) =>
-                hasCapability(capabilityKey, plan),
+                !planReady || hasCapability(capabilityKey, plan),
             isCapabilityLocked: (capabilityKey: string | null | undefined) =>
-                isCapabilityLocked(capabilityKey, plan),
+                planReady && isCapabilityLocked(capabilityKey, plan),
             requiredPlanFor: (capabilityKey: string) => minPlanForCapability(capabilityKey),
             limitFor: (key: PlanLimitKey) => limitFor(plan, key),
             withinLimit: (key: PlanLimitKey, occupied: number) => withinLimit(plan, key, occupied),
             capabilities: CAPABILITIES,
             capabilityKeyForPath: capabilityKeyForPathname,
             accessForPath: (pathname: string) =>
-                capabilityAccessForPath(pathname, plan, isCapabilityLocked),
+                capabilityAccessForPath(pathname, plan, (key, nextPlan) =>
+                    planReady ? isCapabilityLocked(key, nextPlan) : false
+                ),
         }),
-        [plan, caps]
+        [plan, planReady, caps]
     );
 }
 
