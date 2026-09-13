@@ -12,10 +12,10 @@ export default function TrainPage() {
 
     return (
         <div className="grid animate-rise gap-6">
-            <Section eyebrow="Training" title="Energy you invest, not euros you spend.">
+            <Section eyebrow="Training" title="Energy you invest, not money you spend.">
                 <p className="max-w-prose text-base text-fg-muted">
-                    Training is the only investment that pays out in energy rather than euros — and
-                    energy is what earns the euros.
+                    Training is the only investment that pays out in energy rather than money — and
+                    energy is what earns the money.
                 </p>
             </Section>
 

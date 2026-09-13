@@ -4,7 +4,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 
 import { useLiveQuery } from '@rumtelo/hooks';
 
-import { centsToEurosInput } from '@/app/_lib/money-input';
+import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import {
     FixedCostForm,
@@ -49,7 +49,7 @@ export function FixedCostUpdatePage({ id, embedded = false }: { id: string; embe
             defaultValues={{
                 name: row.name,
                 counterparty: row.counterparty ?? '',
-                amount: centsToEurosInput(Math.abs(row.amount)),
+                amount: minorUnitsToAmountInput(Math.abs(row.amount)),
                 jarId: row.jarId,
                 dueDay: row.dueDay !== null ? String(row.dueDay) : '',
             }}

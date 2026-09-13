@@ -4,7 +4,9 @@ import { useState } from 'react';
 
 import { WeekCheckStage } from '@rumtelo/contracts';
 import { Button, Eyebrow } from '@rumtelo/ui';
-import { cn, formatMoney } from '@rumtelo/utils';
+import { cn } from '@rumtelo/utils';
+
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 interface WizardJar {
     id: string;
@@ -66,6 +68,7 @@ export function WeekCheckWizard({
     const [step, setStep] = useState(Math.max(0, stageIndex));
     const [intent, setIntent] = useState('');
     const [redirectJarId, setRedirectJarId] = useState<string | null>(null);
+    const { formatMoney } = useHouseholdCurrency();
 
     const current = STEPS[step]!;
 

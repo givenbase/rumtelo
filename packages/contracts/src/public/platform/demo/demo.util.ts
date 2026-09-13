@@ -60,7 +60,7 @@ export const DEMO_ACCOUNTS: readonly DemoAccount[] = [
         dateOfBirth: '1997-04-18',
         householdName: 'Rivera Household',
         slug: 'demo-basic',
-        why: 'Breathing room — every euro is already spoken for.',
+        why: 'Breathing room — every coin is already spoken for.',
     }),
     person({
         persona: 'plus',

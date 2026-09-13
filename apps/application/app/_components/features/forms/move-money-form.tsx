@@ -17,15 +17,16 @@ import {
     Button,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
-import { cn, formatMoney, toPeriodKey } from '@rumtelo/utils';
+import { cn, toPeriodKey } from '@rumtelo/utils';
 import { jarCapabilitiesFor } from '@rumtelo/contracts';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 import { JAR_META } from '@/app/_lib/jar-meta';
-import { parseEurosToCents, todayIsoDate } from '@/app/_lib/money-input';
+import { parseAmountToMinorUnits, todayIsoDate } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -40,7 +41,7 @@ const moveSchema = z
             .min(1, 'Amount is required')
             .refine(
                 value => {
-                    const cents = parseEurosToCents(value);
+                    const cents = parseAmountToMinorUnits(value);
                     return cents !== null && cents > 0;
                 },
                 { message: 'Enter a valid amount' }
@@ -103,6 +104,7 @@ export function MoveMoneyForm({
 }: MoveMoneyFormProps) {
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
+    const { symbol, formatMoney } = useHouseholdCurrency();
     const { showToast, period } = useAppShell();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
@@ -169,7 +171,7 @@ export function MoveMoneyForm({
 
     useEffect(() => {
         if (maxMoveCents <= 0 || !amountValue) return;
-        const cents = parseEurosToCents(amountValue);
+        const cents = parseAmountToMinorUnits(amountValue);
         if (cents !== null && cents > maxMoveCents) {
             form.setValue('amount', (maxMoveCents / 100).toFixed(2), {
                 shouldValidate: true,
@@ -179,7 +181,7 @@ export function MoveMoneyForm({
 
     const mutation = useMutation({
         mutationFn: async (values: MoveValues) => {
-            const cents = parseEurosToCents(values.amount);
+            const cents = parseAmountToMinorUnits(values.amount);
             if (cents === null || cents <= 0) {
                 throw new Error('Enter a valid amount');
             }
@@ -432,9 +434,9 @@ export function MoveMoneyForm({
                     <span className="font-semibold text-[var(--ink)]">{fromJar.name}</span>
                     <span className="mx-1.5 text-[var(--ink-3)]">→</span>
                     <span className="font-semibold text-[var(--ink)]">{toJar.name}</span>
-                    {amountValue && parseEurosToCents(amountValue) ? (
+                    {amountValue && parseAmountToMinorUnits(amountValue) ? (
                         <span className="ml-2 font-bold text-[var(--teal)] tabular-nums">
-                            {formatMoney(parseEurosToCents(amountValue)!)}
+                            {formatMoney(parseAmountToMinorUnits(amountValue)!)}
                         </span>
                     ) : null}
                 </div>
@@ -446,7 +448,7 @@ export function MoveMoneyForm({
                 render={({ field }) => (
                     <FormItem>
                         <div className="flex items-center justify-between gap-2">
-                            <FormLabel>Amount (€)</FormLabel>
+                            <FormLabel>Amount ({symbol})</FormLabel>
                             {maxMoveCents > 0 ? (
                                 <button
                                     type="button"

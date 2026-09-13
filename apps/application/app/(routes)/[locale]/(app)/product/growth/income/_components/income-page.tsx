@@ -8,13 +8,14 @@ import { useRouter } from 'next/navigation';
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { AccentCard, Button, Card, Eyebrow } from '@rumtelo/ui';
-import { formatMoney, incomeDelta, monthlyNetAsOf, sumMonthly, toPeriodKey } from '@rumtelo/utils';
+import { incomeDelta, monthlyNetAsOf, sumMonthly, toPeriodKey } from '@rumtelo/utils';
 
 import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
 import { isLiveData } from '@/app/_lib/preview';
 import { IncomeSimulator } from '@/components/features/growth/income-simulator';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 /** Demo fallback when no ACTIVE EARN goal is set. */
 const FALLBACK_TARGET = 600_000;
@@ -33,6 +34,7 @@ export function IncomePageClient() {
     const { householdId } = useAuth();
     const { period } = useAppShell();
     const router = useRouter();
+    const { formatMoney } = useHouseholdCurrency();
     const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);
 

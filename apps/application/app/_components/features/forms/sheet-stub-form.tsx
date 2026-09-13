@@ -17,6 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 
@@ -31,7 +32,7 @@ export type StubKind = 'session' | 'asset';
 
 const KIND_COPY: Record<
     StubKind,
-    { submit: string; amountLabel?: string; labelPlaceholder: string }
+    { submit: string; amountLabel?: (symbol: string) => string; labelPlaceholder: string }
 > = {
     session: {
         submit: 'Save training',
@@ -39,7 +40,7 @@ const KIND_COPY: Record<
     },
     asset: {
         submit: 'Save asset',
-        amountLabel: 'Value (€)',
+        amountLabel: symbol => `Value (${symbol})`,
         labelPlaceholder: 'e.g. bicycle',
     },
 };
@@ -66,6 +67,8 @@ export function SheetStubForm({
     const { showToast } = useAppShell();
     const dismiss = useFormDismiss(onSuccess);
     const copy = KIND_COPY[kind];
+    const { symbol } = useHouseholdCurrency();
+    const amountLabel = copy.amountLabel?.(symbol);
 
     const form = useForm<StubValues>({
         defaultValues: {
@@ -109,13 +112,13 @@ export function SheetStubForm({
                 )}
             />
 
-            {copy.amountLabel ? (
+            {amountLabel ? (
                 <FormField
                     control={form.control}
                     name="amount"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>{copy.amountLabel}</FormLabel>
+                            <FormLabel>{amountLabel}</FormLabel>
                             <FormControl>
                                 <FormInput inputMode="decimal" placeholder="0,00" {...field} />
                             </FormControl>

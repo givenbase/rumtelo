@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 
 import { Currency, IncomeStability, Locale, SpendingStyle } from '@rumtelo/contracts';
 import { Button, Field, Input } from '@rumtelo/ui';
-import { cn } from '@rumtelo/utils';
+import { cn, formatMoney, currencySymbol } from '@rumtelo/utils';
 
 import { JAR_META } from '@/app/_lib/jar-meta';
 import { writeHelpersEnabled } from '@/app/_lib/feature-helpers';
@@ -14,12 +14,21 @@ import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useOptionalPlanIntent } from '@/components/features/shell/plan-intent-provider';
 
+const ONBOARDING_CURRENCIES = [
+    { code: Currency.EUR, sampleLocale: 'nl-NL' },
+    { code: Currency.USD, sampleLocale: 'en-US' },
+    { code: Currency.GBP, sampleLocale: 'en-GB' },
+] as const;
+
 const STEPS = [
     {
         title: 'Welcome to Rumtelo',
         body: 'Stop wondering where it went. Six jars, one calm overview.',
     },
-    { title: 'Your income', body: 'What is your net monthly income?' },
+    {
+        title: 'Your income',
+        body: 'Pick the currency for this household, then your net monthly income.',
+    },
     { title: 'The six jars', body: 'Your income is split immediately — pay your future first.' },
     {
         title: 'How you handle money',
@@ -55,6 +64,7 @@ export function OnboardingOverlay() {
     }, [session, householdId, isPending, openOnboarding, closeOnboarding]);
 
     const [householdName, setHouseholdName] = useState('My household');
+    const [currency, setCurrency] = useState<Currency>(Currency.EUR);
     const [monthlyIncome, setMonthlyIncome] = useState('4300');
     const [why, setWhy] = useState('');
     const [spendingStyle, setSpendingStyle] = useState(SpendingStyle.UNKNOWN);
@@ -71,15 +81,15 @@ export function OnboardingOverlay() {
     async function finish() {
         setPending(true);
         try {
-            const euros = Math.round(parseFloat(monthlyIncome.replace(',', '.')) * 100);
+            const minorUnits = Math.round(parseFloat(monthlyIncome.replace(',', '.')) * 100);
             const split = JAR_META.map(jar => ({ key: jar.key, percentage: jar.pct }));
             const household = await api.household.onboard({
                 householdName,
-                currency: Currency.EUR,
+                currency,
                 locale: Locale.NL,
                 spendingStyle,
                 incomeStability,
-                monthlyNetIncome: Number.isFinite(euros) ? euros : 0,
+                monthlyNetIncome: Number.isFinite(minorUnits) ? minorUnits : 0,
                 split,
                 why: why.trim() || null,
             });
@@ -126,8 +136,50 @@ export function OnboardingOverlay() {
                 <p className="mt-2 text-sm leading-relaxed text-fg-muted">{step.body}</p>
 
                 {onboardingStep === 1 && (
-                    <div className="mt-4">
-                        <Field label="Net monthly income (€)" htmlFor="income">
+                    <div className="mt-4 grid gap-3">
+                        <div>
+                            <p className="mb-2 font-mono text-[10px] tracking-[0.12em] text-fg-muted uppercase">
+                                Currency
+                            </p>
+                            <div
+                                className="flex flex-wrap gap-1.5"
+                                role="group"
+                                aria-label="Currency">
+                                {ONBOARDING_CURRENCIES.map(option => {
+                                    const on = currency === option.code;
+                                    return (
+                                        <button
+                                            key={option.code}
+                                            type="button"
+                                            aria-pressed={on}
+                                            onClick={() => setCurrency(option.code)}
+                                            className={cn(
+                                                'grid gap-0.5 rounded-[10px] border px-3 py-2 text-left transition-colors',
+                                                on
+                                                    ? 'border-accent bg-accent-soft'
+                                                    : 'border-line hover:border-accent/50'
+                                            )}>
+                                            <span
+                                                className={cn(
+                                                    'font-mono text-[10px] font-medium tracking-wide',
+                                                    on ? 'text-accent' : 'text-fg'
+                                                )}>
+                                                {option.code}
+                                            </span>
+                                            <span className="font-mono text-[10.5px] text-fg-muted">
+                                                {formatMoney(430_000, {
+                                                    currency: option.code,
+                                                    locale: option.sampleLocale,
+                                                })}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                        <Field
+                            label={`Net monthly income (${currencySymbol(currency)})`}
+                            htmlFor="income">
                             <Input
                                 id="income"
                                 inputMode="decimal"
@@ -135,15 +187,13 @@ export function OnboardingOverlay() {
                                 onChange={event => setMonthlyIncome(event.target.value)}
                             />
                         </Field>
-                        <div className="mt-3">
-                            <Field label="Household name" htmlFor="hh-name">
-                                <Input
-                                    id="hh-name"
-                                    value={householdName}
-                                    onChange={event => setHouseholdName(event.target.value)}
-                                />
-                            </Field>
-                        </div>
+                        <Field label="Household name" htmlFor="hh-name">
+                            <Input
+                                id="hh-name"
+                                value={householdName}
+                                onChange={event => setHouseholdName(event.target.value)}
+                            />
+                        </Field>
                     </div>
                 )}
 

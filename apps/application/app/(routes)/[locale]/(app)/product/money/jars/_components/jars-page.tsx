@@ -54,7 +54,7 @@ export function JarsPageClient() {
             <div>
                 <Eyebrow className="text-accent">✦ THE SIX JARS</Eyebrow>
                 <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-fg lg:text-4xl">
-                    Every euro gets a job before it arrives.
+                    Every coin gets a job before it arrives.
                 </h1>
                 <p className="mt-2 max-w-prose text-base text-pretty text-fg-muted">
                     Income lands, the split happens the same second. Financial Freedom is never

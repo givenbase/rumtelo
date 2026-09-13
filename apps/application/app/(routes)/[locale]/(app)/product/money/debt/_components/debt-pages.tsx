@@ -4,7 +4,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 
 import { useLiveQuery } from '@rumtelo/hooks';
 
-import { centsToEurosInput } from '@/app/_lib/money-input';
+import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { DebtForm } from '@/components/features/forms/debt-form';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -38,9 +38,9 @@ export function DebtUpdatePage({ id, embedded = false }: { id: string; embedded?
             embedded={embedded}
             defaultValues={{
                 name: row.name,
-                balance: centsToEurosInput(row.balance),
+                balance: minorUnitsToAmountInput(row.balance),
                 interestRate: String(row.interestRate),
-                minimumPayment: centsToEurosInput(row.minimumPayment),
+                minimumPayment: minorUnitsToAmountInput(row.minimumPayment),
                 kind: row.kind,
             }}
         />

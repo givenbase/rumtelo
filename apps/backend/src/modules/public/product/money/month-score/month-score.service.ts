@@ -1,10 +1,12 @@
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable } from '@nestjs/common';
+import { DEFAULT_CURRENCY, formatMoney } from '@rumtelo/utils';
 
 import { HouseholdScopedRepository } from '../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../common/household/household.context';
 import { sum } from '../../../../../common/utils/money.util';
 import { daysInPeriod } from '../../../../../common/utils/period.util';
+import { HouseholdSettings } from '../../../../auth/household/household-settings/household-settings.entity';
 import { JarService } from '../plan/jar/jar.service';
 import { MonthScore } from './month-score.entity';
 import { MonthScoreEvent } from './month-score-event.entity';
@@ -109,6 +111,10 @@ export class MonthScoreService {
         const income = await this.jars.monthlyNetIncome();
         const allocated = sum(jarRows.map(jar => jar.allocated));
         const spent = sum(jarRows.map(jar => jar.spent));
+        const settings = await this.em.findOne(HouseholdSettings, {
+            household: currentHouseholdId(),
+        });
+        const currency = settings?.currency ?? DEFAULT_CURRENCY;
 
         const spendable = jarRows.filter(jar => jar.capabilities?.canSpend);
         const held = spendable.filter(jar => !jar.overspent).length;
@@ -130,7 +136,7 @@ export class MonthScoreService {
         const availableTotal = sum(jarRows.map(jar => jar.available));
         const headline =
             availableTotal >= 0
-                ? `${formatEuro(availableTotal)} over deze periode`
+                ? `${formatMoney(availableTotal, { currency, locale: 'nl-NL' })} over deze periode`
                 : 'Eén of meer potten zijn overschreden';
 
         return {
@@ -149,12 +155,4 @@ export class MonthScoreService {
 
 export function levelFor(score: number) {
     return [...LEVELS].reverse().find(level => score >= level.threshold) ?? LEVELS[0]!;
-}
-
-function formatEuro(cents: number) {
-    return new Intl.NumberFormat('nl-NL', {
-        style: 'currency',
-        currency: 'EUR',
-        maximumFractionDigits: 0,
-    }).format(cents / 100);
 }

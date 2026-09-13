@@ -19,11 +19,11 @@ import {
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Cadence, IncomeKind } from '@rumtelo/contracts';
-import { formatMoney } from '@rumtelo/utils';
 import { z } from 'zod';
 
-import { parseEurosToCents } from '@/app/_lib/money-input';
+import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -58,7 +58,7 @@ const incomeFormSchema = z.object({
         .min(1, 'Amount is required')
         .refine(
             value => {
-                const cents = parseEurosToCents(value);
+                const cents = parseAmountToMinorUnits(value);
                 return cents !== null && cents > 0;
             },
             { message: 'Enter a valid amount' }
@@ -101,6 +101,7 @@ export function IncomeForm({
 }: IncomeFormProps) {
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
+    const { symbol, formatMoney } = useHouseholdCurrency();
     const { showToast } = useAppShell();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
@@ -143,7 +144,7 @@ export function IncomeForm({
     const saveMutation = useMutation({
         mutationFn: async (values: IncomeFormValues) => {
             if (!householdId) throw new Error('No household');
-            const cents = parseEurosToCents(values.amount);
+            const cents = parseAmountToMinorUnits(values.amount);
             if (cents === null || cents <= 0) throw new Error('Invalid amount');
             const name = values.name.trim();
             if (mode === 'edit' && entityId) {
@@ -275,7 +276,9 @@ export function IncomeForm({
                 name="amount"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>{mode === 'edit' ? 'New amount (€)' : 'Amount (€)'}</FormLabel>
+                        <FormLabel>
+                            {mode === 'edit' ? `New amount (${symbol})` : `Amount (${symbol})`}
+                        </FormLabel>
                         <FormControl>
                             <FormInput inputMode="decimal" placeholder="0,00" {...field} />
                         </FormControl>

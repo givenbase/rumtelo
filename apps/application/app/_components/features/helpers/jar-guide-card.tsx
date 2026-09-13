@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 
-import { cn, formatMoney } from '@rumtelo/utils';
+import { cn } from '@rumtelo/utils';
 
 import { JAR_GUIDE, type JarGuideKey } from '@/app/_lib/jar-guide';
 import { JAR_META } from '@/app/_lib/jar-meta';
@@ -11,6 +11,7 @@ import { settingsHref } from '@/app/_lib/settings-tabs';
 
 import { CoachMark } from './helper-mark';
 import { useHelpersEnabled } from './provider';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 type JarGuideCardProps = {
     jarKey: JarGuideKey;
@@ -23,6 +24,7 @@ type JarGuideCardProps = {
  * Hidden when Coach guides are off (Help or Settings → Account).
  */
 export function JarGuideCard({ jarKey, allocatedCents = 0, className }: JarGuideCardProps) {
+    const { formatMoney } = useHouseholdCurrency();
     const coachGuidesEnabled = useHelpersEnabled();
     const guide = JAR_GUIDE[jarKey];
     const meta = JAR_META.find(entry => entry.key === jarKey);

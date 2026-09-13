@@ -6,13 +6,14 @@ import { useRouter } from 'next/navigation';
 
 import type { Goal } from '@rumtelo/contracts';
 import { Card } from '@rumtelo/ui';
-import { cn, formatMoney } from '@rumtelo/utils';
+import { cn } from '@rumtelo/utils';
 
 import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
 import { evaluateGoalPace } from '@/app/_lib/goal-pace';
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
 import { JAR_META } from '@/app/_lib/jar-meta';
 import { CoachMark, CoachTipCard, useHelpersEnabled } from '@/components/features/helpers';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 type SimulatorJar = {
     id: string;
@@ -101,6 +102,7 @@ export function IncomeSimulator({
 }: IncomeSimulatorProps) {
     const router = useRouter();
     const coachGuidesEnabled = useHelpersEnabled();
+    const { formatMoney } = useHouseholdCurrency();
 
     /** User override only — `null` means "follow the target (or current income)". */
     const [simOverrideMajor, setSimOverrideMajor] = useState<number | null>(null);
@@ -219,7 +221,7 @@ export function IncomeSimulator({
             default:
                 return null;
         }
-    }, [doneLabel, goal, jarName, pace, wantMonths]);
+    }, [doneLabel, goal, jarName, pace, wantMonths, formatMoney]);
 
     const planFits = pace?.jarHeadroomCents === null ? null : (pace?.jarHeadroomCents ?? 0) >= 0;
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { formatMoney, toPeriodKey } from '@rumtelo/utils';
+import { toPeriodKey } from '@rumtelo/utils';
 import { useLiveQuery } from '@rumtelo/hooks';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
@@ -10,6 +10,7 @@ import { moneyPortalShell } from '@/app/_lib/portal-hubs';
 import { PortalHub, type PortalHubProps } from '@/components/features/home/portal-hub';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 function formatDebtFree(on: string | null): string {
     if (!on) return '—';
@@ -23,6 +24,7 @@ function formatDebtFree(on: string | null): string {
 export function MoneyPortalHubClient() {
     const { householdId } = useAuth();
     const { period } = useAppShell();
+    const { formatMoney } = useHouseholdCurrency();
     const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);
 

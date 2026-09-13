@@ -3,12 +3,12 @@
 import Link from 'next/link';
 
 import { Button } from '@rumtelo/ui';
-import { formatMoney } from '@rumtelo/utils';
 
 import { CREATE_HREF } from '@/app/_lib/create-routes';
 import type { NecessitiesPressure } from '@/app/_lib/necessities-pressure';
 import { productPath } from '@/app/_lib/routes';
 import { CoachTipCard } from '@/components/features/helpers';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 /**
  * Coach tip when fixed costs / Necessities exceed the Eker envelope.
@@ -22,6 +22,7 @@ export function NecessitiesPressureCard({
     /** `plan` = fixed-costs overview; `jar` = jars list (envelope already known). */
     variant?: 'plan' | 'jar';
 }) {
+    const { formatMoney } = useHouseholdCurrency();
     if (!pressure.active) return null;
 
     const shortfallLine =

@@ -1,6 +1,5 @@
 'use client';
 
-import { formatMoney } from '@rumtelo/utils';
 import { useLiveQuery } from '@rumtelo/hooks';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
@@ -9,9 +8,11 @@ import { isLiveData } from '@/app/_lib/preview';
 import { growthPortalShell } from '@/app/_lib/portal-hubs';
 import { PortalHub, type PortalHubProps } from '@/components/features/home/portal-hub';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 export function GrowthPortalHubClient() {
     const { householdId } = useAuth();
+    const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
 
     const query = useLiveQuery(

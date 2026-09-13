@@ -7,21 +7,16 @@ import { useRouter } from 'next/navigation';
 
 import { useLiveQuery } from '@rumtelo/hooks';
 import { AccentCard, Badge, Card, Eyebrow } from '@rumtelo/ui';
-import { cn, formatMoney } from '@rumtelo/utils';
+import { cn } from '@rumtelo/utils';
 
 import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
 import { isLiveData } from '@/app/_lib/preview';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar } from '@/components/layout/list-toolbar';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
-const EXTRA_OPTIONS = [
-    { label: 'Minimum only', value: 0 },
-    { label: '+ €50', value: 5_000 },
-    { label: '+ €100', value: 10_000 },
-    { label: '+ €200', value: 20_000 },
-    { label: '+ €300', value: 30_000 },
-    { label: '+ €500', value: 50_000 },
-] as const;
+/** Raw extra-payment values; labels are built inside the component with the bound formatter. */
+const EXTRA_OPTION_VALUES = [0, 5_000, 10_000, 20_000, 30_000, 50_000];
 
 /** Fallback avalanche simulator used when live plan data isn't available. */
 function computeFreedomLocal(
@@ -63,8 +58,14 @@ function computeFreedomLocal(
 export function DebtsPageClient() {
     const { householdId } = useAuth();
     const router = useRouter();
+    const { formatMoney } = useHouseholdCurrency();
     const [extra, setExtra] = useState(30_000);
     const live = isLiveData(householdId);
+
+    const EXTRA_OPTIONS = EXTRA_OPTION_VALUES.map(value => ({
+        label: value === 0 ? 'Minimum only' : `+ ${formatMoney(value)}`,
+        value,
+    }));
 
     const debtsQuery = useLiveQuery(
         apiQuery.money.debts.list.queryOptions({ input: { householdId: householdId! } }),

@@ -22,8 +22,9 @@ import { GoalKind, GoalStatus, JarKey } from '@rumtelo/contracts';
 import { z } from 'zod';
 
 import { WHY_GIVE } from '@/app/_lib/giving';
-import { parseEurosToCents } from '@/app/_lib/money-input';
+import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { soulPath } from '@/app/_lib/routes';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { CoachTipCard } from '@/components/features/helpers';
@@ -34,12 +35,12 @@ import { ConfirmActionButton } from './confirm-action-button';
 import { FormInput } from './form-input';
 import { PresetNameField } from './preset-name-field';
 
-const euros = z
+const moneyInput = z
     .string()
     .min(1, 'Amount is required')
     .refine(
         value => {
-            const cents = parseEurosToCents(value);
+            const cents = parseAmountToMinorUnits(value);
             return cents !== null && cents > 0;
         },
         { message: 'Enter a valid amount' }
@@ -48,7 +49,7 @@ const euros = z
 const goalFormSchema = z.object({
     kind: z.enum(GoalKind),
     name: z.string().min(1, 'Name is required').max(120),
-    target: euros,
+    target: moneyInput,
     monthlyContribution: z.string().optional(),
     jarId: z.string().optional(),
     why: z.string().max(500).optional(),
@@ -73,6 +74,7 @@ export function GoalForm({
 }: GoalFormProps) {
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
+    const { symbol } = useHouseholdCurrency();
     const { showToast } = useAppShell();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
@@ -142,13 +144,13 @@ export function GoalForm({
     const saveMutation = useMutation({
         mutationFn: async (values: GoalFormValues) => {
             if (!householdId) throw new Error('No household');
-            const target = parseEurosToCents(values.target);
+            const target = parseAmountToMinorUnits(values.target);
             if (target === null || target <= 0) throw new Error('Invalid target');
             const earn = values.kind === GoalKind.EARN;
             const monthly = earn
                 ? 0
                 : values.monthlyContribution?.trim()
-                  ? (parseEurosToCents(values.monthlyContribution) ?? 0)
+                  ? (parseAmountToMinorUnits(values.monthlyContribution) ?? 0)
                   : 0;
             const name = values.name.trim();
             const jarId = earn ? null : values.jarId || null;
@@ -318,7 +320,7 @@ export function GoalForm({
                                 <FormInput
                                     placeholder={
                                         isEarn
-                                            ? 'e.g. €5k net income'
+                                            ? `e.g. ${symbol}5k net income`
                                             : isGive
                                               ? 'e.g. Give pledge this year'
                                               : 'e.g. emergency fund'
@@ -339,10 +341,10 @@ export function GoalForm({
                     <FormItem>
                         <FormLabel>
                             {isEarn
-                                ? 'Monthly net (€)'
+                                ? `Monthly net (${symbol})`
                                 : isGive
-                                  ? 'Pledge for the year (€)'
-                                  : 'Target amount (€)'}
+                                  ? `Pledge for the year (${symbol})`
+                                  : `Target amount (${symbol})`}
                         </FormLabel>
                         <FormControl>
                             <FormInput inputMode="decimal" placeholder="0,00" {...field} />
@@ -360,7 +362,9 @@ export function GoalForm({
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>
-                                    {isGive ? 'Planned per month (€)' : 'Monthly contribution (€)'}
+                                    {isGive
+                                        ? `Planned per month (${symbol})`
+                                        : `Monthly contribution (${symbol})`}
                                 </FormLabel>
                                 <FormControl>
                                     <FormInput inputMode="decimal" placeholder="0,00" {...field} />

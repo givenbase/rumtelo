@@ -331,7 +331,7 @@ export class DemoHouseholdSeeder extends Seeder {
         this.createIncome(em, householdId, {
             name: 'Retail salary',
             kind: IncomeKind.SALARY,
-            amount: 1850,
+            amount: 1_850,
             expectedDay: 25,
         });
 
@@ -407,7 +407,7 @@ export class DemoHouseholdSeeder extends Seeder {
             },
             {
                 daysAgo: 12,
-                amount: 1850,
+                amount: 1_850,
                 description: 'Salary',
                 counterparty: 'Employer',
                 jar: jars.necessities,
@@ -461,7 +461,7 @@ export class DemoHouseholdSeeder extends Seeder {
         em.create(IncomeMilestone, {
             household: householdId,
             label: '€2,000 take-home',
-            targetMonthly: toMinorUnits(2000),
+            targetMonthly: toMinorUnits(2_000),
             reachedOn: null,
         } as never);
     }
@@ -477,7 +477,7 @@ export class DemoHouseholdSeeder extends Seeder {
         this.createIncome(em, householdId, {
             name: 'Client retainers',
             kind: IncomeKind.FREELANCE,
-            amount: 2800,
+            amount: 2_800,
             expectedDay: 15,
         });
         this.createIncome(em, householdId, {
@@ -488,7 +488,7 @@ export class DemoHouseholdSeeder extends Seeder {
         });
 
         for (const row of [
-            { name: 'Rent', amount: 1250, dueDay: 1 },
+            { name: 'Rent', amount: 1_250, dueDay: 1 },
             { name: 'Health insurance', amount: 155, dueDay: 1 },
             { name: 'Coworking', amount: 220, dueDay: 5 },
             { name: 'Software stack', amount: 89, dueDay: 8 },
@@ -503,8 +503,8 @@ export class DemoHouseholdSeeder extends Seeder {
             household: householdId,
             name: 'Credit card',
             kind: DebtKind.CREDIT_CARD,
-            balance: toMinorUnits(2850),
-            originalBalance: toMinorUnits(3200),
+            balance: toMinorUnits(2_850),
+            originalBalance: toMinorUnits(3_200),
             interestRate: '19.90',
             minimumPayment: toMinorUnits(180),
             extraPayment: toMinorUnits(0),
@@ -515,7 +515,7 @@ export class DemoHouseholdSeeder extends Seeder {
             name: 'Laptop loan',
             kind: DebtKind.LOAN,
             balance: toMinorUnits(950),
-            originalBalance: toMinorUnits(1800),
+            originalBalance: toMinorUnits(1_800),
             interestRate: '7.50',
             minimumPayment: toMinorUnits(120),
             extraPayment: toMinorUnits(0),
@@ -528,7 +528,7 @@ export class DemoHouseholdSeeder extends Seeder {
             kind: GoalKind.SAVE,
             status: GoalStatus.ACTIVE,
             name: 'Emergency fund',
-            target: toMinorUnits(6000),
+            target: toMinorUnits(6_000),
             saved: toMinorUnits(420),
             monthlyContribution: toMinorUnits(50),
             targetOn: monthsAhead(24),
@@ -541,7 +541,7 @@ export class DemoHouseholdSeeder extends Seeder {
             kind: GoalKind.SAVE,
             status: GoalStatus.PAUSED,
             name: 'Course: product design',
-            target: toMinorUnits(1200),
+            target: toMinorUnits(1_200),
             saved: toMinorUnits(180),
             monthlyContribution: toMinorUnits(0),
             why: 'Paused — cash went to the card minimum.',
@@ -553,7 +553,7 @@ export class DemoHouseholdSeeder extends Seeder {
             kind: GoalKind.EARN,
             status: GoalStatus.ACTIVE,
             name: '€4k months',
-            target: toMinorUnits(4000),
+            target: toMinorUnits(4_000),
             saved: toMinorUnits(0),
             monthlyContribution: toMinorUnits(0),
             why: demo.why,
@@ -568,7 +568,7 @@ export class DemoHouseholdSeeder extends Seeder {
         this.createBank(em, householdId, {
             name: 'Tax set-aside',
             kind: AccountKind.SAVINGS,
-            balance: 2100,
+            balance: 2_100,
         });
 
         em.create(Rule, {
@@ -645,7 +645,7 @@ export class DemoHouseholdSeeder extends Seeder {
             },
             {
                 daysAgo: 5,
-                amount: -1250,
+                amount: -1_250,
                 description: 'Rent',
                 counterparty: 'Landlord',
                 jar: jars.necessities,
@@ -653,7 +653,7 @@ export class DemoHouseholdSeeder extends Seeder {
             },
             {
                 daysAgo: 7,
-                amount: 1400,
+                amount: 1_400,
                 description: 'Invoice #183 — Nova',
                 counterparty: 'Nova Studio',
                 jar: jars.necessities,
@@ -756,13 +756,13 @@ export class DemoHouseholdSeeder extends Seeder {
         em.create(IncomeMilestone, {
             household: householdId,
             label: '€3,000 months',
-            targetMonthly: toMinorUnits(3000),
+            targetMonthly: toMinorUnits(3_000),
             reachedOn: monthsAgo(2),
         } as never);
         em.create(IncomeMilestone, {
             household: householdId,
             label: '€4,000 months',
-            targetMonthly: toMinorUnits(4000),
+            targetMonthly: toMinorUnits(4_000),
             reachedOn: null,
         } as never);
     }
@@ -778,7 +778,7 @@ export class DemoHouseholdSeeder extends Seeder {
         this.createIncome(em, householdId, {
             name: 'Studio profit draw',
             kind: IncomeKind.OTHER,
-            amount: 5200,
+            amount: 5_200,
             expectedDay: 1,
         });
         this.createIncome(em, householdId, {
@@ -790,12 +790,12 @@ export class DemoHouseholdSeeder extends Seeder {
         this.createIncome(em, householdId, {
             name: 'Rental unit',
             kind: IncomeKind.RENTAL,
-            amount: 1400,
+            amount: 1_400,
             expectedDay: 1,
         });
 
         for (const row of [
-            { name: 'Mortgage', amount: 1850, dueDay: 1, jar: jars.necessities },
+            { name: 'Mortgage', amount: 1_850, dueDay: 1, jar: jars.necessities },
             { name: 'Property tax escrow', amount: 220, dueDay: 1, jar: jars.necessities },
             { name: 'Health + life insurance', amount: 280, dueDay: 5, jar: jars.necessities },
             { name: 'Groceries', amount: 550, dueDay: 1, jar: jars.necessities },
@@ -821,10 +821,10 @@ export class DemoHouseholdSeeder extends Seeder {
             household: householdId,
             name: 'Home mortgage',
             kind: DebtKind.MORTGAGE,
-            balance: toMinorUnits(248000),
-            originalBalance: toMinorUnits(320000),
+            balance: toMinorUnits(248_000),
+            originalBalance: toMinorUnits(320_000),
             interestRate: '3.40',
-            minimumPayment: toMinorUnits(1850),
+            minimumPayment: toMinorUnits(1_850),
             extraPayment: toMinorUnits(500),
             dueDay: 1,
         } as never);
@@ -832,8 +832,8 @@ export class DemoHouseholdSeeder extends Seeder {
             household: householdId,
             name: 'Business credit line',
             kind: DebtKind.LOAN,
-            balance: toMinorUnits(4200),
-            originalBalance: toMinorUnits(15000),
+            balance: toMinorUnits(4_200),
+            originalBalance: toMinorUnits(15_000),
             interestRate: '5.20',
             minimumPayment: toMinorUnits(250),
             extraPayment: toMinorUnits(750),
@@ -846,9 +846,9 @@ export class DemoHouseholdSeeder extends Seeder {
             kind: GoalKind.SAVE,
             status: GoalStatus.ACTIVE,
             name: 'Financial Freedom buffer',
-            target: toMinorUnits(50000),
-            saved: toMinorUnits(18500),
-            monthlyContribution: toMinorUnits(1200),
+            target: toMinorUnits(50_000),
+            saved: toMinorUnits(18_500),
+            monthlyContribution: toMinorUnits(1_200),
             targetOn: monthsAhead(28),
             why: demo.why,
             icon: '🏦',
@@ -859,8 +859,8 @@ export class DemoHouseholdSeeder extends Seeder {
             kind: GoalKind.SAVE,
             status: GoalStatus.ACTIVE,
             name: 'Second property deposit',
-            target: toMinorUnits(25000),
-            saved: toMinorUnits(9800),
+            target: toMinorUnits(25_000),
+            saved: toMinorUnits(9_800),
             monthlyContribution: toMinorUnits(600),
             targetOn: monthsAhead(18),
             why: 'Cash-flowing rental next door to current unit.',
@@ -872,8 +872,8 @@ export class DemoHouseholdSeeder extends Seeder {
             kind: GoalKind.SAVE,
             status: GoalStatus.ACTIVE,
             name: 'Executive leadership program',
-            target: toMinorUnits(3500),
-            saved: toMinorUnits(2100),
+            target: toMinorUnits(3_500),
+            saved: toMinorUnits(2_100),
             monthlyContribution: toMinorUnits(200),
             targetOn: monthsAhead(6),
             icon: '🎓',
@@ -885,7 +885,7 @@ export class DemoHouseholdSeeder extends Seeder {
             kind: GoalKind.GIVE,
             status: GoalStatus.ACTIVE,
             name: 'Annual give pledge',
-            target: toMinorUnits(3000),
+            target: toMinorUnits(3_000),
             saved: toMinorUnits(0),
             monthlyContribution: toMinorUnits(250),
             targetOn: `${new Date().getUTCFullYear()}-12-31`,
@@ -898,7 +898,7 @@ export class DemoHouseholdSeeder extends Seeder {
             kind: GoalKind.EARN,
             status: GoalStatus.ACTIVE,
             name: '€10k passive / month',
-            target: toMinorUnits(10000),
+            target: toMinorUnits(10_000),
             saved: toMinorUnits(0),
             monthlyContribution: toMinorUnits(0),
             why: 'Dividends + rent covering lifestyle floor.',
@@ -908,17 +908,17 @@ export class DemoHouseholdSeeder extends Seeder {
         const checking = this.createBank(em, householdId, {
             name: 'Operating checking',
             kind: AccountKind.CHECKING,
-            balance: 12400,
+            balance: 12_400,
         });
         this.createBank(em, householdId, {
             name: 'High-yield savings',
             kind: AccountKind.SAVINGS,
-            balance: 36500,
+            balance: 36_500,
         });
         const brokerage = this.createBank(em, householdId, {
             name: 'Brokerage',
             kind: AccountKind.INVESTMENT,
-            balance: 124800,
+            balance: 124_800,
         });
 
         em.create(Rule, {
@@ -972,7 +972,7 @@ export class DemoHouseholdSeeder extends Seeder {
             },
             {
                 daysAgo: 1,
-                amount: -1200,
+                amount: -1_200,
                 description: 'Brokerage transfer → VT',
                 counterparty: 'Vanguard',
                 jar: jars.ff,
@@ -981,7 +981,7 @@ export class DemoHouseholdSeeder extends Seeder {
             },
             {
                 daysAgo: 2,
-                amount: 1400,
+                amount: 1_400,
                 description: 'Rental income',
                 counterparty: 'Tenant',
                 jar: jars.ff,
@@ -990,7 +990,7 @@ export class DemoHouseholdSeeder extends Seeder {
             },
             {
                 daysAgo: 3,
-                amount: -1850,
+                amount: -1_850,
                 description: 'Mortgage + extra principal',
                 counterparty: 'Bank NL',
                 jar: jars.necessities,
@@ -999,7 +999,7 @@ export class DemoHouseholdSeeder extends Seeder {
             },
             {
                 daysAgo: 4,
-                amount: 5200,
+                amount: 5_200,
                 description: 'Studio profit draw',
                 counterparty: 'Studio BV',
                 jar: jars.necessities,
@@ -1087,7 +1087,7 @@ export class DemoHouseholdSeeder extends Seeder {
             },
             {
                 daysAgo: 15,
-                amount: -1000,
+                amount: -1_000,
                 description: 'Business credit line extra',
                 counterparty: 'BizBank',
                 jar: jars.ff,
@@ -1157,7 +1157,7 @@ export class DemoHouseholdSeeder extends Seeder {
             household: householdId,
             label: 'Add second rental unit',
             note: 'Underwriting done; deposit goal at 39%.',
-            potentialMonthly: toMinorUnits(1400),
+            potentialMonthly: toMinorUnits(1_400),
             isDone: false,
         } as never);
         em.create(IncomeLever, {
@@ -1178,19 +1178,19 @@ export class DemoHouseholdSeeder extends Seeder {
         em.create(IncomeMilestone, {
             household: householdId,
             label: '€5k months',
-            targetMonthly: toMinorUnits(5000),
+            targetMonthly: toMinorUnits(5_000),
             reachedOn: monthsAgo(14),
         } as never);
         em.create(IncomeMilestone, {
             household: householdId,
             label: '€7.5k months',
-            targetMonthly: toMinorUnits(7500),
+            targetMonthly: toMinorUnits(7_500),
             reachedOn: monthsAgo(4),
         } as never);
         em.create(IncomeMilestone, {
             household: householdId,
             label: '€10k months',
-            targetMonthly: toMinorUnits(10000),
+            targetMonthly: toMinorUnits(10_000),
             reachedOn: null,
         } as never);
     }

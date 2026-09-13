@@ -6,7 +6,7 @@ import { useLiveQuery } from '@rumtelo/hooks';
 
 import type { Transaction } from '@rumtelo/contracts';
 
-import { centsToEurosInput } from '@/app/_lib/money-input';
+import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { ExpenseForm } from '@/components/features/forms/expense-form';
 import { TRANSACTION_IN_PRESETS } from '@/components/features/forms/transaction-in-presets';
@@ -74,7 +74,7 @@ export function ExpenseUpdatePage({ id, embedded = false }: { id: string; embedd
                 note: tx.note ?? '',
                 categoryId: tx.categoryId,
                 inflowKey: tx.inflowKey,
-                amount: centsToEurosInput(Math.abs(tx.amount)),
+                amount: minorUnitsToAmountInput(Math.abs(tx.amount)),
                 jarId: tx.jarId ?? '',
                 label:
                     tx.amount >= 0

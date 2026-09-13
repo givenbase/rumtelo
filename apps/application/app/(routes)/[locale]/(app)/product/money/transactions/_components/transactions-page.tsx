@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card, EmptyState } from '@rumtelo/ui';
-import { cn, formatMoney } from '@rumtelo/utils';
+import { cn } from '@rumtelo/utils';
 
 import {
     JarKey,
@@ -30,6 +30,7 @@ import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 import { ConfirmActionButton } from '@/components/features/forms/confirm-action-button';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 type Tab = 'INBOX' | 'OUT' | 'IN' | 'RULES';
 
@@ -63,6 +64,7 @@ export function TransactionsPageClient() {
     const { householdId } = useAuth();
     const { showToast } = useAppShell();
     const router = useRouter();
+    const { formatMoney } = useHouseholdCurrency();
     const [tab, setTab] = useState<Tab>('INBOX');
     const live = isLiveData(householdId);
 

@@ -1,10 +1,10 @@
 'use client';
 
 /**
- * Parse a user-entered euro amount ("12,50" / "12.50") into integer cents.
- * Returns null when the string is empty or not a finite number.
+ * Parse a user-entered amount in major units ("12,50" / "12.50") into integer
+ * minor units. Returns null when the string is empty or not a finite number.
  */
-export function parseEurosToCents(raw: string): number | null {
+export function parseAmountToMinorUnits(raw: string): number | null {
     const trimmed = raw.trim().replace(/\s/g, '').replace(',', '.');
     if (!trimmed) return null;
     const parsed = Number(trimmed);
@@ -12,11 +12,11 @@ export function parseEurosToCents(raw: string): number | null {
     return Math.round(parsed * 100);
 }
 
-/** Format cents for form inputs (Dutch decimal comma when needed). */
-export function centsToEurosInput(cents: number): string {
-    const euros = cents / 100;
-    if (Number.isInteger(euros)) return String(euros);
-    return euros.toFixed(2).replace('.', ',');
+/** Format minor units for form inputs (decimal comma when needed). */
+export function minorUnitsToAmountInput(minorUnits: number): string {
+    const major = minorUnits / 100;
+    if (Number.isInteger(major)) return String(major);
+    return major.toFixed(2).replace('.', ',');
 }
 
 /** Today's date as YYYY-MM-DD for IsoDate fields. */

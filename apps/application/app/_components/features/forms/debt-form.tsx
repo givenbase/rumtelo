@@ -21,8 +21,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { DebtKind } from '@rumtelo/contracts';
 import { z } from 'zod';
 
-import { parseEurosToCents } from '@/app/_lib/money-input';
+import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -31,12 +32,12 @@ import { ConfirmActionButton } from './confirm-action-button';
 import { FormInput } from './form-input';
 import { PresetNameField } from './preset-name-field';
 
-const euros = z
+const moneyInput = z
     .string()
     .min(1, 'Amount is required')
     .refine(
         value => {
-            const cents = parseEurosToCents(value);
+            const cents = parseAmountToMinorUnits(value);
             return cents !== null && cents >= 0;
         },
         { message: 'Enter a valid amount' }
@@ -44,7 +45,7 @@ const euros = z
 
 const debtFormSchema = z.object({
     name: z.string().min(1, 'Who you owe is required').max(120),
-    balance: euros,
+    balance: moneyInput,
     interestRate: z
         .string()
         .min(1, 'Interest rate is required')
@@ -78,6 +79,7 @@ export function DebtForm({
 }: DebtFormProps) {
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
+    const { symbol } = useHouseholdCurrency();
     const { showToast } = useAppShell();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
@@ -126,10 +128,10 @@ export function DebtForm({
     const saveMutation = useMutation({
         mutationFn: async (values: DebtFormValues) => {
             if (!householdId) throw new Error('No household');
-            const balance = parseEurosToCents(values.balance);
+            const balance = parseAmountToMinorUnits(values.balance);
             if (balance === null || balance < 0) throw new Error('Invalid balance');
             const minimumRaw = values.minimumPayment?.trim()
-                ? parseEurosToCents(values.minimumPayment)
+                ? parseAmountToMinorUnits(values.minimumPayment)
                 : 0;
             const minimumPayment = minimumRaw === null ? 0 : minimumRaw;
             const interestRate = Number(values.interestRate.replace(',', '.'));
@@ -393,7 +395,7 @@ export function DebtForm({
                 name="balance"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Balance (€)</FormLabel>
+                        <FormLabel>Balance ({symbol})</FormLabel>
                         <FormControl>
                             <FormInput inputMode="decimal" placeholder="0,00" {...field} />
                         </FormControl>
@@ -421,7 +423,7 @@ export function DebtForm({
                 name="minimumPayment"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Minimum payment (€)</FormLabel>
+                        <FormLabel>Minimum payment ({symbol})</FormLabel>
                         <FormControl>
                             <FormInput inputMode="decimal" placeholder="0,00" {...field} />
                         </FormControl>

@@ -36,8 +36,10 @@ import {
 import {
     clearPlanIntent,
     cn,
-    formatMoney,
+    DEFAULT_CURRENCY,
+    formatMoney as formatMoneyExplicit,
     formatPercent,
+    formatPlanPrice,
     sumMonthly,
     toPeriodKey,
 } from '@rumtelo/utils';
@@ -72,6 +74,7 @@ import {
     SettingsRowLabel,
 } from './settings-chrome';
 import { PlanChangeDialog } from './plan-change-dialog';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 const JAR_COLOR: Record<string, string> = Object.fromEntries(JAR_META.map(j => [j.key, j.color]));
 
@@ -88,7 +91,7 @@ const AUTO_RULES = [
     {
         key: 'split',
         name: 'Auto-split on income',
-        desc: 'Every euro that arrives goes straight into the jars, 55/10/10/10/10/5.',
+        desc: 'Everything that arrives goes straight into the jars, 55/10/10/10/10/5.',
         defaultOn: true,
     },
     {
@@ -160,7 +163,8 @@ export function AccountSettings() {
     const seatOpen = canAddHouseholdMember(activePlan, memberCount);
     const inviteCopy = lockCopyFor(CAPABILITIES.platformInvite, PlanKey.PLUS);
 
-    const currency = settingsQuery.data?.currency ?? householdQuery.data?.currency ?? 'EUR';
+    const currency =
+        settingsQuery.data?.currency ?? householdQuery.data?.currency ?? DEFAULT_CURRENCY;
     const [currencyDraft, setCurrencyDraft] = useState<string | null>(null);
     const activeCurrency = currencyDraft ?? currency;
 
@@ -504,7 +508,7 @@ export function AccountSettings() {
                                         {opt.code}
                                     </span>
                                     <span className="font-mono text-[10.5px] text-fg-muted">
-                                        {formatMoney(430_000, {
+                                        {formatMoneyExplicit(430_000, {
                                             currency: opt.code === 'CHF' ? 'CHF' : opt.code,
                                             locale: opt.sampleLocale,
                                         })}
@@ -838,6 +842,7 @@ export function JarsSettings() {
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { showToast } = useAppShell();
+    const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
 
     const accountSettingsQuery = useLiveQuery(apiQuery.account.settings.queryOptions(), null, live);
@@ -1178,6 +1183,7 @@ export function BankSettings() {
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { showToast } = useAppShell();
+    const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
 
     const accountsQuery = useLiveQuery(
@@ -1756,7 +1762,7 @@ export function PlanSettings() {
             key: PlanKey.BASIC,
             priceM: 0,
             priceY: 0,
-            tag: 'From €0',
+            tag: `From ${formatPlanPrice(0)}`,
             line: 'Solo board — the six jars and the practice underneath. No bank needed.',
             feats: `${memberLimitLabel(PlanKey.BASIC)} · Solo only · MONEY jars · Coach`,
         },
@@ -1826,7 +1832,7 @@ export function PlanSettings() {
                         const yearly = billing === 'year';
                         const cur = plan === card.key;
                         const cents = displayCents(card, yearly);
-                        const price = cents === 0 ? '€0' : formatMoney(cents);
+                        const price = formatPlanPrice(cents);
                         return (
                             <div
                                 key={card.key}

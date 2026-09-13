@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 
-import { cn, formatMoney, jarCoverage } from '@rumtelo/utils';
+import { cn, jarCoverage } from '@rumtelo/utils';
 
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 import { JarProgressBar } from './jar-progress-bar';
 
@@ -29,6 +30,7 @@ export type JarSummaryModel = {
  * Compact tappable jar row for the jars list — opens /product/money/jars/{slug}.
  */
 export function JarSummaryRow({ jar }: { jar: JarSummaryModel }) {
+    const { formatMoney } = useHouseholdCurrency();
     const coverage = jarCoverage({
         allocated: jar.allocated,
         spent: jar.spent,

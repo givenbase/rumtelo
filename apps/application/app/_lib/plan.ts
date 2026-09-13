@@ -21,6 +21,7 @@ import {
     type CapabilityKey,
     type PlanLimitKey,
 } from '@rumtelo/contracts';
+import { formatPlanPrice, toMinorUnits } from '@rumtelo/utils';
 
 /**
  * Plan gating — plan → product → feature (`{product}-{feature}`).
@@ -59,11 +60,11 @@ export const PLAN_LABELS: Record<PlanKey, string> = {
     [PlanKey.MAX]: 'Max',
 };
 
-/** List price shown on upgrade CTAs. */
+/** List price shown on upgrade CTAs — Stripe catalog currency (EUR), not board money. */
 export const PLAN_PRICE: Record<PlanKey, string> = {
-    [PlanKey.BASIC]: '€0',
-    [PlanKey.PLUS]: '€9 / month',
-    [PlanKey.MAX]: '€19 / month',
+    [PlanKey.BASIC]: formatPlanPrice(0),
+    [PlanKey.PLUS]: `${formatPlanPrice(toMinorUnits(9))} / month`,
+    [PlanKey.MAX]: `${formatPlanPrice(toMinorUnits(19))} / month`,
 };
 
 /** Fallback when household settings have not loaded yet. */

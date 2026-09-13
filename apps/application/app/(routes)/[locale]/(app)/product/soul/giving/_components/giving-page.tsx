@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { GoalKind, GoalStatus, JarKey, TransactionStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card, Eyebrow, Meter, Section } from '@rumtelo/ui';
-import { formatMoney, monthlyAmount } from '@rumtelo/utils';
+import { monthlyAmount } from '@rumtelo/utils';
 
 import { createFixedHref, createGoalHref, updateHref } from '@/app/_lib/create-routes';
 import { WHY_GIVE } from '@/app/_lib/giving';
@@ -17,6 +17,7 @@ import { productPath } from '@/app/_lib/routes';
 import { CoachTipCard } from '@/components/features/helpers';
 import { GivingFinder } from '@/components/features/money/giving-finder';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 const EMPTY_TRANSACTION_PAGE = { items: [] as never[], nextCursor: null };
 
@@ -31,6 +32,7 @@ function yearStartIso(): string {
 export function GivingPageClient() {
     const { householdId } = useAuth();
     const router = useRouter();
+    const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
 
     const jarsQuery = useLiveQuery(

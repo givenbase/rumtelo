@@ -1,8 +1,9 @@
 'use client';
 
-import { cn, formatMoney, jarCoverage } from '@rumtelo/utils';
+import { cn, jarCoverage } from '@rumtelo/utils';
 
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 import { JarProgressBar } from './jar-progress-bar';
 
@@ -28,6 +29,7 @@ export function JarCoverageStrip({
     showStats = true,
     footnote = 'Available = allocated + added − spent − fixed. Booking the same bill as a transaction and a fixed cost will count twice until payments are linked.',
 }: JarCoverageStripProps) {
+    const { formatMoney } = useHouseholdCurrency();
     const coverage = jarCoverage({ allocated, spent, credited, committedOut });
     const accent = bgClassToCssVar(colorClass);
     const envelope = allocated + credited;
@@ -80,6 +82,7 @@ export function JarCoverageStrip({
 }
 
 function CoverageStat({ label, value }: { label: string; value: number }) {
+    const { formatMoney } = useHouseholdCurrency();
     return (
         <div className="rounded-lg border border-line bg-raised px-3 py-2.5">
             <p className="font-mono text-xs tracking-wide text-fg-faint uppercase">{label}</p>

@@ -3,9 +3,10 @@
 import { useMemo, useState } from 'react';
 
 import { Button } from '@rumtelo/ui';
-import { cn, formatMoney } from '@rumtelo/utils';
+import { cn } from '@rumtelo/utils';
 
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 import { JAR_META } from '@/app/_lib/jar-meta';
 
@@ -58,6 +59,7 @@ export function InboxSortCard({
     onConfirm?: (transactionId: string, jarId: string, createRule?: boolean) => Promise<void>;
     onChange?: (transaction: InboxTransaction, jarId: string) => void;
 }) {
+    const { formatMoney } = useHouseholdCurrency();
     const [pickedJarId, setPickedJarId] = useState<string | null>(null);
     const [picking, setPicking] = useState(false);
     const [done, setDone] = useState(false);

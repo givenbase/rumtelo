@@ -21,8 +21,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Cadence, FlowDirection, JarKey } from '@rumtelo/contracts';
 import { z } from 'zod';
 
-import { parseEurosToCents } from '@/app/_lib/money-input';
+import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { GivingFinder } from '@/components/features/money/giving-finder';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
@@ -34,12 +35,12 @@ import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
 import { FormInput } from './form-input';
 import { PresetNameField } from './preset-name-field';
 
-const euros = z
+const moneyInput = z
     .string()
     .min(1, 'Amount is required')
     .refine(
         value => {
-            const cents = parseEurosToCents(value);
+            const cents = parseAmountToMinorUnits(value);
             return cents !== null && cents > 0;
         },
         { message: 'Enter a valid amount' }
@@ -49,7 +50,7 @@ const fixedCostFormSchema = z.object({
     name: z.string().min(1, 'Name is required').max(120),
     /** Who receives it — the organisation for Give, the landlord for rent. */
     counterparty: z.string().max(160).optional(),
-    amount: euros,
+    amount: moneyInput,
     jarId: z.string().min(1, 'Choose a jar'),
     categoryId: z.string().nullable().optional(),
     dueDay: z.string().optional(),
@@ -77,6 +78,7 @@ export function FixedCostForm({
 }: FixedCostFormProps) {
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
+    const { symbol } = useHouseholdCurrency();
     const { showToast } = useAppShell();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
@@ -169,7 +171,7 @@ export function FixedCostForm({
     const saveMutation = useMutation({
         mutationFn: async (values: FixedCostFormValues) => {
             if (!householdId) throw new Error('No household');
-            const cents = parseEurosToCents(values.amount);
+            const cents = parseAmountToMinorUnits(values.amount);
             if (cents === null || cents <= 0) throw new Error('Invalid amount');
             const due = values.dueDay?.trim() ? Number(values.dueDay) : null;
             const dueDay = due !== null && due >= 1 && due <= 31 ? due : null;
@@ -344,7 +346,7 @@ export function FixedCostForm({
                 name="amount"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Amount per month (€)</FormLabel>
+                        <FormLabel>Amount per month ({symbol})</FormLabel>
                         <FormControl>
                             <FormInput inputMode="decimal" placeholder="0,00" {...field} />
                         </FormControl>

@@ -11,7 +11,7 @@ export const WHY_LINES: Record<string, string> = {
     '/product/money/transactions':
         'You do not track spending to judge yourself — you track it to see where your life leaks.',
     '/product/money/debt':
-        'Debt is rented time. Every euro of interest is an hour of your life someone else directs.',
+        'Debt is rented time. Every coin of interest is an hour of your life someone else directs.',
     '/product/money/fixed-costs':
         'Fixed costs are decisions you made once and pay for monthly. Review them like decisions.',
     '/product/growth/goals':

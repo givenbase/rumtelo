@@ -2,7 +2,6 @@
 
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { formatMoney } from '@rumtelo/utils';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { pickPortalCoach } from '@/app/_lib/portal-coach';
@@ -10,9 +9,11 @@ import { isLiveData } from '@/app/_lib/preview';
 import { soulPortalShell } from '@/app/_lib/portal-hubs';
 import { PortalHub, type PortalHubProps } from '@/components/features/home/portal-hub';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 export function SoulPortalHubClient() {
     const { householdId } = useAuth();
+    const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
 
     const query = useLiveQuery(

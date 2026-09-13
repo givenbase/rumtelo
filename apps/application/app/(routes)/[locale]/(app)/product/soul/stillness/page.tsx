@@ -8,7 +8,7 @@ import { cn } from '@rumtelo/utils';
 const MIND_TIE =
     'A restless mind does not steer money — it spends it and calls that a decision. Stillness ' +
     'is not meditative, it is strategic: the only practice here that costs nothing and protects ' +
-    'everything else. Every euro you do not spend impulsively is a euro that chooses a jar.';
+    'everything else. Every coin you do not spend impulsively is a coin that chooses a jar.';
 
 const PRACTICES = [
     {

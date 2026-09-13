@@ -9,13 +9,14 @@ import { useSearchParams } from 'next/navigation';
 
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Eyebrow } from '@rumtelo/ui';
-import { formatMoney, formatPeriod, toPeriodKey, describePeriodTravel } from '@rumtelo/utils';
+import { formatPeriod, toPeriodKey, describePeriodTravel } from '@rumtelo/utils';
 
 import type { CoachMessage, CoachRecapItem } from '@/components/features/home/coach-verdict';
 
 import { JAR_META } from '@/app/_lib/jar-meta';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { isLiveData } from '@/app/_lib/preview';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { CoachVerdict } from '@/components/features/home/coach-verdict';
 import { HeroKluis } from '@/components/features/home/hero-kluis';
 import { PortalWidget } from '@/components/features/home/portal-widget';
@@ -60,6 +61,7 @@ export function HomeDashboardClient() {
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { period, showToast, openOnboarding } = useAppShell();
+    const { formatMoney } = useHouseholdCurrency();
     const searchParams = useSearchParams();
 
     useEffect(() => {

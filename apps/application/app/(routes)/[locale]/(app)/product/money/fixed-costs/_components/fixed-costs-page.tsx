@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Card } from '@rumtelo/ui';
-import { cn, formatMoney, monthlyAmount, fixedOutNetSummary } from '@rumtelo/utils';
+import { cn, monthlyAmount, fixedOutNetSummary } from '@rumtelo/utils';
 
 import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
 import { bgClassToCssVar, cadenceLabel } from '@/app/_lib/jar-chrome';
@@ -18,6 +18,7 @@ import { NecessitiesPressureCard } from '@/components/features/money/necessities
 import { CoachTipCard } from '@/components/features/helpers';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar } from '@/components/layout/list-toolbar';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 type Tab = 'ERUIT' | 'ERIN';
 
@@ -30,6 +31,7 @@ type Tab = 'ERUIT' | 'ERIN';
 export function FixedCostsPageClient() {
     const { householdId } = useAuth();
     const router = useRouter();
+    const { formatMoney } = useHouseholdCurrency();
     const [tab, setTab] = useState<Tab>('ERUIT');
     const [jarFilter, setJarFilter] = useState<string | null>(null);
     const live = isLiveData(householdId);

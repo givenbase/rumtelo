@@ -1,6 +1,10 @@
+'use client';
+
 import Link from 'next/link';
 
-import { cn, categoryVariance, formatMoney } from '@rumtelo/utils';
+import { cn, categoryVariance } from '@rumtelo/utils';
+
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 import { JarProgressBar } from './jar-progress-bar';
 
@@ -39,6 +43,7 @@ function JarDrilldownBody({
     spent: number;
     committedOut: number;
 }) {
+    const { formatMoney } = useHouseholdCurrency();
     return (
         <>
             <span className="flex min-w-0 flex-1 items-center gap-2.5">
@@ -162,6 +167,7 @@ export function JarDrilldownTrigger({
 }
 
 export function JarCategoryTable({ categories }: { categories: JarCategory[] }) {
+    const { formatMoney } = useHouseholdCurrency();
     if (categories.length === 0) {
         return (
             <p className="border-t border-line py-1.5 text-sm text-fg-faint">No categories yet.</p>

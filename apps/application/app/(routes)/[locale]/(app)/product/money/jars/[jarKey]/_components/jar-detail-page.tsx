@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import type { JarKey } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card } from '@rumtelo/ui';
-import { cn, formatMoney, monthlyAmount, toPeriodKey } from '@rumtelo/utils';
+import { cn, monthlyAmount, toPeriodKey } from '@rumtelo/utils';
 
 import { createMoveHref, createTxHref, updateHref } from '@/app/_lib/create-routes';
 import { cadenceLabel } from '@/app/_lib/jar-chrome';
@@ -20,6 +20,7 @@ import { JarCoverageStrip } from '@/components/features/money/jar-coverage-strip
 import { JarCategoryTable } from '@/components/features/money/jar-drilldown-parts';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 /**
  * Per-jar detail — coverage (allocated / committed / spent / available),
@@ -29,6 +30,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
     const { householdId } = useAuth();
     const { period } = useAppShell();
     const router = useRouter();
+    const { formatMoney } = useHouseholdCurrency();
     const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);
     const meta = JAR_META.find(entry => entry.key === jarKey);

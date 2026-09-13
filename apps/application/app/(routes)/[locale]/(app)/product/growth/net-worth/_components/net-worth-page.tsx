@@ -5,12 +5,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { AccentCard, Button, Card, EmptyState, Eyebrow, Section } from '@rumtelo/ui';
-import { cn, formatMoney } from '@rumtelo/utils';
+import { cn } from '@rumtelo/utils';
 
 import { CREATE_HREF } from '@/app/_lib/create-routes';
 import { HOLDING_KINDS, type HoldingKind } from '@/app/_lib/holding-kinds';
 import { JAR_META } from '@/app/_lib/jar-meta';
 import { ListToolbar } from '@/components/layout/list-toolbar';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 type Holding = {
     id: string;
@@ -33,6 +34,7 @@ type FilterKey = 'all' | HoldingKind;
  */
 export function NetWorthPageClient() {
     const router = useRouter();
+    const { formatMoney } = useHouseholdCurrency();
     const [filter, setFilter] = useState<FilterKey>('all');
 
     const assetWorth = holdings.reduce((total, holding) => total + holding.value, 0);
@@ -132,7 +134,7 @@ export function NetWorthPageClient() {
                 </div>
                 <p className="mt-4 text-sm text-pretty text-fg-muted">
                     Your net worth is <strong className="text-fg">{formatMoney(netWorth)}</strong>.
-                    Every euro you add to Financial Freedom works for you — forever.
+                    Everything you add to Financial Freedom works for you — forever.
                 </p>
             </AccentCard>
 

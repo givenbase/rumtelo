@@ -8,12 +8,13 @@ import { useRouter } from 'next/navigation';
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { AccentCard, EmptyState, Meter } from '@rumtelo/ui';
-import { cn, earnGoalProgress, formatMoney, monthlyNetAsOf } from '@rumtelo/utils';
+import { cn, earnGoalProgress, monthlyNetAsOf } from '@rumtelo/utils';
 
 import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
 import { isLiveData } from '@/app/_lib/preview';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar } from '@/components/layout/list-toolbar';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 type Tab = 'ON_TRACK' | 'REACHED';
 
@@ -48,6 +49,7 @@ export function GoalsPageClient() {
     const { householdId } = useAuth();
     const router = useRouter();
     const [tab, setTab] = useState<Tab>('ON_TRACK');
+    const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
 
     const goalsQuery = useLiveQuery(
