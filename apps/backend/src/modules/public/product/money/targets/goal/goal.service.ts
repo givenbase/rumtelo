@@ -1,5 +1,5 @@
 import { EntityManager } from '@mikro-orm/postgresql';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CAPABILITIES, GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { earnGoalProgress } from '@rumtelo/utils';
 
@@ -17,6 +17,7 @@ function todayIso(): string {
 
 @Injectable()
 export class GoalService {
+    private readonly logger = new Logger(GoalService.name);
     private readonly repo: HouseholdScopedRepository<Goal>;
     constructor(
         @Inject(EntityManager) private readonly em: EntityManager,
@@ -84,7 +85,7 @@ export class GoalService {
 
     async list() {
         await this.evaluateEarnGoals();
-        await this.evaluateGiveGoals();
+        await this.safeEvaluateGiveGoals();
         const rows = await this.repo.find({
             status: { $in: [GoalStatus.ACTIVE, GoalStatus.REACHED] },
         });
@@ -97,7 +98,7 @@ export class GoalService {
      */
     async projections() {
         await this.evaluateEarnGoals();
-        await this.evaluateGiveGoals();
+        await this.safeEvaluateGiveGoals();
         const rows = await this.repo.find({ status: GoalStatus.ACTIVE });
         const net = await this.jars.monthlyNetIncome();
 
@@ -178,6 +179,7 @@ export class GoalService {
             status: GoalStatus.ACTIVE,
         });
         if (giveGoals.length === 0) return;
+        await this.em.populate(giveGoals, ['jar']);
 
         const householdId = currentHouseholdId();
         const totals = await Promise.all(
@@ -210,6 +212,22 @@ export class GoalService {
             }
         }
         if (changed) await this.em.flush();
+    }
+
+    /**
+     * Give evaluation must not take down goal list / growth dashboard when the
+     * `GIVE` enum value is missing (migration Migration20260912200000_Giving).
+     */
+    private async safeEvaluateGiveGoals(): Promise<void> {
+        try {
+            await this.evaluateGiveGoals();
+        } catch (error) {
+            this.logger.warn(
+                `Skipping GIVE goal evaluation — apply Migration20260912200000_Giving if money_goal_kind lacks GIVE. ${
+                    error instanceof Error ? error.message : String(error)
+                }`
+            );
+        }
     }
 
     // ====================================================================

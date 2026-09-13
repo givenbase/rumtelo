@@ -72,8 +72,8 @@ export class BillingService {
             stripeEnabled: this.isStripeEnabled(),
             previewBypass: this.isPreviewBypass(),
             planKey: snap.planKey,
-            periodEndsAt: snap.periodEndsAt?.toISOString() ?? null,
-            periodStartedAt: snap.periodStartedAt?.toISOString() ?? null,
+            periodEndsAt: toIsoOrNull(snap.periodEndsAt),
+            periodStartedAt: toIsoOrNull(snap.periodStartedAt),
             isCancelAtPeriodEnd: snap.isCancelAtPeriodEnd,
             scheduledPlanKey: snap.scheduledPlanKey,
             hasStripeCustomer: Boolean(snap.stripeCustomerId),
@@ -118,7 +118,7 @@ export class BillingService {
                             priceId: price.id,
                             amountCents: price.unit_amount ?? 0,
                             currency: price.currency,
-                            label: price.nickname ?? productName,
+                            label: price.nickname ?? productName ?? null,
                         },
                     };
                 } catch (err) {
@@ -710,4 +710,15 @@ export class BillingService {
         this.priceIdCache.set(lookupKey, priceId);
         return priceId;
     }
+}
+
+/** Wire-safe ISO datetime — accepts Date or already-string values from the ORM. */
+function toIsoOrNull(value: Date | string | null | undefined): string | null {
+    if (value == null) return null;
+    if (value instanceof Date) return value.toISOString();
+    if (typeof value === 'string' && value.trim()) {
+        const parsed = new Date(value);
+        return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+    }
+    return null;
 }

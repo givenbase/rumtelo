@@ -23,8 +23,14 @@ export const BillingPriceDisplay = z.object({
     amountCents: z.number().int().nonnegative(),
     currency: z.string(),
     /** Price nickname, else Product name, else null. */
-    label: z.string().nullable(),
+    label: z.string().nullish(),
 });
+
+/** Coerce Date / ISO strings from the ORM into ISO-8601 for the wire. */
+const IsoDateTime = z.preprocess((value: unknown) => {
+    if (value instanceof Date) return value.toISOString();
+    return value;
+}, z.iso.datetime());
 
 /** Household commercial snapshot for plan UI (period-end cancel / downgrade). */
 export const HouseholdBillingStatus = z.object({
@@ -32,8 +38,8 @@ export const HouseholdBillingStatus = z.object({
     previewBypass: z.boolean(),
     planKey: z.enum(PlanKey),
     /** ISO when current paid period ends; null on Basic / unknown. */
-    periodEndsAt: z.iso.datetime().nullable(),
-    periodStartedAt: z.iso.datetime().nullable(),
+    periodEndsAt: IsoDateTime.nullable(),
+    periodStartedAt: IsoDateTime.nullable(),
     /** True when subscription cancels to Basic at {@link periodEndsAt}. */
     isCancelAtPeriodEnd: z.boolean(),
     /**
@@ -45,6 +51,10 @@ export const HouseholdBillingStatus = z.object({
     hasStripeCustomer: z.boolean(),
     /** Active Stripe subscription id is stored (paid tier). */
     hasActiveSubscription: z.boolean(),
+    /**
+     * Live Stripe catalog for Plus/Max (month + year). Null when Stripe is unset.
+     * Always include this key (use `null`, never omit).
+     */
     prices: z
         .object({
             PLUS: z.object({
