@@ -72,20 +72,20 @@ const STRATEGY_OPTIONS = [
     {
         key: PayoffStrategy.AVALANCHE,
         name: 'Avalanche',
-        promise: 'Save the most money',
-        rule: 'Send every extra euro to the highest interest rate.',
+        promise: 'Pay the least interest',
+        rule: 'Extra goes to the highest interest first.',
     },
     {
         key: PayoffStrategy.SNOWBALL,
         name: 'Snowball',
-        promise: 'Clear a debt sooner',
-        rule: 'Send every extra euro to the smallest balance.',
+        promise: 'Clear a small debt first',
+        rule: 'Extra goes to the smallest balance first.',
     },
     {
         key: PayoffStrategy.MINIMAL,
         name: 'Minimal only',
-        promise: 'Pay only what you must',
-        rule: 'No extra — each debt gets its minimum, nothing more.',
+        promise: 'Minimums only',
+        rule: 'No extra — each debt gets its minimum.',
     },
 ] as const;
 
