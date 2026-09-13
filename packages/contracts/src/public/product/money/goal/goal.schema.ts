@@ -16,12 +16,14 @@ export const Goal = z.object({
     /**
      * SAVE: funds from a jar (usually LONG_TERM_SAVINGS / FINANCIAL_FREEDOM).
      * EARN: always null — measures household monthly net.
+     * GIVE: the Give jar — progress is money that left it.
      */
     jarId: Id.nullable(),
     name: z.string().min(1).max(120),
     icon: z.string().max(8).nullable(),
-    /** SAVE: savings target. EARN: monthly net-income target. */
+    /** SAVE: savings target. EARN: monthly net-income target. GIVE: yearly pledge. */
     target: Money,
+    /** SAVE: put aside so far. GIVE: given so far in the pledge year (from the ledger). */
     saved: Money,
     monthlyContribution: Money,
     targetOn: IsoDate.nullable(),

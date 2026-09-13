@@ -36,6 +36,24 @@ export function createTxHref(opts?: { jarId?: string; direction?: TxDirection })
     return qs ? `${CREATE_HREF.tx}?${qs}` : CREATE_HREF.tx;
 }
 
+/** Open the fixed-cost form pre-filled — used by the Give helper on Soul → Giving. */
+export function createFixedHref(opts?: { jarId?: string; counterparty?: string; name?: string }) {
+    const params = new URLSearchParams();
+    if (opts?.jarId) params.set('jarId', opts.jarId);
+    if (opts?.counterparty) params.set('counterparty', opts.counterparty);
+    if (opts?.name) params.set('name', opts.name);
+    const qs = params.toString();
+    return qs ? `${CREATE_HREF.fixed}?${qs}` : CREATE_HREF.fixed;
+}
+
+/** Open the goal form on a specific kind (SAVE | EARN | GIVE). */
+export function createGoalHref(opts?: { kind?: string }) {
+    const params = new URLSearchParams();
+    if (opts?.kind) params.set('kind', opts.kind);
+    const qs = params.toString();
+    return qs ? `${CREATE_HREF.goal}?${qs}` : CREATE_HREF.goal;
+}
+
 /** Open move form; pass fromJarId when already inside a jar. */
 export function createMoveHref(opts?: { fromJarId?: string; returnTo?: string }) {
     const params = new URLSearchParams();

@@ -1,6 +1,8 @@
 'use client';
 
+import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
+import { formatMoney } from '@rumtelo/utils';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { pickPortalCoach } from '@/app/_lib/portal-coach';
@@ -19,6 +21,25 @@ export function SoulPortalHubClient() {
         }),
         null,
         live
+    );
+
+    // Giving lives in Money's ledger; Soul only reads the pledge.
+    const goalsQuery = useLiveQuery(
+        apiQuery.money.goals.list.queryOptions({ input: { householdId: householdId! } }),
+        [] as never,
+        live
+    );
+    const pledge = (
+        (goalsQuery.data ?? []) as ReadonlyArray<{
+            kind?: string;
+            status?: string;
+            target: number;
+            saved: number;
+        }>
+    ).find(
+        goal =>
+            goal.kind === GoalKind.GIVE &&
+            (goal.status === GoalStatus.ACTIVE || goal.status === GoalStatus.REACHED)
     );
 
     const data = query.data;
@@ -54,6 +75,22 @@ export function SoulPortalHubClient() {
                 color: 'var(--color-jar-give)',
                 chart: { kind: 'ring', pct: Math.min(100, thanks * 20) },
                 href: '/product/soul/gratitude',
+            },
+            {
+                name: 'Giving',
+                value: pledge ? formatMoney(pledge.saved) : '—',
+                note: pledge
+                    ? `of ${formatMoney(pledge.target)} pledged this year`
+                    : 'no pledge yet',
+                color: 'var(--color-jar-give)',
+                chart: {
+                    kind: 'ring',
+                    pct:
+                        pledge && pledge.target > 0
+                            ? Math.min(100, Math.round((pledge.saved / pledge.target) * 100))
+                            : 0,
+                },
+                href: '/product/soul/giving',
             },
             {
                 name: 'Intent',

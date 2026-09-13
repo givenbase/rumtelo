@@ -147,6 +147,11 @@ export const NAV_GROUPS = [
                 capabilityKey: CAPABILITIES.soulGratitude,
             },
             {
+                href: productPath('soul/giving'),
+                label: 'Giving',
+                capabilityKey: CAPABILITIES.soulGiving,
+            },
+            {
                 href: productPath('soul/intent'),
                 label: 'Intent',
                 capabilityKey: CAPABILITIES.soulIntent,

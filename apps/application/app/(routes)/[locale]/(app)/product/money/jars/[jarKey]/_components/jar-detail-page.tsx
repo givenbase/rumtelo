@@ -193,6 +193,9 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                                                     {item.name}
                                                 </span>
                                                 <span className="mt-0.5 block font-mono text-xs text-fg-faint">
+                                                    {item.counterparty
+                                                        ? `→ ${item.counterparty} · `
+                                                        : ''}
                                                     {cadenceLabel(item.cadence)}
                                                     {item.dueDay !== null
                                                         ? ` · day ${item.dueDay}`

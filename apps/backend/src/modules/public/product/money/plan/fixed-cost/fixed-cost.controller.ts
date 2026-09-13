@@ -23,6 +23,7 @@ export class FixedCostController {
                 jarId: input.jarId,
                 categoryId: input.categoryId,
                 name: input.name,
+                counterparty: input.counterparty,
                 amount: input.amount,
                 cadence: input.cadence,
                 dueDay: input.dueDay,

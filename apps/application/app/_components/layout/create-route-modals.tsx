@@ -14,7 +14,10 @@ import {
     ExpenseCreatePage,
     ExpenseUpdatePage,
 } from '@/product/money/transactions/_components/expense-pages';
+import type { GoalKind } from '@rumtelo/contracts';
+
 import { formRoute, moveCreateMeta } from '@/app/_lib/form-route-meta';
+import type { FixedCostFormValues } from '@/components/features/forms/fixed-cost-form';
 import { MoveMoneyForm } from '@/components/features/forms/move-money-form';
 import { SheetStubForm } from '@/components/features/forms/sheet-stub-form';
 import { RouteModalShell } from '@/components/layout/route-modal-shell';
@@ -22,6 +25,8 @@ import { RouteModalShell } from '@/components/layout/route-modal-shell';
 type ShellProps = {
     closeHref: string;
 };
+
+type FixedCostPrefill = Partial<FixedCostFormValues>;
 
 export function TxCreateModalShell({
     closeHref,
@@ -45,11 +50,14 @@ export function TxUpdateModalShell({ closeHref, id }: ShellProps & { id: string 
     );
 }
 
-export function FixedCostCreateModalShell({ closeHref }: ShellProps) {
+export function FixedCostCreateModalShell({
+    closeHref,
+    defaultValues,
+}: ShellProps & { defaultValues?: FixedCostPrefill }) {
     const meta = formRoute('fixedCreate');
     return (
         <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
-            <FixedCostCreatePage embedded />
+            <FixedCostCreatePage embedded defaultValues={defaultValues} />
         </RouteModalShell>
     );
 }
@@ -99,11 +107,14 @@ export function IncomeUpdateModalShell({ closeHref, id }: ShellProps & { id: str
     );
 }
 
-export function GoalCreateModalShell({ closeHref }: ShellProps) {
+export function GoalCreateModalShell({
+    closeHref,
+    defaultKind,
+}: ShellProps & { defaultKind?: GoalKind }) {
     const meta = formRoute('goalCreate');
     return (
         <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
-            <GoalCreatePage embedded />
+            <GoalCreatePage embedded defaultKind={defaultKind} />
         </RouteModalShell>
     );
 }

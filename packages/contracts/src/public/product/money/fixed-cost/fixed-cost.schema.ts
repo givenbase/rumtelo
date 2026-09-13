@@ -15,6 +15,11 @@ export const FixedCost = z.object({
     jarId: Id,
     categoryId: Id.nullable(),
     name: z.string().min(1).max(120),
+    /**
+     * Who the money goes to — landlord, insurer, or the organisation you give to.
+     * Optional; surfaced mainly for Give so a household can see *whom* it supports.
+     */
+    counterparty: z.string().max(160).nullable().default(null),
     amount: Money,
     cadence: z.enum(Cadence),
     dueDay: z.int().min(1).max(31).nullable(),

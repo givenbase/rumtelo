@@ -18,6 +18,10 @@ export class FixedCost extends HouseholdEntity {
     @Property({ length: 120 })
     name!: string;
 
+    /** Who receives it (landlord, insurer, organisation). Mirrors Transaction.counterparty. */
+    @Property({ length: 160, nullable: true })
+    counterparty: string | null = null;
+
     @Property({ type: 'bigint' })
     amount!: number;
 

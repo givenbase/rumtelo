@@ -18,12 +18,13 @@ import {
 } from '@rumtelo/ui';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Cadence, FlowDirection } from '@rumtelo/contracts';
+import { Cadence, FlowDirection, JarKey } from '@rumtelo/contracts';
 import { z } from 'zod';
 
 import { parseEurosToCents } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
+import { GivingFinder } from '@/components/features/money/giving-finder';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
@@ -46,11 +47,16 @@ const euros = z
 
 const fixedCostFormSchema = z.object({
     name: z.string().min(1, 'Name is required').max(120),
+    /** Who receives it — the organisation for Give, the landlord for rent. */
+    counterparty: z.string().max(160).optional(),
     amount: euros,
     jarId: z.string().min(1, 'Choose a jar'),
     categoryId: z.string().nullable().optional(),
     dueDay: z.string().optional(),
 });
+
+/** Category template the Give helper falls back to when none was picked. */
+const DONATIONS_CATEGORY_KEY = 'DONATIONS';
 
 export type FixedCostFormValues = z.infer<typeof fixedCostFormSchema>;
 
@@ -129,6 +135,7 @@ export function FixedCostForm({
     const form = useForm<FixedCostFormValues>({
         defaultValues: {
             name: defaultValues?.name ?? '',
+            counterparty: defaultValues?.counterparty ?? '',
             amount: defaultValues?.amount ?? '',
             jarId: defaultValues?.jarId ?? '',
             categoryId: defaultValues?.categoryId ?? null,
@@ -138,6 +145,11 @@ export function FixedCostForm({
     });
 
     const selectedJarId = useWatch({ control: form.control, name: 'jarId' });
+    const counterparty = useWatch({ control: form.control, name: 'counterparty' });
+    const isGive = useMemo(
+        () => jars.find(jar => jar.id === selectedJarId)?.key === JarKey.GIVE,
+        [jars, selectedJarId]
+    );
 
     const jarCategories = useMemo(() => {
         const jar = (balancesQuery.data ?? []).find(row => row.id === selectedJarId);
@@ -162,6 +174,7 @@ export function FixedCostForm({
             const due = values.dueDay?.trim() ? Number(values.dueDay) : null;
             const dueDay = due !== null && due >= 1 && due <= 31 ? due : null;
             const name = values.name.trim();
+            const counterpartyValue = values.counterparty?.trim() || null;
 
             let categoryId = values.categoryId ?? null;
             const templateKey =
@@ -190,6 +203,7 @@ export function FixedCostForm({
                     id: entityId,
                     householdId,
                     name,
+                    counterparty: counterpartyValue,
                     amount: cents,
                     jarId: values.jarId,
                     categoryId,
@@ -201,6 +215,7 @@ export function FixedCostForm({
                 jarId: values.jarId,
                 categoryId,
                 name,
+                counterparty: counterpartyValue,
                 amount: cents,
                 cadence: Cadence.MONTHLY,
                 dueDay,
@@ -368,6 +383,41 @@ export function FixedCostForm({
                     </FormItem>
                 )}
             />
+
+            <FormField
+                control={form.control}
+                name="counterparty"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>
+                            {isGive ? 'To whom (organisation)' : 'Paid to (optional)'}
+                        </FormLabel>
+                        <FormControl>
+                            <FormInput
+                                placeholder={
+                                    isGive
+                                        ? 'The organisation you give to'
+                                        : 'e.g. landlord, insurer'
+                                }
+                                {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+
+            {isGive ? (
+                <GivingFinder
+                    selectedName={counterparty}
+                    onPick={organisation => {
+                        form.setValue('counterparty', organisation.name, { shouldDirty: true });
+                        if (!form.getValues('categoryId') && !pendingCategoryTemplateKey) {
+                            setPendingCategoryTemplateKey(DONATIONS_CATEGORY_KEY);
+                        }
+                    }}
+                />
+            ) : null}
 
             <FormField
                 control={form.control}

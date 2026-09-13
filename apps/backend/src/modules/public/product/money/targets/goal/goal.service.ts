@@ -60,7 +60,8 @@ export class GoalService {
             target: input.target,
             saved: 0,
             monthlyContribution: kind === GoalKind.EARN ? 0 : (input.monthlyContribution ?? 0),
-            targetOn: input.targetOn ?? null,
+            // A pledge without a date is a pledge for this calendar year.
+            targetOn: input.targetOn ?? (kind === GoalKind.GIVE ? endOfYearIso() : null),
             fulfilledOn: null,
             status: (input.status as GoalStatus) ?? GoalStatus.ACTIVE,
             why: input.why ?? null,
@@ -68,6 +69,10 @@ export class GoalService {
         await this.em.persist(entity).flush();
         if (kind === GoalKind.EARN) {
             await this.evaluateEarnGoals();
+            await this.em.refresh(entity);
+        }
+        if (kind === GoalKind.GIVE) {
+            await this.evaluateGiveGoals();
             await this.em.refresh(entity);
         }
         return toDto(entity);
@@ -79,15 +84,20 @@ export class GoalService {
 
     async list() {
         await this.evaluateEarnGoals();
+        await this.evaluateGiveGoals();
         const rows = await this.repo.find({
             status: { $in: [GoalStatus.ACTIVE, GoalStatus.REACHED] },
         });
         return rows.map(toDto);
     }
 
-    /** Straight-line projection at the current contribution rate (SAVE); EARN uses net progress. */
+    /**
+     * Straight-line projection at the current contribution rate (SAVE, GIVE);
+     * EARN uses net progress. GIVE `saved` is refreshed from the ledger first.
+     */
     async projections() {
         await this.evaluateEarnGoals();
+        await this.evaluateGiveGoals();
         const rows = await this.repo.find({ status: GoalStatus.ACTIVE });
         const net = await this.jars.monthlyNetIncome();
 
@@ -157,6 +167,51 @@ export class GoalService {
         if (changed) await this.em.flush();
     }
 
+    /**
+     * A GIVE goal is a pledge: `saved` = sorted money that left its jar inside the
+     * pledge window (the year ending on `targetOn`). Reached when it meets the target.
+     * Idempotent — safe to call from goal reads.
+     */
+    async evaluateGiveGoals(): Promise<void> {
+        const giveGoals = await this.repo.find({
+            kind: GoalKind.GIVE,
+            status: GoalStatus.ACTIVE,
+        });
+        if (giveGoals.length === 0) return;
+
+        const householdId = currentHouseholdId();
+        const totals = await Promise.all(
+            giveGoals.map(async goal => {
+                if (!goal.jar) return null;
+                const { start, end } = pledgeWindow(goal.targetOn);
+                const rows = await this.em.getConnection().execute<{ total: string }[]>(
+                    `SELECT COALESCE(SUM(-amount), 0)::text AS total
+                       FROM money_transaction
+                      WHERE household_id = ? AND status = 'SORTED' AND amount < 0
+                        AND jar_id = ? AND booked_on >= ? AND booked_on <= ?`,
+                    [householdId, goal.jar.id, start, end]
+                );
+                return Number(rows[0]?.total ?? 0);
+            })
+        );
+
+        let changed = false;
+        for (const [index, goal] of giveGoals.entries()) {
+            const given = totals[index];
+            if (given === null || given === undefined) continue;
+            if (given !== Number(goal.saved)) {
+                goal.saved = given;
+                changed = true;
+            }
+            if (given >= Number(goal.target)) {
+                goal.status = GoalStatus.REACHED;
+                goal.fulfilledOn = todayIso();
+                changed = true;
+            }
+        }
+        if (changed) await this.em.flush();
+    }
+
     // ====================================================================
     // ? UPDATE Operations
     // ====================================================================
@@ -208,6 +263,10 @@ export class GoalService {
             await this.evaluateEarnGoals();
             await this.em.refresh(entity);
         }
+        if (entity.kind === GoalKind.GIVE && entity.status === GoalStatus.ACTIVE) {
+            await this.evaluateGiveGoals();
+            await this.em.refresh(entity);
+        }
         return toDto(entity);
     }
 
@@ -225,6 +284,26 @@ export class GoalService {
 function addMonths(from: Date, months: number): string {
     const date = new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth() + months, 1));
     return date.toISOString().slice(0, 10);
+}
+
+function endOfYearIso(): string {
+    return `${new Date().getUTCFullYear()}-12-31`;
+}
+
+/**
+ * The year that ends on `targetOn` (inclusive); calendar year when unset.
+ * Pledges are yearly by doctrine — a monthly pledge is a fixed cost, not a goal.
+ */
+function pledgeWindow(targetOn: string | null): { start: string; end: string } {
+    if (!targetOn) {
+        const year = new Date().getUTCFullYear();
+        return { start: `${year}-01-01`, end: `${year}-12-31` };
+    }
+    const end = new Date(targetOn);
+    const start = new Date(
+        Date.UTC(end.getUTCFullYear() - 1, end.getUTCMonth(), end.getUTCDate() + 1)
+    );
+    return { start: start.toISOString().slice(0, 10), end: targetOn };
 }
 
 function monthsUntil(isoDate: string): number {

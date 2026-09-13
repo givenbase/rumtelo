@@ -55,6 +55,7 @@ export function FixedCostsPageClient() {
                       .map(item => ({
                           id: item.id,
                           name: item.name,
+                          counterparty: item.counterparty,
                           amount: item.amount,
                           monthly: monthlyAmount(Math.abs(item.amount), item.cadence),
                           cadence: item.cadence,
@@ -215,6 +216,9 @@ export function FixedCostsPageClient() {
                                                     )}
                                                 </div>
                                                 <div className="mt-0.5 font-mono text-xs tracking-normal text-fg-faint">
+                                                    {fixedCost.counterparty
+                                                        ? `→ ${fixedCost.counterparty} · `
+                                                        : ''}
                                                     {cadenceLabel(fixedCost.cadence)}
                                                     {fixedCost.dueDay !== null
                                                         ? ` · day ${fixedCost.dueDay}`

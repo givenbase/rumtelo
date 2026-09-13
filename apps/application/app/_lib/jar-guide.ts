@@ -126,6 +126,10 @@ export const JAR_GUIDE: Record<JarGuideKey, JarGuide> = {
             { label: 'Helping someone who needs it', icon: '🤝' },
         ],
         notAllowed: 'No favours expected, no tax-deduction thinking. Giving keeps money a tool.',
-        links: [{ href: '/product/money/transactions', label: 'Transactions', icon: '↔' }],
+        links: [
+            { href: '/product/soul/giving', label: 'Why & where', icon: '✦' },
+            { href: '/product/money/fixed-costs', label: 'Fixed costs', icon: '📌' },
+            { href: '/product/money/transactions', label: 'Transactions', icon: '↔' },
+        ],
     },
 };

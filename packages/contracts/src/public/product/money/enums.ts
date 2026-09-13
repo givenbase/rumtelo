@@ -40,10 +40,43 @@ export enum GoalStatus {
     ARCHIVED = 'ARCHIVED',
 }
 
-/** SAVE = fund a jar target; EARN = reach a monthly net-income desire. */
+/**
+ * SAVE = fund a jar target; EARN = reach a monthly net-income desire;
+ * GIVE = a yearly pledge, filled by money that leaves the Give jar.
+ */
 export enum GoalKind {
     SAVE = 'SAVE',
     EARN = 'EARN',
+    GIVE = 'GIVE',
+}
+
+/** Where a household wants its giving to land. Catalog filter for GivingOrganisation. */
+export enum GivingCause {
+    GLOBAL_HEALTH = 'GLOBAL_HEALTH',
+    POVERTY = 'POVERTY',
+    EDUCATION = 'EDUCATION',
+    CLIMATE = 'CLIMATE',
+    ANIMALS = 'ANIMALS',
+    COMMUNITY = 'COMMUNITY',
+    EMERGENCY = 'EMERGENCY',
+    WATER = 'WATER',
+}
+
+/**
+ * Independent evaluators / registers a GivingOrganisation can cite.
+ * Each one measures something different — the app explains what, and tiers
+ * them: evidence of impact › governance & transparency › tax status.
+ */
+export enum GivingEvaluator {
+    GIVEWELL = 'GIVEWELL',
+    GIVING_WHAT_WE_CAN = 'GIVING_WHAT_WE_CAN',
+    FOUNDERS_PLEDGE = 'FOUNDERS_PLEDGE',
+    GIVING_GREEN = 'GIVING_GREEN',
+    ANIMAL_CHARITY_EVALUATORS = 'ANIMAL_CHARITY_EVALUATORS',
+    DONEER_EFFECTIEF = 'DONEER_EFFECTIEF',
+    CHARITY_NAVIGATOR = 'CHARITY_NAVIGATOR',
+    CBF = 'CBF',
+    ANBI = 'ANBI',
 }
 
 export enum AccountKind {

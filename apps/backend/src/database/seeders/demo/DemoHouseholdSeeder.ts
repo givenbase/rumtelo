@@ -53,6 +53,9 @@ import { Gratitude } from '../../../modules/public/product/soul/gratitude/gratit
 
 loadEnvFiles();
 
+/** Where the max persona's Give jar flows — a name from the giving-organisation catalog. */
+const DEMO_GIVE_COUNTERPARTY = 'GiveDirectly';
+
 /** Persona jar splits (must sum to 100) — shaped for the story, not the catalog default. */
 const JAR_SPLIT: Record<DemoPersona, Record<string, number>> = {
     basic: {
@@ -798,12 +801,19 @@ export class DemoHouseholdSeeder extends Seeder {
             { name: 'Groceries', amount: 550, dueDay: 1, jar: jars.necessities },
             { name: 'Brokerage fees', amount: 45, dueDay: 28, jar: jars.ff },
             { name: 'Learning subscriptions', amount: 79, dueDay: 10, jar: jars.education },
-            { name: 'Charitable giving', amount: 250, dueDay: 1, jar: jars.give },
+            {
+                name: 'Charitable giving',
+                amount: 250,
+                dueDay: 1,
+                jar: jars.give,
+                counterparty: DEMO_GIVE_COUNTERPARTY,
+            },
         ] as const) {
             this.createFixed(em, householdId, row.jar, {
                 name: row.name,
                 amount: row.amount,
                 dueDay: row.dueDay,
+                counterparty: 'counterparty' in row ? row.counterparty : undefined,
             });
         }
 
@@ -868,17 +878,18 @@ export class DemoHouseholdSeeder extends Seeder {
             targetOn: monthsAhead(6),
             icon: '🎓',
         } as never);
+        // GIVE pledge: `saved` is recomputed from Give-jar transactions on read.
         em.create(Goal, {
             household: householdId,
             jar: jars.give,
-            kind: GoalKind.SAVE,
-            status: GoalStatus.REACHED,
+            kind: GoalKind.GIVE,
+            status: GoalStatus.ACTIVE,
             name: 'Annual give pledge',
             target: toMinorUnits(3000),
-            saved: toMinorUnits(3000),
-            monthlyContribution: toMinorUnits(0),
-            fulfilledOn: monthsAgo(1),
-            why: 'Funded early — feels complete.',
+            saved: toMinorUnits(0),
+            monthlyContribution: toMinorUnits(250),
+            targetOn: `${new Date().getUTCFullYear()}-12-31`,
+            why: 'A fixed share leaves before I can hold on to it.',
             icon: '💛',
         } as never);
         em.create(Goal, {
@@ -999,7 +1010,43 @@ export class DemoHouseholdSeeder extends Seeder {
                 daysAgo: 5,
                 amount: -250,
                 description: 'Monthly give',
-                counterparty: 'Foundation',
+                counterparty: DEMO_GIVE_COUNTERPARTY,
+                jar: jars.give,
+                status: TransactionStatus.SORTED,
+                source: TransactionSource.RECURRING,
+            },
+            {
+                daysAgo: 35,
+                amount: -250,
+                description: 'Monthly give',
+                counterparty: DEMO_GIVE_COUNTERPARTY,
+                jar: jars.give,
+                status: TransactionStatus.SORTED,
+                source: TransactionSource.RECURRING,
+            },
+            {
+                daysAgo: 66,
+                amount: -250,
+                description: 'Monthly give',
+                counterparty: DEMO_GIVE_COUNTERPARTY,
+                jar: jars.give,
+                status: TransactionStatus.SORTED,
+                source: TransactionSource.RECURRING,
+            },
+            {
+                daysAgo: 96,
+                amount: -250,
+                description: 'Monthly give',
+                counterparty: DEMO_GIVE_COUNTERPARTY,
+                jar: jars.give,
+                status: TransactionStatus.SORTED,
+                source: TransactionSource.RECURRING,
+            },
+            {
+                daysAgo: 48,
+                amount: -400,
+                description: 'Emergency appeal',
+                counterparty: 'Giro555',
                 jar: jars.give,
                 status: TransactionStatus.SORTED,
             },
@@ -1177,11 +1224,12 @@ export class DemoHouseholdSeeder extends Seeder {
         em: EntityManager,
         householdId: string,
         jar: Jar,
-        input: { name: string; amount: number; dueDay: number }
+        input: { name: string; amount: number; dueDay: number; counterparty?: string }
     ): void {
         em.create(FixedCost, {
             household: householdId,
             name: input.name,
+            counterparty: input.counterparty ?? null,
             amount: toMinorUnits(input.amount),
             dueDay: input.dueDay,
             isActive: true,

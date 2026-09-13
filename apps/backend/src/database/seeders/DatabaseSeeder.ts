@@ -6,6 +6,7 @@ import { PlanSeeder } from './plan/PlanSeeder';
 import { CategoryTemplateSeeder } from './product/money/CategoryTemplateSeeder';
 import { DebtPresetSeeder } from './product/money/DebtPresetSeeder';
 import { FixedCostPresetSeeder } from './product/money/FixedCostPresetSeeder';
+import { GivingOrganisationSeeder } from './product/money/GivingOrganisationSeeder';
 import { GoalPresetSeeder } from './product/money/GoalPresetSeeder';
 import { IncomeSourcePresetSeeder } from './product/money/IncomeSourcePresetSeeder';
 import { JarTemplateSeeder } from './product/money/JarTemplateSeeder';
@@ -29,6 +30,7 @@ export class DatabaseSeeder extends Seeder {
             IncomeSourcePresetSeeder,
             GoalPresetSeeder,
             MerchantPresetSeeder,
+            GivingOrganisationSeeder,
             IncomePostureSeeder,
             WealthStageSeeder,
             LeverPresetSeeder,

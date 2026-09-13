@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 import { Cadence, FlowDirection } from '../../../../common/common.enums';
 import { CatalogItemBase } from '../../../../common/common.schema';
-import { DebtKind, IncomeKind, JarKey } from '../enums';
+import { DebtKind, GivingCause, GivingEvaluator, IncomeKind, JarKey } from '../enums';
 
 /** Money company-catalog DTOs (backoffice.product.money templates + presets). */
 
@@ -56,7 +56,37 @@ export const MerchantPreset = CatalogItemBase.extend({
     categoryTemplateKey: z.string().min(1).max(64),
 });
 
+/** One independent signal about an organisation — who says so, what, and where to check. */
+export const GivingSignal = z.object({
+    evaluator: z.enum(GivingEvaluator),
+    /** Short claim as the evaluator phrases it, e.g. "Top Charity 2025". */
+    label: z.string().min(1).max(120),
+    url: z.url().nullable(),
+    /** Year the signal was last confirmed, so stale badges are visible. */
+    year: z.int().min(2000).max(2100).nullable(),
+});
+
+/**
+ * A vetted organisation for the Give jar. Editorial catalog: every row must
+ * carry at least one independent signal; the app never claims its own vetting.
+ */
+export const GivingOrganisation = CatalogItemBase.extend({
+    /** One neutral sentence on what they do. */
+    summary: z.string().min(1).max(280),
+    causes: z.array(z.enum(GivingCause)).min(1),
+    /** ISO 3166-1 alpha-2 of the HQ; null when genuinely distributed. */
+    country: z.string().length(2).nullable(),
+    /** Where the work lands, e.g. "Sub-Saharan Africa", "Netherlands". */
+    scope: z.string().max(64).nullable(),
+    website: z.url(),
+    signals: z.array(GivingSignal).min(1),
+    /** How donors hear back — annual report, live feed, per-programme updates. */
+    reporting: z.string().max(280).nullable(),
+});
+
 // Inferred types (same-module merge for consumers)
+export type GivingSignal = z.infer<typeof GivingSignal>;
+export type GivingOrganisation = z.infer<typeof GivingOrganisation>;
 export type CategoryTemplate = z.infer<typeof CategoryTemplate>;
 export type FixedCostPreset = z.infer<typeof FixedCostPreset>;
 export type DebtPreset = z.infer<typeof DebtPreset>;

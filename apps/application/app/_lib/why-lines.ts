@@ -25,6 +25,8 @@ export const WHY_LINES: Record<string, string> = {
     '/product/soul/stillness':
         'A calm mind directs money. A restless one spends it and calls that a decision.',
     '/product/soul/gratitude': 'Someone who sees what he already has buys less to fill a hole.',
+    '/product/soul/giving':
+        'A fixed share that leaves before you can hold it keeps money a tool, not a master.',
     '/product/soul/intent': 'An intention is an instruction to yourself. A resolution is a hope.',
     '/product/soul/centres': 'Name where it feels stuck, and the next step usually names itself.',
     '/product/growth/income': 'Cutting costs has a floor. Raising income does not.',

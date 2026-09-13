@@ -7,11 +7,12 @@ import {
     CategoryTemplateService,
     DebtPresetService,
     FixedCostPresetService,
+    GivingOrganisationService,
     GoalPresetService,
     IncomeSourcePresetService,
     MerchantPresetService,
 } from '../../../../../backoffice/product';
-import type { DebtKind, IncomeKind, JarKey } from '@rumtelo/contracts';
+import type { DebtKind, GivingCause, IncomeKind, JarKey } from '@rumtelo/contracts';
 
 @ControllerSwagger('money/catalogs', 'public')
 export class MoneyCatalogsController {
@@ -21,7 +22,9 @@ export class MoneyCatalogsController {
         @Inject(DebtPresetService) private readonly debts: DebtPresetService,
         @Inject(IncomeSourcePresetService) private readonly incomes: IncomeSourcePresetService,
         @Inject(GoalPresetService) private readonly goals: GoalPresetService,
-        @Inject(MerchantPresetService) private readonly merchants: MerchantPresetService
+        @Inject(MerchantPresetService) private readonly merchants: MerchantPresetService,
+        @Inject(GivingOrganisationService)
+        private readonly givingOrganisations: GivingOrganisationService
     ) {}
 
     @Implement(contract.money.catalogs.categoryTemplates.list)
@@ -139,6 +142,15 @@ export class MoneyCatalogsController {
                     categoryTemplateKey: preset.categoryTemplateKey,
                 }));
             }
+        );
+    }
+
+    @Implement(contract.money.catalogs.givingOrganisations.list)
+    listGivingOrganisations() {
+        return implement(contract.money.catalogs.givingOrganisations.list).handler(({ input }) =>
+            this.givingOrganisations.listActive({
+                cause: (input.cause as GivingCause | null) ?? undefined,
+            })
         );
     }
 }

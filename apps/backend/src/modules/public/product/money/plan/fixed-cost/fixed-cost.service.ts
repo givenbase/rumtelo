@@ -28,6 +28,7 @@ export class FixedCostService {
         jarId: string;
         categoryId?: string | null;
         name: string;
+        counterparty?: string | null;
         amount: number;
         cadence?: string;
         dueDay?: number | null;
@@ -41,6 +42,7 @@ export class FixedCostService {
             jar: this.em.getReference(Jar, input.jarId),
             category: input.categoryId ? this.em.getReference(Category, input.categoryId) : null,
             name: input.name,
+            counterparty: input.counterparty ?? null,
             amount: input.amount,
             cadence: (input.cadence as Cadence) ?? Cadence.MONTHLY,
             dueDay: input.dueDay ?? null,
@@ -107,6 +109,7 @@ export class FixedCostService {
             jarId: string;
             categoryId: string | null;
             name: string;
+            counterparty: string | null;
             amount: number;
             cadence: string;
             dueDay: number | null;
@@ -124,6 +127,7 @@ export class FixedCostService {
                 : null;
         }
         if (patch.name !== undefined) entity.name = patch.name;
+        if (patch.counterparty !== undefined) entity.counterparty = patch.counterparty;
         if (patch.amount !== undefined) entity.amount = patch.amount;
         if (patch.cadence !== undefined) entity.cadence = patch.cadence as Cadence;
         if (patch.dueDay !== undefined) entity.dueDay = patch.dueDay;
@@ -157,6 +161,7 @@ export function toDto(fixedCost: FixedCost) {
         jarId: fixedCost.jar.id,
         categoryId: fixedCost.category?.id ?? null,
         name: fixedCost.name,
+        counterparty: fixedCost.counterparty,
         amount: Number(fixedCost.amount),
         cadence: fixedCost.cadence,
         dueDay: fixedCost.dueDay,

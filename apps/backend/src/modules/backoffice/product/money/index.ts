@@ -1,5 +1,11 @@
 export { MoneyProductModule } from './money.module';
 export {
+    GivingOrganisation,
+    GivingOrganisationModule,
+    GivingOrganisationService,
+    MoneyCatalogModule,
+} from './catalog';
+export {
     CategoryTemplate,
     CategoryTemplateModule,
     CategoryTemplateService,

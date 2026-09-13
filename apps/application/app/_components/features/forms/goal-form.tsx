@@ -18,12 +18,15 @@ import {
 } from '@rumtelo/ui';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { GoalKind, GoalStatus } from '@rumtelo/contracts';
+import { GoalKind, GoalStatus, JarKey } from '@rumtelo/contracts';
 import { z } from 'zod';
 
+import { WHY_GIVE } from '@/app/_lib/giving';
 import { parseEurosToCents } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
+import { soulPath } from '@/app/_lib/routes';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
+import { CoachTipCard } from '@/components/features/helpers';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
@@ -115,14 +118,22 @@ export function GoalForm({
 
     const kind = useWatch({ control: form.control, name: 'kind' });
     const isEarn = kind === GoalKind.EARN;
+    const isGive = kind === GoalKind.GIVE;
 
     useEffect(() => {
         if (isEarn) return;
-        if (!form.getValues('jarId') && jars.length > 0) {
-            const lts = jars.find(j => j.key === 'LONG_TERM_SAVINGS');
+        if (jars.length === 0) return;
+        if (isGive) {
+            // A pledge always lives in the Give jar — no choice to make.
+            const give = jars.find(j => j.key === JarKey.GIVE);
+            if (give && form.getValues('jarId') !== give.id) form.setValue('jarId', give.id);
+            return;
+        }
+        if (!form.getValues('jarId')) {
+            const lts = jars.find(j => j.key === JarKey.LONG_TERM_SAVINGS);
             form.setValue('jarId', lts?.id ?? jars[0]!.id);
         }
-    }, [jars, form, isEarn]);
+    }, [jars, form, isEarn, isGive]);
 
     const onError = createFormInvalidHandler(({ title, description }) => {
         showToast(description ?? title, 'error');
@@ -159,7 +170,7 @@ export function GoalForm({
                 kind: values.kind,
                 jarId,
                 name,
-                icon: selectedIcon.current,
+                icon: selectedIcon.current ?? (values.kind === GoalKind.GIVE ? '💛' : null),
                 target,
                 monthlyContribution: monthly,
                 targetOn: null,
@@ -244,12 +255,26 @@ export function GoalForm({
                                 {...field}>
                                 <option value={GoalKind.SAVE}>Save into a jar</option>
                                 <option value={GoalKind.EARN}>Earn monthly net</option>
+                                <option value={GoalKind.GIVE}>Give — a yearly pledge</option>
                             </select>
                         </FormControl>
                         <FormMessage />
                     </FormItem>
                 )}
             />
+
+            {isGive ? (
+                <CoachTipCard
+                    title="A pledge, not a pot"
+                    meta={
+                        <a href={soulPath('giving')} className="hover:text-accent">
+                            Why giving is in a money app → Soul
+                        </a>
+                    }>
+                    {WHY_GIVE.body[1]} Every sorted amount that leaves your Give jar this year
+                    counts toward it — nothing to move by hand.
+                </CoachTipCard>
+            ) : null}
 
             <FormField
                 control={form.control}
@@ -258,7 +283,7 @@ export function GoalForm({
                     <FormItem>
                         <FormLabel>Name</FormLabel>
                         <FormControl>
-                            {mode === 'create' && !isEarn ? (
+                            {mode === 'create' && !isEarn && !isGive ? (
                                 <PresetNameField
                                     value={field.value}
                                     placeholder="e.g. emergency fund"
@@ -292,7 +317,11 @@ export function GoalForm({
                             ) : (
                                 <FormInput
                                     placeholder={
-                                        isEarn ? 'e.g. €5k net income' : 'e.g. emergency fund'
+                                        isEarn
+                                            ? 'e.g. €5k net income'
+                                            : isGive
+                                              ? 'e.g. Give pledge this year'
+                                              : 'e.g. emergency fund'
                                     }
                                     {...field}
                                 />
@@ -308,7 +337,13 @@ export function GoalForm({
                 name="target"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>{isEarn ? 'Monthly net (€)' : 'Target amount (€)'}</FormLabel>
+                        <FormLabel>
+                            {isEarn
+                                ? 'Monthly net (€)'
+                                : isGive
+                                  ? 'Pledge for the year (€)'
+                                  : 'Target amount (€)'}
+                        </FormLabel>
                         <FormControl>
                             <FormInput inputMode="decimal" placeholder="0,00" {...field} />
                         </FormControl>
@@ -324,7 +359,9 @@ export function GoalForm({
                         name="monthlyContribution"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Monthly contribution (€)</FormLabel>
+                                <FormLabel>
+                                    {isGive ? 'Planned per month (€)' : 'Monthly contribution (€)'}
+                                </FormLabel>
                                 <FormControl>
                                     <FormInput inputMode="decimal" placeholder="0,00" {...field} />
                                 </FormControl>
@@ -333,28 +370,30 @@ export function GoalForm({
                         )}
                     />
 
-                    <FormField
-                        control={form.control}
-                        name="jarId"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Jar</FormLabel>
-                                <FormControl>
-                                    <select
-                                        className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
-                                        {...field}>
-                                        {jars.map(jar => (
-                                            <option key={jar.id} value={jar.id}>
-                                                {jar.icon ? `${jar.icon} ` : ''}
-                                                {jar.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    {isGive ? null : (
+                        <FormField
+                            control={form.control}
+                            name="jarId"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Jar</FormLabel>
+                                    <FormControl>
+                                        <select
+                                            className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
+                                            {...field}>
+                                            {jars.map(jar => (
+                                                <option key={jar.id} value={jar.id}>
+                                                    {jar.icon ? `${jar.icon} ` : ''}
+                                                    {jar.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    )}
                 </>
             ) : null}
 

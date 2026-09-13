@@ -7,11 +7,12 @@ import { oc } from '@orpc/contract';
 import { z } from 'zod';
 
 import { HouseholdScoped } from '../../../../common/common.schema';
-import { DebtKind, IncomeKind, JarKey } from '../enums';
+import { DebtKind, GivingCause, IncomeKind, JarKey } from '../enums';
 import {
     CategoryTemplate,
     DebtPreset,
     FixedCostPreset,
+    GivingOrganisation,
     GoalPreset,
     IncomeSourcePreset,
     MerchantPreset,
@@ -60,5 +61,10 @@ export const catalogsContract = {
                 })
             )
             .output(z.array(MerchantPreset)),
+    },
+    givingOrganisations: {
+        list: oc
+            .input(HouseholdScoped.extend({ cause: z.enum(GivingCause).nullish() }))
+            .output(z.array(GivingOrganisation)),
     },
 };

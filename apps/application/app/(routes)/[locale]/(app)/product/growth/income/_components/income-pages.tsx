@@ -4,7 +4,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 
 import { useLiveQuery } from '@rumtelo/hooks';
 
-import { centsToEurosInput } from '@/app/_lib/money-input';
+import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { IncomeForm } from '@/components/features/forms/income-form';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -39,7 +39,7 @@ export function IncomeUpdatePage({ id, embedded = false }: { id: string; embedde
             periods={row.periods ?? []}
             defaultValues={{
                 name: row.name,
-                amount: centsToEurosInput(row.amount),
+                amount: minorUnitsToAmountInput(row.amount),
                 kind: row.kind,
                 cadence: row.cadence,
             }}

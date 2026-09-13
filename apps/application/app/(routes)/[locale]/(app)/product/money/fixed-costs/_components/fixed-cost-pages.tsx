@@ -6,11 +6,21 @@ import { useLiveQuery } from '@rumtelo/hooks';
 
 import { centsToEurosInput } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
-import { FixedCostForm } from '@/components/features/forms/fixed-cost-form';
+import {
+    FixedCostForm,
+    type FixedCostFormValues,
+} from '@/components/features/forms/fixed-cost-form';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
-export function FixedCostCreatePage({ embedded = false }: { embedded?: boolean }) {
-    return <FixedCostForm mode="create" embedded={embedded} />;
+export function FixedCostCreatePage({
+    embedded = false,
+    defaultValues,
+}: {
+    embedded?: boolean;
+    /** Cross-route prefill (jar, organisation, name) — e.g. from Soul → Giving. */
+    defaultValues?: Partial<FixedCostFormValues>;
+}) {
+    return <FixedCostForm mode="create" embedded={embedded} defaultValues={defaultValues} />;
 }
 
 export function FixedCostUpdatePage({ id, embedded = false }: { id: string; embedded?: boolean }) {
@@ -38,6 +48,7 @@ export function FixedCostUpdatePage({ id, embedded = false }: { id: string; embe
             embedded={embedded}
             defaultValues={{
                 name: row.name,
+                counterparty: row.counterparty ?? '',
                 amount: centsToEurosInput(Math.abs(row.amount)),
                 jarId: row.jarId,
                 dueDay: row.dueDay !== null ? String(row.dueDay) : '',

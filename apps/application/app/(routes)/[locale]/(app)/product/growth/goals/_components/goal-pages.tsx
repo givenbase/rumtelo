@@ -5,13 +5,26 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { useLiveQuery } from '@rumtelo/hooks';
 
 import { GoalKind } from '@rumtelo/contracts';
-import { centsToEurosInput } from '@/app/_lib/money-input';
+import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { GoalForm } from '@/components/features/forms/goal-form';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
-export function GoalCreatePage({ embedded = false }: { embedded?: boolean }) {
-    return <GoalForm mode="create" embedded={embedded} />;
+export function GoalCreatePage({
+    embedded = false,
+    defaultKind,
+}: {
+    embedded?: boolean;
+    /** Cross-route prefill — e.g. GIVE from Soul → Giving. */
+    defaultKind?: GoalKind;
+}) {
+    return (
+        <GoalForm
+            mode="create"
+            embedded={embedded}
+            defaultValues={defaultKind ? { kind: defaultKind } : undefined}
+        />
+    );
 }
 
 export function GoalUpdatePage({ id, embedded = false }: { id: string; embedded?: boolean }) {
@@ -50,8 +63,8 @@ export function GoalUpdatePage({ id, embedded = false }: { id: string; embedded?
             defaultValues={{
                 kind: (row.kind as GoalKind | undefined) ?? GoalKind.SAVE,
                 name: row.name,
-                target: centsToEurosInput(row.target),
-                monthlyContribution: centsToEurosInput(row.monthlyContribution),
+                target: minorUnitsToAmountInput(row.target),
+                monthlyContribution: minorUnitsToAmountInput(row.monthlyContribution),
                 jarId: row.jarId ?? '',
                 why: row.why ?? '',
             }}

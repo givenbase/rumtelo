@@ -78,6 +78,7 @@ export function GoalsPageClient() {
         jarId?: string | null;
         why?: string | null;
         status?: string;
+        targetOn?: string | null;
         fulfilledOn?: string | null;
     }>;
 
@@ -107,8 +108,8 @@ export function GoalsPageClient() {
                     Every goal is a decision you've already made.
                 </h1>
                 <p className="mt-2 max-w-prose text-base text-pretty text-fg-muted">
-                    Save into a jar, or set the monthly net you want to earn — when income hits it,
-                    the goal marks itself reached.
+                    Save into a jar, set the monthly net you want to earn, or pledge what you give
+                    this year — each one marks itself reached.
                 </p>
             </div>
 
@@ -147,6 +148,7 @@ export function GoalsPageClient() {
                 ) : (
                     shown.map(goal => {
                         const isEarn = goal.kind === GoalKind.EARN;
+                        const isGive = goal.kind === GoalKind.GIVE;
                         const earn = isEarn
                             ? earnGoalProgress({ target: goal.target, currentNet })
                             : null;
@@ -161,11 +163,21 @@ export function GoalsPageClient() {
                         return (
                             <AccentCard
                                 key={goal.id}
-                                tint={isEarn ? 'var(--color-accent)' : 'var(--color-jar-lts)'}
+                                tint={
+                                    isEarn
+                                        ? 'var(--color-accent)'
+                                        : isGive
+                                          ? 'var(--color-jar-give)'
+                                          : 'var(--color-jar-lts)'
+                                }
                                 className="cursor-pointer transition-colors hover:border-accent-hover">
                                 <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-line bg-raised px-2.5 py-1 font-mono text-xs tracking-widest text-fg-secondary uppercase">
-                                    {goal.icon ?? (isEarn ? '📈' : '🎯')}{' '}
-                                    {isEarn ? 'Earn net ›' : 'Long term ›'}
+                                    {goal.icon ?? (isEarn ? '📈' : isGive ? '💛' : '🎯')}{' '}
+                                    {isEarn
+                                        ? 'Earn net ›'
+                                        : isGive
+                                          ? 'Give pledge ›'
+                                          : 'Long term ›'}
                                 </div>
 
                                 <h3 className="font-display text-2xl leading-tight font-semibold tracking-tight text-fg">
@@ -191,7 +203,11 @@ export function GoalsPageClient() {
                                             : earn!.reached
                                               ? '◇ Target met'
                                               : `◇ ${formatMoney(earn!.remaining)} to go`
-                                        : `◇ ${formatMoney(goal.monthlyContribution)} p/m · done by ${eta(goal.saved, goal.target, goal.monthlyContribution)}`}
+                                        : isGive
+                                          ? tab === 'REACHED'
+                                              ? `◇ Pledge met${goal.fulfilledOn ? ` · ${goal.fulfilledOn}` : ''}`
+                                              : `◇ ${formatMoney(goal.saved)} given · ${formatMoney(Math.max(0, goal.target - goal.saved))} to go${goal.targetOn ? ` by ${goal.targetOn.slice(0, 4)}` : ''}`
+                                          : `◇ ${formatMoney(goal.monthlyContribution)} p/m · done by ${eta(goal.saved, goal.target, goal.monthlyContribution)}`}
                                 </p>
 
                                 <button
