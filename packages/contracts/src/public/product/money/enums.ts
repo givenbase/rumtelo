@@ -18,10 +18,15 @@ export enum DebtKind {
     OTHER = 'OTHER',
 }
 
-/** Avalanche = highest rate first. Snowball = smallest balance first. */
+/**
+ * Avalanche = highest rate first (cheapest interest).
+ * Snowball = smallest balance first (faster wins).
+ * Minimal = contractual minimums only — no extra, no rollover.
+ */
 export enum PayoffStrategy {
     AVALANCHE = 'AVALANCHE',
     SNOWBALL = 'SNOWBALL',
+    MINIMAL = 'MINIMAL',
 }
 
 export enum IncomeKind {

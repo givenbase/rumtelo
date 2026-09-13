@@ -74,8 +74,9 @@ export class BillingService {
             planKey: snap.planKey,
             periodEndsAt: toIsoOrNull(snap.periodEndsAt),
             periodStartedAt: toIsoOrNull(snap.periodStartedAt),
-            isCancelAtPeriodEnd: snap.isCancelAtPeriodEnd,
-            scheduledPlanKey: snap.scheduledPlanKey,
+            // DB rows may still have NULL before the column default applied.
+            isCancelAtPeriodEnd: Boolean(snap.isCancelAtPeriodEnd),
+            scheduledPlanKey: snap.scheduledPlanKey ?? null,
             hasStripeCustomer: Boolean(snap.stripeCustomerId),
             hasActiveSubscription: Boolean(snap.stripeSubscriptionId),
             prices: await this.loadPriceCatalog(),

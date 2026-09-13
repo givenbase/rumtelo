@@ -57,8 +57,9 @@ export class DebtService {
 
     /**
      * Avalanche pays the highest rate first and costs least; snowball clears the
-     * smallest balance first and is easier to sustain. We surface both because the
-     * cheaper plan is worthless if the user abandons it.
+     * smallest balance first and is easier to sustain; minimal pays contractual
+     * minimums only. We surface all three so the cheaper plan is honest about
+     * what “doing nothing extra” costs.
      */
     async plan(strategy?: PayoffStrategy | null) {
         const resolved =
@@ -82,17 +83,21 @@ export class DebtService {
             };
         }
 
-        const ordered = [...debts].sort((left, right) =>
-            resolved === PayoffStrategy.AVALANCHE
-                ? Number(right.interestRate) - Number(left.interestRate)
-                : Number(left.balance) - Number(right.balance)
-        );
+        const ordered = [...debts].sort((left, right) => {
+            if (resolved === PayoffStrategy.SNOWBALL || resolved === PayoffStrategy.MINIMAL) {
+                return Number(left.balance) - Number(right.balance);
+            }
+            return Number(right.interestRate) - Number(left.interestRate);
+        });
 
         const totalBalance = debts.reduce((total, debt) => total + Number(debt.balance), 0);
-        const monthlyPool = debts.reduce(
-            (total, debt) => total + Number(debt.minimumPayment) + Number(debt.extraPayment),
-            0
-        );
+        // Minimal = contractual minimums only; avalanche/snowball include extras.
+        const monthlyPool = debts.reduce((total, debt) => {
+            const minimum = Number(debt.minimumPayment);
+            const extra =
+                resolved === PayoffStrategy.MINIMAL ? 0 : Number(debt.extraPayment);
+            return total + minimum + extra;
+        }, 0);
 
         // TODO: full amortisation with rollover of freed minimums; this is the
         // first-order estimate that keeps the screen honest until then.

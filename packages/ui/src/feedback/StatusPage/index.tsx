@@ -1,12 +1,6 @@
 'use client';
 
-import {
-    useEffect,
-    useState,
-    type ButtonHTMLAttributes,
-    type CSSProperties,
-    type ReactNode,
-} from 'react';
+import { type ButtonHTMLAttributes, type CSSProperties, type ReactNode } from 'react';
 
 import { cn } from '../../lib/utils';
 import { STATUS_COPY } from './copy';
@@ -102,22 +96,11 @@ export function StatusPage({
     const code = statusCode === undefined ? copy.code : statusCode;
     const showDetails =
         type === 'error' && Boolean(errorDetails) && process.env.NODE_ENV === 'development';
-    const [visible, setVisible] = useState(false);
-
-    useEffect(() => {
-        const timeoutId = window.setTimeout(() => setVisible(true), 40);
-        return () => window.clearTimeout(timeoutId);
-    }, []);
-
     const resolvedHomeLabel = homeLabel ?? (homeHref === '/' ? 'Back home' : 'Continue');
 
     return (
         <div
-            className={cn(
-                'relative flex min-h-dvh items-center justify-center overflow-hidden px-4 py-12 sm:px-6',
-                'transition-opacity duration-500 ease-out',
-                visible ? 'opacity-100' : 'opacity-0'
-            )}
+            className="relative flex min-h-dvh items-center justify-center overflow-hidden px-4 py-12 sm:px-6"
             style={{
                 backgroundColor: `var(--color-bg, ${FALLBACK.bg})`,
                 backgroundImage: 'var(--gradient-page, none)',

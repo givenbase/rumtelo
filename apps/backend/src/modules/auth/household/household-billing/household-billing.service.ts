@@ -59,8 +59,8 @@ export class HouseholdBillingService {
             planKey: row.planKey,
             periodEndsAt: row.periodEndsAt,
             periodStartedAt: row.periodStartedAt,
-            isCancelAtPeriodEnd: row.isCancelAtPeriodEnd,
-            scheduledPlanKey: row.scheduledPlanKey,
+            isCancelAtPeriodEnd: Boolean(row.isCancelAtPeriodEnd),
+            scheduledPlanKey: row.scheduledPlanKey ?? null,
             stripeSubscriptionId: row.stripeSubscriptionId,
             stripeCustomerId: row.stripeCustomerId,
         };

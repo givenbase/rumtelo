@@ -1107,10 +1107,14 @@ export function DebtSettings() {
         <SettingsPanel>
             <SettingsInkCard
                 eyebrow="How you pay off debt"
-                blurb="Sets the order Rumtelo recommends on the Debt screen for this household. Switch any time — nothing is lost."
+                blurb="Sets the order Rumtelo recommends on the Debt screen for this household. Compare Avalanche, Snowball, and Minimal any time — nothing is lost."
                 badge={
                     <SettingsPill tone="accent">
-                        {strategy === PayoffStrategy.AVALANCHE ? 'Avalanche' : 'Snowball'}
+                        {strategy === PayoffStrategy.AVALANCHE
+                            ? 'Avalanche'
+                            : strategy === PayoffStrategy.SNOWBALL
+                              ? 'Snowball'
+                              : 'Minimal only'}
                     </SettingsPill>
                 }>
                 {(
@@ -1128,6 +1132,13 @@ export function DebtSettings() {
                             tag: 'Momentum',
                             desc: 'Smallest balance first. Clears debts faster for a quick win.',
                             metric: 'Wins sooner · Slightly more interest overall',
+                        },
+                        {
+                            key: PayoffStrategy.MINIMAL,
+                            name: 'Minimal only',
+                            tag: 'Baseline',
+                            desc: 'Pay each contractual minimum only — no extra, no rollover.',
+                            metric: 'Slowest path · Useful as a comparison baseline',
                         },
                     ] as const
                 ).map((option, index, list) => {

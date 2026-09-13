@@ -85,11 +85,20 @@ export async function setupOrpcErrorFix(app: NestFastifyApplication): Promise<vo
                         `Input validation failed: ${JSON.stringify((body as { data?: unknown }).data)}`
                     );
                 } else if (code === 'INTERNAL_SERVER_ERROR') {
-                    const message = (body as { message?: string }).message ?? 'no message';
-                    const issues = (body as { data?: { issues?: unknown } }).data?.issues;
+                    const errBody = body as {
+                        message?: string;
+                        data?: { issues?: unknown };
+                        cause?: { issues?: unknown; data?: unknown; message?: string };
+                    };
+                    const message = errBody.message ?? 'no message';
+                    const issues = errBody.data?.issues ?? errBody.cause?.issues;
+                    const output = errBody.cause?.data;
                     logger.error(
                         `ORPC ${code} on ${request.method} ${request.url}: ${message}` +
-                            (issues ? ` issues=${JSON.stringify(issues)}` : '')
+                            (issues ? ` issues=${JSON.stringify(issues)}` : '') +
+                            (output && message === 'Output validation failed'
+                                ? ` output=${JSON.stringify(output)}`
+                                : '')
                     );
                 }
 

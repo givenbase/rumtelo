@@ -828,6 +828,19 @@ export class DemoHouseholdSeeder extends Seeder {
             extraPayment: toMinorUnits(500),
             dueDay: 1,
         } as never);
+        // High rate, medium balance — Avalanche hits this first.
+        em.create(Debt, {
+            household: householdId,
+            name: 'Credit card',
+            kind: DebtKind.CREDIT_CARD,
+            balance: toMinorUnits(6_800),
+            originalBalance: toMinorUnits(9_000),
+            interestRate: '18.90',
+            minimumPayment: toMinorUnits(220),
+            extraPayment: toMinorUnits(300),
+            dueDay: 22,
+        } as never);
+        // Smallest balance, lower rate — Snowball hits this first (≠ Avalanche).
         em.create(Debt, {
             household: householdId,
             name: 'Business credit line',
@@ -836,7 +849,7 @@ export class DemoHouseholdSeeder extends Seeder {
             originalBalance: toMinorUnits(15_000),
             interestRate: '5.20',
             minimumPayment: toMinorUnits(250),
-            extraPayment: toMinorUnits(750),
+            extraPayment: toMinorUnits(450),
             dueDay: 15,
         } as never);
 

@@ -48,7 +48,7 @@ export const HouseholdMoneySettings = z.object({
     periodStartDay: z.int().min(1).max(28),
     /** How steady household inflow is — stable, variable, or none (~€0 net). */
     incomeStability: z.enum(IncomeStability),
-    /** Avalanche / snowball — one order for the shared debt list. */
+    /** Avalanche / snowball / minimal — one order for the shared debt list. */
     payoffStrategy: z.enum(PayoffStrategy),
 });
 
