@@ -2,13 +2,14 @@
 
 import { useMemo, useState } from 'react';
 
-import { Button } from '@rumtelo/ui';
+import { Button, VendorMark } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 import { JAR_META } from '@/app/_lib/jar-meta';
+import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
 
 interface InboxTransaction {
     readonly id: string;
@@ -72,6 +73,8 @@ export function InboxSortCard({
 
     const selected = jars.find(j => j.id === jarId) ?? jars[0];
     const meta = metaForKey(selected?.key ?? suggestJarKey(transaction.amount));
+    const title = transaction.counterparty?.trim() || transaction.description;
+    const mark = vendorMarkSrc({ name: title });
     const confident =
         Boolean(suggestedJarId) ||
         suggestJarKey(transaction.amount) === 'NECESSITIES' ||
@@ -97,23 +100,24 @@ export function InboxSortCard({
     return (
         <div className="grid animate-rise gap-4 rounded-2xl border border-line bg-surface p-5 shadow-md">
             <div className="flex flex-wrap items-start justify-between gap-4">
-                <div className="min-w-0">
-                    <p className="text-base font-semibold text-fg">
-                        {transaction.counterparty?.trim() || transaction.description}
-                    </p>
-                    <p className="mt-1 font-mono text-xs tracking-normal text-fg-muted">
-                        {[
-                            transaction.note?.trim() || null,
-                            !transaction.note?.trim() &&
-                            transaction.counterparty?.trim() &&
-                            transaction.description !== transaction.counterparty.trim()
-                                ? transaction.description
-                                : null,
-                            transaction.bookedOn,
-                        ]
-                            .filter(Boolean)
-                            .join(' · ')}
-                    </p>
+                <div className="flex min-w-0 items-start gap-3">
+                    <VendorMark name={mark.name} src={mark.src} size={28} className="mt-0.5" />
+                    <div className="min-w-0">
+                        <p className="text-base font-semibold text-fg">{title}</p>
+                        <p className="mt-1 font-mono text-xs tracking-normal text-fg-muted">
+                            {[
+                                transaction.note?.trim() || null,
+                                !transaction.note?.trim() &&
+                                transaction.counterparty?.trim() &&
+                                transaction.description !== transaction.counterparty.trim()
+                                    ? transaction.description
+                                    : null,
+                                transaction.bookedOn,
+                            ]
+                                .filter(Boolean)
+                                .join(' · ')}
+                        </p>
+                    </div>
                 </div>
                 <span
                     className={cn(

@@ -2,6 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { VendorMark } from '@rumtelo/ui';
+
+import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
+
 import { FormInput } from './form-input';
 
 export type ExpenseMerchantOption = {
@@ -163,17 +167,29 @@ export function ExpenseIntentField({
         ? (categoryIconByKey.get(value.categoryKey) ?? null)
         : null;
 
+    const selectedVendorMark = value.vendor ? vendorMarkSrc({ name: value.vendor }) : null;
+
     return (
         <div ref={rootRef} className="grid gap-3">
             {hasSelection ? (
                 <div className="flex flex-wrap items-center gap-2 rounded-lg border border-line bg-raised px-3 py-2.5">
-                    <div className="min-w-0 flex-1 text-sm text-fg">
+                    <div className="flex min-w-0 flex-1 items-center gap-2 text-sm text-fg">
                         {value.vendor ? (
                             <>
-                                <span className="font-medium">{value.vendor}</span>
-                                {value.categoryName ? (
-                                    <span className="text-fg-muted"> · {value.categoryName}</span>
-                                ) : null}
+                                <VendorMark
+                                    name={selectedVendorMark?.name ?? value.vendor}
+                                    src={selectedVendorMark?.src ?? null}
+                                    size={22}
+                                />
+                                <span className="min-w-0">
+                                    <span className="font-medium">{value.vendor}</span>
+                                    {value.categoryName ? (
+                                        <span className="text-fg-muted">
+                                            {' '}
+                                            · {value.categoryName}
+                                        </span>
+                                    ) : null}
+                                </span>
                             </>
                         ) : (
                             <span className="font-medium">
@@ -257,10 +273,10 @@ export function ExpenseIntentField({
                                             </div>
                                             <ul>
                                                 {merchantHits.map(merchant => {
-                                                    const icon =
-                                                        categoryIconByKey.get(
-                                                            merchant.categoryTemplateKey
-                                                        ) ?? null;
+                                                    const mark = vendorMarkSrc({
+                                                        key: merchant.key,
+                                                        name: merchant.name,
+                                                    });
                                                     const categoryName =
                                                         categories.find(
                                                             candidate =>
@@ -277,13 +293,12 @@ export function ExpenseIntentField({
                                                                 onClick={() =>
                                                                     selectMerchant(merchant)
                                                                 }>
-                                                                {icon ? (
-                                                                    <span
-                                                                        className="w-5 shrink-0 text-center"
-                                                                        aria-hidden>
-                                                                        {icon}
-                                                                    </span>
-                                                                ) : null}
+                                                                <VendorMark
+                                                                    name={mark.name}
+                                                                    src={mark.src}
+                                                                    size={20}
+                                                                    className="bg-bg/15 ring-bg/20"
+                                                                />
                                                                 <span className="min-w-0 flex-1">
                                                                     {merchant.name}
                                                                     <span className="text-bg/50">
@@ -350,27 +365,34 @@ export function ExpenseIntentField({
                     </p>
                     {vendorsForCategory.length > 0 ? (
                         <div className="flex flex-wrap gap-1.5">
-                            {vendorsForCategory.map(merchant => (
-                                <button
-                                    key={merchant.key}
-                                    type="button"
-                                    disabled={disabled}
-                                    className="rounded-full border border-line bg-raised px-3 py-1.5 text-sm text-fg hover:border-accent hover:text-accent"
-                                    onClick={() => selectMerchant(merchant)}>
-                                    {merchant.name}
-                                </button>
-                            ))}
+                            {vendorsForCategory.map(merchant => {
+                                const mark = vendorMarkSrc({
+                                    key: merchant.key,
+                                    name: merchant.name,
+                                });
+                                return (
+                                    <button
+                                        key={merchant.key}
+                                        type="button"
+                                        disabled={disabled}
+                                        className="inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent"
+                                        onClick={() => selectMerchant(merchant)}>
+                                        <VendorMark name={mark.name} src={mark.src} size={20} />
+                                        {merchant.name}
+                                    </button>
+                                );
+                            })}
                             <button
                                 type="button"
                                 disabled={disabled}
-                                className="rounded-full border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
+                                className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
                                 onClick={() => setCustomVendor(true)}>
                                 Other…
                             </button>
                             <button
                                 type="button"
                                 disabled={disabled}
-                                className="rounded-full px-3 py-1.5 text-sm text-fg-faint hover:text-fg-muted"
+                                className="rounded-xl px-3 py-1.5 text-sm text-fg-faint hover:text-fg-muted"
                                 onClick={() => setSkippedVendor(true)}>
                                 Skip
                             </button>

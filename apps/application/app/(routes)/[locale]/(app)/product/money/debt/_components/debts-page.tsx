@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 
 import { PayoffStrategy } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { AccentCard, Badge, Card, Eyebrow } from '@rumtelo/ui';
+import { AccentCard, Badge, Card, Eyebrow, VendorMark } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
@@ -18,6 +18,7 @@ import {
     rankPayoffStrategies,
     simulatePayoff,
 } from '@/app/_lib/debt-payoff';
+import { lenderLogoUrl, resolveLenderBrand } from '@/app/_lib/lender-brands';
 import { isLiveData } from '@/app/_lib/preview';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar, ListToolbarTab } from '@/components/layout/list-toolbar';
@@ -363,6 +364,7 @@ export function DebtsPageClient() {
                                         entry => entry.id === debt.id
                                     );
                                     const isFocus = showPayoffRanks && hasExtra && payoffRank === 0;
+                                    const brand = resolveLenderBrand(debt.name);
                                     return (
                                         <button
                                             type="button"
@@ -376,12 +378,21 @@ export function DebtsPageClient() {
                                                     : 'border-line'
                                             )}>
                                             <div className="flex flex-wrap items-baseline justify-between gap-3">
-                                                <div className="flex items-baseline gap-3">
+                                                <div className="flex items-center gap-3">
                                                     <span className="font-mono text-xs text-accent">
                                                         {showPayoffRanks
                                                             ? `#${payoffRank + 1}`
                                                             : '·'}
                                                     </span>
+                                                    <VendorMark
+                                                        name={debt.name}
+                                                        src={
+                                                            brand
+                                                                ? lenderLogoUrl(brand.domain, 64)
+                                                                : null
+                                                        }
+                                                        size={28}
+                                                    />
                                                     <div>
                                                         <div className="flex flex-wrap items-center gap-2.5">
                                                             <span className="text-base text-fg">

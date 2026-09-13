@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 
 import type { GivingCause, GivingOrganisation } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
+import { VendorMark } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import {
@@ -15,6 +16,7 @@ import {
     givingEvaluatorMeta,
 } from '@/app/_lib/giving';
 import { isLiveData } from '@/app/_lib/preview';
+import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
 import { CoachMark } from '@/components/features/helpers';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
@@ -201,6 +203,10 @@ function GivingOrganisationCard({
     onPick: () => void;
 }) {
     const where = [organisation.scope, organisation.country].filter(Boolean).join(' · ');
+    const mark = vendorMarkSrc({
+        name: organisation.name,
+        website: organisation.website,
+    });
     return (
         <div
             className={cn(
@@ -208,13 +214,16 @@ function GivingOrganisationCard({
                 selected ? 'border-accent' : 'border-line'
             )}>
             <div className="flex flex-wrap items-start justify-between gap-2">
-                <div className="min-w-0">
-                    <p className="text-sm font-medium text-fg">{organisation.name}</p>
-                    {where ? (
-                        <p className="mt-0.5 font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                            {where}
-                        </p>
-                    ) : null}
+                <div className="flex min-w-0 items-start gap-2.5">
+                    <VendorMark name={mark.name} src={mark.src} size={28} className="mt-0.5" />
+                    <div className="min-w-0">
+                        <p className="text-sm font-medium text-fg">{organisation.name}</p>
+                        {where ? (
+                            <p className="mt-0.5 font-mono text-[10px] tracking-wide text-fg-faint uppercase">
+                                {where}
+                            </p>
+                        ) : null}
+                    </div>
                 </div>
                 <button
                     type="button"

@@ -14,6 +14,7 @@ import {
     FormLabel,
     FormMessage,
     Button,
+    VendorMark,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
 
@@ -21,6 +22,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { DebtKind } from '@rumtelo/contracts';
 import { z } from 'zod';
 
+import { lenderLogoUrl, resolveLenderBrand } from '@/app/_lib/lender-brands';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -283,6 +285,7 @@ export function DebtForm({
                                         const selected =
                                             selectedLenderName.toLowerCase() ===
                                             lender.toLowerCase();
+                                        const brand = resolveLenderBrand(lender);
                                         return (
                                             <button
                                                 key={lender}
@@ -290,14 +293,23 @@ export function DebtForm({
                                                 disabled={busy}
                                                 className={
                                                     selected
-                                                        ? 'rounded-full border border-accent bg-accent/15 px-3 py-1.5 text-sm text-accent'
-                                                        : 'rounded-full border border-line bg-raised px-3 py-1.5 text-sm text-fg hover:border-accent hover:text-accent'
+                                                        ? 'inline-flex items-center gap-2 rounded-xl border border-accent bg-accent/15 px-2.5 py-1.5 text-sm text-accent'
+                                                        : 'inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent'
                                                 }
                                                 onClick={() =>
                                                     form.setValue('name', lender, {
                                                         shouldValidate: true,
                                                     })
                                                 }>
+                                                <VendorMark
+                                                    name={lender}
+                                                    src={
+                                                        brand
+                                                            ? lenderLogoUrl(brand.domain, 64)
+                                                            : null
+                                                    }
+                                                    size={20}
+                                                />
                                                 {lender}
                                             </button>
                                         );
@@ -305,7 +317,7 @@ export function DebtForm({
                                     <button
                                         type="button"
                                         disabled={busy}
-                                        className="rounded-full border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
+                                        className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
                                         onClick={() => {
                                             setCustomLender(true);
                                             form.setValue('name', '', {

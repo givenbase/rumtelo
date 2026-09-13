@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Button, Card, EmptyState } from '@rumtelo/ui';
+import { Button, Card, EmptyState, VendorMark } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import {
@@ -25,6 +25,7 @@ import {
 import { createTxHref, updateHref } from '@/app/_lib/create-routes';
 import { matchMerchantJarKey } from '@/app/_lib/merchant-match';
 import { isLiveData } from '@/app/_lib/preview';
+import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
 import { InboxSortCard } from '@/components/features/money/inbox-sort-card';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -318,6 +319,7 @@ export function TransactionsPageClient() {
                                         : undefined;
                                     const title =
                                         transaction.counterparty?.trim() || transaction.description;
+                                    const mark = vendorMarkSrc({ name: title });
                                     const detailParts = [
                                         transaction.note?.trim() || null,
                                         !transaction.note?.trim() &&
@@ -335,7 +337,12 @@ export function TransactionsPageClient() {
                                                 router.push(updateHref('tx', transaction.id))
                                             }
                                             className="grid w-full gap-1 border-b border-line px-5 py-3.5 text-left last:border-b-0 hover:bg-raised">
-                                            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                                                <VendorMark
+                                                    name={mark.name}
+                                                    src={mark.src}
+                                                    size={24}
+                                                />
                                                 <span className="min-w-0 flex-1 text-sm text-fg">
                                                     {title}
                                                     {detailParts.length > 0 ? (

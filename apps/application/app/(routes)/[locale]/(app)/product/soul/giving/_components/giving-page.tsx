@@ -14,9 +14,10 @@ import { createFixedHref, createGoalHref, updateHref } from '@/app/_lib/create-r
 import { WHY_GIVE } from '@/app/_lib/giving';
 import { isLiveData } from '@/app/_lib/preview';
 import { productPath } from '@/app/_lib/routes';
-import { CoachTipCard } from '@/components/features/helpers';
+import { CoachMark, CoachTipCard, HelperGate } from '@/components/features/helpers';
 import { GivingFinder } from '@/components/features/money/giving-finder';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { ListToolbar } from '@/components/layout/list-toolbar';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 const EMPTY_TRANSACTION_PAGE = { items: [] as never[], nextCursor: null };
@@ -135,6 +136,19 @@ export function GivingPageClient() {
                     {WHY_GIVE.body[0]}
                 </p>
             </Section>
+
+            <ListToolbar
+                createLabel="+ Add a recurring gift"
+                onCreate={() => router.push(createFixedHref({ jarId: giveJar?.id }))}
+                secondary={
+                    <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => router.push(productPath('money/jars/give'))}>
+                        Open the Give jar
+                    </Button>
+                }
+            />
 
             <div className="grid items-start gap-4 lg:grid-cols-2">
                 {/* This year */}
@@ -272,22 +286,6 @@ export function GivingPageClient() {
                                 ))}
                             </ul>
                         )}
-                        <div className="mt-3 flex flex-wrap gap-2">
-                            <Button
-                                size="sm"
-                                variant="secondary"
-                                onClick={() =>
-                                    router.push(createFixedHref({ jarId: giveJar?.id }))
-                                }>
-                                + Add a recurring gift
-                            </Button>
-                            <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => router.push(productPath('money/jars/give'))}>
-                                Open the Give jar
-                            </Button>
-                        </div>
                     </div>
                 </Card>
             </div>
@@ -305,28 +303,37 @@ export function GivingPageClient() {
                 }
             />
 
-            {/* The four checks */}
-            <section className="grid gap-3">
-                <Eyebrow className="text-accent">✦ Four checks for any organisation</Eyebrow>
-                <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
-                    {WHY_GIVE.checks.map((check, index) => (
-                        <div
-                            key={check.title}
-                            className="grid gap-2 rounded-2xl border border-t-4 border-line bg-surface p-5 shadow-md"
-                            style={{ borderTopColor: 'var(--color-jar-give)' }}>
-                            <span className="font-mono text-xs font-medium tracking-widest text-fg-faint uppercase">
-                                0{index + 1}
-                            </span>
-                            <span className="font-display text-lg font-semibold text-fg">
-                                {check.title}
-                            </span>
-                            <span className="text-sm leading-relaxed text-fg-muted">
-                                {check.body}
-                            </span>
-                        </div>
-                    ))}
-                </div>
-            </section>
+            {/* The four checks — Coach guide, not permanent page chrome */}
+            <HelperGate>
+                <section
+                    className="grid gap-3"
+                    data-feature-helper="giving-checks"
+                    data-coach-guide="giving-checks"
+                    aria-label="The Coach: four checks for any organisation">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <CoachMark size="sm" />
+                        <Eyebrow className="text-accent">Four checks for any organisation</Eyebrow>
+                    </div>
+                    <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+                        {WHY_GIVE.checks.map((check, index) => (
+                            <div
+                                key={check.title}
+                                className="grid gap-2 rounded-2xl border border-t-4 border-line bg-surface p-5 shadow-md ring-1 ring-accent/10"
+                                style={{ borderTopColor: 'var(--color-jar-give)' }}>
+                                <span className="font-mono text-xs font-medium tracking-widest text-fg-faint uppercase">
+                                    0{index + 1}
+                                </span>
+                                <span className="font-display text-lg font-semibold text-fg">
+                                    {check.title}
+                                </span>
+                                <span className="text-sm leading-relaxed text-fg-muted">
+                                    {check.body}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            </HelperGate>
 
             <CoachTipCard title="Why this is in a money app">
                 {WHY_GIVE.body[1]} {WHY_GIVE.body[2]}

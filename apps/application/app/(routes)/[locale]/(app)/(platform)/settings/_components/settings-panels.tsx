@@ -32,6 +32,7 @@ import {
     Select,
     StubNotice,
     Toggle,
+    VendorMark,
 } from '@rumtelo/ui';
 import {
     clearPlanIntent,
@@ -48,6 +49,7 @@ import { changePassword, signOut, updateOrganization } from '@/app/_lib/auth';
 import { env } from '@/app/_utils/get-env';
 import { useAccountTheme } from '@/components/features/shell/account-theme-sync';
 import { downloadTextFile, toCsv } from '@/app/_lib/download';
+import { lenderLogoUrl, NL_BANK_LENDERS } from '@/app/_lib/lender-brands';
 import {
     CAPABILITIES,
     diffPlans,
@@ -84,8 +86,6 @@ const CURRENCY_OPTIONS = [
     { code: Currency.GBP, sampleLocale: 'en-GB', persist: true as const },
     { code: 'CHF', sampleLocale: 'de-CH', persist: false as const },
 ];
-
-const BANK_OPTIONS = ['ING', 'Rabobank', 'ABN AMRO', 'bunq', 'Revolut', 'N26'] as const;
 
 const AUTO_RULES = [
     {
@@ -1245,9 +1245,16 @@ export function BankSettings() {
                 eyebrow="Bank connection"
                 blurb="Read-only — Rumtelo never moves money. Disconnect any time."
                 badge={<SettingsPill>Not connected</SettingsPill>}>
-                {BANK_OPTIONS.map((bank, i) => (
-                    <SettingsRow key={bank} last={i === BANK_OPTIONS.length - 1}>
-                        <SettingsRowLabel title={bank} />
+                {NL_BANK_LENDERS.map((bank, i) => (
+                    <SettingsRow key={bank.name} last={i === NL_BANK_LENDERS.length - 1}>
+                        <div className="flex min-w-0 items-center gap-2.5">
+                            <VendorMark
+                                name={bank.name}
+                                src={lenderLogoUrl(bank.domain, 64)}
+                                size={22}
+                            />
+                            <SettingsRowLabel title={bank.name} />
+                        </div>
                         <Button
                             variant="secondary"
                             size="sm"
