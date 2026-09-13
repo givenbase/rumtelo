@@ -1107,7 +1107,7 @@ export function DebtSettings() {
         <SettingsPanel>
             <SettingsInkCard
                 eyebrow="How you pay off debt"
-                blurb="Sets the order Rumtelo recommends on the Debt screen for this household. Compare Avalanche, Snowball, and Minimal any time — nothing is lost."
+                blurb="One household choice for the Debt screen. Avalanche, Snowball, or Minimal — switch any time; the Debt list and Coach compare follow."
                 badge={
                     <SettingsPill tone="accent">
                         {strategy === PayoffStrategy.AVALANCHE

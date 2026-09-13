@@ -262,7 +262,9 @@ export function LandingHero() {
                                         {j.pct}%
                                     </span>
                                     <span className="font-mono text-sm font-medium text-fg">
-                                        {formatCatalogMajor(Math.round(((income * j.pct) / 100) * splitP))}
+                                        {formatCatalogMajor(
+                                            Math.round(((income * j.pct) / 100) * splitP)
+                                        )}
                                     </span>
                                 </span>
                             ))}

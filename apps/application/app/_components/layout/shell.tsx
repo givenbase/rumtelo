@@ -18,7 +18,7 @@ import {
     resolveNavChildForPath,
     resolveNavGroupForPath,
 } from '@/app/_lib/nav';
-import { settingsHrefForNavGroup } from '@/app/_lib/settings-tabs';
+import { settingsHrefForPathname } from '@/app/_lib/settings-tabs';
 import { accountThemeFromCss } from '@/app/_lib/theme';
 import { useAccountTheme } from '@/components/features/shell/account-theme-sync';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
@@ -45,7 +45,12 @@ interface MenuItem {
 }
 
 const MENU_ITEMS: MenuItem[] = [
-    { label: 'Settings', sub: 'Jars, rules, automatic split', href: '/settings', danger: false },
+    {
+        label: 'Settings',
+        sub: 'Household prefs for this screen',
+        href: '__settings__',
+        danger: false,
+    },
     {
         label: 'My plan',
         sub: 'Manage your subscription',
@@ -346,10 +351,14 @@ function AppShellInner({ children }: { children: ReactNode }) {
                                             );
 
                                             if (item.href) {
+                                                const href =
+                                                    item.href === '__settings__'
+                                                        ? settingsHrefForPathname(pathname)
+                                                        : item.href;
                                                 return (
                                                     <Link
                                                         key={item.label}
-                                                        href={item.href}
+                                                        href={href}
                                                         onClick={() => setMenuOpen(false)}
                                                         className="grid gap-0.5 rounded-lg px-3 py-2.5 transition-colors hover:bg-raised">
                                                         {inner}
@@ -461,7 +470,7 @@ function AppShellInner({ children }: { children: ReactNode }) {
                                 </div>
                                 <PageHelpButton />
                                 <Link
-                                    href={settingsHrefForNavGroup(activeGroup?.key)}
+                                    href={settingsHrefForPathname(pathname)}
                                     className="hidden items-center gap-1.5 rounded-full border border-line px-3.5 py-1.5 font-mono text-xs font-medium tracking-wide text-fg-faint uppercase transition-colors hover:border-accent-hover hover:text-accent sm:flex">
                                     <span aria-hidden>◇</span>
                                     Settings

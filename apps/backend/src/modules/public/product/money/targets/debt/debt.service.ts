@@ -94,8 +94,7 @@ export class DebtService {
         // Minimal = contractual minimums only; avalanche/snowball include extras.
         const monthlyPool = debts.reduce((total, debt) => {
             const minimum = Number(debt.minimumPayment);
-            const extra =
-                resolved === PayoffStrategy.MINIMAL ? 0 : Number(debt.extraPayment);
+            const extra = resolved === PayoffStrategy.MINIMAL ? 0 : Number(debt.extraPayment);
             return total + minimum + extra;
         }, 0);
 

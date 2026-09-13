@@ -127,9 +127,7 @@ export function rankPayoffStrategies(
     results: ReadonlyArray<{ key: PayoffStrategy } & DebtPayoffResult>
 ): RankedPayoff[] {
     const finite = results.filter(result => result.months > 0 && result.debtFreeOn);
-    const bestInterest = finite.length
-        ? Math.min(...finite.map(result => result.interest))
-        : 0;
+    const bestInterest = finite.length ? Math.min(...finite.map(result => result.interest)) : 0;
     const bestMonths = finite.length ? Math.min(...finite.map(result => result.months)) : 0;
 
     return results.map(result => {
@@ -170,9 +168,7 @@ export function orderDebtsByStrategy<T extends DebtPayoffInput>(
  * True when Avalanche and Snowball attack debts in the same sequence — then
  * interest and freedom date are identical (not a simulator bug).
  */
-export function payoffOrdersMatch<T extends DebtPayoffInput>(
-    debts: ReadonlyArray<T>
-): boolean {
+export function payoffOrdersMatch(debts: ReadonlyArray<DebtPayoffInput>): boolean {
     if (debts.length < 2) return true;
     const avalanche = orderDebtsByStrategy(debts, PayoffStrategy.AVALANCHE);
     const snowball = orderDebtsByStrategy(debts, PayoffStrategy.SNOWBALL);

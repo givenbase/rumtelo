@@ -715,7 +715,7 @@ export class BillingService {
 
 /** Wire-safe ISO datetime — accepts Date or already-string values from the ORM. */
 function toIsoOrNull(value: Date | string | null | undefined): string | null {
-    if (value == null) return null;
+    if (value === null || value === undefined) return null;
     if (value instanceof Date) return value.toISOString();
     if (typeof value === 'string' && value.trim()) {
         const parsed = new Date(value);

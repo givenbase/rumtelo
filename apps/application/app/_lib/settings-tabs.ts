@@ -144,10 +144,40 @@ export function settingsTabForNavGroup(groupKey: string | null | undefined): Set
     }
 }
 
+/**
+ * Prefer the settings page that matches the current product screen
+ * (Debt → Debt settings, Jars → Jars settings, …). Fall back to the product group.
+ */
+export function settingsTabForPathname(pathname: string): SettingsTab {
+    const path = pathname.replace(/\/$/, '') || '/';
+
+    if (path.includes('/product/money/debt')) return 'debt';
+    if (path.includes('/product/money/jars')) return 'jars';
+    if (path.includes('/product/money/fixed-costs')) return 'jars';
+    if (path.includes('/product/money/transactions')) return 'automation';
+    if (path.includes('/product/money/accounts') || path.includes('/product/money/bank')) {
+        return 'bank';
+    }
+    if (path.includes('/product/growth/goals')) return 'goals';
+    if (path.includes('/product/energy/week')) return 'week';
+    if (path.includes('/product/soul/stillness')) return 'stillness';
+
+    if (path.startsWith('/product/money')) return 'jars';
+    if (path.startsWith('/product/growth')) return 'goals';
+    if (path.startsWith('/product/energy')) return 'week';
+    if (path.startsWith('/product/soul')) return 'stillness';
+
+    return DEFAULT_TAB;
+}
+
 export function settingsHref(tab: SettingsTab = DEFAULT_TAB): string {
     return SETTINGS_HREF[tab];
 }
 
 export function settingsHrefForNavGroup(groupKey: string | null | undefined): string {
     return settingsHref(settingsTabForNavGroup(groupKey));
+}
+
+export function settingsHrefForPathname(pathname: string): string {
+    return settingsHref(settingsTabForPathname(pathname));
 }
