@@ -1,4 +1,5 @@
-# Legacy TsMorph metadata cache paths — safe to delete if present
+# TsMorph metadata cache
+temp
 src/database/.temp
 src/database/.temp-dts
 /temp

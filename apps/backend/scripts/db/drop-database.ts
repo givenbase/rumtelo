@@ -4,7 +4,7 @@
  *
  * Usage (from apps/backend):
  *   pnpm schema:drop:db
- *   oxnode scripts/db/drop-database.ts
+ *   tsx scripts/db/drop-database.ts
  *
  * Non-interactive / scripted: pass --yes or DB_DROP_CONFIRM=yes
  */

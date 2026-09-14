@@ -5,7 +5,7 @@
  *
  * Usage (from apps/backend):
  *   pnpm db:create-schemas
- *   oxnode scripts/db/create-schemas.ts
+ *   tsx scripts/db/create-schemas.ts
  */
 import { Pool } from 'pg';
 

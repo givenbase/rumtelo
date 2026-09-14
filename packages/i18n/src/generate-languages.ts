@@ -39,7 +39,7 @@ async function loadTranslations(): Promise<Record<string, Record<string, unknown
             files.map(async file => {
                 const moduleName = basename(file, '.ts');
                 const modulePath = join(sectionDir, file);
-                // Prefer file URL without query/hash — oxc-node keys language off the path.
+                // Prefer file URL without query/hash — language keys off the path.
                 const mod = await import(pathToFileURL(modulePath).href);
                 if (!mod.default) {
                     console.warn(`No default export: ${section}/${file}`);

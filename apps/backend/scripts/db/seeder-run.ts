@@ -1,8 +1,7 @@
 /**
  * Run MikroORM seeders without the `@mikro-orm/cli` binary.
- * Same Node 22.22.3+ / yargonaut rationale as migration-up.ts.
  *
- * Usage: pnpm db:seed  →  oxnode scripts/db/seeder-run.ts
+ * Usage: pnpm db:seed  →  tsx scripts/db/seeder-run.ts
  */
 import { MikroORM } from '@mikro-orm/postgresql';
 

@@ -22,7 +22,7 @@
         "./languages/*": "./languages/*"
     },
     "scripts": {
-        "generate": "oxnode ./src/generate-languages.ts",
+        "generate": "tsx ./src/generate-languages.ts",
         "check-types": "tsc --pretty --noEmit",
         "clean": "rm -rf .turbo dist"
     },
@@ -30,8 +30,8 @@
         "next-intl": "^4.6.1"
     },
     "devDependencies": {
-        "@oxc-node/cli": "^0.1.0",
         "@rumtelo/typescript-config": "workspace:*",
+        "tsx": "^4.23.13",
         "typescript": "5.9.3"
     },
     "peerDependencies": {

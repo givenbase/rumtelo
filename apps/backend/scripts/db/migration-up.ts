@@ -1,11 +1,8 @@
 /**
  * Apply pending MikroORM migrations without the `@mikro-orm/cli` binary.
+ * Prefer the ORM API so CI/local stay on `tsx` (same as `pnpm start`).
  *
- * The CLI pulls in `@jercle/yargonaut`, which crashes on Node 22.22.3+ when
- * loaded via `NODE_OPTIONS=--import @oxc-node/core/register` (`require.cache` is undefined).
- * Running through `oxnode` + the ORM API avoids that path (Galighticus-compatible).
- *
- * Usage: pnpm db:push  →  oxnode scripts/db/migration-up.ts
+ * Usage: pnpm db:push  →  tsx scripts/db/migration-up.ts
  */
 import { MikroORM } from '@mikro-orm/postgresql';
 

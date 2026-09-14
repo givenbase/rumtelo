@@ -21,9 +21,7 @@ const migrationsDir = join(backendRoot, 'src/database/migrations');
 
 const ormEnv = {
     ...process.env,
-    NODE_OPTIONS: [process.env.NODE_OPTIONS, '--import @oxc-node/core/register']
-        .filter(Boolean)
-        .join(' '),
+    NODE_OPTIONS: [process.env.NODE_OPTIONS, '--import tsx'].filter(Boolean).join(' '),
 };
 
 function run(command: string, args: string[], label: string, env = process.env): void {
@@ -75,11 +73,7 @@ function main(): void {
     console.log('db:reset — squash migrations → gen initial → push');
     clearMigrationFiles();
 
-    run(
-        'pnpm',
-        ['exec', 'oxnode', 'scripts/db/drop-schema-cascade.ts', '--yes'],
-        'db:drop schemas'
-    );
+    run('pnpm', ['exec', 'tsx', 'scripts/db/drop-schema-cascade.ts', '--yes'], 'db:drop schemas');
 
     run(
         'pnpm',

@@ -5,7 +5,7 @@
  * Usage (from apps/backend):
  *   pnpm db:drop
  *   pnpm schema:drop:cascade
- *   oxnode scripts/db/drop-schema-cascade.ts
+ *   tsx scripts/db/drop-schema-cascade.ts
  *
  * Non-interactive / scripted: pass --yes or DB_DROP_CONFIRM=yes
  */
