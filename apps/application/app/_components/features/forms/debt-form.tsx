@@ -3,7 +3,7 @@
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import { useLiveQuery } from '@rumtelo/hooks';
@@ -22,7 +22,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { DebtKind } from '@rumtelo/contracts';
 import { z } from 'zod';
 
-import { lenderLogoUrl, resolveLenderBrand } from '@/app/_lib/lender-brands';
+import { findCatalogVendor, vendorMarkSrc } from '@/app/_lib/vendor-brands';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -96,20 +96,17 @@ export function DebtForm({
         [],
         live && mode === 'create'
     );
-
-    const typeOptions = useMemo(
-        () =>
-            (debtTypesQuery.data ?? []).map(preset => ({
-                key: preset.key,
-                name: preset.name,
-                kind: preset.kind,
-                icon: preset.icon,
-                suggestedLenders: preset.suggestedLenders ?? [],
-            })),
-        [debtTypesQuery.data]
+    const merchantsQuery = useLiveQuery(
+        apiQuery.money.catalogs.merchantPresets.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [],
+        live
     );
+    const debtTypes = debtTypesQuery.data ?? [];
+    const merchants = merchantsQuery.data ?? [];
 
-    const selectedType = typeOptions.find(option => option.key === typeKey) ?? null;
+    const selectedType = debtTypes.find(option => option.key === typeKey) ?? null;
     const lendersForType = selectedType?.suggestedLenders ?? [];
 
     const form = useForm<DebtFormValues>({
@@ -260,9 +257,9 @@ export function DebtForm({
                                 value={typeQuery}
                                 onChange={setTypeQuery}
                                 placeholder="e.g. student loan"
-                                options={typeOptions}
+                                options={debtTypes}
                                 onSelect={opt => {
-                                    const full = typeOptions.find(preset => preset.key === opt.key);
+                                    const full = debtTypes.find(preset => preset.key === opt.key);
                                     if (!full) return;
                                     setTypeKey(full.key);
                                     setTypeQuery('');
@@ -285,7 +282,9 @@ export function DebtForm({
                                         const selected =
                                             selectedLenderName.toLowerCase() ===
                                             lender.toLowerCase();
-                                        const brand = resolveLenderBrand(lender);
+                                        const mark = vendorMarkSrc(
+                                            findCatalogVendor(lender, merchants) ?? { name: lender }
+                                        );
                                         return (
                                             <button
                                                 key={lender}
@@ -302,12 +301,8 @@ export function DebtForm({
                                                     })
                                                 }>
                                                 <VendorMark
-                                                    name={lender}
-                                                    src={
-                                                        brand
-                                                            ? lenderLogoUrl(brand.domain, 64)
-                                                            : null
-                                                    }
+                                                    name={mark.name}
+                                                    src={mark.src}
                                                     size={20}
                                                 />
                                                 {lender}

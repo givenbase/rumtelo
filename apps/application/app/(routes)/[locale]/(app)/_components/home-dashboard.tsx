@@ -7,11 +7,12 @@ import { useEffect } from 'react';
 
 import { useSearchParams } from 'next/navigation';
 
+import { CoachKind } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Eyebrow } from '@rumtelo/ui';
 import { formatPeriod, toPeriodKey, describePeriodTravel } from '@rumtelo/utils';
 
-import type { CoachMessage, CoachRecapItem } from '@/components/features/home/coach-verdict';
+import type { CoachVerdictMessage, CoachRecapItem } from '@/components/features/home/coach-verdict';
 
 import { JAR_META } from '@/app/_lib/jar-meta';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
@@ -96,7 +97,7 @@ export function HomeDashboardClient() {
         daysLeft: 0,
         level: 1,
         levelLabel: 'Beginner',
-        events: [] as Array<{ day: number; text: string; points: number; kind: string }>,
+        events: [] as const,
     };
 
     const dashboardQuery = useLiveQuery(
@@ -141,16 +142,8 @@ export function HomeDashboardClient() {
     });
     const monthScore = liveData?.monthScore ?? emptyMonthScore;
     const periodLabel = liveData?.periodLabel ?? formatPeriod(periodKey, 'en-US');
-    const coach: CoachMessage[] =
-        live && liveData?.coach?.length
-            ? liveData.coach.map((message: (typeof liveData.coach)[number]) => ({
-                  id: message.id,
-                  kind: message.kind,
-                  text: message.text,
-                  ctaLabel: message.ctaLabel ?? 'Open',
-                  ctaHref: message.ctaHref ?? '/',
-              }))
-            : [];
+    const coach: readonly CoachVerdictMessage[] =
+        live && liveData?.coach?.length ? liveData.coach : [];
 
     const travel = describePeriodTravel(period);
 
@@ -176,7 +169,7 @@ export function HomeDashboardClient() {
                         : [
                               {
                                   id: 'fallback',
-                                  kind: 'NUDGE',
+                                  kind: CoachKind.NUDGE,
                                   text: dashboard.inboxCount
                                       ? `${dashboard.inboxCount} transaction${dashboard.inboxCount === 1 ? '' : 's'} waiting for a jar.`
                                       : 'All sorted — time for intention.',

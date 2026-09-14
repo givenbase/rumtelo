@@ -25,7 +25,7 @@ import {
 import { createTxHref, updateHref } from '@/app/_lib/create-routes';
 import { matchMerchantJarKey } from '@/app/_lib/merchant-match';
 import { isLiveData } from '@/app/_lib/preview';
-import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
+import { vendorMarkSrc, findCatalogVendorFromFeed } from '@/app/_lib/vendor-brands';
 import { InboxSortCard } from '@/components/features/money/inbox-sort-card';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -271,12 +271,16 @@ export function TransactionsPageClient() {
                     <div className="grid gap-3">
                         {inbox.map(transaction => {
                             const suggestedKey = suggestJarKeyFor(transaction);
+                            const title =
+                                transaction.counterparty?.trim() || transaction.description;
+                            const catalog = findCatalogVendorFromFeed(title, merchants);
                             return (
                                 <InboxSortCard
                                     key={transaction.id}
                                     transaction={transaction}
                                     jars={jars}
                                     suggestedJarId={resolveJarId(suggestedKey)}
+                                    logoDomain={catalog?.logoDomain}
                                     onConfirm={
                                         live
                                             ? async (transactionId, jarId, createRule) => {
@@ -319,7 +323,11 @@ export function TransactionsPageClient() {
                                         : undefined;
                                     const title =
                                         transaction.counterparty?.trim() || transaction.description;
-                                    const mark = vendorMarkSrc({ name: title });
+                                    const mark = vendorMarkSrc(
+                                        findCatalogVendorFromFeed(title, merchants) ?? {
+                                            name: title,
+                                        }
+                                    );
                                     const detailParts = [
                                         transaction.note?.trim() || null,
                                         !transaction.note?.trim() &&

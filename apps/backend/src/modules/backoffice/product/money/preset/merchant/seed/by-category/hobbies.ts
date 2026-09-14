@@ -1,0 +1,51 @@
+import type { MerchantSeed } from '../types';
+import { play } from '../types';
+
+/** hobbies merchant presets */
+export const HOBBIES_MERCHANTS: readonly MerchantSeed[] = [
+    {
+        key: 'LEGO',
+        name: 'LEGO',
+        matchValue: 'LEGO',
+        aliases: ['LEGO', 'Lego Store'],
+        mcc: '5945',
+        jarKey: play,
+        categoryTemplateKey: 'HOBBIES',
+        logoDomain: 'lego.com',
+        website: 'https://lego.com',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'PANDURO',
+        name: 'Panduro',
+        matchValue: 'Panduro',
+        aliases: ['Panduro', 'PANDURO'],
+        mcc: '5949',
+        jarKey: play,
+        categoryTemplateKey: 'HOBBIES',
+        logoDomain: 'panduro.com',
+        website: 'https://panduro.com',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'VRIJBUITER',
+        name: 'Vrijbuiter',
+        matchValue: 'Vrijbuiter',
+        aliases: ['Vrijbuiter', 'De Vrijbuiter'],
+        mcc: '5941',
+        jarKey: play,
+        categoryTemplateKey: 'HOBBIES',
+        logoDomain: 'vrijbuiter.nl',
+        website: 'https://vrijbuiter.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+];

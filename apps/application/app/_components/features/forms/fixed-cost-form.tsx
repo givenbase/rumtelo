@@ -18,6 +18,7 @@ import {
 } from '@rumtelo/ui';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { CategoryTemplate, FixedCostPreset } from '@rumtelo/contracts';
 import { Cadence, FlowDirection, JarKey } from '@rumtelo/contracts';
 import { z } from 'zod';
 
@@ -110,7 +111,7 @@ export function FixedCostForm({
     const categoriesQuery = useCategoryTemplates(live);
 
     const categoryByKey = useMemo(() => {
-        const map = new Map<string, { name: string; icon: string | null }>();
+        const map = new Map<string, Pick<CategoryTemplate, 'name' | 'icon'>>();
         for (const category of categoriesQuery.data ?? []) {
             map.set(category.key, { name: category.name, icon: category.icon });
         }
@@ -122,14 +123,10 @@ export function FixedCostForm({
             (presetsQuery.data ?? []).map(preset => {
                 const category = categoryByKey.get(preset.categoryTemplateKey);
                 return {
-                    key: preset.key,
-                    name: preset.name,
+                    ...preset,
                     group: category?.name ?? preset.categoryTemplateKey,
                     icon: category?.icon ?? null,
-                    jarKey: preset.jarKey,
-                    categoryTemplateKey: preset.categoryTemplateKey,
-                    suggestedDueDay: preset.suggestedDueDay,
-                };
+                } satisfies FixedCostPreset & { group: string; icon: string | null };
             }),
         [presetsQuery.data, categoryByKey]
     );

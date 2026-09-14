@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react';
 
+import type { Jar, Transaction } from '@rumtelo/contracts';
+import { JarKey } from '@rumtelo/contracts';
 import { Button, VendorMark } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
@@ -11,26 +13,12 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { JAR_META } from '@/app/_lib/jar-meta';
 import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
 
-interface InboxTransaction {
-    readonly id: string;
-    readonly description: string;
-    readonly counterparty: string | null;
-    readonly note?: string | null;
-    readonly amount: number;
-    readonly bookedOn: string;
-}
+type InboxJarOption = Pick<Jar, 'id' | 'key' | 'name' | 'subtitle'>;
 
-export type InboxJarOption = {
-    id: string;
-    key: string;
-    name: string;
-    subtitle?: string | null;
-};
-
-function suggestJarKey(amount: number): string {
-    if (amount > 0) return 'NECESSITIES';
-    if (Math.abs(amount) < 2_000) return 'PLAY';
-    return 'NECESSITIES';
+function suggestJarKey(amount: number): JarKey {
+    if (amount > 0) return JarKey.NECESSITIES;
+    if (Math.abs(amount) < 2_000) return JarKey.PLAY;
+    return JarKey.NECESSITIES;
 }
 
 function metaForKey(key: string) {
@@ -51,14 +39,17 @@ export function InboxSortCard({
     transaction,
     jars,
     suggestedJarId,
+    logoDomain,
     onConfirm,
     onChange,
 }: {
-    transaction: InboxTransaction;
+    transaction: Transaction;
     jars: readonly InboxJarOption[];
     suggestedJarId?: string;
+    /** From merchant catalog match when known. */
+    logoDomain?: string | null;
     onConfirm?: (transactionId: string, jarId: string, createRule?: boolean) => Promise<void>;
-    onChange?: (transaction: InboxTransaction, jarId: string) => void;
+    onChange?: (transaction: Transaction, jarId: string) => void;
 }) {
     const { formatMoney } = useHouseholdCurrency();
     const [pickedJarId, setPickedJarId] = useState<string | null>(null);
@@ -74,7 +65,7 @@ export function InboxSortCard({
     const selected = jars.find(j => j.id === jarId) ?? jars[0];
     const meta = metaForKey(selected?.key ?? suggestJarKey(transaction.amount));
     const title = transaction.counterparty?.trim() || transaction.description;
-    const mark = vendorMarkSrc({ name: title });
+    const mark = vendorMarkSrc({ name: title, logoDomain: logoDomain ?? null });
     const confident =
         Boolean(suggestedJarId) ||
         suggestJarKey(transaction.amount) === 'NECESSITIES' ||

@@ -1,3 +1,4 @@
+import type { Jar } from '@rumtelo/contracts';
 import { JarKey, SpendingStyle } from '@rumtelo/contracts';
 
 import {
@@ -154,13 +155,12 @@ function dedupeTips(tips: SplitTip[]): SplitTip[] {
 
 /** Map jar list rows → % by key for the evaluator. */
 export function pctByJarKey(
-    jars: ReadonlyArray<{ key: string; id: string; percentage: number }>,
+    jars: ReadonlyArray<Pick<Jar, 'id' | 'key' | 'percentage'>>,
     pctById: Record<string, number>
 ): SplitPctByKey {
     const out: SplitPctByKey = {};
     for (const jar of jars) {
-        const key = jar.key as JarKey;
-        out[key] = pctById[jar.id] ?? jar.percentage;
+        out[jar.key] = pctById[jar.id] ?? jar.percentage;
     }
     return out;
 }

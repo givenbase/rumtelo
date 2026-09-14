@@ -18,6 +18,7 @@ import {
 } from '@rumtelo/ui';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { CategoryTemplate, MerchantPreset } from '@rumtelo/contracts';
 import { z } from 'zod';
 
 import { parseAmountToMinorUnits, todayIsoDate } from '@/app/_lib/money-input';
@@ -81,8 +82,8 @@ const EMPTY_INTENT: ExpenseIntentSelection = {
 
 function buildIntentFromDefaults(
     defaults: Partial<ExpenseFormValues> | undefined,
-    merchants: Array<{ name: string; categoryTemplateKey: string; jarKey: string }>,
-    categories: Array<{ key: string; name: string; jarKey: string }>
+    merchants: readonly MerchantPreset[],
+    categories: readonly CategoryTemplate[]
 ): ExpenseIntentSelection {
     const vendor = defaults?.counterparty?.trim() || '';
     const description = defaults?.description?.trim() || '';
@@ -203,28 +204,8 @@ export function ExpenseForm({
     );
     const categoriesQuery = useCategoryTemplates(live);
 
-    const merchants = useMemo(
-        () =>
-            (merchantsQuery.data ?? []).map(preset => ({
-                key: preset.key,
-                name: preset.name,
-                jarKey: preset.jarKey,
-                categoryTemplateKey: preset.categoryTemplateKey,
-                aliases: preset.aliases,
-            })),
-        [merchantsQuery.data]
-    );
-
-    const categories = useMemo(
-        () =>
-            (categoriesQuery.data ?? []).map(category => ({
-                key: category.key,
-                name: category.name,
-                jarKey: category.jarKey,
-                icon: category.icon,
-            })),
-        [categoriesQuery.data]
-    );
+    const merchants = useMemo(() => merchantsQuery.data ?? [], [merchantsQuery.data]);
+    const categories = useMemo(() => categoriesQuery.data ?? [], [categoriesQuery.data]);
 
     const categoryIconByKey = useMemo(() => {
         const map = new Map<string, string | null>();

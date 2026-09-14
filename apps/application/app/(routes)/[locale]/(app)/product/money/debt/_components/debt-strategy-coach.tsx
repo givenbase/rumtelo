@@ -1,5 +1,6 @@
 'use client';
 
+import type { Debt } from '@rumtelo/contracts';
 import { PayoffStrategy } from '@rumtelo/contracts';
 import { cn } from '@rumtelo/utils';
 import Link from 'next/link';
@@ -13,14 +14,6 @@ import {
 import { settingsHref } from '@/app/_lib/settings-tabs';
 import { CoachMark, HelperGate } from '@/components/features/helpers';
 
-type DebtRow = {
-    id: string;
-    name: string;
-    balance: number;
-    interestRate: number;
-    minimumPayment: number;
-};
-
 type StrategyOption = {
     key: PayoffStrategy;
     name: string;
@@ -29,7 +22,7 @@ type StrategyOption = {
 } & RankedPayoff;
 
 type DebtStrategyCoachProps = {
-    debts: ReadonlyArray<DebtRow>;
+    debts: ReadonlyArray<Debt>;
     strategy: PayoffStrategy;
     comparisons: ReadonlyArray<StrategyOption>;
     hasExtra: boolean;

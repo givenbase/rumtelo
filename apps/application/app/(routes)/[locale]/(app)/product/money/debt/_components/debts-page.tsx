@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import type { Debt } from '@rumtelo/contracts';
 import { PayoffStrategy } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { AccentCard, Badge, Card, Eyebrow, VendorMark } from '@rumtelo/ui';
@@ -18,7 +19,7 @@ import {
     rankPayoffStrategies,
     simulatePayoff,
 } from '@/app/_lib/debt-payoff';
-import { lenderLogoUrl, resolveLenderBrand } from '@/app/_lib/lender-brands';
+import { findCatalogVendor, vendorMarkSrc } from '@/app/_lib/vendor-brands';
 import { isLiveData } from '@/app/_lib/preview';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar, ListToolbarTab } from '@/components/layout/list-toolbar';
@@ -58,16 +59,6 @@ const DEBT_SORTS: ReadonlyArray<{ key: DebtSort; label: string }> = [
 function isDebtSort(value: string): value is DebtSort {
     return DEBT_SORTS.some(option => option.key === value);
 }
-
-type DebtRow = {
-    id: string;
-    name: string;
-    kind: string;
-    balance: number;
-    interestRate: number;
-    minimumPayment: number;
-    extraPayment?: number;
-};
 
 const STRATEGY_OPTIONS = [
     {
@@ -117,21 +108,18 @@ export function DebtsPageClient() {
         live
     );
 
+    const merchantsQuery = useLiveQuery(
+        apiQuery.money.catalogs.merchantPresets.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [],
+        live
+    );
+    const merchants = merchantsQuery.data ?? [];
+
     const strategy = settingsQuery.data?.money?.payoffStrategy ?? PayoffStrategy.AVALANCHE;
 
-    const debts = useMemo((): ReadonlyArray<DebtRow> => {
-        const rows = debtsQuery.data;
-        if (!rows) return [];
-        return rows.map(row => ({
-            id: row.id,
-            name: row.name,
-            kind: row.kind,
-            balance: row.balance,
-            interestRate: row.interestRate,
-            minimumPayment: row.minimumPayment,
-            extraPayment: row.extraPayment,
-        }));
-    }, [debtsQuery.data]);
+    const debts = useMemo((): ReadonlyArray<Debt> => debtsQuery.data ?? [], [debtsQuery.data]);
 
     const total = debts.reduce((running, debt) => running + debt.balance, 0);
     const monthly = debts.reduce((running, debt) => running + debt.minimumPayment, 0);
@@ -364,7 +352,11 @@ export function DebtsPageClient() {
                                         entry => entry.id === debt.id
                                     );
                                     const isFocus = showPayoffRanks && hasExtra && payoffRank === 0;
-                                    const brand = resolveLenderBrand(debt.name);
+                                    const mark = vendorMarkSrc(
+                                        findCatalogVendor(debt.name, merchants) ?? {
+                                            name: debt.name,
+                                        }
+                                    );
                                     return (
                                         <button
                                             type="button"
@@ -385,12 +377,8 @@ export function DebtsPageClient() {
                                                             : '·'}
                                                     </span>
                                                     <VendorMark
-                                                        name={debt.name}
-                                                        src={
-                                                            brand
-                                                                ? lenderLogoUrl(brand.domain, 64)
-                                                                : null
-                                                        }
+                                                        name={mark.name}
+                                                        src={mark.src}
                                                         size={28}
                                                     />
                                                     <div>

@@ -49,7 +49,7 @@ import { changePassword, signOut, updateOrganization } from '@/app/_lib/auth';
 import { env } from '@/app/_utils/get-env';
 import { useAccountTheme } from '@/components/features/shell/account-theme-sync';
 import { downloadTextFile, toCsv } from '@/app/_lib/download';
-import { lenderLogoUrl, NL_BANK_LENDERS } from '@/app/_lib/lender-brands';
+import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
 import {
     CAPABILITIES,
     diffPlans,
@@ -1202,6 +1202,18 @@ export function BankSettings() {
         [],
         live
     );
+    const bankingMerchantsQuery = useLiveQuery(
+        apiQuery.money.catalogs.merchantPresets.list.queryOptions({
+            input: { householdId: householdId!, categoryTemplateKey: 'BANKING' },
+        }),
+        [],
+        live
+    );
+    /** Connect chips: retail banks only (exclude BNPL / rails also tagged BANKING). */
+    const bankConnectList = useMemo(() => {
+        const rails = new Set(['KLARNA', 'AFTERPAY', 'PAYPAL', 'WISE']);
+        return (bankingMerchantsQuery.data ?? []).filter(merchant => !rails.has(merchant.key));
+    }, [bankingMerchantsQuery.data]);
 
     const [name, setName] = useState('');
     const [iban, setIban] = useState('');
@@ -1245,26 +1257,34 @@ export function BankSettings() {
                 eyebrow="Bank connection"
                 blurb="Read-only — Rumtelo never moves money. Disconnect any time."
                 badge={<SettingsPill>Not connected</SettingsPill>}>
-                {NL_BANK_LENDERS.map((bank, i) => (
-                    <SettingsRow key={bank.name} last={i === NL_BANK_LENDERS.length - 1}>
-                        <div className="flex min-w-0 items-center gap-2.5">
-                            <VendorMark
-                                name={bank.name}
-                                src={lenderLogoUrl(bank.domain, 64)}
-                                size={22}
-                            />
-                            <SettingsRowLabel title={bank.name} />
-                        </div>
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
-                            disabled
-                            onClick={() => showToast('Bank connect coming soon', 'info')}>
-                            Connect
-                        </Button>
-                    </SettingsRow>
-                ))}
+                {bankConnectList.length === 0 ? (
+                    <p className="py-2.5 text-sm text-fg-muted">Loading banks…</p>
+                ) : (
+                    bankConnectList.map((bank, i) => {
+                        const mark = vendorMarkSrc({
+                            key: bank.key,
+                            name: bank.name,
+                            logoDomain: bank.logoDomain,
+                            website: bank.website,
+                        });
+                        return (
+                            <SettingsRow key={bank.key} last={i === bankConnectList.length - 1}>
+                                <div className="flex min-w-0 items-center gap-2.5">
+                                    <VendorMark name={mark.name} src={mark.src} size={22} />
+                                    <SettingsRowLabel title={bank.name} />
+                                </div>
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
+                                    disabled
+                                    onClick={() => showToast('Bank connect coming soon', 'info')}>
+                                    Connect
+                                </Button>
+                            </SettingsRow>
+                        );
+                    })
+                )}
             </SettingsInkCard>
 
             <SettingsInkCard

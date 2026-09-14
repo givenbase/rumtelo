@@ -1,5 +1,6 @@
 'use client';
 
+import type { JarBalance } from '@rumtelo/contracts';
 import { cn, jarCoverage } from '@rumtelo/utils';
 
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
@@ -7,11 +8,8 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 import { JarProgressBar } from './jar-progress-bar';
 
-type JarCoverageStripProps = {
-    allocated: number;
-    spent: number;
-    committedOut: number;
-    credited?: number;
+type JarCoverageStripProps = Pick<JarBalance, 'allocated' | 'spent' | 'committedOut'> & {
+    credited?: JarBalance['credited'];
     /** Tailwind bg-* jar color */
     colorClass: string;
     /** Show allocated / fixed / spent stats row */

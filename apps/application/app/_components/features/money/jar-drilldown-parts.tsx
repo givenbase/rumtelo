@@ -2,37 +2,34 @@
 
 import Link from 'next/link';
 
+import type { Category, JarBalance } from '@rumtelo/contracts';
 import { cn, categoryVariance } from '@rumtelo/utils';
 
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 import { JarProgressBar } from './jar-progress-bar';
 
-export interface JarCategory {
-    id: string;
-    name: string;
-    budgeted: number;
-    actual: number;
-}
-
-export interface JarDrilldownItem {
-    id?: string;
-    /** JarKey — used to build the jar detail href when `href` is omitted. */
-    key?: string;
-    name: string;
+/** Jar row for dashboard drilldown — balance DTO + chrome / navigation. */
+export type JarDrilldownItem = Pick<
+    JarBalance,
+    | 'id'
+    | 'key'
+    | 'name'
+    | 'allocated'
+    | 'available'
+    | 'spent'
+    | 'committedOut'
+    | 'overspent'
+    | 'categories'
+> & {
+    color: string;
+    /** Display strings resolved from jar + JAR_META at the call site. */
     subtitle: string;
     icon: string;
-    color: string;
-    allocated: number;
-    /** Primary leftover after spend + fixed commitments. */
-    available: number;
-    spent?: number;
-    committedOut?: number;
-    overspent: boolean;
-    categories: JarCategory[];
-    /** Jar detail page; when set, the row navigates and the chevron expands categories. */
     href?: string;
-}
+};
+
+export type JarCategory = Pick<Category, 'id' | 'name' | 'budgeted' | 'actual'>;
 
 function JarDrilldownBody({
     jar,

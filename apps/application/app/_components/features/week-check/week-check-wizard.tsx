@@ -2,20 +2,14 @@
 
 import { useState } from 'react';
 
+import type { JarBalance } from '@rumtelo/contracts';
 import { WeekCheckStage } from '@rumtelo/contracts';
 import { Button, Eyebrow } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
-interface WizardJar {
-    id: string;
-    key: string;
-    name: string;
-    icon: string;
-    available: number;
-    overspent: boolean;
-}
+type WizardJar = Pick<JarBalance, 'id' | 'key' | 'name' | 'icon' | 'available' | 'overspent'>;
 
 const STEPS = [
     {

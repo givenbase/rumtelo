@@ -13,8 +13,10 @@ export class MerchantPresetService {
         jarKey?: JarKey;
         categoryTemplateKey?: string;
         mcc?: string;
+        market?: string;
     }): Promise<MerchantPreset[]> {
-        return this.em.find(
+        const market = (filters?.market ?? 'NL').toUpperCase();
+        const rows = await this.em.find(
             MerchantPreset,
             {
                 isActive: true,
@@ -24,32 +26,55 @@ export class MerchantPresetService {
                     : {}),
                 ...(filters?.mcc ? { mcc: filters.mcc } : {}),
             },
-            { orderBy: { sortOrder: 'ASC' }, populate: ['jarTemplate'] }
+            { populate: ['jarTemplate'] }
         );
+        return rows
+            .filter(row => (row.markets?.length ? row.markets : ['NL']).includes(market))
+            .sort((left, right) => {
+                const leftHi = left.highlight ? 1 : 0;
+                const rightHi = right.highlight ? 1 : 0;
+                if (rightHi !== leftHi) return rightHi - leftHi;
+                if (right.matchPriority !== left.matchPriority) {
+                    return right.matchPriority - left.matchPriority;
+                }
+                return left.sortOrder - right.sortOrder;
+            });
     }
 
     /**
      * First-pass bank-feed matcher: MCC exact, then case-insensitive CONTAINS
      * on matchValue + aliases against counterparty/description text.
+     * Higher matchPriority wins when multiple needles hit.
      */
     async matchFeed(input: {
         text?: string | null;
         mcc?: string | null;
+        market?: string;
     }): Promise<MerchantPreset | null> {
-        const isActive = await this.listActive();
+        const isActive = await this.listActive({ market: input.market });
         const mcc = input.mcc?.trim();
         if (mcc) {
-            const byMcc = isActive.find(preset => preset.mcc === mcc);
-            if (byMcc) return byMcc;
+            const byMcc = isActive
+                .filter(preset => preset.mcc === mcc)
+                .sort((left, right) => right.matchPriority - left.matchPriority);
+            if (byMcc[0]) return byMcc[0];
         }
         const text = (input.text ?? '').trim().toLowerCase();
         if (!text) return null;
+        let best: MerchantPreset | null = null;
         for (const row of isActive) {
             const needles = [row.matchValue, ...row.aliases]
                 .map(alias => alias.trim().toLowerCase())
                 .filter(Boolean);
-            if (needles.some(needle => text.includes(needle))) return row;
+            if (!needles.some(needle => text.includes(needle))) continue;
+            if (
+                !best ||
+                row.matchPriority > best.matchPriority ||
+                (row.matchPriority === best.matchPriority && row.sortOrder < best.sortOrder)
+            ) {
+                best = row;
+            }
         }
-        return null;
+        return best;
     }
 }

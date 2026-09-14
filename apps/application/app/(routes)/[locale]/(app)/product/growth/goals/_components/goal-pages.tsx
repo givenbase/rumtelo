@@ -4,6 +4,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 
 import { useLiveQuery } from '@rumtelo/hooks';
 
+import type { Goal } from '@rumtelo/contracts';
 import { GoalKind } from '@rumtelo/contracts';
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
@@ -36,17 +37,7 @@ export function GoalUpdatePage({ id, embedded = false }: { id: string; embedded?
         [] as never,
         live
     );
-    const row = (query.data ?? []).find(goal => goal.id === id) as
-        | {
-              id: string;
-              kind?: string;
-              name: string;
-              target: number;
-              monthlyContribution: number;
-              jarId?: string | null;
-              why?: string | null;
-          }
-        | undefined;
+    const row = (query.data ?? []).find((goal): goal is Goal => goal.id === id);
 
     if (live && query.isLoading && !row) {
         return <p className="text-sm text-fg-muted">Loading…</p>;
@@ -61,7 +52,7 @@ export function GoalUpdatePage({ id, embedded = false }: { id: string; embedded?
             entityId={row.id}
             embedded={embedded}
             defaultValues={{
-                kind: (row.kind as GoalKind | undefined) ?? GoalKind.SAVE,
+                kind: row.kind ?? GoalKind.SAVE,
                 name: row.name,
                 target: minorUnitsToAmountInput(row.target),
                 monthlyContribution: minorUnitsToAmountInput(row.monthlyContribution),

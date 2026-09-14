@@ -15,13 +15,10 @@
  * That is correct math, not a bug — only Minimal then differs.
  */
 
+import type { Debt } from '@rumtelo/contracts';
 import { PayoffStrategy } from '@rumtelo/contracts';
 
-export type DebtPayoffInput = {
-    balance: number;
-    interestRate: number;
-    minimumPayment: number;
-};
+export type DebtPayoffInput = Pick<Debt, 'balance' | 'interestRate' | 'minimumPayment'>;
 
 export type DebtPayoffResult = {
     months: number;

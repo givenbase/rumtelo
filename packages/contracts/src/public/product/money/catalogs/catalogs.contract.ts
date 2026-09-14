@@ -58,6 +58,8 @@ export const catalogsContract = {
                     jarKey: z.enum(JarKey).nullish(),
                     categoryTemplateKey: z.string().max(64).nullish(),
                     mcc: z.string().length(4).nullish(),
+                    /** ISO market filter; default NL on the server when omitted. */
+                    market: z.string().length(2).nullish(),
                 })
             )
             .output(z.array(MerchantPreset)),

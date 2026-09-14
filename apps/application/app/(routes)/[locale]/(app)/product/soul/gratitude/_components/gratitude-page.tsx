@@ -5,6 +5,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 
+import type { Gratitude } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Eyebrow, Input, Section } from '@rumtelo/ui';
 import { currentWeekKey } from '@rumtelo/utils';
@@ -44,17 +45,11 @@ export function GratitudePageClient() {
         },
     });
 
-    const entries = (listQuery.data ?? []) as ReadonlyArray<{
-        id: string;
-        text: string;
-        day?: string;
-        createdAt?: string;
-    }>;
+    const entries = (listQuery.data ?? []) as ReadonlyArray<Gratitude>;
 
     const empty = entries.length === 0;
 
-    function formatDay(entry: { day?: string; createdAt?: string }): string {
-        if (entry.day) return entry.day;
+    function formatDay(entry: Pick<Gratitude, 'createdAt'>): string {
         if (entry.createdAt) {
             const date = new Date(entry.createdAt);
             return date.toLocaleDateString('en-US', { weekday: 'short' });

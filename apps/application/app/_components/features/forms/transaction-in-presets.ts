@@ -1,12 +1,11 @@
+import type { CatalogItemBase } from '@rumtelo/contracts';
 import { JarKey } from '@rumtelo/contracts';
 
 /**
  * One-off Transaction In suggestions — money outside fixed/recurring income.
  * Keep each option a distinct source; free-type covers edge cases.
  */
-export type TransactionInPreset = {
-    key: string;
-    name: string;
+export type TransactionInPreset = Pick<CatalogItemBase, 'key' | 'name'> & {
     group: string;
     icon?: string;
     /** Soft jar hint when the user picks this preset. */

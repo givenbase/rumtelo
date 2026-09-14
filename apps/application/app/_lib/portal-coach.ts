@@ -1,12 +1,11 @@
+import type { CoachMessage } from '@rumtelo/contracts';
+
 import type { PortalHubProps } from '@/components/features/home/portal-hub';
 
+type PortalCoachMessage = Pick<CoachMessage, 'kind' | 'text' | 'ctaLabel' | 'ctaHref'>;
+
 export function pickPortalCoach(
-    messages: Array<{
-        kind: string;
-        text: string;
-        ctaLabel: string | null;
-        ctaHref: string | null;
-    }>,
+    messages: ReadonlyArray<PortalCoachMessage>,
     fallback: PortalHubProps['coach']
 ): PortalHubProps['coach'] {
     const tip = messages[0];

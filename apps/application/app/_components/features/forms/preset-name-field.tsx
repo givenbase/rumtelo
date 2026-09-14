@@ -2,13 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import type { CatalogItemBase } from '@rumtelo/contracts';
 import { cn } from '@rumtelo/utils';
 
 import { FormInput } from './form-input';
 
-export type NamePresetOption = {
-    key: string;
-    name: string;
+/** Catalog picker row — shared identity fields + optional UI extras. */
+export type NamePresetOption = Pick<CatalogItemBase, 'key' | 'name'> & {
+    sortOrder?: number;
     group?: string;
     icon?: string | null;
 };

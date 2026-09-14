@@ -1,3 +1,5 @@
+import type { Goal, JarBalance } from '@rumtelo/contracts';
+
 /**
  * Goal pace for the income simulator (Growth → Income) — "and what it buys you".
  *
@@ -15,20 +17,9 @@
  * All money in minor units (the `Cents` suffix follows the app convention; currency-agnostic).
  */
 
-export type GoalPaceJar = {
-    name: string;
-    /** Share of net income routed here (0..100). */
-    percentage: number;
-    /** Active fixed OUT on this jar, monthly-normalised. */
-    committedOut: number;
-};
+export type GoalPaceJar = Pick<JarBalance, 'name' | 'percentage' | 'committedOut'>;
 
-export type GoalPaceGoal = {
-    saved: number;
-    target: number;
-    monthlyContribution: number;
-    targetOn: string | null;
-};
+export type GoalPaceGoal = Pick<Goal, 'saved' | 'target' | 'monthlyContribution' | 'targetOn'>;
 
 export type GoalPaceInput = {
     /** Simulated net monthly income. */

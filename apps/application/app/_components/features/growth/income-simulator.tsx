@@ -4,7 +4,8 @@ import { useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import type { Goal } from '@rumtelo/contracts';
+import type { Goal, JarBalance } from '@rumtelo/contracts';
+import { GoalStatus } from '@rumtelo/contracts';
 import { Card } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
@@ -15,13 +16,7 @@ import { JAR_META } from '@/app/_lib/jar-meta';
 import { CoachMark, CoachTipCard, useHelpersEnabled } from '@/components/features/helpers';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
-type SimulatorJar = {
-    id: string;
-    key: string;
-    name: string;
-    percentage: number;
-    committedOut: number;
-};
+type SimulatorJar = Pick<JarBalance, 'id' | 'key' | 'name' | 'percentage' | 'committedOut'>;
 
 type IncomeSimulatorProps = {
     /** Current household monthly net (cents). */
@@ -81,8 +76,8 @@ function simRange(netMonthlyCents: number, targetCents: number | null) {
     return { min, max, current };
 }
 
-function isGoalOpen(goal: { saved: number; target: number; status?: string }) {
-    if (goal.status === 'REACHED' || goal.status === 'ARCHIVED') return false;
+function isGoalOpen(goal: Pick<Goal, 'saved' | 'target' | 'status'>) {
+    if (goal.status === GoalStatus.REACHED || goal.status === GoalStatus.ARCHIVED) return false;
     return goal.saved < goal.target;
 }
 

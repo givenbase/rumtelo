@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 
+import type { JarBalance } from '@rumtelo/contracts';
 import { cn, jarCoverage } from '@rumtelo/utils';
 
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
@@ -9,20 +10,23 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 import { JarProgressBar } from './jar-progress-bar';
 
-export type JarSummaryModel = {
-    id: string;
-    key: string;
-    name: string;
+/** Compact jars-list row — balance fields + display chrome. */
+export type JarSummaryModel = Pick<
+    JarBalance,
+    | 'id'
+    | 'key'
+    | 'name'
+    | 'percentage'
+    | 'allocated'
+    | 'available'
+    | 'spent'
+    | 'credited'
+    | 'committedOut'
+    | 'overspent'
+> & {
+    color: string;
     subtitle: string;
     icon: string;
-    color: string;
-    percentage: number;
-    allocated: number;
-    available: number;
-    spent: number;
-    credited: number;
-    committedOut: number;
-    overspent: boolean;
     categoryCount: number;
 };
 

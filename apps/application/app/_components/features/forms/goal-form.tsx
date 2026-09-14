@@ -18,6 +18,7 @@ import {
 } from '@rumtelo/ui';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { GoalPreset } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus, JarKey } from '@rumtelo/contracts';
 import { z } from 'zod';
 
@@ -95,13 +96,13 @@ export function GoalForm({
     );
     const presetOptions = useMemo(
         () =>
-            (presetsQuery.data ?? []).map(preset => ({
-                key: preset.key,
-                name: preset.name,
-                jarKey: preset.jarKey,
-                icon: preset.icon,
-                group: preset.key === 'OTHER' ? 'Other' : undefined,
-            })),
+            (presetsQuery.data ?? []).map(
+                preset =>
+                    ({
+                        ...preset,
+                        group: preset.key === 'OTHER' ? 'Other' : undefined,
+                    }) satisfies GoalPreset & { group?: string }
+            ),
         [presetsQuery.data]
     );
     const selectedIcon = useRef<string | null>(null);

@@ -2,33 +2,25 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import type {
+    CategoryTemplate,
+    JarKey,
+    MerchantHighlight,
+    MerchantPreset,
+} from '@rumtelo/contracts';
 import { VendorMark } from '@rumtelo/ui';
 
 import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
 
 import { FormInput } from './form-input';
 
-export type ExpenseMerchantOption = {
-    key: string;
-    name: string;
-    jarKey: string;
-    categoryTemplateKey: string;
-    aliases?: string[];
-};
-
-export type ExpenseCategoryOption = {
-    key: string;
-    name: string;
-    jarKey: string;
-    icon?: string | null;
-};
-
+/** Form selection state for the expense intent picker (not an API DTO). */
 export type ExpenseIntentSelection = {
     /** Free-typed or picked vendor → counterparty */
     vendor: string;
     categoryKey: string | null;
     categoryName: string | null;
-    jarKey: string | null;
+    jarKey: JarKey | null;
     /** How the intent was chosen — drives follow-up UI */
     source: 'merchant' | 'category' | 'custom' | null;
 };
@@ -36,20 +28,26 @@ export type ExpenseIntentSelection = {
 type ExpenseIntentFieldProps = {
     value: ExpenseIntentSelection;
     onChange: (next: ExpenseIntentSelection) => void;
-    merchants: ExpenseMerchantOption[];
-    categories: ExpenseCategoryOption[];
+    merchants: readonly MerchantPreset[];
+    categories: readonly CategoryTemplate[];
     categoryIconByKey: Map<string, string | null>;
     disabled?: boolean;
     id?: string;
 };
 
-function matchesMerchant(merchant: ExpenseMerchantOption, needle: string) {
+const HIGHLIGHT_LABEL: Record<MerchantHighlight, string> = {
+    FEATURED: 'Featured',
+    NEW: 'New',
+    POPULAR: 'Popular',
+};
+
+function matchesMerchant(merchant: MerchantPreset, needle: string) {
     if (!needle) return true;
     if (merchant.name.toLowerCase().includes(needle)) return true;
-    return (merchant.aliases ?? []).some(alias => alias.toLowerCase().includes(needle));
+    return merchant.aliases.some(alias => alias.toLowerCase().includes(needle));
 }
 
-function matchesCategory(category: ExpenseCategoryOption, needle: string) {
+function matchesCategory(category: CategoryTemplate, needle: string) {
     if (!needle) return true;
     return category.name.toLowerCase().includes(needle);
 }
@@ -76,10 +74,18 @@ export function ExpenseIntentField({
 
     const needle = query.trim().toLowerCase();
 
-    const merchantHits = useMemo(
-        () => merchants.filter(merchant => matchesMerchant(merchant, needle)).slice(0, 8),
-        [merchants, needle]
-    );
+    const merchantHits = useMemo(() => {
+        const hits = merchants.filter(merchant => matchesMerchant(merchant, needle));
+        return hits
+            .slice()
+            .sort((left, right) => {
+                const leftHi = left.highlight ? 1 : 0;
+                const rightHi = right.highlight ? 1 : 0;
+                if (rightHi !== leftHi) return rightHi - leftHi;
+                return left.sortOrder - right.sortOrder;
+            })
+            .slice(0, 8);
+    }, [merchants, needle]);
 
     const categoryHits = useMemo(
         () => categories.filter(category => matchesCategory(category, needle)).slice(0, 8),
@@ -88,7 +94,15 @@ export function ExpenseIntentField({
 
     const vendorsForCategory = useMemo(() => {
         if (!value.categoryKey) return [];
-        return merchants.filter(merchant => merchant.categoryTemplateKey === value.categoryKey);
+        return merchants
+            .filter(merchant => merchant.categoryTemplateKey === value.categoryKey)
+            .slice()
+            .sort((left, right) => {
+                const leftHi = left.highlight ? 1 : 0;
+                const rightHi = right.highlight ? 1 : 0;
+                if (rightHi !== leftHi) return rightHi - leftHi;
+                return left.sortOrder - right.sortOrder;
+            });
     }, [merchants, value.categoryKey]);
 
     const hasSelection = Boolean(value.vendor || value.categoryKey);
@@ -102,7 +116,7 @@ export function ExpenseIntentField({
         return () => document.removeEventListener('mousedown', onDoc);
     }, []);
 
-    function selectMerchant(merchant: ExpenseMerchantOption) {
+    function selectMerchant(merchant: MerchantPreset) {
         const category = categories.find(
             candidate => candidate.key === merchant.categoryTemplateKey
         );
@@ -119,7 +133,7 @@ export function ExpenseIntentField({
         setSkippedVendor(false);
     }
 
-    function selectCategory(category: ExpenseCategoryOption) {
+    function selectCategory(category: CategoryTemplate) {
         onChange({
             vendor: '',
             categoryKey: category.key,
@@ -167,7 +181,15 @@ export function ExpenseIntentField({
         ? (categoryIconByKey.get(value.categoryKey) ?? null)
         : null;
 
-    const selectedVendorMark = value.vendor ? vendorMarkSrc({ name: value.vendor }) : null;
+    const selectedVendorMark = value.vendor
+        ? vendorMarkSrc({
+              name: value.vendor,
+              logoDomain:
+                  merchants.find(
+                      merchant => merchant.name.toLowerCase() === value.vendor.toLowerCase()
+                  )?.logoDomain ?? null,
+          })
+        : null;
 
     return (
         <div ref={rootRef} className="grid gap-3">
@@ -276,6 +298,8 @@ export function ExpenseIntentField({
                                                     const mark = vendorMarkSrc({
                                                         key: merchant.key,
                                                         name: merchant.name,
+                                                        logoDomain: merchant.logoDomain,
+                                                        website: merchant.website,
                                                     });
                                                     const categoryName =
                                                         categories.find(
@@ -283,6 +307,9 @@ export function ExpenseIntentField({
                                                                 candidate.key ===
                                                                 merchant.categoryTemplateKey
                                                         )?.name ?? merchant.categoryTemplateKey;
+                                                    const highlightLabel = merchant.highlight
+                                                        ? HIGHLIGHT_LABEL[merchant.highlight]
+                                                        : null;
                                                     return (
                                                         <li key={`m-${merchant.key}`}>
                                                             <button
@@ -305,6 +332,11 @@ export function ExpenseIntentField({
                                                                         {' '}
                                                                         · {categoryName}
                                                                     </span>
+                                                                    {highlightLabel ? (
+                                                                        <span className="ml-1 text-[10px] tracking-wide text-bg/60 uppercase">
+                                                                            {highlightLabel}
+                                                                        </span>
+                                                                    ) : null}
                                                                 </span>
                                                             </button>
                                                         </li>
@@ -364,12 +396,17 @@ export function ExpenseIntentField({
                         Know the vendor?
                     </p>
                     {vendorsForCategory.length > 0 ? (
-                        <div className="flex flex-wrap gap-1.5">
+                        <div className="flex max-h-40 flex-wrap gap-1.5 overflow-y-auto pr-0.5">
                             {vendorsForCategory.map(merchant => {
                                 const mark = vendorMarkSrc({
                                     key: merchant.key,
                                     name: merchant.name,
+                                    logoDomain: merchant.logoDomain,
+                                    website: merchant.website,
                                 });
+                                const highlightLabel = merchant.highlight
+                                    ? HIGHLIGHT_LABEL[merchant.highlight]
+                                    : null;
                                 return (
                                     <button
                                         key={merchant.key}
@@ -379,6 +416,11 @@ export function ExpenseIntentField({
                                         onClick={() => selectMerchant(merchant)}>
                                         <VendorMark name={mark.name} src={mark.src} size={20} />
                                         {merchant.name}
+                                        {highlightLabel ? (
+                                            <span className="text-[10px] tracking-wide text-fg-muted uppercase">
+                                                {highlightLabel}
+                                            </span>
+                                        ) : null}
                                     </button>
                                 );
                             })}

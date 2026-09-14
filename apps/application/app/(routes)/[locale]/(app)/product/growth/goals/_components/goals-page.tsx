@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import type { Goal } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { AccentCard, EmptyState, Meter } from '@rumtelo/ui';
@@ -69,20 +70,7 @@ export function GoalsPageClient() {
         [incomeQuery.data]
     );
 
-    const goals = (goalsQuery.data ?? []) as ReadonlyArray<{
-        id: string;
-        kind?: string;
-        name: string;
-        icon: string | null;
-        target: number;
-        saved: number;
-        monthlyContribution: number;
-        jarId?: string | null;
-        why?: string | null;
-        status?: string;
-        targetOn?: string | null;
-        fulfilledOn?: string | null;
-    }>;
+    const goals = useMemo((): ReadonlyArray<Goal> => goalsQuery.data ?? [], [goalsQuery.data]);
 
     const active = goals.filter(goal => {
         if (goal.status === GoalStatus.ARCHIVED || goal.status === GoalStatus.REACHED) return false;

@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import type { FixedCost, Goal } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus, JarKey, TransactionStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card, Eyebrow, Meter, Section } from '@rumtelo/ui';
@@ -21,6 +22,21 @@ import { ListToolbar } from '@/components/layout/list-toolbar';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 const EMPTY_TRANSACTION_PAGE = { items: [] as never[], nextCursor: null };
+
+type GivePledge = Pick<
+    Goal,
+    | 'id'
+    | 'kind'
+    | 'status'
+    | 'name'
+    | 'target'
+    | 'saved'
+    | 'monthlyContribution'
+    | 'targetOn'
+    | 'fulfilledOn'
+>;
+
+type GiveFixedRow = Pick<FixedCost, 'id' | 'name' | 'counterparty'> & { monthly: number };
 
 function yearStartIso(): string {
     return `${new Date().getUTCFullYear()}-01-01`;
@@ -51,18 +67,8 @@ export function GivingPageClient() {
         [] as never,
         live
     );
-    const pledge = useMemo(() => {
-        const rows = (goalsQuery.data ?? []) as ReadonlyArray<{
-            id: string;
-            kind?: string;
-            status?: string;
-            name: string;
-            target: number;
-            saved: number;
-            monthlyContribution: number;
-            targetOn?: string | null;
-            fulfilledOn?: string | null;
-        }>;
+    const pledge = useMemo((): GivePledge | null => {
+        const rows = (goalsQuery.data ?? []) as ReadonlyArray<GivePledge>;
         const give = rows.filter(goal => goal.kind === GoalKind.GIVE);
         return (
             give.find(goal => goal.status === GoalStatus.ACTIVE) ??
@@ -76,7 +82,7 @@ export function GivingPageClient() {
         [] as never,
         live
     );
-    const giveFixed = useMemo(() => {
+    const giveFixed = useMemo((): GiveFixedRow[] => {
         const group = (fixedQuery.data ?? []).find(row => row.jarKey === JarKey.GIVE);
         return (group?.items ?? [])
             .filter(item => item.isActive && item.direction === 'OUT')

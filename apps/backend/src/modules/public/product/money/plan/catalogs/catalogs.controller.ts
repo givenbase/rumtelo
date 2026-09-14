@@ -130,6 +130,7 @@ export class MoneyCatalogsController {
                     jarKey: (input.jarKey as JarKey | null) ?? undefined,
                     categoryTemplateKey: input.categoryTemplateKey ?? undefined,
                     mcc: input.mcc ?? undefined,
+                    market: input.market ?? undefined,
                 });
                 return rows.map(preset => ({
                     key: preset.key,
@@ -140,6 +141,12 @@ export class MoneyCatalogsController {
                     mcc: preset.mcc,
                     jarKey: preset.jarTemplate.key,
                     categoryTemplateKey: preset.categoryTemplateKey,
+                    logoDomain: preset.logoDomain,
+                    website: preset.website,
+                    highlight: preset.highlight ?? null,
+                    markets: preset.markets?.length ? preset.markets : ['NL'],
+                    matchPriority: preset.matchPriority ?? 0,
+                    providerIds: preset.providerIds ?? {},
                 }));
             }
         );

@@ -1,3 +1,4 @@
+import type { JarBalance } from '@rumtelo/contracts';
 import { DEFAULT_JAR_SPLIT, JarKey } from '@rumtelo/contracts';
 
 /**
@@ -52,14 +53,12 @@ export function evaluateNecessitiesPressure(input: NecessitiesPressureInput): Ne
 }
 
 /** From jar balances — overspent Necessities (fixed + spend ate the envelope). */
-export function necessitiesPressureFromJar(jar: {
-    key: string;
-    percentage: number;
-    allocated: number;
-    committedOut: number;
-    available: number;
-    overspent: boolean;
-}): NecessitiesPressure | null {
+export function necessitiesPressureFromJar(
+    jar: Pick<
+        JarBalance,
+        'key' | 'percentage' | 'allocated' | 'committedOut' | 'available' | 'overspent'
+    >
+): NecessitiesPressure | null {
     if (jar.key !== JarKey.NECESSITIES) return null;
     const shortfallCents = Math.max(0, -jar.available);
     const active = jar.overspent || jar.committedOut > jar.allocated;

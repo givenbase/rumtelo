@@ -1,7 +1,7 @@
 'use client';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
-import type { AppClient } from '@rumtelo/contracts';
+import type { AppClient, Category } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 
 import { isLiveData } from '@/app/_lib/preview';
@@ -13,7 +13,7 @@ export async function resolveCategoryId(opts: {
     householdId: string;
     jarId: string;
     categoryName: string;
-    existing: Array<{ id: string; name: string; isArchived?: boolean }>;
+    existing: ReadonlyArray<Pick<Category, 'id' | 'name' | 'isArchived'>>;
 }): Promise<string | null> {
     const name = opts.categoryName.trim();
     if (!name) return null;

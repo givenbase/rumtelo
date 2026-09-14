@@ -1,8 +1,6 @@
-import { join } from 'node:path';
-
 import { Migrator } from '@mikro-orm/migrations';
+import { ReflectMetadataProvider } from '@mikro-orm/core';
 import { defineConfig } from '@mikro-orm/postgresql';
-import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 import { SeedManager } from '@mikro-orm/seeder';
 
 import { loadEnvFiles } from './src/common/config/load-env';
@@ -11,11 +9,9 @@ import { loadEnvFiles } from './src/common/config/load-env';
 loadEnvFiles();
 
 const isProd = process.env.NODE_ENV === 'production';
-const baseDir = process.cwd();
 
 export default defineConfig({
-    // Source entities only — we run under oxc-node (Galighticus). TsMorph must read
-    // .ts files; a dist/**/*.js glob makes it look for sibling .ts under dist.
+    // Source entities only — we run under oxc-node (Galighticus).
     entities: ['./src/**/*.entity.ts'],
     entitiesTs: ['./src/**/*.entity.ts'],
     clientUrl: process.env.DATABASE_URL,
@@ -26,12 +22,10 @@ export default defineConfig({
     // Planes: auth, public (app/household), backoffice.
     // Product areas are folders under modules/public — not separate DB schemas.
     schema: 'public',
-    // TsMorph (Galighticus): oxc-node does not emit Reflect decorator metadata.
-    metadataProvider: TsMorphMetadataProvider,
-    // Keep reflection cache next to migrations/seeders (not apps/backend/temp).
-    metadataCache: {
-        options: { cacheDir: join(baseDir, './src/database/.temp') },
-    },
+    // Reflect (not TsMorph): oxc-node rewrites entity `path` to decorate.js, so
+    // TsMorph cannot re-read .ts sources after a cold/missing metadata cache.
+    // oxc-node does emit design:type Reflect metadata for @Property fields.
+    metadataProvider: ReflectMetadataProvider,
     extensions: [Migrator, SeedManager],
     // Never auto-sync a schema that holds money. Migrations only.
     migrations: {

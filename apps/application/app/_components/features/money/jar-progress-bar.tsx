@@ -1,12 +1,10 @@
 'use client';
 
+import type { JarBalance } from '@rumtelo/contracts';
 import { cn, jarCoverage, usedPctDisplay } from '@rumtelo/utils';
 
-type JarProgressBarProps = {
-    allocated: number;
-    spent: number;
-    committedOut: number;
-    credited?: number;
+type JarProgressBarProps = Pick<JarBalance, 'allocated' | 'spent' | 'committedOut'> & {
+    credited?: JarBalance['credited'];
     /** Tailwind bg-* class when not overspent */
     colorClass: string;
     className?: string;

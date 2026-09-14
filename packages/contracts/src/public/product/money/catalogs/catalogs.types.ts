@@ -10,6 +10,7 @@ export type {
     IncomeSourcePreset,
     GoalPreset,
     MerchantPreset,
+    MerchantHighlight,
     GivingSignal,
     GivingOrganisation,
 } from './catalogs.schema';

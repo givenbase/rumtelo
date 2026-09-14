@@ -1,3 +1,4 @@
+import type { MerchantHighlight } from '@rumtelo/contracts';
 import { Entity, ManyToOne, Property, Unique } from '@mikro-orm/core';
 
 import { BaseEntity } from '../../../../../../common/database/base.entity';
@@ -9,6 +10,7 @@ import { JarTemplate } from '../../template/jar/jar.entity';
  *
  * Matchbook for inbox rules and future Open Banking (Revolut, etc.).
  * `matchValue` + `aliases` cover noisy bank descriptors; `mcc` is optional ISO 18245.
+ * Catalog SSOT also owns logoDomain / highlight / markets for the expense picker.
  *
  * @see JarTemplate — default jar for sorted spend
  * @see CategoryTemplate.key — via categoryTemplateKey
@@ -52,6 +54,30 @@ export class MerchantPreset extends BaseEntity {
     /** CategoryTemplate.key for the household category under that jar. */
     @Property({ length: 64 })
     categoryTemplateKey!: string;
+
+    /** Favicon hostname — client builds logo URL; no client brand mirror. */
+    @Property({ length: 120, nullable: true })
+    logoDomain: string | null = null;
+
+    /** Official site when known (optional). */
+    @Property({ length: 240, nullable: true })
+    website: string | null = null;
+
+    /** Editorial pin: FEATURED | NEW | POPULAR; null = normal. */
+    @Property({ length: 16, nullable: true })
+    highlight: MerchantHighlight | null = null;
+
+    /** ISO 3166-1 alpha-2 markets where this merchant is listed. */
+    @Property({ type: 'json', default: ['NL'] })
+    markets: string[] = ['NL'];
+
+    /** Tie-breaker for feed matching and list sort (higher wins). */
+    @Property({ default: 0 })
+    matchPriority = 0;
+
+    /** Aggregator merchant ids when Open Banking is wired. */
+    @Property({ type: 'json' })
+    providerIds: Record<string, string> = {};
 
     /** Display / seed order within the catalog. */
     @Property({ default: 0 })

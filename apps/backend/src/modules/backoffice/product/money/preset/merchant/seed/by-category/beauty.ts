@@ -1,0 +1,51 @@
+import type { MerchantSeed } from '../types';
+import { play } from '../types';
+
+/** beauty merchant presets */
+export const BEAUTY_MERCHANTS: readonly MerchantSeed[] = [
+    {
+        key: 'ICI_PARIS_XL',
+        name: 'ICI Paris XL',
+        matchValue: 'ICI Paris XL',
+        aliases: ['ICI Paris XL', 'ICI PARIS', 'Iciparisxl'],
+        mcc: '5977',
+        jarKey: play,
+        categoryTemplateKey: 'BEAUTY',
+        logoDomain: 'iciparisxl.nl',
+        website: 'https://iciparisxl.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'DOUGLAS',
+        name: 'Douglas',
+        matchValue: 'Douglas',
+        aliases: ['Douglas', 'DOUGLAS'],
+        mcc: '5977',
+        jarKey: play,
+        categoryTemplateKey: 'BEAUTY',
+        logoDomain: 'douglas.nl',
+        website: 'https://douglas.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'THE_BODY_SHOP',
+        name: 'The Body Shop',
+        matchValue: 'The Body Shop',
+        aliases: ['The Body Shop', 'Body Shop', 'THE BODY SHOP'],
+        mcc: '5977',
+        jarKey: play,
+        categoryTemplateKey: 'BEAUTY',
+        logoDomain: 'thebodyshop.com',
+        website: 'https://thebodyshop.com',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+];

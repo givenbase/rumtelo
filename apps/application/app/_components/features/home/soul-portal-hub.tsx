@@ -1,5 +1,6 @@
 'use client';
 
+import type { Goal } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 
@@ -10,6 +11,8 @@ import { soulPortalShell } from '@/app/_lib/portal-hubs';
 import { PortalHub, type PortalHubProps } from '@/components/features/home/portal-hub';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+
+type PledgeGoal = Pick<Goal, 'kind' | 'status' | 'target' | 'saved'>;
 
 export function SoulPortalHubClient() {
     const { householdId } = useAuth();
@@ -30,14 +33,7 @@ export function SoulPortalHubClient() {
         [] as never,
         live
     );
-    const pledge = (
-        (goalsQuery.data ?? []) as ReadonlyArray<{
-            kind?: string;
-            status?: string;
-            target: number;
-            saved: number;
-        }>
-    ).find(
+    const pledge = ((goalsQuery.data ?? []) as ReadonlyArray<PledgeGoal>).find(
         goal =>
             goal.kind === GoalKind.GIVE &&
             (goal.status === GoalStatus.ACTIVE || goal.status === GoalStatus.REACHED)

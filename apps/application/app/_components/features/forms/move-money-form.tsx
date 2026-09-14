@@ -18,6 +18,7 @@ import {
     createFormInvalidHandler,
 } from '@rumtelo/ui';
 import { cn, toPeriodKey } from '@rumtelo/utils';
+import type { Jar, JarCapabilities } from '@rumtelo/contracts';
 import { jarCapabilitiesFor } from '@rumtelo/contracts';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -62,15 +63,12 @@ type MoveMoneyFormProps = {
     onSuccess?: () => void;
 };
 
-type JarPick = {
-    id: string;
-    key: string;
-    name: string;
-    icon: string;
-    available: number | null;
-    canSpend: boolean;
-    canInvest: boolean;
-};
+type JarPick = Pick<Jar, 'id' | 'key' | 'name'> &
+    Pick<JarCapabilities, 'canSpend' | 'canInvest'> & {
+        icon: string;
+        /** null when balances for the period have not loaded yet. */
+        available: number | null;
+    };
 
 type MoveEligibility = { ok: true } | { ok: false; reason: string };
 

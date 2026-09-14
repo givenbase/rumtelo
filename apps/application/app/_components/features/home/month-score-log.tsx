@@ -1,12 +1,8 @@
+import type { MonthScoreEvent } from '@rumtelo/contracts';
 import { Eyebrow } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
-export interface MonthScoreEvent {
-    day: number;
-    text: string;
-    points: number;
-    kind: string;
-}
+export type { MonthScoreEvent };
 
 /**
  * Month score log (design: dashboard "Month score" section).
@@ -20,7 +16,7 @@ export function MonthScoreLog({
 }: {
     score: number;
     daysLeft: number;
-    events: readonly MonthScoreEvent[];
+    events: readonly Pick<MonthScoreEvent, 'day' | 'text' | 'points' | 'kind'>[];
 }) {
     return (
         <div className="rounded-2xl border border-line bg-surface p-6 shadow-md">

@@ -1,10 +1,4 @@
-import type { JarKey } from '@rumtelo/contracts';
-
-export type MerchantMatchNeedle = {
-    jarKey: JarKey;
-    matchValue: string;
-    aliases: readonly string[];
-};
+import type { JarKey, MerchantPreset } from '@rumtelo/contracts';
 
 /**
  * Same first-pass rules as MerchantPresetService.matchFeed (contains, case-insensitive).
@@ -12,7 +6,7 @@ export type MerchantMatchNeedle = {
  */
 export function matchMerchantJarKey(
     text: string,
-    merchants: readonly MerchantMatchNeedle[]
+    merchants: readonly MerchantPreset[]
 ): JarKey | null {
     const haystack = text.trim().toLowerCase();
     if (!haystack || merchants.length === 0) return null;

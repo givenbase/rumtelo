@@ -44,6 +44,12 @@ export const CATEGORY_TEMPLATE_SEED = [
     { key: 'TUITION', name: 'Tuition', jarKey: JarKey.EDUCATION, icon: '🏫' },
     // PLAY
     { key: 'EATING_OUT', name: 'Eating out', jarKey: JarKey.PLAY, icon: '🍽️' },
+    { key: 'FASHION', name: 'Fashion', jarKey: JarKey.PLAY, icon: '👗' },
+    { key: 'SHOPPING', name: 'Shopping', jarKey: JarKey.PLAY, icon: '🛍️' },
+    { key: 'BEAUTY', name: 'Beauty', jarKey: JarKey.PLAY, icon: '💄' },
+    { key: 'TRAVEL', name: 'Travel', jarKey: JarKey.PLAY, icon: '✈️' },
+    { key: 'EVENTS', name: 'Events', jarKey: JarKey.PLAY, icon: '🎟️' },
+    { key: 'GAMING', name: 'Gaming', jarKey: JarKey.PLAY, icon: '🎮' },
     { key: 'HOBBIES', name: 'Hobbies', jarKey: JarKey.PLAY, icon: '🎨' },
     { key: 'MEDIA', name: 'Media', jarKey: JarKey.PLAY, icon: '🎬' },
     { key: 'SPORT', name: 'Sport', jarKey: JarKey.PLAY, icon: '⚽' },

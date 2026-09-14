@@ -18,6 +18,7 @@ import {
 } from '@rumtelo/ui';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { IncomeAmountPeriod, IncomeSourcePreset } from '@rumtelo/contracts';
 import { Cadence, IncomeKind } from '@rumtelo/contracts';
 import { z } from 'zod';
 
@@ -70,22 +71,16 @@ const incomeFormSchema = z.object({
 
 export type IncomeFormValues = z.infer<typeof incomeFormSchema>;
 
-type IncomePeriod = {
-    id: string;
-    amount: number;
-    effectiveOn: string;
-};
-
 type IncomeFormProps = {
     defaultValues?: Partial<IncomeFormValues>;
-    periods?: IncomePeriod[];
+    periods?: IncomeAmountPeriod[];
     embedded?: boolean;
     mode?: 'create' | 'edit';
     entityId?: string;
     onSuccess?: () => void;
 };
 
-const EMPTY_PERIODS: IncomePeriod[] = [];
+const EMPTY_PERIODS: IncomeAmountPeriod[] = [];
 
 function todayIso(): string {
     return new Date().toISOString().slice(0, 10);
@@ -115,14 +110,14 @@ export function IncomeForm({
     );
     const presetOptions = useMemo(
         () =>
-            (presetsQuery.data ?? []).map(preset => ({
-                key: preset.key,
-                name: preset.name,
-                group: INCOME_KIND_GROUP[preset.kind] ?? preset.kind,
-                icon: preset.icon ?? INCOME_KIND_ICON[preset.kind] ?? null,
-                kind: preset.kind,
-                defaultCadence: preset.defaultCadence,
-            })),
+            (presetsQuery.data ?? []).map(
+                preset =>
+                    ({
+                        ...preset,
+                        group: INCOME_KIND_GROUP[preset.kind] ?? preset.kind,
+                        icon: preset.icon ?? INCOME_KIND_ICON[preset.kind] ?? null,
+                    }) satisfies IncomeSourcePreset & { group: string; icon: string | null }
+            ),
         [presetsQuery.data]
     );
 

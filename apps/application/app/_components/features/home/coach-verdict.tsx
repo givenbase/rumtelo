@@ -4,16 +4,15 @@ import { useState } from 'react';
 
 import Link from 'next/link';
 
+import type { CoachMessage } from '@rumtelo/contracts';
 import { Button } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
-export interface CoachMessage {
-    id: string;
-    kind: string;
-    text: string;
-    ctaLabel: string;
-    ctaHref: string;
-}
+/** Display fields for the rotating coach card (full DTO may omit CTA when informational). */
+export type CoachVerdictMessage = Pick<
+    CoachMessage,
+    'id' | 'kind' | 'text' | 'ctaLabel' | 'ctaHref'
+>;
 
 export interface CoachRecapItem {
     portal: string;
@@ -42,7 +41,7 @@ export function CoachVerdict({
     messages,
     recap,
 }: {
-    messages: CoachMessage[];
+    messages: readonly CoachVerdictMessage[];
     recap: CoachRecapItem[];
 }) {
     const [index, setIndex] = useState(0);
@@ -128,8 +127,8 @@ export function CoachVerdict({
                             }}>
                             Share
                         </button>
-                        <Button as={Link} href={msg.ctaHref} size="sm">
-                            {msg.ctaLabel}
+                        <Button as={Link} href={msg.ctaHref ?? '/'} size="sm">
+                            {msg.ctaLabel ?? 'Open'}
                         </Button>
                     </span>
                 </div>

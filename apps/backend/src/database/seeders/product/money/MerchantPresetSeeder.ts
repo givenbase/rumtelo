@@ -3,7 +3,7 @@ import type { EntityManager } from '@mikro-orm/postgresql';
 import { Seeder } from '@mikro-orm/seeder';
 
 import { MerchantPreset } from '../../../../modules/backoffice/product/money/preset/merchant/merchant.entity';
-import { MERCHANT_PRESET_SEED } from '../../../../modules/backoffice/product/money/preset/merchant/seed/merchant.seed-data';
+import { MERCHANT_PRESET_SEED } from '../../../../modules/backoffice/product/money/preset/merchant/seed';
 import {
     jarTemplateFromMap,
     loadJarTemplateMap,
@@ -17,6 +17,13 @@ export class MerchantPresetSeeder extends Seeder {
         const existingByKey = new Map(existingRows.map(row => [row.key, row]));
         for (const [sortOrder, row] of MERCHANT_PRESET_SEED.entries()) {
             const jarTemplate = jarTemplateFromMap(jarByKey, row.jarKey);
+            const isActive = row.isActive ?? true;
+            const highlight = row.highlight ?? null;
+            const logoDomain = row.logoDomain;
+            const website = row.website ?? null;
+            const markets = row.markets?.length ? [...row.markets] : ['NL'];
+            const matchPriority = row.matchPriority ?? 0;
+            const providerIds = { ...row.providerIds };
             const existing = existingByKey.get(row.key);
             if (existing) {
                 existing.name = row.name;
@@ -25,8 +32,14 @@ export class MerchantPresetSeeder extends Seeder {
                 existing.mcc = row.mcc;
                 existing.jarTemplate = jarTemplate;
                 existing.categoryTemplateKey = row.categoryTemplateKey;
+                existing.logoDomain = logoDomain;
+                existing.website = website;
+                existing.highlight = highlight;
+                existing.markets = markets;
+                existing.matchPriority = matchPriority;
+                existing.providerIds = providerIds;
                 existing.sortOrder = sortOrder;
-                existing.isActive = true;
+                existing.isActive = isActive;
                 continue;
             }
             em.create(MerchantPreset, {
@@ -37,8 +50,14 @@ export class MerchantPresetSeeder extends Seeder {
                 mcc: row.mcc,
                 jarTemplate,
                 categoryTemplateKey: row.categoryTemplateKey,
+                logoDomain,
+                website,
+                highlight,
+                markets,
+                matchPriority,
+                providerIds,
                 sortOrder,
-                isActive: true,
+                isActive,
             } as never);
         }
         await em.flush();

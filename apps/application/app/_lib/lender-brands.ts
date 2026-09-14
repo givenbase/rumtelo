@@ -3,8 +3,8 @@
  * existing debt/settings call sites.
  */
 export {
-    NL_BANK_LENDERS,
-    NL_BANK_NAMES,
+    findCatalogVendor,
+    findCatalogVendorFromFeed,
     lenderLogoUrl,
     resolveLenderBrand,
     resolveVendorBrand,

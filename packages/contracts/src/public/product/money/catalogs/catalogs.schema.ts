@@ -46,6 +46,8 @@ export const GoalPreset = CatalogItemBase.extend({
     icon: z.string().max(8).nullable(),
 });
 
+export const MerchantHighlight = z.enum(['FEATURED', 'NEW', 'POPULAR']);
+
 export const MerchantPreset = CatalogItemBase.extend({
     matchValue: z.string().min(1).max(120),
     /** Extra bank-feed needles (Revolut / SEPA / card descriptors). */
@@ -54,6 +56,16 @@ export const MerchantPreset = CatalogItemBase.extend({
     mcc: z.string().length(4).nullable(),
     jarKey: z.enum(JarKey),
     categoryTemplateKey: z.string().min(1).max(64),
+    /** Favicon hostname — client builds logo URL; no client brand mirror. */
+    logoDomain: z.string().min(1).max(120).nullable(),
+    website: z.string().max(240).nullable(),
+    /** Editorial pin + chip label; null = normal. */
+    highlight: MerchantHighlight.nullable(),
+    /** ISO markets where this merchant is listed (e.g. NL). */
+    markets: z.array(z.string().length(2)).min(1),
+    matchPriority: z.int(),
+    /** Aggregator merchant ids when Open Banking is wired. */
+    providerIds: z.record(z.string(), z.string()),
 });
 
 /** One independent signal about an organisation — who says so, what, and where to check. */
@@ -93,3 +105,4 @@ export type DebtPreset = z.infer<typeof DebtPreset>;
 export type IncomeSourcePreset = z.infer<typeof IncomeSourcePreset>;
 export type GoalPreset = z.infer<typeof GoalPreset>;
 export type MerchantPreset = z.infer<typeof MerchantPreset>;
+export type MerchantHighlight = z.infer<typeof MerchantHighlight>;
