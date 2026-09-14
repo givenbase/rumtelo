@@ -12,22 +12,23 @@ and **symlinking** each app’s `public/brand` → `packages/brand/assets` means
 
 ## Assets
 
-Drop designer files here as-is. Do not crop, re-encode, or invent variants.
-
 ```
 packages/brand/assets/
-  rumtelo-logo-icon.svg                 # app — colorful mark (any surface)
-  rumtelo-logo-icon.png                 # email — colorful mark
-  rumtelo-logo-wordmark-on-light.svg    # app — light surfaces
-  rumtelo-logo-wordmark-on-dark.svg     # app — dark surfaces
-  rumtelo-logo-wordmark-on-light.png    # email — light surfaces
-  rumtelo-logo-wordmark-on-dark.png     # email — dark surfaces
-  rumtelo-favicon.ico                   # browser tab
-  rumtelo-favicon-96x96.png             # browser tab PNG
-  rumtelo-apple-touch-icon.png          # iOS home screen (180×180)
-  rumtelo-pwa-192.png                   # PWA maskable
-  rumtelo-pwa-512.png                   # PWA maskable
-  site.webmanifest                      # web app manifest
+  logo/
+    icon.svg                  # app — colorful mark
+    icon.png                  # email — colorful mark
+    wordmark-on-light.svg     # app — light surfaces
+    wordmark-on-dark.svg      # app — dark surfaces
+    wordmark-on-light.png     # email — light surfaces
+    wordmark-on-dark.png      # email — dark surfaces
+  favicon/
+    favicon.ico               # browser tab
+    96x96.png                 # browser tab PNG
+    apple-touch-icon.png      # iOS home screen (180×180)
+  pwa/
+    icon-192.png              # PWA maskable
+    icon-512.png              # PWA maskable
+    manifest.webmanifest      # web app manifest
 ```
 
 **App:** SVG. **Email:** PNG (clients don’t reliably render SVG).

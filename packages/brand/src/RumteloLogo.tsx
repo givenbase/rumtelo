@@ -1,4 +1,7 @@
-import type { ImgHTMLAttributes } from 'react';
+import type { ComponentProps } from 'react';
+import Image from 'next/image';
+
+import { BRAND_ASSETS } from './assets';
 
 export type RumteloLogoVariant =
     | 'wordmark'
@@ -6,7 +9,9 @@ export type RumteloLogoVariant =
     | 'wordmarkOnDark'
     | 'icon';
 
-export type RumteloLogoProps = Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt'> & {
+type ImageProps = ComponentProps<typeof Image>;
+
+export type RumteloLogoProps = Omit<ImageProps, 'src' | 'alt' | 'width' | 'height'> & {
     /**
      * `wordmark` follows the page theme (light/dark).
      * `wordmarkOnLight` / `wordmarkOnDark` force a surface.
@@ -15,12 +20,16 @@ export type RumteloLogoProps = Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' |
     variant?: RumteloLogoVariant;
     /** Accessible name — defaults to “Rumtelo”. */
     alt?: string;
+    /** Intrinsic width — defaults match the SVG viewBox. */
+    width?: number;
+    /** Intrinsic height — defaults match the SVG viewBox. */
+    height?: number;
 };
 
-/** App UI — SVG. Email keeps PNG (see BRAND_ASSETS). */
-const WORDMARK_ON_LIGHT = '/brand/rumtelo-logo-wordmark-on-light.svg';
-const WORDMARK_ON_DARK = '/brand/rumtelo-logo-wordmark-on-dark.svg';
-const ICON = '/brand/rumtelo-logo-icon.svg';
+/** Wordmark viewBox ≈ 349×58 */
+const WORDMARK_SIZE = { width: 350, height: 58 } as const;
+/** Icon mark viewBox ≈ 485×463 */
+const ICON_SIZE = { width: 48, height: 46 } as const;
 
 /**
  * Shared brand lockup — designer files in `@rumtelo/brand/assets`, served
@@ -28,26 +37,43 @@ const ICON = '/brand/rumtelo-logo-icon.svg';
  *
  * Default wordmark swaps on-light / on-dark via `.rumtelo-logo-*` rules in
  * `packages/config/tailwind/dark.css`.
+ *
+ * SVGs use `unoptimized` — Next doesn’t raster-optimize SVG.
  */
 export function RumteloLogo({
     variant = 'wordmark',
     alt = 'Rumtelo',
     className,
+    width,
+    height,
     ...rest
 }: RumteloLogoProps) {
     if (variant === 'icon') {
         return (
-            <img src={ICON} alt={alt} className={className} decoding="async" {...rest} />
+            <Image
+                src={BRAND_ASSETS.icon}
+                alt={alt}
+                width={width ?? ICON_SIZE.width}
+                height={height ?? ICON_SIZE.height}
+                className={className}
+                unoptimized
+                {...rest}
+            />
         );
     }
 
+    const w = width ?? WORDMARK_SIZE.width;
+    const h = height ?? WORDMARK_SIZE.height;
+
     if (variant === 'wordmarkOnLight') {
         return (
-            <img
-                src={WORDMARK_ON_LIGHT}
+            <Image
+                src={BRAND_ASSETS.wordmarkOnLight}
                 alt={alt}
+                width={w}
+                height={h}
                 className={className}
-                decoding="async"
+                unoptimized
                 {...rest}
             />
         );
@@ -55,11 +81,13 @@ export function RumteloLogo({
 
     if (variant === 'wordmarkOnDark') {
         return (
-            <img
-                src={WORDMARK_ON_DARK}
+            <Image
+                src={BRAND_ASSETS.wordmarkOnDark}
                 alt={alt}
+                width={w}
+                height={h}
                 className={className}
-                decoding="async"
+                unoptimized
                 {...rest}
             />
         );
@@ -67,19 +95,23 @@ export function RumteloLogo({
 
     return (
         <span className={['rumtelo-logo', 'inline-grid', className].filter(Boolean).join(' ')}>
-            <img
-                src={WORDMARK_ON_LIGHT}
+            <Image
+                src={BRAND_ASSETS.wordmarkOnLight}
                 alt={alt}
+                width={w}
+                height={h}
                 className="rumtelo-logo-on-light col-start-1 row-start-1 h-full w-auto max-w-full"
-                decoding="async"
+                unoptimized
                 {...rest}
             />
-            <img
-                src={WORDMARK_ON_DARK}
+            <Image
+                src={BRAND_ASSETS.wordmarkOnDark}
                 alt=""
                 aria-hidden
+                width={w}
+                height={h}
                 className="rumtelo-logo-on-dark col-start-1 row-start-1 h-full w-auto max-w-full"
-                decoding="async"
+                unoptimized
             />
         </span>
     );

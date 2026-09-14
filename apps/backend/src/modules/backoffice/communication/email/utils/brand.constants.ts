@@ -4,6 +4,6 @@ export const EMAIL_BRAND = {
     tagline: 'Stop wondering where it went.',
     websiteUrl: 'https://rumtelo.app',
     /** Hosted via app/website `public/brand` symlink — PNG for email clients. */
-    logoWordmarkOnLight: '/brand/rumtelo-logo-wordmark-on-light.png',
-    logoWordmarkOnDark: '/brand/rumtelo-logo-wordmark-on-dark.png',
+    logoWordmarkOnLight: '/brand/logo/wordmark-on-light.png',
+    logoWordmarkOnDark: '/brand/logo/wordmark-on-dark.png',
 } as const;
