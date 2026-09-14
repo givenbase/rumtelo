@@ -3,6 +3,7 @@ import { Archivo, Archivo_Narrow, IBM_Plex_Mono } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 
+import { BRAND_ASSETS, BRAND_METADATA_ICONS } from '@rumtelo/brand';
 import { locales } from '@rumtelo/i18n';
 
 import { Providers } from './providers';
@@ -37,6 +38,13 @@ export const metadata: Metadata = {
     title: TITLE,
     description: DESCRIPTION,
     applicationName: 'Rumtelo',
+    icons: BRAND_METADATA_ICONS,
+    manifest: BRAND_ASSETS.manifest,
+    appleWebApp: {
+        title: 'Rumtelo',
+        capable: true,
+        statusBarStyle: 'default',
+    },
     keywords: [
         'money overview',
         'six jars',

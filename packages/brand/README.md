@@ -1,6 +1,6 @@
 # @rumtelo/brand
 
-Single source of truth for Rumtelo logos.
+Single source of truth for Rumtelo logos, favicons, and PWA icons.
 
 ## Why here (not `apps/*/public`)
 
@@ -16,21 +16,42 @@ Drop designer files here as-is. Do not crop, re-encode, or invent variants.
 
 ```
 packages/brand/assets/
+  rumtelo-logo-icon.svg                 # app — colorful mark (any surface)
+  rumtelo-logo-icon.png                 # email — colorful mark
   rumtelo-logo-wordmark-on-light.svg    # app — light surfaces
   rumtelo-logo-wordmark-on-dark.svg     # app — dark surfaces
   rumtelo-logo-wordmark-on-light.png    # email — light surfaces
   rumtelo-logo-wordmark-on-dark.png     # email — dark surfaces
+  rumtelo-favicon.ico                   # browser tab
+  rumtelo-favicon-96x96.png             # browser tab PNG
+  rumtelo-apple-touch-icon.png          # iOS home screen (180×180)
+  rumtelo-pwa-192.png                   # PWA maskable
+  rumtelo-pwa-512.png                   # PWA maskable
+  site.webmanifest                      # web app manifest
 ```
 
 **App:** SVG. **Email:** PNG (clients don’t reliably render SVG).
+The icon is brand-colored (teal gradient) — no light/dark pair needed.
+
+Do **not** copy favicons into `apps/*/app` or `apps/*/public`. Layouts pull
+them via `BRAND_METADATA_ICONS` / `BRAND_ASSETS.manifest` from `/brand/...`.
 
 ## Usage
 
 ```tsx
-import { RumteloLogo, BRAND_ASSETS } from '@rumtelo/brand';
+import { RumteloLogo, BRAND_ASSETS, BRAND_METADATA_ICONS } from '@rumtelo/brand';
 
 <RumteloLogo variant="wordmark" className="h-7 w-auto" />
 <RumteloLogo variant="wordmarkOnDark" className="h-7 w-auto" />
+<RumteloLogo variant="icon" className="size-8" />
+
+// In layout metadata:
+export const metadata = {
+  icons: BRAND_METADATA_ICONS,
+  manifest: BRAND_ASSETS.manifest,
+  applicationName: 'Rumtelo',
+  appleWebApp: { title: 'Rumtelo', capable: true, statusBarStyle: 'default' },
+};
 ```
 
 ## Symlinks

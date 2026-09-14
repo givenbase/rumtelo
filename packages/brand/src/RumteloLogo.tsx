@@ -1,11 +1,16 @@
 import type { ImgHTMLAttributes } from 'react';
 
-export type RumteloLogoVariant = 'wordmark' | 'wordmarkOnLight' | 'wordmarkOnDark';
+export type RumteloLogoVariant =
+    | 'wordmark'
+    | 'wordmarkOnLight'
+    | 'wordmarkOnDark'
+    | 'icon';
 
 export type RumteloLogoProps = Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt'> & {
     /**
      * `wordmark` follows the page theme (light/dark).
      * `wordmarkOnLight` / `wordmarkOnDark` force a surface.
+     * `icon` is the colorful mark (theme-independent).
      */
     variant?: RumteloLogoVariant;
     /** Accessible name — defaults to “Rumtelo”. */
@@ -15,6 +20,7 @@ export type RumteloLogoProps = Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' |
 /** App UI — SVG. Email keeps PNG (see BRAND_ASSETS). */
 const WORDMARK_ON_LIGHT = '/brand/rumtelo-logo-wordmark-on-light.svg';
 const WORDMARK_ON_DARK = '/brand/rumtelo-logo-wordmark-on-dark.svg';
+const ICON = '/brand/rumtelo-logo-icon.svg';
 
 /**
  * Shared brand lockup — designer files in `@rumtelo/brand/assets`, served
@@ -29,6 +35,12 @@ export function RumteloLogo({
     className,
     ...rest
 }: RumteloLogoProps) {
+    if (variant === 'icon') {
+        return (
+            <img src={ICON} alt={alt} className={className} decoding="async" {...rest} />
+        );
+    }
+
     if (variant === 'wordmarkOnLight') {
         return (
             <img

@@ -3,6 +3,8 @@ import { Archivo, Archivo_Narrow, IBM_Plex_Mono } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 
+import { BRAND_ASSETS, BRAND_METADATA_ICONS } from '@rumtelo/brand';
+
 import { Providers } from './providers';
 
 import '../../globals.css';
@@ -39,6 +41,14 @@ const mono = IBM_Plex_Mono({
 export const metadata: Metadata = {
     title: { default: 'Rumtelo', template: '%s · Rumtelo' },
     description: 'Control that compounds. Six jars, calm weekly rhythm, room to grow.',
+    applicationName: 'Rumtelo',
+    icons: BRAND_METADATA_ICONS,
+    manifest: BRAND_ASSETS.manifest,
+    appleWebApp: {
+        title: 'Rumtelo',
+        capable: true,
+        statusBarStyle: 'default',
+    },
 };
 
 export const viewport: Viewport = {
