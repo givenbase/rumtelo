@@ -13,6 +13,7 @@ export class CategoryTemplateSeeder extends Seeder {
     async run(em: EntityManager): Promise<void> {
         const jarByKey = await loadJarTemplateMap(em);
         const keys = CATEGORY_TEMPLATE_SEED.map(row => row.key);
+        const seedKeys = new Set(keys);
         const existingRows = await em.find(CategoryTemplate, { key: { $in: keys } });
         const existingByKey = new Map(existingRows.map(row => [row.key, row]));
         for (const [sortOrder, row] of CATEGORY_TEMPLATE_SEED.entries()) {
@@ -34,6 +35,11 @@ export class CategoryTemplateSeeder extends Seeder {
                 sortOrder,
                 isActive: true,
             } as never);
+        }
+        // Soft-remove templates no longer in the English spine (e.g. CARE → Pharmacy/…).
+        const orphaned = await em.find(CategoryTemplate, { key: { $nin: [...seedKeys] } });
+        for (const row of orphaned) {
+            row.isActive = false;
         }
         await em.flush();
     }

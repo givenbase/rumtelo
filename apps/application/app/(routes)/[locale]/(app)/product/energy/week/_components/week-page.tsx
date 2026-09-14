@@ -3,6 +3,8 @@
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMemo, useState } from 'react';
 
+import type { EnergySummary } from '@rumtelo/contracts';
+import { EnergyMetric, EnergyTrend } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Card, Eyebrow, Section } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
@@ -24,18 +26,22 @@ const JAR_BORDER: Record<string, string> = {
     GIVE: 'border-t-jar-give',
 };
 
-const METRIC_LABEL: Record<string, string> = {
-    SLEEP: 'Sleep',
-    TRAIN: 'Training',
-    FOOD: 'Nutrition',
-    MIND: 'Stillness',
+const METRIC_LABEL: Record<EnergyMetric, string> = {
+    [EnergyMetric.SLEEP]: 'Sleep',
+    [EnergyMetric.TRAIN]: 'Training',
+    [EnergyMetric.FOOD]: 'Nutrition',
+    [EnergyMetric.MIND]: 'Stillness',
 };
 
-const TREND_ICON: Record<string, string> = { UP: '↑', FLAT: '→', DOWN: '↓' };
-const TREND_CLASS: Record<string, string> = {
-    UP: 'text-success',
-    FLAT: 'text-fg-muted',
-    DOWN: 'text-danger',
+const TREND_ICON: Record<EnergyTrend, string> = {
+    [EnergyTrend.UP]: '↑',
+    [EnergyTrend.FLAT]: '→',
+    [EnergyTrend.DOWN]: '↓',
+};
+const TREND_CLASS: Record<EnergyTrend, string> = {
+    [EnergyTrend.UP]: 'text-success',
+    [EnergyTrend.FLAT]: 'text-fg-muted',
+    [EnergyTrend.DOWN]: 'text-danger',
 };
 
 export function WeekPageClient() {
@@ -49,7 +55,7 @@ export function WeekPageClient() {
         live
     );
 
-    const summary = summaryQuery.data ?? [];
+    const summary = (summaryQuery.data ?? []) as ReadonlyArray<EnergySummary>;
     const restHours = 168 - SLEEP_WEEK - steeredHours;
 
     const weekWhole = useMemo(
@@ -91,27 +97,21 @@ export function WeekPageClient() {
             {/* ── Live energy summary ── */}
             {summary.length > 0 && (
                 <div className="flex flex-wrap gap-3">
-                    {(summary as Array<{ metric: string; average7d: number; trend: string }>).map(
-                        stat => (
-                            <div
-                                key={stat.metric}
-                                className="flex items-center gap-3 rounded-xl border border-line bg-raised px-4 py-2.5">
-                                <span className="font-mono text-xs font-medium tracking-wide text-fg-muted uppercase">
-                                    {METRIC_LABEL[stat.metric] ?? stat.metric}
-                                </span>
-                                <span className="font-mono text-base font-semibold text-fg">
-                                    {Math.round(stat.average7d)}
-                                </span>
-                                <span
-                                    className={cn(
-                                        'font-mono text-xs',
-                                        TREND_CLASS[stat.trend] ?? 'text-fg-muted'
-                                    )}>
-                                    {TREND_ICON[stat.trend] ?? ''}
-                                </span>
-                            </div>
-                        )
-                    )}
+                    {summary.map(stat => (
+                        <div
+                            key={stat.metric}
+                            className="flex items-center gap-3 rounded-xl border border-line bg-raised px-4 py-2.5">
+                            <span className="font-mono text-xs font-medium tracking-wide text-fg-muted uppercase">
+                                {METRIC_LABEL[stat.metric]}
+                            </span>
+                            <span className="font-mono text-base font-semibold text-fg">
+                                {Math.round(stat.average7d)}
+                            </span>
+                            <span className={cn('font-mono text-xs', TREND_CLASS[stat.trend])}>
+                                {TREND_ICON[stat.trend]}
+                            </span>
+                        </div>
+                    ))}
                 </div>
             )}
 
