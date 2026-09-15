@@ -14,11 +14,12 @@ import {
     FormLabel,
     FormMessage,
     Button,
+    VendorMark,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { CategoryTemplate, FixedCostPreset } from '@rumtelo/contracts';
+import type { CategoryTemplate, FixedCostPreset, MerchantPreset } from '@rumtelo/contracts';
 import { Cadence, FlowDirection, JarKey } from '@rumtelo/contracts';
 import { z } from 'zod';
 
@@ -26,6 +27,7 @@ import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
+import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
 import { GivingFinder } from '@/components/features/money/giving-finder';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -35,6 +37,9 @@ import { ConfirmActionButton } from './confirm-action-button';
 import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
 import { FormInput } from './form-input';
 import { PresetNameField } from './preset-name-field';
+
+/** Cap suggested vendor chips so the form stays scannable. */
+const MAX_VENDOR_CHIPS = 16;
 
 const moneyInput = z
     .string()
@@ -87,6 +92,7 @@ export function FixedCostForm({
     const [pendingCategoryTemplateKey, setPendingCategoryTemplateKey] = useState<string | null>(
         null
     );
+    const [customPayee, setCustomPayee] = useState(false);
 
     const jarsQuery = useLiveQuery(
         apiQuery.money.jars.list.queryOptions({ input: { householdId: householdId! } }),
@@ -108,6 +114,13 @@ export function FixedCostForm({
         [],
         live
     );
+    const merchantsQuery = useLiveQuery(
+        apiQuery.money.catalogs.merchantPresets.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [],
+        live
+    );
     const categoriesQuery = useCategoryTemplates(live);
 
     const categoryByKey = useMemo(() => {
@@ -117,6 +130,17 @@ export function FixedCostForm({
         }
         return map;
     }, [categoriesQuery.data]);
+
+    /** Household category display name → catalog template key (for merchant chips). */
+    const templateKeyByCategoryName = useMemo(() => {
+        const map = new Map<string, string>();
+        for (const category of categoriesQuery.data ?? []) {
+            map.set(category.name.trim().toLowerCase(), category.key);
+        }
+        return map;
+    }, [categoriesQuery.data]);
+
+    const merchants = useMemo(() => merchantsQuery.data ?? [], [merchantsQuery.data]);
 
     const presetOptions = useMemo(
         () =>
@@ -144,6 +168,7 @@ export function FixedCostForm({
     });
 
     const selectedJarId = useWatch({ control: form.control, name: 'jarId' });
+    const selectedCategoryId = useWatch({ control: form.control, name: 'categoryId' });
     const counterparty = useWatch({ control: form.control, name: 'counterparty' });
     const isGive = useMemo(
         () => jars.find(jar => jar.id === selectedJarId)?.key === JarKey.GIVE,
@@ -154,6 +179,30 @@ export function FixedCostForm({
         const jar = (balancesQuery.data ?? []).find(row => row.id === selectedJarId);
         return (jar?.categories ?? []).filter(category => !category.isArchived);
     }, [balancesQuery.data, selectedJarId]);
+
+    /**
+     * Category → merchants: from preset pick, or household category matched to
+     * a catalog template by name (same link expense create already uses).
+     */
+    const activeCategoryTemplateKey = useMemo(() => {
+        if (pendingCategoryTemplateKey) return pendingCategoryTemplateKey;
+        if (!selectedCategoryId) return null;
+        const householdCategory = jarCategories.find(
+            category => category.id === selectedCategoryId
+        );
+        if (!householdCategory) return null;
+        return templateKeyByCategoryName.get(householdCategory.name.trim().toLowerCase()) ?? null;
+    }, [pendingCategoryTemplateKey, selectedCategoryId, jarCategories, templateKeyByCategoryName]);
+
+    const vendorsForCategory = useMemo(() => {
+        if (!activeCategoryTemplateKey) return [] as MerchantPreset[];
+        return merchants
+            .filter(merchant => merchant.categoryTemplateKey === activeCategoryTemplateKey)
+            .slice(0, MAX_VENDOR_CHIPS);
+    }, [merchants, activeCategoryTemplateKey]);
+
+    const showPayeeInput =
+        isGive || mode === 'edit' || customPayee || vendorsForCategory.length === 0;
 
     useEffect(() => {
         if (jars[0]?.id && !form.getValues('jarId')) {
@@ -327,6 +376,8 @@ export function FixedCostForm({
                                         }
                                         setPendingCategoryTemplateKey(full.categoryTemplateKey);
                                         form.setValue('categoryId', null);
+                                        setCustomPayee(false);
+                                        form.setValue('counterparty', '', { shouldDirty: false });
                                     }}
                                 />
                             ) : (
@@ -365,6 +416,8 @@ export function FixedCostForm({
                                 onChange={event => {
                                     field.onChange(event);
                                     form.setValue('categoryId', null);
+                                    setPendingCategoryTemplateKey(null);
+                                    setCustomPayee(false);
                                 }}>
                                 {jars.length === 0 ? (
                                     <option value="">No jars — complete setup first</option>
@@ -385,41 +438,6 @@ export function FixedCostForm({
 
             <FormField
                 control={form.control}
-                name="counterparty"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>
-                            {isGive ? 'To whom (organisation)' : 'Paid to (optional)'}
-                        </FormLabel>
-                        <FormControl>
-                            <FormInput
-                                placeholder={
-                                    isGive
-                                        ? 'The organisation you give to'
-                                        : 'e.g. landlord, insurer'
-                                }
-                                {...field}
-                            />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-
-            {isGive ? (
-                <GivingFinder
-                    selectedName={counterparty}
-                    onPick={organisation => {
-                        form.setValue('counterparty', organisation.name, { shouldDirty: true });
-                        if (!form.getValues('categoryId') && !pendingCategoryTemplateKey) {
-                            setPendingCategoryTemplateKey(DONATIONS_CATEGORY_KEY);
-                        }
-                    }}
-                />
-            ) : null}
-
-            <FormField
-                control={form.control}
                 name="categoryId"
                 render={({ field }) => (
                     <FormItem>
@@ -430,6 +448,7 @@ export function FixedCostForm({
                                 value={field.value ?? ''}
                                 onChange={event => {
                                     setPendingCategoryTemplateKey(null);
+                                    setCustomPayee(false);
                                     field.onChange(event.target.value || null);
                                 }}>
                                 <option value="">
@@ -448,6 +467,96 @@ export function FixedCostForm({
                     </FormItem>
                 )}
             />
+
+            <FormField
+                control={form.control}
+                name="counterparty"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>
+                            {isGive ? 'To whom (organisation)' : 'Paid to (optional)'}
+                        </FormLabel>
+                        {!isGive && vendorsForCategory.length > 0 && !customPayee ? (
+                            <div className="flex max-h-40 flex-wrap gap-1.5 overflow-y-auto pr-0.5">
+                                {vendorsForCategory.map(merchant => {
+                                    const selected =
+                                        (counterparty ?? '').trim().toLowerCase() ===
+                                        merchant.name.toLowerCase();
+                                    const mark = vendorMarkSrc({
+                                        key: merchant.key,
+                                        name: merchant.name,
+                                        logoDomain: merchant.logoDomain,
+                                        website: merchant.website,
+                                    });
+                                    return (
+                                        <button
+                                            key={merchant.key}
+                                            type="button"
+                                            disabled={busy}
+                                            className={
+                                                selected
+                                                    ? 'inline-flex items-center gap-2 rounded-xl border border-accent bg-accent/15 px-2.5 py-1.5 text-sm text-accent'
+                                                    : 'inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent'
+                                            }
+                                            onClick={() => {
+                                                form.setValue('counterparty', merchant.name, {
+                                                    shouldValidate: true,
+                                                    shouldDirty: true,
+                                                });
+                                            }}>
+                                            <VendorMark name={mark.name} src={mark.src} size={20} />
+                                            {merchant.name}
+                                        </button>
+                                    );
+                                })}
+                                <button
+                                    type="button"
+                                    disabled={busy}
+                                    className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
+                                    onClick={() => {
+                                        setCustomPayee(true);
+                                        form.setValue('counterparty', '', {
+                                            shouldValidate: false,
+                                        });
+                                    }}>
+                                    Other…
+                                </button>
+                            </div>
+                        ) : null}
+                        {showPayeeInput ? (
+                            <FormControl>
+                                <FormInput
+                                    placeholder={
+                                        isGive
+                                            ? 'The organisation you give to'
+                                            : vendorsForCategory.length > 0
+                                              ? 'Payee name'
+                                              : 'e.g. landlord, insurer'
+                                    }
+                                    {...field}
+                                />
+                            </FormControl>
+                        ) : (
+                            <FormControl>
+                                <input type="hidden" {...field} />
+                            </FormControl>
+                        )}
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+
+            {isGive ? (
+                <GivingFinder
+                    selectedName={counterparty}
+                    onPick={organisation => {
+                        form.setValue('counterparty', organisation.name, { shouldDirty: true });
+                        if (!form.getValues('categoryId') && !pendingCategoryTemplateKey) {
+                            setPendingCategoryTemplateKey(DONATIONS_CATEGORY_KEY);
+                        }
+                    }}
+                />
+            ) : null}
 
             <FormField
                 control={form.control}

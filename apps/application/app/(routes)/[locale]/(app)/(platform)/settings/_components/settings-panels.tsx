@@ -799,13 +799,13 @@ export function AccountSettings() {
 
             <SettingsInkCard
                 eyebrow="The Coach"
-                blurb="The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the inbox at Overview → The Coach holds tip cards across money, growth, energy, and soul.">
+                blurb="The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the inbox at Home → The Coach holds tip cards across money, growth, energy, and soul.">
                 <Toggle
                     checked={helpersEnabled}
                     label="Show The Coach on screens"
                     hint={
                         helpersEnabled
-                            ? 'On — look for the ✦ The Coach mark. Inbox stays at Overview → The Coach.'
+                            ? 'On — look for the ✦ The Coach mark. Inbox stays at Home → The Coach.'
                             : 'Off — on-screen tips hidden. The Coach inbox still available anytime.'
                     }
                     onCheckedChange={setHelpersEnabled}

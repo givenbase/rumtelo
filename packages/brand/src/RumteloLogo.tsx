@@ -3,11 +3,7 @@ import Image from 'next/image';
 
 import { BRAND_ASSETS } from './assets';
 
-export type RumteloLogoVariant =
-    | 'wordmark'
-    | 'wordmarkOnLight'
-    | 'wordmarkOnDark'
-    | 'icon';
+export type RumteloLogoVariant = 'wordmark' | 'wordmarkOnLight' | 'wordmarkOnDark' | 'icon';
 
 type ImageProps = ComponentProps<typeof Image>;
 

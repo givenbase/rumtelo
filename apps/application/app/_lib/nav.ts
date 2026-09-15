@@ -12,7 +12,7 @@ import { productPath } from './routes';
 export const NAV_GROUPS = [
     {
         key: 'home',
-        label: 'Overview',
+        label: 'Home',
         icon: '◇',
         href: '/',
         children: [
@@ -167,7 +167,7 @@ export const NAV_GROUPS = [
 
 /** Compact labels for the desktop portal pill bar (design SHORT map, EN). */
 export const TOP_PILL_LABELS: Record<string, string> = {
-    home: 'Overview',
+    home: 'Home',
     money: 'Money',
     growth: 'Growth',
     energy: 'Energy',
@@ -177,9 +177,9 @@ export const TOP_PILL_LABELS: Record<string, string> = {
 export type NavGroup = (typeof NAV_GROUPS)[number];
 export type NavChild = NavGroup['children'][number];
 
-/** Bottom tabs — design `SHORT` map EN column (home → Start). */
+/** Bottom tabs — design `SHORT` map EN column. */
 export const BOTTOM_TABS = [
-    { href: '/', label: 'Start', glyph: '◇' },
+    { href: '/', label: 'Home', glyph: '◇' },
     { href: productPath('money'), label: 'Money', glyph: '◈' },
     { href: productPath('growth'), label: 'Growth', glyph: '↗' },
     { href: productPath('energy'), label: 'Energy', glyph: '✳\uFE0E' },

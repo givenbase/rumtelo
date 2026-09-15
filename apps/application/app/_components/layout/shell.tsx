@@ -150,7 +150,7 @@ function AppShellInner({ children }: { children: ReactNode }) {
     const activeChild = resolveNavChildForPath(pathname);
     const access = accessForPath(pathname);
     const activePortalLabel =
-        (activeGroup && (TOP_PILL_LABELS[activeGroup.key] ?? activeGroup.label)) || 'Overview';
+        (activeGroup && (TOP_PILL_LABELS[activeGroup.key] ?? activeGroup.label)) || 'Home';
 
     return (
         <div className="min-h-dvh bg-bg bg-(image:--gradient-page) bg-top bg-no-repeat">
