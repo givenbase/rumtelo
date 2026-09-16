@@ -17,7 +17,7 @@ export type FixedCostCreatePrefill = Partial<FixedCostFormValues> & {
     payeeMode?: GivePayeeMode;
     /** GivingOrganisation catalog key (Coach path). */
     orgKey?: string;
-    /** MerchantPreset key (I know who path). */
+    /** MerchantPreset key when the gift was picked from a Coach chip. */
     merchantKey?: string;
 };
 

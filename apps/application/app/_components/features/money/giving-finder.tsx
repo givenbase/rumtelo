@@ -199,13 +199,13 @@ export function GivingFinder({
                         <p className="text-sm text-fg-muted">Loading the list…</p>
                     ) : causesWithRows.length === 0 ? (
                         <p className="text-sm text-fg-muted">
-                            The list is empty right now. Type the organisation you know above — the
-                            four checks still apply.
+                            The list is empty right now. Use I know who and type the name — the four
+                            checks still apply.
                         </p>
                     ) : cause && shown.length === 0 ? (
                         <p className="text-sm text-fg-muted">
-                            Nothing on the list for this cause yet. Type the organisation you know
-                            above — the four checks still apply.
+                            Nothing on the list for this cause yet. Use I know who and type the name
+                            — the four checks still apply.
                         </p>
                     ) : (
                         <ul className="grid gap-2">

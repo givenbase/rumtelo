@@ -92,9 +92,9 @@ const GOAL_KIND_OPTIONS: ReadonlyArray<{
 ];
 
 const GIVE_TARGET_MODES: ReadonlyArray<{ id: GiveTargetMode; label: string }> = [
+    { id: 'manual', label: 'I know who' },
+    { id: 'org', label: 'Help me choose' },
     { id: 'open', label: 'Keep it open' },
-    { id: 'org', label: 'Pick an organisation' },
-    { id: 'manual', label: 'Type a name' },
 ];
 
 function givePledgeName(cause: GivingCause | null | undefined) {
@@ -522,9 +522,9 @@ export function GoalForm({
                             })}
                         </div>
                         <p className="text-xs leading-relaxed text-fg-faint">
-                            Keep it open to reserve the cause only. Pick an organisation to name who
-                            the pledge is for — or type a household name the Coach list does not
-                            cover.
+                            I know who — type whoever you already give to. Help me choose — Coach
+                            shortlist with independent checks. Keep it open — name the cause only,
+                            no organisation yet.
                         </p>
                     </div>
 
@@ -594,7 +594,7 @@ export function GoalForm({
                             ) : isGive && giveTargetMode === 'org' ? (
                                 <FormInput
                                     readOnly
-                                    placeholder="Pick an organisation above"
+                                    placeholder="Pick from Help me choose above"
                                     {...field}
                                 />
                             ) : (

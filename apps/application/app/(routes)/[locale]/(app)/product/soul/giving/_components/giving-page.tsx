@@ -319,7 +319,6 @@ export function GivingPageClient() {
                             [
                                 { id: 'known' as const, label: 'I know who' },
                                 { id: 'coach' as const, label: 'Help me choose' },
-                                { id: 'manual' as const, label: 'Type a name' },
                             ] as const
                         ).map(option => {
                             const on = givePickMode === option.id;
@@ -352,9 +351,8 @@ export function GivingPageClient() {
                         })}
                     </div>
                     <p className="text-xs leading-relaxed text-fg-faint">
-                        Coach picks need an independent check (Doneer Effectief, GiveWell, ACE,
-                        CBF…). “I know who” is the same bar — short list, no padding. Type a name if
-                        yours is missing.
+                        I know who — type whoever you already give to. Help me choose — Coach
+                        shortlist with independent checks (Doneer Effectief, GiveWell, ACE, CBF).
                     </p>
                 </div>
 

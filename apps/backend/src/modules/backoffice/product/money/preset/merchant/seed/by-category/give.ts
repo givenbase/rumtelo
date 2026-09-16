@@ -4,10 +4,10 @@ import { give } from '../types';
 /**
  * Give-jar merchants.
  *
- * DONATIONS = payees we surface on “I know who”. Keep this list short and
+ * DONATIONS = payees we surface on Help me choose. Keep this list short and
  * high-trust only: Doneer Effectief / GiveWell / ACE / Giving Green picks, or
  * CBF-erkend NL orgs with public annual impact reporting. No padding with
- * celebrity brands that lack an independent check.
+ * celebrity brands that lack an independent check. “I know who” is free text.
  *
  * GIFTS = flowers / cards (not charities) — bank matching only.
  */
