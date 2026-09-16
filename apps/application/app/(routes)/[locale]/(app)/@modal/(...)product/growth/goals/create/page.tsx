@@ -2,7 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 
-import { goalKindFromParams } from '@/app/_lib/create-prefill';
+import { goalKindFromParams, goalJarIdFromParams } from '@/app/_lib/create-prefill';
 import { GoalCreateModalShell } from '@/components/layout/create-route-modals';
 
 export default function Page() {
@@ -11,6 +11,7 @@ export default function Page() {
         <GoalCreateModalShell
             closeHref="/product/growth/goals"
             defaultKind={goalKindFromParams(searchParams)}
+            defaultJarId={goalJarIdFromParams(searchParams)}
         />
     );
 }

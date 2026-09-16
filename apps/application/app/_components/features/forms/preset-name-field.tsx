@@ -3,7 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { CatalogItemBase } from '@rumtelo/contracts';
+import { VendorMark } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
+
+import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
 
 import { FormInput } from './form-input';
 
@@ -12,6 +15,9 @@ export type NamePresetOption = Pick<CatalogItemBase, 'key' | 'name'> & {
     sortOrder?: number;
     group?: string;
     icon?: string | null;
+    /** Favicon hostname — rendered as VendorMark when set (merchant / org pickers). */
+    logoDomain?: string | null;
+    website?: string | null;
 };
 
 type PresetNameFieldProps = {
@@ -45,9 +51,23 @@ const EMPTY_FREE_TEXT_KEYS: readonly string[] = [];
 function matchesQuery(option: NamePresetOption, query: string) {
     if (!query) return true;
     const needle = query.toLowerCase();
+    const key = option.key.toLowerCase();
+    const keyAsWords = key.replace(/_/g, ' ');
     return (
         option.name.toLowerCase().includes(needle) ||
+        key.includes(needle) ||
+        keyAsWords.includes(needle) ||
         (option.group?.toLowerCase().includes(needle) ?? false)
+    );
+}
+
+function findOptionByQuery(options: NamePresetOption[], query: string) {
+    if (!query) return null;
+    const needle = query.toLowerCase();
+    return (
+        options.find(option => option.key.toLowerCase() === needle) ??
+        options.find(option => option.name.toLowerCase() === needle) ??
+        null
     );
 }
 
@@ -106,8 +126,7 @@ export function PresetNameField({
 
     const selectedKey = useMemo(() => {
         if (locked) return locked.key;
-        const match = options.find(option => option.name.toLowerCase() === query.toLowerCase());
-        return match?.key ?? null;
+        return findOptionByQuery(options, query)?.key ?? null;
     }, [options, query, locked]);
 
     const filtered = useMemo(
@@ -186,6 +205,8 @@ export function PresetNameField({
                         <span className="shrink-0 text-base" aria-hidden>
                             {locked.icon}
                         </span>
+                    ) : locked.logoDomain || locked.website ? (
+                        <OptionVendorMark option={locked} />
                     ) : null}
                     <span className="min-w-0 flex-1 truncate text-sm font-medium text-fg">
                         {locked.name}
@@ -293,6 +314,8 @@ export function PresetNameField({
                                                             aria-hidden>
                                                             {opt.icon}
                                                         </span>
+                                                    ) : opt.logoDomain || opt.website ? (
+                                                        <OptionVendorMark option={opt} />
                                                     ) : null}
                                                     <span className="min-w-0 flex-1">
                                                         {opt.name}
@@ -314,4 +337,14 @@ export function PresetNameField({
             ) : null}
         </div>
     );
+}
+
+function OptionVendorMark({ option }: { option: NamePresetOption }) {
+    const mark = vendorMarkSrc({
+        key: option.key,
+        name: option.name,
+        logoDomain: option.logoDomain,
+        website: option.website,
+    });
+    return <VendorMark name={mark.name} src={mark.src} size={20} />;
 }

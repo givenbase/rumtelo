@@ -14,18 +14,21 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 export function GoalCreatePage({
     embedded = false,
     defaultKind,
+    defaultJarId,
 }: {
     embedded?: boolean;
     /** Cross-route prefill — e.g. GIVE from Soul → Giving. */
     defaultKind?: GoalKind;
+    defaultJarId?: string;
 }) {
-    return (
-        <GoalForm
-            mode="create"
-            embedded={embedded}
-            defaultValues={defaultKind ? { kind: defaultKind } : undefined}
-        />
-    );
+    const defaults =
+        defaultKind || defaultJarId
+            ? {
+                  ...(defaultKind ? { kind: defaultKind } : {}),
+                  ...(defaultJarId ? { jarId: defaultJarId } : {}),
+              }
+            : undefined;
+    return <GoalForm mode="create" embedded={embedded} defaultValues={defaults} />;
 }
 
 export function GoalUpdatePage({ id, embedded = false }: { id: string; embedded?: boolean }) {

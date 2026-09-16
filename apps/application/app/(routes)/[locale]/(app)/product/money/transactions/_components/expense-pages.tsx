@@ -8,28 +8,41 @@ import type { Transaction } from '@rumtelo/contracts';
 
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
-import { ExpenseForm } from '@/components/features/forms/expense-form';
+import { ExpenseForm, type ExpenseFormValues } from '@/components/features/forms/expense-form';
 import { TRANSACTION_IN_PRESETS } from '@/components/features/forms/transaction-in-presets';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 const EMPTY_TRANSACTIONS: Transaction[] = [];
 const EMPTY_TRANSACTION_PAGE = { items: EMPTY_TRANSACTIONS, nextCursor: null };
 
+export type ExpenseCreatePrefill = Partial<ExpenseFormValues>;
+
 export function ExpenseCreatePage({
     embedded = false,
     defaultJarId,
     direction = 'out',
+    defaultValues,
 }: {
     embedded?: boolean;
     defaultJarId?: string;
     direction?: 'out' | 'in';
+    /** Cross-route prefill (jar, merchantKey, categoryKey, counterparty). */
+    defaultValues?: ExpenseCreatePrefill;
 }) {
+    const merged: ExpenseCreatePrefill | undefined = (() => {
+        if (!defaultJarId && !defaultValues) return undefined;
+        return {
+            ...defaultValues,
+            ...(defaultJarId ? { jarId: defaultValues?.jarId ?? defaultJarId } : {}),
+        };
+    })();
+
     return (
         <ExpenseForm
             mode="create"
             embedded={embedded}
             direction={direction}
-            defaultValues={defaultJarId ? { jarId: defaultJarId } : undefined}
+            defaultValues={merged}
         />
     );
 }

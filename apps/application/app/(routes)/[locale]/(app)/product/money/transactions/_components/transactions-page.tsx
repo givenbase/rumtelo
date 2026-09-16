@@ -16,6 +16,7 @@ import {
     RuleField,
     RuleMatcher,
     TransactionStatus,
+    jarCapabilitiesFor,
     type Jar,
     type MerchantPreset,
     type Rule,
@@ -105,6 +106,7 @@ export function TransactionsPageClient() {
 
     const inbox = inboxQuery.data ?? EMPTY_TRANSACTIONS;
     const jars = jarsQuery.data ?? EMPTY_JARS;
+    const spendableJars = jars.filter(jar => jarCapabilitiesFor(jar.key).canSpend);
     const jarById = new Map(jars.map(jar => [jar.id, jar]));
     const rules = rulesQuery.data ?? EMPTY_RULES;
     const merchants = merchantsQuery.data ?? EMPTY_MERCHANTS;
@@ -278,7 +280,7 @@ export function TransactionsPageClient() {
                                 <InboxSortCard
                                     key={transaction.id}
                                     transaction={transaction}
-                                    jars={jars}
+                                    jars={transaction.amount < 0 ? spendableJars : jars}
                                     suggestedJarId={resolveJarId(suggestedKey)}
                                     logoDomain={catalog?.logoDomain}
                                     onConfirm={

@@ -19,6 +19,7 @@ import {
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { CategoryTemplate, MerchantPreset } from '@rumtelo/contracts';
+import { jarCapabilitiesFor } from '@rumtelo/contracts';
 import { z } from 'zod';
 
 import { parseAmountToMinorUnits, todayIsoDate } from '@/app/_lib/money-input';
@@ -59,6 +60,10 @@ export type ExpenseFormValues = z.infer<typeof expenseFormSchema> & {
     categoryId?: string | null;
     /** Stable In source tag when logged from a preset. */
     inflowKey?: string | null;
+    /** MerchantPreset key from URL / deep-link — preferred over counterparty name. */
+    merchantKey?: string | null;
+    /** CategoryTemplate key from URL / deep-link. */
+    categoryKey?: string | null;
 };
 
 type ExpenseFormProps = {
@@ -74,47 +79,80 @@ type ExpenseFormProps = {
 
 const EMPTY_INTENT: ExpenseIntentSelection = {
     vendor: '',
+    merchantKey: null,
     categoryKey: null,
     categoryName: null,
     jarKey: null,
     source: null,
 };
 
+function intentFromMerchant(
+    merchant: MerchantPreset,
+    categories: readonly CategoryTemplate[]
+): ExpenseIntentSelection {
+    const category = categories.find(candidate => candidate.key === merchant.categoryTemplateKey);
+    return {
+        vendor: merchant.name,
+        merchantKey: merchant.key,
+        categoryKey: merchant.categoryTemplateKey,
+        categoryName: category?.name ?? merchant.categoryTemplateKey,
+        jarKey: merchant.jarKey,
+        source: 'merchant',
+    };
+}
+
 function buildIntentFromDefaults(
     defaults: Partial<ExpenseFormValues> | undefined,
     merchants: readonly MerchantPreset[],
     categories: readonly CategoryTemplate[]
 ): ExpenseIntentSelection {
+    const merchantKey = defaults?.merchantKey?.trim() || '';
+    if (merchantKey) {
+        const merchant = merchants.find(candidate => candidate.key === merchantKey);
+        if (merchant) return intentFromMerchant(merchant, categories);
+        // Unknown key — fall through to name / manual.
+    }
+
+    const categoryKey = defaults?.categoryKey?.trim() || '';
     const vendor = defaults?.counterparty?.trim() || '';
     const description = defaults?.description?.trim() || '';
     const note = defaults?.note?.trim() || '';
 
     if (vendor) {
-        const merchant = merchants.find(
-            candidate => candidate.name.toLowerCase() === vendor.toLowerCase()
-        );
-        if (merchant) {
-            const category = categories.find(
-                candidate => candidate.key === merchant.categoryTemplateKey
-            );
-            return {
-                vendor,
-                categoryKey: merchant.categoryTemplateKey,
-                categoryName: category?.name ?? merchant.categoryTemplateKey,
-                jarKey: merchant.jarKey,
-                source: 'merchant',
-            };
-        }
+        const merchant =
+            merchants.find(candidate => candidate.name.toLowerCase() === vendor.toLowerCase()) ??
+            null;
+        if (merchant) return intentFromMerchant(merchant, categories);
+
+        const categoryFromKey = categoryKey
+            ? categories.find(candidate => candidate.key === categoryKey)
+            : null;
         const categoryFromDesc = categories.find(
             candidate => candidate.name.toLowerCase() === description.toLowerCase()
         );
+        const category = categoryFromKey ?? categoryFromDesc ?? null;
         return {
             vendor,
-            categoryKey: categoryFromDesc?.key ?? null,
-            categoryName: categoryFromDesc?.name ?? null,
-            jarKey: categoryFromDesc?.jarKey ?? null,
-            source: categoryFromDesc ? 'category' : 'custom',
+            merchantKey: null,
+            categoryKey: category?.key ?? null,
+            categoryName: category?.name ?? null,
+            jarKey: category?.jarKey ?? null,
+            source: category ? 'category' : 'custom',
         };
+    }
+
+    if (categoryKey) {
+        const category = categories.find(candidate => candidate.key === categoryKey);
+        if (category) {
+            return {
+                vendor: '',
+                merchantKey: null,
+                categoryKey: category.key,
+                categoryName: category.name,
+                jarKey: category.jarKey,
+                source: 'category',
+            };
+        }
     }
 
     if (description && description !== note) {
@@ -124,6 +162,7 @@ function buildIntentFromDefaults(
         if (category) {
             return {
                 vendor: '',
+                merchantKey: null,
                 categoryKey: category.key,
                 categoryName: category.name,
                 jarKey: category.jarKey,
@@ -132,6 +171,7 @@ function buildIntentFromDefaults(
         }
         return {
             vendor: description,
+            merchantKey: null,
             categoryKey: null,
             categoryName: null,
             jarKey: null,
@@ -188,6 +228,10 @@ export function ExpenseForm({
         live
     );
     const jars = useMemo(() => jarsQuery.data ?? [], [jarsQuery.data]);
+    const jarChoices = useMemo(() => {
+        if (isIn) return jars;
+        return jars.filter(jar => jarCapabilitiesFor(jar.key).canSpend);
+    }, [jars, isIn]);
 
     const balancesQuery = useLiveQuery(
         apiQuery.money.jars.balances.queryOptions({ input: { householdId: householdId! } }),
@@ -216,13 +260,21 @@ export function ExpenseForm({
     }, [categories]);
 
     const catalogsReady = !merchantsQuery.isLoading && !categoriesQuery.isLoading;
-    const editIntent = useMemo(() => {
-        if (mode !== 'edit' || !catalogsReady) return null;
+    const hasIdentityPrefill = Boolean(
+        defaultValues?.merchantKey?.trim() ||
+        defaultValues?.categoryKey?.trim() ||
+        defaultValues?.counterparty?.trim() ||
+        (mode === 'edit' &&
+            (defaultValues?.description?.trim() || defaultValues?.counterparty?.trim()))
+    );
+    const resolvedIntent = useMemo(() => {
+        if (!catalogsReady) return null;
+        if (mode !== 'edit' && !hasIdentityPrefill) return null;
         return buildIntentFromDefaults(defaultValues, merchants, categories);
-    }, [mode, catalogsReady, defaultValues, merchants, categories]);
+    }, [mode, catalogsReady, hasIdentityPrefill, defaultValues, merchants, categories]);
 
-    const intent = intentOverride ?? editIntent ?? EMPTY_INTENT;
-    const intentReady = mode === 'create' || editIntent !== null;
+    const intent = intentOverride ?? resolvedIntent ?? EMPTY_INTENT;
+    const intentReady = mode === 'create' || resolvedIntent !== null;
 
     const form = useForm<z.infer<typeof expenseFormSchema>>({
         defaultValues: {
@@ -238,16 +290,18 @@ export function ExpenseForm({
     });
 
     useEffect(() => {
-        if (jars[0]?.id && !form.getValues('jarId')) {
-            form.setValue('jarId', jars[0].id);
-        }
-    }, [jars, form]);
+        // Wait for jars — otherwise a prefilled jarId gets overwritten while the list is empty.
+        if (jarChoices.length === 0) return;
+        const current = form.getValues('jarId');
+        if (current && jarChoices.some(jar => jar.id === current)) return;
+        if (jarChoices[0]?.id) form.setValue('jarId', jarChoices[0].id);
+    }, [jarChoices, form]);
 
     useEffect(() => {
         if (!intent.jarKey) return;
-        const jar = jars.find(candidate => candidate.key === intent.jarKey);
+        const jar = jarChoices.find(candidate => candidate.key === intent.jarKey);
         if (jar) form.setValue('jarId', jar.id);
-    }, [intent.jarKey, jars, form]);
+    }, [intent.jarKey, jarChoices, form]);
 
     const onError = createFormInvalidHandler(({ title, description }) => {
         showToast(description ?? title, 'error');
@@ -379,7 +433,7 @@ export function ExpenseForm({
         form.formState.isSubmitting ||
         saveMutation.isPending ||
         removeMutation.isPending ||
-        (live && jars.length === 0) ||
+        (live && jarChoices.length === 0) ||
         (mode === 'edit' && !intentReady);
 
     const noteValue = useWatch({ control: form.control, name: 'note' }) ?? '';
@@ -541,10 +595,10 @@ export function ExpenseForm({
                             <select
                                 className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
                                 {...field}>
-                                {jars.length === 0 ? (
+                                {jarChoices.length === 0 ? (
                                     <option value="">No jars — complete setup first</option>
                                 ) : (
-                                    jars.map(jar => (
+                                    jarChoices.map(jar => (
                                         <option key={jar.id} value={jar.id}>
                                             {jar.icon ? `${jar.icon} ` : ''}
                                             {jar.name}

@@ -1,7 +1,7 @@
 'use client';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -22,6 +22,8 @@ import { ListToolbar } from '@/components/layout/list-toolbar';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 const EMPTY_TRANSACTION_PAGE = { items: [] as never[], nextCursor: null };
+
+type GivePickMode = 'known' | 'coach' | 'manual' | null;
 
 type GivePledge = Pick<
     Goal,
@@ -51,6 +53,7 @@ export function GivingPageClient() {
     const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
+    const [givePickMode, setGivePickMode] = useState<GivePickMode>(null);
 
     const jarsQuery = useLiveQuery(
         apiQuery.money.jars.list.queryOptions({ input: { householdId: householdId! } }),
@@ -145,7 +148,9 @@ export function GivingPageClient() {
 
             <ListToolbar
                 createLabel="+ Add a recurring gift"
-                onCreate={() => router.push(createFixedHref({ jarId: giveJar?.id }))}
+                onCreate={() =>
+                    router.push(createFixedHref({ jarId: giveJar?.id, payeeMode: 'known' }))
+                }
                 secondary={
                     <Button
                         size="sm"
@@ -296,18 +301,77 @@ export function GivingPageClient() {
                 </Card>
             </div>
 
-            {/* Choose well */}
-            <GivingFinder
-                defaultOpen
-                onPick={organisation =>
-                    router.push(
-                        createFixedHref({
-                            jarId: giveJar?.id,
-                            counterparty: organisation.name,
-                        })
-                    )
-                }
-            />
+            {/* Choose well — same three paths as the fixed-cost Give form */}
+            <Card className="grid gap-4">
+                <div className="grid gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <CoachMark size="sm" />
+                        <Eyebrow className="text-accent">To whom</Eyebrow>
+                    </div>
+                    <p className="text-sm leading-relaxed text-fg-secondary">
+                        How do you want to pick who receives this gift?
+                    </p>
+                    <div
+                        className="flex flex-wrap gap-2"
+                        role="group"
+                        aria-label="How do you want to pick?">
+                        {(
+                            [
+                                { id: 'known' as const, label: 'I know who' },
+                                { id: 'coach' as const, label: 'Help me choose' },
+                                { id: 'manual' as const, label: 'Type a name' },
+                            ] as const
+                        ).map(option => {
+                            const on = givePickMode === option.id;
+                            return (
+                                <button
+                                    key={option.id}
+                                    type="button"
+                                    aria-pressed={on}
+                                    onClick={() => {
+                                        if (option.id === 'coach') {
+                                            setGivePickMode('coach');
+                                            return;
+                                        }
+                                        setGivePickMode(option.id);
+                                        router.push(
+                                            createFixedHref({
+                                                jarId: giveJar?.id,
+                                                payeeMode: option.id,
+                                            })
+                                        );
+                                    }}
+                                    className={
+                                        on
+                                            ? 'rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                            : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                    }>
+                                    {option.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    <p className="text-xs leading-relaxed text-fg-faint">
+                        The Coach list is organisations with independent checks — not every NL
+                        household name. Pick “I know who” for Giro555 and similar.
+                    </p>
+                </div>
+
+                {givePickMode === 'coach' ? (
+                    <GivingFinder
+                        defaultOpen
+                        onPick={organisation =>
+                            router.push(
+                                createFixedHref({
+                                    jarId: giveJar?.id,
+                                    orgKey: organisation.key,
+                                    payeeMode: 'coach',
+                                })
+                            )
+                        }
+                    />
+                ) : null}
+            </Card>
 
             {/* The four checks — Coach guide, not permanent page chrome */}
             <HelperGate>

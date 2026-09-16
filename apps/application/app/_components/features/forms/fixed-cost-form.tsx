@@ -20,7 +20,7 @@ import {
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { CategoryTemplate, FixedCostPreset, MerchantPreset } from '@rumtelo/contracts';
-import { Cadence, FlowDirection, JarKey } from '@rumtelo/contracts';
+import { Cadence, FlowDirection, JarKey, jarCapabilitiesFor } from '@rumtelo/contracts';
 import { z } from 'zod';
 
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
@@ -40,6 +40,17 @@ import { PresetNameField } from './preset-name-field';
 
 /** Cap suggested vendor chips so the form stays scannable. */
 const MAX_VENDOR_CHIPS = 16;
+
+/** Category template the Give helper falls back to when none was picked. */
+const DONATIONS_CATEGORY_KEY = 'DONATIONS';
+
+export type GivePayeeMode = 'known' | 'coach' | 'manual';
+
+const GIVE_PAYEE_MODES: ReadonlyArray<{ id: GivePayeeMode; label: string }> = [
+    { id: 'known', label: 'I know who' },
+    { id: 'coach', label: 'Help me choose' },
+    { id: 'manual', label: 'Type a name' },
+];
 
 const moneyInput = z
     .string()
@@ -62,21 +73,31 @@ const fixedCostFormSchema = z.object({
     dueDay: z.string().optional(),
 });
 
-/** Category template the Give helper falls back to when none was picked. */
-const DONATIONS_CATEGORY_KEY = 'DONATIONS';
-
 export type FixedCostFormValues = z.infer<typeof fixedCostFormSchema>;
 
 type FixedCostFormProps = {
     defaultValues?: Partial<FixedCostFormValues>;
+    /** Soul → Giving deep-link: lock the Give “To whom” path. */
+    defaultGivePayeeMode?: GivePayeeMode | null;
+    /** Coach catalog key from URL — resolved to counterparty name once orgs load. */
+    defaultOrgKey?: string | null;
+    /** Merchant catalog key from URL — resolved to counterparty name once merchants load. */
+    defaultMerchantKey?: string | null;
     embedded?: boolean;
     mode?: 'create' | 'edit';
     entityId?: string;
     onSuccess?: () => void;
 };
 
+function nameMatches(left: string | null | undefined, right: string) {
+    return (left ?? '').trim().toLowerCase() === right.trim().toLowerCase();
+}
+
 export function FixedCostForm({
     defaultValues,
+    defaultGivePayeeMode = null,
+    defaultOrgKey = null,
+    defaultMerchantKey = null,
     embedded = true,
     mode = 'create',
     entityId,
@@ -93,6 +114,37 @@ export function FixedCostForm({
         null
     );
     const [customPayee, setCustomPayee] = useState(false);
+    /** Give only — null until the household picks a path (or prefill resolves one). */
+    const [givePayeeMode, setGivePayeeMode] = useState<GivePayeeMode | null>(
+        defaultGivePayeeMode ?? null
+    );
+    const [giveOrgKey, setGiveOrgKey] = useState<string | null>(defaultOrgKey);
+    // Keys / display-name counterparty still need catalog resolve; payeeMode-only can stay locked.
+    const [giveModeHydrated, setGiveModeHydrated] = useState(
+        Boolean(defaultGivePayeeMode) &&
+            !defaultOrgKey &&
+            !defaultMerchantKey &&
+            !defaultValues?.counterparty?.trim()
+    );
+    const [seenGivePayeeMode, setSeenGivePayeeMode] = useState(defaultGivePayeeMode);
+    const [seenOrgKey, setSeenOrgKey] = useState(defaultOrgKey);
+    const [seenMerchantKey, setSeenMerchantKey] = useState(defaultMerchantKey);
+
+    if (
+        defaultGivePayeeMode !== seenGivePayeeMode ||
+        defaultOrgKey !== seenOrgKey ||
+        defaultMerchantKey !== seenMerchantKey
+    ) {
+        setSeenGivePayeeMode(defaultGivePayeeMode);
+        setSeenOrgKey(defaultOrgKey);
+        setSeenMerchantKey(defaultMerchantKey);
+        setGivePayeeMode(defaultGivePayeeMode ?? null);
+        setGiveOrgKey(defaultOrgKey);
+        const needsResolve = Boolean(
+            defaultOrgKey || defaultMerchantKey || defaultValues?.counterparty?.trim()
+        );
+        setGiveModeHydrated(Boolean(defaultGivePayeeMode) && !needsResolve);
+    }
 
     const jarsQuery = useLiveQuery(
         apiQuery.money.jars.list.queryOptions({ input: { householdId: householdId! } }),
@@ -100,6 +152,17 @@ export function FixedCostForm({
         live
     );
     const jars = useMemo(() => jarsQuery.data ?? [], [jarsQuery.data]);
+    const billJars = useMemo(() => {
+        const eligible = jars.filter(jar => jarCapabilitiesFor(jar.key).allowsFixedCosts);
+        if (mode !== 'edit') return eligible;
+        const current = defaultValues?.jarId
+            ? jars.find(jar => jar.id === defaultValues.jarId)
+            : undefined;
+        if (current && !eligible.some(jar => jar.id === current.id)) {
+            return [...eligible, current];
+        }
+        return eligible;
+    }, [jars, mode, defaultValues]);
 
     const balancesQuery = useLiveQuery(
         apiQuery.money.jars.balances.queryOptions({ input: { householdId: householdId! } }),
@@ -116,6 +179,13 @@ export function FixedCostForm({
     );
     const merchantsQuery = useLiveQuery(
         apiQuery.money.catalogs.merchantPresets.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [],
+        live
+    );
+    const givingOrgsQuery = useLiveQuery(
+        apiQuery.money.catalogs.givingOrganisations.list.queryOptions({
             input: { householdId: householdId! },
         }),
         [],
@@ -201,14 +271,120 @@ export function FixedCostForm({
             .slice(0, MAX_VENDOR_CHIPS);
     }, [merchants, activeCategoryTemplateKey]);
 
-    const showPayeeInput =
-        isGive || mode === 'edit' || customPayee || vendorsForCategory.length === 0;
+    /** Give “I know who” chips — Donations/Gifts merchants even before a preset is locked. */
+    const giveKnownVendors = useMemo(() => {
+        const categoryKey = activeCategoryTemplateKey ?? DONATIONS_CATEGORY_KEY;
+        return merchants
+            .filter(
+                merchant =>
+                    merchant.jarKey === JarKey.GIVE && merchant.categoryTemplateKey === categoryKey
+            )
+            .slice(0, MAX_VENDOR_CHIPS);
+    }, [merchants, activeCategoryTemplateKey]);
+
+    const givingOrgNames = useMemo(() => givingOrgsQuery.data ?? [], [givingOrgsQuery.data]);
+
+    const showPayeeInput = mode === 'edit' || customPayee || vendorsForCategory.length === 0;
 
     useEffect(() => {
-        if (jars[0]?.id && !form.getValues('jarId')) {
-            form.setValue('jarId', jars[0].id);
+        // Wait for jars — otherwise a prefilled Give jarId gets overwritten while the list is empty.
+        if (billJars.length === 0) return;
+        const current = form.getValues('jarId');
+        if (current && billJars.some(jar => jar.id === current)) return;
+        const necessities = billJars.find(jar => jar.key === JarKey.NECESSITIES);
+        const fallback = necessities?.id ?? billJars[0]?.id;
+        if (fallback) form.setValue('jarId', fallback);
+    }, [billJars, form]);
+
+    // Leave Give → drop the chooser path (adjust during render — no effect).
+    if (!isGive && (givePayeeMode !== null || giveModeHydrated || giveOrgKey)) {
+        setGivePayeeMode(null);
+        setGiveOrgKey(null);
+        setGiveModeHydrated(false);
+    }
+
+    // Resolve initial Give path once catalogs are ready.
+    // Keys win; display-name counterparty is fallback → coach / known / manual.
+    const needsGivingOrgs = Boolean(
+        defaultOrgKey ||
+        defaultValues?.counterparty?.trim() ||
+        form.getValues('counterparty')?.trim()
+    );
+    const giveCatalogsReady =
+        !merchantsQuery.isLoading && (!needsGivingOrgs || !givingOrgsQuery.isLoading);
+    if (isGive && !giveModeHydrated && giveCatalogsReady) {
+        const orgKey = defaultOrgKey?.trim() || null;
+        const merchantKey = defaultMerchantKey?.trim() || null;
+        const prefillName = (
+            defaultValues?.counterparty ??
+            form.getValues('counterparty') ??
+            ''
+        ).trim();
+
+        if (orgKey) {
+            const org = givingOrgNames.find(row => row.key === orgKey);
+            if (org) {
+                form.setValue('counterparty', org.name, { shouldDirty: false });
+                setGiveOrgKey(org.key);
+                setGivePayeeMode(defaultGivePayeeMode ?? 'coach');
+                if (!form.getValues('categoryId') && !pendingCategoryTemplateKey) {
+                    setPendingCategoryTemplateKey(DONATIONS_CATEGORY_KEY);
+                }
+            } else {
+                // Unknown key — keep any name as manual typing.
+                if (prefillName) {
+                    form.setValue('counterparty', prefillName, { shouldDirty: false });
+                }
+                setGiveOrgKey(null);
+                setGivePayeeMode(defaultGivePayeeMode ?? (prefillName ? 'manual' : 'coach'));
+                setCustomPayee(Boolean(prefillName));
+            }
+        } else if (merchantKey) {
+            const merchant = merchants.find(row => row.key === merchantKey);
+            if (merchant) {
+                form.setValue('counterparty', merchant.name, { shouldDirty: false });
+                setGiveOrgKey(null);
+                setGivePayeeMode(defaultGivePayeeMode ?? 'known');
+            } else {
+                if (prefillName) {
+                    form.setValue('counterparty', prefillName, { shouldDirty: false });
+                }
+                setGivePayeeMode(defaultGivePayeeMode ?? (prefillName ? 'manual' : 'known'));
+                setCustomPayee(Boolean(prefillName));
+            }
+        } else if (prefillName) {
+            const coachOrg = givingOrgNames.find(org => nameMatches(org.name, prefillName));
+            const inKnown = merchants.some(
+                merchant =>
+                    merchant.jarKey === JarKey.GIVE && nameMatches(merchant.name, prefillName)
+            );
+            if (coachOrg) {
+                setGiveOrgKey(coachOrg.key);
+                setGivePayeeMode(defaultGivePayeeMode ?? 'coach');
+            } else if (inKnown) {
+                setGivePayeeMode(defaultGivePayeeMode ?? 'known');
+            } else {
+                setGivePayeeMode(defaultGivePayeeMode ?? 'manual');
+                setCustomPayee(true);
+            }
+        } else if (defaultGivePayeeMode) {
+            setGivePayeeMode(defaultGivePayeeMode);
+            setCustomPayee(defaultGivePayeeMode === 'manual');
+        } else if (giveKnownVendors.length > 0) {
+            setGivePayeeMode('known');
+        } else {
+            setGivePayeeMode(null);
         }
-    }, [jars, form]);
+        setGiveModeHydrated(true);
+    }
+
+    function selectGivePayeeMode(next: GivePayeeMode) {
+        if (next === givePayeeMode) return;
+        setGivePayeeMode(next);
+        setGiveOrgKey(null);
+        setCustomPayee(next === 'manual');
+        form.setValue('counterparty', '', { shouldDirty: false });
+    }
 
     const onError = createFormInvalidHandler(({ title, description }) => {
         showToast(description ?? title, 'error');
@@ -371,6 +547,8 @@ export function FixedCostForm({
                                         form.setValue('counterparty', '', {
                                             shouldDirty: false,
                                         });
+                                        setGivePayeeMode(null);
+                                        setGiveModeHydrated(false);
                                     }}
                                     onSelect={opt => {
                                         const full = presetOptions.find(
@@ -386,6 +564,13 @@ export function FixedCostForm({
                                         form.setValue('categoryId', null);
                                         setCustomPayee(false);
                                         form.setValue('counterparty', '', { shouldDirty: false });
+                                        if (full.jarKey === JarKey.GIVE) {
+                                            setGivePayeeMode('known');
+                                            setGiveModeHydrated(true);
+                                        } else {
+                                            setGivePayeeMode(null);
+                                            setGiveModeHydrated(false);
+                                        }
                                     }}
                                 />
                             ) : (
@@ -427,11 +612,13 @@ export function FixedCostForm({
                                     setPendingCategoryTemplateKey(null);
                                     setCustomPayee(false);
                                     form.setValue('counterparty', '', { shouldDirty: false });
+                                    setGivePayeeMode(null);
+                                    setGiveModeHydrated(false);
                                 }}>
-                                {jars.length === 0 ? (
+                                {billJars.length === 0 ? (
                                     <option value="">No jars — complete setup first</option>
                                 ) : (
-                                    jars.map(jar => (
+                                    billJars.map(jar => (
                                         <option key={jar.id} value={jar.id}>
                                             {jar.icon ? `${jar.icon} ` : ''}
                                             {jar.name}
@@ -486,87 +673,211 @@ export function FixedCostForm({
                         <FormLabel>
                             {isGive ? 'To whom (organisation)' : 'Paid to (optional)'}
                         </FormLabel>
-                        {!isGive && vendorsForCategory.length > 0 && !customPayee ? (
-                            <div className="flex max-h-40 flex-wrap gap-1.5 overflow-y-auto pr-0.5">
-                                {vendorsForCategory.map(merchant => {
-                                    const selected =
-                                        (counterparty ?? '').trim().toLowerCase() ===
-                                        merchant.name.toLowerCase();
-                                    const mark = vendorMarkSrc({
-                                        key: merchant.key,
-                                        name: merchant.name,
-                                        logoDomain: merchant.logoDomain,
-                                        website: merchant.website,
-                                    });
-                                    return (
+                        {isGive ? (
+                            <div className="grid gap-3">
+                                <div
+                                    className="flex flex-wrap gap-2"
+                                    role="group"
+                                    aria-label="How do you want to pick?">
+                                    {GIVE_PAYEE_MODES.map(option => {
+                                        const on = givePayeeMode === option.id;
+                                        return (
+                                            <button
+                                                key={option.id}
+                                                type="button"
+                                                disabled={busy}
+                                                aria-pressed={on}
+                                                onClick={() => selectGivePayeeMode(option.id)}
+                                                className={
+                                                    on
+                                                        ? 'rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                                        : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                                }>
+                                                {option.label}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                                <p className="text-xs leading-relaxed text-fg-faint">
+                                    The Coach list is organisations with independent checks — not
+                                    every NL household name. Pick “I know who” for Giro555 and
+                                    similar.
+                                </p>
+
+                                {givePayeeMode === 'known' ? (
+                                    giveKnownVendors.length === 0 ? (
+                                        <p className="text-sm text-fg-muted">
+                                            No known organisations for this category yet. Type a
+                                            name instead.
+                                        </p>
+                                    ) : (
+                                        <div className="flex max-h-40 flex-wrap gap-1.5 overflow-y-auto pr-0.5">
+                                            {giveKnownVendors.map(merchant => {
+                                                const selected = nameMatches(
+                                                    counterparty,
+                                                    merchant.name
+                                                );
+                                                const mark = vendorMarkSrc({
+                                                    key: merchant.key,
+                                                    name: merchant.name,
+                                                    logoDomain: merchant.logoDomain,
+                                                    website: merchant.website,
+                                                });
+                                                return (
+                                                    <button
+                                                        key={merchant.key}
+                                                        type="button"
+                                                        disabled={busy}
+                                                        className={
+                                                            selected
+                                                                ? 'inline-flex items-center gap-2 rounded-xl border border-accent bg-accent/15 px-2.5 py-1.5 text-sm text-accent'
+                                                                : 'inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent'
+                                                        }
+                                                        onClick={() => {
+                                                            form.setValue(
+                                                                'counterparty',
+                                                                merchant.name,
+                                                                {
+                                                                    shouldValidate: true,
+                                                                    shouldDirty: true,
+                                                                }
+                                                            );
+                                                        }}>
+                                                        <VendorMark
+                                                            name={mark.name}
+                                                            src={mark.src}
+                                                            size={20}
+                                                        />
+                                                        {merchant.name}
+                                                    </button>
+                                                );
+                                            })}
+                                            <button
+                                                type="button"
+                                                disabled={busy}
+                                                className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
+                                                onClick={() => selectGivePayeeMode('manual')}>
+                                                Other…
+                                            </button>
+                                        </div>
+                                    )
+                                ) : null}
+
+                                {givePayeeMode === 'coach' ? (
+                                    <GivingFinder
+                                        defaultOpen
+                                        selectedKey={giveOrgKey}
+                                        selectedName={counterparty}
+                                        onPick={organisation => {
+                                            setGiveOrgKey(organisation.key);
+                                            form.setValue('counterparty', organisation.name, {
+                                                shouldDirty: true,
+                                            });
+                                            if (
+                                                !form.getValues('categoryId') &&
+                                                !pendingCategoryTemplateKey
+                                            ) {
+                                                setPendingCategoryTemplateKey(
+                                                    DONATIONS_CATEGORY_KEY
+                                                );
+                                            }
+                                        }}
+                                    />
+                                ) : null}
+
+                                {givePayeeMode === 'manual' ? (
+                                    <FormControl>
+                                        <FormInput
+                                            placeholder="The organisation you give to"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                ) : (
+                                    <FormControl>
+                                        <input type="hidden" {...field} />
+                                    </FormControl>
+                                )}
+                            </div>
+                        ) : (
+                            <>
+                                {!customPayee && vendorsForCategory.length > 0 ? (
+                                    <div className="flex max-h-40 flex-wrap gap-1.5 overflow-y-auto pr-0.5">
+                                        {vendorsForCategory.map(merchant => {
+                                            const selected = nameMatches(
+                                                counterparty,
+                                                merchant.name
+                                            );
+                                            const mark = vendorMarkSrc({
+                                                key: merchant.key,
+                                                name: merchant.name,
+                                                logoDomain: merchant.logoDomain,
+                                                website: merchant.website,
+                                            });
+                                            return (
+                                                <button
+                                                    key={merchant.key}
+                                                    type="button"
+                                                    disabled={busy}
+                                                    className={
+                                                        selected
+                                                            ? 'inline-flex items-center gap-2 rounded-xl border border-accent bg-accent/15 px-2.5 py-1.5 text-sm text-accent'
+                                                            : 'inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent'
+                                                    }
+                                                    onClick={() => {
+                                                        form.setValue(
+                                                            'counterparty',
+                                                            merchant.name,
+                                                            {
+                                                                shouldValidate: true,
+                                                                shouldDirty: true,
+                                                            }
+                                                        );
+                                                    }}>
+                                                    <VendorMark
+                                                        name={mark.name}
+                                                        src={mark.src}
+                                                        size={20}
+                                                    />
+                                                    {merchant.name}
+                                                </button>
+                                            );
+                                        })}
                                         <button
-                                            key={merchant.key}
                                             type="button"
                                             disabled={busy}
-                                            className={
-                                                selected
-                                                    ? 'inline-flex items-center gap-2 rounded-xl border border-accent bg-accent/15 px-2.5 py-1.5 text-sm text-accent'
-                                                    : 'inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent'
-                                            }
+                                            className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
                                             onClick={() => {
-                                                form.setValue('counterparty', merchant.name, {
-                                                    shouldValidate: true,
-                                                    shouldDirty: true,
+                                                setCustomPayee(true);
+                                                form.setValue('counterparty', '', {
+                                                    shouldValidate: false,
                                                 });
                                             }}>
-                                            <VendorMark name={mark.name} src={mark.src} size={20} />
-                                            {merchant.name}
+                                            Other…
                                         </button>
-                                    );
-                                })}
-                                <button
-                                    type="button"
-                                    disabled={busy}
-                                    className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
-                                    onClick={() => {
-                                        setCustomPayee(true);
-                                        form.setValue('counterparty', '', {
-                                            shouldValidate: false,
-                                        });
-                                    }}>
-                                    Other…
-                                </button>
-                            </div>
-                        ) : null}
-                        {showPayeeInput ? (
-                            <FormControl>
-                                <FormInput
-                                    placeholder={
-                                        isGive
-                                            ? 'The organisation you give to'
-                                            : vendorsForCategory.length > 0
-                                              ? 'Payee name'
-                                              : 'e.g. landlord, insurer'
-                                    }
-                                    {...field}
-                                />
-                            </FormControl>
-                        ) : (
-                            <FormControl>
-                                <input type="hidden" {...field} />
-                            </FormControl>
+                                    </div>
+                                ) : null}
+                                {showPayeeInput ? (
+                                    <FormControl>
+                                        <FormInput
+                                            placeholder={
+                                                vendorsForCategory.length > 0
+                                                    ? 'Payee name'
+                                                    : 'e.g. landlord, insurer'
+                                            }
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                ) : (
+                                    <FormControl>
+                                        <input type="hidden" {...field} />
+                                    </FormControl>
+                                )}
+                            </>
                         )}
                         <FormMessage />
                     </FormItem>
                 )}
             />
-
-            {isGive ? (
-                <GivingFinder
-                    selectedName={counterparty}
-                    onPick={organisation => {
-                        form.setValue('counterparty', organisation.name, { shouldDirty: true });
-                        if (!form.getValues('categoryId') && !pendingCategoryTemplateKey) {
-                            setPendingCategoryTemplateKey(DONATIONS_CATEGORY_KEY);
-                        }
-                    }}
-                />
-            ) : null}
 
             <FormField
                 control={form.control}

@@ -1,5 +1,5 @@
 import { EntityManager } from '@mikro-orm/postgresql';
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
@@ -9,7 +9,7 @@ import { Jar } from '../../plan/jar/jar.entity';
 import { BankAccount } from '../account/bank-account.entity';
 import { RuleService } from '../rule/rule.service';
 import { parseStatementCsv } from './csv/csv-parser';
-import { TransactionSource, TransactionStatus } from '@rumtelo/contracts';
+import { jarCapabilitiesFor, TransactionSource, TransactionStatus } from '@rumtelo/contracts';
 
 import { Transaction } from './transaction.entity';
 
@@ -39,6 +39,9 @@ export class TransactionService {
         inflowKey?: string | null;
         note?: string | null;
     }) {
+        if (input.jarId) {
+            await assertJarAllowsOutflow(this.em, input.jarId, input.amount);
+        }
         const entity = this.em.create(Transaction, {
             household: currentHouseholdId(),
             account: input.accountId ? this.em.getReference(BankAccount, input.accountId) : null,
@@ -146,6 +149,7 @@ export class TransactionService {
         createRule = false
     ) {
         const entity = await this.transactions.findOneOrFail({ id: transactionId });
+        await assertJarAllowsOutflow(this.em, jarId, Number(entity.amount));
         entity.jar = this.em.getReference(Jar, jarId);
         entity.category = categoryId ? this.em.getReference(Category, categoryId) : null;
         entity.status = TransactionStatus.SORTED;
@@ -171,6 +175,9 @@ export class TransactionService {
 
     async bulkSort(ids: string[], jarId: string, categoryId?: string | null) {
         const rows = await this.transactions.find({ id: { $in: ids } });
+        if (rows.some(row => Number(row.amount) < 0)) {
+            await assertJarAllowsOutflow(this.em, jarId, -1);
+        }
         for (const row of rows) {
             row.jar = this.em.getReference(Jar, jarId);
             row.category = categoryId ? this.em.getReference(Category, categoryId) : null;
@@ -208,6 +215,16 @@ export class TransactionService {
     async remove(id: string) {
         const entity = await this.transactions.findOneOrFail({ id });
         await this.em.remove(entity).flush();
+    }
+}
+
+async function assertJarAllowsOutflow(em: EntityManager, jarId: string, amount: number) {
+    if (amount >= 0) return;
+    const jar = await em.findOneOrFail(Jar, jarId);
+    if (!jarCapabilitiesFor(jar.key).canSpend) {
+        throw new BadRequestException(
+            'Day-to-day spend cannot land on Financial Freedom. Move money or invest instead.'
+        );
     }
 }
 

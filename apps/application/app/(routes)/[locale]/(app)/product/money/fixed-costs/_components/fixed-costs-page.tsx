@@ -5,6 +5,7 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { jarCapabilitiesFor } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Card } from '@rumtelo/ui';
 import { cn, monthlyAmount, fixedOutNetSummary } from '@rumtelo/utils';
@@ -240,8 +241,10 @@ export function FixedCostsPageClient() {
                         </div>
 
                         <div className="flex flex-wrap gap-2 border-t border-line px-5 py-4">
-                            {JAR_META.filter(j =>
-                                fixedCosts.some(fixedCost => fixedCost.jarKey === j.key)
+                            {JAR_META.filter(
+                                j =>
+                                    jarCapabilitiesFor(j.key).allowsFixedCosts &&
+                                    fixedCosts.some(fixedCost => fixedCost.jarKey === j.key)
                             ).map(j => {
                                 const on = jarFilter === j.key;
                                 return (

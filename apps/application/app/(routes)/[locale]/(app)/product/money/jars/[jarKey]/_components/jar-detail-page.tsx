@@ -4,12 +4,12 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import type { JarKey } from '@rumtelo/contracts';
+import { GoalKind, GoalStatus, JarKey, jarCapabilitiesFor } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card } from '@rumtelo/ui';
 import { cn, monthlyAmount, toPeriodKey } from '@rumtelo/utils';
 
-import { createMoveHref, createTxHref, updateHref } from '@/app/_lib/create-routes';
+import { createGoalHref, createMoveHref, createTxHref, updateHref } from '@/app/_lib/create-routes';
 import { cadenceLabel } from '@/app/_lib/jar-chrome';
 import type { JarGuideKey } from '@/app/_lib/jar-guide';
 import { JAR_META } from '@/app/_lib/jar-meta';
@@ -46,6 +46,12 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
 
     const byJarQuery = useLiveQuery(
         apiQuery.money.fixedCosts.byJar.queryOptions({ input: { householdId: householdId! } }),
+        [] as never,
+        live
+    );
+
+    const goalsQuery = useLiveQuery(
+        apiQuery.money.goals.list.queryOptions({ input: { householdId: householdId! } }),
         [] as never,
         live
     );
@@ -88,6 +94,20 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
     }
 
     const colorClass = meta?.color ?? 'bg-jar-nec';
+    const caps = jarCapabilitiesFor(jar.key);
+    const allowsFixedCosts = caps.allowsFixedCosts;
+    const showGoals =
+        caps.canSave || caps.canInvest || jar.key === JarKey.PLAY || jar.key === JarKey.GIVE;
+    const jarGoals = (goalsQuery.data ?? []).filter(goal => {
+        if (goal.jarId !== jar.id) return false;
+        if (goal.status === GoalStatus.ARCHIVED) return false;
+        if (goal.kind === GoalKind.SAVE) return true;
+        return jar.key === JarKey.GIVE && goal.kind === GoalKind.GIVE;
+    });
+    const addGoalHref = createGoalHref({
+        jarId: jar.id,
+        kind: jar.key === JarKey.GIVE ? GoalKind.GIVE : GoalKind.SAVE,
+    });
 
     return (
         <div className="grid animate-rise gap-8">
@@ -126,11 +146,13 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                             }>
                             Move between jars
                         </Button>
-                        <Button
-                            size="sm"
-                            onClick={() => router.push(createTxHref({ jarId: jar.id }))}>
-                            + Add transaction
-                        </Button>
+                        {caps.canSpend ? (
+                            <Button
+                                size="sm"
+                                onClick={() => router.push(createTxHref({ jarId: jar.id }))}>
+                                + Add transaction
+                            </Button>
+                        ) : null}
                     </div>
                 </div>
             </div>
@@ -142,6 +164,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                 credited={jar.credited}
                 committedOut={jar.committedOut}
                 colorClass={colorClass}
+                showCommitted={allowsFixedCosts}
             />
 
             {/* Categories */}
@@ -161,63 +184,116 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                 </Card>
             </section>
 
-            {/* Fixed costs */}
-            <section className="grid gap-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h2 className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
-                        ✦ Fixed costs
-                    </h2>
-                    <Link
-                        href="/product/money/fixed-costs"
-                        className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
-                        All fixed costs ›
-                    </Link>
-                </div>
-                <Card className="p-0">
-                    {fixedOut.length === 0 ? (
-                        <p className="px-5 py-4 text-sm text-fg-muted">
-                            No active fixed costs on this jar.
-                        </p>
-                    ) : (
-                        <ul className="grid gap-px">
-                            {fixedOut.map(item => {
-                                const monthly = monthlyAmount(item.amount, item.cadence);
-                                return (
-                                    <li key={item.id}>
+            {allowsFixedCosts ? (
+                <section className="grid gap-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                        <h2 className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                            ✦ Fixed costs
+                        </h2>
+                        <Link
+                            href="/product/money/fixed-costs"
+                            className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
+                            All fixed costs ›
+                        </Link>
+                    </div>
+                    <Card className="p-0">
+                        {fixedOut.length === 0 ? (
+                            <p className="px-5 py-4 text-sm text-fg-muted">
+                                No active fixed costs on this jar.
+                            </p>
+                        ) : (
+                            <ul className="grid gap-px">
+                                {fixedOut.map(item => {
+                                    const monthly = monthlyAmount(item.amount, item.cadence);
+                                    return (
+                                        <li key={item.id}>
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    router.push(updateHref('fixed', item.id))
+                                                }
+                                                className="flex w-full items-center justify-between gap-3 border-b border-line px-5 py-3 text-left last:border-b-0 hover:bg-raised">
+                                                <span className="min-w-0">
+                                                    <span className="block text-sm text-fg">
+                                                        {item.name}
+                                                    </span>
+                                                    <span className="mt-0.5 block font-mono text-xs text-fg-faint">
+                                                        {item.counterparty
+                                                            ? `→ ${item.counterparty} · `
+                                                            : ''}
+                                                        {cadenceLabel(item.cadence)}
+                                                        {item.dueDay !== null
+                                                            ? ` · day ${item.dueDay}`
+                                                            : ''}
+                                                        {item.cadence !== 'MONTHLY'
+                                                            ? ` · ${formatMoney(monthly)}/mo`
+                                                            : ''}
+                                                    </span>
+                                                </span>
+                                                <span className="shrink-0 font-mono text-sm text-fg">
+                                                    {formatMoney(-Math.abs(monthly))}
+                                                </span>
+                                            </button>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        )}
+                    </Card>
+                </section>
+            ) : null}
+
+            {showGoals ? (
+                <section className="grid gap-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                        <h2 className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                            ✦ Goals on this jar
+                        </h2>
+                        <button
+                            type="button"
+                            onClick={() => router.push(addGoalHref)}
+                            className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
+                            + Add goal
+                        </button>
+                    </div>
+                    <Card className="p-0">
+                        {jarGoals.length === 0 ? (
+                            <p className="px-5 py-4 text-sm text-fg-muted">
+                                No goals on this jar yet.
+                            </p>
+                        ) : (
+                            <ul className="grid gap-px">
+                                {jarGoals.map(goal => (
+                                    <li key={goal.id}>
                                         <button
                                             type="button"
-                                            onClick={() =>
-                                                router.push(updateHref('fixed', item.id))
-                                            }
+                                            onClick={() => router.push(updateHref('goal', goal.id))}
                                             className="flex w-full items-center justify-between gap-3 border-b border-line px-5 py-3 text-left last:border-b-0 hover:bg-raised">
                                             <span className="min-w-0">
-                                                <span className="block text-sm text-fg">
-                                                    {item.name}
+                                                <span className="block truncate text-sm text-fg">
+                                                    {goal.icon ? `${goal.icon} ` : ''}
+                                                    {goal.name}
                                                 </span>
                                                 <span className="mt-0.5 block font-mono text-xs text-fg-faint">
-                                                    {item.counterparty
-                                                        ? `→ ${item.counterparty} · `
-                                                        : ''}
-                                                    {cadenceLabel(item.cadence)}
-                                                    {item.dueDay !== null
-                                                        ? ` · day ${item.dueDay}`
-                                                        : ''}
-                                                    {item.cadence !== 'MONTHLY'
-                                                        ? ` · ${formatMoney(monthly)}/mo`
-                                                        : ''}
+                                                    {goal.kind === GoalKind.GIVE
+                                                        ? 'Yearly pledge'
+                                                        : goal.status === GoalStatus.REACHED
+                                                          ? 'Reached'
+                                                          : 'Save'}
                                                 </span>
                                             </span>
                                             <span className="shrink-0 font-mono text-sm text-fg">
-                                                {formatMoney(-Math.abs(monthly))}
+                                                {formatMoney(goal.saved)} /{' '}
+                                                {formatMoney(goal.target)}
                                             </span>
                                         </button>
                                     </li>
-                                );
-                            })}
-                        </ul>
-                    )}
-                </Card>
-            </section>
+                                ))}
+                            </ul>
+                        )}
+                    </Card>
+                </section>
+            ) : null}
 
             {/* Period transactions */}
             <section className="grid gap-3">

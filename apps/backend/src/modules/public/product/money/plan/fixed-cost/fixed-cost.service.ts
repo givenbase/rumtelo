@@ -1,7 +1,7 @@
 import { EntityManager } from '@mikro-orm/postgresql';
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 
-import { Cadence, FlowDirection } from '@rumtelo/contracts';
+import { Cadence, FlowDirection, jarCapabilitiesFor } from '@rumtelo/contracts';
 import { sumMonthlyFixedOut } from '@rumtelo/utils';
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
@@ -37,6 +37,7 @@ export class FixedCostService {
         endsOn?: string | null;
         note?: string | null;
     }) {
+        await assertJarAllowsFixedCosts(this.em, input.jarId);
         const entity = this.em.create(FixedCost, {
             household: currentHouseholdId(),
             jar: this.em.getReference(Jar, input.jarId),
@@ -120,7 +121,10 @@ export class FixedCostService {
         }>
     ) {
         const entity = await this.repo.findOneOrFail({ id });
-        if (patch.jarId !== undefined) entity.jar = this.em.getReference(Jar, patch.jarId);
+        if (patch.jarId !== undefined) {
+            await assertJarAllowsFixedCosts(this.em, patch.jarId);
+            entity.jar = this.em.getReference(Jar, patch.jarId);
+        }
         if (patch.categoryId !== undefined) {
             entity.category = patch.categoryId
                 ? this.em.getReference(Category, patch.categoryId)
@@ -151,6 +155,15 @@ export class FixedCostService {
         const entity = await this.repo.findOneOrFail({ id });
         await this.em.remove(entity).flush();
         return { ok: true as const };
+    }
+}
+
+async function assertJarAllowsFixedCosts(em: EntityManager, jarId: string) {
+    const jar = await em.findOneOrFail(Jar, jarId);
+    if (!jarCapabilitiesFor(jar.key).allowsFixedCosts) {
+        throw new BadRequestException(
+            'Recurring bills belong on Necessities, Play, Education, or Give — not Financial Freedom or Long-term savings.'
+        );
     }
 }
 

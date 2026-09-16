@@ -9,18 +9,37 @@ import { isLiveData } from '@/app/_lib/preview';
 import {
     FixedCostForm,
     type FixedCostFormValues,
+    type GivePayeeMode,
 } from '@/components/features/forms/fixed-cost-form';
 import { useAuth } from '@/components/features/shell/auth-provider';
+
+export type FixedCostCreatePrefill = Partial<FixedCostFormValues> & {
+    payeeMode?: GivePayeeMode;
+    /** GivingOrganisation catalog key (Coach path). */
+    orgKey?: string;
+    /** MerchantPreset key (I know who path). */
+    merchantKey?: string;
+};
 
 export function FixedCostCreatePage({
     embedded = false,
     defaultValues,
 }: {
     embedded?: boolean;
-    /** Cross-route prefill (jar, organisation, name) — e.g. from Soul → Giving. */
-    defaultValues?: Partial<FixedCostFormValues>;
+    /** Cross-route prefill (jar, organisation, name, Give payee path) — e.g. Soul → Giving. */
+    defaultValues?: FixedCostCreatePrefill;
 }) {
-    return <FixedCostForm mode="create" embedded={embedded} defaultValues={defaultValues} />;
+    const { payeeMode, orgKey, merchantKey, ...formDefaults } = defaultValues ?? {};
+    return (
+        <FixedCostForm
+            mode="create"
+            embedded={embedded}
+            defaultValues={formDefaults}
+            defaultGivePayeeMode={payeeMode ?? null}
+            defaultOrgKey={orgKey ?? null}
+            defaultMerchantKey={merchantKey ?? null}
+        />
+    );
 }
 
 export function FixedCostUpdatePage({ id, embedded = false }: { id: string; embedded?: boolean }) {

@@ -21,6 +21,7 @@ const SPEND: JarCapabilities = {
     canSave: false,
     canInvest: false,
     countsTowardSafeToSpend: true,
+    allowsFixedCosts: true,
 };
 
 /** Canonical capabilities per jar key — runtime checks import from here. */
@@ -33,18 +34,21 @@ export const JAR_CAPABILITIES: Record<JarKey, JarCapabilities> = {
         canSave: true,
         canInvest: false,
         countsTowardSafeToSpend: true,
+        allowsFixedCosts: true,
     },
     [JarKey.LONG_TERM_SAVINGS]: {
         canSpend: true,
         canSave: true,
         canInvest: false,
         countsTowardSafeToSpend: false,
+        allowsFixedCosts: false,
     },
     [JarKey.FINANCIAL_FREEDOM]: {
         canSpend: false,
         canSave: false,
         canInvest: true,
         countsTowardSafeToSpend: false,
+        allowsFixedCosts: false,
     },
 };
 

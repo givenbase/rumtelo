@@ -6,10 +6,12 @@ import {
     IncomeUpdatePage,
 } from '@/product/growth/income/_components/income-pages';
 import { DebtCreatePage, DebtUpdatePage } from '@/product/money/debt/_components/debt-pages';
+import type { FixedCostCreatePrefill } from '@/product/money/fixed-costs/_components/fixed-cost-pages';
 import {
     FixedCostCreatePage,
     FixedCostUpdatePage,
 } from '@/product/money/fixed-costs/_components/fixed-cost-pages';
+import type { ExpenseCreatePrefill } from '@/product/money/transactions/_components/expense-pages';
 import {
     ExpenseCreatePage,
     ExpenseUpdatePage,
@@ -17,7 +19,6 @@ import {
 import type { GoalKind } from '@rumtelo/contracts';
 
 import { formRoute, moveCreateMeta } from '@/app/_lib/form-route-meta';
-import type { FixedCostFormValues } from '@/components/features/forms/fixed-cost-form';
 import { MoveMoneyForm } from '@/components/features/forms/move-money-form';
 import { SheetStubForm } from '@/components/features/forms/sheet-stub-form';
 import { RouteModalShell } from '@/components/layout/route-modal-shell';
@@ -26,17 +27,25 @@ type ShellProps = {
     closeHref: string;
 };
 
-type FixedCostPrefill = Partial<FixedCostFormValues>;
-
 export function TxCreateModalShell({
     closeHref,
     defaultJarId,
     direction = 'out',
-}: ShellProps & { defaultJarId?: string; direction?: 'out' | 'in' }) {
+    defaultValues,
+}: ShellProps & {
+    defaultJarId?: string;
+    direction?: 'out' | 'in';
+    defaultValues?: ExpenseCreatePrefill;
+}) {
     const meta = formRoute('txCreate');
     return (
         <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
-            <ExpenseCreatePage embedded defaultJarId={defaultJarId} direction={direction} />
+            <ExpenseCreatePage
+                embedded
+                defaultJarId={defaultJarId}
+                direction={direction}
+                defaultValues={defaultValues}
+            />
         </RouteModalShell>
     );
 }
@@ -53,7 +62,7 @@ export function TxUpdateModalShell({ closeHref, id }: ShellProps & { id: string 
 export function FixedCostCreateModalShell({
     closeHref,
     defaultValues,
-}: ShellProps & { defaultValues?: FixedCostPrefill }) {
+}: ShellProps & { defaultValues?: FixedCostCreatePrefill }) {
     const meta = formRoute('fixedCreate');
     return (
         <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
@@ -110,11 +119,12 @@ export function IncomeUpdateModalShell({ closeHref, id }: ShellProps & { id: str
 export function GoalCreateModalShell({
     closeHref,
     defaultKind,
-}: ShellProps & { defaultKind?: GoalKind }) {
+    defaultJarId,
+}: ShellProps & { defaultKind?: GoalKind; defaultJarId?: string }) {
     const meta = formRoute('goalCreate');
     return (
         <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
-            <GoalCreatePage embedded defaultKind={defaultKind} />
+            <GoalCreatePage embedded defaultKind={defaultKind} defaultJarId={defaultJarId} />
         </RouteModalShell>
     );
 }

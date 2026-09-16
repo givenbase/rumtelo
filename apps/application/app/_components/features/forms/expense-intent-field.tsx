@@ -18,12 +18,16 @@ import { FormInput } from './form-input';
 export type ExpenseIntentSelection = {
     /** Free-typed or picked vendor → counterparty */
     vendor: string;
+    /** MerchantPreset key when picked from catalog — null for free text. */
+    merchantKey: string | null;
     categoryKey: string | null;
     categoryName: string | null;
     jarKey: JarKey | null;
     /** How the intent was chosen — drives follow-up UI */
     source: 'merchant' | 'category' | 'custom' | null;
 };
+
+type ExpensePickMode = 'list' | 'manual';
 
 type ExpenseIntentFieldProps = {
     value: ExpenseIntentSelection;
@@ -41,20 +45,34 @@ const HIGHLIGHT_LABEL: Record<MerchantHighlight, string> = {
     POPULAR: 'Popular',
 };
 
+const PICK_MODES: ReadonlyArray<{ id: ExpensePickMode; label: string }> = [
+    { id: 'list', label: 'Pick from list' },
+    { id: 'manual', label: 'Type a name' },
+];
+
 function matchesMerchant(merchant: MerchantPreset, needle: string) {
     if (!needle) return true;
+    const key = merchant.key.toLowerCase();
+    const keyAsWords = key.replace(/_/g, ' ');
     if (merchant.name.toLowerCase().includes(needle)) return true;
+    if (key.includes(needle) || keyAsWords.includes(needle)) return true;
     return merchant.aliases.some(alias => alias.toLowerCase().includes(needle));
 }
 
 function matchesCategory(category: CategoryTemplate, needle: string) {
     if (!needle) return true;
-    return category.name.toLowerCase().includes(needle);
+    const key = category.key.toLowerCase();
+    const keyAsWords = key.replace(/_/g, ' ');
+    return (
+        category.name.toLowerCase().includes(needle) ||
+        key.includes(needle) ||
+        keyAsWords.includes(needle)
+    );
 }
 
 /**
- * Unified payee / type search: merchant hits and category hits in one list.
- * Category pick → vendor chips for that type. Merchant pick fills both.
+ * Unified payee / type picker with an explicit path:
+ * Pick from list (search + optional vendor chips) vs Type a name (free text only).
  */
 export function ExpenseIntentField({
     value,
@@ -65,6 +83,7 @@ export function ExpenseIntentField({
     disabled,
     id,
 }: ExpenseIntentFieldProps) {
+    const [pickMode, setPickMode] = useState<ExpensePickMode>('list');
     const [query, setQuery] = useState('');
     const [open, setOpen] = useState(false);
     const [customVendor, setCustomVendor] = useState(false);
@@ -106,7 +125,8 @@ export function ExpenseIntentField({
     }, [merchants, value.categoryKey]);
 
     const hasSelection = Boolean(value.vendor || value.categoryKey);
-    const showVendorPrompt = value.source === 'category' && !value.vendor && !skippedVendor;
+    const showVendorPrompt =
+        pickMode === 'list' && value.source === 'category' && !value.vendor && !skippedVendor;
 
     useEffect(() => {
         function onDoc(event: MouseEvent) {
@@ -116,12 +136,30 @@ export function ExpenseIntentField({
         return () => document.removeEventListener('mousedown', onDoc);
     }, []);
 
+    function selectPickMode(next: ExpensePickMode) {
+        if (next === pickMode) return;
+        setPickMode(next);
+        setQuery('');
+        setOpen(false);
+        setCustomVendor(false);
+        setSkippedVendor(false);
+        onChange({
+            vendor: '',
+            merchantKey: null,
+            categoryKey: null,
+            categoryName: null,
+            jarKey: null,
+            source: null,
+        });
+    }
+
     function selectMerchant(merchant: MerchantPreset) {
         const category = categories.find(
             candidate => candidate.key === merchant.categoryTemplateKey
         );
         onChange({
             vendor: merchant.name,
+            merchantKey: merchant.key,
             categoryKey: merchant.categoryTemplateKey,
             categoryName: category?.name ?? merchant.categoryTemplateKey,
             jarKey: merchant.jarKey,
@@ -136,6 +174,7 @@ export function ExpenseIntentField({
     function selectCategory(category: CategoryTemplate) {
         onChange({
             vendor: '',
+            merchantKey: null,
             categoryKey: category.key,
             categoryName: category.name,
             jarKey: category.jarKey,
@@ -150,6 +189,7 @@ export function ExpenseIntentField({
     function clearSelection() {
         onChange({
             vendor: '',
+            merchantKey: null,
             categoryKey: null,
             categoryName: null,
             jarKey: null,
@@ -158,7 +198,7 @@ export function ExpenseIntentField({
         setCustomVendor(false);
         setSkippedVendor(false);
         setQuery('');
-        setOpen(true);
+        if (pickMode === 'list') setOpen(true);
     }
 
     function commitCustomVendor(name: string) {
@@ -166,6 +206,7 @@ export function ExpenseIntentField({
         if (!typed) return;
         onChange({
             vendor: typed,
+            merchantKey: null,
             categoryKey: value.categoryKey,
             categoryName: value.categoryName,
             jarKey: value.jarKey,
@@ -181,18 +222,56 @@ export function ExpenseIntentField({
         ? (categoryIconByKey.get(value.categoryKey) ?? null)
         : null;
 
+    const selectedMerchant =
+        (value.merchantKey
+            ? merchants.find(merchant => merchant.key === value.merchantKey)
+            : null) ??
+        (value.vendor
+            ? merchants.find(merchant => merchant.name.toLowerCase() === value.vendor.toLowerCase())
+            : null);
+
     const selectedVendorMark = value.vendor
         ? vendorMarkSrc({
+              key: selectedMerchant?.key,
               name: value.vendor,
-              logoDomain:
-                  merchants.find(
-                      merchant => merchant.name.toLowerCase() === value.vendor.toLowerCase()
-                  )?.logoDomain ?? null,
+              logoDomain: selectedMerchant?.logoDomain ?? null,
           })
         : null;
 
     return (
         <div ref={rootRef} className="grid gap-3">
+            {!hasSelection ? (
+                <div className="grid gap-2">
+                    <div
+                        className="flex flex-wrap gap-2"
+                        role="group"
+                        aria-label="How do you want to pick?">
+                        {PICK_MODES.map(option => {
+                            const on = pickMode === option.id;
+                            return (
+                                <button
+                                    key={option.id}
+                                    type="button"
+                                    disabled={disabled}
+                                    aria-pressed={on}
+                                    onClick={() => selectPickMode(option.id)}
+                                    className={
+                                        on
+                                            ? 'rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                            : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                    }>
+                                    {option.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    <p className="text-xs leading-relaxed text-fg-faint">
+                        Pick from the catalog when you know the shop or type — or type a custom
+                        name.
+                    </p>
+                </div>
+            ) : null}
+
             {hasSelection ? (
                 <div className="flex flex-wrap items-center gap-2 rounded-lg border border-line bg-raised px-3 py-2.5">
                     <div className="flex min-w-0 flex-1 items-center gap-2 text-sm text-fg">
@@ -228,6 +307,24 @@ export function ExpenseIntentField({
                         Change
                     </button>
                 </div>
+            ) : pickMode === 'manual' ? (
+                <FormInput
+                    id={id}
+                    name="rumtelo-expense-vendor-manual"
+                    value={query}
+                    disabled={disabled}
+                    placeholder="Vendor name — e.g. corner shop"
+                    onChange={event => setQuery(event.target.value)}
+                    onKeyDown={event => {
+                        if (event.key === 'Enter') {
+                            event.preventDefault();
+                            commitCustomVendor(query);
+                        }
+                    }}
+                    onBlur={() => {
+                        if (query.trim()) commitCustomVendor(query);
+                    }}
+                />
             ) : (
                 <div className="relative">
                     <FormInput

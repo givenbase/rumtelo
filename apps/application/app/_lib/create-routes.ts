@@ -27,29 +27,61 @@ export function addToJarHref(jarId: string) {
     return `${CREATE_HREF.tx}?${params.toString()}`;
 }
 
-/** Open the ledger form (Out / In). */
-export function createTxHref(opts?: { jarId?: string; direction?: TxDirection }) {
+/** Open the ledger form (Out / In). Prefer merchantKey / categoryKey over display names. */
+export function createTxHref(opts?: {
+    jarId?: string;
+    direction?: TxDirection;
+    /** MerchantPreset catalog key. */
+    merchantKey?: string;
+    /** CategoryTemplate catalog key. */
+    categoryKey?: string;
+    /** Display-name fallback only when no catalog key. */
+    counterparty?: string;
+}) {
     const params = new URLSearchParams();
     if (opts?.jarId) params.set('jarId', opts.jarId);
     if (opts?.direction) params.set('direction', opts.direction);
+    if (opts?.merchantKey) params.set('merchantKey', opts.merchantKey);
+    if (opts?.categoryKey) params.set('categoryKey', opts.categoryKey);
+    if (opts?.counterparty && !opts?.merchantKey) {
+        params.set('counterparty', opts.counterparty);
+    }
     const qs = params.toString();
     return qs ? `${CREATE_HREF.tx}?${qs}` : CREATE_HREF.tx;
 }
 
 /** Open the fixed-cost form pre-filled — used by the Give helper on Soul → Giving. */
-export function createFixedHref(opts?: { jarId?: string; counterparty?: string; name?: string }) {
+export function createFixedHref(opts?: {
+    jarId?: string;
+    /** Display name fallback only — prefer orgKey / merchantKey. */
+    counterparty?: string;
+    name?: string;
+    /** Give “To whom” path — known | coach | manual */
+    payeeMode?: 'known' | 'coach' | 'manual';
+    /** GivingOrganisation catalog key (Coach path). */
+    orgKey?: string;
+    /** MerchantPreset key (I know who path). */
+    merchantKey?: string;
+}) {
     const params = new URLSearchParams();
     if (opts?.jarId) params.set('jarId', opts.jarId);
-    if (opts?.counterparty) params.set('counterparty', opts.counterparty);
+    if (opts?.orgKey) params.set('orgKey', opts.orgKey);
+    if (opts?.merchantKey) params.set('merchantKey', opts.merchantKey);
+    // Name only when we have no stable key (manual / legacy links).
+    if (opts?.counterparty && !opts?.orgKey && !opts?.merchantKey) {
+        params.set('counterparty', opts.counterparty);
+    }
     if (opts?.name) params.set('name', opts.name);
+    if (opts?.payeeMode) params.set('payeeMode', opts.payeeMode);
     const qs = params.toString();
     return qs ? `${CREATE_HREF.fixed}?${qs}` : CREATE_HREF.fixed;
 }
 
 /** Open the goal form on a specific kind (SAVE | EARN | GIVE). */
-export function createGoalHref(opts?: { kind?: string }) {
+export function createGoalHref(opts?: { kind?: string; jarId?: string }) {
     const params = new URLSearchParams();
     if (opts?.kind) params.set('kind', opts.kind);
+    if (opts?.jarId) params.set('jarId', opts.jarId);
     const qs = params.toString();
     return qs ? `${CREATE_HREF.goal}?${qs}` : CREATE_HREF.goal;
 }

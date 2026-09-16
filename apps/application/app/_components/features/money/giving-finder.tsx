@@ -23,8 +23,10 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 type GivingFinderProps = {
     /** Called with the organisation the household picked. */
     onPick: (organisation: GivingOrganisation) => void;
-    /** Currently chosen counterparty, to mark the matching card. */
+    /** Currently chosen counterparty name — marks the matching card. */
     selectedName?: string | null;
+    /** Stable catalog key — preferred over selectedName for deep-links. */
+    selectedKey?: string | null;
     /** Start expanded (e.g. on the Soul page) instead of behind the toggle. */
     defaultOpen?: boolean;
     className?: string;
@@ -38,6 +40,7 @@ type GivingFinderProps = {
 export function GivingFinder({
     onPick,
     selectedName,
+    selectedKey,
     defaultOpen = false,
     className,
 }: GivingFinderProps) {
@@ -45,6 +48,7 @@ export function GivingFinder({
     const live = isLiveData(householdId);
     const [open, setOpen] = useState(defaultOpen);
     const [cause, setCause] = useState<GivingCause | null>(null);
+    const [causeHydratedForKey, setCauseHydratedForKey] = useState<string | null>(null);
 
     const query = useLiveQuery(
         apiQuery.money.catalogs.givingOrganisations.list.queryOptions({
@@ -54,6 +58,29 @@ export function GivingFinder({
         live && open
     );
     const organisations = useMemo(() => query.data ?? [], [query.data]);
+
+    const selectedOrg = useMemo(() => {
+        if (selectedKey) {
+            const byKey = organisations.find(org => org.key === selectedKey);
+            if (byKey) return byKey;
+        }
+        if (selectedName?.trim()) {
+            const needle = selectedName.trim().toLowerCase();
+            return organisations.find(org => org.name.toLowerCase() === needle) ?? null;
+        }
+        return null;
+    }, [organisations, selectedKey, selectedName]);
+
+    // Deep-link: open the cause that contains the pre-selected org (adjust during render).
+    if (
+        selectedOrg &&
+        causeHydratedForKey !== selectedOrg.key &&
+        selectedOrg.causes[0] &&
+        cause !== selectedOrg.causes[0]
+    ) {
+        setCauseHydratedForKey(selectedOrg.key);
+        setCause(selectedOrg.causes[0]);
+    }
 
     const causesWithRows = useMemo(
         () =>
@@ -178,8 +205,9 @@ export function GivingFinder({
                                     <GivingOrganisationCard
                                         organisation={organisation}
                                         selected={
+                                            selectedOrg?.key === organisation.key ||
                                             selectedName?.trim().toLowerCase() ===
-                                            organisation.name.toLowerCase()
+                                                organisation.name.toLowerCase()
                                         }
                                         onPick={() => onPick(organisation)}
                                     />

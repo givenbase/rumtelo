@@ -18,6 +18,8 @@ export const JarCapabilities = z.object({
     canInvest: z.boolean(),
     /** Included in dashboard "safe to spend" / play-left maths. */
     countsTowardSafeToSpend: z.boolean(),
+    /** Recurring bills (fixed OUT) may be booked here. False for Freedom and Long-term savings. */
+    allowsFixedCosts: z.boolean(),
 });
 
 export const Category = z.object({

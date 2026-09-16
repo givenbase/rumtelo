@@ -15,7 +15,12 @@ type JarCoverageStripProps = Pick<JarBalance, 'allocated' | 'spent' | 'committed
     /** Show allocated / fixed / spent stats row */
     showStats?: boolean;
     footnote?: string;
+    /** Hide the committed-bills stat (Financial Freedom / Long-term savings). */
+    showCommitted?: boolean;
 };
+
+const DEFAULT_BILLS_FOOTNOTE =
+    'Available = allocated + added − spent − fixed. Booking the same bill as a transaction and a fixed cost will count twice until payments are linked.';
 
 /** Hero available figure + bar + optional three-stat strip for jar detail. */
 export function JarCoverageStrip({
@@ -25,12 +30,20 @@ export function JarCoverageStrip({
     credited = 0,
     colorClass,
     showStats = true,
-    footnote = 'Available = allocated + added − spent − fixed. Booking the same bill as a transaction and a fixed cost will count twice until payments are linked.',
+    showCommitted = true,
+    footnote,
 }: JarCoverageStripProps) {
     const { formatMoney } = useHouseholdCurrency();
-    const coverage = jarCoverage({ allocated, spent, credited, committedOut });
+    const committed = showCommitted ? committedOut : 0;
+    const coverage = jarCoverage({ allocated, spent, credited, committedOut: committed });
     const accent = bgClassToCssVar(colorClass);
     const envelope = allocated + credited;
+    const resolvedFootnote =
+        footnote !== undefined
+            ? footnote
+            : showCommitted
+              ? DEFAULT_BILLS_FOOTNOTE
+              : 'Available = allocated + added − spent.';
 
     return (
         <div
@@ -57,22 +70,30 @@ export function JarCoverageStrip({
                     allocated={allocated}
                     spent={spent}
                     credited={credited}
-                    committedOut={committedOut}
+                    committedOut={committed}
                     colorClass={colorClass}
                     trackClassName="h-2"
                 />
 
                 {showStats ? (
-                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    <div
+                        className={cn(
+                            'grid gap-3 sm:grid-cols-2',
+                            showCommitted ? 'lg:grid-cols-4' : 'lg:grid-cols-3'
+                        )}>
                         <CoverageStat label="Allocated" value={allocated} />
                         <CoverageStat label="Added" value={credited} />
-                        <CoverageStat label="Fixed (committed)" value={committedOut} />
+                        {showCommitted ? (
+                            <CoverageStat label="Fixed (committed)" value={committedOut} />
+                        ) : null}
                         <CoverageStat label="Spent" value={spent} />
                     </div>
                 ) : null}
 
-                {footnote ? (
-                    <p className="font-mono text-xs leading-relaxed text-fg-faint">{footnote}</p>
+                {resolvedFootnote ? (
+                    <p className="font-mono text-xs leading-relaxed text-fg-faint">
+                        {resolvedFootnote}
+                    </p>
                 ) : null}
             </div>
         </div>

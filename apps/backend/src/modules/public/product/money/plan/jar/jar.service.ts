@@ -1,7 +1,7 @@
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable } from '@nestjs/common';
 
-import { type Jar as ContractJar, type Cadence } from '@rumtelo/contracts';
+import { type Jar as ContractJar, type Cadence, jarCapabilitiesFor } from '@rumtelo/contracts';
 import {
     allocateByPercentage,
     categoryEnvelope,
@@ -367,7 +367,7 @@ function toJarDto(jar: Jar): JarDto {
         subtitle: jar.subtitle,
         icon: jar.icon,
         percentage: Number(jar.percentage),
-        capabilities: jar.capabilities,
+        capabilities: jarCapabilitiesFor(jar.key),
         sortOrder: jar.sortOrder,
     };
 }
