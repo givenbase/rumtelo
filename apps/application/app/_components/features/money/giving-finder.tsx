@@ -27,6 +27,8 @@ type GivingFinderProps = {
     selectedName?: string | null;
     /** Stable catalog key — preferred over selectedName for deep-links. */
     selectedKey?: string | null;
+    /** Prefill the cause chip (e.g. from a Give goal form). */
+    initialCause?: GivingCause | null;
     /** Start expanded (e.g. on the Soul page) instead of behind the toggle. */
     defaultOpen?: boolean;
     className?: string;
@@ -41,14 +43,21 @@ export function GivingFinder({
     onPick,
     selectedName,
     selectedKey,
+    initialCause = null,
     defaultOpen = false,
     className,
 }: GivingFinderProps) {
     const { householdId } = useAuth();
     const live = isLiveData(householdId);
     const [open, setOpen] = useState(defaultOpen);
-    const [cause, setCause] = useState<GivingCause | null>(null);
+    const [cause, setCause] = useState<GivingCause | null>(initialCause);
     const [causeHydratedForKey, setCauseHydratedForKey] = useState<string | null>(null);
+    const [seenInitialCause, setSeenInitialCause] = useState(initialCause);
+
+    if (initialCause !== seenInitialCause) {
+        setSeenInitialCause(initialCause);
+        if (initialCause && cause !== initialCause) setCause(initialCause);
+    }
 
     const query = useLiveQuery(
         apiQuery.money.catalogs.givingOrganisations.list.queryOptions({

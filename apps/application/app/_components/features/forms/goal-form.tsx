@@ -3,7 +3,7 @@
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import { useLiveQuery } from '@rumtelo/hooks';
@@ -19,16 +19,17 @@ import {
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { GoalPreset } from '@rumtelo/contracts';
-import { GoalKind, GoalStatus, JarKey } from '@rumtelo/contracts';
+import { GivingCause, GoalKind, GoalStatus, JarKey } from '@rumtelo/contracts';
 import { z } from 'zod';
 
-import { WHY_GIVE } from '@/app/_lib/giving';
+import { GIVING_CAUSES, WHY_GIVE, givingCauseMeta } from '@/app/_lib/giving';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { soulPath } from '@/app/_lib/routes';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { CoachTipCard } from '@/components/features/helpers';
+import { GivingFinder } from '@/components/features/money/giving-finder';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
@@ -54,9 +55,15 @@ const goalFormSchema = z.object({
     monthlyContribution: z.string().optional(),
     jarId: z.string().optional(),
     why: z.string().max(500).optional(),
+    /** GIVE: cause reserved for this pledge; null = any giving. */
+    cause: z.enum(GivingCause).nullable().optional(),
+    /** GIVE: organisation catalog key when named. */
+    orgKey: z.string().max(64).nullable().optional(),
 });
 
 export type GoalFormValues = z.infer<typeof goalFormSchema>;
+
+type GiveTargetMode = 'open' | 'org' | 'manual';
 
 const GOAL_KIND_OPTIONS: ReadonlyArray<{
     id: GoalKind;
@@ -84,6 +91,26 @@ const GOAL_KIND_OPTIONS: ReadonlyArray<{
     },
 ];
 
+const GIVE_TARGET_MODES: ReadonlyArray<{ id: GiveTargetMode; label: string }> = [
+    { id: 'open', label: 'Keep it open' },
+    { id: 'org', label: 'Pick an organisation' },
+    { id: 'manual', label: 'Type a name' },
+];
+
+function givePledgeName(cause: GivingCause | null | undefined) {
+    if (!cause) return 'Give pledge this year';
+    const meta = givingCauseMeta(cause);
+    return meta ? `${meta.label} pledge` : 'Give pledge this year';
+}
+
+function resolveGiveTargetMode(defaults: Partial<GoalFormValues> | undefined): GiveTargetMode {
+    if (defaults?.orgKey?.trim()) return 'org';
+    if (defaults?.name?.trim() && defaults.name !== givePledgeName(defaults.cause ?? null)) {
+        return 'manual';
+    }
+    return 'open';
+}
+
 type GoalFormProps = {
     defaultValues?: Partial<GoalFormValues>;
     embedded?: boolean;
@@ -105,6 +132,9 @@ export function GoalForm({
     const { showToast } = useAppShell();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
+    const [giveTargetMode, setGiveTargetMode] = useState<GiveTargetMode>(() =>
+        resolveGiveTargetMode(defaultValues)
+    );
 
     const jarsQuery = useLiveQuery(
         apiQuery.money.jars.list.queryOptions({ input: { householdId: householdId! } }),
@@ -141,11 +171,16 @@ export function GoalForm({
             monthlyContribution: defaultValues?.monthlyContribution ?? '',
             jarId: defaultValues?.jarId ?? '',
             why: defaultValues?.why ?? '',
+            cause: defaultValues?.cause ?? null,
+            orgKey: defaultValues?.orgKey ?? null,
         },
         resolver: zodResolver(goalFormSchema),
     });
 
     const kind = useWatch({ control: form.control, name: 'kind' });
+    const cause = useWatch({ control: form.control, name: 'cause' });
+    const orgKey = useWatch({ control: form.control, name: 'orgKey' });
+    const name = useWatch({ control: form.control, name: 'name' });
     const isEarn = kind === GoalKind.EARN;
     const isGive = kind === GoalKind.GIVE;
 
@@ -168,43 +203,104 @@ export function GoalForm({
         showToast(description ?? title, 'error');
     });
 
+    function selectKind(next: GoalKind) {
+        if (next === kind) return;
+        form.setValue('kind', next);
+        if (next === GoalKind.GIVE) {
+            form.setValue('cause', null);
+            form.setValue('orgKey', null);
+            form.setValue('name', givePledgeName(null), { shouldDirty: false });
+            setGiveTargetMode('open');
+            selectedIcon.current = '💛';
+            return;
+        }
+        form.setValue('cause', null);
+        form.setValue('orgKey', null);
+        if (kind === GoalKind.GIVE) {
+            form.setValue('name', '', { shouldDirty: false });
+            selectedIcon.current = null;
+        }
+    }
+
+    function selectCause(next: GivingCause | null) {
+        form.setValue('cause', next, { shouldDirty: true });
+        if (giveTargetMode === 'open') {
+            form.setValue('orgKey', null);
+            form.setValue('name', givePledgeName(next), { shouldDirty: true });
+            const meta = next ? givingCauseMeta(next) : null;
+            selectedIcon.current = meta?.icon ?? '💛';
+        }
+    }
+
+    function selectGiveTargetMode(next: GiveTargetMode) {
+        if (next === giveTargetMode) return;
+        setGiveTargetMode(next);
+        form.setValue('orgKey', null);
+        if (next === 'open') {
+            form.setValue('name', givePledgeName(cause ?? null), { shouldDirty: true });
+            const meta = cause ? givingCauseMeta(cause) : null;
+            selectedIcon.current = meta?.icon ?? '💛';
+            return;
+        }
+        if (next === 'manual') {
+            form.setValue('name', '', { shouldDirty: false });
+            selectedIcon.current = '💛';
+            return;
+        }
+        // org — wait for GivingFinder pick; keep cause-based name until then.
+        if (!name?.trim() || name === givePledgeName(cause ?? null)) {
+            form.setValue('name', givePledgeName(cause ?? null), { shouldDirty: false });
+        }
+    }
+
     const saveMutation = useMutation({
         mutationFn: async (values: GoalFormValues) => {
             if (!householdId) throw new Error('No household');
             const target = parseAmountToMinorUnits(values.target);
             if (target === null || target <= 0) throw new Error('Invalid target');
             const earn = values.kind === GoalKind.EARN;
+            const give = values.kind === GoalKind.GIVE;
             const monthly = earn
                 ? 0
                 : values.monthlyContribution?.trim()
                   ? (parseAmountToMinorUnits(values.monthlyContribution) ?? 0)
                   : 0;
-            const name = values.name.trim();
+            const nameValue = values.name.trim();
             const jarId = earn ? null : values.jarId || null;
             const why = values.why?.trim() || null;
+            const causeValue = give ? (values.cause ?? null) : null;
+            const orgKeyValue = give ? values.orgKey?.trim() || null : null;
             if (mode === 'edit' && entityId) {
                 return api.money.goals.update({
                     id: entityId,
                     householdId,
                     kind: values.kind,
-                    name,
+                    name: nameValue,
                     target,
                     monthlyContribution: monthly,
                     jarId,
                     why,
+                    cause: causeValue,
+                    orgKey: orgKeyValue,
                 });
             }
             return api.money.goals.create({
                 householdId,
                 kind: values.kind,
                 jarId,
-                name,
-                icon: selectedIcon.current ?? (values.kind === GoalKind.GIVE ? '💛' : null),
+                name: nameValue,
+                icon:
+                    selectedIcon.current ??
+                    (give
+                        ? ((causeValue ? givingCauseMeta(causeValue)?.icon : null) ?? '💛')
+                        : null),
                 target,
                 monthlyContribution: monthly,
                 targetOn: null,
                 status: GoalStatus.ACTIVE,
                 why,
+                cause: causeValue,
+                orgKey: orgKeyValue,
             });
         },
         onSuccess: () => {
@@ -243,6 +339,7 @@ export function GoalForm({
     }
 
     const busy = form.formState.isSubmitting || saveMutation.isPending || removeMutation.isPending;
+    const activeCause = cause ? givingCauseMeta(cause) : null;
 
     return (
         <FormCreateEditShell
@@ -292,7 +389,7 @@ export function GoalForm({
                                             role="radio"
                                             aria-checked={on}
                                             disabled={busy}
-                                            onClick={() => field.onChange(option.id)}
+                                            onClick={() => selectKind(option.id)}
                                             className={
                                                 on
                                                     ? 'flex flex-col items-start gap-1 rounded-xl border border-accent/40 bg-accent-soft px-3 py-3 text-left transition-colors'
@@ -325,16 +422,130 @@ export function GoalForm({
             />
 
             {isGive ? (
-                <CoachTipCard
-                    title="A pledge, not a pot"
-                    meta={
-                        <a href={soulPath('giving')} className="hover:text-accent">
-                            Why giving is in a money app → Soul
-                        </a>
-                    }>
-                    {WHY_GIVE.body[1]} Every sorted amount that leaves your Give jar this year
-                    counts toward it — nothing to move by hand.
-                </CoachTipCard>
+                <>
+                    <CoachTipCard
+                        title="A pledge, not a pot"
+                        meta={
+                            <a href={soulPath('giving')} className="hover:text-accent">
+                                Why giving is in a money app → Soul
+                            </a>
+                        }>
+                        {WHY_GIVE.body[1]} Every sorted amount that leaves your Give jar this year
+                        counts toward it — nothing to move by hand.
+                    </CoachTipCard>
+
+                    <FormField
+                        control={form.control}
+                        name="cause"
+                        render={() => (
+                            <FormItem>
+                                <FormLabel>Cause (purpose)</FormLabel>
+                                <FormControl>
+                                    <div
+                                        className="flex flex-wrap gap-2"
+                                        role="group"
+                                        aria-label="Giving cause">
+                                        <button
+                                            type="button"
+                                            disabled={busy}
+                                            aria-pressed={!cause}
+                                            onClick={() => selectCause(null)}
+                                            className={
+                                                !cause
+                                                    ? 'rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                                    : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                            }>
+                                            Any cause
+                                        </button>
+                                        {GIVING_CAUSES.map(meta => {
+                                            const on = cause === meta.key;
+                                            return (
+                                                <button
+                                                    key={meta.key}
+                                                    type="button"
+                                                    disabled={busy}
+                                                    aria-pressed={on}
+                                                    onClick={() =>
+                                                        selectCause(on ? null : meta.key)
+                                                    }
+                                                    className={
+                                                        on
+                                                            ? 'flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                                            : 'flex items-center gap-1.5 rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                                    }>
+                                                    <span aria-hidden>{meta.icon}</span>
+                                                    {meta.label}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </FormControl>
+                                {activeCause ? (
+                                    <p className="text-xs leading-relaxed text-fg-faint">
+                                        {activeCause.line}
+                                    </p>
+                                ) : (
+                                    <p className="text-xs leading-relaxed text-fg-faint">
+                                        Open pledge — any giving from the Give jar counts.
+                                    </p>
+                                )}
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <div className="grid gap-2">
+                        <p className="font-mono text-[10px] font-semibold tracking-widest text-fg-faint uppercase">
+                            Organisation
+                        </p>
+                        <div
+                            className="flex flex-wrap gap-2"
+                            role="group"
+                            aria-label="How specific is this pledge?">
+                            {GIVE_TARGET_MODES.map(option => {
+                                const on = giveTargetMode === option.id;
+                                return (
+                                    <button
+                                        key={option.id}
+                                        type="button"
+                                        disabled={busy}
+                                        aria-pressed={on}
+                                        onClick={() => selectGiveTargetMode(option.id)}
+                                        className={
+                                            on
+                                                ? 'rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                                : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                        }>
+                                        {option.label}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        <p className="text-xs leading-relaxed text-fg-faint">
+                            Keep it open to reserve the cause only. Pick an organisation to name who
+                            the pledge is for — or type a household name the Coach list does not
+                            cover.
+                        </p>
+                    </div>
+
+                    {giveTargetMode === 'org' ? (
+                        <GivingFinder
+                            defaultOpen
+                            initialCause={cause ?? null}
+                            selectedKey={orgKey}
+                            selectedName={name}
+                            onPick={organisation => {
+                                form.setValue('orgKey', organisation.key, { shouldDirty: true });
+                                form.setValue('name', organisation.name, { shouldDirty: true });
+                                const orgCause = organisation.causes[0] ?? null;
+                                if (orgCause && !cause) {
+                                    form.setValue('cause', orgCause, { shouldDirty: true });
+                                }
+                                selectedIcon.current = '💛';
+                            }}
+                        />
+                    ) : null}
+                </>
             ) : null}
 
             <FormField
@@ -342,7 +553,9 @@ export function GoalForm({
                 name="name"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Name</FormLabel>
+                        <FormLabel>
+                            {isGive ? (giveTargetMode === 'open' ? 'Pledge name' : 'Name') : 'Name'}
+                        </FormLabel>
                         <FormControl>
                             {mode === 'create' && !isEarn && !isGive ? (
                                 <PresetNameField
@@ -378,13 +591,21 @@ export function GoalForm({
                                         if (jar) form.setValue('jarId', jar.id);
                                     }}
                                 />
+                            ) : isGive && giveTargetMode === 'org' ? (
+                                <FormInput
+                                    readOnly
+                                    placeholder="Pick an organisation above"
+                                    {...field}
+                                />
                             ) : (
                                 <FormInput
                                     placeholder={
                                         isEarn
                                             ? `e.g. ${symbol}5k net income`
                                             : isGive
-                                              ? 'e.g. Give pledge this year'
+                                              ? giveTargetMode === 'manual'
+                                                  ? 'e.g. local food bank'
+                                                  : 'e.g. Health pledge'
                                               : 'e.g. emergency fund'
                                     }
                                     {...field}

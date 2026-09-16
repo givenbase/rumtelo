@@ -1,13 +1,13 @@
 /**
  * Goal Schemas
- * Savings goals (SAVE) and income targets (EARN).
+ * Savings goals (SAVE), income targets (EARN), and yearly Give pledges (GIVE).
  * Zod only — no `export type`.
  */
 
 import { z } from 'zod';
 
 import { HouseholdId, Id, IsoDate, Money } from '../../../../common/common.schema';
-import { GoalKind, GoalStatus } from '../enums';
+import { GivingCause, GoalKind, GoalStatus } from '../enums';
 
 export const Goal = z.object({
     id: Id,
@@ -29,6 +29,16 @@ export const Goal = z.object({
     targetOn: IsoDate.nullable(),
     status: z.enum(GoalStatus),
     why: z.string().max(500).nullable(),
+    /**
+     * GIVE only — cause this pledge is reserved for (`null` = open / any giving).
+     * SAVE / EARN always null.
+     */
+    cause: z.enum(GivingCause).nullable().default(null),
+    /**
+     * GIVE only — GivingOrganisation catalog key when the pledge names an org.
+     * Free-text / open pledges leave this null. SAVE / EARN always null.
+     */
+    orgKey: z.string().min(1).max(64).nullable().default(null),
     /** When an EARN goal crossed the target (null while open / for SAVE). */
     fulfilledOn: IsoDate.nullable(),
 });

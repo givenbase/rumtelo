@@ -1,6 +1,6 @@
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { CAPABILITIES, GoalKind, GoalStatus } from '@rumtelo/contracts';
+import { CAPABILITIES, type GivingCause, GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { earnGoalProgress } from '@rumtelo/utils';
 
 import { PlanAccessService } from '../../../../../../common/capability';
@@ -41,12 +41,15 @@ export class GoalService {
         targetOn?: string | null;
         status?: string;
         why?: string | null;
+        cause?: string | null;
+        orgKey?: string | null;
     }) {
         await this.planAccess.assertCapability(CAPABILITIES.growthGoals);
         const occupied = await this.repo.count({ status: GoalStatus.ACTIVE });
         await this.planAccess.assertWithinLimit('maxGoals', occupied);
 
         const kind = (input.kind as GoalKind) ?? GoalKind.SAVE;
+        const isGive = kind === GoalKind.GIVE;
         const entity = this.em.create(Goal, {
             household: currentHouseholdId(),
             kind,
@@ -62,10 +65,12 @@ export class GoalService {
             saved: 0,
             monthlyContribution: kind === GoalKind.EARN ? 0 : (input.monthlyContribution ?? 0),
             // A pledge without a date is a pledge for this calendar year.
-            targetOn: input.targetOn ?? (kind === GoalKind.GIVE ? endOfYearIso() : null),
+            targetOn: input.targetOn ?? (isGive ? endOfYearIso() : null),
             fulfilledOn: null,
             status: (input.status as GoalStatus) ?? GoalStatus.ACTIVE,
             why: input.why ?? null,
+            cause: isGive ? ((input.cause as GivingCause | null | undefined) ?? null) : null,
+            orgKey: isGive ? input.orgKey?.trim() || null : null,
         } as never);
         await this.em.persist(entity).flush();
         if (kind === GoalKind.EARN) {
@@ -248,6 +253,8 @@ export class GoalService {
             status: string;
             why: string | null;
             fulfilledOn: string | null;
+            cause: string | null;
+            orgKey: string | null;
         }>
     ) {
         const entity = await this.repo.findOneOrFail({ id });
@@ -272,9 +279,24 @@ export class GoalService {
         if (patch.status !== undefined) entity.status = patch.status as GoalStatus;
         if (patch.why !== undefined) entity.why = patch.why;
         if (patch.fulfilledOn !== undefined) entity.fulfilledOn = patch.fulfilledOn;
+        if (patch.cause !== undefined) {
+            entity.cause =
+                entity.kind === GoalKind.GIVE
+                    ? ((patch.cause as GivingCause | null) ?? null)
+                    : null;
+        }
+        if (patch.orgKey !== undefined) {
+            entity.orgKey = entity.kind === GoalKind.GIVE ? patch.orgKey?.trim() || null : null;
+        }
         if (entity.kind === GoalKind.EARN) {
             entity.jar = null;
             entity.monthlyContribution = 0;
+            entity.cause = null;
+            entity.orgKey = null;
+        }
+        if (entity.kind === GoalKind.SAVE) {
+            entity.cause = null;
+            entity.orgKey = null;
         }
         await this.em.flush();
         if (entity.kind === GoalKind.EARN && entity.status === GoalStatus.ACTIVE) {
@@ -348,6 +370,8 @@ export function toDto(goal: Goal) {
         targetOn: goal.targetOn,
         status: goal.status,
         why: goal.why,
+        cause: goal.cause ?? null,
+        orgKey: goal.orgKey ?? null,
         fulfilledOn: goal.fulfilledOn,
     };
 }

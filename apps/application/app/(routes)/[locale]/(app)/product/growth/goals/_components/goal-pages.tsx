@@ -61,6 +61,8 @@ export function GoalUpdatePage({ id, embedded = false }: { id: string; embedded?
                 monthlyContribution: minorUnitsToAmountInput(row.monthlyContribution),
                 jarId: row.jarId ?? '',
                 why: row.why ?? '',
+                cause: row.cause ?? null,
+                orgKey: row.orgKey ?? null,
             }}
         />
     );

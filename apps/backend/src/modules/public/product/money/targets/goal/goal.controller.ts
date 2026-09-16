@@ -31,6 +31,8 @@ export class GoalController {
                 targetOn: input.targetOn,
                 status: input.status,
                 why: input.why,
+                cause: input.cause,
+                orgKey: input.orgKey,
             })
         );
     }
