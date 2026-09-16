@@ -70,8 +70,4 @@ export {
     writePlanIntent,
     type PendingPlanIntent,
 } from './plan-intent';
-export {
-    accountThemeFromCss,
-    cssThemeFromAccount,
-    type CssTheme,
-} from './theme';
+export { accountThemeFromCss, cssThemeFromAccount, type CssTheme } from './theme';

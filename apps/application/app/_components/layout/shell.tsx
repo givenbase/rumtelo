@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
 import { RumteloLogo } from '@rumtelo/brand';
-import { cn,accountThemeFromCss } from '@rumtelo/utils';
+import { cn, accountThemeFromCss } from '@rumtelo/utils';
 import { Locale } from '@rumtelo/contracts';
 import { useTheme } from '@rumtelo/ui';
 

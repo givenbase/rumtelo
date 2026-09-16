@@ -35,12 +35,14 @@ export function AccountThemeProvider({ children }: { children: ReactNode }) {
     const userId = user?.id ?? null;
     const { setTheme } = useTheme();
     const hydratedForUser = useRef<string | null>(null);
-    const [accountTheme, setAccountThemeState] = useState<Theme | undefined>(undefined);
+    const [accountThemeState, setAccountThemeState] = useState<Theme | undefined>(undefined);
+    const signedIn = Boolean(isAuthenticated && userId);
+    /** Signed-out visitors must not see the last account theme — derive, don't reset in an effect. */
+    const accountTheme = signedIn ? accountThemeState : undefined;
 
     useEffect(() => {
         if (!isAuthenticated || !userId) {
             hydratedForUser.current = null;
-            setAccountThemeState(undefined);
             return;
         }
 
