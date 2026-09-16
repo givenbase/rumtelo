@@ -307,6 +307,9 @@ export function GoalForm({
                                             selectedIcon.current = null;
                                         }
                                     }}
+                                    onClear={() => {
+                                        selectedIcon.current = null;
+                                    }}
                                     onSelect={opt => {
                                         const full = presetOptions.find(
                                             preset => preset.key === opt.key

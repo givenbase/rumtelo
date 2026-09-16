@@ -18,6 +18,12 @@ type PresetNameFieldProps = {
     value: string;
     onChange: (name: string) => void;
     onSelect?: (preset: NamePresetOption) => void;
+    /**
+     * Fired when the locked preset is cleared (×) or the name is wiped.
+     * Use to reset dependent fields (category, vendor, jar hints).
+     * Not fired when picking Other (empty name while typing a custom one).
+     */
+    onClear?: () => void;
     options: NamePresetOption[];
     placeholder?: string;
     /** Placeholder after picking Other / a free-text key. */
@@ -66,6 +72,7 @@ export function PresetNameField({
     value,
     onChange,
     onSelect,
+    onClear,
     options,
     placeholder = 'e.g. rent',
     freeTextPlaceholder = 'Type a custom name…',
@@ -133,6 +140,7 @@ export function PresetNameField({
         setAwaitingCustom(false);
         setFilterQuery('');
         onChange('');
+        onClear?.();
         setOpen(true);
         requestAnimationFrame(() => inputRef.current?.focus());
     }
@@ -218,11 +226,18 @@ export function PresetNameField({
                             const next = event.target.value;
                             if (searchOnly) {
                                 setFilterQuery(next);
-                                if (value) onChange('');
+                                if (value) {
+                                    onChange('');
+                                    onClear?.();
+                                }
                             } else {
+                                const wasFilled = Boolean(value.trim());
                                 onChange(next);
                                 setLocked(null);
-                                if (!next.trim()) setAwaitingCustom(false);
+                                if (!next.trim()) {
+                                    setAwaitingCustom(false);
+                                    if (wasFilled) onClear?.();
+                                }
                             }
                             setOpen(true);
                         }}

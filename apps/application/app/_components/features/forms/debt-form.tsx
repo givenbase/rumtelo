@@ -248,6 +248,7 @@ export function DebtForm({
                                         setTypeQuery('');
                                         setCustomLender(false);
                                         form.setValue('name', '');
+                                        form.setValue('kind', DebtKind.LOAN);
                                     }}>
                                     Change
                                 </button>

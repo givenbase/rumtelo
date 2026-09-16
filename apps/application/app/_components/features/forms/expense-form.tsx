@@ -477,6 +477,9 @@ export function ExpenseForm({
                                             return null;
                                         });
                                     }}
+                                    onClear={() => {
+                                        setInflowKey(null);
+                                    }}
                                     options={[...TRANSACTION_IN_PRESETS]}
                                     placeholder="Gift, tax return…"
                                     freeTextPlaceholder="Describe where it came from…"

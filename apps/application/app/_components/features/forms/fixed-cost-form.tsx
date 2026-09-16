@@ -364,6 +364,14 @@ export function FixedCostForm({
                                     options={presetOptions}
                                     lockPresets
                                     freeTextKeys={['OTHER']}
+                                    onClear={() => {
+                                        setPendingCategoryTemplateKey(null);
+                                        setCustomPayee(false);
+                                        form.setValue('categoryId', null);
+                                        form.setValue('counterparty', '', {
+                                            shouldDirty: false,
+                                        });
+                                    }}
                                     onSelect={opt => {
                                         const full = presetOptions.find(
                                             preset => preset.key === opt.key
@@ -418,6 +426,7 @@ export function FixedCostForm({
                                     form.setValue('categoryId', null);
                                     setPendingCategoryTemplateKey(null);
                                     setCustomPayee(false);
+                                    form.setValue('counterparty', '', { shouldDirty: false });
                                 }}>
                                 {jars.length === 0 ? (
                                     <option value="">No jars — complete setup first</option>
@@ -449,6 +458,7 @@ export function FixedCostForm({
                                 onChange={event => {
                                     setPendingCategoryTemplateKey(null);
                                     setCustomPayee(false);
+                                    form.setValue('counterparty', '', { shouldDirty: false });
                                     field.onChange(event.target.value || null);
                                 }}>
                                 <option value="">

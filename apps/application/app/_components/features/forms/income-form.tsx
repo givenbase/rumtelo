@@ -248,6 +248,10 @@ export function IncomeForm({
                                     options={presetOptions}
                                     lockPresets
                                     freeTextKeys={['OTHER']}
+                                    onClear={() => {
+                                        form.setValue('kind', IncomeKind.SALARY);
+                                        form.setValue('cadence', Cadence.MONTHLY);
+                                    }}
                                     onSelect={opt => {
                                         const full = presetOptions.find(
                                             preset => preset.key === opt.key
