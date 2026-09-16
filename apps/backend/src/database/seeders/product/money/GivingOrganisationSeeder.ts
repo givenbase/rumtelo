@@ -9,7 +9,8 @@ import { GIVING_ORGANISATION_SEED } from '../../../../modules/backoffice/product
 export class GivingOrganisationSeeder extends Seeder {
     async run(em: EntityManager): Promise<void> {
         const keys = GIVING_ORGANISATION_SEED.map(row => row.key);
-        const existingRows = await em.find(GivingOrganisation, { key: { $in: keys } });
+        const seedKeys = new Set(keys);
+        const existingRows = await em.find(GivingOrganisation, {});
         const existingByKey = new Map(existingRows.map(row => [row.key, row]));
         for (const [sortOrder, row] of GIVING_ORGANISATION_SEED.entries()) {
             const existing = existingByKey.get(row.key);
@@ -39,6 +40,9 @@ export class GivingOrganisationSeeder extends Seeder {
                 sortOrder,
                 isActive: true,
             } as never);
+        }
+        for (const row of existingRows) {
+            if (!seedKeys.has(row.key)) row.isActive = false;
         }
         await em.flush();
     }

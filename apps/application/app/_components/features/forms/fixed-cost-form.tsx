@@ -279,6 +279,13 @@ export function FixedCostForm({
                 merchant =>
                     merchant.jarKey === JarKey.GIVE && merchant.categoryTemplateKey === categoryKey
             )
+            .slice()
+            .sort((left, right) => {
+                if (right.matchPriority !== left.matchPriority) {
+                    return right.matchPriority - left.matchPriority;
+                }
+                return left.sortOrder - right.sortOrder;
+            })
             .slice(0, MAX_VENDOR_CHIPS);
     }, [merchants, activeCategoryTemplateKey]);
 
@@ -699,9 +706,9 @@ export function FixedCostForm({
                                     })}
                                 </div>
                                 <p className="text-xs leading-relaxed text-fg-faint">
-                                    The Coach list is organisations with independent checks — not
-                                    every NL household name. Pick “I know who” for Giro555 and
-                                    similar.
+                                    Coach picks need an independent check (Doneer Effectief,
+                                    GiveWell, ACE, CBF…). “I know who” is the same bar — short list,
+                                    no padding. Type a name if yours is missing.
                                 </p>
 
                                 {givePayeeMode === 'known' ? (

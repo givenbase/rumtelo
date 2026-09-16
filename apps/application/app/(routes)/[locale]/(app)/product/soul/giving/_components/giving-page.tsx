@@ -352,8 +352,9 @@ export function GivingPageClient() {
                         })}
                     </div>
                     <p className="text-xs leading-relaxed text-fg-faint">
-                        The Coach list is organisations with independent checks — not every NL
-                        household name. Pick “I know who” for Giro555 and similar.
+                        Coach picks need an independent check (Doneer Effectief, GiveWell, ACE,
+                        CBF…). “I know who” is the same bar — short list, no padding. Type a name if
+                        yours is missing.
                     </p>
                 </div>
 

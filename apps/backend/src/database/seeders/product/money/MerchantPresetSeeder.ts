@@ -13,7 +13,8 @@ export class MerchantPresetSeeder extends Seeder {
     async run(em: EntityManager): Promise<void> {
         const jarByKey = await loadJarTemplateMap(em);
         const keys = MERCHANT_PRESET_SEED.map(row => row.key);
-        const existingRows = await em.find(MerchantPreset, { key: { $in: keys } });
+        const seedKeys = new Set(keys);
+        const existingRows = await em.find(MerchantPreset, {});
         const existingByKey = new Map(existingRows.map(row => [row.key, row]));
         for (const [sortOrder, row] of MERCHANT_PRESET_SEED.entries()) {
             const jarTemplate = jarTemplateFromMap(jarByKey, row.jarKey);
@@ -59,6 +60,9 @@ export class MerchantPresetSeeder extends Seeder {
                 sortOrder,
                 isActive,
             } as never);
+        }
+        for (const row of existingRows) {
+            if (!seedKeys.has(row.key)) row.isActive = false;
         }
         await em.flush();
     }

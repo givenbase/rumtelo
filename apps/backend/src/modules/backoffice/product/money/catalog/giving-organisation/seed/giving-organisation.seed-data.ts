@@ -159,6 +159,64 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
             'Live public dashboard of infants enrolled and cost per infant; quarterly impact reports; independent coverage surveys.',
     },
     {
+        key: 'STRONGMINDS',
+        name: 'StrongMinds',
+        summary:
+            'Group interpersonal therapy for women with depression in Uganda and Zambia — mental health care where almost none exists.',
+        causes: [GLOBAL_HEALTH],
+        country: 'US',
+        scope: 'Uganda & Zambia',
+        website: 'https://strongminds.org/',
+        signals: [
+            {
+                evaluator: DONEER_EFFECTIEF,
+                label: 'Top 10',
+                url: DONEER_EFFECTIEF_LIST,
+                year: 2026,
+            },
+            {
+                evaluator: GIVING_WHAT_WE_CAN,
+                label: 'Recommended',
+                url: GWWC_2026,
+                year: 2026,
+            },
+            {
+                evaluator: CHARITY_NAVIGATOR,
+                label: '4-star',
+                url: 'https://www.charitynavigator.org/ein/461648806',
+                year: 2026,
+            },
+        ],
+        reporting:
+            'Annual impact report with depression-symptom change, cost per woman treated, and follow-up outcomes.',
+    },
+    {
+        key: 'NUTRITION_INTERNATIONAL',
+        name: 'Nutrition International',
+        summary:
+            'Vitamin A and other micronutrient programmes with governments — cheap doses that prevent blindness and child deaths.',
+        causes: [GLOBAL_HEALTH],
+        country: 'CA',
+        scope: 'Africa & Asia',
+        website: 'https://www.nutritionintl.org/',
+        signals: [
+            {
+                evaluator: DONEER_EFFECTIEF,
+                label: 'Jury top pick · poverty & health',
+                url: DONEER_EFFECTIEF_LIST,
+                year: 2025,
+            },
+            {
+                evaluator: CHARITY_NAVIGATOR,
+                label: '4-star',
+                url: 'https://www.charitynavigator.org/ein/980151447',
+                year: 2026,
+            },
+        ],
+        reporting:
+            'Yearly results and audited statements; programme coverage and cost-per-dose published by country.',
+    },
+    {
         key: 'GIVEWELL_ALL_GRANTS_FUND',
         name: 'GiveWell All Grants Fund',
         summary:
@@ -413,6 +471,38 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
             },
         ],
         reporting: 'Annual impact & accountability report with full financials.',
+    },
+    {
+        key: 'GOOD_FOOD_INSTITUTE',
+        name: 'The Good Food Institute',
+        summary:
+            'Policy and industry work so plant-based and cultivated proteins can replace factory-farmed meat at scale.',
+        causes: [ANIMALS, CLIMATE],
+        country: 'US',
+        scope: 'Global',
+        website: 'https://gfi.org/',
+        signals: [
+            {
+                evaluator: DONEER_EFFECTIEF,
+                label: 'Top 10',
+                url: DONEER_EFFECTIEF_LIST,
+                year: 2026,
+            },
+            {
+                evaluator: FOUNDERS_PLEDGE,
+                label: 'Food system recommendation',
+                url: 'https://www.founderspledge.com/research',
+                year: 2026,
+            },
+            {
+                evaluator: CHARITY_NAVIGATOR,
+                label: '4-star',
+                url: 'https://www.charitynavigator.org/ein/461065177',
+                year: 2026,
+            },
+        ],
+        reporting:
+            'Annual State of the Industry reports, audited filings, and open research on alternative proteins.',
     },
 
     // ── Close to home (NL) ───────────────────────────────────────────────────
