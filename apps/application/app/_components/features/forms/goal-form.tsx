@@ -58,6 +58,32 @@ const goalFormSchema = z.object({
 
 export type GoalFormValues = z.infer<typeof goalFormSchema>;
 
+const GOAL_KIND_OPTIONS: ReadonlyArray<{
+    id: GoalKind;
+    icon: string;
+    label: string;
+    line: string;
+}> = [
+    {
+        id: GoalKind.SAVE,
+        icon: '🎯',
+        label: 'Save',
+        line: 'Put money aside in a jar',
+    },
+    {
+        id: GoalKind.EARN,
+        icon: '📈',
+        label: 'Earn',
+        line: 'Reach a monthly income target',
+    },
+    {
+        id: GoalKind.GIVE,
+        icon: '💛',
+        label: 'Give',
+        line: 'Pledge what you’ll give this year',
+    },
+];
+
 type GoalFormProps = {
     defaultValues?: Partial<GoalFormValues>;
     embedded?: boolean;
@@ -253,13 +279,45 @@ export function GoalForm({
                     <FormItem>
                         <FormLabel>Goal type</FormLabel>
                         <FormControl>
-                            <select
-                                className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
-                                {...field}>
-                                <option value={GoalKind.SAVE}>Save into a jar</option>
-                                <option value={GoalKind.EARN}>Earn monthly net</option>
-                                <option value={GoalKind.GIVE}>Give — a yearly pledge</option>
-                            </select>
+                            <div
+                                className="grid gap-2 sm:grid-cols-3"
+                                role="radiogroup"
+                                aria-label="Goal type">
+                                {GOAL_KIND_OPTIONS.map(option => {
+                                    const on = field.value === option.id;
+                                    return (
+                                        <button
+                                            key={option.id}
+                                            type="button"
+                                            role="radio"
+                                            aria-checked={on}
+                                            disabled={busy}
+                                            onClick={() => field.onChange(option.id)}
+                                            className={
+                                                on
+                                                    ? 'flex flex-col items-start gap-1 rounded-xl border border-accent/40 bg-accent-soft px-3 py-3 text-left transition-colors'
+                                                    : 'flex flex-col items-start gap-1 rounded-xl border border-line bg-raised px-3 py-3 text-left transition-colors hover:border-accent-hover'
+                                            }>
+                                            <span className="flex items-center gap-2">
+                                                <span aria-hidden className="text-base">
+                                                    {option.icon}
+                                                </span>
+                                                <span
+                                                    className={
+                                                        on
+                                                            ? 'text-sm font-semibold text-accent'
+                                                            : 'text-sm font-semibold text-fg'
+                                                    }>
+                                                    {option.label}
+                                                </span>
+                                            </span>
+                                            <span className="text-xs leading-snug text-fg-muted">
+                                                {option.line}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </FormControl>
                         <FormMessage />
                     </FormItem>

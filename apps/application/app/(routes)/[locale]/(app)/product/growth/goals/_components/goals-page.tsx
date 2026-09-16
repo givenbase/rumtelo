@@ -98,8 +98,8 @@ export function GoalsPageClient() {
                     Every goal is a decision you've already made.
                 </h1>
                 <p className="mt-2 max-w-prose text-base text-pretty text-fg-muted">
-                    Save into a jar, set the monthly net you want to earn, or pledge what you give
-                    this year — each one marks itself reached.
+                    Save, earn, or give — pick the kind of goal, then set the number. Each one marks
+                    itself reached.
                 </p>
             </div>
 
