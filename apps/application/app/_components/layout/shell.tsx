@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
 import { RumteloLogo } from '@rumtelo/brand';
-import { cn } from '@rumtelo/utils';
+import { cn,accountThemeFromCss } from '@rumtelo/utils';
 import { Locale } from '@rumtelo/contracts';
 import { useTheme } from '@rumtelo/ui';
 
@@ -20,7 +20,6 @@ import {
 } from '@/app/_lib/nav';
 import { PLAN_LABELS } from '@/app/_lib/plan';
 import { settingsHrefForPathname } from '@/app/_lib/settings-tabs';
-import { accountThemeFromCss } from '@/app/_lib/theme';
 import { useAccountTheme } from '@/components/features/shell/account-theme-sync';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';

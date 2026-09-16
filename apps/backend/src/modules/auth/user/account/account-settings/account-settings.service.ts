@@ -170,7 +170,7 @@ export class AccountSettingsService {
         const settings = this.em.create(AccountSettings, {
             account,
             locale: defaults.locale ?? Locale.NL,
-            theme: defaults.theme ?? Theme.SYSTEM,
+            theme: defaults.theme ?? Theme.LIGHT,
             spendingStyle: defaults.spendingStyle ?? SpendingStyle.UNKNOWN,
             tourSnapshot: normalizeTour(defaults.tour ?? DEFAULT_ACCOUNT_TOUR_PROGRESS),
         } as never);

@@ -45,9 +45,9 @@ export class AccountSettings extends BaseEntity {
     @Enum(NativeEnum({ Locale, domain: 'auth', defaultValue: Locale.NL }))
     locale: Locale = Locale.NL;
 
-    /** UI appearance preference (LIGHT | DARK | SYSTEM). */
-    @Enum(NativeEnum({ Theme, domain: 'auth', defaultValue: Theme.SYSTEM }))
-    theme: Theme = Theme.SYSTEM;
+    /** UI appearance preference (LIGHT | DARK | SYSTEM). Defaults to light. */
+    @Enum(NativeEnum({ Theme, domain: 'auth', defaultValue: Theme.LIGHT }))
+    theme: Theme = Theme.LIGHT;
 
     /** Soft spending style — personalises coach tips for who is looking. */
     @Enum(

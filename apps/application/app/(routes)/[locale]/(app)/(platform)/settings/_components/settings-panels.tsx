@@ -169,7 +169,7 @@ export function AccountSettings() {
     const activeCurrency = currencyDraft ?? currency;
 
     const { accountTheme, setAccountTheme } = useAccountTheme();
-    const activeTheme = accountTheme ?? Theme.SYSTEM;
+    const activeTheme = accountTheme ?? Theme.LIGHT;
     const [periodDayDraft, setPeriodDayDraft] = useState<number | null>(null);
     const periodDay = periodDayDraft ?? settingsQuery.data?.money?.periodStartDay ?? 1;
 

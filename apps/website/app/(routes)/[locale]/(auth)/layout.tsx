@@ -1,8 +1,11 @@
+'use client';
+
 import Link from 'next/link';
 
 import { RumteloLogo } from '@rumtelo/brand';
 import { BRAND_TAGLINE } from '@rumtelo/i18n';
-import { ThemeToggle } from '@rumtelo/ui';
+
+import { AccountThemeToggle } from '@/app/_components/account-theme-sync';
 
 import { AuthAside } from './_components/auth-aside';
 
@@ -10,7 +13,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     return (
         <div className="relative grid min-h-dvh lg:grid-cols-2">
             <div className="absolute top-4 right-4 z-10 sm:top-6 sm:right-6">
-                <ThemeToggle className="size-8 rounded-full bg-transparent text-sm text-fg-muted hover:border-accent hover:bg-transparent hover:text-accent" />
+                <AccountThemeToggle className="size-8 rounded-full bg-transparent text-sm text-fg-muted hover:border-accent hover:bg-transparent hover:text-accent" />
             </div>
 
             <div

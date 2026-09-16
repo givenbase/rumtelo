@@ -4,7 +4,7 @@ import { useEffect, useId, useState } from 'react';
 import Link from 'next/link';
 
 import { RumteloLogo } from '@rumtelo/brand';
-import { ThemeToggle } from '@rumtelo/ui';
+import { AccountThemeToggle } from '@/app/_components/account-theme-sync';
 
 import {
     initialsFromUser,
@@ -100,7 +100,7 @@ export function LandingHeader() {
                 </nav>
 
                 <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2 lg:ml-4">
-                    <ThemeToggle className="size-9 shrink-0 rounded-full bg-transparent text-sm text-fg-muted hover:border-accent hover:bg-transparent hover:text-accent sm:size-8" />
+                    <AccountThemeToggle className="size-9 shrink-0 rounded-full bg-transparent text-sm text-fg-muted hover:border-accent hover:bg-transparent hover:text-accent sm:size-8" />
 
                     {!isPending && isAuthenticated ? (
                         <>
