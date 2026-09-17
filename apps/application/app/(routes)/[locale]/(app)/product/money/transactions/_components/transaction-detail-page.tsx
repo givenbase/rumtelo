@@ -11,7 +11,12 @@ import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card, VendorMark } from '@rumtelo/ui';
 import { toPeriodKey } from '@rumtelo/utils';
 
-import { debtDetailHref, fixedDetailHref, updateHref } from '@/app/_lib/create-routes';
+import {
+    debtDetailHref,
+    fixedDetailHref,
+    txDetailHref,
+    updateHref,
+} from '@/app/_lib/create-routes';
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
 import { claimFixedCostMatches } from '@/app/_lib/fixed-cost-match';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
@@ -23,11 +28,37 @@ import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { findCatalogVendorFromFeed, partyMark } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { JarBadge, MetaChip, formatBookedDate } from '@/components/features/money/jar-badge';
+import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 const EMPTY_TRANSACTIONS: Transaction[] = [];
 const EMPTY_PAGE = { items: EMPTY_TRANSACTIONS, nextCursor: null };
+const SAME_PARTY_HISTORY_LIMIT = 5;
+
+function normalizeParty(value: string | null | undefined) {
+    return value?.trim().toLowerCase() ?? '';
+}
+
+/** Stable key so “Vanguard” / catalog merchant / same description group together. */
+function samePartyKey(
+    row: Transaction,
+    merchants: Parameters<typeof findCatalogVendorFromFeed>[1]
+) {
+    const counterparty = normalizeParty(row.counterparty);
+    if (counterparty) return `c:${counterparty}`;
+
+    const title = row.counterparty?.trim() || row.description;
+    const vendor = findCatalogVendorFromFeed(title, merchants);
+    if (vendor?.key) return `k:${vendor.key}`;
+
+    const description = normalizeParty(row.description);
+    return description ? `d:${description}` : '';
+}
+
+function partyDisplayName(row: Transaction) {
+    return row.counterparty?.trim() || row.description.trim() || 'this payee';
+}
 
 function sourceLabel(source: TransactionSource) {
     switch (source) {
@@ -132,7 +163,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
 
     const listQuery = useLiveQuery(
         apiQuery.money.transactions.list.queryOptions({
-            input: { householdId: householdId!, limit: 100 },
+            input: { householdId: householdId!, limit: 200 },
         }),
         EMPTY_PAGE,
         live
@@ -319,6 +350,16 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
         );
     }
 
+    const partyKey = samePartyKey(tx, merchants);
+    const samePartyHistory = partyKey
+        ? (listQuery.data?.items ?? [])
+              .filter(row => row.id !== tx.id && samePartyKey(row, merchants) === partyKey)
+              .slice()
+              .sort((left, right) => right.bookedOn.localeCompare(left.bookedOn))
+              .slice(0, SAME_PARTY_HISTORY_LIMIT)
+        : [];
+    const historyLabel = partyDisplayName(tx);
+
     return (
         <div className="grid animate-rise gap-8">
             <div className="flex flex-wrap items-start justify-between gap-4">
@@ -466,6 +507,67 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                         ✦ Related
                     </h2>
                     <Card className="p-0">{related}</Card>
+                </section>
+            ) : null}
+
+            {samePartyHistory.length > 0 ? (
+                <section className="grid gap-3">
+                    <h2 className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                        ✦ Also from {historyLabel}
+                    </h2>
+                    <Card className="p-0">
+                        <ul className="grid">
+                            {samePartyHistory.map(row => {
+                                const rowTitle = row.counterparty?.trim() || row.description;
+                                const rowSubtitle =
+                                    row.counterparty?.trim() &&
+                                    row.description &&
+                                    row.description !== row.counterparty.trim()
+                                        ? row.description
+                                        : null;
+                                const rowJar = row.jarId
+                                    ? jars.find(entry => entry.id === row.jarId)
+                                    : undefined;
+                                return (
+                                    <li key={row.id}>
+                                        <MoneyPartyRow
+                                            title={rowTitle}
+                                            subtitle={rowSubtitle}
+                                            mark={partyMark(
+                                                findCatalogVendorFromFeed(rowTitle, merchants) ?? {
+                                                    name: rowTitle,
+                                                },
+                                                catalogMarkChrome({
+                                                    billName: row.description,
+                                                    jarKey: rowJar?.key,
+                                                    jarByKey,
+                                                    categoryTemplates,
+                                                })
+                                            )}
+                                            amount={formatMoney(row.amount, { signed: true })}
+                                            amountClassName={
+                                                row.amount < 0 ? 'text-fg' : 'text-success'
+                                            }
+                                            badges={
+                                                <>
+                                                    <MetaChip>
+                                                        {formatBookedDate(row.bookedOn)}
+                                                    </MetaChip>
+                                                    {rowJar ? (
+                                                        <JarBadge
+                                                            jarKey={rowJar.key}
+                                                            name={rowJar.name}
+                                                        />
+                                                    ) : null}
+                                                </>
+                                            }
+                                            onClick={() => router.push(txDetailHref(row.id))}
+                                        />
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </Card>
                 </section>
             ) : null}
         </div>
