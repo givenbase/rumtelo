@@ -19,6 +19,17 @@ export enum DebtKind {
 }
 
 /**
+ * OPEN = no end date (min + cadence drive estimates).
+ * TERM = fixed number of payments at paymentCadence.
+ * DEADLINE = pay off by maturityOn.
+ */
+export enum DebtScheduleKind {
+    OPEN = 'OPEN',
+    TERM = 'TERM',
+    DEADLINE = 'DEADLINE',
+}
+
+/**
  * Avalanche = highest rate first (cheapest interest).
  * Snowball = smallest balance first (faster wins).
  * Minimal = contractual minimums only — no extra, no rollover.

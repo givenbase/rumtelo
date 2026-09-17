@@ -5,6 +5,7 @@ import { Cadence, FlowDirection, jarCapabilitiesFor } from '@rumtelo/contracts';
 import { sumMonthlyFixedOut } from '@rumtelo/utils';
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
+import { Debt } from '../../targets/debt/debt.entity';
 import { Category } from '../jar/category.entity';
 import { Jar } from '../jar/jar.entity';
 import { JarService } from '../jar/jar.service';
@@ -27,6 +28,7 @@ export class FixedCostService {
     async create(input: {
         jarId: string;
         categoryId?: string | null;
+        debtId?: string | null;
         name: string;
         counterparty?: string | null;
         amount: number;
@@ -42,6 +44,7 @@ export class FixedCostService {
             household: currentHouseholdId(),
             jar: this.em.getReference(Jar, input.jarId),
             category: input.categoryId ? this.em.getReference(Category, input.categoryId) : null,
+            debt: input.debtId ? this.em.getReference(Debt, input.debtId) : null,
             name: input.name,
             counterparty: input.counterparty ?? null,
             amount: input.amount,
@@ -55,7 +58,7 @@ export class FixedCostService {
         await this.em.persist(entity).flush();
         if (!input.categoryId) {
             await this.jars.reconcileFixedCostCategories();
-            await this.em.refresh(entity, { populate: ['jar', 'category'] });
+            await this.em.refresh(entity, { populate: ['jar', 'category', 'debt'] });
         }
         return toDto(entity);
     }
@@ -109,6 +112,7 @@ export class FixedCostService {
         patch: Partial<{
             jarId: string;
             categoryId: string | null;
+            debtId: string | null;
             name: string;
             counterparty: string | null;
             amount: number;
@@ -130,6 +134,9 @@ export class FixedCostService {
                 ? this.em.getReference(Category, patch.categoryId)
                 : null;
         }
+        if (patch.debtId !== undefined) {
+            entity.debt = patch.debtId ? this.em.getReference(Debt, patch.debtId) : null;
+        }
         if (patch.name !== undefined) entity.name = patch.name;
         if (patch.counterparty !== undefined) entity.counterparty = patch.counterparty;
         if (patch.amount !== undefined) entity.amount = patch.amount;
@@ -142,7 +149,7 @@ export class FixedCostService {
         await this.em.flush();
         if (entity.category === null) {
             await this.jars.reconcileFixedCostCategories();
-            await this.em.refresh(entity, { populate: ['jar', 'category'] });
+            await this.em.refresh(entity, { populate: ['jar', 'category', 'debt'] });
         }
         return toDto(entity);
     }
@@ -173,6 +180,7 @@ export function toDto(fixedCost: FixedCost) {
         householdId: fixedCost.household,
         jarId: fixedCost.jar.id,
         categoryId: fixedCost.category?.id ?? null,
+        debtId: fixedCost.debt?.id ?? null,
         name: fixedCost.name,
         counterparty: fixedCost.counterparty,
         amount: Number(fixedCost.amount),

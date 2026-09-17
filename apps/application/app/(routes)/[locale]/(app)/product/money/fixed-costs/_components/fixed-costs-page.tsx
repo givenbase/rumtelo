@@ -13,10 +13,12 @@ import { cn, monthlyAmount, fixedOutNetSummary } from '@rumtelo/utils';
 import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
 import { bgClassToCssVar, cadenceLabel } from '@/app/_lib/jar-chrome';
 import { evaluateNecessitiesPressure } from '@/app/_lib/necessities-pressure';
-import { isLiveData } from '@/app/_lib/preview';
 import { jarChrome } from '@/app/_lib/jar-meta';
+import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
-import { findPartyVendor, vendorMarkSrc } from '@/app/_lib/vendor-brands';
+import { isLiveData } from '@/app/_lib/preview';
+import { findPartyVendor, partyMark, vendorMarkSrc } from '@/app/_lib/vendor-brands';
+import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { CoachTipCard } from '@/components/features/helpers';
 import { JarBadge, MetaChip, formatDueDay } from '@/components/features/money/jar-badge';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
@@ -66,9 +68,11 @@ export function FixedCostsPageClient() {
         [] as never,
         live
     );
+    const categoryTemplatesQuery = useCategoryTemplates(live);
     const merchants = merchantsQuery.data ?? [];
     const givingOrgs = givingOrgsQuery.data ?? [];
-    const { jars: catalogJars } = useJarCatalog();
+    const categoryTemplates = categoryTemplatesQuery.data ?? [];
+    const { jars: catalogJars, byKey: jarByKey } = useJarCatalog();
     const splitJars =
         catalogJars.length > 0
             ? catalogJars
@@ -261,12 +265,18 @@ export function FixedCostsPageClient() {
                                                     key={fixedCost.id}
                                                     title={company}
                                                     subtitle={subtitle}
-                                                    mark={vendorMarkSrc(
+                                                    mark={partyMark(
                                                         findPartyVendor(
                                                             company,
                                                             merchants,
                                                             givingOrgs
-                                                        )
+                                                        ),
+                                                        catalogMarkChrome({
+                                                            billName: fixedCost.name,
+                                                            jarKey: fixedCost.jarKey,
+                                                            jarByKey,
+                                                            categoryTemplates,
+                                                        })
                                                     )}
                                                     amount={formatMoney(
                                                         -Math.abs(fixedCost.monthly)

@@ -1,9 +1,10 @@
-import { Entity, Enum, ManyToOne, Property } from '@mikro-orm/core';
+import { Entity, Enum, ManyToOne, Property, Unique } from '@mikro-orm/core';
 import { Cadence, FlowDirection } from '@rumtelo/contracts';
 
 import { HouseholdEntity } from '../../../../../../common/database/household.entity';
 import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import { Debt } from '../../targets/debt/debt.entity';
 import { Category } from '../jar/category.entity';
 import { Jar } from '../jar/jar.entity';
 
@@ -13,6 +14,7 @@ import { Jar } from '../jar/jar.entity';
  * @see https://mikro-orm.io/docs/defining-entities
  */
 @Entity(entityConfig({ schema: 'public', domain: 'money', tableName: 'fixed_cost' }))
+@Unique({ properties: ['debt'] })
 export class FixedCost extends HouseholdEntity {
     // ? PROPERTIES
     @Property({ length: 120 })
@@ -50,4 +52,8 @@ export class FixedCost extends HouseholdEntity {
 
     @ManyToOne(() => Category, { nullable: true })
     category: Category | null = null;
+
+    /** Planned payment for a debt — at most one fixed cost per debt. */
+    @ManyToOne(() => Debt, { nullable: true, deleteRule: 'set null' })
+    debt: Debt | null = null;
 }

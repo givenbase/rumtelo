@@ -6,6 +6,7 @@ import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
 import { Category } from '../../plan/jar/category.entity';
 import { Jar } from '../../plan/jar/jar.entity';
+import { Debt } from '../../targets/debt/debt.entity';
 import { BankAccount } from '../account/bank-account.entity';
 
 /**
@@ -74,4 +75,8 @@ export class Transaction extends HouseholdEntity {
 
     @ManyToOne(() => Category, { nullable: true })
     category: Category | null = null;
+
+    /** Outflow linked as a payment toward this debt. */
+    @ManyToOne(() => Debt, { nullable: true, deleteRule: 'set null' })
+    debt: Debt | null = null;
 }

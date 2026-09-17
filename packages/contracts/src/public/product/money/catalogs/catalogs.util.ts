@@ -39,9 +39,7 @@ export function defaultGiveCategoryTemplate<T extends { jarKey: JarKey; sortOrde
 export function bankingCategoryTemplate<T extends { name: string }>(
     categories: readonly T[]
 ): T | null {
-    return (
-        categories.find(category => category.name.trim().toLowerCase() === 'banking') ?? null
-    );
+    return categories.find(category => category.name.trim().toLowerCase() === 'banking') ?? null;
 }
 
 export type GivingCauseCatalogItem = {

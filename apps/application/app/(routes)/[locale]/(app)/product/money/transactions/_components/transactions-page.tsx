@@ -17,6 +17,7 @@ import {
     RuleMatcher,
     TransactionStatus,
     jarCapabilitiesFor,
+    type Debt,
     type Jar,
     type MerchantPreset,
     type Rule,
@@ -53,6 +54,7 @@ const FIELD_LABEL: Record<RuleField, string> = {
 
 const EMPTY_TRANSACTIONS: Transaction[] = [];
 const EMPTY_JARS: Jar[] = [];
+const EMPTY_DEBTS: Debt[] = [];
 const EMPTY_RULES: Rule[] = [];
 const EMPTY_MERCHANTS: MerchantPreset[] = [];
 const EMPTY_TRANSACTION_PAGE = { items: EMPTY_TRANSACTIONS, nextCursor: null };
@@ -92,6 +94,12 @@ export function TransactionsPageClient() {
         live
     );
 
+    const debtsQuery = useLiveQuery(
+        apiQuery.money.debts.list.queryOptions({ input: { householdId: householdId! } }),
+        EMPTY_DEBTS,
+        live
+    );
+
     const rulesQuery = useLiveQuery(
         apiQuery.money.rules.list.queryOptions({ input: { householdId: householdId! } }),
         EMPTY_RULES,
@@ -108,6 +116,7 @@ export function TransactionsPageClient() {
 
     const inbox = inboxQuery.data ?? EMPTY_TRANSACTIONS;
     const jars = jarsQuery.data ?? EMPTY_JARS;
+    const debts = debtsQuery.data ?? EMPTY_DEBTS;
     const spendableJars = jars.filter(jar => jarCapabilitiesFor(jar.key).canSpend);
     const jarById = new Map(jars.map(jar => [jar.id, jar]));
     const rules = rulesQuery.data ?? EMPTY_RULES;
@@ -123,10 +132,12 @@ export function TransactionsPageClient() {
             transactionId,
             jarId,
             createRule,
+            debtId,
         }: {
             transactionId: string;
             jarId: string;
             createRule?: boolean;
+            debtId?: string | null;
         }) => {
             if (!householdId) throw new Error('No household');
             return api.money.transactions.sort({
@@ -134,6 +145,7 @@ export function TransactionsPageClient() {
                 transactionId,
                 jarId,
                 createRule: createRule ?? false,
+                debtId: debtId ?? null,
             });
         },
         onSuccess: (_data, vars) => {
@@ -144,11 +156,15 @@ export function TransactionsPageClient() {
                 queryKey: apiQuery.money.transactions.list.key(),
             });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.key() });
             if (vars.createRule) {
                 void queryClient.invalidateQueries({ queryKey: apiQuery.money.rules.list.key() });
                 showToast('Sorted and rule saved', 'success');
             } else {
-                showToast('Transaction sorted', 'success');
+                showToast(
+                    vars.debtId ? 'Sorted and applied to debt' : 'Transaction sorted',
+                    'success'
+                );
             }
         },
         onError: () => showToast('Sort failed', 'error'),
@@ -283,15 +299,17 @@ export function TransactionsPageClient() {
                                     key={transaction.id}
                                     transaction={transaction}
                                     jars={transaction.amount < 0 ? spendableJars : jars}
+                                    debts={debts}
                                     suggestedJarId={resolveJarId(suggestedKey)}
                                     logoDomain={catalog?.logoDomain}
                                     onConfirm={
                                         live
-                                            ? async (transactionId, jarId, createRule) => {
+                                            ? async (transactionId, jarId, createRule, debtId) => {
                                                   await sortMutation.mutateAsync({
                                                       transactionId,
                                                       jarId,
                                                       createRule,
+                                                      debtId,
                                                   });
                                               }
                                             : undefined

@@ -3,4 +3,10 @@
  * Re-exports from schema (same-module merge).
  */
 
-export type { Debt, DebtPlan } from './debt.schema';
+export type {
+    Debt,
+    DebtDetail,
+    DebtPaymentCadence,
+    DebtPlan,
+    RecordDebtPayment,
+} from './debt.schema';

@@ -19,7 +19,7 @@ import {
 } from '@rumtelo/ui';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DebtKind } from '@rumtelo/contracts';
+import { Cadence, DebtKind, DebtScheduleKind } from '@rumtelo/contracts';
 import { z } from 'zod';
 
 import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
@@ -47,24 +47,77 @@ const moneyInput = z
         { message: 'Enter a valid amount' }
     );
 
-const debtFormSchema = z.object({
-    name: z.string().min(1, 'Who you owe is required').max(120),
-    balance: moneyInput,
-    interestRate: z
-        .string()
-        .min(1, 'Interest rate is required')
-        .refine(
-            value => {
-                const parsed = Number(value.replace(',', '.'));
-                return Number.isFinite(parsed) && parsed >= 0 && parsed <= 100;
-            },
-            { message: 'Interest must be between 0 and 100' }
-        ),
-    minimumPayment: z.string().optional(),
-    kind: z.enum(DebtKind),
-});
+const debtFormSchema = z
+    .object({
+        name: z.string().min(1, 'Who you owe is required').max(120),
+        balance: moneyInput,
+        interestRate: z
+            .string()
+            .min(1, 'Interest rate is required')
+            .refine(
+                value => {
+                    const parsed = Number(value.replace(',', '.'));
+                    return Number.isFinite(parsed) && parsed >= 0 && parsed <= 100;
+                },
+                { message: 'Interest must be between 0 and 100' }
+            ),
+        minimumPayment: z.string().optional(),
+        extraPayment: z.string().optional(),
+        dueDay: z.string().optional(),
+        startedOn: z.string().optional(),
+        scheduleKind: z.enum(DebtScheduleKind),
+        paymentCadence: z.enum([
+            Cadence.WEEKLY,
+            Cadence.MONTHLY,
+            Cadence.QUARTERLY,
+            Cadence.YEARLY,
+        ]),
+        termPayments: z.string().optional(),
+        maturityOn: z.string().optional(),
+        linkFixedCost: z.boolean(),
+        kind: z.enum(DebtKind),
+    })
+    .superRefine((value, ctx) => {
+        if (value.scheduleKind === DebtScheduleKind.TERM) {
+            const count = Number(value.termPayments);
+            if (!Number.isFinite(count) || count < 1) {
+                ctx.addIssue({
+                    code: 'custom',
+                    path: ['termPayments'],
+                    message: 'Enter how many payments',
+                });
+            }
+        }
+        if (value.scheduleKind === DebtScheduleKind.DEADLINE && !value.maturityOn?.trim()) {
+            ctx.addIssue({
+                code: 'custom',
+                path: ['maturityOn'],
+                message: 'Pick a deadline',
+            });
+        }
+    });
 
 export type DebtFormValues = z.infer<typeof debtFormSchema>;
+
+const SCHEDULE_OPTIONS: ReadonlyArray<{
+    id: DebtScheduleKind;
+    label: string;
+    hint: string;
+}> = [
+    { id: DebtScheduleKind.OPEN, label: 'Open', hint: 'No fixed end' },
+    { id: DebtScheduleKind.TERM, label: 'Fixed payments', hint: 'e.g. 24 times' },
+    { id: DebtScheduleKind.DEADLINE, label: 'Deadline', hint: 'Pay off by a date' },
+];
+
+const CADENCE_OPTIONS: ReadonlyArray<{
+    id: DebtFormValues['paymentCadence'];
+    label: string;
+}> = [
+    { id: Cadence.WEEKLY, label: 'Weekly' },
+    { id: Cadence.MONTHLY, label: 'Monthly' },
+    { id: Cadence.QUARTERLY, label: 'Quarterly' },
+    { id: Cadence.YEARLY, label: 'Yearly' },
+];
 
 type DebtFormProps = {
     defaultValues?: Partial<DebtFormValues>;
@@ -126,6 +179,14 @@ export function DebtForm({
             balance: defaultValues?.balance ?? '',
             interestRate: defaultValues?.interestRate ?? '0',
             minimumPayment: defaultValues?.minimumPayment ?? '',
+            extraPayment: defaultValues?.extraPayment ?? '',
+            dueDay: defaultValues?.dueDay ?? '',
+            startedOn: defaultValues?.startedOn ?? '',
+            scheduleKind: defaultValues?.scheduleKind ?? DebtScheduleKind.OPEN,
+            paymentCadence: defaultValues?.paymentCadence ?? Cadence.MONTHLY,
+            termPayments: defaultValues?.termPayments ?? '',
+            maturityOn: defaultValues?.maturityOn ?? '',
+            linkFixedCost: defaultValues?.linkFixedCost ?? true,
             kind: defaultValues?.kind ?? DebtKind.LOAN,
         },
         resolver: zodResolver(debtFormSchema),
@@ -134,6 +195,9 @@ export function DebtForm({
     const onError = createFormInvalidHandler(({ title, description }) => {
         showToast(description ?? title, 'error');
     });
+
+    const scheduleKind = useWatch({ control: form.control, name: 'scheduleKind' });
+    const paymentCadence = useWatch({ control: form.control, name: 'paymentCadence' });
 
     const saveMutation = useMutation({
         mutationFn: async (values: DebtFormValues) => {
@@ -144,8 +208,37 @@ export function DebtForm({
                 ? parseAmountToMinorUnits(values.minimumPayment)
                 : 0;
             const minimumPayment = minimumRaw === null ? 0 : minimumRaw;
+            const extraRaw = values.extraPayment?.trim()
+                ? parseAmountToMinorUnits(values.extraPayment)
+                : 0;
+            const extraPayment = extraRaw === null ? 0 : extraRaw;
             const interestRate = Number(values.interestRate.replace(',', '.'));
             const name = values.name.trim();
+            const dueDayRaw = values.dueDay?.trim() ? Number(values.dueDay) : null;
+            const dueDay =
+                dueDayRaw !== null &&
+                Number.isFinite(dueDayRaw) &&
+                dueDayRaw >= 1 &&
+                dueDayRaw <= 31
+                    ? dueDayRaw
+                    : null;
+            const startedOn = values.startedOn?.trim() || null;
+            const termPayments =
+                values.scheduleKind === DebtScheduleKind.TERM ? Number(values.termPayments) : null;
+            const maturityOn =
+                values.scheduleKind === DebtScheduleKind.DEADLINE
+                    ? values.maturityOn?.trim() || null
+                    : null;
+
+            const schedule = {
+                scheduleKind: values.scheduleKind,
+                paymentCadence: values.paymentCadence,
+                termPayments,
+                maturityOn,
+                startedOn,
+                dueDay,
+                extraPayment,
+            };
 
             if (mode === 'edit' && entityId) {
                 return api.money.debts.update({
@@ -156,6 +249,8 @@ export function DebtForm({
                     balance,
                     interestRate,
                     minimumPayment,
+                    ...schedule,
+                    linkFixedCost: values.linkFixedCost || undefined,
                 });
             }
             return api.money.debts.create({
@@ -166,14 +261,14 @@ export function DebtForm({
                 originalBalance: balance,
                 interestRate,
                 minimumPayment,
-                extraPayment: 0,
-                dueDay: null,
                 closedOn: null,
+                linkFixedCost: values.linkFixedCost,
+                ...schedule,
             });
         },
         onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.list.key() });
-            void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.plan.key() });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.key() });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.key() });
             showToast(mode === 'edit' ? 'Debt updated' : 'Debt saved', 'success');
             dismiss();
         },
@@ -467,6 +562,176 @@ export function DebtForm({
                             <FormInput inputMode="decimal" placeholder="0,00" {...field} />
                         </FormControl>
                         <FormMessage />
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="extraPayment"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Extra per period ({symbol})</FormLabel>
+                        <FormControl>
+                            <FormInput inputMode="decimal" placeholder="0,00" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+
+            <div className="grid gap-2">
+                <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
+                    How often do you pay?
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                    {CADENCE_OPTIONS.map(option => {
+                        const selected = paymentCadence === option.id;
+                        return (
+                            <button
+                                key={option.id}
+                                type="button"
+                                disabled={busy}
+                                className={
+                                    selected
+                                        ? 'rounded-xl border border-accent bg-accent/15 px-3 py-1.5 text-sm text-accent'
+                                        : 'rounded-xl border border-line bg-raised px-3 py-1.5 text-sm text-fg hover:border-accent'
+                                }
+                                onClick={() =>
+                                    form.setValue('paymentCadence', option.id, {
+                                        shouldValidate: true,
+                                    })
+                                }>
+                                {option.label}
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+
+            <FormField
+                control={form.control}
+                name="dueDay"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Due day (1–31)</FormLabel>
+                        <FormControl>
+                            <FormInput inputMode="numeric" placeholder="e.g. 28" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="startedOn"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Payments start</FormLabel>
+                        <FormControl>
+                            <FormInput type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+
+            <div className="grid gap-2">
+                <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
+                    Schedule
+                </p>
+                <div className="grid gap-2 sm:grid-cols-3">
+                    {SCHEDULE_OPTIONS.map(option => {
+                        const selected = scheduleKind === option.id;
+                        return (
+                            <button
+                                key={option.id}
+                                type="button"
+                                disabled={busy}
+                                className={
+                                    selected
+                                        ? 'rounded-xl border border-accent bg-accent/15 px-3 py-2.5 text-left'
+                                        : 'rounded-xl border border-line bg-raised px-3 py-2.5 text-left hover:border-accent'
+                                }
+                                onClick={() => {
+                                    form.setValue('scheduleKind', option.id, {
+                                        shouldValidate: true,
+                                    });
+                                    if (option.id !== DebtScheduleKind.TERM) {
+                                        form.setValue('termPayments', '');
+                                    }
+                                    if (option.id !== DebtScheduleKind.DEADLINE) {
+                                        form.setValue('maturityOn', '');
+                                    }
+                                }}>
+                                <span className="block text-sm font-medium text-fg">
+                                    {option.label}
+                                </span>
+                                <span className="mt-0.5 block text-xs text-fg-muted">
+                                    {option.hint}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {scheduleKind === DebtScheduleKind.TERM ? (
+                <FormField
+                    control={form.control}
+                    name="termPayments"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Number of payments</FormLabel>
+                            <FormControl>
+                                <FormInput inputMode="numeric" placeholder="e.g. 24" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            ) : null}
+
+            {scheduleKind === DebtScheduleKind.DEADLINE ? (
+                <FormField
+                    control={form.control}
+                    name="maturityOn"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Pay off by</FormLabel>
+                            <FormControl>
+                                <FormInput type="date" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            ) : null}
+
+            <FormField
+                control={form.control}
+                name="linkFixedCost"
+                render={({ field }) => (
+                    <FormItem>
+                        <div className="flex items-start gap-3 rounded-xl border border-line bg-raised px-3 py-3">
+                            <input
+                                id="debt-link-fixed-cost"
+                                type="checkbox"
+                                className="mt-1"
+                                checked={field.value}
+                                onChange={event => field.onChange(event.target.checked)}
+                                disabled={busy}
+                            />
+                            <label htmlFor="debt-link-fixed-cost" className="cursor-pointer">
+                                <span className="block text-sm font-medium text-fg">
+                                    Also add as Necessities fixed cost
+                                </span>
+                                <span className="mt-0.5 block text-xs text-fg-muted">
+                                    Keeps the planned payment in your jar budget at this cadence.
+                                </span>
+                            </label>
+                        </div>
                     </FormItem>
                 )}
             />

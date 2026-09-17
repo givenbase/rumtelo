@@ -7,27 +7,28 @@ import { useRouter } from 'next/navigation';
 import { GoalKind, GoalStatus, JarKey, jarCapabilitiesFor } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card } from '@rumtelo/ui';
-import { monthlyAmount, toPeriodKey } from '@rumtelo/utils';
+import { toPeriodKey } from '@rumtelo/utils';
 
 import { createGoalHref, createMoveHref, createTxHref, updateHref } from '@/app/_lib/create-routes';
-import { cadenceLabel } from '@/app/_lib/jar-chrome';
 import { jarChrome } from '@/app/_lib/jar-meta';
+import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { isLiveData } from '@/app/_lib/preview';
-import { findPartyVendor, vendorMarkSrc } from '@/app/_lib/vendor-brands';
+import { findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
+import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { JarGuideCard } from '@/components/features/helpers';
+import { JarCategoryBreakdown } from '@/components/features/money/jar-category-breakdown';
 import { JarCoverageStrip } from '@/components/features/money/jar-coverage-strip';
-import { JarCategoryTable } from '@/components/features/money/jar-drilldown-parts';
-import { MetaChip, formatBookedDate, formatDueDay } from '@/components/features/money/jar-badge';
+import { MetaChip, formatBookedDate } from '@/components/features/money/jar-badge';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 /**
- * Per-jar detail — coverage (allocated / committed / spent / available),
- * categories, fixed costs, period transactions, guide, and CTAs.
+ * Per-jar detail — coverage, collapsible categories (fixed costs + activity),
+ * goals, period transactions, guide, and CTAs.
  */
 export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
     const { householdId } = useAuth();
@@ -72,8 +73,10 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
         [] as never,
         live
     );
+    const categoryTemplatesQuery = useCategoryTemplates(live);
     const merchants = merchantsQuery.data ?? [];
     const givingOrgs = givingOrgsQuery.data ?? [];
+    const categoryTemplates = categoryTemplatesQuery.data ?? [];
 
     const jar = (jarsQuery.data ?? []).find(row => row.key === jarKey);
 
@@ -188,85 +191,48 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                 showCommitted={allowsFixedCosts}
             />
 
-            {/* Categories */}
+            {/* Categories — expand for fixed costs + period activity */}
             <section className="grid gap-3">
-                <h2 className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
-                    ✦ Categories this month
-                </h2>
-                <Card className="p-4">
-                    <JarCategoryTable
-                        categories={[...(jar.categories ?? [])]
-                            .filter(category => !category.isArchived)
-                            .sort(
-                                (left, right) =>
-                                    right.budgeted - left.budgeted || right.actual - left.actual
-                            )}
-                    />
-                </Card>
-            </section>
-
-            {allowsFixedCosts ? (
-                <section className="grid gap-3">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                        <h2 className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
-                            ✦ Fixed costs
-                        </h2>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h2 className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                        ✦ Categories this month
+                    </h2>
+                    {allowsFixedCosts ? (
                         <Link
                             href="/product/money/fixed-costs"
                             className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
                             All fixed costs ›
                         </Link>
+                    ) : null}
+                </div>
+                <Card className="p-0">
+                    <div className="hidden items-center gap-3 border-b border-line px-5 py-2 font-mono text-xs font-medium tracking-wide text-fg-faint uppercase sm:flex">
+                        <span className="w-9 shrink-0" aria-hidden />
+                        <span className="min-w-0 flex-1">Category</span>
+                        <span className="flex min-w-0 flex-1 items-center justify-end gap-6">
+                            <span className="w-20 text-right">Planned</span>
+                            <span className="w-20 text-right">Spent</span>
+                            <span className="w-24 text-right">Over / under</span>
+                        </span>
+                        <span className="w-3 shrink-0" aria-hidden />
                     </div>
-                    <Card className="p-0">
-                        {fixedOut.length === 0 ? (
-                            <p className="px-5 py-4 text-sm text-fg-muted">
-                                No active fixed costs on this jar.
-                            </p>
-                        ) : (
-                            <ul className="grid">
-                                {fixedOut.map(item => {
-                                    const monthly = monthlyAmount(item.amount, item.cadence);
-                                    const company = item.counterparty?.trim() || item.name;
-                                    const subtitle =
-                                        item.counterparty?.trim() &&
-                                        item.counterparty.trim() !== item.name.trim()
-                                            ? item.name
-                                            : null;
-                                    const due = formatDueDay(item.dueDay);
-                                    return (
-                                        <li key={item.id}>
-                                            <MoneyPartyRow
-                                                title={company}
-                                                subtitle={subtitle}
-                                                mark={vendorMarkSrc(
-                                                    findPartyVendor(company, merchants, givingOrgs)
-                                                )}
-                                                amount={formatMoney(-Math.abs(monthly))}
-                                                badges={
-                                                    <>
-                                                        {due ? <MetaChip>{due}</MetaChip> : null}
-                                                        <MetaChip>
-                                                            {cadenceLabel(item.cadence)}
-                                                        </MetaChip>
-                                                        {item.cadence !== 'MONTHLY' ? (
-                                                            <MetaChip>
-                                                                {formatMoney(monthly)}/mo
-                                                            </MetaChip>
-                                                        ) : null}
-                                                    </>
-                                                }
-                                                onClick={() =>
-                                                    router.push(updateHref('fixed', item.id))
-                                                }
-                                            />
-                                        </li>
-                                    );
-                                })}
-                            </ul>
+                    <JarCategoryBreakdown
+                        categories={[...(jar.categories ?? [])].filter(
+                            category => !category.isArchived
                         )}
-                    </Card>
-                </section>
-            ) : null}
+                        fixedCosts={fixedOut}
+                        transactions={transactions}
+                        period={period}
+                        jarKey={jarKey}
+                        jarIcon={jar.icon ?? catalog?.icon}
+                        jarByKey={catalogByKey}
+                        categoryTemplates={categoryTemplates}
+                        merchants={merchants}
+                        givingOrgs={givingOrgs}
+                        allowFixedCosts={allowsFixedCosts}
+                    />
+                </Card>
+            </section>
 
             {showGoals ? (
                 <section className="grid gap-3">
@@ -352,8 +318,13 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                                         <MoneyPartyRow
                                             title={title}
                                             subtitle={subtitle}
-                                            mark={vendorMarkSrc(
-                                                findPartyVendor(title, merchants, givingOrgs)
+                                            mark={partyMark(
+                                                findPartyVendor(title, merchants, givingOrgs),
+                                                catalogMarkChrome({
+                                                    jarKey,
+                                                    jarByKey: catalogByKey,
+                                                    categoryTemplates,
+                                                })
                                             )}
                                             amount={formatMoney(tx.amount)}
                                             amountClassName={

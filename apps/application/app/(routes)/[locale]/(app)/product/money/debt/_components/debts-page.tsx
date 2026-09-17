@@ -11,7 +11,7 @@ import { useLiveQuery } from '@rumtelo/hooks';
 import { AccentCard, Badge, Card, Eyebrow, VendorMark } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
-import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
+import { CREATE_HREF, debtDetailHref } from '@/app/_lib/create-routes';
 import {
     formatDebtFreeMonth,
     orderDebtsByStrategy,
@@ -19,6 +19,7 @@ import {
     rankPayoffStrategies,
     simulatePayoff,
 } from '@/app/_lib/debt-payoff';
+import { scheduleHint } from '@/app/_lib/debt-schedule';
 import { findCatalogVendor, vendorMarkSrc } from '@/app/_lib/vendor-brands';
 import { isLiveData } from '@/app/_lib/preview';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -362,7 +363,7 @@ export function DebtsPageClient() {
                                             type="button"
                                             key={debt.id}
                                             aria-label={debt.name}
-                                            onClick={() => router.push(updateHref('debt', debt.id))}
+                                            onClick={() => router.push(debtDetailHref(debt.id))}
                                             className={cn(
                                                 'w-full cursor-pointer rounded-2xl border bg-raised p-4.5 text-left transition-colors hover:border-accent-hover',
                                                 isFocus
@@ -409,6 +410,10 @@ export function DebtsPageClient() {
                                                                     ? ' · focus'
                                                                     : ' · waiting'
                                                                 : ''}
+                                                            {(() => {
+                                                                const hint = scheduleHint(debt, 0);
+                                                                return hint ? ` · ${hint}` : '';
+                                                            })()}
                                                         </div>
                                                     </div>
                                                 </div>

@@ -57,16 +57,35 @@ export function lenderLogoUrl(domain: string, size = 64): string {
     return vendorLogoUrl(domain, size);
 }
 
+export type PartyMark = {
+    name: string;
+    src: string | null;
+    /** Category / jar emoji when the logo is missing. */
+    fallbackIcon?: string | null;
+    /** Soft CSS color behind non-logo fallbacks. */
+    tone?: string | null;
+};
+
 /** Convenience: logo src for a resolved brand, or null. */
-export function vendorMarkSrc(
-    input: ResolveVendorInput,
-    size = 64
-): { name: string; src: string | null } {
+export function vendorMarkSrc(input: ResolveVendorInput, size = 64): PartyMark {
     const brand = resolveVendorBrand(input);
     if (!brand) {
         return { name: input.name?.trim() || '?', src: null };
     }
     return { name: brand.name, src: vendorLogoUrl(brand.domain, size) };
+}
+
+/** Brand mark plus optional catalog chrome (category/jar icon + soft tone). */
+export function partyMark(
+    input: ResolveVendorInput,
+    chrome?: { fallbackIcon?: string | null; tone?: string | null },
+    size = 64
+): PartyMark {
+    return {
+        ...vendorMarkSrc(input, size),
+        fallbackIcon: chrome?.fallbackIcon ?? null,
+        tone: chrome?.tone ?? null,
+    };
 }
 
 function toResolveInput(merchant: MerchantPreset): ResolveVendorInput {

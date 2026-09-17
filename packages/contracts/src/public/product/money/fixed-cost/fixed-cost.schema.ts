@@ -14,6 +14,11 @@ export const FixedCost = z.object({
     householdId: HouseholdId,
     jarId: Id,
     categoryId: Id.nullable(),
+    /**
+     * When set, this recurring bill is the planned payment for that debt
+     * (one fixed cost per debt). Does not reduce the debt balance on its own.
+     */
+    debtId: Id.nullable().default(null),
     name: z.string().min(1).max(120),
     /**
      * Who the money goes to — landlord, insurer, or the organisation you give to.

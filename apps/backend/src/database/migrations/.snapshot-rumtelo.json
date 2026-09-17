@@ -272,6 +272,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -707,6 +716,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -1149,6 +1167,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -1615,6 +1642,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -1998,6 +2034,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -2406,6 +2451,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -2796,6 +2850,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -3181,6 +3244,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -3539,6 +3611,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -4053,6 +4134,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -4534,6 +4624,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -4943,6 +5042,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -5302,6 +5410,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -5749,6 +5866,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -6168,6 +6294,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -6541,6 +6676,98 @@
           ],
           "mappedType": "unknown",
           "nativeEnumName": "money_debt_kind"
+        },
+        "started_on": {
+          "name": "started_on",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 0,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "date"
+        },
+        "term_payments": {
+          "name": "term_payments",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "maturity_on": {
+          "name": "maturity_on",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 0,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "date"
+        },
+        "schedule_kind": {
+          "name": "schedule_kind",
+          "type": "money_debt_schedule_kind",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "'OPEN'",
+          "comment": null,
+          "enumItems": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "money_debt_schedule_kind"
+        },
+        "payment_cadence": {
+          "name": "payment_cadence",
+          "type": "money_cadence",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "'MONTHLY'",
+          "comment": null,
+          "enumItems": [
+            "WEEKLY",
+            "MONTHLY",
+            "QUARTERLY",
+            "YEARLY",
+            "ONCE"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "money_cadence"
         }
       },
       "name": "money_debt",
@@ -6660,6 +6887,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -7070,11 +7306,37 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "string"
+        },
+        "debt_id": {
+          "name": "debt_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
         }
       },
       "name": "money_fixed_cost",
       "schema": "public",
       "indexes": [
+        {
+          "columnNames": [
+            "debt_id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "money_fixed_cost_debt_id_unique",
+          "unique": true,
+          "primary": false
+        },
         {
           "columnNames": [
             "household_id"
@@ -7105,6 +7367,19 @@
           "constraintName": "money_fixed_cost_category_id_foreign",
           "localTableName": "public.money_fixed_cost",
           "referencedTableName": "public.money_category",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "set null"
+        },
+        "money_fixed_cost_debt_id_foreign": {
+          "columnNames": [
+            "debt_id"
+          ],
+          "constraintName": "money_fixed_cost_debt_id_foreign",
+          "localTableName": "public.money_fixed_cost",
+          "referencedTableName": "public.money_debt",
           "referencedColumnNames": [
             "id"
           ],
@@ -7215,6 +7490,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -7791,6 +8075,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -8192,6 +8485,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -8661,6 +8963,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -9136,6 +9447,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -9583,6 +9903,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -10055,6 +10384,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -10564,6 +10902,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -11004,11 +11351,37 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "string"
+        },
+        "debt_id": {
+          "name": "debt_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
         }
       },
       "name": "money_transaction",
       "schema": "public",
       "indexes": [
+        {
+          "columnNames": [
+            "debt_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "money_transaction_debt_id_index",
+          "unique": false,
+          "primary": false
+        },
         {
           "columnNames": [
             "dedupe_key"
@@ -11084,6 +11457,19 @@
           "constraintName": "money_transaction_category_id_foreign",
           "localTableName": "public.money_transaction",
           "referencedTableName": "public.money_category",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "set null"
+        },
+        "money_transaction_debt_id_foreign": {
+          "columnNames": [
+            "debt_id"
+          ],
+          "constraintName": "money_transaction_debt_id_foreign",
+          "localTableName": "public.money_transaction",
+          "referencedTableName": "public.money_debt",
           "referencedColumnNames": [
             "id"
           ],
@@ -11194,6 +11580,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -11635,6 +12030,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -12062,6 +12466,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -12475,6 +12888,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -12876,6 +13298,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -13301,6 +13732,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -13675,6 +14115,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -14131,6 +14580,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -14625,6 +15083,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -15015,6 +15482,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -15473,6 +15949,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -15895,6 +16380,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -16353,6 +16847,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -16773,6 +17276,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -17205,6 +17717,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -17720,6 +18241,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -18208,6 +18738,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -18644,6 +19183,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -19083,6 +19631,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -19549,6 +20106,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -19905,6 +20471,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -20279,6 +20854,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -20701,6 +21285,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -21173,6 +21766,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -21605,6 +22207,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -22027,6 +22638,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -22441,6 +23061,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -22826,6 +23455,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -23204,6 +23842,15 @@
             "MORTGAGE",
             "FAMILY",
             "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
           ]
         },
         "money_flow_direction": {
@@ -23598,6 +24245,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -23948,6 +24604,15 @@
             "OTHER"
           ]
         },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
         "money_flow_direction": {
           "name": "money_flow_direction",
           "schema": "public",
@@ -24182,6 +24847,15 @@
         "MORTGAGE",
         "FAMILY",
         "OTHER"
+      ]
+    },
+    "money_debt_schedule_kind": {
+      "name": "money_debt_schedule_kind",
+      "schema": "public",
+      "items": [
+        "OPEN",
+        "TERM",
+        "DEADLINE"
       ]
     },
     "money_flow_direction": {

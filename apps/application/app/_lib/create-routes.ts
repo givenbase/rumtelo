@@ -109,3 +109,8 @@ export function updateHref(kind: Exclude<CreateKind, 'session' | 'asset' | 'move
             return productPath(`growth/goals/update/${id}`);
     }
 }
+
+/** Open debt detail (progress, schedule, payment log). */
+export function debtDetailHref(id: string) {
+    return productPath(`money/debt/${id}`);
+}

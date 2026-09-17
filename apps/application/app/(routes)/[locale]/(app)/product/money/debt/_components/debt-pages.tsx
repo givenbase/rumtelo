@@ -2,6 +2,7 @@
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 
+import { Cadence, DebtScheduleKind } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
@@ -41,6 +42,14 @@ export function DebtUpdatePage({ id, embedded = false }: { id: string; embedded?
                 balance: minorUnitsToAmountInput(row.balance),
                 interestRate: String(row.interestRate),
                 minimumPayment: minorUnitsToAmountInput(row.minimumPayment),
+                extraPayment: row.extraPayment > 0 ? minorUnitsToAmountInput(row.extraPayment) : '',
+                dueDay: row.dueDay !== null ? String(row.dueDay) : '',
+                startedOn: row.startedOn ?? '',
+                scheduleKind: row.scheduleKind ?? DebtScheduleKind.OPEN,
+                paymentCadence: row.paymentCadence ?? Cadence.MONTHLY,
+                termPayments: row.termPayments !== null ? String(row.termPayments) : '',
+                maturityOn: row.maturityOn ?? '',
+                linkFixedCost: true,
                 kind: row.kind,
             }}
         />

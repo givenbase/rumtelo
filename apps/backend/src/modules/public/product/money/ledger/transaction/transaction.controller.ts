@@ -49,7 +49,12 @@ export class TransactionController {
     @Implement(contract.money.transactions.list)
     list() {
         return implement(contract.money.transactions.list).handler(({ input }) =>
-            this.transactions.list({ status: input.status, jarId: input.jarId, limit: input.limit })
+            this.transactions.list({
+                status: input.status,
+                jarId: input.jarId,
+                debtId: input.debtId,
+                limit: input.limit,
+            })
         );
     }
 
@@ -65,7 +70,8 @@ export class TransactionController {
                 input.transactionId,
                 input.jarId,
                 input.categoryId,
-                input.createRule
+                input.createRule,
+                input.debtId
             )
         );
     }
@@ -90,6 +96,7 @@ export class TransactionController {
                 counterparty: input.counterparty,
                 inflowKey: input.inflowKey,
                 categoryId: input.categoryId,
+                debtId: input.debtId,
             })
         );
     }

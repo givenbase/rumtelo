@@ -20,17 +20,21 @@ export class DebtController {
     /** Register a new debt for tracking. */
     @Implement(contract.money.debts.create)
     create() {
-        return implement(contract.money.debts.create).handler(({ input }) =>
-            this.debts.create({
-                name: input.name,
-                kind: input.kind,
-                balance: input.balance,
-                originalBalance: input.originalBalance,
-                interestRate: input.interestRate,
-                minimumPayment: input.minimumPayment,
-                extraPayment: input.extraPayment,
-                dueDay: input.dueDay,
-                closedOn: input.closedOn,
+        return implement(contract.money.debts.create).handler(({ input }) => {
+            const { linkFixedCost, ...rest } = input;
+            return this.debts.create({ ...rest, linkFixedCost });
+        });
+    }
+
+    /** Log a payment (OUT transaction) and reduce the balance. */
+    @Implement(contract.money.debts.recordPayment)
+    recordPayment() {
+        return implement(contract.money.debts.recordPayment).handler(({ input }) =>
+            this.debts.recordPayment({
+                debtId: input.debtId,
+                amount: input.amount,
+                bookedOn: input.bookedOn,
+                note: input.note,
             })
         );
     }
@@ -43,6 +47,12 @@ export class DebtController {
     @Implement(contract.money.debts.list)
     list() {
         return implement(contract.money.debts.list).handler(() => this.debts.list());
+    }
+
+    /** Debt detail: progress, payment log, linked fixed cost. */
+    @Implement(contract.money.debts.get)
+    get() {
+        return implement(contract.money.debts.get).handler(({ input }) => this.debts.get(input.id));
     }
 
     /** Return a payoff plan for the chosen strategy. */
@@ -61,8 +71,8 @@ export class DebtController {
     @Implement(contract.money.debts.update)
     update() {
         return implement(contract.money.debts.update).handler(({ input }) => {
-            const { id, ...patch } = input;
-            return this.debts.update(id, patch);
+            const { id, linkFixedCost, ...patch } = input;
+            return this.debts.update(id, { ...patch, linkFixedCost });
         });
     }
 

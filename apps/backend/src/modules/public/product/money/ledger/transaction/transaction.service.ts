@@ -6,6 +6,7 @@ import { HouseholdScopedRepository } from '../../../../../../common/household/ho
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { Category } from '../../plan/jar/category.entity';
 import { Jar } from '../../plan/jar/jar.entity';
+import { applyDebtLinkChange } from '../../targets/debt/debt-link.util';
 import { BankAccount } from '../account/bank-account.entity';
 import { RuleService } from '../rule/rule.service';
 import { parseStatementCsv } from './csv/csv-parser';
@@ -32,6 +33,7 @@ export class TransactionService {
         accountId?: string | null;
         jarId?: string | null;
         categoryId?: string | null;
+        debtId?: string | null;
         amount: number;
         bookedOn: string;
         description: string;
@@ -47,6 +49,7 @@ export class TransactionService {
             account: input.accountId ? this.em.getReference(BankAccount, input.accountId) : null,
             jar: input.jarId ? this.em.getReference(Jar, input.jarId) : null,
             category: input.categoryId ? this.em.getReference(Category, input.categoryId) : null,
+            debt: null,
             amount: input.amount,
             bookedOn: input.bookedOn,
             description: input.description,
@@ -63,6 +66,12 @@ export class TransactionService {
             ),
         } as never);
         await this.em.persist(entity).flush();
+
+        if (input.debtId) {
+            await applyDebtLinkChange(this.em, entity, input.debtId);
+            await this.em.flush();
+        }
+
         return toDto(entity);
     }
 
@@ -120,15 +129,22 @@ export class TransactionService {
         return rows.map(toDto);
     }
 
-    async list(filter: { status?: string | null; jarId?: string | null; limit: number }) {
+    async list(filter: {
+        status?: string | null;
+        jarId?: string | null;
+        debtId?: string | null;
+        limit: number;
+    }) {
         const where: Record<string, unknown> = {};
         if (filter.status) where.status = filter.status;
         if (filter.jarId) where.jar = filter.jarId;
+        if (filter.debtId) where.debt = filter.debtId;
 
         const rows = await this.transactions.find(where, {
             orderBy: { bookedOn: 'DESC' },
             limit: filter.limit + 1,
         });
+        await this.em.populate(rows, ['debt']);
         const hasMore = rows.length > filter.limit;
         const page = hasMore ? rows.slice(0, filter.limit) : rows;
         return { items: page.map(toDto), nextCursor: hasMore ? (page.at(-1)?.id ?? null) : null };
@@ -146,9 +162,11 @@ export class TransactionService {
         transactionId: string,
         jarId: string,
         categoryId?: string | null,
-        createRule = false
+        createRule = false,
+        debtId?: string | null
     ) {
         const entity = await this.transactions.findOneOrFail({ id: transactionId });
+        await this.em.populate(entity, ['debt']);
         await assertJarAllowsOutflow(this.em, jarId, Number(entity.amount));
         entity.jar = this.em.getReference(Jar, jarId);
         entity.category = categoryId ? this.em.getReference(Category, categoryId) : null;
@@ -167,6 +185,10 @@ export class TransactionService {
                 isActive: true,
             });
             entity.appliedRuleId = rule.id;
+        }
+
+        if (debtId !== undefined) {
+            await applyDebtLinkChange(this.em, entity, debtId);
         }
 
         await this.em.flush();
@@ -191,10 +213,11 @@ export class TransactionService {
         id: string,
         patch: Partial<
             Pick<Transaction, 'description' | 'amount' | 'note' | 'status' | 'counterparty'>
-        > & { categoryId?: string | null; inflowKey?: string | null }
+        > & { categoryId?: string | null; inflowKey?: string | null; debtId?: string | null }
     ) {
         const entity = await this.transactions.findOneOrFail({ id });
-        const { categoryId, inflowKey, ...fields } = patch;
+        await this.em.populate(entity, ['debt']);
+        const { categoryId, inflowKey, debtId, ...fields } = patch;
         Object.assign(entity, fields);
         if (categoryId !== undefined) {
             entity.category = categoryId ? this.em.getReference(Category, categoryId) : null;
@@ -203,6 +226,9 @@ export class TransactionService {
             entity.inflowKey = null;
         } else if (inflowKey !== undefined) {
             entity.inflowKey = inflowKey?.trim() || null;
+        }
+        if (debtId !== undefined) {
+            await applyDebtLinkChange(this.em, entity, debtId);
         }
         await this.em.flush();
         return toDto(entity);
@@ -214,6 +240,10 @@ export class TransactionService {
 
     async remove(id: string) {
         const entity = await this.transactions.findOneOrFail({ id });
+        await this.em.populate(entity, ['debt']);
+        if (entity.debt) {
+            await applyDebtLinkChange(this.em, entity, null);
+        }
         await this.em.remove(entity).flush();
     }
 }
@@ -235,6 +265,7 @@ export function toDto(transaction: Transaction) {
         accountId: transaction.account?.id ?? null,
         jarId: transaction.jar?.id ?? null,
         categoryId: transaction.category?.id ?? null,
+        debtId: transaction.debt?.id ?? null,
         amount: Number(transaction.amount),
         bookedOn: transaction.bookedOn,
         description: transaction.description,

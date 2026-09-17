@@ -14,12 +14,21 @@ function initialsFromName(name: string): string {
 }
 
 /**
- * Compact vendor / bank mark: logo when available, lettermark fallback.
+ * Compact vendor / bank mark: logo → catalog icon (+ tone) → lettermark.
  */
-export function VendorMark({ name, src, size = 20, className }: VendorMarkProps) {
+export function VendorMark({
+    name,
+    src,
+    fallbackIcon,
+    tone,
+    size = 20,
+    className,
+}: VendorMarkProps) {
     /** Remember which `src` failed so a new URL can retry without an effect. */
     const [failedSrc, setFailedSrc] = useState<string | null>(null);
     const showImage = Boolean(src) && src !== failedSrc;
+    const icon = fallbackIcon?.trim() || null;
+    const softBg = !showImage && tone ? `color-mix(in srgb, ${tone} 22%, transparent)` : undefined;
 
     return (
         <span
@@ -27,7 +36,7 @@ export function VendorMark({ name, src, size = 20, className }: VendorMarkProps)
                 'inline-flex shrink-0 items-center justify-center overflow-hidden rounded-md bg-raised ring-1 ring-line',
                 className
             )}
-            style={{ width: size, height: size }}
+            style={{ width: size, height: size, background: softBg }}
             aria-hidden
             title={name}>
             {showImage ? (
@@ -41,6 +50,12 @@ export function VendorMark({ name, src, size = 20, className }: VendorMarkProps)
                     decoding="async"
                     onError={() => setFailedSrc(src!)}
                 />
+            ) : icon ? (
+                <span
+                    className="leading-none"
+                    style={{ fontSize: Math.max(10, Math.round(size * 0.52)) }}>
+                    {icon}
+                </span>
             ) : (
                 <span
                     className="font-mono font-semibold tracking-tight text-fg-muted"

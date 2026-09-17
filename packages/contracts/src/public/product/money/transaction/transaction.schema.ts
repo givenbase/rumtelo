@@ -31,6 +31,11 @@ export const Transaction = z.object({
     accountId: Id.nullable(),
     jarId: Id.nullable(),
     categoryId: Id.nullable(),
+    /**
+     * When set, this outflow counts as a payment toward that debt
+     * (balance was reduced when the link was established).
+     */
+    debtId: Id.nullable(),
     /** Negative = money out, positive = money in. Minor units. */
     amount: Money,
     bookedOn: IsoDate,
@@ -54,6 +59,7 @@ export const ListTransactions = Pagination.extend({
     period: PeriodKey.nullish(),
     status: z.enum(TransactionStatus).nullish(),
     jarId: Id.nullish(),
+    debtId: Id.nullish(),
     search: z.string().max(120).nullish(),
 });
 
@@ -62,6 +68,7 @@ export const CreateTransaction = z.object({
     accountId: Id.nullish(),
     jarId: Id.nullish(),
     categoryId: Id.nullish(),
+    debtId: Id.nullish(),
     amount: Money,
     bookedOn: IsoDate,
     description: z.string().min(1).max(280),
@@ -77,6 +84,8 @@ export const SortTransaction = z.object({
     transactionId: Id,
     jarId: Id,
     categoryId: Id.nullish(),
+    /** Link this outflow as a debt payment (reduces balance on first link). */
+    debtId: Id.nullish(),
     createRule: z.boolean().default(false),
 });
 

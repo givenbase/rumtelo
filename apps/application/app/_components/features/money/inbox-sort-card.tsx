@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 
-import type { Jar, Transaction } from '@rumtelo/contracts';
+import type { Debt, Jar, Transaction } from '@rumtelo/contracts';
 import { JarKey } from '@rumtelo/contracts';
 import { Button, VendorMark } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
@@ -16,6 +16,7 @@ import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
 import { formatBookedDate } from '@/components/features/money/jar-badge';
 
 type InboxJarOption = Pick<Jar, 'id' | 'key' | 'name' | 'subtitle'>;
+type InboxDebtOption = Pick<Debt, 'id' | 'name'>;
 
 function suggestJarKey(amount: number): JarKey {
     if (amount > 0) return JarKey.NECESSITIES;
@@ -36,6 +37,7 @@ function resolveInitialJarId(
 export function InboxSortCard({
     transaction,
     jars,
+    debts = [],
     suggestedJarId,
     logoDomain,
     onConfirm,
@@ -43,15 +45,23 @@ export function InboxSortCard({
 }: {
     transaction: Transaction;
     jars: readonly InboxJarOption[];
+    /** Open debts — optional “apply as payment” for outflows. */
+    debts?: readonly InboxDebtOption[];
     suggestedJarId?: string;
     /** From merchant catalog match when known. */
     logoDomain?: string | null;
-    onConfirm?: (transactionId: string, jarId: string, createRule?: boolean) => Promise<void>;
+    onConfirm?: (
+        transactionId: string,
+        jarId: string,
+        createRule?: boolean,
+        debtId?: string | null
+    ) => Promise<void>;
     onChange?: (transaction: Transaction, jarId: string) => void;
 }) {
     const { formatMoney } = useHouseholdCurrency();
     const { byKey: catalogByKey } = useJarCatalog();
     const [pickedJarId, setPickedJarId] = useState<string | null>(null);
+    const [debtId, setDebtId] = useState<string | null>(null);
     const [picking, setPicking] = useState(false);
     const [done, setDone] = useState(false);
     const [pending, setPending] = useState<'sort' | 'rule' | null>(null);
@@ -70,6 +80,7 @@ export function InboxSortCard({
         Boolean(suggestedJarId) ||
         suggestJarKey(transaction.amount) === 'NECESSITIES' ||
         Math.abs(transaction.amount) < 2_000;
+    const canApplyDebt = transaction.amount < 0 && debts.length > 0;
 
     if (done) return null;
 
@@ -81,7 +92,7 @@ export function InboxSortCard({
         }
         setPending(createRule ? 'rule' : 'sort');
         try {
-            await onConfirm(transaction.id, jarId, createRule);
+            await onConfirm(transaction.id, jarId, createRule, canApplyDebt ? debtId : null);
             setDone(true);
         } finally {
             setPending(null);
@@ -177,6 +188,28 @@ export function InboxSortCard({
                     </div>
                 ) : null}
             </div>
+
+            {canApplyDebt ? (
+                <div className="grid gap-2">
+                    <label
+                        htmlFor="inbox-apply-debt"
+                        className="font-mono text-[10px] tracking-widest text-fg-muted uppercase">
+                        Apply to debt
+                    </label>
+                    <select
+                        id="inbox-apply-debt"
+                        value={debtId ?? ''}
+                        onChange={event => setDebtId(event.target.value || null)}
+                        className="h-10 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg outline-none focus:border-accent">
+                        <option value="">Don’t link</option>
+                        {debts.map(debt => (
+                            <option key={debt.id} value={debt.id}>
+                                {debt.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            ) : null}
 
             <div className="flex flex-wrap gap-2">
                 <Button

@@ -1,5 +1,5 @@
 import { Entity, Enum, Property } from '@mikro-orm/core';
-import { DebtKind } from '@rumtelo/contracts';
+import { Cadence, DebtKind, DebtScheduleKind } from '@rumtelo/contracts';
 
 import { HouseholdEntity } from '../../../../../../common/database/household.entity';
 import { NativeEnum } from '../../../../../../common/database/native-enum.util';
@@ -35,10 +35,31 @@ export class Debt extends HouseholdEntity {
     @Property({ nullable: true })
     dueDay: number | null = null;
 
+    @Property({ nullable: true })
+    termPayments: number | null = null;
+
     @Property({ type: 'date', nullable: true })
     closedOn: string | null = null;
+
+    @Property({ type: 'date', nullable: true })
+    maturityOn: string | null = null;
+
+    @Property({ type: 'date', nullable: true })
+    startedOn: string | null = null;
 
     // ? ENUMS
     @Enum(NativeEnum({ DebtKind, domain: 'money', defaultValue: DebtKind.LOAN }))
     kind: DebtKind = DebtKind.LOAN;
+
+    @Enum(
+        NativeEnum({
+            DebtScheduleKind,
+            domain: 'money',
+            defaultValue: DebtScheduleKind.OPEN,
+        })
+    )
+    scheduleKind: DebtScheduleKind = DebtScheduleKind.OPEN;
+
+    @Enum(NativeEnum({ Cadence, domain: 'money', defaultValue: Cadence.MONTHLY }))
+    paymentCadence: Cadence = Cadence.MONTHLY;
 }

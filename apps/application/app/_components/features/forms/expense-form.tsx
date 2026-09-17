@@ -269,6 +269,13 @@ export function ExpenseForm({
         live
     );
 
+    const debtsQuery = useLiveQuery(
+        apiQuery.money.debts.list.queryOptions({ input: { householdId: householdId! } }),
+        [],
+        live && !isIn
+    );
+    const openDebts = useMemo(() => debtsQuery.data ?? [], [debtsQuery.data]);
+
     const merchantsQuery = useLiveQuery(
         apiQuery.money.catalogs.merchantPresets.list.queryOptions({
             input: { householdId: householdId! },
@@ -338,6 +345,7 @@ export function ExpenseForm({
 
     const [givePayeeMode, setGivePayeeMode] = useState<GivePayeeMode>('known');
     const [giveOrgKey, setGiveOrgKey] = useState<string | null>(null);
+    const [debtId, setDebtId] = useState<string | null>(null);
 
     const donationsCategory = useMemo(() => defaultGiveCategoryTemplate(categories), [categories]);
 
@@ -461,6 +469,7 @@ export function ExpenseForm({
                     jarId: values.jarId,
                     categoryId,
                     createRule: false,
+                    debtId: isIn ? null : debtId,
                 });
             }
 
@@ -475,6 +484,7 @@ export function ExpenseForm({
                 counterparty: vendor || null,
                 note: note || null,
                 inflowKey: isIn ? inflowKey : null,
+                debtId: isIn ? null : debtId,
             });
         },
         onSuccess: () => {
@@ -486,6 +496,7 @@ export function ExpenseForm({
             });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.key() });
             showToast(
                 mode === 'edit' ? 'Transaction updated' : isIn ? 'In saved' : 'Out saved',
                 'success'
@@ -793,6 +804,26 @@ export function ExpenseForm({
                     </FormItem>
                 )}
             />
+
+            {!isIn && openDebts.length > 0 ? (
+                <div className="grid gap-1.5">
+                    <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
+                        Apply to debt
+                    </p>
+                    <select
+                        value={debtId ?? ''}
+                        disabled={busy}
+                        onChange={event => setDebtId(event.target.value || null)}
+                        className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none">
+                        <option value="">Don’t link</option>
+                        {openDebts.map(debt => (
+                            <option key={debt.id} value={debt.id}>
+                                {debt.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            ) : null}
 
             {isIn ? (
                 lockJar && selectedJar ? (
