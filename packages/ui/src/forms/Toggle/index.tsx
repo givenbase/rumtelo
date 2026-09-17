@@ -1,5 +1,7 @@
 'use client';
 
+import { Typography } from '../../display/Typography';
+
 import type ToggleProps from './types';
 
 import { toggleThumbClass, toggleTrackClass } from './styles';
@@ -9,7 +11,11 @@ export function Toggle({ checked, label, hint, onCheckedChange, disabled }: Togg
         <div className="flex items-start justify-between gap-4 py-3">
             <div className="min-w-0">
                 <p className="text-sm font-medium text-fg">{label}</p>
-                {hint ? <p className="mt-0.5 text-xs text-fg-muted">{hint}</p> : null}
+                {hint ? (
+                    <Typography as="p" variant="caption" className="mt-0.5">
+                        {hint}
+                    </Typography>
+                ) : null}
             </div>
             <button
                 type="button"

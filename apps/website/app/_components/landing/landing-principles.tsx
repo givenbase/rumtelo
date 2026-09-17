@@ -15,10 +15,7 @@ export function LandingPrinciples() {
                         <Eyebrow className="text-accent-hover">
                             {PRINCIPLES_SECTION.eyebrow}
                         </Eyebrow>
-                        <Typography
-                            as="h2"
-                            size="lg"
-                            className="mt-3.5 max-w-xl leading-[1.08]">
+                        <Typography as="h2" size="lg" className="mt-3.5 max-w-xl leading-[1.08]">
                             {PRINCIPLES_SECTION.headline}
                         </Typography>
                     </div>
@@ -40,9 +37,13 @@ export function LandingPrinciples() {
                                     0{index + 1}
                                 </span>
                             </span>
-                            <span className="font-display text-xl leading-snug font-semibold tracking-tight text-balance">
+                            <Typography
+                                as="h3"
+                                size="lg"
+                                color="white"
+                                className="leading-snug text-balance">
                                 {principle.nl}
-                            </span>
+                            </Typography>
                             <span className="font-mono text-xs font-medium tracking-wide text-accent-hover uppercase">
                                 {principle.en}
                             </span>

@@ -3,6 +3,7 @@
 import { apiQuery } from '@/app/_lib/api-hooks';
 
 import { useLiveQuery } from '@rumtelo/hooks';
+import { Typography } from '@rumtelo/ui';
 
 import type { Transaction } from '@rumtelo/contracts';
 
@@ -77,7 +78,11 @@ export function ExpenseUpdatePage({ id, embedded = false }: { id: string; embedd
     const transactionInPresets = transactionInQuery.data ?? [];
 
     if (live && (listQuery.isLoading || inboxQuery.isLoading) && !tx) {
-        return <p className="text-sm text-fg-muted">Loading…</p>;
+        return (
+            <Typography as="p" size="sm" color="muted">
+                Loading…
+            </Typography>
+        );
     }
     if (!tx) {
         return <p className="text-sm text-fg-muted">Transaction not found.</p>;

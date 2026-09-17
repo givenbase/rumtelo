@@ -39,10 +39,12 @@ export function LandingWhy() {
                         </p>
 
                         <div className="mt-8 flex flex-col gap-2 border-t border-line pt-6 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-6">
-                            <span className="font-display text-xl font-semibold tracking-tight text-fg">
+                            <Typography as="h3" size="lg">
                                 {WHY.manifesto}
-                            </span>
-                            <span className="text-sm text-fg-muted">{WHY.audience}</span>
+                            </Typography>
+                            <Typography as="span" size="sm" color="muted">
+                                {WHY.audience}
+                            </Typography>
                         </div>
                     </div>
 
@@ -51,9 +53,13 @@ export function LandingWhy() {
                         <Typography as="span" variant="eyebrow" color="primary">
                             ✦ {WHY.booksEyebrow}
                         </Typography>
-                        <p className="mt-3 max-w-prose text-sm leading-relaxed text-pretty text-fg-muted">
+                        <Typography
+                            as="p"
+                            size="sm"
+                            color="muted"
+                            className="mt-3 max-w-prose text-pretty">
                             {WHY.booksLead}
-                        </p>
+                        </Typography>
                         <ul className="mt-4 hidden gap-2.5 lg:grid">
                             {WHY.books.map(book => (
                                 <BookCard key={book.title} book={book} />
@@ -68,11 +74,19 @@ export function LandingWhy() {
                             </ul>
                             {moreBooks.length > 0 ? (
                                 <details className="group mt-2.5">
-                                    <summary className="cursor-pointer list-none py-2 font-mono text-xs font-semibold tracking-widest text-accent uppercase [&::-webkit-details-marker]:hidden">
-                                        <span className="group-open:hidden">
-                                            + {moreBooks.length} more books
-                                        </span>
-                                        <span className="hidden group-open:inline">Show fewer</span>
+                                    <summary className="cursor-pointer list-none py-2 [&::-webkit-details-marker]:hidden">
+                                        <Typography
+                                            as="span"
+                                            variant="eyebrow"
+                                            color="primary"
+                                            weight="semibold">
+                                            <span className="group-open:hidden">
+                                                + {moreBooks.length} more books
+                                            </span>
+                                            <span className="hidden group-open:inline">
+                                                Show fewer
+                                            </span>
+                                        </Typography>
                                     </summary>
                                     <ul className="grid gap-2.5">
                                         {moreBooks.map(book => (
@@ -97,12 +111,12 @@ function BookCard({ book }: { book: (typeof WHY.books)[number] }) {
     return (
         <li className={`${CARD} grid gap-1 border-l-4 border-l-accent/50 p-4`}>
             <span className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                <span className="font-display text-base font-semibold tracking-tight text-fg">
-                    {book.title}
-                </span>
+                <Typography as="h4">{book.title}</Typography>
                 <span className="font-mono text-xs text-fg-faint">{book.author}</span>
             </span>
-            <span className="text-xs leading-relaxed text-fg-muted">{book.line}</span>
+            <Typography as="span" variant="caption" color="muted">
+                {book.line}
+            </Typography>
         </li>
     );
 }

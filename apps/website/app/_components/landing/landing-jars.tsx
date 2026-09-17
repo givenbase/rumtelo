@@ -1,3 +1,5 @@
+import { Typography } from '@rumtelo/ui';
+
 import { JARS, JARS_SECTION } from '@/lib/landing-content';
 
 import { LandingIcon } from './landing-icon';
@@ -51,16 +53,16 @@ export function LandingJars() {
                                 <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-line bg-raised">
                                     <LandingIcon name={jar.icon} size={20} color={jar.colorVar} />
                                 </span>
-                                <span className="font-display text-xl font-semibold tracking-tight text-fg">
+                                <Typography as="h3" size="lg">
                                     {jar.name}
-                                </span>
+                                </Typography>
                                 <span className="ml-auto font-mono text-xs font-semibold text-accent">
                                     {jar.pct}%
                                 </span>
                             </span>
-                            <span className="text-sm leading-relaxed text-pretty text-fg-muted">
+                            <Typography as="span" size="sm" color="muted" className="text-pretty">
                                 {jar.line}
-                            </span>
+                            </Typography>
                             <span className="border-t border-line pt-2.5 font-mono text-xs leading-relaxed font-medium tracking-normal text-fg-faint">
                                 {jar.not}
                             </span>

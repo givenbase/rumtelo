@@ -8,7 +8,7 @@ import type {
     MerchantHighlight,
     MerchantPreset,
 } from '@rumtelo/contracts';
-import { VendorMark } from '@rumtelo/ui';
+import { Typography, VendorMark } from '@rumtelo/ui';
 
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
@@ -715,9 +715,9 @@ export function ExpenseIntentField({
             ) : null}
 
             {value.source === 'custom' && value.vendor && !value.categoryKey ? (
-                <p className="text-sm text-fg-muted">
+                <Typography as="p" size="sm" color="muted">
                     Pick a jar below — or change and choose a type so we can categorize it.
-                </p>
+                </Typography>
             ) : null}
         </div>
     );

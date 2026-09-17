@@ -21,6 +21,7 @@ import {
     FormLabel,
     FormMessage,
     VendorMark,
+    Typography,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -153,7 +154,11 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
     });
 
     if (live && detailQuery.isLoading && !detail) {
-        return <p className="text-sm text-fg-muted">Loading…</p>;
+        return (
+            <Typography as="p" size="sm" color="muted">
+                Loading…
+            </Typography>
+        );
     }
     if (!debt || !detail) {
         return (

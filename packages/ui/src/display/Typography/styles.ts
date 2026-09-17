@@ -42,7 +42,7 @@ const typographyVariants = cva('', {
             default: '',
             lead: 'text-pretty',
             caption: '',
-            eyebrow: 'font-mono uppercase tracking-widest',
+            eyebrow: 'font-mono tracking-widest uppercase',
         },
     },
     compoundVariants: [

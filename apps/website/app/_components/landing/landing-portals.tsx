@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
 
-import { Typography, typographyVariants } from '@rumtelo/ui';
+import { Typography } from '@rumtelo/ui';
 
 import { PORTALS, PORTALS_SECTION } from '@/lib/landing-content';
 import { webSignUpPath } from '@/lib/portal-urls';
@@ -155,26 +155,27 @@ export function LandingPortals() {
                                 style={{ borderColor: portal.colorVar }}>
                                 <LandingIcon name={portal.icon} size={21} color={portal.colorVar} />
                             </span>
-                            <span className="font-mono text-xs font-medium tracking-widest text-fg-faint uppercase">
+                            <Typography
+                                as="span"
+                                variant="eyebrow"
+                                color="muted"
+                                className="text-fg-faint">
                                 {portal.dutch} · {index + 1} / {PORTALS.length}
-                            </span>
+                            </Typography>
                         </span>
 
                         <span className="grid gap-1.5">
-                            <Typography
-                                as="span"
-                                className={typographyVariants({
-                                    as: 'h2',
-                                    size: 'lg',
-                                    weight: 'semibold',
-                                })}>
+                            <Typography as="h2" size="lg" weight="semibold">
                                 {portal.name}
                             </Typography>
-                            <span
-                                className="font-display text-xl leading-snug font-medium text-balance"
+                            <Typography
+                                as="h3"
+                                size="lg"
+                                weight="medium"
+                                className="leading-snug text-balance"
                                 style={{ color: portal.colorVar }}>
                                 {portal.hook}
-                            </span>
+                            </Typography>
                         </span>
 
                         <span className="font-mono text-xs font-medium tracking-wide text-fg-muted">

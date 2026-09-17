@@ -62,7 +62,9 @@ export function ForgotPasswordForm() {
                 <Typography as="h1" className="text-2xl lg:text-2xl">
                     {AUTH_FORGOT_PASSWORD.title}
                 </Typography>
-                <p className="mt-1 text-sm text-fg-muted">{AUTH_FORGOT_PASSWORD.subtitle}</p>
+                <Typography as="p" size="sm" color="muted" className="mt-1">
+                    {AUTH_FORGOT_PASSWORD.subtitle}
+                </Typography>
             </div>
 
             {sent ? (
@@ -100,7 +102,7 @@ export function ForgotPasswordForm() {
                 </Form>
             )}
 
-            <p className="text-center text-sm text-fg-muted">
+            <Typography as="p" size="sm" color="muted" className="text-center">
                 <a href={appSignInUrl()} className="font-semibold text-accent hover:underline">
                     {AUTH_FORGOT_PASSWORD.back_to_sign_in}
                 </a>
@@ -108,7 +110,7 @@ export function ForgotPasswordForm() {
                 <Link href="/sign-up" className="font-semibold text-accent hover:underline">
                     {AUTH_FORGOT_PASSWORD.back_to_sign_up}
                 </Link>
-            </p>
+            </Typography>
         </div>
     );
 }

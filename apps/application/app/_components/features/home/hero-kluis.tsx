@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import Link from 'next/link';
 
-import { Eyebrow, HeroNumber } from '@rumtelo/ui';
+import { Eyebrow, HeroNumber, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 interface KluisStat {
@@ -48,12 +48,16 @@ export function HeroKluis({
                     <HeroNumber className="mt-2.5 text-4xl leading-none transition-colors group-hover:text-accent sm:text-5xl lg:text-6xl">
                         {total}
                     </HeroNumber>
-                    <p className="mt-2 text-sm text-fg-muted group-hover:text-fg-secondary">
+                    <Typography
+                        as="p"
+                        size="sm"
+                        color="muted"
+                        className="mt-2 group-hover:text-fg-secondary">
                         {incomeBreakdown}
                         <span className="ml-1.5 font-mono text-xs tracking-wide text-fg-faint uppercase group-hover:text-accent">
                             See income ▸
                         </span>
-                    </p>
+                    </Typography>
                 </Link>
 
                 {/* Anchor stats */}

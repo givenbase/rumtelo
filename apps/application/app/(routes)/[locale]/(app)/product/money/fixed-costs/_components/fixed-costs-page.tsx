@@ -498,9 +498,9 @@ export function FixedCostsPageClient() {
                         </div>
 
                         <div className="border-t border-line px-5 py-4">
-                            <p className="mb-3 font-mono text-xs tracking-widest text-fg-muted uppercase">
+                            <Typography as="p" variant="eyebrow" color="muted" className="mb-3">
                                 How this is split
-                            </p>
+                            </Typography>
                             <div className="flex flex-wrap gap-2">
                                 {splitJars.map(j => (
                                     <span

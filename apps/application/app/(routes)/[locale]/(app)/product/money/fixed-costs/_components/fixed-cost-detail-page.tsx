@@ -90,7 +90,11 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
     const periodTxs = periodTxQuery.data?.items ?? [];
 
     if (live && listQuery.isLoading && !item) {
-        return <p className="text-sm text-fg-muted">Loading…</p>;
+        return (
+            <Typography as="p" size="sm" color="muted">
+                Loading…
+            </Typography>
+        );
     }
     if (!item) {
         return (
@@ -100,7 +104,9 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                     className="w-fit font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
                     ← Fixed costs
                 </Link>
-                <p className="text-sm text-fg-muted">Fixed cost not found.</p>
+                <Typography as="p" size="sm" color="muted">
+                    Fixed cost not found.
+                </Typography>
             </div>
         );
     }
@@ -291,9 +297,9 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                             onClick={() => router.push(txDetailHref(match.id))}
                         />
                     ) : (
-                        <p className="px-5 py-4 text-sm text-fg-muted">
+                        <Typography as="p" size="sm" color="muted" className="px-5 py-4">
                             No matching payment logged in this period yet.
-                        </p>
+                        </Typography>
                     )}
                 </Card>
             </section>

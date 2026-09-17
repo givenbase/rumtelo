@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import { RumteloLogo } from '@rumtelo/brand';
+import { Typography } from '@rumtelo/ui';
 import { BRAND_TAGLINE } from '@rumtelo/i18n';
 
 import { AccountThemeToggle } from '@/app/_components/account-theme-sync';
@@ -22,7 +23,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                 <div className="w-full max-w-md">
                     <Link href="/" className="mb-10 inline-grid gap-1.5">
                         <RumteloLogo variant="wordmark" className="h-8 w-auto max-w-[11rem]" />
-                        <span className="text-xs text-fg-muted">{BRAND_TAGLINE}</span>
+                        <Typography as="span" variant="caption" color="muted">
+                            {BRAND_TAGLINE}
+                        </Typography>
                     </Link>
                     {children}
                 </div>

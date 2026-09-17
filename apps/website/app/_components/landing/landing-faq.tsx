@@ -1,3 +1,5 @@
+import { Typography } from '@rumtelo/ui';
+
 import { FAQ, FAQ_SECTION } from '@/lib/landing-content';
 
 import { CARD, SectionHeading } from './landing-primitives';
@@ -21,18 +23,22 @@ export function LandingFaq() {
                                 open={index === 0}
                                 className={`${CARD} group open:border-accent/35`}>
                                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 [&::-webkit-details-marker]:hidden">
-                                    <span className="font-display text-base font-semibold tracking-tight text-fg lg:text-lg">
+                                    <Typography as="h4" size="lg">
                                         {item.question}
-                                    </span>
+                                    </Typography>
                                     <span
                                         className="grid size-7 shrink-0 place-items-center rounded-full border border-line font-mono text-sm text-fg-muted transition-transform group-open:rotate-45 group-open:border-accent group-open:text-accent"
                                         aria-hidden>
                                         +
                                     </span>
                                 </summary>
-                                <p className="border-t border-line px-5 py-4 text-sm leading-relaxed text-pretty text-fg-muted">
+                                <Typography
+                                    as="p"
+                                    size="sm"
+                                    color="muted"
+                                    className="border-t border-line px-5 py-4 text-pretty">
                                     {item.answer}
-                                </p>
+                                </Typography>
                             </details>
                         ))}
                     </div>

@@ -142,7 +142,12 @@ export function StatusPage({
 
                 <p
                     className={cn(
-                        typographyVariants({ as: 'h1', size: 'sm', weight: 'semibold', color: 'inherit' }),
+                        typographyVariants({
+                            as: 'h1',
+                            size: 'sm',
+                            weight: 'semibold',
+                            color: 'inherit',
+                        }),
                         'mb-3'
                     )}
                     style={{ color: `var(--color-fg, ${FALLBACK.fg})` }}>
@@ -151,7 +156,12 @@ export function StatusPage({
 
                 <h1
                     className={cn(
-                        typographyVariants({ as: 'h1', size: 'sm', weight: 'semibold', color: 'default' }),
+                        typographyVariants({
+                            as: 'h1',
+                            size: 'sm',
+                            weight: 'semibold',
+                            color: 'default',
+                        }),
                         'text-[clamp(1.5rem,4vw,1.875rem)] leading-tight lg:text-[clamp(1.5rem,4vw,1.875rem)]'
                     )}>
                     {title ?? copy.title}

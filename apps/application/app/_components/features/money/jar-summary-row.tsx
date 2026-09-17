@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import type { JarBalance } from '@rumtelo/contracts';
+import { Typography } from '@rumtelo/ui';
 import { cn, jarCoverage } from '@rumtelo/utils';
 
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
@@ -63,9 +64,9 @@ export function JarSummaryRow({ jar }: { jar: JarSummaryModel }) {
                 </span>
                 <span className="grid min-w-0 flex-1 gap-0.5">
                     <span className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                        <span className="truncate font-display text-base font-semibold text-fg">
+                        <Typography as="h4" weight="semibold" className="truncate">
                             {jar.name}
-                        </span>
+                        </Typography>
                         <span className="font-mono text-xs text-fg-faint">{jar.percentage}%</span>
                     </span>
                     <span className="truncate font-mono text-xs tracking-wide text-fg-faint uppercase">

@@ -28,10 +28,14 @@ export default function LearnPage() {
             <div
                 className="flex flex-wrap items-center gap-4 rounded-2xl border border-accent/40 bg-accent-soft px-5 py-4"
                 style={{ boxShadow: 'var(--shadow-glow)' }}>
-                <p className="min-w-0 flex-1 basis-72 text-sm leading-relaxed text-pretty text-fg-secondary">
+                <Typography
+                    as="p"
+                    size="sm"
+                    color="secondary"
+                    className="min-w-0 flex-1 basis-72 text-pretty">
                     Your Education jar is where knowledge spending lives — books, courses, and tools
                     that raise your earning power pay themselves back into Financial Freedom.
-                </p>
+                </Typography>
                 <Link
                     href="/product/money/jars"
                     className="flex-none rounded-full border border-line-strong px-4 py-2.5 font-mono text-xs tracking-wide whitespace-nowrap text-fg-secondary uppercase transition-colors hover:border-accent-hover hover:text-accent">
@@ -47,9 +51,9 @@ export default function LearnPage() {
                         className={`grid gap-1.5 rounded-2xl border ${book.edge} bg-surface p-5 shadow-md`}>
                         <div className="flex flex-wrap items-baseline justify-between gap-3">
                             <span className="flex min-w-0 flex-wrap items-baseline gap-2.5">
-                                <span className="font-display text-xl font-semibold tracking-tight text-fg">
+                                <Typography as="h3" size="lg">
                                     {book.title}
-                                </span>
+                                </Typography>
                                 <span className="font-mono text-xs text-fg-muted">
                                     {book.author}
                                 </span>
@@ -59,9 +63,9 @@ export default function LearnPage() {
                                 {book.tag}
                             </span>
                         </div>
-                        <p className="text-sm leading-relaxed text-pretty text-fg-muted">
+                        <Typography as="p" size="sm" color="muted" className="text-pretty">
                             ◇ {book.use}
-                        </p>
+                        </Typography>
                     </div>
                 ))}
             </div>

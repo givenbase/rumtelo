@@ -432,9 +432,9 @@ export function IncomeSimulator({
                         <div className="flex flex-wrap items-start gap-4 rounded-xl border border-line bg-raised p-4 lg:gap-8 lg:p-5">
                             <div className="grid min-w-0 flex-1 gap-2.5">
                                 <span className="flex flex-wrap items-baseline gap-2.5">
-                                    <span className="font-display text-xl font-semibold tracking-tight text-fg">
+                                    <Typography as="h3" size="lg" className="text-xl">
                                         {goal.name}
-                                    </span>
+                                    </Typography>
                                     <span className="font-mono text-xs font-medium tracking-wide text-accent uppercase">
                                         {jarName}
                                     </span>

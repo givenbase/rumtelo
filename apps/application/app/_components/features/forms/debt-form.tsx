@@ -14,6 +14,7 @@ import {
     FormLabel,
     FormMessage,
     Button,
+    Typography,
     VendorMark,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
@@ -681,9 +682,9 @@ export function DebtForm({
                                 <span className="block text-sm font-medium text-fg">
                                     {option.label}
                                 </span>
-                                <span className="mt-0.5 block text-xs text-fg-muted">
+                                <Typography as="span" variant="caption" className="mt-0.5 block">
                                     {option.hint}
-                                </span>
+                                </Typography>
                             </button>
                         );
                     })}
@@ -740,9 +741,9 @@ export function DebtForm({
                                 <span className="block text-sm font-medium text-fg">
                                     Also add as Necessities fixed cost
                                 </span>
-                                <span className="mt-0.5 block text-xs text-fg-muted">
+                                <Typography as="span" variant="caption" className="mt-0.5 block">
                                     Keeps the planned payment in your jar budget at this cadence.
-                                </span>
+                                </Typography>
                             </label>
                         </div>
                     </FormItem>

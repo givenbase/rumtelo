@@ -92,13 +92,9 @@ export default function ChakraPage() {
                                 className="size-2.5 shrink-0 rounded-full"
                                 style={{ background: centre.color }}
                             />
-                            <span
-                                className={cn(
-                                    'min-w-0 flex-1 font-display text-lg font-semibold',
-                                    active ? 'text-fg' : 'text-fg'
-                                )}>
+                            <Typography as="h3" className="min-w-0 flex-1">
                                 {centre.name}
-                            </span>
+                            </Typography>
                             <span className="shrink-0 font-mono text-xs text-fg-faint">
                                 {centre.gov}
                             </span>
@@ -112,14 +108,20 @@ export default function ChakraPage() {
                 <div
                     className="grid animate-rise gap-3 rounded-2xl border border-l-4 border-accent/30 bg-surface p-6 shadow-glow"
                     style={{ borderLeftColor: pick.color }}>
-                    <p
-                        className="font-mono text-xs font-semibold tracking-widest uppercase"
+                    <Typography
+                        as="p"
+                        variant="eyebrow"
+                        weight="semibold"
+                        className="uppercase"
                         style={{ color: pick.color }}>
                         {pick.name}
-                    </p>
-                    <p className="max-w-prose font-display text-lg leading-snug font-medium text-fg lg:text-xl">
+                    </Typography>
+                    <Typography
+                        as="h3"
+                        weight="medium"
+                        className="max-w-prose leading-snug lg:text-xl">
                         {pick.ask}
-                    </p>
+                    </Typography>
                     <Button
                         as={Link}
                         href="/product/soul/intent"

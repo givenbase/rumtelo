@@ -7,7 +7,7 @@ import { useRef, useState } from 'react';
 
 import type { Gratitude } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Button, Eyebrow, Input, Section } from '@rumtelo/ui';
+import { Button, Eyebrow, Input, Section, Typography } from '@rumtelo/ui';
 import { currentWeekKey } from '@rumtelo/utils';
 
 import { isLiveData } from '@/app/_lib/preview';
@@ -71,9 +71,9 @@ export function GratitudePageClient() {
     return (
         <PageContent width="narrow" className="grid animate-rise gap-6">
             <Section eyebrow="Gratitude" title="One thing per day.">
-                <p className="text-base text-fg-muted">
+                <Typography as="p" color="muted">
                     Not because it changes your balance, but because it changes how you see it.
-                </p>
+                </Typography>
             </Section>
 
             {/* ── Add row ── */}
@@ -99,9 +99,9 @@ export function GratitudePageClient() {
 
             {/* ── Entries list ── */}
             {empty ? (
-                <p className="text-sm text-fg-muted">
+                <Typography as="p" size="sm" color="muted">
                     Nothing written yet. The week check will ask you here.
-                </p>
+                </Typography>
             ) : (
                 <div className="grid gap-2.5">
                     {entries.map(entry => (
@@ -128,10 +128,10 @@ export function GratitudePageClient() {
 
             <div className="border-t border-line pt-3">
                 <Eyebrow>This week</Eyebrow>
-                <p className="mt-2 text-sm leading-relaxed text-fg-muted">
+                <Typography as="p" size="sm" color="muted" className="mt-2">
                     One line per week during the week check. No more than that — it is a check-in,
                     not a journal.
-                </p>
+                </Typography>
             </div>
         </PageContent>
     );

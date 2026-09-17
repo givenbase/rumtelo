@@ -78,9 +78,13 @@ export function PortalHub({ tint, icon, eyebrow, title, line, coach, cards }: Po
                             · {coach.kind}
                         </span>
                     </span>
-                    <span className="font-display text-base leading-snug font-medium text-pretty text-fg lg:text-lg">
+                    <Typography
+                        as="p"
+                        weight="medium"
+                        size="default"
+                        className="leading-snug text-pretty lg:text-lg">
                         {coach.text}
-                    </span>
+                    </Typography>
                 </div>
                 <Button as={Link} href={coach.href} size="sm">
                     {coachLocked ? `🔒 ${coach.cta}` : coach.cta}
@@ -102,9 +106,14 @@ export function PortalHub({ tint, icon, eyebrow, title, line, coach, cards }: Po
                             )}
                             style={{ borderTopColor: card.color }}>
                             <span className="flex items-center justify-between gap-2">
-                                <span className="font-mono text-xs font-semibold tracking-widest text-fg-faint uppercase">
+                                <Typography
+                                    as="span"
+                                    variant="eyebrow"
+                                    weight="semibold"
+                                    color="muted"
+                                    className="text-fg-faint">
                                     {card.name}
-                                </span>
+                                </Typography>
                                 {locked && <span className="text-xs text-fg-faint">🔒</span>}
                             </span>
                             <span className="flex min-h-13 items-end justify-between gap-3">
@@ -147,9 +156,13 @@ export function PortalHub({ tint, icon, eyebrow, title, line, coach, cards }: Po
                                     />
                                 )}
                             </span>
-                            <span className="text-sm leading-relaxed text-pretty text-fg-muted">
+                            <Typography
+                                as="p"
+                                size="sm"
+                                color="muted"
+                                className="leading-relaxed text-pretty">
                                 {card.note}
-                            </span>
+                            </Typography>
                             {card.delta && (
                                 <span className="flex items-center gap-1.5 border-t border-line pt-2.5">
                                     <span

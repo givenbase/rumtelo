@@ -170,9 +170,9 @@ export function GoalsPageClient() {
                                           : 'Long term ›'}
                                 </div>
 
-                                <h3 className="font-display text-2xl leading-tight font-semibold tracking-tight text-fg">
+                                <Typography as="h3" className="text-2xl leading-tight">
                                     {goal.name}
-                                </h3>
+                                </Typography>
 
                                 <div className="mt-3 flex items-baseline gap-2">
                                     <span className="font-mono text-2xl text-accent">
@@ -186,7 +186,7 @@ export function GoalsPageClient() {
 
                                 <Meter value={progress} className="mt-3.5" />
 
-                                <p className="mt-3 text-sm text-fg-muted">
+                                <Typography as="p" size="sm" color="muted" className="mt-3">
                                     {isEarn
                                         ? tab === 'REACHED' && goal.fulfilledOn
                                             ? `◇ Reached ${goal.fulfilledOn}`
@@ -198,7 +198,7 @@ export function GoalsPageClient() {
                                               ? `◇ Pledge met${goal.fulfilledOn ? ` · ${goal.fulfilledOn}` : ''}`
                                               : `◇ ${formatMoney(goal.saved)} given · ${formatMoney(Math.max(0, goal.target - goal.saved))} to go${goal.targetOn ? ` by ${goal.targetOn.slice(0, 4)}` : ''}`
                                           : `◇ ${formatMoney(goal.monthlyContribution)} p/m · done by ${eta(goal.saved, goal.target, goal.monthlyContribution)}`}
-                                </p>
+                                </Typography>
 
                                 <button
                                     type="button"

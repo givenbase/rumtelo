@@ -11,6 +11,7 @@ import type {
     Transaction,
 } from '@rumtelo/contracts';
 import { FlowDirection, jarCapabilitiesFor } from '@rumtelo/contracts';
+import { Typography } from '@rumtelo/ui';
 
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { JarCategoryBreakdown } from '@/components/features/money/jar-category-breakdown';
@@ -92,9 +93,13 @@ export function JarDrilldownTable({
                                         allowFixedCosts={allowFixed}
                                     />
                                 ) : (
-                                    <p className="px-5 py-3 text-sm text-fg-muted">
+                                    <Typography
+                                        as="p"
+                                        size="sm"
+                                        color="muted"
+                                        className="px-5 py-3">
                                         Open the jar for category detail.
-                                    </p>
+                                    </Typography>
                                 )}
                                 {href ? (
                                     <div className="border-t border-line px-5 py-2.5">

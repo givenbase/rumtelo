@@ -59,10 +59,7 @@ export function SectionHeading({
                 {headline}
             </Typography>
             {lead ? (
-                <Typography
-                    as="p"
-                    variant="lead"
-                    className={cn(centered && 'mx-auto')}>
+                <Typography as="p" variant="lead" className={cn(centered && 'mx-auto')}>
                     {lead}
                 </Typography>
             ) : null}

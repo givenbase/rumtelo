@@ -22,12 +22,12 @@ export function TourOfferDialog({ onAccept, onDismiss }: TourOfferDialogProps) {
                 <Typography as="p" variant="eyebrow" color="primary">
                     {offer.eyebrow}
                 </Typography>
-                <h2
-                    id="tour-offer-title"
-                    className="mt-2 font-display text-xl font-semibold tracking-tight text-fg">
+                <Typography as="h3" size="lg" id="tour-offer-title" className="mt-2">
                     {offer.title}
-                </h2>
-                <p className="mt-2 text-sm leading-relaxed text-fg-secondary">{offer.body}</p>
+                </Typography>
+                <Typography as="p" size="sm" color="secondary" className="mt-2">
+                    {offer.body}
+                </Typography>
                 <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-end">
                     <Button type="button" variant="ghost" onClick={onDismiss}>
                         {offer.dismiss}

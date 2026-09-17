@@ -62,17 +62,23 @@ export function CoachVerdict({
                     </Typography>
                     <span className="flex items-center gap-2">
                         <span className="size-1.75 rounded-full" style={{ background: meta.dot }} />
-                        <span
-                            className="font-mono text-xs font-medium tracking-wide uppercase"
+                        <Typography
+                            as="span"
+                            variant="eyebrow"
+                            color="inherit"
                             style={{ color: meta.dot }}>
                             {meta.label}
-                        </span>
+                        </Typography>
                     </span>
                 </div>
 
-                <p className="max-w-prose font-display text-xl leading-snug font-medium text-pretty text-fg lg:text-2xl">
+                <Typography
+                    as="h3"
+                    size="lg"
+                    weight="medium"
+                    className="max-w-prose leading-snug text-pretty lg:text-2xl">
                     {msg.text}
-                </p>
+                </Typography>
 
                 <div className="flex flex-wrap items-center gap-3.5">
                     {/* Dot pagination */}
@@ -142,11 +148,14 @@ export function CoachVerdict({
                         href={row.href}
                         className="grid min-w-0 gap-1 border-t-2 border-r border-b border-line px-3 py-2.5 transition-colors last:border-r-0 hover:bg-raised sm:flex-1 sm:border-b-0 sm:px-4"
                         style={{ borderTopColor: row.tint }}>
-                        <span
-                            className="font-mono text-xs font-semibold tracking-widest uppercase"
+                        <Typography
+                            as="span"
+                            variant="eyebrow"
+                            weight="semibold"
+                            color="inherit"
                             style={{ color: row.tint }}>
                             {row.portal}
-                        </span>
+                        </Typography>
                         <span className="flex min-w-0 flex-wrap items-baseline gap-1.5">
                             <span className="font-mono text-xs text-fg">{row.value}</span>
                             <span className="text-xs text-fg-faint">{row.what}</span>
@@ -155,8 +164,10 @@ export function CoachVerdict({
                 ))}
                 <Link
                     href="/product/coach"
-                    className="col-span-2 flex items-center justify-center border-t border-line px-4.5 py-2.5 font-mono text-xs font-medium tracking-wide text-fg-faint uppercase transition-colors hover:text-accent sm:col-span-1 sm:ml-auto sm:border-t-0 sm:border-l">
-                    Detail
+                    className="col-span-2 flex items-center justify-center border-t border-line px-4.5 py-2.5 transition-colors hover:text-accent sm:col-span-1 sm:ml-auto sm:border-t-0 sm:border-l">
+                    <Typography as="span" variant="eyebrow" color="muted" className="text-fg-faint">
+                        Detail
+                    </Typography>
                 </Link>
             </div>
         </div>

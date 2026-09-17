@@ -11,6 +11,7 @@ import type {
     MerchantPreset,
     Transaction,
 } from '@rumtelo/contracts';
+import { Typography } from '@rumtelo/ui';
 import { cn, categoryVariance, monthlyAmount } from '@rumtelo/utils';
 
 import { cadenceLabel } from '@/app/_lib/jar-chrome';
@@ -166,7 +167,11 @@ export function JarCategoryBreakdown({
     }
 
     if (rows.length === 0) {
-        return <p className="px-5 py-4 text-sm text-fg-muted">No categories yet.</p>;
+        return (
+            <Typography as="p" size="sm" color="muted" className="px-5 py-4">
+                No categories yet.
+            </Typography>
+        );
     }
 
     return (
@@ -259,9 +264,13 @@ export function JarCategoryBreakdown({
                         {open ? (
                             <div className="animate-rise border-t border-line bg-raised/40">
                                 {childCount === 0 ? (
-                                    <p className="px-5 py-3 text-sm text-fg-muted">
+                                    <Typography
+                                        as="p"
+                                        size="sm"
+                                        color="muted"
+                                        className="px-5 py-3">
                                         Nothing booked in this category yet.
-                                    </p>
+                                    </Typography>
                                 ) : (
                                     <ul className="grid">
                                         {fixedRows.map(({ item, monthly, match, status }) => {

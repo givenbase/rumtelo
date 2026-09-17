@@ -106,7 +106,9 @@ export function VerifyPanel() {
                 <Typography as="h1" className="text-2xl lg:text-2xl">
                     {confirmed ? AUTH_VERIFY.confirmed_title : AUTH_VERIFY.title}
                 </Typography>
-                <p className="mt-1 text-sm text-fg-muted">{subtitle}</p>
+                <Typography as="p" size="sm" color="muted" className="mt-1">
+                    {subtitle}
+                </Typography>
             </div>
 
             {confirmed ? (
@@ -176,7 +178,7 @@ export function VerifyPanel() {
                 </Form>
             )}
 
-            <p className="text-center text-sm text-fg-muted">
+            <Typography as="p" size="sm" color="muted" className="text-center">
                 <Link
                     href={`/sign-up${
                         Object.keys(continueQuery).length
@@ -192,7 +194,7 @@ export function VerifyPanel() {
                     className="font-semibold text-accent hover:underline">
                     {AUTH_VERIFY.back_to_sign_in}
                 </a>
-            </p>
+            </Typography>
         </div>
     );
 }

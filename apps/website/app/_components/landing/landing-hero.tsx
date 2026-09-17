@@ -230,9 +230,13 @@ export function LandingHero() {
                     <span className="block h-1 bg-(image:--gradient-accent)" />
                     <div className="p-5 lg:p-7">
                         <div className="flex flex-wrap items-baseline justify-between gap-3">
-                            <span className="font-mono text-xs font-medium tracking-widest text-fg-faint uppercase">
+                            <Typography
+                                as="span"
+                                variant="eyebrow"
+                                color="muted"
+                                className="text-fg-faint">
                                 {demoStage}
-                            </span>
+                            </Typography>
                             <span className="font-mono text-xs font-semibold text-accent">
                                 {demoPct}
                             </span>

@@ -125,7 +125,9 @@ export function SignUpForm() {
         <div className="grid gap-6">
             <div>
                 <Typography as="h1">{AUTH_SIGN_UP.title}</Typography>
-                <p className="mt-1 text-sm text-fg-muted">{AUTH_SIGN_UP.subtitle}</p>
+                <Typography as="p" size="sm" color="muted" className="mt-1">
+                    {AUTH_SIGN_UP.subtitle}
+                </Typography>
                 {intent ? (
                     <p className="mt-3 rounded-lg border border-accent/35 bg-accent-soft/40 px-3 py-2 text-sm text-fg-secondary">
                         You chose{' '}
@@ -289,12 +291,12 @@ export function SignUpForm() {
                 </form>
             </Form>
 
-            <p className="text-center text-sm text-fg-muted">
+            <Typography as="p" size="sm" color="muted" className="text-center">
                 Already have an account?{' '}
                 <a href={appSignInUrl()} className="font-semibold text-accent hover:underline">
                     Sign in
                 </a>
-            </p>
+            </Typography>
         </div>
     );
 }

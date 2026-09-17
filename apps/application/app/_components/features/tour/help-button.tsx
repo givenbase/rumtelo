@@ -9,6 +9,7 @@ import {
     SheetDescription,
     SheetHeader,
     SheetTitle,
+    Typography,
 } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
@@ -61,9 +62,9 @@ export function PageHelpButton() {
                             <h3 className="font-mono text-[10px] font-semibold tracking-widest text-accent uppercase">
                                 {section.heading}
                             </h3>
-                            <p className="text-sm leading-relaxed text-pretty text-fg-secondary">
+                            <Typography as="p" size="sm" color="secondary" className="text-pretty">
                                 {section.body}
-                            </p>
+                            </Typography>
                         </section>
                     ))}
                 </div>
@@ -77,9 +78,13 @@ export function PageHelpButton() {
                             <span className="block text-sm font-medium text-fg">
                                 {chrome.helpers_label}
                             </span>
-                            <span className="mt-0.5 block text-xs text-fg-muted">
+                            <Typography
+                                as="span"
+                                variant="caption"
+                                color="muted"
+                                className="mt-0.5 block">
                                 {chrome.helpers_hint}
-                            </span>
+                            </Typography>
                         </span>
                         <span
                             className={cn(
@@ -101,9 +106,9 @@ export function PageHelpButton() {
 
                     {hasTour && help.tourId ? (
                         <div className="grid gap-2">
-                            <p className="text-sm text-fg-muted">
+                            <Typography as="p" size="sm" color="muted">
                                 {replay ? chrome.replay_tour_prompt : chrome.take_tour_prompt}
-                            </p>
+                            </Typography>
                             <Button
                                 type="button"
                                 className="w-full"
@@ -117,7 +122,9 @@ export function PageHelpButton() {
                             </Button>
                         </div>
                     ) : (
-                        <p className="text-xs leading-relaxed text-fg-faint">{chrome.no_tour}</p>
+                        <Typography as="p" variant="caption" className="text-fg-faint">
+                            {chrome.no_tour}
+                        </Typography>
                     )}
                 </div>
             </SheetContent>

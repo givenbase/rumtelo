@@ -102,9 +102,7 @@ export function IncomePageClient() {
                     <Typography as="span" variant="eyebrow" color="primary">
                         ✦ MY INCOME
                     </Typography>
-                    <Typography
-                        as="h1"
-                        className="mt-1 text-2xl sm:text-3xl lg:text-3xl">
+                    <Typography as="h1" className="mt-1 text-2xl sm:text-3xl lg:text-3xl">
                         Spending cuts have a floor. Earning doesn't.
                     </Typography>
                 </div>

@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import {
@@ -78,12 +79,15 @@ export function SettingsShell({ children }: { children: ReactNode }) {
                 <p className="font-mono text-[10px] font-medium tracking-[0.16em] text-accent uppercase">
                     ✦ Settings
                 </p>
-                <h1 className="mt-1.5 font-display text-[clamp(1.375rem,3.5vw,1.875rem)] font-semibold tracking-tight text-fg">
+                <Typography
+                    as="h1"
+                    size="sm"
+                    className="mt-1.5 text-[clamp(1.375rem,3.5vw,1.875rem)] lg:text-[clamp(1.375rem,3.5vw,1.875rem)]">
                     Everything you set once.
-                </h1>
-                <p className="mt-1.5 text-sm text-pretty text-fg-muted">
+                </Typography>
+                <Typography as="p" size="sm" color="muted" className="mt-1.5 text-pretty">
                     Rules and choices live here. The numbers themselves live on their own screens.
-                </p>
+                </Typography>
             </header>
 
             <div className="flex flex-col gap-5 md:flex-row md:items-start md:gap-6">

@@ -334,11 +334,11 @@ export function TransactionsPageClient() {
             {tab === 'OUT' || tab === 'IN' ? (
                 <div className="grid gap-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                        <p className="text-sm text-fg-muted">
+                        <Typography as="p" size="sm" color="muted">
                             {tab === 'OUT'
                                 ? 'Money that left a jar. Tap a row to edit or delete it.'
                                 : 'Gifts, refunds, tax returns, and jar top-ups. Tap a row to edit.'}
-                        </p>
+                        </Typography>
                         <div className="flex gap-1" role="group" aria-label="Ledger layout">
                             {(
                                 [
@@ -367,11 +367,15 @@ export function TransactionsPageClient() {
                             const items = tab === 'OUT' ? outItems : inItems;
                             if (items.length === 0) {
                                 return (
-                                    <p className="px-5 py-4 text-sm text-fg-muted">
+                                    <Typography
+                                        as="p"
+                                        size="sm"
+                                        color="muted"
+                                        className="px-5 py-4">
                                         {tab === 'OUT'
                                             ? 'No out transactions in this period yet.'
                                             : 'No in transactions in this period yet.'}
-                                    </p>
+                                    </Typography>
                                 );
                             }
 
@@ -536,10 +540,10 @@ export function TransactionsPageClient() {
                     />
                 ) : (
                     <div className="grid gap-3">
-                        <p className="text-sm text-fg-muted">
+                        <Typography as="p" size="sm" color="muted">
                             First match wins, by priority. Dead rules (0 hits) can safely be
                             deleted.
-                        </p>
+                        </Typography>
                         <Card className="overflow-hidden p-0">
                             <div className="grid gap-px">
                                 {rules.map(rule => {

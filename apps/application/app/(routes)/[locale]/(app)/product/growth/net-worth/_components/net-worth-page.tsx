@@ -134,10 +134,10 @@ export function NetWorthPageClient() {
                         </p>
                     </div>
                 </div>
-                <p className="mt-4 text-sm text-pretty text-fg-muted">
+                <Typography as="p" size="sm" color="muted" className="mt-4 text-pretty">
                     Your net worth is <strong className="text-fg">{formatMoney(netWorth)}</strong>.
                     Everything you add to Financial Freedom works for you — forever.
-                </p>
+                </Typography>
             </AccentCard>
 
             {holdings.length === 0 ? (
@@ -182,18 +182,22 @@ export function NetWorthPageClient() {
                                 <div className="flex flex-wrap items-start gap-4 border-b border-line px-5 py-4">
                                     <div className="min-w-0 flex-1">
                                         <div className="flex flex-wrap items-baseline gap-2.5">
-                                            <h3 className="font-display text-xl font-semibold tracking-tight text-fg">
+                                            <Typography as="h3" size="lg">
                                                 {group.nl}
-                                            </h3>
+                                            </Typography>
                                             <span className="font-mono text-xs tracking-wide text-fg-muted uppercase">
                                                 {group.items.length === 1
                                                     ? '1 asset'
                                                     : `${group.items.length} assets`}
                                             </span>
                                         </div>
-                                        <p className="mt-1 text-sm leading-relaxed text-pretty text-fg-muted">
+                                        <Typography
+                                            as="p"
+                                            size="sm"
+                                            color="muted"
+                                            className="mt-1 text-pretty">
                                             {group.desc}
-                                        </p>
+                                        </Typography>
                                     </div>
                                     <div className="grid justify-items-end gap-1">
                                         <span className="font-display text-2xl leading-none font-semibold tracking-tight text-fg">
@@ -261,9 +265,12 @@ export function NetWorthPageClient() {
                                                             {jar.name} ›
                                                         </span>
                                                     ) : null}
-                                                    <span className="font-display text-xl leading-snug font-semibold tracking-tight text-fg">
+                                                    <Typography
+                                                        as="h3"
+                                                        size="lg"
+                                                        className="leading-snug">
                                                         {holding.name}
-                                                    </span>
+                                                    </Typography>
                                                     <div className="flex justify-between font-mono text-xs">
                                                         <span className="text-fg-muted">Value</span>
                                                         <span className="text-fg-secondary">

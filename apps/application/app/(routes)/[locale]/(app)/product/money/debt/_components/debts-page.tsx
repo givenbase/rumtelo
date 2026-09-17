@@ -340,19 +340,19 @@ export function DebtsPageClient() {
                     </div>
 
                     {showPayoffRanks && focusDebt && hasExtra ? (
-                        <p className="text-xs text-fg-muted">
+                        <Typography as="p" size="xs" color="muted">
                             #1 gets the extra until it is gone, then #2, and so on.
-                        </p>
+                        </Typography>
                     ) : null}
 
                     <Card className="p-0">
                         <div className="grid gap-3 p-5">
                             {visibleDebts.length === 0 ? (
-                                <p className="text-sm text-fg-muted">
+                                <Typography as="p" size="sm" color="muted">
                                     {debts.length === 0
                                         ? 'No open debts yet.'
                                         : 'No debts match this filter.'}
-                                </p>
+                                </Typography>
                             ) : (
                                 visibleDebts.map(debt => {
                                     const payoffRank = payoffOrdered.findIndex(

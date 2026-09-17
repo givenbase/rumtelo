@@ -1,3 +1,5 @@
+import { Typography } from '@rumtelo/ui';
+
 import { COACH_DEMO, COACH_POINTS, COACH_SECTION, PORTALS } from '@/lib/landing-content';
 
 import { CARD, SectionHeading } from './landing-primitives';
@@ -24,9 +26,9 @@ export function LandingCoach() {
                                     aria-hidden>
                                     ✦
                                 </span>
-                                <span className="text-sm leading-relaxed text-fg-secondary">
+                                <Typography as="span" size="sm" color="secondary">
                                     {point}
-                                </span>
+                                </Typography>
                             </li>
                         ))}
                     </ul>
@@ -38,10 +40,14 @@ export function LandingCoach() {
                     aria-label="Example of the Coach — one tip per portal">
                     <span className="absolute inset-x-0 top-0 block h-1 bg-(image:--gradient-accent)" />
                     <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2 pt-1">
-                        <span className="inline-flex items-center gap-2 font-mono text-xs font-medium tracking-widest text-fg-faint uppercase">
+                        <Typography
+                            as="span"
+                            variant="eyebrow"
+                            color="muted"
+                            className="inline-flex items-center gap-2 text-fg-faint">
                             <span className="size-1.5 rounded-full bg-accent" />
                             The Coach · across every portal
-                        </span>
+                        </Typography>
                         <span className="font-mono text-xs text-fg-faint">week 37</span>
                     </div>
 
@@ -60,9 +66,9 @@ export function LandingCoach() {
                                             </span>
                                             <span className="text-fg-faint">· {message.kind}</span>
                                         </span>
-                                        <span className="font-display text-base leading-snug font-medium text-pretty text-fg">
+                                        <Typography as="h3" size="sm" weight="medium">
                                             {message.text}
-                                        </span>
+                                        </Typography>
                                     </span>
                                     <span className="inline-flex w-fit items-center rounded-full border border-line-strong px-3 py-1.5 font-mono text-[10px] font-semibold tracking-wide whitespace-nowrap text-fg-secondary uppercase">
                                         {message.cta} ›

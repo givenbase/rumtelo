@@ -37,20 +37,20 @@ export default function IntentPage() {
                 />
 
                 {hasIntent && (
-                    <p className="font-mono text-xs font-medium tracking-widest text-success uppercase">
+                    <Typography as="p" variant="eyebrow" color="success">
                         ✦ Set for this week
-                    </p>
+                    </Typography>
                 )}
 
                 <IntentStillnessLink />
             </div>
 
             {/* ── Tip ── */}
-            <p className="text-sm leading-relaxed text-fg-faint">
+            <Typography as="p" size="sm" color="muted" className="text-fg-faint">
                 A good intention is small, concrete, and about behaviour — not an outcome. &quot;I
                 check my jars every Sunday&quot; works better than &quot;I am more financially
                 aware.&quot;
-            </p>
+            </Typography>
         </PageContent>
     );
 }

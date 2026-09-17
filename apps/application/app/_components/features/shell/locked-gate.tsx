@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@rumtelo/ui';
+import { Button, Typography } from '@rumtelo/ui';
 
 import { lockCopyFor, PLAN_LABELS, type PlanKey } from '@/app/_lib/plan';
 
@@ -26,10 +26,12 @@ export function LockedGate({
                 🔒
             </span>
             <div className="max-w-sm">
-                <p className="font-display text-xl font-semibold text-fg sm:text-2xl">
+                <Typography as="h2" className="text-xl sm:text-2xl">
                     Available in the {planLabel} plan
-                </p>
-                <p className="mt-2 text-sm leading-relaxed text-fg-muted">{copy.line}</p>
+                </Typography>
+                <Typography as="p" size="sm" color="muted" className="mt-2">
+                    {copy.line}
+                </Typography>
             </div>
             <Button as="a" href="/settings/general/plan">
                 {copy.cta}

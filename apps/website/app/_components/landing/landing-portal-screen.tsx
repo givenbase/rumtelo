@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { Typography } from '@rumtelo/ui';
+
 import {
     PORTAL_DEMO_ENERGY,
     PORTAL_DEMO_GROWTH,
@@ -118,9 +120,9 @@ export function LandingPortalScreen({
                                                 </svg>
                                             </span>
                                             <span className="grid gap-0.5">
-                                                <span className="font-display text-base font-semibold text-fg">
+                                                <Typography as="h4" weight="semibold">
                                                     Watch {portal.name} in action
-                                                </span>
+                                                </Typography>
                                                 <span className="font-mono text-[10px] font-medium tracking-widest text-fg-faint uppercase">
                                                     Short video · no sound
                                                 </span>
@@ -479,13 +481,13 @@ function SoulDemo() {
                     <span className="block font-mono text-[10px] font-medium tracking-widest text-portal-soul uppercase">
                         Intention · this week
                     </span>
-                    <span className="mt-1 block font-display text-base font-medium text-fg">
+                    <Typography as="h4" weight="medium" className="mt-1">
                         {intention}
                         <span
                             className="ml-0.5 inline-block h-4 w-px translate-y-0.5 animate-[demoBlink_1s_steps(1)_infinite] bg-portal-soul"
                             aria-hidden
                         />
-                    </span>
+                    </Typography>
                 </div>
             </div>
         </div>

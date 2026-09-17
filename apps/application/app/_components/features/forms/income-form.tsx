@@ -14,6 +14,7 @@ import {
     FormLabel,
     FormMessage,
     Button,
+    Typography,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
 
@@ -349,9 +350,9 @@ export function IncomeForm({
 
             {mode === 'edit' && periods.length > 0 ? (
                 <div className="grid gap-2 border-t border-line pt-4">
-                    <p className="font-mono text-xs font-medium tracking-widest text-fg-muted uppercase">
+                    <Typography as="p" variant="eyebrow" color="muted">
                         Amount history
-                    </p>
+                    </Typography>
                     <ul className="grid gap-1.5">
                         {periods.map(period => (
                             <li

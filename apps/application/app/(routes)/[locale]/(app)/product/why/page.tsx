@@ -62,9 +62,12 @@ export default function WhyFoundationPage() {
                 <Typography as="p" variant="eyebrow" color="primary">
                     The line we stand on
                 </Typography>
-                <h1 className="mt-3 font-display text-4xl leading-[1.1] font-semibold tracking-tight text-fg md:text-5xl lg:text-6xl">
+                <Typography
+                    as="h1"
+                    size="lg"
+                    className="mt-3 text-4xl leading-[1.1] md:text-5xl lg:text-6xl">
                     {BRAND_TAGLINE}
-                </h1>
+                </Typography>
                 <Typography as="p" variant="lead" size="lg" className="mt-5">
                     That is not a clever phrase. It is the problem we refuse to leave unsolved —
                     mystery spending, foggy paychecks, and the quiet stress of not knowing. We end
@@ -79,12 +82,12 @@ export default function WhyFoundationPage() {
                 <div className="grid gap-4">
                     {MEANING.map(item => (
                         <Card key={item.line} className="grid gap-2 p-5">
-                            <h2 className="font-display text-xl font-semibold tracking-tight text-fg">
+                            <Typography as="h3" size="lg">
                                 {item.line}
-                            </h2>
-                            <p className="text-sm leading-relaxed text-pretty text-fg-secondary">
+                            </Typography>
+                            <Typography as="p" size="sm" color="secondary" className="text-pretty">
                                 {item.body}
-                            </p>
+                            </Typography>
                         </Card>
                     ))}
                 </div>
@@ -95,10 +98,14 @@ export default function WhyFoundationPage() {
                     <Typography as="span" variant="eyebrow" color="primary">
                         ✦ Bigger than the balance
                     </Typography>
-                    <p className="mt-3 max-w-prose text-sm leading-relaxed text-pretty text-fg-muted">
+                    <Typography
+                        as="p"
+                        size="sm"
+                        color="muted"
+                        className="mt-3 max-w-prose text-pretty">
                         Money is the door. Energy, growth, and soul complete the overview — so you
                         stop wondering where it went, what you’re running on, and why it matters.
-                    </p>
+                    </Typography>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
                     {WIDER.map(item => (
@@ -109,26 +116,26 @@ export default function WhyFoundationPage() {
                             <span className="font-mono text-[10px] font-medium tracking-[0.14em] text-fg-faint uppercase">
                                 {item.portal}
                             </span>
-                            <span className="font-display text-base font-semibold tracking-tight text-fg group-hover:text-accent">
+                            <Typography as="h4" className="group-hover:text-accent">
                                 {item.line}
-                            </span>
-                            <span className="text-sm leading-relaxed text-pretty text-fg-secondary">
+                            </Typography>
+                            <Typography as="p" size="sm" color="secondary" className="text-pretty">
                                 {item.body}
-                            </span>
+                            </Typography>
                         </Link>
                     ))}
                 </div>
             </section>
 
             <section className="mt-12 grid gap-5 border-t border-line pt-10">
-                <p className="font-display text-2xl leading-snug font-semibold tracking-tight text-fg md:text-3xl">
+                <Typography as="h2" className="leading-snug md:text-3xl">
                     Don’t chase the number. Own the direction.
-                </p>
-                <p className="max-w-prose text-sm leading-relaxed text-pretty text-fg-muted">
+                </Typography>
+                <Typography as="p" size="sm" color="muted" className="max-w-prose text-pretty">
                     Built for people who are doing well — and for people who are ready to. Six jars.
                     One calm overview. Information, never shame: a jar over its line is a signal
                     with a next move, not a verdict on who you are.
-                </p>
+                </Typography>
                 <div className="flex flex-wrap gap-2">
                     <Link
                         href={productPath('money/jars')}

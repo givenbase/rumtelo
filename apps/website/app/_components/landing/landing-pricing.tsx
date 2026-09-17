@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { PLAN_RANK, PlanKey } from '@rumtelo/contracts';
 import { planIntentFromPlanKey, planIntentQuery } from '@rumtelo/utils';
 
+import { Typography } from '@rumtelo/ui';
+
 import { useMarketingSession } from '@/app/_components/marketing-session-provider';
 import { PLANS, PRICING_SECTION } from '@/lib/landing-content';
 import { appHomeUrl, appPlanSettingsUrl, webSignUpPath } from '@/lib/portal-urls';
@@ -184,9 +186,7 @@ export function LandingPricing() {
                             />
 
                             <div className="flex flex-wrap items-center justify-between gap-2.5 px-6 pt-6">
-                                <span className="font-display text-2xl font-semibold tracking-tight text-fg">
-                                    {plan.name}
-                                </span>
+                                <Typography as="h2">{plan.name}</Typography>
                                 <span
                                     className={`rounded-full border px-3 py-1 font-mono text-xs font-semibold tracking-wide whitespace-nowrap uppercase ${
                                         isCurrent || rec
@@ -211,9 +211,13 @@ export function LandingPricing() {
                                 </span>
                             </div>
 
-                            <p className="mx-6 my-4 text-sm leading-relaxed text-pretty text-fg-secondary">
+                            <Typography
+                                as="p"
+                                size="sm"
+                                color="secondary"
+                                className="mx-6 my-4 text-pretty">
                                 {plan.line}
-                            </p>
+                            </Typography>
 
                             <ul className="mx-0 mb-5 grid gap-2 border-t border-line px-6 pt-4">
                                 {plan.feats.map(feature => (

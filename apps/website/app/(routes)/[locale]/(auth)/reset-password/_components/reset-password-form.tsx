@@ -76,9 +76,9 @@ export function ResetPasswordForm() {
                 <Typography as="h1" className="text-2xl lg:text-2xl">
                     {AUTH_RESET_PASSWORD.title}
                 </Typography>
-                <p className="mt-1 text-sm text-fg-muted">
+                <Typography as="p" size="sm" color="muted" className="mt-1">
                     {invalidToken ? AUTH_RESET_PASSWORD.invalid : AUTH_RESET_PASSWORD.subtitle}
-                </p>
+                </Typography>
             </div>
 
             {done ? (

@@ -1,4 +1,4 @@
-import type { ElementType, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export type TypographyAs = 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'span' | 'label';
 export type TypographySize = 'xs' | 'sm' | 'default' | 'lg';

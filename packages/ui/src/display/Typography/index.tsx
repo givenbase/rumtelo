@@ -3,12 +3,7 @@ import type { ElementType } from 'react';
 import { cn } from '@rumtelo/utils';
 
 import type TypographyProps from './types';
-import {
-    defaultAsForVariant,
-    defaultColorFor,
-    defaultSizeFor,
-    defaultWeightFor,
-} from './types';
+import { defaultAsForVariant, defaultColorFor, defaultSizeFor, defaultWeightFor } from './types';
 
 import typographyVariants from './styles';
 

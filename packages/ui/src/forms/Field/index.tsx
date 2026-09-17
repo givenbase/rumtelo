@@ -1,5 +1,7 @@
 'use client';
 
+import { Typography } from '../../display/Typography';
+
 import type FieldProps from './types';
 
 export function Field({ label, hint, children, htmlFor }: FieldProps) {
@@ -9,7 +11,11 @@ export function Field({ label, hint, children, htmlFor }: FieldProps) {
                 {label}
             </label>
             {children}
-            {hint ? <p className="text-xs text-fg-muted">{hint}</p> : null}
+            {hint ? (
+                <Typography as="p" variant="caption">
+                    {hint}
+                </Typography>
+            ) : null}
         </div>
     );
 }

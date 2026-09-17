@@ -119,7 +119,9 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                     className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
                     ← Jars
                 </Link>
-                <p className="text-sm text-fg-muted">Loading jar…</p>
+                <Typography as="p" size="sm" color="muted">
+                    Loading jar…
+                </Typography>
             </div>
         );
     }
@@ -274,11 +276,11 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                 </div>
                 <Card className="p-0">
                     {leftoverPeriodTxs.length === 0 ? (
-                        <p className="px-5 py-4 text-sm text-fg-muted">
+                        <Typography as="p" size="sm" color="muted" className="px-5 py-4">
                             {transactions.length === 0
                                 ? 'No transactions sorted into this jar this month.'
                                 : 'All period payments are nested under categories above.'}
-                        </p>
+                        </Typography>
                     ) : (
                         <ul className="grid">
                             {leftoverPeriodTxs.map(tx => {

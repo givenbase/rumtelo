@@ -6,6 +6,8 @@ import { useLiveQuery } from '@rumtelo/hooks';
 
 import type { Goal } from '@rumtelo/contracts';
 import { GoalKind } from '@rumtelo/contracts';
+import { Typography } from '@rumtelo/ui';
+
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { GoalForm } from '@/components/features/forms/goal-form';
@@ -43,10 +45,18 @@ export function GoalUpdatePage({ id, embedded = false }: { id: string; embedded?
     const row = (query.data ?? []).find((goal): goal is Goal => goal.id === id);
 
     if (live && query.isLoading && !row) {
-        return <p className="text-sm text-fg-muted">Loading…</p>;
+        return (
+            <Typography as="p" size="sm" color="muted">
+                Loading…
+            </Typography>
+        );
     }
     if (!row) {
-        return <p className="text-sm text-fg-muted">Goal not found.</p>;
+        return (
+            <Typography as="p" size="sm" color="muted">
+                Goal not found.
+            </Typography>
+        );
     }
 
     return (

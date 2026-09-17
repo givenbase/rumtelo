@@ -4,6 +4,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 
 import { Cadence, DebtScheduleKind } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
+import { Typography } from '@rumtelo/ui';
 
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
@@ -26,7 +27,11 @@ export function DebtUpdatePage({ id, embedded = false }: { id: string; embedded?
     const row = (query.data ?? []).find(debt => debt.id === id);
 
     if (live && query.isLoading && !row) {
-        return <p className="text-sm text-fg-muted">Loading…</p>;
+        return (
+            <Typography as="p" size="sm" color="muted">
+                Loading…
+            </Typography>
+        );
     }
     if (!row) {
         return <p className="text-sm text-fg-muted">Debt not found.</p>;

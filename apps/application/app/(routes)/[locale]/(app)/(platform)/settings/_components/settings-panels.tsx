@@ -33,6 +33,7 @@ import {
     Select,
     StubNotice,
     Toggle,
+    Typography,
     VendorMark,
 } from '@rumtelo/ui';
 import {
@@ -1719,9 +1720,14 @@ export function GrowthSettings() {
                         className="min-w-0 flex-1 accent-(--color-accent)"
                         aria-label="Planning horizon in months"
                     />
-                    <span className="font-display text-xl font-semibold tracking-tight whitespace-nowrap text-accent">
+                    <Typography
+                        as="h3"
+                        size="lg"
+                        weight="semibold"
+                        color="primary"
+                        className="whitespace-nowrap">
                         {horizon} months
-                    </span>
+                    </Typography>
                 </div>
             </SettingsInkCard>
             <StubNotice what="Horizon persists with growth settings when that API lands." />
@@ -2216,9 +2222,9 @@ export function PlanSettings() {
                                 )}>
                                 <div className="grid min-w-0 gap-1">
                                     <span className="flex flex-wrap items-baseline gap-2">
-                                        <span className="font-display text-lg font-semibold tracking-tight text-fg">
+                                        <Typography as="h3" weight="semibold">
                                             {PLAN_LABELS[card.key]}
-                                        </span>
+                                        </Typography>
                                         <span className="font-display text-lg font-semibold tracking-tight text-accent">
                                             {price}
                                         </span>

@@ -107,14 +107,16 @@ export default function MindPage() {
                         key={practice.name}
                         className="grid gap-2.5 rounded-2xl border border-t-4 border-line bg-surface p-5 shadow-md"
                         style={{ borderTopColor: practice.color }}>
-                        <span
-                            className="font-mono text-xs font-medium tracking-widest uppercase"
+                        <Typography
+                            as="span"
+                            variant="eyebrow"
+                            color="inherit"
                             style={{ color: practice.color }}>
                             {practice.meta}
-                        </span>
-                        <span className="font-display text-xl font-semibold text-fg">
+                        </Typography>
+                        <Typography as="h3" size="lg">
                             {practice.name}
-                        </span>
+                        </Typography>
                         <span className="text-sm leading-relaxed text-fg-muted">
                             {practice.desc}
                         </span>

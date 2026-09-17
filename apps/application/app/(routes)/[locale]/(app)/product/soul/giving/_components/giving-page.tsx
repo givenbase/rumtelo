@@ -213,18 +213,20 @@ export function GivingPageClient() {
                     {pledge ? (
                         <>
                             <div>
-                                <p className="text-sm text-fg-muted">{pledge.name}</p>
+                                <Typography as="p" size="sm" color="muted">
+                                    {pledge.name}
+                                </Typography>
                                 <div className="mt-1 flex items-baseline gap-2">
                                     <span className="font-display text-3xl font-semibold tracking-tight text-accent">
                                         {formatMoney(pledge.saved)}
                                     </span>
-                                    <span className="font-mono text-xs text-fg-muted">
+                                    <Typography as="span" variant="caption" className="font-mono">
                                         of {formatMoney(pledge.target)} pledged
-                                    </span>
+                                    </Typography>
                                 </div>
                             </div>
                             <Meter value={pledgeProgress} />
-                            <p className="text-sm leading-relaxed text-fg-secondary">
+                            <Typography as="p" size="sm" color="secondary">
                                 {pledge.status === GoalStatus.REACHED
                                     ? 'Pledge met. The jar keeps flowing — that was the point.'
                                     : neededPerMonth !== null && monthsLeft !== null
@@ -232,7 +234,7 @@ export function GivingPageClient() {
                                           ? `${formatMoney(monthlyPlanned)} leaves every month — enough to land the pledge with ${monthsLeft} ${monthsLeft === 1 ? 'month' : 'months'} to go.`
                                           : `${formatMoney(neededPerMonth)} a month would land it; ${formatMoney(monthlyPlanned)} is planned. The gap is a choice, not a failure.`
                                       : 'No date on this pledge yet.'}
-                            </p>
+                            </Typography>
                             <button
                                 type="button"
                                 onClick={() => router.push(updateHref('goal', pledge.id))}
@@ -247,15 +249,15 @@ export function GivingPageClient() {
                                     <span className="font-display text-3xl font-semibold tracking-tight text-accent">
                                         {formatMoney(givenThisYear)}
                                     </span>
-                                    <span className="font-mono text-xs text-fg-muted">
+                                    <Typography as="span" variant="caption" className="font-mono">
                                         given so far
-                                    </span>
+                                    </Typography>
                                 </div>
                             </div>
-                            <p className="text-sm leading-relaxed text-fg-secondary">
+                            <Typography as="p" size="sm" color="secondary">
                                 A pledge gives the jar a finish line for the year. Every sorted
                                 amount that leaves Give counts toward it — nothing to move by hand.
-                            </p>
+                            </Typography>
                             <Button
                                 size="sm"
                                 onClick={() =>
@@ -280,9 +282,9 @@ export function GivingPageClient() {
 
                     <div className="grid gap-px">
                         {giveFixed.length === 0 ? (
-                            <p className="px-5 pb-1 text-sm text-fg-muted">
+                            <Typography as="p" size="sm" color="muted" className="px-5 pb-1">
                                 Nothing leaves the Give jar automatically yet.
-                            </p>
+                            </Typography>
                         ) : (
                             giveFixed.map(item => {
                                 const company = item.counterparty?.trim() || item.name;
@@ -320,13 +322,13 @@ export function GivingPageClient() {
                     </div>
 
                     <div className="border-t border-line px-5 py-4">
-                        <p className="mb-2 font-mono text-xs tracking-widest text-fg-muted uppercase">
+                        <Typography as="p" variant="eyebrow" color="muted" className="mb-2">
                             Received this year
-                        </p>
+                        </Typography>
                         {recipients.length === 0 ? (
-                            <p className="text-sm text-fg-muted">
+                            <Typography as="p" size="sm" color="muted">
                                 No sorted giving in the ledger yet this year.
-                            </p>
+                            </Typography>
                         ) : (
                             <ul className="grid gap-1.5">
                                 {recipients.slice(0, 6).map(row => (
@@ -356,9 +358,9 @@ export function GivingPageClient() {
                             To whom
                         </Typography>
                     </div>
-                    <p className="text-sm leading-relaxed text-fg-secondary">
+                    <Typography as="p" size="sm" color="secondary">
                         How do you want to pick who receives this gift?
-                    </p>
+                    </Typography>
                     <div
                         className="flex flex-wrap gap-2"
                         role="group"
@@ -398,10 +400,10 @@ export function GivingPageClient() {
                             );
                         })}
                     </div>
-                    <p className="text-xs leading-relaxed text-fg-faint">
+                    <Typography as="p" variant="caption" className="text-fg-faint">
                         I know who — type whoever you already give to. Help me choose — Coach
                         shortlist with independent checks (Doneer Effectief, GiveWell, ACE, CBF).
-                    </p>
+                    </Typography>
                 </div>
 
                 {givePickMode === 'coach' ? (
@@ -439,15 +441,17 @@ export function GivingPageClient() {
                                 key={check.title}
                                 className="grid gap-2 rounded-2xl border border-t-4 border-line bg-surface p-5 shadow-md ring-1 ring-accent/10"
                                 style={{ borderTopColor: 'var(--color-jar-give)' }}>
-                                <span className="font-mono text-xs font-medium tracking-widest text-fg-faint uppercase">
+                                <Typography
+                                    as="span"
+                                    variant="eyebrow"
+                                    color="muted"
+                                    className="text-fg-faint">
                                     0{index + 1}
-                                </span>
-                                <span className="font-display text-lg font-semibold text-fg">
-                                    {check.title}
-                                </span>
-                                <span className="text-sm leading-relaxed text-fg-muted">
+                                </Typography>
+                                <Typography as="h3">{check.title}</Typography>
+                                <Typography as="p" size="sm" color="muted">
                                     {check.body}
-                                </span>
+                                </Typography>
                             </div>
                         ))}
                     </div>

@@ -61,10 +61,10 @@ export function CoachPageClient() {
 
             {messages.length === 0 ? (
                 <div className="grid gap-3 rounded-2xl border border-line bg-surface px-5 py-6">
-                    <p className="text-sm text-fg-muted">
+                    <Typography as="p" size="sm" color="muted">
                         No open tips right now. The Coach speaks when a jar, habit, or week needs a
                         nudge.
-                    </p>
+                    </Typography>
                     <Link
                         href="/product/money/week-check"
                         className="text-sm font-medium text-accent hover:underline">
@@ -91,9 +91,9 @@ export function CoachPageClient() {
                                     </Button>
                                 ) : null}
                             </div>
-                            <p className="font-display text-lg leading-snug text-fg">
+                            <Typography as="h3" className="leading-snug">
                                 {message.text}
-                            </p>
+                            </Typography>
                             {message.ctaHref && message.ctaLabel ? (
                                 <Link
                                     href={message.ctaHref}

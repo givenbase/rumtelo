@@ -3,6 +3,7 @@
 import { apiQuery } from '@/app/_lib/api-hooks';
 
 import { useLiveQuery } from '@rumtelo/hooks';
+import { Typography } from '@rumtelo/ui';
 
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
@@ -25,10 +26,18 @@ export function IncomeUpdatePage({ id, embedded = false }: { id: string; embedde
     const row = (query.data ?? []).find(source => source.id === id);
 
     if (live && query.isLoading && !row) {
-        return <p className="text-sm text-fg-muted">Loading…</p>;
+        return (
+            <Typography as="p" size="sm" color="muted">
+                Loading…
+            </Typography>
+        );
     }
     if (!row) {
-        return <p className="text-sm text-fg-muted">Income source not found.</p>;
+        return (
+            <Typography as="p" size="sm" color="muted">
+                Income source not found.
+            </Typography>
+        );
     }
 
     return (

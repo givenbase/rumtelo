@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { RumteloLogo } from '@rumtelo/brand';
+import { Typography } from '@rumtelo/ui';
 import { BRAND_TAGLINE } from '@rumtelo/i18n';
 
 import { FOOT_COLS, FOOTER_BLURB, TRUST_BADGES, TRUST_CARDS } from '@/lib/landing-content';
@@ -36,9 +37,13 @@ export function LandingFooter() {
                 <div className="grid w-full max-w-prose min-w-0 gap-3 lg:max-w-xs lg:flex-1">
                     <div className="grid gap-2">
                         <RumteloLogo variant="wordmark" className="h-6 w-auto max-w-34" />
-                        <span className="font-mono text-xs font-medium tracking-wide text-fg-faint">
+                        <Typography
+                            as="span"
+                            variant="eyebrow"
+                            color="muted"
+                            className="text-fg-faint">
                             {BRAND_TAGLINE}
-                        </span>
+                        </Typography>
                     </div>
                     <span className="text-sm leading-relaxed text-pretty text-fg-faint">
                         {FOOTER_BLURB.attribution}
@@ -53,9 +58,13 @@ export function LandingFooter() {
                     className="grid w-full min-w-0 grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4 sm:gap-x-8 lg:flex-1 lg:justify-end">
                     {FOOT_COLS.map(col => (
                         <div key={col.head} className="grid min-w-0 content-start gap-2.5">
-                            <span className="font-mono text-xs font-medium tracking-widest text-fg-faint uppercase">
+                            <Typography
+                                as="span"
+                                variant="eyebrow"
+                                color="muted"
+                                className="text-fg-faint">
                                 {col.head}
-                            </span>
+                            </Typography>
                             {col.links.map(link => (
                                 <Link
                                     key={link.text}

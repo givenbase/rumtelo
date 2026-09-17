@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import Link from 'next/link';
 
-import { AccentCard } from '@rumtelo/ui';
+import { AccentCard, Typography } from '@rumtelo/ui';
 
 interface PreviewRow {
     label: string;
@@ -35,12 +35,15 @@ export function PortalPreviewCard({
     return (
         <AccentCard tint={tint} className="flex flex-1 flex-col gap-3.5 rounded-2xl p-5.5">
             <div className="flex items-center justify-between gap-3">
-                <span
-                    className="flex items-center gap-2 font-mono text-xs font-medium tracking-widest uppercase"
+                <Typography
+                    as="span"
+                    variant="eyebrow"
+                    color="inherit"
+                    className="flex items-center gap-2"
                     style={{ color: tint }}>
                     {icon}
                     {title}
-                </span>
+                </Typography>
                 <Link
                     href={href}
                     className="font-mono text-xs font-medium text-fg-faint hover:text-accent">
@@ -52,9 +55,13 @@ export function PortalPreviewCard({
                     <div
                         key={row.label}
                         className="flex items-baseline justify-between gap-3 border-b border-line py-2.5 last:border-b-0">
-                        <span className="font-mono text-xs tracking-wide whitespace-nowrap text-fg-faint">
+                        <Typography
+                            as="span"
+                            variant="eyebrow"
+                            color="muted"
+                            className="whitespace-nowrap text-fg-faint">
                             {row.label}
-                        </span>
+                        </Typography>
                         <span
                             className="font-display text-2xl leading-none font-semibold tracking-tight"
                             style={{ color: row.color }}>

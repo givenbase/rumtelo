@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from 'react';
 
+import { Typography, typographyVariants } from '../Typography';
+import { cn } from '@rumtelo/utils';
+
 export type AuthManifestoQuote = {
     eyebrow: string;
     headline: string;
@@ -92,16 +95,32 @@ export function AuthManifesto({
                     key={quote.headline}
                     className="relative max-w-lg animate-rise"
                     style={{ textShadow: QUOTE_SHADOW }}>
-                    <p className="font-mono text-[11px] tracking-[0.28em] text-accent-hover uppercase">
+                    <Typography
+                        as="p"
+                        variant="eyebrow"
+                        color="primary"
+                        className="text-[11px] tracking-[0.28em] text-accent-hover">
                         {quote.eyebrow}
-                    </p>
+                    </Typography>
                     <div className="mt-2 h-px w-12 bg-accent" aria-hidden />
-                    <p className="mt-3 font-display text-[2rem] leading-[1.15] font-semibold tracking-tight text-white xl:text-[2.25rem]">
+                    <p
+                        className={cn(
+                            typographyVariants({
+                                as: 'h2',
+                                size: 'default',
+                                weight: 'semibold',
+                                color: 'white',
+                            }),
+                            'mt-3 text-[2rem] leading-[1.15] xl:text-[2.25rem]'
+                        )}>
                         {quote.headline}
                     </p>
-                    <p className="mt-2.5 max-w-md text-[15px] leading-snug text-white/92">
+                    <Typography
+                        as="p"
+                        color="white"
+                        className="mt-2.5 max-w-md text-[15px] leading-snug text-white/92">
                         {quote.support}
-                    </p>
+                    </Typography>
                 </div>
 
                 {quotes.length > 1 ? (
@@ -132,10 +151,16 @@ export function AuthManifesto({
             </div>
 
             <div className="bg-black/80 px-10 py-3.5 xl:px-14">
-                <p className="font-mono text-[10px] tracking-[0.22em] text-white/70 uppercase">
+                <Typography
+                    as="p"
+                    variant="eyebrow"
+                    color="white"
+                    className="text-[10px] tracking-[0.22em] text-white/70">
                     {strip.eyebrow}
-                </p>
-                <p className="mt-0.5 text-sm font-medium text-white">{strip.line}</p>
+                </Typography>
+                <Typography as="p" size="sm" weight="medium" color="white" className="mt-0.5">
+                    {strip.line}
+                </Typography>
                 <div className="mt-2 flex gap-0.5">
                     {strip.items.map(item => (
                         <div

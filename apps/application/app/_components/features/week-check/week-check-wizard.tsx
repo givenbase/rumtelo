@@ -102,21 +102,28 @@ export function WeekCheckWizard({
                                   ? 'hover:bg-raised'
                                   : 'hover:bg-raised'
                         )}>
-                        <span
-                            className={cn(
-                                'font-mono text-xs font-semibold tracking-widest uppercase',
-                                i === step ? 'text-accent' : 'text-fg-faint'
-                            )}>
+                        <Typography
+                            as="span"
+                            variant="eyebrow"
+                            weight="semibold"
+                            color={i === step ? 'primary' : 'muted'}
+                            className={i === step ? undefined : 'text-fg-faint'}>
                             Step {i + 1}
-                        </span>
-                        <span
-                            className={cn(
-                                'font-display text-sm font-semibold',
-                                i === step ? 'text-fg' : 'text-fg-secondary'
-                            )}>
+                        </Typography>
+                        <Typography
+                            as="h4"
+                            weight="semibold"
+                            color={i === step ? 'default' : 'secondary'}
+                            className="text-sm">
                             {stageItem.label}
-                        </span>
-                        <span className="text-xs leading-tight text-fg-faint">{stageItem.sub}</span>
+                        </Typography>
+                        <Typography
+                            as="span"
+                            size="xs"
+                            color="muted"
+                            className="leading-tight text-fg-faint">
+                            {stageItem.sub}
+                        </Typography>
                         {/* Progress pip */}
                         <span
                             className={cn(
@@ -245,9 +252,9 @@ export function WeekCheckWizard({
                             aria-label="Intention for next week"
                         />
                         {intent.trim().length > 0 && (
-                            <p className="text-xs text-fg-muted">
+                            <Typography as="p" size="xs" color="muted">
                                 Good. Remember this when the week feels hard.
-                            </p>
+                            </Typography>
                         )}
                     </div>
                 )}

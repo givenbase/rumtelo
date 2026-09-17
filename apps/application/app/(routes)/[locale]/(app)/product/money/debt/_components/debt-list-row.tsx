@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 
 import type { Debt, MerchantPreset } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Badge, VendorMark } from '@rumtelo/ui';
+import { Badge, Typography, VendorMark } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { debtDetailHref } from '@/app/_lib/create-routes';
@@ -144,7 +144,9 @@ export function DebtListRow({
                         )}
                     </div>
                     {recent.length === 0 && detailQuery.data ? (
-                        <p className="text-sm text-fg-muted">No payments logged yet.</p>
+                        <Typography as="p" size="sm" color="muted">
+                            No payments logged yet.
+                        </Typography>
                     ) : (
                         <ul className="grid gap-1.5">
                             {recent.map(tx => (

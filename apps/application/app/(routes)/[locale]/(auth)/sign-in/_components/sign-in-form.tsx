@@ -140,14 +140,14 @@ export function SignInForm() {
                 <div
                     className="grid gap-3 rounded-xl border border-warning/30 bg-warning/10 p-4"
                     role="status">
-                    <p className="font-display text-sm font-semibold text-fg">
+                    <Typography as="h4" weight="semibold" className="text-sm">
                         {AUTH_SIGN_IN.verification.title}
-                    </p>
-                    <p className="text-sm text-fg-secondary">
+                    </Typography>
+                    <Typography as="p" size="sm" color="secondary">
                         {verification.sent
                             ? withEmail(AUTH_SIGN_IN.verification.sent, verification.email)
                             : withEmail(AUTH_SIGN_IN.verification.required, verification.email)}
-                    </p>
+                    </Typography>
                     <div className="flex flex-wrap gap-2">
                         <Button
                             type="button"
@@ -209,7 +209,7 @@ export function SignInForm() {
                             </Button>
                         ))}
                     </div>
-                    <p className="text-xs text-fg-muted">
+                    <Typography as="p" variant="caption" color="muted">
                         Passwords:{' '}
                         {DEMO_ACCOUNTS.map((account, index) => (
                             <span key={account.persona}>
@@ -217,7 +217,7 @@ export function SignInForm() {
                                 <code className="text-fg">{account.password}</code>
                             </span>
                         ))}
-                    </p>
+                    </Typography>
                 </div>
             ) : null}
 
@@ -291,12 +291,12 @@ export function SignInForm() {
                 </div>
             </div>
 
-            <p className="text-center text-sm text-fg-muted">
+            <Typography as="p" size="sm" color="muted" className="text-center">
                 No account yet?{' '}
                 <a href={webSignUpUrl()} className="font-semibold text-accent hover:underline">
                     {AUTH_SIGN_IN.create_account}
                 </a>
-            </p>
+            </Typography>
         </div>
     );
 }
