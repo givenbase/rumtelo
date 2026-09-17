@@ -21,6 +21,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { CategoryTemplate, MerchantPreset } from '@rumtelo/contracts';
 import { Cadence, FlowDirection, JarKey, jarCapabilitiesFor } from '@rumtelo/contracts';
+import { cn } from '@rumtelo/utils';
 import { z } from 'zod';
 
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
@@ -49,6 +50,23 @@ const MAX_VENDOR_CHIPS = 16;
 
 /** Category template the Give helper falls back to when none was picked. */
 const DONATIONS_CATEGORY_KEY = 'DONATIONS';
+
+/** Baseline tag — always included when a lifestyle filter is on. */
+const AUDIENCE_COMMON = 'COMMON';
+
+function matchesAudienceTag(tags: readonly string[], filter: string | null): boolean {
+    if (!filter) return true;
+    return tags.includes(filter) || tags.includes(AUDIENCE_COMMON);
+}
+
+/** Chip label from catalog key (CAR_OWNER → Car owner). */
+function audienceTagLabel(key: string): string {
+    return key
+        .toLowerCase()
+        .split('_')
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
+}
 
 export type GivePayeeMode = 'known' | 'coach' | 'manual';
 
@@ -125,6 +143,8 @@ export function FixedCostForm({
     );
     /** Bill-type preset key (VPN, INTERNET, …) — narrows Paid-to chips within Subscriptions. */
     const [selectedBillPresetKey, setSelectedBillPresetKey] = useState<string | null>(null);
+    /** Narrow bill-type suggestions by lifestyle tag from the catalog. */
+    const [audienceFilter, setAudienceFilter] = useState<string | null>(null);
     const [customPayee, setCustomPayee] = useState(false);
     /** Give only — null until the household picks a path (or prefill resolves one). */
     const [givePayeeMode, setGivePayeeMode] = useState<GivePayeeMode | null>(
@@ -225,24 +245,38 @@ export function FixedCostForm({
     const merchants = useMemo(() => merchantsQuery.data ?? [], [merchantsQuery.data]);
     const fixedCostPresets = useMemo(() => presetsQuery.data ?? [], [presetsQuery.data]);
 
+    /** Distinct audience tags from the loaded catalog (COMMON is baseline, not a chip). */
+    const audienceFilterKeys = useMemo(() => {
+        const keys = new Set<string>();
+        for (const preset of fixedCostPresets) {
+            for (const tag of preset.audienceTags) {
+                if (tag !== AUDIENCE_COMMON) keys.add(tag);
+            }
+        }
+        return [...keys].sort((a, b) => a.localeCompare(b));
+    }, [fixedCostPresets]);
+
     /** Bill-type presets + brand catalog — type Netflix, get Media + Play auto-filled. */
     const nameOptions = useMemo((): NamePresetOption[] => {
         const fromMerchants = merchantsToNameOptions(merchants, {
             keyPrefix: MERCHANT_OPTION_PREFIX,
             categoryMeta: categoryByKey,
+            excludeGivingLinked: true,
         });
-        const fromPresets: NamePresetOption[] = fixedCostPresets.map(preset => {
-            const category = categoryByKey.get(preset.categoryTemplateKey);
-            return {
-                key: preset.key,
-                name: preset.name,
-                group: category?.name ?? preset.categoryTemplateKey,
-                icon: category?.icon ?? null,
-            };
-        });
+        const fromPresets: NamePresetOption[] = fixedCostPresets
+            .filter(preset => matchesAudienceTag(preset.audienceTags, audienceFilter))
+            .map(preset => {
+                const category = categoryByKey.get(preset.categoryTemplateKey);
+                return {
+                    key: preset.key,
+                    name: preset.name,
+                    group: category?.name ?? preset.categoryTemplateKey,
+                    icon: category?.icon ?? null,
+                };
+            });
         // Brands first so “netflix” hits Netflix before “Streaming video”.
         return [...fromMerchants, ...fromPresets];
-    }, [merchants, fixedCostPresets, categoryByKey]);
+    }, [merchants, fixedCostPresets, categoryByKey, audienceFilter]);
 
     const form = useForm<FixedCostFormValues>({
         defaultValues: {
@@ -297,7 +331,11 @@ export function FixedCostForm({
         }
         if (!activeCategoryTemplateKey) return [] as MerchantPreset[];
         return merchants
-            .filter(merchant => merchant.categoryTemplateKey === activeCategoryTemplateKey)
+            .filter(
+                merchant =>
+                    merchant.categoryTemplateKey === activeCategoryTemplateKey &&
+                    !merchant.givingOrganisationKey
+            )
             .slice(0, MAX_VENDOR_CHIPS);
     }, [merchants, activeCategoryTemplateKey, selectedBillPresetKey, fixedCostPresets]);
 
@@ -572,6 +610,47 @@ export function FixedCostForm({
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>Name</FormLabel>
+                        {mode === 'create' ? (
+                            <div
+                                className="flex flex-wrap gap-1.5"
+                                role="group"
+                                aria-label="Filter bill types">
+                                <button
+                                    type="button"
+                                    aria-pressed={audienceFilter === null}
+                                    onClick={() => setAudienceFilter(null)}
+                                    className={cn(
+                                        'rounded-full border px-2.5 py-1 font-mono text-[11px] transition-colors',
+                                        audienceFilter === null
+                                            ? 'border-accent/40 bg-accent-soft text-accent'
+                                            : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                    )}>
+                                    All
+                                </button>
+                                {audienceFilterKeys.map(tag => {
+                                    const on = audienceFilter === tag;
+                                    return (
+                                        <button
+                                            key={tag}
+                                            type="button"
+                                            aria-pressed={on}
+                                            onClick={() =>
+                                                setAudienceFilter(previous =>
+                                                    previous === tag ? null : tag
+                                                )
+                                            }
+                                            className={cn(
+                                                'rounded-full border px-2.5 py-1 font-mono text-[11px] transition-colors',
+                                                on
+                                                    ? 'border-accent/40 bg-accent-soft text-accent'
+                                                    : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                            )}>
+                                            {audienceTagLabel(tag)}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        ) : null}
                         <FormControl>
                             {mode === 'create' ? (
                                 <PresetNameField

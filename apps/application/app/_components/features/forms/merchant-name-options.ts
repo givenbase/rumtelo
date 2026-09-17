@@ -31,13 +31,22 @@ export function merchantsToNameOptions(
     opts?: {
         keyPrefix?: string;
         categoryTemplateKey?: string;
+        /**
+         * Drop merchants that mirror GivingOrganisation — Coach owns those names
+         * in the fixed-cost / Give pickers.
+         */
+        excludeGivingLinked?: boolean;
         /** categoryTemplateKey → human group label + optional icon */
         categoryMeta?: ReadonlyMap<string, { name: string; icon?: string | null }>;
     }
 ): NamePresetOption[] {
-    const rows = opts?.categoryTemplateKey
+    let rows = opts?.categoryTemplateKey
         ? merchants.filter(merchant => merchant.categoryTemplateKey === opts.categoryTemplateKey)
         : [...merchants];
+
+    if (opts?.excludeGivingLinked) {
+        rows = rows.filter(merchant => !merchant.givingOrganisationKey);
+    }
 
     return rows.map(merchant => {
         const meta = opts?.categoryMeta?.get(merchant.categoryTemplateKey);
