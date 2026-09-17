@@ -10,7 +10,7 @@ import { useLiveQuery } from '@rumtelo/hooks';
 import { Card } from '@rumtelo/ui';
 import { cn, monthlyAmount, fixedOutNetSummary, toPeriodKey } from '@rumtelo/utils';
 
-import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
+import { CREATE_HREF, fixedDetailHref, updateHref } from '@/app/_lib/create-routes';
 import { bgClassToCssVar, cadenceLabel } from '@/app/_lib/jar-chrome';
 import {
     claimFixedCostMatches,
@@ -389,10 +389,7 @@ export function FixedCostsPageClient() {
                                                               }
                                                               onClick={() =>
                                                                   router.push(
-                                                                      updateHref(
-                                                                          'fixed',
-                                                                          fixedCost.id
-                                                                      )
+                                                                      fixedDetailHref(fixedCost.id)
                                                                   )
                                                               }
                                                           />

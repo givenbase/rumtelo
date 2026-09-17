@@ -114,3 +114,13 @@ export function updateHref(kind: Exclude<CreateKind, 'session' | 'asset' | 'move
 export function debtDetailHref(id: string) {
     return productPath(`money/debt/${id}`);
 }
+
+/** Open fixed-cost detail (plan + period status). Edit stays on update. */
+export function fixedDetailHref(id: string) {
+    return productPath(`money/fixed-costs/${id}`);
+}
+
+/** Open transaction detail. Edit stays on update. */
+export function txDetailHref(id: string) {
+    return productPath(`money/transactions/${id}`);
+}

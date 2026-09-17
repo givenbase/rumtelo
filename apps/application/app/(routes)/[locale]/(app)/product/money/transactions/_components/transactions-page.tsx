@@ -24,12 +24,12 @@ import {
     type Transaction,
 } from '@rumtelo/contracts';
 
-import { createTxHref, updateHref } from '@/app/_lib/create-routes';
+import { createTxHref, txDetailHref } from '@/app/_lib/create-routes';
 import { matchMerchantJarKey } from '@/app/_lib/merchant-match';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
-import { partyMark, findCatalogVendorFromFeed } from '@/app/_lib/vendor-brands';
+import { partyMark, findCatalogMerchantFromFeed } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { InboxSortCard } from '@/components/features/money/inbox-sort-card';
 import { JarBadge, MetaChip, formatBookedDate } from '@/components/features/money/jar-badge';
@@ -301,7 +301,7 @@ export function TransactionsPageClient() {
                             const suggestedKey = suggestJarKeyFor(transaction);
                             const title =
                                 transaction.counterparty?.trim() || transaction.description;
-                            const catalog = findCatalogVendorFromFeed(title, merchants);
+                            const catalog = findCatalogMerchantFromFeed(title, merchants);
                             return (
                                 <InboxSortCard
                                     key={transaction.id}
@@ -323,7 +323,7 @@ export function TransactionsPageClient() {
                                             : undefined
                                     }
                                     onChange={tx => {
-                                        router.push(updateHref('tx', tx.id));
+                                        router.push(txDetailHref(tx.id));
                                     }}
                                 />
                             );
@@ -381,13 +381,17 @@ export function TransactionsPageClient() {
                                     : undefined;
                                 const title =
                                     transaction.counterparty?.trim() || transaction.description;
+                                const feedText = `${transaction.counterparty ?? ''} ${transaction.description}`;
+                                const merchant = findCatalogMerchantFromFeed(feedText, merchants);
+                                const jarKey =
+                                    jar?.key ?? merchant?.jarKey ?? suggestJarKeyFor(transaction);
                                 const mark = partyMark(
-                                    findCatalogVendorFromFeed(title, merchants) ?? {
-                                        name: title,
-                                    },
+                                    merchant ?? { name: title },
                                     catalogMarkChrome({
-                                        billName: transaction.description,
-                                        jarKey: jar?.key,
+                                        billName: title,
+                                        searchText: feedText,
+                                        categoryTemplateKey: merchant?.categoryTemplateKey,
+                                        jarKey,
                                         jarByKey,
                                         categoryTemplates,
                                     })
@@ -426,9 +430,7 @@ export function TransactionsPageClient() {
                                                 )}
                                             </>
                                         }
-                                        onClick={() =>
-                                            router.push(updateHref('tx', transaction.id))
-                                        }
+                                        onClick={() => router.push(txDetailHref(transaction.id))}
                                     />
                                 );
                             }

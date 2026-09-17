@@ -11,7 +11,12 @@ import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card, Eyebrow, Meter, Section } from '@rumtelo/ui';
 import { monthlyAmount } from '@rumtelo/utils';
 
-import { createFixedHref, createGoalHref, updateHref } from '@/app/_lib/create-routes';
+import {
+    createFixedHref,
+    createGoalHref,
+    fixedDetailHref,
+    updateHref,
+} from '@/app/_lib/create-routes';
 import { cadenceLabel } from '@/app/_lib/jar-chrome';
 import { WHY_GIVE } from '@/app/_lib/giving';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
@@ -303,7 +308,7 @@ export function GivingPageClient() {
                                                 <MetaChip>{cadenceLabel(item.cadence)}</MetaChip>
                                             </>
                                         }
-                                        onClick={() => router.push(updateHref('fixed', item.id))}
+                                        onClick={() => router.push(fixedDetailHref(item.id))}
                                     />
                                 );
                             })

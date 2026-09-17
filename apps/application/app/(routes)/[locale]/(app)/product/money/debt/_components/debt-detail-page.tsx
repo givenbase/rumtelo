@@ -26,7 +26,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
-import { updateHref } from '@/app/_lib/create-routes';
+import { fixedDetailHref, txDetailHref, updateHref } from '@/app/_lib/create-routes';
 import { cadenceWord, scheduleHint } from '@/app/_lib/debt-schedule';
 import { cadenceLabel } from '@/app/_lib/jar-chrome';
 import {
@@ -400,7 +400,7 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
                                 subtitle={formatBookedDate(payment.bookedOn)}
                                 mark={paymentMark}
                                 amount={formatMoney(Math.abs(payment.amount))}
-                                onClick={() => router.push(updateHref('tx', payment.id))}
+                                onClick={() => router.push(txDetailHref(payment.id))}
                             />
                         );
                     })
@@ -431,7 +431,7 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
                         )}
                         amount={formatMoney(detail.linkedFixedCost.amount)}
                         badges={<MetaChip>Necessities</MetaChip>}
-                        onClick={() => router.push(updateHref('fixed', detail.linkedFixedCost!.id))}
+                        onClick={() => router.push(fixedDetailHref(detail.linkedFixedCost!.id))}
                     />
                 ) : (
                     <div className="flex flex-wrap items-center justify-between gap-3">

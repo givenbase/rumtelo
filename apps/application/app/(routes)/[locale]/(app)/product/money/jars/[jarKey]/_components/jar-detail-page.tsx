@@ -9,7 +9,6 @@ import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card } from '@rumtelo/ui';
 import { toPeriodKey } from '@rumtelo/utils';
 
-import { createGoalHref, createMoveHref, createTxHref, updateHref } from '@/app/_lib/create-routes';
 import { claimFixedCostMatches } from '@/app/_lib/fixed-cost-match';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
@@ -27,6 +26,12 @@ import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import {
+    createGoalHref,
+    createMoveHref,
+    createTxHref,
+    txDetailHref,
+} from '@/app/_lib/create-routes';
 
 /**
  * Per-jar detail — coverage, collapsible categories (fixed costs + activity),
@@ -306,7 +311,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                                             badges={
                                                 <MetaChip>{formatBookedDate(tx.bookedOn)}</MetaChip>
                                             }
-                                            onClick={() => router.push(updateHref('tx', tx.id))}
+                                            onClick={() => router.push(txDetailHref(tx.id))}
                                         />
                                     </li>
                                 );

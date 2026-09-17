@@ -59,7 +59,7 @@ export const GIVE_MERCHANTS: readonly MerchantSeed[] = [
         name: 'GiveDirectly',
         matchValue: 'GiveDirectly',
         aliases: ['GiveDirectly', 'GIVE DIRECTLY'],
-        logoDomain: 'givedirectly.org',
+        logoDomain: null, // no reliable mark — lists use Give jar/category chrome
         website: 'https://www.givedirectly.org',
         highlight: 'FEATURED',
         matchPriority: 18,

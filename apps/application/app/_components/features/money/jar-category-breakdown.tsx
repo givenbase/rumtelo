@@ -20,7 +20,7 @@ import {
     type FixedCostStatus,
 } from '@/app/_lib/fixed-cost-match';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
-import { updateHref } from '@/app/_lib/create-routes';
+import { fixedDetailHref, txDetailHref } from '@/app/_lib/create-routes';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
 import { MetaChip, formatBookedDate, formatDueDay } from '@/components/features/money/jar-badge';
@@ -316,9 +316,7 @@ export function JarCategoryBreakdown({
                                                             </>
                                                         }
                                                         onClick={() =>
-                                                            router.push(
-                                                                updateHref('fixed', item.id)
-                                                            )
+                                                            router.push(fixedDetailHref(item.id))
                                                         }
                                                     />
                                                 </li>
@@ -366,7 +364,7 @@ export function JarCategoryBreakdown({
                                                             </>
                                                         }
                                                         onClick={() =>
-                                                            router.push(updateHref('tx', tx.id))
+                                                            router.push(txDetailHref(tx.id))
                                                         }
                                                     />
                                                 </li>

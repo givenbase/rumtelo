@@ -75,14 +75,24 @@ export function vendorMarkSrc(input: ResolveVendorInput, size = 64): PartyMark {
     return { name: brand.name, src: vendorLogoUrl(brand.domain, size) };
 }
 
-/** Brand mark plus optional catalog chrome (category/jar icon + soft tone). */
+/**
+ * Brand mark + optional catalog chrome (category/jar icon + soft tone).
+ *
+ * When chrome is present, only an explicit `logoDomain` counts as a brand logo.
+ * Deriving a favicon from `website` is too noisy (lettermark placeholders) and
+ * would skip the catalog fallback — keep website for links, not for marks.
+ */
 export function partyMark(
     input: ResolveVendorInput,
     chrome?: { fallbackIcon?: string | null; tone?: string | null },
     size = 64
 ): PartyMark {
+    const hasChrome = Boolean(chrome?.fallbackIcon?.trim() || chrome?.tone);
+    const brandInput = hasChrome
+        ? { key: input.key, name: input.name, logoDomain: input.logoDomain }
+        : input;
     return {
-        ...vendorMarkSrc(input, size),
+        ...vendorMarkSrc(brandInput, size),
         fallbackIcon: chrome?.fallbackIcon ?? null,
         tone: chrome?.tone ?? null,
     };
@@ -102,13 +112,23 @@ export function findCatalogVendor(
     name: string,
     merchants: readonly MerchantPreset[]
 ): ResolveVendorInput | null {
+    const hit = findCatalogMerchant(name, merchants);
+    return hit ? toResolveInput(hit) : null;
+}
+
+/** Exact name / alias match — full merchant row. */
+export function findCatalogMerchant(
+    name: string,
+    merchants: readonly MerchantPreset[]
+): MerchantPreset | null {
     const needle = name.trim().toLowerCase();
     if (!needle) return null;
-    const hit = merchants.find(merchant => {
-        if (merchant.name.toLowerCase() === needle) return true;
-        return merchant.aliases.some(alias => alias.trim().toLowerCase() === needle);
-    });
-    return hit ? toResolveInput(hit) : null;
+    return (
+        merchants.find(merchant => {
+            if (merchant.name.toLowerCase() === needle) return true;
+            return merchant.aliases.some(alias => alias.trim().toLowerCase() === needle);
+        }) ?? null
+    );
 }
 
 /**
@@ -119,7 +139,16 @@ export function findCatalogVendorFromFeed(
     text: string,
     merchants: readonly MerchantPreset[]
 ): ResolveVendorInput | null {
-    const exact = findCatalogVendor(text, merchants);
+    const hit = findCatalogMerchantFromFeed(text, merchants);
+    return hit ? toResolveInput(hit) : null;
+}
+
+/** Feed-style match — full merchant row (jar + category keys). */
+export function findCatalogMerchantFromFeed(
+    text: string,
+    merchants: readonly MerchantPreset[]
+): MerchantPreset | null {
+    const exact = findCatalogMerchant(text, merchants);
     if (exact) return exact;
     const haystack = text.trim().toLowerCase();
     if (!haystack) return null;
@@ -135,7 +164,7 @@ export function findCatalogVendorFromFeed(
             }
         }
     }
-    return best ? toResolveInput(best.merchant) : null;
+    return best?.merchant ?? null;
 }
 
 /** Catalog merchant first, then giving-org website, then initials-only fallback. */

@@ -14,7 +14,10 @@ import { jarChrome } from '@/app/_lib/jar-meta';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { partyMark } from '@/app/_lib/vendor-brands';
+import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { formatBookedDate } from '@/components/features/money/jar-badge';
+import { isLiveData } from '@/app/_lib/preview';
+import { useAuth } from '@/components/features/shell/auth-provider';
 
 type InboxJarOption = Pick<Jar, 'id' | 'key' | 'name' | 'subtitle'>;
 type InboxDebtOption = Pick<Debt, 'id' | 'name'>;
@@ -60,7 +63,9 @@ export function InboxSortCard({
     onChange?: (transaction: Transaction, jarId: string) => void;
 }) {
     const { formatMoney } = useHouseholdCurrency();
+    const { householdId } = useAuth();
     const { byKey: catalogByKey } = useJarCatalog();
+    const categoryTemplatesQuery = useCategoryTemplates(isLiveData(householdId));
     const [pickedJarId, setPickedJarId] = useState<string | null>(null);
     const [debtId, setDebtId] = useState<string | null>(null);
     const [picking, setPicking] = useState(false);
@@ -76,12 +81,15 @@ export function InboxSortCard({
     const suggestedKey = selected?.key ?? suggestJarKey(transaction.amount);
     const catalog = catalogByKey.get(suggestedKey);
     const title = transaction.counterparty?.trim() || transaction.description;
+    const feedText = `${transaction.counterparty ?? ''} ${transaction.description}`;
     const mark = partyMark(
         { name: title, logoDomain: logoDomain ?? null },
         catalogMarkChrome({
-            billName: transaction.description,
+            billName: title,
+            searchText: feedText,
             jarKey: suggestedKey,
             jarByKey: catalogByKey,
+            categoryTemplates: categoryTemplatesQuery.data ?? [],
         })
     );
     const confident =
