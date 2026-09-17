@@ -14,6 +14,11 @@
     --font-display: var(--font-archivo-narrow), ui-sans-serif, system-ui, sans-serif;
     --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
     --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+    /*
+     * Type scale: use @rumtelo/ui Typography (as / size / weight / color / variant).
+     * Sizes: xs→text-xs · sm→text-sm · default/lg via as×size compounds — no text-[Npx].
+     * Colors: theme-aware text-foreground etc. (light=dark ink, dark=light text).
+     */
 
     /* Surfaces — cool wash keyed to brand navy */
     --color-bg: #e6eaef;

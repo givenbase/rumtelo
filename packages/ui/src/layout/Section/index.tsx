@@ -4,6 +4,7 @@ import { cn } from '@rumtelo/utils';
 
 import type SectionProps from './types';
 
+import { Typography } from '../../display/Typography';
 import { Eyebrow } from '../Eyebrow';
 
 export function Section({ eyebrow, title, action, children, className }: SectionProps) {
@@ -13,11 +14,7 @@ export function Section({ eyebrow, title, action, children, className }: Section
                 <div className="mb-4 flex items-end justify-between gap-4">
                     <div className="min-w-0">
                         {eyebrow ? <Eyebrow className="mb-1">✦ {eyebrow}</Eyebrow> : null}
-                        {title ? (
-                            <h2 className="font-display text-2xl font-semibold tracking-tight text-fg">
-                                {title}
-                            </h2>
-                        ) : null}
+                        {title ? <Typography as="h2">{title}</Typography> : null}
                     </div>
                     {action}
                 </div>

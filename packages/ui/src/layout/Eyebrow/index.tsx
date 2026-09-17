@@ -1,11 +1,11 @@
-'use client';
-
 import type { ReactNode } from 'react';
 
-import { cn } from '@rumtelo/utils';
-
-import eyebrowClass from './styles';
+import { Typography } from '../../display/Typography';
 
 export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
-    return <p className={cn(eyebrowClass, className)}>{children}</p>;
+    return (
+        <Typography as="p" variant="eyebrow" className={className}>
+            {children}
+        </Typography>
+    );
 }

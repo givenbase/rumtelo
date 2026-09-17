@@ -7,6 +7,8 @@ import { cn } from '@rumtelo/utils';
 
 import { Dialog as SheetPrimitive } from 'radix-ui';
 
+import { typographyVariants } from '../../display/Typography';
+
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
     return <SheetPrimitive.Root data-slot="sheet" {...props} />;
 }
@@ -105,7 +107,10 @@ function SheetTitle({ className, ...props }: React.ComponentProps<typeof SheetPr
     return (
         <SheetPrimitive.Title
             data-slot="sheet-title"
-            className={cn('font-semibold text-foreground', className)}
+            className={cn(
+                typographyVariants({ as: 'h1', size: 'sm', weight: 'semibold', color: 'default' }),
+                className
+            )}
             {...props}
         />
     );

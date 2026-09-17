@@ -7,6 +7,8 @@ import { cn } from '@rumtelo/utils';
 
 import { Dialog as DialogPrimitive } from 'radix-ui';
 
+import { typographyVariants } from '../../display/Typography';
+
 function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
     return <DialogPrimitive.Root data-slot="dialog" {...props} />;
 }
@@ -112,7 +114,10 @@ function DialogTitle({ className, ...props }: React.ComponentProps<typeof Dialog
     return (
         <DialogPrimitive.Title
             data-slot="dialog-title"
-            className={cn('text-lg leading-none font-semibold', className)}
+            className={cn(
+                typographyVariants({ as: 'h1', size: 'sm', weight: 'semibold', color: 'default' }),
+                className
+            )}
             {...props}
         />
     );
