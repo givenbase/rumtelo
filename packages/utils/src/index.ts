@@ -71,3 +71,4 @@ export {
     type PendingPlanIntent,
 } from './plan-intent';
 export { accountThemeFromCss, cssThemeFromAccount, type CssTheme } from './theme';
+export { formatIban, isValidIban, nlIbanBankCode, normalizeIban } from './iban';

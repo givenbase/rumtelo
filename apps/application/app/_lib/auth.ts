@@ -56,20 +56,43 @@ export async function updateOrganization(organizationId: string, data: { name?: 
     await client.organization.update({ organizationId, data });
 }
 
-export type Session = NonNullable<ReturnType<typeof useSession>['data']>;
+export type Session = {
+    session: {
+        activeOrganizationId?: string | null;
+    };
+    user: {
+        id: string;
+        name?: string | null;
+        email?: string | null;
+        image?: string | null;
+    };
+};
+
+type SessionInput =
+    | {
+          session?: { activeOrganizationId?: string | null } | null;
+          user?: {
+              id?: string | null;
+              name?: string | null;
+              email?: string | null;
+              image?: string | null;
+          } | null;
+      }
+    | null
+    | undefined;
 
 /**
  * Active household for this session.
  * Better Auth exposes `activeOrganizationId` (SDK name); DB column is
  * `active_household_id`. Value is an opaque AuthId string.
  */
-export function activeHouseholdId(session: Session | null | undefined): string | null {
+export function activeHouseholdId(session: SessionInput): string | null {
     if (!session) return null;
     return session.session?.activeOrganizationId ?? null;
 }
 
 /** Better Auth `user.id` — opaque AuthId, not Rumtelo uuid. */
-export function sessionUserId(session: Session | null | undefined): string | null {
+export function sessionUserId(session: SessionInput): string | null {
     return session?.user?.id ?? null;
 }
 

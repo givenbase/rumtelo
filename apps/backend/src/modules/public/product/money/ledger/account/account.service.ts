@@ -1,9 +1,11 @@
 import { EntityManager } from '@mikro-orm/postgresql';
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+
+import { type AccountKind } from '@rumtelo/contracts';
+import { isValidIban, normalizeIban } from '@rumtelo/utils';
 
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
-import { type AccountKind } from '@rumtelo/contracts';
 
 import { BankAccount } from './bank-account.entity';
 
@@ -19,10 +21,11 @@ export class AccountService {
     // ====================================================================
 
     async create(input: { name: string; iban?: string | null; kind: string; balance: number }) {
+        const iban = normalizeOptionalIban(input.iban);
         const account = this.em.create(BankAccount, {
             household: currentHouseholdId(),
             name: input.name,
-            iban: input.iban ?? null,
+            iban,
             kind: input.kind as AccountKind,
             balance: input.balance,
         } as never);
@@ -38,6 +41,14 @@ export class AccountService {
         const rows = await this.repo.find();
         return rows.map(toDto);
     }
+}
+
+function normalizeOptionalIban(value: string | null | undefined): string | null {
+    if (value === null || value === undefined || !value.trim()) return null;
+    if (!isValidIban(value)) {
+        throw new BadRequestException('Invalid IBAN — check the number and try again.');
+    }
+    return normalizeIban(value);
 }
 
 export function toDto(account: BankAccount) {

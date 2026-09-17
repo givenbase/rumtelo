@@ -51,9 +51,6 @@ export class GivingOrganisation extends BaseEntity {
     @Property({ length: 64, nullable: true })
     scope: string | null = null;
 
-    @Property({ type: 'text' })
-    website!: string;
-
     /** Independent signals: evaluator, claim, source URL, year confirmed. */
     @Property({ type: 'json', default: [] })
     signals: GivingSignal[] = [];
@@ -65,6 +62,9 @@ export class GivingOrganisation extends BaseEntity {
     /** Display / seed order within the catalog. */
     @Property({ default: 0 })
     sortOrder = 0;
+
+    @Property({ type: 'text' })
+    website!: string;
 
     /** Soft-disable without deleting historical seed identity. */
     @Property({ default: true })

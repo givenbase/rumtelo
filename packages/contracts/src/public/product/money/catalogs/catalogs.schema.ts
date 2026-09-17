@@ -59,6 +59,8 @@ export const MerchantPreset = CatalogItemBase.extend({
     /** Favicon hostname — client builds logo URL; no client brand mirror. */
     logoDomain: z.string().min(1).max(120).nullable(),
     website: z.string().max(240).nullable(),
+    /** Dutch IBAN bank code (positions 5–8), e.g. INGB. Null when not applicable. */
+    ibanBankCode: z.string().length(4).nullable(),
     /** Editorial pin + chip label; null = normal. */
     highlight: MerchantHighlight.nullable(),
     /** ISO markets where this merchant is listed (e.g. NL). */

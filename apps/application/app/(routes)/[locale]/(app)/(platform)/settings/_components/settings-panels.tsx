@@ -41,6 +41,10 @@ import {
     formatMoney as formatMoneyExplicit,
     formatPercent,
     formatPlanPrice,
+    formatIban,
+    isValidIban,
+    nlIbanBankCode,
+    normalizeIban,
     sumMonthly,
     toPeriodKey,
 } from '@rumtelo/utils';
@@ -79,6 +83,29 @@ import { PlanChangeDialog } from './plan-change-dialog';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 const JAR_COLOR: Record<string, string> = Object.fromEntries(JAR_META.map(j => [j.key, j.color]));
+
+const ACCOUNT_KIND_LABEL: Record<string, string> = {
+    CHECKING: 'Checking',
+    SAVINGS: 'Savings',
+    CREDIT: 'Credit card',
+    CASH: 'Cash',
+    INVESTMENT: 'Investment',
+};
+
+/** True when the field is empty or still only a bank stub / previous stub. */
+function isIbanStub(value: string): boolean {
+    const compact = value.replace(/\s+/g, '').toUpperCase();
+    if (!compact) return true;
+    return /^NL\d{0,2}[A-Z]{0,4}\d{0,10}$/.test(compact) && compact.length <= 8;
+}
+
+function formatNlIbanStub(bankCode: string): string {
+    return `NL00 ${bankCode} 0000 0000 00`;
+}
+
+function nlIbanPrefix(bankCode: string): string {
+    return `NL00 ${bankCode} `;
+}
 
 const CURRENCY_OPTIONS = [
     { code: Currency.EUR, sampleLocale: 'nl-NL', persist: true as const },
@@ -867,10 +894,25 @@ export function JarsSettings() {
     );
     const [pctDraft, setPctDraft] = useState<Record<string, number> | null>(null);
     const [dismissedTips, setDismissedTips] = useState<Record<string, true>>({});
+    /** Jar → account seat until the mapping API lands. */
+    const [jarSeats, setJarSeats] = useState<Record<string, string>>({});
+    const [editingJarId, setEditingJarId] = useState<string | null>(null);
     const pct = pctDraft ?? serverPct;
 
     const total = Object.values(pct).reduce((running, value) => running + value, 0);
     const balanced = Math.abs(total - 100) < 0.01;
+
+    const effectiveJarSeats = useMemo(() => {
+        if (accounts.length === 0) return jarSeats;
+        const fallbackId = accounts[0]!.id;
+        const next: Record<string, string> = { ...jarSeats };
+        for (const jar of jars) {
+            const current = next[jar.id];
+            if (current && accounts.some(account => account.id === current)) continue;
+            next[jar.id] = fallbackId;
+        }
+        return next;
+    }, [accounts, jars, jarSeats]);
 
     const coachTips = useMemo(() => {
         const spendingStyle = accountSettingsQuery.data?.spendingStyle ?? SpendingStyle.UNKNOWN;
@@ -911,11 +953,12 @@ export function JarsSettings() {
         setDismissedTips({});
     }
 
-    const defaultAccountLabel = (() => {
-        const account = accounts[0];
+    function accountLabel(accountId: string | undefined) {
+        if (!accountId) return null;
+        const account = accounts.find(item => item.id === accountId);
         if (!account) return null;
         return `${account.name}${account.iban ? ` · ${account.iban.slice(-4)}` : ''}`;
-    })();
+    }
 
     return (
         <SettingsPanel>
@@ -929,40 +972,89 @@ export function JarsSettings() {
                             : 'No accounts'}
                     </SettingsPill>
                 }>
-                {jars.map((jar, i) => (
-                    <SettingsRow key={jar.id} last={i === jars.length - 1}>
-                        <span className="flex min-w-0 items-center gap-3">
-                            <span
-                                className={cn(
-                                    'size-2 shrink-0 rounded-sm',
-                                    JAR_COLOR[jar.key] ?? 'bg-accent'
-                                )}
-                            />
-                            <span className="grid min-w-0 gap-0.5">
-                                <span className="text-sm text-fg">{jar.name}</span>
-                                <span
-                                    className={cn(
-                                        'font-mono text-[10px]',
-                                        defaultAccountLabel ? 'text-fg-secondary' : 'text-warning'
-                                    )}>
-                                    {defaultAccountLabel ?? 'Not set — add a bank account'}
+                {jars.map((jar, i) => {
+                    const seatId = effectiveJarSeats[jar.id];
+                    const label = accountLabel(seatId);
+                    const isEditing = editingJarId === jar.id;
+                    return (
+                        <div
+                            key={jar.id}
+                            className={cn(i < jars.length - 1 && 'border-b border-line')}>
+                            <SettingsRow last>
+                                <span className="flex min-w-0 items-center gap-3">
+                                    <span
+                                        className={cn(
+                                            'size-2 shrink-0 rounded-sm',
+                                            JAR_COLOR[jar.key] ?? 'bg-accent'
+                                        )}
+                                    />
+                                    <span className="grid min-w-0 gap-0.5">
+                                        <span className="text-sm text-fg">{jar.name}</span>
+                                        <span
+                                            className={cn(
+                                                'font-mono text-[10px]',
+                                                label ? 'text-fg-secondary' : 'text-warning'
+                                            )}>
+                                            {label ?? 'Not set — add a bank account'}
+                                        </span>
+                                    </span>
                                 </span>
-                            </span>
-                        </span>
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
-                            onClick={() =>
-                                showToast(
-                                    'Jar → account mapping saves with bank accounts — coming soon.',
-                                    'info'
-                                )
-                            }>
-                            Change
-                        </Button>
-                    </SettingsRow>
-                ))}
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
+                                    disabled={accounts.length === 0}
+                                    onClick={() =>
+                                        setEditingJarId(current =>
+                                            current === jar.id ? null : jar.id
+                                        )
+                                    }>
+                                    {isEditing ? 'Close' : 'Change'}
+                                </Button>
+                            </SettingsRow>
+                            {isEditing ? (
+                                <div className="flex flex-wrap gap-2 pb-3 pl-5">
+                                    {accounts.map(account => {
+                                        const selected = seatId === account.id;
+                                        return (
+                                            <button
+                                                key={account.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    setJarSeats(prev => ({
+                                                        ...prev,
+                                                        [jar.id]: account.id,
+                                                    }));
+                                                    setEditingJarId(null);
+                                                    showToast(
+                                                        `${jar.name} → ${account.name}`,
+                                                        'success'
+                                                    );
+                                                }}
+                                                className={cn(
+                                                    'rounded-full border px-3 py-1.5 text-left text-xs transition-colors',
+                                                    selected
+                                                        ? 'border-accent bg-accent/10 text-fg'
+                                                        : 'border-line text-fg-secondary hover:border-fg-faint hover:text-fg'
+                                                )}>
+                                                <span className="block font-medium text-fg">
+                                                    {account.name}
+                                                </span>
+                                                <span className="font-mono text-[10px] text-fg-muted">
+                                                    {ACCOUNT_KIND_LABEL[account.kind] ??
+                                                        account.kind}
+                                                    {account.iban
+                                                        ? ` · ${account.iban.slice(-4)}`
+                                                        : ''}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            ) : null}
+                        </div>
+                    );
+                })}
             </SettingsInkCard>
 
             <SettingsInkCard
@@ -1209,47 +1301,138 @@ export function BankSettings() {
         [],
         live
     );
-    /** Connect chips: retail banks only (exclude BNPL / rails also tagged BANKING). */
-    const bankConnectList = useMemo(() => {
+    /** Retail banks only (exclude BNPL / rails also tagged BANKING). */
+    const bankList = useMemo(() => {
         const rails = new Set(['KLARNA', 'AFTERPAY', 'PAYPAL', 'WISE']);
         return (bankingMerchantsQuery.data ?? []).filter(merchant => !rails.has(merchant.key));
     }, [bankingMerchantsQuery.data]);
 
-    const [name, setName] = useState('');
+    const bankByKey = useMemo(() => new Map(bankList.map(bank => [bank.key, bank])), [bankList]);
+
+    /** Match a saved account name back to a catalog bank for logos. */
+    function resolveBankForAccount(accountName: string) {
+        const needle = accountName.trim().toLowerCase();
+        return (
+            bankList.find(bank => {
+                const bankName = bank.name.toLowerCase();
+                return (
+                    needle === bankName ||
+                    needle.startsWith(`${bankName} ·`) ||
+                    needle.startsWith(`${bankName} -`) ||
+                    needle.includes(bankName)
+                );
+            }) ?? null
+        );
+    }
+
+    const [bankKey, setBankKey] = useState<string | null>(null);
+    const [label, setLabel] = useState('');
     const [iban, setIban] = useState('');
+    const [ibanError, setIbanError] = useState<string | null>(null);
     const [kind, setKind] = useState<AccountKind>(AccountKind.CHECKING);
     const [adding, setAdding] = useState(false);
+    const [customBank, setCustomBank] = useState(false);
+
+    function resetAddForm() {
+        setBankKey(null);
+        setLabel('');
+        setIban('');
+        setIbanError(null);
+        setKind(AccountKind.CHECKING);
+        setCustomBank(false);
+        setAdding(false);
+    }
+
+    function pickBank(key: string) {
+        const bank = bankByKey.get(key);
+        if (!bank) return;
+        setCustomBank(false);
+        setBankKey(key);
+        setLabel(prev =>
+            prev.trim() && prev.trim() !== bankByKey.get(bankKey ?? '')?.name ? prev : bank.name
+        );
+        const code = bank.ibanBankCode?.toUpperCase() ?? null;
+        if (code) {
+            setIban(prev => (isIbanStub(prev) ? nlIbanPrefix(code) : prev));
+            setIbanError(null);
+        }
+    }
+
+    function resolveIbanForSubmit(): string | null {
+        const trimmed = iban.trim();
+        if (!trimmed || isIbanStub(trimmed)) return null;
+        if (!isValidIban(trimmed)) {
+            throw new Error('Invalid IBAN');
+        }
+        const expected = selectedBank?.ibanBankCode?.toUpperCase() ?? null;
+        if (expected) {
+            const actual = nlIbanBankCode(trimmed);
+            if (actual && actual !== expected) {
+                throw new Error(
+                    `IBAN bank code is ${actual}, expected ${expected} for ${selectedBank?.name}`
+                );
+            }
+        }
+        return normalizeIban(trimmed);
+    }
+
+    const selectedBank = bankKey ? bankByKey.get(bankKey) : null;
+    const selectedIbanCode = selectedBank?.ibanBankCode?.toUpperCase() ?? undefined;
+    const ibanPlaceholder = selectedIbanCode
+        ? formatNlIbanStub(selectedIbanCode)
+        : 'NL00 BANK 0000 0000 00';
+    const ibanHint = selectedIbanCode
+        ? `Starts with NL00 ${selectedIbanCode} — paste the rest from your statement.`
+        : 'Optional — validated when filled (ISO IBAN check).';
 
     const createAccount = useMutation({
         mutationFn: async () => {
             if (!householdId) throw new Error('No household');
+            const bank = bankKey ? bankByKey.get(bankKey) : null;
+            let accountName = label.trim();
+            if (!accountName && bank) accountName = bank.name;
+            if (
+                bank &&
+                accountName &&
+                !accountName.toLowerCase().includes(bank.name.toLowerCase())
+            ) {
+                accountName = `${bank.name} · ${accountName}`;
+            }
+            if (!accountName) throw new Error('Name required');
+            const resolvedIban = resolveIbanForSubmit();
             return api.money.accounts.create({
                 householdId,
-                name: name.trim(),
-                iban: iban.trim() || null,
+                name: accountName,
+                iban: resolvedIban,
                 kind,
                 balance: 0,
             });
         },
         onSuccess: () => {
-            setName('');
-            setIban('');
-            setKind(AccountKind.CHECKING);
-            setAdding(false);
+            resetAddForm();
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.accounts.list.key() });
             showToast('Account added', 'success');
         },
-        onError: () => showToast('Account add failed', 'error'),
+        onError: error => {
+            const message = error instanceof Error ? error.message : '';
+            if (message.includes('IBAN') || message.includes('iban')) {
+                setIbanError(message);
+                showToast(message, 'error');
+                return;
+            }
+            showToast('Account add failed', 'error');
+        },
     });
 
     const accounts = accountsQuery.data ?? [];
-    const kindLabel: Record<string, string> = {
-        CHECKING: 'Checking',
-        SAVINGS: 'Savings',
-        CREDIT: 'Credit card',
-        CASH: 'Cash',
-        INVESTMENT: 'Investment',
-    };
+    const kindLabel = ACCOUNT_KIND_LABEL;
+
+    const canSubmit =
+        live &&
+        !createAccount.isPending &&
+        !ibanError &&
+        Boolean(label.trim() || (bankKey && bankByKey.get(bankKey)?.name)) &&
+        (customBank || Boolean(bankKey));
 
     return (
         <SettingsPanel>
@@ -1257,10 +1440,10 @@ export function BankSettings() {
                 eyebrow="Bank connection"
                 blurb="Read-only — Rumtelo never moves money. Disconnect any time."
                 badge={<SettingsPill>Not connected</SettingsPill>}>
-                {bankConnectList.length === 0 ? (
+                {bankList.length === 0 ? (
                     <p className="py-2.5 text-sm text-fg-muted">Loading banks…</p>
                 ) : (
-                    bankConnectList.map((bank, i) => {
+                    bankList.map((bank, i) => {
                         const mark = vendorMarkSrc({
                             key: bank.key,
                             name: bank.name,
@@ -1268,7 +1451,7 @@ export function BankSettings() {
                             website: bank.website,
                         });
                         return (
-                            <SettingsRow key={bank.key} last={i === bankConnectList.length - 1}>
+                            <SettingsRow key={bank.key} last={i === bankList.length - 1}>
                                 <div className="flex min-w-0 items-center gap-2.5">
                                     <VendorMark name={mark.name} src={mark.src} size={22} />
                                     <SettingsRowLabel title={bank.name} />
@@ -1289,7 +1472,7 @@ export function BankSettings() {
 
             <SettingsInkCard
                 eyebrow="Manual accounts"
-                blurb="CSV import always works. Add accounts here for recognition during import."
+                blurb="CSV import always works. Pick a bank from the list, then add the account for recognition during import."
                 badge={
                     <Button
                         size="sm"
@@ -1302,37 +1485,140 @@ export function BankSettings() {
                 {accounts.length === 0 ? (
                     <p className="py-2.5 text-sm text-fg-muted">No accounts yet.</p>
                 ) : (
-                    accounts.map((account, i) => (
-                        <SettingsRow key={account.id} last={i === accounts.length - 1 && !adding}>
-                            <SettingsRowLabel
-                                title={account.name}
-                                sub={`${account.iban ?? 'No IBAN'} · ${formatMoney(account.balance)}`}
-                            />
-                            <Badge>{kindLabel[account.kind] ?? account.kind}</Badge>
-                        </SettingsRow>
-                    ))
+                    accounts.map((account, i) => {
+                        const bank = resolveBankForAccount(account.name);
+                        const mark = bank
+                            ? vendorMarkSrc({
+                                  key: bank.key,
+                                  name: bank.name,
+                                  logoDomain: bank.logoDomain,
+                                  website: bank.website,
+                              })
+                            : null;
+                        return (
+                            <SettingsRow
+                                key={account.id}
+                                last={i === accounts.length - 1 && !adding}>
+                                <div className="flex min-w-0 items-center gap-2.5">
+                                    {mark ? (
+                                        <VendorMark name={mark.name} src={mark.src} size={22} />
+                                    ) : null}
+                                    <SettingsRowLabel
+                                        title={account.name}
+                                        sub={`${account.iban ?? 'No IBAN'} · ${formatMoney(account.balance)}`}
+                                    />
+                                </div>
+                                <Badge>{kindLabel[account.kind] ?? account.kind}</Badge>
+                            </SettingsRow>
+                        );
+                    })
                 )}
 
                 {adding ? (
                     <div className="grid gap-3 border-t border-line py-2.5">
-                        <Field label="Name" htmlFor="acc-name">
+                        <div className="grid gap-2">
+                            <span className="font-mono text-[10px] tracking-[0.14em] text-fg-faint uppercase">
+                                Which bank?
+                            </span>
+                            {bankList.length === 0 ? (
+                                <p className="text-sm text-fg-muted">Loading banks…</p>
+                            ) : (
+                                <div className="flex flex-wrap gap-2">
+                                    {bankList.map(bank => {
+                                        const mark = vendorMarkSrc({
+                                            key: bank.key,
+                                            name: bank.name,
+                                            logoDomain: bank.logoDomain,
+                                            website: bank.website,
+                                        });
+                                        const selected = !customBank && bankKey === bank.key;
+                                        return (
+                                            <button
+                                                key={bank.key}
+                                                type="button"
+                                                disabled={!live}
+                                                onClick={() => pickBank(bank.key)}
+                                                className={cn(
+                                                    'inline-flex items-center gap-2 rounded-full border px-2.5 py-1.5 text-xs transition-colors',
+                                                    selected
+                                                        ? 'border-accent bg-accent/10 text-fg'
+                                                        : 'border-line text-fg-secondary hover:border-fg-faint hover:text-fg'
+                                                )}>
+                                                <VendorMark
+                                                    name={mark.name}
+                                                    src={mark.src}
+                                                    size={18}
+                                                />
+                                                {bank.name}
+                                            </button>
+                                        );
+                                    })}
+                                    <button
+                                        type="button"
+                                        disabled={!live}
+                                        onClick={() => {
+                                            setCustomBank(true);
+                                            setBankKey(null);
+                                        }}
+                                        className={cn(
+                                            'inline-flex items-center rounded-full border px-2.5 py-1.5 text-xs transition-colors',
+                                            customBank
+                                                ? 'border-accent bg-accent/10 text-fg'
+                                                : 'border-line text-fg-secondary hover:border-fg-faint hover:text-fg'
+                                        )}>
+                                        Other…
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                        <Field
+                            label="Account label"
+                            htmlFor="acc-name"
+                            hint="Shown in jar seats and CSV import — e.g. Operating checking.">
                             <Input
                                 id="acc-name"
-                                placeholder="Checking account"
-                                value={name}
-                                onChange={event => setName(event.target.value)}
+                                placeholder={
+                                    bankKey
+                                        ? `${bankByKey.get(bankKey)?.name ?? 'Bank'} checking`
+                                        : 'Operating checking'
+                                }
+                                value={label}
+                                onChange={event => setLabel(event.target.value)}
                                 disabled={!live}
                             />
                         </Field>
-                        <Field
-                            label="IBAN"
-                            htmlFor="acc-iban"
-                            hint="Optional — only for recognition during import.">
+                        <Field label="IBAN" htmlFor="acc-iban" hint={ibanError ?? ibanHint}>
                             <Input
                                 id="acc-iban"
-                                placeholder="NL00 BANK 0000 0000 00"
+                                placeholder={ibanPlaceholder}
                                 value={iban}
-                                onChange={event => setIban(event.target.value)}
+                                aria-invalid={Boolean(ibanError)}
+                                onChange={event => {
+                                    setIban(event.target.value);
+                                    if (ibanError) setIbanError(null);
+                                }}
+                                onBlur={() => {
+                                    const trimmed = iban.trim();
+                                    if (!trimmed || isIbanStub(trimmed)) return;
+                                    if (!isValidIban(trimmed)) {
+                                        setIbanError(
+                                            'Invalid IBAN — check the number and try again.'
+                                        );
+                                        return;
+                                    }
+                                    const expected = selectedIbanCode ?? null;
+                                    if (expected) {
+                                        const actual = nlIbanBankCode(trimmed);
+                                        if (actual && actual !== expected) {
+                                            setIbanError(
+                                                `This IBAN is ${actual}, but ${selectedBank?.name} uses ${expected}.`
+                                            );
+                                            return;
+                                        }
+                                    }
+                                    setIbanError(null);
+                                    setIban(formatIban(trimmed));
+                                }}
                                 disabled={!live}
                             />
                         </Field>
@@ -1350,12 +1636,10 @@ export function BankSettings() {
                             </Select>
                         </Field>
                         <div className="flex justify-end gap-2">
-                            <Button variant="ghost" onClick={() => setAdding(false)}>
+                            <Button variant="ghost" onClick={resetAddForm}>
                                 Cancel
                             </Button>
-                            <Button
-                                disabled={!live || createAccount.isPending || !name.trim()}
-                                onClick={() => createAccount.mutate()}>
+                            <Button disabled={!canSubmit} onClick={() => createAccount.mutate()}>
                                 {createAccount.isPending ? 'Working…' : 'Add'}
                             </Button>
                         </div>

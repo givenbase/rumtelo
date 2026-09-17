@@ -275,24 +275,6 @@ export function FixedCostForm({
             .slice(0, MAX_VENDOR_CHIPS);
     }, [merchants, activeCategoryTemplateKey]);
 
-    /** Evidence-backed donation chips — shown on Help me choose, not “I know who”. */
-    const giveKnownVendors = useMemo(() => {
-        const categoryKey = activeCategoryTemplateKey ?? DONATIONS_CATEGORY_KEY;
-        return merchants
-            .filter(
-                merchant =>
-                    merchant.jarKey === JarKey.GIVE && merchant.categoryTemplateKey === categoryKey
-            )
-            .slice()
-            .sort((left, right) => {
-                if (right.matchPriority !== left.matchPriority) {
-                    return right.matchPriority - left.matchPriority;
-                }
-                return left.sortOrder - right.sortOrder;
-            })
-            .slice(0, MAX_VENDOR_CHIPS);
-    }, [merchants, activeCategoryTemplateKey]);
-
     const givingOrgNames = useMemo(() => givingOrgsQuery.data ?? [], [givingOrgsQuery.data]);
 
     const showPayeeInput = mode === 'edit' || customPayee || vendorsForCategory.length === 0;
@@ -724,78 +706,31 @@ export function FixedCostForm({
                                 )}
 
                                 {givePayeeMode === 'coach' ? (
-                                    <div className="grid gap-3">
-                                        {giveKnownVendors.length > 0 ? (
-                                            <div className="flex max-h-40 flex-wrap gap-1.5 overflow-y-auto pr-0.5">
-                                                {giveKnownVendors.map(merchant => {
-                                                    const selected = nameMatches(
-                                                        counterparty,
-                                                        merchant.name
-                                                    );
-                                                    const mark = vendorMarkSrc({
-                                                        key: merchant.key,
-                                                        name: merchant.name,
-                                                        logoDomain: merchant.logoDomain,
-                                                        website: merchant.website,
-                                                    });
-                                                    return (
-                                                        <button
-                                                            key={merchant.key}
-                                                            type="button"
-                                                            disabled={busy}
-                                                            className={
-                                                                selected
-                                                                    ? 'inline-flex items-center gap-2 rounded-xl border border-accent bg-accent/15 px-2.5 py-1.5 text-sm text-accent'
-                                                                    : 'inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent'
-                                                            }
-                                                            onClick={() => {
-                                                                setGiveOrgKey(null);
-                                                                form.setValue(
-                                                                    'counterparty',
-                                                                    merchant.name,
-                                                                    {
-                                                                        shouldValidate: true,
-                                                                        shouldDirty: true,
-                                                                    }
-                                                                );
-                                                            }}>
-                                                            <VendorMark
-                                                                name={mark.name}
-                                                                src={mark.src}
-                                                                size={20}
-                                                            />
-                                                            {merchant.name}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        ) : null}
-                                        <GivingFinder
-                                            defaultOpen
-                                            selectedKey={giveOrgKey}
-                                            selectedName={counterparty}
-                                            onPick={organisation => {
-                                                setGiveOrgKey(organisation.key);
-                                                form.setValue('counterparty', organisation.name, {
-                                                    shouldDirty: true,
-                                                });
-                                                if (
-                                                    !form.getValues('categoryId') &&
-                                                    !pendingCategoryTemplateKey
-                                                ) {
-                                                    setPendingCategoryTemplateKey(
-                                                        DONATIONS_CATEGORY_KEY
-                                                    );
-                                                }
-                                            }}
-                                        />
-                                    </div>
+                                    <GivingFinder
+                                        defaultOpen
+                                        selectedKey={giveOrgKey}
+                                        selectedName={counterparty}
+                                        onPick={organisation => {
+                                            setGiveOrgKey(organisation.key);
+                                            form.setValue('counterparty', organisation.name, {
+                                                shouldDirty: true,
+                                            });
+                                            if (
+                                                !form.getValues('categoryId') &&
+                                                !pendingCategoryTemplateKey
+                                            ) {
+                                                setPendingCategoryTemplateKey(
+                                                    DONATIONS_CATEGORY_KEY
+                                                );
+                                            }
+                                        }}
+                                    />
                                 ) : null}
                             </div>
                         ) : (
                             <>
                                 {!customPayee && vendorsForCategory.length > 0 ? (
-                                    <div className="flex max-h-40 flex-wrap gap-1.5 overflow-y-auto pr-0.5">
+                                    <div className="flex flex-wrap gap-1.5">
                                         {vendorsForCategory.map(merchant => {
                                             const selected = nameMatches(
                                                 counterparty,

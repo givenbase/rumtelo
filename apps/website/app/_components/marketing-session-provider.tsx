@@ -38,6 +38,21 @@ interface MarketingSessionCtx {
 
 const MarketingSessionContext = createContext<MarketingSessionCtx | null>(null);
 
+function toSession(data: ReturnType<typeof useSession>['data']): Session | null | undefined {
+    if (data === null || data === undefined) return data;
+    const userId = data.user?.id;
+    if (!userId) return null;
+    return {
+        session: { activeOrganizationId: data.session?.activeOrganizationId ?? null },
+        user: {
+            id: userId,
+            name: data.user?.name ?? null,
+            email: data.user?.email ?? null,
+            image: data.user?.image ?? null,
+        },
+    };
+}
+
 function parsePlanKey(value: unknown): PlanKey | null {
     if (value === PlanKey.BASIC || value === PlanKey.PLUS || value === PlanKey.MAX) {
         return value;
@@ -48,7 +63,8 @@ function parsePlanKey(value: unknown): PlanKey | null {
 type PlanFetch = { householdId: string; planKey: PlanKey | null };
 
 export function MarketingSessionProvider({ children }: { children: ReactNode }) {
-    const { data: session, isPending, refetch } = useSession();
+    const { data, isPending, refetch } = useSession();
+    const session = toSession(data);
     const activating = useRef(false);
     const refetchRef = useRef(refetch);
 

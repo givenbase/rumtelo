@@ -587,6 +587,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      ibantools:
+        specifier: ^4.5.4
+        version: 4.5.4
       tailwind-merge:
         specifier: ^3.3.1
         version: 3.6.0
@@ -4619,6 +4622,9 @@ packages:
     resolution: {integrity: sha512-5gs5ytaNjBrh5Ow3zrvdUUY+0VxIuWVL4i9irt6friV+BqdCfmV11CQTWMiBYWHbXhco+J1kHfTOUkePhCDvMA==}
     engines: {node: '>=18'}
     hasBin: true
+
+  ibantools@4.5.4:
+    resolution: {integrity: sha512-6jX1gh4aH6XH+o0ey+wtkMTzkcvsEta7DakIOZSng9voZYpMw3U+gK1+tZChk3aRcPcloEt0NOzksjaRZiqXbw==}
 
   iconv-lite@0.7.3:
     resolution: {integrity: sha512-IKXpvIzjnC9XTAUbVBcMfGS0EPaIXtW6v+zr+RRp+hqULEpo0owZax6wyRwPOJbWbzjYspQwusTsfVr0ifh4uQ==}
@@ -9879,6 +9885,8 @@ snapshots:
       toidentifier: 1.0.1
 
   husky@9.1.7: {}
+
+  ibantools@4.5.4: {}
 
   iconv-lite@0.7.3:
     dependencies:

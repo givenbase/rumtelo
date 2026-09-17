@@ -13,6 +13,11 @@ export type MerchantSeed = {
     categoryTemplateKey: string;
     logoDomain: string | null;
     website?: string | null;
+    /**
+     * Dutch IBAN bank identifier (positions 5–8), e.g. INGB.
+     * Null for rails / foreign issuers without a single NL domestic code.
+     */
+    ibanBankCode?: string | null;
     highlight?: MerchantHighlight | null;
     markets?: string[];
     matchPriority?: number;

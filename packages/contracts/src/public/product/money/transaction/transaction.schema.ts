@@ -88,7 +88,8 @@ export const Account = z.object({
     id: Id,
     householdId: HouseholdId,
     name: z.string().min(1).max(120),
-    iban: z.string().max(34).nullable(),
+    /** Optional; accept spaced input — server normalizes to electronic form. */
+    iban: z.string().max(42).nullable(),
     kind: z.enum(AccountKind),
     balance: Money,
     /** Null for manual accounts; set when linked through the bank-sync port. */

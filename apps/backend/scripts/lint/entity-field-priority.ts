@@ -339,10 +339,15 @@ export const EXACT_FIELD_PRIORITY: Record<string, number> = {
     forPostureKeys: 8,
     forSpendingStyles: 8,
     minStageKey: 8,
+    aliases: 8,
+    markets: 8,
+    providerIds: 8,
 
     url: 9,
     imageUrl: 9,
     linkPath: 9,
+    logoDomain: 9,
+    website: 9,
 
     isActive: 10,
     isFeatured: 10,
@@ -373,6 +378,8 @@ export const SAME_PRIORITY_ORDER: readonly (readonly string[])[] = [
     ['entityId', 'entityType', 'fieldName'],
     ['household', 'account'],
     ['key', 'name', 'slug'],
+    ['matchValue', 'mcc', 'categoryTemplateKey', 'ibanBankCode'],
+    ['aliases', 'markets', 'providerIds'],
     ['budgeted', 'actual', 'target'],
     ['amount', 'balance', 'rate', 'percentage'],
     ['isBankSyncEnabled', 'isCoachEnabled'],
@@ -383,8 +390,11 @@ export const SAME_PRIORITY_ORDER: readonly (readonly string[])[] = [
 export const UI_METADATA_PRIORITY: Record<string, number> = {
     color: 1,
     icon: 2,
-    isFeatured: 3,
-    sortOrder: 4,
+    logoDomain: 3,
+    website: 4,
+    highlight: 5,
+    isFeatured: 6,
+    sortOrder: 7,
 };
 
 export function inferFieldPriority(fieldName: string): number {

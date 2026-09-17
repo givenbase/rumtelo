@@ -24,9 +24,9 @@ export class MerchantPresetService {
                 ...(filters?.categoryTemplateKey
                     ? { categoryTemplateKey: filters.categoryTemplateKey }
                     : {}),
-                ...(filters?.mcc ? { mcc: filters.mcc } : {}),
+                ...(filters?.mcc ? { matching: { mcc: filters.mcc } } : {}),
             },
-            { populate: ['jarTemplate'] }
+            { populate: ['jarTemplate', 'matching', 'branding', 'banking'] }
         );
         return rows
             .filter(row => (row.markets?.length ? row.markets : ['NL']).includes(market))
@@ -34,9 +34,9 @@ export class MerchantPresetService {
                 const leftHi = left.highlight ? 1 : 0;
                 const rightHi = right.highlight ? 1 : 0;
                 if (rightHi !== leftHi) return rightHi - leftHi;
-                if (right.matchPriority !== left.matchPriority) {
-                    return right.matchPriority - left.matchPriority;
-                }
+                const leftPri = left.matching?.matchPriority ?? 0;
+                const rightPri = right.matching?.matchPriority ?? 0;
+                if (rightPri !== leftPri) return rightPri - leftPri;
                 return left.sortOrder - right.sortOrder;
             });
     }
@@ -55,22 +55,28 @@ export class MerchantPresetService {
         const mcc = input.mcc?.trim();
         if (mcc) {
             const byMcc = isActive
-                .filter(preset => preset.mcc === mcc)
-                .sort((left, right) => right.matchPriority - left.matchPriority);
+                .filter(preset => preset.matching?.mcc === mcc)
+                .sort(
+                    (left, right) =>
+                        (right.matching?.matchPriority ?? 0) - (left.matching?.matchPriority ?? 0)
+                );
             if (byMcc[0]) return byMcc[0];
         }
         const text = (input.text ?? '').trim().toLowerCase();
         if (!text) return null;
         let best: MerchantPreset | null = null;
         for (const row of isActive) {
-            const needles = [row.matchValue, ...row.aliases]
+            const matching = row.matching;
+            if (!matching) continue;
+            const needles = [matching.matchValue, ...matching.aliases]
                 .map(alias => alias.trim().toLowerCase())
                 .filter(Boolean);
             if (!needles.some(needle => text.includes(needle))) continue;
+            const bestPri = best?.matching?.matchPriority ?? -1;
             if (
                 !best ||
-                row.matchPriority > best.matchPriority ||
-                (row.matchPriority === best.matchPriority && row.sortOrder < best.sortOrder)
+                matching.matchPriority > bestPri ||
+                (matching.matchPriority === bestPri && row.sortOrder < (best?.sortOrder ?? 0))
             ) {
                 best = row;
             }

@@ -36,8 +36,24 @@ interface AuthCtx {
 
 const AuthContext = createContext<AuthCtx | null>(null);
 
+function toSession(data: ReturnType<typeof useSession>['data']): Session | null | undefined {
+    if (data === null || data === undefined) return data;
+    const userId = data.user?.id;
+    if (!userId) return null;
+    return {
+        session: { activeOrganizationId: data.session?.activeOrganizationId ?? null },
+        user: {
+            id: userId,
+            name: data.user?.name ?? null,
+            email: data.user?.email ?? null,
+            image: data.user?.image ?? null,
+        },
+    };
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const { data: session, isPending, refetch } = useSession();
+    const { data, isPending, refetch } = useSession();
+    const session = toSession(data);
     const activating = useRef(false);
 
     const householdId = activeHouseholdId(session);

@@ -105,7 +105,7 @@ export function SignUpForm() {
             lastName: values.lastName,
             phone: values.phone || undefined,
             dateOfBirth: values.dateOfBirth || undefined,
-        } as never);
+        } as Parameters<typeof signUp.email>[0]);
 
         if (result.error) {
             form.setValue('password', '');

@@ -40,18 +40,32 @@ export async function listOrganizations() {
     return client.organization.list();
 }
 
-export type Session = NonNullable<ReturnType<typeof useSession>['data']>;
+export type Session = {
+    session: {
+        activeOrganizationId?: string | null;
+    };
+    user: {
+        id: string;
+        name?: string | null;
+        email?: string | null;
+        image?: string | null;
+    };
+};
 
 /**
  * Active household for this session.
  * Better Auth exposes `activeOrganizationId` (SDK name).
  */
-export function activeHouseholdId(session: Session | null | undefined): string | null {
+export function activeHouseholdId(
+    session: { session?: { activeOrganizationId?: string | null } | null } | null | undefined
+): string | null {
     if (!session) return null;
     return session.session?.activeOrganizationId ?? null;
 }
 
 /** Better Auth `user.id` — opaque AuthId. */
-export function sessionUserId(session: Session | null | undefined): string | null {
+export function sessionUserId(
+    session: { user?: { id?: string | null } | null } | null | undefined
+): string | null {
     return session?.user?.id ?? null;
 }
