@@ -42,6 +42,7 @@ export function ExpenseCreatePage({
             mode="create"
             embedded={embedded}
             direction={direction}
+            lockJar={Boolean(defaultJarId)}
             defaultValues={merged}
         />
     );

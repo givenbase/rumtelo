@@ -35,6 +35,8 @@ type ExpenseIntentFieldProps = {
     merchants: readonly MerchantPreset[];
     categories: readonly CategoryTemplate[];
     categoryIconByKey: Map<string, string | null>;
+    /** When set, only show types/vendors that belong to this jar. */
+    jarKey?: JarKey | null;
     disabled?: boolean;
     id?: string;
 };
@@ -80,6 +82,7 @@ export function ExpenseIntentField({
     merchants,
     categories,
     categoryIconByKey,
+    jarKey = null,
     disabled,
     id,
 }: ExpenseIntentFieldProps) {
@@ -91,10 +94,20 @@ export function ExpenseIntentField({
     const rootRef = useRef<HTMLDivElement>(null);
     const listboxId = `${id ?? 'expense-intent'}-listbox`;
 
+    const scopedCategories = useMemo(
+        () => (jarKey ? categories.filter(category => category.jarKey === jarKey) : categories),
+        [categories, jarKey]
+    );
+
+    const scopedMerchants = useMemo(
+        () => (jarKey ? merchants.filter(merchant => merchant.jarKey === jarKey) : merchants),
+        [merchants, jarKey]
+    );
+
     const needle = query.trim().toLowerCase();
 
     const merchantHits = useMemo(() => {
-        const hits = merchants.filter(merchant => matchesMerchant(merchant, needle));
+        const hits = scopedMerchants.filter(merchant => matchesMerchant(merchant, needle));
         return hits
             .slice()
             .sort((left, right) => {
@@ -104,15 +117,17 @@ export function ExpenseIntentField({
                 return left.sortOrder - right.sortOrder;
             })
             .slice(0, 8);
-    }, [merchants, needle]);
+    }, [scopedMerchants, needle]);
 
     const categoryHits = useMemo(
-        () => categories.filter(category => matchesCategory(category, needle)).slice(0, 8),
-        [categories, needle]
+        () => scopedCategories.filter(category => matchesCategory(category, needle)).slice(0, 8),
+        [scopedCategories, needle]
     );
 
     const vendorsForCategory = useMemo(() => {
         if (!value.categoryKey) return [];
+        // Category already pins the spend type — use the full catalog for that
+        // category (not jar-scoped), so chips/typeahead still work if jar keys drift.
         return merchants
             .filter(merchant => merchant.categoryTemplateKey === value.categoryKey)
             .slice()
@@ -123,6 +138,14 @@ export function ExpenseIntentField({
                 return left.sortOrder - right.sortOrder;
             });
     }, [merchants, value.categoryKey]);
+
+    const vendorTypeaheadHits = useMemo(() => {
+        if (!customVendor) return [];
+        const pool = value.categoryKey ? vendorsForCategory : scopedMerchants;
+        return pool
+            .filter(merchant => matchesMerchant(merchant, needle))
+            .slice(0, 8);
+    }, [customVendor, value.categoryKey, vendorsForCategory, scopedMerchants, needle]);
 
     const hasSelection = Boolean(value.vendor || value.categoryKey);
     const showVendorPrompt =
@@ -154,7 +177,7 @@ export function ExpenseIntentField({
     }
 
     function selectMerchant(merchant: MerchantPreset) {
-        const category = categories.find(
+        const category = scopedCategories.find(
             candidate => candidate.key === merchant.categoryTemplateKey
         );
         onChange({
@@ -266,7 +289,7 @@ export function ExpenseIntentField({
                         })}
                     </div>
                     <p className="text-xs leading-relaxed text-fg-faint">
-                        Pick from the catalog when you know the shop or type — or type a custom
+                        Pick from this jar’s catalog when you know the shop or type — or type a custom
                         name.
                     </p>
                 </div>
@@ -371,8 +394,9 @@ export function ExpenseIntentField({
                             {merchantHits.length === 0 && categoryHits.length === 0 ? (
                                 <div className="grid gap-1 px-3 py-2">
                                     <p className="text-bg/60">
-                                        No matches — press Enter to use “{query.trim() || '…'}” as
-                                        vendor.
+                                        {jarKey && scopedCategories.length === 0 && !needle
+                                            ? 'No types for this jar yet — type a custom name instead.'
+                                            : `No matches — press Enter to use “${query.trim() || '…'}” as vendor.`}
                                     </p>
                                     {query.trim() ? (
                                         <button
@@ -555,18 +579,77 @@ export function ExpenseIntentField({
                         </div>
                     )}
                     {customVendor ? (
-                        <FormInput
-                            placeholder="Type vendor name"
-                            disabled={disabled}
-                            value={query}
-                            onChange={event => setQuery(event.target.value)}
-                            onKeyDown={event => {
-                                if (event.key === 'Enter') {
-                                    event.preventDefault();
-                                    commitCustomVendor(query);
-                                }
-                            }}
-                        />
+                        <div className="relative grid gap-1.5">
+                            <FormInput
+                                placeholder="Type vendor name — e.g. Zara"
+                                disabled={disabled}
+                                value={query}
+                                autoComplete="off"
+                                onChange={event => setQuery(event.target.value)}
+                                onKeyDown={event => {
+                                    if (event.key === 'Enter') {
+                                        event.preventDefault();
+                                        const first = vendorTypeaheadHits[0];
+                                        if (first && needle) {
+                                            selectMerchant(first);
+                                            return;
+                                        }
+                                        commitCustomVendor(query);
+                                    }
+                                }}
+                            />
+                            {vendorTypeaheadHits.length > 0 ? (
+                                <ul
+                                    role="listbox"
+                                    className="max-h-48 overflow-y-auto rounded-xl border border-line bg-raised py-1 shadow-lg">
+                                    {vendorTypeaheadHits.map(merchant => {
+                                        const mark = vendorMarkSrc({
+                                            key: merchant.key,
+                                            name: merchant.name,
+                                            logoDomain: merchant.logoDomain,
+                                            website: merchant.website,
+                                        });
+                                        return (
+                                            <li key={merchant.key} role="option">
+                                                <button
+                                                    type="button"
+                                                    disabled={disabled}
+                                                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-fg hover:bg-accent-soft hover:text-accent"
+                                                    onClick={() => selectMerchant(merchant)}>
+                                                    <VendorMark
+                                                        name={mark.name}
+                                                        src={mark.src}
+                                                        size={20}
+                                                    />
+                                                    <span className="min-w-0 flex-1 truncate font-medium">
+                                                        {merchant.name}
+                                                    </span>
+                                                </button>
+                                            </li>
+                                        );
+                                    })}
+                                    {needle ? (
+                                        <li>
+                                            <button
+                                                type="button"
+                                                disabled={disabled}
+                                                className="w-full px-3 py-2 text-left text-sm text-fg-muted hover:bg-accent-soft hover:text-accent"
+                                                onClick={() => commitCustomVendor(query)}>
+                                                Use “{query.trim()}” as vendor
+                                            </button>
+                                        </li>
+                                    ) : null}
+                                </ul>
+                            ) : needle ? (
+                                <button
+                                    type="button"
+                                    disabled={disabled}
+                                    className="rounded-xl border border-dashed border-line px-3 py-2 text-left text-sm text-fg-muted hover:border-accent hover:text-accent"
+                                    onClick={() => commitCustomVendor(query)}>
+                                    No match — use “{query.trim()}” as vendor
+                                </button>
+                            ) : null}
+                        </div>
                     ) : null}
                 </div>
             ) : null}

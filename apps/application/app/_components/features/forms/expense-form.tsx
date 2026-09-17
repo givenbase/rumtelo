@@ -19,13 +19,14 @@ import {
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { CategoryTemplate, MerchantPreset } from '@rumtelo/contracts';
-import { jarCapabilitiesFor } from '@rumtelo/contracts';
+import { JarKey, jarCapabilitiesFor } from '@rumtelo/contracts';
 import { z } from 'zod';
 
 import { parseAmountToMinorUnits, todayIsoDate } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
+import { GivingFinder } from '@/components/features/money/giving-finder';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
@@ -35,6 +36,16 @@ import { ExpenseIntentField, type ExpenseIntentSelection } from './expense-inten
 import { FormInput } from './form-input';
 import { PresetNameField } from './preset-name-field';
 import { resolveInflowKey, TRANSACTION_IN_PRESETS } from './transaction-in-presets';
+
+/** Category template used when logging a one-time gift (matches fixed-cost Give). */
+const DONATIONS_CATEGORY_KEY = 'DONATIONS';
+
+type GivePayeeMode = 'known' | 'coach';
+
+const GIVE_PAYEE_MODES: ReadonlyArray<{ id: GivePayeeMode; label: string }> = [
+    { id: 'known', label: 'I know who' },
+    { id: 'coach', label: 'Help me choose' },
+];
 
 const expenseFormSchema = z.object({
     amount: z
@@ -72,6 +83,8 @@ type ExpenseFormProps = {
     mode?: 'create' | 'edit';
     /** Out = spend (negative); In = gift / top-up / refund (positive). */
     direction?: 'out' | 'in';
+    /** When true (opened from a jar page), jar is fixed — no picker. */
+    lockJar?: boolean;
     /** When set (inbox "Anders"), submit sorts/updates that transaction instead of creating. */
     entityId?: string;
     onSuccess?: () => void;
@@ -192,6 +205,7 @@ export function ExpenseForm({
     embedded = true,
     mode = 'create',
     direction: directionProp = 'out',
+    lockJar = false,
     entityId,
     onSuccess,
 }: ExpenseFormProps) {
@@ -289,19 +303,100 @@ export function ExpenseForm({
         resolver: zodResolver(expenseFormSchema),
     });
 
+    const selectedJarId = useWatch({ control: form.control, name: 'jarId' });
+    const selectedJar = useMemo(
+        () => jars.find(jar => jar.id === selectedJarId) ?? null,
+        [jars, selectedJarId]
+    );
+    const selectedJarKey = useMemo(() => selectedJar?.key ?? null, [selectedJar]);
+    const isGive = selectedJarKey === JarKey.GIVE;
+
+    // Drop intent when it belongs to another jar (adjust during render).
+    const [seenJarKey, setSeenJarKey] = useState<JarKey | null>(selectedJarKey);
+    if (selectedJarKey !== seenJarKey) {
+        setSeenJarKey(selectedJarKey);
+        if (
+            intent.jarKey &&
+            selectedJarKey &&
+            intent.jarKey !== selectedJarKey &&
+            intentOverride
+        ) {
+            setIntentOverride(null);
+        }
+    }
+
+    const [givePayeeMode, setGivePayeeMode] = useState<GivePayeeMode>('known');
+    const [giveOrgKey, setGiveOrgKey] = useState<string | null>(null);
+
+    const donationsCategory = useMemo(
+        () => categories.find(category => category.key === DONATIONS_CATEGORY_KEY) ?? null,
+        [categories]
+    );
+
+    function applyGivePayee(name: string, orgKey: string | null = null) {
+        setGiveOrgKey(orgKey);
+        setIntentOverride({
+            vendor: name,
+            merchantKey: null,
+            categoryKey: donationsCategory?.key ?? DONATIONS_CATEGORY_KEY,
+            categoryName: donationsCategory?.name ?? 'Donations',
+            jarKey: JarKey.GIVE,
+            source: name.trim() ? 'custom' : null,
+        });
+    }
+
+    // Leaving Give clears the special payee path (adjust during render).
+    if (!isGive && (giveOrgKey || givePayeeMode !== 'known' || intent.jarKey === JarKey.GIVE)) {
+        if (giveOrgKey) setGiveOrgKey(null);
+        if (givePayeeMode !== 'known') setGivePayeeMode('known');
+        if (intent.jarKey === JarKey.GIVE && intentOverride) {
+            setIntentOverride(null);
+        }
+    }
+
+    // Prefill Give payee from edit / deep-link counterparty once.
+    const [giveHydrated, setGiveHydrated] = useState(false);
+    if (isGive && !giveHydrated && !isIn) {
+        setGiveHydrated(true);
+        const prefill = (defaultValues?.counterparty ?? '').trim();
+        if (prefill) {
+            applyGivePayee(prefill, null);
+            setGivePayeeMode('known');
+        } else if (intent.jarKey !== JarKey.GIVE) {
+            // Drop merchant intent from another jar when landing on Give.
+            setIntentOverride({
+                vendor: '',
+                merchantKey: null,
+                categoryKey: donationsCategory?.key ?? DONATIONS_CATEGORY_KEY,
+                categoryName: donationsCategory?.name ?? 'Donations',
+                jarKey: JarKey.GIVE,
+                source: null,
+            });
+        }
+    }
+    if (!isGive && giveHydrated) {
+        setGiveHydrated(false);
+    }
     useEffect(() => {
         // Wait for jars — otherwise a prefilled jarId gets overwritten while the list is empty.
         if (jarChoices.length === 0) return;
         const current = form.getValues('jarId');
         if (current && jarChoices.some(jar => jar.id === current)) return;
+        // Prefer the locked / prefilled jar even if it is not in jarChoices yet (loading race).
+        if (lockJar && defaultValues?.jarId) {
+            form.setValue('jarId', defaultValues.jarId);
+            return;
+        }
         if (jarChoices[0]?.id) form.setValue('jarId', jarChoices[0].id);
-    }, [jarChoices, form]);
+    }, [jarChoices, form, lockJar, defaultValues?.jarId]);
 
     useEffect(() => {
+        // Locked jar context wins — don't let merchant intent switch jars.
+        if (lockJar) return;
         if (!intent.jarKey) return;
         const jar = jarChoices.find(candidate => candidate.key === intent.jarKey);
         if (jar) form.setValue('jarId', jar.id);
-    }, [intent.jarKey, jarChoices, form]);
+    }, [intent.jarKey, jarChoices, form, lockJar]);
 
     const onError = createFormInvalidHandler(({ title, description }) => {
         showToast(description ?? title, 'error');
@@ -310,8 +405,8 @@ export function ExpenseForm({
     const saveMutation = useMutation({
         mutationFn: async (values: z.infer<typeof expenseFormSchema>) => {
             if (!householdId) throw new Error('No household');
-            if (!isIn && !intent.vendor && !intent.categoryKey) {
-                throw new Error('Pick a vendor or type');
+            if (!isIn && !intent.vendor.trim() && !intent.categoryKey) {
+                throw new Error(isGive ? 'Choose who you gave to' : 'Pick a vendor or type');
             }
             const label = values.label.trim();
             if (isIn && !label) {
@@ -419,7 +514,10 @@ export function ExpenseForm({
             return;
         }
         if (!isIn && !intent.vendor && !intent.categoryKey) {
-            showToast('Pick a vendor or a type first', 'error');
+            showToast(
+                isGive ? 'Choose who you gave to' : 'Pick a vendor or a type first',
+                'error'
+            );
             return;
         }
         if (isIn && !values.label.trim()) {
@@ -502,6 +600,52 @@ export function ExpenseForm({
                 </div>
             </div>
 
+            {isIn ? null : lockJar && selectedJar ? (
+                <div className="grid gap-1.5">
+                    <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
+                        Jar
+                    </p>
+                    <div className="flex items-center gap-3 rounded-xl border border-accent/40 bg-accent-soft px-3 py-3">
+                        <span className="text-lg" aria-hidden>
+                            {selectedJar.icon ?? '◇'}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold text-fg">{selectedJar.name}</p>
+                            <p className="font-mono text-[10px] tracking-wide text-fg-muted uppercase">
+                                This jar
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                <FormField
+                    control={form.control}
+                    name="jarId"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Jar</FormLabel>
+                            <FormControl>
+                                <select
+                                    className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
+                                    {...field}>
+                                    {jarChoices.length === 0 ? (
+                                        <option value="">No jars — complete setup first</option>
+                                    ) : (
+                                        jarChoices.map(jar => (
+                                            <option key={jar.id} value={jar.id}>
+                                                {jar.icon ? `${jar.icon} ` : ''}
+                                                {jar.name}
+                                            </option>
+                                        ))
+                                    )}
+                                </select>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            )}
+
             {isIn ? (
                 <FormField
                     control={form.control}
@@ -525,7 +669,6 @@ export function ExpenseForm({
                                         const resolved = resolveInflowKey(value);
                                         setInflowKey(current => {
                                             if (resolved) return resolved;
-                                            // Keep Other after picking it (empty while they type)
                                             if (current === 'OTHER_IN') return 'OTHER_IN';
                                             if (!value.trim()) return null;
                                             return null;
@@ -540,6 +683,7 @@ export function ExpenseForm({
                                     disabled={busy}
                                     onSelect={preset => {
                                         setInflowKey(preset.key);
+                                        if (lockJar) return;
                                         const full = TRANSACTION_IN_PRESETS.find(
                                             candidate => candidate.key === preset.key
                                         );
@@ -555,6 +699,62 @@ export function ExpenseForm({
                         </FormItem>
                     )}
                 />
+            ) : isGive ? (
+                <div className="grid gap-3">
+                    <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
+                        To whom
+                    </p>
+                    <p className="text-xs leading-relaxed text-fg-muted">
+                        One-time gift — shows on Give and in Out transactions. For a recurring gift,
+                        add a fixed cost instead.
+                    </p>
+                    <div
+                        className="flex flex-wrap gap-2"
+                        role="group"
+                        aria-label="How do you want to pick?">
+                        {GIVE_PAYEE_MODES.map(option => {
+                            const on = givePayeeMode === option.id;
+                            return (
+                                <button
+                                    key={option.id}
+                                    type="button"
+                                    disabled={busy}
+                                    aria-pressed={on}
+                                    onClick={() => setGivePayeeMode(option.id)}
+                                    className={
+                                        on
+                                            ? 'rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                            : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                    }>
+                                    {option.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    <p className="text-xs leading-relaxed text-fg-faint">
+                        I know who — type whoever you already give to. Help me choose — Coach
+                        shortlist with independent checks (Doneer Effectief, GiveWell, ACE, CBF).
+                    </p>
+                    {givePayeeMode === 'known' ? (
+                        <FormInput
+                            placeholder="e.g. Giro555, your church, KWF"
+                            value={intent.vendor}
+                            disabled={busy}
+                            onChange={event => {
+                                applyGivePayee(event.target.value, null);
+                            }}
+                        />
+                    ) : (
+                        <GivingFinder
+                            defaultOpen
+                            selectedKey={giveOrgKey}
+                            selectedName={intent.vendor}
+                            onPick={organisation => {
+                                applyGivePayee(organisation.name, organisation.key);
+                            }}
+                        />
+                    )}
+                </div>
             ) : (
                 <div className="grid gap-2">
                     <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
@@ -566,6 +766,7 @@ export function ExpenseForm({
                         merchants={merchants}
                         categories={categories}
                         categoryIconByKey={categoryIconByKey}
+                        jarKey={selectedJarKey}
                         disabled={busy}
                     />
                 </div>
@@ -585,32 +786,53 @@ export function ExpenseForm({
                 )}
             />
 
-            <FormField
-                control={form.control}
-                name="jarId"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>{isIn ? 'Into jar' : 'Jar'}</FormLabel>
-                        <FormControl>
-                            <select
-                                className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
-                                {...field}>
-                                {jarChoices.length === 0 ? (
-                                    <option value="">No jars — complete setup first</option>
-                                ) : (
-                                    jarChoices.map(jar => (
-                                        <option key={jar.id} value={jar.id}>
-                                            {jar.icon ? `${jar.icon} ` : ''}
-                                            {jar.name}
-                                        </option>
-                                    ))
-                                )}
-                            </select>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
+            {isIn ? (
+                lockJar && selectedJar ? (
+                    <div className="grid gap-1.5">
+                        <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
+                            Into jar
+                        </p>
+                        <div className="flex items-center gap-3 rounded-xl border border-accent/40 bg-accent-soft px-3 py-3">
+                            <span className="text-lg" aria-hidden>
+                                {selectedJar.icon ?? '◇'}
+                            </span>
+                            <div className="min-w-0 flex-1">
+                                <p className="text-sm font-semibold text-fg">{selectedJar.name}</p>
+                                <p className="font-mono text-[10px] tracking-wide text-fg-muted uppercase">
+                                    This jar
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <FormField
+                        control={form.control}
+                        name="jarId"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Into jar</FormLabel>
+                                <FormControl>
+                                    <select
+                                        className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
+                                        {...field}>
+                                        {jarChoices.length === 0 ? (
+                                            <option value="">No jars — complete setup first</option>
+                                        ) : (
+                                            jarChoices.map(jar => (
+                                                <option key={jar.id} value={jar.id}>
+                                                    {jar.icon ? `${jar.icon} ` : ''}
+                                                    {jar.name}
+                                                </option>
+                                            ))
+                                        )}
+                                    </select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                )
+            ) : null}
 
             {showNote || noteValue ? (
                 <FormField

@@ -133,25 +133,27 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                         </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
-                        <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() =>
-                                router.push(
-                                    createMoveHref({
-                                        fromJarId: jar.id,
-                                        returnTo: `/product/money/jars/${jarKeyToSlug(jar.key)}`,
-                                    })
-                                )
-                            }>
-                            Move between jars
-                        </Button>
                         {caps.canSpend ? (
-                            <Button
-                                size="sm"
-                                onClick={() => router.push(createTxHref({ jarId: jar.id }))}>
-                                + Add transaction
-                            </Button>
+                            <>
+                                <Button
+                                    size="sm"
+                                    variant="secondary"
+                                    onClick={() =>
+                                        router.push(
+                                            createMoveHref({
+                                                fromJarId: jar.id,
+                                                returnTo: `/product/money/jars/${jarKeyToSlug(jar.key)}`,
+                                            })
+                                        )
+                                    }>
+                                    Move between jars
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    onClick={() => router.push(createTxHref({ jarId: jar.id }))}>
+                                    + Add transaction
+                                </Button>
+                            </>
                         ) : null}
                     </div>
                 </div>
