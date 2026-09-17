@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 
 import { DEFAULT_JAR_SPLIT, jarCapabilitiesFor, JarKey } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Card } from '@rumtelo/ui';
+import { Card, Typography } from '@rumtelo/ui';
 import { cn, monthlyAmount, fixedOutNetSummary, toPeriodKey } from '@rumtelo/utils';
 
 import { CREATE_HREF, fixedDetailHref, updateHref } from '@/app/_lib/create-routes';
@@ -196,12 +196,12 @@ export function FixedCostsPageClient() {
     return (
         <div className="grid animate-rise gap-8">
             <div>
-                <span className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                <Typography as="span" variant="eyebrow" color="primary">
                     ✦ FIXED COSTS &amp; INCOME
-                </span>
-                <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-fg lg:text-4xl">
+                </Typography>
+                <Typography as="h1" className="mt-2">
                     Set it up once. Then it runs automatically.
-                </h1>
+                </Typography>
             </div>
 
             {/* Doctrine: money README → “When Necessities can’t fit in 55%” */}
@@ -253,9 +253,9 @@ export function FixedCostsPageClient() {
                 <div data-tour="fixed-list" className="grid items-start gap-5 sm:grid-cols-2">
                     <Card className="p-0">
                         <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
-                            <span className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                            <Typography as="span" variant="eyebrow" color="primary">
                                 ✦ Every month out
-                            </span>
+                            </Typography>
                             <span className="font-mono text-sm text-fg-secondary">
                                 {formatMoney(outTotal)}
                             </span>
@@ -450,9 +450,9 @@ export function FixedCostsPageClient() {
                 <div data-tour="fixed-list" className="grid items-start gap-5 sm:grid-cols-2">
                     <Card className="p-0">
                         <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
-                            <span className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                            <Typography as="span" variant="eyebrow" color="primary">
                                 ✦ Every month in
-                            </span>
+                            </Typography>
                             <span className="font-mono text-sm text-success">
                                 {formatMoney(NET)}
                             </span>

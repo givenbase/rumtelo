@@ -51,12 +51,8 @@ export function PageHelpButton() {
                     <p className="font-mono text-[10px] font-semibold tracking-widest text-fg-faint uppercase">
                         {chrome.sheet_eyebrow}
                     </p>
-                    <SheetTitle className="font-display text-lg font-semibold tracking-tight text-fg">
-                        {help.title}
-                    </SheetTitle>
-                    <SheetDescription className="text-sm text-fg-muted">
-                        {chrome.sheet_description}
-                    </SheetDescription>
+                    <SheetTitle>{help.title}</SheetTitle>
+                    <SheetDescription>{chrome.sheet_description}</SheetDescription>
                 </SheetHeader>
 
                 <div className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-5 py-5">

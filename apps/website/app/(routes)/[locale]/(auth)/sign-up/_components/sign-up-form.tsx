@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 
 import {
     Button,
+    Typography,
     Form,
     FormControl,
     FormErrorBox,
@@ -123,9 +124,7 @@ export function SignUpForm() {
     return (
         <div className="grid gap-6">
             <div>
-                <h1 className="font-display text-3xl font-semibold tracking-tight text-fg">
-                    {AUTH_SIGN_UP.title}
-                </h1>
+                <Typography as="h1">{AUTH_SIGN_UP.title}</Typography>
                 <p className="mt-1 text-sm text-fg-muted">{AUTH_SIGN_UP.subtitle}</p>
                 {intent ? (
                     <p className="mt-3 rounded-lg border border-accent/35 bg-accent-soft/40 px-3 py-2 text-sm text-fg-secondary">

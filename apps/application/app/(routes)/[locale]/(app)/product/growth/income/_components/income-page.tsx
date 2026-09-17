@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { AccentCard, Button, Card, Eyebrow } from '@rumtelo/ui';
+import { AccentCard, Button, Card, Eyebrow, Typography } from '@rumtelo/ui';
 import { incomeDelta, monthlyNetAsOf, sumMonthly, toPeriodKey } from '@rumtelo/utils';
 
 import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
@@ -99,12 +99,14 @@ export function IncomePageClient() {
         <div className="grid animate-rise gap-6">
             <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
-                    <span className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                    <Typography as="span" variant="eyebrow" color="primary">
                         ✦ MY INCOME
-                    </span>
-                    <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-fg sm:text-3xl">
+                    </Typography>
+                    <Typography
+                        as="h1"
+                        className="mt-1 text-2xl sm:text-3xl lg:text-3xl">
                         Spending cuts have a floor. Earning doesn't.
-                    </h1>
+                    </Typography>
                 </div>
                 <Button size="sm" onClick={() => router.push(CREATE_HREF.income)}>
                     + Add income
@@ -179,9 +181,9 @@ export function IncomePageClient() {
             <div data-tour="income-sources">
                 <Card className="p-0">
                     <div className="border-b border-line px-4 py-2.5 sm:px-5">
-                        <span className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                        <Typography as="span" variant="eyebrow" color="primary">
                             ✦ Income sources
-                        </span>
+                        </Typography>
                     </div>
                     {sources.length === 0 ? (
                         <p className="px-4 py-3.5 text-sm text-fg-muted sm:px-5">

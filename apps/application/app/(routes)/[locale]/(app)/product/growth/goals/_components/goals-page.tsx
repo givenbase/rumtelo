@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import type { Goal } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { AccentCard, EmptyState, Meter } from '@rumtelo/ui';
+import { AccentCard, EmptyState, Meter, Typography } from '@rumtelo/ui';
 import { cn, earnGoalProgress, monthlyNetAsOf } from '@rumtelo/utils';
 
 import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
@@ -91,16 +91,16 @@ export function GoalsPageClient() {
     return (
         <div className="grid animate-rise gap-8">
             <div>
-                <span className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                <Typography as="span" variant="eyebrow" color="primary">
                     ✦ GOALS
-                </span>
-                <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-fg lg:text-4xl">
+                </Typography>
+                <Typography as="h1" className="mt-2">
                     Every goal is a decision you've already made.
-                </h1>
-                <p className="mt-2 max-w-prose text-base text-pretty text-fg-muted">
+                </Typography>
+                <Typography as="p" variant="lead" size="default" className="mt-2">
                     Save, earn, or give — pick the kind of goal, then set the number. Each one marks
                     itself reached.
-                </p>
+                </Typography>
             </div>
 
             <ListToolbar createLabel="+ Add goal" onCreate={() => router.push(CREATE_HREF.goal)}>

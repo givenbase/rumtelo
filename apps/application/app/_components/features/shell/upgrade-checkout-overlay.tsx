@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
 import { PlanKey } from '@rumtelo/contracts';
-import { Button } from '@rumtelo/ui';
+import { Button, Typography } from '@rumtelo/ui';
 
 import { api } from '@/app/_lib/api';
 import { PLAN_LABELS } from '@/app/_lib/plan';
@@ -80,17 +80,17 @@ export function UpgradeCheckoutOverlay({ open, onSkip }: { open: boolean; onSkip
                 aria-modal="true"
                 aria-label={`Upgrade to ${label}`}
                 className="fixed top-1/2 left-1/2 z-71 w-full max-w-md -translate-1/2 animate-rise rounded-2xl border border-line-strong bg-surface p-6 shadow-xl">
-                <p className="font-mono text-xs font-semibold tracking-widest text-accent uppercase">
+                <Typography as="p" variant="eyebrow" color="primary">
                     Finish your upgrade
-                </p>
-                <h2 className="mt-2 font-display text-2xl font-semibold tracking-tight text-fg">
+                </Typography>
+                <Typography as="h2" className="mt-2">
                     {opening ? `Opening Stripe for ${label}…` : `Add payment for ${label}`}
-                </h2>
-                <p className="mt-2 text-sm leading-relaxed text-fg-muted">
+                </Typography>
+                <Typography as="p" size="sm" color="muted" className="mt-2">
                     You chose {label} ({period}) on the website. Account setup is done — next is
                     Stripe Checkout to activate the plan. You can skip and stay on Basic, then
                     upgrade anytime in Settings → Plan.
-                </p>
+                </Typography>
 
                 <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-end">
                     <Button

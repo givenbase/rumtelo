@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 import type { EnergySummary } from '@rumtelo/contracts';
 import { DEFAULT_JAR_SPLIT, EnergyMetric, EnergyTrend, JarKey } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Card, Eyebrow, Section } from '@rumtelo/ui';
+import { Card, Eyebrow, Section, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { isLiveData } from '@/app/_lib/preview';
@@ -101,10 +101,10 @@ export function WeekPageClient() {
     return (
         <div className="grid animate-rise gap-6">
             <Section eyebrow="My week" title="Every hour gets a job too.">
-                <p className="max-w-prose text-base text-fg-muted">
+                <Typography as="p" variant="lead" size="default">
                     The same six percentages, but spent in hours. Money buys things; hours build the
                     person who earns them.
-                </p>
+                </Typography>
             </Section>
 
             {/* ── Live energy summary ── */}
@@ -163,7 +163,13 @@ export function WeekPageClient() {
 
                 {/* ── Steered-hours slider ── */}
                 <div className="flex flex-wrap items-center gap-4 border-t border-line pt-5">
-                    <Eyebrow className="whitespace-nowrap text-accent">Of which you steer</Eyebrow>
+                    <Typography
+                        as="span"
+                        variant="eyebrow"
+                        color="primary"
+                        className="whitespace-nowrap">
+                        Of which you steer
+                    </Typography>
                     <input
                         type="range"
                         min={8}
@@ -216,7 +222,9 @@ export function WeekPageClient() {
 
                 {/* ── Where time and money disagree ── */}
                 <div className="border-t border-line pt-5">
-                    <Eyebrow className="text-accent">✦ Where time and money diverge</Eyebrow>
+                    <Typography as="span" variant="eyebrow" color="primary">
+                        ✦ Where time and money diverge
+                    </Typography>
                     <p className="mt-3 max-w-prose text-sm leading-relaxed text-fg-secondary">
                         You give Play 10% of your money but only{' '}
                         {steeredHours > 0 ? Math.round((playHours / steeredHours) * 100) : 0}% of

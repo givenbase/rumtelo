@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Eyebrow, Button } from '@rumtelo/ui';
+import { Button, Typography } from '@rumtelo/ui';
 import { toPeriodKey } from '@rumtelo/utils';
 
 import { CREATE_HREF, createTxHref } from '@/app/_lib/create-routes';
@@ -54,14 +54,16 @@ export function JarsPageClient() {
     return (
         <div className="grid animate-rise gap-8">
             <div>
-                <Eyebrow className="text-accent">✦ THE SIX JARS</Eyebrow>
-                <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-fg lg:text-4xl">
+                <Typography as="span" variant="eyebrow" color="primary">
+                    ✦ THE SIX JARS
+                </Typography>
+                <Typography as="h1" className="mt-2">
                     Every coin gets a job before it arrives.
-                </h1>
-                <p className="mt-2 max-w-prose text-base text-pretty text-fg-muted">
+                </Typography>
+                <Typography as="p" variant="lead" size="default" className="mt-2">
                     Income lands, the split happens the same second. Financial Freedom is never
                     spent — only invested.
-                </p>
+                </Typography>
             </div>
 
             <div data-tour="jars-toolbar">

@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Button, Card, EmptyState } from '@rumtelo/ui';
+import { Button, Card, EmptyState, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import {
@@ -227,16 +227,16 @@ export function TransactionsPageClient() {
     return (
         <div className="grid animate-rise gap-8">
             <div>
-                <span className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                <Typography as="span" variant="eyebrow" color="primary">
                     ✦ TRANSACTIONS
-                </span>
-                <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-fg lg:text-4xl">
+                </Typography>
+                <Typography as="h1" className="mt-2">
                     Only what changes. Fixed costs are elsewhere.
-                </h1>
-                <p className="mt-2 max-w-prose text-base text-pretty text-fg-muted">
+                </Typography>
+                <Typography as="p" variant="lead" size="default" className="mt-2">
                     Out is spend. In is a gift, tax return, refund, or money you add to a jar.
                     Connecting a bank is a setting.
-                </p>
+                </Typography>
             </div>
 
             <ListToolbar

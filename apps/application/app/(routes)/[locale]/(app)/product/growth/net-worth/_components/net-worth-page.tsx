@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { AccentCard, Button, Card, EmptyState, Eyebrow, Section } from '@rumtelo/ui';
+import { AccentCard, Button, Card, EmptyState, Eyebrow, Section, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { CREATE_HREF } from '@/app/_lib/create-routes';
@@ -84,17 +84,17 @@ export function NetWorthPageClient() {
     return (
         <div className="grid animate-rise gap-8">
             <div>
-                <span className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                <Typography as="span" variant="eyebrow" color="primary">
                     ✦ MY NET WORTH
-                </span>
-                <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-fg lg:text-4xl">
+                </Typography>
+                <Typography as="h1" className="mt-2">
                     Where your money stands — not how it moves.
-                </h1>
-                <p className="mt-2 max-w-prose text-base text-pretty text-fg-muted">
+                </Typography>
+                <Typography as="p" variant="lead" size="default" className="mt-2">
                     Everything you own minus everything you owe. A tile turns gold the moment it
                     pays you every month — that is the difference between owning something and
                     having it.
-                </p>
+                </Typography>
             </div>
 
             <ListToolbar
@@ -103,9 +103,9 @@ export function NetWorthPageClient() {
             />
 
             <AccentCard tint="var(--color-accent)">
-                <span className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                <Typography as="span" variant="eyebrow" color="primary">
                     ✦ How far this takes you
-                </span>
+                </Typography>
                 <div className="mt-4 flex flex-wrap gap-x-8 gap-y-4">
                     <div className="grid gap-1.5">
                         <Eyebrow>Total value</Eyebrow>

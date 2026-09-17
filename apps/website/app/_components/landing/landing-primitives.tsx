@@ -1,21 +1,26 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 
+import { Typography } from '@rumtelo/ui';
+
 import { cn } from '@/lib/cn';
 
 /** Mono eyebrow with the house ✦ mark. */
 export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
     return (
-        <span
+        <Typography
+            as="span"
+            variant="eyebrow"
+            color="primary"
             className={cn(
-                'inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[11px] font-medium tracking-wide text-accent uppercase sm:text-xs sm:tracking-widest',
+                'inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1',
                 className
             )}>
             <span aria-hidden className="shrink-0">
                 ✦
             </span>
             {children}
-        </span>
+        </Typography>
     );
 }
 
@@ -42,22 +47,24 @@ export function SectionHeading({
     return (
         <div className={cn(centered && 'mx-auto text-center', className)}>
             <Eyebrow>{eyebrow}</Eyebrow>
-            <h2
+            <Typography
+                as="h2"
+                size="lg"
+                weight="bold"
                 className={cn(
-                    'mt-3.5 mb-3 font-display text-3xl leading-[1.08] font-bold tracking-tight text-balance text-fg lg:text-4xl',
+                    'mt-3.5 mb-3 leading-[1.08]',
                     centered ? 'mx-auto max-w-2xl' : 'max-w-xl',
                     headlineClassName
                 )}>
                 {headline}
-            </h2>
+            </Typography>
             {lead ? (
-                <p
-                    className={cn(
-                        'max-w-prose text-base leading-relaxed text-pretty text-fg-muted lg:text-lg',
-                        centered && 'mx-auto'
-                    )}>
+                <Typography
+                    as="p"
+                    variant="lead"
+                    className={cn(centered && 'mx-auto')}>
                     {lead}
-                </p>
+                </Typography>
             ) : null}
         </div>
     );

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@rumtelo/ui';
+import { Button, Typography } from '@rumtelo/ui';
 
 import { offer } from './content';
 
@@ -19,9 +19,9 @@ export function TourOfferDialog({ onAccept, onDismiss }: TourOfferDialogProps) {
                 aria-modal="true"
                 aria-labelledby="tour-offer-title"
                 className="fixed top-1/2 left-1/2 z-71 w-full max-w-md -translate-1/2 animate-rise rounded-2xl border border-line-strong bg-surface p-6 shadow-xl">
-                <p className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                <Typography as="p" variant="eyebrow" color="primary">
                     {offer.eyebrow}
-                </p>
+                </Typography>
                 <h2
                     id="tour-offer-title"
                     className="mt-2 font-display text-xl font-semibold tracking-tight text-fg">

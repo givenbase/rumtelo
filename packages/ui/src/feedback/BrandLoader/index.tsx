@@ -1,4 +1,5 @@
 import { cn } from '../../lib/utils';
+import { Typography, typographyVariants } from '../../display/Typography';
 import type { BrandLoaderProps } from './types';
 
 /**
@@ -27,18 +28,21 @@ export function BrandLoader({
                     aria-hidden
                 />
                 <span
-                    className="animate-brand-breathe font-display text-lg font-semibold tracking-tight text-accent"
+                    className={cn(
+                        typographyVariants({ as: 'h3', weight: 'semibold', color: 'primary' }),
+                        'animate-brand-breathe'
+                    )}
                     aria-hidden>
                     ✦
                 </span>
             </div>
             <div className="grid gap-1">
-                <p className="font-display text-base font-semibold tracking-tight text-fg">
+                <Typography as="h4" weight="semibold">
                     Rumtelo
-                </p>
-                <p className="font-mono text-[11px] tracking-[0.18em] text-fg-muted uppercase">
+                </Typography>
+                <Typography as="p" variant="eyebrow" color="muted">
                     {label}
-                </p>
+                </Typography>
             </div>
             <span className="sr-only">{label}</span>
         </div>

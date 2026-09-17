@@ -1,4 +1,4 @@
-import { Eyebrow, Section } from '@rumtelo/ui';
+import { Eyebrow, Section, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { PageContent } from '@/components/layout/page-content';
@@ -15,9 +15,9 @@ export default function IntentPage() {
     return (
         <PageContent width="narrow" className="grid animate-rise gap-6">
             <Section eyebrow="Intention" title="One sentence for this week.">
-                <p className="max-w-prose text-base text-fg-muted">
+                <Typography as="p" variant="lead" size="default">
                     Not a resolution. An instruction to yourself, small enough to keep.
-                </p>
+                </Typography>
             </Section>
 
             {/* ── Intent card ── */}

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { Card, Eyebrow, Section } from '@rumtelo/ui';
+import { Card, Eyebrow, Section, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 const MIND_TIE =
@@ -45,9 +45,9 @@ export default function MindPage() {
     return (
         <div className="grid animate-rise gap-6">
             <Section eyebrow="Stillness" title="Control is a rhythm, not a mood.">
-                <p className="max-w-prose text-base text-fg-muted">
+                <Typography as="p" variant="lead" size="default">
                     The only practice here that costs nothing and protects everything else.
-                </p>
+                </Typography>
             </Section>
 
             {/* ── Two-column cards ── */}
@@ -93,7 +93,9 @@ export default function MindPage() {
 
                 {/* Why it's here */}
                 <Card className="w-full min-w-0 flex-1 sm:min-w-70">
-                    <Eyebrow className="mb-3 text-accent">✦ Why this is in a money app</Eyebrow>
+                    <Typography as="span" variant="eyebrow" color="primary" className="mb-3">
+                        ✦ Why this is in a money app
+                    </Typography>
                     <p className="text-sm leading-relaxed text-fg-secondary">{MIND_TIE}</p>
                 </Card>
             </div>

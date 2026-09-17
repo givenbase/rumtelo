@@ -1,3 +1,5 @@
+import { Typography } from '@rumtelo/ui';
+
 import { WHY } from '@/lib/landing-content';
 
 import { CARD, Eyebrow } from './landing-primitives';
@@ -22,16 +24,16 @@ export function LandingWhy() {
                     <div className="min-w-0">
                         <Eyebrow>{WHY.eyebrow}</Eyebrow>
                         <blockquote className="mt-4">
-                            <p className="max-w-2xl font-display text-3xl leading-[1.08] font-semibold tracking-tight text-balance text-fg lg:text-4xl">
+                            <Typography as="h2" size="lg" className="max-w-2xl leading-[1.08]">
                                 {WHY.quoteNl}
-                            </p>
+                            </Typography>
                             <p className="mt-2 font-mono text-xs font-medium tracking-wide text-fg-faint">
                                 {WHY.quoteEn}
                             </p>
                         </blockquote>
-                        <p className="mt-6 max-w-prose text-base leading-relaxed text-pretty text-fg-muted lg:text-lg">
+                        <Typography as="p" variant="lead" className="mt-6">
                             {WHY.body}
-                        </p>
+                        </Typography>
                         <p className="mt-5 font-mono text-xs font-medium tracking-wide text-fg-faint">
                             {WHY.signature}
                         </p>
@@ -46,9 +48,9 @@ export function LandingWhy() {
 
                     {/* Books that shaped the practice */}
                     <div className="min-w-0">
-                        <span className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                        <Typography as="span" variant="eyebrow" color="primary">
                             ✦ {WHY.booksEyebrow}
-                        </span>
+                        </Typography>
                         <p className="mt-3 max-w-prose text-sm leading-relaxed text-pretty text-fg-muted">
                             {WHY.booksLead}
                         </p>

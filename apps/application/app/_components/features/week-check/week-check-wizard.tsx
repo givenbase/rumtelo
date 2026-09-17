@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import type { JarBalance } from '@rumtelo/contracts';
 import { WeekCheckStage } from '@rumtelo/contracts';
-import { Button, Eyebrow } from '@rumtelo/ui';
+import { Button, Eyebrow, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -135,12 +135,12 @@ export function WeekCheckWizard({
                     <div className="grid gap-5">
                         <div>
                             <Eyebrow>✦ Look</Eyebrow>
-                            <h2 className="mt-1.5 font-display text-2xl font-semibold tracking-tight text-fg">
+                            <Typography as="h2" className="mt-1.5">
                                 What did you do this week?
-                            </h2>
-                            <p className="mt-1 text-sm text-fg-muted">
+                            </Typography>
+                            <Typography as="p" size="sm" color="muted" className="mt-1">
                                 No judgment. Information is all we need.
-                            </p>
+                            </Typography>
                         </div>
                         <div className="grid gap-2">
                             {jars.map(jar => (
@@ -171,10 +171,10 @@ export function WeekCheckWizard({
                     <div className="grid gap-5">
                         <div>
                             <Eyebrow>✦ Direct</Eyebrow>
-                            <h2 className="mt-1.5 font-display text-2xl font-semibold tracking-tight text-fg">
+                            <Typography as="h2" className="mt-1.5">
                                 Distribute surplus
-                            </h2>
-                            <p className="mt-1 text-sm text-fg-muted">
+                            </Typography>
+                            <Typography as="p" size="sm" color="muted" className="mt-1">
                                 {surplus > 0 ? (
                                     <>
                                         <span className="font-semibold text-fg">
@@ -188,7 +188,7 @@ export function WeekCheckWizard({
                                         you&apos;re ready.
                                     </>
                                 )}
-                            </p>
+                            </Typography>
                         </div>
                         {surplus > 0 ? (
                             <div className="grid gap-2">
@@ -229,12 +229,12 @@ export function WeekCheckWizard({
                     <div className="grid gap-5">
                         <div>
                             <Eyebrow>✦ Intend</Eyebrow>
-                            <h2 className="mt-1.5 font-display text-2xl font-semibold tracking-tight text-fg">
+                            <Typography as="h2" className="mt-1.5">
                                 My intention for next week
-                            </h2>
-                            <p className="mt-1 text-sm text-fg-muted">
+                            </Typography>
+                            <Typography as="p" size="sm" color="muted" className="mt-1">
                                 One sentence. What will you do differently?
-                            </p>
+                            </Typography>
                         </div>
                         <textarea
                             rows={4}

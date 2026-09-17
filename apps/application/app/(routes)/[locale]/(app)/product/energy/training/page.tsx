@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 
-import { EmptyState, Section } from '@rumtelo/ui';
+import { EmptyState, Section, Typography } from '@rumtelo/ui';
 
 import { CREATE_HREF } from '@/app/_lib/create-routes';
 import { ListToolbar } from '@/components/layout/list-toolbar';
@@ -13,10 +13,10 @@ export default function TrainPage() {
     return (
         <div className="grid animate-rise gap-6">
             <Section eyebrow="Training" title="Energy you invest, not money you spend.">
-                <p className="max-w-prose text-base text-fg-muted">
+                <Typography as="p" variant="lead" size="default">
                     Training is the only investment that pays out in energy rather than money — and
                     energy is what earns the money.
-                </p>
+                </Typography>
             </Section>
 
             <ListToolbar

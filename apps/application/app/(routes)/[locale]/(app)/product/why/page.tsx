@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 import { BRAND_TAGLINE } from '@rumtelo/i18n';
-import { Card, Eyebrow, Section } from '@rumtelo/ui';
+import { Card, Section, Typography } from '@rumtelo/ui';
 
 import { productPath } from '@/app/_lib/routes';
 import { PageContent } from '@/components/layout/page-content';
@@ -59,21 +59,23 @@ export default function WhyFoundationPage() {
     return (
         <PageContent width="prose" className="animate-rise">
             <Section eyebrow="✦ Why Rumtelo">
-                <p className="font-mono text-xs font-medium tracking-[0.14em] text-accent uppercase">
+                <Typography as="p" variant="eyebrow" color="primary">
                     The line we stand on
-                </p>
+                </Typography>
                 <h1 className="mt-3 font-display text-4xl leading-[1.1] font-semibold tracking-tight text-fg md:text-5xl lg:text-6xl">
                     {BRAND_TAGLINE}
                 </h1>
-                <p className="mt-5 max-w-prose text-base leading-relaxed text-pretty text-fg-muted md:text-lg">
+                <Typography as="p" variant="lead" size="lg" className="mt-5">
                     That is not a clever phrase. It is the problem we refuse to leave unsolved —
                     mystery spending, foggy paychecks, and the quiet stress of not knowing. We end
                     the mystery. Then we widen the picture.
-                </p>
+                </Typography>
             </Section>
 
             <section className="mt-12 grid gap-6">
-                <Eyebrow className="text-accent">✦ What we mean</Eyebrow>
+                <Typography as="span" variant="eyebrow" color="primary">
+                    ✦ What we mean
+                </Typography>
                 <div className="grid gap-4">
                     {MEANING.map(item => (
                         <Card key={item.line} className="grid gap-2 p-5">
@@ -90,7 +92,9 @@ export default function WhyFoundationPage() {
 
             <section className="mt-12 grid gap-6">
                 <div>
-                    <Eyebrow className="text-accent">✦ Bigger than the balance</Eyebrow>
+                    <Typography as="span" variant="eyebrow" color="primary">
+                        ✦ Bigger than the balance
+                    </Typography>
                     <p className="mt-3 max-w-prose text-sm leading-relaxed text-pretty text-fg-muted">
                         Money is the door. Energy, growth, and soul complete the overview — so you
                         stop wondering where it went, what you’re running on, and why it matters.

@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import type { Debt } from '@rumtelo/contracts';
 import { JarKey, PayoffStrategy } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { AccentCard, Card, Eyebrow } from '@rumtelo/ui';
+import { AccentCard, Card, Eyebrow, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { CREATE_HREF } from '@/app/_lib/create-routes';
@@ -187,16 +187,16 @@ export function DebtsPageClient() {
     return (
         <div className="grid animate-rise gap-8">
             <div>
-                <span className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                <Typography as="span" variant="eyebrow" color="primary">
                     ✦ DEBT
-                </span>
-                <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-fg lg:text-4xl">
+                </Typography>
+                <Typography as="h1" className="mt-2">
                     Debt-free by {freedomDate}.
-                </h1>
-                <p className="mt-2 max-w-prose text-base text-pretty text-fg-muted">
+                </Typography>
+                <Typography as="p" variant="lead" size="default" className="mt-2">
                     Pay every minimum. Your household method decides where any extra goes — set once
                     in Settings.
-                </p>
+                </Typography>
             </div>
 
             <ListToolbar createLabel="+ Add debt" onCreate={() => router.push(CREATE_HREF.debt)}>
@@ -297,9 +297,9 @@ export function DebtsPageClient() {
             ) : (
                 <div className="grid gap-3">
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                        <span className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                        <Typography as="span" variant="eyebrow" color="primary">
                             {listTitle}
-                        </span>
+                        </Typography>
                         <label className="flex items-center gap-2 text-xs text-fg-muted">
                             <span className="font-mono text-[10px] tracking-widest uppercase">
                                 Sort

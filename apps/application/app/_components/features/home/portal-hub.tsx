@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 
 import Link from 'next/link';
 
-import { Button } from '@rumtelo/ui';
+import { Button, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { capabilityKeyForPathname } from '@/app/_lib/capability-access';
@@ -52,10 +52,12 @@ export function PortalHub({ tint, icon, eyebrow, title, line, coach, cards }: Po
                     {icon}
                     {eyebrow}
                 </span>
-                <h1 className="mt-2.5 font-display text-3xl font-semibold tracking-tight text-fg lg:text-4xl">
+                <Typography as="h1" className="mt-2.5">
                     {title}
-                </h1>
-                <p className="mt-2 max-w-prose text-base text-fg-muted">{line}</p>
+                </Typography>
+                <Typography as="p" variant="lead" size="default" className="mt-2">
+                    {line}
+                </Typography>
             </div>
 
             <div
@@ -67,9 +69,9 @@ export function PortalHub({ tint, icon, eyebrow, title, line, coach, cards }: Po
                             className="size-1.75 rounded-full"
                             style={{ background: coach.dot }}
                         />
-                        <span className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                        <Typography as="span" variant="eyebrow" color="primary">
                             The Coach
-                        </span>
+                        </Typography>
                         <span
                             className="font-mono text-xs font-medium tracking-widest uppercase"
                             style={{ color: coach.dot }}>

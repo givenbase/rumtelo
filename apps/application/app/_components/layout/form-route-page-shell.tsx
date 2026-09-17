@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import type { FormRouteWidth } from '@/app/_lib/form-route-meta';
@@ -36,11 +37,13 @@ export function FormRoutePageShell({
                 <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-xl">
                     <header className="border-b border-line bg-raised px-5 py-4">
                         <div className="space-y-1">
-                            <h1 className="font-display text-lg font-semibold tracking-tight text-fg">
+                            <Typography as="h1" size="sm">
                                 {title}
-                            </h1>
+                            </Typography>
                             {description ? (
-                                <p className="text-sm text-fg-muted">{description}</p>
+                                <Typography as="p" size="sm" color="muted">
+                                    {description}
+                                </Typography>
                             ) : null}
                         </div>
                     </header>

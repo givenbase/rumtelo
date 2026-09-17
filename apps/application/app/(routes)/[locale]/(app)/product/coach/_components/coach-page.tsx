@@ -5,7 +5,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Button, Eyebrow } from '@rumtelo/ui';
+import { Button, Eyebrow, Typography } from '@rumtelo/ui';
 import { toPeriodKey } from '@rumtelo/utils';
 
 import Link from 'next/link';
@@ -50,13 +50,13 @@ export function CoachPageClient() {
         <PageContent width="narrow" className="grid gap-8">
             <div>
                 <Eyebrow>Across every portal</Eyebrow>
-                <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-fg">
+                <Typography as="h1" className="mt-2">
                     The Coach
-                </h1>
-                <p className="mt-2 max-w-prose text-sm text-fg-muted">
+                </Typography>
+                <Typography as="p" size="sm" color="muted" className="mt-2 max-w-prose">
                     Suggestions and next moves from money, growth, energy, and soul — one tip at a
                     time, never shame.
-                </p>
+                </Typography>
             </div>
 
             {messages.length === 0 ? (
@@ -78,9 +78,9 @@ export function CoachPageClient() {
                             key={message.id}
                             className="grid gap-3 rounded-2xl border border-line bg-surface px-5 py-4">
                             <div className="flex flex-wrap items-center justify-between gap-2">
-                                <span className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                                <Typography as="span" variant="eyebrow" color="primary">
                                     {message.kind}
-                                </span>
+                                </Typography>
                                 {live ? (
                                     <Button
                                         type="button"

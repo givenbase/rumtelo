@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
 
+import { Typography, typographyVariants } from '@rumtelo/ui';
+
 import { PORTALS, PORTALS_SECTION } from '@/lib/landing-content';
 import { webSignUpPath } from '@/lib/portal-urls';
 
@@ -159,9 +161,15 @@ export function LandingPortals() {
                         </span>
 
                         <span className="grid gap-1.5">
-                            <span className="font-display text-3xl font-semibold tracking-tight text-fg lg:text-4xl">
+                            <Typography
+                                as="span"
+                                className={typographyVariants({
+                                    as: 'h2',
+                                    size: 'lg',
+                                    weight: 'semibold',
+                                })}>
                                 {portal.name}
-                            </span>
+                            </Typography>
                             <span
                                 className="font-display text-xl leading-snug font-medium text-balance"
                                 style={{ color: portal.colorVar }}>

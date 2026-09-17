@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import { Typography } from '@rumtelo/ui';
+
 import { BOOKS } from './learn-books';
 
 export const metadata = { title: 'Learn' };
@@ -13,13 +15,13 @@ export default function LearnPage() {
         <div className="grid max-w-4xl animate-rise gap-8">
             {/* Page header */}
             <div>
-                <span className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                <Typography as="span" variant="eyebrow" color="primary">
                     ✦ WHAT I LEARN
-                </span>
-                <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-fg lg:text-4xl">
+                </Typography>
+                <Typography as="h1" className="mt-2">
                     {/* copy from design: learn.head field (personalised) */}
                     Distribution has a floor. Learning doesn't.
-                </h1>
+                </Typography>
             </div>
 
             {/* Education jar note */}

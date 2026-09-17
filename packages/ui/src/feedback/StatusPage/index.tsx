@@ -3,6 +3,7 @@
 import { type ButtonHTMLAttributes, type CSSProperties, type ReactNode } from 'react';
 
 import { cn } from '../../lib/utils';
+import { typographyVariants } from '../../display/Typography';
 import { STATUS_COPY } from './copy';
 import type { StatusPageProps } from './types';
 
@@ -126,18 +127,33 @@ export function StatusPage({
                 />
 
                 <p
-                    className="mb-4 font-mono text-xs font-medium tracking-widest uppercase"
+                    className={cn(
+                        typographyVariants({
+                            as: 'p',
+                            variant: 'eyebrow',
+                            weight: 'medium',
+                            color: 'inherit',
+                        }),
+                        'mb-4'
+                    )}
                     style={{ color: `var(--color-accent, ${FALLBACK.accent})` }}>
                     ✦ {code ? String(code) : 'Rumtelo'}
                 </p>
 
                 <p
-                    className="mb-3 font-display text-lg font-semibold tracking-tight"
+                    className={cn(
+                        typographyVariants({ as: 'h1', size: 'sm', weight: 'semibold', color: 'inherit' }),
+                        'mb-3'
+                    )}
                     style={{ color: `var(--color-fg, ${FALLBACK.fg})` }}>
                     Rumtelo
                 </p>
 
-                <h1 className="font-display text-[clamp(1.5rem,4vw,1.875rem)] leading-tight font-semibold tracking-tight">
+                <h1
+                    className={cn(
+                        typographyVariants({ as: 'h1', size: 'sm', weight: 'semibold', color: 'default' }),
+                        'text-[clamp(1.5rem,4vw,1.875rem)] leading-tight lg:text-[clamp(1.5rem,4vw,1.875rem)]'
+                    )}>
                     {title ?? copy.title}
                 </h1>
 

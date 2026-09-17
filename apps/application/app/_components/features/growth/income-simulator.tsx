@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 
 import type { Goal, JarBalance } from '@rumtelo/contracts';
 import { GoalStatus } from '@rumtelo/contracts';
-import { Card } from '@rumtelo/ui';
+import { Card, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
@@ -271,9 +271,9 @@ export function IncomeSimulator({
                 )}>
                 <div className="flex flex-wrap items-center gap-2">
                     {coachGuidesEnabled ? <CoachMark size="sm" /> : null}
-                    <span className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                    <Typography as="span" variant="eyebrow" color="primary">
                         {coachGuidesEnabled ? 'What a raise does' : '✦ What a raise does'}
-                    </span>
+                    </Typography>
                 </div>
                 <p className="mt-2 max-w-prose text-sm leading-relaxed text-pretty text-fg-muted">
                     Drag to any monthly net. The split runs on every income automatically, so this
@@ -376,9 +376,9 @@ export function IncomeSimulator({
                 <div className="mt-6 border-t border-line pt-5">
                     <div className="flex flex-wrap items-center gap-2">
                         {coachGuidesEnabled ? <CoachMark size="sm" /> : null}
-                        <span className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                        <Typography as="span" variant="eyebrow" color="primary">
                             {coachGuidesEnabled ? 'And what it buys you' : '✦ And what it buys you'}
-                        </span>
+                        </Typography>
                     </div>
                     <p className="mt-2 max-w-prose text-sm leading-relaxed text-pretty text-fg-muted">
                         Pick a goal. It moves at the monthly amount you set on it — the same date as

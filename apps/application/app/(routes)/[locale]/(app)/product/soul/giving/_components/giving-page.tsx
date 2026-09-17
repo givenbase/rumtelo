@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import type { FixedCost, Goal } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus, JarKey, TransactionStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Button, Card, Eyebrow, Meter, Section } from '@rumtelo/ui';
+import { Button, Card, Meter, Section, Typography } from '@rumtelo/ui';
 import { monthlyAmount } from '@rumtelo/utils';
 
 import {
@@ -176,9 +176,9 @@ export function GivingPageClient() {
     return (
         <div className="grid animate-rise gap-6">
             <Section eyebrow="Giving" title={WHY_GIVE.headline}>
-                <p className="max-w-prose text-base text-pretty text-fg-muted">
+                <Typography as="p" variant="lead" size="default">
                     {WHY_GIVE.body[0]}
-                </p>
+                </Typography>
             </Section>
 
             <ListToolbar
@@ -200,7 +200,9 @@ export function GivingPageClient() {
                 {/* This year */}
                 <Card className="grid gap-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                        <Eyebrow className="text-accent">✦ This year</Eyebrow>
+                        <Typography as="span" variant="eyebrow" color="primary">
+                            ✦ This year
+                        </Typography>
                         {giveJar ? (
                             <span className="font-mono text-xs text-fg-faint">
                                 Give jar · {giveJar.percentage}%
@@ -268,7 +270,9 @@ export function GivingPageClient() {
                 {/* Where it goes */}
                 <Card className="grid gap-4 p-0">
                     <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
-                        <Eyebrow className="text-accent">✦ Where it goes</Eyebrow>
+                        <Typography as="span" variant="eyebrow" color="primary">
+                            ✦ Where it goes
+                        </Typography>
                         <span className="font-mono text-xs text-fg-secondary">
                             {formatMoney(monthlyPlanned)}/mo planned
                         </span>
@@ -348,7 +352,9 @@ export function GivingPageClient() {
                 <div className="grid gap-2">
                     <div className="flex flex-wrap items-center gap-2">
                         <CoachMark size="sm" />
-                        <Eyebrow className="text-accent">To whom</Eyebrow>
+                        <Typography as="span" variant="eyebrow" color="primary">
+                            To whom
+                        </Typography>
                     </div>
                     <p className="text-sm leading-relaxed text-fg-secondary">
                         How do you want to pick who receives this gift?
@@ -423,7 +429,9 @@ export function GivingPageClient() {
                     aria-label="The Coach: four checks for any organisation">
                     <div className="flex flex-wrap items-center gap-2">
                         <CoachMark size="sm" />
-                        <Eyebrow className="text-accent">Four checks for any organisation</Eyebrow>
+                        <Typography as="span" variant="eyebrow" color="primary">
+                            Four checks for any organisation
+                        </Typography>
                     </div>
                     <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
                         {WHY_GIVE.checks.map((check, index) => (

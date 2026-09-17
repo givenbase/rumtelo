@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import {
     Button,
+    Typography,
     Form,
     FormControl,
     FormErrorBox,
@@ -129,10 +130,10 @@ export function SignInForm() {
     return (
         <div className="grid gap-6">
             <div>
-                <h1 className="font-display text-3xl font-semibold tracking-tight text-fg">
-                    {AUTH_SIGN_IN.title}
-                </h1>
-                <p className="mt-1 text-sm text-fg-muted">{AUTH_SIGN_IN.subtitle}</p>
+                <Typography as="h1">{AUTH_SIGN_IN.title}</Typography>
+                <Typography as="p" size="sm" color="muted" className="mt-1">
+                    {AUTH_SIGN_IN.subtitle}
+                </Typography>
             </div>
 
             {verification ? (

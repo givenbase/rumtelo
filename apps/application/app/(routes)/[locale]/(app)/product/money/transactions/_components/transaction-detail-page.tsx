@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
 import type { Transaction } from '@rumtelo/contracts';
 import { FlowDirection, TransactionSource, TransactionStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Button, Card, VendorMark } from '@rumtelo/ui';
+import { Button, Card, Typography, VendorMark } from '@rumtelo/ui';
 import { toPeriodKey } from '@rumtelo/utils';
 
 import {
@@ -503,18 +503,18 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
 
             {related.length > 0 ? (
                 <section className="grid gap-3">
-                    <h2 className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                    <Typography as="h2" variant="eyebrow" color="primary">
                         ✦ Related
-                    </h2>
+                    </Typography>
                     <Card className="p-0">{related}</Card>
                 </section>
             ) : null}
 
             {samePartyHistory.length > 0 ? (
                 <section className="grid gap-3">
-                    <h2 className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                    <Typography as="h2" variant="eyebrow" color="primary">
                         ✦ Also from {historyLabel}
-                    </h2>
+                    </Typography>
                     <Card className="p-0">
                         <ul className="grid">
                             {samePartyHistory.map(row => {

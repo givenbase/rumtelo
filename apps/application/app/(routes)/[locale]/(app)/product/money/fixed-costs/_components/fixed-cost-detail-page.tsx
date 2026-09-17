@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 
 import { FlowDirection } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Button, Card, VendorMark } from '@rumtelo/ui';
+import { Button, Card, Typography, VendorMark } from '@rumtelo/ui';
 import { monthlyAmount, toPeriodKey } from '@rumtelo/utils';
 
 import { debtDetailHref, txDetailHref, updateHref } from '@/app/_lib/create-routes';
@@ -260,9 +260,9 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
             </Card>
 
             <section className="grid gap-3">
-                <h2 className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                <Typography as="h2" variant="eyebrow" color="primary">
                     ✦ This period’s payment
-                </h2>
+                </Typography>
                 <Card className="p-0">
                     {match ? (
                         <MoneyPartyRow
@@ -300,9 +300,9 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
 
             {item.debtId ? (
                 <section className="grid gap-3">
-                    <h2 className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                    <Typography as="h2" variant="eyebrow" color="primary">
                         ✦ Linked debt
-                    </h2>
+                    </Typography>
                     <Card className="p-0">
                         <button
                             type="button"

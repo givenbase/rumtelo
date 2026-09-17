@@ -8,6 +8,7 @@ import { useSearchParams } from 'next/navigation';
 
 import {
     Button,
+    Typography,
     Form,
     FormControl,
     FormErrorBox,
@@ -102,9 +103,9 @@ export function VerifyPanel() {
     return (
         <div className="grid gap-6">
             <div>
-                <h1 className="font-display text-2xl font-semibold tracking-tight text-fg">
+                <Typography as="h1" className="text-2xl lg:text-2xl">
                     {confirmed ? AUTH_VERIFY.confirmed_title : AUTH_VERIFY.title}
-                </h1>
+                </Typography>
                 <p className="mt-1 text-sm text-fg-muted">{subtitle}</p>
             </div>
 

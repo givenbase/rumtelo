@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 
 import { GoalKind, GoalStatus, JarKey, jarCapabilitiesFor } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Button, Card } from '@rumtelo/ui';
+import { Button, Card, Typography } from '@rumtelo/ui';
 import { toPeriodKey } from '@rumtelo/utils';
 
 import { claimFixedCostMatches } from '@/app/_lib/fixed-cost-match';
@@ -155,9 +155,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                             {jar.icon ?? catalog?.icon ?? '◇'}
                         </span>
                         <div className="grid min-w-0 gap-1">
-                            <h1 className="font-display text-3xl font-semibold tracking-tight text-fg lg:text-4xl">
-                                {jar.name}
-                            </h1>
+                            <Typography as="h1">{jar.name}</Typography>
                             <p className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase">
                                 {jar.subtitle ?? catalog?.subtitle ?? ''} · {jar.percentage}% of net
                             </p>
@@ -203,9 +201,9 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
             {/* Categories — expand for fixed costs + period activity */}
             <section className="grid gap-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h2 className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                    <Typography as="h2" variant="eyebrow" color="primary">
                         ✦ Categories this month
-                    </h2>
+                    </Typography>
                     {allowsFixedCosts ? (
                         <Link
                             href="/product/money/fixed-costs"
@@ -246,9 +244,9 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
             {showGoals ? (
                 <section className="grid gap-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                        <h2 className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                        <Typography as="h2" variant="eyebrow" color="primary">
                             ✦ Goals on this jar
-                        </h2>
+                        </Typography>
                         <button
                             type="button"
                             onClick={() => router.push(addGoalHref)}
@@ -265,9 +263,9 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
             {/* Unmatched / one-off activity (bills settled under categories stay there) */}
             <section className="grid gap-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h2 className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                    <Typography as="h2" variant="eyebrow" color="primary">
                         ✦ Other activity this period
-                    </h2>
+                    </Typography>
                     <Link
                         href="/product/money/transactions"
                         className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">

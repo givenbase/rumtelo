@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { WeekCheckStage } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Eyebrow } from '@rumtelo/ui';
+import { Eyebrow, Typography } from '@rumtelo/ui';
 import { currentWeekKey, toPeriodKey } from '@rumtelo/utils';
 
 import { isLiveData } from '@/app/_lib/preview';
@@ -85,13 +85,13 @@ export function WeekCheckPageClient() {
         <PageContent width="narrow" className="grid gap-8">
             <div>
                 <Eyebrow>Ten minutes a week</Eyebrow>
-                <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-fg">
+                <Typography as="h1" className="mt-2">
                     The week check
-                </h1>
-                <p className="mt-2 max-w-prose text-sm text-fg-muted">
+                </Typography>
+                <Typography as="p" size="sm" color="muted" className="mt-2 max-w-prose">
                     Rumtelo does not ask for your evenings. One week check — look, direct, set
                     intention — beats worrying every single day.
-                </p>
+                </Typography>
             </div>
 
             <WeekCheckWizard

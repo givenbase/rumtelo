@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import Link from 'next/link';
 
-import { Button, Section } from '@rumtelo/ui';
+import { Button, Section, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { PageContent } from '@/components/layout/page-content';
@@ -67,10 +67,10 @@ export default function ChakraPage() {
     return (
         <PageContent width="prose" className="grid animate-rise gap-6">
             <Section eyebrow="The centres" title="Where does it feel stuck?">
-                <p className="max-w-prose text-base text-fg-muted">
+                <Typography as="p" variant="lead" size="default">
                     Not an esoteric score — a map to name where things feel stuck this week, so your
                     intention has somewhere to land.
-                </p>
+                </Typography>
             </Section>
 
             {/* ── Centre picker ── */}

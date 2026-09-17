@@ -7,6 +7,7 @@ import Link from 'next/link';
 
 import {
     Button,
+    Typography,
     Form,
     FormControl,
     FormErrorBox,
@@ -58,9 +59,9 @@ export function ForgotPasswordForm() {
     return (
         <div className="grid gap-6">
             <div>
-                <h1 className="font-display text-2xl font-semibold tracking-tight text-fg">
+                <Typography as="h1" className="text-2xl lg:text-2xl">
                     {AUTH_FORGOT_PASSWORD.title}
-                </h1>
+                </Typography>
                 <p className="mt-1 text-sm text-fg-muted">{AUTH_FORGOT_PASSWORD.subtitle}</p>
             </div>
 

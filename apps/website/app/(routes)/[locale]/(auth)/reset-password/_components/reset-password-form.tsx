@@ -8,6 +8,7 @@ import { useSearchParams } from 'next/navigation';
 
 import {
     Button,
+    Typography,
     Form,
     FormControl,
     FormErrorBox,
@@ -72,9 +73,9 @@ export function ResetPasswordForm() {
     return (
         <div className="grid gap-6">
             <div>
-                <h1 className="font-display text-2xl font-semibold tracking-tight text-fg">
+                <Typography as="h1" className="text-2xl lg:text-2xl">
                     {AUTH_RESET_PASSWORD.title}
-                </h1>
+                </Typography>
                 <p className="mt-1 text-sm text-fg-muted">
                     {invalidToken ? AUTH_RESET_PASSWORD.invalid : AUTH_RESET_PASSWORD.subtitle}
                 </p>

@@ -81,13 +81,9 @@ export function RouteModalShell({
                 )}>
                 <SheetHeader className="shrink-0 space-y-0 border-b border-line bg-raised px-5 py-4 pr-12 text-left">
                     <div className="space-y-1">
-                        <SheetTitle className="font-display text-lg font-semibold tracking-tight text-fg">
-                            {title}
-                        </SheetTitle>
+                        <SheetTitle>{title}</SheetTitle>
                         {description ? (
-                            <SheetDescription className="text-sm text-fg-muted">
-                                {description}
-                            </SheetDescription>
+                            <SheetDescription>{description}</SheetDescription>
                         ) : null}
                     </div>
                 </SheetHeader>

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 
 import { RumteloLogo } from '@rumtelo/brand';
+import { Typography } from '@rumtelo/ui';
 
 import { Cta } from '@/components/landing/landing-primitives';
 import { webSignUpPath } from '@/lib/portal-urls';
@@ -26,12 +27,12 @@ export function LegalPage({
                 </div>
             </header>
             <main className="mx-auto max-w-3xl px-4 py-12 lg:px-6 lg:py-16">
-                <p className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
+                <Typography variant="eyebrow" color="primary">
                     ✦ Legal
-                </p>
-                <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight text-fg">
+                </Typography>
+                <Typography as="h1" weight="semibold" className="mt-3 text-4xl lg:text-4xl">
                     {title}
-                </h1>
+                </Typography>
                 <p className="mt-2 font-mono text-xs text-fg-faint">Last updated · {updated}</p>
                 <div className="prose-legal mt-10 grid gap-6 text-base leading-relaxed text-fg-secondary [&_h2]:mt-2 [&_h2]:font-display [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h2]:text-fg [&_p]:text-pretty [&_ul]:grid [&_ul]:list-disc [&_ul]:gap-1.5 [&_ul]:pl-5">
                     {children}

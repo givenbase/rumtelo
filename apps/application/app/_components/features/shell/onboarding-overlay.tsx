@@ -11,7 +11,7 @@ import {
     Locale,
     SpendingStyle,
 } from '@rumtelo/contracts';
-import { Button, Field, Input } from '@rumtelo/ui';
+import { Button, Field, Input, Typography } from '@rumtelo/ui';
 import { cn, formatMoney, currencySymbol } from '@rumtelo/utils';
 
 import { jarChrome } from '@/app/_lib/jar-meta';
@@ -149,10 +149,10 @@ export function OnboardingOverlay() {
                     </p>
                 </div>
 
-                <h2 className="font-display text-2xl font-semibold tracking-tight text-fg">
-                    {step.title}
-                </h2>
-                <p className="mt-2 text-sm leading-relaxed text-fg-muted">{step.body}</p>
+                <Typography as="h2">{step.title}</Typography>
+                <Typography as="p" size="sm" color="muted" className="mt-2">
+                    {step.body}
+                </Typography>
 
                 {onboardingStep === 1 && (
                     <div className="mt-4 grid gap-3">

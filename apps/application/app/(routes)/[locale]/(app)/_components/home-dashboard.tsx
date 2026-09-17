@@ -9,7 +9,7 @@ import { useSearchParams } from 'next/navigation';
 
 import { CoachKind } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Eyebrow } from '@rumtelo/ui';
+import { Eyebrow, Typography } from '@rumtelo/ui';
 import { formatPeriod, toPeriodKey, describePeriodTravel } from '@rumtelo/utils';
 
 import type { CoachVerdictMessage, CoachRecapItem } from '@/components/features/home/coach-verdict';
@@ -189,11 +189,13 @@ export function HomeDashboardClient() {
                     ✦ {formatPeriod(dashboard.period ?? periodKey, 'en-US')}
                     {travel.direction !== 'current' ? ` · ${travel.relativeLabel}` : ''}
                 </Eyebrow>
-                <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-fg lg:text-4xl">
+                <Typography as="h1" className="mt-2">
                     {periodLabel}
-                </h1>
+                </Typography>
                 {travel.direction !== 'current' && travel.daysLabel ? (
-                    <p className="mt-1 text-sm text-fg-muted">{travel.daysLabel}</p>
+                    <Typography as="p" size="sm" color="muted" className="mt-1">
+                        {travel.daysLabel}
+                    </Typography>
                 ) : null}
             </div>
 

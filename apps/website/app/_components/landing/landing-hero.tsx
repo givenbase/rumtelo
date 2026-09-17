@@ -15,6 +15,8 @@ import {
 } from '@/lib/landing-content';
 import { appHomeUrl, appPlanSettingsUrl, webSignUpPath } from '@/lib/portal-urls';
 
+import { Typography } from '@rumtelo/ui';
+
 import { Cta, Eyebrow } from './landing-primitives';
 import { formatCatalogMajor } from './landing-money';
 
@@ -176,12 +178,16 @@ export function LandingHero() {
                             </span>
                         ))}
                     </Eyebrow>
-                    <h1 className="my-4 max-w-md font-display text-4xl leading-[1.05] font-bold tracking-tight text-balance text-fg sm:text-5xl sm:leading-[1.02] lg:max-w-lg lg:text-7xl">
+                    <Typography
+                        as="h1"
+                        size="lg"
+                        weight="bold"
+                        className="my-4 max-w-md leading-[1.05] sm:leading-[1.02] lg:max-w-lg">
                         {HERO.headline}
-                    </h1>
-                    <p className="mb-7 max-w-prose text-base leading-relaxed text-pretty text-fg-muted lg:text-lg">
+                    </Typography>
+                    <Typography as="p" variant="lead" className="mb-7">
                         {HERO.lead}
-                    </p>
+                    </Typography>
                     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                         {isAuthenticated ? (
                             <>

@@ -1,3 +1,5 @@
+import { Typography } from '@rumtelo/ui';
+
 import { PRINCIPLES, PRINCIPLES_SECTION } from '@/lib/landing-content';
 
 import { LandingIcon } from './landing-icon';
@@ -13,9 +15,12 @@ export function LandingPrinciples() {
                         <Eyebrow className="text-accent-hover">
                             {PRINCIPLES_SECTION.eyebrow}
                         </Eyebrow>
-                        <h2 className="mt-3.5 max-w-xl font-display text-3xl leading-[1.08] font-semibold tracking-tight text-balance lg:text-4xl">
+                        <Typography
+                            as="h2"
+                            size="lg"
+                            className="mt-3.5 max-w-xl leading-[1.08]">
                             {PRINCIPLES_SECTION.headline}
-                        </h2>
+                        </Typography>
                     </div>
                     <span className="font-mono text-xs font-medium tracking-widest text-bg/55 uppercase">
                         Code is English · product copy is English first
