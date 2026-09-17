@@ -9,7 +9,7 @@ import { VendorMark } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import {
-    GIVING_CAUSES,
+    GIVING_CAUSE_CATALOG,
     GIVING_SIGNAL_TIER_ORDER,
     GIVING_SIGNAL_TIERS,
     givingCauseMeta,
@@ -93,7 +93,7 @@ export function GivingFinder({
 
     const causesWithRows = useMemo(
         () =>
-            GIVING_CAUSES.filter(meta =>
+            GIVING_CAUSE_CATALOG.filter(meta =>
                 organisations.some(organisation => organisation.causes.includes(meta.key))
             ),
         [organisations]
@@ -183,7 +183,7 @@ export function GivingFinder({
                                             : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
                                     )}>
                                     <span aria-hidden>{meta.icon}</span>
-                                    {meta.label}
+                                    {meta.name}
                                 </button>
                             );
                         })}

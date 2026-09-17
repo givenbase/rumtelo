@@ -235,7 +235,7 @@ const JSON_BAG_NAMES = new Set([
 const JSON_BAG_SUFFIX_RE = /(Json|Metadata|Settings|Config|Payload|Snapshot)$/;
 
 function looksPluralField(name: string): boolean {
-    // Simple plural heuristic — aliases, unlocks, tags, audienceTags
+    // Simple plural heuristic — aliases, unlocks, tags, audienceKeys
     if (name.endsWith('ies')) return true;
     if (name.endsWith('ses')) return true;
     if (name.endsWith('s') && !/ss$|us$|is$status|Status$/.test(name)) return true;
@@ -325,8 +325,11 @@ export const EXACT_FIELD_PRIORITY: Record<string, number> = {
     currency: 7,
     icon: 7,
     color: 7,
+    accentColor: 7,
+    softColor: 7,
     badgeLabel: 7,
     minNetWorth: 7,
+    isBaseline: 7,
 
     metadata: 8,
     settings: 8,
@@ -389,6 +392,8 @@ export const SAME_PRIORITY_ORDER: readonly (readonly string[])[] = [
 
 export const UI_METADATA_PRIORITY: Record<string, number> = {
     color: 1,
+    accentColor: 1,
+    softColor: 1,
     icon: 2,
     logoDomain: 3,
     website: 4,

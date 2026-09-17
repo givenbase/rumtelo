@@ -12,7 +12,7 @@ export class FixedCostPresetService {
     async listActive(filters?: {
         jarKey?: JarKey;
         categoryTemplateKey?: string;
-        audienceTag?: string;
+        audienceKey?: string;
     }): Promise<FixedCostPreset[]> {
         const rows = await this.em.find(
             FixedCostPreset,
@@ -25,7 +25,7 @@ export class FixedCostPresetService {
             },
             { orderBy: { sortOrder: 'ASC' }, populate: ['jarTemplate'] }
         );
-        if (!filters?.audienceTag) return rows;
-        return rows.filter(preset => preset.audienceTags.includes(filters.audienceTag!));
+        if (!filters?.audienceKey) return rows;
+        return rows.filter(preset => preset.audienceKeys.includes(filters.audienceKey!));
     }
 }

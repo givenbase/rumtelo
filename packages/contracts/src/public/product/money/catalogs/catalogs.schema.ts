@@ -8,7 +8,14 @@ import { z } from 'zod';
 
 import { Cadence, FlowDirection } from '../../../../common/common.enums';
 import { CatalogItemBase } from '../../../../common/common.schema';
-import { DebtKind, GivingCause, GivingEvaluator, IncomeKind, JarKey } from '../enums';
+import {
+    DebtKind,
+    GivingCause,
+    GivingEvaluator,
+    GivingSignalTier,
+    IncomeKind,
+    JarKey,
+} from '../enums';
 import { JarCapabilities } from '../jar/jar.schema';
 
 /** Money company-catalog DTOs (backoffice.product.money templates + presets). */
@@ -18,13 +25,27 @@ export const CategoryTemplate = CatalogItemBase.extend({
     icon: z.string().max(8).nullable(),
 });
 
+/** Lifestyle audience for the fixed-cost bill picker (grows via seed, not a TS enum). */
+export const Audience = CatalogItemBase.extend({
+    /** One line under the chip / for tooltips. */
+    description: z.string().max(280).nullable(),
+    /** Baseline audiences are not chips; their bills stay listed under every other filter. */
+    isBaseline: z.boolean(),
+    icon: z.string().max(8).nullable(),
+    /** CSS color token for chip text / border. */
+    accentColor: z.string().max(64).nullable(),
+    /** CSS color token for chip fill. */
+    softColor: z.string().max(64).nullable(),
+});
+
 export const FixedCostPreset = CatalogItemBase.extend({
     jarKey: z.enum(JarKey),
     categoryTemplateKey: z.string().min(1).max(64),
     defaultCadence: z.enum(Cadence),
     suggestedDueDay: z.int().min(1).max(31).nullable(),
     direction: z.enum(FlowDirection),
-    audienceTags: z.array(z.string()),
+    /** Audience.key values from the audience catalog. */
+    audienceKeys: z.array(z.string().min(1).max(64)),
     /** MerchantPreset.key chips for “Paid to” after this bill type is picked. */
     suggestedMerchantKeys: z.array(z.string().min(1).max(64)),
 });
@@ -152,10 +173,24 @@ export const GivingOrganisation = CatalogItemBase.extend({
     reporting: z.string().max(280).nullable(),
 });
 
+export const GivingCauseCatalog = CatalogItemBase.extend({
+    key: z.enum(GivingCause),
+    icon: z.string().min(1).max(8),
+    line: z.string().min(1).max(280),
+});
+
+export const GivingEvaluatorCatalog = CatalogItemBase.extend({
+    key: z.enum(GivingEvaluator),
+    tier: z.enum(GivingSignalTier),
+    measures: z.string().min(1).max(480),
+    url: z.url(),
+});
+
 // Inferred types (same-module merge for consumers)
 export type GivingSignal = z.infer<typeof GivingSignal>;
 export type GivingOrganisation = z.infer<typeof GivingOrganisation>;
 export type CategoryTemplate = z.infer<typeof CategoryTemplate>;
+export type Audience = z.infer<typeof Audience>;
 export type FixedCostPreset = z.infer<typeof FixedCostPreset>;
 export type DebtPreset = z.infer<typeof DebtPreset>;
 export type JarGuide = z.infer<typeof JarGuide>;
@@ -165,3 +200,5 @@ export type TransactionInPreset = z.infer<typeof TransactionInPreset>;
 export type GoalPreset = z.infer<typeof GoalPreset>;
 export type MerchantPreset = z.infer<typeof MerchantPreset>;
 export type MerchantHighlight = z.infer<typeof MerchantHighlight>;
+export type GivingCauseCatalog = z.infer<typeof GivingCauseCatalog>;
+export type GivingEvaluatorCatalog = z.infer<typeof GivingEvaluatorCatalog>;

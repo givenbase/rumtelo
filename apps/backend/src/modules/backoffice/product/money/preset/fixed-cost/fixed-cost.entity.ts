@@ -45,11 +45,11 @@ export class FixedCostPreset extends BaseEntity {
     suggestedDueDay: number | null = null;
 
     /**
-     * Life-stage / lifestyle filters for the picker
-     * (STUDENT, FAMILY, ELDERLY, CAR_OWNER, COMMON, …).
+     * Audience.key filters for the bill picker.
+     * Vocabulary grows via the audience catalog — not a TS enum.
      */
     @Property({ type: 'json', default: [] })
-    audienceTags: string[] = [];
+    audienceKeys: string[] = [];
 
     /**
      * MerchantPreset.key chips for “Paid to” after this bill type is picked.

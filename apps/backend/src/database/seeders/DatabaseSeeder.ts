@@ -3,6 +3,7 @@ import type { EntityManager } from '@mikro-orm/postgresql';
 import { Seeder } from '@mikro-orm/seeder';
 
 import { PlanSeeder } from './plan/PlanSeeder';
+import { AudienceSeeder } from './product/money/AudienceSeeder';
 import { CategoryTemplateSeeder } from './product/money/CategoryTemplateSeeder';
 import { DebtPresetSeeder } from './product/money/DebtPresetSeeder';
 import { FixedCostPresetSeeder } from './product/money/FixedCostPresetSeeder';
@@ -26,6 +27,7 @@ export class DatabaseSeeder extends Seeder {
         return this.call(em, [
             JarTemplateSeeder,
             CategoryTemplateSeeder,
+            AudienceSeeder,
             FixedCostPresetSeeder,
             DebtPresetSeeder,
             IncomeSourcePresetSeeder,

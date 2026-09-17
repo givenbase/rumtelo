@@ -1,5 +1,8 @@
 export { MoneyProductModule } from './money.module';
 export {
+    Audience,
+    AudienceModule,
+    AudienceService,
     GivingOrganisation,
     GivingOrganisationModule,
     GivingOrganisationService,

@@ -20,7 +20,14 @@ import {
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { CategoryTemplate, MerchantPreset } from '@rumtelo/contracts';
-import { Cadence, FlowDirection, JarKey, jarCapabilitiesFor } from '@rumtelo/contracts';
+import {
+    Cadence,
+    FlowDirection,
+    JarKey,
+    defaultGiveCategoryTemplate,
+    jarCapabilitiesFor,
+    matchesAudience,
+} from '@rumtelo/contracts';
 import { cn } from '@rumtelo/utils';
 import { z } from 'zod';
 
@@ -47,26 +54,6 @@ import { PresetNameField, type NamePresetOption } from './preset-name-field';
 
 /** Cap suggested vendor chips so the form stays scannable. */
 const MAX_VENDOR_CHIPS = 16;
-
-/** Category template the Give helper falls back to when none was picked. */
-const DONATIONS_CATEGORY_KEY = 'DONATIONS';
-
-/** Baseline tag — always included when a lifestyle filter is on. */
-const AUDIENCE_COMMON = 'COMMON';
-
-function matchesAudienceTag(tags: readonly string[], filter: string | null): boolean {
-    if (!filter) return true;
-    return tags.includes(filter) || tags.includes(AUDIENCE_COMMON);
-}
-
-/** Chip label from catalog key (CAR_OWNER → Car owner). */
-function audienceTagLabel(key: string): string {
-    return key
-        .toLowerCase()
-        .split('_')
-        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-        .join(' ');
-}
 
 export type GivePayeeMode = 'known' | 'coach' | 'manual';
 
@@ -143,7 +130,7 @@ export function FixedCostForm({
     );
     /** Bill-type preset key (VPN, INTERNET, …) — narrows Paid-to chips within Subscriptions. */
     const [selectedBillPresetKey, setSelectedBillPresetKey] = useState<string | null>(null);
-    /** Narrow bill-type suggestions by lifestyle tag from the catalog. */
+    /** Narrow bill-type suggestions by lifestyle audience from the catalog. */
     const [audienceFilter, setAudienceFilter] = useState<string | null>(null);
     const [customPayee, setCustomPayee] = useState(false);
     /** Give only — null until the household picks a path (or prefill resolves one). */
@@ -209,6 +196,13 @@ export function FixedCostForm({
         [],
         live
     );
+    const audiencesQuery = useLiveQuery(
+        apiQuery.money.catalogs.audiences.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [],
+        live
+    );
     const merchantsQuery = useLiveQuery(
         apiQuery.money.catalogs.merchantPresets.list.queryOptions({
             input: { householdId: householdId! },
@@ -233,6 +227,12 @@ export function FixedCostForm({
         return map;
     }, [categoriesQuery.data]);
 
+    /** Default Give spend category from the catalog (Donations before Gifts). */
+    const giveCategoryTemplateKey = useMemo(
+        () => defaultGiveCategoryTemplate(categoriesQuery.data ?? [])?.key ?? null,
+        [categoriesQuery.data]
+    );
+
     /** Household category display name → catalog template key (for merchant chips). */
     const templateKeyByCategoryName = useMemo(() => {
         const map = new Map<string, string>();
@@ -244,17 +244,17 @@ export function FixedCostForm({
 
     const merchants = useMemo(() => merchantsQuery.data ?? [], [merchantsQuery.data]);
     const fixedCostPresets = useMemo(() => presetsQuery.data ?? [], [presetsQuery.data]);
+    const audiences = useMemo(() => audiencesQuery.data ?? [], [audiencesQuery.data]);
 
-    /** Distinct audience tags from the loaded catalog (COMMON is baseline, not a chip). */
-    const audienceFilterKeys = useMemo(() => {
-        const keys = new Set<string>();
-        for (const preset of fixedCostPresets) {
-            for (const tag of preset.audienceTags) {
-                if (tag !== AUDIENCE_COMMON) keys.add(tag);
-            }
-        }
-        return [...keys].sort((a, b) => a.localeCompare(b));
-    }, [fixedCostPresets]);
+    /** Chip audiences from the catalog (baseline rows stay out of the chip row). */
+    const audienceChips = useMemo(
+        () => audiences.filter(audience => !audience.isBaseline),
+        [audiences]
+    );
+    const baselineAudienceKeys = useMemo(
+        () => audiences.filter(audience => audience.isBaseline).map(audience => audience.key),
+        [audiences]
+    );
 
     /** Bill-type presets + brand catalog — type Netflix, get Media + Play auto-filled. */
     const nameOptions = useMemo((): NamePresetOption[] => {
@@ -264,7 +264,9 @@ export function FixedCostForm({
             excludeGivingLinked: true,
         });
         const fromPresets: NamePresetOption[] = fixedCostPresets
-            .filter(preset => matchesAudienceTag(preset.audienceTags, audienceFilter))
+            .filter(preset =>
+                matchesAudience(preset.audienceKeys, audienceFilter, baselineAudienceKeys)
+            )
             .map(preset => {
                 const category = categoryByKey.get(preset.categoryTemplateKey);
                 return {
@@ -276,7 +278,7 @@ export function FixedCostForm({
             });
         // Brands first so “netflix” hits Netflix before “Streaming video”.
         return [...fromMerchants, ...fromPresets];
-    }, [merchants, fixedCostPresets, categoryByKey, audienceFilter]);
+    }, [merchants, fixedCostPresets, categoryByKey, audienceFilter, baselineAudienceKeys]);
 
     const form = useForm<FixedCostFormValues>({
         defaultValues: {
@@ -385,7 +387,9 @@ export function FixedCostForm({
                 setGiveOrgKey(org.key);
                 setGivePayeeMode(defaultGivePayeeMode ?? 'coach');
                 if (!form.getValues('categoryId') && !pendingCategoryTemplateKey) {
-                    setPendingCategoryTemplateKey(DONATIONS_CATEGORY_KEY);
+                    if (giveCategoryTemplateKey) {
+                        setPendingCategoryTemplateKey(giveCategoryTemplateKey);
+                    }
                 }
             } else {
                 // Unknown key — keep any name as manual typing.
@@ -627,25 +631,39 @@ export function FixedCostForm({
                                     )}>
                                     All
                                 </button>
-                                {audienceFilterKeys.map(tag => {
-                                    const on = audienceFilter === tag;
+                                {audienceChips.map(audience => {
+                                    const on = audienceFilter === audience.key;
                                     return (
                                         <button
-                                            key={tag}
+                                            key={audience.key}
                                             type="button"
+                                            title={audience.description ?? undefined}
                                             aria-pressed={on}
                                             onClick={() =>
                                                 setAudienceFilter(previous =>
-                                                    previous === tag ? null : tag
+                                                    previous === audience.key ? null : audience.key
                                                 )
                                             }
                                             className={cn(
-                                                'rounded-full border px-2.5 py-1 font-mono text-[11px] transition-colors',
+                                                'inline-flex items-center gap-1 rounded-full border px-2.5 py-1 font-mono text-[11px] transition-colors',
+                                                !on &&
+                                                    'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                            )}
+                                            style={
                                                 on
-                                                    ? 'border-accent/40 bg-accent-soft text-accent'
-                                                    : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
-                                            )}>
-                                            {audienceTagLabel(tag)}
+                                                    ? {
+                                                          borderColor:
+                                                              audience.accentColor ?? undefined,
+                                                          backgroundColor:
+                                                              audience.softColor ?? undefined,
+                                                          color: audience.accentColor ?? undefined,
+                                                      }
+                                                    : undefined
+                                            }>
+                                            {audience.icon ? (
+                                                <span aria-hidden>{audience.icon}</span>
+                                            ) : null}
+                                            {audience.name}
                                         </button>
                                     );
                                 })}
@@ -896,10 +914,11 @@ export function FixedCostForm({
                                             });
                                             if (
                                                 !form.getValues('categoryId') &&
-                                                !pendingCategoryTemplateKey
+                                                !pendingCategoryTemplateKey &&
+                                                giveCategoryTemplateKey
                                             ) {
                                                 setPendingCategoryTemplateKey(
-                                                    DONATIONS_CATEGORY_KEY
+                                                    giveCategoryTemplateKey
                                                 );
                                             }
                                         }}

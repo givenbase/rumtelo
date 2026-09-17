@@ -9,9 +9,12 @@ import { z } from 'zod';
 import { HouseholdScoped } from '../../../../common/common.schema';
 import { DebtKind, GivingCause, IncomeKind, JarKey } from '../enums';
 import {
+    Audience,
     CategoryTemplate,
     DebtPreset,
     FixedCostPreset,
+    GivingCauseCatalog,
+    GivingEvaluatorCatalog,
     GivingOrganisation,
     GoalPreset,
     IncomeSourcePreset,
@@ -36,10 +39,13 @@ export const catalogsContract = {
                 HouseholdScoped.extend({
                     jarKey: z.enum(JarKey).nullish(),
                     categoryTemplateKey: z.string().max(64).nullish(),
-                    audienceTag: z.string().max(32).nullish(),
+                    audienceKey: z.string().max(64).nullish(),
                 })
             )
             .output(z.array(FixedCostPreset)),
+    },
+    audiences: {
+        list: oc.input(HouseholdScoped).output(z.array(Audience)),
     },
     debtPresets: {
         list: oc
@@ -76,5 +82,11 @@ export const catalogsContract = {
         list: oc
             .input(HouseholdScoped.extend({ cause: z.enum(GivingCause).nullish() }))
             .output(z.array(GivingOrganisation)),
+    },
+    givingCauses: {
+        list: oc.input(HouseholdScoped).output(z.array(GivingCauseCatalog)),
+    },
+    givingEvaluators: {
+        list: oc.input(HouseholdScoped).output(z.array(GivingEvaluatorCatalog)),
     },
 };

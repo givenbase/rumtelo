@@ -1,5 +1,8 @@
 export { ProductModule } from './product.module';
 export {
+    Audience,
+    AudienceModule,
+    AudienceService,
     CategoryTemplate,
     CategoryTemplateModule,
     CategoryTemplateService,

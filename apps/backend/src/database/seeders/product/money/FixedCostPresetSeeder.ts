@@ -26,7 +26,7 @@ export class FixedCostPresetSeeder extends Seeder {
                 existing.name = row.name;
                 existing.jarTemplate = jarTemplate;
                 existing.categoryTemplateKey = row.categoryTemplateKey;
-                existing.audienceTags = [...row.audienceTags];
+                existing.audienceKeys = [...row.audienceKeys];
                 existing.suggestedMerchantKeys = suggestedMerchantKeys;
                 existing.suggestedDueDay = suggestedDueDay;
                 existing.sortOrder = sortOrder;
@@ -38,7 +38,7 @@ export class FixedCostPresetSeeder extends Seeder {
                 name: row.name,
                 jarTemplate,
                 categoryTemplateKey: row.categoryTemplateKey,
-                audienceTags: [...row.audienceTags],
+                audienceKeys: [...row.audienceKeys],
                 suggestedMerchantKeys,
                 suggestedDueDay,
                 sortOrder,

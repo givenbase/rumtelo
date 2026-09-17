@@ -19,7 +19,7 @@ import {
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { CategoryTemplate, MerchantPreset } from '@rumtelo/contracts';
-import { JarKey, jarCapabilitiesFor } from '@rumtelo/contracts';
+import { JarKey, defaultGiveCategoryTemplate, jarCapabilitiesFor } from '@rumtelo/contracts';
 import { z } from 'zod';
 
 import { parseAmountToMinorUnits, todayIsoDate } from '@/app/_lib/money-input';
@@ -35,9 +35,6 @@ import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
 import { ExpenseIntentField, type ExpenseIntentSelection } from './expense-intent-field';
 import { FormInput } from './form-input';
 import { PresetNameField } from './preset-name-field';
-
-/** Category template used when logging a one-time gift (matches fixed-cost Give). */
-const DONATIONS_CATEGORY_KEY = 'DONATIONS';
 
 function resolveInflowKey(
     label: string,
@@ -342,18 +339,15 @@ export function ExpenseForm({
     const [givePayeeMode, setGivePayeeMode] = useState<GivePayeeMode>('known');
     const [giveOrgKey, setGiveOrgKey] = useState<string | null>(null);
 
-    const donationsCategory = useMemo(
-        () => categories.find(category => category.key === DONATIONS_CATEGORY_KEY) ?? null,
-        [categories]
-    );
+    const donationsCategory = useMemo(() => defaultGiveCategoryTemplate(categories), [categories]);
 
     function applyGivePayee(name: string, orgKey: string | null = null) {
         setGiveOrgKey(orgKey);
         setIntentOverride({
             vendor: name,
             merchantKey: null,
-            categoryKey: donationsCategory?.key ?? DONATIONS_CATEGORY_KEY,
-            categoryName: donationsCategory?.name ?? 'Donations',
+            categoryKey: donationsCategory?.key ?? null,
+            categoryName: donationsCategory?.name ?? null,
             jarKey: JarKey.GIVE,
             source: name.trim() ? 'custom' : null,
         });
@@ -381,8 +375,8 @@ export function ExpenseForm({
             setIntentOverride({
                 vendor: '',
                 merchantKey: null,
-                categoryKey: donationsCategory?.key ?? DONATIONS_CATEGORY_KEY,
-                categoryName: donationsCategory?.name ?? 'Donations',
+                categoryKey: donationsCategory?.key ?? null,
+                categoryName: donationsCategory?.name ?? null,
                 jarKey: JarKey.GIVE,
                 source: null,
             });

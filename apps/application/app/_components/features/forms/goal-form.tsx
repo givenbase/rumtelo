@@ -22,7 +22,7 @@ import type { GoalPreset } from '@rumtelo/contracts';
 import { GivingCause, GoalKind, GoalStatus, JarKey } from '@rumtelo/contracts';
 import { z } from 'zod';
 
-import { GIVING_CAUSES, WHY_GIVE, givingCauseMeta } from '@/app/_lib/giving';
+import { GIVING_CAUSE_CATALOG, WHY_GIVE, givingCauseMeta } from '@/app/_lib/giving';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -100,7 +100,7 @@ const GIVE_TARGET_MODES: ReadonlyArray<{ id: GiveTargetMode; label: string }> = 
 function givePledgeName(cause: GivingCause | null | undefined) {
     if (!cause) return 'Give pledge this year';
     const meta = givingCauseMeta(cause);
-    return meta ? `${meta.label} pledge` : 'Give pledge this year';
+    return meta ? `${meta.name} pledge` : 'Give pledge this year';
 }
 
 function resolveGiveTargetMode(defaults: Partial<GoalFormValues> | undefined): GiveTargetMode {
@@ -457,7 +457,7 @@ export function GoalForm({
                                             }>
                                             Any cause
                                         </button>
-                                        {GIVING_CAUSES.map(meta => {
+                                        {GIVING_CAUSE_CATALOG.map(meta => {
                                             const on = cause === meta.key;
                                             return (
                                                 <button
@@ -474,7 +474,7 @@ export function GoalForm({
                                                             : 'flex items-center gap-1.5 rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
                                                     }>
                                                     <span aria-hidden>{meta.icon}</span>
-                                                    {meta.label}
+                                                    {meta.name}
                                                 </button>
                                             );
                                         })}

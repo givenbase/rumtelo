@@ -1,9 +1,11 @@
 import { Inject } from '@nestjs/common';
 import { Implement, implement } from '@orpc/nest';
-import { contract } from '@rumtelo/contracts';
+import type { DebtKind, GivingCause, IncomeKind, JarKey } from '@rumtelo/contracts';
+import { GIVING_CAUSE_CATALOG, GIVING_EVALUATOR_CATALOG, contract } from '@rumtelo/contracts';
 
 import { ControllerSwagger } from '../../../../../../common/decorators/controller-swagger.decorators';
 import {
+    AudienceService,
     CategoryTemplateService,
     DebtPresetService,
     FixedCostPresetService,
@@ -14,13 +16,13 @@ import {
     MerchantPresetService,
     TransactionInPresetService,
 } from '../../../../../backoffice/product';
-import type { DebtKind, GivingCause, IncomeKind, JarKey } from '@rumtelo/contracts';
 
 @ControllerSwagger('money/catalogs', 'public')
 export class MoneyCatalogsController {
     constructor(
         @Inject(JarTemplateService) private readonly jars: JarTemplateService,
         @Inject(CategoryTemplateService) private readonly categories: CategoryTemplateService,
+        @Inject(AudienceService) private readonly audiences: AudienceService,
         @Inject(FixedCostPresetService) private readonly fixedCosts: FixedCostPresetService,
         @Inject(DebtPresetService) private readonly debts: DebtPresetService,
         @Inject(IncomeSourcePresetService) private readonly incomes: IncomeSourcePresetService,
@@ -74,7 +76,7 @@ export class MoneyCatalogsController {
                 const rows = await this.fixedCosts.listActive({
                     jarKey: (input.jarKey as JarKey | null) ?? undefined,
                     categoryTemplateKey: input.categoryTemplateKey ?? undefined,
-                    audienceTag: input.audienceTag ?? undefined,
+                    audienceKey: input.audienceKey ?? undefined,
                 });
                 return rows.map(preset => ({
                     key: preset.key,
@@ -85,11 +87,28 @@ export class MoneyCatalogsController {
                     defaultCadence: preset.defaultCadence,
                     suggestedDueDay: preset.suggestedDueDay,
                     direction: preset.direction,
-                    audienceTags: preset.audienceTags,
+                    audienceKeys: preset.audienceKeys ?? [],
                     suggestedMerchantKeys: preset.suggestedMerchantKeys ?? [],
                 }));
             }
         );
+    }
+
+    @Implement(contract.money.catalogs.audiences.list)
+    listAudiences() {
+        return implement(contract.money.catalogs.audiences.list).handler(async () => {
+            const rows = await this.audiences.listActive();
+            return rows.map(row => ({
+                key: row.key,
+                name: row.name,
+                sortOrder: row.sortOrder,
+                description: row.description,
+                isBaseline: row.isBaseline,
+                icon: row.icon,
+                accentColor: row.accentColor,
+                softColor: row.softColor,
+            }));
+        });
     }
 
     @Implement(contract.money.catalogs.debtPresets.list)
@@ -198,6 +217,33 @@ export class MoneyCatalogsController {
             this.givingOrganisations.listActive({
                 cause: (input.cause as GivingCause | null) ?? undefined,
             })
+        );
+    }
+
+    @Implement(contract.money.catalogs.givingCauses.list)
+    listGivingCauses() {
+        return implement(contract.money.catalogs.givingCauses.list).handler(() =>
+            GIVING_CAUSE_CATALOG.map((row, sortOrder) => ({
+                key: row.key,
+                name: row.name,
+                sortOrder,
+                icon: row.icon,
+                line: row.line,
+            }))
+        );
+    }
+
+    @Implement(contract.money.catalogs.givingEvaluators.list)
+    listGivingEvaluators() {
+        return implement(contract.money.catalogs.givingEvaluators.list).handler(() =>
+            GIVING_EVALUATOR_CATALOG.map((row, sortOrder) => ({
+                key: row.key,
+                name: row.name,
+                sortOrder,
+                tier: row.tier,
+                measures: row.measures,
+                url: row.url,
+            }))
         );
     }
 }

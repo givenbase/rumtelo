@@ -84,6 +84,16 @@ export enum GivingEvaluator {
     ANBI = 'ANBI',
 }
 
+/**
+ * What a giving signal is evidence of. Never let governance or tax
+ * read as proof of impact — UI tiers keep that honest.
+ */
+export enum GivingSignalTier {
+    IMPACT = 'impact',
+    GOVERNANCE = 'governance',
+    TAX = 'tax',
+}
+
 export enum AccountKind {
     CHECKING = 'CHECKING',
     SAVINGS = 'SAVINGS',
