@@ -6,7 +6,7 @@ import type { CatalogItemBase } from '@rumtelo/contracts';
 import { VendorMark } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
-import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
+import { partyMark } from '@/app/_lib/vendor-brands';
 
 import { FormInput } from './form-input';
 
@@ -345,11 +345,22 @@ export function PresetNameField({
 }
 
 function OptionVendorMark({ option }: { option: NamePresetOption }) {
-    const mark = vendorMarkSrc({
-        key: option.key,
-        name: option.name,
-        logoDomain: option.logoDomain,
-        website: option.website,
-    });
-    return <VendorMark name={mark.name} src={mark.src} size={20} />;
+    const mark = partyMark(
+        {
+            key: option.key,
+            name: option.name,
+            logoDomain: option.logoDomain,
+            website: option.website,
+        },
+        { fallbackIcon: option.icon ?? null, tone: null }
+    );
+    return (
+        <VendorMark
+            name={mark.name}
+            src={mark.src}
+            fallbackIcon={mark.fallbackIcon}
+            tone={mark.tone}
+            size={20}
+        />
+    );
 }

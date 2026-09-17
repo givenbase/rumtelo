@@ -14,9 +14,12 @@ import { monthlyAmount } from '@rumtelo/utils';
 import { createFixedHref, createGoalHref, updateHref } from '@/app/_lib/create-routes';
 import { cadenceLabel } from '@/app/_lib/jar-chrome';
 import { WHY_GIVE } from '@/app/_lib/giving';
+import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
 import { productPath } from '@/app/_lib/routes';
-import { findPartyVendor, vendorMarkSrc } from '@/app/_lib/vendor-brands';
+import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
+import { findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
+import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { CoachMark, CoachTipCard, HelperGate } from '@/components/features/helpers';
 import { GivingFinder } from '@/components/features/money/giving-finder';
 import { MetaChip, formatDueDay } from '@/components/features/money/jar-badge';
@@ -121,6 +124,9 @@ export function GivingPageClient() {
     );
     const merchants = merchantsQuery.data ?? [];
     const givingOrgs = givingOrgsQuery.data ?? [];
+    const categoryTemplatesQuery = useCategoryTemplates(live);
+    const categoryTemplates = categoryTemplatesQuery.data ?? [];
+    const { byKey: jarByKey } = useJarCatalog();
 
     const txQuery = useLiveQuery(
         apiQuery.money.transactions.list.queryOptions({
@@ -281,8 +287,14 @@ export function GivingPageClient() {
                                                 ? item.name
                                                 : 'No organisation named yet'
                                         }
-                                        mark={vendorMarkSrc(
-                                            findPartyVendor(company, merchants, givingOrgs)
+                                        mark={partyMark(
+                                            findPartyVendor(company, merchants, givingOrgs),
+                                            catalogMarkChrome({
+                                                billName: item.name,
+                                                jarKey: JarKey.GIVE,
+                                                jarByKey,
+                                                categoryTemplates,
+                                            })
                                         )}
                                         amount={`${formatMoney(item.monthly)}/mo`}
                                         badges={

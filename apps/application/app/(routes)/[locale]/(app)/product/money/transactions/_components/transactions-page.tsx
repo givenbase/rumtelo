@@ -26,8 +26,11 @@ import {
 
 import { createTxHref, updateHref } from '@/app/_lib/create-routes';
 import { matchMerchantJarKey } from '@/app/_lib/merchant-match';
+import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
-import { vendorMarkSrc, findCatalogVendorFromFeed } from '@/app/_lib/vendor-brands';
+import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
+import { partyMark, findCatalogVendorFromFeed } from '@/app/_lib/vendor-brands';
+import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { InboxSortCard } from '@/components/features/money/inbox-sort-card';
 import { JarBadge, MetaChip, formatBookedDate } from '@/components/features/money/jar-badge';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
@@ -72,6 +75,8 @@ export function TransactionsPageClient() {
     const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
     const [tab, setTab] = useState<Tab>('INBOX');
+    const [ledgerLayout, setLedgerLayout] = useState<'list' | 'jar'>('list');
+    const [openJarIds, setOpenJarIds] = useState<Set<string>>(() => new Set());
     const live = isLiveData(householdId);
 
     const inboxQuery = useLiveQuery(
@@ -113,6 +118,8 @@ export function TransactionsPageClient() {
         EMPTY_MERCHANTS,
         live
     );
+    const categoryTemplatesQuery = useCategoryTemplates(live);
+    const { byKey: jarByKey } = useJarCatalog();
 
     const inbox = inboxQuery.data ?? EMPTY_TRANSACTIONS;
     const jars = jarsQuery.data ?? EMPTY_JARS;
@@ -121,6 +128,7 @@ export function TransactionsPageClient() {
     const jarById = new Map(jars.map(jar => [jar.id, jar]));
     const rules = rulesQuery.data ?? EMPTY_RULES;
     const merchants = merchantsQuery.data ?? EMPTY_MERCHANTS;
+    const categoryTemplates = categoryTemplatesQuery.data ?? [];
     const all = (listQuery.data?.items ?? [])
         .slice()
         .sort((left, right) => right.bookedOn.localeCompare(left.bookedOn));
@@ -325,77 +333,188 @@ export function TransactionsPageClient() {
 
             {tab === 'OUT' || tab === 'IN' ? (
                 <div className="grid gap-3">
-                    <p className="text-sm text-fg-muted">
-                        {tab === 'OUT'
-                            ? 'Money that left a jar. Tap a row to edit or delete it.'
-                            : 'Gifts, refunds, tax returns, and jar top-ups. Tap a row to edit.'}
-                    </p>
-                    <Card className="overflow-hidden p-0">
-                        <div className="grid gap-px">
-                            {(tab === 'OUT' ? outItems : inItems).length === 0 ? (
-                                <p className="px-5 py-4 text-sm text-fg-muted">
-                                    {tab === 'OUT'
-                                        ? 'No out transactions in this period yet.'
-                                        : 'No in transactions in this period yet.'}
-                                </p>
-                            ) : (
-                                (tab === 'OUT' ? outItems : inItems).map(transaction => {
-                                    const jar = transaction.jarId
-                                        ? jarById.get(transaction.jarId)
-                                        : undefined;
-                                    const title =
-                                        transaction.counterparty?.trim() || transaction.description;
-                                    const mark = vendorMarkSrc(
-                                        findCatalogVendorFromFeed(title, merchants) ?? {
-                                            name: title,
-                                        }
-                                    );
-                                    const subtitle = [
-                                        transaction.note?.trim() || null,
-                                        !transaction.note?.trim() &&
-                                        transaction.counterparty?.trim() &&
-                                        transaction.description !== transaction.counterparty.trim()
-                                            ? transaction.description
-                                            : null,
-                                    ]
-                                        .filter(Boolean)
-                                        .join(' · ');
-                                    return (
-                                        <MoneyPartyRow
-                                            key={transaction.id}
-                                            title={title}
-                                            subtitle={subtitle || null}
-                                            mark={mark}
-                                            amount={formatMoney(transaction.amount, {
-                                                signed: true,
-                                            })}
-                                            amountClassName={
-                                                transaction.amount < 0 ? 'text-fg' : 'text-success'
-                                            }
-                                            badges={
-                                                <>
-                                                    <MetaChip>
-                                                        {formatBookedDate(transaction.bookedOn)}
-                                                    </MetaChip>
-                                                    {transaction.status ===
-                                                    TransactionStatus.INBOX ? (
-                                                        <MetaChip>Inbox</MetaChip>
-                                                    ) : (
-                                                        <JarBadge
-                                                            jarKey={jar?.key}
-                                                            name={jar?.name}
-                                                        />
-                                                    )}
-                                                </>
-                                            }
-                                            onClick={() =>
-                                                router.push(updateHref('tx', transaction.id))
-                                            }
-                                        />
-                                    );
-                                })
-                            )}
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-sm text-fg-muted">
+                            {tab === 'OUT'
+                                ? 'Money that left a jar. Tap a row to edit or delete it.'
+                                : 'Gifts, refunds, tax returns, and jar top-ups. Tap a row to edit.'}
+                        </p>
+                        <div className="flex gap-1" role="group" aria-label="Ledger layout">
+                            {(
+                                [
+                                    { key: 'list' as const, label: 'List' },
+                                    { key: 'jar' as const, label: 'By jar' },
+                                ] as const
+                            ).map(option => (
+                                <button
+                                    key={option.key}
+                                    type="button"
+                                    aria-pressed={ledgerLayout === option.key}
+                                    onClick={() => setLedgerLayout(option.key)}
+                                    className={cn(
+                                        'rounded-full border px-3 py-1 font-mono text-[10px] font-medium tracking-widest uppercase transition-colors',
+                                        ledgerLayout === option.key
+                                            ? 'border-accent/40 bg-accent-soft text-accent'
+                                            : 'border-line text-fg-muted hover:text-accent'
+                                    )}>
+                                    {option.label}
+                                </button>
+                            ))}
                         </div>
+                    </div>
+                    <Card className="overflow-hidden p-0">
+                        {(() => {
+                            const items = tab === 'OUT' ? outItems : inItems;
+                            if (items.length === 0) {
+                                return (
+                                    <p className="px-5 py-4 text-sm text-fg-muted">
+                                        {tab === 'OUT'
+                                            ? 'No out transactions in this period yet.'
+                                            : 'No in transactions in this period yet.'}
+                                    </p>
+                                );
+                            }
+
+                            function renderTx(transaction: Transaction) {
+                                const jar = transaction.jarId
+                                    ? jarById.get(transaction.jarId)
+                                    : undefined;
+                                const title =
+                                    transaction.counterparty?.trim() || transaction.description;
+                                const mark = partyMark(
+                                    findCatalogVendorFromFeed(title, merchants) ?? {
+                                        name: title,
+                                    },
+                                    catalogMarkChrome({
+                                        billName: transaction.description,
+                                        jarKey: jar?.key,
+                                        jarByKey,
+                                        categoryTemplates,
+                                    })
+                                );
+                                const subtitle = [
+                                    transaction.note?.trim() || null,
+                                    !transaction.note?.trim() &&
+                                    transaction.counterparty?.trim() &&
+                                    transaction.description !== transaction.counterparty.trim()
+                                        ? transaction.description
+                                        : null,
+                                ]
+                                    .filter(Boolean)
+                                    .join(' · ');
+                                return (
+                                    <MoneyPartyRow
+                                        key={transaction.id}
+                                        title={title}
+                                        subtitle={subtitle || null}
+                                        mark={mark}
+                                        amount={formatMoney(transaction.amount, {
+                                            signed: true,
+                                        })}
+                                        amountClassName={
+                                            transaction.amount < 0 ? 'text-fg' : 'text-success'
+                                        }
+                                        badges={
+                                            <>
+                                                <MetaChip>
+                                                    {formatBookedDate(transaction.bookedOn)}
+                                                </MetaChip>
+                                                {transaction.status === TransactionStatus.INBOX ? (
+                                                    <MetaChip>Inbox</MetaChip>
+                                                ) : (
+                                                    <JarBadge jarKey={jar?.key} name={jar?.name} />
+                                                )}
+                                            </>
+                                        }
+                                        onClick={() =>
+                                            router.push(updateHref('tx', transaction.id))
+                                        }
+                                    />
+                                );
+                            }
+
+                            if (ledgerLayout === 'list') {
+                                return <div className="grid gap-px">{items.map(renderTx)}</div>;
+                            }
+
+                            const groups = new Map<
+                                string,
+                                { jar: Jar | undefined; items: Transaction[] }
+                            >();
+                            for (const tx of items) {
+                                const key = tx.jarId ?? 'none';
+                                const existing = groups.get(key);
+                                if (existing) existing.items.push(tx);
+                                else
+                                    groups.set(key, {
+                                        jar: tx.jarId ? jarById.get(tx.jarId) : undefined,
+                                        items: [tx],
+                                    });
+                            }
+                            const ordered = [...groups.entries()].sort((left, right) => {
+                                const leftName = left[1].jar?.name ?? 'Unassigned';
+                                const rightName = right[1].jar?.name ?? 'Unassigned';
+                                return leftName.localeCompare(rightName);
+                            });
+
+                            return (
+                                <div className="grid">
+                                    {ordered.map(([jarId, group]) => {
+                                        const open =
+                                            openJarIds.size === 0 ? true : openJarIds.has(jarId);
+                                        const label = group.jar?.name ?? 'Unassigned';
+                                        return (
+                                            <div key={jarId}>
+                                                <button
+                                                    type="button"
+                                                    aria-expanded={open}
+                                                    onClick={() =>
+                                                        setOpenJarIds(previous => {
+                                                            const baseline =
+                                                                previous.size === 0
+                                                                    ? new Set(
+                                                                          ordered.map(
+                                                                              entry => entry[0]
+                                                                          )
+                                                                      )
+                                                                    : new Set(previous);
+                                                            if (baseline.has(jarId)) {
+                                                                baseline.delete(jarId);
+                                                            } else {
+                                                                baseline.add(jarId);
+                                                            }
+                                                            return baseline;
+                                                        })
+                                                    }
+                                                    className="flex w-full items-center justify-between gap-3 border-b border-line bg-raised/60 px-5 py-2.5 text-left hover:bg-raised">
+                                                    <JarBadge
+                                                        jarKey={group.jar?.key}
+                                                        name={label}
+                                                    />
+                                                    <span className="flex items-center gap-2">
+                                                        <span className="font-mono text-[11px] text-fg-faint">
+                                                            {group.items.length}
+                                                        </span>
+                                                        <span
+                                                            className={cn(
+                                                                'text-xs text-fg-faint transition-transform duration-200',
+                                                                open && 'rotate-180'
+                                                            )}>
+                                                            ▾
+                                                        </span>
+                                                    </span>
+                                                </button>
+                                                {open ? (
+                                                    <div className="grid gap-px">
+                                                        {group.items.map(renderTx)}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            );
+                        })()}
                     </Card>
                 </div>
             ) : null}

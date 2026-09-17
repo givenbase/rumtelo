@@ -3,35 +3,68 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
+import { FlowDirection, jarCapabilitiesFor } from '@rumtelo/contracts';
+
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
+import { JarCategoryBreakdown } from '@/components/features/money/jar-category-breakdown';
 import {
-    JarCategoryTable,
     JarDrilldownTrigger,
     type JarDrilldownItem,
 } from '@/components/features/money/jar-drilldown-parts';
+import type { JarDrilldownExtras } from '@/components/features/money/jar-drilldown-table';
 
 /** One collapsible jar row — same layout as {@link JarDrilldownTable}. */
-export function JarDrilldownRow({ jar }: { jar: JarDrilldownItem }) {
+export function JarDrilldownRow({
+    jar,
+    extras,
+}: {
+    jar: JarDrilldownItem;
+    extras?: JarDrilldownExtras;
+}) {
     const [open, setOpen] = useState(false);
     const href = jar.href ?? (jar.key ? `/product/money/jars/${jarKeyToSlug(jar.key)}` : undefined);
-    const item = href ? { ...jar, href } : jar;
+    const jarFixed = extras
+        ? extras.fixedCosts.filter(
+              row => row.jarId === jar.id && row.direction === FlowDirection.OUT && row.isActive
+          )
+        : [];
+    const jarTxs = extras ? extras.transactions.filter(tx => tx.jarId === jar.id) : [];
+    const allowFixed = jar.key ? jarCapabilitiesFor(jar.key).allowsFixedCosts : jarFixed.length > 0;
 
     return (
         <div className="border-b border-line last:border-b-0">
             <JarDrilldownTrigger
-                jar={item}
+                jar={jar}
                 open={open}
                 onToggle={() => setOpen(previous => !previous)}
             />
             {open && (
-                <div className="mb-3 ml-0 animate-rise space-y-2 pl-0 sm:ml-11.5">
-                    <JarCategoryTable categories={jar.categories} />
+                <div className="animate-rise border-t border-line bg-raised/40">
+                    {extras ? (
+                        <JarCategoryBreakdown
+                            categories={[...(jar.categories ?? [])].filter(
+                                category => !category.isArchived
+                            )}
+                            fixedCosts={jarFixed}
+                            transactions={jarTxs}
+                            period={extras.period}
+                            jarKey={jar.key ?? ''}
+                            jarIcon={jar.icon}
+                            jarByKey={extras.jarByKey}
+                            categoryTemplates={extras.categoryTemplates}
+                            merchants={extras.merchants}
+                            givingOrgs={extras.givingOrgs}
+                            allowFixedCosts={allowFixed}
+                        />
+                    ) : null}
                     {href ? (
-                        <Link
-                            href={href}
-                            className="inline-flex font-mono text-xs font-semibold tracking-wide text-fg-muted uppercase hover:text-accent">
-                            Open jar ▸
-                        </Link>
+                        <div className="border-t border-line px-5 py-2.5">
+                            <Link
+                                href={href}
+                                className="inline-flex font-mono text-xs font-semibold tracking-wide text-fg-muted uppercase hover:text-accent">
+                                Open jar ▸
+                            </Link>
+                        </div>
                     ) : null}
                 </div>
             )}

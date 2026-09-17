@@ -6,12 +6,12 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import type { Debt } from '@rumtelo/contracts';
-import { PayoffStrategy } from '@rumtelo/contracts';
+import { JarKey, PayoffStrategy } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { AccentCard, Badge, Card, Eyebrow, VendorMark } from '@rumtelo/ui';
+import { AccentCard, Card, Eyebrow } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
-import { CREATE_HREF, debtDetailHref } from '@/app/_lib/create-routes';
+import { CREATE_HREF } from '@/app/_lib/create-routes';
 import {
     formatDebtFreeMonth,
     orderDebtsByStrategy,
@@ -19,13 +19,14 @@ import {
     rankPayoffStrategies,
     simulatePayoff,
 } from '@/app/_lib/debt-payoff';
-import { scheduleHint } from '@/app/_lib/debt-schedule';
-import { findCatalogVendor, vendorMarkSrc } from '@/app/_lib/vendor-brands';
+import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
+import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar, ListToolbarTab } from '@/components/layout/list-toolbar';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
+import { DebtListRow } from './debt-list-row';
 import { DebtStrategyCoach } from './debt-strategy-coach';
 
 /** Raw extra-payment values; labels are built inside the component with the bound formatter. */
@@ -117,6 +118,11 @@ export function DebtsPageClient() {
         live
     );
     const merchants = merchantsQuery.data ?? [];
+    const { byKey: jarByKey } = useJarCatalog();
+    const debtChrome = catalogMarkChrome({
+        jarKey: JarKey.NECESSITIES,
+        jarByKey,
+    });
 
     const strategy = settingsQuery.data?.money?.payoffStrategy ?? PayoffStrategy.AVALANCHE;
 
@@ -353,77 +359,16 @@ export function DebtsPageClient() {
                                         entry => entry.id === debt.id
                                     );
                                     const isFocus = showPayoffRanks && hasExtra && payoffRank === 0;
-                                    const mark = vendorMarkSrc(
-                                        findCatalogVendor(debt.name, merchants) ?? {
-                                            name: debt.name,
-                                        }
-                                    );
                                     return (
-                                        <button
-                                            type="button"
+                                        <DebtListRow
                                             key={debt.id}
-                                            aria-label={debt.name}
-                                            onClick={() => router.push(debtDetailHref(debt.id))}
-                                            className={cn(
-                                                'w-full cursor-pointer rounded-2xl border bg-raised p-4.5 text-left transition-colors hover:border-accent-hover',
-                                                isFocus
-                                                    ? 'border-accent/40 ring-1 ring-accent/15'
-                                                    : 'border-line'
-                                            )}>
-                                            <div className="flex flex-wrap items-baseline justify-between gap-3">
-                                                <div className="flex items-center gap-3">
-                                                    <span className="font-mono text-xs text-accent">
-                                                        {showPayoffRanks
-                                                            ? `#${payoffRank + 1}`
-                                                            : '·'}
-                                                    </span>
-                                                    <VendorMark
-                                                        name={mark.name}
-                                                        src={mark.src}
-                                                        size={28}
-                                                    />
-                                                    <div>
-                                                        <div className="flex flex-wrap items-center gap-2.5">
-                                                            <span className="text-base text-fg">
-                                                                {debt.name}
-                                                            </span>
-                                                            <Badge
-                                                                tone={
-                                                                    debt.interestRate >=
-                                                                    EXPENSIVE_RATE
-                                                                        ? 'danger'
-                                                                        : 'neutral'
-                                                                }>
-                                                                {debt.interestRate}% interest
-                                                            </Badge>
-                                                            {isFocus ? (
-                                                                <Badge tone="success">
-                                                                    Extra goes here
-                                                                </Badge>
-                                                            ) : null}
-                                                        </div>
-                                                        <div className="mt-1 font-mono text-xs tracking-normal text-fg-faint">
-                                                            {formatMoney(debt.minimumPayment)}/mo
-                                                            minimum
-                                                            {showPayoffRanks
-                                                                ? payoffRank === 0
-                                                                    ? ' · focus'
-                                                                    : ' · waiting'
-                                                                : ''}
-                                                            {(() => {
-                                                                const hint = scheduleHint(debt, 0);
-                                                                return hint ? ` · ${hint}` : '';
-                                                            })()}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="text-right">
-                                                    <div className="font-mono text-base text-fg">
-                                                        {formatMoney(debt.balance)}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </button>
+                                            debt={debt}
+                                            merchants={merchants}
+                                            payoffRank={payoffRank}
+                                            showPayoffRanks={showPayoffRanks}
+                                            isFocus={isFocus}
+                                            markChrome={debtChrome}
+                                        />
                                     );
                                 })
                             )}

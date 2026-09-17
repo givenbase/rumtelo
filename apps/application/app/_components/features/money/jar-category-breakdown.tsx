@@ -14,6 +14,11 @@ import type {
 import { cn, categoryVariance, monthlyAmount } from '@rumtelo/utils';
 
 import { cadenceLabel } from '@/app/_lib/jar-chrome';
+import {
+    claimFixedCostMatches,
+    fixedCostStatus,
+    type FixedCostStatus,
+} from '@/app/_lib/fixed-cost-match';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { updateHref } from '@/app/_lib/create-routes';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -23,57 +28,7 @@ import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 
 type CategoryRow = Pick<Category, 'id' | 'name' | 'budgeted' | 'actual'>;
 
-type FixedStatus = 'taken' | 'due' | 'upcoming';
-
-function normalize(value: string | null | undefined) {
-    return value?.trim().toLowerCase() ?? '';
-}
-
-function txMatchesFixedCost(tx: Transaction, item: FixedCost, monthly: number) {
-    if (tx.amount >= 0) return false;
-    // Same category wins; uncategorized payments may still settle a categorized bill.
-    if (tx.categoryId && item.categoryId && tx.categoryId !== item.categoryId) return false;
-
-    const party = normalize(tx.counterparty);
-    const desc = normalize(tx.description);
-    const fcParty = normalize(item.counterparty);
-    const fcName = normalize(item.name);
-
-    if (fcParty && party && (party.includes(fcParty) || fcParty.includes(party))) return true;
-    if (
-        fcName &&
-        ((party && (party.includes(fcName) || fcName.includes(party))) ||
-            (desc && desc.includes(fcName)))
-    ) {
-        return true;
-    }
-
-    return Math.abs(Math.abs(tx.amount) - Math.abs(monthly)) <= 1;
-}
-
-function fixedCostStatus(
-    item: FixedCost,
-    matchedTx: Transaction | undefined,
-    period: { year: number; month: number },
-    today: Date
-): FixedStatus {
-    if (matchedTx) return 'taken';
-
-    const dueDay = item.dueDay;
-    if (dueDay === null || dueDay === undefined) return 'upcoming';
-
-    const periodIsCurrent =
-        today.getFullYear() === period.year && today.getMonth() + 1 === period.month;
-    const periodIsPast =
-        period.year < today.getFullYear() ||
-        (period.year === today.getFullYear() && period.month < today.getMonth() + 1);
-
-    if (periodIsPast) return 'due';
-    if (!periodIsCurrent) return 'upcoming';
-    return today.getDate() >= dueDay ? 'due' : 'upcoming';
-}
-
-function statusChip(status: FixedStatus) {
+function statusChip(status: FixedCostStatus) {
     if (status === 'taken') {
         return <MetaChip className="border-success/30 text-success">Taken</MetaChip>;
     }
@@ -146,14 +101,31 @@ export function JarCategoryBreakdown({
 
     const rows: Array<CategoryRow & { synthetic?: boolean }> = [...categories];
     const knownIds = new Set(categories.map(row => row.id));
+
+    function bucketTotals(bucketId: string) {
+        const bucketFixed = allowFixedCosts ? (fixedByCategory.get(bucketId) ?? []) : [];
+        const bucketTxs = txByCategory.get(bucketId) ?? [];
+        const budgeted = bucketFixed.reduce(
+            (sum, item) => sum + monthlyAmount(Math.abs(item.amount), item.cadence),
+            0
+        );
+        // Match jar category "actual": period OUT only (inflows nest under the row but don't count as spent).
+        const actual = bucketTxs.reduce(
+            (sum, tx) => (tx.amount < 0 ? sum + Math.abs(tx.amount) : sum),
+            0
+        );
+        return { budgeted, actual };
+    }
+
     for (const [key, items] of fixedByCategory) {
         if (key === uncategorizedKey || knownIds.has(key)) continue;
         if (items.length === 0) continue;
+        const totals = bucketTotals(key);
         rows.push({
             id: key,
             name: 'Other',
-            budgeted: 0,
-            actual: 0,
+            budgeted: totals.budgeted,
+            actual: totals.actual,
             synthetic: true,
         });
         knownIds.add(key);
@@ -163,11 +135,12 @@ export function JarCategoryBreakdown({
         (fixedByCategory.get(uncategorizedKey)?.length ?? 0) > 0 ||
         (txByCategory.get(uncategorizedKey)?.length ?? 0) > 0;
     if (hasUncategorized) {
+        const totals = bucketTotals(uncategorizedKey);
         rows.push({
             id: uncategorizedKey,
             name: 'Uncategorized',
-            budgeted: 0,
-            actual: 0,
+            budgeted: totals.budgeted,
+            actual: totals.actual,
             synthetic: true,
         });
     }
@@ -179,20 +152,9 @@ export function JarCategoryBreakdown({
             left.name.localeCompare(right.name)
     );
 
-    const claimedTxIds = new Set<string>();
-    const fixedMatchById = new Map<string, Transaction>();
-    if (allowFixedCosts) {
-        for (const item of fixedCosts) {
-            const monthly = monthlyAmount(item.amount, item.cadence);
-            const match = transactions.find(
-                tx => !claimedTxIds.has(tx.id) && txMatchesFixedCost(tx, item, monthly)
-            );
-            if (match) {
-                claimedTxIds.add(match.id);
-                fixedMatchById.set(item.id, match);
-            }
-        }
-    }
+    const { claimedTxIds, matchByFixedCostId: fixedMatchById } = allowFixedCosts
+        ? claimFixedCostMatches(fixedCosts, transactions)
+        : { claimedTxIds: new Set<string>(), matchByFixedCostId: new Map<string, Transaction>() };
 
     function toggle(id: string) {
         setOpenIds(previous => {

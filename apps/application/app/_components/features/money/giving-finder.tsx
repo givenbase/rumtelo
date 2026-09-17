@@ -4,6 +4,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMemo, useState } from 'react';
 
 import type { GivingCause, GivingOrganisation } from '@rumtelo/contracts';
+import { JarKey } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { VendorMark } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
@@ -15,8 +16,10 @@ import {
     givingCauseMeta,
     givingEvaluatorMeta,
 } from '@/app/_lib/giving';
+import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
-import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
+import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
+import { partyMark } from '@/app/_lib/vendor-brands';
 import { CoachMark } from '@/components/features/helpers/helper-mark';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
@@ -239,11 +242,18 @@ function GivingOrganisationCard({
     selected: boolean;
     onPick: () => void;
 }) {
+    const { byKey: jarByKey } = useJarCatalog();
     const where = [organisation.scope, organisation.country].filter(Boolean).join(' · ');
-    const mark = vendorMarkSrc({
-        name: organisation.name,
-        website: organisation.website,
-    });
+    const mark = partyMark(
+        {
+            name: organisation.name,
+            website: organisation.website,
+        },
+        catalogMarkChrome({
+            jarKey: JarKey.GIVE,
+            jarByKey,
+        })
+    );
     return (
         <div
             className={cn(
@@ -252,7 +262,14 @@ function GivingOrganisationCard({
             )}>
             <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="flex min-w-0 items-start gap-2.5">
-                    <VendorMark name={mark.name} src={mark.src} size={28} className="mt-0.5" />
+                    <VendorMark
+                        name={mark.name}
+                        src={mark.src}
+                        fallbackIcon={mark.fallbackIcon}
+                        tone={mark.tone}
+                        size={28}
+                        className="mt-0.5"
+                    />
                     <div className="min-w-0">
                         <p className="text-sm font-medium text-fg">{organisation.name}</p>
                         {where ? (

@@ -12,7 +12,8 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
-import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
+import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
+import { partyMark } from '@/app/_lib/vendor-brands';
 import { formatBookedDate } from '@/components/features/money/jar-badge';
 
 type InboxJarOption = Pick<Jar, 'id' | 'key' | 'name' | 'subtitle'>;
@@ -75,7 +76,14 @@ export function InboxSortCard({
     const suggestedKey = selected?.key ?? suggestJarKey(transaction.amount);
     const catalog = catalogByKey.get(suggestedKey);
     const title = transaction.counterparty?.trim() || transaction.description;
-    const mark = vendorMarkSrc({ name: title, logoDomain: logoDomain ?? null });
+    const mark = partyMark(
+        { name: title, logoDomain: logoDomain ?? null },
+        catalogMarkChrome({
+            billName: transaction.description,
+            jarKey: suggestedKey,
+            jarByKey: catalogByKey,
+        })
+    );
     const confident =
         Boolean(suggestedJarId) ||
         suggestJarKey(transaction.amount) === 'NECESSITIES' ||
@@ -103,7 +111,14 @@ export function InboxSortCard({
         <div className="grid animate-rise gap-4 rounded-2xl border border-line bg-surface p-5 shadow-md">
             <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="flex min-w-0 items-start gap-3">
-                    <VendorMark name={mark.name} src={mark.src} size={28} className="mt-0.5" />
+                    <VendorMark
+                        name={mark.name}
+                        src={mark.src}
+                        fallbackIcon={mark.fallbackIcon}
+                        tone={mark.tone}
+                        size={28}
+                        className="mt-0.5"
+                    />
                     <div className="min-w-0">
                         <p className="text-base font-semibold text-fg">{title}</p>
                         <p className="mt-1 font-mono text-xs tracking-normal text-fg-muted">

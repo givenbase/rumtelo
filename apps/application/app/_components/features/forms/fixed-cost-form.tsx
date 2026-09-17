@@ -32,10 +32,12 @@ import { cn } from '@rumtelo/utils';
 import { z } from 'zod';
 
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
+import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
-import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
+import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
+import { partyMark } from '@/app/_lib/vendor-brands';
 import { GivingFinder } from '@/components/features/money/giving-finder';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -575,6 +577,18 @@ export function FixedCostForm({
     const pendingLabel = pendingCategoryTemplateKey
         ? categoryByKey.get(pendingCategoryTemplateKey)?.name
         : null;
+    const { byKey: jarByKey } = useJarCatalog();
+    const selectedJarKey = jars.find(jar => jar.id === selectedJarId)?.key ?? null;
+    const activeCategory = activeCategoryTemplateKey
+        ? categoryByKey.get(activeCategoryTemplateKey)
+        : null;
+    const vendorChrome = catalogMarkChrome({
+        icon: activeCategory?.icon,
+        billName: activeCategory?.name,
+        jarKey: selectedJarKey,
+        jarByKey,
+        categoryTemplates: categoriesQuery.data ?? [],
+    });
 
     return (
         <FormCreateEditShell
@@ -934,12 +948,15 @@ export function FixedCostForm({
                                                 counterparty,
                                                 merchant.name
                                             );
-                                            const mark = vendorMarkSrc({
-                                                key: merchant.key,
-                                                name: merchant.name,
-                                                logoDomain: merchant.logoDomain,
-                                                website: merchant.website,
-                                            });
+                                            const mark = partyMark(
+                                                {
+                                                    key: merchant.key,
+                                                    name: merchant.name,
+                                                    logoDomain: merchant.logoDomain,
+                                                    website: merchant.website,
+                                                },
+                                                vendorChrome
+                                            );
                                             return (
                                                 <button
                                                     key={merchant.key}
@@ -963,6 +980,8 @@ export function FixedCostForm({
                                                     <VendorMark
                                                         name={mark.name}
                                                         src={mark.src}
+                                                        fallbackIcon={mark.fallbackIcon}
+                                                        tone={mark.tone}
                                                         size={20}
                                                     />
                                                     {merchant.name}

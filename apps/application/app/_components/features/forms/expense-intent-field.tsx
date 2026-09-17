@@ -10,7 +10,9 @@ import type {
 } from '@rumtelo/contracts';
 import { VendorMark } from '@rumtelo/ui';
 
-import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
+import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
+import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
+import { partyMark } from '@/app/_lib/vendor-brands';
 
 import { FormInput } from './form-input';
 
@@ -93,6 +95,20 @@ export function ExpenseIntentField({
     const [skippedVendor, setSkippedVendor] = useState(false);
     const rootRef = useRef<HTMLDivElement>(null);
     const listboxId = `${id ?? 'expense-intent'}-listbox`;
+    const { byKey: jarByKey } = useJarCatalog();
+
+    const intentChrome = (opts?: {
+        icon?: string | null;
+        billName?: string | null;
+        merchantJarKey?: JarKey | null;
+    }) =>
+        catalogMarkChrome({
+            icon: opts?.icon,
+            billName: opts?.billName ?? value.categoryName,
+            jarKey: opts?.merchantJarKey ?? value.jarKey ?? jarKey,
+            jarByKey,
+            categoryTemplates: categories,
+        });
 
     const scopedCategories = useMemo(
         () => (jarKey ? categories.filter(category => category.jarKey === jarKey) : categories),
@@ -252,11 +268,17 @@ export function ExpenseIntentField({
             : null);
 
     const selectedVendorMark = value.vendor
-        ? vendorMarkSrc({
-              key: selectedMerchant?.key,
-              name: value.vendor,
-              logoDomain: selectedMerchant?.logoDomain ?? null,
-          })
+        ? partyMark(
+              {
+                  key: selectedMerchant?.key,
+                  name: value.vendor,
+                  logoDomain: selectedMerchant?.logoDomain ?? null,
+              },
+              intentChrome({
+                  icon: categoryIcon,
+                  billName: value.categoryName,
+              })
+          )
         : null;
 
     return (
@@ -301,6 +323,8 @@ export function ExpenseIntentField({
                                 <VendorMark
                                     name={selectedVendorMark?.name ?? value.vendor}
                                     src={selectedVendorMark?.src ?? null}
+                                    fallbackIcon={selectedVendorMark?.fallbackIcon}
+                                    tone={selectedVendorMark?.tone}
                                     size={22}
                                 />
                                 <span className="min-w-0">
@@ -414,18 +438,27 @@ export function ExpenseIntentField({
                                             </div>
                                             <ul>
                                                 {merchantHits.map(merchant => {
-                                                    const mark = vendorMarkSrc({
-                                                        key: merchant.key,
-                                                        name: merchant.name,
-                                                        logoDomain: merchant.logoDomain,
-                                                        website: merchant.website,
-                                                    });
+                                                    const category = categories.find(
+                                                        candidate =>
+                                                            candidate.key ===
+                                                            merchant.categoryTemplateKey
+                                                    );
+                                                    const mark = partyMark(
+                                                        {
+                                                            key: merchant.key,
+                                                            name: merchant.name,
+                                                            logoDomain: merchant.logoDomain,
+                                                            website: merchant.website,
+                                                        },
+                                                        intentChrome({
+                                                            icon: category?.icon,
+                                                            billName: category?.name,
+                                                            merchantJarKey: merchant.jarKey,
+                                                        })
+                                                    );
                                                     const categoryName =
-                                                        categories.find(
-                                                            candidate =>
-                                                                candidate.key ===
-                                                                merchant.categoryTemplateKey
-                                                        )?.name ?? merchant.categoryTemplateKey;
+                                                        category?.name ??
+                                                        merchant.categoryTemplateKey;
                                                     const highlightLabel = merchant.highlight
                                                         ? HIGHLIGHT_LABEL[merchant.highlight]
                                                         : null;
@@ -442,6 +475,8 @@ export function ExpenseIntentField({
                                                                 <VendorMark
                                                                     name={mark.name}
                                                                     src={mark.src}
+                                                                    fallbackIcon={mark.fallbackIcon}
+                                                                    tone={mark.tone}
                                                                     size={20}
                                                                     className="bg-bg/15 ring-bg/20"
                                                                 />
@@ -517,12 +552,22 @@ export function ExpenseIntentField({
                     {vendorsForCategory.length > 0 ? (
                         <div className="flex max-h-40 flex-wrap gap-1.5 overflow-y-auto pr-0.5">
                             {vendorsForCategory.map(merchant => {
-                                const mark = vendorMarkSrc({
-                                    key: merchant.key,
-                                    name: merchant.name,
-                                    logoDomain: merchant.logoDomain,
-                                    website: merchant.website,
-                                });
+                                const category = categories.find(
+                                    candidate => candidate.key === merchant.categoryTemplateKey
+                                );
+                                const mark = partyMark(
+                                    {
+                                        key: merchant.key,
+                                        name: merchant.name,
+                                        logoDomain: merchant.logoDomain,
+                                        website: merchant.website,
+                                    },
+                                    intentChrome({
+                                        icon: category?.icon ?? categoryIcon,
+                                        billName: category?.name ?? value.categoryName,
+                                        merchantJarKey: merchant.jarKey,
+                                    })
+                                );
                                 const highlightLabel = merchant.highlight
                                     ? HIGHLIGHT_LABEL[merchant.highlight]
                                     : null;
@@ -533,7 +578,13 @@ export function ExpenseIntentField({
                                         disabled={disabled}
                                         className="inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent"
                                         onClick={() => selectMerchant(merchant)}>
-                                        <VendorMark name={mark.name} src={mark.src} size={20} />
+                                        <VendorMark
+                                            name={mark.name}
+                                            src={mark.src}
+                                            fallbackIcon={mark.fallbackIcon}
+                                            tone={mark.tone}
+                                            size={20}
+                                        />
                                         {merchant.name}
                                         {highlightLabel ? (
                                             <span className="text-[10px] tracking-wide text-fg-muted uppercase">
@@ -599,12 +650,23 @@ export function ExpenseIntentField({
                             {vendorTypeaheadHits.length > 0 ? (
                                 <ul className="max-h-48 overflow-y-auto rounded-xl border border-line bg-raised py-1 shadow-lg">
                                     {vendorTypeaheadHits.map(merchant => {
-                                        const mark = vendorMarkSrc({
-                                            key: merchant.key,
-                                            name: merchant.name,
-                                            logoDomain: merchant.logoDomain,
-                                            website: merchant.website,
-                                        });
+                                        const category = categories.find(
+                                            candidate =>
+                                                candidate.key === merchant.categoryTemplateKey
+                                        );
+                                        const mark = partyMark(
+                                            {
+                                                key: merchant.key,
+                                                name: merchant.name,
+                                                logoDomain: merchant.logoDomain,
+                                                website: merchant.website,
+                                            },
+                                            intentChrome({
+                                                icon: category?.icon ?? categoryIcon,
+                                                billName: category?.name ?? value.categoryName,
+                                                merchantJarKey: merchant.jarKey,
+                                            })
+                                        );
                                         return (
                                             <li key={merchant.key}>
                                                 <button
@@ -615,6 +677,8 @@ export function ExpenseIntentField({
                                                     <VendorMark
                                                         name={mark.name}
                                                         src={mark.src}
+                                                        fallbackIcon={mark.fallbackIcon}
+                                                        tone={mark.tone}
                                                         size={20}
                                                     />
                                                     <span className="min-w-0 flex-1 truncate font-medium">

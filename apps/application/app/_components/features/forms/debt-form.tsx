@@ -19,13 +19,15 @@ import {
 } from '@rumtelo/ui';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Cadence, DebtKind, DebtScheduleKind } from '@rumtelo/contracts';
+import { Cadence, DebtKind, DebtScheduleKind, JarKey } from '@rumtelo/contracts';
 import { z } from 'zod';
 
-import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
+import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
+import { partyMark } from '@/app/_lib/vendor-brands';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -160,7 +162,13 @@ export function DebtForm({
     );
     const debtTypes = debtTypesQuery.data ?? [];
     const merchants = merchantsQuery.data ?? [];
+    const { byKey: jarByKey } = useJarCatalog();
     const selectedType = debtTypes.find(option => option.key === typeKey) ?? null;
+    const lenderChrome = catalogMarkChrome({
+        icon: selectedType?.icon,
+        jarKey: JarKey.NECESSITIES,
+        jarByKey,
+    });
     const lendersForType: MerchantPreset[] = (() => {
         const keys = selectedType?.suggestedMerchantKeys ?? [];
         if (keys.length === 0) return [];
@@ -389,12 +397,15 @@ export function DebtForm({
                                         const selected =
                                             selectedLenderName.toLowerCase() ===
                                             lender.name.toLowerCase();
-                                        const mark = vendorMarkSrc({
-                                            key: lender.key,
-                                            name: lender.name,
-                                            logoDomain: lender.logoDomain,
-                                            website: lender.website,
-                                        });
+                                        const mark = partyMark(
+                                            {
+                                                key: lender.key,
+                                                name: lender.name,
+                                                logoDomain: lender.logoDomain,
+                                                website: lender.website,
+                                            },
+                                            lenderChrome
+                                        );
                                         return (
                                             <button
                                                 key={lender.key}
@@ -413,6 +424,8 @@ export function DebtForm({
                                                 <VendorMark
                                                     name={mark.name}
                                                     src={mark.src}
+                                                    fallbackIcon={mark.fallbackIcon}
+                                                    tone={mark.tone}
                                                     size={20}
                                                 />
                                                 {lender.name}

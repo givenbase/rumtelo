@@ -8,26 +8,47 @@ import { useRouter } from 'next/navigation';
 import { DEFAULT_JAR_SPLIT, jarCapabilitiesFor, JarKey } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Card } from '@rumtelo/ui';
-import { cn, monthlyAmount, fixedOutNetSummary } from '@rumtelo/utils';
+import { cn, monthlyAmount, fixedOutNetSummary, toPeriodKey } from '@rumtelo/utils';
 
 import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
 import { bgClassToCssVar, cadenceLabel } from '@/app/_lib/jar-chrome';
+import {
+    claimFixedCostMatches,
+    fixedCostStatus,
+    type FixedCostStatus,
+} from '@/app/_lib/fixed-cost-match';
 import { evaluateNecessitiesPressure } from '@/app/_lib/necessities-pressure';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { isLiveData } from '@/app/_lib/preview';
-import { findPartyVendor, partyMark, vendorMarkSrc } from '@/app/_lib/vendor-brands';
+import { findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { CoachTipCard } from '@/components/features/helpers';
-import { JarBadge, MetaChip, formatDueDay } from '@/components/features/money/jar-badge';
+import {
+    JarBadge,
+    MetaChip,
+    formatBookedDate,
+    formatDueDay,
+} from '@/components/features/money/jar-badge';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { NecessitiesPressureCard } from '@/components/features/money/necessities-pressure-card';
+import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 type Tab = 'ERUIT' | 'ERIN';
+
+function statusChip(status: FixedCostStatus) {
+    if (status === 'taken') {
+        return <MetaChip className="border-success/30 text-success">Taken</MetaChip>;
+    }
+    if (status === 'due') {
+        return <MetaChip className="border-danger/30 text-danger">Still due</MetaChip>;
+    }
+    return <MetaChip>Planned</MetaChip>;
+}
 
 /**
  * Fixed costs & income.
@@ -37,15 +58,26 @@ type Tab = 'ERUIT' | 'ERIN';
  */
 export function FixedCostsPageClient() {
     const { householdId } = useAuth();
+    const { period } = useAppShell();
     const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
     const [tab, setTab] = useState<Tab>('ERUIT');
     const [jarFilter, setJarFilter] = useState<string | null>(null);
+    const [openJarKeys, setOpenJarKeys] = useState<Set<string>>(() => new Set());
     const live = isLiveData(householdId);
+    const periodKey = toPeriodKey(period.year, period.month);
 
     const byJarQuery = useLiveQuery(
         apiQuery.money.fixedCosts.byJar.queryOptions({ input: { householdId: householdId! } }),
         [] as never,
+        live
+    );
+
+    const periodTxQuery = useLiveQuery(
+        apiQuery.money.transactions.list.queryOptions({
+            input: { householdId: householdId!, period: periodKey, limit: 200 },
+        }),
+        { items: [], nextCursor: null },
         live
     );
 
@@ -90,18 +122,16 @@ export function FixedCostsPageClient() {
                   group.items
                       .filter(item => item.direction === 'OUT' && item.isActive)
                       .map(item => ({
-                          id: item.id,
-                          name: item.name,
-                          counterparty: item.counterparty,
-                          amount: item.amount,
+                          ...item,
                           monthly: monthlyAmount(Math.abs(item.amount), item.cadence),
-                          cadence: item.cadence,
-                          dueDay: item.dueDay,
-                          jarId: group.jarId,
                           jarKey: group.jarKey,
+                          jarId: group.jarId,
                       }))
               )
             : [];
+
+    const periodTransactions = periodTxQuery.data?.items ?? [];
+    const { matchByFixedCostId } = claimFixedCostMatches(fixedCosts, periodTransactions);
 
     const incomeSources =
         live && incomeQuery.data?.length
@@ -239,74 +269,139 @@ export function FixedCostsPageClient() {
                                         : 'No fixed costs yet.'}
                                 </p>
                             ) : (
-                                groupedFixedCosts.map(group => (
-                                    <div key={group.jar.key}>
-                                        <div className="flex items-center justify-between gap-3 border-b border-line bg-raised/60 px-5 py-2">
-                                            <JarBadge
-                                                jarKey={group.jar.key}
-                                                name={group.jar.name}
-                                            />
-                                            <span className="font-mono text-[11px] text-fg-faint">
-                                                {formatMoney(-Math.abs(group.monthly))}
-                                            </span>
-                                        </div>
-                                        {group.items.map(fixedCost => {
-                                            const company =
-                                                fixedCost.counterparty?.trim() || fixedCost.name;
-                                            const subtitle =
-                                                fixedCost.counterparty?.trim() &&
-                                                fixedCost.counterparty.trim() !==
-                                                    fixedCost.name.trim()
-                                                    ? fixedCost.name
-                                                    : null;
-                                            const due = formatDueDay(fixedCost.dueDay);
-                                            return (
-                                                <MoneyPartyRow
-                                                    key={fixedCost.id}
-                                                    title={company}
-                                                    subtitle={subtitle}
-                                                    mark={partyMark(
-                                                        findPartyVendor(
-                                                            company,
-                                                            merchants,
-                                                            givingOrgs
-                                                        ),
-                                                        catalogMarkChrome({
-                                                            billName: fixedCost.name,
-                                                            jarKey: fixedCost.jarKey,
-                                                            jarByKey,
-                                                            categoryTemplates,
-                                                        })
-                                                    )}
-                                                    amount={formatMoney(
-                                                        -Math.abs(fixedCost.monthly)
-                                                    )}
-                                                    badges={
-                                                        <>
-                                                            {due ? (
-                                                                <MetaChip>{due}</MetaChip>
-                                                            ) : null}
-                                                            <MetaChip>
-                                                                {cadenceLabel(fixedCost.cadence)}
-                                                            </MetaChip>
-                                                            {fixedCost.cadence !== 'MONTHLY' ? (
-                                                                <MetaChip>
-                                                                    {formatMoney(fixedCost.monthly)}
-                                                                    /mo
-                                                                </MetaChip>
-                                                            ) : null}
-                                                        </>
-                                                    }
-                                                    onClick={() =>
-                                                        router.push(
-                                                            updateHref('fixed', fixedCost.id)
-                                                        )
-                                                    }
+                                groupedFixedCosts.map(group => {
+                                    const open =
+                                        openJarKeys.size === 0
+                                            ? true
+                                            : openJarKeys.has(group.jar.key);
+                                    return (
+                                        <div key={group.jar.key}>
+                                            <button
+                                                type="button"
+                                                aria-expanded={open}
+                                                onClick={() =>
+                                                    setOpenJarKeys(previous => {
+                                                        const baseline =
+                                                            previous.size === 0
+                                                                ? new Set(
+                                                                      groupedFixedCosts.map(
+                                                                          row => row.jar.key
+                                                                      )
+                                                                  )
+                                                                : new Set(previous);
+                                                        if (baseline.has(group.jar.key)) {
+                                                            baseline.delete(group.jar.key);
+                                                        } else {
+                                                            baseline.add(group.jar.key);
+                                                        }
+                                                        return baseline;
+                                                    })
+                                                }
+                                                className="flex w-full items-center justify-between gap-3 border-b border-line bg-raised/60 px-5 py-2 text-left hover:bg-raised">
+                                                <JarBadge
+                                                    jarKey={group.jar.key}
+                                                    name={group.jar.name}
                                                 />
-                                            );
-                                        })}
-                                    </div>
-                                ))
+                                                <span className="flex items-center gap-2">
+                                                    <span className="font-mono text-[11px] text-fg-faint">
+                                                        {formatMoney(-Math.abs(group.monthly))}
+                                                    </span>
+                                                    <span
+                                                        className={cn(
+                                                            'text-xs text-fg-faint transition-transform duration-200',
+                                                            open && 'rotate-180'
+                                                        )}>
+                                                        ▾
+                                                    </span>
+                                                </span>
+                                            </button>
+                                            {open
+                                                ? group.items.map(fixedCost => {
+                                                      const company =
+                                                          fixedCost.counterparty?.trim() ||
+                                                          fixedCost.name;
+                                                      const subtitle =
+                                                          fixedCost.counterparty?.trim() &&
+                                                          fixedCost.counterparty.trim() !==
+                                                              fixedCost.name.trim()
+                                                              ? fixedCost.name
+                                                              : null;
+                                                      const due = formatDueDay(fixedCost.dueDay);
+                                                      const match = matchByFixedCostId.get(
+                                                          fixedCost.id
+                                                      );
+                                                      const status = fixedCostStatus(
+                                                          fixedCost,
+                                                          match,
+                                                          period
+                                                      );
+                                                      return (
+                                                          <MoneyPartyRow
+                                                              key={fixedCost.id}
+                                                              title={company}
+                                                              subtitle={subtitle}
+                                                              mark={partyMark(
+                                                                  findPartyVendor(
+                                                                      company,
+                                                                      merchants,
+                                                                      givingOrgs
+                                                                  ),
+                                                                  catalogMarkChrome({
+                                                                      billName: fixedCost.name,
+                                                                      jarKey: fixedCost.jarKey,
+                                                                      jarByKey,
+                                                                      categoryTemplates,
+                                                                  })
+                                                              )}
+                                                              amount={formatMoney(
+                                                                  -Math.abs(fixedCost.monthly)
+                                                              )}
+                                                              badges={
+                                                                  <>
+                                                                      {statusChip(status)}
+                                                                      {due ? (
+                                                                          <MetaChip>{due}</MetaChip>
+                                                                      ) : null}
+                                                                      <MetaChip>
+                                                                          {cadenceLabel(
+                                                                              fixedCost.cadence
+                                                                          )}
+                                                                      </MetaChip>
+                                                                      {match ? (
+                                                                          <MetaChip>
+                                                                              {formatBookedDate(
+                                                                                  match.bookedOn
+                                                                              )}
+                                                                          </MetaChip>
+                                                                      ) : null}
+                                                                      {Math.abs(
+                                                                          fixedCost.monthly
+                                                                      ) !==
+                                                                      Math.abs(fixedCost.amount) ? (
+                                                                          <MetaChip>
+                                                                              {formatMoney(
+                                                                                  fixedCost.monthly
+                                                                              )}
+                                                                              /mo
+                                                                          </MetaChip>
+                                                                      ) : null}
+                                                                  </>
+                                                              }
+                                                              onClick={() =>
+                                                                  router.push(
+                                                                      updateHref(
+                                                                          'fixed',
+                                                                          fixedCost.id
+                                                                      )
+                                                                  )
+                                                              }
+                                                          />
+                                                      );
+                                                  })
+                                                : null}
+                                        </div>
+                                    );
+                                })
                             )}
                         </div>
 
@@ -373,7 +468,13 @@ export function FixedCostsPageClient() {
                                     <MoneyPartyRow
                                         key={source.id ?? i}
                                         title={source.label}
-                                        mark={vendorMarkSrc({ name: source.label })}
+                                        mark={partyMark(
+                                            { name: source.label },
+                                            catalogMarkChrome({
+                                                billName: source.label,
+                                                categoryTemplates,
+                                            })
+                                        )}
                                         amount={formatMoney(source.monthly)}
                                         amountClassName="text-success"
                                         badges={

@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 
-import { DebtScheduleKind } from '@rumtelo/contracts';
+import { DebtScheduleKind, JarKey } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import {
     Badge,
@@ -34,10 +34,12 @@ import {
     parseAmountToMinorUnits,
     todayIsoDate,
 } from '@/app/_lib/money-input';
+import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
 import { productPath } from '@/app/_lib/routes';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
-import { findCatalogVendor, vendorMarkSrc } from '@/app/_lib/vendor-brands';
+import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
+import { findCatalogVendor, partyMark } from '@/app/_lib/vendor-brands';
 import { FormInput } from '@/components/features/forms/form-input';
 import { MetaChip, formatBookedDate, formatDueDay } from '@/components/features/money/jar-badge';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
@@ -88,6 +90,11 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
     const detail = detailQuery.data;
     const debt = detail?.debt;
     const merchants = merchantsQuery.data ?? [];
+    const { byKey: jarByKey } = useJarCatalog();
+    const debtChrome = catalogMarkChrome({
+        jarKey: JarKey.NECESSITIES,
+        jarByKey,
+    });
 
     const paymentForm = useForm<PaymentFormValues>({
         defaultValues: {
@@ -161,7 +168,10 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
         );
     }
 
-    const mark = vendorMarkSrc(findCatalogVendor(debt.name, merchants) ?? { name: debt.name });
+    const mark = partyMark(
+        findCatalogVendor(debt.name, merchants) ?? { name: debt.name },
+        debtChrome
+    );
     const paidPct =
         debt.originalBalance > 0
             ? Math.min(100, Math.round((detail.paidAmount / debt.originalBalance) * 100))
@@ -189,7 +199,13 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
                         ← Debts
                     </Link>
                     <div className="flex items-center gap-3">
-                        <VendorMark name={mark.name} src={mark.src} size={40} />
+                        <VendorMark
+                            name={mark.name}
+                            src={mark.src}
+                            fallbackIcon={mark.fallbackIcon}
+                            tone={mark.tone}
+                            size={40}
+                        />
                         <div>
                             <h1 className="text-2xl font-semibold tracking-tight text-fg">
                                 {debt.name}
@@ -368,13 +384,14 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
                     </p>
                 ) : (
                     detail.payments.map(payment => {
-                        const paymentMark = vendorMarkSrc(
+                        const paymentMark = partyMark(
                             findCatalogVendor(
                                 payment.counterparty ?? payment.description,
                                 merchants
                             ) ?? {
                                 name: payment.counterparty ?? payment.description,
-                            }
+                            },
+                            debtChrome
                         );
                         return (
                             <MoneyPartyRow
@@ -402,10 +419,15 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
                                 ? ` · ${formatDueDay(detail.linkedFixedCost.dueDay)}`
                                 : ''
                         }`}
-                        mark={vendorMarkSrc(
+                        mark={partyMark(
                             findCatalogVendor(detail.linkedFixedCost.name, merchants) ?? {
                                 name: detail.linkedFixedCost.name,
-                            }
+                            },
+                            catalogMarkChrome({
+                                billName: detail.linkedFixedCost.name,
+                                jarKey: JarKey.NECESSITIES,
+                                jarByKey,
+                            })
                         )}
                         amount={formatMoney(detail.linkedFixedCost.amount)}
                         badges={<MetaChip>Necessities</MetaChip>}

@@ -3,9 +3,18 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
+import type {
+    CategoryTemplate,
+    FixedCost,
+    GivingOrganisation,
+    MerchantPreset,
+    Transaction,
+} from '@rumtelo/contracts';
+import { FlowDirection, jarCapabilitiesFor } from '@rumtelo/contracts';
+
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
+import { JarCategoryBreakdown } from '@/components/features/money/jar-category-breakdown';
 import {
-    JarCategoryTable,
     JarDrilldownTrigger,
     type JarDrilldownItem,
 } from '@/components/features/money/jar-drilldown-parts';
@@ -16,11 +25,26 @@ function jarHref(jar: JarDrilldownItem): string | undefined {
     return undefined;
 }
 
+export type JarDrilldownExtras = {
+    period: { year: number; month: number };
+    fixedCosts: readonly FixedCost[];
+    transactions: readonly Transaction[];
+    categoryTemplates: readonly Pick<CategoryTemplate, 'name' | 'icon'>[];
+    merchants: readonly MerchantPreset[];
+    givingOrgs: readonly Pick<GivingOrganisation, 'name' | 'website'>[];
+    jarByKey?: Map<string, { icon: string | null }>;
+};
+
 /**
- * Full-table expandable jar list (design: Kluis Finance App.dc.html:422-465).
- * Row opens the jar; chevron expands categories.
+ * Expandable jar list — row toggles categories; “Open jar” navigates to detail.
  */
-export function JarDrilldownTable({ jars }: { jars: JarDrilldownItem[] }) {
+export function JarDrilldownTable({
+    jars,
+    extras,
+}: {
+    jars: JarDrilldownItem[];
+    extras?: JarDrilldownExtras;
+}) {
     const [openId, setOpenId] = useState<string | null>(null);
 
     return (
@@ -29,24 +53,57 @@ export function JarDrilldownTable({ jars }: { jars: JarDrilldownItem[] }) {
                 const id = jar.id ?? jar.name;
                 const open = openId === id;
                 const href = jarHref(jar);
-                const item = href ? { ...jar, href } : jar;
+                const jarFixed = extras
+                    ? extras.fixedCosts.filter(
+                          cost =>
+                              cost.jarId === jar.id &&
+                              cost.direction === FlowDirection.OUT &&
+                              cost.isActive
+                      )
+                    : [];
+                const jarTxs = extras ? extras.transactions.filter(tx => tx.jarId === jar.id) : [];
+                const allowFixed = jar.key
+                    ? jarCapabilitiesFor(jar.key).allowsFixedCosts
+                    : jarFixed.length > 0;
 
                 return (
                     <div key={id} className="border-b border-line last:border-b-0">
                         <JarDrilldownTrigger
-                            jar={item}
+                            jar={jar}
                             open={open}
                             onToggle={() => setOpenId(open ? null : id)}
                         />
                         {open && (
-                            <div className="mb-3 ml-0 animate-rise space-y-2 pl-0 sm:ml-11.5">
-                                <JarCategoryTable categories={jar.categories} />
+                            <div className="animate-rise border-t border-line bg-raised/40">
+                                {extras ? (
+                                    <JarCategoryBreakdown
+                                        categories={[...(jar.categories ?? [])].filter(
+                                            category => !category.isArchived
+                                        )}
+                                        fixedCosts={jarFixed}
+                                        transactions={jarTxs}
+                                        period={extras.period}
+                                        jarKey={jar.key ?? ''}
+                                        jarIcon={jar.icon}
+                                        jarByKey={extras.jarByKey}
+                                        categoryTemplates={extras.categoryTemplates}
+                                        merchants={extras.merchants}
+                                        givingOrgs={extras.givingOrgs}
+                                        allowFixedCosts={allowFixed}
+                                    />
+                                ) : (
+                                    <p className="px-5 py-3 text-sm text-fg-muted">
+                                        Open the jar for category detail.
+                                    </p>
+                                )}
                                 {href ? (
-                                    <Link
-                                        href={href}
-                                        className="inline-flex font-mono text-xs font-semibold tracking-wide text-fg-muted uppercase hover:text-accent">
-                                        Open jar ▸
-                                    </Link>
+                                    <div className="border-t border-line px-5 py-2.5">
+                                        <Link
+                                            href={href}
+                                            className="inline-flex font-mono text-xs font-semibold tracking-wide text-fg-muted uppercase hover:text-accent">
+                                            Open jar ▸
+                                        </Link>
+                                    </div>
                                 ) : null}
                             </div>
                         )}

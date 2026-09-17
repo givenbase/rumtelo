@@ -10,6 +10,7 @@ import { Button, Card } from '@rumtelo/ui';
 import { toPeriodKey } from '@rumtelo/utils';
 
 import { createGoalHref, createMoveHref, createTxHref, updateHref } from '@/app/_lib/create-routes';
+import { claimFixedCostMatches } from '@/app/_lib/fixed-cost-match';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
@@ -20,6 +21,7 @@ import { useCategoryTemplates } from '@/components/features/forms/catalog-helper
 import { JarGuideCard } from '@/components/features/helpers';
 import { JarCategoryBreakdown } from '@/components/features/money/jar-category-breakdown';
 import { JarCoverageStrip } from '@/components/features/money/jar-coverage-strip';
+import { JarGoalAccordion } from '@/components/features/money/jar-goal-accordion';
 import { MetaChip, formatBookedDate } from '@/components/features/money/jar-badge';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
@@ -101,6 +103,8 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
     const transactions = [...(txQuery.data?.items ?? [])].sort((left, right) =>
         right.bookedOn.localeCompare(left.bookedOn)
     );
+    const { claimedTxIds } = claimFixedCostMatches(fixedOut, transactions);
+    const leftoverPeriodTxs = transactions.filter(tx => !claimedTxIds.has(tx.id));
 
     if (!jar) {
         return (
@@ -248,49 +252,16 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                         </button>
                     </div>
                     <Card className="p-0">
-                        {jarGoals.length === 0 ? (
-                            <p className="px-5 py-4 text-sm text-fg-muted">
-                                No goals on this jar yet.
-                            </p>
-                        ) : (
-                            <ul className="grid gap-px">
-                                {jarGoals.map(goal => (
-                                    <li key={goal.id}>
-                                        <button
-                                            type="button"
-                                            onClick={() => router.push(updateHref('goal', goal.id))}
-                                            className="flex w-full items-center justify-between gap-3 border-b border-line px-5 py-3 text-left last:border-b-0 hover:bg-raised">
-                                            <span className="min-w-0">
-                                                <span className="block truncate text-sm text-fg">
-                                                    {goal.icon ? `${goal.icon} ` : ''}
-                                                    {goal.name}
-                                                </span>
-                                                <span className="mt-0.5 block font-mono text-xs text-fg-faint">
-                                                    {goal.kind === GoalKind.GIVE
-                                                        ? 'Yearly pledge'
-                                                        : goal.status === GoalStatus.REACHED
-                                                          ? 'Reached'
-                                                          : 'Save'}
-                                                </span>
-                                            </span>
-                                            <span className="shrink-0 font-mono text-sm text-fg">
-                                                {formatMoney(goal.saved)} /{' '}
-                                                {formatMoney(goal.target)}
-                                            </span>
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
+                        <JarGoalAccordion goals={jarGoals} />
                     </Card>
                 </section>
             ) : null}
 
-            {/* Period transactions */}
+            {/* Unmatched / one-off activity (bills settled under categories stay there) */}
             <section className="grid gap-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                     <h2 className="font-mono text-xs font-medium tracking-widest text-accent uppercase">
-                        ✦ This period
+                        ✦ Other activity this period
                     </h2>
                     <Link
                         href="/product/money/transactions"
@@ -299,13 +270,15 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                     </Link>
                 </div>
                 <Card className="p-0">
-                    {transactions.length === 0 ? (
+                    {leftoverPeriodTxs.length === 0 ? (
                         <p className="px-5 py-4 text-sm text-fg-muted">
-                            No transactions sorted into this jar this month.
+                            {transactions.length === 0
+                                ? 'No transactions sorted into this jar this month.'
+                                : 'All period payments are nested under categories above.'}
                         </p>
                     ) : (
                         <ul className="grid">
-                            {transactions.map(tx => {
+                            {leftoverPeriodTxs.map(tx => {
                                 const title = tx.counterparty?.trim() || tx.description;
                                 const subtitle =
                                     tx.counterparty?.trim() &&

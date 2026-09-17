@@ -3,9 +3,11 @@ import { jarChrome } from '@/app/_lib/jar-meta';
 
 /**
  * Intermediate VendorMark chrome when a brand logo is missing:
- * category-template emoji → jar emoji, tinted with jar color.
+ * explicit icon → category-template emoji → jar emoji, tinted with jar color.
  */
 export function catalogMarkChrome(opts: {
+    /** Prefer this icon when set (debt kind, preset option, etc.). */
+    icon?: string | null;
     /** Bill / category display name — matched to CategoryTemplate.name. */
     billName?: string | null;
     jarKey?: string | null;
@@ -19,7 +21,7 @@ export function catalogMarkChrome(opts: {
         : null;
     const jarIcon = opts.jarKey ? (opts.jarByKey?.get(opts.jarKey)?.icon?.trim() ?? null) : null;
     return {
-        fallbackIcon: categoryIcon || jarIcon,
+        fallbackIcon: opts.icon?.trim() || categoryIcon || jarIcon,
         tone: opts.jarKey ? bgClassToCssVar(jarChrome(opts.jarKey).color) : null,
     };
 }

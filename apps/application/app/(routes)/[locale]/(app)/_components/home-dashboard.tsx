@@ -19,6 +19,7 @@ import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { CoachVerdict } from '@/components/features/home/coach-verdict';
 import { HeroKluis } from '@/components/features/home/hero-kluis';
 import { PortalWidget } from '@/components/features/home/portal-widget';
@@ -102,12 +103,43 @@ export function HomeDashboardClient() {
     };
 
     const { byKey: catalogByKey } = useJarCatalog();
+    const categoryTemplatesQuery = useCategoryTemplates(live);
 
     const dashboardQuery = useLiveQuery(
         apiQuery.money.dashboard.get.queryOptions({
             input: { householdId: householdId!, period: periodKey },
         }),
         emptyDashboard as never,
+        live
+    );
+
+    const byJarQuery = useLiveQuery(
+        apiQuery.money.fixedCosts.byJar.queryOptions({ input: { householdId: householdId! } }),
+        [] as never,
+        live
+    );
+
+    const periodTxQuery = useLiveQuery(
+        apiQuery.money.transactions.list.queryOptions({
+            input: { householdId: householdId!, period: periodKey, limit: 200 },
+        }),
+        { items: [], nextCursor: null },
+        live
+    );
+
+    const merchantsQuery = useLiveQuery(
+        apiQuery.money.catalogs.merchantPresets.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [] as never,
+        live
+    );
+
+    const givingOrgsQuery = useLiveQuery(
+        apiQuery.money.catalogs.givingOrganisations.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [] as never,
         live
     );
 
@@ -206,7 +238,22 @@ export function HomeDashboardClient() {
                         href: `/product/money/jars/${jarKeyToSlug('PLAY')}`,
                     },
                 ]}>
-                <JarDrilldownTable jars={jars} />
+                <JarDrilldownTable
+                    jars={jars}
+                    extras={
+                        live
+                            ? {
+                                  period,
+                                  fixedCosts: (byJarQuery.data ?? []).flatMap(group => group.items),
+                                  transactions: periodTxQuery.data?.items ?? [],
+                                  categoryTemplates: categoryTemplatesQuery.data ?? [],
+                                  merchants: merchantsQuery.data ?? [],
+                                  givingOrgs: givingOrgsQuery.data ?? [],
+                                  jarByKey: catalogByKey,
+                              }
+                            : undefined
+                    }
+                />
             </HeroKluis>
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
