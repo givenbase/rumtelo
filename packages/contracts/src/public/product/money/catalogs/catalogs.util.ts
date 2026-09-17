@@ -32,6 +32,18 @@ export function defaultGiveCategoryTemplate<T extends { jarKey: JarKey; sortOrde
     return [...give].sort((left, right) => left.sortOrder - right.sortOrder)[0] ?? null;
 }
 
+/**
+ * Category for bank-account pickers.
+ * Resolved by catalog display name (“Banking”) so the key can rename in seed.
+ */
+export function bankingCategoryTemplate<T extends { name: string }>(
+    categories: readonly T[]
+): T | null {
+    return (
+        categories.find(category => category.name.trim().toLowerCase() === 'banking') ?? null
+    );
+}
+
 export type GivingCauseCatalogItem = {
     key: GivingCause;
     name: string;

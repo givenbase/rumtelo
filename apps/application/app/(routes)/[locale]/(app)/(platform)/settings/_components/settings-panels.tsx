@@ -17,6 +17,7 @@ import {
     SpendingStyle,
     PayoffStrategy,
     Theme,
+    bankingCategoryTemplate,
     canAddHouseholdMember,
     canInviteOnPlan,
     type JarKey,
@@ -55,6 +56,7 @@ import { useAccountTheme } from '@/components/features/shell/account-theme-sync'
 import { downloadTextFile, toCsv } from '@/app/_lib/download';
 import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
 import { merchantsToNameOptions } from '@/components/features/forms/merchant-name-options';
+import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import {
     PresetNameField,
     type NamePresetOption,
@@ -1301,14 +1303,22 @@ export function BankSettings() {
         [],
         live
     );
+    const categoriesQuery = useCategoryTemplates(live);
+    const bankingCategoryKey = useMemo(
+        () => bankingCategoryTemplate(categoriesQuery.data ?? [])?.key ?? null,
+        [categoriesQuery.data]
+    );
     const bankingMerchantsQuery = useLiveQuery(
         apiQuery.money.catalogs.merchantPresets.list.queryOptions({
-            input: { householdId: householdId!, categoryTemplateKey: 'BANKING' },
+            input: {
+                householdId: householdId!,
+                categoryTemplateKey: bankingCategoryKey,
+            },
         }),
         [],
-        live
+        live && Boolean(bankingCategoryKey)
     );
-    /** Retail banks only (exclude BNPL / rails also tagged BANKING). */
+    /** Retail banks only (exclude BNPL / rails also under Banking). */
     const bankList = useMemo(() => {
         const rails = new Set(['KLARNA', 'AFTERPAY', 'PAYPAL', 'WISE']);
         return (bankingMerchantsQuery.data ?? []).filter(merchant => !rails.has(merchant.key));
@@ -1316,10 +1326,12 @@ export function BankSettings() {
 
     const bankNameOptions = useMemo((): NamePresetOption[] => {
         return [
-            ...merchantsToNameOptions(bankList, { categoryTemplateKey: 'BANKING' }),
+            ...merchantsToNameOptions(bankList, {
+                categoryTemplateKey: bankingCategoryKey ?? undefined,
+            }),
             { key: 'OTHER', name: 'Other', group: 'Custom' },
         ];
-    }, [bankList]);
+    }, [bankList, bankingCategoryKey]);
 
     const bankByKey = useMemo(() => new Map(bankList.map(bank => [bank.key, bank])), [bankList]);
 
