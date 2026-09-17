@@ -40,6 +40,7 @@ export class MerchantPresetSeeder extends Seeder {
                 existing.name = row.name;
                 existing.jarTemplate = jarTemplate;
                 existing.categoryTemplateKey = row.categoryTemplateKey;
+                existing.givingOrganisationKey = row.givingOrganisationKey ?? null;
                 existing.markets = markets;
                 existing.highlight = highlight;
                 existing.sortOrder = sortOrder;
@@ -87,6 +88,7 @@ export class MerchantPresetSeeder extends Seeder {
                 name: row.name,
                 jarTemplate,
                 categoryTemplateKey: row.categoryTemplateKey,
+                givingOrganisationKey: row.givingOrganisationKey ?? null,
                 markets,
                 highlight,
                 sortOrder,

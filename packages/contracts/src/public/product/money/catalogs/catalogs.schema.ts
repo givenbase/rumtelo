@@ -105,6 +105,11 @@ export const MerchantPreset = CatalogItemBase.extend({
     mcc: z.string().length(4).nullable(),
     jarKey: z.enum(JarKey),
     categoryTemplateKey: z.string().min(1).max(64),
+    /**
+     * When set, mirrors GivingOrganisation.key — bank matching only;
+     * Coach catalog owns editorial identity.
+     */
+    givingOrganisationKey: z.string().min(1).max(64).nullable(),
     /** Favicon hostname — client builds logo URL; no client brand mirror. */
     logoDomain: z.string().min(1).max(120).nullable(),
     website: z.string().max(240).nullable(),

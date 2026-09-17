@@ -179,6 +179,7 @@ export class MoneyCatalogsController {
                     mcc: preset.matching?.mcc ?? null,
                     jarKey: preset.jarTemplate.key,
                     categoryTemplateKey: preset.categoryTemplateKey,
+                    givingOrganisationKey: preset.givingOrganisationKey ?? null,
                     logoDomain: preset.branding?.logoDomain ?? null,
                     website: preset.branding?.website ?? null,
                     ibanBankCode: preset.banking?.ibanBankCode ?? null,

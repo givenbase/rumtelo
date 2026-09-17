@@ -204,30 +204,13 @@ export const SUGGESTED_MERCHANTS_BY_PRESET: Readonly<Record<string, readonly str
     SPORTS_CLUB: [],
     HOBBY_MEMBERSHIP: [],
 
-    // Give
-    CHARITY: [
-        'DONEER_EFFECTIEF',
-        'RODE_KRUIS',
-        'ARTSEN_ZONDER_GRENZEN',
-        'UNICEF',
-        'KWF',
-        '100WEEKS',
-    ],
+    // Give — Coach owns org-backed charities; keep merchant-only payees for chips / matching
+    CHARITY: ['RODE_KRUIS', 'ARTSEN_ZONDER_GRENZEN', 'UNICEF', 'KWF'],
     CHURCH_TITHE: [],
     SPONSORSHIP: [],
-    EFFECTIVE_GIVING: [
-        'DONEER_EFFECTIEF',
-        'AGAINST_MALARIA_FOUNDATION',
-        'GIVEDIRECTLY',
-        'HELEN_KELLER_INTL',
-        'NEW_INCENTIVES',
-        'STRONGMINDS',
-        'CLEAN_AIR_TASK_FORCE',
-        'THE_HUMANE_LEAGUE',
-        'GOOD_FOOD_INSTITUTE',
-    ],
-    FOOD_BANK: ['VOEDSELBANKEN_NEDERLAND'],
-    EMERGENCY_RELIEF: ['GIRO555', 'RODE_KRUIS', 'STICHTING_VLUCHTELING', 'ARTSEN_ZONDER_GRENZEN'],
+    EFFECTIVE_GIVING: [],
+    FOOD_BANK: [],
+    EMERGENCY_RELIEF: ['GIRO555', 'RODE_KRUIS', 'ARTSEN_ZONDER_GRENZEN'],
     HELPING_SOMEONE: [],
 
     OTHER: [],

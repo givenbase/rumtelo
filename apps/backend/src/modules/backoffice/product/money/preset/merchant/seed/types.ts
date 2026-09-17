@@ -11,6 +11,11 @@ export type MerchantSeed = {
     mcc: string | null;
     jarKey: JarKey;
     categoryTemplateKey: string;
+    /**
+     * When set, this merchant mirrors GivingOrganisation.key — bank matching only;
+     * Coach catalog owns the editorial identity.
+     */
+    givingOrganisationKey?: string | null;
     logoDomain: string | null;
     website?: string | null;
     /**

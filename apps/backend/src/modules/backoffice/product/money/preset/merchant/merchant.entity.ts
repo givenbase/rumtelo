@@ -44,6 +44,13 @@ export class MerchantPreset extends BaseEntity {
     @Property({ length: 64 })
     categoryTemplateKey!: string;
 
+    /**
+     * When set, this merchant mirrors a GivingOrganisation (same stable key).
+     * Coach / org catalog owns identity; merchant row stays for bank matching.
+     */
+    @Property({ length: 64, nullable: true })
+    givingOrganisationKey: string | null = null;
+
     /** ISO 3166-1 alpha-2 markets where this merchant is listed. */
     @Property({ type: 'json', default: ['NL'] })
     markets: string[] = ['NL'];

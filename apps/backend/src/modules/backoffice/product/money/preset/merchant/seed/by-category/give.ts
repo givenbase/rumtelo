@@ -1,3 +1,4 @@
+import { GIVING_ORGANISATION_SEED } from '../../../../catalog/giving-organisation/seed/giving-organisation.seed-data';
 import type { MerchantSeed } from '../types';
 import { give } from '../types';
 
@@ -9,14 +10,20 @@ import { give } from '../types';
  * CBF-erkend NL orgs with public annual impact reporting. No padding with
  * celebrity brands that lack an independent check. “I know who” is free text.
  *
+ * When `key` also exists on GivingOrganisation, set givingOrganisationKey so
+ * Coach owns identity/copy and the merchant row stays for bank matching only.
+ *
  * GIFTS = flowers / cards (not charities) — bank matching only.
  */
+const GIVING_ORG_KEYS = new Set(GIVING_ORGANISATION_SEED.map(org => org.key));
+
 function donation(row: Omit<MerchantSeed, 'jarKey' | 'categoryTemplateKey' | 'mcc'>): MerchantSeed {
     return {
         ...row,
         mcc: '8398',
         jarKey: give,
         categoryTemplateKey: 'DONATIONS',
+        givingOrganisationKey: GIVING_ORG_KEYS.has(row.key) ? row.key : null,
         highlight: row.highlight ?? null,
         markets: row.markets ?? ['NL'],
         matchPriority: row.matchPriority ?? 0,
