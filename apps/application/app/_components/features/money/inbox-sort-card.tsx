@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
 import type { Debt, Jar, Transaction } from '@rumtelo/contracts';
@@ -45,6 +46,7 @@ export function InboxSortCard({
     suggestedJarId,
     logoDomain,
     onConfirm,
+    detailHref,
     onChange,
 }: {
     transaction: Transaction;
@@ -60,6 +62,8 @@ export function InboxSortCard({
         createRule?: boolean,
         debtId?: string | null
     ) => Promise<void>;
+    /** Prefer for “Other” — opens transaction detail. */
+    detailHref?: string;
     onChange?: (transaction: Transaction, jarId: string) => void;
 }) {
     const { formatMoney } = useHouseholdCurrency();
@@ -248,13 +252,19 @@ export function InboxSortCard({
                     disabled={pending !== null || !onConfirm || !jarId}>
                     {pending === 'rule' ? 'Working…' : 'Always this'}
                 </Button>
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    disabled={pending !== null || !jarId}
-                    onClick={() => onChange?.(transaction, jarId)}>
-                    Other
-                </Button>
+                {detailHref ? (
+                    <Button as={Link} href={detailHref} variant="ghost" size="sm">
+                        Other
+                    </Button>
+                ) : (
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled={pending !== null || !jarId}
+                        onClick={() => onChange?.(transaction, jarId)}>
+                        Other
+                    </Button>
+                )}
             </div>
         </div>
     );

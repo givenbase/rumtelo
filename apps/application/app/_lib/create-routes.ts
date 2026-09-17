@@ -124,3 +124,8 @@ export function fixedDetailHref(id: string) {
 export function txDetailHref(id: string) {
     return productPath(`money/transactions/${id}`);
 }
+
+/** Open goal detail (pace, jar context, advice). Edit stays on update. */
+export function goalDetailHref(id: string) {
+    return productPath(`growth/goals/${id}`);
+}

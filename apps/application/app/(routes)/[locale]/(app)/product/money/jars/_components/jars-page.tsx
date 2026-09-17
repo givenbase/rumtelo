@@ -3,7 +3,6 @@
 import { apiQuery } from '@/app/_lib/api-hooks';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Typography } from '@rumtelo/ui';
@@ -32,7 +31,6 @@ import { ListToolbar } from '@/components/layout/list-toolbar';
 export function JarsPageClient() {
     const { householdId } = useAuth();
     const { period } = useAppShell();
-    const router = useRouter();
     const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);
 
@@ -75,13 +73,10 @@ export function JarsPageClient() {
                     }
                     createSlot={
                         <div className="flex flex-wrap items-center gap-2">
-                            <Button
-                                size="sm"
-                                variant="secondary"
-                                onClick={() => router.push(CREATE_HREF.move)}>
+                            <Button as={Link} href={CREATE_HREF.move} size="sm" variant="secondary">
                                 Move between jars
                             </Button>
-                            <Button size="sm" onClick={() => router.push(createTxHref())}>
+                            <Button as={Link} href={createTxHref()} size="sm">
                                 + Add transaction
                             </Button>
                         </div>

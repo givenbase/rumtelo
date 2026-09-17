@@ -3,8 +3,6 @@
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useState } from 'react';
 
-import { useRouter } from 'next/navigation';
-
 import { DEFAULT_JAR_SPLIT, jarCapabilitiesFor, JarKey } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Card, Typography } from '@rumtelo/ui';
@@ -14,7 +12,10 @@ import { CREATE_HREF, fixedDetailHref, updateHref } from '@/app/_lib/create-rout
 import { bgClassToCssVar, cadenceLabel } from '@/app/_lib/jar-chrome';
 import {
     claimFixedCostMatches,
+    fixedCostLifecycle,
     fixedCostStatus,
+    isFixedCostCounting,
+    lifecycleLabel,
     type FixedCostStatus,
 } from '@/app/_lib/fixed-cost-match';
 import { evaluateNecessitiesPressure } from '@/app/_lib/necessities-pressure';
@@ -59,7 +60,6 @@ function statusChip(status: FixedCostStatus) {
 export function FixedCostsPageClient() {
     const { householdId } = useAuth();
     const { period } = useAppShell();
-    const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
     const [tab, setTab] = useState<Tab>('ERUIT');
     const [jarFilter, setJarFilter] = useState<string | null>(null);
@@ -116,11 +116,11 @@ export function FixedCostsPageClient() {
               }));
 
     // Flatten byJar groups — keep cadence so OUT totals match jar committedOut.
-    const fixedCosts =
+    const allFixedOut =
         live && byJarQuery.data?.length
             ? byJarQuery.data.flatMap(group =>
                   group.items
-                      .filter(item => item.direction === 'OUT' && item.isActive)
+                      .filter(item => item.direction === 'OUT')
                       .map(item => ({
                           ...item,
                           monthly: monthlyAmount(Math.abs(item.amount), item.cadence),
@@ -129,6 +129,8 @@ export function FixedCostsPageClient() {
                       }))
               )
             : [];
+    const fixedCosts = allFixedOut.filter(isFixedCostCounting);
+    const inactiveFixedCosts = allFixedOut.filter(item => !isFixedCostCounting(item));
 
     const periodTransactions = periodTxQuery.data?.items ?? [];
     const { matchByFixedCostId } = claimFixedCostMatches(fixedCosts, periodTransactions);
@@ -210,9 +212,7 @@ export function FixedCostsPageClient() {
             <div data-tour="fixed-tabs">
                 <ListToolbar
                     createLabel={tab === 'ERUIT' ? '+ Add fixed cost' : '+ Add income'}
-                    onCreate={() =>
-                        router.push(tab === 'ERUIT' ? CREATE_HREF.fixed : CREATE_HREF.income)
-                    }
+                    createHref={tab === 'ERUIT' ? CREATE_HREF.fixed : CREATE_HREF.income}
                     secondary={
                         <span
                             className={cn(
@@ -250,199 +250,269 @@ export function FixedCostsPageClient() {
             </div>
 
             {tab === 'ERUIT' && (
-                <div data-tour="fixed-list" className="grid items-start gap-5 sm:grid-cols-2">
-                    <Card className="p-0">
-                        <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
-                            <Typography as="span" variant="eyebrow" color="primary">
-                                ✦ Every month out
-                            </Typography>
-                            <span className="font-mono text-sm text-fg-secondary">
-                                {formatMoney(outTotal)}
-                            </span>
-                        </div>
+                <div data-tour="fixed-list" className="grid gap-5">
+                    <div className="grid items-start gap-5 sm:grid-cols-2">
+                        <Card className="p-0">
+                            <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
+                                <Typography as="span" variant="eyebrow" color="primary">
+                                    ✦ Every month out
+                                </Typography>
+                                <span className="font-mono text-sm text-fg-secondary">
+                                    {formatMoney(outTotal)}
+                                </span>
+                            </div>
 
-                        <div className="grid">
-                            {groupedFixedCosts.length === 0 ? (
-                                <p className="px-5 py-4 text-sm text-fg-muted">
-                                    {jarFilter
-                                        ? 'No fixed costs in this jar.'
-                                        : 'No fixed costs yet.'}
-                                </p>
-                            ) : (
-                                groupedFixedCosts.map(group => {
-                                    const open =
-                                        openJarKeys.size === 0
-                                            ? true
-                                            : openJarKeys.has(group.jar.key);
-                                    return (
-                                        <div key={group.jar.key}>
-                                            <button
-                                                type="button"
-                                                aria-expanded={open}
-                                                onClick={() =>
-                                                    setOpenJarKeys(previous => {
-                                                        const baseline =
-                                                            previous.size === 0
-                                                                ? new Set(
-                                                                      groupedFixedCosts.map(
-                                                                          row => row.jar.key
+                            <div className="grid">
+                                {groupedFixedCosts.length === 0 ? (
+                                    <p className="px-5 py-4 text-sm text-fg-muted">
+                                        {jarFilter
+                                            ? 'No fixed costs in this jar.'
+                                            : 'No fixed costs yet.'}
+                                    </p>
+                                ) : (
+                                    groupedFixedCosts.map(group => {
+                                        const open =
+                                            openJarKeys.size === 0
+                                                ? true
+                                                : openJarKeys.has(group.jar.key);
+                                        return (
+                                            <div key={group.jar.key}>
+                                                <button
+                                                    type="button"
+                                                    aria-expanded={open}
+                                                    onClick={() =>
+                                                        setOpenJarKeys(previous => {
+                                                            const baseline =
+                                                                previous.size === 0
+                                                                    ? new Set(
+                                                                          groupedFixedCosts.map(
+                                                                              row => row.jar.key
+                                                                          )
                                                                       )
-                                                                  )
-                                                                : new Set(previous);
-                                                        if (baseline.has(group.jar.key)) {
-                                                            baseline.delete(group.jar.key);
-                                                        } else {
-                                                            baseline.add(group.jar.key);
-                                                        }
-                                                        return baseline;
-                                                    })
+                                                                    : new Set(previous);
+                                                            if (baseline.has(group.jar.key)) {
+                                                                baseline.delete(group.jar.key);
+                                                            } else {
+                                                                baseline.add(group.jar.key);
+                                                            }
+                                                            return baseline;
+                                                        })
+                                                    }
+                                                    className="flex w-full items-center justify-between gap-3 border-b border-line bg-raised/60 px-5 py-2 text-left hover:bg-raised">
+                                                    <JarBadge
+                                                        jarKey={group.jar.key}
+                                                        name={group.jar.name}
+                                                    />
+                                                    <span className="flex items-center gap-2">
+                                                        <span className="font-mono text-[11px] text-fg-faint">
+                                                            {formatMoney(-Math.abs(group.monthly))}
+                                                        </span>
+                                                        <span
+                                                            className={cn(
+                                                                'text-xs text-fg-faint transition-transform duration-200',
+                                                                open && 'rotate-180'
+                                                            )}>
+                                                            ▾
+                                                        </span>
+                                                    </span>
+                                                </button>
+                                                {open
+                                                    ? group.items.map(fixedCost => {
+                                                          const company =
+                                                              fixedCost.counterparty?.trim() ||
+                                                              fixedCost.name;
+                                                          const subtitle =
+                                                              fixedCost.counterparty?.trim() &&
+                                                              fixedCost.counterparty.trim() !==
+                                                                  fixedCost.name.trim()
+                                                                  ? fixedCost.name
+                                                                  : null;
+                                                          const due = formatDueDay(
+                                                              fixedCost.dueDay
+                                                          );
+                                                          const match = matchByFixedCostId.get(
+                                                              fixedCost.id
+                                                          );
+                                                          const status = fixedCostStatus(
+                                                              fixedCost,
+                                                              match,
+                                                              period
+                                                          );
+                                                          return (
+                                                              <MoneyPartyRow
+                                                                  key={fixedCost.id}
+                                                                  title={company}
+                                                                  subtitle={subtitle}
+                                                                  mark={partyMark(
+                                                                      findPartyVendor(
+                                                                          company,
+                                                                          merchants,
+                                                                          givingOrgs
+                                                                      ),
+                                                                      catalogMarkChrome({
+                                                                          billName: fixedCost.name,
+                                                                          jarKey: fixedCost.jarKey,
+                                                                          jarByKey,
+                                                                          categoryTemplates,
+                                                                      })
+                                                                  )}
+                                                                  amount={formatMoney(
+                                                                      -Math.abs(fixedCost.monthly)
+                                                                  )}
+                                                                  badges={
+                                                                      <>
+                                                                          {statusChip(status)}
+                                                                          {due ? (
+                                                                              <MetaChip>
+                                                                                  {due}
+                                                                              </MetaChip>
+                                                                          ) : null}
+                                                                          <MetaChip>
+                                                                              {cadenceLabel(
+                                                                                  fixedCost.cadence
+                                                                              )}
+                                                                          </MetaChip>
+                                                                          {match ? (
+                                                                              <MetaChip>
+                                                                                  {formatBookedDate(
+                                                                                      match.bookedOn
+                                                                                  )}
+                                                                              </MetaChip>
+                                                                          ) : null}
+                                                                          {Math.abs(
+                                                                              fixedCost.monthly
+                                                                          ) !==
+                                                                          Math.abs(
+                                                                              fixedCost.amount
+                                                                          ) ? (
+                                                                              <MetaChip>
+                                                                                  {formatMoney(
+                                                                                      fixedCost.monthly
+                                                                                  )}
+                                                                                  /mo
+                                                                              </MetaChip>
+                                                                          ) : null}
+                                                                      </>
+                                                                  }
+                                                                  href={fixedDetailHref(fixedCost.id)}
+                                                              />
+                                                          );
+                                                      })
+                                                    : null}
+                                            </div>
+                                        );
+                                    })
+                                )}
+                            </div>
+
+                            <div className="flex flex-wrap gap-2 border-t border-line px-5 py-4">
+                                {splitJars
+                                    .filter(
+                                        j =>
+                                            jarCapabilitiesFor(j.key as JarKey).allowsFixedCosts &&
+                                            fixedCosts.some(fixedCost => fixedCost.jarKey === j.key)
+                                    )
+                                    .map(j => {
+                                        const on = jarFilter === j.key;
+                                        return (
+                                            <button
+                                                key={j.key}
+                                                type="button"
+                                                onClick={() =>
+                                                    setJarFilter(previous =>
+                                                        previous === j.key ? null : j.key
+                                                    )
                                                 }
-                                                className="flex w-full items-center justify-between gap-3 border-b border-line bg-raised/60 px-5 py-2 text-left hover:bg-raised">
-                                                <JarBadge
-                                                    jarKey={group.jar.key}
-                                                    name={group.jar.name}
+                                                aria-pressed={on}
+                                                className={cn(
+                                                    'flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
+                                                    on
+                                                        ? 'border-accent/40 bg-accent-soft text-accent'
+                                                        : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                                )}>
+                                                <span
+                                                    className="size-1.75 rounded-sm"
+                                                    style={{ background: bgClassToCssVar(j.color) }}
                                                 />
-                                                <span className="flex items-center gap-2">
-                                                    <span className="font-mono text-[11px] text-fg-faint">
-                                                        {formatMoney(-Math.abs(group.monthly))}
-                                                    </span>
-                                                    <span
-                                                        className={cn(
-                                                            'text-xs text-fg-faint transition-transform duration-200',
-                                                            open && 'rotate-180'
-                                                        )}>
-                                                        ▾
-                                                    </span>
-                                                </span>
+                                                {j.name}
                                             </button>
-                                            {open
-                                                ? group.items.map(fixedCost => {
-                                                      const company =
-                                                          fixedCost.counterparty?.trim() ||
-                                                          fixedCost.name;
-                                                      const subtitle =
-                                                          fixedCost.counterparty?.trim() &&
-                                                          fixedCost.counterparty.trim() !==
-                                                              fixedCost.name.trim()
-                                                              ? fixedCost.name
-                                                              : null;
-                                                      const due = formatDueDay(fixedCost.dueDay);
-                                                      const match = matchByFixedCostId.get(
-                                                          fixedCost.id
-                                                      );
-                                                      const status = fixedCostStatus(
-                                                          fixedCost,
-                                                          match,
-                                                          period
-                                                      );
-                                                      return (
-                                                          <MoneyPartyRow
-                                                              key={fixedCost.id}
-                                                              title={company}
-                                                              subtitle={subtitle}
-                                                              mark={partyMark(
-                                                                  findPartyVendor(
-                                                                      company,
-                                                                      merchants,
-                                                                      givingOrgs
-                                                                  ),
-                                                                  catalogMarkChrome({
-                                                                      billName: fixedCost.name,
-                                                                      jarKey: fixedCost.jarKey,
-                                                                      jarByKey,
-                                                                      categoryTemplates,
-                                                                  })
-                                                              )}
-                                                              amount={formatMoney(
-                                                                  -Math.abs(fixedCost.monthly)
-                                                              )}
-                                                              badges={
-                                                                  <>
-                                                                      {statusChip(status)}
-                                                                      {due ? (
-                                                                          <MetaChip>{due}</MetaChip>
-                                                                      ) : null}
-                                                                      <MetaChip>
-                                                                          {cadenceLabel(
-                                                                              fixedCost.cadence
-                                                                          )}
-                                                                      </MetaChip>
-                                                                      {match ? (
-                                                                          <MetaChip>
-                                                                              {formatBookedDate(
-                                                                                  match.bookedOn
-                                                                              )}
-                                                                          </MetaChip>
-                                                                      ) : null}
-                                                                      {Math.abs(
-                                                                          fixedCost.monthly
-                                                                      ) !==
-                                                                      Math.abs(fixedCost.amount) ? (
-                                                                          <MetaChip>
-                                                                              {formatMoney(
-                                                                                  fixedCost.monthly
-                                                                              )}
-                                                                              /mo
-                                                                          </MetaChip>
-                                                                      ) : null}
-                                                                  </>
-                                                              }
-                                                              onClick={() =>
-                                                                  router.push(
-                                                                      fixedDetailHref(fixedCost.id)
-                                                                  )
-                                                              }
-                                                          />
-                                                      );
-                                                  })
-                                                : null}
-                                        </div>
-                                    );
-                                })
-                            )}
-                        </div>
+                                        );
+                                    })}
+                            </div>
+                        </Card>
 
-                        <div className="flex flex-wrap gap-2 border-t border-line px-5 py-4">
-                            {splitJars
-                                .filter(
-                                    j =>
-                                        jarCapabilitiesFor(j.key as JarKey).allowsFixedCosts &&
-                                        fixedCosts.some(fixedCost => fixedCost.jarKey === j.key)
-                                )
-                                .map(j => {
-                                    const on = jarFilter === j.key;
-                                    return (
-                                        <button
-                                            key={j.key}
-                                            type="button"
-                                            onClick={() =>
-                                                setJarFilter(previous =>
-                                                    previous === j.key ? null : j.key
-                                                )
-                                            }
-                                            aria-pressed={on}
-                                            className={cn(
-                                                'flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
-                                                on
-                                                    ? 'border-accent/40 bg-accent-soft text-accent'
-                                                    : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
-                                            )}>
-                                            <span
-                                                className="size-1.75 rounded-sm"
-                                                style={{ background: bgClassToCssVar(j.color) }}
+                        <CoachTipCard title="Subscription check">
+                            Check every quarter that everything here still applies. Small amounts
+                            add up — a subscription you don&apos;t use is money you throw away
+                            monthly. Healthy: less than 20% of Necessity goes to recurring services.
+                        </CoachTipCard>
+                    </div>
+
+                    {inactiveFixedCosts.length > 0 ? (
+                        <Card className="p-0">
+                            <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
+                                <Typography as="span" variant="eyebrow" color="muted">
+                                    ✦ Paused &amp; ended
+                                </Typography>
+                                <span className="font-mono text-xs text-fg-faint">
+                                    {inactiveFixedCosts.length}
+                                </span>
+                            </div>
+                            <div className="grid opacity-80">
+                                {inactiveFixedCosts
+                                    .slice()
+                                    .sort((left, right) =>
+                                        (left.counterparty ?? left.name).localeCompare(
+                                            right.counterparty ?? right.name
+                                        )
+                                    )
+                                    .map(fixedCost => {
+                                        const company =
+                                            fixedCost.counterparty?.trim() || fixedCost.name;
+                                        const subtitle =
+                                            fixedCost.counterparty?.trim() &&
+                                            fixedCost.counterparty.trim() !== fixedCost.name.trim()
+                                                ? fixedCost.name
+                                                : null;
+                                        const lifecycle = fixedCostLifecycle(fixedCost);
+                                        return (
+                                            <MoneyPartyRow
+                                                key={fixedCost.id}
+                                                title={company}
+                                                subtitle={subtitle}
+                                                mark={partyMark(
+                                                    findPartyVendor(company, merchants, givingOrgs),
+                                                    catalogMarkChrome({
+                                                        billName: fixedCost.name,
+                                                        jarKey: fixedCost.jarKey,
+                                                        jarByKey,
+                                                        categoryTemplates,
+                                                    })
+                                                )}
+                                                amount={formatMoney(-Math.abs(fixedCost.monthly))}
+                                                badges={
+                                                    <>
+                                                        <MetaChip className="text-fg-muted">
+                                                            {lifecycleLabel(lifecycle)}
+                                                        </MetaChip>
+                                                        <JarBadge
+                                                            jarKey={fixedCost.jarKey}
+                                                            name={
+                                                                splitJars.find(
+                                                                    jar =>
+                                                                        jar.key === fixedCost.jarKey
+                                                                )?.name ?? fixedCost.jarKey
+                                                            }
+                                                        />
+                                                    </>
+                                                }
+                                                href={fixedDetailHref(fixedCost.id)}
                                             />
-                                            {j.name}
-                                        </button>
-                                    );
-                                })}
-                        </div>
-                    </Card>
-
-                    <CoachTipCard title="Subscription check">
-                        Check every quarter that everything here still applies. Small amounts add up
-                        — a subscription you don&apos;t use is money you throw away monthly.
-                        Healthy: less than 20% of Necessity goes to recurring services.
-                    </CoachTipCard>
+                                        );
+                                    })}
+                            </div>
+                        </Card>
+                    ) : null}
                 </div>
             )}
 
@@ -485,13 +555,11 @@ export function FixedCostsPageClient() {
                                                 ) : null}
                                             </>
                                         }
-                                        onClick={() => {
-                                            if (!source.id) {
-                                                router.push(CREATE_HREF.income);
-                                                return;
-                                            }
-                                            router.push(updateHref('income', source.id));
-                                        }}
+                                        href={
+                                            source.id
+                                                ? updateHref('income', source.id)
+                                                : CREATE_HREF.income
+                                        }
                                     />
                                 );
                             })}

@@ -2,6 +2,7 @@ import { type EntityManager } from '@mikro-orm/postgresql';
 
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { type Transaction } from '../../ledger/transaction/transaction.entity';
+import { FixedCost } from '../../plan/fixed-cost/fixed-cost.entity';
 import { Debt } from './debt.entity';
 
 /**
@@ -16,6 +17,17 @@ export function applyDebtBalanceDelta(debt: Debt, signedAmount: number) {
     } else if (debt.closedOn) {
         debt.closedOn = null;
     }
+}
+
+/** Keep the linked bill in sync: closed debt → ended (isActive false + endsOn). */
+export async function syncLinkedFixedCostLifecycle(em: EntityManager, debt: Debt) {
+    const fixed = await em.findOne(FixedCost, {
+        debt: debt.id,
+        household: currentHouseholdId(),
+    });
+    if (!fixed) return;
+    fixed.isActive = !debt.closedOn;
+    fixed.endsOn = debt.closedOn ?? debt.maturityOn;
 }
 
 /** Link or unlink a transaction as a debt payment; adjusts balance only on change. */
@@ -37,6 +49,7 @@ export async function applyDebtLinkChange(
         if (previous) {
             // Restore what this outflow took off the balance (outflow is negative).
             applyDebtBalanceDelta(previous, -Number(transaction.amount));
+            await syncLinkedFixedCostLifecycle(em, previous);
         }
     }
 
@@ -47,6 +60,7 @@ export async function applyDebtLinkChange(
         });
         transaction.debt = next;
         applyDebtBalanceDelta(next, Number(transaction.amount));
+        await syncLinkedFixedCostLifecycle(em, next);
         return;
     }
 

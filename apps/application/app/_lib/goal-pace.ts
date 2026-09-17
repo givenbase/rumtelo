@@ -1,4 +1,5 @@
 import type { Goal, JarBalance } from '@rumtelo/contracts';
+import { incomeNeededForTarget } from '@rumtelo/utils';
 
 /**
  * Goal pace for the income simulator (Growth → Income) — "and what it buys you".
@@ -13,6 +14,8 @@ import type { Goal, JarBalance } from '@rumtelo/contracts';
  *   Headroom is the honest answer to "is there room to speed this up?".
  * - "I want it in N months" converts to a needed monthly amount; we then say
  *   whether the jar has room for it at this income, or what income would.
+ *
+ * Income-needed math is shared with period-travel via `incomeNeededForTarget`.
  *
  * All money in minor units (the `Cents` suffix follows the app convention; currency-agnostic).
  */
@@ -76,10 +79,6 @@ export function monthsUntil(isoDate: string, today = new Date()): number {
     );
 }
 
-function ceilTo(cents: number, stepCents: number): number {
-    return Math.ceil(cents / stepCents) * stepCents;
-}
-
 export function addMonths(date: Date, months: number): Date {
     const next = new Date(date);
     next.setMonth(next.getMonth() + months);
@@ -107,14 +106,16 @@ export function evaluateGoalPace(input: GoalPaceInput): GoalPace {
     const jarHeadroomCents =
         jarFlowCents === null ? null : jarFlowCents - jarFixedCents - jarGoalsCents;
 
-    // Whole major units: the coach tells the user an amount to type into the goal form.
-    const needCents = remainingCents > 0 ? ceilTo(remainingCents / wantMonths, 100) : 0;
+    const needed = incomeNeededForTarget({
+        remainingCents,
+        months: wantMonths,
+        jarPercentage: jar?.percentage ?? 0,
+        jarFixedCents,
+        siblingPlannedCents: siblings,
+    });
+    const needCents = needed.needCents;
     const deltaCents = needCents - plannedCents;
-    // "Roughly" figure — round up to 10 major units so it reads as a target, not a decimal.
-    const incomeForNeedCents =
-        jar && jar.percentage > 0
-            ? ceilTo(((jarFixedCents + siblings + needCents) * 100) / jar.percentage, 1_000)
-            : null;
+    const incomeForNeedCents = jar && jar.percentage > 0 ? needed.incomeForNeedCents : null;
 
     let verdict: GoalPaceVerdict;
     if (remainingCents <= 0) {

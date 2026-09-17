@@ -1,15 +1,11 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-
 import { EmptyState, Section, Typography } from '@rumtelo/ui';
 
 import { CREATE_HREF } from '@/app/_lib/create-routes';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 
 export default function TrainPage() {
-    const router = useRouter();
-
     return (
         <div className="grid animate-rise gap-6">
             <Section eyebrow="Training" title="Energy you invest, not money you spend.">
@@ -19,10 +15,7 @@ export default function TrainPage() {
                 </Typography>
             </Section>
 
-            <ListToolbar
-                createLabel="+ Add session"
-                onCreate={() => router.push(CREATE_HREF.session)}
-            />
+            <ListToolbar createLabel="+ Add session" createHref={CREATE_HREF.session} />
 
             <EmptyState
                 icon="💪"

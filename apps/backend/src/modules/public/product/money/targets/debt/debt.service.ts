@@ -21,7 +21,7 @@ import { FixedCost } from '../../plan/fixed-cost/fixed-cost.entity';
 import { Category } from '../../plan/jar/category.entity';
 import { Jar } from '../../plan/jar/jar.entity';
 
-import { applyDebtBalanceDelta } from './debt-link.util';
+import { applyDebtBalanceDelta, syncLinkedFixedCostLifecycle } from './debt-link.util';
 import { Debt } from './debt.entity';
 
 /** Seed name for DEBT_PAYMENTS category template. */
@@ -118,6 +118,7 @@ export class DebtService {
         this.em.persist(transaction);
 
         applyDebtBalanceDelta(debt, outflow);
+        await syncLinkedFixedCostLifecycle(this.em, debt);
         await this.em.flush();
 
         return this.buildDetail(debt);
@@ -326,8 +327,8 @@ export class DebtService {
                 cadence: debt.paymentCadence,
                 dueDay: debt.dueDay,
                 direction: FlowDirection.OUT,
-                isActive: true,
-                endsOn: debt.maturityOn,
+                isActive: !debt.closedOn,
+                endsOn: debt.closedOn ?? debt.maturityOn,
                 note: null,
             } as never);
             this.em.persist(fixed);
@@ -339,7 +340,8 @@ export class DebtService {
         fixed.amount = Number(debt.minimumPayment);
         fixed.cadence = debt.paymentCadence;
         fixed.dueDay = debt.dueDay;
-        fixed.endsOn = debt.maturityOn;
+        fixed.isActive = !debt.closedOn;
+        fixed.endsOn = debt.closedOn ?? debt.maturityOn;
         if (category) fixed.category = this.em.getReference(Category, category.id);
         fixed.jar = this.em.getReference(Jar, jar.id);
     }

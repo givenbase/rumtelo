@@ -1,16 +1,37 @@
 'use client';
 
+import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 import { FlowDirection } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Button, Card, Typography, VendorMark } from '@rumtelo/ui';
+import {
+    Button,
+    Calendar,
+    Card,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    Typography,
+    VendorMark,
+    cn,
+} from '@rumtelo/ui';
 import { monthlyAmount, toPeriodKey } from '@rumtelo/utils';
 
 import { debtDetailHref, txDetailHref, updateHref } from '@/app/_lib/create-routes';
-import { claimFixedCostMatches, fixedCostStatus } from '@/app/_lib/fixed-cost-match';
+import {
+    claimFixedCostMatches,
+    fixedCostLifecycle,
+    fixedCostStatus,
+    lifecycleLabel,
+    todayIsoDate,
+} from '@/app/_lib/fixed-cost-match';
 import { bgClassToCssVar, cadenceLabel } from '@/app/_lib/jar-chrome';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
@@ -29,6 +50,13 @@ import {
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import {
+    EditIcon,
+    EndIcon,
+    PauseIcon,
+    ReactivateIcon,
+    ResumeIcon,
+} from '@/components/features/ui/action-icons';
 
 function statusLabel(status: ReturnType<typeof fixedCostStatus>) {
     if (status === 'taken') return 'Taken this period';
@@ -36,18 +64,29 @@ function statusLabel(status: ReturnType<typeof fixedCostStatus>) {
     return 'Planned';
 }
 
+function invalidateFixedCostQueries(queryClient: ReturnType<typeof useQueryClient>) {
+    void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.key() });
+    void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
+}
+
+type ConfirmKind = 'pause' | 'end' | null;
+
 /**
  * Fixed-cost detail — see the plan and this period’s status; Edit opens the form.
+ * Lifecycle is stored as isActive + endsOn (Active / Paused / Ended).
  */
 export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string }) {
     const { householdId } = useAuth();
-    const { period } = useAppShell();
-    const router = useRouter();
+    const { period, showToast } = useAppShell();
+    const queryClient = useQueryClient();
     const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
     const periodKey = toPeriodKey(period.year, period.month);
     const { byKey: jarByKey } = useJarCatalog();
     const categoryTemplatesQuery = useCategoryTemplates(live);
+    const [confirmKind, setConfirmKind] = useState<ConfirmKind>(null);
+    const [endWhen, setEndWhen] = useState<'today' | 'earlier'>('today');
+    const [endDate, setEndDate] = useState(() => todayIsoDate());
 
     const listQuery = useLiveQuery(
         apiQuery.money.fixedCosts.list.queryOptions({ input: { householdId: householdId! } }),
@@ -89,6 +128,50 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
     const categoryTemplates = categoryTemplatesQuery.data ?? [];
     const periodTxs = periodTxQuery.data?.items ?? [];
 
+    const lifecycleMutation = useMutation({
+        mutationFn: async (patch: { isActive: boolean; endsOn?: string | null }) => {
+            if (!householdId || !item) throw new Error('No household');
+            return api.money.fixedCosts.update({
+                id: item.id,
+                householdId,
+                isActive: patch.isActive,
+                ...(patch.endsOn !== undefined ? { endsOn: patch.endsOn } : {}),
+            });
+        },
+        onSuccess: (_data, patch) => {
+            invalidateFixedCostQueries(queryClient);
+            setConfirmKind(null);
+            if (patch.isActive) showToast('Bill is active again', 'success');
+            else if (patch.endsOn) showToast('Bill ended', 'success');
+            else showToast('Bill paused', 'success');
+        },
+        onError: () => showToast('Could not update status', 'error'),
+    });
+
+    function openPauseConfirm() {
+        setConfirmKind('pause');
+    }
+
+    function openEndConfirm() {
+        setEndWhen('today');
+        setEndDate(todayIsoDate());
+        setConfirmKind('end');
+    }
+
+    function confirmPause() {
+        lifecycleMutation.mutate({ isActive: false });
+    }
+
+    function confirmEnd() {
+        const today = todayIsoDate();
+        const endsOn = endWhen === 'today' ? today : endDate;
+        if (!endsOn || endsOn > today) {
+            showToast('Pick a date today or earlier', 'error');
+            return;
+        }
+        lifecycleMutation.mutate({ isActive: false, endsOn });
+    }
+
     if (live && listQuery.isLoading && !item) {
         return (
             <Typography as="p" size="sm" color="muted">
@@ -115,6 +198,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
     const { matchByFixedCostId } = claimFixedCostMatches([item], periodTxs);
     const match = matchByFixedCostId.get(item.id);
     const status = fixedCostStatus(item, match, period);
+    const lifecycle = fixedCostLifecycle(item);
     const company = item.counterparty?.trim() || item.name;
     const subtitle =
         item.counterparty?.trim() && item.counterparty.trim() !== item.name.trim()
@@ -136,6 +220,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
     const jarIcon =
         jar?.icon?.trim() || (jar?.key ? jarByKey.get(jar.key)?.icon?.trim() : null) || '◇';
     const jarTone = jar?.key ? bgClassToCssVar(jarChrome(jar.key).color) : null;
+    const busy = lifecycleMutation.isPending;
 
     return (
         <div className="grid animate-rise gap-8">
@@ -164,13 +249,169 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                         </div>
                     </div>
                 </div>
-                <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => router.push(updateHref('fixed', item.id))}>
-                    Edit
-                </Button>
+                <div className="flex flex-wrap items-center gap-2">
+                    {lifecycle === 'active' ? (
+                        <>
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                disabled={busy || !live}
+                                onClick={openPauseConfirm}>
+                                <PauseIcon />
+                                Pause
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                disabled={busy || !live}
+                                onClick={openEndConfirm}>
+                                <EndIcon />
+                                End
+                            </Button>
+                        </>
+                    ) : null}
+                    {lifecycle === 'paused' ? (
+                        <>
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                disabled={busy || !live}
+                                onClick={() => lifecycleMutation.mutate({ isActive: true })}>
+                                <ResumeIcon />
+                                Resume
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                disabled={busy || !live}
+                                onClick={openEndConfirm}>
+                                <EndIcon />
+                                End
+                            </Button>
+                        </>
+                    ) : null}
+                    {lifecycle === 'ended' ? (
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            disabled={busy || !live}
+                            onClick={() =>
+                                lifecycleMutation.mutate({ isActive: true, endsOn: null })
+                            }>
+                            <ReactivateIcon />
+                            Reactivate
+                        </Button>
+                    ) : null}
+                    <Button as={Link} href={updateHref('fixed', item.id)} variant="secondary">
+                        <EditIcon />
+                        Edit
+                    </Button>
+                </div>
             </div>
+
+            <Dialog
+                open={confirmKind !== null}
+                onOpenChange={open => {
+                    if (!open && !busy) setConfirmKind(null);
+                }}>
+                <DialogContent className="sm:max-w-md">
+                    {confirmKind === 'pause' ? (
+                        <>
+                            <DialogHeader>
+                                <DialogTitle>Pause this bill?</DialogTitle>
+                                <DialogDescription>
+                                    It stays on your list but won&apos;t count toward jar pressure or
+                                    “still due” until you resume.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    disabled={busy}
+                                    onClick={() => setConfirmKind(null)}>
+                                    Cancel
+                                </Button>
+                                <Button type="button" disabled={busy} onClick={confirmPause}>
+                                    <PauseIcon />
+                                    {busy ? 'Pausing…' : 'Pause bill'}
+                                </Button>
+                            </DialogFooter>
+                        </>
+                    ) : null}
+                    {confirmKind === 'end' ? (
+                        <>
+                            <DialogHeader>
+                                <DialogTitle>End this bill?</DialogTitle>
+                                <DialogDescription>
+                                    It stops counting in your plan. You can reactivate it later if
+                                    needed.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-3">
+                                <p className="font-mono text-[10px] tracking-wider text-fg-muted uppercase">
+                                    When did it end?
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                    <button
+                                        type="button"
+                                        aria-pressed={endWhen === 'today'}
+                                        onClick={() => {
+                                            setEndWhen('today');
+                                            setEndDate(todayIsoDate());
+                                        }}
+                                        className={cn(
+                                            'rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
+                                            endWhen === 'today'
+                                                ? 'border-accent/40 bg-accent-soft text-accent'
+                                                : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                        )}>
+                                        Today
+                                    </button>
+                                    <button
+                                        type="button"
+                                        aria-pressed={endWhen === 'earlier'}
+                                        onClick={() => setEndWhen('earlier')}
+                                        className={cn(
+                                            'rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
+                                            endWhen === 'earlier'
+                                                ? 'border-accent/40 bg-accent-soft text-accent'
+                                                : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                        )}>
+                                        Earlier date
+                                    </button>
+                                </div>
+                                {endWhen === 'earlier' ? (
+                                    <div className="grid gap-1.5">
+                                        <span className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
+                                            End date
+                                        </span>
+                                        <Calendar
+                                            value={endDate}
+                                            max={todayIsoDate()}
+                                            onSelect={setEndDate}
+                                            className="max-w-none w-full"
+                                        />
+                                    </div>
+                                ) : null}
+                            </div>
+                            <DialogFooter>
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    disabled={busy}
+                                    onClick={() => setConfirmKind(null)}>
+                                    Cancel
+                                </Button>
+                                <Button type="button" disabled={busy} onClick={confirmEnd}>
+                                    <EndIcon />
+                                    {busy ? 'Ending…' : 'End bill'}
+                                </Button>
+                            </DialogFooter>
+                        </>
+                    ) : null}
+                </DialogContent>
+            </Dialog>
 
             <Card className="grid gap-4 p-5">
                 <div className="flex flex-wrap items-end justify-between gap-3">
@@ -182,16 +423,30 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                             {formatMoney(signedMonthly)}
                         </p>
                     </div>
-                    <MetaChip
-                        className={
-                            status === 'taken'
-                                ? 'border-success/30 text-success'
-                                : status === 'due'
-                                  ? 'border-danger/30 text-danger'
-                                  : undefined
-                        }>
-                        {statusLabel(status)}
-                    </MetaChip>
+                    <div className="flex flex-wrap gap-1.5">
+                        <MetaChip
+                            className={
+                                lifecycle === 'active'
+                                    ? 'border-success/30 text-success'
+                                    : lifecycle === 'paused'
+                                      ? 'border-line text-fg-muted'
+                                      : 'border-fg-faint/40 text-fg-faint'
+                            }>
+                            {lifecycleLabel(lifecycle)}
+                        </MetaChip>
+                        {lifecycle === 'active' ? (
+                            <MetaChip
+                                className={
+                                    status === 'taken'
+                                        ? 'border-success/30 text-success'
+                                        : status === 'due'
+                                          ? 'border-danger/30 text-danger'
+                                          : undefined
+                                }>
+                                {statusLabel(status)}
+                            </MetaChip>
+                        ) : null}
+                    </div>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                     <MetaChip>{cadenceLabel(item.cadence)}</MetaChip>
@@ -202,9 +457,8 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                         </MetaChip>
                     ) : null}
                     {jar && jarHref ? (
-                        <button
-                            type="button"
-                            onClick={() => router.push(jarHref)}
+                        <Link
+                            href={jarHref}
                             className="inline-flex items-center gap-1.5 rounded-full border border-line bg-raised py-0.5 pr-2 pl-1 outline-none hover:border-accent-hover focus-visible:ring-2 focus-visible:ring-accent/25">
                             <span
                                 className="grid size-5 place-items-center rounded-md text-[11px]"
@@ -221,11 +475,10 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                 name={jar.name}
                                 className="border-0 bg-transparent p-0"
                             />
-                        </button>
+                        </Link>
                     ) : jar ? (
                         <JarBadge jarKey={jar.key} name={jar.name} />
                     ) : null}
-                    {!item.isActive ? <MetaChip>Inactive</MetaChip> : null}
                 </div>
             </Card>
 
@@ -265,44 +518,46 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                 </dl>
             </Card>
 
-            <section className="grid gap-3">
-                <Typography as="h2" variant="eyebrow" color="primary">
-                    ✦ This period’s payment
-                </Typography>
-                <Card className="p-0">
-                    {match ? (
-                        <MoneyPartyRow
-                            title={match.counterparty?.trim() || match.description}
-                            subtitle={
-                                match.counterparty?.trim() &&
-                                match.description !== match.counterparty.trim()
-                                    ? match.description
-                                    : null
-                            }
-                            mark={partyMark(
-                                findPartyVendor(
-                                    match.counterparty?.trim() || match.description,
-                                    merchants,
-                                    givingOrgs
-                                ),
-                                catalogMarkChrome({
-                                    jarKey: jar?.key,
-                                    jarByKey,
-                                    categoryTemplates,
-                                })
-                            )}
-                            amount={formatMoney(match.amount)}
-                            amountClassName={match.amount < 0 ? 'text-fg' : 'text-success'}
-                            badges={<MetaChip>{formatBookedDate(match.bookedOn)}</MetaChip>}
-                            onClick={() => router.push(txDetailHref(match.id))}
-                        />
-                    ) : (
-                        <Typography as="p" size="sm" color="muted" className="px-5 py-4">
-                            No matching payment logged in this period yet.
-                        </Typography>
-                    )}
-                </Card>
-            </section>
+            {lifecycle === 'active' ? (
+                <section className="grid gap-3">
+                    <Typography as="h2" variant="eyebrow" color="primary">
+                        ✦ This period’s payment
+                    </Typography>
+                    <Card className="p-0">
+                        {match ? (
+                            <MoneyPartyRow
+                                title={match.counterparty?.trim() || match.description}
+                                subtitle={
+                                    match.counterparty?.trim() &&
+                                    match.description !== match.counterparty.trim()
+                                        ? match.description
+                                        : null
+                                }
+                                mark={partyMark(
+                                    findPartyVendor(
+                                        match.counterparty?.trim() || match.description,
+                                        merchants,
+                                        givingOrgs
+                                    ),
+                                    catalogMarkChrome({
+                                        jarKey: jar?.key,
+                                        jarByKey,
+                                        categoryTemplates,
+                                    })
+                                )}
+                                amount={formatMoney(match.amount)}
+                                amountClassName={match.amount < 0 ? 'text-fg' : 'text-success'}
+                                badges={<MetaChip>{formatBookedDate(match.bookedOn)}</MetaChip>}
+                                href={txDetailHref(match.id)}
+                            />
+                        ) : (
+                            <Typography as="p" size="sm" color="muted" className="px-5 py-4">
+                                No matching payment logged in this period yet.
+                            </Typography>
+                        )}
+                    </Card>
+                </section>
+            ) : null}
 
             {item.debtId ? (
                 <section className="grid gap-3">
@@ -310,13 +565,12 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                         ✦ Linked debt
                     </Typography>
                     <Card className="p-0">
-                        <button
-                            type="button"
-                            onClick={() => router.push(debtDetailHref(item.debtId!))}
+                        <Link
+                            href={debtDetailHref(item.debtId)}
                             className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left hover:bg-raised">
                             <span className="text-sm text-fg">Open linked debt</span>
                             <span className="font-mono text-xs text-accent uppercase">Open ›</span>
-                        </button>
+                        </Link>
                     </Card>
                 </section>
             ) : null}

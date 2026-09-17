@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 import type {
     Category,
@@ -78,7 +77,6 @@ export function JarCategoryBreakdown({
     givingOrgs: readonly Pick<GivingOrganisation, 'name' | 'website'>[];
     allowFixedCosts: boolean;
 }) {
-    const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
     const [openIds, setOpenIds] = useState<Set<string>>(() => new Set());
     const today = new Date();
@@ -324,9 +322,7 @@ export function JarCategoryBreakdown({
                                                                 ) : null}
                                                             </>
                                                         }
-                                                        onClick={() =>
-                                                            router.push(fixedDetailHref(item.id))
-                                                        }
+                                                        href={fixedDetailHref(item.id)}
                                                     />
                                                 </li>
                                             );
@@ -372,9 +368,7 @@ export function JarCategoryBreakdown({
                                                                 </MetaChip>
                                                             </>
                                                         }
-                                                        onClick={() =>
-                                                            router.push(txDetailHref(tx.id))
-                                                        }
+                                                        href={txDetailHref(tx.id)}
                                                     />
                                                 </li>
                                             );

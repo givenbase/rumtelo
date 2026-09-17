@@ -1,13 +1,13 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 import type { Goal } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { cn } from '@rumtelo/utils';
 
-import { updateHref } from '@/app/_lib/create-routes';
+import { goalDetailHref } from '@/app/_lib/create-routes';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 function kindLabel(goal: Goal) {
@@ -19,7 +19,6 @@ function kindLabel(goal: Goal) {
 
 /** Expandable goal row — progress detail (no per-contribution ledger yet). */
 export function JarGoalAccordion({ goals }: { goals: readonly Goal[] }) {
-    const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
     const [openId, setOpenId] = useState<string | null>(null);
 
@@ -108,12 +107,11 @@ export function JarGoalAccordion({ goals }: { goals: readonly Goal[] }) {
                                 {goal.why ? (
                                     <p className="text-sm text-fg-secondary">{goal.why}</p>
                                 ) : null}
-                                <button
-                                    type="button"
-                                    onClick={() => router.push(updateHref('goal', goal.id))}
-                                    className="font-mono text-xs font-medium tracking-wide text-accent uppercase hover:underline">
-                                    Edit goal ›
-                                </button>
+                                <Link
+                                    href={goalDetailHref(goal.id)}
+                                    className="inline-flex items-center gap-1.5 font-mono text-xs font-medium tracking-wide text-accent uppercase hover:underline">
+                                    Open goal ›
+                                </Link>
                             </div>
                         ) : null}
                     </li>

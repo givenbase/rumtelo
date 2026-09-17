@@ -25,6 +25,8 @@ export type JarDrilldownItem = Pick<
     subtitle: string;
     icon: string;
     href?: string;
+    /** Live-month allocated for current→selected delta when period-traveling. */
+    baselineAllocated?: number | null;
 };
 
 export type JarCategory = Pick<Category, 'id' | 'name' | 'budgeted' | 'actual'>;
@@ -39,6 +41,12 @@ function JarDrilldownBody({
     committedOut: number;
 }) {
     const { formatMoney } = useHouseholdCurrency();
+    const showDelta =
+        jar.baselineAllocated !== null &&
+        jar.baselineAllocated !== undefined &&
+        jar.baselineAllocated !== jar.allocated;
+    const delta = showDelta ? jar.allocated - (jar.baselineAllocated ?? 0) : 0;
+
     return (
         <>
             <span className="flex min-w-0 flex-1 items-center gap-2.5">
@@ -63,12 +71,38 @@ function JarDrilldownBody({
             />
 
             <span className="shrink-0 text-right tabular-nums">
-                <div className={cn('font-mono text-sm', jar.overspent ? 'text-danger' : 'text-fg')}>
-                    {formatMoney(jar.available)}
-                </div>
-                <div className="font-mono text-xs text-fg-faint">
-                    of {formatMoney(jar.allocated)}
-                </div>
+                {showDelta ? (
+                    <>
+                        <div
+                            className={cn(
+                                'font-mono text-sm',
+                                jar.overspent ? 'text-danger' : 'text-fg'
+                            )}>
+                            <span className="text-fg-faint">
+                                {formatMoney(jar.baselineAllocated ?? 0)}
+                            </span>
+                            <span className="mx-1 text-fg-faint">→</span>
+                            {formatMoney(jar.allocated)}
+                        </div>
+                        <div className="font-mono text-xs text-success">
+                            {delta >= 0 ? '+' : ''}
+                            {formatMoney(delta)}
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <div
+                            className={cn(
+                                'font-mono text-sm',
+                                jar.overspent ? 'text-danger' : 'text-fg'
+                            )}>
+                            {formatMoney(jar.available)}
+                        </div>
+                        <div className="font-mono text-xs text-fg-faint">
+                            of {formatMoney(jar.allocated)}
+                        </div>
+                    </>
+                )}
             </span>
         </>
     );

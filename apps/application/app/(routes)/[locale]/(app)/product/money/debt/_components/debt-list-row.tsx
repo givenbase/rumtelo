@@ -1,8 +1,8 @@
 'use client';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
+import Link from 'next/link';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 import type { Debt, MerchantPreset } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
@@ -26,6 +26,11 @@ type DebtListRowProps = {
     showPayoffRanks: boolean;
     isFocus: boolean;
     markChrome?: { fallbackIcon?: string | null; tone?: string | null };
+    /** Live balance when Looking Ahead — shows current → projected. */
+    baselineBalance?: number | null;
+    clearedByPeriod?: boolean;
+    /** e.g. "Oct 2026" when this debt clears on the plan. */
+    clearedOnLabel?: string | null;
 };
 
 /** Debt card with optional expand for schedule + recent payments (lazy get). */
@@ -36,9 +41,11 @@ export function DebtListRow({
     showPayoffRanks,
     isFocus,
     markChrome,
+    baselineBalance = null,
+    clearedByPeriod = false,
+    clearedOnLabel = null,
 }: DebtListRowProps) {
     const { householdId } = useAuth();
-    const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
     const [open, setOpen] = useState(false);
     const live = isLiveData(householdId);
@@ -59,23 +66,35 @@ export function DebtListRow({
     const hint = scheduleHint(debt, paymentsMade);
     const due = formatDueDay(debt.dueDay);
     const recent = (detailQuery.data?.payments ?? []).slice(0, 3);
+    const showDelta =
+        baselineBalance !== null &&
+        baselineBalance !== undefined &&
+        baselineBalance !== debt.balance &&
+        !clearedByPeriod;
 
     return (
         <div
             className={cn(
                 'rounded-2xl border bg-raised transition-colors',
-                isFocus ? 'border-accent/40 ring-1 ring-accent/15' : 'border-line'
+                clearedByPeriod
+                    ? 'border-success/35 bg-success/5 opacity-80'
+                    : isFocus
+                      ? 'border-accent/40 ring-1 ring-accent/15'
+                      : 'border-line'
             )}>
             <div className="flex w-full items-start gap-2 p-4.5">
-                <button
-                    type="button"
+                <Link
+                    href={debtDetailHref(debt.id)}
                     aria-label={debt.name}
-                    onClick={() => router.push(debtDetailHref(debt.id))}
-                    className="min-w-0 flex-1 cursor-pointer text-left hover:opacity-90">
+                    className="min-w-0 flex-1 text-left hover:opacity-90">
                     <div className="flex flex-wrap items-baseline justify-between gap-3">
                         <div className="flex items-center gap-3">
                             <span className="font-mono text-xs text-accent">
-                                {showPayoffRanks ? `#${payoffRank + 1}` : '·'}
+                                {clearedByPeriod
+                                    ? '✓'
+                                    : showPayoffRanks && payoffRank >= 0
+                                      ? `#${payoffRank + 1}`
+                                      : '·'}
                             </span>
                             <VendorMark
                                 name={mark.name}
@@ -86,33 +105,76 @@ export function DebtListRow({
                             />
                             <div>
                                 <div className="flex flex-wrap items-center gap-2.5">
-                                    <span className="text-base text-fg">{debt.name}</span>
-                                    <Badge
-                                        tone={
-                                            debt.interestRate >= EXPENSIVE_RATE
-                                                ? 'danger'
-                                                : 'neutral'
-                                        }>
-                                        {debt.interestRate}% interest
-                                    </Badge>
-                                    {isFocus ? <Badge tone="success">Extra goes here</Badge> : null}
+                                    <span
+                                        className={cn(
+                                            'text-base text-fg',
+                                            clearedByPeriod && 'text-fg-muted line-through'
+                                        )}>
+                                        {debt.name}
+                                    </span>
+                                    {clearedByPeriod ? (
+                                        <Badge tone="success">
+                                            {clearedOnLabel
+                                                ? `Cleared ${clearedOnLabel}`
+                                                : 'Cleared by then'}
+                                        </Badge>
+                                    ) : (
+                                        <>
+                                            <Badge
+                                                tone={
+                                                    debt.interestRate >= EXPENSIVE_RATE
+                                                        ? 'danger'
+                                                        : 'neutral'
+                                                }>
+                                                {debt.interestRate}% interest
+                                            </Badge>
+                                            {isFocus ? (
+                                                <Badge tone="success">Extra goes here</Badge>
+                                            ) : null}
+                                        </>
+                                    )}
                                 </div>
                                 <div className="mt-1 font-mono text-xs tracking-normal text-fg-faint">
-                                    {formatMoney(debt.minimumPayment)}/mo minimum
-                                    {showPayoffRanks
-                                        ? payoffRank === 0
-                                            ? ' · focus'
-                                            : ' · waiting'
-                                        : ''}
-                                    {hint ? ` · ${hint}` : ''}
+                                    {clearedByPeriod
+                                        ? clearedOnLabel
+                                            ? `Paid off ${clearedOnLabel} on this plan`
+                                            : 'Paid off on this plan'
+                                        : `${formatMoney(debt.minimumPayment)}/mo minimum${
+                                              showPayoffRanks
+                                                  ? payoffRank === 0
+                                                      ? ' · focus'
+                                                      : ' · waiting'
+                                                  : ''
+                                          }${hint ? ` · ${hint}` : ''}`}
                                 </div>
                             </div>
                         </div>
-                        <div className="font-mono text-base text-fg">
-                            {formatMoney(debt.balance)}
+                        <div className="text-right font-mono text-base text-fg">
+                            {clearedByPeriod ? (
+                                <>
+                                    <div className="text-fg-faint line-through">
+                                        {formatMoney(baselineBalance ?? debt.balance)}
+                                    </div>
+                                    <div className="text-sm text-success">{formatMoney(0)}</div>
+                                </>
+                            ) : showDelta ? (
+                                <>
+                                    <div>
+                                        <span className="text-fg-faint">
+                                            {formatMoney(baselineBalance ?? 0)}
+                                        </span>
+                                        <span className="mx-1 text-fg-faint">→</span>
+                                        <span className="text-success">
+                                            {formatMoney(debt.balance)}
+                                        </span>
+                                    </div>
+                                </>
+                            ) : (
+                                formatMoney(debt.balance)
+                            )}
                         </div>
                     </div>
-                </button>
+                </Link>
                 <button
                     type="button"
                     aria-expanded={open}
@@ -161,12 +223,11 @@ export function DebtListRow({
                             ))}
                         </ul>
                     )}
-                    <button
-                        type="button"
-                        onClick={() => router.push(debtDetailHref(debt.id))}
+                    <Link
+                        href={debtDetailHref(debt.id)}
                         className="font-mono text-xs font-medium tracking-wide text-accent uppercase hover:underline">
                         Open debt ›
-                    </button>
+                    </Link>
                 </div>
             ) : null}
         </div>

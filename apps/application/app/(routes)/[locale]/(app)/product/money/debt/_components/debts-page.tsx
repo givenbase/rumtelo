@@ -3,16 +3,15 @@
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMemo, useState } from 'react';
 
-import { useRouter } from 'next/navigation';
-
 import type { Debt } from '@rumtelo/contracts';
 import { JarKey, PayoffStrategy } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { AccentCard, Card, Eyebrow, Typography } from '@rumtelo/ui';
-import { cn } from '@rumtelo/utils';
+import { cn, describePeriodTravel, projectBalancesAfterMonths } from '@rumtelo/utils';
 
 import { CREATE_HREF } from '@/app/_lib/create-routes';
 import {
+    formatClearedMonth,
     formatDebtFreeMonth,
     orderDebtsByStrategy,
     payoffStrategyLabel,
@@ -22,10 +21,10 @@ import {
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
+import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar, ListToolbarTab } from '@/components/layout/list-toolbar';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
-
 import { DebtListRow } from './debt-list-row';
 import { DebtStrategyCoach } from './debt-strategy-coach';
 
@@ -85,13 +84,16 @@ const STRATEGY_OPTIONS = [
 
 export function DebtsPageClient() {
     const { householdId } = useAuth();
-    const router = useRouter();
+    const { period } = useAppShell();
     const { formatMoney } = useHouseholdCurrency();
     const [tab, setTab] = useState<DebtPageTab>('debts');
     const [extra, setExtra] = useState(30_000);
     const [filter, setFilter] = useState<DebtFilter>('all');
     const [sort, setSort] = useState<DebtSort>('payoff');
     const live = isLiveData(householdId);
+    const travel = describePeriodTravel(period);
+    const lookingAhead = travel.direction === 'future';
+    const monthsAhead = Math.max(0, travel.monthsDelta);
 
     const EXTRA_OPTIONS = EXTRA_OPTION_VALUES.map(value => ({
         label: value === 0 ? 'Minimum only' : `+ ${formatMoney(value)}`,
@@ -126,27 +128,60 @@ export function DebtsPageClient() {
 
     const strategy = settingsQuery.data?.money?.payoffStrategy ?? PayoffStrategy.AVALANCHE;
 
-    const debts = useMemo((): ReadonlyArray<Debt> => debtsQuery.data ?? [], [debtsQuery.data]);
+    const debtsLive = useMemo((): ReadonlyArray<Debt> => debtsQuery.data ?? [], [debtsQuery.data]);
 
-    const total = debts.reduce((running, debt) => running + debt.balance, 0);
-    const monthly = debts.reduce((running, debt) => running + debt.minimumPayment, 0);
-    const liveExtra = debts.reduce((running, debt) => running + (debt.extraPayment ?? 0), 0);
+    const liveExtra = debtsLive.reduce((running, debt) => running + (debt.extraPayment ?? 0), 0);
     const extraForSim = live ? liveExtra : extra;
     const hasExtra = extraForSim > 0;
+
+    /** Looking Ahead: balances after N months of the household payoff plan. */
+    const projected = useMemo(() => {
+        if (!lookingAhead || debtsLive.length === 0) return null;
+        return projectBalancesAfterMonths(
+            debtsLive,
+            monthsAhead,
+            strategy,
+            strategy === PayoffStrategy.MINIMAL ? 0 : extraForSim
+        );
+    }, [lookingAhead, debtsLive, monthsAhead, strategy, extraForSim]);
+
+    const debts = useMemo((): ReadonlyArray<
+        Debt & { clearedByPeriod?: boolean; clearedOn?: Date | null }
+    > => {
+        if (!projected) return debtsLive;
+        return debtsLive.map((debt, index) => {
+            const remaining = projected.balances[index] ?? debt.balance;
+            return {
+                ...debt,
+                balance: remaining,
+                clearedByPeriod: remaining <= 0.5,
+                clearedOn: projected.clearedOn[index] ?? null,
+            };
+        });
+    }, [debtsLive, projected]);
+
+    const totalLive = debtsLive.reduce((running, debt) => running + debt.balance, 0);
+    const total = debts.reduce((running, debt) => running + debt.balance, 0);
+    const monthly = debtsLive.reduce((running, debt) => running + debt.minimumPayment, 0);
+    const clearedCount = debts.filter(debt => debt.clearedByPeriod).length;
 
     const comparisons = useMemo(() => {
         const simulated = STRATEGY_OPTIONS.map(option => {
             const simExtra = option.key === PayoffStrategy.MINIMAL ? 0 : extraForSim;
-            const result = simulatePayoff(debts, option.key, simExtra);
+            const result = simulatePayoff(debtsLive, option.key, simExtra);
             return { ...option, ...result };
         });
         const ranked = rankPayoffStrategies(simulated);
         return simulated.map((option, index) => ({ ...option, ...ranked[index]! }));
-    }, [debts, extraForSim]);
+    }, [debtsLive, extraForSim]);
 
     const selected = comparisons.find(option => option.key === strategy) ?? comparisons[0]!;
     const payoffOrdered = useMemo(() => orderDebtsByStrategy(debts, strategy), [debts, strategy]);
-    const focusDebt = strategy === PayoffStrategy.MINIMAL ? null : (payoffOrdered[0] ?? null);
+    const openOrdered = useMemo(
+        () => payoffOrdered.filter(debt => !debt.clearedByPeriod),
+        [payoffOrdered]
+    );
+    const focusDebt = strategy === PayoffStrategy.MINIMAL ? null : (openOrdered[0] ?? null);
     const freedomDate = formatDebtFreeMonth(selected.debtFreeOn);
 
     const visibleDebts = useMemo(() => {
@@ -176,6 +211,11 @@ export function DebtsPageClient() {
         }
     }, [debts, filter, sort, payoffOrdered]);
 
+    const baselineById = useMemo(
+        () => new Map(debtsLive.map(debt => [debt.id, debt.balance] as const)),
+        [debtsLive]
+    );
+
     const showPayoffRanks = sort === 'payoff' && strategy !== PayoffStrategy.MINIMAL;
     const listTitle =
         sort === 'payoff'
@@ -184,31 +224,45 @@ export function DebtsPageClient() {
                 : `✦ Payoff order · ${payoffStrategyLabel(strategy)}`
             : `✦ Your debts · ${DEBT_SORTS.find(option => option.key === sort)?.label ?? 'sorted'}`;
 
+    const openDebtCount = debts.filter(debt => !debt.clearedByPeriod).length;
+
     return (
         <div className="grid animate-rise gap-8">
             <div>
                 <Typography as="span" variant="eyebrow" color="primary">
                     ✦ DEBT
+                    {lookingAhead ? ` · ${travel.relativeLabel}` : ''}
                 </Typography>
                 <Typography as="h1" className="mt-2">
-                    Debt-free by {freedomDate}.
+                    {lookingAhead && projected?.cleared
+                        ? 'Debt-free by then.'
+                        : `Debt-free by ${freedomDate}.`}
                 </Typography>
                 <Typography as="p" variant="lead" size="default" className="mt-2">
-                    Pay every minimum. Your household method decides where any extra goes — set once
-                    in Settings.
+                    {lookingAhead
+                        ? `Projected after ${monthsAhead} month${monthsAhead === 1 ? '' : 's'} on your ${payoffStrategyLabel(strategy)} plan${hasExtra ? ` (+${formatMoney(extraForSim)}/mo extra)` : ''}.`
+                        : 'Pay every minimum. Your household method decides where any extra goes — set once in Settings.'}
                 </Typography>
+                {lookingAhead && clearedCount > 0 ? (
+                    <Typography as="p" size="sm" color="muted" className="mt-1.5">
+                        {clearedCount} debt{clearedCount === 1 ? '' : 's'} cleared by then
+                        {openDebtCount > 0 ? ` · ${openDebtCount} still open` : ''}
+                    </Typography>
+                ) : null}
             </div>
 
-            <ListToolbar createLabel="+ Add debt" onCreate={() => router.push(CREATE_HREF.debt)}>
+            <ListToolbar createLabel="+ Add debt" createHref={CREATE_HREF.debt}>
                 {PAGE_TABS.map(option => (
                     <ListToolbarTab
                         key={option.key}
                         active={tab === option.key}
                         onClick={() => setTab(option.key)}>
                         {option.label}
-                        {option.key === 'debts' && debts.length > 0 ? (
+                        {option.key === 'debts' && debtsLive.length > 0 ? (
                             <span className="rounded-full bg-accent/15 px-2 py-0.5 font-mono text-xs text-accent">
-                                {debts.length}
+                                {lookingAhead
+                                    ? `${openDebtCount}/${debtsLive.length}`
+                                    : debtsLive.length}
                             </span>
                         ) : null}
                     </ListToolbarTab>
@@ -219,9 +273,19 @@ export function DebtsPageClient() {
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                     <div className="flex flex-wrap items-end gap-x-6 gap-y-3">
                         <div className="grid gap-0.5">
-                            <Eyebrow>Total debt</Eyebrow>
+                            <Eyebrow>{lookingAhead ? 'Remaining then' : 'Total debt'}</Eyebrow>
                             <p className="font-display text-xl font-semibold text-fg tabular-nums lg:text-2xl">
-                                {formatMoney(total)}
+                                {lookingAhead && total !== totalLive ? (
+                                    <>
+                                        <span className="text-fg-faint">
+                                            {formatMoney(totalLive)}
+                                        </span>
+                                        <span className="mx-1.5 text-fg-faint">→</span>
+                                        <span className="text-success">{formatMoney(total)}</span>
+                                    </>
+                                ) : (
+                                    formatMoney(total)
+                                )}
                             </p>
                         </div>
                         <div className="grid gap-0.5">
@@ -249,7 +313,9 @@ export function DebtsPageClient() {
                                     ? ' · mins only'
                                     : focusDebt
                                       ? ` · ${focusDebt.name}`
-                                      : null}
+                                      : lookingAhead && projected?.cleared
+                                        ? ' · all clear'
+                                        : null}
                             </p>
                             {hasExtra ? (
                                 <p className="font-mono text-[10px] text-fg-faint">
@@ -287,7 +353,7 @@ export function DebtsPageClient() {
 
             {tab === 'compare' ? (
                 <DebtStrategyCoach
-                    debts={debts}
+                    debts={debtsLive}
                     strategy={strategy}
                     comparisons={comparisons}
                     hasExtra={hasExtra}
@@ -349,25 +415,40 @@ export function DebtsPageClient() {
                         <div className="grid gap-3 p-5">
                             {visibleDebts.length === 0 ? (
                                 <Typography as="p" size="sm" color="muted">
-                                    {debts.length === 0
+                                    {debtsLive.length === 0
                                         ? 'No open debts yet.'
                                         : 'No debts match this filter.'}
                                 </Typography>
                             ) : (
                                 visibleDebts.map(debt => {
-                                    const payoffRank = payoffOrdered.findIndex(
+                                    const payoffRank = openOrdered.findIndex(
                                         entry => entry.id === debt.id
                                     );
-                                    const isFocus = showPayoffRanks && hasExtra && payoffRank === 0;
+                                    const isFocus =
+                                        showPayoffRanks &&
+                                        hasExtra &&
+                                        !debt.clearedByPeriod &&
+                                        payoffRank === 0;
                                     return (
                                         <DebtListRow
                                             key={debt.id}
                                             debt={debt}
                                             merchants={merchants}
-                                            payoffRank={payoffRank}
+                                            payoffRank={debt.clearedByPeriod ? -1 : payoffRank}
                                             showPayoffRanks={showPayoffRanks}
                                             isFocus={isFocus}
                                             markChrome={debtChrome}
+                                            baselineBalance={
+                                                lookingAhead
+                                                    ? (baselineById.get(debt.id) ?? null)
+                                                    : null
+                                            }
+                                            clearedByPeriod={Boolean(debt.clearedByPeriod)}
+                                            clearedOnLabel={
+                                                debt.clearedOn
+                                                    ? formatClearedMonth(debt.clearedOn)
+                                                    : null
+                                            }
                                         />
                                     );
                                 })

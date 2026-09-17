@@ -2,12 +2,11 @@
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 import { GoalKind, GoalStatus, JarKey, jarCapabilitiesFor } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card, Typography } from '@rumtelo/ui';
-import { toPeriodKey } from '@rumtelo/utils';
+import { toPeriodKey, isFixedCostCounting } from '@rumtelo/utils';
 
 import { claimFixedCostMatches } from '@/app/_lib/fixed-cost-match';
 import { jarChrome } from '@/app/_lib/jar-meta';
@@ -40,7 +39,6 @@ import {
 export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
     const { householdId } = useAuth();
     const { period } = useAppShell();
-    const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
     const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);
@@ -102,7 +100,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
 
     const fixedGroup = (byJarQuery.data ?? []).find(group => group.jarKey === jarKey);
     const fixedOut = (fixedGroup?.items ?? []).filter(
-        item => item.direction === 'OUT' && item.isActive
+        item => item.direction === 'OUT' && isFixedCostCounting(item)
     );
 
     const transactions = [...(txQuery.data?.items ?? [])].sort((left, right) =>
@@ -167,21 +165,19 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                         {caps.canSpend ? (
                             <>
                                 <Button
+                                    as={Link}
+                                    href={createMoveHref({
+                                        fromJarId: jar.id,
+                                        returnTo: `/product/money/jars/${jarKeyToSlug(jar.key)}`,
+                                    })}
                                     size="sm"
-                                    variant="secondary"
-                                    onClick={() =>
-                                        router.push(
-                                            createMoveHref({
-                                                fromJarId: jar.id,
-                                                returnTo: `/product/money/jars/${jarKeyToSlug(jar.key)}`,
-                                            })
-                                        )
-                                    }>
+                                    variant="secondary">
                                     Move between jars
                                 </Button>
                                 <Button
-                                    size="sm"
-                                    onClick={() => router.push(createTxHref({ jarId: jar.id }))}>
+                                    as={Link}
+                                    href={createTxHref({ jarId: jar.id })}
+                                    size="sm">
                                     + Add transaction
                                 </Button>
                             </>
@@ -249,12 +245,11 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                         <Typography as="h2" variant="eyebrow" color="primary">
                             ✦ Goals on this jar
                         </Typography>
-                        <button
-                            type="button"
-                            onClick={() => router.push(addGoalHref)}
+                        <Link
+                            href={addGoalHref}
                             className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
                             + Add goal
-                        </button>
+                        </Link>
                     </div>
                     <Card className="p-0">
                         <JarGoalAccordion goals={jarGoals} />
@@ -311,7 +306,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                                             badges={
                                                 <MetaChip>{formatBookedDate(tx.bookedOn)}</MetaChip>
                                             }
-                                            onClick={() => router.push(txDetailHref(tx.id))}
+                                            href={txDetailHref(tx.id)}
                                         />
                                     </li>
                                 );

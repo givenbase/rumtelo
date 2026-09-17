@@ -2,14 +2,13 @@
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 import type { Transaction } from '@rumtelo/contracts';
 import { FlowDirection, TransactionSource, TransactionStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card, Typography, VendorMark } from '@rumtelo/ui';
-import { toPeriodKey } from '@rumtelo/utils';
+import { isFixedCostCounting, toPeriodKey } from '@rumtelo/utils';
 
 import {
     debtDetailHref,
@@ -31,6 +30,7 @@ import { JarBadge, MetaChip, formatBookedDate } from '@/components/features/mone
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { EditIcon } from '@/components/features/ui/action-icons';
 
 const EMPTY_TRANSACTIONS: Transaction[] = [];
 const EMPTY_PAGE = { items: EMPTY_TRANSACTIONS, nextCursor: null };
@@ -92,13 +92,13 @@ function RelatedRow({
     label,
     value,
     hint,
-    onClick,
+    href,
     leading,
 }: {
     label: string;
     value: string;
     hint?: string | null;
-    onClick?: () => void;
+    href?: string;
     leading?: { icon: string; tone?: string | null };
 }) {
     const body = (
@@ -124,13 +124,13 @@ function RelatedRow({
                     <span className="mt-0.5 block font-mono text-[11px] text-fg-faint">{hint}</span>
                 ) : null}
             </span>
-            {onClick ? (
+            {href ? (
                 <span className="shrink-0 font-mono text-xs text-accent uppercase">Open ›</span>
             ) : null}
         </>
     );
 
-    if (!onClick) {
+    if (!href) {
         return (
             <div className="flex items-center gap-3 border-b border-line px-5 py-3.5 last:border-b-0">
                 {body}
@@ -139,12 +139,11 @@ function RelatedRow({
     }
 
     return (
-        <button
-            type="button"
-            onClick={onClick}
+        <Link
+            href={href}
             className="flex w-full items-center gap-3 border-b border-line px-5 py-3.5 text-left last:border-b-0 hover:bg-raised">
             {body}
-        </button>
+        </Link>
     );
 }
 
@@ -154,7 +153,6 @@ function RelatedRow({
 export function TransactionDetailPageClient({ transactionId }: { transactionId: string }) {
     const { householdId } = useAuth();
     const { period } = useAppShell();
-    const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
     const periodKey = toPeriodKey(period.year, period.month);
@@ -229,7 +227,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
         : undefined;
 
     const activeFixedOut = (fixedQuery.data ?? []).filter(
-        item => item.isActive && item.direction === FlowDirection.OUT
+        item => isFixedCostCounting(item) && item.direction === FlowDirection.OUT
     );
     const matchedFixed =
         tx && tx.amount < 0
@@ -285,7 +283,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                 value={jar.name}
                 hint={jar.subtitle ?? jar.key}
                 leading={{ icon: jarIcon, tone: jarTone }}
-                onClick={() => router.push(jarHref)}
+                href={jarHref}
             />
         );
     }
@@ -297,7 +295,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                 value={category.name}
                 hint={`On ${jar?.name ?? 'jar'} · planned ${formatMoney(category.budgeted)}`}
                 leading={{ icon: categoryIcon, tone: jarTone }}
-                onClick={() => router.push(jarHref)}
+                href={jarHref}
             />
         );
     }
@@ -308,7 +306,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                 label="Recurring bill"
                 value={linkedBill.counterparty?.trim() || linkedBill.name}
                 hint="Looks like this period’s payment for that bill"
-                onClick={() => router.push(fixedDetailHref(linkedBill.id))}
+                href={fixedDetailHref(linkedBill.id)}
             />
         );
     }
@@ -323,7 +321,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                         ? `${formatMoney(debt.balance)} left · ${debt.interestRate}% APR`
                         : 'Applied to a debt balance'
                 }
-                onClick={() => router.push(debtDetailHref(tx.debtId!))}
+                href={debtDetailHref(tx.debtId)}
             />
         );
     }
@@ -334,7 +332,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                 label="Sorted by rule"
                 value={`“${appliedRule.value}” → jar`}
                 hint="Manage rules on the Transactions page"
-                onClick={() => router.push('/product/money/transactions')}
+                href="/product/money/transactions"
             />
         );
     }
@@ -345,7 +343,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                 label="Needs sorting"
                 value="Still in the inbox"
                 hint="Assign a jar to include it in the budget"
-                onClick={() => router.push('/product/money/transactions')}
+                href="/product/money/transactions"
             />
         );
     }
@@ -387,10 +385,8 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                         </div>
                     </div>
                 </div>
-                <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => router.push(updateHref('tx', tx.id))}>
+                <Button as={Link} href={updateHref('tx', tx.id)} variant="secondary">
+                    <EditIcon />
                     Edit
                 </Button>
             </div>
@@ -409,10 +405,9 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                     <MetaChip>{formatBookedDate(tx.bookedOn)}</MetaChip>
-                    {jar ? (
-                        <button
-                            type="button"
-                            onClick={() => jarHref && router.push(jarHref)}
+                    {jar && jarHref ? (
+                        <Link
+                            href={jarHref}
                             className="inline-flex items-center gap-1.5 rounded-full border border-line bg-raised py-0.5 pr-2 pl-1 outline-none hover:border-accent-hover focus-visible:ring-2 focus-visible:ring-accent/25">
                             <span
                                 className="grid size-5 place-items-center rounded-md text-[11px]"
@@ -429,29 +424,44 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                                 name={jar.name}
                                 className="border-0 bg-transparent p-0"
                             />
-                        </button>
+                        </Link>
+                    ) : jar ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-raised py-0.5 pr-2 pl-1">
+                            <span
+                                className="grid size-5 place-items-center rounded-md text-[11px]"
+                                style={
+                                    jarTone
+                                        ? { background: jarTone }
+                                        : { background: 'var(--color-raised)' }
+                                }
+                                aria-hidden>
+                                {jarIcon}
+                            </span>
+                            <JarBadge
+                                jarKey={jar.key}
+                                name={jar.name}
+                                className="border-0 bg-transparent p-0"
+                            />
+                        </span>
                     ) : null}
                     {category && jarHref ? (
-                        <button
-                            type="button"
-                            onClick={() => router.push(jarHref)}
+                        <Link
+                            href={jarHref}
                             className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-2 py-0.5 font-mono text-[10px] font-medium tracking-wide text-fg-muted uppercase outline-none hover:border-accent-hover hover:text-accent focus-visible:ring-2 focus-visible:ring-accent/25">
                             <span aria-hidden>{categoryIcon}</span>
                             {category.name}
-                        </button>
+                        </Link>
                     ) : category ? (
                         <MetaChip>
                             {categoryIcon} {category.name}
                         </MetaChip>
                     ) : null}
                     {tx.debtId ? (
-                        <button
-                            type="button"
-                            onClick={() => router.push(debtDetailHref(tx.debtId!))}>
+                        <Link href={debtDetailHref(tx.debtId)}>
                             <MetaChip className="hover:border-accent-hover hover:text-accent">
                                 Debt
                             </MetaChip>
-                        </button>
+                        </Link>
                     ) : null}
                     {tx.status === TransactionStatus.INBOX ? <MetaChip>Inbox</MetaChip> : null}
                 </div>
@@ -561,7 +571,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                                                     ) : null}
                                                 </>
                                             }
-                                            onClick={() => router.push(txDetailHref(row.id))}
+                                            href={txDetailHref(row.id)}
                                         />
                                     </li>
                                 );

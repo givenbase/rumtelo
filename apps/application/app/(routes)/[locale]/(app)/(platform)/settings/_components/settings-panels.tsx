@@ -79,6 +79,7 @@ import { chrome as tourChrome, usePageTour } from '@/components/features/tour';
 import { useFeatureHelpers } from '@/components/features/helpers';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { EditIcon } from '@/components/features/ui/action-icons';
 
 import {
     SettingsInkCard,
@@ -424,6 +425,7 @@ export function AccountSettings() {
                             size="sm"
                             className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
                             onClick={beginEditProfile}>
+                            <EditIcon />
                             Edit
                         </Button>
                     )}

@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { Eyebrow, HeroNumber, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
+import { MoneyDeltaLabel } from '@/components/features/home/money-delta-label';
+
 interface KluisStat {
     label: string;
     value: string;
@@ -27,6 +29,8 @@ export function HeroKluis({
     children,
     incomeHref = '/product/growth/income',
     jarsHref = '/product/money/jars',
+    eyebrow = 'Money · Distributed this month',
+    totalDelta,
 }: {
     total: string;
     incomeBreakdown: string;
@@ -36,6 +40,15 @@ export function HeroKluis({
     incomeHref?: string;
     /** Opens the full jars list. */
     jarsHref?: string;
+    /** Override eyebrow for stacked travel (projected / accumulated). */
+    eyebrow?: string;
+    /** Current → selected delta when period-traveling. */
+    totalDelta?: {
+        fromLabel: string;
+        toLabel: string;
+        deltaLabel: string;
+        tone?: 'grow' | 'neutral';
+    } | null;
 }) {
     return (
         <div className="rounded-2xl border border-accent/30 bg-surface p-6 shadow-glow sm:p-7">
@@ -44,10 +57,22 @@ export function HeroKluis({
                 <Link
                     href={incomeHref}
                     className="group rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-accent/25">
-                    <Eyebrow>Money · Distributed this month</Eyebrow>
-                    <HeroNumber className="mt-2.5 text-4xl leading-none transition-colors group-hover:text-accent sm:text-5xl lg:text-6xl">
-                        {total}
-                    </HeroNumber>
+                    <Eyebrow>{eyebrow}</Eyebrow>
+                    {totalDelta ? (
+                        <div className="mt-2.5">
+                            <MoneyDeltaLabel
+                                fromLabel={totalDelta.fromLabel}
+                                toLabel={totalDelta.toLabel}
+                                deltaLabel={totalDelta.deltaLabel}
+                                tone={totalDelta.tone ?? 'grow'}
+                                className="font-display text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl"
+                            />
+                        </div>
+                    ) : (
+                        <HeroNumber className="mt-2.5 text-4xl leading-none transition-colors group-hover:text-accent sm:text-5xl lg:text-6xl">
+                            {total}
+                        </HeroNumber>
+                    )}
                     <Typography
                         as="p"
                         size="sm"

@@ -1,9 +1,8 @@
 'use client';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
+import Link from 'next/link';
 import { useMemo } from 'react';
-
-import { useRouter } from 'next/navigation';
 
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
@@ -33,7 +32,6 @@ function dayBefore(iso: string): string {
 export function IncomePageClient() {
     const { householdId } = useAuth();
     const { period } = useAppShell();
-    const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
     const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);
@@ -106,7 +104,7 @@ export function IncomePageClient() {
                         Spending cuts have a floor. Earning doesn't.
                     </Typography>
                 </div>
-                <Button size="sm" onClick={() => router.push(CREATE_HREF.income)}>
+                <Button as={Link} href={CREATE_HREF.income} size="sm">
                     + Add income
                 </Button>
             </div>
@@ -192,10 +190,9 @@ export function IncomePageClient() {
                     ) : (
                         <div className="grid gap-px">
                             {sources.map(source => (
-                                <button
-                                    type="button"
+                                <Link
                                     key={source.id}
-                                    onClick={() => router.push(updateHref('income', source.id))}
+                                    href={updateHref('income', source.id)}
                                     className="flex w-full items-center justify-between gap-3 border-b border-line px-4 py-2.5 text-left last:border-b-0 hover:bg-raised sm:px-5 sm:py-3">
                                     <div>
                                         <div className="text-sm text-fg">{source.name}</div>
@@ -206,7 +203,7 @@ export function IncomePageClient() {
                                     <span className="font-mono text-sm text-success">
                                         {formatMoney(source.amount)}
                                     </span>
-                                </button>
+                                </Link>
                             ))}
                         </div>
                     )}

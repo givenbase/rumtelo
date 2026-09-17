@@ -5,8 +5,6 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
-import { useRouter } from 'next/navigation';
-
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card, EmptyState, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
@@ -72,7 +70,6 @@ export function TransactionsPageClient() {
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { showToast } = useAppShell();
-    const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
     const [tab, setTab] = useState<Tab>('INBOX');
     const [ledgerLayout, setLedgerLayout] = useState<'list' | 'jar'>('list');
@@ -241,9 +238,7 @@ export function TransactionsPageClient() {
 
             <ListToolbar
                 createLabel={tab === 'IN' ? '+ Add in' : '+ Add out'}
-                onCreate={() =>
-                    router.push(createTxHref({ direction: tab === 'IN' ? 'in' : 'out' }))
-                }
+                createHref={createTxHref({ direction: tab === 'IN' ? 'in' : 'out' })}
                 secondary={
                     live && (tab === 'INBOX' || tab === 'RULES') && rules.length > 0 ? (
                         <Button
@@ -322,9 +317,7 @@ export function TransactionsPageClient() {
                                               }
                                             : undefined
                                     }
-                                    onChange={tx => {
-                                        router.push(txDetailHref(tx.id));
-                                    }}
+                                    detailHref={txDetailHref(transaction.id)}
                                 />
                             );
                         })}
@@ -434,7 +427,7 @@ export function TransactionsPageClient() {
                                                 )}
                                             </>
                                         }
-                                        onClick={() => router.push(txDetailHref(transaction.id))}
+                                        href={txDetailHref(transaction.id)}
                                     />
                                 );
                             }

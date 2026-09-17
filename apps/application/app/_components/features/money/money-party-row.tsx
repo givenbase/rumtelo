@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { VendorMark } from '@rumtelo/ui';
@@ -19,7 +20,10 @@ type MoneyPartyRowProps = {
     amount: string;
     amountClassName?: string;
     badges?: ReactNode;
-    onClick: () => void;
+    /** Prefer for pure navigation — enables prefetch + open-in-new-tab. */
+    href?: string;
+    /** Use only when navigation is conditional or follows another action. */
+    onClick?: () => void;
 };
 
 /**
@@ -32,14 +36,14 @@ export function MoneyPartyRow({
     amount,
     amountClassName,
     badges,
+    href,
     onClick,
 }: MoneyPartyRowProps) {
-    return (
-        <button
-            type="button"
-            aria-label={title}
-            onClick={onClick}
-            className="flex w-full cursor-pointer items-center gap-3 border-b border-line px-5 py-3.5 text-left last:border-b-0 hover:bg-raised">
+    const className =
+        'flex w-full cursor-pointer items-center gap-3 border-b border-line px-5 py-3.5 text-left last:border-b-0 hover:bg-raised';
+
+    const body = (
+        <>
             <VendorMark
                 name={mark.name}
                 src={mark.src}
@@ -66,6 +70,20 @@ export function MoneyPartyRow({
                 )}>
                 {amount}
             </span>
+        </>
+    );
+
+    if (href) {
+        return (
+            <Link href={href} aria-label={title} className={className}>
+                {body}
+            </Link>
+        );
+    }
+
+    return (
+        <button type="button" aria-label={title} onClick={onClick} className={className}>
+            {body}
         </button>
     );
 }

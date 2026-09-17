@@ -11,6 +11,7 @@ import type {
     Transaction,
 } from '@rumtelo/contracts';
 import { FlowDirection, jarCapabilitiesFor } from '@rumtelo/contracts';
+import { isFixedCostCounting } from '@rumtelo/utils';
 import { Typography } from '@rumtelo/ui';
 
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
@@ -59,7 +60,7 @@ export function JarDrilldownTable({
                           cost =>
                               cost.jarId === jar.id &&
                               cost.direction === FlowDirection.OUT &&
-                              cost.isActive
+                              isFixedCostCounting(cost)
                       )
                     : [];
                 const jarTxs = extras ? extras.transactions.filter(tx => tx.jarId === jar.id) : [];

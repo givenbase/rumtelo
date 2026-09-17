@@ -99,7 +99,36 @@ type FixedOutLike = {
     cadence: Cadence | string;
     direction?: string;
     isActive?: boolean;
+    /** When set with isActive false → ended; future endsOn on an active bill is still counting. */
+    endsOn?: string | null;
 };
+
+/**
+ * Lifecycle derived from stored flags — no separate status column.
+ * - active: isActive true (optional future endsOn is still a plan date)
+ * - paused: isActive false, and endsOn is missing or still in the future
+ * - ended: isActive false and endsOn is today or earlier
+ */
+export type FixedCostLifecycle = 'active' | 'paused' | 'ended';
+
+export function fixedCostLifecycle(
+    item: {
+        isActive?: boolean;
+        endsOn?: string | null;
+    },
+    asOf: string = new Date().toISOString().slice(0, 10)
+): FixedCostLifecycle {
+    if (item.isActive === false) {
+        if (item.endsOn && item.endsOn <= asOf) return 'ended';
+        return 'paused';
+    }
+    return 'active';
+}
+
+/** True when the bill should count toward jar pressure / monthly out. */
+export function isFixedCostCounting(item: { isActive?: boolean; endsOn?: string | null }): boolean {
+    return item.isActive !== false;
+}
 
 /**
  * Sum monthly-normalised OUT fixed costs.
@@ -112,7 +141,7 @@ export function sumMonthlyFixedOut(
     const activeOnly = opts?.activeOnly ?? true;
     return items.reduce((total, item) => {
         if (item.direction !== undefined && item.direction !== 'OUT') return total;
-        if (activeOnly && item.isActive === false) return total;
+        if (activeOnly && !isFixedCostCounting(item)) return total;
         return total + monthlyAmount(Math.abs(item.amount), item.cadence);
     }, 0);
 }

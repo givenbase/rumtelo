@@ -1,5 +1,6 @@
 'use client';
 
+import { CoachKind } from '@rumtelo/contracts';
 import { toPeriodKey } from '@rumtelo/utils';
 import { useLiveQuery } from '@rumtelo/hooks';
 
@@ -47,14 +48,63 @@ export function MoneyPortalHubClient() {
             ? Math.min(100, Math.round((fixed / (data?.incomeTotal ?? 1)) * 100))
             : 0;
 
+    const stacked = data?.travel?.mode === 'stacked';
+    const debtsAt = data?.debtsAtPeriod;
+    const goalsAt = data?.goalsAtPeriod ?? [];
+    const fulfilled = goalsAt.filter(goal => goal.fulfilledByPeriod).length;
+
+    const debtValue =
+        stacked && debtsAt
+            ? debtsAt.clearedByPeriod
+                ? 'Free'
+                : `${formatMoney(debtsAt.totalOriginal)} → ${formatMoney(debtsAt.totalRemaining)}`
+            : formatDebtFree(data?.debtFreeOn ?? null);
+
+    const debtNote =
+        stacked && debtsAt
+            ? debtsAt.clearedByPeriod
+                ? 'cleared by this month'
+                : `${debtsAt.monthsRemaining ?? '—'} months still to free`
+            : data?.debtMonthsRemaining !== null && data?.debtMonthsRemaining !== undefined
+              ? `${data.debtMonthsRemaining} months to free`
+              : 'the month you are free';
+
+    const jarsNote = stacked
+        ? goalsAt.length
+            ? `${fulfilled}/${goalsAt.length} goals on track · put through over ${data?.travel?.monthsHorizon ?? '—'} mo`
+            : `put through over ${data?.travel?.monthsHorizon ?? '—'} months`
+        : 'jars on track this month';
+
+    const coachMessages = data?.travelCoachText
+        ? [
+              {
+                  kind: CoachKind.WIN,
+                  text: data.travelCoachText,
+                  ctaLabel: 'See overview',
+                  ctaHref: '/',
+              },
+              ...(data.coach ?? []).map(message => ({
+                  kind: message.kind,
+                  text: message.text,
+                  ctaLabel: message.ctaLabel,
+                  ctaHref: message.ctaHref,
+              })),
+          ]
+        : (data?.coach ?? []).map(message => ({
+              kind: message.kind,
+              text: message.text,
+              ctaLabel: message.ctaLabel,
+              ctaHref: message.ctaHref,
+          }));
+
     const props: PortalHubProps = {
         ...moneyPortalShell,
-        coach: pickPortalCoach(data?.coach ?? [], moneyPortalShell.fallbackCoach),
+        coach: pickPortalCoach(coachMessages, moneyPortalShell.fallbackCoach),
         cards: [
             {
                 name: 'Jars',
                 value: `${onTrack} / ${total}`,
-                note: 'jars on track this month',
+                note: jarsNote,
                 color: 'var(--color-jar-nec)',
                 chart: { kind: 'ring', pct: ringPct },
                 href: '/product/money/jars',
@@ -62,18 +112,15 @@ export function MoneyPortalHubClient() {
             {
                 name: 'Transactions',
                 value: formatMoney(spent),
-                note: 'booked this month',
+                note: stacked ? 'booked across span' : 'booked this month',
                 color: 'var(--color-jar-play)',
                 chart: { kind: 'bars', bars: [0, 0, 0, 0, 0, 0, 0] },
                 href: '/product/money/transactions',
             },
             {
                 name: 'Debt',
-                value: formatDebtFree(data?.debtFreeOn ?? null),
-                note:
-                    data?.debtMonthsRemaining !== null && data?.debtMonthsRemaining !== undefined
-                        ? `${data.debtMonthsRemaining} months to free`
-                        : 'the month you are free',
+                value: debtValue,
+                note: debtNote,
                 color: 'var(--color-danger)',
                 chart: { kind: 'bars', bars: [0, 0, 0, 0, 0, 0, 0] },
                 href: '/product/money/debt',

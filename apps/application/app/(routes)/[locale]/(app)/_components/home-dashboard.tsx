@@ -90,6 +90,18 @@ export function HomeDashboardClient() {
         debtFreeOn: null as string | null,
         debtMonthsRemaining: null as number | null,
         why: null as string | null,
+        travel: {
+            direction: 'current' as const,
+            monthsHorizon: 1,
+            mode: 'snapshot' as const,
+            relativeLabel: 'This month',
+            daysLabel: null as string | null,
+        },
+        goalsAtPeriod: [] as const,
+        debtsAtPeriod: null,
+        baselineAllocatedTotal: null as number | null,
+        baselineJars: null,
+        travelCoachText: null as string | null,
     };
 
     const emptyMonthScore = {
@@ -157,6 +169,9 @@ export function HomeDashboardClient() {
 
     const liveData = dashboardQuery.data;
     const dashboard = liveData ?? emptyDashboard;
+    const baselineById = new Map(
+        (liveData?.baselineJars ?? []).map(jar => [jar.id, jar.allocated] as const)
+    );
     const jars: JarDrilldownItem[] = (liveData?.jars ?? []).map(jar => {
         const catalog = catalogByKey.get(jar.key);
         return {
@@ -173,14 +188,84 @@ export function HomeDashboardClient() {
             overspent: jar.overspent,
             categories: jar.categories ?? [],
             href: `/product/money/jars/${jarKeyToSlug(jar.key)}`,
+            baselineAllocated: baselineById.get(jar.id) ?? null,
         };
     });
     const monthScore = liveData?.monthScore ?? emptyMonthScore;
     const periodLabel = liveData?.periodLabel ?? formatPeriod(periodKey, 'en-US');
-    const coach: readonly CoachVerdictMessage[] =
-        live && liveData?.coach?.length ? liveData.coach : [];
+    const travelMeta = liveData?.travel ?? emptyDashboard.travel;
+    const stacked = travelMeta.mode === 'stacked';
+    const travelCoach: CoachVerdictMessage | null =
+        stacked && liveData?.travelCoachText
+            ? {
+                  id: 'period-travel',
+                  kind: CoachKind.WIN,
+                  text: liveData.travelCoachText,
+                  ctaLabel: 'See jars',
+                  ctaHref: '/product/money/jars',
+              }
+            : null;
+    const coach: readonly CoachVerdictMessage[] = (() => {
+        const feed =
+            live && liveData?.coach?.length
+                ? liveData.coach
+                : [
+                      {
+                          id: 'fallback',
+                          kind: CoachKind.NUDGE,
+                          text: dashboard.inboxCount
+                              ? `${dashboard.inboxCount} transaction${dashboard.inboxCount === 1 ? '' : 's'} waiting for a jar.`
+                              : 'All sorted — time for intention.',
+                          ctaLabel: dashboard.inboxCount ? 'Sort inbox' : 'Week check',
+                          ctaHref: dashboard.inboxCount
+                              ? '/product/money/transactions'
+                              : '/product/money/week-check',
+                      },
+                  ];
+        return travelCoach ? [travelCoach, ...feed] : feed;
+    })();
 
     const travel = describePeriodTravel(period);
+    const horizon = travelMeta.monthsHorizon;
+    const baselineTotal = dashboard.baselineAllocatedTotal;
+    const totalDelta =
+        stacked && baselineTotal !== null && baselineTotal !== undefined
+            ? {
+                  fromLabel: formatMoney(baselineTotal),
+                  toLabel: formatMoney(dashboard.allocatedTotal ?? 0),
+                  deltaLabel: `${dashboard.allocatedTotal - baselineTotal >= 0 ? '+' : ''}${formatMoney(dashboard.allocatedTotal - baselineTotal)} · ${horizon} mo`,
+                  tone: 'grow' as const,
+              }
+            : null;
+
+    const goalsAtPeriod = liveData?.goalsAtPeriod ?? [];
+    const debtsAtPeriod = liveData?.debtsAtPeriod ?? null;
+    const fulfilledGoals = goalsAtPeriod.filter(goal => goal.fulfilledByPeriod).length;
+    const travelStrip =
+        stacked && (goalsAtPeriod.length > 0 || debtsAtPeriod)
+            ? [
+                  goalsAtPeriod.length
+                      ? `${fulfilledGoals}/${goalsAtPeriod.length} goals on track by then`
+                      : null,
+                  debtsAtPeriod
+                      ? debtsAtPeriod.clearedByPeriod
+                          ? 'Debt cleared by then'
+                          : `Debt ${formatMoney(debtsAtPeriod.totalOriginal)} → ${formatMoney(debtsAtPeriod.totalRemaining)}`
+                      : null,
+              ]
+                  .filter(Boolean)
+                  .join(' · ')
+            : null;
+
+    const heroEyebrow = stacked
+        ? travel.direction === 'past'
+            ? `Money · Accumulated through ${formatPeriod(periodKey, 'en-US')}`
+            : `Money · Put through over ${horizon} month${horizon === 1 ? '' : 's'}`
+        : 'Money · Distributed this month';
+
+    const incomeBreakdown = stacked
+        ? `Across ${horizon} months · ${jars.length} jar${jars.length === 1 ? '' : 's'}`
+        : `Distributed across ${jars.length} jar${jars.length === 1 ? '' : 's'}`;
 
     return (
         <div className="grid gap-6">
@@ -192,37 +277,20 @@ export function HomeDashboardClient() {
                 <Typography as="h1" className="mt-2">
                     {periodLabel}
                 </Typography>
-                {travel.direction !== 'current' && travel.daysLabel ? (
-                    <Typography as="p" size="sm" color="muted" className="mt-1">
-                        {travel.daysLabel}
+                {travelStrip ? (
+                    <Typography as="p" size="sm" color="muted" className="mt-1.5">
+                        {travelStrip}
                     </Typography>
                 ) : null}
             </div>
 
-            <CoachVerdict
-                messages={
-                    coach.length
-                        ? coach
-                        : [
-                              {
-                                  id: 'fallback',
-                                  kind: CoachKind.NUDGE,
-                                  text: dashboard.inboxCount
-                                      ? `${dashboard.inboxCount} transaction${dashboard.inboxCount === 1 ? '' : 's'} waiting for a jar.`
-                                      : 'All sorted — time for intention.',
-                                  ctaLabel: dashboard.inboxCount ? 'Sort inbox' : 'Week check',
-                                  ctaHref: dashboard.inboxCount
-                                      ? '/product/money/transactions'
-                                      : '/product/money/week-check',
-                              },
-                          ]
-                }
-                recap={FALLBACK_RECAP}
-            />
+            <CoachVerdict messages={coach} recap={FALLBACK_RECAP} />
 
             <HeroKluis
+                eyebrow={heroEyebrow}
                 total={formatMoney(dashboard.allocatedTotal ?? 0)}
-                incomeBreakdown={`Distributed across ${jars.length} jar${jars.length === 1 ? '' : 's'}`}
+                totalDelta={totalDelta}
+                incomeBreakdown={incomeBreakdown}
                 stats={[
                     {
                         label: 'Avg left/month',
@@ -266,7 +334,7 @@ export function HomeDashboardClient() {
                     href="/product/growth"
                     stats={[
                         {
-                            label: 'INCOME THIS MONTH',
+                            label: stacked ? 'INCOME OVER SPAN' : 'INCOME THIS MONTH',
                             value: formatMoney(dashboard.incomeTotal ?? 0),
                         },
                         { label: 'INBOX', value: String(dashboard.inboxCount ?? 0) },

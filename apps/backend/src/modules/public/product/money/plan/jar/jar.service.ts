@@ -272,6 +272,70 @@ export class JarService {
 
     // Private
 
+    /**
+     * Sum sorted OUT / IN across an inclusive YYYY-MM range (Looking Back stack).
+     * Single query — do not N+1 per month.
+     */
+    async spentCreditedByJarBetween(
+        fromPeriod: string,
+        toPeriod: string
+    ): Promise<{ spent: Map<string, number>; credited: Map<string, number> }> {
+        const start = fromPeriod <= toPeriod ? fromPeriod : toPeriod;
+        const end = fromPeriod <= toPeriod ? toPeriod : fromPeriod;
+        const [spentRows, creditedRows] = await Promise.all([
+            this.em.getConnection().execute<{ jar_id: string; total: string }[]>(
+                `SELECT jar_id, COALESCE(SUM(-amount), 0)::text AS total
+             FROM money_transaction
+            WHERE household_id = ? AND status = 'SORTED' AND amount < 0
+              AND to_char(booked_on, 'YYYY-MM') >= ?
+              AND to_char(booked_on, 'YYYY-MM') <= ?
+            GROUP BY jar_id`,
+                [currentHouseholdId(), start, end]
+            ),
+            this.em.getConnection().execute<{ jar_id: string; total: string }[]>(
+                `SELECT jar_id, COALESCE(SUM(amount), 0)::text AS total
+             FROM money_transaction
+            WHERE household_id = ? AND status = 'SORTED' AND amount > 0
+              AND to_char(booked_on, 'YYYY-MM') >= ?
+              AND to_char(booked_on, 'YYYY-MM') <= ?
+            GROUP BY jar_id`,
+                [currentHouseholdId(), start, end]
+            ),
+        ]);
+        return {
+            spent: new Map(
+                spentRows.filter(row => row.jar_id).map(row => [row.jar_id, Number(row.total)])
+            ),
+            credited: new Map(
+                creditedRows.filter(row => row.jar_id).map(row => [row.jar_id, Number(row.total)])
+            ),
+        };
+    }
+
+    /** Sum category OUT across an inclusive period range. */
+    async spentByCategoryBetween(
+        fromPeriod: string,
+        toPeriod: string
+    ): Promise<Map<string, number>> {
+        const start = fromPeriod <= toPeriod ? fromPeriod : toPeriod;
+        const end = fromPeriod <= toPeriod ? toPeriod : fromPeriod;
+        const rows = await this.em
+            .getConnection()
+            .execute<{ category_id: string; total: string }[]>(
+                `SELECT category_id, COALESCE(SUM(-amount), 0)::text AS total
+             FROM money_transaction
+            WHERE household_id = ? AND status = 'SORTED' AND amount < 0
+              AND category_id IS NOT NULL
+              AND to_char(booked_on, 'YYYY-MM') >= ?
+              AND to_char(booked_on, 'YYYY-MM') <= ?
+            GROUP BY category_id`,
+                [currentHouseholdId(), start, end]
+            );
+        return new Map(
+            rows.filter(row => row.category_id).map(row => [row.category_id, Number(row.total)])
+        );
+    }
+
     /** One grouped query rather than a per-jar round trip. */
     private async spentByJar(period: string): Promise<Map<string, number>> {
         const rows = await this.em.getConnection().execute<{ jar_id: string; total: string }[]>(

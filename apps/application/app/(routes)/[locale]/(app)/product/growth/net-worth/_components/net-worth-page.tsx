@@ -1,8 +1,7 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
-
-import { useRouter } from 'next/navigation';
 
 import { AccentCard, Button, Card, EmptyState, Eyebrow, Section, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
@@ -34,7 +33,6 @@ type FilterKey = 'all' | HoldingKind;
  * Design: Kluis Finance App.dc.html:1236-1357 (MIJN VERMOGEN).
  */
 export function NetWorthPageClient() {
-    const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
     const { byKey: catalogByKey } = useJarCatalog();
     const [filter, setFilter] = useState<FilterKey>('all');
@@ -97,10 +95,7 @@ export function NetWorthPageClient() {
                 </Typography>
             </div>
 
-            <ListToolbar
-                createLabel="+ Add asset"
-                onCreate={() => router.push(CREATE_HREF.asset)}
-            />
+            <ListToolbar createLabel="+ Add asset" createHref={CREATE_HREF.asset} />
 
             <AccentCard tint="var(--color-accent)">
                 <Typography as="span" variant="eyebrow" color="primary">
@@ -214,10 +209,11 @@ export function NetWorthPageClient() {
                                         </span>
                                     </div>
                                     <Button
+                                        as={Link}
+                                        href={CREATE_HREF.asset}
                                         size="sm"
                                         variant="secondary"
-                                        className="self-center"
-                                        onClick={() => router.push(CREATE_HREF.asset)}>
+                                        className="self-center">
                                         + Add asset
                                     </Button>
                                 </div>
@@ -226,10 +222,9 @@ export function NetWorthPageClient() {
                                         const jar = catalogByKey.get(holding.jarKey);
                                         const pays = !holding.locked && holding.flow > 0;
                                         return (
-                                            <button
+                                            <Link
                                                 key={holding.id}
-                                                type="button"
-                                                onClick={() => router.push(CREATE_HREF.asset)}
+                                                href={CREATE_HREF.asset}
                                                 className={cn(
                                                     'grid cursor-pointer gap-0 overflow-hidden rounded-xl border bg-raised text-left transition-colors hover:border-accent-hover',
                                                     pays
@@ -295,7 +290,7 @@ export function NetWorthPageClient() {
                                                         </span>
                                                     </div>
                                                 </div>
-                                            </button>
+                                            </Link>
                                         );
                                     })}
                                 </div>

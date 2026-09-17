@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 import { FlowDirection, jarCapabilitiesFor } from '@rumtelo/contracts';
+import { isFixedCostCounting } from '@rumtelo/utils';
 
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { JarCategoryBreakdown } from '@/components/features/money/jar-category-breakdown';
@@ -25,7 +26,10 @@ export function JarDrilldownRow({
     const href = jar.href ?? (jar.key ? `/product/money/jars/${jarKeyToSlug(jar.key)}` : undefined);
     const jarFixed = extras
         ? extras.fixedCosts.filter(
-              row => row.jarId === jar.id && row.direction === FlowDirection.OUT && row.isActive
+              row =>
+                  row.jarId === jar.id &&
+                  row.direction === FlowDirection.OUT &&
+                  isFixedCostCounting(row)
           )
         : [];
     const jarTxs = extras ? extras.transactions.filter(tx => tx.jarId === jar.id) : [];

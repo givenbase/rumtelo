@@ -3,7 +3,6 @@
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -46,6 +45,7 @@ import { MetaChip, formatBookedDate, formatDueDay } from '@/components/features/
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { EditIcon } from '@/components/features/ui/action-icons';
 
 const paymentSchema = z.object({
     amount: z
@@ -66,7 +66,6 @@ type PaymentFormValues = z.infer<typeof paymentSchema>;
  */
 export function DebtDetailPageClient({ debtId }: { debtId: string }) {
     const { householdId } = useAuth();
-    const router = useRouter();
     const queryClient = useQueryClient();
     const { formatMoney, symbol } = useHouseholdCurrency();
     const { showToast } = useAppShell();
@@ -226,10 +225,8 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
                     <Button type="button" onClick={openPay}>
                         Record payment
                     </Button>
-                    <Button
-                        type="button"
-                        variant="secondary"
-                        onClick={() => router.push(updateHref('debt', debt.id))}>
+                    <Button as={Link} href={updateHref('debt', debt.id)} variant="secondary">
+                        <EditIcon />
                         Edit
                     </Button>
                 </div>
@@ -405,7 +402,7 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
                                 subtitle={formatBookedDate(payment.bookedOn)}
                                 mark={paymentMark}
                                 amount={formatMoney(Math.abs(payment.amount))}
-                                onClick={() => router.push(txDetailHref(payment.id))}
+                                href={txDetailHref(payment.id)}
                             />
                         );
                     })
@@ -436,7 +433,7 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
                         )}
                         amount={formatMoney(detail.linkedFixedCost.amount)}
                         badges={<MetaChip>Necessities</MetaChip>}
-                        onClick={() => router.push(fixedDetailHref(detail.linkedFixedCost!.id))}
+                        href={fixedDetailHref(detail.linkedFixedCost.id)}
                     />
                 ) : (
                     <div className="flex flex-wrap items-center justify-between gap-3">

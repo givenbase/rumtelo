@@ -7,7 +7,8 @@
         ".": "./src/index.ts"
     },
     "scripts": {
-        "check-types": "tsc --noEmit"
+        "check-types": "tsc --noEmit",
+        "test": "node --import tsx --test src/**/*.test.ts"
     },
     "dependencies": {
         "@rumtelo/contracts": "workspace:*",
@@ -18,6 +19,7 @@
     "devDependencies": {
         "@rumtelo/typescript-config": "workspace:*",
         "@types/node": "26.3.0",
+        "tsx": "^4.20.5",
         "typescript": "5.9.3"
     }
 }

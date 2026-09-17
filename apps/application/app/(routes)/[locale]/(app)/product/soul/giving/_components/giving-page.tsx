@@ -1,6 +1,7 @@
 'use client';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
@@ -9,13 +10,13 @@ import type { FixedCost, Goal } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus, JarKey, TransactionStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card, Meter, Section, Typography } from '@rumtelo/ui';
-import { monthlyAmount } from '@rumtelo/utils';
+import { monthlyAmount, isFixedCostCounting } from '@rumtelo/utils';
 
 import {
     createFixedHref,
     createGoalHref,
     fixedDetailHref,
-    updateHref,
+    goalDetailHref,
 } from '@/app/_lib/create-routes';
 import { cadenceLabel } from '@/app/_lib/jar-chrome';
 import { WHY_GIVE } from '@/app/_lib/giving';
@@ -102,7 +103,7 @@ export function GivingPageClient() {
     const giveFixed = useMemo((): GiveFixedRow[] => {
         const group = (fixedQuery.data ?? []).find(row => row.jarKey === JarKey.GIVE);
         return (group?.items ?? [])
-            .filter(item => item.isActive && item.direction === 'OUT')
+            .filter(item => isFixedCostCounting(item) && item.direction === 'OUT')
             .map(item => ({
                 id: item.id,
                 name: item.name,
@@ -183,14 +184,9 @@ export function GivingPageClient() {
 
             <ListToolbar
                 createLabel="+ Add a recurring gift"
-                onCreate={() =>
-                    router.push(createFixedHref({ jarId: giveJar?.id, payeeMode: 'known' }))
-                }
+                createHref={createFixedHref({ jarId: giveJar?.id, payeeMode: 'known' })}
                 secondary={
-                    <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => router.push(productPath('money/jars/give'))}>
+                    <Button as={Link} href={productPath('money/jars/give')} size="sm" variant="ghost">
                         Open the Give jar
                     </Button>
                 }
@@ -235,12 +231,11 @@ export function GivingPageClient() {
                                           : `${formatMoney(neededPerMonth)} a month would land it; ${formatMoney(monthlyPlanned)} is planned. The gap is a choice, not a failure.`
                                       : 'No date on this pledge yet.'}
                             </Typography>
-                            <button
-                                type="button"
-                                onClick={() => router.push(updateHref('goal', pledge.id))}
-                                className="w-full rounded-full border border-line-strong py-2.5 font-mono text-xs tracking-wide text-fg-muted uppercase transition-colors hover:border-accent-hover hover:text-accent">
-                                Edit pledge
-                            </button>
+                            <Link
+                                href={goalDetailHref(pledge.id)}
+                                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-line-strong py-2.5 font-mono text-xs tracking-wide text-fg-muted uppercase transition-colors hover:border-accent-hover hover:text-accent">
+                                Open pledge ›
+                            </Link>
                         </>
                     ) : (
                         <>
@@ -259,10 +254,9 @@ export function GivingPageClient() {
                                 amount that leaves Give counts toward it — nothing to move by hand.
                             </Typography>
                             <Button
-                                size="sm"
-                                onClick={() =>
-                                    router.push(createGoalHref({ kind: GoalKind.GIVE }))
-                                }>
+                                as={Link}
+                                href={createGoalHref({ kind: GoalKind.GIVE })}
+                                size="sm">
                                 Set a pledge for this year
                             </Button>
                         </>
@@ -314,7 +308,7 @@ export function GivingPageClient() {
                                                 <MetaChip>{cadenceLabel(item.cadence)}</MetaChip>
                                             </>
                                         }
-                                        onClick={() => router.push(fixedDetailHref(item.id))}
+                                        href={fixedDetailHref(item.id)}
                                     />
                                 );
                             })
@@ -372,31 +366,38 @@ export function GivingPageClient() {
                             ] as const
                         ).map(option => {
                             const on = givePickMode === option.id;
+                            if (option.id === 'coach') {
+                                return (
+                                    <button
+                                        key={option.id}
+                                        type="button"
+                                        aria-pressed={on}
+                                        onClick={() => setGivePickMode('coach')}
+                                        className={
+                                            on
+                                                ? 'rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                                : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                        }>
+                                        {option.label}
+                                    </button>
+                                );
+                            }
                             return (
-                                <button
+                                <Link
                                     key={option.id}
-                                    type="button"
+                                    href={createFixedHref({
+                                        jarId: giveJar?.id,
+                                        payeeMode: option.id,
+                                    })}
                                     aria-pressed={on}
-                                    onClick={() => {
-                                        if (option.id === 'coach') {
-                                            setGivePickMode('coach');
-                                            return;
-                                        }
-                                        setGivePickMode(option.id);
-                                        router.push(
-                                            createFixedHref({
-                                                jarId: giveJar?.id,
-                                                payeeMode: option.id,
-                                            })
-                                        );
-                                    }}
+                                    onClick={() => setGivePickMode(option.id)}
                                     className={
                                         on
                                             ? 'rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
                                             : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
                                     }>
                                     {option.label}
-                                </button>
+                                </Link>
                             );
                         })}
                     </div>

@@ -21,7 +21,7 @@ const MONTHS_SHORT = [
 
 /**
  * Persistent chrome when the selected budget month is not “now”.
- * Shows on every portal so time travel is obvious across Money / Growth / …
+ * Compact stamp only — full Looking Ahead / Looking Back narration lives in The Coach card.
  */
 export function PeriodTravelBanner() {
     const { period, setPeriod } = useAppShell();

@@ -1,15 +1,14 @@
 'use client';
 
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
-
-import { useRouter } from 'next/navigation';
 
 import type { Goal, JarBalance } from '@rumtelo/contracts';
 import { GoalStatus } from '@rumtelo/contracts';
 import { Card, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
-import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
+import { CREATE_HREF, goalDetailHref } from '@/app/_lib/create-routes';
 import { evaluateGoalPace } from '@/app/_lib/goal-pace';
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
 import { jarChrome } from '@/app/_lib/jar-meta';
@@ -95,7 +94,6 @@ export function IncomeSimulator({
     goals,
     className,
 }: IncomeSimulatorProps) {
-    const router = useRouter();
     const coachGuidesEnabled = useHelpersEnabled();
     const { formatMoney } = useHouseholdCurrency();
 
@@ -236,12 +234,11 @@ export function IncomeSimulator({
 
     const editGoalAction = (label: string) =>
         goal ? (
-            <button
-                type="button"
-                onClick={() => router.push(updateHref('goal', goal.id))}
+            <Link
+                href={goalDetailHref(goal.id)}
                 className="font-mono text-xs font-medium tracking-wide text-accent uppercase underline-offset-2 hover:underline">
                 {label} →
-            </button>
+            </Link>
         ) : null;
 
     const reachedAction = nextGoal ? (
@@ -252,12 +249,11 @@ export function IncomeSimulator({
             Next: {nextGoal.name}
         </button>
     ) : (
-        <button
-            type="button"
-            onClick={() => router.push(CREATE_HREF.goal)}
+        <Link
+            href={CREATE_HREF.goal}
             className="font-mono text-xs font-medium tracking-wide text-accent uppercase underline-offset-2 hover:underline">
             + Add goal
-        </button>
+        </Link>
     );
 
     return (
@@ -419,12 +415,11 @@ export function IncomeSimulator({
                     ) : (
                         <div className="my-4 rounded-xl border border-line bg-raised px-3.5 py-4 text-sm text-fg-secondary">
                             No goals yet. Add one to see when this income gets you there.
-                            <button
-                                type="button"
-                                onClick={() => router.push(CREATE_HREF.goal)}
+                            <Link
+                                href={CREATE_HREF.goal}
                                 className="mt-3 block font-mono text-xs font-medium tracking-wide text-accent uppercase underline-offset-2 hover:underline">
                                 + Add goal
-                            </button>
+                            </Link>
                         </div>
                     )}
 

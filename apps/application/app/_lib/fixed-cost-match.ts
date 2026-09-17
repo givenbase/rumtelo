@@ -1,7 +1,14 @@
 import type { FixedCost, Transaction } from '@rumtelo/contracts';
-import { monthlyAmount } from '@rumtelo/utils';
+import {
+    fixedCostLifecycle,
+    isFixedCostCounting,
+    monthlyAmount,
+    type FixedCostLifecycle,
+} from '@rumtelo/utils';
 
 export type FixedCostStatus = 'taken' | 'due' | 'upcoming';
+export type { FixedCostLifecycle };
+export { fixedCostLifecycle, isFixedCostCounting };
 
 function normalize(value: string | null | undefined) {
     return value?.trim().toLowerCase() ?? '';
@@ -35,6 +42,8 @@ export function fixedCostStatus(
     period: { year: number; month: number },
     today: Date = new Date()
 ): FixedCostStatus {
+    // Paused/ended bills are not “still due” — period status only applies while counting.
+    if (!isFixedCostCounting(item)) return 'upcoming';
     if (matchedTx) return 'taken';
 
     const dueDay = item.dueDay;
@@ -49,6 +58,17 @@ export function fixedCostStatus(
     if (periodIsPast) return 'due';
     if (!periodIsCurrent) return 'upcoming';
     return today.getDate() >= dueDay ? 'due' : 'upcoming';
+}
+
+export function lifecycleLabel(lifecycle: FixedCostLifecycle): string {
+    if (lifecycle === 'paused') return 'Paused';
+    if (lifecycle === 'ended') return 'Ended';
+    return 'Active';
+}
+
+/** ISO calendar date (UTC) for endsOn when ending a bill. */
+export function todayIsoDate(today: Date = new Date()): string {
+    return today.toISOString().slice(0, 10);
 }
 
 /** Match each fixed cost to at most one period payment; returns claimed tx ids + map. */

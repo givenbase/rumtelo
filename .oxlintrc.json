@@ -106,7 +106,8 @@
             "rules": {
                 "no-console": "off",
                 "id-length": "off",
-                "import/no-cycle": "off"
+                "import/no-cycle": "off",
+                "typescript/no-floating-promises": "off"
             }
         },
         {

@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { Button } from '@rumtelo/ui';
@@ -15,33 +16,42 @@ const TAB =
 export function ListToolbar({
     children,
     createLabel = '+ Add',
+    createHref,
     onCreate,
     createSlot,
     secondary,
 }: {
     children?: ReactNode;
     createLabel?: string;
-    /** Used when {@link createSlot} is omitted. */
+    /** Prefer for pure create navigation — enables prefetch. */
+    createHref?: string;
+    /** Used when {@link createHref} and {@link createSlot} are omitted. */
     onCreate?: () => void;
     /** Custom primary action (e.g. money menu). Replaces the default create button. */
     createSlot?: ReactNode;
     /** Optional actions left of create (e.g. Regels toepassen). */
     secondary?: ReactNode;
 }) {
+    const createButton = createHref ? (
+        <Button as={Link} href={createHref} size="sm">
+            {createLabel}
+        </Button>
+    ) : (
+        <Button
+            size="sm"
+            onClick={() => {
+                onCreate?.();
+            }}>
+            {createLabel}
+        </Button>
+    );
+
     return (
         <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">{children}</div>
             <div className="flex flex-wrap items-center gap-2">
                 {secondary}
-                {createSlot ?? (
-                    <Button
-                        size="sm"
-                        onClick={() => {
-                            onCreate?.();
-                        }}>
-                        {createLabel}
-                    </Button>
-                )}
+                {createSlot ?? createButton}
             </div>
         </div>
     );
