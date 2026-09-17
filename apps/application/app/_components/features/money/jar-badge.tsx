@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { cn } from '@rumtelo/utils';
 
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
-import { JAR_META } from '@/app/_lib/jar-meta';
+import { jarChrome } from '@/app/_lib/jar-meta';
 
 type JarBadgeProps = {
     jarKey?: string | null;
@@ -13,9 +13,9 @@ type JarBadgeProps = {
 
 /** Colored jar pill — used on lists so the destination is scannable, not flat text. */
 export function JarBadge({ jarKey, name, className }: JarBadgeProps) {
-    const meta = jarKey ? JAR_META.find(jar => jar.key === jarKey) : undefined;
-    const label = meta?.name ?? name?.trim();
+    const label = name?.trim();
     if (!label) return null;
+    const chrome = jarChrome(jarKey);
 
     return (
         <span
@@ -26,7 +26,7 @@ export function JarBadge({ jarKey, name, className }: JarBadgeProps) {
             <span
                 className="size-1.75 shrink-0 rounded-sm"
                 style={{
-                    background: meta ? bgClassToCssVar(meta.color) : 'var(--color-fg-faint)',
+                    background: jarKey ? bgClassToCssVar(chrome.color) : 'var(--color-fg-faint)',
                 }}
                 aria-hidden
             />

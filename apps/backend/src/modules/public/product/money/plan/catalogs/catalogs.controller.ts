@@ -10,22 +10,44 @@ import {
     GivingOrganisationService,
     GoalPresetService,
     IncomeSourcePresetService,
+    JarTemplateService,
     MerchantPresetService,
+    TransactionInPresetService,
 } from '../../../../../backoffice/product';
 import type { DebtKind, GivingCause, IncomeKind, JarKey } from '@rumtelo/contracts';
 
 @ControllerSwagger('money/catalogs', 'public')
 export class MoneyCatalogsController {
     constructor(
+        @Inject(JarTemplateService) private readonly jars: JarTemplateService,
         @Inject(CategoryTemplateService) private readonly categories: CategoryTemplateService,
         @Inject(FixedCostPresetService) private readonly fixedCosts: FixedCostPresetService,
         @Inject(DebtPresetService) private readonly debts: DebtPresetService,
         @Inject(IncomeSourcePresetService) private readonly incomes: IncomeSourcePresetService,
+        @Inject(TransactionInPresetService)
+        private readonly transactionIns: TransactionInPresetService,
         @Inject(GoalPresetService) private readonly goals: GoalPresetService,
         @Inject(MerchantPresetService) private readonly merchants: MerchantPresetService,
         @Inject(GivingOrganisationService)
         private readonly givingOrganisations: GivingOrganisationService
     ) {}
+
+    @Implement(contract.money.catalogs.jarTemplates.list)
+    listJarTemplates() {
+        return implement(contract.money.catalogs.jarTemplates.list).handler(async () => {
+            const rows = await this.jars.listActive();
+            return rows.map(template => ({
+                key: template.key,
+                name: template.name,
+                sortOrder: template.sortOrder,
+                subtitle: template.subtitle,
+                icon: template.icon,
+                defaultPercentage: Number(template.defaultPercentage),
+                capabilities: template.capabilities,
+                guide: template.guidePayload ?? null,
+            }));
+        });
+    }
 
     @Implement(contract.money.catalogs.categoryTemplates.list)
     listCategoryTemplates() {
@@ -82,7 +104,7 @@ export class MoneyCatalogsController {
                 sortOrder: preset.sortOrder,
                 kind: preset.kind,
                 icon: preset.icon,
-                suggestedLenders: preset.suggestedLenders ?? [],
+                suggestedMerchantKeys: preset.suggestedMerchantKeys ?? [],
             }));
         });
     }
@@ -104,6 +126,21 @@ export class MoneyCatalogsController {
                 }));
             }
         );
+    }
+
+    @Implement(contract.money.catalogs.transactionInPresets.list)
+    listTransactionInPresets() {
+        return implement(contract.money.catalogs.transactionInPresets.list).handler(async () => {
+            const rows = await this.transactionIns.listActive();
+            return rows.map(preset => ({
+                key: preset.key,
+                name: preset.name,
+                sortOrder: preset.sortOrder,
+                group: preset.groupLabel,
+                icon: preset.icon,
+                jarKey: preset.jarKey,
+            }));
+        });
     }
 
     @Implement(contract.money.catalogs.goalPresets.list)

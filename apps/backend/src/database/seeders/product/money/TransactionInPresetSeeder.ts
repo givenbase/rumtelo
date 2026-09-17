@@ -2,33 +2,32 @@ import type { EntityManager } from '@mikro-orm/postgresql';
 
 import { Seeder } from '@mikro-orm/seeder';
 
-import { DebtPreset } from '../../../../modules/backoffice/product/money/preset/debt/debt.entity';
-import { DEBT_PRESET_SEED } from '../../../../modules/backoffice/product/money/preset/debt/seed/debt.seed-data';
+import { TransactionInPreset } from '../../../../modules/backoffice/product/money/preset/transaction-in/transaction-in.entity';
+import { TRANSACTION_IN_PRESET_SEED } from '../../../../modules/backoffice/product/money/preset/transaction-in/seed/transaction-in.seed-data';
 
-export class DebtPresetSeeder extends Seeder {
+export class TransactionInPresetSeeder extends Seeder {
     async run(em: EntityManager): Promise<void> {
-        const keys = DEBT_PRESET_SEED.map(row => row.key);
+        const keys = TRANSACTION_IN_PRESET_SEED.map(row => row.key);
         const seedKeys = new Set<string>(keys);
-        const existingRows = await em.find(DebtPreset, {});
+        const existingRows = await em.find(TransactionInPreset, {});
         const existingByKey = new Map(existingRows.map(row => [row.key, row]));
-        for (const [sortOrder, row] of DEBT_PRESET_SEED.entries()) {
+        for (const [sortOrder, row] of TRANSACTION_IN_PRESET_SEED.entries()) {
             const existing = existingByKey.get(row.key);
-            const suggestedMerchantKeys = [...row.suggestedMerchantKeys];
             if (existing) {
                 existing.name = row.name;
-                existing.kind = row.kind;
+                existing.groupLabel = row.groupLabel;
                 existing.icon = row.icon;
-                existing.suggestedMerchantKeys = suggestedMerchantKeys;
+                existing.jarKey = row.jarKey;
                 existing.sortOrder = sortOrder;
                 existing.isActive = true;
                 continue;
             }
-            em.create(DebtPreset, {
+            em.create(TransactionInPreset, {
                 key: row.key,
                 name: row.name,
-                kind: row.kind,
+                groupLabel: row.groupLabel,
                 icon: row.icon,
-                suggestedMerchantKeys,
+                jarKey: row.jarKey,
                 sortOrder,
                 isActive: true,
             } as never);

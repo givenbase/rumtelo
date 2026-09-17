@@ -28,6 +28,9 @@ export {
     MoneyPresetModule,
     MoneyProductModule,
     MoneyTemplateModule,
+    TransactionInPreset,
+    TransactionInPresetModule,
+    TransactionInPresetService,
     requireJarTemplate,
 } from './money';
 export {

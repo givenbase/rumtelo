@@ -3,11 +3,19 @@
 import { api } from '@/app/_lib/api';
 import { useEffect, useState } from 'react';
 
-import { Currency, IncomeStability, Locale, SpendingStyle } from '@rumtelo/contracts';
+import {
+    Currency,
+    DEFAULT_JAR_SPLIT,
+    IncomeStability,
+    JarKey,
+    Locale,
+    SpendingStyle,
+} from '@rumtelo/contracts';
 import { Button, Field, Input } from '@rumtelo/ui';
 import { cn, formatMoney, currencySymbol } from '@rumtelo/utils';
 
-import { JAR_META } from '@/app/_lib/jar-meta';
+import { jarChrome } from '@/app/_lib/jar-meta';
+import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { writeHelpersEnabled } from '@/app/_lib/feature-helpers';
 import { usePageTour } from '@/components/features/tour';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
@@ -70,6 +78,17 @@ export function OnboardingOverlay() {
     const [spendingStyle, setSpendingStyle] = useState(SpendingStyle.UNKNOWN);
     const [incomeStability, setIncomeStability] = useState(IncomeStability.STABLE);
     const [pending, setPending] = useState(false);
+    const { jars: catalogJars } = useJarCatalog();
+    const displayJars =
+        catalogJars.length > 0
+            ? catalogJars
+            : (Object.values(JarKey) as JarKey[]).map(key => ({
+                  key,
+                  name: key,
+                  icon: '◇',
+                  pct: DEFAULT_JAR_SPLIT[key],
+                  text: jarChrome(key).text,
+              }));
 
     if (!session) return null;
     if (householdId) return null;
@@ -82,7 +101,7 @@ export function OnboardingOverlay() {
         setPending(true);
         try {
             const minorUnits = Math.round(parseFloat(monthlyIncome.replace(',', '.')) * 100);
-            const split = JAR_META.map(jar => ({ key: jar.key, percentage: jar.pct }));
+            const split = displayJars.map(jar => ({ key: jar.key, percentage: jar.pct }));
             const household = await api.household.onboard({
                 householdName,
                 currency,
@@ -199,7 +218,7 @@ export function OnboardingOverlay() {
 
                 {onboardingStep === 2 && (
                     <ul className="mt-4 grid gap-2">
-                        {JAR_META.map(jar => (
+                        {displayJars.map(jar => (
                             <li
                                 key={jar.key}
                                 className="flex items-center justify-between rounded-xl border border-line bg-raised px-3 py-2">

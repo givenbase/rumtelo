@@ -5,6 +5,7 @@ import { FixedCostPresetModule } from './fixed-cost';
 import { GoalPresetModule } from './goal';
 import { IncomeSourcePresetModule } from './income';
 import { MerchantPresetModule } from './merchant';
+import { TransactionInPresetModule } from './transaction-in';
 
 /** Money presets — suggestion catalogs for create forms. */
 @Module({
@@ -14,6 +15,7 @@ import { MerchantPresetModule } from './merchant';
         IncomeSourcePresetModule,
         GoalPresetModule,
         MerchantPresetModule,
+        TransactionInPresetModule,
     ],
     exports: [
         FixedCostPresetModule,
@@ -21,6 +23,7 @@ import { MerchantPresetModule } from './merchant';
         IncomeSourcePresetModule,
         GoalPresetModule,
         MerchantPresetModule,
+        TransactionInPresetModule,
     ],
 })
 export class MoneyPresetModule {}

@@ -71,7 +71,7 @@ import {
 import { isLiveData, PREVIEW_MODE } from '@/app/_lib/preview';
 import { isDemoAccountEmail } from '@rumtelo/contracts/platform';
 import { evaluateSplitCoach, pctByJarKey } from '@/app/_lib/split-coach';
-import { JAR_META } from '@/app/_lib/jar-meta';
+import { JAR_CHROME } from '@/app/_lib/jar-meta';
 import { chrome as tourChrome, usePageTour } from '@/components/features/tour';
 import { useFeatureHelpers } from '@/components/features/helpers';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
@@ -87,7 +87,9 @@ import {
 import { PlanChangeDialog } from './plan-change-dialog';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
-const JAR_COLOR: Record<string, string> = Object.fromEntries(JAR_META.map(j => [j.key, j.color]));
+const JAR_COLOR: Record<string, string> = Object.fromEntries(
+    Object.entries(JAR_CHROME).map(([key, chrome]) => [key, chrome.color])
+);
 
 const ACCOUNT_KIND_LABEL: Record<string, string> = {
     CHECKING: 'Checking',

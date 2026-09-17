@@ -12,7 +12,7 @@ import { cn } from '@rumtelo/utils';
 import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
 import { evaluateGoalPace } from '@/app/_lib/goal-pace';
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
-import { JAR_META } from '@/app/_lib/jar-meta';
+import { jarChrome } from '@/app/_lib/jar-meta';
 import { CoachMark, CoachTipCard, useHelpersEnabled } from '@/components/features/helpers';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
@@ -341,8 +341,7 @@ export function IncomeSimulator({
 
                 <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
                     {jars.map(j => {
-                        const meta = JAR_META.find(entry => entry.key === j.key);
-                        const color = meta?.color ?? 'bg-jar-nec';
+                        const color = jarChrome(j.key).color;
                         const now =
                             netCents > 0 ? Math.round((netCents * j.percentage) / 100) : null;
                         const then = Math.round((simCents * j.percentage) / 100);

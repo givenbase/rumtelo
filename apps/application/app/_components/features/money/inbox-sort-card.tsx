@@ -10,7 +10,8 @@ import { cn } from '@rumtelo/utils';
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
-import { JAR_META } from '@/app/_lib/jar-meta';
+import { jarChrome } from '@/app/_lib/jar-meta';
+import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
 import { formatBookedDate } from '@/components/features/money/jar-badge';
 
@@ -20,10 +21,6 @@ function suggestJarKey(amount: number): JarKey {
     if (amount > 0) return JarKey.NECESSITIES;
     if (Math.abs(amount) < 2_000) return JarKey.PLAY;
     return JarKey.NECESSITIES;
-}
-
-function metaForKey(key: string) {
-    return JAR_META.find(j => j.key === key) ?? JAR_META[0];
 }
 
 function resolveInitialJarId(
@@ -53,6 +50,7 @@ export function InboxSortCard({
     onChange?: (transaction: Transaction, jarId: string) => void;
 }) {
     const { formatMoney } = useHouseholdCurrency();
+    const { byKey: catalogByKey } = useJarCatalog();
     const [pickedJarId, setPickedJarId] = useState<string | null>(null);
     const [picking, setPicking] = useState(false);
     const [done, setDone] = useState(false);
@@ -64,7 +62,8 @@ export function InboxSortCard({
     }, [pickedJarId, jars, suggestedJarId, transaction.amount]);
 
     const selected = jars.find(j => j.id === jarId) ?? jars[0];
-    const meta = metaForKey(selected?.key ?? suggestJarKey(transaction.amount));
+    const suggestedKey = selected?.key ?? suggestJarKey(transaction.amount);
+    const catalog = catalogByKey.get(suggestedKey);
     const title = transaction.counterparty?.trim() || transaction.description;
     const mark = vendorMarkSrc({ name: title, logoDomain: logoDomain ?? null });
     const confident =
@@ -130,9 +129,11 @@ export function InboxSortCard({
                     </span>
                     <span
                         className="size-2 shrink-0 rounded-sm"
-                        style={{ background: bgClassToCssVar(meta.color) }}
+                        style={{ background: bgClassToCssVar(jarChrome(suggestedKey).color) }}
                     />
-                    <span className="text-sm text-fg">{selected?.name ?? meta.name}</span>
+                    <span className="text-sm text-fg">
+                        {selected?.name ?? catalog?.name ?? 'Jar'}
+                    </span>
                     {selected?.subtitle ? (
                         <span className="text-sm text-fg-muted">· {selected.subtitle}</span>
                     ) : null}
@@ -148,7 +149,6 @@ export function InboxSortCard({
                 {picking && jars.length > 0 ? (
                     <div className="flex flex-wrap gap-1.5">
                         {jars.map(jar => {
-                            const jarMeta = metaForKey(jar.key);
                             const active = jar.id === jarId;
                             return (
                                 <button
@@ -166,7 +166,9 @@ export function InboxSortCard({
                                     )}>
                                     <span
                                         className="size-1.5 rounded-sm"
-                                        style={{ background: bgClassToCssVar(jarMeta.color) }}
+                                        style={{
+                                            background: bgClassToCssVar(jarChrome(jar.key).color),
+                                        }}
                                     />
                                     {jar.name}
                                 </button>

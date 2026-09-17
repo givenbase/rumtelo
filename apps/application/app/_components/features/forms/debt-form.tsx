@@ -22,7 +22,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { DebtKind } from '@rumtelo/contracts';
 import { z } from 'zod';
 
-import { findCatalogVendor, vendorMarkSrc } from '@/app/_lib/vendor-brands';
+import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -34,6 +34,7 @@ import { ConfirmActionButton } from './confirm-action-button';
 import { FormInput } from './form-input';
 import { merchantsToNameOptions } from './merchant-name-options';
 import { PresetNameField, type NamePresetOption } from './preset-name-field';
+import type { MerchantPreset } from '@rumtelo/contracts';
 
 const moneyInput = z
     .string()
@@ -107,22 +108,18 @@ export function DebtForm({
     const debtTypes = debtTypesQuery.data ?? [];
     const merchants = merchantsQuery.data ?? [];
     const selectedType = debtTypes.find(option => option.key === typeKey) ?? null;
-    const lendersForType = selectedType?.suggestedLenders ?? [];
+    const lendersForType: MerchantPreset[] = (() => {
+        const keys = selectedType?.suggestedMerchantKeys ?? [];
+        if (keys.length === 0) return [];
+        const byKey = new Map(merchants.map(merchant => [merchant.key, merchant]));
+        return keys
+            .map(key => byKey.get(key))
+            .filter((merchant): merchant is MerchantPreset => Boolean(merchant));
+    })();
 
     /** Suggested lenders + full merchant catalog (banks, BNPL, …) for typeahead. */
     const fromMerchants = merchantsToNameOptions(merchants);
-    const knownLenderNames = new Set(fromMerchants.map(row => row.name.toLowerCase()));
-    const lenderOptions: NamePresetOption[] = [
-        ...lendersForType
-            .filter(lender => !knownLenderNames.has(lender.toLowerCase()))
-            .map(lender => ({
-                key: `suggested:${lender}`,
-                name: lender,
-                group: 'Suggested',
-            })),
-        ...fromMerchants,
-    ];
-
+    const lenderOptions: NamePresetOption[] = fromMerchants;
     const form = useForm<DebtFormValues>({
         defaultValues: {
             name: defaultValues?.name ?? '',
@@ -296,13 +293,16 @@ export function DebtForm({
                                     {lendersForType.map(lender => {
                                         const selected =
                                             selectedLenderName.toLowerCase() ===
-                                            lender.toLowerCase();
-                                        const mark = vendorMarkSrc(
-                                            findCatalogVendor(lender, merchants) ?? { name: lender }
-                                        );
+                                            lender.name.toLowerCase();
+                                        const mark = vendorMarkSrc({
+                                            key: lender.key,
+                                            name: lender.name,
+                                            logoDomain: lender.logoDomain,
+                                            website: lender.website,
+                                        });
                                         return (
                                             <button
-                                                key={lender}
+                                                key={lender.key}
                                                 type="button"
                                                 disabled={busy}
                                                 className={
@@ -311,7 +311,7 @@ export function DebtForm({
                                                         : 'inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent'
                                                 }
                                                 onClick={() =>
-                                                    form.setValue('name', lender, {
+                                                    form.setValue('name', lender.name, {
                                                         shouldValidate: true,
                                                     })
                                                 }>
@@ -320,7 +320,7 @@ export function DebtForm({
                                                     src={mark.src}
                                                     size={20}
                                                 />
-                                                {lender}
+                                                {lender.name}
                                             </button>
                                         );
                                     })}

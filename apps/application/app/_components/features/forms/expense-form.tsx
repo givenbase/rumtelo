@@ -35,10 +35,18 @@ import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
 import { ExpenseIntentField, type ExpenseIntentSelection } from './expense-intent-field';
 import { FormInput } from './form-input';
 import { PresetNameField } from './preset-name-field';
-import { resolveInflowKey, TRANSACTION_IN_PRESETS } from './transaction-in-presets';
 
 /** Category template used when logging a one-time gift (matches fixed-cost Give). */
 const DONATIONS_CATEGORY_KEY = 'DONATIONS';
+
+function resolveInflowKey(
+    label: string,
+    presets: ReadonlyArray<{ key: string; name: string }>
+): string | null {
+    const needle = label.trim().toLowerCase();
+    if (!needle) return null;
+    return presets.find(preset => preset.name.toLowerCase() === needle)?.key ?? null;
+}
 
 type GivePayeeMode = 'known' | 'coach';
 
@@ -242,6 +250,17 @@ export function ExpenseForm({
         live
     );
     const jars = useMemo(() => jarsQuery.data ?? [], [jarsQuery.data]);
+    const transactionInQuery = useLiveQuery(
+        apiQuery.money.catalogs.transactionInPresets.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [],
+        live && isIn
+    );
+    const transactionInPresets = useMemo(
+        () => transactionInQuery.data ?? [],
+        [transactionInQuery.data]
+    );
     const jarChoices = useMemo(() => {
         if (isIn) return jars;
         return jars.filter(jar => jarCapabilitiesFor(jar.key).canSpend);
@@ -658,7 +677,10 @@ export function ExpenseForm({
                                     }
                                     onChange={value => {
                                         field.onChange(value);
-                                        const resolved = resolveInflowKey(value);
+                                        const resolved = resolveInflowKey(
+                                            value,
+                                            transactionInPresets
+                                        );
                                         setInflowKey(current => {
                                             if (resolved) return resolved;
                                             if (current === 'OTHER_IN') return 'OTHER_IN';
@@ -669,14 +691,14 @@ export function ExpenseForm({
                                     onClear={() => {
                                         setInflowKey(null);
                                     }}
-                                    options={[...TRANSACTION_IN_PRESETS]}
+                                    options={transactionInPresets}
                                     placeholder="Gift, tax return…"
                                     freeTextPlaceholder="Describe where it came from…"
                                     disabled={busy}
                                     onSelect={preset => {
                                         setInflowKey(preset.key);
                                         if (lockJar) return;
-                                        const full = TRANSACTION_IN_PRESETS.find(
+                                        const full = transactionInPresets.find(
                                             candidate => candidate.key === preset.key
                                         );
                                         if (!full?.jarKey) return;

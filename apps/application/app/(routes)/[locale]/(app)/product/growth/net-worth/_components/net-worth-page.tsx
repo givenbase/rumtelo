@@ -9,7 +9,8 @@ import { cn } from '@rumtelo/utils';
 
 import { CREATE_HREF } from '@/app/_lib/create-routes';
 import { HOLDING_KINDS, type HoldingKind } from '@/app/_lib/holding-kinds';
-import { JAR_META } from '@/app/_lib/jar-meta';
+import { jarChrome } from '@/app/_lib/jar-meta';
+import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
@@ -35,6 +36,7 @@ type FilterKey = 'all' | HoldingKind;
 export function NetWorthPageClient() {
     const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
+    const { byKey: catalogByKey } = useJarCatalog();
     const [filter, setFilter] = useState<FilterKey>('all');
 
     const assetWorth = holdings.reduce((total, holding) => total + holding.value, 0);
@@ -217,7 +219,7 @@ export function NetWorthPageClient() {
                                 </div>
                                 <div className="grid gap-3.5 p-4 sm:grid-cols-2 lg:grid-cols-3">
                                     {group.items.map(holding => {
-                                        const jar = JAR_META.find(j => j.key === holding.jarKey);
+                                        const jar = catalogByKey.get(holding.jarKey);
                                         const pays = !holding.locked && holding.flow > 0;
                                         return (
                                             <button
@@ -248,17 +250,17 @@ export function NetWorthPageClient() {
                                                               ? 'Pays you monthly'
                                                               : 'Appreciates in value'}
                                                     </span>
-                                                    {jar && (
+                                                    {jar ? (
                                                         <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 py-1 font-mono text-xs tracking-widest text-fg-secondary uppercase">
                                                             <span
                                                                 className={cn(
                                                                     'size-1.75 rounded-sm',
-                                                                    jar.color
+                                                                    jarChrome(holding.jarKey).color
                                                                 )}
                                                             />
                                                             {jar.name} ›
                                                         </span>
-                                                    )}
+                                                    ) : null}
                                                     <span className="font-display text-xl leading-snug font-semibold tracking-tight text-fg">
                                                         {holding.name}
                                                     </span>

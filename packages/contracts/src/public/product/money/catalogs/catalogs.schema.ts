@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { Cadence, FlowDirection } from '../../../../common/common.enums';
 import { CatalogItemBase } from '../../../../common/common.schema';
 import { DebtKind, GivingCause, GivingEvaluator, IncomeKind, JarKey } from '../enums';
+import { JarCapabilities } from '../jar/jar.schema';
 
 /** Money company-catalog DTOs (backoffice.product.money templates + presets). */
 
@@ -31,8 +32,46 @@ export const FixedCostPreset = CatalogItemBase.extend({
 export const DebtPreset = CatalogItemBase.extend({
     kind: z.enum(DebtKind),
     icon: z.string().max(8).nullable(),
-    /** Lender name chips for "Who do you owe?" after this type is picked. */
-    suggestedLenders: z.array(z.string().min(1).max(120)),
+    /** MerchantPreset.key chips for "Who do you owe?" after this type is picked. */
+    suggestedMerchantKeys: z.array(z.string().min(1).max(64)),
+});
+
+export const JarGuideItem = z.object({
+    label: z.string().min(1).max(80),
+    icon: z.string().min(1).max(8),
+});
+
+export const JarGuideLink = z.object({
+    href: z.string().min(1).max(240),
+    label: z.string().min(1).max(80),
+    icon: z.string().min(1).max(8),
+});
+
+export const JarGuide = z.object({
+    note: z.string().min(1).max(480),
+    allowed: z.array(JarGuideItem).max(16),
+    notAllowed: z.string().min(1).max(320),
+    links: z.array(JarGuideLink).max(8),
+    subs: z
+        .array(
+            z.object({
+                label: z.string().min(1).max(80),
+                pct: z.number().min(0).max(100),
+                icon: z.string().max(8).optional(),
+            })
+        )
+        .max(8)
+        .optional(),
+    subNote: z.string().max(480).optional(),
+});
+
+export const JarTemplate = CatalogItemBase.extend({
+    subtitle: z.string().max(160).nullable(),
+    icon: z.string().max(8).nullable(),
+    /** Default share of net income (0–100). */
+    defaultPercentage: z.number().min(0).max(100),
+    capabilities: JarCapabilities,
+    guide: JarGuide.nullable(),
 });
 
 export const IncomeSourcePreset = CatalogItemBase.extend({
@@ -40,6 +79,14 @@ export const IncomeSourcePreset = CatalogItemBase.extend({
     defaultCadence: z.enum(Cadence),
     /** Emoji for the create picker; nullish until migration/seed lands. */
     icon: z.string().max(32).nullish(),
+});
+
+export const TransactionInPreset = CatalogItemBase.extend({
+    /** Picker group label (People, Official, …). */
+    group: z.string().min(1).max(64),
+    icon: z.string().max(8).nullable(),
+    /** Soft jar hint when picked; null = leave jar alone. */
+    jarKey: z.enum(JarKey).nullable(),
 });
 
 export const GoalPreset = CatalogItemBase.extend({
@@ -106,7 +153,10 @@ export type GivingOrganisation = z.infer<typeof GivingOrganisation>;
 export type CategoryTemplate = z.infer<typeof CategoryTemplate>;
 export type FixedCostPreset = z.infer<typeof FixedCostPreset>;
 export type DebtPreset = z.infer<typeof DebtPreset>;
+export type JarGuide = z.infer<typeof JarGuide>;
+export type JarTemplate = z.infer<typeof JarTemplate>;
 export type IncomeSourcePreset = z.infer<typeof IncomeSourcePreset>;
+export type TransactionInPreset = z.infer<typeof TransactionInPreset>;
 export type GoalPreset = z.infer<typeof GoalPreset>;
 export type MerchantPreset = z.infer<typeof MerchantPreset>;
 export type MerchantHighlight = z.infer<typeof MerchantHighlight>;

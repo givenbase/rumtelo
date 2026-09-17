@@ -24,7 +24,7 @@ import { jarCapabilitiesFor } from '@rumtelo/contracts';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
-import { JAR_META } from '@/app/_lib/jar-meta';
+import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { parseAmountToMinorUnits, todayIsoDate } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -304,24 +304,25 @@ export function MoveMoneyForm({
         [],
         live
     );
+    const { byKey: catalogByKey } = useJarCatalog();
 
     const jars = useMemo((): JarPick[] => {
         const balances = balancesQuery.data ?? [];
         const availableById = new Map(balances.map(row => [row.id, row.available]));
         return (jarsQuery.data ?? []).map(jar => {
-            const meta = JAR_META.find(entry => entry.key === jar.key);
+            const catalog = catalogByKey.get(jar.key);
             const caps = jar.capabilities ?? jarCapabilitiesFor(jar.key);
             return {
                 id: jar.id,
                 key: jar.key,
                 name: jar.name,
-                icon: jar.icon || meta?.icon || '◇',
+                icon: jar.icon || catalog?.icon || '◇',
                 available: availableById.has(jar.id) ? (availableById.get(jar.id) ?? 0) : null,
                 canSpend: caps.canSpend,
                 canInvest: caps.canInvest,
             };
         });
-    }, [jarsQuery.data, balancesQuery.data]);
+    }, [jarsQuery.data, balancesQuery.data, catalogByKey]);
 
     const form = useForm<MoveValues>({
         defaultValues: {

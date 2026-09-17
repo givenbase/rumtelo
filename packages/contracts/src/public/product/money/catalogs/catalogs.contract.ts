@@ -15,11 +15,16 @@ import {
     GivingOrganisation,
     GoalPreset,
     IncomeSourcePreset,
+    JarTemplate,
     MerchantPreset,
+    TransactionInPreset,
 } from './catalogs.schema';
 
 /** Nested contract object mounted at `contract.money.catalogs`. */
 export const catalogsContract = {
+    jarTemplates: {
+        list: oc.input(HouseholdScoped).output(z.array(JarTemplate)),
+    },
     categoryTemplates: {
         list: oc
             .input(HouseholdScoped.extend({ jarKey: z.enum(JarKey).nullish() }))
@@ -45,6 +50,9 @@ export const catalogsContract = {
         list: oc
             .input(HouseholdScoped.extend({ kind: z.enum(IncomeKind).nullish() }))
             .output(z.array(IncomeSourcePreset)),
+    },
+    transactionInPresets: {
+        list: oc.input(HouseholdScoped).output(z.array(TransactionInPreset)),
     },
     goalPresets: {
         list: oc

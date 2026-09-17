@@ -23,7 +23,7 @@ export type JarDrilldownItem = Pick<
     | 'categories'
 > & {
     color: string;
-    /** Display strings resolved from jar + JAR_META at the call site. */
+    /** Display strings resolved from jar + catalog at the call site. */
     subtitle: string;
     icon: string;
     href?: string;

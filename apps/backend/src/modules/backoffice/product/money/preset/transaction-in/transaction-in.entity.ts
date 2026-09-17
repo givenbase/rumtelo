@@ -1,17 +1,17 @@
 import { Entity, Enum, Property, Unique } from '@mikro-orm/core';
-import { DebtKind } from '@rumtelo/contracts';
+import { JarKey } from '@rumtelo/contracts';
 
 import { BaseEntity } from '../../../../../../common/database/base.entity';
 import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
 
 /**
- * Debt Preset Entity
+ * Transaction In Preset Entity
  *
- * Suggestion catalog for "New debt" — name + DebtKind defaults.
- * Households copy into money.debt; no jar (debts are household-level).
+ * Suggestion catalog for one-off Transaction In (gift, refund, tax return…).
+ * Households store the chosen key on money.transaction.inflow_key.
  *
- * @see money.debt — household-owned instances
+ * @see money.transaction.inflowKey
  * @see https://mikro-orm.io/docs/defining-entities
  */
 @Entity(
@@ -19,13 +19,13 @@ import { entityConfig } from '../../../../../../common/database/entity-config.ut
         schema: 'backoffice',
         domain: 'reference',
         group: 'money',
-        tableName: 'debt_preset',
+        tableName: 'transaction_in_preset',
     })
 )
 @Unique({ properties: ['key'] })
-export class DebtPreset extends BaseEntity {
+export class TransactionInPreset extends BaseEntity {
     // ? PROPERTIES
-    /** Stable catalog key (e.g. STUDENT) — never rename in place. */
+    /** Stable catalog key (e.g. TAX_RETURN) — never rename in place. */
     @Property({ length: 64 })
     key!: string;
 
@@ -33,27 +33,24 @@ export class DebtPreset extends BaseEntity {
     @Property({ length: 120 })
     name!: string;
 
-    /** Optional emoji for the debt create picker. */
+    /** Picker group label (People, Official, …). */
+    @Property({ length: 64 })
+    groupLabel!: string;
+
+    /** Optional emoji for the picker. */
     @Property({ length: 8, nullable: true })
     icon: string | null = null;
-
-    /**
-     * MerchantPreset.key chips after this type is chosen (“Who do you owe?”).
-     * Empty = free text only. Order = chip order.
-     */
-    @Property({ type: 'json', default: [] })
-    suggestedMerchantKeys: string[] = [];
 
     /** Display / seed order within the catalog. */
     @Property({ default: 0 })
     sortOrder = 0;
 
-    /** Soft-disable without deleting historical seed identity. */
+    /** Soft-disable without deleting historical inflow_key references. */
     @Property({ default: true })
     isActive = true;
 
     // ? ENUMS
-    /** Maps onto money.debt.kind when the preset is selected. */
-    @Enum(NativeEnum({ DebtKind, domain: 'money' }))
-    kind!: DebtKind;
+    /** Soft jar hint when the user picks this preset; null = leave jar alone. */
+    @Enum(NativeEnum({ JarKey, domain: 'money', nullable: true }))
+    jarKey: JarKey | null = null;
 }

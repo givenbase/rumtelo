@@ -14,7 +14,8 @@ import { formatPeriod, toPeriodKey, describePeriodTravel } from '@rumtelo/utils'
 
 import type { CoachVerdictMessage, CoachRecapItem } from '@/components/features/home/coach-verdict';
 
-import { JAR_META } from '@/app/_lib/jar-meta';
+import { jarChrome } from '@/app/_lib/jar-meta';
+import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -100,6 +101,8 @@ export function HomeDashboardClient() {
         events: [] as const,
     };
 
+    const { byKey: catalogByKey } = useJarCatalog();
+
     const dashboardQuery = useLiveQuery(
         apiQuery.money.dashboard.get.queryOptions({
             input: { householdId: householdId!, period: periodKey },
@@ -123,14 +126,14 @@ export function HomeDashboardClient() {
     const liveData = dashboardQuery.data;
     const dashboard = liveData ?? emptyDashboard;
     const jars: JarDrilldownItem[] = (liveData?.jars ?? []).map(jar => {
-        const meta = JAR_META.find(entry => entry.key === jar.key);
+        const catalog = catalogByKey.get(jar.key);
         return {
             id: jar.id,
             key: jar.key,
             name: jar.name,
-            subtitle: jar.subtitle ?? meta?.subtitle ?? '',
-            icon: jar.icon ?? meta?.icon ?? '◇',
-            color: meta?.color ?? 'bg-jar-nec',
+            subtitle: jar.subtitle ?? catalog?.subtitle ?? '',
+            icon: jar.icon ?? catalog?.icon ?? '◇',
+            color: jarChrome(jar.key).color,
             allocated: jar.allocated,
             available: jar.available,
             spent: jar.spent,

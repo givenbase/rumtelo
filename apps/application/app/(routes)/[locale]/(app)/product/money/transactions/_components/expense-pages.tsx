@@ -9,7 +9,6 @@ import type { Transaction } from '@rumtelo/contracts';
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { ExpenseForm, type ExpenseFormValues } from '@/components/features/forms/expense-form';
-import { TRANSACTION_IN_PRESETS } from '@/components/features/forms/transaction-in-presets';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 const EMPTY_TRANSACTIONS: Transaction[] = [];
@@ -64,10 +63,18 @@ export function ExpenseUpdatePage({ id, embedded = false }: { id: string; embedd
         EMPTY_TRANSACTIONS,
         live
     );
+    const transactionInQuery = useLiveQuery(
+        apiQuery.money.catalogs.transactionInPresets.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [],
+        live
+    );
 
     const fromList = listQuery.data?.items?.find(transaction => transaction.id === id);
     const fromInbox = (inboxQuery.data ?? []).find(transaction => transaction.id === id);
     const tx = fromList ?? fromInbox;
+    const transactionInPresets = transactionInQuery.data ?? [];
 
     if (live && (listQuery.isLoading || inboxQuery.isLoading) && !tx) {
         return <p className="text-sm text-fg-muted">Loading…</p>;
@@ -93,8 +100,7 @@ export function ExpenseUpdatePage({ id, embedded = false }: { id: string; embedd
                 label:
                     tx.amount >= 0
                         ? tx.counterparty?.trim() ||
-                          TRANSACTION_IN_PRESETS.find(preset => preset.key === tx.inflowKey)
-                              ?.name ||
+                          transactionInPresets.find(preset => preset.key === tx.inflowKey)?.name ||
                           ''
                         : '',
             }}

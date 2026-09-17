@@ -11,6 +11,7 @@ import { GoalPresetSeeder } from './product/money/GoalPresetSeeder';
 import { IncomeSourcePresetSeeder } from './product/money/IncomeSourcePresetSeeder';
 import { JarTemplateSeeder } from './product/money/JarTemplateSeeder';
 import { MerchantPresetSeeder } from './product/money/MerchantPresetSeeder';
+import { TransactionInPresetSeeder } from './product/money/TransactionInPresetSeeder';
 import { IncomePostureSeeder } from './product/growth/IncomePostureSeeder';
 import { LeverPresetSeeder } from './product/growth/LeverPresetSeeder';
 import { WealthStageSeeder } from './product/growth/WealthStageSeeder';
@@ -28,6 +29,7 @@ export class DatabaseSeeder extends Seeder {
             FixedCostPresetSeeder,
             DebtPresetSeeder,
             IncomeSourcePresetSeeder,
+            TransactionInPresetSeeder,
             GoalPresetSeeder,
             MerchantPresetSeeder,
             GivingOrganisationSeeder,

@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { jarCapabilitiesFor } from '@rumtelo/contracts';
+import { DEFAULT_JAR_SPLIT, jarCapabilitiesFor, JarKey } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Card } from '@rumtelo/ui';
 import { cn, monthlyAmount, fixedOutNetSummary } from '@rumtelo/utils';
@@ -14,7 +14,8 @@ import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
 import { bgClassToCssVar, cadenceLabel } from '@/app/_lib/jar-chrome';
 import { evaluateNecessitiesPressure } from '@/app/_lib/necessities-pressure';
 import { isLiveData } from '@/app/_lib/preview';
-import { JAR_META } from '@/app/_lib/jar-meta';
+import { jarChrome } from '@/app/_lib/jar-meta';
+import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { findPartyVendor, vendorMarkSrc } from '@/app/_lib/vendor-brands';
 import { CoachTipCard } from '@/components/features/helpers';
 import { JarBadge, MetaChip, formatDueDay } from '@/components/features/money/jar-badge';
@@ -67,6 +68,16 @@ export function FixedCostsPageClient() {
     );
     const merchants = merchantsQuery.data ?? [];
     const givingOrgs = givingOrgsQuery.data ?? [];
+    const { jars: catalogJars } = useJarCatalog();
+    const splitJars =
+        catalogJars.length > 0
+            ? catalogJars
+            : (Object.values(JarKey) as JarKey[]).map(key => ({
+                  key,
+                  name: key,
+                  color: jarChrome(key).color,
+                  pct: DEFAULT_JAR_SPLIT[key],
+              }));
 
     // Flatten byJar groups — keep cadence so OUT totals match jar committedOut.
     const fixedCosts =
@@ -121,23 +132,23 @@ export function FixedCostsPageClient() {
         ? fixedCosts.filter(fixedCost => fixedCost.jarKey === jarFilter)
         : fixedCosts;
 
-    const groupedFixedCosts = JAR_META.filter(jar =>
-        visibleFixedCosts.some(item => item.jarKey === jar.key)
-    ).map(jar => {
-        const items = visibleFixedCosts
-            .filter(item => item.jarKey === jar.key)
-            .slice()
-            .sort((left, right) => {
-                const leftDay = left.dueDay ?? 99;
-                const rightDay = right.dueDay ?? 99;
-                if (leftDay !== rightDay) return leftDay - rightDay;
-                return (left.counterparty ?? left.name).localeCompare(
-                    right.counterparty ?? right.name
-                );
-            });
-        const monthly = items.reduce((total, item) => total + item.monthly, 0);
-        return { jar, items, monthly };
-    });
+    const groupedFixedCosts = splitJars
+        .filter(jar => visibleFixedCosts.some(item => item.jarKey === jar.key))
+        .map(jar => {
+            const items = visibleFixedCosts
+                .filter(item => item.jarKey === jar.key)
+                .slice()
+                .sort((left, right) => {
+                    const leftDay = left.dueDay ?? 99;
+                    const rightDay = right.dueDay ?? 99;
+                    if (leftDay !== rightDay) return leftDay - rightDay;
+                    return (left.counterparty ?? left.name).localeCompare(
+                        right.counterparty ?? right.name
+                    );
+                });
+            const monthly = items.reduce((total, item) => total + item.monthly, 0);
+            return { jar, items, monthly };
+        });
 
     const necessitiesFixedMonthly = fixedCosts
         .filter(item => item.jarKey === 'NECESSITIES')
@@ -290,36 +301,38 @@ export function FixedCostsPageClient() {
                         </div>
 
                         <div className="flex flex-wrap gap-2 border-t border-line px-5 py-4">
-                            {JAR_META.filter(
-                                j =>
-                                    jarCapabilitiesFor(j.key).allowsFixedCosts &&
-                                    fixedCosts.some(fixedCost => fixedCost.jarKey === j.key)
-                            ).map(j => {
-                                const on = jarFilter === j.key;
-                                return (
-                                    <button
-                                        key={j.key}
-                                        type="button"
-                                        onClick={() =>
-                                            setJarFilter(previous =>
-                                                previous === j.key ? null : j.key
-                                            )
-                                        }
-                                        aria-pressed={on}
-                                        className={cn(
-                                            'flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
-                                            on
-                                                ? 'border-accent/40 bg-accent-soft text-accent'
-                                                : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
-                                        )}>
-                                        <span
-                                            className="size-1.75 rounded-sm"
-                                            style={{ background: bgClassToCssVar(j.color) }}
-                                        />
-                                        {j.name}
-                                    </button>
-                                );
-                            })}
+                            {splitJars
+                                .filter(
+                                    j =>
+                                        jarCapabilitiesFor(j.key as JarKey).allowsFixedCosts &&
+                                        fixedCosts.some(fixedCost => fixedCost.jarKey === j.key)
+                                )
+                                .map(j => {
+                                    const on = jarFilter === j.key;
+                                    return (
+                                        <button
+                                            key={j.key}
+                                            type="button"
+                                            onClick={() =>
+                                                setJarFilter(previous =>
+                                                    previous === j.key ? null : j.key
+                                                )
+                                            }
+                                            aria-pressed={on}
+                                            className={cn(
+                                                'flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
+                                                on
+                                                    ? 'border-accent/40 bg-accent-soft text-accent'
+                                                    : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                            )}>
+                                            <span
+                                                className="size-1.75 rounded-sm"
+                                                style={{ background: bgClassToCssVar(j.color) }}
+                                            />
+                                            {j.name}
+                                        </button>
+                                    );
+                                })}
                         </div>
                     </Card>
 
@@ -381,7 +394,7 @@ export function FixedCostsPageClient() {
                                 How this is split
                             </p>
                             <div className="flex flex-wrap gap-2">
-                                {JAR_META.map(j => (
+                                {splitJars.map(j => (
                                     <span
                                         key={j.key}
                                         className="flex items-center gap-1.5 rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary">

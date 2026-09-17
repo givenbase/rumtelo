@@ -11,8 +11,8 @@ import { monthlyAmount, toPeriodKey } from '@rumtelo/utils';
 
 import { createGoalHref, createMoveHref, createTxHref, updateHref } from '@/app/_lib/create-routes';
 import { cadenceLabel } from '@/app/_lib/jar-chrome';
-import type { JarGuideKey } from '@/app/_lib/jar-guide';
-import { JAR_META } from '@/app/_lib/jar-meta';
+import { jarChrome } from '@/app/_lib/jar-meta';
+import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { isLiveData } from '@/app/_lib/preview';
 import { findPartyVendor, vendorMarkSrc } from '@/app/_lib/vendor-brands';
@@ -36,8 +36,8 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
     const { formatMoney } = useHouseholdCurrency();
     const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);
-    const meta = JAR_META.find(entry => entry.key === jarKey);
-    const guideKey = jarKey as JarGuideKey;
+    const { byKey: catalogByKey } = useJarCatalog();
+    const catalog = catalogByKey.get(jarKey);
 
     const jarsQuery = useLiveQuery(
         apiQuery.money.jars.balances.queryOptions({
@@ -112,7 +112,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
         );
     }
 
-    const colorClass = meta?.color ?? 'bg-jar-nec';
+    const colorClass = jarChrome(jarKey).color;
     const caps = jarCapabilitiesFor(jar.key);
     const allowsFixedCosts = caps.allowsFixedCosts;
     const showGoals =
@@ -140,14 +140,14 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                 <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="flex min-w-0 items-start gap-3">
                         <span className="grid size-11 shrink-0 place-items-center rounded-xl border border-line bg-raised text-xl">
-                            {jar.icon ?? meta?.icon ?? '◇'}
+                            {jar.icon ?? catalog?.icon ?? '◇'}
                         </span>
                         <div className="grid min-w-0 gap-1">
                             <h1 className="font-display text-3xl font-semibold tracking-tight text-fg lg:text-4xl">
                                 {jar.name}
                             </h1>
                             <p className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase">
-                                {jar.subtitle ?? meta?.subtitle ?? ''} · {jar.percentage}% of net
+                                {jar.subtitle ?? catalog?.subtitle ?? ''} · {jar.percentage}% of net
                             </p>
                         </div>
                     </div>
@@ -372,7 +372,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                 </Card>
             </section>
 
-            <JarGuideCard jarKey={guideKey} jarId={jar.id} allocatedCents={jar.allocated} />
+            <JarGuideCard jarKey={jarKey} jarId={jar.id} allocatedCents={jar.allocated} />
         </div>
     );
 }

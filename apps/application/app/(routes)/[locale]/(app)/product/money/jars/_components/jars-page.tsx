@@ -12,7 +12,8 @@ import { toPeriodKey } from '@rumtelo/utils';
 import { CREATE_HREF, createTxHref } from '@/app/_lib/create-routes';
 import { necessitiesPressureFromJar } from '@/app/_lib/necessities-pressure';
 import { isLiveData } from '@/app/_lib/preview';
-import { JAR_META } from '@/app/_lib/jar-meta';
+import { jarChrome } from '@/app/_lib/jar-meta';
+import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { productPath } from '@/app/_lib/routes';
 import { JarSummaryRow } from '@/components/features/money/jar-summary-row';
 import { NecessitiesPressureCard } from '@/components/features/money/necessities-pressure-card';
@@ -43,6 +44,7 @@ export function JarsPageClient() {
         live
     );
 
+    const { byKey: catalogByKey } = useJarCatalog();
     const jars = jarsQuery.data ?? [];
     const totalPct = jars.reduce((total, j) => total + j.percentage, 0);
     const onTarget = jars.filter(j => !j.overspent).length;
@@ -101,7 +103,7 @@ export function JarsPageClient() {
 
                 <div className="grid gap-2">
                     {jars.map(jar => {
-                        const meta = JAR_META.find(entry => entry.key === jar.key);
+                        const catalog = catalogByKey.get(jar.key);
                         return (
                             <JarSummaryRow
                                 key={jar.id}
@@ -109,9 +111,9 @@ export function JarsPageClient() {
                                     id: jar.id,
                                     key: jar.key,
                                     name: jar.name,
-                                    subtitle: jar.subtitle ?? meta?.subtitle ?? '',
-                                    icon: jar.icon ?? meta?.icon ?? '◇',
-                                    color: meta?.color ?? 'bg-jar-nec',
+                                    subtitle: jar.subtitle ?? catalog?.subtitle ?? '',
+                                    icon: jar.icon ?? catalog?.icon ?? '◇',
+                                    color: jarChrome(jar.key).color,
                                     percentage: jar.percentage,
                                     allocated: jar.allocated,
                                     available: jar.available,

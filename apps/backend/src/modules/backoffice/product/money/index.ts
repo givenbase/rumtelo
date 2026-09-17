@@ -34,5 +34,8 @@ export {
     MerchantPresetModule,
     MerchantPresetService,
     MoneyPresetModule,
+    TransactionInPreset,
+    TransactionInPresetModule,
+    TransactionInPresetService,
 } from './preset';
 export { requireJarTemplate } from './require-jar-template';

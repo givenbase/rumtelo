@@ -10,4 +10,9 @@ export {
     MerchantPresetModule,
     MerchantPresetService,
 } from './merchant';
+export {
+    TransactionInPreset,
+    TransactionInPresetModule,
+    TransactionInPresetService,
+} from './transaction-in';
 export { MoneyPresetModule } from './preset.module';

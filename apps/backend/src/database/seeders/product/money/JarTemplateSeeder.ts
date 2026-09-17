@@ -18,13 +18,19 @@ export class JarTemplateSeeder extends Seeder {
                 existing.icon = row.icon;
                 existing.defaultPercentage = row.defaultPercentage;
                 existing.capabilities = { ...row.capabilities };
+                existing.guidePayload = structuredClone(row.guide);
                 existing.sortOrder = sortOrder;
                 existing.isActive = true;
                 continue;
             }
             em.create(JarTemplate, {
-                ...row,
+                key: row.key,
+                name: row.name,
+                subtitle: row.subtitle,
+                icon: row.icon,
+                defaultPercentage: row.defaultPercentage,
                 capabilities: { ...row.capabilities },
+                guidePayload: structuredClone(row.guide),
                 sortOrder,
                 isActive: true,
             } as never);

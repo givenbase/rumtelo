@@ -3,21 +3,21 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { JarKey } from '@rumtelo/contracts';
 import { cn } from '@rumtelo/utils';
 
 import { createFixedHref, createTxHref } from '@/app/_lib/create-routes';
-import { JAR_GUIDE, type JarGuideKey } from '@/app/_lib/jar-guide';
-import { JAR_META } from '@/app/_lib/jar-meta';
 import { productPath } from '@/app/_lib/routes';
 import { settingsHref } from '@/app/_lib/settings-tabs';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { GivingFinder } from '@/components/features/money/giving-finder';
 
 import { CoachMark } from './helper-mark';
 import { useHelpersEnabled } from './provider';
 
 type JarGuideCardProps = {
-    jarKey: JarGuideKey;
+    jarKey: JarKey;
     /** Household jar id — needed so Give can open a form with the org prefilled. */
     jarId?: string;
     allocatedCents?: number;
@@ -33,9 +33,10 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
     const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
     const coachGuidesEnabled = useHelpersEnabled();
-    const guide = JAR_GUIDE[jarKey];
-    const meta = JAR_META.find(entry => entry.key === jarKey);
-    const isGive = jarKey === 'GIVE';
+    const { guideFor, byKey } = useJarCatalog();
+    const guide = guideFor(jarKey);
+    const catalog = byKey.get(jarKey);
+    const isGive = jarKey === JarKey.GIVE;
 
     if (!coachGuidesEnabled || !guide) return null;
 
@@ -49,7 +50,7 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
                 <span
                     className="grid size-7 place-items-center rounded-lg bg-accent/12 text-sm"
                     aria-hidden>
-                    {meta?.icon ?? '✦'}
+                    {catalog?.icon ?? '✦'}
                 </span>
                 <h2 className="font-mono text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
                     What can I use this for?

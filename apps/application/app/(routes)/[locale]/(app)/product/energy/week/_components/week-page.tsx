@@ -4,14 +4,15 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMemo, useState } from 'react';
 
 import type { EnergySummary } from '@rumtelo/contracts';
-import { EnergyMetric, EnergyTrend } from '@rumtelo/contracts';
+import { DEFAULT_JAR_SPLIT, EnergyMetric, EnergyTrend, JarKey } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Card, Eyebrow, Section } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { isLiveData } from '@/app/_lib/preview';
 import { DEFAULT_SLEEP_HOURS } from '@/app/_lib/energy-constants';
-import { JAR_META } from '@/app/_lib/jar-meta';
+import { jarChrome } from '@/app/_lib/jar-meta';
+import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 const DEFAULT_STEERED_HOURS = 40;
@@ -48,6 +49,18 @@ export function WeekPageClient() {
     const { householdId } = useAuth();
     const live = isLiveData(householdId);
     const [steeredHours, setSteeredHours] = useState(DEFAULT_STEERED_HOURS);
+    const { jars: catalogJars } = useJarCatalog();
+    const hourJars =
+        catalogJars.length > 0
+            ? catalogJars
+            : (Object.values(JarKey) as JarKey[]).map(key => ({
+                  key,
+                  name: key,
+                  icon: '◇',
+                  subtitle: '',
+                  pct: DEFAULT_JAR_SPLIT[key],
+                  text: jarChrome(key).text,
+              }));
 
     const summaryQuery = useLiveQuery(
         apiQuery.energy.logs.summary.queryOptions({ input: { householdId: householdId! } }),
@@ -168,7 +181,7 @@ export function WeekPageClient() {
 
                 {/* ── Per-jar hour cards ── */}
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                    {JAR_META.map(j => {
+                    {hourJars.map(j => {
                         const hours = Math.round((steeredHours * j.pct) / 100);
                         return (
                             <div

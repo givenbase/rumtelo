@@ -1,5 +1,5 @@
 import { Entity, Enum, Property, Unique } from '@mikro-orm/core';
-import { JarKey, type JarCapabilities } from '@rumtelo/contracts';
+import { JarKey, type JarCapabilities, type JarGuide } from '@rumtelo/contracts';
 
 import { BaseEntity } from '../../../../../../common/database/base.entity';
 import { NativeEnum } from '../../../../../../common/database/native-enum.util';
@@ -42,6 +42,10 @@ export class JarTemplate extends BaseEntity {
     /** Display / seed order within the catalog. */
     @Property({ default: 0 })
     sortOrder = 0;
+
+    /** Coach helper copy — what belongs in this jar. */
+    @Property({ type: 'json', nullable: true })
+    guidePayload: JarGuide | null = null;
 
     /**
      * What jars of this key may do (spend / save / invest / safe-to-spend).

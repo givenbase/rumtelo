@@ -1,60 +1,24 @@
-import { DEFAULT_JAR_SPLIT, JarKey } from '@rumtelo/contracts';
+import { JarKey } from '@rumtelo/contracts';
 
-/** Jar catalogue — names, icons, colors. Default % from contracts DEFAULT_JAR_SPLIT. */
+/**
+ * Client-only jar chrome (Tailwind token classes).
+ * Names / icons / % / guide come from catalogs.jarTemplates (DB).
+ */
+export const JAR_CHROME: Record<JarKey, { color: string; text: string }> = {
+    [JarKey.NECESSITIES]: { color: 'bg-jar-nec', text: 'text-jar-nec' },
+    [JarKey.FINANCIAL_FREEDOM]: { color: 'bg-jar-ff', text: 'text-jar-ff' },
+    [JarKey.LONG_TERM_SAVINGS]: { color: 'bg-jar-lts', text: 'text-jar-lts' },
+    [JarKey.EDUCATION]: { color: 'bg-jar-edu', text: 'text-jar-edu' },
+    [JarKey.PLAY]: { color: 'bg-jar-play', text: 'text-jar-play' },
+    [JarKey.GIVE]: { color: 'bg-jar-give', text: 'text-jar-give' },
+};
 
-export const JAR_META = [
-    {
-        key: JarKey.NECESSITIES,
-        name: 'Necessity',
-        subtitle: 'Must-pays',
-        icon: '🏠',
-        pct: DEFAULT_JAR_SPLIT[JarKey.NECESSITIES],
-        color: 'bg-jar-nec',
-        text: 'text-jar-nec',
-    },
-    {
-        key: JarKey.FINANCIAL_FREEDOM,
-        name: 'Financial Freedom',
-        subtitle: 'Never spend',
-        icon: '🔒',
-        pct: DEFAULT_JAR_SPLIT[JarKey.FINANCIAL_FREEDOM],
-        color: 'bg-jar-ff',
-        text: 'text-jar-ff',
-    },
-    {
-        key: JarKey.LONG_TERM_SAVINGS,
-        name: 'Long Term Savings',
-        subtitle: 'Big things',
-        icon: '🎯',
-        pct: DEFAULT_JAR_SPLIT[JarKey.LONG_TERM_SAVINGS],
-        color: 'bg-jar-lts',
-        text: 'text-jar-lts',
-    },
-    {
-        key: JarKey.EDUCATION,
-        name: 'Education',
-        subtitle: 'Grow yourself',
-        icon: '📚',
-        pct: DEFAULT_JAR_SPLIT[JarKey.EDUCATION],
-        color: 'bg-jar-edu',
-        text: 'text-jar-edu',
-    },
-    {
-        key: JarKey.PLAY,
-        name: 'Play',
-        subtitle: 'Guilt-free',
-        icon: '✨',
-        pct: DEFAULT_JAR_SPLIT[JarKey.PLAY],
-        color: 'bg-jar-play',
-        text: 'text-jar-play',
-    },
-    {
-        key: JarKey.GIVE,
-        name: 'Give / foundation',
-        subtitle: 'Pass it on',
-        icon: '🤲',
-        pct: DEFAULT_JAR_SPLIT[JarKey.GIVE],
-        color: 'bg-jar-give',
-        text: 'text-jar-give',
-    },
-] as const;
+export function jarChrome(key: string | null | undefined): {
+    color: string;
+    text: string;
+} {
+    if (key && Object.prototype.hasOwnProperty.call(JAR_CHROME, key)) {
+        return JAR_CHROME[key as JarKey];
+    }
+    return JAR_CHROME[JarKey.NECESSITIES];
+}
