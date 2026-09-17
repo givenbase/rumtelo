@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Button, Card, EmptyState, VendorMark } from '@rumtelo/ui';
+import { Button, Card, EmptyState } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import {
@@ -28,6 +28,8 @@ import { matchMerchantJarKey } from '@/app/_lib/merchant-match';
 import { isLiveData } from '@/app/_lib/preview';
 import { vendorMarkSrc, findCatalogVendorFromFeed } from '@/app/_lib/vendor-brands';
 import { InboxSortCard } from '@/components/features/money/inbox-sort-card';
+import { JarBadge, MetaChip, formatBookedDate } from '@/components/features/money/jar-badge';
+import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar } from '@/components/layout/list-toolbar';
@@ -330,60 +332,48 @@ export function TransactionsPageClient() {
                                             name: title,
                                         }
                                     );
-                                    const detailParts = [
+                                    const subtitle = [
                                         transaction.note?.trim() || null,
                                         !transaction.note?.trim() &&
                                         transaction.counterparty?.trim() &&
                                         transaction.description !== transaction.counterparty.trim()
                                             ? transaction.description
                                             : null,
-                                    ].filter(Boolean);
+                                    ]
+                                        .filter(Boolean)
+                                        .join(' · ');
                                     return (
-                                        <button
-                                            type="button"
+                                        <MoneyPartyRow
                                             key={transaction.id}
-                                            aria-label={title}
+                                            title={title}
+                                            subtitle={subtitle || null}
+                                            mark={mark}
+                                            amount={formatMoney(transaction.amount, {
+                                                signed: true,
+                                            })}
+                                            amountClassName={
+                                                transaction.amount < 0 ? 'text-fg' : 'text-success'
+                                            }
+                                            badges={
+                                                <>
+                                                    <MetaChip>
+                                                        {formatBookedDate(transaction.bookedOn)}
+                                                    </MetaChip>
+                                                    {transaction.status ===
+                                                    TransactionStatus.INBOX ? (
+                                                        <MetaChip>Inbox</MetaChip>
+                                                    ) : (
+                                                        <JarBadge
+                                                            jarKey={jar?.key}
+                                                            name={jar?.name}
+                                                        />
+                                                    )}
+                                                </>
+                                            }
                                             onClick={() =>
                                                 router.push(updateHref('tx', transaction.id))
                                             }
-                                            className="grid w-full gap-1 border-b border-line px-5 py-3.5 text-left last:border-b-0 hover:bg-raised">
-                                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                                                <VendorMark
-                                                    name={mark.name}
-                                                    src={mark.src}
-                                                    size={24}
-                                                />
-                                                <span className="min-w-0 flex-1 text-sm text-fg">
-                                                    {title}
-                                                    {detailParts.length > 0 ? (
-                                                        <span className="text-fg-muted">
-                                                            {' '}
-                                                            · {detailParts.join(' · ')}
-                                                        </span>
-                                                    ) : null}
-                                                </span>
-                                                <span
-                                                    className={cn(
-                                                        'font-mono text-sm',
-                                                        transaction.amount < 0
-                                                            ? 'text-fg'
-                                                            : 'text-success'
-                                                    )}>
-                                                    {formatMoney(transaction.amount, {
-                                                        signed: true,
-                                                    })}
-                                                </span>
-                                            </div>
-                                            <div className="flex flex-wrap gap-x-2 font-mono text-xs tracking-wide text-fg-faint uppercase">
-                                                <span>{transaction.bookedOn}</span>
-                                                <span>·</span>
-                                                <span>
-                                                    {transaction.status === TransactionStatus.INBOX
-                                                        ? 'Inbox'
-                                                        : (jar?.name ?? 'No jar')}
-                                                </span>
-                                            </div>
-                                        </button>
+                                        />
                                     );
                                 })
                             )}

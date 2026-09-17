@@ -12,11 +12,15 @@ import { Button, Card, Eyebrow, Meter, Section } from '@rumtelo/ui';
 import { monthlyAmount } from '@rumtelo/utils';
 
 import { createFixedHref, createGoalHref, updateHref } from '@/app/_lib/create-routes';
+import { cadenceLabel } from '@/app/_lib/jar-chrome';
 import { WHY_GIVE } from '@/app/_lib/giving';
 import { isLiveData } from '@/app/_lib/preview';
 import { productPath } from '@/app/_lib/routes';
+import { findPartyVendor, vendorMarkSrc } from '@/app/_lib/vendor-brands';
 import { CoachMark, CoachTipCard, HelperGate } from '@/components/features/helpers';
 import { GivingFinder } from '@/components/features/money/giving-finder';
+import { MetaChip, formatDueDay } from '@/components/features/money/jar-badge';
+import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -38,7 +42,9 @@ type GivePledge = Pick<
     | 'fulfilledOn'
 >;
 
-type GiveFixedRow = Pick<FixedCost, 'id' | 'name' | 'counterparty'> & { monthly: number };
+type GiveFixedRow = Pick<FixedCost, 'id' | 'name' | 'counterparty' | 'cadence' | 'dueDay'> & {
+    monthly: number;
+};
 
 function yearStartIso(): string {
     return `${new Date().getUTCFullYear()}-01-01`;
@@ -93,10 +99,28 @@ export function GivingPageClient() {
                 id: item.id,
                 name: item.name,
                 counterparty: item.counterparty,
+                cadence: item.cadence,
+                dueDay: item.dueDay,
                 monthly: monthlyAmount(Math.abs(item.amount), item.cadence),
             }));
     }, [fixedQuery.data]);
     const monthlyPlanned = giveFixed.reduce((total, item) => total + item.monthly, 0);
+    const merchantsQuery = useLiveQuery(
+        apiQuery.money.catalogs.merchantPresets.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [] as never,
+        live
+    );
+    const givingOrgsQuery = useLiveQuery(
+        apiQuery.money.catalogs.givingOrganisations.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [] as never,
+        live
+    );
+    const merchants = merchantsQuery.data ?? [];
+    const givingOrgs = givingOrgsQuery.data ?? [];
 
     const txQuery = useLiveQuery(
         apiQuery.money.transactions.list.queryOptions({
@@ -245,31 +269,32 @@ export function GivingPageClient() {
                                 Nothing leaves the Give jar automatically yet.
                             </p>
                         ) : (
-                            giveFixed.map(item => (
-                                <button
-                                    key={item.id}
-                                    type="button"
-                                    onClick={() => router.push(updateHref('fixed', item.id))}
-                                    className="flex w-full items-center justify-between gap-3 px-5 py-2.5 text-left hover:bg-raised">
-                                    <span className="min-w-0">
-                                        <span className="block truncate text-sm text-fg">
-                                            {item.counterparty ?? item.name}
-                                        </span>
-                                        {item.counterparty ? (
-                                            <span className="block font-mono text-xs text-fg-faint">
-                                                {item.name}
-                                            </span>
-                                        ) : (
-                                            <span className="block font-mono text-xs text-warning">
-                                                No organisation named yet
-                                            </span>
+                            giveFixed.map(item => {
+                                const company = item.counterparty?.trim() || item.name;
+                                const due = formatDueDay(item.dueDay);
+                                return (
+                                    <MoneyPartyRow
+                                        key={item.id}
+                                        title={company}
+                                        subtitle={
+                                            item.counterparty
+                                                ? item.name
+                                                : 'No organisation named yet'
+                                        }
+                                        mark={vendorMarkSrc(
+                                            findPartyVendor(company, merchants, givingOrgs)
                                         )}
-                                    </span>
-                                    <span className="font-mono text-sm whitespace-nowrap text-fg">
-                                        {formatMoney(item.monthly)}/mo
-                                    </span>
-                                </button>
-                            ))
+                                        amount={`${formatMoney(item.monthly)}/mo`}
+                                        badges={
+                                            <>
+                                                {due ? <MetaChip>{due}</MetaChip> : null}
+                                                <MetaChip>{cadenceLabel(item.cadence)}</MetaChip>
+                                            </>
+                                        }
+                                        onClick={() => router.push(updateHref('fixed', item.id))}
+                                    />
+                                );
+                            })
                         )}
                     </div>
 

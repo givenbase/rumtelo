@@ -1,33 +1,41 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import { cn } from '@rumtelo/utils';
 
+import { createFixedHref, createTxHref } from '@/app/_lib/create-routes';
 import { JAR_GUIDE, type JarGuideKey } from '@/app/_lib/jar-guide';
 import { JAR_META } from '@/app/_lib/jar-meta';
 import { productPath } from '@/app/_lib/routes';
 import { settingsHref } from '@/app/_lib/settings-tabs';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { GivingFinder } from '@/components/features/money/giving-finder';
 
 import { CoachMark } from './helper-mark';
 import { useHelpersEnabled } from './provider';
-import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 type JarGuideCardProps = {
     jarKey: JarGuideKey;
+    /** Household jar id — needed so Give can open a form with the org prefilled. */
+    jarId?: string;
     allocatedCents?: number;
     className?: string;
 };
 
 /**
  * Coach guide for a jar — what it is for, with icons and next moves.
+ * Give also embeds the organisation finder (same Coach path as Soul → Giving).
  * Hidden when Coach guides are off (Help or Settings → Account).
  */
-export function JarGuideCard({ jarKey, allocatedCents = 0, className }: JarGuideCardProps) {
+export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: JarGuideCardProps) {
+    const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
     const coachGuidesEnabled = useHelpersEnabled();
     const guide = JAR_GUIDE[jarKey];
     const meta = JAR_META.find(entry => entry.key === jarKey);
+    const isGive = jarKey === 'GIVE';
 
     if (!coachGuidesEnabled || !guide) return null;
 
@@ -72,6 +80,54 @@ export function JarGuideCard({ jarKey, allocatedCents = 0, className }: JarGuide
                             ))}
                         </ul>
                     </div>
+
+                    {isGive ? (
+                        <div className="grid gap-2">
+                            <p className="font-mono text-[10px] font-semibold tracking-[0.12em] text-fg-faint uppercase">
+                                Who should receive it?
+                            </p>
+                            <p className="text-xs leading-relaxed text-fg-muted">
+                                Pick a cause, then an organisation with independent checks — same
+                                Coach shortlist as on Why &amp; where.
+                            </p>
+                            <GivingFinder
+                                defaultOpen
+                                className="border-line ring-0"
+                                onPick={organisation => {
+                                    if (jarId) {
+                                        router.push(
+                                            createFixedHref({
+                                                jarId,
+                                                orgKey: organisation.key,
+                                                payeeMode: 'coach',
+                                            })
+                                        );
+                                        return;
+                                    }
+                                    router.push(
+                                        createTxHref({
+                                            direction: 'out',
+                                            counterparty: organisation.name,
+                                        })
+                                    );
+                                }}
+                            />
+                            <p className="text-[11px] leading-relaxed text-fg-faint">
+                                Choosing an organisation opens a recurring gift (fixed cost). For a
+                                one-time gift, use{' '}
+                                <Link
+                                    href={
+                                        jarId
+                                            ? createTxHref({ jarId, direction: 'out' })
+                                            : createTxHref({ direction: 'out' })
+                                    }
+                                    className="font-medium text-accent underline-offset-2 hover:underline">
+                                    Add transaction
+                                </Link>
+                                .
+                            </p>
+                        </div>
+                    ) : null}
 
                     {guide.subs && guide.subs.length > 0 ? (
                         <div className="rounded-xl border border-dashed border-line bg-raised/40 px-3 py-3">

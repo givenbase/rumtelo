@@ -315,12 +315,7 @@ export function ExpenseForm({
     const [seenJarKey, setSeenJarKey] = useState<JarKey | null>(selectedJarKey);
     if (selectedJarKey !== seenJarKey) {
         setSeenJarKey(selectedJarKey);
-        if (
-            intent.jarKey &&
-            selectedJarKey &&
-            intent.jarKey !== selectedJarKey &&
-            intentOverride
-        ) {
+        if (intent.jarKey && selectedJarKey && intent.jarKey !== selectedJarKey && intentOverride) {
             setIntentOverride(null);
         }
     }
@@ -514,10 +509,7 @@ export function ExpenseForm({
             return;
         }
         if (!isIn && !intent.vendor && !intent.categoryKey) {
-            showToast(
-                isGive ? 'Choose who you gave to' : 'Pick a vendor or a type first',
-                'error'
-            );
+            showToast(isGive ? 'Choose who you gave to' : 'Pick a vendor or a type first', 'error');
             return;
         }
         if (isIn && !values.label.trim()) {

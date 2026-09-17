@@ -15,8 +15,11 @@ import { bgClassToCssVar, cadenceLabel } from '@/app/_lib/jar-chrome';
 import { evaluateNecessitiesPressure } from '@/app/_lib/necessities-pressure';
 import { isLiveData } from '@/app/_lib/preview';
 import { JAR_META } from '@/app/_lib/jar-meta';
-import { NecessitiesPressureCard } from '@/components/features/money/necessities-pressure-card';
+import { findPartyVendor, vendorMarkSrc } from '@/app/_lib/vendor-brands';
 import { CoachTipCard } from '@/components/features/helpers';
+import { JarBadge, MetaChip, formatDueDay } from '@/components/features/money/jar-badge';
+import { MoneyPartyRow } from '@/components/features/money/money-party-row';
+import { NecessitiesPressureCard } from '@/components/features/money/necessities-pressure-card';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -48,6 +51,22 @@ export function FixedCostsPageClient() {
         [] as never,
         live
     );
+    const merchantsQuery = useLiveQuery(
+        apiQuery.money.catalogs.merchantPresets.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [] as never,
+        live
+    );
+    const givingOrgsQuery = useLiveQuery(
+        apiQuery.money.catalogs.givingOrganisations.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [] as never,
+        live
+    );
+    const merchants = merchantsQuery.data ?? [];
+    const givingOrgs = givingOrgsQuery.data ?? [];
 
     // Flatten byJar groups — keep cadence so OUT totals match jar committedOut.
     const fixedCosts =
@@ -101,6 +120,24 @@ export function FixedCostsPageClient() {
     const visibleFixedCosts = jarFilter
         ? fixedCosts.filter(fixedCost => fixedCost.jarKey === jarFilter)
         : fixedCosts;
+
+    const groupedFixedCosts = JAR_META.filter(jar =>
+        visibleFixedCosts.some(item => item.jarKey === jar.key)
+    ).map(jar => {
+        const items = visibleFixedCosts
+            .filter(item => item.jarKey === jar.key)
+            .slice()
+            .sort((left, right) => {
+                const leftDay = left.dueDay ?? 99;
+                const rightDay = right.dueDay ?? 99;
+                if (leftDay !== rightDay) return leftDay - rightDay;
+                return (left.counterparty ?? left.name).localeCompare(
+                    right.counterparty ?? right.name
+                );
+            });
+        const monthly = items.reduce((total, item) => total + item.monthly, 0);
+        return { jar, items, monthly };
+    });
 
     const necessitiesFixedMonthly = fixedCosts
         .filter(item => item.jarKey === 'NECESSITIES')
@@ -179,64 +216,76 @@ export function FixedCostsPageClient() {
                             </span>
                         </div>
 
-                        <div className="grid gap-px">
-                            {visibleFixedCosts.length === 0 ? (
+                        <div className="grid">
+                            {groupedFixedCosts.length === 0 ? (
                                 <p className="px-5 py-4 text-sm text-fg-muted">
                                     {jarFilter
                                         ? 'No fixed costs in this jar.'
                                         : 'No fixed costs yet.'}
                                 </p>
                             ) : (
-                                visibleFixedCosts.map(fixedCost => {
-                                    const jar = JAR_META.find(j => j.key === fixedCost.jarKey);
-                                    return (
-                                        <button
-                                            type="button"
-                                            key={fixedCost.id}
-                                            onClick={() =>
-                                                router.push(updateHref('fixed', fixedCost.id))
-                                            }
-                                            className="flex w-full cursor-pointer items-center justify-between gap-3 border-b border-line px-5 py-3 text-left last:border-b-0 hover:bg-raised">
-                                            <div className="min-w-0">
-                                                <div className="flex flex-wrap items-center gap-2">
-                                                    {jar && (
-                                                        <span
-                                                            className="size-1.75 shrink-0 rounded-sm"
-                                                            style={{
-                                                                background: bgClassToCssVar(
-                                                                    jar.color
-                                                                ),
-                                                            }}
-                                                        />
-                                                    )}
-                                                    <span className="text-sm text-fg">
-                                                        {fixedCost.name}
-                                                    </span>
-                                                    {jar && (
-                                                        <span className="font-mono text-xs tracking-wide text-fg-muted uppercase">
-                                                            {jar.name}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <div className="mt-0.5 font-mono text-xs tracking-normal text-fg-faint">
-                                                    {fixedCost.counterparty
-                                                        ? `→ ${fixedCost.counterparty} · `
-                                                        : ''}
-                                                    {cadenceLabel(fixedCost.cadence)}
-                                                    {fixedCost.dueDay !== null
-                                                        ? ` · day ${fixedCost.dueDay}`
-                                                        : ''}
-                                                    {fixedCost.cadence !== 'MONTHLY'
-                                                        ? ` · ${formatMoney(fixedCost.monthly)}/mo`
-                                                        : ''}
-                                                </div>
-                                            </div>
-                                            <span className="font-mono text-sm whitespace-nowrap text-fg">
-                                                {formatMoney(-Math.abs(fixedCost.monthly))}
+                                groupedFixedCosts.map(group => (
+                                    <div key={group.jar.key}>
+                                        <div className="flex items-center justify-between gap-3 border-b border-line bg-raised/60 px-5 py-2">
+                                            <JarBadge
+                                                jarKey={group.jar.key}
+                                                name={group.jar.name}
+                                            />
+                                            <span className="font-mono text-[11px] text-fg-faint">
+                                                {formatMoney(-Math.abs(group.monthly))}
                                             </span>
-                                        </button>
-                                    );
-                                })
+                                        </div>
+                                        {group.items.map(fixedCost => {
+                                            const company =
+                                                fixedCost.counterparty?.trim() || fixedCost.name;
+                                            const subtitle =
+                                                fixedCost.counterparty?.trim() &&
+                                                fixedCost.counterparty.trim() !==
+                                                    fixedCost.name.trim()
+                                                    ? fixedCost.name
+                                                    : null;
+                                            const due = formatDueDay(fixedCost.dueDay);
+                                            return (
+                                                <MoneyPartyRow
+                                                    key={fixedCost.id}
+                                                    title={company}
+                                                    subtitle={subtitle}
+                                                    mark={vendorMarkSrc(
+                                                        findPartyVendor(
+                                                            company,
+                                                            merchants,
+                                                            givingOrgs
+                                                        )
+                                                    )}
+                                                    amount={formatMoney(
+                                                        -Math.abs(fixedCost.monthly)
+                                                    )}
+                                                    badges={
+                                                        <>
+                                                            {due ? (
+                                                                <MetaChip>{due}</MetaChip>
+                                                            ) : null}
+                                                            <MetaChip>
+                                                                {cadenceLabel(fixedCost.cadence)}
+                                                            </MetaChip>
+                                                            {fixedCost.cadence !== 'MONTHLY' ? (
+                                                                <MetaChip>
+                                                                    {formatMoney(fixedCost.monthly)}
+                                                                    /mo
+                                                                </MetaChip>
+                                                            ) : null}
+                                                        </>
+                                                    }
+                                                    onClick={() =>
+                                                        router.push(
+                                                            updateHref('fixed', fixedCost.id)
+                                                        )
+                                                    }
+                                                />
+                                            );
+                                        })}
+                                    </div>
+                                ))
                             )}
                         </div>
 
@@ -294,36 +343,37 @@ export function FixedCostsPageClient() {
                             </span>
                         </div>
 
-                        <div className="grid gap-px">
-                            {incomeSources.map((source, i) => (
-                                <button
-                                    type="button"
-                                    key={source.id ?? i}
-                                    onClick={() => {
-                                        if (!source.id) {
-                                            router.push(CREATE_HREF.income);
-                                            return;
+                        <div className="grid">
+                            {incomeSources.map((source, i) => {
+                                const due = formatDueDay(source.dueDay);
+                                return (
+                                    <MoneyPartyRow
+                                        key={source.id ?? i}
+                                        title={source.label}
+                                        mark={vendorMarkSrc({ name: source.label })}
+                                        amount={formatMoney(source.monthly)}
+                                        amountClassName="text-success"
+                                        badges={
+                                            <>
+                                                {due ? <MetaChip>{due}</MetaChip> : null}
+                                                <MetaChip>{cadenceLabel(source.cadence)}</MetaChip>
+                                                {source.cadence !== 'MONTHLY' ? (
+                                                    <MetaChip>
+                                                        {formatMoney(source.monthly)}/mo
+                                                    </MetaChip>
+                                                ) : null}
+                                            </>
                                         }
-                                        router.push(updateHref('income', source.id));
-                                    }}
-                                    className="flex w-full cursor-pointer items-center justify-between gap-3 border-b border-line px-5 py-3 text-left last:border-b-0 hover:bg-raised">
-                                    <div>
-                                        <div className="text-sm text-fg">{source.label}</div>
-                                        <div className="mt-0.5 font-mono text-xs tracking-normal text-fg-faint">
-                                            {cadenceLabel(source.cadence)}
-                                            {source.dueDay !== null
-                                                ? ` · pay day ${source.dueDay}`
-                                                : ' · pay day'}
-                                            {source.cadence !== 'MONTHLY'
-                                                ? ` · ${formatMoney(source.monthly)}/mo`
-                                                : ''}
-                                        </div>
-                                    </div>
-                                    <span className="font-mono text-sm whitespace-nowrap text-success">
-                                        {formatMoney(source.monthly)}
-                                    </span>
-                                </button>
-                            ))}
+                                        onClick={() => {
+                                            if (!source.id) {
+                                                router.push(CREATE_HREF.income);
+                                                return;
+                                            }
+                                            router.push(updateHref('income', source.id));
+                                        }}
+                                    />
+                                );
+                            })}
                         </div>
 
                         <div className="border-t border-line px-5 py-4">

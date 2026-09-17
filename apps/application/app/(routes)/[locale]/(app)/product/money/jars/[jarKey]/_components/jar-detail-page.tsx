@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { GoalKind, GoalStatus, JarKey, jarCapabilitiesFor } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card } from '@rumtelo/ui';
-import { cn, monthlyAmount, toPeriodKey } from '@rumtelo/utils';
+import { monthlyAmount, toPeriodKey } from '@rumtelo/utils';
 
 import { createGoalHref, createMoveHref, createTxHref, updateHref } from '@/app/_lib/create-routes';
 import { cadenceLabel } from '@/app/_lib/jar-chrome';
@@ -15,9 +15,12 @@ import type { JarGuideKey } from '@/app/_lib/jar-guide';
 import { JAR_META } from '@/app/_lib/jar-meta';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { isLiveData } from '@/app/_lib/preview';
+import { findPartyVendor, vendorMarkSrc } from '@/app/_lib/vendor-brands';
 import { JarGuideCard } from '@/components/features/helpers';
 import { JarCoverageStrip } from '@/components/features/money/jar-coverage-strip';
 import { JarCategoryTable } from '@/components/features/money/jar-drilldown-parts';
+import { MetaChip, formatBookedDate, formatDueDay } from '@/components/features/money/jar-badge';
+import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -55,6 +58,22 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
         [] as never,
         live
     );
+    const merchantsQuery = useLiveQuery(
+        apiQuery.money.catalogs.merchantPresets.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [] as never,
+        live
+    );
+    const givingOrgsQuery = useLiveQuery(
+        apiQuery.money.catalogs.givingOrganisations.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [] as never,
+        live
+    );
+    const merchants = merchantsQuery.data ?? [];
+    const givingOrgs = givingOrgsQuery.data ?? [];
 
     const jar = (jarsQuery.data ?? []).find(row => row.key === jarKey);
 
@@ -204,38 +223,42 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                                 No active fixed costs on this jar.
                             </p>
                         ) : (
-                            <ul className="grid gap-px">
+                            <ul className="grid">
                                 {fixedOut.map(item => {
                                     const monthly = monthlyAmount(item.amount, item.cadence);
+                                    const company = item.counterparty?.trim() || item.name;
+                                    const subtitle =
+                                        item.counterparty?.trim() &&
+                                        item.counterparty.trim() !== item.name.trim()
+                                            ? item.name
+                                            : null;
+                                    const due = formatDueDay(item.dueDay);
                                     return (
                                         <li key={item.id}>
-                                            <button
-                                                type="button"
+                                            <MoneyPartyRow
+                                                title={company}
+                                                subtitle={subtitle}
+                                                mark={vendorMarkSrc(
+                                                    findPartyVendor(company, merchants, givingOrgs)
+                                                )}
+                                                amount={formatMoney(-Math.abs(monthly))}
+                                                badges={
+                                                    <>
+                                                        {due ? <MetaChip>{due}</MetaChip> : null}
+                                                        <MetaChip>
+                                                            {cadenceLabel(item.cadence)}
+                                                        </MetaChip>
+                                                        {item.cadence !== 'MONTHLY' ? (
+                                                            <MetaChip>
+                                                                {formatMoney(monthly)}/mo
+                                                            </MetaChip>
+                                                        ) : null}
+                                                    </>
+                                                }
                                                 onClick={() =>
                                                     router.push(updateHref('fixed', item.id))
                                                 }
-                                                className="flex w-full items-center justify-between gap-3 border-b border-line px-5 py-3 text-left last:border-b-0 hover:bg-raised">
-                                                <span className="min-w-0">
-                                                    <span className="block text-sm text-fg">
-                                                        {item.name}
-                                                    </span>
-                                                    <span className="mt-0.5 block font-mono text-xs text-fg-faint">
-                                                        {item.counterparty
-                                                            ? `→ ${item.counterparty} · `
-                                                            : ''}
-                                                        {cadenceLabel(item.cadence)}
-                                                        {item.dueDay !== null
-                                                            ? ` · day ${item.dueDay}`
-                                                            : ''}
-                                                        {item.cadence !== 'MONTHLY'
-                                                            ? ` · ${formatMoney(monthly)}/mo`
-                                                            : ''}
-                                                    </span>
-                                                </span>
-                                                <span className="shrink-0 font-mono text-sm text-fg">
-                                                    {formatMoney(-Math.abs(monthly))}
-                                                </span>
-                                            </button>
+                                            />
                                         </li>
                                     );
                                 })}
@@ -315,40 +338,41 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                             No transactions sorted into this jar this month.
                         </p>
                     ) : (
-                        <ul className="grid gap-px">
-                            {transactions.map(tx => (
-                                <li key={tx.id}>
-                                    <button
-                                        type="button"
-                                        onClick={() => router.push(updateHref('tx', tx.id))}
-                                        className="flex w-full items-center justify-between gap-3 border-b border-line px-5 py-3 text-left last:border-b-0 hover:bg-raised">
-                                        <span className="min-w-0">
-                                            <span className="block truncate text-sm text-fg">
-                                                {tx.counterparty || tx.description}
-                                            </span>
-                                            <span className="mt-0.5 block font-mono text-xs text-fg-faint">
-                                                {tx.bookedOn}
-                                                {tx.counterparty && tx.description
-                                                    ? ` · ${tx.description}`
-                                                    : ''}
-                                            </span>
-                                        </span>
-                                        <span
-                                            className={cn(
-                                                'shrink-0 font-mono text-sm',
+                        <ul className="grid">
+                            {transactions.map(tx => {
+                                const title = tx.counterparty?.trim() || tx.description;
+                                const subtitle =
+                                    tx.counterparty?.trim() &&
+                                    tx.description &&
+                                    tx.description !== tx.counterparty.trim()
+                                        ? tx.description
+                                        : null;
+                                return (
+                                    <li key={tx.id}>
+                                        <MoneyPartyRow
+                                            title={title}
+                                            subtitle={subtitle}
+                                            mark={vendorMarkSrc(
+                                                findPartyVendor(title, merchants, givingOrgs)
+                                            )}
+                                            amount={formatMoney(tx.amount)}
+                                            amountClassName={
                                                 tx.amount < 0 ? 'text-fg' : 'text-success'
-                                            )}>
-                                            {formatMoney(tx.amount)}
-                                        </span>
-                                    </button>
-                                </li>
-                            ))}
+                                            }
+                                            badges={
+                                                <MetaChip>{formatBookedDate(tx.bookedOn)}</MetaChip>
+                                            }
+                                            onClick={() => router.push(updateHref('tx', tx.id))}
+                                        />
+                                    </li>
+                                );
+                            })}
                         </ul>
                     )}
                 </Card>
             </section>
 
-            <JarGuideCard jarKey={guideKey} allocatedCents={jar.allocated} />
+            <JarGuideCard jarKey={guideKey} jarId={jar.id} allocatedCents={jar.allocated} />
         </div>
     );
 }

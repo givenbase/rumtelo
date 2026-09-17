@@ -118,3 +118,20 @@ export function findCatalogVendorFromFeed(
     }
     return best ? toResolveInput(best.merchant) : null;
 }
+
+/** Catalog merchant first, then giving-org website, then initials-only fallback. */
+export function findPartyVendor(
+    name: string,
+    merchants: readonly MerchantPreset[],
+    organisations?: readonly { name: string; website?: string | null }[]
+): ResolveVendorInput {
+    const catalog =
+        findCatalogVendor(name, merchants) ?? findCatalogVendorFromFeed(name, merchants);
+    if (catalog) return catalog;
+    const needle = name.trim().toLowerCase();
+    const organisation = organisations?.find(row => row.name.toLowerCase() === needle);
+    if (organisation) {
+        return { name: organisation.name, website: organisation.website };
+    }
+    return { name };
+}

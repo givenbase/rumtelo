@@ -118,7 +118,7 @@ export const JAR_GUIDE: Record<JarGuideKey, JarGuide> = {
         links: [{ href: '/product/money/transactions', label: 'Transactions', icon: '↔' }],
     },
     GIVE: {
-        note: 'Giving keeps money a tool and not a master. Transferred automatically.',
+        note: 'Giving keeps money a tool and not a master. Transferred automatically — the Coach helps you choose where.',
         allowed: [
             { label: 'Your foundation', icon: '🏛️' },
             { label: 'Charities', icon: '💚' },

@@ -12,6 +12,7 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 import { JAR_META } from '@/app/_lib/jar-meta';
 import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
+import { formatBookedDate } from '@/components/features/money/jar-badge';
 
 type InboxJarOption = Pick<Jar, 'id' | 'key' | 'name' | 'subtitle'>;
 
@@ -103,7 +104,7 @@ export function InboxSortCard({
                                 transaction.description !== transaction.counterparty.trim()
                                     ? transaction.description
                                     : null,
-                                transaction.bookedOn,
+                                formatBookedDate(transaction.bookedOn),
                             ]
                                 .filter(Boolean)
                                 .join(' · ')}

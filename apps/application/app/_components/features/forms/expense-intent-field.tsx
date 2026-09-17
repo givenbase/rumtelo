@@ -142,9 +142,7 @@ export function ExpenseIntentField({
     const vendorTypeaheadHits = useMemo(() => {
         if (!customVendor) return [];
         const pool = value.categoryKey ? vendorsForCategory : scopedMerchants;
-        return pool
-            .filter(merchant => matchesMerchant(merchant, needle))
-            .slice(0, 8);
+        return pool.filter(merchant => matchesMerchant(merchant, needle)).slice(0, 8);
     }, [customVendor, value.categoryKey, vendorsForCategory, scopedMerchants, needle]);
 
     const hasSelection = Boolean(value.vendor || value.categoryKey);
@@ -289,8 +287,8 @@ export function ExpenseIntentField({
                         })}
                     </div>
                     <p className="text-xs leading-relaxed text-fg-faint">
-                        Pick from this jar’s catalog when you know the shop or type — or type a custom
-                        name.
+                        Pick from this jar’s catalog when you know the shop or type — or type a
+                        custom name.
                     </p>
                 </div>
             ) : null}
@@ -599,9 +597,7 @@ export function ExpenseIntentField({
                                 }}
                             />
                             {vendorTypeaheadHits.length > 0 ? (
-                                <ul
-                                    role="listbox"
-                                    className="max-h-48 overflow-y-auto rounded-xl border border-line bg-raised py-1 shadow-lg">
+                                <ul className="max-h-48 overflow-y-auto rounded-xl border border-line bg-raised py-1 shadow-lg">
                                     {vendorTypeaheadHits.map(merchant => {
                                         const mark = vendorMarkSrc({
                                             key: merchant.key,
@@ -610,7 +606,7 @@ export function ExpenseIntentField({
                                             website: merchant.website,
                                         });
                                         return (
-                                            <li key={merchant.key} role="option">
+                                            <li key={merchant.key}>
                                                 <button
                                                     type="button"
                                                     disabled={disabled}

@@ -17,7 +17,7 @@ import {
 } from '@/app/_lib/giving';
 import { isLiveData } from '@/app/_lib/preview';
 import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
-import { CoachMark } from '@/components/features/helpers';
+import { CoachMark } from '@/components/features/helpers/helper-mark';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 type GivingFinderProps = {

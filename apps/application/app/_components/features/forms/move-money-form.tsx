@@ -102,8 +102,7 @@ function JarBalance({
     formatMoney: (cents: number) => string;
 }) {
     if (cents === null) return null;
-    const showAfter =
-        afterCents !== undefined && afterCents !== null && afterCents !== cents;
+    const showAfter = afterCents !== undefined && afterCents !== null && afterCents !== cents;
     if (!showAfter) {
         return (
             <span
@@ -119,7 +118,7 @@ function JarBalance({
         <span className="shrink-0 text-right">
             <span
                 className={cn(
-                    'block font-mono text-[10px] tabular-nums text-fg-faint',
+                    'block font-mono text-[10px] text-fg-faint tabular-nums',
                     cents < 0 && 'text-danger/70'
                 )}>
                 {formatMoney(cents)}
@@ -153,9 +152,7 @@ function LockedFromJar({
             <div
                 className={cn(
                     'flex items-center gap-3 rounded-xl border px-3 py-3',
-                    blocked
-                        ? 'border-danger/40 bg-danger/10'
-                        : 'border-accent/40 bg-accent-soft'
+                    blocked ? 'border-danger/40 bg-danger/10' : 'border-accent/40 bg-accent-soft'
                 )}>
                 <span className="text-lg" aria-hidden>
                     {jar.icon}
@@ -172,9 +169,7 @@ function LockedFromJar({
                     formatMoney={formatMoney}
                 />
             </div>
-            {blocked ? (
-                <p className="text-xs text-danger">{eligibility.reason}</p>
-            ) : null}
+            {blocked ? <p className="text-xs text-danger">{eligibility.reason}</p> : null}
         </div>
     );
 }
@@ -353,9 +348,7 @@ export function MoveMoneyForm({
     const fromAvail = fromJar?.available ?? null;
     const toAvail = toJar?.available ?? null;
     const fromAfterCents =
-        moveCents !== null && moveCents > 0 && fromAvail !== null
-            ? fromAvail - moveCents
-            : null;
+        moveCents !== null && moveCents > 0 && fromAvail !== null ? fromAvail - moveCents : null;
     const toAfterCents =
         moveCents !== null && moveCents > 0 && toAvail !== null ? toAvail + moveCents : null;
 
