@@ -19,7 +19,7 @@ import {
 } from '@rumtelo/ui';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { CategoryTemplate, FixedCostPreset, MerchantPreset } from '@rumtelo/contracts';
+import type { CategoryTemplate, MerchantPreset } from '@rumtelo/contracts';
 import { Cadence, FlowDirection, JarKey, jarCapabilitiesFor } from '@rumtelo/contracts';
 import { z } from 'zod';
 
@@ -36,7 +36,13 @@ import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell'
 import { ConfirmActionButton } from './confirm-action-button';
 import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
 import { FormInput } from './form-input';
-import { PresetNameField } from './preset-name-field';
+import {
+    MERCHANT_OPTION_PREFIX,
+    isMerchantOptionKey,
+    merchantKeyFromOptionKey,
+    merchantsToNameOptions,
+} from './merchant-name-options';
+import { PresetNameField, type NamePresetOption } from './preset-name-field';
 
 /** Cap suggested vendor chips so the form stays scannable. */
 const MAX_VENDOR_CHIPS = 16;
@@ -117,6 +123,8 @@ export function FixedCostForm({
     const [pendingCategoryTemplateKey, setPendingCategoryTemplateKey] = useState<string | null>(
         null
     );
+    /** Bill-type preset key (VPN, INTERNET, …) — narrows Paid-to chips within Subscriptions. */
+    const [selectedBillPresetKey, setSelectedBillPresetKey] = useState<string | null>(null);
     const [customPayee, setCustomPayee] = useState(false);
     /** Give only — null until the household picks a path (or prefill resolves one). */
     const [givePayeeMode, setGivePayeeMode] = useState<GivePayeeMode | null>(
@@ -215,19 +223,26 @@ export function FixedCostForm({
     }, [categoriesQuery.data]);
 
     const merchants = useMemo(() => merchantsQuery.data ?? [], [merchantsQuery.data]);
+    const fixedCostPresets = useMemo(() => presetsQuery.data ?? [], [presetsQuery.data]);
 
-    const presetOptions = useMemo(
-        () =>
-            (presetsQuery.data ?? []).map(preset => {
-                const category = categoryByKey.get(preset.categoryTemplateKey);
-                return {
-                    ...preset,
-                    group: category?.name ?? preset.categoryTemplateKey,
-                    icon: category?.icon ?? null,
-                } satisfies FixedCostPreset & { group: string; icon: string | null };
-            }),
-        [presetsQuery.data, categoryByKey]
-    );
+    /** Bill-type presets + brand catalog — type Netflix, get Media + Play auto-filled. */
+    const nameOptions = useMemo((): NamePresetOption[] => {
+        const fromMerchants = merchantsToNameOptions(merchants, {
+            keyPrefix: MERCHANT_OPTION_PREFIX,
+            categoryMeta: categoryByKey,
+        });
+        const fromPresets: NamePresetOption[] = fixedCostPresets.map(preset => {
+            const category = categoryByKey.get(preset.categoryTemplateKey);
+            return {
+                key: preset.key,
+                name: preset.name,
+                group: category?.name ?? preset.categoryTemplateKey,
+                icon: category?.icon ?? null,
+            };
+        });
+        // Brands first so “netflix” hits Netflix before “Streaming video”.
+        return [...fromMerchants, ...fromPresets];
+    }, [merchants, fixedCostPresets, categoryByKey]);
 
     const form = useForm<FixedCostFormValues>({
         defaultValues: {
@@ -269,11 +284,22 @@ export function FixedCostForm({
     }, [pendingCategoryTemplateKey, selectedCategoryId, jarCategories, templateKeyByCategoryName]);
 
     const vendorsForCategory = useMemo(() => {
+        const byKey = new Map(merchants.map(merchant => [merchant.key, merchant]));
+        // Bill preset owns Paid-to chips in the catalog (cross-category OK).
+        if (selectedBillPresetKey) {
+            const bill = fixedCostPresets.find(preset => preset.key === selectedBillPresetKey);
+            const keys = bill?.suggestedMerchantKeys ?? [];
+            if (keys.length === 0) return [] as MerchantPreset[];
+            return keys
+                .map(key => byKey.get(key))
+                .filter((merchant): merchant is MerchantPreset => Boolean(merchant))
+                .slice(0, MAX_VENDOR_CHIPS);
+        }
         if (!activeCategoryTemplateKey) return [] as MerchantPreset[];
         return merchants
             .filter(merchant => merchant.categoryTemplateKey === activeCategoryTemplateKey)
             .slice(0, MAX_VENDOR_CHIPS);
-    }, [merchants, activeCategoryTemplateKey]);
+    }, [merchants, activeCategoryTemplateKey, selectedBillPresetKey, fixedCostPresets]);
 
     const givingOrgNames = useMemo(() => givingOrgsQuery.data ?? [], [givingOrgsQuery.data]);
 
@@ -389,9 +415,17 @@ export function FixedCostForm({
             let categoryId = values.categoryId ?? null;
             const templateKey =
                 pendingCategoryTemplateKey ??
-                presetOptions.find(preset => preset.name.toLowerCase() === name.toLowerCase())
-                    ?.categoryTemplateKey ??
-                null;
+                (() => {
+                    const merchant = merchants.find(
+                        row => row.name.toLowerCase() === name.toLowerCase()
+                    );
+                    if (merchant) return merchant.categoryTemplateKey;
+                    return (
+                        fixedCostPresets.find(
+                            preset => preset.name.toLowerCase() === name.toLowerCase()
+                        )?.categoryTemplateKey ?? null
+                    );
+                })();
             const categoryName = templateKey
                 ? (categoryByKey.get(templateKey)?.name ?? null)
                 : null;
@@ -474,6 +508,28 @@ export function FixedCostForm({
         removeMutation.isPending ||
         (live && jars.length === 0);
 
+    function applyCategoryFromTemplate(jarId: string, templateKey: string) {
+        const categoryName = categoryByKey.get(templateKey)?.name;
+        if (!categoryName) {
+            setPendingCategoryTemplateKey(templateKey);
+            form.setValue('categoryId', null);
+            return;
+        }
+        const jarBalance = (balancesQuery.data ?? []).find(row => row.id === jarId);
+        const match = (jarBalance?.categories ?? []).find(
+            category =>
+                !category.isArchived &&
+                category.name.trim().toLowerCase() === categoryName.trim().toLowerCase()
+        );
+        if (match) {
+            setPendingCategoryTemplateKey(null);
+            form.setValue('categoryId', match.id);
+            return;
+        }
+        setPendingCategoryTemplateKey(templateKey);
+        form.setValue('categoryId', null);
+    }
+
     const pendingLabel = pendingCategoryTemplateKey
         ? categoryByKey.get(pendingCategoryTemplateKey)?.name
         : null;
@@ -521,13 +577,14 @@ export function FixedCostForm({
                                 <PresetNameField
                                     value={field.value}
                                     onChange={field.onChange}
-                                    placeholder="e.g. rent"
+                                    placeholder="e.g. Netflix, rent"
                                     freeTextPlaceholder="Type a custom bill name…"
-                                    options={presetOptions}
+                                    options={nameOptions}
                                     lockPresets
                                     freeTextKeys={['OTHER']}
                                     onClear={() => {
                                         setPendingCategoryTemplateKey(null);
+                                        setSelectedBillPresetKey(null);
                                         setCustomPayee(false);
                                         form.setValue('categoryId', null);
                                         form.setValue('counterparty', '', {
@@ -537,17 +594,59 @@ export function FixedCostForm({
                                         setGiveModeHydrated(false);
                                     }}
                                     onSelect={opt => {
-                                        const full = presetOptions.find(
+                                        if (isMerchantOptionKey(opt.key)) {
+                                            const merchantKey = merchantKeyFromOptionKey(opt.key);
+                                            const merchant = merchants.find(
+                                                row => row.key === merchantKey
+                                            );
+                                            if (!merchant) return;
+                                            setSelectedBillPresetKey(null);
+                                            const jar = jars.find(j => j.key === merchant.jarKey);
+                                            if (jar) {
+                                                form.setValue('jarId', jar.id);
+                                                applyCategoryFromTemplate(
+                                                    jar.id,
+                                                    merchant.categoryTemplateKey
+                                                );
+                                            } else {
+                                                setPendingCategoryTemplateKey(
+                                                    merchant.categoryTemplateKey
+                                                );
+                                                form.setValue('categoryId', null);
+                                            }
+                                            setCustomPayee(false);
+                                            form.setValue('counterparty', merchant.name, {
+                                                shouldDirty: true,
+                                            });
+                                            if (merchant.jarKey === JarKey.GIVE) {
+                                                setGivePayeeMode('known');
+                                                setGiveModeHydrated(true);
+                                            } else {
+                                                setGivePayeeMode(null);
+                                                setGiveModeHydrated(false);
+                                            }
+                                            return;
+                                        }
+
+                                        const full = fixedCostPresets.find(
                                             preset => preset.key === opt.key
                                         );
                                         if (!full) return;
+                                        setSelectedBillPresetKey(full.key);
                                         const jar = jars.find(j => j.key === full.jarKey);
-                                        if (jar) form.setValue('jarId', jar.id);
+                                        if (jar) {
+                                            form.setValue('jarId', jar.id);
+                                            applyCategoryFromTemplate(
+                                                jar.id,
+                                                full.categoryTemplateKey
+                                            );
+                                        } else {
+                                            setPendingCategoryTemplateKey(full.categoryTemplateKey);
+                                            form.setValue('categoryId', null);
+                                        }
                                         if (full.suggestedDueDay !== null) {
                                             form.setValue('dueDay', String(full.suggestedDueDay));
                                         }
-                                        setPendingCategoryTemplateKey(full.categoryTemplateKey);
-                                        form.setValue('categoryId', null);
                                         setCustomPayee(false);
                                         form.setValue('counterparty', '', { shouldDirty: false });
                                         if (full.jarKey === JarKey.GIVE) {
@@ -596,6 +695,7 @@ export function FixedCostForm({
                                     field.onChange(event);
                                     form.setValue('categoryId', null);
                                     setPendingCategoryTemplateKey(null);
+                                    setSelectedBillPresetKey(null);
                                     setCustomPayee(false);
                                     form.setValue('counterparty', '', { shouldDirty: false });
                                     setGivePayeeMode(null);

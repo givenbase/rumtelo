@@ -15,6 +15,8 @@ export type NamePresetOption = Pick<CatalogItemBase, 'key' | 'name'> & {
     sortOrder?: number;
     group?: string;
     icon?: string | null;
+    /** Extra search needles (merchant aliases, bank descriptors). */
+    aliases?: readonly string[];
     /** Favicon hostname — rendered as VendorMark when set (merchant / org pickers). */
     logoDomain?: string | null;
     website?: string | null;
@@ -52,13 +54,11 @@ function matchesQuery(option: NamePresetOption, query: string) {
     if (!query) return true;
     const needle = query.toLowerCase();
     const key = option.key.toLowerCase();
-    const keyAsWords = key.replace(/_/g, ' ');
-    return (
-        option.name.toLowerCase().includes(needle) ||
-        key.includes(needle) ||
-        keyAsWords.includes(needle) ||
-        (option.group?.toLowerCase().includes(needle) ?? false)
-    );
+    const keyAsWords = key.replace(/_/g, ' ').replace(/^merchant:/, '');
+    if (option.name.toLowerCase().includes(needle)) return true;
+    if (key.includes(needle) || keyAsWords.includes(needle)) return true;
+    if (option.group?.toLowerCase().includes(needle)) return true;
+    return option.aliases?.some(alias => alias.toLowerCase().includes(needle)) ?? false;
 }
 
 function findOptionByQuery(options: NamePresetOption[], query: string) {
@@ -67,6 +67,7 @@ function findOptionByQuery(options: NamePresetOption[], query: string) {
     return (
         options.find(option => option.key.toLowerCase() === needle) ??
         options.find(option => option.name.toLowerCase() === needle) ??
+        options.find(option => option.aliases?.some(alias => alias.toLowerCase() === needle)) ??
         null
     );
 }
@@ -129,11 +130,15 @@ export function PresetNameField({
         return findOptionByQuery(options, query)?.key ?? null;
     }, [options, query, locked]);
 
-    const filtered = useMemo(
-        () =>
-            lockPresets && locked ? options : options.filter(option => matchesQuery(option, query)),
-        [options, query, lockPresets, locked]
-    );
+    const filtered = useMemo(() => {
+        if (lockPresets && locked) return options;
+        const matched = options.filter(option => matchesQuery(option, query));
+        // Merchant catalog is large — only surface brands once the user types.
+        if (!query) {
+            return matched.filter(option => !option.key.startsWith('merchant:'));
+        }
+        return matched;
+    }, [options, query, lockPresets, locked]);
 
     const grouped = useMemo(() => {
         const map = new Map<string, NamePresetOption[]>();

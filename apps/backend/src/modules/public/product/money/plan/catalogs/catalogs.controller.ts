@@ -64,6 +64,7 @@ export class MoneyCatalogsController {
                     suggestedDueDay: preset.suggestedDueDay,
                     direction: preset.direction,
                     audienceTags: preset.audienceTags,
+                    suggestedMerchantKeys: preset.suggestedMerchantKeys ?? [],
                 }));
             }
         );

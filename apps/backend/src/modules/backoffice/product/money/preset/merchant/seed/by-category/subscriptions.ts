@@ -1,8 +1,8 @@
 import type { MerchantSeed } from '../types';
 import { necessities } from '../types';
 
-/** subscriptions merchant presets */
-export const SUBSCRIPTIONS_MERCHANTS: readonly MerchantSeed[] = [
+/** Telco / ISP — internet & mobile bills. */
+const TELCO_MERCHANTS: readonly MerchantSeed[] = [
     {
         key: 'VODAFONE',
         name: 'Vodafone',
@@ -63,6 +63,10 @@ export const SUBSCRIPTIONS_MERCHANTS: readonly MerchantSeed[] = [
         matchPriority: 0,
         isActive: true,
     },
+];
+
+/** SaaS / cloud — software & storage bills. */
+const SOFTWARE_MERCHANTS: readonly MerchantSeed[] = [
     {
         key: 'APPLE',
         name: 'Apple',
@@ -168,4 +172,155 @@ export const SUBSCRIPTIONS_MERCHANTS: readonly MerchantSeed[] = [
         matchPriority: 0,
         isActive: true,
     },
+];
+
+/** VPN providers — only suggested for the VPN bill preset. */
+const VPN_MERCHANTS: readonly MerchantSeed[] = [
+    {
+        key: 'NORDVPN',
+        name: 'NordVPN',
+        matchValue: 'NordVPN',
+        aliases: ['NordVPN', 'NORDVPN', 'Nord Security', 'nordvpn.com'],
+        mcc: '5817',
+        jarKey: necessities,
+        categoryTemplateKey: 'SUBSCRIPTIONS',
+        logoDomain: 'nordvpn.com',
+        website: 'https://nordvpn.com',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'PROTON_VPN',
+        name: 'Proton VPN',
+        matchValue: 'Proton VPN',
+        aliases: ['Proton VPN', 'ProtonVPN', 'PROTONVPN', 'Proton AG'],
+        mcc: '5817',
+        jarKey: necessities,
+        categoryTemplateKey: 'SUBSCRIPTIONS',
+        logoDomain: 'protonvpn.com',
+        website: 'https://protonvpn.com',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'MULLVAD',
+        name: 'Mullvad',
+        matchValue: 'Mullvad',
+        aliases: ['Mullvad', 'MULLVAD VPN', 'Mullvad VPN'],
+        mcc: '5817',
+        jarKey: necessities,
+        categoryTemplateKey: 'SUBSCRIPTIONS',
+        logoDomain: 'mullvad.net',
+        website: 'https://mullvad.net',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'SURFSHARK',
+        name: 'Surfshark',
+        matchValue: 'Surfshark',
+        aliases: ['Surfshark', 'SURFSHARK'],
+        mcc: '5817',
+        jarKey: necessities,
+        categoryTemplateKey: 'SUBSCRIPTIONS',
+        logoDomain: 'surfshark.com',
+        website: 'https://surfshark.com',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'EXPRESSVPN',
+        name: 'ExpressVPN',
+        matchValue: 'ExpressVPN',
+        aliases: ['ExpressVPN', 'EXPRESSVPN', 'Express VPN'],
+        mcc: '5817',
+        jarKey: necessities,
+        categoryTemplateKey: 'SUBSCRIPTIONS',
+        logoDomain: 'expressvpn.com',
+        website: 'https://expressvpn.com',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'CYBERGHOST',
+        name: 'CyberGhost',
+        matchValue: 'CyberGhost',
+        aliases: ['CyberGhost', 'CYBERGHOST', 'CyberGhost VPN'],
+        mcc: '5817',
+        jarKey: necessities,
+        categoryTemplateKey: 'SUBSCRIPTIONS',
+        logoDomain: 'cyberghostvpn.com',
+        website: 'https://cyberghostvpn.com',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+];
+
+/** News / press subscriptions. */
+const NEWS_MERCHANTS: readonly MerchantSeed[] = [
+    {
+        key: 'VOLKSKRANT',
+        name: 'de Volkskrant',
+        matchValue: 'Volkskrant',
+        aliases: ['Volkskrant', 'de Volkskrant', 'VOLKSKRANT'],
+        mcc: '5967',
+        jarKey: necessities,
+        categoryTemplateKey: 'SUBSCRIPTIONS',
+        logoDomain: 'volkskrant.nl',
+        website: 'https://volkskrant.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'NRC',
+        name: 'NRC',
+        matchValue: 'NRC',
+        aliases: ['NRC', 'NRC Handelsblad', 'NRC.nl'],
+        mcc: '5967',
+        jarKey: necessities,
+        categoryTemplateKey: 'SUBSCRIPTIONS',
+        logoDomain: 'nrc.nl',
+        website: 'https://nrc.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'AD',
+        name: 'AD',
+        matchValue: 'AD',
+        aliases: ['AD', 'Algemeen Dagblad', 'AD.nl'],
+        mcc: '5967',
+        jarKey: necessities,
+        categoryTemplateKey: 'SUBSCRIPTIONS',
+        logoDomain: 'ad.nl',
+        website: 'https://ad.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+];
+
+/** Subscriptions merchant presets (telco, software, VPN, news). */
+export const SUBSCRIPTIONS_MERCHANTS: readonly MerchantSeed[] = [
+    ...TELCO_MERCHANTS,
+    ...SOFTWARE_MERCHANTS,
+    ...VPN_MERCHANTS,
+    ...NEWS_MERCHANTS,
 ];

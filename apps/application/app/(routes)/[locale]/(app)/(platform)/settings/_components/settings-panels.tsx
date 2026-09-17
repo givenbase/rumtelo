@@ -54,6 +54,11 @@ import { env } from '@/app/_utils/get-env';
 import { useAccountTheme } from '@/components/features/shell/account-theme-sync';
 import { downloadTextFile, toCsv } from '@/app/_lib/download';
 import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
+import { merchantsToNameOptions } from '@/components/features/forms/merchant-name-options';
+import {
+    PresetNameField,
+    type NamePresetOption,
+} from '@/components/features/forms/preset-name-field';
 import {
     CAPABILITIES,
     diffPlans,
@@ -1307,6 +1312,13 @@ export function BankSettings() {
         return (bankingMerchantsQuery.data ?? []).filter(merchant => !rails.has(merchant.key));
     }, [bankingMerchantsQuery.data]);
 
+    const bankNameOptions = useMemo((): NamePresetOption[] => {
+        return [
+            ...merchantsToNameOptions(bankList, { categoryTemplateKey: 'BANKING' }),
+            { key: 'OTHER', name: 'Other', group: 'Custom' },
+        ];
+    }, [bankList]);
+
     const bankByKey = useMemo(() => new Map(bankList.map(bank => [bank.key, bank])), [bankList]);
 
     /** Match a saved account name back to a catalog bank for logos. */
@@ -1523,51 +1535,75 @@ export function BankSettings() {
                             {bankList.length === 0 ? (
                                 <p className="text-sm text-fg-muted">Loading banks…</p>
                             ) : (
-                                <div className="flex flex-wrap gap-2">
-                                    {bankList.map(bank => {
-                                        const mark = vendorMarkSrc({
-                                            key: bank.key,
-                                            name: bank.name,
-                                            logoDomain: bank.logoDomain,
-                                            website: bank.website,
-                                        });
-                                        const selected = !customBank && bankKey === bank.key;
-                                        return (
-                                            <button
-                                                key={bank.key}
-                                                type="button"
-                                                disabled={!live}
-                                                onClick={() => pickBank(bank.key)}
-                                                className={cn(
-                                                    'inline-flex items-center gap-2 rounded-full border px-2.5 py-1.5 text-xs transition-colors',
-                                                    selected
-                                                        ? 'border-accent bg-accent/10 text-fg'
-                                                        : 'border-line text-fg-secondary hover:border-fg-faint hover:text-fg'
-                                                )}>
-                                                <VendorMark
-                                                    name={mark.name}
-                                                    src={mark.src}
-                                                    size={18}
-                                                />
-                                                {bank.name}
-                                            </button>
-                                        );
-                                    })}
-                                    <button
-                                        type="button"
-                                        disabled={!live}
-                                        onClick={() => {
-                                            setCustomBank(true);
-                                            setBankKey(null);
-                                        }}
-                                        className={cn(
-                                            'inline-flex items-center rounded-full border px-2.5 py-1.5 text-xs transition-colors',
+                                <div className="grid gap-2">
+                                    <PresetNameField
+                                        value={
                                             customBank
-                                                ? 'border-accent bg-accent/10 text-fg'
-                                                : 'border-line text-fg-secondary hover:border-fg-faint hover:text-fg'
-                                        )}>
-                                        Other…
-                                    </button>
+                                                ? label
+                                                : (bankByKey.get(bankKey ?? '')?.name ?? '')
+                                        }
+                                        onChange={value => {
+                                            if (!customBank) {
+                                                setCustomBank(true);
+                                                setBankKey(null);
+                                            }
+                                            setLabel(value);
+                                        }}
+                                        options={bankNameOptions}
+                                        placeholder="Search bank — e.g. ING, Bunq"
+                                        freeTextPlaceholder="Type a bank name…"
+                                        lockPresets
+                                        freeTextKeys={['OTHER']}
+                                        initialLockedKey={
+                                            customBank ? null : (bankKey ?? undefined)
+                                        }
+                                        disabled={!live}
+                                        onClear={() => {
+                                            setBankKey(null);
+                                            setCustomBank(false);
+                                            setLabel('');
+                                        }}
+                                        onSelect={opt => {
+                                            if (opt.key === 'OTHER') {
+                                                setCustomBank(true);
+                                                setBankKey(null);
+                                                setLabel('');
+                                                return;
+                                            }
+                                            pickBank(opt.key);
+                                        }}
+                                    />
+                                    <div className="flex flex-wrap gap-2">
+                                        {bankList.slice(0, 8).map(bank => {
+                                            const mark = vendorMarkSrc({
+                                                key: bank.key,
+                                                name: bank.name,
+                                                logoDomain: bank.logoDomain,
+                                                website: bank.website,
+                                            });
+                                            const selected = !customBank && bankKey === bank.key;
+                                            return (
+                                                <button
+                                                    key={bank.key}
+                                                    type="button"
+                                                    disabled={!live}
+                                                    onClick={() => pickBank(bank.key)}
+                                                    className={cn(
+                                                        'inline-flex items-center gap-2 rounded-full border px-2.5 py-1.5 text-xs transition-colors',
+                                                        selected
+                                                            ? 'border-accent bg-accent/10 text-fg'
+                                                            : 'border-line text-fg-secondary hover:border-fg-faint hover:text-fg'
+                                                    )}>
+                                                    <VendorMark
+                                                        name={mark.name}
+                                                        src={mark.src}
+                                                        size={18}
+                                                    />
+                                                    {bank.name}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             )}
                         </div>

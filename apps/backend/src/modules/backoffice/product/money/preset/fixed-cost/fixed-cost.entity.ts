@@ -51,6 +51,13 @@ export class FixedCostPreset extends BaseEntity {
     @Property({ type: 'json', default: [] })
     audienceTags: string[] = [];
 
+    /**
+     * MerchantPreset.key chips for “Paid to” after this bill type is picked.
+     * Empty = free text only (no category dump). Order = chip order.
+     */
+    @Property({ type: 'json', default: [] })
+    suggestedMerchantKeys: string[] = [];
+
     /** Display / seed order within the catalog. */
     @Property({ default: 0 })
     sortOrder = 0;

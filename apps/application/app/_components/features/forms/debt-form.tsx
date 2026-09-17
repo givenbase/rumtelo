@@ -32,7 +32,8 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 import { ConfirmActionButton } from './confirm-action-button';
 import { FormInput } from './form-input';
-import { PresetNameField } from './preset-name-field';
+import { merchantsToNameOptions } from './merchant-name-options';
+import { PresetNameField, type NamePresetOption } from './preset-name-field';
 
 const moneyInput = z
     .string()
@@ -105,9 +106,22 @@ export function DebtForm({
     );
     const debtTypes = debtTypesQuery.data ?? [];
     const merchants = merchantsQuery.data ?? [];
-
     const selectedType = debtTypes.find(option => option.key === typeKey) ?? null;
     const lendersForType = selectedType?.suggestedLenders ?? [];
+
+    /** Suggested lenders + full merchant catalog (banks, BNPL, …) for typeahead. */
+    const fromMerchants = merchantsToNameOptions(merchants);
+    const knownLenderNames = new Set(fromMerchants.map(row => row.name.toLowerCase()));
+    const lenderOptions: NamePresetOption[] = [
+        ...lendersForType
+            .filter(lender => !knownLenderNames.has(lender.toLowerCase()))
+            .map(lender => ({
+                key: `suggested:${lender}`,
+                name: lender,
+                group: 'Suggested',
+            })),
+        ...fromMerchants,
+    ];
 
     const form = useForm<DebtFormValues>({
         defaultValues: {
@@ -331,13 +345,20 @@ export function DebtForm({
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormControl>
-                                                <FormInput
+                                                <PresetNameField
+                                                    value={field.value}
+                                                    onChange={field.onChange}
+                                                    options={lenderOptions}
                                                     placeholder={
                                                         lendersForType.length > 0
-                                                            ? 'Lender name'
-                                                            : 'e.g. bank or person'
+                                                            ? 'Search lender or bank…'
+                                                            : 'e.g. ING, DUO, Klarna'
                                                     }
-                                                    {...field}
+                                                    freeTextPlaceholder="Type a lender name…"
+                                                    disabled={busy}
+                                                    onSelect={opt => {
+                                                        field.onChange(opt.name);
+                                                    }}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -367,7 +388,17 @@ export function DebtForm({
                             <FormItem>
                                 <FormLabel>Who do you owe?</FormLabel>
                                 <FormControl>
-                                    <FormInput placeholder="e.g. DUO" {...field} />
+                                    <PresetNameField
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        options={lenderOptions}
+                                        placeholder="e.g. ING, DUO"
+                                        freeTextPlaceholder="Type a lender name…"
+                                        disabled={busy}
+                                        onSelect={opt => {
+                                            field.onChange(opt.name);
+                                        }}
+                                    />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

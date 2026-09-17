@@ -17127,6 +17127,22 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "uuid"
+        },
+        "suggested_merchant_keys": {
+          "name": "suggested_merchant_keys",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "'[]'",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "json"
         }
       },
       "name": "reference_money_fixed_cost_preset",

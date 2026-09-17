@@ -24,6 +24,8 @@ export const FixedCostPreset = CatalogItemBase.extend({
     suggestedDueDay: z.int().min(1).max(31).nullable(),
     direction: z.enum(FlowDirection),
     audienceTags: z.array(z.string()),
+    /** MerchantPreset.key chips for “Paid to” after this bill type is picked. */
+    suggestedMerchantKeys: z.array(z.string().min(1).max(64)),
 });
 
 export const DebtPreset = CatalogItemBase.extend({
