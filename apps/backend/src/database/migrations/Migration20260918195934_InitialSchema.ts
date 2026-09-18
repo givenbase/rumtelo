@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260918070924_InitialSchema extends Migration {
+export class Migration20260918195934_InitialSchema extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create schema if not exists "backoffice";`);
@@ -9,12 +9,12 @@ export class Migration20260918070924_InitialSchema extends Migration {
     this.addSql(`create type "auth_theme" as enum ('LIGHT', 'DARK', 'SYSTEM');`);
     this.addSql(`create type "money_spending_style" as enum ('SPENDER', 'SAVER', 'BALANCED', 'UNKNOWN');`);
     this.addSql(`create type "money_account_kind" as enum ('CHECKING', 'SAVINGS', 'CREDIT', 'CASH', 'INVESTMENT');`);
+    this.addSql(`create type "backoffice_plan_key" as enum ('BASIC', 'PLUS', 'MAX');`);
     this.addSql(`create type "platform_coach_kind" as enum ('NUDGE', 'WIN', 'WARNING', 'INSIGHT', 'WEEK_CHECK');`);
     this.addSql(`create type "money_debt_kind" as enum ('CREDIT_CARD', 'LOAN', 'STUDENT', 'MORTGAGE', 'FAMILY', 'OTHER');`);
     this.addSql(`create type "money_debt_schedule_kind" as enum ('OPEN', 'TERM', 'DEADLINE');`);
     this.addSql(`create type "money_cadence" as enum ('WEEKLY', 'MONTHLY', 'QUARTERLY', 'YEARLY', 'ONCE');`);
     this.addSql(`create type "energy_metric" as enum ('SLEEP', 'TRAIN', 'FOOD', 'MIND');`);
-    this.addSql(`create type "backoffice_plan_key" as enum ('BASIC', 'PLUS', 'MAX');`);
     this.addSql(`create type "platform_household_kind" as enum ('FAMILY', 'PARTNERS', 'FRIENDS', 'SOLO');`);
     this.addSql(`create type "platform_currency" as enum ('EUR', 'USD', 'GBP');`);
     this.addSql(`create type "money_income_kind" as enum ('SALARY', 'FREELANCE', 'BENEFIT', 'RENTAL', 'DIVIDEND', 'OTHER');`);
@@ -23,6 +23,7 @@ export class Migration20260918070924_InitialSchema extends Migration {
     this.addSql(`create type "money_goal_status" as enum ('ACTIVE', 'REACHED', 'PAUSED', 'ARCHIVED');`);
     this.addSql(`create type "money_giving_cause" as enum ('GLOBAL_HEALTH', 'POVERTY', 'EDUCATION', 'CLIMATE', 'ANIMALS', 'COMMUNITY', 'EMERGENCY', 'WATER');`);
     this.addSql(`create type "money_flow_direction" as enum ('IN', 'OUT');`);
+    this.addSql(`create type "growth_learn_progress_status" as enum ('QUEUE', 'NOW', 'DONE');`);
     this.addSql(`create type "money_merchant_highlight" as enum ('FEATURED', 'NEW', 'POPULAR');`);
     this.addSql(`create type "money_week_check_stage" as enum ('LOOK', 'REDIRECT', 'INTEND', 'DONE');`);
     this.addSql(`create type "money_month_score_event_kind" as enum ('JAR_HELD', 'JAR_OVERSPENT', 'INBOX_CLEARED', 'WEEK_CHECK_DONE', 'GOAL_REACHED', 'DEBT_CLEARED', 'INCOME_LOGGED', 'STREAK_KEPT');`);
@@ -31,6 +32,14 @@ export class Migration20260918070924_InitialSchema extends Migration {
     this.addSql(`create type "money_rule_matcher" as enum ('CONTAINS', 'EQUALS', 'STARTS_WITH', 'REGEX');`);
     this.addSql(`create type "money_transaction_status" as enum ('INBOX', 'SORTED', 'IGNORED');`);
     this.addSql(`create type "money_transaction_source" as enum ('MANUAL', 'CSV', 'BANK', 'RECURRING');`);
+    this.addSql(`create type "growth_learn_watch_kind" as enum ('FILM', 'VIDEO', 'SERIES');`);
+    this.addSql(`create table "backoffice"."reference_growth_asset_kind" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "key" varchar(64) not null, "name" varchar(120) not null, "sort_order" int not null default 0, "is_active" boolean not null default true, "description" text null, "can_pay" boolean not null default false, "icon" varchar(8) null, constraint "reference_growth_asset_kind_pkey" primary key ("id"));`);
+    this.addSql(`alter table "backoffice"."reference_growth_asset_kind" add constraint "reference_growth_asset_kind_key_unique" unique ("key");`);
+
+    this.addSql(`create table "backoffice"."reference_growth_asset_preset" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "key" varchar(64) not null, "name" varchar(120) not null, "sort_order" int not null default 0, "is_active" boolean not null default true, "description" text null, "kind_id" uuid not null, constraint "reference_growth_asset_preset_pkey" primary key ("id"));`);
+    this.addSql(`create index "reference_growth_asset_preset_kind_id_index" on "backoffice"."reference_growth_asset_preset" ("kind_id");`);
+    this.addSql(`alter table "backoffice"."reference_growth_asset_preset" add constraint "reference_growth_asset_preset_key_unique" unique ("key");`);
+
     this.addSql(`create table "backoffice"."reference_money_audience" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "key" varchar(64) not null, "name" varchar(120) not null, "sort_order" int not null default 0, "is_active" boolean not null default true, "description" text null, "is_baseline" boolean not null default false, "accent_color" varchar(64) null, "soft_color" varchar(64) null, "icon" varchar(8) null, constraint "reference_money_audience_pkey" primary key ("id"));`);
     this.addSql(`alter table "backoffice"."reference_money_audience" add constraint "reference_money_audience_key_unique" unique ("key");`);
 
@@ -62,6 +71,9 @@ export class Migration20260918070924_InitialSchema extends Migration {
     this.addSql(`create table "money_bank_account" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "name" varchar(120) not null, "iban" varchar(34) null, "balance" bigint not null default 0, "connection_id" uuid null, "last_synced_at" timestamptz null, "kind" "public"."money_account_kind" not null default 'CHECKING', constraint "money_bank_account_pkey" primary key ("id"));`);
     this.addSql(`create index "money_bank_account_household_id_index" on "money_bank_account" ("household_id");`);
     this.addSql(`alter table "money_bank_account" add constraint "money_bank_account_household_id_iban_unique" unique ("household_id", "iban");`);
+
+    this.addSql(`create table "backoffice"."reference_growth_book_preset" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "key" varchar(64) not null, "name" varchar(120) not null, "sort_order" int not null default 0, "is_active" boolean not null default true, "description" text not null, "author" varchar(120) not null, "skill" varchar(64) not null default 'MONEY', "topic" varchar(64) not null, "cover_id" int null, "isbn13" varchar(13) null, "spending_styles" jsonb not null default '[]', "url" varchar(280) not null, "min_plan" "public"."backoffice_plan_key" not null, constraint "reference_growth_book_preset_pkey" primary key ("id"));`);
+    this.addSql(`alter table "backoffice"."reference_growth_book_preset" add constraint "reference_growth_book_preset_key_unique" unique ("key");`);
 
     this.addSql(`create table "platform_coach_message" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "period" varchar(7) not null, "text" text not null, "cta_label" varchar(60) null, "cta_href" varchar(200) null, "dismissed_at" timestamptz null, "kind" "public"."platform_coach_kind" not null default 'NUDGE', constraint "platform_coach_message_pkey" primary key ("id"));`);
     this.addSql(`create index "platform_coach_message_household_id_index" on "platform_coach_message" ("household_id");`);
@@ -158,6 +170,18 @@ export class Migration20260918070924_InitialSchema extends Migration {
     this.addSql(`create index "reference_money_fixed_cost_preset_jar_template_id_index" on "backoffice"."reference_money_fixed_cost_preset" ("jar_template_id");`);
     this.addSql(`alter table "backoffice"."reference_money_fixed_cost_preset" add constraint "reference_money_fixed_cost_preset_key_unique" unique ("key");`);
 
+    this.addSql(`create table "growth_learn_book" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "name" varchar(160) not null, "description" text not null, "author" varchar(120) not null, "skill" varchar(64) not null, "topic" varchar(64) not null, "cover_id" int null, "isbn13" varchar(13) null, "source_key" varchar(64) not null, "url" varchar(280) not null, "account_id" uuid not null, constraint "growth_learn_book_pkey" primary key ("id"));`);
+    this.addSql(`create index "growth_learn_book_household_id_index" on "growth_learn_book" ("household_id");`);
+    this.addSql(`alter table "growth_learn_book" add constraint "growth_learn_book_household_id_source_key_unique" unique ("household_id", "source_key");`);
+
+    this.addSql(`create table "growth_learn_progress" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "piece_key" varchar(64) not null, "skill" varchar(64) not null, "rank" int not null default 1, "due_on" date null, "status" "public"."growth_learn_progress_status" not null, "account_id" uuid not null, constraint "growth_learn_progress_pkey" primary key ("id"));`);
+    this.addSql(`create index "growth_learn_progress_household_id_index" on "growth_learn_progress" ("household_id");`);
+    this.addSql(`alter table "growth_learn_progress" add constraint "growth_learn_progress_household_id_account_id_piece_key_unique" unique ("household_id", "account_id", "piece_key");`);
+
+    this.addSql(`create table "growth_learn_focus" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "skill" varchar(64) not null, "account_id" uuid not null, constraint "growth_learn_focus_pkey" primary key ("id"));`);
+    this.addSql(`create index "growth_learn_focus_household_id_index" on "growth_learn_focus" ("household_id");`);
+    this.addSql(`alter table "growth_learn_focus" add constraint "growth_learn_focus_household_id_account_id_skill_unique" unique ("household_id", "account_id", "skill");`);
+
     this.addSql(`create table "backoffice"."reference_money_market" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "key" varchar(64) not null, "name" varchar(120) not null, "sort_order" int not null default 0, "is_active" boolean not null default true, constraint "reference_money_market_pkey" primary key ("id"));`);
     this.addSql(`alter table "backoffice"."reference_money_market" add constraint "reference_money_market_key_unique" unique ("key");`);
 
@@ -227,7 +251,7 @@ export class Migration20260918070924_InitialSchema extends Migration {
     this.addSql(`create index "soul_week_check_household_id_index" on "soul_week_check" ("household_id");`);
     this.addSql(`alter table "soul_week_check" add constraint "soul_week_check_household_id_week_unique" unique ("household_id", "week");`);
 
-    this.addSql(`create table "money_transaction" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "description" varchar(280) not null, "note" text null, "counterparty" varchar(160) null, "amount" bigint not null, "inflow_key" varchar(64) null, "dedupe_key" varchar(64) null, "booked_on" date not null, "status" "public"."money_transaction_status" not null default 'INBOX', "source" "public"."money_transaction_source" not null default 'MANUAL', "account_id" uuid null, "jar_id" uuid null, "category_id" uuid null, "debt_id" uuid null, "applied_rule_id" uuid null, constraint "money_transaction_pkey" primary key ("id"));`);
+    this.addSql(`create table "money_transaction" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "description" varchar(280) not null, "note" text null, "counterparty" varchar(160) null, "amount" bigint not null, "inflow_key" varchar(64) null, "applied_merchant_key" varchar(64) null, "dedupe_key" varchar(64) null, "booked_on" date not null, "status" "public"."money_transaction_status" not null default 'INBOX', "source" "public"."money_transaction_source" not null default 'MANUAL', "account_id" uuid null, "jar_id" uuid null, "category_id" uuid null, "debt_id" uuid null, "applied_rule_id" uuid null, constraint "money_transaction_pkey" primary key ("id"));`);
     this.addSql(`create index "money_transaction_household_id_index" on "money_transaction" ("household_id");`);
     this.addSql(`create index "money_transaction_applied_rule_id_index" on "money_transaction" ("applied_rule_id");`);
     this.addSql(`create index "money_transaction_debt_id_index" on "money_transaction" ("debt_id");`);
@@ -240,6 +264,9 @@ export class Migration20260918070924_InitialSchema extends Migration {
 
     this.addSql(`create table "backoffice"."reference_money_transaction_in_preset" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "key" varchar(64) not null, "name" varchar(120) not null, "sort_order" int not null default 0, "is_active" boolean not null default true, "group_name" varchar(64) not null, "icon" varchar(8) null, "jar_key" "public"."money_jar_key" null, constraint "reference_money_transaction_in_preset_pkey" primary key ("id"));`);
     this.addSql(`alter table "backoffice"."reference_money_transaction_in_preset" add constraint "reference_money_transaction_in_preset_key_unique" unique ("key");`);
+
+    this.addSql(`create table "backoffice"."reference_growth_watch_preset" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "key" varchar(64) not null, "name" varchar(120) not null, "sort_order" int not null default 0, "is_active" boolean not null default true, "description" text not null, "creator" varchar(120) not null, "skill" varchar(64) not null default 'MONEY', "topic" varchar(64) not null, "youtube_id" varchar(16) null, "spending_styles" jsonb not null default '[]', "url" varchar(280) not null, "watch_url" varchar(280) null, "format" "public"."growth_learn_watch_kind" not null, "min_plan" "public"."backoffice_plan_key" not null, constraint "reference_growth_watch_preset_pkey" primary key ("id"));`);
+    this.addSql(`alter table "backoffice"."reference_growth_watch_preset" add constraint "reference_growth_watch_preset_key_unique" unique ("key");`);
 
     this.addSql(`create table "backoffice"."reference_growth_wealth_stage" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "key" varchar(64) not null, "name" varchar(120) not null, "sort_order" int not null default 0, "is_active" boolean not null default true, "description" text null, "min_net_worth" bigint null, "badge_label" varchar(64) null, constraint "reference_growth_wealth_stage_pkey" primary key ("id"));`);
     this.addSql(`alter table "backoffice"."reference_growth_wealth_stage" add constraint "reference_growth_wealth_stage_key_unique" unique ("key");`);
@@ -254,6 +281,8 @@ export class Migration20260918070924_InitialSchema extends Migration {
     this.addSql(`create index "money_week_check_allocation_household_id_index" on "money_week_check_allocation" ("household_id");`);
     this.addSql(`create index "money_week_check_allocation_jar_id_index" on "money_week_check_allocation" ("jar_id");`);
     this.addSql(`alter table "money_week_check_allocation" add constraint "money_week_check_allocation_week_check_id_jar_id_unique" unique ("week_check_id", "jar_id");`);
+
+    this.addSql(`alter table "backoffice"."reference_growth_asset_preset" add constraint "reference_growth_asset_preset_kind_id_foreign" foreign key ("kind_id") references "backoffice"."reference_growth_asset_kind" ("id") on update cascade on delete restrict;`);
 
     this.addSql(`alter table "auth"."two_factor" add constraint "two_factor_user_id_foreign" foreign key ("user_id") references "auth"."user" ("id") on update cascade on delete cascade;`);
 
@@ -320,6 +349,15 @@ export class Migration20260918070924_InitialSchema extends Migration {
 
     this.addSql(`alter table "backoffice"."reference_money_fixed_cost_preset" add constraint "reference_money_fixed_cost_preset_jar_template_id_foreign" foreign key ("jar_template_id") references "backoffice"."reference_money_jar_template" ("id") on update cascade on delete restrict;`);
     this.addSql(`alter table "backoffice"."reference_money_fixed_cost_preset" add constraint "reference_money_fixed_cost_preset_category_template_id_foreign" foreign key ("category_template_id") references "backoffice"."reference_money_category_template" ("id") on update cascade on delete restrict;`);
+
+    this.addSql(`alter table "growth_learn_book" add constraint "growth_learn_book_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
+    this.addSql(`alter table "growth_learn_book" add constraint "growth_learn_book_account_id_foreign" foreign key ("account_id") references "auth"."account" ("id") on update cascade on delete cascade;`);
+
+    this.addSql(`alter table "growth_learn_progress" add constraint "growth_learn_progress_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
+    this.addSql(`alter table "growth_learn_progress" add constraint "growth_learn_progress_account_id_foreign" foreign key ("account_id") references "auth"."account" ("id") on update cascade on delete cascade;`);
+
+    this.addSql(`alter table "growth_learn_focus" add constraint "growth_learn_focus_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
+    this.addSql(`alter table "growth_learn_focus" add constraint "growth_learn_focus_account_id_foreign" foreign key ("account_id") references "auth"."account" ("id") on update cascade on delete cascade;`);
 
     this.addSql(`alter table "backoffice"."reference_money_merchant_preset" add constraint "reference_money_merchant_preset_jar_template_id_foreign" foreign key ("jar_template_id") references "backoffice"."reference_money_jar_template" ("id") on update cascade on delete restrict;`);
     this.addSql(`alter table "backoffice"."reference_money_merchant_preset" add constraint "reference_money_merchant_preset_category_template_id_foreign" foreign key ("category_template_id") references "backoffice"."reference_money_category_template" ("id") on update cascade on delete restrict;`);
