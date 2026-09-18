@@ -326,7 +326,7 @@ export function FixedCostForm({
         // Bill preset owns Paid-to chips in the catalog (cross-category OK).
         if (selectedBillPresetKey) {
             const bill = fixedCostPresets.find(preset => preset.key === selectedBillPresetKey);
-            const keys = bill?.suggestedMerchantKeys ?? [];
+            const keys = bill?.merchantKeys ?? [];
             if (keys.length === 0) return [] as MerchantPreset[];
             return keys
                 .map(key => byKey.get(key))
@@ -755,8 +755,8 @@ export function FixedCostForm({
                                             setPendingCategoryTemplateKey(full.categoryTemplateKey);
                                             form.setValue('categoryId', null);
                                         }
-                                        if (full.suggestedDueDay !== null) {
-                                            form.setValue('dueDay', String(full.suggestedDueDay));
+                                        if (full.dueDay !== null) {
+                                            form.setValue('dueDay', String(full.dueDay));
                                         }
                                         setCustomPayee(false);
                                         form.setValue('counterparty', '', { shouldDirty: false });

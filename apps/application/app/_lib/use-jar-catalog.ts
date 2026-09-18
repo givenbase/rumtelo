@@ -40,7 +40,7 @@ export function useJarCatalog(): {
                 ...template,
                 color: chrome.color,
                 text: chrome.text,
-                pct: template.defaultPercentage,
+                pct: template.percentage,
             };
         });
     }, [query.data]);

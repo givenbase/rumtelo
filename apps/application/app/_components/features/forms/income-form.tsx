@@ -259,7 +259,7 @@ export function IncomeForm({
                                         );
                                         if (!full) return;
                                         form.setValue('kind', full.kind);
-                                        form.setValue('cadence', full.defaultCadence);
+                                        form.setValue('cadence', full.cadence);
                                     }}
                                 />
                             ) : (

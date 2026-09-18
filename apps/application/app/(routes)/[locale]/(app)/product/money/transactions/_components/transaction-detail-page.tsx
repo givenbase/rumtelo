@@ -330,7 +330,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
             <RelatedRow
                 key="rule"
                 label="Sorted by rule"
-                value={`“${appliedRule.value}” → jar`}
+                value={`“${appliedRule.matchValue}” → jar`}
                 hint="Manage rules on the Transactions page"
                 href="/product/money/transactions"
             />

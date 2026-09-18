@@ -1950,7 +1950,7 @@ export function PlanSettings() {
             planKey: PlanKey.BASIC,
             periodEndsAt: null,
             periodStartedAt: null,
-            isCancelAtPeriodEnd: false,
+            willCancelAtPeriodEnd: false,
             scheduledPlanKey: null,
             hasStripeCustomer: false,
             hasActiveSubscription: false,

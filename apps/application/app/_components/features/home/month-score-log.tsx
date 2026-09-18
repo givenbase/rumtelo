@@ -4,6 +4,11 @@ import { cn } from '@rumtelo/utils';
 
 export type { MonthScoreEvent };
 
+/** `YYYY-MM-DD` → day-of-month without a leading zero. */
+function dayOfMonth(isoDate: string): number {
+    return Number(isoDate.slice(8, 10));
+}
+
 /**
  * Month score log (design: dashboard "Month score" section).
  *
@@ -16,7 +21,7 @@ export function MonthScoreLog({
 }: {
     score: number;
     daysLeft: number;
-    events: readonly Pick<MonthScoreEvent, 'day' | 'text' | 'points' | 'kind'>[];
+    events: readonly Pick<MonthScoreEvent, 'occurredOn' | 'text' | 'points' | 'kind'>[];
 }) {
     return (
         <div className="rounded-2xl border border-line bg-surface p-6 shadow-md">
@@ -38,10 +43,10 @@ export function MonthScoreLog({
             <div className="mt-4.5 grid gap-0">
                 {events.map(entry => (
                     <div
-                        key={`${entry.day}-${entry.text}`}
+                        key={`${entry.occurredOn}-${entry.text}`}
                         className="flex items-baseline gap-2.5 border-b border-line py-3 last:border-b-0 last:pb-0">
                         <span className="w-14 shrink-0 font-mono text-xs text-fg-faint">
-                            {entry.day}
+                            {dayOfMonth(entry.occurredOn)}
                         </span>
                         <span className="min-w-0 flex-1 text-sm text-pretty text-fg-secondary">
                             {entry.text}

@@ -171,7 +171,7 @@ export function DebtForm({
         jarByKey,
     });
     const lendersForType: MerchantPreset[] = (() => {
-        const keys = selectedType?.suggestedMerchantKeys ?? [];
+        const keys = selectedType?.merchantKeys ?? [];
         if (keys.length === 0) return [];
         const byKey = new Map(merchants.map(merchant => [merchant.key, merchant]));
         return keys

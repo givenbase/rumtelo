@@ -58,7 +58,7 @@ const goalFormSchema = z.object({
     /** GIVE: cause reserved for this pledge; null = any giving. */
     cause: z.enum(GivingCause).nullable().optional(),
     /** GIVE: organisation catalog key when named. */
-    orgKey: z.string().max(64).nullable().optional(),
+    givingOrganisationKey: z.string().max(64).nullable().optional(),
 });
 
 export type GoalFormValues = z.infer<typeof goalFormSchema>;
@@ -104,7 +104,7 @@ function givePledgeName(cause: GivingCause | null | undefined) {
 }
 
 function resolveGiveTargetMode(defaults: Partial<GoalFormValues> | undefined): GiveTargetMode {
-    if (defaults?.orgKey?.trim()) return 'org';
+    if (defaults?.givingOrganisationKey?.trim()) return 'org';
     if (defaults?.name?.trim() && defaults.name !== givePledgeName(defaults.cause ?? null)) {
         return 'manual';
     }
@@ -172,14 +172,17 @@ export function GoalForm({
             jarId: defaultValues?.jarId ?? '',
             why: defaultValues?.why ?? '',
             cause: defaultValues?.cause ?? null,
-            orgKey: defaultValues?.orgKey ?? null,
+            givingOrganisationKey: defaultValues?.givingOrganisationKey ?? null,
         },
         resolver: zodResolver(goalFormSchema),
     });
 
     const kind = useWatch({ control: form.control, name: 'kind' });
     const cause = useWatch({ control: form.control, name: 'cause' });
-    const orgKey = useWatch({ control: form.control, name: 'orgKey' });
+    const givingOrganisationKey = useWatch({
+        control: form.control,
+        name: 'givingOrganisationKey',
+    });
     const name = useWatch({ control: form.control, name: 'name' });
     const isEarn = kind === GoalKind.EARN;
     const isGive = kind === GoalKind.GIVE;
@@ -208,14 +211,14 @@ export function GoalForm({
         form.setValue('kind', next);
         if (next === GoalKind.GIVE) {
             form.setValue('cause', null);
-            form.setValue('orgKey', null);
+            form.setValue('givingOrganisationKey', null);
             form.setValue('name', givePledgeName(null), { shouldDirty: false });
             setGiveTargetMode('open');
             selectedIcon.current = '💛';
             return;
         }
         form.setValue('cause', null);
-        form.setValue('orgKey', null);
+        form.setValue('givingOrganisationKey', null);
         if (kind === GoalKind.GIVE) {
             form.setValue('name', '', { shouldDirty: false });
             selectedIcon.current = null;
@@ -225,7 +228,7 @@ export function GoalForm({
     function selectCause(next: GivingCause | null) {
         form.setValue('cause', next, { shouldDirty: true });
         if (giveTargetMode === 'open') {
-            form.setValue('orgKey', null);
+            form.setValue('givingOrganisationKey', null);
             form.setValue('name', givePledgeName(next), { shouldDirty: true });
             const meta = next ? givingCauseMeta(next) : null;
             selectedIcon.current = meta?.icon ?? '💛';
@@ -235,7 +238,7 @@ export function GoalForm({
     function selectGiveTargetMode(next: GiveTargetMode) {
         if (next === giveTargetMode) return;
         setGiveTargetMode(next);
-        form.setValue('orgKey', null);
+        form.setValue('givingOrganisationKey', null);
         if (next === 'open') {
             form.setValue('name', givePledgeName(cause ?? null), { shouldDirty: true });
             const meta = cause ? givingCauseMeta(cause) : null;
@@ -269,7 +272,9 @@ export function GoalForm({
             const jarId = earn ? null : values.jarId || null;
             const why = values.why?.trim() || null;
             const causeValue = give ? (values.cause ?? null) : null;
-            const orgKeyValue = give ? values.orgKey?.trim() || null : null;
+            const givingOrganisationKeyValue = give
+                ? values.givingOrganisationKey?.trim() || null
+                : null;
             if (mode === 'edit' && entityId) {
                 return api.money.goals.update({
                     id: entityId,
@@ -281,7 +286,7 @@ export function GoalForm({
                     jarId,
                     why,
                     cause: causeValue,
-                    orgKey: orgKeyValue,
+                    givingOrganisationKey: givingOrganisationKeyValue,
                 });
             }
             return api.money.goals.create({
@@ -300,7 +305,7 @@ export function GoalForm({
                 status: GoalStatus.ACTIVE,
                 why,
                 cause: causeValue,
-                orgKey: orgKeyValue,
+                givingOrganisationKey: givingOrganisationKeyValue,
             });
         },
         onSuccess: () => {
@@ -532,10 +537,12 @@ export function GoalForm({
                         <GivingFinder
                             defaultOpen
                             initialCause={cause ?? null}
-                            selectedKey={orgKey}
+                            selectedKey={givingOrganisationKey}
                             selectedName={name}
                             onPick={organisation => {
-                                form.setValue('orgKey', organisation.key, { shouldDirty: true });
+                                form.setValue('givingOrganisationKey', organisation.key, {
+                                    shouldDirty: true,
+                                });
                                 form.setValue('name', organisation.name, { shouldDirty: true });
                                 const orgCause = organisation.causes[0] ?? null;
                                 if (orgCause && !cause) {

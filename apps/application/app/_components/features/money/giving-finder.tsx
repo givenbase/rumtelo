@@ -292,7 +292,7 @@ function GivingOrganisationCard({
                 </button>
             </div>
 
-            <p className="text-sm leading-relaxed text-fg-secondary">{organisation.summary}</p>
+            <p className="text-sm leading-relaxed text-fg-secondary">{organisation.description}</p>
 
             <ul className="flex flex-wrap gap-1.5" aria-label="Independent signals">
                 {organisation.signals.map(signal => {

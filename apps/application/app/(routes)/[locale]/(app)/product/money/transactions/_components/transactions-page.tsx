@@ -550,7 +550,7 @@ export function TransactionsPageClient() {
                                                     If {FIELD_LABEL[rule.field]}{' '}
                                                     {MATCHER_LABEL[rule.matcher]}{' '}
                                                     <span className="font-mono text-sm">
-                                                        “{rule.value}”
+                                                        “{rule.matchValue}”
                                                     </span>
                                                 </p>
                                                 <p className="mt-1 font-mono text-xs tracking-normal text-fg-faint uppercase">

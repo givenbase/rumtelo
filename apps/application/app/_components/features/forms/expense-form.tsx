@@ -255,7 +255,11 @@ export function ExpenseForm({
         live && isIn
     );
     const transactionInPresets = useMemo(
-        () => transactionInQuery.data ?? [],
+        () =>
+            (transactionInQuery.data ?? []).map(preset => ({
+                ...preset,
+                group: preset.groupName,
+            })),
         [transactionInQuery.data]
     );
     const jarChoices = useMemo(() => {

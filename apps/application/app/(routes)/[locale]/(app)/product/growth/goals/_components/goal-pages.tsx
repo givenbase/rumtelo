@@ -72,7 +72,7 @@ export function GoalUpdatePage({ id, embedded = false }: { id: string; embedded?
                 jarId: row.jarId ?? '',
                 why: row.why ?? '',
                 cause: row.cause ?? null,
-                orgKey: row.orgKey ?? null,
+                givingOrganisationKey: row.givingOrganisationKey ?? null,
             }}
         />
     );
