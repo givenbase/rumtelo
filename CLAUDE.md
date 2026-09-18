@@ -11,9 +11,10 @@ Follow project Cursor rules in `.cursor/rules/` (especially `react-next-patterns
 | Frontend | Next.js 16 App Router, React 19, **Tailwind v4 only** |
 | UI | `@rumtelo/ui` + `cn` from `@rumtelo/utils` |
 | i18n | `@rumtelo/i18n` + next-intl — **EN first, NL second** |
-| API | **NestJS 11 + Fastify + oRPC** |
+| API | NestJS 11 + **Fastify** + **oRPC** |
 | Contracts | `@rumtelo/contracts` (Zod + procedures) — wire source of truth |
-| DB | PostgreSQL · row-level `household_id` (`HouseholdScopedRepository`) — **not** schema-per-tenant |
+| ORM | **MikroORM 6** + PostgreSQL |
+| Isolation | Row-level `household_id` (`HouseholdScopedRepository`) — **not** schema-per-tenant |
 | Auth | better-auth (`organization` = household, **2FA**) |
 | Lint | **oxlint + oxfmt** (`pnpm lint`) — not ESLint/Prettier |
 | Host | Railway (EU) |

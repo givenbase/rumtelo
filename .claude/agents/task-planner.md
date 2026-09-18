@@ -5,7 +5,7 @@ model: opus
 color: blue
 ---
 
-Plan 5–12 steps with deps and acceptance. Assign agents from `.claude/agents/`. Prefer contracts-first for API work.
+Plan 5–12 steps with deps and acceptance. Prefer contracts-first for API; MikroORM for entities/migrations. Assign agents from this folder.
 
 ## Canonical sources
 

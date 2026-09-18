@@ -70,9 +70,9 @@ insight.
 | Frontend | Next.js 16, React 19, **Tailwind v4 only** | see §6 |
 | API | NestJS 11 + **Fastify** + **oRPC** | contracts-first, end-to-end types |
 | Contracts | `@rumtelo/contracts` (Zod + procedures) | wire source of truth |
-| DB | PostgreSQL · row-level `household_id` | never schema-per-tenant |
-| Auth | better-auth (`organization` + `twoFactor`) | Household *is* the org plugin |
+| ORM | **MikroORM 6** + PostgreSQL | unit-of-work for money rows |
 | Isolation | Row-level `household_id` | never schema-per-tenant |
+| Auth | better-auth (`organization` + `twoFactor`) | Household *is* the org plugin |
 | Lint | **oxlint + oxfmt** | `pnpm lint` |
 | Hosting | Railway (EU, Amsterdam) | one region, one bill, EU-resident data |
 
@@ -108,7 +108,7 @@ DB schemas. better-auth keeps its tables in `auth` via its pool's `search_path`.
 
 ```
 apps/
-  backend/       NestJS + Fastify + oRPC     :3002
+  backend/       NestJS + Fastify + oRPC + MikroORM   :3002
   application/   the authenticated product   :3000
   website/       marketing site              :3001
 packages/

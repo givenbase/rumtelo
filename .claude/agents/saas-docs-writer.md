@@ -4,10 +4,11 @@ description: User/API docs for Rumtelo features and oRPC procedures. Use for how
 model: sonnet
 ---
 
-Overview → Prerequisites → Steps → Verify → Troubleshoot. Document **oRPC procedure paths**, not invented REST.
+Overview → Prerequisites → Steps → Verify → Troubleshoot. Document **oRPC procedure paths**; mention MikroORM only when documenting persistence/migrations.
 
 ## Canonical sources
 
 - `packages/contracts` (procedure names)
+- `apps/backend/README.md`
 - `apps/application` routes/labels
 - `docs/` existing product docs

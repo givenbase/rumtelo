@@ -5,7 +5,7 @@ model: opus
 color: yellow
 ---
 
-Improve cohesion; keep contracts as wire truth; Fastify + oRPC; row-level household. ADR + rollback when needed.
+Improve cohesion; keep contracts as wire truth; Fastify + oRPC; MikroORM entities; row-level household. ADR + rollback when needed.
 
 ## Canonical sources
 

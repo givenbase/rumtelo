@@ -20,7 +20,7 @@ sets an intention. Once a month, the turn closes with a score and a log.
 
 | Layer | Choice | Why |
 |---|---|---|
-| Monorepo | Turborepo + pnpm | matches the existing platforms |
+| Monorepo | Turborepo + pnpm | one workspace, shared packages |
 | Frontend | Next.js 16, React 19, **Tailwind v4 only** | no CSS modules, no SCSS |
 | API | NestJS 11 + Fastify + **oRPC** | contract-first, end-to-end types |
 | ORM | MikroORM 6 + PostgreSQL | unit-of-work matters for money |
@@ -46,7 +46,7 @@ service cannot pass the wrong id or forget one.
 
 ```
 apps/
-  backend/       NestJS + oRPC + MikroORM   :3002
+  backend/       NestJS + Fastify + oRPC + MikroORM   :3002
   application/   the authenticated product  :3000
   website/       marketing site             :3001
 packages/

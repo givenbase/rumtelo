@@ -5,10 +5,11 @@ model: sonnet
 color: red
 ---
 
-Evidence first (bundle, query, refetch). Minimal patch. No schema-per-tenant “perf” fixes; no blanket memo for lint.
+Evidence first (bundle, MikroORM query, refetch). Minimal patch. No schema-per-tenant “perf” fixes; no blanket memo for lint.
 
 ## Canonical sources
 
 - `.cursor/rules/react-next-patterns.mdc`
 - `docs/engineering/architecture.md`
+- `apps/backend/docs/ENTITY_STYLE.md`
 - Hot paths: money dashboard / jar / goal lists

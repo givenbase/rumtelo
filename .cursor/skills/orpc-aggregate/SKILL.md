@@ -11,7 +11,7 @@ disable-model-invocation: false
 
 ## When
 
-New or changed API surface for Rumtelo (Nest + Fastify + oRPC).
+New or changed API surface for Rumtelo (Nest + Fastify + oRPC; persist with MikroORM).
 
 ## Steps
 
@@ -19,7 +19,7 @@ New or changed API surface for Rumtelo (Nest + Fastify + oRPC).
    - `{aggregate}.schema.ts` — Zod + `export type X = z.infer<typeof X>` in the same file
    - `{aggregate}.contract.ts` — `oc` procedures, CRUD banners Create → Read → Update → Delete
    - `index.ts` barrel; compose into domain router → root `contract`
-2. **Entity** (if new storage) — match neighbor aggregates; household money → `HouseholdEntity` + scoped repo
+2. **MikroORM entity** (if new storage) — match neighbor aggregates / ENTITY_STYLE; household money → `HouseholdEntity` + scoped repo
 3. **Service** — business rules; same CRUD order; explicit `toDto` / object map to contract types
 4. **Controller** — thin `@Implement(contract…)` only; no money `if`s
 5. **Module + index** — register like neighbors; export what others need
@@ -37,6 +37,7 @@ New or changed API surface for Rumtelo (Nest + Fastify + oRPC).
 - [packages/contracts/README.md](../../../packages/contracts/README.md)
 - [apps/backend/src/modules/README.md](../../../apps/backend/src/modules/README.md)
 - [.cursor/rules/backend-module-shape.mdc](../../rules/backend-module-shape.mdc)
+- [apps/backend/docs/ENTITY_STYLE.md](../../../apps/backend/docs/ENTITY_STYLE.md)
 - Neighbor: `apps/backend/src/modules/public/product/money/` (e.g. rule, jar, goal)
 
 ## Checklist

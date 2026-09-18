@@ -12,9 +12,9 @@ Snapshot of how the system is built. For status, next steps, and full narrative,
 | Frontend | Next.js 16, React 19, **Tailwind v4 only** | one styling system |
 | API | NestJS 11 + **Fastify** + **oRPC** | contracts-first, end-to-end types |
 | Contracts | `@rumtelo/contracts` (Zod + procedures) | wire source of truth |
-| DB | PostgreSQL · row-level `household_id` | never schema-per-tenant |
-| Auth | better-auth (`organization` + `twoFactor`) | Household *is* the org plugin |
+| ORM | **MikroORM 6** + PostgreSQL | unit-of-work for money rows |
 | Isolation | Row-level `household_id` | never schema-per-tenant |
+| Auth | better-auth (`organization` + `twoFactor`) | Household *is* the org plugin |
 | Lint | **oxlint + oxfmt** | `pnpm lint` |
 | Hosting | Railway (EU, Amsterdam) | one region, one bill, EU-resident data |
 
@@ -26,7 +26,7 @@ Pinned: **node >=22 / pnpm 10.x / TypeScript 5.9.x**. Do not bump casually.
 
 ```
 apps/
-  backend/       NestJS + Fastify + oRPC     :3002
+  backend/       NestJS + Fastify + oRPC + MikroORM   :3002
   application/   the authenticated product   :3000
   website/       marketing site              :3001
 packages/
