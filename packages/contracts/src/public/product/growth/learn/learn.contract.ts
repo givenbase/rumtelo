@@ -31,6 +31,7 @@ export const learnSave = oc
             status: z.enum(LearnProgressStatus),
             skill: LearnSkillKey,
             dueOn: IsoDate.nullable(),
+            rank: z.number().int().min(1).max(999),
         })
     )
     .output(LearnProgress);

@@ -3985,6 +3985,22 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "string"
+        },
+        "rank": {
+          "name": "rank",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": "1",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
         }
       },
       "name": "growth_learn_progress",

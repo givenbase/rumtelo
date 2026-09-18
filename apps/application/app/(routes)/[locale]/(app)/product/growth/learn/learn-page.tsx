@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
 
 import {
@@ -12,7 +12,6 @@ import {
 } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import {
-    AccentCard,
     Button,
     Card,
     DatePicker,
@@ -33,7 +32,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { isLiveData } from '@/app/_lib/preview';
 import { PlanKey } from '@/app/_lib/plan';
 import { env } from '@/app/_utils/get-env';
-import { CoachTipCard } from '@/components/features/helpers';
+import { CoachMark, useHelpersEnabled } from '@/components/features/helpers';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { EditIcon } from '@/components/features/ui/action-icons';
@@ -72,6 +71,8 @@ import {
 const EMPTY_BOOKS: LearnBookPreset[] = [];
 const EMPTY_WATCH: LearnWatchPreset[] = [];
 const EMPTY_BOOKS_ADDED: LearnBook[] = [];
+/** A taste of the shelf, not the whole library. One of each format, then a few more. */
+const RECOMMENDED_LIMIT = 6;
 /** Partner tags ride along on store links when set; the links work without them. */
 const STORE_TAGS = {
     bolPartnerId: env.NEXT_PUBLIC_BOL_PARTNER_ID,
@@ -97,6 +98,43 @@ function coursePartner(plan: PlanKey): string {
 function onThisPlan(piece: LearnPiece, plan: PlanKey): boolean {
     if (!piece.partner) return true;
     return piece.partner === coursePartner(plan);
+}
+
+function recommendedFor(
+    catalog: readonly LearnPiece[],
+    skills: ReadonlySet<LearnSkill>,
+    suggestedIds: ReadonlySet<string>,
+    statusOf: (piece: LearnPiece) => LearnStatus
+): LearnPiece[] {
+    const shelf = catalog.filter(
+        piece => !piece.added && skills.has(piece.skill) && statusOf(piece) === 'SHELF'
+    );
+    const ranked = [...shelf].sort(
+        (left, right) => Number(suggestedIds.has(right.id)) - Number(suggestedIds.has(left.id))
+    );
+    const chosen: LearnPiece[] = [];
+    const used = new Set<string>();
+    for (const format of FORMAT_ORDER) {
+        const hit = ranked.find(piece => piece.format === format);
+        if (!hit) continue;
+        chosen.push(hit);
+        used.add(hit.id);
+    }
+    for (const piece of ranked) {
+        if (chosen.length >= RECOMMENDED_LIMIT) break;
+        if (used.has(piece.id)) continue;
+        chosen.push(piece);
+        used.add(piece.id);
+    }
+    return chosen.slice(0, RECOMMENDED_LIMIT);
+}
+
+function byPriority(pieces: readonly LearnPiece[], rankById: Record<string, number>): LearnPiece[] {
+    return [...pieces].sort((left, right) => {
+        const delta = (rankById[left.id] ?? 1) - (rankById[right.id] ?? 1);
+        if (delta !== 0) return delta;
+        return left.title.localeCompare(right.title);
+    });
 }
 
 function partnerLine(plan: PlanKey): string {
@@ -532,7 +570,6 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
     const { householdId } = useAuth();
     const { plan } = usePlanCapabilities();
     const { locale } = useAppShell();
-    const router = useRouter();
     const searchParams = useSearchParams();
     const store = storeFor(locale);
     const live = isLiveData(householdId);
@@ -548,10 +585,10 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
     const {
         statusById,
         dueById,
-        focused,
+        rankById,
         setStatus: saveStatus,
         setDue: saveDue,
-        focusSkill,
+        setOrder,
     } = useLearnShelf();
 
     const booksQuery = useLiveQuery(
@@ -649,8 +686,13 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
     );
     const filtering = search.trim() !== '' || formatFilter !== 'ALL' || aboutFilter !== 'ALL';
 
-    const activeSkills = SKILLS.filter(skill => focused.has(skill.key));
-    const idleSkills = SKILLS.filter(skill => !focused.has(skill.key));
+    const listSkills = new Set<LearnSkill>(
+        focusPieces.length > 0 ? focusPieces.map(piece => piece.skill) : ['MONEY']
+    );
+    const recommended =
+        !browsing && tab === 'FOCUS'
+            ? recommendedFor(catalog, listSkills, suggestedIds, statusOf)
+            : [];
 
     function resetFilters() {
         setSearch('');
@@ -809,31 +851,35 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
             ) : null}
 
             {tab === 'FOCUS' && !browsing ? (
-                <FocusBoard
-                    active={activeSkills}
-                    idle={idleSkills}
-                    catalog={catalog}
-                    statusOf={statusOf}
-                    dueOf={dueOf}
-                    onDue={setDue}
-                    onFocus={skill => {
-                        focusSkill(skill);
-                        router.push(
-                            skill === 'MONEY' ? LIBRARY_HREF : `${LIBRARY_HREF}?about=${skill}`
-                        );
-                    }}
-                    shelf={
-                        shown.length > 0 ? (
-                            <PieceGroups
-                                pieces={shown}
-                                statusOf={statusOf}
-                                dueOf={dueOf}
-                                onStatus={setStatus}
-                                onDue={setDue}
-                            />
-                        ) : null
-                    }
-                />
+                <div className="grid gap-8">
+                    <ReadingList
+                        pieces={byPriority(focusPieces, rankById)}
+                        statusOf={statusOf}
+                        dueOf={dueOf}
+                        onStatus={setStatus}
+                        onDue={setDue}
+                        onMove={shift => {
+                            const ordered = byPriority(focusPieces, rankById);
+                            const next = [...ordered];
+                            const target = shift.from + shift.dir;
+                            if (target < 0 || target >= next.length) return;
+                            const [row] = next.splice(shift.from, 1);
+                            if (!row) return;
+                            next.splice(target, 0, row);
+                            setOrder(next.map(piece => ({ id: piece.id, skill: piece.skill })));
+                        }}
+                    />
+                    {recommended.length > 0 ? (
+                        <PieceGroups
+                            pieces={recommended}
+                            recommended
+                            statusOf={statusOf}
+                            dueOf={dueOf}
+                            onStatus={setStatus}
+                            onDue={setDue}
+                        />
+                    ) : null}
+                </div>
             ) : null}
 
             {shown.length === 0 && (browsing || tab === 'DONE') ? (
@@ -969,7 +1015,7 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
                 />
             ) : null}
 
-            {shown.length > 0 ? (
+            {shown.length > 0 || recommended.length > 0 ? (
                 <p className="px-1 text-center text-xs text-pretty text-fg-faint">
                     Books open at {storeName(store)}. Films and series open on JustWatch, which
                     shows where they stream in your country. Courses open at Udemy or Masterclass.
@@ -992,248 +1038,228 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
     );
 }
 
-function FocusBoard({
-    active,
-    idle,
-    catalog,
-    statusOf,
-    dueOf,
-    onDue,
-    onFocus,
-    shelf,
-}: {
-    active: readonly (typeof SKILLS)[number][];
-    idle: readonly (typeof SKILLS)[number][];
-    catalog: LearnPiece[];
-    statusOf: (piece: LearnPiece) => LearnStatus;
-    dueOf: (piece: LearnPiece) => string | undefined;
-    onDue: (id: string, iso: string) => void;
-    onFocus: (skill: LearnSkill) => void;
-    /** The titles already picked. Sits in the space beside one skill in focus. */
-    shelf?: ReactNode;
-}) {
-    if (active.length === 0 && idle.length === 0) return null;
-
-    const withShelf = Boolean(shelf) && active.length > 0;
-
-    return (
-        <div className="grid gap-4">
-            {active.length > 0 ? (
-                <div
-                    className={cn(
-                        'grid gap-4',
-                        !withShelf && active.length > 1 && 'sm:grid-cols-2'
-                    )}>
-                    {active.map(skill => {
-                        const pieces = catalog.filter(piece => piece.skill === skill.key);
-                        const next = withShelf
-                            ? null
-                            : (pieces.find(piece => statusOf(piece) === 'NOW') ??
-                              pieces.find(piece => statusOf(piece) === 'QUEUE') ??
-                              null);
-                        return (
-                            <AccentCard key={skill.key} tint={skill.tint}>
-                                <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-raised px-2.5 py-1 font-mono text-[10px] tracking-widest text-fg-secondary uppercase">
-                                    <span
-                                        className="size-1.75 rounded-sm"
-                                        style={{ background: skill.tint }}
-                                    />
-                                    Skill · {skill.line}
-                                </span>
-                                <Typography as="h3" className="mt-3 text-2xl leading-tight">
-                                    {skill.name}
-                                </Typography>
-                                <p className="mt-2 text-sm leading-snug text-fg-secondary italic">
-                                    “{skill.why}”
-                                </p>
-                                {next ? (
-                                    <PieceAdjust
-                                        format={next.format}
-                                        status={statusOf(next)}
-                                        due={dueOf(next)}
-                                        onStatus={() => undefined}
-                                        onDue={iso => onDue(next.id, iso)}
-                                        withStatus={false}>
-                                        {({ button, body }) => (
-                                            <div className="mt-5 grid gap-3">
-                                                <div className="flex items-start justify-between gap-3">
-                                                    <div className="flex min-w-0 items-center gap-3">
-                                                        <MediaCover
-                                                            piece={next}
-                                                            className="w-11 shrink-0 rounded-md"
-                                                        />
-                                                        <div className="min-w-0">
-                                                            <p className="font-mono text-[10px] tracking-widest text-fg-faint uppercase">
-                                                                {pickLabel(
-                                                                    next.format,
-                                                                    statusOf(next)
-                                                                )}
-                                                            </p>
-                                                            <p className="truncate text-sm font-medium text-fg">
-                                                                {next.title}
-                                                            </p>
-                                                            <p className="truncate font-mono text-[11px] text-fg-muted">
-                                                                {formatLabel(next.format)} ·{' '}
-                                                                {next.by}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    {button}
-                                                </div>
-                                                {body}
-                                            </div>
-                                        )}
-                                    </PieceAdjust>
-                                ) : withShelf ? null : (
-                                    <p className="mt-4 font-mono text-xs text-fg-muted">
-                                        ◇ Nothing picked for {skill.name} yet. Choose one in the
-                                        library.
-                                    </p>
-                                )}
-                            </AccentCard>
-                        );
-                    })}
-                    {withShelf ? <div className="sm:col-span-full">{shelf}</div> : null}
-                </div>
-            ) : (
-                <EmptyState
-                    icon="✦"
-                    title="No skill in focus."
-                    body="Pick communication, marketing, or money. Then choose a piece from the library."
-                />
-            )}
-
-            {idle.length > 0 ? (
-                <div
-                    className={cn(
-                        'grid gap-2',
-                        idle.length === 3
-                            ? 'sm:grid-cols-3'
-                            : idle.length > 1
-                              ? 'sm:grid-cols-2'
-                              : undefined
-                    )}>
-                    {idle.map(skill => (
-                        <button
-                            key={skill.key}
-                            type="button"
-                            onClick={() => onFocus(skill.key)}
-                            className="flex items-center justify-between gap-3 rounded-2xl border border-dashed border-line bg-surface px-4 py-3 text-left hover:border-accent-hover">
-                            <span className="min-w-0">
-                                <span className="flex items-center gap-2">
-                                    <span
-                                        className="size-1.75 rounded-sm"
-                                        style={{ background: skill.tint }}
-                                    />
-                                    <span className="text-sm font-medium text-fg">
-                                        {skill.name}
-                                    </span>
-                                </span>
-                                <span className="mt-0.5 block truncate text-xs text-fg-muted">
-                                    {skill.line}
-                                </span>
-                            </span>
-                            <span className="shrink-0 font-mono text-[11px] tracking-wide text-accent uppercase">
-                                Focus
-                            </span>
-                        </button>
-                    ))}
-                </div>
-            ) : null}
-        </div>
-    );
-}
-
-function PieceGroups({
+function ReadingList({
     pieces,
     statusOf,
     dueOf,
     onStatus,
     onDue,
+    onMove,
 }: {
     pieces: LearnPiece[];
     statusOf: (piece: LearnPiece) => LearnStatus;
     dueOf: (piece: LearnPiece) => string | undefined;
     onStatus: (id: string, status: LearnStatus) => void;
     onDue: (id: string, iso: string) => void;
+    onMove: (shift: { from: number; dir: -1 | 1 }) => void;
 }) {
-    const groups = FORMAT_ORDER.map(format => ({
-        format,
-        items: pieces.filter(piece => piece.format === format),
-    })).filter(group => group.items.length > 0);
+    if (pieces.length === 0) {
+        return (
+            <EmptyState
+                icon="✦"
+                title="Nothing picked yet."
+                body="The coach has a few below. Mark one and it lands here, in the order you want to take it."
+            />
+        );
+    }
+
+    return (
+        <Card className="p-0">
+            <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-3.5">
+                <Typography as="span" variant="eyebrow" color="primary">
+                    ✦ To read
+                </Typography>
+                <span className="font-mono text-xs text-fg-muted">{pieces.length}</span>
+            </div>
+            <ul className="grid">
+                {pieces.map((piece, index) => {
+                    const status = statusOf(piece);
+                    const reading = status === 'NOW';
+                    return (
+                        <li
+                            key={piece.id}
+                            className={cn(
+                                'border-b border-line last:border-b-0',
+                                reading && 'bg-accent-soft'
+                            )}>
+                            <PieceAdjust
+                                format={piece.format}
+                                status={status}
+                                due={dueOf(piece)}
+                                onStatus={next => onStatus(piece.id, next)}
+                                onDue={iso => onDue(piece.id, iso)}>
+                                {({ button, body }) => (
+                                    <div className="flex items-start gap-3 px-5 py-3.5">
+                                        <span
+                                            className={cn(
+                                                'grid size-7 shrink-0 place-items-center rounded-full font-mono text-xs',
+                                                reading
+                                                    ? 'bg-accent text-on-accent'
+                                                    : 'bg-raised text-fg-muted'
+                                            )}>
+                                            {index + 1}
+                                        </span>
+                                        <MediaCover
+                                            piece={piece}
+                                            className="w-12 shrink-0 rounded-md"
+                                        />
+                                        <div className="min-w-0 flex-1">
+                                            <p className="truncate text-sm font-medium text-fg">
+                                                {piece.title}
+                                                <span className="ml-2 font-mono text-[10px] tracking-wide text-accent uppercase">
+                                                    {pickLabel(piece.format, status)}
+                                                </span>
+                                            </p>
+                                            <PieceLine
+                                                piece={piece}
+                                                className="mt-0.5 truncate text-xs text-fg-muted italic"
+                                            />
+                                            <p className="mt-1 font-mono text-[11px] text-fg-faint">
+                                                {piece.by} · {aboutLabel(aboutOf(piece))}
+                                            </p>
+                                            {body ? <div className="mt-3">{body}</div> : null}
+                                        </div>
+                                        <div className="flex shrink-0 flex-col items-end gap-2">
+                                            <div className="flex gap-1">
+                                                <button
+                                                    type="button"
+                                                    aria-label="Earlier"
+                                                    disabled={index === 0}
+                                                    onClick={() => onMove({ from: index, dir: -1 })}
+                                                    className="grid size-7 place-items-center rounded-full border border-line font-mono text-xs text-fg-muted hover:border-accent-hover hover:text-accent disabled:opacity-30">
+                                                    ↑
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    aria-label="Later"
+                                                    disabled={index === pieces.length - 1}
+                                                    onClick={() => onMove({ from: index, dir: 1 })}
+                                                    className="grid size-7 place-items-center rounded-full border border-line font-mono text-xs text-fg-muted hover:border-accent-hover hover:text-accent disabled:opacity-30">
+                                                    ↓
+                                                </button>
+                                            </div>
+                                            {button}
+                                            <PieceLinks piece={piece} />
+                                        </div>
+                                    </div>
+                                )}
+                            </PieceAdjust>
+                        </li>
+                    );
+                })}
+            </ul>
+        </Card>
+    );
+}
+
+function PieceGroups({
+    pieces,
+    recommended = false,
+    statusOf,
+    dueOf,
+    onStatus,
+    onDue,
+}: {
+    pieces: LearnPiece[];
+    /** Nothing is picked yet. The coach offers a short list, not the library. */
+    recommended?: boolean;
+    statusOf: (piece: LearnPiece) => LearnStatus;
+    dueOf: (piece: LearnPiece) => string | undefined;
+    onStatus: (id: string, status: LearnStatus) => void;
+    onDue: (id: string, iso: string) => void;
+}) {
+    const coach = useHelpersEnabled();
+    const groups = recommended
+        ? []
+        : FORMAT_ORDER.map(format => ({
+              key: format,
+              label: formatLabel(format).toUpperCase(),
+              items: pieces.filter(piece => piece.format === format),
+          })).filter(group => group.items.length > 0);
+
+    function row(piece: LearnPiece) {
+        const status = statusOf(piece);
+        return (
+            <li key={piece.id} className="border-b border-line last:border-b-0">
+                <PieceAdjust
+                    format={piece.format}
+                    status={status}
+                    due={dueOf(piece)}
+                    onStatus={next => onStatus(piece.id, next)}
+                    onDue={iso => onDue(piece.id, iso)}>
+                    {({ button, body }) => (
+                        <div className="flex items-start gap-3 px-5 py-3.5">
+                            <MediaCover piece={piece} className="w-12 shrink-0 rounded-md" />
+                            <div className="min-w-0 flex-1">
+                                <p className="truncate text-sm font-medium text-fg">
+                                    {piece.title}
+                                    <span className="ml-2 font-mono text-[10px] tracking-wide text-accent uppercase">
+                                        {status === 'SHELF' ? '' : pickLabel(piece.format, status)}
+                                    </span>
+                                </p>
+                                <PieceLine
+                                    piece={piece}
+                                    className="mt-0.5 truncate text-xs text-fg-muted italic"
+                                />
+                                <p className="mt-1 font-mono text-[11px] text-fg-faint">
+                                    {piece.by} · {aboutLabel(aboutOf(piece))}
+                                </p>
+                                {piece.secondary ? (
+                                    <div className="mt-1">
+                                        <PieceSecondary piece={piece} />
+                                    </div>
+                                ) : null}
+                                {body ? <div className="mt-3">{body}</div> : null}
+                            </div>
+                            <div className="flex shrink-0 flex-col items-end gap-3">
+                                {button}
+                                <PieceLinks piece={piece} />
+                            </div>
+                        </div>
+                    )}
+                </PieceAdjust>
+            </li>
+        );
+    }
+
+    if (recommended) {
+        return (
+            <Card className="p-0">
+                <div className="grid gap-2 border-b border-line px-5 py-3.5">
+                    <div className="flex items-center justify-between gap-3">
+                        <div className="flex min-w-0 flex-wrap items-center gap-2">
+                            {coach ? <CoachMark size="sm" /> : null}
+                            <Typography as="span" variant="eyebrow" color="primary">
+                                {coach ? 'Not on your list' : '✦ Recommended'}
+                            </Typography>
+                        </div>
+                        <span className="font-mono text-xs text-fg-muted">{pieces.length}</span>
+                    </div>
+                    {coach ? (
+                        <p className="text-sm leading-relaxed text-pretty text-fg-secondary">
+                            These are not need-to-read yet. Mark one and it joins the list, at the
+                            end.
+                        </p>
+                    ) : null}
+                </div>
+                <ul className="grid">{pieces.map(row)}</ul>
+            </Card>
+        );
+    }
 
     return (
         <div className="grid gap-4">
-            {pieces.some(piece => piece.added) ? (
-                <CoachTipCard title="Yours, not ours">
-                    Added by this household. We keep the pointer, not the book.
-                </CoachTipCard>
-            ) : null}
             {groups.map(group => (
-                <Card key={group.format} className="p-0">
+                <Card key={group.key} className="p-0">
                     <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-3.5">
-                        <div>
-                            <Typography as="span" variant="eyebrow" color="primary">
-                                ✦ {formatLabel(group.format).toUpperCase()}
-                            </Typography>
-                        </div>
+                        <Typography as="span" variant="eyebrow" color="primary">
+                            ✦ {group.label}
+                        </Typography>
                         <span className="font-mono text-xs text-fg-muted">
                             {group.items.length}
                         </span>
                     </div>
-                    <ul className="grid">
-                        {group.items.map(piece => {
-                            const status = statusOf(piece);
-                            return (
-                                <li key={piece.id} className="border-b border-line last:border-b-0">
-                                    <PieceAdjust
-                                        format={piece.format}
-                                        status={status}
-                                        due={dueOf(piece)}
-                                        onStatus={next => onStatus(piece.id, next)}
-                                        onDue={iso => onDue(piece.id, iso)}>
-                                        {({ button, body }) => (
-                                            <div className="flex items-start gap-3 px-5 py-3.5">
-                                                <MediaCover
-                                                    piece={piece}
-                                                    className="w-12 shrink-0 rounded-md"
-                                                />
-                                                <div className="min-w-0 flex-1">
-                                                    <p className="truncate text-sm font-medium text-fg">
-                                                        {piece.title}
-                                                        <span className="ml-2 font-mono text-[10px] tracking-wide text-accent uppercase">
-                                                            {status === 'SHELF'
-                                                                ? ''
-                                                                : pickLabel(piece.format, status)}
-                                                        </span>
-                                                    </p>
-                                                    <PieceLine
-                                                        piece={piece}
-                                                        className="mt-0.5 truncate text-xs text-fg-muted italic"
-                                                    />
-                                                    <p className="mt-1 font-mono text-[11px] text-fg-faint">
-                                                        {piece.by} · {aboutLabel(aboutOf(piece))}
-                                                    </p>
-                                                    {piece.secondary ? (
-                                                        <div className="mt-1">
-                                                            <PieceSecondary piece={piece} />
-                                                        </div>
-                                                    ) : null}
-                                                    {body ? (
-                                                        <div className="mt-3">{body}</div>
-                                                    ) : null}
-                                                </div>
-                                                <div className="flex shrink-0 flex-col items-end gap-3">
-                                                    {button}
-                                                    <PieceLinks piece={piece} />
-                                                </div>
-                                            </div>
-                                        )}
-                                    </PieceAdjust>
-                                </li>
-                            );
-                        })}
-                    </ul>
+                    <ul className="grid">{group.items.map(row)}</ul>
                 </Card>
             ))}
         </div>

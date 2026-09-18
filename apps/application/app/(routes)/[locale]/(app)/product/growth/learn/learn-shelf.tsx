@@ -14,9 +14,12 @@ import { PIECES, SKILLS, type LearnSkill, type LearnStatus } from './learn-catal
 type LearnShelfApi = {
     statusById: Record<string, LearnStatus>;
     dueById: Record<string, string>;
+    rankById: Record<string, number>;
     focused: Set<LearnSkill>;
     setStatus: (id: string, status: LearnStatus, skill: LearnSkill) => void;
     setDue: (id: string, iso: string, skill: LearnSkill) => void;
+    /** Rewrite 1..n for the open list. 1 is what they want next. */
+    setOrder: (ordered: readonly { id: string; skill: LearnSkill }[]) => void;
     focusSkill: (skill: LearnSkill) => void;
 };
 
@@ -46,12 +49,14 @@ function useLocalShelf(): LearnShelfApi {
         Object.fromEntries(PIECES.map(piece => [piece.id, piece.status]))
     );
     const [dueById, setDueById] = useState<Record<string, string>>({});
+    const [rankById, setRankById] = useState<Record<string, number>>({});
     const [focused, setFocused] = useState<Set<LearnSkill>>(() => new Set(['MONEY']));
 
     return useMemo(
         () => ({
             statusById,
             dueById,
+            rankById,
             focused,
             setStatus(id, status, skill) {
                 setStatusById(previous => ({ ...previous, [id]: status }));
@@ -60,8 +65,19 @@ function useLocalShelf(): LearnShelfApi {
                         const { [id]: _gone, ...rest } = previous;
                         return rest;
                     });
+                    setRankById(previous => {
+                        const { [id]: _gone, ...rest } = previous;
+                        return rest;
+                    });
                 }
                 if (status === 'NOW' || status === 'QUEUE') {
+                    setRankById(previous => {
+                        if (previous[id]) return previous;
+                        const next =
+                            Object.values(previous).reduce((max, rank) => Math.max(max, rank), 0) +
+                            1;
+                        return { ...previous, [id]: next };
+                    });
                     setFocused(previous => new Set(previous).add(skill));
                 }
             },
@@ -74,11 +90,20 @@ function useLocalShelf(): LearnShelfApi {
                     return { ...previous, [id]: iso };
                 });
             },
+            setOrder(ordered) {
+                setRankById(previous => {
+                    const next = { ...previous };
+                    ordered.forEach((row, index) => {
+                        next[row.id] = index + 1;
+                    });
+                    return next;
+                });
+            },
             focusSkill(skill) {
                 setFocused(previous => new Set(previous).add(skill));
             },
         }),
-        [statusById, dueById, focused]
+        [statusById, dueById, rankById, focused]
     );
 }
 
@@ -101,6 +126,12 @@ function useRemoteShelf(live: boolean, householdId: string | null): LearnShelfAp
         for (const row of shelf.progress) {
             if (row.dueOn) map[row.pieceKey] = row.dueOn;
         }
+        return map;
+    }, [shelf.progress]);
+
+    const rankById = useMemo(() => {
+        const map: Record<string, number> = {};
+        for (const row of shelf.progress) map[row.pieceKey] = row.rank;
         return map;
     }, [shelf.progress]);
 
@@ -137,6 +168,7 @@ function useRemoteShelf(live: boolean, householdId: string | null): LearnShelfAp
         return {
             statusById,
             dueById,
+            rankById,
             focused,
             setStatus(id, status, skill) {
                 if (!householdId) return;
@@ -151,8 +183,11 @@ function useRemoteShelf(live: boolean, householdId: string | null): LearnShelfAp
                 }
                 const picked = status as LearnProgressStatus;
                 const existing = current.progress.find(row => row.pieceKey === id);
+                const rank =
+                    existing?.rank ??
+                    current.progress.reduce((max, row) => Math.max(max, row.rank), 0) + 1;
                 const nextRow = existing
-                    ? { ...existing, status: picked, skill }
+                    ? { ...existing, status: picked, skill, rank }
                     : {
                           id: crypto.randomUUID(),
                           householdId,
@@ -161,6 +196,7 @@ function useRemoteShelf(live: boolean, householdId: string | null): LearnShelfAp
                           status: picked,
                           skill,
                           dueOn: null,
+                          rank,
                       };
                 const progress = existing
                     ? current.progress.map(row => (row.pieceKey === id ? nextRow : row))
@@ -177,6 +213,7 @@ function useRemoteShelf(live: boolean, householdId: string | null): LearnShelfAp
                     status: picked,
                     skill,
                     dueOn: existing?.dueOn ?? null,
+                    rank,
                 });
                 if ((status === 'NOW' || status === 'QUEUE') && !alreadyFocused) {
                     focus.mutate({ householdId, skill, on: true });
@@ -200,7 +237,33 @@ function useRemoteShelf(live: boolean, householdId: string | null): LearnShelfAp
                     status: existing.status,
                     skill,
                     dueOn,
+                    rank: existing.rank,
                 });
+            },
+            setOrder(ordered) {
+                if (!householdId) return;
+                const current = queryClient.getQueryData<LearnShelfDto>(options.queryKey) ?? shelf;
+                const rankOf = new Map(ordered.map((row, index) => [row.id, index + 1]));
+                write({
+                    ...current,
+                    progress: current.progress.map(row =>
+                        rankOf.has(row.pieceKey) ? { ...row, rank: rankOf.get(row.pieceKey)! } : row
+                    ),
+                });
+                void (async () => {
+                    for (const row of ordered) {
+                        const existing = current.progress.find(item => item.pieceKey === row.id);
+                        if (!existing) continue;
+                        await save.mutateAsync({
+                            householdId,
+                            pieceKey: row.id,
+                            status: existing.status,
+                            skill: row.skill,
+                            dueOn: existing.dueOn,
+                            rank: rankOf.get(row.id)!,
+                        });
+                    }
+                })();
             },
             focusSkill(skill) {
                 if (!householdId) return;
@@ -218,6 +281,7 @@ function useRemoteShelf(live: boolean, householdId: string | null): LearnShelfAp
         householdId,
         options.queryKey,
         queryClient,
+        rankById,
         remove,
         save,
         shelf,

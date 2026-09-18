@@ -30,6 +30,10 @@ export class LearnProgress extends HouseholdEntity {
     @Property({ length: 64 })
     skill!: string;
 
+    /** 1 is next. Reading does not move this. */
+    @Property({ type: 'integer' })
+    rank: number = 1;
+
     /** The day they want to be finished. Null until they pick one. */
     @Property({ type: 'date', nullable: true })
     dueOn: string | null = null;

@@ -36,6 +36,8 @@ export const LearnProgress = z.object({
     skill: LearnSkillKey,
     /** The day they want to be finished. Null until they pick one. */
     dueOn: IsoDate.nullable(),
+    /** 1 is next. The person sets this. Reading does not change it. */
+    rank: z.number().int().min(1).max(999),
 });
 
 /** The shelf for the signed-in person: picked titles, plus which skills are in focus. */

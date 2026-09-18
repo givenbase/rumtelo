@@ -33,6 +33,7 @@ export class ProgressService {
         status: LearnProgressStatus;
         skill: LearnSkillKey;
         dueOn: string | null;
+        rank: number;
     }): Promise<LearnProgress> {
         const accountId = await this.accountId();
         const existing = await this.progress.findOne({
@@ -47,10 +48,12 @@ export class ProgressService {
                 status: input.status,
                 skill: input.skill,
                 dueOn: input.dueOn,
+                rank: input.rank,
             });
         row.status = input.status;
         row.skill = input.skill;
         row.dueOn = input.dueOn;
+        row.rank = input.rank;
         await this.em.persist(row).flush();
         return toProgress(row);
     }
@@ -68,7 +71,7 @@ export class ProgressService {
     async list(): Promise<LearnShelf> {
         const accountId = await this.accountId();
         const [progress, focused] = await Promise.all([
-            this.progress.find({ account: accountId }, { orderBy: { updatedAt: 'DESC' } }),
+            this.progress.find({ account: accountId }, { orderBy: { rank: 'ASC' } }),
             this.focus.list(),
         ]);
         return {
@@ -112,5 +115,6 @@ function toProgress(row: LearnProgressEntity): LearnProgress {
         status: row.status,
         skill: row.skill,
         dueOn: asDate(row.dueOn),
+        rank: row.rank,
     };
 }

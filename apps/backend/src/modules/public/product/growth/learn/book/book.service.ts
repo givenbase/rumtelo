@@ -62,11 +62,14 @@ export class BookService {
 
         const picked = await this.progress.has(row.id);
         if (!picked) {
+            const shelf = await this.progress.list();
+            const rank = shelf.progress.reduce((max, item) => Math.max(max, item.rank), 0) + 1;
             await this.progress.save({
                 pieceKey: row.id,
                 status: LearnProgressStatus.QUEUE,
                 skill: row.skill,
                 dueOn: null,
+                rank,
             });
         }
         return toBook(row);
