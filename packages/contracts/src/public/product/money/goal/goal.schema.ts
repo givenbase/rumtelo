@@ -41,6 +41,11 @@ export const Goal = z.object({
     orgKey: z.string().min(1).max(64).nullable().default(null),
     /** When an EARN goal crossed the target (null while open / for SAVE). */
     fulfilledOn: IsoDate.nullable(),
+    /**
+     * SAVE: priority within the same jar — lower = higher focus (#1 first).
+     * EARN / GIVE: unused (always 0).
+     */
+    sortOrder: z.number().int().nonnegative().default(0),
 });
 
 export const GoalProjection = z.object({

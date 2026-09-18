@@ -1,11 +1,12 @@
 import { EntityManager } from '@mikro-orm/postgresql';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
 import { CAPABILITIES, type GivingCause, GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { earnGoalProgress } from '@rumtelo/utils';
 
 import { PlanAccessService } from '../../../../../../common/capability';
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
+import { TransactionService } from '../../ledger/transaction/transaction.service';
 import { Jar } from '../../plan/jar/jar.entity';
 import { JarService } from '../../plan/jar/jar.service';
 
@@ -22,7 +23,8 @@ export class GoalService {
     constructor(
         @Inject(EntityManager) private readonly em: EntityManager,
         @Inject(PlanAccessService) private readonly planAccess: PlanAccessService,
-        @Inject(JarService) private readonly jars: JarService
+        @Inject(JarService) private readonly jars: JarService,
+        @Inject(TransactionService) private readonly transactions: TransactionService
     ) {
         this.repo = new HouseholdScopedRepository(em, Goal);
     }
@@ -50,20 +52,20 @@ export class GoalService {
 
         const kind = (input.kind as GoalKind) ?? GoalKind.SAVE;
         const isGive = kind === GoalKind.GIVE;
+        const isSave = kind === GoalKind.SAVE;
+        const jarId = kind === GoalKind.EARN ? null : (input.jarId ?? null);
+        const sortOrder = isSave && jarId ? await this.nextSortOrder(jarId) : 0;
+
         const entity = this.em.create(Goal, {
             household: currentHouseholdId(),
             kind,
-            jar:
-                kind === GoalKind.EARN
-                    ? null
-                    : input.jarId
-                      ? this.em.getReference(Jar, input.jarId)
-                      : null,
+            jar: jarId ? this.em.getReference(Jar, jarId) : null,
             name: input.name,
             icon: input.icon ?? null,
             target: input.target,
             saved: 0,
             monthlyContribution: kind === GoalKind.EARN ? 0 : (input.monthlyContribution ?? 0),
+            sortOrder,
             // A pledge without a date is a pledge for this calendar year.
             targetOn: input.targetOn ?? (isGive ? endOfYearIso() : null),
             fulfilledOn: null,
@@ -91,9 +93,10 @@ export class GoalService {
     async list() {
         await this.evaluateEarnGoals();
         await this.safeEvaluateGiveGoals();
-        const rows = await this.repo.find({
-            status: { $in: [GoalStatus.ACTIVE, GoalStatus.REACHED] },
-        });
+        const rows = await this.repo.find(
+            { status: { $in: [GoalStatus.ACTIVE, GoalStatus.REACHED] } },
+            { orderBy: { sortOrder: 'ASC' } }
+        );
         return rows.map(toDto);
     }
 
@@ -255,6 +258,7 @@ export class GoalService {
             fulfilledOn: string | null;
             cause: string | null;
             orgKey: string | null;
+            sortOrder: number;
         }>
     ) {
         const entity = await this.repo.findOneOrFail({ id });
@@ -279,6 +283,9 @@ export class GoalService {
         if (patch.status !== undefined) entity.status = patch.status as GoalStatus;
         if (patch.why !== undefined) entity.why = patch.why;
         if (patch.fulfilledOn !== undefined) entity.fulfilledOn = patch.fulfilledOn;
+        if (patch.sortOrder !== undefined && entity.kind === GoalKind.SAVE) {
+            entity.sortOrder = patch.sortOrder;
+        }
         if (patch.cause !== undefined) {
             entity.cause =
                 entity.kind === GoalKind.GIVE
@@ -293,10 +300,14 @@ export class GoalService {
             entity.monthlyContribution = 0;
             entity.cause = null;
             entity.orgKey = null;
+            entity.sortOrder = 0;
         }
         if (entity.kind === GoalKind.SAVE) {
             entity.cause = null;
             entity.orgKey = null;
+        }
+        if (entity.kind === GoalKind.GIVE) {
+            entity.sortOrder = 0;
         }
         await this.em.flush();
         if (entity.kind === GoalKind.EARN && entity.status === GoalStatus.ACTIVE) {
@@ -310,6 +321,68 @@ export class GoalService {
         return toDto(entity);
     }
 
+    /** Promote a SAVE goal to #1 focus on its jar. */
+    async setFocus(id: string) {
+        const entity = await this.repo.findOneOrFail({ id });
+        await this.em.populate(entity, ['jar']);
+        if (entity.kind !== GoalKind.SAVE) {
+            throw new BadRequestException('Only SAVE goals have jar focus');
+        }
+        if (!entity.jar) {
+            throw new BadRequestException('SAVE goal needs a jar before it can be focus');
+        }
+        if (entity.status !== GoalStatus.ACTIVE) {
+            throw new BadRequestException('Only active goals can be focus');
+        }
+        await this.reindexJarFocus(entity.jar.id, entity.id);
+        await this.em.refresh(entity);
+        return toDto(entity);
+    }
+
+    /**
+     * Mark SAVE goal reached. `spend` books an Out from the jar for the target;
+     * `keep` leaves the cash available in the jar.
+     */
+    async achieve(id: string, mode: 'keep' | 'spend') {
+        const entity = await this.repo.findOneOrFail({ id });
+        await this.em.populate(entity, ['jar']);
+        if (entity.kind !== GoalKind.SAVE) {
+            throw new BadRequestException('Only SAVE goals can be marked achieved this way');
+        }
+        if (entity.status === GoalStatus.REACHED) {
+            return toDto(entity);
+        }
+        if (entity.status !== GoalStatus.ACTIVE) {
+            throw new BadRequestException('Goal is not active');
+        }
+        const jarId = entity.jar?.id ?? null;
+        const target = Number(entity.target);
+
+        if (mode === 'spend') {
+            if (!jarId) {
+                throw new BadRequestException('Goal has no jar to spend from');
+            }
+            await this.transactions.create({
+                jarId,
+                amount: -Math.abs(target),
+                bookedOn: todayIso(),
+                description: `Achieved: ${entity.name}`,
+                note: 'Goal claimed from jar',
+            });
+        }
+
+        entity.status = GoalStatus.REACHED;
+        entity.fulfilledOn = todayIso();
+        entity.saved = target;
+        await this.em.flush();
+
+        if (jarId) {
+            await this.reindexJarFocus(jarId, null);
+        }
+        await this.em.refresh(entity);
+        return toDto(entity);
+    }
+
     // ====================================================================
     // ? DELETE Operations
     // ====================================================================
@@ -318,6 +391,37 @@ export class GoalService {
         const entity = await this.repo.findOneOrFail({ id });
         await this.em.remove(entity).flush();
         return { ok: true as const };
+    }
+
+    /** Next sortOrder for a new SAVE goal on this jar (append after focus queue). */
+    private async nextSortOrder(jarId: string): Promise<number> {
+        const rows = await this.repo.find(
+            { kind: GoalKind.SAVE, jar: jarId, status: GoalStatus.ACTIVE },
+            { orderBy: { sortOrder: 'DESC' }, limit: 1 }
+        );
+        return (rows[0]?.sortOrder ?? -1) + 1;
+    }
+
+    /**
+     * Reindex ACTIVE SAVE goals on a jar: focusId becomes 0, others 1..n in prior order.
+     * When focusId is null, keep relative order starting at 0 (after a claim).
+     */
+    private async reindexJarFocus(jarId: string, focusId: string | null) {
+        const siblings = await this.repo.find(
+            { kind: GoalKind.SAVE, jar: jarId, status: GoalStatus.ACTIVE },
+            { orderBy: { sortOrder: 'ASC' } }
+        );
+        const ordered =
+            focusId === null
+                ? siblings
+                : [
+                      ...siblings.filter(row => row.id === focusId),
+                      ...siblings.filter(row => row.id !== focusId),
+                  ];
+        ordered.forEach((row, index) => {
+            row.sortOrder = index;
+        });
+        await this.em.flush();
     }
 }
 
@@ -373,5 +477,6 @@ export function toDto(goal: Goal) {
         cause: goal.cause ?? null,
         orgKey: goal.orgKey ?? null,
         fulfilledOn: goal.fulfilledOn,
+        sortOrder: goal.sortOrder ?? 0,
     };
 }

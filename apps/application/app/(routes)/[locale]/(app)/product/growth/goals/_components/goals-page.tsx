@@ -11,6 +11,7 @@ import { AccentCard, Card, EmptyState, Meter, Typography } from '@rumtelo/ui';
 import { cn, earnGoalProgress, monthlyNetAsOf } from '@rumtelo/utils';
 
 import { CREATE_HREF, goalDetailHref } from '@/app/_lib/create-routes';
+import { isFocusSaveGoal, saveGoalRank } from '@/app/_lib/goal-focus';
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { isLiveData } from '@/app/_lib/preview';
@@ -176,20 +177,29 @@ export function GoalsPageClient() {
 
     const goals = useMemo((): ReadonlyArray<Goal> => goalsQuery.data ?? [], [goalsQuery.data]);
 
-    const active = goals.filter(goal => {
-        if (goal.status === GoalStatus.ARCHIVED || goal.status === GoalStatus.REACHED) return false;
-        if (goal.kind === GoalKind.EARN) {
-            return !earnGoalProgress({ target: goal.target, currentNet }).reached;
-        }
-        return goal.saved < goal.target;
-    });
-    const reached = goals.filter(goal => {
-        if (goal.status === GoalStatus.REACHED) return true;
-        if (goal.kind === GoalKind.EARN) {
-            return earnGoalProgress({ target: goal.target, currentNet }).reached;
-        }
-        return goal.saved >= goal.target;
-    });
+    const active = useMemo(
+        () =>
+            goals.filter(goal => {
+                if (goal.status === GoalStatus.ARCHIVED || goal.status === GoalStatus.REACHED)
+                    return false;
+                if (goal.kind === GoalKind.EARN) {
+                    return !earnGoalProgress({ target: goal.target, currentNet }).reached;
+                }
+                return goal.saved < goal.target;
+            }),
+        [goals, currentNet]
+    );
+    const reached = useMemo(
+        () =>
+            goals.filter(goal => {
+                if (goal.status === GoalStatus.REACHED) return true;
+                if (goal.kind === GoalKind.EARN) {
+                    return earnGoalProgress({ target: goal.target, currentNet }).reached;
+                }
+                return goal.saved >= goal.target;
+            }),
+        [goals, currentNet]
+    );
     const tabGoals = tab === 'ON_TRACK' ? active : reached;
 
     const kindsPresent = KIND_ORDER.filter(kind => tabGoals.some(goal => goal.kind === kind));
@@ -216,7 +226,14 @@ export function GoalsPageClient() {
     const featured = shown.length > 0 && shown.length <= FEATURED_MAX;
     const grouped = KIND_ORDER.map(kind => ({
         kind,
-        items: shown.filter(goal => goal.kind === kind),
+        items: shown
+            .filter(goal => goal.kind === kind)
+            .sort((left, right) => {
+                if (kind !== GoalKind.SAVE) return 0;
+                if (left.jarId !== right.jarId)
+                    return (left.jarId ?? '').localeCompare(right.jarId ?? '');
+                return left.sortOrder - right.sortOrder;
+            }),
     })).filter(group => group.items.length > 0);
 
     function toggleKind(kind: GoalKind) {
@@ -356,6 +373,8 @@ export function GoalsPageClient() {
                     {shown.map(goal => {
                         const stats = goalProgress(goal, currentNet, tab, formatMoney);
                         const jar = goal.jarId ? jarById.get(goal.jarId) : null;
+                        const focus = isFocusSaveGoal(goal, goals);
+                        const rank = saveGoalRank(goal, goals);
                         return (
                             <Link
                                 key={goal.id}
@@ -368,6 +387,15 @@ export function GoalsPageClient() {
                                         <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-raised px-2.5 py-1 font-mono text-[10px] tracking-widest text-fg-secondary uppercase">
                                             {kindIcon(goal)} {kindEyebrow(goal.kind)}
                                         </span>
+                                        {focus ? (
+                                            <span className="inline-flex items-center rounded-full border border-accent/40 bg-accent-soft px-2.5 py-1 font-mono text-[10px] tracking-widest text-accent uppercase">
+                                                Focus
+                                            </span>
+                                        ) : rank !== null && rank > 1 ? (
+                                            <span className="inline-flex items-center rounded-full border border-line bg-raised px-2.5 py-1 font-mono text-[10px] tracking-widest text-fg-faint uppercase">
+                                                #{rank}
+                                            </span>
+                                        ) : null}
                                         {jar && goal.kind === GoalKind.SAVE ? (
                                             <JarBadge jarKey={jar.key} name={jar.name} />
                                         ) : null}
@@ -409,8 +437,7 @@ export function GoalsPageClient() {
             ) : (
                 <div className="grid gap-4">
                     {grouped.map(group => {
-                        const open =
-                            openKindKeys.size === 0 ? true : openKindKeys.has(group.kind);
+                        const open = openKindKeys.size === 0 ? true : openKindKeys.has(group.kind);
                         return (
                             <Card key={group.kind} className="p-0">
                                 <button
@@ -448,10 +475,10 @@ export function GoalsPageClient() {
                                                 tab,
                                                 formatMoney
                                             );
-                                            const jar = goal.jarId
-                                                ? jarById.get(goal.jarId)
-                                                : null;
+                                            const jar = goal.jarId ? jarById.get(goal.jarId) : null;
                                             const pct = Math.round(stats.progress * 100);
+                                            const focus = isFocusSaveGoal(goal, goals);
+                                            const rank = saveGoalRank(goal, goals);
                                             return (
                                                 <li
                                                     key={goal.id}
@@ -466,6 +493,16 @@ export function GoalsPageClient() {
                                                                         {kindIcon(goal)}{' '}
                                                                     </span>
                                                                     {goal.name}
+                                                                    {focus ? (
+                                                                        <span className="ml-2 font-mono text-[10px] tracking-wide text-accent uppercase">
+                                                                            Focus
+                                                                        </span>
+                                                                    ) : rank !== null &&
+                                                                      rank > 1 ? (
+                                                                        <span className="ml-2 font-mono text-[10px] tracking-wide text-fg-faint uppercase">
+                                                                            #{rank}
+                                                                        </span>
+                                                                    ) : null}
                                                                 </p>
                                                                 {goal.why?.trim() ? (
                                                                     <p className="mt-0.5 truncate text-xs text-fg-muted italic">

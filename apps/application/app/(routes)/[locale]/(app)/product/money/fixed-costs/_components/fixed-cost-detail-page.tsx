@@ -320,8 +320,8 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                             <DialogHeader>
                                 <DialogTitle>Pause this bill?</DialogTitle>
                                 <DialogDescription>
-                                    It stays on your list but won&apos;t count toward jar pressure or
-                                    “still due” until you resume.
+                                    It stays on your list but won&apos;t count toward jar pressure
+                                    or “still due” until you resume.
                                 </DialogDescription>
                             </DialogHeader>
                             <DialogFooter>
@@ -390,7 +390,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                             value={endDate}
                                             max={todayIsoDate()}
                                             onSelect={setEndDate}
-                                            className="max-w-none w-full"
+                                            className="w-full max-w-none"
                                         />
                                     </div>
                                 ) : null}

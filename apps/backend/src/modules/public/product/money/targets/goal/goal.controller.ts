@@ -66,6 +66,22 @@ export class GoalController {
         });
     }
 
+    /** Make this SAVE goal the #1 focus on its jar. */
+    @Implement(contract.money.goals.setFocus)
+    setFocus() {
+        return implement(contract.money.goals.setFocus).handler(({ input }) =>
+            this.goals.setFocus(input.id)
+        );
+    }
+
+    /** Mark a SAVE goal achieved — keep cash in jar or spend it out. */
+    @Implement(contract.money.goals.achieve)
+    achieve() {
+        return implement(contract.money.goals.achieve).handler(({ input }) =>
+            this.goals.achieve(input.id, input.mode)
+        );
+    }
+
     // ====================================================================
     // ? DELETE Operations
     // ====================================================================

@@ -71,9 +71,7 @@ export function DatePicker({
                     'inline-flex items-center justify-between gap-2 text-left',
                     !value && 'text-fg-faint'
                 )}>
-                <span className="truncate">
-                    {value ? formatDisplayDate(value) : placeholder}
-                </span>
+                <span className="truncate">{value ? formatDisplayDate(value) : placeholder}</span>
                 <CalendarIcon className="size-4 shrink-0 text-fg-muted" aria-hidden />
             </button>
 

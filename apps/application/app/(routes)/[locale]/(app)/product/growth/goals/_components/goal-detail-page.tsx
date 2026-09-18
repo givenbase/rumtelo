@@ -11,6 +11,7 @@ import { Button, Card, Meter, Typography } from '@rumtelo/ui';
 import { earnGoalProgress, monthlyNetAsOf } from '@rumtelo/utils';
 
 import { createMoveHref, goalDetailHref, updateHref } from '@/app/_lib/create-routes';
+import { isFocusSaveGoal, saveGoalProgressCents, saveGoalRank } from '@/app/_lib/goal-focus';
 import { evaluateGoalPace, type GoalPaceVerdict } from '@/app/_lib/goal-pace';
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
 import { jarChrome } from '@/app/_lib/jar-meta';
@@ -19,11 +20,8 @@ import { isLiveData } from '@/app/_lib/preview';
 import { productPath } from '@/app/_lib/routes';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
-import {
-    JarBadge,
-    MetaChip,
-    formatBookedDate,
-} from '@/components/features/money/jar-badge';
+import { SaveGoalManifestActions } from '@/components/features/growth/save-goal-manifest-actions';
+import { JarBadge, MetaChip, formatBookedDate } from '@/components/features/money/jar-badge';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { EditIcon } from '@/components/features/ui/action-icons';
 
@@ -84,7 +82,10 @@ function paceAdvice(input: {
     const { goal, verdict, projection, formatMoney, jarName, headroom, siblingCount } = input;
     const tips: { title: string; body: string }[] = [];
 
-    if (goal.status === GoalStatus.REACHED || (goal.saved >= goal.target && goal.kind !== GoalKind.EARN)) {
+    if (
+        goal.status === GoalStatus.REACHED ||
+        (goal.saved >= goal.target && goal.kind !== GoalKind.EARN)
+    ) {
         tips.push({
             title: 'You made it',
             body: 'Protect the win. Keep the habit that got you here — even a smaller monthly amount keeps the muscle warm.',
@@ -128,7 +129,10 @@ function paceAdvice(input: {
             title: 'Set a monthly amount',
             body: 'A target without a pace is a wish. Pick what this jar can spare each month — then the finish date appears.',
         });
-    } else if (verdict === 'ahead' || (projection?.onTrack && projection.monthsRemaining !== null)) {
+    } else if (
+        verdict === 'ahead' ||
+        (projection?.onTrack && projection.monthsRemaining !== null)
+    ) {
         tips.push({
             title: 'On pace — keep the rhythm',
             body: projection?.projectedDate
@@ -153,7 +157,7 @@ function paceAdvice(input: {
     if (siblingCount > 0 && jarName) {
         tips.push({
             title: `${siblingCount} other goal${siblingCount === 1 ? '' : 's'} share ${jarName}`,
-            body: 'They compete for the same monthly flow. Rank what matters this season so the jar is not stretched thin.',
+            body: 'They compete for the same monthly flow. Make one the focus so the jar is not stretched thin.',
         });
     }
 
@@ -204,8 +208,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
     );
 
     const goal = (goalsQuery.data ?? []).find(row => row.id === goalId);
-    const projection =
-        (projectionsQuery.data ?? []).find(row => row.goalId === goalId) ?? null;
+    const projection = (projectionsQuery.data ?? []).find(row => row.goalId === goalId) ?? null;
     const currentNet = useMemo(
         () => monthlyNetAsOf(incomeQuery.data ?? [], todayIso()),
         [incomeQuery.data]
@@ -234,12 +237,8 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
         );
     }
 
-    const jar = goal.jarId
-        ? (jarsQuery.data ?? []).find(row => row.id === goal.jarId)
-        : undefined;
-    const jarBalance = jar
-        ? (balancesQuery.data ?? []).find(row => row.id === jar.id)
-        : undefined;
+    const jar = goal.jarId ? (jarsQuery.data ?? []).find(row => row.id === goal.jarId) : undefined;
+    const jarBalance = jar ? (balancesQuery.data ?? []).find(row => row.id === jar.id) : undefined;
     const jarHref = jar?.key ? `/product/money/jars/${jarKeyToSlug(jar.key)}` : null;
     const jarIcon =
         jar?.icon?.trim() || (jar?.key ? jarByKey.get(jar.key)?.icon?.trim() : null) || '◇';
@@ -258,16 +257,25 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
 
     const isEarn = goal.kind === GoalKind.EARN;
     const earn = isEarn ? earnGoalProgress({ target: goal.target, currentNet }) : null;
-    const current = isEarn ? earn!.current : goal.saved;
-    const progress =
-        goal.target > 0 ? Math.min(1, Math.max(0, current / goal.target)) : 0;
+    const isFocus =
+        goal.kind === GoalKind.SAVE ? isFocusSaveGoal(goal, goalsQuery.data ?? []) : false;
+    const rank = goal.kind === GoalKind.SAVE ? saveGoalRank(goal, goalsQuery.data ?? []) : null;
+    const current = isEarn
+        ? earn!.current
+        : goal.kind === GoalKind.SAVE
+          ? saveGoalProgressCents({
+                goal,
+                isFocus,
+                jarAvailableCents: jarBalance?.available,
+            })
+          : goal.saved;
+    const progress = goal.target > 0 ? Math.min(1, Math.max(0, current / goal.target)) : 0;
     const remaining = Math.max(0, goal.target - current);
     const reached =
-        goal.status === GoalStatus.REACHED ||
-        (isEarn ? earn!.reached : goal.saved >= goal.target);
+        goal.status === GoalStatus.REACHED || (isEarn ? earn!.reached : goal.saved >= goal.target);
 
     const wantMonths =
-        goal.targetOn != null
+        goal.targetOn !== null
             ? Math.max(
                   1,
                   (new Date(goal.targetOn).getUTCFullYear() - new Date().getUTCFullYear()) * 12 +
@@ -363,17 +371,30 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                         </div>
                     </div>
                 </div>
-                <Button as={Link} href={updateHref('goal', goal.id)} variant="secondary">
-                    <EditIcon />
-                    Edit
-                </Button>
+                <div className="flex flex-wrap items-center gap-2">
+                    {householdId && goal.kind === GoalKind.SAVE ? (
+                        <SaveGoalManifestActions
+                            goal={goal}
+                            allGoals={goalsQuery.data ?? []}
+                            householdId={householdId}
+                            jarAvailableCents={jarBalance?.available ?? null}
+                            formatMoney={formatMoney}
+                        />
+                    ) : null}
+                    <Button as={Link} href={updateHref('goal', goal.id)} variant="secondary">
+                        <EditIcon />
+                        Edit
+                    </Button>
+                </div>
             </div>
 
             <Card className="grid gap-4 p-5">
                 <div className="flex flex-wrap items-end justify-between gap-3">
                     <div>
                         <p className="font-mono text-[10px] tracking-wider text-fg-muted uppercase">
-                            Progress
+                            {goal.kind === GoalKind.SAVE && isFocus && !reached
+                                ? 'Jar toward focus'
+                                : 'Progress'}
                         </p>
                         <div className="mt-1 flex flex-wrap items-baseline gap-2">
                             <span className="text-2xl font-semibold text-accent">
@@ -386,6 +407,11 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                         </div>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
+                        {rank !== null && !reached ? (
+                            <MetaChip className="border-accent/30 text-accent">
+                                {isFocus ? 'Focus · #1' : `#${rank}`}
+                            </MetaChip>
+                        ) : null}
                         <MetaChip
                             className={
                                 reached

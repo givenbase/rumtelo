@@ -186,7 +186,11 @@ export function GivingPageClient() {
                 createLabel="+ Add a recurring gift"
                 createHref={createFixedHref({ jarId: giveJar?.id, payeeMode: 'known' })}
                 secondary={
-                    <Button as={Link} href={productPath('money/jars/give')} size="sm" variant="ghost">
+                    <Button
+                        as={Link}
+                        href={productPath('money/jars/give')}
+                        size="sm"
+                        variant="ghost">
                         Open the Give jar
                     </Button>
                 }

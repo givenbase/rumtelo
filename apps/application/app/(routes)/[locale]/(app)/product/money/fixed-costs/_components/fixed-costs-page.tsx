@@ -394,7 +394,9 @@ export function FixedCostsPageClient() {
                                                                           ) : null}
                                                                       </>
                                                                   }
-                                                                  href={fixedDetailHref(fixedCost.id)}
+                                                                  href={fixedDetailHref(
+                                                                      fixedCost.id
+                                                                  )}
                                                               />
                                                           );
                                                       })

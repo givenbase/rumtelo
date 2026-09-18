@@ -9,6 +9,7 @@ import { Button, Card, Typography } from '@rumtelo/ui';
 import { toPeriodKey, isFixedCostCounting } from '@rumtelo/utils';
 
 import { claimFixedCostMatches } from '@/app/_lib/fixed-cost-match';
+import { activeSaveGoalsOnJar, focusSaveGoal } from '@/app/_lib/goal-focus';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
@@ -29,6 +30,7 @@ import {
     createGoalHref,
     createMoveHref,
     createTxHref,
+    goalDetailHref,
     txDetailHref,
 } from '@/app/_lib/create-routes';
 
@@ -135,6 +137,8 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
         if (goal.kind === GoalKind.SAVE) return true;
         return jar.key === JarKey.GIVE && goal.kind === GoalKind.GIVE;
     });
+    const focusGoal = focusSaveGoal(goalsQuery.data ?? [], jar.id);
+    const saveQueue = activeSaveGoalsOnJar(goalsQuery.data ?? [], jar.id);
     const addGoalHref = createGoalHref({
         jarId: jar.id,
         kind: jar.key === JarKey.GIVE ? GoalKind.GIVE : GoalKind.SAVE,
@@ -174,10 +178,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                                     variant="secondary">
                                     Move between jars
                                 </Button>
-                                <Button
-                                    as={Link}
-                                    href={createTxHref({ jarId: jar.id })}
-                                    size="sm">
+                                <Button as={Link} href={createTxHref({ jarId: jar.id })} size="sm">
                                     + Add transaction
                                 </Button>
                             </>
@@ -251,8 +252,32 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                             + Add goal
                         </Link>
                     </div>
+                    {focusGoal ? (
+                        <Card className="grid gap-2 border-accent/30 bg-accent-soft/50 p-4">
+                            <p className="font-mono text-[10px] tracking-wider text-accent uppercase">
+                                Focus · #1 of {saveQueue.length}
+                            </p>
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                <Link
+                                    href={goalDetailHref(focusGoal.id)}
+                                    className="min-w-0 text-sm font-semibold text-fg hover:text-accent">
+                                    {focusGoal.icon ? `${focusGoal.icon} ` : ''}
+                                    {focusGoal.name}
+                                </Link>
+                                <span className="font-mono text-sm text-fg-muted">
+                                    {formatMoney(
+                                        Math.min(focusGoal.target, Math.max(0, jar.available))
+                                    )}{' '}
+                                    / {formatMoney(focusGoal.target)}
+                                </span>
+                            </div>
+                            <p className="text-xs text-fg-muted">
+                                Fill this jar first — then claim the goal when you&apos;re ready.
+                            </p>
+                        </Card>
+                    ) : null}
                     <Card className="p-0">
-                        <JarGoalAccordion goals={jarGoals} />
+                        <JarGoalAccordion goals={jarGoals} jarAvailableCents={jar.available} />
                     </Card>
                 </section>
             ) : null}

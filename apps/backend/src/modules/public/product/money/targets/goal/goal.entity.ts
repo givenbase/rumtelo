@@ -32,6 +32,13 @@ export class Goal extends HouseholdEntity {
     @Property({ type: 'bigint', default: 0 })
     monthlyContribution = 0;
 
+    /**
+     * SAVE: priority within the same jar — lower = higher focus (#1 first).
+     * EARN / GIVE stay 0.
+     */
+    @Property({ type: 'int', default: 0 })
+    sortOrder = 0;
+
     /** GIVE: GivingCause key this pledge is reserved for; null = open. */
     @Property({ length: 32, nullable: true })
     cause: GivingCause | null = null;
