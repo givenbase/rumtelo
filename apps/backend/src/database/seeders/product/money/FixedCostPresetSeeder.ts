@@ -14,7 +14,12 @@ import {
     loadJarTemplateMap,
 } from '../../../../modules/backoffice/product/money/require-jar-template';
 
-import { loadAudiences, loadCategoryTemplates, loadMerchantPresets } from './catalog-lookups';
+import {
+    loadAudiences,
+    loadCategoryTemplates,
+    loadMerchantPresets,
+    syncOrderedMerchantLinks,
+} from './catalog-lookups';
 
 const OWNER = 'FixedCostPresetSeeder';
 
@@ -34,7 +39,7 @@ export class FixedCostPresetSeeder extends Seeder {
         const existingRows = await em.find(
             FixedCostPreset,
             { key: { $in: keys } },
-            { populate: ['audiences', 'merchantLinks'] }
+            { populate: ['audiences', 'merchantLinks.merchant'] }
         );
         const existingByKey = new Map(existingRows.map(row => [row.key, row]));
 
@@ -55,7 +60,6 @@ export class FixedCostPresetSeeder extends Seeder {
                 existing.cadence = cadence;
                 existing.sortOrder = sortOrder;
                 existing.isActive = true;
-                existing.merchantLinks.removeAll();
             }
             const preset: FixedCostPreset =
                 existing ??
@@ -71,15 +75,12 @@ export class FixedCostPresetSeeder extends Seeder {
                 } as never);
             preset.audiences.set(audiences);
 
-            for (const [linkOrder, merchantKey] of merchantKeys.entries()) {
-                preset.merchantLinks.add(
-                    em.create(FixedCostPresetMerchant, {
-                        preset,
-                        merchant: merchantByKey(merchantKey),
-                        sortOrder: linkOrder,
-                    } as never)
-                );
-            }
+            syncOrderedMerchantLinks(
+                preset.merchantLinks,
+                merchantKeys.map(merchantByKey),
+                (merchant, sortOrder) =>
+                    em.create(FixedCostPresetMerchant, { preset, merchant, sortOrder } as never)
+            );
         }
         await em.flush();
     }

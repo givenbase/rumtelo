@@ -1,3 +1,4 @@
+import type { Collection } from '@mikro-orm/core';
 import type { EntityManager } from '@mikro-orm/postgresql';
 
 import { Audience } from '../../../../modules/backoffice/product/money/catalog/audience/audience.entity';
@@ -51,4 +52,30 @@ export async function loadGivingOrganisations(em: EntityManager, owner: string) 
 
 export async function loadMerchantPresets(em: EntityManager, owner: string) {
     return requireFrom(await loadByKey(em, MerchantPreset), 'MerchantPreset', owner);
+}
+
+type MerchantLink = { merchant: { id: string }; sortOrder: number };
+
+/**
+ * Re-seed ordered preset ↔ merchant rows without delete-then-insert.
+ * Removing a link and inserting the same pair in one flush hits the
+ * UNIQUE(preset, merchant) constraint, because Postgres inserts first.
+ */
+export function syncOrderedMerchantLinks<T extends MerchantLink>(
+    links: Collection<T>,
+    merchants: readonly MerchantPreset[],
+    create: (merchant: MerchantPreset, sortOrder: number) => T
+) {
+    const wanted = new Set(merchants.map(merchant => merchant.id));
+    for (const link of [...links.getItems()]) {
+        if (!wanted.has(link.merchant.id)) links.remove(link);
+    }
+    merchants.forEach((merchant, sortOrder) => {
+        const link = links.getItems().find(row => row.merchant.id === merchant.id);
+        if (link) {
+            link.sortOrder = sortOrder;
+            return;
+        }
+        links.add(create(merchant, sortOrder));
+    });
 }
