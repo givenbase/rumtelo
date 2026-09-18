@@ -6,6 +6,7 @@
  * Mirror: apps/backend/src/modules/public/product/growth/
  */
 
+import { assetContract } from './asset/asset.contract';
 import { growthCatalogsContract } from './catalogs/catalogs.contract';
 import { growthDashboardContract } from './dashboard/dashboard.contract';
 import { learnContract } from './learn/learn.contract';
@@ -20,4 +21,5 @@ export const contract = {
     weekCheck: growthWeekCheckContract,
     catalogs: growthCatalogsContract,
     learn: learnContract,
+    assets: assetContract,
 };

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 
+import { AssetModule } from './asset/asset.module';
 import { GrowthCatalogsModule } from './catalogs/catalogs.module';
 import { GrowthDashboardModule } from './dashboard/dashboard.module';
 import { IncomeLeverModule } from './income-lever/income-lever.module';
@@ -16,6 +17,7 @@ import { GrowthWeekCheckModule } from './week-check/week-check.module';
         IncomeLeverModule,
         IncomeMilestoneModule,
         GrowthCatalogsModule,
+        AssetModule,
         LearnModule,
         GrowthWeekCheckModule,
         GrowthDashboardModule,
@@ -24,6 +26,7 @@ import { GrowthWeekCheckModule } from './week-check/week-check.module';
         IncomeLeverModule,
         IncomeMilestoneModule,
         GrowthCatalogsModule,
+        AssetModule,
         LearnModule,
         GrowthWeekCheckModule,
         GrowthDashboardModule,

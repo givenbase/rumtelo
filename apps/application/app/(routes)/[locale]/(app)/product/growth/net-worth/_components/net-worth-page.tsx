@@ -7,30 +7,18 @@ import { AccentCard, Button, Card, EmptyState, Eyebrow, Section, Typography } fr
 import { cn } from '@rumtelo/utils';
 
 import { useLiveQuery } from '@rumtelo/hooks';
-import type { AssetKind } from '@rumtelo/contracts';
+import type { Asset, AssetKind } from '@rumtelo/contracts';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { CREATE_HREF } from '@/app/_lib/create-routes';
-import { jarChrome } from '@/app/_lib/jar-meta';
 import { isLiveData } from '@/app/_lib/preview';
-import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
-type Holding = {
-    id: string;
-    name: string;
-    jarKey: string;
-    value: number;
-    flow: number;
-    kind: string;
-    locked: boolean;
-};
-
-const holdings: Holding[] = [];
 const TOTAL_DEBT = 0;
 const EMPTY_KINDS: AssetKind[] = [];
+const EMPTY_ASSETS: Asset[] = [];
 
 /**
  * BOARD — net worth board + assets + month score + level ladder + log.
@@ -38,17 +26,28 @@ const EMPTY_KINDS: AssetKind[] = [];
  */
 export function NetWorthPageClient() {
     const { formatMoney } = useHouseholdCurrency();
-    const { byKey: catalogByKey } = useJarCatalog();
     const { householdId } = useAuth();
+    const live = isLiveData(householdId);
     const kindsQuery = useLiveQuery(
         apiQuery.growth.catalogs.assetKinds.list.queryOptions({
             input: { householdId: householdId! },
         }),
         EMPTY_KINDS,
-        isLiveData(householdId)
+        live
+    );
+    const assetsQuery = useLiveQuery(
+        apiQuery.growth.assets.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        EMPTY_ASSETS,
+        live
     );
     const kinds = kindsQuery.data ?? EMPTY_KINDS;
     const [filter, setFilter] = useState('all');
+    const holdings = (assetsQuery.data ?? EMPTY_ASSETS).map(asset => {
+        const kind = kinds.find(row => row.key === asset.kindKey);
+        return { ...asset, locked: kind ? !kind.canPay : false };
+    });
 
     const assetWorth = holdings.reduce((total, holding) => total + holding.value, 0);
     const monthlyPassive = holdings
@@ -56,14 +55,16 @@ export function NetWorthPageClient() {
         .reduce((total, holding) => total + holding.flow, 0);
     const netWorth = assetWorth - TOTAL_DEBT;
 
-    const presentKinds = kinds.filter(kind => holdings.some(holding => holding.kind === kind.key));
+    const presentKinds = kinds.filter(kind =>
+        holdings.some(holding => holding.kindKey === kind.key)
+    );
 
     const groups: Array<{
         key: string;
         name: string;
         description: string | null;
         canPay: boolean;
-        items: Holding[];
+        items: Array<(typeof holdings)[number]>;
         total: number;
         flow: number;
         flowLabel: string;
@@ -71,7 +72,7 @@ export function NetWorthPageClient() {
 
     for (const meta of kinds) {
         if (filter !== 'all' && filter !== meta.key) continue;
-        const items = holdings.filter(holding => holding.kind === meta.key);
+        const items = holdings.filter(holding => holding.kindKey === meta.key);
         if (items.length === 0) continue;
         const total = items.reduce((running, holding) => running + holding.value, 0);
         const flow = items.reduce((running, holding) => running + holding.flow, 0);
@@ -113,35 +114,70 @@ export function NetWorthPageClient() {
                 <Typography as="span" variant="eyebrow" color="primary">
                     ✦ How far this takes you
                 </Typography>
-                <div className="mt-4 flex flex-wrap gap-x-8 gap-y-4">
-                    <div className="grid gap-1.5">
-                        <Eyebrow>Total value</Eyebrow>
-                        <p className="font-display text-2xl leading-none font-semibold tracking-tight text-fg lg:text-3xl">
-                            {formatMoney(assetWorth)}
-                        </p>
-                    </div>
-                    <div className="grid gap-1.5">
-                        <Eyebrow>Monthly income</Eyebrow>
-                        <p
-                            className="font-display text-2xl leading-none font-semibold tracking-tight lg:text-3xl"
-                            style={{ color: 'var(--color-jar-give)' }}>
-                            {monthlyPassive === 0 ? 'None yet' : formatMoney(monthlyPassive)}
-                        </p>
-                    </div>
-                    <div className="grid gap-1.5">
-                        <Eyebrow>Your life costs</Eyebrow>
-                        <p className="font-display text-2xl leading-none font-semibold tracking-tight text-fg lg:text-3xl">
-                            {formatMoney(0)}
-                        </p>
-                    </div>
-                    <div className="grid gap-1.5">
-                        <Eyebrow>Total debt</Eyebrow>
-                        <p className="font-display text-2xl leading-none font-semibold tracking-tight text-danger lg:text-3xl">
-                            {formatMoney(TOTAL_DEBT)}
-                        </p>
-                    </div>
+                <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+                    {(
+                        [
+                            {
+                                label: 'Total value',
+                                value: formatMoney(assetWorth),
+                                tone: 'text-fg',
+                                rail: 'var(--color-accent)',
+                            },
+                            {
+                                label: 'Monthly income',
+                                value:
+                                    monthlyPassive === 0 ? 'None yet' : formatMoney(monthlyPassive),
+                                tone: '',
+                                rail: 'var(--color-jar-give)',
+                                ink: 'var(--color-jar-give)',
+                            },
+                            {
+                                label: 'Your life costs',
+                                value: formatMoney(0),
+                                tone: 'text-fg',
+                                rail: 'var(--color-fg-muted)',
+                            },
+                            {
+                                label: 'Total debt',
+                                value: formatMoney(TOTAL_DEBT),
+                                tone: 'text-danger',
+                                rail: 'var(--color-danger)',
+                            },
+                        ] satisfies Array<{
+                            label: string;
+                            value: string;
+                            tone: string;
+                            rail: string;
+                            ink?: string;
+                        }>
+                    ).map(figure => (
+                        <div
+                            key={figure.label}
+                            className="flex overflow-hidden rounded-xl border border-line bg-sunken">
+                            <span
+                                aria-hidden
+                                className="w-1 shrink-0"
+                                style={{ background: figure.rail }}
+                            />
+                            <div className="grid min-w-0 gap-1.5 px-3 py-3 sm:px-3.5">
+                                <Eyebrow>{figure.label}</Eyebrow>
+                                <p
+                                    className={cn(
+                                        'font-display text-base leading-none font-semibold tracking-tight whitespace-nowrap sm:text-2xl',
+                                        figure.tone
+                                    )}
+                                    style={figure.ink ? { color: figure.ink } : undefined}>
+                                    {figure.value}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
                 </div>
-                <Typography as="p" size="sm" color="muted" className="mt-4 text-pretty">
+                <Typography
+                    as="p"
+                    size="sm"
+                    color="muted"
+                    className="mt-4 border-t border-line pt-4 text-pretty">
                     Your net worth is <strong className="text-fg">{formatMoney(netWorth)}</strong>.
                     Everything you add to Financial Freedom works for you — forever.
                 </Typography>
@@ -164,7 +200,7 @@ export function NetWorthPageClient() {
                                 { key: 'all' as const, label: `All  ${holdings.length}` },
                                 ...presentKinds.map(k => ({
                                     key: k.key,
-                                    label: `${k.name}  ${holdings.filter(holding => holding.kind === k.key).length}`,
+                                    label: `${k.name}  ${holdings.filter(holding => holding.kindKey === k.key).length}`,
                                 })),
                             ] as const
                         ).map(filterOption => (
@@ -231,7 +267,6 @@ export function NetWorthPageClient() {
                                 </div>
                                 <div className="grid gap-3.5 p-4 sm:grid-cols-2 lg:grid-cols-3">
                                     {group.items.map(holding => {
-                                        const jar = catalogByKey.get(holding.jarKey);
                                         const pays = !holding.locked && holding.flow > 0;
                                         return (
                                             <Link
@@ -255,23 +290,14 @@ export function NetWorthPageClient() {
                                                 />
                                                 <div className="grid gap-2 p-4">
                                                     <span className="font-mono text-xs font-medium tracking-wide text-fg-muted uppercase">
-                                                        {holding.locked
+                                                        {holding.kindKey === 'PENSION'
                                                             ? 'Locked until pension'
-                                                            : pays
-                                                              ? 'Pays you monthly'
-                                                              : 'Appreciates in value'}
+                                                            : holding.locked
+                                                              ? 'Does not pay you'
+                                                              : pays
+                                                                ? 'Pays you monthly'
+                                                                : 'Appreciates in value'}
                                                     </span>
-                                                    {jar ? (
-                                                        <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 py-1 font-mono text-xs tracking-widest text-fg-secondary uppercase">
-                                                            <span
-                                                                className={cn(
-                                                                    'size-1.75 rounded-sm',
-                                                                    jarChrome(holding.jarKey).color
-                                                                )}
-                                                            />
-                                                            {jar.name} ›
-                                                        </span>
-                                                    ) : null}
                                                     <Typography
                                                         as="h3"
                                                         size="lg"

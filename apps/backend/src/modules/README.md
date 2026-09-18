@@ -29,7 +29,7 @@ with its `*.entity.ts`, service, controller and module as flat siblings.
 | `public/platform/` | `coach` |
 | `public/product/` | `money/` (Geld) · `growth/` (Groei) · `energy/` (Energie) · `soul/` (Ziel) |
 | `public/product/money/` | `plan/` (`jar` `income` `fixed-cost` `catalogs`) · `ledger/` · `targets/` · `month-score/` · `week-check/` · `dashboard` |
-| `public/product/growth/` | `lever` `milestone` `catalogs` `learn` (`book` `progress` `focus`) |
+| `public/product/growth/` | `lever` `milestone` `catalogs` `asset` `learn` (`book` `progress` `focus`) |
 | `public/product/energy/` | `log` |
 | `public/product/soul/` | `gratitude` |
 | `backoffice/` | `product/` · `plan/` · `communication/email` · reserved `reference/` |

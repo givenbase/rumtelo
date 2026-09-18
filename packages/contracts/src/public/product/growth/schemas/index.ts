@@ -4,6 +4,7 @@
  */
 export * from '../lever';
 export * from '../catalogs';
+export * from '../asset';
 export * from '../dashboard';
 export * from '../learn';
 export * from '../milestone';

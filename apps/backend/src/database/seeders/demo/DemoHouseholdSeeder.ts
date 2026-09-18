@@ -14,6 +14,7 @@ import {
     HouseholdKind,
     IncomeKind,
     IncomeStability,
+    LearnProgressStatus,
     Locale,
     PayoffStrategy,
     RuleField,
@@ -49,6 +50,9 @@ import { IncomeSource } from '../../../modules/public/product/money/plan/income/
 import { Jar } from '../../../modules/public/product/money/plan/jar/jar.entity';
 import { Debt } from '../../../modules/public/product/money/targets/debt/debt.entity';
 import { Goal } from '../../../modules/public/product/money/targets/goal/goal.entity';
+import { Asset } from '../../../modules/public/product/growth/asset/asset.entity';
+import { LearnSkillFocus } from '../../../modules/public/product/growth/learn/focus/focus.entity';
+import { LearnProgress } from '../../../modules/public/product/growth/learn/progress/progress.entity';
 import { Gratitude } from '../../../modules/public/product/soul/gratitude/gratitude.entity';
 
 loadEnvFiles();
@@ -314,6 +318,20 @@ export class DemoHouseholdSeeder extends Seeder {
                 case 'max':
                     this.seedMaxBoard(em, householdId, rumteloAccount.id, jarMap, demo);
                     break;
+            }
+        }
+
+        await em.flush();
+
+        if (demo.persona === 'max') {
+            const assetCount = await em.count(Asset, { household: householdId });
+            if (assetCount === 0) this.seedMaxAssets(em, householdId);
+        }
+
+        if (demo.persona === 'plus' || demo.persona === 'max') {
+            const learnCount = await em.count(LearnProgress, { household: householdId });
+            if (learnCount === 0) {
+                this.seedLearn(em, householdId, rumteloAccount.id, demo.persona);
             }
         }
 
@@ -768,6 +786,157 @@ export class DemoHouseholdSeeder extends Seeder {
     }
 
     /** Investor / operator — profits, portfolio accounts, large goals, healthy rhythm. */
+    /** A shelf that already has titles, so Learn is not empty on the demo accounts. */
+    private seedLearn(
+        em: EntityManager,
+        householdId: string,
+        accountId: string,
+        persona: 'plus' | 'max'
+    ): void {
+        const rows =
+            persona === 'plus'
+                ? [
+                      {
+                          pieceKey: 'psychology-of-money',
+                          skill: 'MONEY',
+                          status: LearnProgressStatus.NOW,
+                          rank: 1,
+                          dueOn: monthsAhead(1),
+                      },
+                      {
+                          pieceKey: 'rich-dad',
+                          skill: 'MONEY',
+                          status: LearnProgressStatus.QUEUE,
+                          rank: 2,
+                          dueOn: null,
+                      },
+                      {
+                          pieceKey: 'profit-first',
+                          skill: 'MONEY',
+                          status: LearnProgressStatus.QUEUE,
+                          rank: 3,
+                          dueOn: null,
+                      },
+                      {
+                          pieceKey: 'the-founder',
+                          skill: 'MONEY',
+                          status: LearnProgressStatus.QUEUE,
+                          rank: 4,
+                          dueOn: null,
+                      },
+                  ]
+                : [
+                      {
+                          pieceKey: 'profit-first',
+                          skill: 'MONEY',
+                          status: LearnProgressStatus.NOW,
+                          rank: 1,
+                          dueOn: monthsAhead(2),
+                      },
+                      {
+                          pieceKey: 'extreme-ownership',
+                          skill: 'LEADERSHIP',
+                          status: LearnProgressStatus.NOW,
+                          rank: 2,
+                          dueOn: monthsAhead(3),
+                      },
+                      {
+                          pieceKey: 'buy-back-your-time',
+                          skill: 'MONEY',
+                          status: LearnProgressStatus.QUEUE,
+                          rank: 3,
+                          dueOn: null,
+                      },
+                      {
+                          pieceKey: '100m-offers',
+                          skill: 'MONEY',
+                          status: LearnProgressStatus.QUEUE,
+                          rank: 4,
+                          dueOn: null,
+                      },
+                      {
+                          pieceKey: 'psychology-of-money',
+                          skill: 'MONEY',
+                          status: LearnProgressStatus.DONE,
+                          rank: 5,
+                          dueOn: null,
+                      },
+                      {
+                          pieceKey: 'succession',
+                          skill: 'LEADERSHIP',
+                          status: LearnProgressStatus.QUEUE,
+                          rank: 6,
+                          dueOn: null,
+                      },
+                  ];
+
+        for (const row of rows) {
+            em.create(LearnProgress, {
+                household: householdId,
+                account: accountId,
+                pieceKey: row.pieceKey,
+                skill: row.skill,
+                status: row.status,
+                rank: row.rank,
+                dueOn: row.dueOn,
+            } as never);
+        }
+
+        const skills = persona === 'plus' ? ['MONEY'] : ['MONEY', 'LEADERSHIP'];
+        for (const skill of skills) {
+            em.create(LearnSkillFocus, {
+                household: householdId,
+                account: accountId,
+                skill,
+            } as never);
+        }
+    }
+
+    /** Ownership for the Max household — a studio, a portfolio, a home, a rental. */
+    private seedMaxAssets(em: EntityManager, householdId: string): void {
+        for (const row of [
+            {
+                name: 'The company',
+                kindKey: 'BUSINESS',
+                presetKey: 'COMPANY',
+                value: 220_000,
+                flow: 5_200,
+            },
+            {
+                name: 'Dividend portfolio',
+                kindKey: 'PORTFOLIO',
+                presetKey: 'DIVIDEND_PORTFOLIO',
+                value: 124_800,
+                flow: 950,
+            },
+            {
+                name: 'Rental property',
+                kindKey: 'PROPERTY',
+                presetKey: 'RENTAL',
+                value: 336_000,
+                flow: 1_400,
+            },
+            { name: 'Home', kindKey: 'PROPERTY', presetKey: 'HOME', value: 410_000, flow: 0 },
+            {
+                name: 'Private pension',
+                kindKey: 'PENSION',
+                presetKey: 'PRIVATE_PENSION',
+                value: 86_000,
+                flow: 0,
+            },
+            { name: 'Car', kindKey: 'VEHICLE', presetKey: 'CAR', value: 28_000, flow: 0 },
+        ] as const) {
+            em.create(Asset, {
+                household: householdId,
+                name: row.name,
+                kindKey: row.kindKey,
+                presetKey: row.presetKey,
+                value: toMinorUnits(row.value),
+                flow: toMinorUnits(row.flow),
+            } as never);
+        }
+    }
+
     private seedMaxBoard(
         em: EntityManager,
         householdId: string,
