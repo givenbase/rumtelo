@@ -20,6 +20,7 @@ import type { GoalKind } from '@rumtelo/contracts';
 
 import { formRoute, moveCreateMeta } from '@/app/_lib/form-route-meta';
 import { MoveMoneyForm } from '@/components/features/forms/move-money-form';
+import { AssetForm } from '@/components/features/forms/asset-form';
 import { SheetStubForm } from '@/components/features/forms/sheet-stub-form';
 import { RouteModalShell } from '@/components/layout/route-modal-shell';
 
@@ -142,7 +143,7 @@ export function AssetCreateModalShell({ closeHref }: ShellProps) {
     const meta = formRoute('assetCreate');
     return (
         <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
-            <SheetStubForm kind="asset" mode="create" embedded />
+            <AssetForm embedded />
         </RouteModalShell>
     );
 }

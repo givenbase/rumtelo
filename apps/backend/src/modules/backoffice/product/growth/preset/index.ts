@@ -1,4 +1,12 @@
 export {
+    AssetKind,
+    AssetKindModule,
+    AssetKindService,
+    AssetPreset,
+    AssetPresetModule,
+    AssetPresetService,
+} from './asset';
+export {
     BookPreset,
     BookPresetModule,
     BookPresetService,

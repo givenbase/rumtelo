@@ -4,6 +4,8 @@ import { contract, type SpendingStyle } from '@rumtelo/contracts';
 
 import { ControllerSwagger } from '../../../../../common/decorators/controller-swagger.decorators';
 import {
+    AssetKindService,
+    AssetPresetService,
     BookPresetService,
     IncomePostureService,
     LeverPresetService,
@@ -18,7 +20,9 @@ export class GrowthCatalogsController {
         @Inject(BookPresetService) private readonly books: BookPresetService,
         @Inject(WatchPresetService) private readonly watches: WatchPresetService,
         @Inject(IncomePostureService) private readonly postures: IncomePostureService,
-        @Inject(WealthStageService) private readonly stages: WealthStageService
+        @Inject(WealthStageService) private readonly stages: WealthStageService,
+        @Inject(AssetKindService) private readonly assetKinds: AssetKindService,
+        @Inject(AssetPresetService) private readonly assetPresets: AssetPresetService
     ) {}
 
     @Implement(contract.growth.catalogs.incomePostures.list)
@@ -57,6 +61,20 @@ export class GrowthCatalogsController {
     listWatchPresets() {
         return implement(contract.growth.catalogs.watchPresets.list).handler(async () =>
             this.watches.listActive()
+        );
+    }
+
+    @Implement(contract.growth.catalogs.assetKinds.list)
+    listAssetKinds() {
+        return implement(contract.growth.catalogs.assetKinds.list).handler(async () =>
+            this.assetKinds.listActive()
+        );
+    }
+
+    @Implement(contract.growth.catalogs.assetPresets.list)
+    listAssetPresets() {
+        return implement(contract.growth.catalogs.assetPresets.list).handler(async () =>
+            this.assetPresets.listActive()
         );
     }
 }

@@ -9,6 +9,8 @@ import { z } from 'zod';
 import { HouseholdScoped } from '../../../../common/common.schema';
 import { SpendingStyle } from '../../../platform/enums';
 import {
+    AssetKind,
+    AssetPreset,
     GrowthLeverPreset,
     IncomePosture,
     LearnBookPreset,
@@ -42,5 +44,13 @@ export const growthCatalogsContract = {
     /** Films, videos, and series we recommend. Same plan and style gates as books. */
     watchPresets: {
         list: oc.input(HouseholdScoped).output(z.array(LearnWatchPreset)),
+    },
+    /** Classes of what a household can own. The list can grow without an enum. */
+    assetKinds: {
+        list: oc.input(HouseholdScoped).output(z.array(AssetKind)),
+    },
+    /** Suggested names for New asset. Picking one sets the class. */
+    assetPresets: {
+        list: oc.input(HouseholdScoped).output(z.array(AssetPreset)),
     },
 };

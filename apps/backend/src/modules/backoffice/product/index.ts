@@ -61,4 +61,10 @@ export {
     WealthStage,
     WealthStageModule,
     WealthStageService,
+    AssetKind,
+    AssetKindModule,
+    AssetKindService,
+    AssetPreset,
+    AssetPresetModule,
+    AssetPresetService,
 } from './growth';

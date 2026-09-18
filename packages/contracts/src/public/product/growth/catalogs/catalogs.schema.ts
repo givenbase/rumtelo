@@ -90,9 +90,32 @@ export const LearnWatchPreset = CatalogItemBase.extend({
     watchUrl: z.string().url().max(280).nullable(),
 });
 
+/**
+ * A class of what a household can own. A catalog row, not an enum.
+ * canPay is whether that class can send money in each month.
+ */
+export const AssetKind = CatalogItemBase.extend({
+    description: z.string().max(280).nullable(),
+    icon: z.string().max(8).nullable(),
+    canPay: z.boolean(),
+});
+
+/**
+ * A suggested name for New asset. Picking one files it under a class.
+ * The household can still type a name that is not in this list.
+ */
+export const AssetPreset = CatalogItemBase.extend({
+    description: z.string().max(280).nullable(),
+    kindKey: z.string().min(1).max(64),
+    kindName: z.string().min(1).max(120),
+    canPay: z.boolean(),
+});
+
 // Inferred types (same-module merge for consumers)
 export type IncomePosture = z.infer<typeof IncomePosture>;
 export type WealthStage = z.infer<typeof WealthStage>;
 export type GrowthLeverPreset = z.infer<typeof GrowthLeverPreset>;
 export type LearnBookPreset = z.infer<typeof LearnBookPreset>;
 export type LearnWatchPreset = z.infer<typeof LearnWatchPreset>;
+export type AssetKind = z.infer<typeof AssetKind>;
+export type AssetPreset = z.infer<typeof AssetPreset>;

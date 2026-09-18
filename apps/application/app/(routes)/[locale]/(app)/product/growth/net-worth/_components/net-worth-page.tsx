@@ -6,11 +6,16 @@ import { useState } from 'react';
 import { AccentCard, Button, Card, EmptyState, Eyebrow, Section, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
+import { useLiveQuery } from '@rumtelo/hooks';
+import type { AssetKind } from '@rumtelo/contracts';
+
+import { apiQuery } from '@/app/_lib/api-hooks';
 import { CREATE_HREF } from '@/app/_lib/create-routes';
-import { HOLDING_KINDS, type HoldingKind } from '@/app/_lib/holding-kinds';
 import { jarChrome } from '@/app/_lib/jar-meta';
+import { isLiveData } from '@/app/_lib/preview';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { ListToolbar } from '@/components/layout/list-toolbar';
+import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 type Holding = {
@@ -19,14 +24,13 @@ type Holding = {
     jarKey: string;
     value: number;
     flow: number;
-    kind: HoldingKind;
+    kind: string;
     locked: boolean;
 };
 
 const holdings: Holding[] = [];
 const TOTAL_DEBT = 0;
-
-type FilterKey = 'all' | HoldingKind;
+const EMPTY_KINDS: AssetKind[] = [];
 
 /**
  * BOARD — net worth board + assets + month score + level ladder + log.
@@ -35,7 +39,16 @@ type FilterKey = 'all' | HoldingKind;
 export function NetWorthPageClient() {
     const { formatMoney } = useHouseholdCurrency();
     const { byKey: catalogByKey } = useJarCatalog();
-    const [filter, setFilter] = useState<FilterKey>('all');
+    const { householdId } = useAuth();
+    const kindsQuery = useLiveQuery(
+        apiQuery.growth.catalogs.assetKinds.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        EMPTY_KINDS,
+        isLiveData(householdId)
+    );
+    const kinds = kindsQuery.data ?? EMPTY_KINDS;
+    const [filter, setFilter] = useState('all');
 
     const assetWorth = holdings.reduce((total, holding) => total + holding.value, 0);
     const monthlyPassive = holdings
@@ -43,36 +56,35 @@ export function NetWorthPageClient() {
         .reduce((total, holding) => total + holding.flow, 0);
     const netWorth = assetWorth - TOTAL_DEBT;
 
-    const presentKinds = HOLDING_KINDS.filter(k =>
-        holdings.some(holding => holding.kind === k.key)
-    );
+    const presentKinds = kinds.filter(kind => holdings.some(holding => holding.kind === kind.key));
 
     const groups: Array<{
-        key: HoldingKind;
-        nl: string;
-        desc: string;
+        key: string;
+        name: string;
+        description: string | null;
+        canPay: boolean;
         items: Holding[];
         total: number;
         flow: number;
-        isPension: boolean;
         flowLabel: string;
     }> = [];
 
-    for (const meta of HOLDING_KINDS) {
+    for (const meta of kinds) {
         if (filter !== 'all' && filter !== meta.key) continue;
         const items = holdings.filter(holding => holding.kind === meta.key);
         if (items.length === 0) continue;
         const total = items.reduce((running, holding) => running + holding.value, 0);
         const flow = items.reduce((running, holding) => running + holding.flow, 0);
-        const isPension = meta.key === 'pension';
         groups.push({
-            ...meta,
+            key: meta.key,
+            name: meta.name,
+            description: meta.description,
+            canPay: meta.canPay,
             items,
             total,
             flow,
-            isPension,
-            flowLabel: isPension
-                ? 'locked'
+            flowLabel: !meta.canPay
+                ? 'no income'
                 : flow > 0
                   ? `+ ${formatMoney(flow)} p/m`
                   : 'no income p/m',
@@ -152,7 +164,7 @@ export function NetWorthPageClient() {
                                 { key: 'all' as const, label: `All  ${holdings.length}` },
                                 ...presentKinds.map(k => ({
                                     key: k.key,
-                                    label: `${k.nl}  ${holdings.filter(holding => holding.kind === k.key).length}`,
+                                    label: `${k.name}  ${holdings.filter(holding => holding.kind === k.key).length}`,
                                 })),
                             ] as const
                         ).map(filterOption => (
@@ -178,7 +190,7 @@ export function NetWorthPageClient() {
                                     <div className="min-w-0 flex-1">
                                         <div className="flex flex-wrap items-baseline gap-2.5">
                                             <Typography as="h3" size="lg">
-                                                {group.nl}
+                                                {group.name}
                                             </Typography>
                                             <span className="font-mono text-xs tracking-wide text-fg-muted uppercase">
                                                 {group.items.length === 1
@@ -191,7 +203,7 @@ export function NetWorthPageClient() {
                                             size="sm"
                                             color="muted"
                                             className="mt-1 text-pretty">
-                                            {group.desc}
+                                            {group.description}
                                         </Typography>
                                     </div>
                                     <div className="grid justify-items-end gap-1">
@@ -201,7 +213,7 @@ export function NetWorthPageClient() {
                                         <span
                                             className={cn(
                                                 'font-mono text-xs',
-                                                group.isPension || group.flow <= 0
+                                                !group.canPay || group.flow <= 0
                                                     ? 'text-fg-muted'
                                                     : 'text-accent'
                                             )}>

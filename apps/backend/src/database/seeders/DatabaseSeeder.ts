@@ -18,6 +18,8 @@ import { BookPresetSeeder } from './product/growth/BookPresetSeeder';
 import { WatchPresetSeeder } from './product/growth/WatchPresetSeeder';
 import { IncomePostureSeeder } from './product/growth/IncomePostureSeeder';
 import { LeverPresetSeeder } from './product/growth/LeverPresetSeeder';
+import { AssetKindSeeder } from './product/growth/AssetKindSeeder';
+import { AssetPresetSeeder } from './product/growth/AssetPresetSeeder';
 import { WealthStageSeeder } from './product/growth/WealthStageSeeder';
 import { DemoHouseholdSeeder } from './demo/DemoHouseholdSeeder';
 
@@ -43,6 +45,8 @@ export class DatabaseSeeder extends Seeder {
             GoalPresetSeeder,
             IncomePostureSeeder,
             WealthStageSeeder,
+            AssetKindSeeder,
+            AssetPresetSeeder,
             LeverPresetSeeder,
             BookPresetSeeder,
             WatchPresetSeeder,

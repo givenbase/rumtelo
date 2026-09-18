@@ -35,7 +35,7 @@ with its `*.entity.ts`, service, controller and module as flat siblings.
 | `backoffice/` | `product/` · `plan/` · `communication/email` · reserved `reference/` |
 | `backoffice/product/` | `money/` · `growth/` (mirrors `public/product/*`) |
 | `backoffice/product/money/` | `template/` (jar, category) · `preset/` (fixed-cost, debt, income, goal, merchant) |
-| `backoffice/product/growth/` | `preset/` (`lever`, `learn` → `book` `watch`) · `catalog/` (income-posture, wealth-stage) |
+| `backoffice/product/growth/` | `preset/` (`lever`, `learn` → `book` `watch`, `asset` → `kind` + names) · `catalog/` (income-posture, wealth-stage) |
 
 A product grows a sub-domain folder (like `money/plan/`) once it has several
 aggregates that belong together — never pre-emptively. `growth`, `energy` and

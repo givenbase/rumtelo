@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 
 import {
+    AssetKindModule,
+    AssetPresetModule,
     BookPresetModule,
     IncomePostureModule,
     LeverPresetModule,
@@ -17,6 +19,8 @@ import { GrowthCatalogsController } from './catalogs.controller';
         WatchPresetModule,
         IncomePostureModule,
         WealthStageModule,
+        AssetKindModule,
+        AssetPresetModule,
     ],
     controllers: [GrowthCatalogsController],
 })

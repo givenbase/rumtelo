@@ -62,6 +62,7 @@ export const FORM_ROUTE = {
     },
     assetCreate: {
         title: 'New asset',
+        description: 'What you own, and whether it pays you.',
         closeHref: productPath('growth/net-worth'),
     },
     sessionCreate: {

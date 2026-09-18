@@ -1,5 +1,5 @@
 import { formRoute } from '@/app/_lib/form-route-meta';
-import { SheetStubForm } from '@/components/features/forms/sheet-stub-form';
+import { AssetForm } from '@/components/features/forms/asset-form';
 import { FormRoutePageShell } from '@/components/layout/form-route-page-shell';
 
 export const metadata = { title: formRoute('assetCreate').title };
@@ -13,7 +13,7 @@ export default function Page() {
             description={meta.description}
             closeHref={meta.closeHref}
             width={meta.width}>
-            <SheetStubForm kind="asset" mode="create" embedded />
+            <AssetForm embedded />
         </FormRoutePageShell>
     );
 }

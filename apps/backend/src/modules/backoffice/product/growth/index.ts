@@ -10,6 +10,12 @@ export {
 } from './catalog';
 export {
     GrowthPresetModule,
+    AssetKind,
+    AssetKindModule,
+    AssetKindService,
+    AssetPreset,
+    AssetPresetModule,
+    AssetPresetService,
     LeverPreset,
     LeverPresetModule,
     LeverPresetService,
