@@ -61,6 +61,7 @@ export function AuthManifesto({
 
     useEffect(() => {
         if (!autoRotate || reduceMotion || quotes.length < 2) return;
+
         const id = window.setInterval(() => {
             setQuoteIndex(current => (current + 1) % quotes.length);
         }, ROTATE_MS);

@@ -74,7 +74,9 @@ export function LandingWhy() {
                             </ul>
                             {moreBooks.length > 0 ? (
                                 <details className="group mt-2.5">
-                                    <summary className="cursor-pointer list-none py-2 [&::-webkit-details-marker]:hidden">
+                                    <summary
+                                        aria-label={`Show ${moreBooks.length} more books`}
+                                        className="cursor-pointer list-none py-2 [&::-webkit-details-marker]:hidden">
                                         <Typography
                                             as="span"
                                             variant="eyebrow"

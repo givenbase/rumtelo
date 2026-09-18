@@ -899,7 +899,7 @@ export function JarsSettings() {
     );
 
     const jars = useMemo(() => jarsQuery.data ?? [], [jarsQuery.data]);
-    const accounts = accountsQuery.data ?? [];
+    const accounts = useMemo(() => accountsQuery.data ?? [], [accountsQuery.data]);
     const serverPct = useMemo(
         () => Object.fromEntries(jars.map(j => [j.id, j.percentage])),
         [jars]
@@ -1960,9 +1960,9 @@ export function PlanSettings() {
     );
 
     /** Stripe Checkout / Portal when backend reports stripeEnabled. */
-    const stripeLive = !PREVIEW_MODE && billingStatus.data?.stripeEnabled === true;
+    const stripeLive = !PREVIEW_MODE && billingStatus.data?.stripeEnabled;
     /** Explicit free switches (preview mode or BILLING_PREVIEW_BYPASS). */
-    const freePlanSwitch = PREVIEW_MODE || billingStatus.data?.previewBypass === true;
+    const freePlanSwitch = PREVIEW_MODE || billingStatus.data?.previewBypass;
     /** No Stripe and no bypass — paid upgrades blocked; stay on Basic. */
     const billingUnavailable = !stripeLive && !freePlanSwitch;
     const pendingDiff = pendingPlan ? diffPlans(plan, pendingPlan) : null;
@@ -2127,7 +2127,7 @@ export function PlanSettings() {
         billingStatus.isLoading;
     const scheduledPlanKey = billingStatus.data?.scheduledPlanKey ?? null;
     const periodEndsAt = billingStatus.data?.periodEndsAt ?? null;
-    const hasActiveSubscription = billingStatus.data?.hasActiveSubscription === true;
+    const hasActiveSubscription = billingStatus.data?.hasActiveSubscription;
 
     const cards: {
         key: PlanKey;

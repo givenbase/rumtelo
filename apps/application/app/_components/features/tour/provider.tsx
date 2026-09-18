@@ -270,18 +270,25 @@ export function PageTourProvider({ children }: { children: ReactNode }) {
     }, [goToSeriesIndex, persist]);
 
     useEffect(() => {
-        if (!hydrated || !progress.seriesActive || run || startingRef.current) return;
-        const expected = resumeHrefRef.current;
-        if (!expected) return;
-        const chapter = FULL_TOUR_CHAPTERS[progress.seriesIndex];
-        if (!chapter || chapter.href !== expected) return;
-        if (!pathMatchesChapter(pathname, chapter.href)) return;
-
-        const timer = window.setTimeout(() => {
-            resumeHrefRef.current = null;
-            launchSteps(chapter.id, chapter.steps, true);
-        }, 280);
-        return () => window.clearTimeout(timer);
+        let timer: number | undefined;
+        if (hydrated && progress.seriesActive && !run && !startingRef.current) {
+            const expected = resumeHrefRef.current;
+            const chapter = FULL_TOUR_CHAPTERS[progress.seriesIndex];
+            if (
+                expected &&
+                chapter &&
+                chapter.href === expected &&
+                pathMatchesChapter(pathname, chapter.href)
+            ) {
+                timer = window.setTimeout(() => {
+                    resumeHrefRef.current = null;
+                    launchSteps(chapter.id, chapter.steps, true);
+                }, 280);
+            }
+        }
+        return () => {
+            if (timer !== undefined) window.clearTimeout(timer);
+        };
     }, [hydrated, progress.seriesActive, progress.seriesIndex, pathname, run, launchSteps]);
 
     const value = useMemo<PageTourContextValue>(

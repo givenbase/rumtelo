@@ -81,6 +81,10 @@ export class EmailPreviewController {
                     },
                     'en'
                 );
+            default: {
+                const exhaustive: never = template;
+                throw new Error(`Unknown email template: ${String(exhaustive)}`);
+            }
         }
     }
 }

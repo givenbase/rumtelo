@@ -36,8 +36,9 @@ export function CoachPageClient() {
 
     const dismiss = useMutation({
         mutationFn: async (id: string) => {
-            if (!householdId) return;
-            return api.coach.dismiss({ householdId, id });
+            if (householdId) {
+                await api.coach.dismiss({ householdId, id });
+            }
         },
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: apiQuery.coach.feed.key() });

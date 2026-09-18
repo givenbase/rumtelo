@@ -54,14 +54,15 @@ export function WeekCheckPageClient() {
             intention?: string;
             allocations?: { jarId: string; amount: number }[];
         }) => {
-            if (!householdId) return;
-            return api.money.weekCheck.advance({
-                householdId,
-                week,
-                stage: payload.stage,
-                intention: payload.intention,
-                allocations: payload.allocations,
-            });
+            if (householdId) {
+                await api.money.weekCheck.advance({
+                    householdId,
+                    week,
+                    stage: payload.stage,
+                    intention: payload.intention,
+                    allocations: payload.allocations,
+                });
+            }
         },
         onSuccess: () => {
             void queryClient.invalidateQueries({

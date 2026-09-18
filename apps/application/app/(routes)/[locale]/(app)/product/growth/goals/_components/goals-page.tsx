@@ -91,7 +91,7 @@ function goalProgress(
     goal: Goal,
     currentNet: number,
     tab: Tab,
-    formatMoney: (n: number) => string
+    formatMoney: (amount: number) => string
 ): GoalProgress {
     const isEarn = goal.kind === GoalKind.EARN;
     const isGive = goal.kind === GoalKind.GIVE;
@@ -442,6 +442,7 @@ export function GoalsPageClient() {
                             <Card key={group.kind} className="p-0">
                                 <button
                                     type="button"
+                                    aria-label={`${kindLabel(group.kind)} goals (${group.items.length})`}
                                     aria-expanded={open}
                                     onClick={() => toggleKind(group.kind)}
                                     className="flex w-full items-center justify-between gap-3 border-b border-line px-5 py-3.5 text-left hover:bg-raised/60">

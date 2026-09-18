@@ -74,7 +74,7 @@ function paceAdvice(input: {
     goal: Goal;
     verdict: GoalPaceVerdict | null;
     projection: GoalProjection | null;
-    formatMoney: (n: number) => string;
+    formatMoney: (amount: number) => string;
     jarName: string | null;
     headroom: number | null;
     siblingCount: number;

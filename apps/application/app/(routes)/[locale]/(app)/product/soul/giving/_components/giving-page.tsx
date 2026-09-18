@@ -393,7 +393,6 @@ export function GivingPageClient() {
                                         jarId: giveJar?.id,
                                         payeeMode: option.id,
                                     })}
-                                    aria-pressed={on}
                                     onClick={() => setGivePickMode(option.id)}
                                     className={
                                         on

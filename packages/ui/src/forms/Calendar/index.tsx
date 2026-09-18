@@ -64,15 +64,15 @@ function sameDay(left: Date, right: Date): boolean {
 }
 
 function isBeforeDay(date: Date, bound: Date): boolean {
-    const a = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
-    const b = new Date(bound.getFullYear(), bound.getMonth(), bound.getDate()).getTime();
-    return a < b;
+    const dateTime = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+    const boundTime = new Date(bound.getFullYear(), bound.getMonth(), bound.getDate()).getTime();
+    return dateTime < boundTime;
 }
 
 function isAfterDay(date: Date, bound: Date): boolean {
-    const a = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
-    const b = new Date(bound.getFullYear(), bound.getMonth(), bound.getDate()).getTime();
-    return a > b;
+    const dateTime = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+    const boundTime = new Date(bound.getFullYear(), bound.getMonth(), bound.getDate()).getTime();
+    return dateTime > boundTime;
 }
 
 /** Monday-first index: Mon=0 … Sun=6 */
@@ -136,17 +136,31 @@ export function Calendar({ value, onSelect, min, max, className }: CalendarProps
     const days = useMemo(() => {
         const first = startOfMonth(visibleMonth);
         const lead = mondayIndex(first);
-        const cells: Array<Date | null> = [];
-        for (let i = 0; i < lead; i++) cells.push(null);
-        const daysInMonth = new Date(
-            visibleMonth.getFullYear(),
-            visibleMonth.getMonth() + 1,
-            0
-        ).getDate();
-        for (let day = 1; day <= daysInMonth; day++) {
-            cells.push(new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), day));
+        const year = visibleMonth.getFullYear();
+        const month = visibleMonth.getMonth();
+        const cells: Array<{ date: Date | null; key: string }> = [];
+
+        for (let slot = 0; slot < lead; slot++) {
+            const pad = new Date(first);
+            pad.setDate(pad.getDate() - (lead - slot));
+            cells.push({ date: null, key: `pad-${toIsoDate(pad)}` });
         }
-        while (cells.length % 7 !== 0) cells.push(null);
+
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            cells.push({ date, key: toIsoDate(date) });
+        }
+
+        const lastDay = new Date(year, month, daysInMonth);
+        let trail = 0;
+        while (cells.length % 7 !== 0) {
+            trail++;
+            const pad = new Date(lastDay);
+            pad.setDate(pad.getDate() + trail);
+            cells.push({ date: null, key: `pad-${toIsoDate(pad)}` });
+        }
+
         return cells;
     }, [visibleMonth]);
 
@@ -257,11 +271,12 @@ export function Calendar({ value, onSelect, min, max, className }: CalendarProps
             </div>
 
             <div className="grid grid-cols-7 gap-0.5">
-                {days.map((date, index) => {
-                    if (!date) {
-                        return <div key={`empty-${index}`} className="h-9" />;
+                {days.map(cell => {
+                    if (!cell.date) {
+                        return <div key={cell.key} className="h-9" />;
                     }
-                    const iso = toIsoDate(date);
+                    const date = cell.date;
+                    const iso = cell.key;
                     const disabled =
                         (minDate !== null && isBeforeDay(date, minDate)) ||
                         (maxDate !== null && isAfterDay(date, maxDate));

@@ -107,6 +107,10 @@ export function updateHref(kind: Exclude<CreateKind, 'session' | 'asset' | 'move
             return productPath(`growth/income/update/${id}`);
         case 'goal':
             return productPath(`growth/goals/update/${id}`);
+        default: {
+            const exhaustive: never = kind;
+            throw new Error(`Unhandled update kind: ${String(exhaustive)}`);
+        }
     }
 }
 

@@ -41,6 +41,7 @@ export function DatePicker({
 
     useEffect(() => {
         if (inline || !open) return;
+
         function onPointerDown(event: MouseEvent) {
             if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
         }

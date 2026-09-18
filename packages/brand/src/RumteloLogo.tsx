@@ -58,16 +58,16 @@ export function RumteloLogo({
         );
     }
 
-    const w = width ?? WORDMARK_SIZE.width;
-    const h = height ?? WORDMARK_SIZE.height;
+    const wordmarkWidth = width ?? WORDMARK_SIZE.width;
+    const wordmarkHeight = height ?? WORDMARK_SIZE.height;
 
     if (variant === 'wordmarkOnLight') {
         return (
             <Image
                 src={BRAND_ASSETS.wordmarkOnLight}
                 alt={alt}
-                width={w}
-                height={h}
+                width={wordmarkWidth}
+                height={wordmarkHeight}
                 className={className}
                 unoptimized
                 {...rest}
@@ -80,8 +80,8 @@ export function RumteloLogo({
             <Image
                 src={BRAND_ASSETS.wordmarkOnDark}
                 alt={alt}
-                width={w}
-                height={h}
+                width={wordmarkWidth}
+                height={wordmarkHeight}
                 className={className}
                 unoptimized
                 {...rest}
@@ -94,8 +94,8 @@ export function RumteloLogo({
             <Image
                 src={BRAND_ASSETS.wordmarkOnLight}
                 alt={alt}
-                width={w}
-                height={h}
+                width={wordmarkWidth}
+                height={wordmarkHeight}
                 className="rumtelo-logo-on-light col-start-1 row-start-1 h-full w-auto max-w-full"
                 unoptimized
                 {...rest}
@@ -104,8 +104,8 @@ export function RumteloLogo({
                 src={BRAND_ASSETS.wordmarkOnDark}
                 alt=""
                 aria-hidden
-                width={w}
-                height={h}
+                width={wordmarkWidth}
+                height={wordmarkHeight}
                 className="rumtelo-logo-on-dark col-start-1 row-start-1 h-full w-auto max-w-full"
                 unoptimized
             />
