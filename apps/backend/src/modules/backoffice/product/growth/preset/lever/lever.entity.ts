@@ -1,15 +1,28 @@
-import { Entity, Property, Unique } from '@mikro-orm/core';
+import {
+    Collection,
+    Entity,
+    Index,
+    ManyToMany,
+    ManyToOne,
+    Property,
+    Unique,
+} from '@mikro-orm/core';
 import type { SpendingStyle } from '@rumtelo/contracts';
 
-import { BaseEntity } from '../../../../../../common/database/base.entity';
+import { CatalogEntity } from '../../../../../../common/database/catalog.entity';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import { IncomePosture } from '../../catalog/income-posture/income-posture.entity';
+import { WealthStage } from '../../catalog/wealth-stage/wealth-stage.entity';
 
 /**
- * Growth Lever Preset Entity
+ * Lever Preset Entity
  *
  * Rumtelo-owned catalog of earning methods / levers shown on Growth → Income.
- * Tags use catalog keys (posture / wealth stage) so taxonomies scale without enums.
+ * Audience targeting uses catalog relations (posture / wealth stage) so the
+ * taxonomies scale without enums; spending style is a contracts enum.
  *
+ * @see IncomePosture — N:M audience filter
+ * @see WealthStage — minimum stage that sees this lever
  * @see https://mikro-orm.io/docs/defining-entities
  */
 @Entity(
@@ -21,36 +34,30 @@ import { entityConfig } from '../../../../../../common/database/entity-config.ut
     })
 )
 @Unique({ properties: ['key'] })
-export class LeverPreset extends BaseEntity {
+@Index({ properties: ['minWealthStage'] })
+export class LeverPreset extends CatalogEntity {
     // ? PROPERTIES
-    @Property({ length: 64 })
-    key!: string;
-
-    @Property({ length: 120 })
-    name!: string;
-
+    /** One-paragraph pitch shown on the lever card. */
     @Property({ type: 'text' })
-    summary!: string;
+    description!: string;
 
-    /** CSS color token (e.g. var(--color-accent)). */
+    /** Empty = relevant for every spending style (contracts enum values). */
+    @Property({ type: 'json', default: [] })
+    spendingStyles: SpendingStyle[] = [];
+
+    // ? UI METADATA
+    /** CSS color token for the card accent (e.g. var(--color-accent)). */
     @Property({ length: 64 })
     accentColor!: string;
 
-    @Property({ default: 0 })
-    sortOrder = 0;
+    // ? RELATIONSHIPS
+    /** Lowest wealth stage that should see this lever (compared by stage.sortOrder). */
+    @ManyToOne(() => WealthStage, { deleteRule: 'restrict' })
+    minWealthStage!: WealthStage;
 
-    /** Empty = show for every posture. Keys → reference_growth_income_posture.key */
-    @Property({ type: 'json', default: [] })
-    forPostureKeys: string[] = [];
-
-    /** Empty = show for every spending style. */
-    @Property({ type: 'json', default: [] })
-    forSpendingStyles: SpendingStyle[] = [];
-
-    /** Lowest wealth stage key that should see this lever. */
-    @Property({ length: 64, default: 'BUILDING' })
-    minStageKey = 'BUILDING';
-
-    @Property({ default: true })
-    isActive = true;
+    /** Postures this lever targets (N:M, owner side). Empty = every posture. */
+    @ManyToMany(() => IncomePosture, undefined, {
+        pivotTable: 'reference_growth_lever_preset_income_posture',
+    })
+    postures = new Collection<IncomePosture>(this);
 }

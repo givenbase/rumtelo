@@ -11,7 +11,7 @@ export type StripeBillingSyncInput = {
     periodStartedAt?: Date | null;
     periodEndsAt?: Date | null;
     trialEndsAt?: Date | null;
-    isCancelAtPeriodEnd?: boolean;
+    willCancelAtPeriodEnd?: boolean;
     scheduledPlanKey?: PlanKey | null;
 };
 
@@ -19,7 +19,7 @@ export type HouseholdBillingSnapshot = {
     planKey: PlanKey;
     periodEndsAt: Date | null;
     periodStartedAt: Date | null;
-    isCancelAtPeriodEnd: boolean;
+    willCancelAtPeriodEnd: boolean;
     scheduledPlanKey: PlanKey | null;
     stripeSubscriptionId: string | null;
     stripeCustomerId: string | null;
@@ -59,7 +59,7 @@ export class HouseholdBillingService {
             planKey: row.planKey,
             periodEndsAt: row.periodEndsAt,
             periodStartedAt: row.periodStartedAt,
-            isCancelAtPeriodEnd: Boolean(row.isCancelAtPeriodEnd),
+            willCancelAtPeriodEnd: row.willCancelAtPeriodEnd,
             scheduledPlanKey: row.scheduledPlanKey ?? null,
             stripeSubscriptionId: row.stripeSubscriptionId,
             stripeCustomerId: row.stripeCustomerId,
@@ -74,7 +74,7 @@ export class HouseholdBillingService {
         const row = await this.ensure(householdId);
         row.planKey = planKey;
         row.scheduledPlanKey = null;
-        row.isCancelAtPeriodEnd = false;
+        row.willCancelAtPeriodEnd = false;
         if (planKey === PlanKey.BASIC) {
             row.periodStartedAt = null;
             row.periodEndsAt = null;
@@ -104,8 +104,8 @@ export class HouseholdBillingService {
         if (input.trialEndsAt !== undefined) {
             row.trialEndsAt = input.trialEndsAt;
         }
-        if (input.isCancelAtPeriodEnd !== undefined) {
-            row.isCancelAtPeriodEnd = input.isCancelAtPeriodEnd;
+        if (input.willCancelAtPeriodEnd !== undefined) {
+            row.willCancelAtPeriodEnd = input.willCancelAtPeriodEnd;
         }
         if (input.scheduledPlanKey !== undefined) {
             row.scheduledPlanKey = input.scheduledPlanKey;

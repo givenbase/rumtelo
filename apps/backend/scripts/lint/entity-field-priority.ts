@@ -4,8 +4,25 @@
  * @see apps/backend/docs/ENTITY_STYLE.md
  */
 
-/** Allowed concrete bases — HouseholdEntity extends BaseEntity. */
-export const ALLOWED_ENTITY_BASES = ['BaseEntity', 'HouseholdEntity'] as const;
+/**
+ * Allowed abstract bases.
+ *   BaseEntity → HouseholdEntity → WeekCheckEntity
+ *   BaseEntity → CatalogEntity
+ */
+export const ALLOWED_ENTITY_BASES = [
+    'BaseEntity',
+    'HouseholdEntity',
+    'CatalogEntity',
+    'WeekCheckEntity',
+] as const;
+
+/** Fields each base owns — subclasses must not redeclare them. */
+const BASE_OWNED_FIELDS: Record<AllowedEntityBase, readonly string[]> = {
+    BaseEntity: ['id', 'createdAt', 'updatedAt'],
+    HouseholdEntity: ['id', 'createdAt', 'updatedAt', 'household'],
+    CatalogEntity: ['id', 'createdAt', 'updatedAt', 'key', 'name', 'sortOrder', 'isActive'],
+    WeekCheckEntity: ['id', 'createdAt', 'updatedAt', 'household', 'week', 'completedAt'],
+};
 
 export type AllowedEntityBase = (typeof ALLOWED_ENTITY_BASES)[number];
 
@@ -41,31 +58,35 @@ export function findMissingBaseEntity(text: string): string | null {
     }
 
     if (!(ALLOWED_ENTITY_BASES as readonly string[]).includes(decl.extendsName)) {
-        return `${decl.className} extends ${decl.extendsName} — must extend BaseEntity or HouseholdEntity`;
+        return `${decl.className} extends ${decl.extendsName} — must extend one of ${ALLOWED_ENTITY_BASES.join(' / ')}`;
     }
 
     const importsBase =
-        /from\s+['"][^'"]*common\/database\/(?:base|household)\.entity['"]/.test(text) ||
-        /from\s+['"][^'"]*\/(?:base|household)\.entity['"]/.test(text) ||
+        /from\s+['"][^'"]*common\/database\/(?:base|household|catalog|week-check)\.entity['"]/.test(
+            text
+        ) ||
+        /from\s+['"][^'"]*\/(?:base|household|catalog|week-check)\.entity['"]/.test(text) ||
         /from\s+['"][^'"]*common\/database['"]/.test(text);
     if (!importsBase) {
-        return `${decl.className} extends ${decl.extendsName} but does not import BaseEntity / HouseholdEntity from common/database`;
+        return `${decl.className} extends ${decl.extendsName} but does not import it from common/database`;
     }
 
     return null;
 }
 
 /**
- * Fields owned by BaseEntity / HouseholdEntity must not be redeclared on subclasses.
+ * Fields owned by the abstract base must not be redeclared on subclasses.
  */
 export function findInheritedFieldRedeclarations(text: string): string[] {
     const decl = extractEntityClassDeclaration(text);
     if (!decl?.extendsName) return [];
 
-    const forbidden = new Set<string>(['id', 'createdAt', 'updatedAt']);
-    if (decl.extendsName === 'HouseholdEntity') {
-        forbidden.add('household');
-    }
+    const owned = BASE_OWNED_FIELDS[decl.extendsName as AllowedEntityBase] ?? [
+        'id',
+        'createdAt',
+        'updatedAt',
+    ];
+    const forbidden = new Set<string>(owned);
 
     const redeclarations: string[] = [];
     const pattern =
@@ -99,8 +120,8 @@ export function findRelationIdSuffixViolations(text: string): string[] {
     return violations;
 }
 
-/** Affirmative boolean prefixes — see ENTITY_STYLE.md field naming. */
-const BOOLEAN_NAME_RE = /^(is|has|can)[A-Z]/;
+/** Affirmative boolean prefixes (state / possession / ability / scheduled) — see ENTITY_STYLE.md. */
+const BOOLEAN_NAME_RE = /^(is|has|can|will)[A-Z]/;
 
 /**
  * Extract `@Property` field names that look like booleans (default true/false or `: boolean`).
@@ -135,7 +156,7 @@ export function findBooleanNamingViolations(text: string): string[] {
     for (const fieldName of extractBooleanPropertyNames(text)) {
         if (BOOLEAN_NAME_RE.test(fieldName)) continue;
         violations.push(
-            `"${fieldName}" looks boolean — rename to is*/has*/can* (e.g. isActive, not active)`
+            `"${fieldName}" looks boolean — rename to is*/has*/can*/will* (e.g. isActive, not active)`
         );
     }
     return violations;
@@ -230,6 +251,16 @@ const JSON_BAG_NAMES = new Set([
     'snapshot',
     'checkoutSnapshot',
     'contentBlocks',
+    // HouseholdSettings bags — class name already says "settings"
+    'money',
+    'weekCheck',
+    'features',
+    'answers',
+    // AccountSettings guided-tour progress
+    'tour',
+    // JarTemplate / Jar behaviour flags + Coach helper copy (mirrors contracts JarGuide)
+    'capabilities',
+    'guide',
 ]);
 
 const JSON_BAG_SUFFIX_RE = /(Json|Metadata|Settings|Config|Payload|Snapshot)$/;
@@ -269,6 +300,8 @@ export const EXACT_FIELD_PRIORITY: Record<string, number> = {
     account: 1,
     entityId: 1,
     version: 1,
+    period: 1,
+    week: 1,
 
     name: 2,
     title: 2,
@@ -288,6 +321,7 @@ export const EXACT_FIELD_PRIORITY: Record<string, number> = {
     why: 4,
     message: 4,
     notes: 4,
+    note: 4,
 
     body: 5,
     content: 5,
@@ -300,58 +334,88 @@ export const EXACT_FIELD_PRIORITY: Record<string, number> = {
     email: 6,
     phone: 6,
     iban: 6,
+    counterparty: 6,
+    highlight: 6,
     address: 6,
     city: 6,
     country: 6,
     postalCode: 6,
 
+    // 7 — numeric / monetary values and small scalar facts
     amount: 7,
     balance: 7,
+    originalBalance: 7,
     budgeted: 7,
     actual: 7,
     target: 7,
+    saved: 7,
+    monthlyContribution: 7,
+    minimumPayment: 7,
+    extraPayment: 7,
+    interestRate: 7,
+    surplus: 7,
+    potentialMonthly: 7,
+    targetMonthly: 7,
+    priceMonthly: 7,
+    score: 7,
+    maxScore: 7,
+    level: 7,
+    points: 7,
+    priority: 7,
+    matchPriority: 7,
+    hitCount: 7,
     rate: 7,
     percentage: 7,
     price: 7,
     quantity: 7,
+    value: 7,
     sortOrder: 7,
     orderIndex: 7,
-    periodStartDay: 7,
-    weekCheckReminderDay: 7,
-    weekCheckReminderAt: 7,
-    dueDay: 7,
-    expectedDay: 7,
-    suggestedDueDay: 7,
     currency: 7,
     icon: 7,
     color: 7,
     accentColor: 7,
     softColor: 7,
     badgeLabel: 7,
+    groupLabel: 7,
     minNetWorth: 7,
     isBaseline: 7,
+    intention: 7,
+    text: 7,
+    scope: 7,
+    reporting: 7,
+    ibanBankCode: 7,
+    mcc: 7,
+    matchValue: 7,
+    dedupeKey: 7,
+    inflowKey: 7,
+    givingOrganisationKey: 7,
 
+    // 8 — config / json
     metadata: 8,
     settings: 8,
     additionalSettings: 8,
-    moneySettings: 8,
-    weekCheckSettings: 8,
-    featureSettings: 8,
+    money: 8,
+    weekCheck: 8,
+    features: 8,
     answers: 8,
+    tour: 8,
     capabilities: 8,
-    forPostureKeys: 8,
-    forSpendingStyles: 8,
-    minStageKey: 8,
+    guidePayload: 8,
+    spendingStyles: 8,
     aliases: 8,
-    markets: 8,
     providerIds: 8,
+    causes: 8,
+    signals: 8,
 
+    // 9 — links / media
     url: 9,
     imageUrl: 9,
     linkPath: 9,
     logoDomain: 9,
     website: 9,
 
+    // 10 — boolean flags
     isActive: 10,
     isFeatured: 10,
     isPublished: 10,
@@ -359,20 +423,19 @@ export const EXACT_FIELD_PRIORITY: Record<string, number> = {
     isSpendable: 10,
     isBankSyncEnabled: 10,
     isCoachEnabled: 10,
-    isDone: 10,
     isClosed: 10,
     isFixed: 10,
+    willCancelAtPeriodEnd: 10,
 
-    expiresAt: 11,
-    completedAt: 11,
-    closedAt: 11,
-    dueDate: 11,
-    startDate: 11,
-    endDate: 11,
-    startedOn: 11,
-    endsOn: 11,
-    targetOn: 11,
-    publishedAt: 11,
+    // 11 — day ordinals (int, repeat every period)
+    dueDay: 11,
+    expectedDay: 11,
+    periodStartDay: 11,
+    weekCheckReminderDay: 11,
+    weekCheckReminderAt: 11,
+
+    // 12 — calendar dates and instants (see inferFieldPriority for *On / *At)
+    dateOfBirth: 12,
 };
 
 /** When priorities tie, earlier names in each tuple must appear first. */
@@ -381,13 +444,25 @@ export const SAME_PRIORITY_ORDER: readonly (readonly string[])[] = [
     ['entityId', 'entityType', 'fieldName'],
     ['household', 'account'],
     ['key', 'name', 'slug'],
-    ['matchValue', 'mcc', 'categoryTemplateKey', 'ibanBankCode'],
-    ['aliases', 'markets', 'providerIds'],
-    ['budgeted', 'actual', 'target'],
-    ['amount', 'balance', 'rate', 'percentage'],
+    ['period', 'week'],
+    ['matchValue', 'mcc', 'ibanBankCode'],
+    ['aliases', 'providerIds'],
+    ['budgeted', 'actual', 'target', 'saved', 'monthlyContribution'],
+    [
+        'amount',
+        'balance',
+        'originalBalance',
+        'interestRate',
+        'minimumPayment',
+        'extraPayment',
+        'rate',
+        'percentage',
+    ],
+    ['score', 'maxScore', 'level'],
     ['isBankSyncEnabled', 'isCoachEnabled'],
-    ['moneySettings', 'weekCheckSettings', 'featureSettings', 'answers'],
+    ['money', 'weekCheck', 'features', 'answers'],
     ['periodStartDay', 'weekCheckReminderDay', 'weekCheckReminderAt'],
+    ['isActive', 'isArchived'],
 ];
 
 export const UI_METADATA_PRIORITY: Record<string, number> = {
@@ -395,6 +470,7 @@ export const UI_METADATA_PRIORITY: Record<string, number> = {
     accentColor: 1,
     softColor: 1,
     icon: 2,
+    badgeLabel: 2,
     logoDomain: 3,
     website: 4,
     highlight: 5,
@@ -413,8 +489,14 @@ export function inferFieldPriority(fieldName: string): number {
     ) {
         return 10;
     }
-    if (fieldName.endsWith('At') || fieldName.endsWith('Date')) {
+    if (fieldName.endsWith('At') || fieldName.endsWith('On') || fieldName.endsWith('Date')) {
+        return 12;
+    }
+    if (fieldName.endsWith('Day')) {
         return 11;
+    }
+    if (BOOLEAN_NAME_RE.test(fieldName)) {
+        return 10;
     }
     if (fieldName.includes('Url') || fieldName.includes('Path')) {
         return 9;

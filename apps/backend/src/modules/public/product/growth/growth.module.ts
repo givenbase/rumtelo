@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 
 import { GrowthCatalogsModule } from './catalogs/catalogs.module';
 import { GrowthDashboardModule } from './dashboard/dashboard.module';
-import { LeverModule } from './lever/lever.module';
-import { MilestoneModule } from './milestone/milestone.module';
+import { IncomeLeverModule } from './income-lever/income-lever.module';
+import { IncomeMilestoneModule } from './income-milestone/income-milestone.module';
 import { GrowthWeekCheckModule } from './week-check/week-check.module';
 
 /**
@@ -12,15 +12,15 @@ import { GrowthWeekCheckModule } from './week-check/week-check.module';
  */
 @Module({
     imports: [
-        LeverModule,
-        MilestoneModule,
+        IncomeLeverModule,
+        IncomeMilestoneModule,
         GrowthCatalogsModule,
         GrowthWeekCheckModule,
         GrowthDashboardModule,
     ],
     exports: [
-        LeverModule,
-        MilestoneModule,
+        IncomeLeverModule,
+        IncomeMilestoneModule,
         GrowthCatalogsModule,
         GrowthWeekCheckModule,
         GrowthDashboardModule,

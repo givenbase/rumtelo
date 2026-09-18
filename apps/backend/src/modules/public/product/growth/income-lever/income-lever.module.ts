@@ -1,7 +1,11 @@
 import { Module } from '@nestjs/common';
 
-import { LeverController } from './lever.controller';
-import { LeverService } from './lever.service';
+import { IncomeLeverController } from './income-lever.controller';
+import { IncomeLeverService } from './income-lever.service';
 
-@Module({ controllers: [LeverController], providers: [LeverService], exports: [LeverService] })
-export class LeverModule {}
+@Module({
+    controllers: [IncomeLeverController],
+    providers: [IncomeLeverService],
+    exports: [IncomeLeverService],
+})
+export class IncomeLeverModule {}

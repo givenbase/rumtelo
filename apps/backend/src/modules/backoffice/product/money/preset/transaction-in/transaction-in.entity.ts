@@ -1,7 +1,7 @@
 import { Entity, Enum, Property, Unique } from '@mikro-orm/core';
 import { JarKey } from '@rumtelo/contracts';
 
-import { BaseEntity } from '../../../../../../common/database/base.entity';
+import { CatalogEntity } from '../../../../../../common/database/catalog.entity';
 import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
 
@@ -23,31 +23,15 @@ import { entityConfig } from '../../../../../../common/database/entity-config.ut
     })
 )
 @Unique({ properties: ['key'] })
-export class TransactionInPreset extends BaseEntity {
+export class TransactionInPreset extends CatalogEntity {
     // ? PROPERTIES
-    /** Stable catalog key (e.g. TAX_RETURN) — never rename in place. */
+    /** Picker group heading (People, Official, …). `groupName` — `group` is a SQL keyword. */
     @Property({ length: 64 })
-    key!: string;
-
-    /** English name filled into the create form when picked. */
-    @Property({ length: 120 })
-    name!: string;
-
-    /** Picker group label (People, Official, …). */
-    @Property({ length: 64 })
-    groupLabel!: string;
+    groupName!: string;
 
     /** Optional emoji for the picker. */
     @Property({ length: 8, nullable: true })
     icon: string | null = null;
-
-    /** Display / seed order within the catalog. */
-    @Property({ default: 0 })
-    sortOrder = 0;
-
-    /** Soft-disable without deleting historical inflow_key references. */
-    @Property({ default: true })
-    isActive = true;
 
     // ? ENUMS
     /** Soft jar hint when the user picks this preset; null = leave jar alone. */

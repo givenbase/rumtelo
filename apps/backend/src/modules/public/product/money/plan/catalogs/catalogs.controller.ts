@@ -44,9 +44,9 @@ export class MoneyCatalogsController {
                 sortOrder: template.sortOrder,
                 subtitle: template.subtitle,
                 icon: template.icon,
-                defaultPercentage: Number(template.defaultPercentage),
+                percentage: Number(template.percentage),
                 capabilities: template.capabilities,
-                guide: template.guidePayload ?? null,
+                guide: template.guide,
             }));
         });
     }
@@ -83,12 +83,12 @@ export class MoneyCatalogsController {
                     name: preset.name,
                     sortOrder: preset.sortOrder,
                     jarKey: preset.jarTemplate.key,
-                    categoryTemplateKey: preset.categoryTemplateKey,
-                    defaultCadence: preset.defaultCadence,
-                    suggestedDueDay: preset.suggestedDueDay,
+                    categoryTemplateKey: preset.categoryTemplate.key,
+                    cadence: preset.cadence,
+                    dueDay: preset.dueDay,
                     direction: preset.direction,
-                    audienceKeys: preset.audienceKeys ?? [],
-                    suggestedMerchantKeys: preset.suggestedMerchantKeys ?? [],
+                    audienceKeys: preset.audiences.getItems().map(audience => audience.key),
+                    merchantKeys: preset.merchantLinks.getItems().map(link => link.merchant.key),
                 }));
             }
         );
@@ -123,7 +123,7 @@ export class MoneyCatalogsController {
                 sortOrder: preset.sortOrder,
                 kind: preset.kind,
                 icon: preset.icon,
-                suggestedMerchantKeys: preset.suggestedMerchantKeys ?? [],
+                merchantKeys: preset.merchantLinks.getItems().map(link => link.merchant.key),
             }));
         });
     }
@@ -140,8 +140,8 @@ export class MoneyCatalogsController {
                     name: preset.name,
                     sortOrder: preset.sortOrder,
                     kind: preset.kind,
-                    defaultCadence: preset.defaultCadence,
-                    icon: preset.icon ?? null,
+                    cadence: preset.cadence,
+                    icon: preset.icon,
                 }));
             }
         );
@@ -155,7 +155,7 @@ export class MoneyCatalogsController {
                 key: preset.key,
                 name: preset.name,
                 sortOrder: preset.sortOrder,
-                group: preset.groupLabel,
+                groupName: preset.groupName,
                 icon: preset.icon,
                 jarKey: preset.jarKey,
             }));
@@ -173,7 +173,7 @@ export class MoneyCatalogsController {
                 name: preset.name,
                 sortOrder: preset.sortOrder,
                 jarKey: preset.jarTemplate.key,
-                categoryTemplateKey: preset.categoryTemplateKey,
+                categoryTemplateKey: preset.categoryTemplate?.key ?? null,
                 icon: preset.icon,
             }));
         });
@@ -197,13 +197,13 @@ export class MoneyCatalogsController {
                     aliases: preset.matching?.aliases ?? [],
                     mcc: preset.matching?.mcc ?? null,
                     jarKey: preset.jarTemplate.key,
-                    categoryTemplateKey: preset.categoryTemplateKey,
-                    givingOrganisationKey: preset.givingOrganisationKey ?? null,
+                    categoryTemplateKey: preset.categoryTemplate.key,
+                    givingOrganisationKey: preset.givingOrganisation?.key ?? null,
                     logoDomain: preset.branding?.logoDomain ?? null,
                     website: preset.branding?.website ?? null,
                     ibanBankCode: preset.banking?.ibanBankCode ?? null,
                     highlight: preset.highlight ?? null,
-                    markets: preset.markets?.length ? preset.markets : ['NL'],
+                    markets: preset.markets.getItems().map(market => market.key),
                     matchPriority: preset.matching?.matchPriority ?? 0,
                     providerIds: preset.matching?.providerIds ?? {},
                 }));

@@ -151,7 +151,7 @@ export class DebtService {
                 await this.em.findOne(HouseholdSettings, {
                     household: currentHouseholdId(),
                 })
-            )?.moneySettings?.payoffStrategy ??
+            )?.money?.payoffStrategy ??
             PayoffStrategy.AVALANCHE;
 
         const debts = await this.repo.find({ closedOn: null });
@@ -168,15 +168,15 @@ export class DebtService {
 
         const ordered = [...debts].sort((left, right) => {
             if (resolved === PayoffStrategy.SNOWBALL || resolved === PayoffStrategy.MINIMAL) {
-                return Number(left.balance) - Number(right.balance);
+                return left.balance - right.balance;
             }
             return Number(right.interestRate) - Number(left.interestRate);
         });
 
-        const totalBalance = debts.reduce((total, debt) => total + Number(debt.balance), 0);
+        const totalBalance = debts.reduce((total, debt) => total + debt.balance, 0);
         const monthlyPool = debts.reduce((total, debt) => {
-            const minimum = Number(debt.minimumPayment);
-            const extra = resolved === PayoffStrategy.MINIMAL ? 0 : Number(debt.extraPayment);
+            const minimum = debt.minimumPayment;
+            const extra = resolved === PayoffStrategy.MINIMAL ? 0 : debt.extraPayment;
             return total + minimum + extra;
         }, 0);
 
@@ -288,8 +288,8 @@ export class DebtService {
             { populate: ['jar', 'category', 'debt'] }
         );
 
-        const paidAmount = Math.max(0, Number(debt.originalBalance) - Number(debt.balance));
-        const remaining = Number(debt.balance);
+        const paidAmount = Math.max(0, debt.originalBalance - debt.balance);
+        const remaining = debt.balance;
         const paymentsMade = payments.length;
         const paymentsRemaining =
             debt.scheduleKind === DebtScheduleKind.TERM && debt.termPayments !== null
@@ -323,7 +323,7 @@ export class DebtService {
                 debt,
                 name: debt.name,
                 counterparty: debt.name,
-                amount: Number(debt.minimumPayment),
+                amount: debt.minimumPayment,
                 cadence: debt.paymentCadence,
                 dueDay: debt.dueDay,
                 direction: FlowDirection.OUT,
@@ -337,7 +337,7 @@ export class DebtService {
 
         fixed.name = debt.name;
         fixed.counterparty = debt.name;
-        fixed.amount = Number(debt.minimumPayment);
+        fixed.amount = debt.minimumPayment;
         fixed.cadence = debt.paymentCadence;
         fixed.dueDay = debt.dueDay;
         fixed.isActive = !debt.closedOn;
@@ -354,13 +354,15 @@ async function resolveDebtPaymentTargets(em: EntityManager) {
     });
     if (!jar) return { jar: null, category: null };
 
+    // UNIQUE(household, jar, name): revive an archived row rather than create a twin.
     let category = await em.findOne(Category, {
         household: currentHouseholdId(),
         jar: jar.id,
         name: DEBT_PAYMENTS_CATEGORY_NAME,
-        isArchived: false,
     });
-    if (!category) {
+    if (category) {
+        category.isArchived = false;
+    } else {
         category = em.create(Category, {
             household: currentHouseholdId(),
             jar,
@@ -386,11 +388,11 @@ export function toDto(debt: Debt) {
         householdId: debt.household,
         name: debt.name,
         kind: debt.kind,
-        balance: Number(debt.balance),
-        originalBalance: Number(debt.originalBalance),
+        balance: debt.balance,
+        originalBalance: debt.originalBalance,
         interestRate: Number(debt.interestRate),
-        minimumPayment: Number(debt.minimumPayment),
-        extraPayment: Number(debt.extraPayment),
+        minimumPayment: debt.minimumPayment,
+        extraPayment: debt.extraPayment,
         dueDay: debt.dueDay,
         closedOn: debt.closedOn,
         startedOn: debt.startedOn,
@@ -409,14 +411,14 @@ function toPaymentDto(transaction: Transaction) {
         jarId: transaction.jar?.id ?? null,
         categoryId: transaction.category?.id ?? null,
         debtId: transaction.debt?.id ?? null,
-        amount: Number(transaction.amount),
+        amount: transaction.amount,
         bookedOn: transaction.bookedOn,
         description: transaction.description,
         counterparty: transaction.counterparty,
         inflowKey: transaction.inflowKey,
         status: transaction.status,
         source: transaction.source,
-        appliedRuleId: transaction.appliedRuleId,
+        appliedRuleId: transaction.appliedRule,
         note: transaction.note,
         createdAt: transaction.createdAt.toISOString(),
     };
@@ -431,7 +433,7 @@ function toLinkedFixedCostDto(fixedCost: FixedCost) {
         debtId: fixedCost.debt?.id ?? null,
         name: fixedCost.name,
         counterparty: fixedCost.counterparty,
-        amount: Number(fixedCost.amount),
+        amount: fixedCost.amount,
         cadence: fixedCost.cadence,
         dueDay: fixedCost.dueDay,
         direction: fixedCost.direction,

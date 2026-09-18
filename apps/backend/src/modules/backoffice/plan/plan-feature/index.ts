@@ -1,2 +1,2 @@
-export { PlanFeature } from './feature.entity';
-export { PlanFeatureModule } from './feature.module';
+export { PlanFeature } from './plan-feature.entity';
+export { PlanFeatureModule } from './plan-feature.module';

@@ -7,6 +7,8 @@ import { entityConfig } from '../../../../common/database/entity-config.util';
 import { AuthUser } from '../managed/user/auth-user.entity';
 
 /**
+ * Account Entity
+ *
  * Application-owned person profile — NOT Better Auth.
  *
  * Better Auth owns login identity only (`auth.user`: email, password/OAuth,
@@ -25,20 +27,16 @@ import { AuthUser } from '../managed/user/auth-user.entity';
  */
 @Entity(entityConfig({ schema: 'auth', tableName: 'account' }))
 export class Account extends BaseEntity {
-    // ? RELATIONSHIPS
-    @OneToOne(() => AuthUser, { deleteRule: 'cascade', unique: true })
-    user!: AuthUser;
-
-    @OneToOne('AccountSettings', { mappedBy: 'account' })
-    settings?: AccountSettings;
-
     // ? PROPERTIES
+    /** Legal first name (not the greeting — that is `AuthUser.name`). */
     @Property({ type: 'varchar', length: 80, nullable: true })
     firstName: string | null = null;
 
+    /** Legal last name. */
     @Property({ type: 'varchar', length: 80, nullable: true })
     lastName: string | null = null;
 
+    /** Optional middle name(s). */
     @Property({ type: 'varchar', length: 80, nullable: true })
     middleName: string | null = null;
 
@@ -49,4 +47,13 @@ export class Account extends BaseEntity {
     /** Calendar date only (no time zone), ISO `YYYY-MM-DD`. */
     @Property({ type: 'date', nullable: true })
     dateOfBirth: string | null = null;
+
+    // ? RELATIONSHIPS
+    /** Better Auth login identity (1:1, owner side). Cascades when the user is deleted. */
+    @OneToOne(() => AuthUser, { deleteRule: 'cascade', unique: true })
+    user!: AuthUser;
+
+    /** Person-scoped UI prefs (1:1, inverse side). */
+    @OneToOne('AccountSettings', { mappedBy: 'account' })
+    settings?: AccountSettings;
 }

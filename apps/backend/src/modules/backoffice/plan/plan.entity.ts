@@ -1,21 +1,23 @@
 import { Collection, Entity, Enum, OneToMany, Property, Unique } from '@mikro-orm/core';
-import { PlanKey, type PlanCapabilities } from '@rumtelo/contracts';
+import { PlanKey } from '@rumtelo/contracts';
 
 import { BaseEntity } from '../../../common/database/base.entity';
+import { MoneyType } from '../../../common/database/money.type';
 import { NativeEnum } from '../../../common/database/native-enum.util';
 import { entityConfig } from '../../../common/database/entity-config.util';
-
-import type { PlanCapability } from './plan-capability/plan-capability.entity';
+import type { PlanCapabilityGrant } from './plan-capability-grant/plan-capability-grant.entity';
 
 /**
  * Plan Entity
  *
  * Rumtelo-owned product tiers (Basic / Plus / Max).
  * We write these rows; households only *subscribe* (later) or read for gating.
- * Runtime checks use PLAN_CAPABILITY_GRANTS from contracts; this row is the catalog mirror.
- * Display / tier order is `sortOrder` only (0 = Basic …).
+ * Runtime checks use PLAN_CAPABILITY_GRANTS from contracts; the grant rows are
+ * the DB mirror of that graph. Display / tier order is `sortOrder` only (0 = Basic …).
  *
- * @see Capability / PlanCapability — normalized grant graph
+ * Stays on BaseEntity (not CatalogEntity) because its key is the `PlanKey` enum.
+ *
+ * @see PlanCapability / PlanCapabilityGrant — normalized grant graph
  * @see product/money/plan — household money split (jars), unrelated
  * @see https://mikro-orm.io/docs/defining-entities
  */
@@ -27,20 +29,13 @@ export class Plan extends BaseEntity {
     @Property({ length: 40 })
     name!: string;
 
-    /** List price per month in major units (EUR). Free tier is 0. */
-    @Property({ type: 'decimal', precision: 8, scale: 2, default: '0.00' })
-    priceMonthly: string = '0.00';
+    /** List price per month in eurocents. Free tier is 0. */
+    @Property({ type: MoneyType, default: 0 })
+    priceMonthly = 0;
 
     /** Ascending tier order — Basic = 0, Plus = 1, Max = 2. */
     @Property({ default: 0 })
     sortOrder = 0;
-
-    /**
-     * Denormalized snapshot of contracts PLAN_CAPABILITIES[key]
-     * (limits + capabilityKeys). Prefer plan_capability rows for joins.
-     */
-    @Property({ type: 'json' })
-    capabilities!: PlanCapabilities;
 
     /** Soft-disable without breaking historical subscriptions that used this key. */
     @Property({ default: true })
@@ -52,6 +47,7 @@ export class Plan extends BaseEntity {
     key!: PlanKey;
 
     // ? RELATIONSHIPS
-    @OneToMany('PlanCapability', 'plan')
-    capabilityGrants = new Collection<PlanCapability>(this);
+    /** Capabilities this tier unlocks (1:N to the grant rows). */
+    @OneToMany('PlanCapabilityGrant', 'plan')
+    grants = new Collection<PlanCapabilityGrant>(this);
 }

@@ -6,12 +6,12 @@
 
 import { z } from 'zod';
 
-import { CatalogItemBase } from '../../../../common/common.schema';
+import { CatalogItemBase, Money } from '../../../../common/common.schema';
 import { SpendingStyle } from '../../../platform/enums';
 
 /** Scalable earning-posture row (backoffice.reference_growth_income_posture). */
 export const IncomePosture = CatalogItemBase.extend({
-    summary: z.string().max(280).nullable(),
+    description: z.string().max(280).nullable(),
 });
 
 /**
@@ -19,28 +19,28 @@ export const IncomePosture = CatalogItemBase.extend({
  * sortOrder drives progression; optional net-worth floor in minor units for later auto-detect.
  */
 export const WealthStage = CatalogItemBase.extend({
-    summary: z.string().max(280).nullable(),
+    description: z.string().max(280).nullable(),
     /** Optional display badge (e.g. milestone label) — not a legal/status claim. */
     badgeLabel: z.string().max(64).nullable(),
     /** Net worth floor in eurocents; null = no automatic threshold yet. */
-    minNetWorth: z.number().int().nullable(),
+    minNetWorth: Money.nullable(),
 });
 
 /**
  * Backoffice catalog row: growth lever / method suggestion.
- * Tags use catalog keys so postures/stages can grow without code deploys.
+ * Audience tags use catalog keys so postures/stages can grow without code deploys.
  */
 export const GrowthLeverPreset = CatalogItemBase.extend({
-    summary: z.string().min(1).max(280),
+    description: z.string().min(1).max(280),
     accentColor: z.string().min(1).max(64),
-    /** Empty = relevant for every posture. Keys → reference_growth_income_posture.key */
-    forPostureKeys: z.array(z.string().min(1).max(64)),
-    /** Empty = relevant for every character. */
-    forSpendingStyles: z.array(z.enum(SpendingStyle)),
+    /** Empty = relevant for every posture. Keys → IncomePosture.key */
+    postureKeys: z.array(z.string().min(1).max(64)),
+    /** Empty = relevant for every spending style. */
+    spendingStyles: z.array(z.enum(SpendingStyle)),
     /** Lowest wealth stage key that should see this lever. */
-    minStageKey: z.string().min(1).max(64),
-    /** Copied from wealth stage.sortOrder at list time for filtering. */
-    minStageSortOrder: z.int(),
+    minWealthStageKey: z.string().min(1).max(64),
+    /** WealthStage.sortOrder of that stage, for client-side filtering. */
+    minWealthStageSortOrder: z.int(),
 });
 
 // Inferred types (same-module merge for consumers)

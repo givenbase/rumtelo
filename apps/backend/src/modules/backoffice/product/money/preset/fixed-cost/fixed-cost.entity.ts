@@ -1,10 +1,23 @@
-import { Entity, Enum, ManyToOne, Property, Unique } from '@mikro-orm/core';
+import {
+    Collection,
+    Entity,
+    Enum,
+    Index,
+    ManyToMany,
+    ManyToOne,
+    OneToMany,
+    Property,
+    Unique,
+} from '@mikro-orm/core';
 import { Cadence, FlowDirection } from '@rumtelo/contracts';
 
-import { BaseEntity } from '../../../../../../common/database/base.entity';
+import { CatalogEntity } from '../../../../../../common/database/catalog.entity';
 import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import { Audience } from '../../catalog/audience/audience.entity';
+import { CategoryTemplate } from '../../template/category/category.entity';
 import { JarTemplate } from '../../template/jar/jar.entity';
+import type { FixedCostPresetMerchant } from './fixed-cost-merchant.entity';
 
 /**
  * Fixed Cost Preset Entity
@@ -12,8 +25,9 @@ import { JarTemplate } from '../../template/jar/jar.entity';
  * Suggestion catalog for "New fixed cost" — real-world bill names with jar +
  * category defaults and audience tags. Households copy into money.fixed_cost.
  *
- * @see JarTemplate — default jar for this bill
- * @see CategoryTemplate.key — via categoryTemplateKey
+ * @see JarTemplate / CategoryTemplate — default placement for this bill
+ * @see Audience — picker filter chips (N:M)
+ * @see FixedCostPresetMerchant — ordered "Paid to" chips
  * @see money.fixed_cost — household-owned instances
  * @see https://mikro-orm.io/docs/defining-entities
  */
@@ -26,50 +40,18 @@ import { JarTemplate } from '../../template/jar/jar.entity';
     })
 )
 @Unique({ properties: ['key'] })
-export class FixedCostPreset extends BaseEntity {
+@Index({ properties: ['jarTemplate'] })
+@Index({ properties: ['categoryTemplate'] })
+export class FixedCostPreset extends CatalogEntity {
     // ? PROPERTIES
-    /** Stable catalog key (e.g. RENT) — never rename in place. */
-    @Property({ length: 64 })
-    key!: string;
-
-    /** English name filled into the create form when picked. */
-    @Property({ length: 120 })
-    name!: string;
-
-    /** CategoryTemplate.key to resolve/create under that jar on pick. */
-    @Property({ length: 64 })
-    categoryTemplateKey!: string;
-
-    /** Optional day-of-month hint (1–31) for the due-day field. */
+    /** Day-of-month hint (1–31) pre-filled in the due-day field; null = none. */
     @Property({ type: 'smallint', nullable: true })
-    suggestedDueDay: number | null = null;
-
-    /**
-     * Audience.key filters for the bill picker.
-     * Vocabulary grows via the audience catalog — not a TS enum.
-     */
-    @Property({ type: 'json', default: [] })
-    audienceKeys: string[] = [];
-
-    /**
-     * MerchantPreset.key chips for “Paid to” after this bill type is picked.
-     * Empty = free text only (no category dump). Order = chip order.
-     */
-    @Property({ type: 'json', default: [] })
-    suggestedMerchantKeys: string[] = [];
-
-    /** Display / seed order within the catalog. */
-    @Property({ default: 0 })
-    sortOrder = 0;
-
-    /** Soft-disable without deleting historical seed identity. */
-    @Property({ default: true })
-    isActive = true;
+    dueDay: number | null = null;
 
     // ? ENUMS
-    /** Suggested recurrence when creating the household fixed cost. */
+    /** Recurrence pre-filled when creating the household fixed cost. */
     @Enum(NativeEnum({ Cadence, domain: 'money', defaultValue: Cadence.MONTHLY }))
-    defaultCadence: Cadence = Cadence.MONTHLY;
+    cadence: Cadence = Cadence.MONTHLY;
 
     /** OUT = expense bill; IN = rare fixed inflow. */
     @Enum(NativeEnum({ FlowDirection, domain: 'money', defaultValue: FlowDirection.OUT }))
@@ -79,4 +61,23 @@ export class FixedCostPreset extends BaseEntity {
     /** Default jar template; app resolves household jar by jarTemplate.key. */
     @ManyToOne(() => JarTemplate, { deleteRule: 'restrict' })
     jarTemplate!: JarTemplate;
+
+    /** Category to resolve / create under that jar on pick. */
+    @ManyToOne(() => CategoryTemplate, { deleteRule: 'restrict' })
+    categoryTemplate!: CategoryTemplate;
+
+    /** Audience filters for the bill picker (N:M, owner side). Empty = every audience. */
+    @ManyToMany(() => Audience, undefined, {
+        pivotTable: 'reference_money_fixed_cost_preset_audience',
+    })
+    audiences = new Collection<Audience>(this);
+
+    /** Ordered "Paid to" merchant chips (1:N to the pivot; empty = free text only). */
+    @OneToMany<FixedCostPresetMerchant, FixedCostPreset>({
+        entity: 'FixedCostPresetMerchant',
+        mappedBy: 'preset',
+        orderBy: { sortOrder: 'ASC' },
+        orphanRemoval: true,
+    })
+    merchantLinks = new Collection<FixedCostPresetMerchant>(this);
 }

@@ -5,13 +5,13 @@ import { Implement, implement } from '@orpc/nest';
 
 import { RequireCapability } from '../../../../../common/capability';
 import { ControllerSwagger } from '../../../../../common/decorators/controller-swagger.decorators';
-import { LeverService } from './lever.service';
+import { IncomeLeverService } from './income-lever.service';
 
 /** Transport only. Handler order is always CRUD. */
 @RequireCapability(CAPABILITIES.growthIncome)
 @ControllerSwagger('growth/levers', 'public')
-export class LeverController {
-    constructor(@Inject(LeverService) private readonly levers: LeverService) {}
+export class IncomeLeverController {
+    constructor(@Inject(IncomeLeverService) private readonly levers: IncomeLeverService) {}
 
     // ====================================================================
     // ? READ Operations

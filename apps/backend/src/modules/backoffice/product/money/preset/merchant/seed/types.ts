@@ -1,7 +1,6 @@
-import type { MerchantHighlight } from '@rumtelo/contracts';
-import { JarKey } from '@rumtelo/contracts';
+import { JarKey, MerchantHighlight } from '@rumtelo/contracts';
 
-export type { MerchantHighlight };
+export { MerchantHighlight };
 
 export type MerchantSeed = {
     key: string;

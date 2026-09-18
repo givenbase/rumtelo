@@ -46,15 +46,22 @@ Every domain entity must extend one of:
 
 | Base | Use when |
 |------|----------|
-| `BaseEntity` | Root — uuid `id` + timestamps. Catalogs, account, anything not household-scoped |
+| `BaseEntity` | Root — uuid `id` + timestamps. Account, join tables, catalogs whose `key` is an **enum** (`Plan`, `JarTemplate`) |
+| `CatalogEntity` | **Extends** `BaseEntity` + `key`, `name`, `sortOrder`, `isActive`. Every company-authored catalog / preset / template with a free-text key (`CategoryTemplate`, `MerchantPreset`, `PlanFeature`, `WealthStage`, …). Mirrors `CatalogItemBase` in contracts |
 | `HouseholdEntity` | **Extends** `BaseEntity` and adds `household` → `AuthHousehold` via `@ManyToOne({ mapToPk: true })` (money / product / household settings) |
+| `WeekCheckEntity` | **Extends** `HouseholdEntity` + `week`, `completedAt`. The four portal week checks (`MoneyWeekCheck`, `GrowthWeekCheck`, `EnergyWeekCheck`, `SoulWeekCheck`) |
+
+```text
+BaseEntity ─┬─ CatalogEntity
+            └─ HouseholdEntity ── WeekCheckEntity
+```
 
 **1:1 vs 1:N:** both use `HouseholdEntity`. Enforce one row per household with `@Unique({ properties: ['household'] })` (e.g. `HouseholdSettings`). Product rows (jars, goals) stay many-per-household without that unique.
 
 `household` stays a **string** uuid in app code (`mapToPk`); MikroORM still owns the FK to `auth.household`. Do not redeclare it as a plain `@Property` or a full entity relation on subclasses.
 
-Files: `common/database/base.entity.ts`, `household.entity.ts`.
-Do **not** redeclare `id`, `createdAt`, `updatedAt`, or `household` on subclasses.
+Files: `common/database/base.entity.ts`, `catalog.entity.ts`, `household.entity.ts`, `week-check.entity.ts`.
+Do **not** redeclare `id`, `createdAt`, `updatedAt`, `household`, or the `CatalogEntity` / `WeekCheckEntity` columns on subclasses. `@Unique` on `key` (or `['household', 'week']`) stays on the concrete class.
 
 Not the same as `AuthHousehold` (Better Auth organization plugin table) — that mirror does **not** extend `BaseEntity`.
 
@@ -86,11 +93,15 @@ Names should make the **shape** obvious without reading the decorator or the col
 | **Calendar date** | `*On` → Postgres `date` | `startedOn`, `endsOn`, `publishedOn` | `*At` for date-only; `*Day` for a full date |
 | **Day ordinal** | `*Day` → `int` / `smallint` (1–31 or weekday 1–7) | `dueDay`, `expectedDay`, `periodStartDay`, `weekCheckReminderDay` | `dueDate` / `expectedDate` when the value is **not** a full date |
 | **FK / id** | `*Id` for plain scalar FKs; relation noun for `@ManyToOne`/`@OneToOne` (`mapToPk`) | `jarId` (plain scalar); `household`, `account` (mapToPk relations) | bare `householdId`/`accountId` on entity fields — use `household`/`account` and map at API boundary |
-| **Money / count** | plain noun | `amount`, `balance`, `percentage`, `rate` | encoding the type in the name (`amountCents`) unless dual units exist |
-| **JSON array** | plural noun | `aliases`, `unlocks`, `audienceTags` | `aliasList`, `unlockJson` when plural is enough |
-| **JSON object** | bag noun or `*Json` / `*Metadata` / `*Payload` | `metadata`, `settings`, `checkoutSnapshot`, `payloadJson` | vague `data`, `info`, `json` |
-| **M2M / collection** | plural **relation** (table), not a json id list | `tags`, `members`, `events` | `tagIds: string[]` stored as jsonb |
-| **1:1 / N:1** | singular relation | `account`, `user`, `jar` | embedding only the FK with no relation |
+| **Money / count** | plain noun; column type `MoneyType` (bigint eurocents → `number`) | `amount`, `balance`, `target`, `priceMonthly` | `amountCents`, `type: 'bigint'` (hydrates as `BigInt`), `decimal` for money |
+| **Ratio** | plain noun; `decimal` string | `percentage`, `interestRate` | storing percentages as money |
+| **Display text** | `name` (short) / `description` (one paragraph) | `name`, `description` | `label`, `title`, `summary`, `groupLabel` — pick `name` / `description` and stay consistent |
+| **Catalog default** | plain noun on the catalog row — the catalog *is* the default | `cadence`, `percentage`, `dueDay`, `amount` | `defaultCadence`, `suggestedDueDay`, `defaultPercentage` — the prefix only says "this is a preset", which the class name already does |
+| **JSON array** | plural noun | `aliases`, `unlocks`, `causes`, `spendingStyles` | `aliasList`, `unlockJson`, `for*` / `*Keys` when it should be a relation |
+| **JSON object** | bag noun (`metadata`, `settings`, `guide`, `tour`, `*Snapshot`) | `metadata`, `guide`, `checkoutSnapshot` | vague `data`, `info`, `json`; storage suffixes (`guidePayload`, `tourSnapshot` for a live object) |
+| **Nested settings bag** | noun of the sub-area (parent name gives context) | `HouseholdSettings.money`, `.weekCheck`, `.features` | `moneySettings`, `weekCheckSettings` inside `HouseholdSettings` (stutter) |
+| **M2M / collection** | plural **relation** (table), not a json id list | `audiences`, `markets`, `postures`, `merchantLinks` | `audienceKeys: string[]` stored as jsonb and filtered in JS |
+| **1:1 / N:1** | singular relation | `account`, `user`, `jar`, `categoryTemplate` | `categoryTemplateKey` string column pointing at a row in the same schema |
 
 ### Temporal — do not confuse Day / On / At / Date
 
@@ -117,6 +128,16 @@ Rumtelo calendar-date suffix is **`*On`** (Rails-style). Prefer `startedOn` / `e
    - Objects → `metadata` / `settings` / `*Snapshot` / `*Payload` / `*Json` when the noun alone is ambiguous
 4. Never store a relation as `uuid[]` / id-list jsonb if you will query membership — that is an M2M table.
 
+### References — FK or key snapshot?
+
+| From → to | Store | Why |
+|-----------|-------|-----|
+| **backoffice → backoffice** (preset → template, lever → posture, plan → capability) | real `@ManyToOne` / `@ManyToMany` / pivot entity on `id` | same owner, same lifecycle; the DB enforces integrity and services filter in SQL |
+| **household → backoffice** (`Jar.templateKey`, `Goal.givingOrganisationKey`, `Transaction.inflowKey`) | **key snapshot** string | catalogs are mutable and can be retired; household history must never break or cascade |
+| **household → household** (`Transaction.jar`, `WeekCheckAllocation.weekCheck`) | real relation with `deleteRule` | same tenant, cascade / restrict is a product decision to state explicitly |
+
+Pivot entities with their own data (`FixedCostPresetMerchant.sortOrder`) are explicit classes extending `BaseEntity`; plain M2M without payload uses `@ManyToMany({ pivotTable })`. Inverse-side collections use `import type` + the string entity name (`@OneToMany('PlanFeature', 'product')`) so entity files never import each other in a cycle.
+
 ### Booleans & enums
 
 Booleans are yes/no questions. Prefer `isActive` over `active`. Prefer positive forms — negate in code (`!isActive`), do not store `isInactive`.
@@ -129,7 +150,8 @@ When a “flag” needs more than two values later, use an **enum** (`status`) i
 |-----------|--------|
 | Household-owned money rows | `HouseholdEntity` + `household` relation (`mapToPk` string — row-level isolation) |
 | Person attribution on household rows | `account` relation (`@ManyToOne` + `mapToPk`) → `auth.account` — **not** Better Auth `userId`; DTO maps as `accountId: row.account` |
-| Catalog we publish | `backoffice.*` templates/presets — households **copy**, do not FK live money to mutable catalog rows except stable template keys |
+| Catalog we publish | `backoffice.*` extends `CatalogEntity` — households **copy**, do not FK live money to mutable catalog rows except stable template keys |
+| Money columns | `@Property({ type: MoneyType })` — integer eurocents, hydrated as `number`; never `Number(row.amount)` in services |
 | Repeating child lines you query | Child entity + FK (`WeekCheckAllocation`) |
 | Opaque config / match needles | jsonb with a clear plural / bag name |
 | Soft delete / disable | `isActive` / `isArchived` — do not invent parallel “status enums” for on/off |
@@ -144,9 +166,9 @@ Order domain fields as follows:
 |---------:|-------------|----------|
 | 0 | Primary key (when declared on entity) | `id` (`@PrimaryKey`) |
 | 1 | **Identifier cluster** | `key`, `household`, `account`, `code` |
-| 2 | Names & titles | `name`, `title`, `label` |
+| 2 | Names & titles | `name`, `title` |
 | 3 | URL slugs / dates | `slug`, `date` |
-| 4 | Summaries & descriptions | `summary`, `description`, `why`, `notes` |
+| 4 | Descriptions | `description`, `why`, `notes` |
 | 5 | Rich content | `body`, `content` |
 | 6 | Classification & contact | `role`, `type`, `email`, `iban` |
 | 7 | Numeric / monetary values | `amount`, `balance`, `percentage`, `rate` |
@@ -158,7 +180,7 @@ Order domain fields as follows:
 
 **Identifier cluster rule:** IDs belong together immediately after the primary key — never separated by descriptive fields.
 
-Within `// ? UI METADATA`, order: `color` → `icon` → `isFeatured` → `sortOrder`.
+Within `// ? UI METADATA`, order: `color` / `accentColor` / `softColor` → `icon` / `badgeLabel` → `logoDomain` → `website` → `highlight` → `isFeatured` → `sortOrder`. Only those names are allowed there (`UI_METADATA_PRIORITY`); `isActive` is a lifecycle flag and belongs in PROPERTIES.
 
 ## Enum order within `// ? ENUMS`
 
@@ -186,6 +208,9 @@ Document each relationship with JSDoc covering: role, cardinality, owner side, O
 Abstract bases are not domain entities:
 
 - `common/database/base.entity.ts`
+- `common/database/catalog.entity.ts`
+- `common/database/household.entity.ts`
+- `common/database/week-check.entity.ts`
 
 ## Automated check
 
@@ -197,8 +222,8 @@ pnpm --filter @rumtelo/backend lint:entities
 
 The script `scripts/lint/check-entity-style.ts` enforces:
 
-- `extends BaseEntity` or `extends HouseholdEntity` (+ import from `common/database/base.entity` or `household.entity`)
-- no redeclared inherited fields (`id` / `createdAt` / `updatedAt` / `household`)
+- `extends BaseEntity` / `CatalogEntity` / `HouseholdEntity` / `WeekCheckEntity` (+ import from `common/database/*`)
+- no redeclared inherited fields (`id` / `createdAt` / `updatedAt` / `household` / `key` / `name` / `sortOrder` / `isActive` / `week` / `completedAt`)
 - **1:1 household rows** listed in `HOUSEHOLD_ONE_TO_ONE_ENTITIES` must have `@Unique({ properties: ['household'] })`
 - `@ManyToOne` / `@OneToOne` fields are relation nouns — never `*Id` (API DTOs still map `householdId: row.household`)
 - boolean `@Property` names use `is*` / `has*` / `can*` (e.g. `isActive`, not `active`)
@@ -213,7 +238,10 @@ When adding a new **1:1** household-owned entity, add its class name to `HOUSEHO
 
 ## Checklist for new / updated entities
 
-- [ ] `extends BaseEntity` or `extends HouseholdEntity` (imported from `common/database`)
+- [ ] `extends BaseEntity` / `CatalogEntity` / `HouseholdEntity` / `WeekCheckEntity` (imported from `common/database`)
+- [ ] Money columns use `MoneyType`; ratios stay `decimal`
+- [ ] Catalog defaults have no `default*` / `suggested*` prefix; text is `name` / `description`
+- [ ] backoffice → backoffice references are relations (id FKs / pivots), household → backoffice stays a `*Key` snapshot
 - [ ] If 1:1 household-owned: `@Unique({ properties: ['household'] })` + listed in `HOUSEHOLD_ONE_TO_ONE_ENTITIES`
 - [ ] Relation fields are nouns (`household`, `account`, `jar`) — never `householdId` / `accountId` on `@ManyToOne` / `@OneToOne`
 - [ ] Booleans named `is*` / `has*` / `can*` (affirmative)

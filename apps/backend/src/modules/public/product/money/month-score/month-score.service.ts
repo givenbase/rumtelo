@@ -39,7 +39,12 @@ export class MonthScoreService {
 
     async current(period: string) {
         const monthScore = await this.scores.findOne({ period });
-        const events = await this.events.find({ period }, { orderBy: { day: 'DESC' } });
+        const events = monthScore
+            ? await this.events.find(
+                  { monthScore: monthScore.id },
+                  { orderBy: { occurredOn: 'DESC', createdAt: 'DESC' } }
+              )
+            : [];
         const score = monthScore?.score ?? 0;
         const level = levelFor(score);
 
@@ -55,9 +60,9 @@ export class MonthScoreService {
             events: events.map(event => ({
                 id: event.id,
                 householdId: event.household,
-                period: event.period,
+                period,
                 kind: event.kind,
-                day: event.day,
+                occurredOn: event.occurredOn,
                 text: event.text,
                 points: event.points,
             })),

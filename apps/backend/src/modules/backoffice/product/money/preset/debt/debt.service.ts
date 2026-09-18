@@ -16,7 +16,7 @@ export class DebtPresetService {
                 isActive: true,
                 ...(filters?.kind ? { kind: filters.kind } : {}),
             },
-            { orderBy: { sortOrder: 'ASC' } }
+            { orderBy: { sortOrder: 'ASC' }, populate: ['merchantLinks.merchant'] }
         );
     }
 }

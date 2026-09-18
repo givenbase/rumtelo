@@ -6,7 +6,7 @@
 
 import { z } from 'zod';
 
-import { HouseholdId, Id, Money, PeriodKey } from '../../../../common/common.schema';
+import { HouseholdId, Id, IsoDate, Money, PeriodKey } from '../../../../common/common.schema';
 import { MonthScoreEventKind } from '../enums';
 
 /**
@@ -19,7 +19,8 @@ export const MonthScoreEvent = z.object({
     householdId: HouseholdId,
     period: PeriodKey,
     kind: z.enum(MonthScoreEventKind),
-    day: z.int().min(1).max(31),
+    /** Calendar date the behaviour happened (`YYYY-MM-DD`). */
+    occurredOn: IsoDate,
     text: z.string().max(240),
     points: z.int(),
 });

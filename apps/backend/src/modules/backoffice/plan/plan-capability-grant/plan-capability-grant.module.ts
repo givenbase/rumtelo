@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 
-import { PlanCapability } from './plan-capability.entity';
+import { PlanCapabilityGrant } from './plan-capability-grant.entity';
 
 @Module({
-    imports: [MikroOrmModule.forFeature([PlanCapability])],
+    imports: [MikroOrmModule.forFeature([PlanCapabilityGrant])],
     exports: [MikroOrmModule],
 })
-export class PlanCapabilityModule {}
+export class PlanCapabilityGrantModule {}

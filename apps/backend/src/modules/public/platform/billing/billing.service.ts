@@ -75,7 +75,7 @@ export class BillingService {
             periodEndsAt: toIsoOrNull(snap.periodEndsAt),
             periodStartedAt: toIsoOrNull(snap.periodStartedAt),
             // DB rows may still have NULL before the column default applied.
-            isCancelAtPeriodEnd: Boolean(snap.isCancelAtPeriodEnd),
+            willCancelAtPeriodEnd: snap.willCancelAtPeriodEnd,
             scheduledPlanKey: snap.scheduledPlanKey ?? null,
             hasStripeCustomer: Boolean(snap.stripeCustomerId),
             hasActiveSubscription: Boolean(snap.stripeSubscriptionId),
@@ -392,7 +392,7 @@ export class BillingService {
             stripeSubscriptionId: updated.id,
             ...periodFieldsFromSubscription(updated),
             scheduledPlanKey: null,
-            isCancelAtPeriodEnd: false,
+            willCancelAtPeriodEnd: false,
         });
         this.logger.log(
             `Plan ${input.planKey} applied in-place for household ${input.householdId}`
@@ -422,7 +422,7 @@ export class BillingService {
             stripeSubscriptionId: updated.id,
             ...periodFieldsFromSubscription(updated),
             scheduledPlanKey: PlanKey.BASIC,
-            isCancelAtPeriodEnd: true,
+            willCancelAtPeriodEnd: true,
         });
         this.logger.log(
             `Cancel at period end scheduled for household ${householdId} (keeps ${currentPlan})`
@@ -511,7 +511,7 @@ export class BillingService {
             stripeSubscriptionId: refreshed.id,
             ...periodFieldsFromSubscription(refreshed),
             scheduledPlanKey: toPlan,
-            isCancelAtPeriodEnd: false,
+            willCancelAtPeriodEnd: false,
         });
         this.logger.log(
             `Downgrade to ${toPlan} scheduled at period end for household ${householdId}`
@@ -639,7 +639,7 @@ export class BillingService {
         // Keep a scheduled downgrade marker while cancel_at_period_end is set,
         // or while we still expect Max→Plus and price has not switched yet.
         let scheduledPlanKey: PlanKey | null = null;
-        if (period.isCancelAtPeriodEnd) {
+        if (period.willCancelAtPeriodEnd) {
             scheduledPlanKey = PlanKey.BASIC;
         } else if (snap.scheduledPlanKey && snap.scheduledPlanKey !== planKey) {
             scheduledPlanKey = snap.scheduledPlanKey;
@@ -673,7 +673,7 @@ export class BillingService {
             periodStartedAt: null,
             periodEndsAt: null,
             trialEndsAt: null,
-            isCancelAtPeriodEnd: false,
+            willCancelAtPeriodEnd: false,
             scheduledPlanKey: null,
         });
         this.logger.log(`Plan BASIC applied for household ${householdId} via subscription.deleted`);

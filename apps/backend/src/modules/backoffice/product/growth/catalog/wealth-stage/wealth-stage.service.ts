@@ -19,12 +19,9 @@ export class WealthStageService {
             key: row.key,
             name: row.name,
             sortOrder: row.sortOrder,
-            summary: row.summary,
+            description: row.description,
             badgeLabel: row.badgeLabel,
-            minNetWorth:
-                row.minNetWorth === null || row.minNetWorth === undefined
-                    ? null
-                    : Number(row.minNetWorth),
+            minNetWorth: row.minNetWorth,
         }));
     }
 

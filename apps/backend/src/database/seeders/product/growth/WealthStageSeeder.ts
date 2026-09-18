@@ -15,7 +15,7 @@ export class WealthStageSeeder extends Seeder {
             const existing = existingByKey.get(row.key);
             if (existing) {
                 existing.name = row.name;
-                existing.summary = row.summary;
+                existing.description = row.description;
                 existing.badgeLabel = row.badgeLabel;
                 existing.minNetWorth = row.minNetWorth;
                 existing.sortOrder = sortOrder;
@@ -25,7 +25,7 @@ export class WealthStageSeeder extends Seeder {
             em.create(WealthStage, {
                 key: row.key,
                 name: row.name,
-                summary: row.summary,
+                description: row.description,
                 badgeLabel: row.badgeLabel,
                 minNetWorth: row.minNetWorth,
                 sortOrder,

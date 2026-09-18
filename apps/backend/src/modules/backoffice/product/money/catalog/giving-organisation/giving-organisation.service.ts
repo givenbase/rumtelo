@@ -9,20 +9,21 @@ import { GivingOrganisation } from './giving-organisation.entity';
 export class GivingOrganisationService {
     constructor(@Inject(EntityManager) private readonly em: EntityManager) {}
 
+    /** Active organisations; `cause` filter is a JSON containment check in SQL. */
     async listActive(filters?: { cause?: GivingCause }): Promise<GivingOrganisationDto[]> {
         const rows = await this.em.find(
             GivingOrganisation,
-            { isActive: true },
+            {
+                isActive: true,
+                ...(filters?.cause ? { causes: { $contains: [filters.cause] } } : {}),
+            },
             { orderBy: { sortOrder: 'ASC' } }
         );
-        const filtered = filters?.cause
-            ? rows.filter(row => row.causes.includes(filters.cause!))
-            : rows;
-        return filtered.map(row => ({
+        return rows.map(row => ({
             key: row.key,
             name: row.name,
             sortOrder: row.sortOrder,
-            summary: row.summary,
+            description: row.description,
             causes: row.causes,
             country: row.country,
             scope: row.scope,

@@ -7,8 +7,8 @@ import { currentHouseholdId } from '../../../../../../common/household/household
 import { Category } from '../../plan/jar/category.entity';
 import { Jar } from '../../plan/jar/jar.entity';
 import { applyDebtLinkChange } from '../../targets/debt/debt-link.util';
-import { BankAccount } from '../account/bank-account.entity';
-import { RuleService } from '../rule/rule.service';
+import { BankAccount } from '../bank-account/bank-account.entity';
+import { SortRuleService } from '../sort-rule/sort-rule.service';
 import { parseStatementCsv } from './csv/csv-parser';
 import { jarCapabilitiesFor, TransactionSource, TransactionStatus } from '@rumtelo/contracts';
 
@@ -20,7 +20,7 @@ export class TransactionService {
 
     constructor(
         @Inject(EntityManager) private readonly em: EntityManager,
-        @Inject(RuleService) private readonly rules: RuleService
+        @Inject(SortRuleService) private readonly rules: SortRuleService
     ) {
         this.transactions = new HouseholdScopedRepository(em, Transaction);
     }
@@ -58,12 +58,9 @@ export class TransactionService {
             note: input.note ?? null,
             status: input.jarId ? TransactionStatus.SORTED : TransactionStatus.INBOX,
             source: TransactionSource.MANUAL,
-            dedupeKey: dedupeKey(
-                input.accountId ?? null,
-                input.bookedOn,
-                input.amount,
-                input.description
-            ),
+            // Manual rows are never de-duplicated: two identical coffees on one day are
+            // both real. UNIQUE(household, dedupeKey) is for imports only.
+            dedupeKey: null,
         } as never);
         await this.em.persist(entity).flush();
 
@@ -94,6 +91,8 @@ export class TransactionService {
         if (!dryRun) {
             parsed.forEach((row, i) => {
                 if (seen.has(keys[i]!)) return;
+                // A statement can legitimately repeat a line; only the first copy lands.
+                seen.add(keys[i]!);
                 this.em.create(Transaction, {
                     household: currentHouseholdId(),
                     account: this.em.getReference(BankAccount, accountId),
@@ -167,24 +166,24 @@ export class TransactionService {
     ) {
         const entity = await this.transactions.findOneOrFail({ id: transactionId });
         await this.em.populate(entity, ['debt']);
-        await assertJarAllowsOutflow(this.em, jarId, Number(entity.amount));
+        await assertJarAllowsOutflow(this.em, jarId, entity.amount);
         entity.jar = this.em.getReference(Jar, jarId);
         entity.category = categoryId ? this.em.getReference(Category, categoryId) : null;
         entity.status = TransactionStatus.SORTED;
 
         if (createRule) {
-            const value = (entity.counterparty?.trim() || entity.description).trim();
+            const matchValue = (entity.counterparty?.trim() || entity.description).trim();
             const field = entity.counterparty?.trim() ? 'COUNTERPARTY' : 'DESCRIPTION';
             const rule = await this.rules.create({
                 field,
                 matcher: 'CONTAINS',
-                value,
+                matchValue,
                 jarId,
                 categoryId: categoryId ?? null,
                 priority: 100,
                 isActive: true,
             });
-            entity.appliedRuleId = rule.id;
+            entity.appliedRule = rule.id;
         }
 
         if (debtId !== undefined) {
@@ -197,7 +196,7 @@ export class TransactionService {
 
     async bulkSort(ids: string[], jarId: string, categoryId?: string | null) {
         const rows = await this.transactions.find({ id: { $in: ids } });
-        if (rows.some(row => Number(row.amount) < 0)) {
+        if (rows.some(row => row.amount < 0)) {
             await assertJarAllowsOutflow(this.em, jarId, -1);
         }
         for (const row of rows) {
@@ -222,7 +221,7 @@ export class TransactionService {
         if (categoryId !== undefined) {
             entity.category = categoryId ? this.em.getReference(Category, categoryId) : null;
         }
-        if (Number(entity.amount) <= 0) {
+        if (entity.amount <= 0) {
             entity.inflowKey = null;
         } else if (inflowKey !== undefined) {
             entity.inflowKey = inflowKey?.trim() || null;
@@ -266,14 +265,14 @@ export function toDto(transaction: Transaction) {
         jarId: transaction.jar?.id ?? null,
         categoryId: transaction.category?.id ?? null,
         debtId: transaction.debt?.id ?? null,
-        amount: Number(transaction.amount),
+        amount: transaction.amount,
         bookedOn: transaction.bookedOn,
         description: transaction.description,
         counterparty: transaction.counterparty,
         inflowKey: transaction.inflowKey,
         status: transaction.status,
         source: transaction.source,
-        appliedRuleId: transaction.appliedRuleId,
+        appliedRuleId: transaction.appliedRule,
         note: transaction.note,
         createdAt: transaction.createdAt.toISOString(),
     };

@@ -35,20 +35,32 @@ export class JarService {
     // ? CREATE Operations
     // ====================================================================
 
+    /**
+     * UNIQUE(household, jar, name) — re-creating a name that exists (usually
+     * archived) revives that row so its history stays attached, rather than 500ing.
+     */
     async createCategory(jarId: string, name: string, budgeted: number) {
         const jar = await this.jars.findOneOrFail({ id: jarId });
-        const cat = this.em.create(Category, {
-            household: currentHouseholdId(),
-            jar,
-            name,
-            budgeted,
-        } as never);
-        await this.em.persist(cat).flush();
+        const trimmed = name.trim();
+        let cat = await this.categories.findOne({ jar: jar.id, name: trimmed });
+        if (cat) {
+            cat.isArchived = false;
+            cat.budgeted = budgeted;
+        } else {
+            cat = this.em.create(Category, {
+                household: currentHouseholdId(),
+                jar,
+                name: trimmed,
+                budgeted,
+            } as never);
+            this.em.persist(cat);
+        }
+        await this.em.flush();
         return {
             id: cat.id,
             jarId: jar.id,
             name: cat.name,
-            budgeted: Number(cat.budgeted),
+            budgeted: cat.budgeted,
             /** Period actual only exists on JarBalance — CRUD has no period. */
             actual: 0,
             isArchived: false,
@@ -104,7 +116,7 @@ export class JarService {
                             id: category.id,
                             jarId: jar.id,
                             name: category.name,
-                            budgeted: categoryEnvelope(Number(category.budgeted), fixed),
+                            budgeted: categoryEnvelope(category.budgeted, fixed),
                             actual: spentByCategory.get(category.id) ?? 0,
                             isArchived: category.isArchived,
                         };
@@ -142,7 +154,7 @@ export class JarService {
              JOIN backoffice.reference_money_fixed_cost_preset p
                ON lower(p.name) = lower(fc.name) AND p.is_active = true
              JOIN backoffice.reference_money_category_template ct
-               ON ct.key = p.category_template_key AND ct.is_active = true
+               ON ct.id = p.category_template_id AND ct.is_active = true
             WHERE fc.household_id = ? AND fc.is_active = true AND fc.category_id IS NULL`,
             [currentHouseholdId()]
         );
@@ -254,7 +266,7 @@ export class JarService {
             id: cat.id,
             jarId: cat.jar.id,
             name: cat.name,
-            budgeted: Number(cat.budgeted),
+            budgeted: cat.budgeted,
             /** Period actual only exists on JarBalance — CRUD has no period. */
             actual: 0,
             isArchived: cat.isArchived,

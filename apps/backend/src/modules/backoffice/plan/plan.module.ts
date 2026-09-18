@@ -1,24 +1,24 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { Module } from '@nestjs/common';
 
-import { CapabilityModule } from './capability';
-import { PlanFeatureModule } from './feature';
+import { PlanCapabilityModule } from './plan-capability';
+import { PlanCapabilityGrantModule } from './plan-capability-grant';
 import { PlanController } from './plan.controller';
 import { Plan } from './plan.entity';
-import { PlanCapabilityModule } from './plan-capability';
-import { PlanProductModule } from './product';
+import { PlanFeatureModule } from './plan-feature';
+import { PlanProductModule } from './plan-product';
 import { PlanService } from './plan.service';
 
 /**
- * Plan Module — parent: Plan entity + catalog children (product / feature / capability).
+ * Plan Module — parent: Plan entity + catalog children (product / feature / capability / grant).
  */
 @Module({
     imports: [
         MikroOrmModule.forFeature([Plan]),
         PlanProductModule,
         PlanFeatureModule,
-        CapabilityModule,
         PlanCapabilityModule,
+        PlanCapabilityGrantModule,
     ],
     controllers: [PlanController],
     providers: [PlanService],
@@ -26,8 +26,8 @@ import { PlanService } from './plan.service';
         PlanService,
         PlanProductModule,
         PlanFeatureModule,
-        CapabilityModule,
         PlanCapabilityModule,
+        PlanCapabilityGrantModule,
     ],
 })
 export class PlanModule {}

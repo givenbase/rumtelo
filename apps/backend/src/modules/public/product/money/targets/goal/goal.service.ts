@@ -44,7 +44,7 @@ export class GoalService {
         status?: string;
         why?: string | null;
         cause?: string | null;
-        orgKey?: string | null;
+        givingOrganisationKey?: string | null;
     }) {
         await this.planAccess.assertCapability(CAPABILITIES.growthGoals);
         const occupied = await this.repo.count({ status: GoalStatus.ACTIVE });
@@ -72,7 +72,7 @@ export class GoalService {
             status: (input.status as GoalStatus) ?? GoalStatus.ACTIVE,
             why: input.why ?? null,
             cause: isGive ? ((input.cause as GivingCause | null | undefined) ?? null) : null,
-            orgKey: isGive ? input.orgKey?.trim() || null : null,
+            givingOrganisationKey: isGive ? input.givingOrganisationKey?.trim() || null : null,
         } as never);
         await this.em.persist(entity).flush();
         if (kind === GoalKind.EARN) {
@@ -113,7 +113,7 @@ export class GoalService {
         return rows.map(goal => {
             if (goal.kind === GoalKind.EARN) {
                 const progress = earnGoalProgress({
-                    target: Number(goal.target),
+                    target: goal.target,
                     currentNet: net,
                 });
                 return {
@@ -125,8 +125,8 @@ export class GoalService {
                 };
             }
 
-            const remaining = Number(goal.target) - Number(goal.saved);
-            const monthly = Number(goal.monthlyContribution);
+            const remaining = goal.target - goal.saved;
+            const monthly = goal.monthlyContribution;
             const months = monthly > 0 ? Math.ceil(remaining / monthly) : null;
 
             const projectedDate = months === null ? null : addMonths(new Date(), months);
@@ -167,7 +167,7 @@ export class GoalService {
         const net = await this.jars.monthlyNetIncome();
         let changed = false;
         for (const goal of earnGoals) {
-            if (earnGoalProgress({ target: Number(goal.target), currentNet: net }).reached) {
+            if (earnGoalProgress({ target: goal.target, currentNet: net }).reached) {
                 goal.status = GoalStatus.REACHED;
                 goal.fulfilledOn = todayIso();
                 changed = true;
@@ -209,11 +209,11 @@ export class GoalService {
         for (const [index, goal] of giveGoals.entries()) {
             const given = totals[index];
             if (given === null || given === undefined) continue;
-            if (given !== Number(goal.saved)) {
+            if (given !== goal.saved) {
                 goal.saved = given;
                 changed = true;
             }
-            if (given >= Number(goal.target)) {
+            if (given >= goal.target) {
                 goal.status = GoalStatus.REACHED;
                 goal.fulfilledOn = todayIso();
                 changed = true;
@@ -257,7 +257,7 @@ export class GoalService {
             why: string | null;
             fulfilledOn: string | null;
             cause: string | null;
-            orgKey: string | null;
+            givingOrganisationKey: string | null;
             sortOrder: number;
         }>
     ) {
@@ -292,19 +292,20 @@ export class GoalService {
                     ? ((patch.cause as GivingCause | null) ?? null)
                     : null;
         }
-        if (patch.orgKey !== undefined) {
-            entity.orgKey = entity.kind === GoalKind.GIVE ? patch.orgKey?.trim() || null : null;
+        if (patch.givingOrganisationKey !== undefined) {
+            entity.givingOrganisationKey =
+                entity.kind === GoalKind.GIVE ? patch.givingOrganisationKey?.trim() || null : null;
         }
         if (entity.kind === GoalKind.EARN) {
             entity.jar = null;
             entity.monthlyContribution = 0;
             entity.cause = null;
-            entity.orgKey = null;
+            entity.givingOrganisationKey = null;
             entity.sortOrder = 0;
         }
         if (entity.kind === GoalKind.SAVE) {
             entity.cause = null;
-            entity.orgKey = null;
+            entity.givingOrganisationKey = null;
         }
         if (entity.kind === GoalKind.GIVE) {
             entity.sortOrder = 0;
@@ -356,7 +357,7 @@ export class GoalService {
             throw new BadRequestException('Goal is not active');
         }
         const jarId = entity.jar?.id ?? null;
-        const target = Number(entity.target);
+        const target = entity.target;
 
         if (mode === 'spend') {
             if (!jarId) {
@@ -468,14 +469,14 @@ export function toDto(goal: Goal) {
         jarId: goal.jar?.id ?? null,
         name: goal.name,
         icon: goal.icon,
-        target: Number(goal.target),
-        saved: Number(goal.saved),
-        monthlyContribution: Number(goal.monthlyContribution),
+        target: goal.target,
+        saved: goal.saved,
+        monthlyContribution: goal.monthlyContribution,
         targetOn: goal.targetOn,
         status: goal.status,
         why: goal.why,
         cause: goal.cause ?? null,
-        orgKey: goal.orgKey ?? null,
+        givingOrganisationKey: goal.givingOrganisationKey ?? null,
         fulfilledOn: goal.fulfilledOn,
         sortOrder: goal.sortOrder ?? 0,
     };

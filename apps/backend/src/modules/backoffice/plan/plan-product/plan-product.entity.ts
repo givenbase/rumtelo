@@ -1,37 +1,23 @@
-import { Collection, Entity, OneToMany, Property, Unique } from '@mikro-orm/core';
+import { Collection, Entity, OneToMany, Unique } from '@mikro-orm/core';
 
-import { BaseEntity } from '../../../../common/database/base.entity';
+import { CatalogEntity } from '../../../../common/database/catalog.entity';
 import { entityConfig } from '../../../../common/database/entity-config.util';
-
-import type { PlanFeature } from '../feature/feature.entity';
+import type { PlanFeature } from '../plan-feature/plan-feature.entity';
 
 /**
- * PlanProduct — catalog product prefix (home | money | growth | energy | soul | platform).
+ * Plan Product Entity
+ *
+ * Catalog product prefix (home | money | growth | energy | soul | platform).
  * Named PlanProduct to avoid clashing with backoffice/product domain modules.
  *
+ * @see PlanFeature — segments under this product
  * @see https://mikro-orm.io/docs/defining-entities
  */
 @Entity(entityConfig({ schema: 'backoffice', tableName: 'plan_product' }))
 @Unique({ properties: ['key'] })
-export class PlanProduct extends BaseEntity {
-    // ? PROPERTIES
-    /** Stable product key — money | growth | … (never rename in place). */
-    @Property({ length: 32 })
-    key!: string;
-
-    /** Label for catalog / admin. */
-    @Property({ length: 120 })
-    name!: string;
-
-    /** Display / seed order. */
-    @Property({ default: 0 })
-    sortOrder = 0;
-
-    /** Soft-disable without breaking feature FKs. */
-    @Property({ default: true })
-    isActive = true;
-
+export class PlanProduct extends CatalogEntity {
     // ? RELATIONSHIPS
+    /** Feature segments under this product (1:N). */
     @OneToMany('PlanFeature', 'product')
     features = new Collection<PlanFeature>(this);
 }

@@ -16,7 +16,7 @@ export class IncomeSourcePresetSeeder extends Seeder {
             if (existing) {
                 existing.name = row.name;
                 existing.kind = row.kind;
-                existing.defaultCadence = row.defaultCadence;
+                existing.cadence = row.cadence;
                 existing.icon = row.icon;
                 existing.sortOrder = sortOrder;
                 existing.isActive = true;
@@ -26,7 +26,7 @@ export class IncomeSourcePresetSeeder extends Seeder {
                 key: row.key,
                 name: row.name,
                 kind: row.kind,
-                defaultCadence: row.defaultCadence,
+                cadence: row.cadence,
                 icon: row.icon,
                 sortOrder,
                 isActive: true,

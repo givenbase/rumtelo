@@ -1,6 +1,6 @@
 import { GIVING_ORGANISATION_SEED } from '../../../../catalog/giving-organisation/seed/giving-organisation.seed-data';
 import type { MerchantSeed } from '../types';
-import { give } from '../types';
+import { MerchantHighlight, give } from '../types';
 
 /**
  * Give-jar merchants.
@@ -41,7 +41,7 @@ export const GIVE_MERCHANTS: readonly MerchantSeed[] = [
         aliases: ['Doneer Effectief', 'DONEER EFFECTIEF', 'DoneerEffectief'],
         logoDomain: 'doneereffectief.nl',
         website: 'https://doneereffectief.nl',
-        highlight: 'FEATURED',
+        highlight: MerchantHighlight.FEATURED,
         matchPriority: 20,
     }),
     donation({
@@ -51,7 +51,7 @@ export const GIVE_MERCHANTS: readonly MerchantSeed[] = [
         aliases: ['Against Malaria Foundation', 'AMF', 'Against Malaria'],
         logoDomain: 'againstmalaria.com',
         website: 'https://www.againstmalaria.com',
-        highlight: 'FEATURED',
+        highlight: MerchantHighlight.FEATURED,
         matchPriority: 18,
     }),
     donation({
@@ -61,7 +61,7 @@ export const GIVE_MERCHANTS: readonly MerchantSeed[] = [
         aliases: ['GiveDirectly', 'GIVE DIRECTLY'],
         logoDomain: null, // no reliable mark — lists use Give jar/category chrome
         website: 'https://www.givedirectly.org',
-        highlight: 'FEATURED',
+        highlight: MerchantHighlight.FEATURED,
         matchPriority: 18,
     }),
     donation({
@@ -125,7 +125,7 @@ export const GIVE_MERCHANTS: readonly MerchantSeed[] = [
         aliases: ['100WEEKS', '100 Weeks', 'Honderd Weken'],
         logoDomain: '100weeks.nl',
         website: 'https://www.100weeks.nl',
-        highlight: 'FEATURED',
+        highlight: MerchantHighlight.FEATURED,
         matchPriority: 15,
     }),
 

@@ -2,7 +2,7 @@
  * Optional day-of-month hint (1–31) for fixed-cost bill presets.
  * Only set when a typical NL due day is well known.
  */
-export const SUGGESTED_DUE_DAY_BY_PRESET: Readonly<Record<string, number>> = {
+export const DUE_DAY_BY_PRESET: Readonly<Record<string, number>> = {
     RENT: 1,
     STUDENT_HOUSING: 1,
     ROOM_RENT: 1,

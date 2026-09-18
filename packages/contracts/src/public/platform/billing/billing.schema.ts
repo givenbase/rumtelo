@@ -41,7 +41,7 @@ export const HouseholdBillingStatus = z.object({
     periodEndsAt: IsoDateTime.nullable(),
     periodStartedAt: IsoDateTime.nullable(),
     /** True when subscription cancels to Basic at {@link periodEndsAt}. */
-    isCancelAtPeriodEnd: z.preprocess(value => Boolean(value), z.boolean()),
+    willCancelAtPeriodEnd: z.preprocess(value => Boolean(value), z.boolean()),
     /**
      * Plan that takes effect at period end (Basic cancel, or Max→Plus).
      * Null when no change is scheduled.

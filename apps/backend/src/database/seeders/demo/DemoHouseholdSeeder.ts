@@ -38,10 +38,10 @@ import { JarTemplate } from '../../../modules/backoffice/product/money/template/
 import { HouseholdSettings } from '../../../modules/auth/household/household-settings/household-settings.entity';
 import { HouseholdBilling } from '../../../modules/auth/household/household-billing/household-billing.entity';
 import { EnergyLog } from '../../../modules/public/product/energy/log/energy-log.entity';
-import { IncomeLever } from '../../../modules/public/product/growth/lever/lever.entity';
-import { IncomeMilestone } from '../../../modules/public/product/growth/milestone/milestone.entity';
-import { BankAccount } from '../../../modules/public/product/money/ledger/account/bank-account.entity';
-import { Rule } from '../../../modules/public/product/money/ledger/rule/rule.entity';
+import { IncomeLever } from '../../../modules/public/product/growth/income-lever/income-lever.entity';
+import { IncomeMilestone } from '../../../modules/public/product/growth/income-milestone/income-milestone.entity';
+import { BankAccount } from '../../../modules/public/product/money/ledger/bank-account/bank-account.entity';
+import { SortRule } from '../../../modules/public/product/money/ledger/sort-rule/sort-rule.entity';
 import { Transaction } from '../../../modules/public/product/money/ledger/transaction/transaction.entity';
 import { FixedCost } from '../../../modules/public/product/money/plan/fixed-cost/fixed-cost.entity';
 import { IncomeAmountPeriod } from '../../../modules/public/product/money/plan/income/income-amount-period.entity';
@@ -225,14 +225,14 @@ export class DemoHouseholdSeeder extends Seeder {
                   : HouseholdKind.SOLO;
 
         let settings = await em.findOne(HouseholdSettings, { household: householdId });
-        const moneySettings = {
+        const money = {
             periodStartDay: 1,
             incomeStability:
                 demo.persona === 'basic' ? IncomeStability.STABLE : IncomeStability.VARIABLE,
             payoffStrategy:
                 demo.persona === 'plus' ? PayoffStrategy.SNOWBALL : PayoffStrategy.AVALANCHE,
         };
-        const featureSettings = {
+        const features = {
             isBankSyncEnabled: demo.persona !== 'basic',
             isCoachEnabled: true,
         };
@@ -243,9 +243,9 @@ export class DemoHouseholdSeeder extends Seeder {
                 why: demo.why,
                 kind: householdKind,
                 currency: Currency.EUR,
-                moneySettings,
-                featureSettings,
-                weekCheckSettings: { reminderDay: 7, reminderAt: '19:00' },
+                money,
+                features,
+                weekCheck: { reminderDay: 7, reminderAt: '19:00' },
                 onboardedAt: new Date(),
             } as never);
             em.persist(settings);
@@ -253,8 +253,8 @@ export class DemoHouseholdSeeder extends Seeder {
             settings.why = demo.why;
             settings.kind = householdKind;
             settings.currency = Currency.EUR;
-            settings.moneySettings = { ...settings.moneySettings, ...moneySettings };
-            settings.featureSettings = { ...settings.featureSettings, ...featureSettings };
+            settings.money = { ...settings.money, ...money };
+            settings.features = { ...settings.features, ...features };
             if (!settings.onboardedAt) settings.onboardedAt = new Date();
         }
 
@@ -280,7 +280,7 @@ export class DemoHouseholdSeeder extends Seeder {
                     name: meta.name,
                     subtitle: meta.subtitle,
                     icon: meta.icon,
-                    percentage: typeof pct === 'number' ? `${pct}.00` : meta.defaultPercentage,
+                    percentage: typeof pct === 'number' ? `${pct}.00` : meta.percentage,
                     capabilities: { ...meta.capabilities },
                     sortOrder: meta.sortOrder,
                 } as never);
@@ -452,7 +452,7 @@ export class DemoHouseholdSeeder extends Seeder {
 
         em.create(IncomeLever, {
             household: householdId,
-            label: 'Ask for a small raise',
+            name: 'Ask for a small raise',
             note: 'Shift lead opening next quarter — prepare numbers.',
             potentialMonthly: toMinorUnits(120),
             isDone: false,
@@ -460,7 +460,7 @@ export class DemoHouseholdSeeder extends Seeder {
 
         em.create(IncomeMilestone, {
             household: householdId,
-            label: '€2,000 take-home',
+            name: '€2,000 take-home',
             targetMonthly: toMinorUnits(2_000),
             reachedOn: null,
         } as never);
@@ -571,21 +571,21 @@ export class DemoHouseholdSeeder extends Seeder {
             balance: 2_100,
         });
 
-        em.create(Rule, {
+        em.create(SortRule, {
             household: householdId,
             field: RuleField.COUNTERPARTY,
             matcher: RuleMatcher.CONTAINS,
-            value: 'Adobe',
+            matchValue: 'Adobe',
             jar: jars.necessities,
             priority: 10,
             hitCount: 4,
             isActive: true,
         } as never);
-        em.create(Rule, {
+        em.create(SortRule, {
             household: householdId,
             field: RuleField.DESCRIPTION,
             matcher: RuleMatcher.CONTAINS,
-            value: 'Uber',
+            matchValue: 'Uber',
             jar: jars.play,
             priority: 20,
             hitCount: 11,
@@ -733,21 +733,21 @@ export class DemoHouseholdSeeder extends Seeder {
 
         em.create(IncomeLever, {
             household: householdId,
-            label: 'Raise retainer rates 15%',
+            name: 'Raise retainer rates 15%',
             note: 'Two clients renewing next month.',
             potentialMonthly: toMinorUnits(350),
             isDone: false,
         } as never);
         em.create(IncomeLever, {
             household: householdId,
-            label: 'Drop lowest-value client',
+            name: 'Drop lowest-value client',
             note: 'Frees 6h/week for higher-rate work.',
             potentialMonthly: toMinorUnits(200),
             isDone: true,
         } as never);
         em.create(IncomeLever, {
             household: householdId,
-            label: 'Productize a template pack',
+            name: 'Productize a template pack',
             note: 'Passive add-on once, sell many times.',
             potentialMonthly: toMinorUnits(400),
             isDone: false,
@@ -755,13 +755,13 @@ export class DemoHouseholdSeeder extends Seeder {
 
         em.create(IncomeMilestone, {
             household: householdId,
-            label: '€3,000 months',
+            name: '€3,000 months',
             targetMonthly: toMinorUnits(3_000),
             reachedOn: monthsAgo(2),
         } as never);
         em.create(IncomeMilestone, {
             household: householdId,
-            label: '€4,000 months',
+            name: '€4,000 months',
             targetMonthly: toMinorUnits(4_000),
             reachedOn: null,
         } as never);
@@ -934,31 +934,31 @@ export class DemoHouseholdSeeder extends Seeder {
             balance: 124_800,
         });
 
-        em.create(Rule, {
+        em.create(SortRule, {
             household: householdId,
             field: RuleField.COUNTERPARTY,
             matcher: RuleMatcher.CONTAINS,
-            value: 'Vanguard',
+            matchValue: 'Vanguard',
             jar: jars.ff,
             priority: 5,
             hitCount: 22,
             isActive: true,
         } as never);
-        em.create(Rule, {
+        em.create(SortRule, {
             household: householdId,
             field: RuleField.DESCRIPTION,
             matcher: RuleMatcher.CONTAINS,
-            value: 'Dividend',
+            matchValue: 'Dividend',
             jar: jars.ff,
             priority: 5,
             hitCount: 18,
             isActive: true,
         } as never);
-        em.create(Rule, {
+        em.create(SortRule, {
             household: householdId,
             field: RuleField.COUNTERPARTY,
             matcher: RuleMatcher.CONTAINS,
-            value: 'Whole Foods',
+            matchValue: 'Whole Foods',
             jar: jars.necessities,
             priority: 30,
             hitCount: 9,
@@ -1161,28 +1161,28 @@ export class DemoHouseholdSeeder extends Seeder {
 
         em.create(IncomeLever, {
             household: householdId,
-            label: 'Raise studio day rate',
+            name: 'Raise studio day rate',
             note: 'Already at capacity — price is the lever.',
             potentialMonthly: toMinorUnits(800),
             isDone: true,
         } as never);
         em.create(IncomeLever, {
             household: householdId,
-            label: 'Add second rental unit',
+            name: 'Add second rental unit',
             note: 'Underwriting done; deposit goal at 39%.',
             potentialMonthly: toMinorUnits(1_400),
             isDone: false,
         } as never);
         em.create(IncomeLever, {
             household: householdId,
-            label: 'Dividend reinvest (DRIP) on',
+            name: 'Dividend reinvest (DRIP) on',
             note: 'Compounding quietly in brokerage.',
             potentialMonthly: toMinorUnits(120),
             isDone: true,
         } as never);
         em.create(IncomeLever, {
             household: householdId,
-            label: 'Productize studio playbooks',
+            name: 'Productize studio playbooks',
             note: 'Sell internal SOPs as a digital product.',
             potentialMonthly: toMinorUnits(550),
             isDone: false,
@@ -1190,19 +1190,19 @@ export class DemoHouseholdSeeder extends Seeder {
 
         em.create(IncomeMilestone, {
             household: householdId,
-            label: '€5k months',
+            name: '€5k months',
             targetMonthly: toMinorUnits(5_000),
             reachedOn: monthsAgo(14),
         } as never);
         em.create(IncomeMilestone, {
             household: householdId,
-            label: '€7.5k months',
+            name: '€7.5k months',
             targetMonthly: toMinorUnits(7_500),
             reachedOn: monthsAgo(4),
         } as never);
         em.create(IncomeMilestone, {
             household: householdId,
-            label: '€10k months',
+            name: '€10k months',
             targetMonthly: toMinorUnits(10_000),
             reachedOn: null,
         } as never);

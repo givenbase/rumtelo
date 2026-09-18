@@ -27,7 +27,8 @@ import { FREEDOM_MERCHANTS } from './by-category/freedom';
 import { GIVE_MERCHANTS } from './by-category/give';
 import type { MerchantSeed } from './types';
 
-export type { MerchantSeed, MerchantHighlight } from './types';
+export type { MerchantSeed } from './types';
+export { MerchantHighlight } from './types';
 export { necessities, play, education, give, financialFreedom, longTermSavings } from './types';
 
 /** Full merchant catalog — concat order controls default sortOrder. */

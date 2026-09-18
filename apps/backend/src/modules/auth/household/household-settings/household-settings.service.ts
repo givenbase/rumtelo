@@ -71,9 +71,9 @@ export class HouseholdSettingsService {
             kind: input.kind,
             currency: input.currency,
             why: input.why,
-            moneySettings: { ...DEFAULT_MONEY_SETTINGS, ...input.money },
-            weekCheckSettings: { ...DEFAULT_WEEK_CHECK_SETTINGS },
-            featureSettings: { ...DEFAULT_FEATURE_SETTINGS },
+            money: { ...DEFAULT_MONEY_SETTINGS, ...input.money },
+            weekCheck: { ...DEFAULT_WEEK_CHECK_SETTINGS },
+            features: { ...DEFAULT_FEATURE_SETTINGS },
             answers: {},
             onboardedAt: new Date(),
         } as never);
@@ -150,13 +150,13 @@ export class HouseholdSettingsService {
         if (patch.kind !== undefined) row.kind = patch.kind;
         if (patch.currency !== undefined) row.currency = patch.currency;
         if (patch.money) {
-            row.moneySettings = { ...row.moneySettings, ...patch.money };
+            row.money = { ...row.money, ...patch.money };
         }
         if (patch.weekCheck) {
-            row.weekCheckSettings = { ...row.weekCheckSettings, ...patch.weekCheck };
+            row.weekCheck = { ...row.weekCheck, ...patch.weekCheck };
         }
         if (patch.features) {
-            row.featureSettings = { ...row.featureSettings, ...patch.features };
+            row.features = { ...row.features, ...patch.features };
         }
         if (patch.answers) {
             row.answers = { ...row.answers, ...patch.answers };
@@ -221,18 +221,9 @@ function toSettingsDto(row: HouseholdSettings, planKey: PlanKey): HouseholdSetti
         kind: row.kind,
         currency: row.currency,
         planKey,
-        money: {
-            ...DEFAULT_MONEY_SETTINGS,
-            ...row.moneySettings,
-        },
-        weekCheck: {
-            ...DEFAULT_WEEK_CHECK_SETTINGS,
-            ...row.weekCheckSettings,
-        },
-        features: {
-            ...DEFAULT_FEATURE_SETTINGS,
-            ...row.featureSettings,
-        },
+        money: { ...DEFAULT_MONEY_SETTINGS, ...row.money },
+        weekCheck: { ...DEFAULT_WEEK_CHECK_SETTINGS, ...row.weekCheck },
+        features: { ...DEFAULT_FEATURE_SETTINGS, ...row.features },
         answers: row.answers ?? {},
         onboardedAt: row.onboardedAt ? row.onboardedAt.toISOString() : null,
     };

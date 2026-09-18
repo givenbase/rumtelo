@@ -19,7 +19,7 @@ export class IncomePostureService {
             key: row.key,
             name: row.name,
             sortOrder: row.sortOrder,
-            summary: row.summary,
+            description: row.description,
         }));
     }
 

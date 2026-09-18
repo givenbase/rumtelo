@@ -1,31 +1,29 @@
-import { Entity, Enum, ManyToOne, Unique } from '@mikro-orm/core';
-import { PlanKey } from '@rumtelo/contracts';
+import { Entity, Index, ManyToOne, Unique } from '@mikro-orm/core';
 
 import { BaseEntity } from '../../../../common/database/base.entity';
-import { NativeEnum } from '../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../common/database/entity-config.util';
-
-import { Capability } from '../capability/capability.entity';
+import { PlanCapability } from '../plan-capability/plan-capability.entity';
 import { Plan } from '../plan.entity';
 
 /**
- * Plan ↔ Capability grant — which tier unlocks which capability key.
- * Mirrors contracts PLAN_CAPABILITY_GRANTS. Runtime gating still uses contracts.
+ * Plan Capability Grant Entity
  *
+ * Plan ↔ PlanCapability link — which tier unlocks which capability key.
+ * Mirrors contracts PLAN_CAPABILITY_GRANTS; runtime gating still reads contracts.
+ *
+ * @see Plan.grants / PlanCapability.grants
  * @see https://mikro-orm.io/docs/defining-entities
  */
-@Entity(entityConfig({ schema: 'backoffice', tableName: 'plan_capability' }))
-@Unique({ properties: ['planKey', 'capability'] })
-export class PlanCapability extends BaseEntity {
-    // ? ENUMS
-    /** Denormalized plan key for simple queries (matches Plan.key). */
-    @Enum(NativeEnum({ PlanKey, domain: 'backoffice' }))
-    planKey!: PlanKey;
-
+@Entity(entityConfig({ schema: 'backoffice', tableName: 'plan_capability_grant' }))
+@Unique({ properties: ['plan', 'capability'] })
+@Index({ properties: ['capability'] })
+export class PlanCapabilityGrant extends BaseEntity {
     // ? RELATIONSHIPS
+    /** Granting plan (N:1). Deleting the plan deletes its grants. */
     @ManyToOne(() => Plan, { deleteRule: 'cascade' })
     plan!: Plan;
 
-    @ManyToOne(() => Capability, { deleteRule: 'cascade' })
-    capability!: Capability;
+    /** Granted capability (N:1). Deleting the capability deletes its grants. */
+    @ManyToOne(() => PlanCapability, { deleteRule: 'cascade' })
+    capability!: PlanCapability;
 }

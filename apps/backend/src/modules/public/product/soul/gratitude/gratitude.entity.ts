@@ -7,6 +7,7 @@ import { Account } from '../../../../auth/user/account/account.entity';
 /**
  * Gratitude Entity
  *
+ * One line of gratitude written during the week.
  * Person-attributed household row — who wrote it is {@link Account}, not Better Auth `user`.
  *
  * @see https://mikro-orm.io/docs/defining-entities
@@ -15,9 +16,11 @@ import { Account } from '../../../../auth/user/account/account.entity';
 @Index({ properties: ['household', 'week'] })
 export class Gratitude extends HouseholdEntity {
     // ? PROPERTIES
+    /** ISO week key `YYYY-Www` the entry belongs to. */
     @Property({ length: 8 })
     week!: string;
 
+    /** The gratitude line itself. */
     @Property({ length: 280 })
     text!: string;
 
@@ -26,10 +29,6 @@ export class Gratitude extends HouseholdEntity {
      * Authoring person (`auth.account`). mapToPk keeps `account: string` in app code.
      * Cascades when the account is deleted.
      */
-    @ManyToOne(() => Account, {
-        mapToPk: true,
-        fieldName: 'account_id',
-        deleteRule: 'cascade',
-    })
+    @ManyToOne(() => Account, { mapToPk: true, deleteRule: 'cascade' })
     account!: string;
 }

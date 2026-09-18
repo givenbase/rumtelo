@@ -20,9 +20,11 @@ export abstract class BaseEntity {
     @PrimaryKey({ type: 'uuid' })
     id: string = uuidv7();
 
+    /** Row insert time (UTC). */
     @Property({ type: 'timestamptz', defaultRaw: 'now()' })
     createdAt: Date = new Date();
 
+    /** Last flush that changed this row (UTC) — set by the ORM, never by hand. */
     @Property({ type: 'timestamptz', defaultRaw: 'now()', onUpdate: () => new Date() })
     updatedAt: Date = new Date();
 }

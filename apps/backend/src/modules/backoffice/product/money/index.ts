@@ -6,6 +6,9 @@ export {
     GivingOrganisation,
     GivingOrganisationModule,
     GivingOrganisationService,
+    Market,
+    MarketModule,
+    MarketService,
     MoneyCatalogModule,
 } from './catalog';
 export {
@@ -19,9 +22,11 @@ export {
 } from './template';
 export {
     DebtPreset,
+    DebtPresetMerchant,
     DebtPresetModule,
     DebtPresetService,
     FixedCostPreset,
+    FixedCostPresetMerchant,
     FixedCostPresetModule,
     FixedCostPresetService,
     GoalPreset,

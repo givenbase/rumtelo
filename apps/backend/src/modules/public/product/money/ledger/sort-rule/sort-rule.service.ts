@@ -8,13 +8,13 @@ import { Jar } from '../../plan/jar/jar.entity';
 import { RuleField, RuleMatcher, TransactionStatus } from '@rumtelo/contracts';
 
 import { Transaction } from '../transaction/transaction.entity';
-import { Rule } from './rule.entity';
+import { SortRule } from './sort-rule.entity';
 
 @Injectable()
-export class RuleService {
-    private readonly repo: HouseholdScopedRepository<Rule>;
+export class SortRuleService {
+    private readonly repo: HouseholdScopedRepository<SortRule>;
     constructor(@Inject(EntityManager) private readonly em: EntityManager) {
-        this.repo = new HouseholdScopedRepository(em, Rule);
+        this.repo = new HouseholdScopedRepository(em, SortRule);
     }
 
     // ====================================================================
@@ -24,17 +24,17 @@ export class RuleService {
     async create(input: {
         field: string;
         matcher: string;
-        value: string;
+        matchValue: string;
         jarId: string;
         categoryId?: string | null;
         priority?: number;
         isActive?: boolean;
     }) {
-        const entity = this.em.create(Rule, {
+        const entity = this.em.create(SortRule, {
             household: currentHouseholdId(),
             field: input.field as RuleField,
             matcher: input.matcher as RuleMatcher,
-            value: input.value.trim(),
+            matchValue: input.matchValue.trim(),
             jar: this.em.getReference(Jar, input.jarId),
             category: input.categoryId ? this.em.getReference(Category, input.categoryId) : null,
             priority: input.priority ?? 100,
@@ -63,7 +63,7 @@ export class RuleService {
         patch: Partial<{
             field: string;
             matcher: string;
-            value: string;
+            matchValue: string;
             jarId: string;
             categoryId: string | null;
             priority: number;
@@ -73,7 +73,7 @@ export class RuleService {
         const entity = await this.repo.findOneOrFail({ id });
         if (patch.field !== undefined) entity.field = patch.field as RuleField;
         if (patch.matcher !== undefined) entity.matcher = patch.matcher as RuleMatcher;
-        if (patch.value !== undefined) entity.value = patch.value.trim();
+        if (patch.matchValue !== undefined) entity.matchValue = patch.matchValue.trim();
         if (patch.jarId !== undefined) entity.jar = this.em.getReference(Jar, patch.jarId);
         if (patch.categoryId !== undefined) {
             entity.category = patch.categoryId
@@ -88,7 +88,7 @@ export class RuleService {
 
     /**
      * Re-runs isActive rules over inbox history — first match wins, priority ASC.
-     * Stamps appliedRuleId so the decision stays auditable.
+     * Stamps appliedRule so the decision stays auditable.
      */
     async replay() {
         const rules = await this.repo.find({ isActive: true }, { orderBy: { priority: 'ASC' } });
@@ -108,7 +108,7 @@ export class RuleService {
                 transaction.jar = rule.jar;
                 transaction.category = rule.category;
                 transaction.status = TransactionStatus.SORTED;
-                transaction.appliedRuleId = rule.id;
+                transaction.appliedRule = rule.id;
                 rule.hitCount += 1;
                 sorted += 1;
                 break;
@@ -135,9 +135,9 @@ export class RuleService {
      * First match wins, in priority order — so the engine is predictable and a user
      * can reason about why a transaction landed where it did.
      */
-    matches(rule: Rule, value: string): boolean {
+    matches(rule: SortRule, value: string): boolean {
         const haystack = value.toLowerCase();
-        const needle = rule.value.toLowerCase();
+        const needle = rule.matchValue.toLowerCase();
         switch (rule.matcher) {
             case RuleMatcher.EQUALS:
                 return haystack === needle;
@@ -147,7 +147,7 @@ export class RuleService {
                 return haystack.includes(needle);
             case RuleMatcher.REGEX:
                 try {
-                    return new RegExp(rule.value, 'i').test(value);
+                    return new RegExp(rule.matchValue, 'i').test(value);
                 } catch {
                     return false; // A user-authored bad pattern must not break sorting.
                 }
@@ -169,13 +169,13 @@ function fieldValue(transaction: Transaction, field: RuleField): string {
     }
 }
 
-export function toDto(rule: Rule) {
+export function toDto(rule: SortRule) {
     return {
         id: rule.id,
         householdId: rule.household,
         field: rule.field,
         matcher: rule.matcher,
-        value: rule.value,
+        matchValue: rule.matchValue,
         jarId: rule.jar.id,
         categoryId: rule.category?.id ?? null,
         priority: rule.priority,

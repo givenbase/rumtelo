@@ -27,11 +27,16 @@ Audience groups: `auth/` (identity), `public/` (platform + product → Postgres 
 
 ## Entity
 
+Full rules + linter: `apps/backend/docs/ENTITY_STYLE.md` (`pnpm --filter @rumtelo/backend lint:entities`). Table of every entity: `apps/backend/docs/ENTITY_INVENTORY.md`.
+
 - File-level JSDoc: what it is, who owns writes, schema
-- Sections in this order only: `// ? PROPERTIES` then `// ? RELATIONSHIPS`
+- Sections in this order only: `// ? PROPERTIES` → `// ? UI METADATA` → `// ? ENUMS` → `// ? RELATIONSHIPS`
 - Short JSDoc on every property and relation
 - Explicit MikroORM `type` / `Enum` / relation options — never bare `@Property()` on `string | null` unions when Reflect metadata is involved
-- Household money rows extend `HouseholdEntity` and go through `HouseholdScopedRepository`
+- Base class by row kind: `BaseEntity` (account, pivots, enum-keyed catalogs) · `CatalogEntity` (company catalogs with `key/name/sortOrder/isActive`) · `HouseholdEntity` (household rows, via `HouseholdScopedRepository`) · `WeekCheckEntity` (portal week checks)
+- Money columns use `MoneyType` (bigint eurocents → `number`); ratios stay `decimal` strings
+- Names: `is*/has*/can*` booleans · `*At` instant · `*On` date · `*Day` ordinal · `name`/`description` for text (no `label`/`summary`) · no `default*`/`suggested*` prefixes on catalog rows
+- References: backoffice → backoffice = real relations (id FKs, pivot entities); household → backoffice = `*Key` snapshot string; inverse collections use `import type` + string entity name (no import cycles)
 - Enums from `@rumtelo/contracts` only — `@Enum(NativeEnum({ DebtKind, domain: 'money', … }))`, never local `export enum`
 - Persistence: `await em.persist(e).flush()` / `await em.remove(e).flush()` — never deprecated `persistAndFlush` / `removeAndFlush`
 - Naming: no single-letter locals; prefer domain words (`goal`/`debt`/`transaction`, not `g`/`d`/`tx`)

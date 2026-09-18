@@ -18,7 +18,8 @@ export const Rule = z.object({
     householdId: HouseholdId,
     field: z.enum(RuleField),
     matcher: z.enum(RuleMatcher),
-    value: z.string().min(1).max(200),
+    /** Needle compared against `field` using `matcher`. */
+    matchValue: z.string().min(1).max(200),
     jarId: Id,
     categoryId: Id.nullable(),
     priority: z.int(),

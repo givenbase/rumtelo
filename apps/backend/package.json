@@ -10,6 +10,7 @@
         "start:node": "node dist/src/main.js",
         "lint": "pnpm lint:entities",
         "lint:entities": "tsx scripts/lint/check-entity-style.ts",
+        "docs:entities": "tsx scripts/docs/entity-inventory.ts",
         "check-types": "tsc --noEmit",
         "test": "vitest run",
         "db:gen": "NODE_OPTIONS='--import tsx' mikro-orm migration:create --config ./mikro-orm.config.ts",

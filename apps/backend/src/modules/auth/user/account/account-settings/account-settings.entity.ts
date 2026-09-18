@@ -26,12 +26,9 @@ import { Account } from '../account.entity';
 @Entity(entityConfig({ schema: 'auth', domain: 'account', tableName: 'settings' }))
 export class AccountSettings extends BaseEntity {
     // ? PROPERTIES
-    /**
-     * Guided tour / Help walkthrough progress (offer + per-chapter status).
-     * Column `tour` — API DTO field is also `tour`.
-     */
-    @Property({ type: 'json', fieldName: 'tour' })
-    tourSnapshot: AccountTourProgress = { ...DEFAULT_ACCOUNT_TOUR_PROGRESS, tours: {} };
+    /** Guided tour / Help walkthrough progress (offer + per-chapter status). */
+    @Property({ type: 'json' })
+    tour: AccountTourProgress = { ...DEFAULT_ACCOUNT_TOUR_PROGRESS, tours: {} };
 
     /**
      * When personal onboarding finished. Null = still new at person level.

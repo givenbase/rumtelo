@@ -12,23 +12,39 @@ import {
     loadJarTemplateMap,
 } from '../../../../modules/backoffice/product/money/require-jar-template';
 
+import { loadCategoryTemplates, loadGivingOrganisations, loadMarkets } from './catalog-lookups';
+
+const DEFAULT_MARKETS = ['NL'] as const;
+const OWNER = 'MerchantPresetSeeder';
+
+/**
+ * Seeds backoffice.reference_money_merchant_preset and its 1:1 children.
+ * Requires JarTemplate, CategoryTemplate, Market and GivingOrganisation seeded first.
+ */
 export class MerchantPresetSeeder extends Seeder {
     async run(em: EntityManager): Promise<void> {
         const jarByKey = await loadJarTemplateMap(em);
-        const keys = MERCHANT_PRESET_SEED.map(row => row.key);
-        const seedKeys = new Set(keys);
+        const categoryByKey = await loadCategoryTemplates(em, OWNER);
+        const marketByKey = await loadMarkets(em, OWNER);
+        const organisationByKey = await loadGivingOrganisations(em, OWNER);
+
+        const seedKeys = new Set(MERCHANT_PRESET_SEED.map(row => row.key));
         const existingRows = await em.find(
             MerchantPreset,
             {},
-            { populate: ['matching', 'branding', 'banking'] }
+            { populate: ['matching', 'branding', 'banking', 'markets'] }
         );
         const existingByKey = new Map(existingRows.map(row => [row.key, row]));
 
         for (const [sortOrder, row] of MERCHANT_PRESET_SEED.entries()) {
             const jarTemplate = jarTemplateFromMap(jarByKey, row.jarKey);
+            const categoryTemplate = categoryByKey(row.categoryTemplateKey);
+            const givingOrganisation = row.givingOrganisationKey
+                ? organisationByKey(row.givingOrganisationKey)
+                : null;
+            const markets = (row.markets?.length ? row.markets : DEFAULT_MARKETS).map(marketByKey);
             const isActive = row.isActive ?? true;
             const highlight = row.highlight ?? null;
-            const markets = row.markets?.length ? [...row.markets] : ['NL'];
             const matchPriority = row.matchPriority ?? 0;
             const providerIds = { ...row.providerIds };
             const logoDomain = row.logoDomain;
@@ -39,9 +55,9 @@ export class MerchantPresetSeeder extends Seeder {
             if (existing) {
                 existing.name = row.name;
                 existing.jarTemplate = jarTemplate;
-                existing.categoryTemplateKey = row.categoryTemplateKey;
-                existing.givingOrganisationKey = row.givingOrganisationKey ?? null;
-                existing.markets = markets;
+                existing.categoryTemplate = categoryTemplate;
+                existing.givingOrganisation = givingOrganisation;
+                existing.markets.set(markets);
                 existing.highlight = highlight;
                 existing.sortOrder = sortOrder;
                 existing.isActive = isActive;
@@ -87,15 +103,15 @@ export class MerchantPresetSeeder extends Seeder {
                 key: row.key,
                 name: row.name,
                 jarTemplate,
-                categoryTemplateKey: row.categoryTemplateKey,
-                givingOrganisationKey: row.givingOrganisationKey ?? null,
-                markets,
+                categoryTemplate,
+                givingOrganisation,
                 highlight,
                 sortOrder,
                 isActive,
             } as never);
+            preset.markets.set(markets);
 
-            const matching = em.create(MerchantMatching, {
+            preset.matching = em.create(MerchantMatching, {
                 preset,
                 matchValue: row.matchValue,
                 aliases: [...row.aliases],
@@ -104,21 +120,14 @@ export class MerchantPresetSeeder extends Seeder {
                 providerIds,
             } as never);
 
-            const branding = em.create(MerchantBranding, {
+            preset.branding = em.create(MerchantBranding, {
                 preset,
                 logoDomain,
                 website,
             } as never);
 
-            preset.matching = matching;
-            preset.branding = branding;
-
             if (ibanBankCode) {
-                const banking = em.create(MerchantBanking, {
-                    preset,
-                    ibanBankCode,
-                } as never);
-                preset.banking = banking;
+                preset.banking = em.create(MerchantBanking, { preset, ibanBankCode } as never);
             }
         }
 

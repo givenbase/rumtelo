@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 
-import { RuleModule } from '../rule/rule.module';
+import { SortRuleModule } from '../sort-rule/sort-rule.module';
 import { TransactionController } from './transaction.controller';
 import { TransactionService } from './transaction.service';
 
 @Module({
-    imports: [RuleModule],
+    imports: [SortRuleModule],
     controllers: [TransactionController],
     providers: [TransactionService],
     exports: [TransactionService],

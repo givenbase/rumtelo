@@ -20,12 +20,19 @@ import {
     findMissingBaseEntity,
     findRelationIdSuffixViolations,
     findTemporalNamingViolations,
+    UI_METADATA_PRIORITY,
 } from './entity-field-priority';
 
 const BACKEND_ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '..', '..');
 const SRC_ROOT = join(BACKEND_ROOT, 'src');
 
-const EXCLUDED = new Set(['common/database/base.entity.ts', 'common/database/household.entity.ts']);
+/** Abstract bases — no @Entity, no table; the rules below target concrete entities. */
+const EXCLUDED = new Set([
+    'common/database/base.entity.ts',
+    'common/database/household.entity.ts',
+    'common/database/catalog.entity.ts',
+    'common/database/week-check.entity.ts',
+]);
 
 /**
  * Path prefixes (relative to SRC_ROOT) whose entity files are owned by a library.
@@ -84,14 +91,16 @@ function sectionIndex(sections: CanonicalSection[], name: CanonicalSection): num
     return sections.indexOf(name);
 }
 
+/**
+ * Section markers in the order they actually appear in the file.
+ * Sorting by offset (not by canonical order) is what makes the
+ * section-order checks below meaningful.
+ */
 function extractSections(text: string): CanonicalSection[] {
-    const found: CanonicalSection[] = [];
-    for (const name of CANONICAL_SECTIONS) {
-        if (text.includes(`// ? ${name}`)) {
-            found.push(name);
-        }
-    }
-    return found;
+    return CANONICAL_SECTIONS.map(name => ({ name, at: text.indexOf(`// ? ${name}`) }))
+        .filter(entry => entry.at !== -1)
+        .sort((left, right) => left.at - right.at)
+        .map(entry => entry.name);
 }
 
 function sliceBetween(text: string, startMarker: string, endMarkers: string[]): string {
@@ -246,7 +255,7 @@ function validateEntity(absPath: string): EntityIssue[] {
                 issues,
                 file,
                 'section-order',
-                `Sections out of order: // ? ${sections[i - 1]} must come before // ? ${sections[i]}`
+                `Sections out of order: // ? ${sections[i]} must come before // ? ${sections[i - 1]}`
             );
         }
     }
@@ -331,6 +340,19 @@ function validateEntity(absPath: string): EntityIssue[] {
                 'relationship-in-ui-metadata',
                 'Relationship decorators must be under // ? RELATIONSHIPS'
             );
+        }
+
+        // UI METADATA is for presentation hints only — lifecycle flags such as
+        // isActive belong in PROPERTIES like every other entity.
+        for (const fieldName of extractPropertyFieldNames(uiBlock)) {
+            if (!(fieldName in UI_METADATA_PRIORITY)) {
+                pushIssue(
+                    issues,
+                    file,
+                    'ui-metadata-field',
+                    `"${fieldName}" is not presentation metadata — move it to // ? PROPERTIES (allowed here: ${Object.keys(UI_METADATA_PRIORITY).join(', ')})`
+                );
+            }
         }
 
         for (const violation of findFieldOrderViolations(

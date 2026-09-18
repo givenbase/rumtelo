@@ -12,7 +12,7 @@ import { HouseholdId, Id, Money } from '../../../../common/common.schema';
 export const IncomeLever = z.object({
     id: Id,
     householdId: HouseholdId,
-    label: z.string().min(1).max(160),
+    name: z.string().min(1).max(160),
     note: z.string().max(500).nullable(),
     potentialMonthly: Money,
     isDone: z.boolean(),

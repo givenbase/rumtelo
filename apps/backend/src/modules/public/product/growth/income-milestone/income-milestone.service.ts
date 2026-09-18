@@ -2,10 +2,10 @@ import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { HouseholdScopedRepository } from '../../../../../common/household/household-scoped.repository';
-import { IncomeMilestone } from './milestone.entity';
+import { IncomeMilestone } from './income-milestone.entity';
 
 @Injectable()
-export class MilestoneService {
+export class IncomeMilestoneService {
     private readonly repo: HouseholdScopedRepository<IncomeMilestone>;
     constructor(@Inject(EntityManager) private readonly em: EntityManager) {
         this.repo = new HouseholdScopedRepository(em, IncomeMilestone);
@@ -20,8 +20,8 @@ export class MilestoneService {
         return rows.map(milestone => ({
             id: milestone.id,
             householdId: milestone.household,
-            label: milestone.label,
-            targetMonthly: Number(milestone.targetMonthly),
+            name: milestone.name,
+            targetMonthly: milestone.targetMonthly,
             reachedOn: milestone.reachedOn,
         }));
     }

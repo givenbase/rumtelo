@@ -9,23 +9,31 @@ import { FixedCostPreset } from './fixed-cost.entity';
 export class FixedCostPresetService {
     constructor(@Inject(EntityManager) private readonly em: EntityManager) {}
 
+    /** Active presets, all filters applied in SQL; relations populated for DTO mapping. */
     async listActive(filters?: {
         jarKey?: JarKey;
         categoryTemplateKey?: string;
         audienceKey?: string;
     }): Promise<FixedCostPreset[]> {
-        const rows = await this.em.find(
+        return this.em.find(
             FixedCostPreset,
             {
                 isActive: true,
                 ...(filters?.jarKey ? { jarTemplate: { key: filters.jarKey } } : {}),
                 ...(filters?.categoryTemplateKey
-                    ? { categoryTemplateKey: filters.categoryTemplateKey }
+                    ? { categoryTemplate: { key: filters.categoryTemplateKey } }
                     : {}),
+                ...(filters?.audienceKey ? { audiences: { key: filters.audienceKey } } : {}),
             },
-            { orderBy: { sortOrder: 'ASC' }, populate: ['jarTemplate'] }
+            {
+                orderBy: { sortOrder: 'ASC' },
+                populate: [
+                    'jarTemplate',
+                    'categoryTemplate',
+                    'audiences',
+                    'merchantLinks.merchant',
+                ],
+            }
         );
-        if (!filters?.audienceKey) return rows;
-        return rows.filter(preset => preset.audienceKeys.includes(filters.audienceKey!));
     }
 }

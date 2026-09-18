@@ -117,15 +117,26 @@ export class IncomeService {
         if (patch.startedOn !== undefined) source.startedOn = patch.startedOn;
 
         let amountChanged = false;
-        if (patch.amount !== undefined && Number(source.amount) !== patch.amount) {
+        if (patch.amount !== undefined && source.amount !== patch.amount) {
             const effectiveOn = patch.amountEffectiveFrom?.slice(0, 10) || todayIso();
-            const period = this.em.create(IncomeAmountPeriod, {
-                household: currentHouseholdId(),
-                incomeSource: source,
-                amount: patch.amount,
+            // UNIQUE(incomeSource, effectiveOn): a second change on the same day
+            // overwrites that day's figure instead of adding a duplicate row.
+            const sameDay = await this.em.findOne(IncomeAmountPeriod, {
+                incomeSource: source.id,
                 effectiveOn,
-            } as never);
-            this.em.persist(period);
+            });
+            if (sameDay) {
+                sameDay.amount = patch.amount;
+            } else {
+                this.em.persist(
+                    this.em.create(IncomeAmountPeriod, {
+                        household: currentHouseholdId(),
+                        incomeSource: source,
+                        amount: patch.amount,
+                        effectiveOn,
+                    } as never)
+                );
+            }
             source.amount = patch.amount;
             amountChanged = true;
         }
@@ -175,14 +186,14 @@ export class IncomeService {
             householdId: source.household,
             name: source.name,
             kind: source.kind,
-            amount: Number(source.amount),
+            amount: source.amount,
             cadence: source.cadence,
             expectedDay: source.expectedDay,
             isActive: source.isActive,
             startedOn: source.startedOn,
             periods: rows.map(period => ({
                 id: period.id,
-                amount: Number(period.amount),
+                amount: period.amount,
                 effectiveOn: period.effectiveOn,
             })),
         };

@@ -38,7 +38,7 @@ export const Goal = z.object({
      * GIVE only — GivingOrganisation catalog key when the pledge names an org.
      * Free-text / open pledges leave this null. SAVE / EARN always null.
      */
-    orgKey: z.string().min(1).max(64).nullable().default(null),
+    givingOrganisationKey: z.string().min(1).max(64).nullable().default(null),
     /** When an EARN goal crossed the target (null while open / for SAVE). */
     fulfilledOn: IsoDate.nullable(),
     /**

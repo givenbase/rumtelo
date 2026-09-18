@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 
-import { RuleController } from './rule.controller';
-import { RuleService } from './rule.service';
+import { SortRuleController } from './sort-rule.controller';
+import { SortRuleService } from './sort-rule.service';
 
 @Module({
-    controllers: [RuleController],
-    providers: [RuleService],
-    exports: [RuleService],
+    controllers: [SortRuleController],
+    providers: [SortRuleService],
+    exports: [SortRuleService],
 })
-export class RuleModule {}
+export class SortRuleModule {}

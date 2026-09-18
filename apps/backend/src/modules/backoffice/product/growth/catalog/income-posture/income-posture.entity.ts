@@ -1,12 +1,15 @@
 import { Entity, Property, Unique } from '@mikro-orm/core';
 
-import { BaseEntity } from '../../../../../../common/database/base.entity';
+import { CatalogEntity } from '../../../../../../common/database/catalog.entity';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
 
 /**
- * Income Posture catalog — how someone primarily earns.
+ * Income Posture Entity
+ *
+ * How someone primarily earns (time trade, skill trade, system, assets).
  * Scalable rows (not a Postgres enum): add postures via seed/admin.
  *
+ * @see LeverPreset.postures — levers relevant to a posture
  * @see https://mikro-orm.io/docs/defining-entities
  */
 @Entity(
@@ -18,20 +21,9 @@ import { entityConfig } from '../../../../../../common/database/entity-config.ut
     })
 )
 @Unique({ properties: ['key'] })
-export class IncomePosture extends BaseEntity {
+export class IncomePosture extends CatalogEntity {
     // ? PROPERTIES
-    @Property({ length: 64 })
-    key!: string;
-
-    @Property({ length: 120 })
-    name!: string;
-
+    /** One line under the name in pickers / coach copy. */
     @Property({ type: 'text', nullable: true })
-    summary: string | null = null;
-
-    @Property({ default: 0 })
-    sortOrder = 0;
-
-    @Property({ default: true })
-    isActive = true;
+    description: string | null = null;
 }

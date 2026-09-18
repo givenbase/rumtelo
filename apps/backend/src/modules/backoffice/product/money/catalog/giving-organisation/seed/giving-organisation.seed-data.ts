@@ -3,7 +3,7 @@ import { GivingCause, GivingEvaluator, type GivingSignal } from '@rumtelo/contra
 type Seed = {
     key: string;
     name: string;
-    summary: string;
+    description: string;
     causes: GivingCause[];
     country: string | null;
     scope: string | null;
@@ -49,7 +49,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
     {
         key: 'AGAINST_MALARIA_FOUNDATION',
         name: 'Against Malaria Foundation',
-        summary:
+        description:
             'Funds long-lasting insecticidal bed nets and tracks whether they are used, distribution by distribution.',
         causes: [GLOBAL_HEALTH],
         country: 'GB',
@@ -83,7 +83,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
     {
         key: 'MALARIA_CONSORTIUM',
         name: 'Malaria Consortium',
-        summary:
+        description:
             'Seasonal malaria chemoprevention for children under five in seven African countries.',
         causes: [GLOBAL_HEALTH],
         country: 'GB',
@@ -105,7 +105,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
     {
         key: 'HELEN_KELLER_INTL',
         name: 'Helen Keller Intl',
-        summary:
+        description:
             'Vitamin A supplementation campaigns with fourteen African governments, at very low cost per child per year.',
         causes: [GLOBAL_HEALTH],
         country: 'US',
@@ -133,7 +133,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
     {
         key: 'NEW_INCENTIVES',
         name: 'New Incentives',
-        summary:
+        description:
             'Small cash incentives so caregivers in northern Nigeria complete routine childhood vaccinations.',
         causes: [GLOBAL_HEALTH],
         country: 'US',
@@ -161,7 +161,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
     {
         key: 'STRONGMINDS',
         name: 'StrongMinds',
-        summary:
+        description:
             'Group interpersonal therapy for women with depression in Uganda and Zambia — mental health care where almost none exists.',
         causes: [GLOBAL_HEALTH],
         country: 'US',
@@ -193,7 +193,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
     {
         key: 'NUTRITION_INTERNATIONAL',
         name: 'Nutrition International',
-        summary:
+        description:
             'Vitamin A and other micronutrient programmes with governments — cheap doses that prevent blindness and child deaths.',
         causes: [GLOBAL_HEALTH],
         country: 'CA',
@@ -219,7 +219,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
     {
         key: 'GIVEWELL_ALL_GRANTS_FUND',
         name: 'GiveWell All Grants Fund',
-        summary:
+        description:
             'A pooled fund that grants to whichever programmes clear GiveWell’s cost-effectiveness bar this year.',
         causes: [GLOBAL_HEALTH, POVERTY],
         country: 'US',
@@ -247,7 +247,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
     {
         key: 'GIVEDIRECTLY',
         name: 'GiveDirectly',
-        summary:
+        description:
             'Unconditional cash, sent by mobile money, to households in extreme poverty — they decide what they need.',
         causes: [POVERTY, EMERGENCY],
         country: 'US',
@@ -279,7 +279,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
     {
         key: '100WEEKS',
         name: '100WEEKS',
-        summary:
+        description:
             'A fixed weekly amount for a hundred weeks, plus training and savings groups, for women in extreme poverty.',
         causes: [POVERTY],
         country: 'NL',
@@ -301,7 +301,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
     {
         key: 'EVIDENCE_ACTION',
         name: 'Evidence Action',
-        summary:
+        description:
             'Chlorine dispensers and in-line chlorination so drinking water is safe where its absence kills children.',
         causes: [WATER, GLOBAL_HEALTH],
         country: 'US',
@@ -329,7 +329,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
     {
         key: 'CLEAN_AIR_TASK_FORCE',
         name: 'Clean Air Task Force',
-        summary:
+        description:
             'Policy and technical advocacy for neglected decarbonisation — methane, geothermal, nuclear, shipping.',
         causes: [CLIMATE],
         country: 'US',
@@ -366,7 +366,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
     {
         key: 'FUTURE_CLEANTECH_ARCHITECTS',
         name: 'Future Cleantech Architects',
-        summary:
+        description:
             'A European think tank pushing innovation for the hard sectors — cement, steel, aviation — into EU policy.',
         causes: [CLIMATE],
         country: 'DE',
@@ -392,7 +392,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
     {
         key: 'OPPORTUNITY_GREEN',
         name: 'Opportunity Green',
-        summary: 'Legal and economic advocacy to cut aviation and shipping emissions.',
+        description: 'Legal and economic advocacy to cut aviation and shipping emissions.',
         causes: [CLIMATE],
         country: 'GB',
         scope: 'Global',
@@ -418,7 +418,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
     {
         key: 'THE_HUMANE_LEAGUE',
         name: 'The Humane League',
-        summary:
+        description:
             'Corporate campaigns that move the largest food companies to cage-free and better broiler welfare.',
         causes: [ANIMALS],
         country: 'US',
@@ -450,7 +450,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
     {
         key: 'ANIMAL_WELFARE_OBSERVATORY',
         name: 'Animal Welfare Observatory',
-        summary:
+        description:
             'Corporate and EU policy advocacy for hens, broilers, fish and shrimp — Europe’s newest evaluator-recommended pick.',
         causes: [ANIMALS],
         country: 'ES',
@@ -475,7 +475,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
     {
         key: 'GOOD_FOOD_INSTITUTE',
         name: 'The Good Food Institute',
-        summary:
+        description:
             'Policy and industry work so plant-based and cultivated proteins can replace factory-farmed meat at scale.',
         causes: [ANIMALS, CLIMATE],
         country: 'US',
@@ -509,7 +509,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
     {
         key: 'VOEDSELBANKEN_NEDERLAND',
         name: 'Voedselbanken Nederland',
-        summary:
+        description:
             'The umbrella of Dutch food banks, redistributing surplus food to households living in poverty.',
         causes: [COMMUNITY],
         country: 'NL',
@@ -537,7 +537,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
     {
         key: 'STICHTING_VLUCHTELING',
         name: 'Stichting Vluchteling',
-        summary:
+        description:
             'Rapid humanitarian aid to refugees and displaced people through local partners, with a preference for cash.',
         causes: [EMERGENCY],
         country: 'NL',
@@ -565,7 +565,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
     {
         key: 'DONEER_EFFECTIEF',
         name: 'Doneer Effectief',
-        summary:
+        description:
             'A Dutch platform that passes gifts through, in full, to the evaluator-backed organisations above — with Dutch tax deduction.',
         causes: [GLOBAL_HEALTH, POVERTY, CLIMATE, ANIMALS],
         country: 'NL',

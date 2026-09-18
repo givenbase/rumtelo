@@ -16,7 +16,7 @@ export class GoalPresetService {
                 isActive: true,
                 ...(filters?.jarKey ? { jarTemplate: { key: filters.jarKey } } : {}),
             },
-            { orderBy: { sortOrder: 'ASC' }, populate: ['jarTemplate'] }
+            { orderBy: { sortOrder: 'ASC' }, populate: ['jarTemplate', 'categoryTemplate'] }
         );
     }
 }

@@ -15,7 +15,7 @@ export class IncomePostureSeeder extends Seeder {
             const existing = existingByKey.get(row.key);
             if (existing) {
                 existing.name = row.name;
-                existing.summary = row.summary;
+                existing.description = row.description;
                 existing.sortOrder = sortOrder;
                 existing.isActive = true;
                 continue;
@@ -23,7 +23,7 @@ export class IncomePostureSeeder extends Seeder {
             em.create(IncomePosture, {
                 key: row.key,
                 name: row.name,
-                summary: row.summary,
+                description: row.description,
                 sortOrder,
                 isActive: true,
             } as never);

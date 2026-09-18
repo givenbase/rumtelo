@@ -15,6 +15,7 @@ import {
     GivingSignalTier,
     IncomeKind,
     JarKey,
+    MerchantHighlight,
 } from '../enums';
 import { JarCapabilities } from '../jar/jar.schema';
 
@@ -41,20 +42,21 @@ export const Audience = CatalogItemBase.extend({
 export const FixedCostPreset = CatalogItemBase.extend({
     jarKey: z.enum(JarKey),
     categoryTemplateKey: z.string().min(1).max(64),
-    defaultCadence: z.enum(Cadence),
-    suggestedDueDay: z.int().min(1).max(31).nullable(),
+    cadence: z.enum(Cadence),
+    /** Day-of-month hint (1–31) pre-filled in the due-day field. */
+    dueDay: z.int().min(1).max(31).nullable(),
     direction: z.enum(FlowDirection),
-    /** Audience.key values from the audience catalog. */
+    /** Audience.key values from the audience catalog (empty = every audience). */
     audienceKeys: z.array(z.string().min(1).max(64)),
-    /** MerchantPreset.key chips for “Paid to” after this bill type is picked. */
-    suggestedMerchantKeys: z.array(z.string().min(1).max(64)),
+    /** Ordered MerchantPreset.key chips for “Paid to” after this bill type is picked. */
+    merchantKeys: z.array(z.string().min(1).max(64)),
 });
 
 export const DebtPreset = CatalogItemBase.extend({
     kind: z.enum(DebtKind),
     icon: z.string().max(8).nullable(),
-    /** MerchantPreset.key chips for "Who do you owe?" after this type is picked. */
-    suggestedMerchantKeys: z.array(z.string().min(1).max(64)),
+    /** Ordered MerchantPreset.key chips for "Who do you owe?" after this type is picked. */
+    merchantKeys: z.array(z.string().min(1).max(64)),
 });
 
 export const JarGuideItem = z.object({
@@ -90,21 +92,21 @@ export const JarTemplate = CatalogItemBase.extend({
     subtitle: z.string().max(160).nullable(),
     icon: z.string().max(8).nullable(),
     /** Default share of net income (0–100). */
-    defaultPercentage: z.number().min(0).max(100),
+    percentage: z.number().min(0).max(100),
     capabilities: JarCapabilities,
     guide: JarGuide.nullable(),
 });
 
 export const IncomeSourcePreset = CatalogItemBase.extend({
     kind: z.enum(IncomeKind),
-    defaultCadence: z.enum(Cadence),
-    /** Emoji for the create picker; nullish until migration/seed lands. */
-    icon: z.string().max(32).nullish(),
+    cadence: z.enum(Cadence),
+    /** Emoji for the create picker. */
+    icon: z.string().max(8).nullable(),
 });
 
 export const TransactionInPreset = CatalogItemBase.extend({
-    /** Picker group label (People, Official, …). */
-    group: z.string().min(1).max(64),
+    /** Picker group heading (People, Official, …). */
+    groupName: z.string().min(1).max(64),
     icon: z.string().max(8).nullable(),
     /** Soft jar hint when picked; null = leave jar alone. */
     jarKey: z.enum(JarKey).nullable(),
@@ -115,8 +117,6 @@ export const GoalPreset = CatalogItemBase.extend({
     categoryTemplateKey: z.string().min(1).max(64).nullable(),
     icon: z.string().max(8).nullable(),
 });
-
-export const MerchantHighlight = z.enum(['FEATURED', 'NEW', 'POPULAR']);
 
 export const MerchantPreset = CatalogItemBase.extend({
     matchValue: z.string().min(1).max(120),
@@ -137,7 +137,7 @@ export const MerchantPreset = CatalogItemBase.extend({
     /** Dutch IBAN bank code (positions 5–8), e.g. INGB. Null when not applicable. */
     ibanBankCode: z.string().length(4).nullable(),
     /** Editorial pin + chip label; null = normal. */
-    highlight: MerchantHighlight.nullable(),
+    highlight: z.enum(MerchantHighlight).nullable(),
     /** ISO markets where this merchant is listed (e.g. NL). */
     markets: z.array(z.string().length(2)).min(1),
     matchPriority: z.int(),
@@ -161,7 +161,7 @@ export const GivingSignal = z.object({
  */
 export const GivingOrganisation = CatalogItemBase.extend({
     /** One neutral sentence on what they do. */
-    summary: z.string().min(1).max(280),
+    description: z.string().min(1).max(280),
     causes: z.array(z.enum(GivingCause)).min(1),
     /** ISO 3166-1 alpha-2 of the HQ; null when genuinely distributed. */
     country: z.string().length(2).nullable(),
@@ -199,6 +199,5 @@ export type IncomeSourcePreset = z.infer<typeof IncomeSourcePreset>;
 export type TransactionInPreset = z.infer<typeof TransactionInPreset>;
 export type GoalPreset = z.infer<typeof GoalPreset>;
 export type MerchantPreset = z.infer<typeof MerchantPreset>;
-export type MerchantHighlight = z.infer<typeof MerchantHighlight>;
 export type GivingCauseCatalog = z.infer<typeof GivingCauseCatalog>;
 export type GivingEvaluatorCatalog = z.infer<typeof GivingEvaluatorCatalog>;

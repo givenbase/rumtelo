@@ -15,7 +15,7 @@ export class TransactionInPresetSeeder extends Seeder {
             const existing = existingByKey.get(row.key);
             if (existing) {
                 existing.name = row.name;
-                existing.groupLabel = row.groupLabel;
+                existing.groupName = row.groupName;
                 existing.icon = row.icon;
                 existing.jarKey = row.jarKey;
                 existing.sortOrder = sortOrder;
@@ -25,7 +25,7 @@ export class TransactionInPresetSeeder extends Seeder {
             em.create(TransactionInPreset, {
                 key: row.key,
                 name: row.name,
-                groupLabel: row.groupLabel,
+                groupName: row.groupName,
                 icon: row.icon,
                 jarKey: row.jarKey,
                 sortOrder,

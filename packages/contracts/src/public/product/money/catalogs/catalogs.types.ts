@@ -13,7 +13,6 @@ export type {
     TransactionInPreset,
     GoalPreset,
     MerchantPreset,
-    MerchantHighlight,
     GivingSignal,
     GivingOrganisation,
 } from './catalogs.schema';

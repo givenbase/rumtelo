@@ -1,7 +1,7 @@
 import { Entity, Enum, Property, Unique } from '@mikro-orm/core';
 import { Cadence, IncomeKind } from '@rumtelo/contracts';
 
-import { BaseEntity } from '../../../../../../common/database/base.entity';
+import { CatalogEntity } from '../../../../../../common/database/catalog.entity';
 import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
 
@@ -23,34 +23,18 @@ import { entityConfig } from '../../../../../../common/database/entity-config.ut
     })
 )
 @Unique({ properties: ['key'] })
-export class IncomeSourcePreset extends BaseEntity {
+export class IncomeSourcePreset extends CatalogEntity {
     // ? PROPERTIES
-    /** Stable catalog key (e.g. PARTNER_SALARY) — never rename in place. */
-    @Property({ length: 64 })
-    key!: string;
-
-    /** English name filled into the create form when picked. */
-    @Property({ length: 120 })
-    name!: string;
-
     /** Optional emoji for the income create picker. */
-    @Property({ length: 32, nullable: true })
+    @Property({ length: 8, nullable: true })
     icon: string | null = null;
-
-    /** Display / seed order within the catalog. */
-    @Property({ default: 0 })
-    sortOrder = 0;
-
-    /** Soft-disable without deleting historical seed identity. */
-    @Property({ default: true })
-    isActive = true;
 
     // ? ENUMS
     /** Maps onto money.income_source.kind; also used to group the picker. */
     @Enum(NativeEnum({ IncomeKind, domain: 'money' }))
     kind!: IncomeKind;
 
-    /** Suggested cadence when creating the household income source. */
+    /** Cadence pre-filled when creating the household income source. */
     @Enum(NativeEnum({ Cadence, domain: 'money', defaultValue: Cadence.MONTHLY }))
-    defaultCadence: Cadence = Cadence.MONTHLY;
+    cadence: Cadence = Cadence.MONTHLY;
 }

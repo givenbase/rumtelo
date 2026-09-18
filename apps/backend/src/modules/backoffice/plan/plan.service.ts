@@ -1,7 +1,7 @@
 import { EntityManager } from '@mikro-orm/postgresql';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
-import { type PlanKey, PLAN_CAPABILITIES } from '@rumtelo/contracts';
+import type { PlanKey } from '@rumtelo/contracts';
 
 import { Plan } from './plan.entity';
 
@@ -13,36 +13,7 @@ import { Plan } from './plan.entity';
  */
 @Injectable()
 export class PlanService {
-    private readonly logger = new Logger(PlanService.name);
-
     constructor(@Inject(EntityManager) private readonly em: EntityManager) {}
-
-    // ====================================================================
-    // ? CREATE Operations
-    // ====================================================================
-
-    /** Idempotent seed / staff upsert of catalog rows. */
-    async ensureDefaults(rows: Array<Partial<Plan> & { key: PlanKey }>) {
-        const keys = rows.map(row => row.key);
-        const existingRows = await this.em.find(Plan, { key: { $in: keys } });
-        const existingKeys = new Set(existingRows.map(row => row.key));
-        for (const [sortOrder, row] of rows.entries()) {
-            if (existingKeys.has(row.key)) continue;
-            this.em.create(Plan, {
-                sortOrder: row.sortOrder ?? sortOrder,
-                isActive: true,
-                priceMonthly: row.priceMonthly ?? '0.00',
-                capabilities: row.capabilities ?? PLAN_CAPABILITIES[row.key],
-                ...row,
-            } as never);
-        }
-        await this.em.flush();
-        this.logger.log(`Ensured ${rows.length} plans`);
-    }
-
-    // ====================================================================
-    // ? READ Operations
-    // ====================================================================
 
     /** Active tiers in sortOrder / display order. */
     async listActive(): Promise<Plan[]> {

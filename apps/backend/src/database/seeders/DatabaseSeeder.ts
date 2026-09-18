@@ -11,6 +11,7 @@ import { GivingOrganisationSeeder } from './product/money/GivingOrganisationSeed
 import { GoalPresetSeeder } from './product/money/GoalPresetSeeder';
 import { IncomeSourcePresetSeeder } from './product/money/IncomeSourcePresetSeeder';
 import { JarTemplateSeeder } from './product/money/JarTemplateSeeder';
+import { MarketSeeder } from './product/money/MarketSeeder';
 import { MerchantPresetSeeder } from './product/money/MerchantPresetSeeder';
 import { TransactionInPresetSeeder } from './product/money/TransactionInPresetSeeder';
 import { IncomePostureSeeder } from './product/growth/IncomePostureSeeder';
@@ -25,16 +26,19 @@ import { DemoHouseholdSeeder } from './demo/DemoHouseholdSeeder';
 export class DatabaseSeeder extends Seeder {
     async run(em: EntityManager): Promise<void> {
         return this.call(em, [
+            // Lookups first — presets link to them by FK.
             JarTemplateSeeder,
             CategoryTemplateSeeder,
             AudienceSeeder,
+            MarketSeeder,
+            GivingOrganisationSeeder,
+            MerchantPresetSeeder,
+            // Presets that link to merchants.
             FixedCostPresetSeeder,
             DebtPresetSeeder,
             IncomeSourcePresetSeeder,
             TransactionInPresetSeeder,
             GoalPresetSeeder,
-            MerchantPresetSeeder,
-            GivingOrganisationSeeder,
             IncomePostureSeeder,
             WealthStageSeeder,
             LeverPresetSeeder,

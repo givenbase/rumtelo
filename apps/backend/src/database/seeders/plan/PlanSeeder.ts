@@ -1,28 +1,28 @@
 import type { EntityManager } from '@mikro-orm/postgresql';
 
 import { Seeder } from '@mikro-orm/seeder';
-import { PLAN_CAPABILITIES, type CapabilityKey } from '@rumtelo/contracts';
+import type { CapabilityKey } from '@rumtelo/contracts';
 
-import { Capability } from '../../../modules/backoffice/plan/capability/capability.entity';
-import {
-    CAPABILITY_SEED,
-    PLAN_CAPABILITY_SEED,
-} from '../../../modules/backoffice/plan/capability/seed/capability.seed-data';
-import { PlanFeature } from '../../../modules/backoffice/plan/feature/feature.entity';
-import { PLAN_FEATURE_SEED } from '../../../modules/backoffice/plan/feature/seed/feature.seed-data';
-import { Plan } from '../../../modules/backoffice/plan/plan.entity';
+import { PlanCapabilityGrant } from '../../../modules/backoffice/plan/plan-capability-grant/plan-capability-grant.entity';
 import { PlanCapability } from '../../../modules/backoffice/plan/plan-capability/plan-capability.entity';
-import { PlanProduct } from '../../../modules/backoffice/plan/product/product.entity';
-import { PLAN_PRODUCT_SEED } from '../../../modules/backoffice/plan/product/seed/product.seed-data';
+import {
+    PLAN_CAPABILITY_GRANT_SEED,
+    PLAN_CAPABILITY_SEED,
+} from '../../../modules/backoffice/plan/plan-capability/seed/plan-capability.seed-data';
+import { PlanFeature } from '../../../modules/backoffice/plan/plan-feature/plan-feature.entity';
+import { PLAN_FEATURE_SEED } from '../../../modules/backoffice/plan/plan-feature/seed/plan-feature.seed-data';
+import { PlanProduct } from '../../../modules/backoffice/plan/plan-product/plan-product.entity';
+import { PLAN_PRODUCT_SEED } from '../../../modules/backoffice/plan/plan-product/seed/plan-product.seed-data';
+import { Plan } from '../../../modules/backoffice/plan/plan.entity';
 import { PLAN_SEED } from '../../../modules/backoffice/plan/seed/plan.seed-data';
 
 /**
  * Seeds (order matters):
  *   1. plan_product
- *   2. plan_feature
- *   3. capability (FK → feature)
+ *   2. plan_feature            (FK → product)
+ *   3. plan_capability         (FK → feature)
  *   4. plan
- *   5. plan_capability grants
+ *   5. plan_capability_grant   (FK → plan, capability)
  */
 export class PlanSeeder extends Seeder {
     async run(em: EntityManager): Promise<void> {
@@ -102,11 +102,11 @@ export class PlanSeeder extends Seeder {
             }).filter((entry): entry is readonly [CapabilityKey, PlanFeature] => Boolean(entry[1]))
         );
 
-        const keys = CAPABILITY_SEED.map(row => row.key);
-        const existingRows = await em.find(Capability, { key: { $in: keys } });
+        const keys = PLAN_CAPABILITY_SEED.map(row => row.key);
+        const existingRows = await em.find(PlanCapability, { key: { $in: keys } });
         const existingByKey = new Map(existingRows.map(row => [row.key, row]));
 
-        for (const row of CAPABILITY_SEED) {
+        for (const row of PLAN_CAPABILITY_SEED) {
             const feature = featureByCapabilityKey.get(row.key);
             if (!feature) continue;
             const existing = existingByKey.get(row.key);
@@ -119,7 +119,7 @@ export class PlanSeeder extends Seeder {
                 existing.feature = feature;
                 continue;
             }
-            em.create(Capability, {
+            em.create(PlanCapability, {
                 key: row.key,
                 name: row.name,
                 description: row.description,
@@ -142,7 +142,6 @@ export class PlanSeeder extends Seeder {
             if (existing) {
                 existing.name = row.name;
                 existing.priceMonthly = row.priceMonthly;
-                existing.capabilities = { ...PLAN_CAPABILITIES[row.key] };
                 existing.sortOrder = sortOrder;
                 existing.isActive = true;
                 continue;
@@ -151,7 +150,6 @@ export class PlanSeeder extends Seeder {
                 key: row.key,
                 name: row.name,
                 priceMonthly: row.priceMonthly,
-                capabilities: { ...PLAN_CAPABILITIES[row.key] },
                 sortOrder,
                 isActive: true,
             } as never);
@@ -161,41 +159,33 @@ export class PlanSeeder extends Seeder {
 
     private async seedGrants(em: EntityManager): Promise<void> {
         const plans = await em.find(Plan, {});
-        const capabilities = await em.find(Capability, {});
+        const capabilities = await em.find(PlanCapability, {});
         const planByKey = new Map(plans.map(plan => [plan.key, plan]));
         const capabilityByKey = new Map(
             capabilities.map(capability => [capability.key as CapabilityKey, capability])
         );
 
-        const existingGrants = await em.find(PlanCapability, {}, { populate: ['capability'] });
-        const existingPair = new Set(
-            existingGrants.map(grant => `${grant.planKey}:${grant.capability.key}`)
+        const existingGrants = await em.find(
+            PlanCapabilityGrant,
+            {},
+            { populate: ['plan', 'capability'] }
         );
-
+        const pairOf = (grant: PlanCapabilityGrant) => `${grant.plan.key}:${grant.capability.key}`;
+        const existingPairs = new Set(existingGrants.map(pairOf));
         const desiredPairs = new Set(
-            PLAN_CAPABILITY_SEED.map(row => `${row.planKey}:${row.capabilityKey}`)
+            PLAN_CAPABILITY_GRANT_SEED.map(row => `${row.planKey}:${row.capabilityKey}`)
         );
 
         for (const grant of existingGrants) {
-            const pair = `${grant.planKey}:${grant.capability.key}`;
-            if (!desiredPairs.has(pair)) {
-                em.remove(grant);
-            }
+            if (!desiredPairs.has(pairOf(grant))) em.remove(grant);
         }
 
-        for (const row of PLAN_CAPABILITY_SEED) {
-            const pair = `${row.planKey}:${row.capabilityKey}`;
-            if (existingPair.has(pair)) continue;
-
+        for (const row of PLAN_CAPABILITY_GRANT_SEED) {
+            if (existingPairs.has(`${row.planKey}:${row.capabilityKey}`)) continue;
             const plan = planByKey.get(row.planKey);
             const capability = capabilityByKey.get(row.capabilityKey);
             if (!plan || !capability) continue;
-
-            em.create(PlanCapability, {
-                planKey: row.planKey,
-                plan,
-                capability,
-            } as never);
+            em.create(PlanCapabilityGrant, { plan, capability } as never);
         }
     }
 }

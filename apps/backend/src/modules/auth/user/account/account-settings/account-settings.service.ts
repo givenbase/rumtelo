@@ -64,7 +64,7 @@ export class AccountSettingsService {
             if (defaults.spendingStyle !== undefined) {
                 existing.spendingStyle = defaults.spendingStyle;
             }
-            if (defaults.tour !== undefined) existing.tourSnapshot = normalizeTour(defaults.tour);
+            if (defaults.tour !== undefined) existing.tour = normalizeTour(defaults.tour);
             await this.em.flush();
             return existing;
         }
@@ -124,7 +124,7 @@ export class AccountSettingsService {
         if (patch.locale !== undefined) row.locale = patch.locale;
         if (patch.theme !== undefined) row.theme = patch.theme;
         if (patch.spendingStyle !== undefined) row.spendingStyle = patch.spendingStyle;
-        if (patch.tour !== undefined) row.tourSnapshot = normalizeTour(patch.tour);
+        if (patch.tour !== undefined) row.tour = normalizeTour(patch.tour);
         await this.em.flush();
         this.logger.debug(`Updated account settings ${row.id}`);
         return toDto(row);
@@ -172,7 +172,7 @@ export class AccountSettingsService {
             locale: defaults.locale ?? Locale.NL,
             theme: defaults.theme ?? Theme.LIGHT,
             spendingStyle: defaults.spendingStyle ?? SpendingStyle.UNKNOWN,
-            tourSnapshot: normalizeTour(defaults.tour ?? DEFAULT_ACCOUNT_TOUR_PROGRESS),
+            tour: normalizeTour(defaults.tour ?? DEFAULT_ACCOUNT_TOUR_PROGRESS),
         } as never);
         await this.em.persist(settings).flush();
         return settings;
@@ -183,7 +183,7 @@ function normalizeTour(tour: AccountTourProgress): AccountTourProgress {
     return {
         offer: tour.offer ?? DEFAULT_ACCOUNT_TOUR_PROGRESS.offer,
         tours: tour.tours ?? {},
-        seriesActive: Boolean(tour.seriesActive),
+        seriesActive: tour.seriesActive,
         seriesIndex: Math.max(0, Math.floor(tour.seriesIndex ?? 0)),
     };
 }
@@ -194,7 +194,7 @@ function toDto(row: AccountSettings): AccountSettingsDto {
         locale: row.locale,
         theme: row.theme,
         spendingStyle: row.spendingStyle,
-        tour: normalizeTour(row.tourSnapshot ?? DEFAULT_ACCOUNT_TOUR_PROGRESS),
+        tour: normalizeTour(row.tour ?? DEFAULT_ACCOUNT_TOUR_PROGRESS),
         onboardedAt: row.onboardedAt ? row.onboardedAt.toISOString() : null,
     };
 }

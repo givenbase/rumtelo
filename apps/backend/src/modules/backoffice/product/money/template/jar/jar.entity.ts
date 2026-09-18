@@ -11,6 +11,8 @@ import { entityConfig } from '../../../../../../common/database/entity-config.ut
  * Rumtelo-owned catalog for the six jars (name, subtitle, icon, default %, capabilities).
  * We write these rows; households only copy them into money.jar on onboard.
  *
+ * Stays on BaseEntity (not CatalogEntity) because its key is the `JarKey` enum.
+ *
  * @see money.jar — household-owned instances
  * @see https://mikro-orm.io/docs/defining-entities
  */
@@ -29,15 +31,17 @@ export class JarTemplate extends BaseEntity {
     @Property({ length: 80 })
     name!: string;
 
+    /** One-line purpose shown under the name. */
     @Property({ length: 160, nullable: true })
     subtitle: string | null = null;
 
+    /** Emoji / short icon token. */
     @Property({ length: 8, nullable: true })
     icon: string | null = null;
 
     /** Default share of net income (0–100). All active templates should sum to 100. */
     @Property({ type: 'decimal', precision: 5, scale: 2 })
-    defaultPercentage!: string;
+    percentage!: string;
 
     /** Display / seed order within the catalog. */
     @Property({ default: 0 })
@@ -45,7 +49,7 @@ export class JarTemplate extends BaseEntity {
 
     /** Coach helper copy — what belongs in this jar. */
     @Property({ type: 'json', nullable: true })
-    guidePayload: JarGuide | null = null;
+    guide: JarGuide | null = null;
 
     /**
      * What jars of this key may do (spend / save / invest / safe-to-spend).

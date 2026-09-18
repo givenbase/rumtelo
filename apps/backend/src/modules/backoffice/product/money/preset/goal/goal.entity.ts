@@ -1,7 +1,8 @@
-import { Entity, ManyToOne, Property, Unique } from '@mikro-orm/core';
+import { Entity, Index, ManyToOne, Property, Unique } from '@mikro-orm/core';
 
-import { BaseEntity } from '../../../../../../common/database/base.entity';
+import { CatalogEntity } from '../../../../../../common/database/catalog.entity';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import { CategoryTemplate } from '../../template/category/category.entity';
 import { JarTemplate } from '../../template/jar/jar.entity';
 
 /**
@@ -23,34 +24,20 @@ import { JarTemplate } from '../../template/jar/jar.entity';
     })
 )
 @Unique({ properties: ['key'] })
-export class GoalPreset extends BaseEntity {
+@Index({ properties: ['jarTemplate'] })
+@Index({ properties: ['categoryTemplate'] })
+export class GoalPreset extends CatalogEntity {
     // ? PROPERTIES
-    /** Stable catalog key (e.g. EMERGENCY_FUND) — never rename in place. */
-    @Property({ length: 64 })
-    key!: string;
-
-    /** English name filled into the create form when picked. */
-    @Property({ length: 120 })
-    name!: string;
-
-    /** Optional CategoryTemplate.key hint under that jar (goals may stay uncategorized). */
-    @Property({ length: 64, nullable: true })
-    categoryTemplateKey: string | null = null;
-
     /** Optional emoji / short icon for the goal create form. */
     @Property({ length: 8, nullable: true })
     icon: string | null = null;
-
-    /** Display / seed order within the catalog. */
-    @Property({ default: 0 })
-    sortOrder = 0;
-
-    /** Soft-disable without deleting historical seed identity. */
-    @Property({ default: true })
-    isActive = true;
 
     // ? RELATIONSHIPS
     /** Default jar template; app resolves household jar by jarTemplate.key. */
     @ManyToOne(() => JarTemplate, { deleteRule: 'restrict' })
     jarTemplate!: JarTemplate;
+
+    /** Optional category hint under that jar (goals may stay uncategorised). */
+    @ManyToOne(() => CategoryTemplate, { nullable: true, deleteRule: 'set null' })
+    categoryTemplate: CategoryTemplate | null = null;
 }

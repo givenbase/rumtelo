@@ -1,9 +1,10 @@
-import { Entity, Enum, Property, Unique } from '@mikro-orm/core';
+import { Collection, Entity, Enum, OneToMany, Property, Unique } from '@mikro-orm/core';
 import { DebtKind } from '@rumtelo/contracts';
 
-import { BaseEntity } from '../../../../../../common/database/base.entity';
+import { CatalogEntity } from '../../../../../../common/database/catalog.entity';
 import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import type { DebtPresetMerchant } from './debt-merchant.entity';
 
 /**
  * Debt Preset Entity
@@ -11,6 +12,7 @@ import { entityConfig } from '../../../../../../common/database/entity-config.ut
  * Suggestion catalog for "New debt" — name + DebtKind defaults.
  * Households copy into money.debt; no jar (debts are household-level).
  *
+ * @see DebtPresetMerchant — ordered "Who do you owe?" chips
  * @see money.debt — household-owned instances
  * @see https://mikro-orm.io/docs/defining-entities
  */
@@ -23,37 +25,24 @@ import { entityConfig } from '../../../../../../common/database/entity-config.ut
     })
 )
 @Unique({ properties: ['key'] })
-export class DebtPreset extends BaseEntity {
+export class DebtPreset extends CatalogEntity {
     // ? PROPERTIES
-    /** Stable catalog key (e.g. STUDENT) — never rename in place. */
-    @Property({ length: 64 })
-    key!: string;
-
-    /** English name filled into the create form when picked. */
-    @Property({ length: 120 })
-    name!: string;
-
     /** Optional emoji for the debt create picker. */
     @Property({ length: 8, nullable: true })
     icon: string | null = null;
-
-    /**
-     * MerchantPreset.key chips after this type is chosen (“Who do you owe?”).
-     * Empty = free text only. Order = chip order.
-     */
-    @Property({ type: 'json', default: [] })
-    suggestedMerchantKeys: string[] = [];
-
-    /** Display / seed order within the catalog. */
-    @Property({ default: 0 })
-    sortOrder = 0;
-
-    /** Soft-disable without deleting historical seed identity. */
-    @Property({ default: true })
-    isActive = true;
 
     // ? ENUMS
     /** Maps onto money.debt.kind when the preset is selected. */
     @Enum(NativeEnum({ DebtKind, domain: 'money' }))
     kind!: DebtKind;
+
+    // ? RELATIONSHIPS
+    /** Ordered "Who do you owe?" merchant chips (1:N to the pivot; empty = free text only). */
+    @OneToMany<DebtPresetMerchant, DebtPreset>({
+        entity: 'DebtPresetMerchant',
+        mappedBy: 'preset',
+        orderBy: { sortOrder: 'ASC' },
+        orphanRemoval: true,
+    })
+    merchantLinks = new Collection<DebtPresetMerchant>(this);
 }

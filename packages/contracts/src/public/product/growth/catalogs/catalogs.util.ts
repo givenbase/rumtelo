@@ -39,18 +39,18 @@ export function filterGrowthLeverPresets(
     const stageSortOrder = audience.stageSortOrder ?? 0;
 
     return presets.filter(preset => {
-        if (preset.minStageSortOrder > stageSortOrder) return false;
+        if (preset.minWealthStageSortOrder > stageSortOrder) return false;
         if (
-            preset.forPostureKeys.length > 0 &&
+            preset.postureKeys.length > 0 &&
             postureKey !== INCOME_POSTURE_KEYS.UNKNOWN &&
-            !preset.forPostureKeys.includes(postureKey)
+            !preset.postureKeys.includes(postureKey)
         ) {
             return false;
         }
         if (
-            preset.forSpendingStyles.length > 0 &&
+            preset.spendingStyles.length > 0 &&
             spendingStyle !== SpendingStyle.UNKNOWN &&
-            !preset.forSpendingStyles.includes(spendingStyle)
+            !preset.spendingStyles.includes(spendingStyle)
         ) {
             return false;
         }

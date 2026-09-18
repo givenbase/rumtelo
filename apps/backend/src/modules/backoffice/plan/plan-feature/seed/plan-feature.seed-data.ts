@@ -5,7 +5,7 @@ import {
 } from '@rumtelo/contracts';
 
 /**
- * PlanFeature seed — one row per capability (1:1 with Capability for now).
+ * PlanFeature seed — one row per capability (1:1 with PlanCapability for now).
  * key = feature segment; productKey = product prefix.
  */
 export const PLAN_FEATURE_SEED = CAPABILITY_DEFINITIONS.map(row => {

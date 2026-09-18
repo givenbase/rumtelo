@@ -5,16 +5,16 @@ import { Inject, Injectable } from '@nestjs/common';
 import { HouseholdScopedRepository } from '../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../common/household/household.context';
 import { Jar } from '../plan/jar/jar.entity';
+import { MoneyWeekCheck } from './money-week-check.entity';
 import { WeekCheckAllocation } from './week-check-allocation.entity';
-import { WeekCheck } from './week-check.entity';
 
 @Injectable()
 export class WeekCheckService {
-    private readonly weekChecks: HouseholdScopedRepository<WeekCheck>;
+    private readonly weekChecks: HouseholdScopedRepository<MoneyWeekCheck>;
     private readonly allocations: HouseholdScopedRepository<WeekCheckAllocation>;
 
     constructor(@Inject(EntityManager) private readonly em: EntityManager) {
-        this.weekChecks = new HouseholdScopedRepository(em, WeekCheck);
+        this.weekChecks = new HouseholdScopedRepository(em, MoneyWeekCheck);
         this.allocations = new HouseholdScopedRepository(em, WeekCheckAllocation);
     }
 
@@ -26,7 +26,7 @@ export class WeekCheckService {
     async current(week: string) {
         let weekCheck = await this.weekChecks.findOne({ week });
         if (!weekCheck) {
-            weekCheck = this.em.create(WeekCheck, {
+            weekCheck = this.em.create(MoneyWeekCheck, {
                 household: currentHouseholdId(),
                 week,
             } as never);
@@ -52,7 +52,7 @@ export class WeekCheckService {
     }) {
         let weekCheck = await this.weekChecks.findOne({ week: input.week });
         if (!weekCheck) {
-            weekCheck = this.em.create(WeekCheck, {
+            weekCheck = this.em.create(MoneyWeekCheck, {
                 household: currentHouseholdId(),
                 week: input.week,
             } as never);
@@ -84,17 +84,17 @@ export class WeekCheckService {
 
     // Private
 
-    private async toDto(weekCheck: WeekCheck) {
+    private async toDto(weekCheck: MoneyWeekCheck) {
         const allocations = await this.allocations.find({ weekCheck: weekCheck.id });
         return {
             id: weekCheck.id,
             householdId: weekCheck.household,
             week: weekCheck.week,
             stage: weekCheck.stage,
-            surplus: Number(weekCheck.surplus),
+            surplus: weekCheck.surplus,
             allocations: allocations.map(allocation => ({
                 jarId: allocation.jar.id,
-                amount: Number(allocation.amount),
+                amount: allocation.amount,
             })),
             intention: weekCheck.intention,
             completedAt: weekCheck.completedAt?.toISOString() ?? null,

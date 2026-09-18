@@ -5,12 +5,12 @@ import { Implement, implement } from '@orpc/nest';
 
 import { RequireCapability } from '../../../../../../common/capability';
 import { ControllerSwagger } from '../../../../../../common/decorators/controller-swagger.decorators';
-import { AccountService } from './account.service';
+import { BankAccountService } from './bank-account.service';
 
 /** Transport only. Handler order is always CRUD. */
 @ControllerSwagger('money/accounts', 'public')
-export class AccountController {
-    constructor(@Inject(AccountService) private readonly accounts: AccountService) {}
+export class BankAccountController {
+    constructor(@Inject(BankAccountService) private readonly accounts: BankAccountService) {}
 
     // ====================================================================
     // ? CREATE Operations

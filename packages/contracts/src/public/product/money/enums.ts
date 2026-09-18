@@ -66,6 +66,13 @@ export enum GoalKind {
     GIVE = 'GIVE',
 }
 
+/** Editorial pin on a MerchantPreset — sorts to the top and shows a chip. */
+export enum MerchantHighlight {
+    FEATURED = 'FEATURED',
+    NEW = 'NEW',
+    POPULAR = 'POPULAR',
+}
+
 /** Where a household wants its giving to land. Catalog filter for GivingOrganisation. */
 export enum GivingCause {
     GLOBAL_HEALTH = 'GLOBAL_HEALTH',

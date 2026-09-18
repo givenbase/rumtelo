@@ -3,7 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { HouseholdScopedRepository } from '../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../common/household/household.context';
-import { SoulWeekCheck } from './week-check.entity';
+import { SoulWeekCheck } from './soul-week-check.entity';
 
 @Injectable()
 export class SoulWeekCheckService {

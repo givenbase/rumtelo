@@ -16,7 +16,7 @@ export class GivingOrganisationSeeder extends Seeder {
             const existing = existingByKey.get(row.key);
             if (existing) {
                 existing.name = row.name;
-                existing.summary = row.summary;
+                existing.description = row.description;
                 existing.causes = [...row.causes];
                 existing.country = row.country;
                 existing.scope = row.scope;
@@ -30,7 +30,7 @@ export class GivingOrganisationSeeder extends Seeder {
             em.create(GivingOrganisation, {
                 key: row.key,
                 name: row.name,
-                summary: row.summary,
+                description: row.description,
                 causes: [...row.causes],
                 country: row.country,
                 scope: row.scope,

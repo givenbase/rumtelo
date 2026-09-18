@@ -1,4 +1,4 @@
-import { contract } from '@rumtelo/contracts';
+import { PLAN_CAPABILITIES, contract } from '@rumtelo/contracts';
 
 import { Inject } from '@nestjs/common';
 import { Implement, implement } from '@orpc/nest';
@@ -19,7 +19,8 @@ export class PlanController {
                 key: plan.key,
                 name: plan.name,
                 priceMonthly: plan.priceMonthly,
-                capabilities: plan.capabilities,
+                // Limits + capability keys are contracts truth; the DB mirrors only the grant graph.
+                capabilities: PLAN_CAPABILITIES[plan.key],
                 sortOrder: plan.sortOrder,
                 isActive: plan.isActive,
             }));

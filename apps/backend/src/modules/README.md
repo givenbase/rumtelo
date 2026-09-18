@@ -47,7 +47,7 @@ aggregates that belong together — never pre-emptively. `growth`, `energy` and
 |---|---|
 | **`product/`** | Catalogs tied to a product line (Geld, Groei, …) |
 | **`reference/`** | Reserved — cross-product lookups (countries, FAQ, …) when they exist |
-| **`plan/`** | Commercial tiers (span products via capabilities) |
+| **`plan/`** | Commercial tiers — `Plan` + catalog children `plan-product/`, `plan-feature/`, `plan-capability/`, `plan-capability-grant/` |
 | **`communication/`** | Ops outbound email |
 
 Under **each** `backoffice/product/{money\|growth\|…}` only these kind folders (create when used):
@@ -120,7 +120,7 @@ Every Rumtelo-owned entity uses `entityConfig({ schema, domain?, tableName })` f
 
 ```
 <aggregate>/
-  <aggregate>.entity.ts      # PROPERTIES then RELATIONSHIPS
+  <aggregate>.entity.ts      # PROPERTIES → [UI METADATA] → [ENUMS] → RELATIONSHIPS
   <aggregate>.service.ts     # CREATE → READ → UPDATE → DELETE
   <aggregate>.controller.ts  # same order, transport only
   <aggregate>.module.ts      # MikroOrmModule.forFeature + exports
@@ -177,6 +177,23 @@ Private helpers sit in a final `// Private` block after all public CRUD.
 | **R** | `list`, `get`, `findOne`, `settings`, `current`, `members`, `summary`, `balances`, `inbox`, `plan`, `projections`, `history`, `feed` |
 | **U** | `update`, `updateSettings`, `updateSplit`, `sort`, `dismiss`, `close`, `applySplit`, `replay`, `advance` |
 | **D** | `delete`, `remove`, `deleteCategory` |
+
+### Entity bases, naming, references
+
+Full rules + linter (`pnpm --filter @rumtelo/backend lint:entities`): `apps/backend/docs/ENTITY_STYLE.md`.
+Every entity, its base, table and relations: `apps/backend/docs/ENTITY_INVENTORY.md`.
+
+| Base | Rows |
+|---|---|
+| `BaseEntity` | account, pivot entities, enum-keyed catalogs (`Plan`, `JarTemplate`) |
+| `CatalogEntity` | company catalogs with `key` / `name` / `sortOrder` / `isActive` (templates, presets, catalogs, plan children) |
+| `HouseholdEntity` | household-owned product + settings rows |
+| `WeekCheckEntity` | the four portal week checks (`week`, `completedAt`) |
+
+- Money → `MoneyType` (bigint eurocents, `number` at runtime); ratios stay `decimal`
+- Text → `name` / `description`; catalog defaults are plain nouns (`cadence`, not `defaultCadence`)
+- backoffice → backoffice = real relations (`categoryTemplate`, `audiences`, `merchantLinks`, `postures`, `minWealthStage`); household → backoffice = `*Key` snapshot (`Jar.templateKey`, `Goal.givingOrganisationKey`)
+- Inverse collections: `import type` + string entity name (`@OneToMany('PlanFeature', 'product')`) — no entity import cycles
 
 ### Entity comments
 

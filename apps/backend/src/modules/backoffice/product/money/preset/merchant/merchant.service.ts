@@ -5,40 +5,55 @@ import type { JarKey } from '@rumtelo/contracts';
 
 import { MerchantPreset } from './merchant.entity';
 
+const DEFAULT_MARKET = 'NL';
+
 @Injectable()
 export class MerchantPresetService {
     constructor(@Inject(EntityManager) private readonly em: EntityManager) {}
 
+    /**
+     * Active merchants for one market, filtered in SQL and sorted:
+     * highlighted first, then matchPriority desc, then sortOrder asc.
+     */
     async listActive(filters?: {
         jarKey?: JarKey;
         categoryTemplateKey?: string;
         mcc?: string;
         market?: string;
     }): Promise<MerchantPreset[]> {
-        const market = (filters?.market ?? 'NL').toUpperCase();
+        const market = (filters?.market ?? DEFAULT_MARKET).toUpperCase();
         const rows = await this.em.find(
             MerchantPreset,
             {
                 isActive: true,
+                markets: { key: market },
                 ...(filters?.jarKey ? { jarTemplate: { key: filters.jarKey } } : {}),
                 ...(filters?.categoryTemplateKey
-                    ? { categoryTemplateKey: filters.categoryTemplateKey }
+                    ? { categoryTemplate: { key: filters.categoryTemplateKey } }
                     : {}),
                 ...(filters?.mcc ? { matching: { mcc: filters.mcc } } : {}),
             },
-            { populate: ['jarTemplate', 'matching', 'branding', 'banking'] }
+            {
+                populate: [
+                    'jarTemplate',
+                    'categoryTemplate',
+                    'givingOrganisation',
+                    'markets',
+                    'matching',
+                    'branding',
+                    'banking',
+                ],
+            }
         );
-        return rows
-            .filter(row => (row.markets?.length ? row.markets : ['NL']).includes(market))
-            .sort((left, right) => {
-                const leftHi = left.highlight ? 1 : 0;
-                const rightHi = right.highlight ? 1 : 0;
-                if (rightHi !== leftHi) return rightHi - leftHi;
-                const leftPri = left.matching?.matchPriority ?? 0;
-                const rightPri = right.matching?.matchPriority ?? 0;
-                if (rightPri !== leftPri) return rightPri - leftPri;
-                return left.sortOrder - right.sortOrder;
-            });
+        return rows.sort((left, right) => {
+            const leftHi = left.highlight ? 1 : 0;
+            const rightHi = right.highlight ? 1 : 0;
+            if (rightHi !== leftHi) return rightHi - leftHi;
+            const leftPri = left.matching?.matchPriority ?? 0;
+            const rightPri = right.matching?.matchPriority ?? 0;
+            if (rightPri !== leftPri) return rightPri - leftPri;
+            return left.sortOrder - right.sortOrder;
+        });
     }
 
     /**
@@ -51,10 +66,10 @@ export class MerchantPresetService {
         mcc?: string | null;
         market?: string;
     }): Promise<MerchantPreset | null> {
-        const isActive = await this.listActive({ market: input.market });
+        const active = await this.listActive({ market: input.market });
         const mcc = input.mcc?.trim();
         if (mcc) {
-            const byMcc = isActive
+            const byMcc = active
                 .filter(preset => preset.matching?.mcc === mcc)
                 .sort(
                     (left, right) =>
@@ -65,7 +80,7 @@ export class MerchantPresetService {
         const text = (input.text ?? '').trim().toLowerCase();
         if (!text) return null;
         let best: MerchantPreset | null = null;
-        for (const row of isActive) {
+        for (const row of active) {
             const matching = row.matching;
             if (!matching) continue;
             const needles = [matching.matchValue, ...matching.aliases]

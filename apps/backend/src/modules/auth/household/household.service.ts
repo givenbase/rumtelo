@@ -237,7 +237,7 @@ export class HouseholdService {
         }
 
         for (const meta of templates) {
-            const pct = splitByKey.get(meta.key) ?? Number(meta.defaultPercentage);
+            const pct = splitByKey.get(meta.key) ?? Number(meta.percentage);
             this.em.create(Jar, {
                 household: org.id,
                 key: meta.key,

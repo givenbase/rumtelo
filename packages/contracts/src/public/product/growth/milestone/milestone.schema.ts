@@ -11,7 +11,7 @@ import { HouseholdId, Id, IsoDate, Money } from '../../../../common/common.schem
 export const IncomeMilestone = z.object({
     id: Id,
     householdId: HouseholdId,
-    label: z.string().min(1).max(160),
+    name: z.string().min(1).max(160),
     targetMonthly: Money,
     reachedOn: IsoDate.nullable(),
 });

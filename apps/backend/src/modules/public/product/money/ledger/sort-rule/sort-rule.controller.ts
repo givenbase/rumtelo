@@ -4,12 +4,12 @@ import { Inject } from '@nestjs/common';
 import { Implement, implement } from '@orpc/nest';
 
 import { ControllerSwagger } from '../../../../../../common/decorators/controller-swagger.decorators';
-import { RuleService } from './rule.service';
+import { SortRuleService } from './sort-rule.service';
 
 /** Transport only. Handler order is always CRUD. */
 @ControllerSwagger('money/rules', 'public')
-export class RuleController {
-    constructor(@Inject(RuleService) private readonly rules: RuleService) {}
+export class SortRuleController {
+    constructor(@Inject(SortRuleService) private readonly rules: SortRuleService) {}
 
     // ====================================================================
     // ? CREATE Operations
@@ -22,7 +22,7 @@ export class RuleController {
             this.rules.create({
                 field: input.field,
                 matcher: input.matcher,
-                value: input.value,
+                matchValue: input.matchValue,
                 jarId: input.jarId,
                 categoryId: input.categoryId,
                 priority: input.priority,

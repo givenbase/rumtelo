@@ -1,5 +1,5 @@
 import { EntityManager } from '@mikro-orm/postgresql';
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable } from '@nestjs/common';
 
 import { type AccountKind } from '@rumtelo/contracts';
 import { isValidIban, normalizeIban } from '@rumtelo/utils';
@@ -10,7 +10,7 @@ import { currentHouseholdId } from '../../../../../../common/household/household
 import { BankAccount } from './bank-account.entity';
 
 @Injectable()
-export class AccountService {
+export class BankAccountService {
     private readonly repo: HouseholdScopedRepository<BankAccount>;
     constructor(@Inject(EntityManager) private readonly em: EntityManager) {
         this.repo = new HouseholdScopedRepository(em, BankAccount);
@@ -22,6 +22,10 @@ export class AccountService {
 
     async create(input: { name: string; iban?: string | null; kind: string; balance: number }) {
         const iban = normalizeOptionalIban(input.iban);
+        // UNIQUE(household, iban) backs this; the pre-check turns a 500 into a clear 409.
+        if (iban && (await this.repo.findOne({ iban }))) {
+            throw new ConflictException('This IBAN is already linked to an account.');
+        }
         const account = this.em.create(BankAccount, {
             household: currentHouseholdId(),
             name: input.name,
@@ -58,7 +62,7 @@ export function toDto(account: BankAccount) {
         name: account.name,
         iban: account.iban,
         kind: account.kind,
-        balance: Number(account.balance),
+        balance: account.balance,
         connectionId: account.connectionId,
         lastSyncedAt: account.lastSyncedAt?.toISOString() ?? null,
     };

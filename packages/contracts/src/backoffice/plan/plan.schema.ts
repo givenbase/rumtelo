@@ -5,6 +5,7 @@
 
 import { z } from 'zod';
 
+import { Money } from '../../common/common.schema';
 import { HouseholdKind } from '../../enums';
 import { CAPABILITY_KEYS } from './capabilities';
 import { CapabilityKind, PlanKey } from './enums';
@@ -61,7 +62,8 @@ export const CapabilityDefinition = z.object({
 export const PlanCatalogItem = z.object({
     key: z.enum(PlanKey),
     name: z.string(),
-    priceMonthly: z.string(),
+    /** List price per month in eurocents; 0 = free tier. */
+    priceMonthly: Money,
     capabilities: PlanCapabilities,
     sortOrder: z.int(),
     isActive: z.boolean(),

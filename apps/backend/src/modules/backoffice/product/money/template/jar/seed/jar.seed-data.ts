@@ -11,7 +11,7 @@ type Seed = {
     name: string;
     subtitle: string;
     icon: string;
-    defaultPercentage: string;
+    percentage: string;
     capabilities: (typeof JAR_CAPABILITIES)[JarKey];
     guide: JarGuide;
 };
@@ -22,7 +22,7 @@ export const JAR_TEMPLATE_SEED: readonly Seed[] = [
         name: 'Necessity',
         subtitle: 'Must-pays',
         icon: '🏠',
-        defaultPercentage: '55.00',
+        percentage: '55.00',
         capabilities: JAR_CAPABILITIES[JarKey.NECESSITIES],
         guide: {
             note: 'Rent, energy, insurance, groceries, transport. Staying under 55% is the whole game.',
@@ -48,7 +48,7 @@ export const JAR_TEMPLATE_SEED: readonly Seed[] = [
         name: 'Financial Freedom',
         subtitle: 'Never spend',
         icon: '🔒',
-        defaultPercentage: '10.00',
+        percentage: '10.00',
         capabilities: JAR_CAPABILITIES[JarKey.FINANCIAL_FREEDOM],
         guide: {
             note: 'This jar buys assets. Money goes in and never comes out — only returns do.',
@@ -79,7 +79,7 @@ export const JAR_TEMPLATE_SEED: readonly Seed[] = [
         name: 'Long Term Savings',
         subtitle: 'Big things',
         icon: '🎯',
-        defaultPercentage: '10.00',
+        percentage: '10.00',
         capabilities: JAR_CAPABILITIES[JarKey.LONG_TERM_SAVINGS],
         guide: {
             note: 'Emergency fund, car, down payment. Known, planned, not urgent.',
@@ -103,7 +103,7 @@ export const JAR_TEMPLATE_SEED: readonly Seed[] = [
         name: 'Education',
         subtitle: 'Grow yourself',
         icon: '📚',
-        defaultPercentage: '10.00',
+        percentage: '10.00',
         capabilities: JAR_CAPABILITIES[JarKey.EDUCATION],
         guide: {
             note: 'Books, courses, mentors, tools. The only spend that raises your earning power.',
@@ -127,7 +127,7 @@ export const JAR_TEMPLATE_SEED: readonly Seed[] = [
         name: 'Play',
         subtitle: 'Guilt-free',
         icon: '✨',
-        defaultPercentage: '10.00',
+        percentage: '10.00',
         capabilities: JAR_CAPABILITIES[JarKey.PLAY],
         guide: {
             note: 'Spend it every month. A plan with no joy in it does not survive.',
@@ -148,7 +148,7 @@ export const JAR_TEMPLATE_SEED: readonly Seed[] = [
         name: 'Give / foundation',
         subtitle: 'Pass it on',
         icon: '🤲',
-        defaultPercentage: '5.00',
+        percentage: '5.00',
         capabilities: JAR_CAPABILITIES[JarKey.GIVE],
         guide: {
             note: 'Giving keeps money a tool and not a master. Transferred automatically — the Coach helps you choose where.',

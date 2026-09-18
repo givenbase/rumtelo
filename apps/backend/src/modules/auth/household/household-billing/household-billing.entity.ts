@@ -41,9 +41,9 @@ export class HouseholdBilling extends HouseholdEntity {
     @Property({ type: 'varchar', length: 255, nullable: true })
     stripeSubscriptionId: string | null = null;
 
-    /** True when the user cancelled but keeps access until {@link periodEndsAt}. */
+    /** Stripe `cancel_at_period_end` — cancelled, but access runs until {@link periodEndsAt}. */
     @Property({ type: 'boolean', default: false })
-    isCancelAtPeriodEnd = false;
+    willCancelAtPeriodEnd = false;
 
     /** Current Stripe billing period start (from subscription item). */
     @Property({ type: 'timestamptz', nullable: true })

@@ -183,7 +183,7 @@ export function toDto(fixedCost: FixedCost) {
         debtId: fixedCost.debt?.id ?? null,
         name: fixedCost.name,
         counterparty: fixedCost.counterparty,
-        amount: Number(fixedCost.amount),
+        amount: fixedCost.amount,
         cadence: fixedCost.cadence,
         dueDay: fixedCost.dueDay,
         direction: fixedCost.direction,

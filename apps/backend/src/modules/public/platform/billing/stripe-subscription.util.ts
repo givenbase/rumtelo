@@ -47,7 +47,7 @@ export function periodFieldsFromSubscription(subscription: Stripe.Subscription):
     periodStartedAt: Date | null;
     periodEndsAt: Date | null;
     trialEndsAt: Date | null;
-    isCancelAtPeriodEnd: boolean;
+    willCancelAtPeriodEnd: boolean;
 } {
     // Stripe API 2025+: period lives on subscription items, not the subscription root.
     const item = subscription.items.data[0];
@@ -60,6 +60,6 @@ export function periodFieldsFromSubscription(subscription: Stripe.Subscription):
         periodEndsAt:
             periodEnd !== null && periodEnd !== undefined ? new Date(periodEnd * 1000) : null,
         trialEndsAt: subscription.trial_end ? new Date(subscription.trial_end * 1000) : null,
-        isCancelAtPeriodEnd: Boolean(subscription.cancel_at_period_end),
+        willCancelAtPeriodEnd: subscription.cancel_at_period_end,
     };
 }

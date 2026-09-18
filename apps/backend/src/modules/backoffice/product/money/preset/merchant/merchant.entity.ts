@@ -1,8 +1,21 @@
-import type { MerchantHighlight } from '@rumtelo/contracts';
-import { Entity, ManyToOne, OneToOne, Property, Unique } from '@mikro-orm/core';
+import {
+    Collection,
+    Entity,
+    Enum,
+    Index,
+    ManyToMany,
+    ManyToOne,
+    OneToOne,
+    Unique,
+} from '@mikro-orm/core';
+import { MerchantHighlight } from '@rumtelo/contracts';
 
-import { BaseEntity } from '../../../../../../common/database/base.entity';
+import { CatalogEntity } from '../../../../../../common/database/catalog.entity';
+import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import { GivingOrganisation } from '../../catalog/giving-organisation/giving-organisation.entity';
+import { Market } from '../../catalog/market/market.entity';
+import { CategoryTemplate } from '../../template/category/category.entity';
 import { JarTemplate } from '../../template/jar/jar.entity';
 
 import type { MerchantBanking } from './merchant-banking.entity';
@@ -18,7 +31,7 @@ import type { MerchantMatching } from './merchant-matching.entity';
  * @see MerchantMatching — feed needles
  * @see MerchantBranding — logo / website
  * @see MerchantBanking — NL IBAN bank code (optional)
- * @see JarTemplate — default jar for sorted spend
+ * @see JarTemplate / CategoryTemplate — default placement for sorted spend
  * @see https://mikro-orm.io/docs/defining-entities
  */
 @Entity(
@@ -30,48 +43,36 @@ import type { MerchantMatching } from './merchant-matching.entity';
     })
 )
 @Unique({ properties: ['key'] })
-export class MerchantPreset extends BaseEntity {
-    // ? PROPERTIES
-    /** Stable catalog key (e.g. SPOTIFY) — never rename in place. */
-    @Property({ length: 64 })
-    key!: string;
-
-    /** Human label in admin / future picker UIs. */
-    @Property({ length: 120 })
-    name!: string;
-
-    /** CategoryTemplate.key for the household category under that jar. */
-    @Property({ length: 64 })
-    categoryTemplateKey!: string;
-
-    /**
-     * When set, this merchant mirrors a GivingOrganisation (same stable key).
-     * Coach / org catalog owns identity; merchant row stays for bank matching.
-     */
-    @Property({ length: 64, nullable: true })
-    givingOrganisationKey: string | null = null;
-
-    /** ISO 3166-1 alpha-2 markets where this merchant is listed. */
-    @Property({ type: 'json', default: ['NL'] })
-    markets: string[] = ['NL'];
-
-    // ? UI METADATA
+@Index({ properties: ['jarTemplate'] })
+@Index({ properties: ['categoryTemplate'] })
+@Index({ properties: ['givingOrganisation'] })
+export class MerchantPreset extends CatalogEntity {
+    // ? ENUMS
     /** Editorial pin: FEATURED | NEW | POPULAR; null = normal. */
-    @Property({ length: 16, nullable: true })
+    @Enum(NativeEnum({ MerchantHighlight, domain: 'money', nullable: true }))
     highlight: MerchantHighlight | null = null;
-
-    /** Display / seed order within the catalog. */
-    @Property({ default: 0 })
-    sortOrder = 0;
-
-    /** Soft-disable without deleting historical seed identity. */
-    @Property({ default: true })
-    isActive = true;
 
     // ? RELATIONSHIPS
     /** Default jar template when this merchant is auto-sorted. */
     @ManyToOne(() => JarTemplate, { deleteRule: 'restrict' })
     jarTemplate!: JarTemplate;
+
+    /** Default category under that jar. */
+    @ManyToOne(() => CategoryTemplate, { deleteRule: 'restrict' })
+    categoryTemplate!: CategoryTemplate;
+
+    /**
+     * When set, this merchant mirrors a GivingOrganisation. The org catalog owns
+     * editorial identity; the merchant row stays for bank matching.
+     */
+    @ManyToOne(() => GivingOrganisation, { nullable: true, deleteRule: 'set null' })
+    givingOrganisation: GivingOrganisation | null = null;
+
+    /** Markets where this merchant is listed (N:M, owner side). */
+    @ManyToMany(() => Market, undefined, {
+        pivotTable: 'reference_money_merchant_preset_market',
+    })
+    markets = new Collection<Market>(this);
 
     /** Feed matching needles (always present). */
     @OneToOne('MerchantMatching', { mappedBy: 'preset' })

@@ -1,6 +1,6 @@
 import { Entity, Property, Unique } from '@mikro-orm/core';
 
-import { BaseEntity } from '../../../../../../common/database/base.entity';
+import { CatalogEntity } from '../../../../../../common/database/catalog.entity';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
 
 /**
@@ -10,7 +10,7 @@ import { entityConfig } from '../../../../../../common/database/entity-config.ut
  * New options are seed rows — not a contracts enum — so the list can grow
  * without a code change in the picker.
  *
- * @see FixedCostPreset.audienceKeys
+ * @see FixedCostPreset.audiences
  * @see https://mikro-orm.io/docs/defining-entities
  */
 @Entity(
@@ -22,16 +22,8 @@ import { entityConfig } from '../../../../../../common/database/entity-config.ut
     })
 )
 @Unique({ properties: ['key'] })
-export class Audience extends BaseEntity {
+export class Audience extends CatalogEntity {
     // ? PROPERTIES
-    /** Stable catalog key (e.g. STUDENT) — never rename in place. */
-    @Property({ length: 64 })
-    key!: string;
-
-    /** Chip label in the bill picker. */
-    @Property({ length: 120 })
-    name!: string;
-
     /** One line under the chip / for tooltips. */
     @Property({ type: 'text', nullable: true })
     description: string | null = null;
@@ -55,12 +47,4 @@ export class Audience extends BaseEntity {
     /** Optional emoji for the picker chip. */
     @Property({ length: 8, nullable: true })
     icon: string | null = null;
-
-    /** Display / seed order within the catalog. */
-    @Property({ default: 0 })
-    sortOrder = 0;
-
-    /** Soft-disable without deleting historical seed identity. */
-    @Property({ default: true })
-    isActive = true;
 }

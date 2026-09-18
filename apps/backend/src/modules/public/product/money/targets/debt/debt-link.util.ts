@@ -10,7 +10,7 @@ import { Debt } from './debt.entity';
  * Outflows (negative) reduce balance; removing a payment (positive restore) raises it.
  */
 export function applyDebtBalanceDelta(debt: Debt, signedAmount: number) {
-    const next = Math.max(0, Number(debt.balance) + signedAmount);
+    const next = Math.max(0, debt.balance + signedAmount);
     debt.balance = next;
     if (next <= 0) {
         debt.closedOn = debt.closedOn ?? new Date().toISOString().slice(0, 10);
@@ -48,7 +48,7 @@ export async function applyDebtLinkChange(
         });
         if (previous) {
             // Restore what this outflow took off the balance (outflow is negative).
-            applyDebtBalanceDelta(previous, -Number(transaction.amount));
+            applyDebtBalanceDelta(previous, -transaction.amount);
             await syncLinkedFixedCostLifecycle(em, previous);
         }
     }
@@ -59,7 +59,7 @@ export async function applyDebtLinkChange(
             household: currentHouseholdId(),
         });
         transaction.debt = next;
-        applyDebtBalanceDelta(next, Number(transaction.amount));
+        applyDebtBalanceDelta(next, transaction.amount);
         await syncLinkedFixedCostLifecycle(em, next);
         return;
     }

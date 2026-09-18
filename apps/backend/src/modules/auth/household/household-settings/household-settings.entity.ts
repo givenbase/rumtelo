@@ -62,17 +62,15 @@ export class HouseholdSettings extends HouseholdEntity {
      * Queried via the settings row — not filtered as SQL columns.
      */
     @Property({ type: 'json' })
-    moneySettings: HouseholdMoneySettings = { ...DEFAULT_MONEY_SETTINGS };
+    money: HouseholdMoneySettings = { ...DEFAULT_MONEY_SETTINGS };
 
-    /**
-     * Week-check reminder slot (weekday + local HH:mm). Null day/at disables.
-     */
+    /** Week-check reminder slot (weekday + local HH:mm). Null day/at disables. */
     @Property({ type: 'json' })
-    weekCheckSettings: HouseholdWeekCheckSettings = { ...DEFAULT_WEEK_CHECK_SETTINGS };
+    weekCheck: HouseholdWeekCheckSettings = { ...DEFAULT_WEEK_CHECK_SETTINGS };
 
     /** Feature toggles for the board (bank sync, coach, …). */
     @Property({ type: 'json' })
-    featureSettings: HouseholdFeatureSettings = { ...DEFAULT_FEATURE_SETTINGS };
+    features: HouseholdFeatureSettings = { ...DEFAULT_FEATURE_SETTINGS };
 
     /**
      * Extensible household Q&A (onboarding / coach prompts).
@@ -88,9 +86,11 @@ export class HouseholdSettings extends HouseholdEntity {
     onboardedAt: Date | null = null;
 
     // ? ENUMS
+    /** Solo / couple / family — drives copy and member expectations. */
     @Enum(NativeEnum({ HouseholdKind, domain: 'platform', defaultValue: HouseholdKind.SOLO }))
     kind: HouseholdKind = HouseholdKind.SOLO;
 
+    /** One accounting currency for every member's money view. */
     @Enum(NativeEnum({ Currency, domain: 'platform', defaultValue: Currency.EUR }))
     currency: Currency = Currency.EUR;
 }

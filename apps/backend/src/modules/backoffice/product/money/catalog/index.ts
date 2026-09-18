@@ -5,3 +5,4 @@ export {
     GivingOrganisationModule,
     GivingOrganisationService,
 } from './giving-organisation';
+export { Market, MarketModule, MarketService } from './market';

@@ -1,9 +1,9 @@
 /**
  * Paid-to merchant keys per fixed-cost bill preset.
- * Stored on FixedCostPreset.suggestedMerchantKeys (ordered chip list).
+ * Seeded into FixedCostPresetMerchant rows (array order = chip order).
  * Empty = free text / Other only — do not dump the whole category.
  */
-export const SUGGESTED_MERCHANTS_BY_PRESET: Readonly<Record<string, readonly string[]>> = {
+export const MERCHANT_KEYS_BY_PRESET: Readonly<Record<string, readonly string[]>> = {
     // Housing
     RENT: ['VESTIA', 'YOMERE', 'ROCHDALE', 'EIGEN_HAARD', 'PORTAAL', 'DUWO', 'SSH'],
     STUDENT_HOUSING: ['DUWO', 'SSH', 'VESTIA', 'YOMERE', 'ROCHDALE', 'EIGEN_HAARD', 'PORTAAL'],
