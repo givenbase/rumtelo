@@ -13514,6 +13514,22 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "uuid"
+        },
+        "applied_merchant_key": {
+          "name": "applied_merchant_key",
+          "type": "varchar(64)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 64,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
         }
       },
       "name": "money_transaction",

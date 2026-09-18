@@ -33,7 +33,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { isLiveData } from '@/app/_lib/preview';
 import { PlanKey } from '@/app/_lib/plan';
 import { env } from '@/app/_utils/get-env';
-import { CoachMark, useHelpersEnabled } from '@/components/features/helpers';
+import { CoachTipCard } from '@/components/features/helpers';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { EditIcon } from '@/components/features/ui/action-icons';
@@ -185,17 +185,7 @@ function MediaCover({ piece, className }: { piece: LearnPiece; className?: strin
 }
 
 function PieceLine({ piece, className }: { piece: LearnPiece; className?: string }) {
-    const coach = useHelpersEnabled();
-    if (piece.added) {
-        if (!coach) return null;
-        return (
-            <p className="flex items-start gap-2 text-xs leading-snug text-fg-muted">
-                <CoachMark size="sm" className="mt-px shrink-0" />
-                <span>Added by this household. We keep the pointer, not the book.</span>
-            </p>
-        );
-    }
-    if (!piece.use) return null;
+    if (piece.added || !piece.use) return null;
     return <p className={className}>{piece.use}</p>;
 }
 
@@ -1174,6 +1164,11 @@ function PieceGroups({
 
     return (
         <div className="grid gap-4">
+            {pieces.some(piece => piece.added) ? (
+                <CoachTipCard title="Yours, not ours">
+                    Added by this household. We keep the pointer, not the book.
+                </CoachTipCard>
+            ) : null}
             {groups.map(group => (
                 <Card key={group.format} className="p-0">
                     <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-3.5">
@@ -1181,9 +1176,6 @@ function PieceGroups({
                             <Typography as="span" variant="eyebrow" color="primary">
                                 ✦ {formatLabel(group.format).toUpperCase()}
                             </Typography>
-                            <p className="mt-0.5 font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                Recommended · not hosted
-                            </p>
                         </div>
                         <span className="font-mono text-xs text-fg-muted">
                             {group.items.length}
