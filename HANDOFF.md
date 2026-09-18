@@ -66,11 +66,14 @@ insight.
 
 | Layer | Choice | Reason |
 |---|---|---|
-| Monorepo | Turborepo + pnpm | matches Meltizo / Galighticus |
+| Monorepo | Turborepo + **pnpm** | one workspace, shared packages |
 | Frontend | Next.js 16, React 19, **Tailwind v4 only** | see §6 |
-| API | NestJS 11 + Fastify + **oRPC** | contract-first, end-to-end types |
-| ORM | MikroORM 6 + PostgreSQL | unit-of-work matters for money |
+| API | NestJS 11 + **Fastify** + **oRPC** | contracts-first, end-to-end types |
+| Contracts | `@rumtelo/contracts` (Zod + procedures) | wire source of truth |
+| DB | PostgreSQL · row-level `household_id` | never schema-per-tenant |
 | Auth | better-auth (`organization` + `twoFactor`) | Household *is* the org plugin |
+| Isolation | Row-level `household_id` | never schema-per-tenant |
+| Lint | **oxlint + oxfmt** | `pnpm lint` |
 | Hosting | Railway (EU, Amsterdam) | one region, one bill, EU-resident data |
 
 Pinned to **node >=22 / pnpm 10.33.0 / TypeScript 5.9.3**. `create-turbo` ships
@@ -84,17 +87,15 @@ casually.
 "module"`, `.mjs`, no CommonJS build — so a CJS NestJS app physically cannot
 `require()` them. `packages/contracts` is therefore built **dual CJS+ESM** by
 tsup, and both the ESM backend and the Next apps consume one contract definition.
-This is the real fix for what `galighticus-platform/ORPC_MIGRATION_PLAN.md`
-worked around with an internal HTTP hop. **That hop is not needed. Do not
-reintroduce it.**
+Do not reintroduce an internal HTTP hop between Nest and oRPC — contracts
+are dual CJS+ESM and consumed directly.
 
 **Household isolation is row-level, not schema-per-tenant.** Rumtelo's "tenant"
-is a *household*. A B2C product would reach tens of thousands of schemas,
+is a *household*. Schema-per-household would mean tens of thousands of schemas,
 O(households) migrations and catalog bloat. Every financial row carries
 `household_id`, and the filter is injected in exactly one place —
 `common/household/household-scoped.repository.ts` — from `AsyncLocalStorage`, so
-a service cannot pass the wrong id or forget one. Schema-per-tenant remains
-correct for Meltizo; different problem.
+a service cannot pass the wrong id or forget one.
 
 **Postgres schemas group by ownership plane, not by product.** `auth` (identity),
 `public` (platform + product / household data), `backoffice` (catalogs we publish).
@@ -107,7 +108,7 @@ DB schemas. better-auth keeps its tables in `auth` via its pool's `search_path`.
 
 ```
 apps/
-  backend/       NestJS + oRPC + MikroORM    :3002
+  backend/       NestJS + Fastify + oRPC     :3002
   application/   the authenticated product   :3000
   website/       marketing site              :3001
 packages/
@@ -310,7 +311,7 @@ pnpm test:e2e:smoke
 pnpm test:e2e:plan
 ```
 
-Env files use the Galighticus-style sectioned templates (root + `apps/*/`.env.example`).
+Env files use sectioned templates (root + `apps/*/`.env.example`).
 
 | App | Port |
 |---|---|

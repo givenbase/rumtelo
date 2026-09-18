@@ -1,12 +1,12 @@
 ---
-description: Backend Nest module/entity/service/controller shape (Galighticus-aligned)
+description: Backend Nest module/entity/service/controller shape for Rumtelo
 globs: apps/backend/src/modules/**/*.{ts,md}
 alwaysApply: false
 ---
 
 # Backend module consistency
 
-Match Galighticus. Do not invent one-off skinny files or reorder CRUD.
+Match existing Rumtelo backend modules. Do not invent one-off skinny files or reorder CRUD.
 
 Also documented in `apps/backend/src/modules/README.md` — keep both in sync.
 
@@ -34,7 +34,7 @@ Audience groups: `auth/` (identity), `public/` (platform + product → Postgres 
 - Household money rows extend `HouseholdEntity` and go through `HouseholdScopedRepository`
 - Enums from `@rumtelo/contracts` only — `@Enum(NativeEnum({ DebtKind, domain: 'money', … }))`, never local `export enum`
 - Persistence: `await em.persist(e).flush()` / `await em.remove(e).flush()` — never deprecated `persistAndFlush` / `removeAndFlush`
-- Naming: no single-letter locals; prefer domain words (`goal`/`debt`/`transaction`, not `g`/`d`/`tx`) — ESLint `id-length`
+- Naming: no single-letter locals; prefer domain words (`goal`/`debt`/`transaction`, not `g`/`d`/`tx`)
 
 ## CRUD order — non-negotiable
 

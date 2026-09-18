@@ -25,6 +25,7 @@
         "react/react-in-jsx-scope": "off",
         "react/no-array-index-key": "warn",
         "react/jsx-no-constructed-context-values": "warn",
+        "react/no-object-type-as-default-prop": "off",
 
         "jsx-a11y/alt-text": "warn",
         "jsx-a11y/aria-props": "warn",

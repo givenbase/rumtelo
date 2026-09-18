@@ -1,6 +1,6 @@
 # @rumtelo/i18n
 
-Internationalization for Rumtelo — same spine as Galighticus (`next-intl` + TypeScript sources → generated JSON).
+Internationalization for Rumtelo: `next-intl` + TypeScript sources under `translations/` → generated JSON in `languages/`.
 
 ## Source of truth
 
@@ -28,8 +28,8 @@ Apps load messages via `i18n/request.ts` + `next-intl` plugin (see `apps/applica
 
 Brand lockups that are not yet on `useTranslations` can import `BRAND_TAGLINE` / `AUTH_QUOTES` — those re-export from the same `translations/` modules.
 
-## What we kept vs dropped
+## Scope
 
-**Kept (useful):** next-intl routing helpers, locale metadata, common action/status/message, ui button/form, Rumtelo brand + auth + shell/onboarding/dashboard.
+**In scope:** next-intl routing helpers, locale metadata, common action/status/message, ui button/form, Rumtelo brand + auth + shell/onboarding/dashboard. **EN first, NL second.**
 
-**Not ported (Galighticus-only):** POS, shop, checkout, student portal, pantheon, admin commerce, DeepL scripts, i18next mobile stack, healthcare entity vocabulary.
+**Out of scope:** POS, shop, checkout, student portal, admin commerce, DeepL scripts, i18next mobile stacks, healthcare vocabulary.

@@ -2,8 +2,8 @@
 
 **Repo:** [github.com/givenbase/rumtelo](https://github.com/givenbase/rumtelo)
 
-Ported from Galighticus directions — **only what Rumtelo needs today**. No Docker image
-build / single-app deploy / GHCR cleanup yet (no app Dockerfiles). Add those when images exist.
+Rumtelo-focused workflows only. No Docker image build / single-app deploy / GHCR
+cleanup yet (no app Dockerfiles). Add those when images exist.
 
 ## GitHub Environments
 
@@ -36,7 +36,7 @@ Match `apps/backend/.env.example` and app `get-env.ts`:
 CI runners are outside Railway’s private mesh — never point `DATABASE_URL`, smoke, or e2e at `*.railway.internal`.
 On Railway, Application’s server-only `DOMAIN_BACK` is the private Nest URL for proxies.
 
-### Sync from your machine (Galighticus pattern)
+### Sync from your machine
 
 ```bash
 pnpm sync:github-secrets:init        # creates .env.github.*.{staging,production}

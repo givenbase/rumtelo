@@ -135,10 +135,9 @@ pnpm test:e2e:plan
 
 Basic may stay €0 or become a small paid tier later without renaming.
 
-Env templates follow the same documented style as Galighticus/Meltizo (sectioned
-banners + comments). Root `.env.example` is the source of truth for local API
-secrets; per-app examples under `apps/*/`.env.example` cover client-safe
-`NEXT_PUBLIC_*` keys.
+Env templates use sectioned banners + comments. Root `.env.example` is the
+source of truth for local API secrets; per-app examples under
+`apps/*/`.env.example` cover client-safe `NEXT_PUBLIC_*` keys.
 
 ## Renaming
 

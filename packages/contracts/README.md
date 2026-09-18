@@ -118,8 +118,9 @@ const must be paired with `export type X = z.infer<typeof X>` in `*.schema.ts`. 
 **Schema is the source of truth.** Never invent a parallel hand-written interface that
 duplicates a Zod shape.
 
-Keep existing public Zod names (`AccountProfile`, `SignUpForm`, …). Do not rename to
-Galighticus `createXSchema` / `responseXSchema` unless a dedicated rename PR says so.
+Keep existing public Zod names (`AccountProfile`, `SignUpForm`, …). Do not rename
+wholesale to a foreign `createXSchema` / `responseXSchema` convention unless a
+dedicated rename PR says so.
 
 ---
 

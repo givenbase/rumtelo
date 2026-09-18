@@ -138,14 +138,11 @@ other households.
 
 ### Why shared schema, not schema-per-tenant
 
-Meltizo gives each subscriber its own `tenant_*` Postgres schema because its
-tenants are companies: large, compliance-heavy, with per-subscriber
-customization. Rumtelo's "tenant" is a household of 1–10 people sharing one
-budget. Schema-per-household would mean creating/dropping a schema per signup,
+Rumtelo's "tenant" is a household of 1–10 people sharing one budget.
+Schema-per-household would mean creating/dropping a schema per signup,
 N× migrations, an EntityManager fork on every request and painful
-cross-household analytics — with zero product benefit at this tenant size.
+cross-household analytics — with zero product benefit at this size.
 
-Row-level isolation (`household_id` column + the scoped repository + the
-interceptor) gives the same guarantee with one migration path and one
-database. This is a deliberate decision; do not introduce `tenant_*` schemas
-or `em.fork({ schema })`.
+Row-level isolation (`household_id` column + `HouseholdScopedRepository` + the
+interceptor) gives the guarantee with one migration path and one database.
+This is deliberate; do not introduce `tenant_*` schemas or `em.fork({ schema })`.

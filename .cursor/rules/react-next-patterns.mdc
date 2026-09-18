@@ -1,0 +1,33 @@
+---
+description: React/Next App Router patterns — prefer industry reality over lint theater
+globs: apps/application/**/*.{ts,tsx},apps/website/**/*.{ts,tsx},packages/ui/**/*.{ts,tsx},packages/hooks/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# React / Next — professional bar
+
+Prefer patterns Next.js and React docs endorse. Lint is a hint: keep rules that catch real bugs; do not invent ceremony for pedantic warnings.
+
+## Do
+
+- **Server Components by default**; `'use client'` only for hooks, events, browser APIs
+- **`Link` for navigations**; `router.push` only after mutations / programmatic redirects
+- **Keys from identity** (`id`), not array index (static non-reordering grids are OK)
+- **Effects sync with the outside world** (timers, listeners, subscriptions). Derive UI from props/state when you can
+- **Cleanup only when there is something to clean** — clear timers/listeners or set `cancelled`. Never `return () => {}` to silence lint
+- **Stable empty fallbacks for queries** — `const EMPTY_X: T[] = []` when used as `useLiveQuery(…, EMPTY_X)` or `data ?? EMPTY_X` in deps. Not required for default props only used for `.map` / `.length`
+- **a11y that ships** — labels on icon-only controls; no `aria-pressed` on `Link`; real `<button>` for toggles
+- **Classnames** — `cn` from `@rumtelo/utils`
+
+## Don't
+
+- Blanket `useMemo` / `useCallback` — only when a memoized child or a real dep needs stability (follow React Compiler / repo practice)
+- Module `EMPTY_*` solely to satisfy `no-object-type-as-default-prop`
+- No-op effect cleanups for `consistent-return`
+- Pulling an entire page client for one interactive widget — extract a small client island
+
+## PR self-check
+
+> Would I still write this if the lint rule did not exist?
+
+If no → simplify. If yes and it prevents a rerender, broken nav, or a11y gap → keep.

@@ -8,11 +8,14 @@ Snapshot of how the system is built. For status, next steps, and full narrative,
 
 | Layer | Choice | Reason |
 |---|---|---|
-| Monorepo | Turborepo + pnpm | matches Meltizo / Galighticus |
+| Monorepo | Turborepo + **pnpm** | one workspace, shared packages |
 | Frontend | Next.js 16, React 19, **Tailwind v4 only** | one styling system |
-| API | NestJS 11 + Fastify + **oRPC** | contract-first, end-to-end types |
-| ORM | MikroORM 6 + PostgreSQL | unit-of-work matters for money |
+| API | NestJS 11 + **Fastify** + **oRPC** | contracts-first, end-to-end types |
+| Contracts | `@rumtelo/contracts` (Zod + procedures) | wire source of truth |
+| DB | PostgreSQL · row-level `household_id` | never schema-per-tenant |
 | Auth | better-auth (`organization` + `twoFactor`) | Household *is* the org plugin |
+| Isolation | Row-level `household_id` | never schema-per-tenant |
+| Lint | **oxlint + oxfmt** | `pnpm lint` |
 | Hosting | Railway (EU, Amsterdam) | one region, one bill, EU-resident data |
 
 Pinned: **node >=22 / pnpm 10.x / TypeScript 5.9.x**. Do not bump casually.
@@ -23,7 +26,7 @@ Pinned: **node >=22 / pnpm 10.x / TypeScript 5.9.x**. Do not bump casually.
 
 ```
 apps/
-  backend/       NestJS + oRPC + MikroORM    :3002
+  backend/       NestJS + Fastify + oRPC     :3002
   application/   the authenticated product   :3000
   website/       marketing site              :3001
 packages/
@@ -69,7 +72,7 @@ Money children (same list everywhere): `jar` `income` `fixed-cost` `account` `tr
 
 ## Conventions (short)
 
-- One folder per aggregate: `entities/`, service, controller, module.
+- One folder per aggregate: entity, service, controller, module (flat — no `entities/` subfolder).
 - Controllers are transport only — no money `if`s in controllers.
 - Never query another aggregate’s tables — import its service.
 - Migrations only against databases that hold money.
