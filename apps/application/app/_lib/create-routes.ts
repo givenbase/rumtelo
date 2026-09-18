@@ -95,7 +95,7 @@ export function createMoveHref(opts?: { fromJarId?: string; returnTo?: string })
     return qs ? `${CREATE_HREF.move}?${qs}` : CREATE_HREF.move;
 }
 
-export function updateHref(kind: Exclude<CreateKind, 'session' | 'asset' | 'move'>, id: string) {
+export function updateHref(kind: Exclude<CreateKind, 'session' | 'move'>, id: string) {
     switch (kind) {
         case 'tx':
             return productPath(`money/transactions/update/${id}`);
@@ -107,6 +107,8 @@ export function updateHref(kind: Exclude<CreateKind, 'session' | 'asset' | 'move
             return productPath(`growth/income/update/${id}`);
         case 'goal':
             return productPath(`growth/goals/update/${id}`);
+        case 'asset':
+            return productPath(`growth/net-worth/update/${id}`);
         default: {
             const exhaustive: never = kind;
             throw new Error(`Unhandled update kind: ${String(exhaustive)}`);
@@ -132,4 +134,9 @@ export function txDetailHref(id: string) {
 /** Open goal detail (pace, jar context, advice). Edit stays on update. */
 export function goalDetailHref(id: string) {
     return productPath(`growth/goals/${id}`);
+}
+
+/** Open asset detail (value, monthly pay, class). Edit stays on update. */
+export function assetDetailHref(id: string) {
+    return productPath(`growth/net-worth/${id}`);
 }

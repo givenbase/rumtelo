@@ -1,6 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useLiveQuery } from '@rumtelo/hooks';
 import {
@@ -18,6 +20,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import type { AssetKind, AssetPreset } from '@rumtelo/contracts';
 import { z } from 'zod';
 
+import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
@@ -29,6 +32,7 @@ import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell'
 
 import { FormInput } from './form-input';
 import { type NamePresetOption, PresetNameField } from './preset-name-field';
+import { ConfirmActionButton } from './confirm-action-button';
 
 const EMPTY_KINDS: AssetKind[] = [];
 const EMPTY_PRESETS: AssetPreset[] = [];
@@ -61,18 +65,37 @@ const assetFormSchema = z
 
 type AssetFormValues = z.infer<typeof assetFormSchema>;
 
+type AssetFormDefaults = {
+    kind: string;
+    name: string;
+    value: string;
+    flow: string;
+    presetKey: string | null;
+};
+
 type AssetFormProps = {
     embedded?: boolean;
     onSuccess?: () => void;
+    mode?: 'create' | 'edit';
+    entityId?: string;
+    defaultValues?: AssetFormDefaults;
 };
 
 /** Asks the class first. The name searches the same catalog a fixed cost does. */
-export function AssetForm({ embedded = true, onSuccess }: AssetFormProps) {
+export function AssetForm({
+    embedded = true,
+    onSuccess,
+    mode = 'create',
+    entityId,
+    defaultValues,
+}: AssetFormProps) {
     const { showToast } = useAppShell();
     const dismiss = useFormDismiss(onSuccess);
     const { symbol } = useHouseholdCurrency();
     const { householdId } = useAuth();
     const live = isLiveData(householdId);
+    const queryClient = useQueryClient();
+    const [presetKey, setPresetKey] = useState(defaultValues?.presetKey ?? null);
 
     const kindsQuery = useLiveQuery(
         apiQuery.growth.catalogs.assetKinds.list.queryOptions({
@@ -92,7 +115,12 @@ export function AssetForm({ embedded = true, onSuccess }: AssetFormProps) {
     const presets = presetsQuery.data ?? EMPTY_PRESETS;
 
     const form = useForm<AssetFormValues>({
-        defaultValues: { kind: 'PORTFOLIO', name: '', value: '', flow: '' },
+        defaultValues: {
+            kind: defaultValues?.kind ?? 'PORTFOLIO',
+            name: defaultValues?.name ?? '',
+            value: defaultValues?.value ?? '',
+            flow: defaultValues?.flow ?? '',
+        },
         resolver: zodResolver(assetFormSchema),
     });
 
@@ -113,7 +141,10 @@ export function AssetForm({ embedded = true, onSuccess }: AssetFormProps) {
         const current = form.getValues('name');
         form.setValue('kind', next, { shouldValidate: true });
         const preset = presets.find(row => row.name === current);
-        if (preset && preset.kindKey !== next) form.setValue('name', '');
+        if (preset && preset.kindKey !== next) {
+            form.setValue('name', '');
+            setPresetKey(null);
+        }
         const nextKind = kinds.find(row => row.key === next);
         if (nextKind && !nextKind.canPay) form.setValue('flow', '');
     }
@@ -122,13 +153,69 @@ export function AssetForm({ embedded = true, onSuccess }: AssetFormProps) {
         const preset = presets.find(row => row.key === option.key);
         if (!preset) return;
         form.setValue('kind', preset.kindKey, { shouldValidate: true });
+        setPresetKey(preset.key);
         if (!preset.canPay) form.setValue('flow', '');
     }
 
-    async function onSubmit() {
-        showToast('Not on the board yet — an asset has nowhere to be stored.', 'success');
-        dismiss();
+    const saveMutation = useMutation({
+        mutationFn: async (values: AssetFormValues) => {
+            if (!householdId || !entityId) throw new Error('No household');
+            const cents = parseAmountToMinorUnits(values.value);
+            if (cents === null || cents <= 0) throw new Error('Invalid amount');
+            const kind = kinds.find(row => row.key === values.kind);
+            const flowCents =
+                kind && !kind.canPay
+                    ? 0
+                    : values.flow?.trim()
+                      ? (parseAmountToMinorUnits(values.flow) ?? 0)
+                      : 0;
+            return api.growth.assets.update({
+                id: entityId,
+                householdId,
+                name: values.name.trim(),
+                kindKey: values.kind,
+                presetKey,
+                value: cents,
+                flow: flowCents,
+            });
+        },
+        onSuccess: () => {
+            void queryClient.invalidateQueries({ queryKey: apiQuery.growth.assets.list.key() });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.growth.assets.get.key() });
+            showToast('Asset updated', 'success');
+            dismiss();
+        },
+        onError: () => showToast('Save failed', 'error'),
+    });
+
+    const removeMutation = useMutation({
+        mutationFn: async () => {
+            if (!householdId || !entityId) throw new Error('No household');
+            return api.growth.assets.remove({ householdId, id: entityId });
+        },
+        onSuccess: () => {
+            void queryClient.invalidateQueries({ queryKey: apiQuery.growth.assets.list.key() });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.growth.assets.get.key() });
+            showToast('Asset deleted', 'success');
+            dismiss();
+        },
+        onError: () => showToast('Delete failed', 'error'),
+    });
+
+    async function onSubmit(values: AssetFormValues) {
+        if (mode !== 'edit' || !entityId) {
+            showToast('Not on the board yet — an asset has nowhere to be stored.', 'success');
+            dismiss();
+            return;
+        }
+        if (!live) {
+            showToast('Sign in to save this asset', 'error');
+            return;
+        }
+        await saveMutation.mutateAsync(values);
     }
+
+    const busy = form.formState.isSubmitting || saveMutation.isPending || removeMutation.isPending;
 
     return (
         <FormCreateEditShell
@@ -137,9 +224,22 @@ export function AssetForm({ embedded = true, onSuccess }: AssetFormProps) {
             onError={onError}
             onSubmit={onSubmit}
             sidebar={
-                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                    {form.formState.isSubmitting ? 'Working…' : 'Save asset'}
-                </Button>
+                <div className="grid gap-2">
+                    <Button type="submit" className="w-full" disabled={busy}>
+                        {busy ? 'Working…' : mode === 'edit' ? 'Save changes' : 'Save asset'}
+                    </Button>
+                    {mode === 'edit' && entityId ? (
+                        <ConfirmActionButton
+                            variant="ghost"
+                            className="w-full text-danger hover:bg-danger/10 hover:text-danger"
+                            disabled={busy}
+                            pending={removeMutation.isPending}
+                            label="Delete"
+                            confirmLabel="Click again to delete"
+                            onConfirm={() => void removeMutation.mutateAsync()}
+                        />
+                    ) : null}
+                </div>
             }>
             <FormField
                 control={form.control}
@@ -209,7 +309,11 @@ export function AssetForm({ embedded = true, onSuccess }: AssetFormProps) {
                                 options={suggestions}
                                 placeholder="Start typing, or pick one"
                                 freeTextPlaceholder="Type the name"
-                                onChange={field.onChange}
+                                onChange={value => {
+                                    field.onChange(value);
+                                    const preset = presets.find(row => row.key === presetKey);
+                                    if (preset && preset.name !== value) setPresetKey(null);
+                                }}
                                 onSelect={selectPreset}
                             />
                         </FormControl>

@@ -20,7 +20,7 @@
         "db:create-schemas": "tsx scripts/db/create-schemas.ts",
         "db:drop": "tsx scripts/db/drop-schema-cascade.ts",
         "db:reset": "tsx scripts/db/reset-migrations.ts",
-        "db:fresh": "tsx scripts/db/drop-schema-cascade.ts -- --yes && pnpm db:create-schemas && pnpm db:push && pnpm db:seed",
+        "db:fresh": "tsx scripts/db/drop-schema-cascade.ts -- --yes && pnpm db:create-schemas && pnpm db:push && pnpm auth:migrate && pnpm db:seed",
         "db:seed": "pnpm --filter @rumtelo/contracts build && tsx scripts/db/seeder-run.ts",
         "schema:drop": "tsx scripts/db/drop-schema-cascade.ts",
         "schema:drop:cascade": "tsx scripts/db/drop-schema-cascade.ts",

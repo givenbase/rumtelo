@@ -65,6 +65,11 @@ export const FORM_ROUTE = {
         description: 'What you own, and whether it pays you.',
         closeHref: productPath('growth/net-worth'),
     },
+    assetUpdate: {
+        title: 'Edit asset',
+        description: 'Change the name, the class, or what it is worth.',
+        closeHref: productPath('growth/net-worth'),
+    },
     sessionCreate: {
         title: 'New training',
         closeHref: productPath('energy/training'),

@@ -10,7 +10,7 @@ import { useLiveQuery } from '@rumtelo/hooks';
 import type { Asset, AssetKind } from '@rumtelo/contracts';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
-import { CREATE_HREF } from '@/app/_lib/create-routes';
+import { CREATE_HREF, assetDetailHref } from '@/app/_lib/create-routes';
 import { isLiveData } from '@/app/_lib/preview';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -271,7 +271,7 @@ export function NetWorthPageClient() {
                                         return (
                                             <Link
                                                 key={holding.id}
-                                                href={CREATE_HREF.asset}
+                                                href={assetDetailHref(holding.id)}
                                                 className={cn(
                                                     'grid cursor-pointer gap-0 overflow-hidden rounded-xl border bg-raised text-left transition-colors hover:border-accent-hover',
                                                     pays
