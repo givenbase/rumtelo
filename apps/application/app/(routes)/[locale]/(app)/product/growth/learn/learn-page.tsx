@@ -33,6 +33,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { isLiveData } from '@/app/_lib/preview';
 import { PlanKey } from '@/app/_lib/plan';
 import { env } from '@/app/_utils/get-env';
+import { CoachMark, useHelpersEnabled } from '@/components/features/helpers';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { EditIcon } from '@/components/features/ui/action-icons';
@@ -181,6 +182,21 @@ function MediaCover({ piece, className }: { piece: LearnPiece; className?: strin
             )}
         </div>
     );
+}
+
+function PieceLine({ piece, className }: { piece: LearnPiece; className?: string }) {
+    const coach = useHelpersEnabled();
+    if (piece.added) {
+        if (!coach) return null;
+        return (
+            <p className="flex items-start gap-2 text-xs leading-snug text-fg-muted">
+                <CoachMark size="sm" className="mt-px shrink-0" />
+                <span>Added by this household. We keep the pointer, not the book.</span>
+            </p>
+        );
+    }
+    if (!piece.use) return null;
+    return <p className={className}>{piece.use}</p>;
 }
 
 function Outbound({
@@ -816,6 +832,17 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
                             skill === 'MONEY' ? LIBRARY_HREF : `${LIBRARY_HREF}?about=${skill}`
                         );
                     }}
+                    shelf={
+                        shown.length > 0 ? (
+                            <PieceGroups
+                                pieces={shown}
+                                statusOf={statusOf}
+                                dueOf={dueOf}
+                                onStatus={setStatus}
+                                onDue={setDue}
+                            />
+                        ) : null
+                    }
                 />
             ) : null}
 
@@ -907,9 +934,10 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
                                                                 <p className="font-mono text-xs text-fg-muted">
                                                                     {piece.by}
                                                                 </p>
-                                                                <p className="text-sm text-pretty text-fg-secondary">
-                                                                    {piece.use}
-                                                                </p>
+                                                                <PieceLine
+                                                                    piece={piece}
+                                                                    className="text-sm text-pretty text-fg-secondary"
+                                                                />
                                                                 <PieceSecondary piece={piece} />
                                                                 <div className="mt-auto flex flex-wrap items-end justify-between gap-3 pt-3">
                                                                     <div className="grid gap-2">
@@ -941,7 +969,7 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
                 </div>
             ) : null}
 
-            {!browsing && shown.length > 0 ? (
+            {!browsing && tab !== 'FOCUS' && shown.length > 0 ? (
                 <PieceGroups
                     pieces={shown}
                     statusOf={statusOf}
@@ -982,6 +1010,7 @@ function FocusBoard({
     dueOf,
     onDue,
     onFocus,
+    shelf,
 }: {
     active: readonly (typeof SKILLS)[number][];
     idle: readonly (typeof SKILLS)[number][];
@@ -990,21 +1019,30 @@ function FocusBoard({
     dueOf: (piece: LearnPiece) => string | undefined;
     onDue: (id: string, iso: string) => void;
     onFocus: (skill: LearnSkill) => void;
+    /** The titles already picked. Sits in the space beside one skill in focus. */
+    shelf?: ReactNode;
 }) {
     if (active.length === 0 && idle.length === 0) return null;
+
+    const withShelf = Boolean(shelf) && active.length > 0;
 
     return (
         <div className="grid gap-4">
             {active.length > 0 ? (
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div
+                    className={cn(
+                        'grid gap-4',
+                        !withShelf && active.length > 1 && 'sm:grid-cols-2'
+                    )}>
                     {active.map(skill => {
                         const pieces = catalog.filter(piece => piece.skill === skill.key);
-                        const next =
-                            pieces.find(piece => statusOf(piece) === 'NOW') ??
-                            pieces.find(piece => statusOf(piece) === 'QUEUE') ??
-                            null;
+                        const next = withShelf
+                            ? null
+                            : (pieces.find(piece => statusOf(piece) === 'NOW') ??
+                              pieces.find(piece => statusOf(piece) === 'QUEUE') ??
+                              null);
                         return (
-                            <AccentCard key={skill.key} tint={skill.tint} className="h-full">
+                            <AccentCard key={skill.key} tint={skill.tint}>
                                 <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-raised px-2.5 py-1 font-mono text-[10px] tracking-widest text-fg-secondary uppercase">
                                     <span
                                         className="size-1.75 rounded-sm"
@@ -1056,7 +1094,7 @@ function FocusBoard({
                                             </div>
                                         )}
                                     </PieceAdjust>
-                                ) : (
+                                ) : withShelf ? null : (
                                     <p className="mt-4 font-mono text-xs text-fg-muted">
                                         ◇ Nothing picked for {skill.name} yet. Choose one in the
                                         library.
@@ -1065,6 +1103,7 @@ function FocusBoard({
                             </AccentCard>
                         );
                     })}
+                    {withShelf ? <div className="sm:col-span-full">{shelf}</div> : null}
                 </div>
             ) : (
                 <EmptyState
@@ -1075,7 +1114,15 @@ function FocusBoard({
             )}
 
             {idle.length > 0 ? (
-                <div className="grid gap-2 sm:grid-cols-2">
+                <div
+                    className={cn(
+                        'grid gap-2',
+                        idle.length === 3
+                            ? 'sm:grid-cols-3'
+                            : idle.length > 1
+                              ? 'sm:grid-cols-2'
+                              : undefined
+                    )}>
                     {idle.map(skill => (
                         <button
                             key={skill.key}
@@ -1168,9 +1215,10 @@ function PieceGroups({
                                                                 : pickLabel(piece.format, status)}
                                                         </span>
                                                     </p>
-                                                    <p className="mt-0.5 truncate text-xs text-fg-muted italic">
-                                                        {piece.use}
-                                                    </p>
+                                                    <PieceLine
+                                                        piece={piece}
+                                                        className="mt-0.5 truncate text-xs text-fg-muted italic"
+                                                    />
                                                     <p className="mt-1 font-mono text-[11px] text-fg-faint">
                                                         {piece.by} · {aboutLabel(aboutOf(piece))}
                                                     </p>

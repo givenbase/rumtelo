@@ -39,6 +39,8 @@ export type LearnPiece = {
     /** The free text, the trailer, or the author. */
     secondary?: LearnLink;
     partner?: string;
+    /** This household added it. The note is the coach, not a blurb. */
+    added?: boolean;
     /** Learning section key. Not an enum. */
     topic?: string;
     minPlan?: PlanKey;
@@ -476,24 +478,27 @@ export function bookToPiece(book: LearnBookPreset, store: BookStore, tags: Store
 
 /** A household-added book uses the same card as a recommendation. Theirs is never plan-gated. */
 export function addedBookToPiece(book: LearnBook, store: BookStore, tags: StoreTags): LearnPiece {
-    return bookToPiece(
-        {
-            key: book.id,
-            sortOrder: 0,
-            name: book.name,
-            author: book.author,
-            description: book.description,
-            skill: book.skill,
-            topic: book.topic,
-            minPlan: PlanKey.BASIC,
-            spendingStyles: [],
-            coverId: book.coverId,
-            isbn13: book.isbn13,
-            url: book.url,
-        },
-        store,
-        tags
-    );
+    return {
+        ...bookToPiece(
+            {
+                key: book.id,
+                sortOrder: 0,
+                name: book.name,
+                author: book.author,
+                description: book.description,
+                skill: book.skill,
+                topic: book.topic,
+                minPlan: PlanKey.BASIC,
+                spendingStyles: [],
+                coverId: book.coverId,
+                isbn13: book.isbn13,
+                url: book.url,
+            },
+            store,
+            tags
+        ),
+        added: true,
+    };
 }
 
 export function watchToPiece(watch: LearnWatchPreset): LearnPiece {
