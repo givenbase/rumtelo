@@ -1,2 +1,2 @@
-export { PlanCapability } from './plan-capability.entity';
-export { PlanCapabilityModule } from './plan-capability.module';
+export { Capability } from './capability.entity';
+export { CapabilityModule } from './capability.module';
