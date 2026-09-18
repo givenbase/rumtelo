@@ -419,6 +419,7 @@ function toPaymentDto(transaction: Transaction) {
         status: transaction.status,
         source: transaction.source,
         appliedRuleId: transaction.appliedRule,
+        appliedMerchantKey: transaction.appliedMerchantKey,
         note: transaction.note,
         createdAt: transaction.createdAt.toISOString(),
     };

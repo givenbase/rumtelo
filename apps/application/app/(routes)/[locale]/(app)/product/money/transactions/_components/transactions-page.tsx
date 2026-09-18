@@ -191,7 +191,7 @@ export function TransactionsPageClient() {
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
             showToast(
                 result.sorted > 0
-                    ? `${result.sorted} transaction${result.sorted === 1 ? '' : 's'} sorted by rules`
+                    ? `${result.sorted} transaction${result.sorted === 1 ? '' : 's'} sorted`
                     : 'No matches — inbox unchanged',
                 result.sorted > 0 ? 'success' : 'info'
             );

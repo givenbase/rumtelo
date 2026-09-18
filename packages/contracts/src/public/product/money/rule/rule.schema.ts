@@ -12,6 +12,7 @@ import { RuleField, RuleMatcher } from '../enums';
 /**
  * The auto-sort engine. Rules run in priority order on every incoming transaction;
  * first match wins and stamps appliedRuleId so the decision stays auditable.
+ * Rows no rule claims fall through to the merchant catalog (appliedMerchantKey).
  */
 export const Rule = z.object({
     id: Id,

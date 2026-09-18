@@ -2,8 +2,10 @@ import { EntityManager } from '@mikro-orm/postgresql';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 
+import { containsWord } from '@rumtelo/utils';
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
+import { MerchantPresetService } from '../../../../../backoffice/product/money/preset/merchant/merchant.service';
 import { Category } from '../../plan/jar/category.entity';
 import { Jar } from '../../plan/jar/jar.entity';
 import { applyDebtLinkChange } from '../../targets/debt/debt-link.util';
@@ -20,7 +22,8 @@ export class TransactionService {
 
     constructor(
         @Inject(EntityManager) private readonly em: EntityManager,
-        @Inject(SortRuleService) private readonly rules: SortRuleService
+        @Inject(SortRuleService) private readonly rules: SortRuleService,
+        @Inject(MerchantPresetService) private readonly merchants: MerchantPresetService
     ) {
         this.transactions = new HouseholdScopedRepository(em, Transaction);
     }
@@ -88,11 +91,37 @@ export class TransactionService {
         const seen = new Set(existing.map(transaction => transaction.dedupeKey));
         const freshCount = keys.filter(key => !seen.has(key)).length;
 
-        if (!dryRun) {
-            parsed.forEach((row, i) => {
-                if (seen.has(keys[i]!)) return;
-                // A statement can legitimately repeat a line; only the first copy lands.
-                seen.add(keys[i]!);
+        const incoming: {
+            bookedOn: string;
+            amount: number;
+            description: string;
+            counterparty: string | null;
+            dedupeKey: string;
+        }[] = [];
+        parsed.forEach((row, index) => {
+            const key = keys[index]!;
+            if (seen.has(key)) return;
+            seen.add(key);
+            incoming.push({ ...row, dedupeKey: key });
+        });
+
+        let sorted = 0;
+        if (dryRun) {
+            sorted = await this.rules.autoSort(
+                incoming.map(row => ({
+                    amount: row.amount,
+                    description: row.description,
+                    counterparty: row.counterparty,
+                    status: TransactionStatus.INBOX,
+                    jar: null,
+                    category: null,
+                    appliedRule: null,
+                    appliedMerchantKey: null,
+                })),
+                { countHits: false }
+            );
+        } else {
+            const created = incoming.map(row =>
                 this.em.create(Transaction, {
                     household: currentHouseholdId(),
                     account: this.em.getReference(BankAccount, accountId),
@@ -102,9 +131,10 @@ export class TransactionService {
                     counterparty: row.counterparty,
                     status: TransactionStatus.INBOX,
                     source: TransactionSource.CSV,
-                    dedupeKey: keys[i]!,
-                } as never);
-            });
+                    dedupeKey: row.dedupeKey,
+                } as never)
+            );
+            sorted = await this.rules.autoSort(created, { countHits: true });
             await this.em.flush();
         }
 
@@ -112,6 +142,7 @@ export class TransactionService {
             detected: parsed.length,
             duplicates: parsed.length - freshCount,
             willImport: freshCount,
+            sorted,
             sample: [],
         };
     }
@@ -170,10 +201,31 @@ export class TransactionService {
         entity.jar = this.em.getReference(Jar, jarId);
         entity.category = categoryId ? this.em.getReference(Category, categoryId) : null;
         entity.status = TransactionStatus.SORTED;
+        entity.appliedMerchantKey = null;
 
         if (createRule) {
-            const matchValue = (entity.counterparty?.trim() || entity.description).trim();
-            const field = entity.counterparty?.trim() ? 'COUNTERPARTY' : 'DESCRIPTION';
+            const counterparty = entity.counterparty?.trim() ?? '';
+            const description = entity.description.trim();
+            const merchant = await this.merchants.matchFeed({
+                text: `${counterparty} ${description}`,
+            });
+            const needle = merchant?.matching?.matchValue.trim() ?? '';
+            let field: 'COUNTERPARTY' | 'DESCRIPTION' = counterparty
+                ? 'COUNTERPARTY'
+                : 'DESCRIPTION';
+            let matchValue = counterparty || description;
+            // Prefer the catalog needle when it is specific enough to be a rule.
+            // Short brands (NS, ING) stay on the raw counterparty — a CONTAINS rule
+            // of two letters would swallow unrelated descriptions.
+            if (needle.length >= 4) {
+                if (containsWord(description, needle)) {
+                    field = 'DESCRIPTION';
+                    matchValue = needle;
+                } else if (containsWord(counterparty, needle)) {
+                    field = 'COUNTERPARTY';
+                    matchValue = needle;
+                }
+            }
             const rule = await this.rules.create({
                 field,
                 matcher: 'CONTAINS',
@@ -203,6 +255,7 @@ export class TransactionService {
             row.jar = this.em.getReference(Jar, jarId);
             row.category = categoryId ? this.em.getReference(Category, categoryId) : null;
             row.status = TransactionStatus.SORTED;
+            row.appliedMerchantKey = null;
         }
         await this.em.flush();
         return { updated: rows.length };
@@ -273,6 +326,7 @@ export function toDto(transaction: Transaction) {
         status: transaction.status,
         source: transaction.source,
         appliedRuleId: transaction.appliedRule,
+        appliedMerchantKey: transaction.appliedMerchantKey,
         note: transaction.note,
         createdAt: transaction.createdAt.toISOString(),
     };

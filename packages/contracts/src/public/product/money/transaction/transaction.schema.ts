@@ -50,6 +50,11 @@ export const Transaction = z.object({
     source: z.enum(TransactionSource),
     /** Set when a rule auto-sorted this, so the user can see and undo the automation. */
     appliedRuleId: Id.nullable(),
+    /**
+     * MerchantPreset.key that auto-sorted this when no household rule matched.
+     * Null when a rule won, the user sorted by hand, or nothing matched.
+     */
+    appliedMerchantKey: z.string().min(1).max(64).nullable(),
     note: z.string().max(500).nullable(),
     createdAt: z.iso.datetime(),
 });
@@ -122,6 +127,8 @@ export const ImportPreview = z.object({
     detected: z.int(),
     duplicates: z.int(),
     willImport: z.int(),
+    /** Of the rows that land, how many a rule or the merchant catalog sorts immediately. */
+    sorted: z.int(),
     sample: z.array(z.string()),
 });
 

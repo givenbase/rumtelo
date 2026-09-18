@@ -3,17 +3,32 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
+import { MerchantPresetService } from '../../../../../backoffice/product/money/preset/merchant/merchant.service';
 import { Category } from '../../plan/jar/category.entity';
 import { Jar } from '../../plan/jar/jar.entity';
-import { RuleField, RuleMatcher, TransactionStatus } from '@rumtelo/contracts';
+import {
+    type JarKey,
+    type RuleField,
+    type RuleMatcher,
+    TransactionStatus,
+} from '@rumtelo/contracts';
 
+import {
+    autoSortRows,
+    categoryIndex,
+    type AutoSortContext,
+    type AutoSortRow,
+} from '../auto-sort.util';
 import { Transaction } from '../transaction/transaction.entity';
 import { SortRule } from './sort-rule.entity';
 
 @Injectable()
 export class SortRuleService {
     private readonly repo: HouseholdScopedRepository<SortRule>;
-    constructor(@Inject(EntityManager) private readonly em: EntityManager) {
+    constructor(
+        @Inject(EntityManager) private readonly em: EntityManager,
+        @Inject(MerchantPresetService) private readonly merchants: MerchantPresetService
+    ) {
         this.repo = new HouseholdScopedRepository(em, SortRule);
     }
 
@@ -87,34 +102,25 @@ export class SortRuleService {
     }
 
     /**
-     * Re-runs isActive rules over inbox history — first match wins, priority ASC.
-     * Stamps appliedRule so the decision stays auditable.
+     * Rules first, then the merchant catalog, over the rows given.
+     * `countHits` is false for a dry-run preview so rules are not credited.
+     */
+    async autoSort(rows: AutoSortRow[], options?: { countHits?: boolean }): Promise<number> {
+        if (rows.length === 0) return 0;
+        return autoSortRows(rows, await this.loadContext(), options);
+    }
+
+    /**
+     * Re-runs rules, then the merchant catalog, over the inbox.
+     * Stamps appliedRule or appliedMerchantKey so the decision stays auditable.
      */
     async replay() {
-        const rules = await this.repo.find({ isActive: true }, { orderBy: { priority: 'ASC' } });
-        await this.em.populate(rules, ['jar', 'category']);
-
         const inbox = await this.em.find(
             Transaction,
             { household: currentHouseholdId(), status: TransactionStatus.INBOX },
             { orderBy: { bookedOn: 'DESC' }, limit: 500 }
         );
-
-        let sorted = 0;
-        for (const transaction of inbox) {
-            for (const rule of rules) {
-                const haystack = fieldValue(transaction, rule.field);
-                if (!this.matches(rule, haystack)) continue;
-                transaction.jar = rule.jar;
-                transaction.category = rule.category;
-                transaction.status = TransactionStatus.SORTED;
-                transaction.appliedRule = rule.id;
-                rule.hitCount += 1;
-                sorted += 1;
-                break;
-            }
-        }
-
+        const sorted = await this.autoSort(inbox, { countHits: true });
         if (sorted > 0) await this.em.flush();
         return { sorted };
     }
@@ -131,41 +137,21 @@ export class SortRuleService {
 
     // Private
 
-    /**
-     * First match wins, in priority order — so the engine is predictable and a user
-     * can reason about why a transaction landed where it did.
-     */
-    matches(rule: SortRule, value: string): boolean {
-        const haystack = value.toLowerCase();
-        const needle = rule.matchValue.toLowerCase();
-        switch (rule.matcher) {
-            case RuleMatcher.EQUALS:
-                return haystack === needle;
-            case RuleMatcher.STARTS_WITH:
-                return haystack.startsWith(needle);
-            case RuleMatcher.CONTAINS:
-                return haystack.includes(needle);
-            case RuleMatcher.REGEX:
-                try {
-                    return new RegExp(rule.matchValue, 'i').test(value);
-                } catch {
-                    return false; // A user-authored bad pattern must not break sorting.
-                }
-            default:
-                return false;
-        }
-    }
-}
-
-function fieldValue(transaction: Transaction, field: RuleField): string {
-    switch (field) {
-        case RuleField.COUNTERPARTY:
-            return transaction.counterparty ?? '';
-        case RuleField.AMOUNT:
-            return String(transaction.amount);
-        case RuleField.DESCRIPTION:
-        default:
-            return transaction.description;
+    private async loadContext(): Promise<AutoSortContext> {
+        const household = currentHouseholdId();
+        const [rules, merchants, jars, categories] = await Promise.all([
+            this.repo.find({ isActive: true }, { orderBy: { priority: 'ASC' } }),
+            this.merchants.listActive(),
+            this.em.find(Jar, { household }),
+            this.em.find(Category, { household }, { populate: ['jar'] }),
+        ]);
+        await this.em.populate(rules, ['jar', 'category']);
+        return {
+            rules,
+            merchants,
+            jarsByKey: new Map(jars.map(jar => [jar.key, jar])),
+            categoryByJarAndName: categoryIndex(categories),
+        };
     }
 }
 

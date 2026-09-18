@@ -31,7 +31,7 @@ export const ruleUpdate = oc
     .input(Rule.partial().extend({ id: Id, householdId: HouseholdId }))
     .output(Rule);
 
-/** Re-runs isActive rules over unsorted history — the "clean my inbox" button. */
+/** Re-runs isActive rules over the inbox, then the merchant catalog — the "clean my inbox" button. */
 export const ruleReplay = oc.input(HouseholdScoped).output(z.object({ sorted: z.int() }));
 
 // ====================================================================

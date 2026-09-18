@@ -1,8 +1,9 @@
 import type { JarKey, MerchantPreset } from '@rumtelo/contracts';
+import { containsWord } from '@rumtelo/utils';
 
 /**
- * Same first-pass rules as MerchantPresetService.matchFeed (contains, case-insensitive).
- * Prefer longer needles so "AH TO GO" wins over bare "AH ".
+ * Same first-pass rules as MerchantPresetService.matchFeed (whole-word, case-insensitive).
+ * Prefer longer needles so "AH TO GO" wins over bare "AH".
  */
 export function matchMerchantJarKey(
     text: string,
@@ -17,7 +18,7 @@ export function matchMerchantJarKey(
             .map(alias => alias.trim().toLowerCase())
             .filter(Boolean);
         for (const needle of needles) {
-            if (!haystack.includes(needle)) continue;
+            if (!containsWord(haystack, needle)) continue;
             if (!best || needle.length > best.length) {
                 best = { jarKey: merchant.jarKey, length: needle.length };
             }

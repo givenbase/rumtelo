@@ -61,6 +61,14 @@ export class Transaction extends HouseholdEntity {
     inflowKey: string | null = null;
 
     /**
+     * MerchantPreset.key that auto-sorted this row, when no household rule matched.
+     * Snapshot, not an FK — retiring a merchant must not rewrite history.
+     * Cleared when a rule or the user sorts the row themselves.
+     */
+    @Property({ length: 64, nullable: true })
+    appliedMerchantKey: string | null = null;
+
+    /**
      * Stable hash of (account, date, amount, description) — see class-level UNIQUE.
      * Null for manual entries, which are never de-duplicated.
      */

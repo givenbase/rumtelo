@@ -225,6 +225,9 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
     const appliedRule = tx?.appliedRuleId
         ? rules.find(row => row.id === tx.appliedRuleId)
         : undefined;
+    const appliedMerchant = tx?.appliedMerchantKey
+        ? merchants.find(merchant => merchant.key === tx.appliedMerchantKey)
+        : undefined;
 
     const activeFixedOut = (fixedQuery.data ?? []).filter(
         item => isFixedCostCounting(item) && item.direction === FlowDirection.OUT
@@ -332,6 +335,16 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                 label="Sorted by rule"
                 value={`“${appliedRule.matchValue}” → jar`}
                 hint="Manage rules on the Transactions page"
+                href="/product/money/transactions"
+            />
+        );
+    } else if (appliedMerchant) {
+        related.push(
+            <RelatedRow
+                key="merchant"
+                label="Sorted from catalog"
+                value={appliedMerchant.name}
+                hint="No household rule matched — the merchant catalog placed this"
                 href="/product/money/transactions"
             />
         );
