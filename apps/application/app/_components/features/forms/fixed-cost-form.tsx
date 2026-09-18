@@ -505,7 +505,9 @@ export function FixedCostForm({
                 name,
                 counterparty: counterpartyValue,
                 amount: cents,
-                cadence: Cadence.MONTHLY,
+                cadence:
+                    fixedCostPresets.find(preset => preset.key === selectedBillPresetKey)
+                        ?.cadence ?? Cadence.MONTHLY,
                 dueDay,
                 direction: FlowDirection.OUT,
                 isActive: true,

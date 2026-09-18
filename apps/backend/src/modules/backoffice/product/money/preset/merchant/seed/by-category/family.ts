@@ -21,8 +21,8 @@ export const FAMILY_MERCHANTS: readonly MerchantSeed[] = [
     {
         key: 'HEMA_FAMILY',
         name: 'HEMA (kids)',
-        matchValue: 'HEMA',
-        aliases: ['HEMA kids', 'HEMA baby'],
+        matchValue: 'HEMA kids',
+        aliases: ['HEMA baby'],
         mcc: '5641',
         jarKey: necessities,
         categoryTemplateKey: 'FAMILY',

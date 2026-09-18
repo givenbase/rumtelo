@@ -30,7 +30,7 @@ export const INSURANCE_MERCHANTS: readonly MerchantSeed[] = [
         website: 'https://centraalbeheer.nl',
         highlight: null,
         markets: ['NL'],
-        matchPriority: 0,
+        matchPriority: 1,
         isActive: true,
     },
     {
@@ -75,7 +75,7 @@ export const INSURANCE_MERCHANTS: readonly MerchantSeed[] = [
         website: 'https://zilverenkruis.nl',
         highlight: null,
         markets: ['NL'],
-        matchPriority: 0,
+        matchPriority: 1,
         isActive: true,
     },
     {
@@ -337,7 +337,7 @@ export const INSURANCE_MERCHANTS: readonly MerchantSeed[] = [
         key: 'ANWB_VERZEKEREN',
         name: 'ANWB Verzekeren',
         matchValue: 'ANWB Verzekeren',
-        aliases: ['ANWB Verzekeren', 'ANWB Verzekeringen', 'Unigarant'],
+        aliases: ['ANWB Verzekeren', 'ANWB Verzekeringen'],
         mcc: '6300',
         jarKey: necessities,
         categoryTemplateKey: 'INSURANCE',
@@ -345,7 +345,7 @@ export const INSURANCE_MERCHANTS: readonly MerchantSeed[] = [
         website: 'https://anwb.nl',
         highlight: null,
         markets: ['NL'],
-        matchPriority: 0,
+        matchPriority: 1,
         isActive: true,
     },
     {

@@ -15,7 +15,7 @@ export const EATING_OUT_MERCHANTS: readonly MerchantSeed[] = [
         website: 'https://thuisbezorgd.nl',
         highlight: null,
         markets: ['NL'],
-        matchPriority: 0,
+        matchPriority: 1,
         isActive: true,
     },
     {
@@ -30,7 +30,7 @@ export const EATING_OUT_MERCHANTS: readonly MerchantSeed[] = [
         website: 'https://ubereats.com',
         highlight: null,
         markets: ['NL'],
-        matchPriority: 0,
+        matchPriority: 1,
         isActive: true,
     },
     {
@@ -111,8 +111,8 @@ export const EATING_OUT_MERCHANTS: readonly MerchantSeed[] = [
     {
         key: 'MCDONALDS',
         name: "McDonald's",
-        matchValue: 'McDonald',
-        aliases: ['s", ', ', ', ', '],
+        matchValue: "McDonald's",
+        aliases: ['McDonalds', "MCDONALD'S", 'McD'],
         mcc: '5814',
         jarKey: play,
         categoryTemplateKey: 'EATING_OUT',
@@ -156,8 +156,8 @@ export const EATING_OUT_MERCHANTS: readonly MerchantSeed[] = [
     {
         key: 'DOMINOS',
         name: "Domino's",
-        matchValue: 'Domino',
-        aliases: ['s", ', ', '],
+        matchValue: "Domino's",
+        aliases: ['Dominos', "DOMINO'S PIZZA"],
         mcc: '5814',
         jarKey: play,
         categoryTemplateKey: 'EATING_OUT',

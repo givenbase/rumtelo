@@ -45,7 +45,7 @@ export const MEDIA_MERCHANTS: readonly MerchantSeed[] = [
         website: 'https://disneyplus.com',
         highlight: null,
         markets: ['NL'],
-        matchPriority: 0,
+        matchPriority: 1,
         isActive: true,
     },
     {
@@ -75,7 +75,7 @@ export const MEDIA_MERCHANTS: readonly MerchantSeed[] = [
         website: 'https://primevideo.com',
         highlight: null,
         markets: ['NL'],
-        matchPriority: 0,
+        matchPriority: 1,
         isActive: true,
     },
     {
@@ -90,7 +90,7 @@ export const MEDIA_MERCHANTS: readonly MerchantSeed[] = [
         website: 'https://youtube.com',
         highlight: null,
         markets: ['NL'],
-        matchPriority: 0,
+        matchPriority: 1,
         isActive: true,
     },
     {
@@ -135,7 +135,7 @@ export const MEDIA_MERCHANTS: readonly MerchantSeed[] = [
         website: 'https://tinder.com',
         highlight: null,
         markets: ['NL'],
-        matchPriority: 0,
+        matchPriority: 1,
         isActive: true,
     },
     {

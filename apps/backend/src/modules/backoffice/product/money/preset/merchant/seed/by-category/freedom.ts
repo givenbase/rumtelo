@@ -135,7 +135,7 @@ export const FREEDOM_MERCHANTS: readonly MerchantSeed[] = [
         website: 'https://revolut.com',
         highlight: null,
         markets: ['NL'],
-        matchPriority: 0,
+        matchPriority: 1,
         isActive: true,
     },
     {
@@ -225,7 +225,7 @@ export const FREEDOM_MERCHANTS: readonly MerchantSeed[] = [
         website: 'https://partner.bol.com',
         highlight: null,
         markets: ['NL'],
-        matchPriority: 0,
+        matchPriority: 1,
         isActive: true,
     },
     {
@@ -240,7 +240,7 @@ export const FREEDOM_MERCHANTS: readonly MerchantSeed[] = [
         website: 'https://sellercentral.amazon.nl',
         highlight: null,
         markets: ['NL'],
-        matchPriority: 0,
+        matchPriority: 1,
         isActive: true,
     },
     {

@@ -45,7 +45,7 @@ export const FINES_MERCHANTS: readonly MerchantSeed[] = [
         website: 'https://om.nl',
         highlight: null,
         markets: ['NL'],
-        matchPriority: 0,
+        matchPriority: 1,
         isActive: true,
     },
     {

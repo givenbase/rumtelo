@@ -45,7 +45,7 @@ export const GAMING_MERCHANTS: readonly MerchantSeed[] = [
         website: 'https://xbox.com',
         highlight: null,
         markets: ['NL'],
-        matchPriority: 0,
+        matchPriority: 1,
         isActive: true,
     },
     {

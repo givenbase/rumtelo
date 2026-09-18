@@ -252,7 +252,7 @@ export const GIVE_MERCHANTS: readonly MerchantSeed[] = [
         website: 'https://bol.com',
         highlight: null,
         markets: ['NL'],
-        matchPriority: 0,
+        matchPriority: 1,
         isActive: true,
     },
     {

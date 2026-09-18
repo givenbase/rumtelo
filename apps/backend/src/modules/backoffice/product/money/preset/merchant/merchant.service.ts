@@ -7,6 +7,29 @@ import { MerchantPreset } from './merchant.entity';
 
 const DEFAULT_MARKET = 'NL';
 
+const WORD_CHAR = /[\p{L}\p{N}]/u;
+
+/**
+ * Case-insensitive needle match that respects word edges on the needle's own
+ * letter/digit ends. `ns` matches "NS GROEP" but not "belastingdienst";
+ * `microsoft*` still matches "MICROSOFT*XBOX" because `*` is not a word char.
+ * Both inputs are expected lower-cased.
+ */
+export function containsWord(text: string, needle: string): boolean {
+    let from = 0;
+    while (from <= text.length - needle.length) {
+        const at = text.indexOf(needle, from);
+        if (at === -1) return false;
+        const before = text[at - 1];
+        const after = text[at + needle.length];
+        const startOk = !WORD_CHAR.test(needle.charAt(0)) || !before || !WORD_CHAR.test(before);
+        const endOk = !WORD_CHAR.test(needle.slice(-1)) || !after || !WORD_CHAR.test(after);
+        if (startOk && endOk) return true;
+        from = at + 1;
+    }
+    return false;
+}
+
 @Injectable()
 export class MerchantPresetService {
     constructor(@Inject(EntityManager) private readonly em: EntityManager) {}
@@ -57,9 +80,10 @@ export class MerchantPresetService {
     }
 
     /**
-     * First-pass bank-feed matcher: MCC exact, then case-insensitive CONTAINS
-     * on matchValue + aliases against counterparty/description text.
-     * Higher matchPriority wins when multiple needles hit.
+     * First-pass bank-feed matcher: MCC exact, then case-insensitive **whole-word**
+     * match of matchValue + aliases against counterparty/description text
+     * (`NS` must not hit "Belastingdienst", `ING` must not hit "Booking").
+     * Higher matchPriority wins when multiple needles hit, then lower sortOrder.
      */
     async matchFeed(input: {
         text?: string | null;
@@ -86,7 +110,7 @@ export class MerchantPresetService {
             const needles = [matching.matchValue, ...matching.aliases]
                 .map(alias => alias.trim().toLowerCase())
                 .filter(Boolean);
-            if (!needles.some(needle => text.includes(needle))) continue;
+            if (!needles.some(needle => containsWord(text, needle))) continue;
             const bestPri = best?.matching?.matchPriority ?? -1;
             if (
                 !best ||

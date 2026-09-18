@@ -1,9 +1,11 @@
 import type { EntityManager } from '@mikro-orm/postgresql';
 
 import { Seeder } from '@mikro-orm/seeder';
+import { Cadence } from '@rumtelo/contracts';
 
 import { FixedCostPresetMerchant } from '../../../../modules/backoffice/product/money/preset/fixed-cost/fixed-cost-merchant.entity';
 import { FixedCostPreset } from '../../../../modules/backoffice/product/money/preset/fixed-cost/fixed-cost.entity';
+import { CADENCE_BY_PRESET } from '../../../../modules/backoffice/product/money/preset/fixed-cost/seed/cadences';
 import { DUE_DAY_BY_PRESET } from '../../../../modules/backoffice/product/money/preset/fixed-cost/seed/due-days';
 import { FIXED_COST_PRESET_SEED } from '../../../../modules/backoffice/product/money/preset/fixed-cost/seed/fixed-cost.seed-data';
 import { MERCHANT_KEYS_BY_PRESET } from '../../../../modules/backoffice/product/money/preset/fixed-cost/seed/merchant-keys';
@@ -42,6 +44,7 @@ export class FixedCostPresetSeeder extends Seeder {
             const audiences = row.audienceKeys.map(audienceByKey);
             const merchantKeys = MERCHANT_KEYS_BY_PRESET[row.key] ?? [];
             const dueDay = DUE_DAY_BY_PRESET[row.key] ?? null;
+            const cadence = CADENCE_BY_PRESET[row.key] ?? Cadence.MONTHLY;
 
             const existing = existingByKey.get(row.key);
             if (existing) {
@@ -49,6 +52,7 @@ export class FixedCostPresetSeeder extends Seeder {
                 existing.jarTemplate = jarTemplate;
                 existing.categoryTemplate = categoryTemplate;
                 existing.dueDay = dueDay;
+                existing.cadence = cadence;
                 existing.sortOrder = sortOrder;
                 existing.isActive = true;
                 existing.merchantLinks.removeAll();
@@ -61,6 +65,7 @@ export class FixedCostPresetSeeder extends Seeder {
                     jarTemplate,
                     categoryTemplate,
                     dueDay,
+                    cadence,
                     sortOrder,
                     isActive: true,
                 } as never);

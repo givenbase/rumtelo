@@ -120,7 +120,7 @@ export const TRAVEL_MERCHANTS: readonly MerchantSeed[] = [
         website: 'https://nsinternational.com',
         highlight: null,
         markets: ['NL'],
-        matchPriority: 0,
+        matchPriority: 1,
         isActive: true,
     },
 ];
