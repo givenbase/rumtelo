@@ -8,7 +8,14 @@ import type { Goal, GoalProjection } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card, Meter, Typography } from '@rumtelo/ui';
-import { earnGoalProgress, monthlyNetAsOf } from '@rumtelo/utils';
+import {
+    earnGoalProgress,
+    monthlyNetAsOf,
+    describePeriodTravel,
+    endOfPeriodIso,
+    projectGoalsAtHorizon,
+    toPeriodKey,
+} from '@rumtelo/utils';
 
 import { createMoveHref, goalDetailHref, updateHref } from '@/app/_lib/create-routes';
 import { isFocusSaveGoal, saveGoalProgressCents, saveGoalRank } from '@/app/_lib/goal-focus';
@@ -23,6 +30,7 @@ import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { SaveGoalManifestActions } from '@/components/features/growth/save-goal-manifest-actions';
 import { JarBadge, MetaChip, formatBookedDate } from '@/components/features/money/jar-badge';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { EditIcon } from '@/components/features/ui/action-icons';
 
 const EN_MONTHS = [
@@ -177,6 +185,7 @@ function paceAdvice(input: {
  */
 export function GoalDetailPageClient({ goalId }: { goalId: string }) {
     const { householdId } = useAuth();
+    const { period } = useAppShell();
     const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
     const { byKey: jarByKey } = useJarCatalog();
@@ -269,10 +278,41 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                 jarAvailableCents: jarBalance?.available,
             })
           : goal.saved;
-    const progress = goal.target > 0 ? Math.min(1, Math.max(0, current / goal.target)) : 0;
-    const remaining = Math.max(0, goal.target - current);
+    const travel = describePeriodTravel(period);
+    const periodKey = toPeriodKey(period.year, period.month);
+    const atPeriod =
+        travel.direction === 'current' || isEarn
+            ? null
+            : (projectGoalsAtHorizon({
+                  monthsDelta: travel.monthsDelta,
+                  direction: travel.direction,
+                  selectedPeriodEndIso: endOfPeriodIso(periodKey),
+                  goals: [
+                      {
+                          id: goal.id,
+                          name: goal.name,
+                          jarKey: jar?.key ?? null,
+                          kind: goal.kind,
+                          status: goal.status,
+                          saved: goal.saved,
+                          target: goal.target,
+                          monthlyContribution: goal.monthlyContribution,
+                          targetOn: goal.targetOn,
+                          fulfilledOn: goal.fulfilledOn,
+                      },
+                  ],
+              })[0] ?? null);
+    const shown = atPeriod?.projectedSaved ?? current;
+    const reachedByThen = atPeriod?.fulfilledByPeriod === true;
+    const reachedMonth = atPeriod?.reachedOn
+        ? `${EN_MONTHS[Number(atPeriod.reachedOn.slice(5, 7)) - 1] ?? ''} ${atPeriod.reachedOn.slice(0, 4)}`.trim()
+        : null;
+    const progress = goal.target > 0 ? Math.min(1, Math.max(0, shown / goal.target)) : 0;
+    const remaining = Math.max(0, goal.target - shown);
     const reached =
-        goal.status === GoalStatus.REACHED || (isEarn ? earn!.reached : goal.saved >= goal.target);
+        goal.status === GoalStatus.REACHED ||
+        (isEarn ? earn!.reached : goal.saved >= goal.target) ||
+        reachedByThen;
 
     const wantMonths =
         goal.targetOn !== null
@@ -397,9 +437,17 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                                 : 'Progress'}
                         </p>
                         <div className="mt-1 flex flex-wrap items-baseline gap-2">
-                            <span className="text-2xl font-semibold text-accent">
-                                {formatMoney(current)}
-                            </span>
+                            {atPeriod && atPeriod.projectedSaved !== current ? (
+                                <span className="text-2xl font-semibold tracking-tight">
+                                    <span className="text-fg-faint">{formatMoney(current)}</span>
+                                    <span className="mx-1 text-fg-faint">→</span>
+                                    <span className="text-success">{formatMoney(shown)}</span>
+                                </span>
+                            ) : (
+                                <span className="text-2xl font-semibold text-accent">
+                                    {formatMoney(current)}
+                                </span>
+                            )}
                             <span className="font-mono text-xs text-fg-muted">
                                 of {formatMoney(goal.target)}
                                 {isEarn ? ' /mo' : ''}
@@ -420,32 +468,36 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                                       ? 'border-danger/30 text-danger'
                                       : 'border-success/30 text-success'
                             }>
-                            {reached
-                                ? 'Reached'
-                                : projection?.onTrack === false
-                                  ? 'Needs attention'
-                                  : 'On track'}
+                            {reachedByThen && reachedMonth
+                                ? `Reached ${reachedMonth}`
+                                : reached
+                                  ? 'Reached'
+                                  : projection?.onTrack === false
+                                    ? 'Needs attention'
+                                    : 'On track'}
                         </MetaChip>
                         <MetaChip>{Math.round(progress * 100)}%</MetaChip>
                     </div>
                 </div>
                 <Meter value={progress} />
                 <p className="font-mono text-xs text-fg-muted">
-                    {reached
-                        ? goal.fulfilledOn
-                            ? `◇ Reached ${formatBookedDate(goal.fulfilledOn)}`
-                            : '◇ Target met'
-                        : isEarn
-                          ? `◇ ${formatMoney(remaining)} still to earn each month`
-                          : goal.kind === GoalKind.GIVE
-                            ? `◇ ${formatMoney(remaining)} left on the pledge${
-                                  goal.targetOn ? ` · by ${goal.targetOn.slice(0, 4)}` : ''
-                              }`
-                            : `◇ ${formatMoney(goal.monthlyContribution)} /mo · ${
-                                  formatMonthYear(projection?.projectedDate) ??
-                                  formatMonthYear(goal.targetOn) ??
-                                  'date open'
-                              }`}
+                    {reachedByThen && reachedMonth
+                        ? `◇ Reached ${reachedMonth}`
+                        : reached
+                          ? goal.fulfilledOn
+                              ? `◇ Reached ${formatBookedDate(goal.fulfilledOn)}`
+                              : '◇ Target met'
+                          : isEarn
+                            ? `◇ ${formatMoney(remaining)} still to earn each month`
+                            : goal.kind === GoalKind.GIVE
+                              ? `◇ ${formatMoney(remaining)} left on the pledge${
+                                    goal.targetOn ? ` · by ${goal.targetOn.slice(0, 4)}` : ''
+                                }`
+                              : `◇ ${formatMoney(goal.monthlyContribution)} /mo · ${
+                                    formatMonthYear(projection?.projectedDate) ??
+                                    formatMonthYear(goal.targetOn) ??
+                                    'date open'
+                                }`}
                 </p>
                 {goal.why?.trim() ? (
                     <p className="border-t border-line pt-4 text-sm leading-relaxed text-fg-secondary italic">

@@ -122,6 +122,7 @@ describe('period-stack', () => {
                     projectedSaved: 100,
                     fulfilledByPeriod: true,
                     monthsToFulfill: 0,
+                    reachedOn: null,
                     incomeNeededCents: null,
                 },
             ],

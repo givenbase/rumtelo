@@ -4,7 +4,9 @@ import Link from 'next/link';
 
 import type { JarBalance } from '@rumtelo/contracts';
 import { Typography } from '@rumtelo/ui';
-import { cn, jarCoverage } from '@rumtelo/utils';
+import { cn, jarCoverage, moneyDelta } from '@rumtelo/utils';
+
+import { MoneyDeltaLabel } from '@/components/features/home/money-delta-label';
 
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -29,6 +31,8 @@ export type JarSummaryModel = Pick<
     subtitle: string;
     icon: string;
     categoryCount: number;
+    /** Live-month allocation when the list is stacked. Null on the current month. */
+    baselineAllocated?: number | null;
 };
 
 /**
@@ -42,6 +46,9 @@ export function JarSummaryRow({ jar }: { jar: JarSummaryModel }) {
         credited: jar.credited,
         committedOut: jar.committedOut,
     });
+    const baseline = jar.baselineAllocated;
+    const showDelta = baseline !== null && baseline !== undefined && baseline !== jar.allocated;
+    const allocationDelta = showDelta ? moneyDelta(baseline, jar.allocated) : null;
     const activity =
         jar.committedOut > 0 || jar.spent > 0 || jar.credited > 0
             ? [
@@ -81,9 +88,18 @@ export function JarSummaryRow({ jar }: { jar: JarSummaryModel }) {
                         )}>
                         {formatMoney(coverage.available)}
                     </span>
-                    <span className="font-mono text-xs text-fg-faint">
-                        of {formatMoney(jar.allocated + jar.credited)}
-                    </span>
+                    {allocationDelta ? (
+                        <MoneyDeltaLabel
+                            className="justify-end font-mono text-xs"
+                            fromLabel={formatMoney(allocationDelta.from)}
+                            toLabel={formatMoney(allocationDelta.to)}
+                            deltaLabel={`${allocationDelta.delta > 0 ? '+' : ''}${formatMoney(allocationDelta.delta)}`}
+                        />
+                    ) : (
+                        <span className="font-mono text-xs text-fg-faint">
+                            of {formatMoney(jar.allocated + jar.credited)}
+                        </span>
+                    )}
                 </span>
                 <span className="shrink-0 text-xs text-fg-faint" aria-hidden>
                     ›

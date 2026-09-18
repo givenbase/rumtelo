@@ -34,16 +34,20 @@ export function JarsPageClient() {
     const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);
 
-    const jarsQuery = useLiveQuery(
-        apiQuery.money.jars.balances.queryOptions({
+    const dashboardQuery = useLiveQuery(
+        apiQuery.money.dashboard.get.queryOptions({
             input: { householdId: householdId!, period: periodKey },
         }),
-        [] as never,
+        null,
         live
     );
 
     const { byKey: catalogByKey } = useJarCatalog();
-    const jars = jarsQuery.data ?? [];
+    const jars = dashboardQuery.data?.jars ?? [];
+    const baselineById = new Map(
+        (dashboardQuery.data?.baselineJars ?? []).map(jar => [jar.id, jar.allocated] as const)
+    );
+    const stacked = dashboardQuery.data?.travel?.mode === 'stacked';
     const totalPct = jars.reduce((total, j) => total + j.percentage, 0);
     const onTarget = jars.filter(j => !j.overspent).length;
     const necJar = jars.find(jar => jar.key === 'NECESSITIES');
@@ -119,6 +123,9 @@ export function JarsPageClient() {
                                     committedOut: jar.committedOut,
                                     overspent: jar.overspent,
                                     categoryCount: jar.categories?.length ?? 0,
+                                    baselineAllocated: stacked
+                                        ? (baselineById.get(jar.id) ?? null)
+                                        : null,
                                 }}
                             />
                         );
@@ -127,7 +134,10 @@ export function JarsPageClient() {
 
                 <div className="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 font-mono text-xs text-fg-faint">
                     <span>
-                        {onTarget} / {jars.length} jars on track this period
+                        {onTarget} / {jars.length} jars on track
+                        {stacked
+                            ? ` · stacked over ${dashboardQuery.data?.travel?.monthsHorizon ?? '—'} months`
+                            : ' this period'}
                     </span>
                     <Link
                         href={productPath('growth/income')}

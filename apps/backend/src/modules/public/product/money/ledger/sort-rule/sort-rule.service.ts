@@ -6,12 +6,7 @@ import { currentHouseholdId } from '../../../../../../common/household/household
 import { MerchantPresetService } from '../../../../../backoffice/product/money/preset/merchant/merchant.service';
 import { Category } from '../../plan/jar/category.entity';
 import { Jar } from '../../plan/jar/jar.entity';
-import {
-    type JarKey,
-    type RuleField,
-    type RuleMatcher,
-    TransactionStatus,
-} from '@rumtelo/contracts';
+import { type RuleField, type RuleMatcher, TransactionStatus } from '@rumtelo/contracts';
 
 import {
     autoSortRows,

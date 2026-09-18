@@ -14,6 +14,8 @@ import { JarTemplateSeeder } from './product/money/JarTemplateSeeder';
 import { MarketSeeder } from './product/money/MarketSeeder';
 import { MerchantPresetSeeder } from './product/money/MerchantPresetSeeder';
 import { TransactionInPresetSeeder } from './product/money/TransactionInPresetSeeder';
+import { BookPresetSeeder } from './product/growth/BookPresetSeeder';
+import { WatchPresetSeeder } from './product/growth/WatchPresetSeeder';
 import { IncomePostureSeeder } from './product/growth/IncomePostureSeeder';
 import { LeverPresetSeeder } from './product/growth/LeverPresetSeeder';
 import { WealthStageSeeder } from './product/growth/WealthStageSeeder';
@@ -42,6 +44,8 @@ export class DatabaseSeeder extends Seeder {
             IncomePostureSeeder,
             WealthStageSeeder,
             LeverPresetSeeder,
+            BookPresetSeeder,
+            WatchPresetSeeder,
             PlanSeeder,
             DemoHouseholdSeeder,
         ]);

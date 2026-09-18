@@ -30,6 +30,11 @@ export const env = createEnv({
         NEXT_PUBLIC_PREVIEW_PLAN: z.union([z.enum(PlanKey), z.enum(['ALL', 'FULL'])]).optional(),
 
         NEXT_PUBLIC_SENTRY_DSN: z.url().optional(),
+
+        /** bol.com partner site id — Learn book links carry it when set. */
+        NEXT_PUBLIC_BOL_PARTNER_ID: z.string().min(1).optional(),
+        /** Amazon Associates tag (amazon.nl) — Learn book links carry it when set. */
+        NEXT_PUBLIC_AMAZON_TAG: z.string().min(1).optional(),
     },
 
     emptyStringAsUndefined: true,
@@ -44,6 +49,8 @@ export const env = createEnv({
         NEXT_PUBLIC_PREVIEW_MODE: process.env.NEXT_PUBLIC_PREVIEW_MODE,
         NEXT_PUBLIC_PREVIEW_PLAN: process.env.NEXT_PUBLIC_PREVIEW_PLAN,
         NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+        NEXT_PUBLIC_BOL_PARTNER_ID: process.env.NEXT_PUBLIC_BOL_PARTNER_ID,
+        NEXT_PUBLIC_AMAZON_TAG: process.env.NEXT_PUBLIC_AMAZON_TAG,
 
         NODE_ENV: process.env.NODE_ENV,
         SKIP_ENV_VALIDATION: process.env.SKIP_ENV_VALIDATION,

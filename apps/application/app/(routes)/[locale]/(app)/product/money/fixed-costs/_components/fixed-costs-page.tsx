@@ -6,7 +6,14 @@ import { useState } from 'react';
 import { DEFAULT_JAR_SPLIT, jarCapabilitiesFor, JarKey } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Card, Typography } from '@rumtelo/ui';
-import { cn, monthlyAmount, fixedOutNetSummary, toPeriodKey } from '@rumtelo/utils';
+import {
+    cn,
+    describePeriodTravel,
+    fixedOutNetSummary,
+    horizonMonths,
+    monthlyAmount,
+    toPeriodKey,
+} from '@rumtelo/utils';
 
 import { CREATE_HREF, fixedDetailHref, updateHref } from '@/app/_lib/create-routes';
 import { bgClassToCssVar, cadenceLabel } from '@/app/_lib/jar-chrome';
@@ -66,6 +73,9 @@ export function FixedCostsPageClient() {
     const [openJarKeys, setOpenJarKeys] = useState<Set<string>>(() => new Set());
     const live = isLiveData(householdId);
     const periodKey = toPeriodKey(period.year, period.month);
+    const travel = describePeriodTravel(period);
+    const horizon = horizonMonths(travel);
+    const traveling = travel.direction !== 'current';
 
     const byJarQuery = useLiveQuery(
         apiQuery.money.fixedCosts.byJar.queryOptions({ input: { householdId: householdId! } }),
@@ -204,6 +214,12 @@ export function FixedCostsPageClient() {
                 <Typography as="h1" className="mt-2">
                     Set it up once. Then it runs automatically.
                 </Typography>
+                {traveling ? (
+                    <Typography as="p" variant="lead" size="default" className="mt-2">
+                        Over {horizon} months that&apos;s {formatMoney(outTotal * horizon)} out and{' '}
+                        {formatMoney(NET * horizon)} in. Each row stays the monthly amount.
+                    </Typography>
+                ) : null}
             </div>
 
             {/* Doctrine: money README → “When Necessities can’t fit in 55%” */}
@@ -221,6 +237,9 @@ export function FixedCostsPageClient() {
                             )}>
                             {leftover >= 0 ? '+ ' : ''}
                             {formatMoney(leftover)} left after costs
+                            {traveling
+                                ? ` · ${formatMoney(leftover * horizon)} over ${horizon} mo`
+                                : ''}
                         </span>
                     }>
                     {(['ERUIT', 'ERIN'] as const).map(tabKey => (

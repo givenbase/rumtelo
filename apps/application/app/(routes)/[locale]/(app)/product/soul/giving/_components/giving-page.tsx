@@ -10,7 +10,14 @@ import type { FixedCost, Goal } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus, JarKey, TransactionStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card, Meter, Section, Typography } from '@rumtelo/ui';
-import { monthlyAmount, isFixedCostCounting } from '@rumtelo/utils';
+import {
+    describePeriodTravel,
+    endOfPeriodIso,
+    isFixedCostCounting,
+    monthlyAmount,
+    projectGoalsAtHorizon,
+    toPeriodKey,
+} from '@rumtelo/utils';
 
 import {
     createFixedHref,
@@ -30,6 +37,7 @@ import { CoachMark, CoachTipCard, HelperGate } from '@/components/features/helpe
 import { GivingFinder } from '@/components/features/money/giving-finder';
 import { MetaChip, formatDueDay } from '@/components/features/money/jar-badge';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
+import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -59,12 +67,23 @@ function yearStartIso(): string {
     return `${new Date().getUTCFullYear()}-01-01`;
 }
 
+function pledgeMonth(iso: string | null): string | null {
+    if (!iso) return null;
+    const year = Number(iso.slice(0, 4));
+    const month = Number(iso.slice(5, 7));
+    if (!year || !month) return null;
+    return new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric' }).format(
+        new Date(Date.UTC(year, month - 1, 1))
+    );
+}
+
 /**
  * Soul → Giving. Money owns the flow (jar, fixed cost, ledger); this page owns the
  * meaning: why the Give jar exists, where it goes, and how to choose a place well.
  */
 export function GivingPageClient() {
     const { householdId } = useAuth();
+    const { period } = useAppShell();
     const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
@@ -94,6 +113,33 @@ export function GivingPageClient() {
             null
         );
     }, [goalsQuery.data]);
+    const travel = describePeriodTravel(period);
+    const traveling = travel.direction !== 'current';
+    const periodKey = toPeriodKey(period.year, period.month);
+    const pledgeAt = useMemo(() => {
+        if (!traveling || !pledge) return null;
+        return (
+            projectGoalsAtHorizon({
+                monthsDelta: travel.monthsDelta,
+                direction: travel.direction,
+                selectedPeriodEndIso: endOfPeriodIso(periodKey),
+                goals: [
+                    {
+                        id: pledge.id,
+                        name: pledge.name,
+                        jarKey: JarKey.GIVE,
+                        kind: pledge.kind,
+                        status: pledge.status,
+                        saved: pledge.saved,
+                        target: pledge.target,
+                        monthlyContribution: pledge.monthlyContribution,
+                        targetOn: pledge.targetOn,
+                        fulfilledOn: pledge.fulfilledOn,
+                    },
+                ],
+            })[0] ?? null
+        );
+    }, [traveling, pledge, travel.monthsDelta, travel.direction, periodKey]);
 
     const fixedQuery = useLiveQuery(
         apiQuery.money.fixedCosts.byJar.queryOptions({ input: { householdId: householdId! } }),
@@ -160,8 +206,9 @@ export function GivingPageClient() {
     }, [txQuery.data]);
     const givenThisYear = recipients.reduce((total, row) => total + row.total, 0);
 
+    const shownSaved = pledgeAt?.projectedSaved ?? pledge?.saved ?? 0;
     const pledgeProgress =
-        pledge && pledge.target > 0 ? Math.min(1, pledge.saved / pledge.target) : 0;
+        pledge && pledge.target > 0 ? Math.min(1, shownSaved / pledge.target) : 0;
     const monthsLeft = pledge?.targetOn
         ? Math.max(
               1,
@@ -217,9 +264,21 @@ export function GivingPageClient() {
                                     {pledge.name}
                                 </Typography>
                                 <div className="mt-1 flex items-baseline gap-2">
-                                    <span className="font-display text-3xl font-semibold tracking-tight text-accent">
-                                        {formatMoney(pledge.saved)}
-                                    </span>
+                                    {pledgeAt && pledgeAt.projectedSaved !== pledge.saved ? (
+                                        <span className="font-display text-3xl font-semibold tracking-tight">
+                                            <span className="text-fg-faint">
+                                                {formatMoney(pledge.saved)}
+                                            </span>
+                                            <span className="mx-1 text-fg-faint">→</span>
+                                            <span className="text-success">
+                                                {formatMoney(pledgeAt.projectedSaved)}
+                                            </span>
+                                        </span>
+                                    ) : (
+                                        <span className="font-display text-3xl font-semibold tracking-tight text-accent">
+                                            {formatMoney(pledge.saved)}
+                                        </span>
+                                    )}
                                     <Typography as="span" variant="caption" className="font-mono">
                                         of {formatMoney(pledge.target)} pledged
                                     </Typography>
@@ -227,13 +286,15 @@ export function GivingPageClient() {
                             </div>
                             <Meter value={pledgeProgress} />
                             <Typography as="p" size="sm" color="secondary">
-                                {pledge.status === GoalStatus.REACHED
-                                    ? 'Pledge met. The jar keeps flowing — that was the point.'
-                                    : neededPerMonth !== null && monthsLeft !== null
-                                      ? monthlyPlanned >= neededPerMonth
-                                          ? `${formatMoney(monthlyPlanned)} leaves every month — enough to land the pledge with ${monthsLeft} ${monthsLeft === 1 ? 'month' : 'months'} to go.`
-                                          : `${formatMoney(neededPerMonth)} a month would land it; ${formatMoney(monthlyPlanned)} is planned. The gap is a choice, not a failure.`
-                                      : 'No date on this pledge yet.'}
+                                {pledgeAt?.fulfilledByPeriod
+                                    ? `Reached ${pledgeMonth(pledgeAt.reachedOn) ?? 'by then'}. The jar keeps flowing — that was the point.`
+                                    : pledge.status === GoalStatus.REACHED
+                                      ? 'Pledge met. The jar keeps flowing — that was the point.'
+                                      : neededPerMonth !== null && monthsLeft !== null
+                                        ? monthlyPlanned >= neededPerMonth
+                                            ? `${formatMoney(monthlyPlanned)} leaves every month — enough to land the pledge with ${monthsLeft} ${monthsLeft === 1 ? 'month' : 'months'} to go.`
+                                            : `${formatMoney(neededPerMonth)} a month would land it; ${formatMoney(monthlyPlanned)} is planned. The gap is a choice, not a failure.`
+                                        : 'No date on this pledge yet.'}
                             </Typography>
                             <Link
                                 href={goalDetailHref(pledge.id)}

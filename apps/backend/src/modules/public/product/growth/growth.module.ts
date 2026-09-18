@@ -4,6 +4,7 @@ import { GrowthCatalogsModule } from './catalogs/catalogs.module';
 import { GrowthDashboardModule } from './dashboard/dashboard.module';
 import { IncomeLeverModule } from './income-lever/income-lever.module';
 import { IncomeMilestoneModule } from './income-milestone/income-milestone.module';
+import { LearnModule } from './learn/learn.module';
 import { GrowthWeekCheckModule } from './week-check/week-check.module';
 
 /**
@@ -15,6 +16,7 @@ import { GrowthWeekCheckModule } from './week-check/week-check.module';
         IncomeLeverModule,
         IncomeMilestoneModule,
         GrowthCatalogsModule,
+        LearnModule,
         GrowthWeekCheckModule,
         GrowthDashboardModule,
     ],
@@ -22,6 +24,7 @@ import { GrowthWeekCheckModule } from './week-check/week-check.module';
         IncomeLeverModule,
         IncomeMilestoneModule,
         GrowthCatalogsModule,
+        LearnModule,
         GrowthWeekCheckModule,
         GrowthDashboardModule,
     ],

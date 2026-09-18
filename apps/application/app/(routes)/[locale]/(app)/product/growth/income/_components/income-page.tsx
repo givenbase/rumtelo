@@ -7,7 +7,14 @@ import { useMemo } from 'react';
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { AccentCard, Button, Card, Eyebrow, Typography } from '@rumtelo/ui';
-import { incomeDelta, monthlyNetAsOf, sumMonthly, toPeriodKey } from '@rumtelo/utils';
+import {
+    incomeDelta,
+    monthlyNetAsOf,
+    describePeriodTravel,
+    endOfPeriodIso,
+    horizonMonths,
+    toPeriodKey,
+} from '@rumtelo/utils';
 
 import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
 import { isLiveData } from '@/app/_lib/preview';
@@ -34,6 +41,9 @@ export function IncomePageClient() {
     const { period } = useAppShell();
     const { formatMoney } = useHouseholdCurrency();
     const periodKey = toPeriodKey(period.year, period.month);
+    const travel = describePeriodTravel(period);
+    const horizon = horizonMonths(travel);
+    const traveling = travel.direction !== 'current';
     const live = isLiveData(householdId);
 
     const incomeQuery = useLiveQuery(
@@ -57,9 +67,12 @@ export function IncomePageClient() {
     );
 
     const allSources = incomeQuery.data ?? [];
-    const NET = sumMonthly(allSources);
-    const jars = jarsQuery.data ?? [];
     const sources = allSources.filter(source => source.isActive);
+    const netNow = monthlyNetAsOf(sources, todayIso());
+    const netAsOf = monthlyNetAsOf(sources, endOfPeriodIso(periodKey));
+    const monthlyNet = travel.direction === 'past' ? netAsOf : netNow;
+    const spanNet = traveling ? monthlyNet * horizon : monthlyNet;
+    const jars = jarsQuery.data ?? [];
 
     const target = useMemo(() => {
         const earnTargets = (goalsQuery.data ?? [])
@@ -78,7 +91,7 @@ export function IncomePageClient() {
         [goalsQuery.data]
     );
 
-    const gap = target - NET;
+    const gap = target - monthlyNet;
 
     const newestEffective = sources
         .flatMap(source => source.periods ?? [])
@@ -116,13 +129,33 @@ export function IncomePageClient() {
                         className="grid h-full content-center gap-4 p-4 sm:p-5">
                         <div className="grid grid-cols-3 gap-3 sm:gap-4">
                             <div className="grid gap-1">
-                                <Eyebrow>Now</Eyebrow>
+                                <Eyebrow>
+                                    {travel.direction === 'future'
+                                        ? 'Through then'
+                                        : travel.direction === 'past'
+                                          ? 'Then'
+                                          : 'Now'}
+                                </Eyebrow>
                                 <p className="font-display text-2xl leading-none font-semibold tracking-tight text-fg sm:text-3xl">
-                                    {formatMoney(NET)}
+                                    {traveling ? (
+                                        <>
+                                            <span className="text-fg-faint">
+                                                {formatMoney(monthlyNet)}
+                                            </span>
+                                            <span className="mx-1 text-fg-faint">→</span>
+                                            <span className="text-success">
+                                                {formatMoney(spanNet)}
+                                            </span>
+                                        </>
+                                    ) : (
+                                        formatMoney(monthlyNet)
+                                    )}
                                 </p>
                                 <p className="font-mono text-[11px] leading-snug text-fg-muted">
-                                    {formatMoney(NET * 12)}/yr
-                                    {delta && delta.absolute !== 0 ? (
+                                    {traveling
+                                        ? `${formatMoney(monthlyNet)}/mo · ${horizon} months`
+                                        : `${formatMoney(monthlyNet * 12)}/yr`}
+                                    {delta && delta.absolute !== 0 && !traveling ? (
                                         <>
                                             <br />
                                             <span
@@ -166,7 +199,7 @@ export function IncomePageClient() {
 
                 <div data-tour="income-simulator" className="min-w-0">
                     <IncomeSimulator
-                        netCents={NET}
+                        netCents={monthlyNet}
                         targetCents={target}
                         jars={jars}
                         goals={saveGoals}

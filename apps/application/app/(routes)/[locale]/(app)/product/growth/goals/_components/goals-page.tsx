@@ -8,7 +8,16 @@ import type { Goal } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { AccentCard, Card, EmptyState, Meter, Typography } from '@rumtelo/ui';
-import { cn, earnGoalProgress, monthlyNetAsOf } from '@rumtelo/utils';
+import {
+    cn,
+    describePeriodTravel,
+    earnGoalProgress,
+    endOfPeriodIso,
+    monthlyNetAsOf,
+    projectGoalsAtHorizon,
+    toPeriodKey,
+    type GoalAtPeriod,
+} from '@rumtelo/utils';
 
 import { CREATE_HREF, goalDetailHref } from '@/app/_lib/create-routes';
 import { isFocusSaveGoal, saveGoalRank } from '@/app/_lib/goal-focus';
@@ -18,6 +27,7 @@ import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { JarBadge } from '@/components/features/money/jar-badge';
+import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 
@@ -87,14 +97,27 @@ type GoalProgress = {
     subline: string;
 };
 
+function formatReachedMonth(iso: string | null): string | null {
+    if (!iso) return null;
+    const [year, month] = iso.split('-').map(Number);
+    if (!year || !month) return null;
+    return `${EN_MONTHS[month - 1]} ${year}`;
+}
+
 function goalProgress(
     goal: Goal,
     currentNet: number,
     tab: Tab,
-    formatMoney: (amount: number) => string
+    formatMoney: (amount: number) => string,
+    projection?: GoalAtPeriod | null
 ): GoalProgress {
     const isEarn = goal.kind === GoalKind.EARN;
     const isGive = goal.kind === GoalKind.GIVE;
+    const reachedLabel = formatReachedMonth(projection?.reachedOn ?? null);
+    const traveling =
+        projection !== null &&
+        projection !== undefined &&
+        (projection.projectedSaved !== goal.saved || projection.fulfilledByPeriod);
 
     if (isEarn) {
         const earn = earnGoalProgress({ target: goal.target, currentNet });
@@ -103,39 +126,50 @@ function goalProgress(
             progress: goal.target > 0 ? Math.min(1, earn.current / goal.target) : 0,
             subline:
                 tab === 'REACHED' && goal.fulfilledOn
-                    ? `Reached ${goal.fulfilledOn}`
+                    ? `Reached ${formatReachedMonth(goal.fulfilledOn) ?? goal.fulfilledOn}`
                     : earn.reached
                       ? 'Target met'
                       : `${formatMoney(earn.remaining)} still to earn`,
         };
     }
 
-    if (isGive) {
+    if (projection?.fulfilledByPeriod && reachedLabel) {
         return {
-            current: goal.saved,
-            progress: goal.target > 0 ? Math.min(1, goal.saved / goal.target) : 0,
+            current: projection.projectedSaved,
+            progress: 1,
+            subline: `Reached ${reachedLabel} on this plan`,
+        };
+    }
+
+    if (isGive) {
+        const current = traveling ? (projection?.projectedSaved ?? goal.saved) : goal.saved;
+        return {
+            current,
+            progress: goal.target > 0 ? Math.min(1, current / goal.target) : 0,
             subline:
                 tab === 'REACHED'
-                    ? `Pledge met${goal.fulfilledOn ? ` · ${goal.fulfilledOn}` : ''}`
-                    : `${formatMoney(Math.max(0, goal.target - goal.saved))} left${
+                    ? `Pledge met${goal.fulfilledOn ? ` · ${formatReachedMonth(goal.fulfilledOn) ?? goal.fulfilledOn}` : ''}`
+                    : `${formatMoney(Math.max(0, goal.target - current))} left${
                           goal.targetOn ? ` · by ${goal.targetOn.slice(0, 4)}` : ''
                       }`,
         };
     }
 
+    const current = traveling ? (projection?.projectedSaved ?? goal.saved) : goal.saved;
+    const etaLabel = eta(goal.saved, goal.target, goal.monthlyContribution);
+
     return {
-        current: goal.saved,
-        progress: goal.target > 0 ? Math.min(1, goal.saved / goal.target) : 0,
-        subline: `${formatMoney(goal.monthlyContribution)} /mo · by ${eta(
-            goal.saved,
-            goal.target,
-            goal.monthlyContribution
-        )}`,
+        current,
+        progress: goal.target > 0 ? Math.min(1, current / goal.target) : 0,
+        subline: traveling
+            ? `${formatMoney(goal.monthlyContribution)} /mo · reaches ${etaLabel}`
+            : `${formatMoney(goal.monthlyContribution)} /mo · by ${etaLabel}`,
     };
 }
 
 export function GoalsPageClient() {
     const { householdId } = useAuth();
+    const { period } = useAppShell();
     const [tab, setTab] = useState<Tab>('ON_TRACK');
     const [kindFilter, setKindFilter] = useState<KindFilter>('ALL');
     const [jarFilter, setJarFilter] = useState<string | null>(null);
@@ -177,9 +211,38 @@ export function GoalsPageClient() {
 
     const goals = useMemo((): ReadonlyArray<Goal> => goalsQuery.data ?? [], [goalsQuery.data]);
 
+    const travel = describePeriodTravel(period);
+    const traveling = travel.direction !== 'current';
+    const periodKey = toPeriodKey(period.year, period.month);
+
+    const projectionById = useMemo(() => {
+        if (!traveling) return new Map<string, GoalAtPeriod>();
+        const rows = projectGoalsAtHorizon({
+            monthsDelta: travel.monthsDelta,
+            direction: travel.direction,
+            selectedPeriodEndIso: endOfPeriodIso(periodKey),
+            goals: goals.map(goal => ({
+                id: goal.id,
+                name: goal.name,
+                jarKey: goal.jarId ? (jarById.get(goal.jarId)?.key ?? null) : null,
+                jarId: goal.jarId,
+                kind: goal.kind,
+                status: goal.status,
+                saved: goal.saved,
+                target: goal.target,
+                monthlyContribution: goal.monthlyContribution,
+                targetOn: goal.targetOn,
+                fulfilledOn: goal.fulfilledOn,
+            })),
+        });
+        return new Map(rows.map(row => [row.goalId, row]));
+    }, [traveling, travel.monthsDelta, travel.direction, periodKey, goals, jarById]);
+
     const active = useMemo(
         () =>
             goals.filter(goal => {
+                const projected = projectionById.get(goal.id);
+                if (traveling && projected?.fulfilledByPeriod) return false;
                 if (goal.status === GoalStatus.ARCHIVED || goal.status === GoalStatus.REACHED)
                     return false;
                 if (goal.kind === GoalKind.EARN) {
@@ -187,18 +250,23 @@ export function GoalsPageClient() {
                 }
                 return goal.saved < goal.target;
             }),
-        [goals, currentNet]
+        [goals, currentNet, projectionById, traveling]
     );
     const reached = useMemo(
         () =>
             goals.filter(goal => {
+                const projected = projectionById.get(goal.id);
+                if (traveling && projected?.fulfilledByPeriod) return true;
+                if (travel.direction === 'past') {
+                    return Boolean(projected?.fulfilledByPeriod);
+                }
                 if (goal.status === GoalStatus.REACHED) return true;
                 if (goal.kind === GoalKind.EARN) {
                     return earnGoalProgress({ target: goal.target, currentNet }).reached;
                 }
                 return goal.saved >= goal.target;
             }),
-        [goals, currentNet]
+        [goals, currentNet, projectionById, traveling, travel.direction]
     );
     const tabGoals = tab === 'ON_TRACK' ? active : reached;
 
@@ -256,8 +324,11 @@ export function GoalsPageClient() {
                     Every goal is a decision you&apos;ve already made.
                 </Typography>
                 <Typography as="p" variant="lead" size="default" className="mt-2">
-                    Save toward a jar, raise what you earn, or keep a give pledge. Direction first —
-                    the number follows.
+                    {traveling
+                        ? travel.direction === 'future'
+                            ? `Looking ahead ${travel.relativeLabel}. Goals that finish on this plan move to Reached, with the month they land.`
+                            : `Looking back ${travel.relativeLabel}. Only goals already fulfilled by then count as reached.`
+                        : 'Save toward a jar, raise what you earn, or keep a give pledge. Direction first — the number follows.'}
                 </Typography>
             </div>
 
@@ -371,7 +442,9 @@ export function GoalsPageClient() {
             ) : featured ? (
                 <div className="grid gap-4 sm:grid-cols-2">
                     {shown.map(goal => {
-                        const stats = goalProgress(goal, currentNet, tab, formatMoney);
+                        const projection = traveling ? (projectionById.get(goal.id) ?? null) : null;
+                        const stats = goalProgress(goal, currentNet, tab, formatMoney, projection);
+                        const reachedLabel = formatReachedMonth(projection?.reachedOn ?? null);
                         const jar = goal.jarId ? jarById.get(goal.jarId) : null;
                         const focus = isFocusSaveGoal(goal, goals);
                         const rank = saveGoalRank(goal, goals);
@@ -394,6 +467,11 @@ export function GoalsPageClient() {
                                         ) : rank !== null && rank > 1 ? (
                                             <span className="inline-flex items-center rounded-full border border-line bg-raised px-2.5 py-1 font-mono text-[10px] tracking-widest text-fg-faint uppercase">
                                                 #{rank}
+                                            </span>
+                                        ) : null}
+                                        {projection?.fulfilledByPeriod && reachedLabel ? (
+                                            <span className="inline-flex items-center rounded-full border border-success/40 bg-success/10 px-2.5 py-1 font-mono text-[10px] tracking-widest text-success uppercase">
+                                                Reached {reachedLabel}
                                             </span>
                                         ) : null}
                                         {jar && goal.kind === GoalKind.SAVE ? (
@@ -470,11 +548,18 @@ export function GoalsPageClient() {
                                 {open ? (
                                     <ul className="grid">
                                         {group.items.map(goal => {
+                                            const projection = traveling
+                                                ? (projectionById.get(goal.id) ?? null)
+                                                : null;
                                             const stats = goalProgress(
                                                 goal,
                                                 currentNet,
                                                 tab,
-                                                formatMoney
+                                                formatMoney,
+                                                projection
+                                            );
+                                            const reachedLabel = formatReachedMonth(
+                                                projection?.reachedOn ?? null
                                             );
                                             const jar = goal.jarId ? jarById.get(goal.jarId) : null;
                                             const pct = Math.round(stats.progress * 100);
@@ -502,6 +587,12 @@ export function GoalsPageClient() {
                                                                       rank > 1 ? (
                                                                         <span className="ml-2 font-mono text-[10px] tracking-wide text-fg-faint uppercase">
                                                                             #{rank}
+                                                                        </span>
+                                                                    ) : null}
+                                                                    {projection?.fulfilledByPeriod &&
+                                                                    reachedLabel ? (
+                                                                        <span className="ml-2 font-mono text-[10px] tracking-wide text-success uppercase">
+                                                                            Reached {reachedLabel}
                                                                         </span>
                                                                     ) : null}
                                                                 </p>

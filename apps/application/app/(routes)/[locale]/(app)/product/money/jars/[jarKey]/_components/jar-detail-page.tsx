@@ -6,7 +6,14 @@ import Link from 'next/link';
 import { GoalKind, GoalStatus, JarKey, jarCapabilitiesFor } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card, Typography } from '@rumtelo/ui';
-import { toPeriodKey, isFixedCostCounting } from '@rumtelo/utils';
+import {
+    describePeriodTravel,
+    endOfPeriodIso,
+    isFixedCostCounting,
+    moneyDelta,
+    projectGoalsAtHorizon,
+    toPeriodKey,
+} from '@rumtelo/utils';
 
 import { claimFixedCostMatches } from '@/app/_lib/fixed-cost-match';
 import { activeSaveGoalsOnJar, focusSaveGoal } from '@/app/_lib/goal-focus';
@@ -25,6 +32,7 @@ import { MetaChip, formatBookedDate } from '@/components/features/money/jar-badg
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { MoneyDeltaLabel } from '@/components/features/home/money-delta-label';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import {
     createGoalHref,
@@ -47,11 +55,11 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
     const { byKey: catalogByKey } = useJarCatalog();
     const catalog = catalogByKey.get(jarKey);
 
-    const jarsQuery = useLiveQuery(
-        apiQuery.money.jars.balances.queryOptions({
+    const dashboardQuery = useLiveQuery(
+        apiQuery.money.dashboard.get.queryOptions({
             input: { householdId: householdId!, period: periodKey },
         }),
-        [] as never,
+        null,
         live
     );
 
@@ -85,7 +93,10 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
     const givingOrgs = givingOrgsQuery.data ?? [];
     const categoryTemplates = categoryTemplatesQuery.data ?? [];
 
-    const jar = (jarsQuery.data ?? []).find(row => row.key === jarKey);
+    const jar = (dashboardQuery.data?.jars ?? []).find(row => row.key === jarKey);
+    const stacked = dashboardQuery.data?.travel?.mode === 'stacked';
+    const baselineAllocated =
+        dashboardQuery.data?.baselineJars?.find(row => row.id === jar?.id)?.allocated ?? null;
 
     const txQuery = useLiveQuery(
         apiQuery.money.transactions.list.queryOptions({
@@ -127,6 +138,10 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
     }
 
     const colorClass = jarChrome(jarKey).color;
+    const allocationDelta =
+        stacked && baselineAllocated !== null && baselineAllocated !== jar.allocated
+            ? moneyDelta(baselineAllocated, jar.allocated)
+            : null;
     const caps = jarCapabilitiesFor(jar.key);
     const allowsFixedCosts = caps.allowsFixedCosts;
     const showGoals =
@@ -137,6 +152,40 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
         if (goal.kind === GoalKind.SAVE) return true;
         return jar.key === JarKey.GIVE && goal.kind === GoalKind.GIVE;
     });
+    const travel = describePeriodTravel(period);
+    const projectionById = new Map(
+        travel.direction === 'current'
+            ? []
+            : projectGoalsAtHorizon({
+                  monthsDelta: travel.monthsDelta,
+                  direction: travel.direction,
+                  selectedPeriodEndIso: endOfPeriodIso(periodKey),
+                  goals: jarGoals.map(goal => ({
+                      id: goal.id,
+                      name: goal.name,
+                      jarKey,
+                      kind: goal.kind,
+                      status: goal.status,
+                      saved: goal.saved,
+                      target: goal.target,
+                      monthlyContribution: goal.monthlyContribution,
+                      targetOn: goal.targetOn,
+                      fulfilledOn: goal.fulfilledOn,
+                  })),
+              }).map(row => [row.goalId, row] as const)
+    );
+    const goalsForList =
+        travel.direction === 'current'
+            ? jarGoals
+            : jarGoals.map(goal => {
+                  const projected = projectionById.get(goal.id);
+                  if (!projected) return goal;
+                  return {
+                      ...goal,
+                      saved: projected.projectedSaved,
+                      status: projected.fulfilledByPeriod ? GoalStatus.REACHED : goal.status,
+                  };
+              });
     const focusGoal = focusSaveGoal(goalsQuery.data ?? [], jar.id);
     const saveQueue = activeSaveGoalsOnJar(goalsQuery.data ?? [], jar.id);
     const addGoalHref = createGoalHref({
@@ -163,6 +212,14 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                             <p className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase">
                                 {jar.subtitle ?? catalog?.subtitle ?? ''} · {jar.percentage}% of net
                             </p>
+                            {allocationDelta ? (
+                                <MoneyDeltaLabel
+                                    className="font-mono text-sm"
+                                    fromLabel={formatMoney(allocationDelta.from)}
+                                    toLabel={formatMoney(allocationDelta.to)}
+                                    deltaLabel={`${allocationDelta.delta > 0 ? '+' : ''}${formatMoney(allocationDelta.delta)}`}
+                                />
+                            ) : null}
                         </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
@@ -195,6 +252,11 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                 committedOut={jar.committedOut}
                 colorClass={colorClass}
                 showCommitted={allowsFixedCosts}
+                footnote={
+                    stacked
+                        ? `Stacked over ${dashboardQuery.data?.travel?.monthsHorizon ?? '—'} months. Activity below is still the selected month.`
+                        : undefined
+                }
             />
 
             {/* Categories — expand for fixed costs + period activity */}
@@ -266,7 +328,8 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                                 </Link>
                                 <span className="font-mono text-sm text-fg-muted">
                                     {formatMoney(
-                                        Math.min(focusGoal.target, Math.max(0, jar.available))
+                                        projectionById.get(focusGoal.id)?.projectedSaved ??
+                                            Math.min(focusGoal.target, Math.max(0, jar.available))
                                     )}{' '}
                                     / {formatMoney(focusGoal.target)}
                                 </span>
@@ -277,7 +340,10 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                         </Card>
                     ) : null}
                     <Card className="p-0">
-                        <JarGoalAccordion goals={jarGoals} jarAvailableCents={jar.available} />
+                        <JarGoalAccordion
+                            goals={goalsForList}
+                            jarAvailableCents={stacked ? null : jar.available}
+                        />
                     </Card>
                 </section>
             ) : null}

@@ -115,7 +115,7 @@ export class DashboardService {
         );
 
         const jarById = new Map(baselineJars.map(jar => [jar.id, jar]));
-        const goalsAtPeriod = projectGoalsAtHorizon({
+        const projectedGoals = projectGoalsAtHorizon({
             monthsDelta: meta.travel.monthsDelta,
             direction: meta.travel.direction,
             selectedPeriodEndIso: endOfPeriodIso(period),
@@ -147,9 +147,17 @@ export class DashboardService {
                     siblingPlannedCents: siblings,
                 };
             }),
-        }).map(goal => ({
-            ...goal,
+        });
+        const goalsAtPeriod = projectedGoals.map(goal => ({
+            goalId: goal.goalId,
+            name: goal.name,
             jarKey: (goal.jarKey as JarKey | null) ?? null,
+            saved: goal.saved,
+            target: goal.target,
+            projectedSaved: goal.projectedSaved,
+            fulfilledByPeriod: goal.fulfilledByPeriod,
+            monthsToFulfill: goal.monthsToFulfill,
+            incomeNeededCents: goal.incomeNeededCents,
         }));
 
         const strategy =
@@ -184,7 +192,7 @@ export class DashboardService {
                       const base = baselineJars.find(row => row.id === jar.id);
                       return `${jar.name} ${moneyFmt(base?.allocated ?? 0)} → ${moneyFmt(jar.allocated)}`;
                   }),
-                  goalsAtPeriod,
+                  goalsAtPeriod: projectedGoals,
                   debtsAtPeriod: debtList.length > 0 ? debtsAtPeriod : null,
               })
             : null;

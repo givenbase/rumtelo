@@ -8,7 +8,13 @@ import { z } from 'zod';
 
 import { HouseholdScoped } from '../../../../common/common.schema';
 import { SpendingStyle } from '../../../platform/enums';
-import { GrowthLeverPreset, IncomePosture, WealthStage } from './catalogs.schema';
+import {
+    GrowthLeverPreset,
+    IncomePosture,
+    LearnBookPreset,
+    LearnWatchPreset,
+    WealthStage,
+} from './catalogs.schema';
 
 /** Nested contract object mounted at `contract.growth.catalogs`. */
 export const growthCatalogsContract = {
@@ -28,5 +34,13 @@ export const growthCatalogsContract = {
                 })
             )
             .output(z.array(GrowthLeverPreset)),
+    },
+    /** Books we recommend. Plan and spending style decide what is suggested, not hosted. */
+    bookPresets: {
+        list: oc.input(HouseholdScoped).output(z.array(LearnBookPreset)),
+    },
+    /** Films, videos, and series we recommend. Same plan and style gates as books. */
+    watchPresets: {
+        list: oc.input(HouseholdScoped).output(z.array(LearnWatchPreset)),
     },
 };

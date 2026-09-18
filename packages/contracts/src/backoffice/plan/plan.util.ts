@@ -121,7 +121,8 @@ export const CAPABILITY_CATALOG: Record<CapabilityKey, CapabilityDefinition> = {
         key: CAPABILITIES.growthLearn,
         kind: CapabilityKind.SCREEN,
         name: 'Learn',
-        description: 'Books, insights, and what they changed.',
+        description:
+            'Skills to work, and books, courses, seminars, and events we recommend — not host.',
         sortOrder: 23,
     },
     [CAPABILITIES.growthNetWorth]: {
@@ -245,6 +246,7 @@ const BASIC_ACCESS: ProductFeatureMap = {
         CAPABILITIES.growthOverview,
         CAPABILITIES.growthGoals,
         CAPABILITIES.growthIncome,
+        CAPABILITIES.growthLearn,
     ],
     [CapabilityProduct.ENERGY]: [CAPABILITIES.energyOverview, CAPABILITIES.energySleep],
     [CapabilityProduct.SOUL]: [
@@ -277,7 +279,7 @@ const PLUS_EXTRA: ProductFeatureMap = {
 const MAX_EXTRA: ProductFeatureMap = {
     [CapabilityProduct.HOME]: [],
     [CapabilityProduct.MONEY]: [],
-    [CapabilityProduct.GROWTH]: [CAPABILITIES.growthNetWorth, CAPABILITIES.growthLearn],
+    [CapabilityProduct.GROWTH]: [CAPABILITIES.growthNetWorth],
     [CapabilityProduct.ENERGY]: [],
     [CapabilityProduct.SOUL]: [CAPABILITIES.soulCentres],
     [CapabilityProduct.PLATFORM]: [],

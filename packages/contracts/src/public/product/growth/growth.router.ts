@@ -8,6 +8,7 @@
 
 import { growthCatalogsContract } from './catalogs/catalogs.contract';
 import { growthDashboardContract } from './dashboard/dashboard.contract';
+import { learnContract } from './learn/learn.contract';
 import { leverContract } from './lever/lever.contract';
 import { milestoneContract } from './milestone/milestone.contract';
 import { growthWeekCheckContract } from './week-check/week-check.contract';
@@ -18,4 +19,5 @@ export const contract = {
     dashboard: growthDashboardContract,
     weekCheck: growthWeekCheckContract,
     catalogs: growthCatalogsContract,
+    learn: learnContract,
 };

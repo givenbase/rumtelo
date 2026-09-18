@@ -67,7 +67,7 @@ export function syncOrderedMerchantLinks<T extends MerchantLink>(
     create: (merchant: MerchantPreset, sortOrder: number) => T
 ) {
     const wanted = new Set(merchants.map(merchant => merchant.id));
-    for (const link of [...links.getItems()]) {
+    for (const link of links.getItems().slice()) {
         if (!wanted.has(link.merchant.id)) links.remove(link);
     }
     merchants.forEach((merchant, sortOrder) => {

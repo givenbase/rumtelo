@@ -12,5 +12,6 @@ export * from '../backoffice/plan/enums';
 export * from '../backoffice/plan/capabilities';
 export * from '../common/enums';
 export * from '../public/product/energy/enums';
+export * from '../public/product/growth/enums';
 export * from '../public/product/money/enums';
 export * from '../public/platform/enums';

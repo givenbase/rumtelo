@@ -3,4 +3,10 @@
  * Re-exports from schema (same-module merge).
  */
 
-export type { IncomePosture, WealthStage, GrowthLeverPreset } from './catalogs.schema';
+export type {
+    IncomePosture,
+    LearnBookPreset,
+    LearnWatchPreset,
+    WealthStage,
+    GrowthLeverPreset,
+} from './catalogs.schema';

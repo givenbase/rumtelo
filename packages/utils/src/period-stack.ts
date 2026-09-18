@@ -172,8 +172,18 @@ export type GoalAtPeriod = {
     projectedSaved: number;
     fulfilledByPeriod: boolean;
     monthsToFulfill: number | null;
+    /** YYYY-MM-DD when this goal first hits target inside the horizon; null if not yet. */
+    reachedOn: string | null;
     incomeNeededCents: number | null;
 };
+
+function isoMonthStart(from: Date, monthsAhead: number): string {
+    const date = new Date(from.getFullYear(), from.getMonth(), 1);
+    date.setMonth(date.getMonth() + monthsAhead);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    return `${year}-${month}-01`;
+}
 
 export function projectGoalsAtHorizon(input: {
     goals: readonly GoalAtHorizonInput[];
@@ -203,11 +213,9 @@ export function projectGoalsAtHorizon(input: {
                 saved: goal.saved,
                 target: goal.target,
                 projectedSaved,
-                fulfilledByPeriod:
-                    fulfilledAlready ||
-                    goal.status === GoalStatus.REACHED ||
-                    goal.saved >= goal.target,
+                fulfilledByPeriod: fulfilledAlready,
                 monthsToFulfill: null,
+                reachedOn: fulfilledAlready ? goal.fulfilledOn : null,
                 incomeNeededCents: null,
             };
         }
@@ -228,6 +236,10 @@ export function projectGoalsAtHorizon(input: {
                         : goal.saved >= goal.target
                           ? 0
                           : null,
+                reachedOn:
+                    projectedSaved >= goal.target
+                        ? (goal.fulfilledOn ?? isoMonthStart(new Date(), 0))
+                        : null,
                 incomeNeededCents: null,
             };
         }
@@ -290,6 +302,10 @@ export function projectGoalsAtHorizon(input: {
             projectedSaved,
             fulfilledByPeriod: projectedSaved >= goal.target,
             monthsToFulfill,
+            reachedOn:
+                monthsToFulfill !== null && monthsToFulfill <= futureMonths
+                    ? isoMonthStart(new Date(), monthsToFulfill)
+                    : null,
             incomeNeededCents,
         };
     });

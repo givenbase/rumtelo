@@ -3,21 +3,44 @@
 import type { Goal } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
+import {
+    describePeriodTravel,
+    endOfPeriodIso,
+    projectGoalsAtHorizon,
+    toPeriodKey,
+} from '@rumtelo/utils';
+import { useMemo } from 'react';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { pickPortalCoach } from '@/app/_lib/portal-coach';
 import { isLiveData } from '@/app/_lib/preview';
 import { soulPortalShell } from '@/app/_lib/portal-hubs';
 import { PortalHub, type PortalHubProps } from '@/components/features/home/portal-hub';
+import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
-type PledgeGoal = Pick<Goal, 'kind' | 'status' | 'target' | 'saved'>;
+type PledgeGoal = Pick<
+    Goal,
+    | 'id'
+    | 'name'
+    | 'kind'
+    | 'status'
+    | 'target'
+    | 'saved'
+    | 'monthlyContribution'
+    | 'targetOn'
+    | 'fulfilledOn'
+>;
 
 export function SoulPortalHubClient() {
     const { householdId } = useAuth();
+    const { period } = useAppShell();
     const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
+    const travel = describePeriodTravel(period);
+    const traveling = travel.direction !== 'current';
+    const periodKey = toPeriodKey(period.year, period.month);
 
     const query = useLiveQuery(
         apiQuery.soul.dashboard.get.queryOptions({
@@ -38,6 +61,31 @@ export function SoulPortalHubClient() {
             goal.kind === GoalKind.GIVE &&
             (goal.status === GoalStatus.ACTIVE || goal.status === GoalStatus.REACHED)
     );
+    const pledgeAt = useMemo(() => {
+        if (!traveling || !pledge) return null;
+        return (
+            projectGoalsAtHorizon({
+                monthsDelta: travel.monthsDelta,
+                direction: travel.direction,
+                selectedPeriodEndIso: endOfPeriodIso(periodKey),
+                goals: [
+                    {
+                        id: pledge.id,
+                        name: pledge.name,
+                        jarKey: null,
+                        kind: pledge.kind,
+                        status: pledge.status,
+                        saved: pledge.saved,
+                        target: pledge.target,
+                        monthlyContribution: pledge.monthlyContribution,
+                        targetOn: pledge.targetOn,
+                        fulfilledOn: pledge.fulfilledOn,
+                    },
+                ],
+            })[0] ?? null
+        );
+    }, [traveling, pledge, travel.monthsDelta, travel.direction, periodKey]);
+    const pledgeSaved = pledgeAt?.projectedSaved ?? pledge?.saved ?? 0;
 
     const data = query.data;
     const streak = data?.stillnessStreakDays;
@@ -75,18 +123,30 @@ export function SoulPortalHubClient() {
             },
             {
                 name: 'Giving',
-                value: pledge ? formatMoney(pledge.saved) : '—',
+                value: pledge ? formatMoney(pledgeSaved) : '—',
                 note: pledge
-                    ? `of ${formatMoney(pledge.target)} pledged this year`
+                    ? pledgeAt?.fulfilledByPeriod
+                        ? `reached by then · of ${formatMoney(pledge.target)}`
+                        : traveling
+                          ? `${formatMoney(pledge.saved)} now · of ${formatMoney(pledge.target)}`
+                          : `of ${formatMoney(pledge.target)} pledged this year`
                     : 'no pledge yet',
                 color: 'var(--color-jar-give)',
                 chart: {
                     kind: 'ring',
                     pct:
                         pledge && pledge.target > 0
-                            ? Math.min(100, Math.round((pledge.saved / pledge.target) * 100))
+                            ? Math.min(100, Math.round((pledgeSaved / pledge.target) * 100))
                             : 0,
                 },
+                delta:
+                    traveling && pledge && pledgeAt && pledgeAt.projectedSaved !== pledge.saved
+                        ? {
+                              mark: '↑',
+                              text: `${formatMoney(pledge.saved)} → ${formatMoney(pledgeAt.projectedSaved)}`,
+                              positive: true,
+                          }
+                        : undefined,
                 href: '/product/soul/giving',
             },
             {

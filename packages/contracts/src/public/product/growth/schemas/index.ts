@@ -5,5 +5,6 @@
 export * from '../lever';
 export * from '../catalogs';
 export * from '../dashboard';
+export * from '../learn';
 export * from '../milestone';
 export * from '../week-check';

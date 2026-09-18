@@ -31,6 +31,8 @@ export const WHY_LINES: Record<string, string> = {
     '/product/soul/centres': 'Name where it feels stuck, and the next step usually names itself.',
     '/product/growth/income': 'Cutting costs has a floor. Raising income does not.',
     '/product/growth/learn': 'A book you cannot name a use for was Play spending, not Education.',
+    '/product/growth/learn/library':
+        'We recommend what to get and who to support. We never host the work.',
     '/product/energy/training':
         'Training is the only spend that raises the value of every other hour.',
     '/product/energy/food':

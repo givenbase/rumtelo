@@ -661,9 +661,9 @@ function count(value: number | null, singular: string, plural: string): string {
 
 /**
  * Feature lines mirror PLAN_ACCESS in @rumtelo/contracts:
- *   Basic  = home + money core + growth goals/income + energy sleep + soul stillness/gratitude/intent
+ *   Basic  = home + money core + growth goals/income/learn + energy sleep + soul stillness/gratitude/intent
  *   Plus   = + money debt/bank/import + energy week/training/food + invite
- *   Max    = + growth net-worth/learn + soul centres
+ *   Max    = + growth net-worth + soul centres. Learn courses are Masterclass, not Udemy.
  * Limits come from PLAN_LIMITS so the numbers cannot drift.
  */
 export const PLANS: Plan[] = [
@@ -676,7 +676,7 @@ export const PLANS: Plan[] = [
         line: 'The whole practice, solo. Six jars, the Coach, one goal, your sleep, one minute of stillness. Enough to start — and never a reason to stop.',
         feats: [
             'MONEY · six jars, transactions, fixed costs',
-            `GROWTH · income and ${count(basicLimits.maxGoals, 'goal', 'goals')}`,
+            `GROWTH · income, Learn, and ${count(basicLimits.maxGoals, 'goal', 'goals')}`,
             'ENERGY · sleep',
             'SOUL · stillness, gratitude, one intention a week',
             'The Coach, the week check, the month score',
@@ -709,7 +709,7 @@ export const PLANS: Plan[] = [
         feats: [
             'Everything in Plus',
             'GROWTH · net worth, returns and your freedom number',
-            'GROWTH · Learn — books, courses, what they changed',
+            'GROWTH · Learn courses on Masterclass, not Udemy',
             'SOUL · the seven centres',
             'Unlimited goals and members',
             'Devices — watch, scale, ring (coming)',

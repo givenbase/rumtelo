@@ -2144,7 +2144,7 @@ export function PlanSettings() {
             priceY: 0,
             tag: `From ${formatPlanPrice(0)}`,
             line: 'Solo board — the six jars and the practice underneath. No bank needed.',
-            feats: `${memberLimitLabel(PlanKey.BASIC)} · Solo only · MONEY jars · Coach`,
+            feats: `${memberLimitLabel(PlanKey.BASIC)} · Solo only · MONEY jars · Learn · Coach`,
         },
         {
             key: PlanKey.PLUS,
@@ -2160,7 +2160,7 @@ export function PlanSettings() {
             priceY: 190,
             tag: 'All four portals',
             line: 'Unlimited household, income curve, learning, and net worth.',
-            feats: `${memberLimitLabel(PlanKey.MAX)} · GROWTH · Income · Learning · Net worth`,
+            feats: `${memberLimitLabel(PlanKey.MAX)} · GROWTH · Masterclass · Net worth`,
         },
     ];
 
