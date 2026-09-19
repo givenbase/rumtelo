@@ -153,7 +153,7 @@ export function NetWorthPageClient() {
                     ).map(figure => (
                         <div
                             key={figure.label}
-                            className="flex overflow-hidden rounded-xl border border-line bg-sunken">
+                            className="flex overflow-hidden rounded-xl border border-line bg-bg-app">
                             <span
                                 aria-hidden
                                 className="w-1 shrink-0"
