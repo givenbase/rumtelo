@@ -1,3 +1,5 @@
+import { AUTO_FINANCE_KEYS } from '../../merchant/seed/by-category/auto-finance';
+
 /**
  * Paid-to merchant keys per fixed-cost bill preset.
  * Seeded into FixedCostPresetMerchant rows (array order = chip order).
@@ -93,7 +95,7 @@ export const MERCHANT_KEYS_BY_PRESET: Readonly<Record<string, readonly string[]>
     TRANSIT_PASS: ['NS', 'GVB', 'RET'],
     STUDENT_TRANSIT: ['NS', 'GVB', 'RET'],
     BIKE_LEASE: ['SWAPFIETS'],
-    CAR_LEASE: ['LEASEPLAN', 'ALPHERA'],
+    CAR_LEASE: ['LEASEPLAN', 'ALPHERA', ...AUTO_FINANCE_KEYS],
     PARKING_PERMIT: ['Q_PARK', 'PARKMOBILE', 'YELLOWBRICK_FINE'],
     PARKING_SUBSCRIPTION: ['Q_PARK', 'PARKMOBILE', 'YELLOWBRICK_FINE'],
     ROAD_TAX: ['BELASTINGDIENST', 'RDW'],
@@ -187,7 +189,7 @@ export const MERCHANT_KEYS_BY_PRESET: Readonly<Record<string, readonly string[]>
     ],
 
     // Debt
-    CAR_LOAN_PAYMENT: ['ING', 'ABN_AMRO', 'RABOBANK', 'ASN_BANK'],
+    CAR_LOAN_PAYMENT: ['ING', 'ABN_AMRO', 'RABOBANK', 'ASN_BANK', ...AUTO_FINANCE_KEYS],
     STUDENT_LOAN_PAYMENT: ['DUO'],
     PERSONAL_LOAN_PAYMENT: ['ING', 'ABN_AMRO', 'RABOBANK', 'KNAB'],
     CREDIT_CARD_PAYMENT: ['ING', 'ABN_AMRO', 'RABOBANK', 'BUNQ', 'REVOLUT'],

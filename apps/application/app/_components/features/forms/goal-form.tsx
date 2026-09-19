@@ -14,6 +14,7 @@ import {
     FormLabel,
     FormMessage,
     Button,
+    VendorMark,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
 
@@ -28,11 +29,13 @@ import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { soulPath } from '@/app/_lib/routes';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
+import { partyMark } from '@/app/_lib/vendor-brands';
 import { CoachTipCard } from '@/components/features/helpers';
 import { GivingFinder } from '@/components/features/money/giving-finder';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
+import { ChipSearch, matchesChipQuery } from './chip-search';
 import { ConfirmActionButton } from './confirm-action-button';
 import { FormInput } from './form-input';
 import { PresetNameField } from './preset-name-field';
@@ -91,6 +94,12 @@ const GOAL_KIND_OPTIONS: ReadonlyArray<{
     },
 ];
 
+/** Lease companies share the auto-finance MCC; they are not a car you save for. */
+const NOT_A_CAR_BRAND = new Set(['LEASEPLAN', 'ALPHERA']);
+
+/** First chip row on Car fund. The rest sit behind More — same dashed chip as other pickers. */
+const CAR_BRAND_PREVIEW = 12;
+
 const GIVE_TARGET_MODES: ReadonlyArray<{ id: GiveTargetMode; label: string }> = [
     { id: 'manual', label: 'I know who' },
     { id: 'org', label: 'Help me choose' },
@@ -135,6 +144,9 @@ export function GoalForm({
     const [giveTargetMode, setGiveTargetMode] = useState<GiveTargetMode>(() =>
         resolveGiveTargetMode(defaultValues)
     );
+    const [goalPresetKey, setGoalPresetKey] = useState<string | null>(null);
+    const [showAllCarBrands, setShowAllCarBrands] = useState(false);
+    const [carBrandQuery, setCarBrandQuery] = useState('');
 
     const jarsQuery = useLiveQuery(
         apiQuery.money.jars.list.queryOptions({ input: { householdId: householdId! } }),
@@ -161,6 +173,21 @@ export function GoalForm({
             ),
         [presetsQuery.data]
     );
+    const merchantsQuery = useLiveQuery(
+        apiQuery.money.catalogs.merchantPresets.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [],
+        live && mode === 'create'
+    );
+    const carBrands = useMemo(
+        () =>
+            (merchantsQuery.data ?? [])
+                .filter(merchant => merchant.mcc === '7512' && !NOT_A_CAR_BRAND.has(merchant.key))
+                .slice()
+                .sort((left, right) => left.sortOrder - right.sortOrder),
+        [merchantsQuery.data]
+    );
     const selectedIcon = useRef<string | null>(null);
 
     const form = useForm<GoalFormValues>({
@@ -184,6 +211,18 @@ export function GoalForm({
         name: 'givingOrganisationKey',
     });
     const name = useWatch({ control: form.control, name: 'name' });
+    const carBrandSearch = carBrandQuery.trim().length > 0;
+    const visibleCarBrands = useMemo(() => {
+        const matched = carBrandSearch
+            ? carBrands.filter(brand => matchesChipQuery(carBrandQuery, brand))
+            : carBrands;
+        const needle = name.trim().toLowerCase();
+        const selectedPastPreview = matched
+            .slice(CAR_BRAND_PREVIEW)
+            .some(brand => brand.name.toLowerCase() === needle);
+        if (carBrandSearch || showAllCarBrands || selectedPastPreview) return matched;
+        return matched.slice(0, CAR_BRAND_PREVIEW);
+    }, [carBrands, carBrandQuery, carBrandSearch, name, showAllCarBrands]);
     const isEarn = kind === GoalKind.EARN;
     const isGive = kind === GoalKind.GIVE;
 
@@ -587,12 +626,14 @@ export function GoalForm({
                                     }}
                                     onClear={() => {
                                         selectedIcon.current = null;
+                                        setGoalPresetKey(null);
                                     }}
                                     onSelect={opt => {
                                         const full = presetOptions.find(
                                             preset => preset.key === opt.key
                                         );
                                         if (!full) return;
+                                        setGoalPresetKey(full.key);
                                         selectedIcon.current = full.icon;
                                         const jar = jars.find(j => j.key === full.jarKey);
                                         if (jar) form.setValue('jarId', jar.id);
@@ -623,6 +664,71 @@ export function GoalForm({
                     </FormItem>
                 )}
             />
+
+            {carBrands.length > 0 &&
+            (goalPresetKey === 'CAR' ||
+                name.trim().toLowerCase() === 'car fund' ||
+                carBrands.some(brand => brand.name.toLowerCase() === name.trim().toLowerCase())) ? (
+                <div className="grid gap-2">
+                    <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
+                        Which car?
+                    </p>
+                    <ChipSearch
+                        value={carBrandQuery}
+                        onChange={setCarBrandQuery}
+                        placeholder="Search brand"
+                    />
+                    {carBrandSearch && visibleCarBrands.length === 0 ? (
+                        <p className="text-sm text-fg-muted">No matches</p>
+                    ) : null}
+                    <div className="flex flex-wrap gap-1.5">
+                        {visibleCarBrands.map(brand => {
+                            const selected = name.trim().toLowerCase() === brand.name.toLowerCase();
+                            const mark = partyMark(
+                                {
+                                    key: brand.key,
+                                    name: brand.name,
+                                    logoDomain: brand.logoDomain,
+                                },
+                                { fallbackIcon: '🚗', tone: null }
+                            );
+                            return (
+                                <button
+                                    key={brand.key}
+                                    type="button"
+                                    className={
+                                        selected
+                                            ? 'inline-flex items-center gap-2 rounded-xl border border-accent bg-accent/15 px-2.5 py-1.5 text-sm text-accent'
+                                            : 'inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent'
+                                    }
+                                    onClick={() =>
+                                        form.setValue('name', brand.name, {
+                                            shouldDirty: true,
+                                            shouldValidate: true,
+                                        })
+                                    }>
+                                    <VendorMark
+                                        name={mark.name}
+                                        src={mark.src}
+                                        fallbackIcon={mark.fallbackIcon}
+                                        tone={mark.tone}
+                                        size={20}
+                                    />
+                                    {brand.name}
+                                </button>
+                            );
+                        })}
+                        {!carBrandSearch && visibleCarBrands.length < carBrands.length ? (
+                            <button
+                                type="button"
+                                className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
+                                onClick={() => setShowAllCarBrands(true)}>
+                                More
+                            </button>
+                        ) : null}
+                    </div>
+                </div>
+            ) : null}
 
             <FormField
                 control={form.control}

@@ -1,5 +1,6 @@
 import type { MerchantSeed } from '../types';
 import { necessities } from '../types';
+import { AUTO_FINANCE_MERCHANTS } from './auto-finance';
 
 /** transport merchant presets */
 export const TRANSPORT_MERCHANTS: readonly MerchantSeed[] = [
@@ -228,4 +229,5 @@ export const TRANSPORT_MERCHANTS: readonly MerchantSeed[] = [
         matchPriority: 0,
         isActive: true,
     },
+    ...AUTO_FINANCE_MERCHANTS,
 ];

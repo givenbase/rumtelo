@@ -217,7 +217,7 @@ export function PresetNameField({
                         <OptionVendorMark option={locked} />
                     ) : null}
                     <span className="min-w-0 flex-1 truncate text-sm font-medium text-fg">
-                        {locked.name}
+                        {value.trim() || locked.name}
                     </span>
                     <button
                         type="button"

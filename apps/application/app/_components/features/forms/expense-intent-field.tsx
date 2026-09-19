@@ -14,6 +14,7 @@ import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { partyMark } from '@/app/_lib/vendor-brands';
 
+import { ChipSearch, matchesChipQuery } from './chip-search';
 import { FormInput } from './form-input';
 
 /** Form selection state for the expense intent picker (not an API DTO). */
@@ -55,12 +56,7 @@ const PICK_MODES: ReadonlyArray<{ id: ExpensePickMode; label: string }> = [
 ];
 
 function matchesMerchant(merchant: MerchantPreset, needle: string) {
-    if (!needle) return true;
-    const key = merchant.key.toLowerCase();
-    const keyAsWords = key.replace(/_/g, ' ');
-    if (merchant.name.toLowerCase().includes(needle)) return true;
-    if (key.includes(needle) || keyAsWords.includes(needle)) return true;
-    return merchant.aliases.some(alias => alias.toLowerCase().includes(needle));
+    return matchesChipQuery(needle, merchant);
 }
 
 function matchesCategory(category: CategoryTemplate, needle: string) {
@@ -93,6 +89,7 @@ export function ExpenseIntentField({
     const [open, setOpen] = useState(false);
     const [customVendor, setCustomVendor] = useState(false);
     const [skippedVendor, setSkippedVendor] = useState(false);
+    const [vendorChipQuery, setVendorChipQuery] = useState('');
     const rootRef = useRef<HTMLDivElement>(null);
     const listboxId = `${id ?? 'expense-intent'}-listbox`;
     const { byKey: jarByKey } = useJarCatalog();
@@ -154,6 +151,11 @@ export function ExpenseIntentField({
                 return left.sortOrder - right.sortOrder;
             });
     }, [merchants, value.categoryKey]);
+
+    const visibleVendorChips = useMemo(
+        () => vendorsForCategory.filter(merchant => matchesChipQuery(vendorChipQuery, merchant)),
+        [vendorsForCategory, vendorChipQuery]
+    );
 
     const vendorTypeaheadHits = useMemo(() => {
         if (!customVendor) return [];
@@ -550,64 +552,75 @@ export function ExpenseIntentField({
                         Know the vendor?
                     </p>
                     {vendorsForCategory.length > 0 ? (
-                        <div className="flex max-h-40 flex-wrap gap-1.5 overflow-y-auto pr-0.5">
-                            {vendorsForCategory.map(merchant => {
-                                const category = categories.find(
-                                    candidate => candidate.key === merchant.categoryTemplateKey
-                                );
-                                const mark = partyMark(
-                                    {
-                                        key: merchant.key,
-                                        name: merchant.name,
-                                        logoDomain: merchant.logoDomain,
-                                        website: merchant.website,
-                                    },
-                                    intentChrome({
-                                        icon: category?.icon ?? categoryIcon,
-                                        billName: category?.name ?? value.categoryName,
-                                        merchantJarKey: merchant.jarKey,
-                                    })
-                                );
-                                const highlightLabel = merchant.highlight
-                                    ? HIGHLIGHT_LABEL[merchant.highlight]
-                                    : null;
-                                return (
-                                    <button
-                                        key={merchant.key}
-                                        type="button"
-                                        disabled={disabled}
-                                        className="inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent"
-                                        onClick={() => selectMerchant(merchant)}>
-                                        <VendorMark
-                                            name={mark.name}
-                                            src={mark.src}
-                                            fallbackIcon={mark.fallbackIcon}
-                                            tone={mark.tone}
-                                            size={20}
-                                        />
-                                        {merchant.name}
-                                        {highlightLabel ? (
-                                            <span className="text-[10px] tracking-wide text-fg-muted uppercase">
-                                                {highlightLabel}
-                                            </span>
-                                        ) : null}
-                                    </button>
-                                );
-                            })}
-                            <button
-                                type="button"
+                        <div className="grid gap-2">
+                            <ChipSearch
+                                value={vendorChipQuery}
+                                onChange={setVendorChipQuery}
+                                placeholder="Search vendor"
                                 disabled={disabled}
-                                className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
-                                onClick={() => setCustomVendor(true)}>
-                                Other…
-                            </button>
-                            <button
-                                type="button"
-                                disabled={disabled}
-                                className="rounded-xl px-3 py-1.5 text-sm text-fg-faint hover:text-fg-muted"
-                                onClick={() => setSkippedVendor(true)}>
-                                Skip
-                            </button>
+                            />
+                            {vendorChipQuery.trim() && visibleVendorChips.length === 0 ? (
+                                <p className="text-sm text-fg-muted">No matches</p>
+                            ) : null}
+                            <div className="flex flex-wrap gap-1.5">
+                                {visibleVendorChips.map(merchant => {
+                                    const category = categories.find(
+                                        candidate => candidate.key === merchant.categoryTemplateKey
+                                    );
+                                    const mark = partyMark(
+                                        {
+                                            key: merchant.key,
+                                            name: merchant.name,
+                                            logoDomain: merchant.logoDomain,
+                                            website: merchant.website,
+                                        },
+                                        intentChrome({
+                                            icon: category?.icon ?? categoryIcon,
+                                            billName: category?.name ?? value.categoryName,
+                                            merchantJarKey: merchant.jarKey,
+                                        })
+                                    );
+                                    const highlightLabel = merchant.highlight
+                                        ? HIGHLIGHT_LABEL[merchant.highlight]
+                                        : null;
+                                    return (
+                                        <button
+                                            key={merchant.key}
+                                            type="button"
+                                            disabled={disabled}
+                                            className="inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent"
+                                            onClick={() => selectMerchant(merchant)}>
+                                            <VendorMark
+                                                name={mark.name}
+                                                src={mark.src}
+                                                fallbackIcon={mark.fallbackIcon}
+                                                tone={mark.tone}
+                                                size={20}
+                                            />
+                                            {merchant.name}
+                                            {highlightLabel ? (
+                                                <span className="text-[10px] tracking-wide text-fg-muted uppercase">
+                                                    {highlightLabel}
+                                                </span>
+                                            ) : null}
+                                        </button>
+                                    );
+                                })}
+                                <button
+                                    type="button"
+                                    disabled={disabled}
+                                    className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
+                                    onClick={() => setCustomVendor(true)}>
+                                    Other…
+                                </button>
+                                <button
+                                    type="button"
+                                    disabled={disabled}
+                                    className="rounded-xl px-3 py-1.5 text-sm text-fg-faint hover:text-fg-muted"
+                                    onClick={() => setSkippedVendor(true)}>
+                                    Skip
+                                </button>
+                            </div>
                         </div>
                     ) : (
                         <div className="flex flex-wrap gap-1.5">
