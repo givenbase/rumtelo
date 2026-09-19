@@ -86,6 +86,13 @@ export function createGoalHref(opts?: { kind?: string; jarId?: string }) {
     return qs ? `${CREATE_HREF.goal}?${qs}` : CREATE_HREF.goal;
 }
 
+/** Open New asset. A class key locks that class and hides the others. */
+export function createAssetHref(kindKey?: string) {
+    if (!kindKey) return CREATE_HREF.asset;
+    const params = new URLSearchParams({ kind: kindKey });
+    return `${CREATE_HREF.asset}?${params.toString()}`;
+}
+
 /** Open move form; pass fromJarId when already inside a jar. */
 export function createMoveHref(opts?: { fromJarId?: string; returnTo?: string }) {
     const params = new URLSearchParams();

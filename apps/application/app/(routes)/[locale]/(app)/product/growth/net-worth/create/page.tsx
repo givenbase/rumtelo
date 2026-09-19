@@ -1,10 +1,14 @@
+'use client';
+
+import { useSearchParams } from 'next/navigation';
+
+import { assetKindFromParams } from '@/app/_lib/create-prefill';
 import { formRoute } from '@/app/_lib/form-route-meta';
 import { AssetForm } from '@/components/features/forms/asset-form';
 import { FormRoutePageShell } from '@/components/layout/form-route-page-shell';
 
-export const metadata = { title: formRoute('assetCreate').title };
-
 export default function Page() {
+    const searchParams = useSearchParams();
     const meta = formRoute('assetCreate');
 
     return (
@@ -13,7 +17,7 @@ export default function Page() {
             description={meta.description}
             closeHref={meta.closeHref}
             width={meta.width}>
-            <AssetForm embedded />
+            <AssetForm embedded lockedKind={assetKindFromParams(searchParams)} />
         </FormRoutePageShell>
     );
 }

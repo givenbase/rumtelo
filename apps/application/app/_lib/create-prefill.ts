@@ -64,3 +64,10 @@ export function goalJarIdFromParams(params: ParamSource): string | undefined {
     const jarId = params.get('jarId')?.trim();
     return jarId || undefined;
 }
+
+/** Asset class key from New asset. Unknown keys are ignored by the form. */
+export function assetKindFromParams(params: ParamSource): string | undefined {
+    const kind = params.get('kind')?.trim();
+    if (!kind || kind.length > 64) return undefined;
+    return kind;
+}

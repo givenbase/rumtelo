@@ -10,7 +10,7 @@ import { useLiveQuery } from '@rumtelo/hooks';
 import type { Asset, AssetKind } from '@rumtelo/contracts';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
-import { CREATE_HREF, assetDetailHref } from '@/app/_lib/create-routes';
+import { CREATE_HREF, assetDetailHref, createAssetHref } from '@/app/_lib/create-routes';
 import { isLiveData } from '@/app/_lib/preview';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -258,11 +258,11 @@ export function NetWorthPageClient() {
                                     </div>
                                     <Button
                                         as={Link}
-                                        href={CREATE_HREF.asset}
+                                        href={createAssetHref(group.key)}
                                         size="sm"
                                         variant="secondary"
                                         className="self-center">
-                                        + Add asset
+                                        + Add {group.name}
                                     </Button>
                                 </div>
                                 <div className="grid gap-3.5 p-4 sm:grid-cols-2 lg:grid-cols-3">

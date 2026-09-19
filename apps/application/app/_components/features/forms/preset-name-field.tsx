@@ -15,6 +15,8 @@ export type NamePresetOption = Pick<CatalogItemBase, 'key' | 'name'> & {
     sortOrder?: number;
     group?: string;
     icon?: string | null;
+    /** One line under the group, or under the name when the group is shared. */
+    description?: string | null;
     /** Extra search needles (merchant aliases, bank descriptors). */
     aliases?: readonly string[];
     /** Favicon hostname — rendered as VendorMark when set (merchant / org pickers). */
@@ -58,6 +60,7 @@ function matchesQuery(option: NamePresetOption, query: string) {
     if (option.name.toLowerCase().includes(needle)) return true;
     if (key.includes(needle) || keyAsWords.includes(needle)) return true;
     if (option.group?.toLowerCase().includes(needle)) return true;
+    if (option.description?.toLowerCase().includes(needle)) return true;
     return option.aliases?.some(alias => alias.toLowerCase().includes(needle)) ?? false;
 }
 
@@ -292,8 +295,15 @@ export function PresetNameField({
                         grouped.map(([group, items]) => (
                             <div key={group || 'all'}>
                                 {group ? (
-                                    <div className="px-3 pt-2 pb-1 text-[10px] font-semibold tracking-wider text-bg/50 uppercase">
-                                        {group}
+                                    <div className="px-3 pt-2.5 pb-1">
+                                        <div className="text-[10px] font-semibold tracking-wider text-bg/50 uppercase">
+                                            {group}
+                                        </div>
+                                        {items[0]?.description ? (
+                                            <p className="mt-0.5 text-xs leading-snug font-normal tracking-normal text-bg/60 normal-case">
+                                                {items[0].description}
+                                            </p>
+                                        ) : null}
                                     </div>
                                 ) : null}
                                 <ul>

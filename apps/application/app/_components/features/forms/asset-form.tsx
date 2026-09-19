@@ -79,6 +79,8 @@ type AssetFormProps = {
     mode?: 'create' | 'edit';
     entityId?: string;
     defaultValues?: AssetFormDefaults;
+    /** Class already chosen from a section. Hides the other classes. */
+    lockedKind?: string;
 };
 
 /** Asks the class first. The name searches the same catalog a fixed cost does. */
@@ -88,6 +90,7 @@ export function AssetForm({
     mode = 'create',
     entityId,
     defaultValues,
+    lockedKind,
 }: AssetFormProps) {
     const { showToast } = useAppShell();
     const dismiss = useFormDismiss(onSuccess);
@@ -116,7 +119,7 @@ export function AssetForm({
 
     const form = useForm<AssetFormValues>({
         defaultValues: {
-            kind: defaultValues?.kind ?? 'PORTFOLIO',
+            kind: defaultValues?.kind ?? lockedKind ?? 'PORTFOLIO',
             name: defaultValues?.name ?? '',
             value: defaultValues?.value ?? '',
             flow: defaultValues?.flow ?? '',
@@ -127,11 +130,21 @@ export function AssetForm({
     const kindKey = useWatch({ control: form.control, name: 'kind' });
     const picked = kinds.find(kind => kind.key === kindKey) ?? kinds[0];
 
-    const suggestions: NamePresetOption[] = presets.map(preset => ({
-        key: preset.key,
-        name: preset.name,
-        group: preset.kindName,
-    }));
+    const locked = kinds.find(kind => kind.key === lockedKind);
+    const visibleKinds = locked ? [locked] : kinds;
+
+    const suggestions: NamePresetOption[] = presets
+        .filter(preset => !locked || preset.kindKey === locked.key)
+        .map(preset => {
+            const kind = kinds.find(row => row.key === preset.kindKey);
+            return {
+                key: preset.key,
+                name: preset.name,
+                group: preset.kindName,
+                icon: kind?.icon ?? null,
+                description: kind?.description ?? null,
+            };
+        });
 
     const onError = createFormInvalidHandler(({ title, description }) => {
         showToast(description ?? title, 'error');
@@ -252,7 +265,7 @@ export function AssetForm({
                                 className="grid gap-2 sm:grid-cols-2"
                                 role="radiogroup"
                                 aria-label="Asset type">
-                                {kinds.map(option => {
+                                {visibleKinds.map(option => {
                                     const on = field.value === option.key;
                                     return (
                                         <button

@@ -140,11 +140,14 @@ export function GoalUpdateModalShell({ closeHref, id }: ShellProps & { id: strin
     );
 }
 
-export function AssetCreateModalShell({ closeHref }: ShellProps) {
+export function AssetCreateModalShell({
+    closeHref,
+    lockedKind,
+}: ShellProps & { lockedKind?: string }) {
     const meta = formRoute('assetCreate');
     return (
         <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
-            <AssetForm embedded />
+            <AssetForm embedded lockedKind={lockedKind} />
         </RouteModalShell>
     );
 }
