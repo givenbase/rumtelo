@@ -4,15 +4,15 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
 import type { Goal, JarBalance } from '@rumtelo/contracts';
-import { GoalStatus } from '@rumtelo/contracts';
+import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { Card, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
-import { CREATE_HREF, goalDetailHref } from '@/app/_lib/create-routes';
+import { CREATE_HREF, createGoalHref, goalDetailHref } from '@/app/_lib/create-routes';
 import { evaluateGoalPace } from '@/app/_lib/goal-pace';
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
 import { jarChrome } from '@/app/_lib/jar-meta';
-import { CoachMark, CoachTipCard, useHelpersEnabled } from '@/components/features/helpers';
+import { CoachMark, useHelpersEnabled } from '@/components/features/helpers';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 type SimulatorJar = Pick<JarBalance, 'id' | 'key' | 'name' | 'percentage' | 'committedOut'>;
@@ -22,6 +22,8 @@ type IncomeSimulatorProps = {
     netCents: number;
     /** Active Earn-goal target (cents); null when none is set. */
     targetCents: number | null;
+    /** Name of the earn goal already cleared. Null while one is still open. */
+    clearedName?: string | null;
     jars: SimulatorJar[];
     /** SAVE goals only. */
     goals: Goal[];
@@ -29,7 +31,6 @@ type IncomeSimulatorProps = {
 };
 
 type PaceTip = {
-    title: string;
     body: string;
     tone: 'default' | 'warning';
     /** Label for the "edit this goal" CTA, when the next move is on the goal itself. */
@@ -90,6 +91,7 @@ function isGoalOpen(goal: Pick<Goal, 'saved' | 'target' | 'status'>) {
 export function IncomeSimulator({
     netCents,
     targetCents,
+    clearedName = null,
     jars,
     goals,
     className,
@@ -105,7 +107,10 @@ export function IncomeSimulator({
 
     const range = simRange(netCents, targetCents);
     const targetMajor = targetCents && targetCents > 0 ? roundToStep(targetCents / 100) : null;
-    const defaultMajor = targetMajor ?? range.current ?? roundToStep((range.min + range.max) / 2);
+    const defaultMajor =
+        clearedName && range.current !== null
+            ? range.current
+            : (targetMajor ?? range.current ?? roundToStep((range.min + range.max) / 2));
     const simMajor = Math.min(range.max, Math.max(range.min, simOverrideMajor ?? defaultMajor));
     const simCents = simMajor * 100;
     const simDeltaPct = netCents > 0 ? Math.round(((simCents - netCents) / netCents) * 100) : 0;
@@ -158,73 +163,43 @@ export function IncomeSimulator({
 
     const paceTip = useMemo<PaceTip | null>(() => {
         if (!goal || !pace) return null;
-        const planned = formatMoney(pace.plannedCents);
         const need = formatMoney(pace.needCents);
-        const months = pace.monthsAtPlan ?? 0;
 
         switch (pace.verdict) {
             case 'no-plan':
                 return {
-                    title: 'No monthly amount yet',
-                    body:
-                        `This goal has no monthly amount, so there is no date to project.` +
-                        (pace.jarFlowCents !== null && pace.jarHeadroomCents !== null
-                            ? ` At this income ${jarName} receives ${formatMoney(pace.jarFlowCents)}/mo; ${formatMoney(Math.max(0, pace.jarHeadroomCents))} of that is free after fixed costs and other goals.`
-                            : ''),
+                    body: 'No monthly amount, so there is no date.',
                     action: 'Set monthly amount',
                     tone: 'default',
                 };
             case 'on-target':
-                return {
-                    title: 'Right on your date',
-                    body: `${planned}/mo finishes this in about ${months} months (${doneLabel}).`,
-                    tone: 'default',
-                };
             case 'ahead':
-                return {
-                    title: 'Ahead of your date',
-                    body: `${planned}/mo finishes this in about ${months} months (${doneLabel}) — ${wantMonths - months} months early. ${need}/mo would be enough; the other ${formatMoney(pace.plannedCents - pace.needCents)}/mo could go to the next goal.`,
-                    tone: 'default',
-                };
+                return null;
             case 'behind-room':
                 return {
-                    title: 'Room to speed up',
-                    body: `To finish in ${wantMonths} months this goal needs ${need}/mo (now ${planned}). At this income ${jarName} has ${formatMoney(pace.jarHeadroomCents ?? 0)}/mo free after fixed costs and other goals — raise the monthly amount and you are there.`,
+                    body: `${need}/mo would finish this in ${wantMonths} months. The jar has room.`,
                     action: 'Raise monthly amount',
                     tone: 'default',
                 };
             case 'behind-income':
                 if (pace.jarFlowCents === null) {
                     return {
-                        title: 'Not at this amount',
-                        body: `To finish in ${wantMonths} months this goal needs ${need}/mo (now ${planned}). Fund it from a jar to see whether your income covers that.`,
+                        body: `${need}/mo would finish this in ${wantMonths} months. Fund it from a jar to see if income covers that.`,
                         tone: 'warning',
                     };
                 }
                 return {
-                    title: 'Not at this income',
-                    body:
-                        `To finish in ${wantMonths} months this goal needs ${need}/mo (now ${planned}). ` +
-                        `${jarName} receives ${formatMoney(pace.jarFlowCents)}/mo here; after ${formatMoney(pace.jarFixedCents)} fixed costs and ${formatMoney(pace.jarGoalsCents - pace.plannedCents)} for other goals, ${formatMoney(Math.max(0, pace.jarHeadroomCents ?? 0))} is free.` +
-                        (pace.incomeForNeedCents !== null
-                            ? ` Roughly ${formatMoney(pace.incomeForNeedCents)}/mo income covers it at your current split — or give ${jarName} a larger share.`
-                            : ''),
+                    body: `${need}/mo would finish this in ${wantMonths} months. ${jarName} cannot cover that here.`,
                     tone: 'warning',
                 };
             default:
                 return null;
         }
-    }, [doneLabel, goal, jarName, pace, wantMonths, formatMoney]);
+    }, [goal, jarName, pace, wantMonths, formatMoney]);
 
     const planFits = pace?.jarHeadroomCents === null ? null : (pace?.jarHeadroomCents ?? 0) >= 0;
 
-    const hasNextGoal = Boolean(nextOpenGoal && goal && nextOpenGoal.id !== goal.id);
-    const nextGoal = hasNextGoal ? nextOpenGoal : null;
-    const reachedBody = hasNextGoal
-        ? 'This goal is done — keep the momentum going.'
-        : openGoals.length === 0
-          ? 'Every goal here is done. Set the next one.'
-          : 'This goal is done.';
+    const nextGoal = nextOpenGoal && goal && nextOpenGoal.id !== goal.id ? nextOpenGoal : null;
 
     const goToNextGoal = () => {
         if (!nextGoal) return;
@@ -271,10 +246,20 @@ export function IncomeSimulator({
                         {coachGuidesEnabled ? 'What a raise does' : '✦ What a raise does'}
                     </Typography>
                 </div>
-                <p className="mt-2 max-w-prose text-sm leading-relaxed text-pretty text-fg-muted">
-                    Drag to any monthly net. The split runs on every income automatically, so this
-                    is what each jar would receive — and what that does for a goal.
-                </p>
+                {clearedName ? (
+                    <p className="mt-2 max-w-prose text-sm leading-relaxed text-pretty text-fg-secondary">
+                        {clearedName} is reached. I won&apos;t pick a higher number.{' '}
+                        <Link
+                            href={createGoalHref({ kind: GoalKind.EARN })}
+                            className="font-medium text-accent underline-offset-2 hover:underline">
+                            Set the next target
+                        </Link>
+                    </p>
+                ) : (
+                    <p className="mt-2 max-w-prose text-sm leading-relaxed text-pretty text-fg-muted">
+                        Drag the monthly net. The split stays; each jar moves with it.
+                    </p>
+                )}
 
                 <div className="my-5 flex flex-wrap items-center gap-4">
                     <input
@@ -321,17 +306,11 @@ export function IncomeSimulator({
                             Target {formatMoney(targetMajor * 100)}
                         </button>
                     ) : null}
-                    <span>
-                        Range {formatMoney(range.min * 100)} – {formatMoney(range.max * 100)}
-                    </span>
                     {netCents > 0 && simDeltaPct !== 0 ? (
-                        <>
-                            <span aria-hidden>·</span>
-                            <span className="text-fg-secondary">
-                                {simDeltaPct > 0 ? '+' : ''}
-                                {simDeltaPct}% vs now
-                            </span>
-                        </>
+                        <span className="text-fg-secondary">
+                            {simDeltaPct > 0 ? '+' : ''}
+                            {simDeltaPct}% vs now
+                        </span>
                     ) : null}
                 </div>
 
@@ -363,26 +342,9 @@ export function IncomeSimulator({
                     })}
                 </div>
 
-                <CoachTipCard className="mt-5" title="Same split, every income">
-                    Percentages stay put — only the amounts move. Drag up to feel a raise; drag down
-                    to feel a cut. Change the split in Settings → Jars when the mix itself needs
-                    work.
-                </CoachTipCard>
-
                 <div className="mt-6 border-t border-line pt-5">
-                    <div className="flex flex-wrap items-center gap-2">
-                        {coachGuidesEnabled ? <CoachMark size="sm" /> : null}
-                        <Typography as="span" variant="eyebrow" color="primary">
-                            {coachGuidesEnabled ? 'And what it buys you' : '✦ And what it buys you'}
-                        </Typography>
-                    </div>
-                    <p className="mt-2 max-w-prose text-sm leading-relaxed text-pretty text-fg-muted">
-                        Pick a goal. It moves at the monthly amount you set on it — the same date as
-                        on Goals. Income changes how much room its jar has to speed it up.
-                    </p>
-
                     {goals.length > 0 ? (
-                        <div className="my-4 flex flex-wrap gap-1.5">
+                        <div className="mb-4 flex flex-wrap gap-1.5">
                             {goals.map(goalItem => {
                                 const isActive = goalItem.id === goal?.id;
                                 const reached = !isGoalOpen(goalItem);
@@ -449,25 +411,12 @@ export function IncomeSimulator({
                                         : null}
                                 </span>
                                 {goalReached ? (
-                                    <p className="mt-1 text-sm leading-relaxed text-pretty text-fg-secondary">
-                                        Already reached. Pick the next one — this is where momentum
-                                        comes from.
+                                    <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-fg-secondary">
+                                        <span>Done.</span>
+                                        {reachedAction}
                                     </p>
                                 ) : pace.jarFlowCents !== null && pace.jarHeadroomCents !== null ? (
-                                    <p className="mt-1 text-sm leading-relaxed text-pretty text-fg-secondary">
-                                        At this income {jarName} receives{' '}
-                                        <span className="font-mono text-fg">
-                                            {formatMoney(pace.jarFlowCents)}
-                                        </span>
-                                        /mo. Fixed costs take{' '}
-                                        <span className="font-mono text-fg">
-                                            {formatMoney(pace.jarFixedCents)}
-                                        </span>
-                                        , goal plans{' '}
-                                        <span className="font-mono text-fg">
-                                            {formatMoney(pace.jarGoalsCents)}
-                                        </span>
-                                        {' — '}
+                                    <p className="mt-1 text-sm text-pretty text-fg-secondary">
                                         <span
                                             className={cn(
                                                 'font-mono',
@@ -476,13 +425,12 @@ export function IncomeSimulator({
                                             {planFits
                                                 ? `${formatMoney(pace.jarHeadroomCents)} free`
                                                 : `${formatMoney(-pace.jarHeadroomCents)} short`}
-                                        </span>
-                                        .
+                                        </span>{' '}
+                                        in {jarName} after bills and other goals.
                                     </p>
                                 ) : (
-                                    <p className="mt-1 text-sm leading-relaxed text-pretty text-fg-secondary">
-                                        This goal is not funded from a jar, so income does not
-                                        change its pace here.
+                                    <p className="mt-1 text-sm text-pretty text-fg-secondary">
+                                        Not funded from a jar, so income does not change this date.
                                     </p>
                                 )}
                             </div>
@@ -513,7 +461,7 @@ export function IncomeSimulator({
                         </div>
                     )}
 
-                    {!goalReached && goal && pace && paceTip ? (
+                    {!goalReached && goal && pace ? (
                         <>
                             <div className="mt-4 flex flex-wrap items-center gap-3.5">
                                 <span className="font-mono text-xs font-medium tracking-wide whitespace-nowrap text-fg-faint uppercase">
@@ -546,37 +494,19 @@ export function IncomeSimulator({
                                     </button>
                                 ) : null}
                             </div>
-                            {coachGuidesEnabled ? (
-                                <CoachTipCard
-                                    className="mt-3"
-                                    title={paceTip.title}
-                                    tone={paceTip.tone}
-                                    actions={
-                                        paceTip.action ? editGoalAction(paceTip.action) : undefined
-                                    }>
-                                    {paceTip.body}
-                                </CoachTipCard>
-                            ) : (
-                                <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-raised px-3.5 py-3 text-sm leading-relaxed text-pretty text-fg-secondary">
-                                    <span className="min-w-0 flex-1">{paceTip.body}</span>
+                            {paceTip ? (
+                                <p
+                                    className={cn(
+                                        'mt-3 text-sm text-pretty',
+                                        paceTip.tone === 'warning'
+                                            ? 'text-warning'
+                                            : 'text-fg-secondary'
+                                    )}>
+                                    {paceTip.body}{' '}
                                     {paceTip.action ? editGoalAction(paceTip.action) : null}
-                                </div>
-                            )}
+                                </p>
+                            ) : null}
                         </>
-                    ) : goal ? (
-                        coachGuidesEnabled ? (
-                            <CoachTipCard
-                                className="mt-4"
-                                title="Goal reached"
-                                actions={reachedAction}>
-                                {reachedBody}
-                            </CoachTipCard>
-                        ) : (
-                            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-raised px-3.5 py-3 text-sm text-fg-secondary">
-                                <span>{reachedBody}</span>
-                                {reachedAction}
-                            </div>
-                        )
                     ) : null}
                 </div>
             </Card>

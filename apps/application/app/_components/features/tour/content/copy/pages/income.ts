@@ -12,7 +12,7 @@ const income = {
         },
         simulator: {
             heading: 'What a raise does',
-            body: 'Drag to any monthly net — it opens on your Target. With the same jar percentages, this is what each jar would receive per month. Pick a goal to see its date (at the monthly amount you set on it) and how much room its jar has to speed it up. It is a projection — not money moved yet.',
+            body: 'Drag the monthly net. The jar split stays; each jar amount moves with it. Pick a goal to see its date. A projection — not money moved yet.',
         },
         sources: {
             heading: 'Income sources',

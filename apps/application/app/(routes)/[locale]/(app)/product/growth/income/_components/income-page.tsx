@@ -74,17 +74,28 @@ export function IncomePageClient() {
     const spanNet = traveling ? monthlyNet * horizon : monthlyNet;
     const jars = jarsQuery.data ?? [];
 
-    const target = useMemo(() => {
-        const earnTargets = (goalsQuery.data ?? [])
-            .filter(
-                goal =>
-                    goal.kind === GoalKind.EARN &&
-                    goal.status === GoalStatus.ACTIVE &&
-                    goal.target > 0
-            )
-            .map(goal => goal.target);
-        return earnTargets.length > 0 ? Math.max(...earnTargets) : FALLBACK_TARGET;
+    const earnBar = useMemo(() => {
+        const earn = (goalsQuery.data ?? []).filter(
+            goal =>
+                goal.kind === GoalKind.EARN &&
+                goal.target > 0 &&
+                (goal.status === GoalStatus.ACTIVE || goal.status === GoalStatus.REACHED)
+        );
+        const open = earn.filter(goal => goal.status === GoalStatus.ACTIVE);
+        const reached = earn.filter(goal => goal.status === GoalStatus.REACHED);
+        // A reached bar still is the target. Dropping it showed the €6,000 demo number.
+        const pool = open.length > 0 ? open : reached;
+        const amount =
+            pool.length > 0 ? Math.max(...pool.map(goal => goal.target)) : FALLBACK_TARGET;
+        const cleared = pool.find(
+            goal => goal.target === amount && goal.status === GoalStatus.REACHED
+        );
+        return {
+            target: amount,
+            clearedName: open.length === 0 && cleared ? cleared.name : null,
+        };
     }, [goalsQuery.data]);
+    const target = earnBar.target;
     const saveGoals = useMemo(
         () =>
             (goalsQuery.data ?? []).filter(goal => (goal.kind ?? GoalKind.SAVE) === GoalKind.SAVE),
@@ -114,7 +125,7 @@ export function IncomePageClient() {
                         ✦ MY INCOME
                     </Typography>
                     <Typography as="h1" className="mt-1 text-2xl sm:text-3xl lg:text-3xl">
-                        Spending cuts have a floor. Earning doesn't.
+                        What comes in each month.
                     </Typography>
                 </div>
                 <Button as={Link} href={CREATE_HREF.income} size="sm">
@@ -186,11 +197,14 @@ export function IncomePageClient() {
                             </div>
                             <div className="grid gap-1">
                                 <Eyebrow>Gap</Eyebrow>
-                                <p className="font-display text-2xl leading-none font-semibold tracking-tight text-warning sm:text-3xl">
-                                    {formatMoney(Math.max(0, gap))}
+                                <p
+                                    className={`font-display text-2xl leading-none font-semibold tracking-tight sm:text-3xl ${
+                                        gap < 0 ? 'text-success' : 'text-warning'
+                                    }`}>
+                                    {gap < 0 ? `+${formatMoney(-gap)}` : formatMoney(gap)}
                                 </p>
                                 <p className="font-mono text-[11px] text-fg-muted">
-                                    {gap <= 0 ? 'met' : 'to go'}
+                                    {gap < 0 ? 'over' : gap === 0 ? 'met' : 'to go'}
                                 </p>
                             </div>
                         </div>
@@ -201,6 +215,7 @@ export function IncomePageClient() {
                     <IncomeSimulator
                         netCents={monthlyNet}
                         targetCents={target}
+                        clearedName={!traveling && gap <= 0 ? earnBar.clearedName : null}
                         jars={jars}
                         goals={saveGoals}
                     />
