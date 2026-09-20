@@ -30,7 +30,7 @@ Planes: `auth` = identity (better-auth + Rumtelo person/household rows) · `publ
 
 | Entity | Base | Table | File | Relations |
 |---|---|---|---|---|
-| `CoachMessage` | `HouseholdEntity` | `public.platform_coach_message` | `modules/public/platform/coach/coach-message.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade |
+| `CoachMessage` | `HouseholdEntity` | `public.platform_coach_message` | `modules/public/platform/coach/coach-message.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade; `account` N:1 → Account (mapToPk, nullable) |
 
 ## public · money (14)
 

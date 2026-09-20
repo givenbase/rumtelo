@@ -81,9 +81,13 @@ export function WeekSetupWizard({ householdId, templates, onDone, onCancel }: Pr
                 ],
             }),
         onSuccess: async () => {
-            await queryClient.invalidateQueries({
-                queryKey: apiQuery.energy.timeTemplates.list.key(),
-            });
+            await Promise.all([
+                queryClient.invalidateQueries({
+                    queryKey: apiQuery.energy.timeTemplates.list.key(),
+                }),
+                queryClient.invalidateQueries({ queryKey: apiQuery.coach.feed.key() }),
+                queryClient.invalidateQueries({ queryKey: apiQuery.energy.dashboard.get.key() }),
+            ]);
             showToast('Your typical week is set', 'success');
             onDone();
         },

@@ -67,6 +67,11 @@ export function CoachPageClient() {
                         nudge.
                     </Typography>
                     <Link
+                        href="/product/energy/week"
+                        className="text-sm font-medium text-accent hover:underline">
+                        Open my week →
+                    </Link>
+                    <Link
                         href="/product/money/week-check"
                         className="text-sm font-medium text-accent hover:underline">
                         Open the week check →

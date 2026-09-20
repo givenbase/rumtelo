@@ -18,6 +18,7 @@ import { currentHouseholdId } from '../../../../../common/household/household.co
 import { currentWeek } from '../../../../../common/utils/period.util';
 import { AccountService } from '../../../../auth/user/account/account.service';
 
+import { TimeCoachService } from './time-coach.service';
 import { TimeEntry } from './time-entry.entity';
 import { weekRange } from './time-week.util';
 
@@ -27,7 +28,8 @@ export class TimeService {
     constructor(
         @Inject(EntityManager) private readonly em: EntityManager,
         @Inject(PlanAccessService) private readonly planAccess: PlanAccessService,
-        @Inject(AccountService) private readonly accounts: AccountService
+        @Inject(AccountService) private readonly accounts: AccountService,
+        @Inject(TimeCoachService) private readonly timeCoach: TimeCoachService
     ) {
         this.repo = new HouseholdScopedRepository(em, TimeEntry);
     }
@@ -73,6 +75,7 @@ export class TimeService {
             touched.push(row);
         }
         await this.em.flush();
+        await this.timeCoach.refresh();
         return touched.map(row => this.toDto(row));
     }
 
@@ -179,6 +182,7 @@ export class TimeService {
         const row = await this.repo.findOne({ id: input.id, account: account.id });
         if (!row) throw new NotFoundException('Time entry not found');
         await this.em.remove(row).flush();
+        await this.timeCoach.refresh();
     }
 
     // Private

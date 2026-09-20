@@ -11,6 +11,7 @@ import { PlanAccessService } from '../../../../../common/capability';
 import { HouseholdScopedRepository } from '../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../common/household/household.context';
 import { AccountService } from '../../../../auth/user/account/account.service';
+import { TimeCoachService } from '../time/time-coach.service';
 import { TimeEntry } from '../time/time-entry.entity';
 
 import { TimeTemplate } from './time-template.entity';
@@ -27,7 +28,8 @@ export class TimeTemplateService {
     constructor(
         @Inject(EntityManager) private readonly em: EntityManager,
         @Inject(PlanAccessService) private readonly planAccess: PlanAccessService,
-        @Inject(AccountService) private readonly accounts: AccountService
+        @Inject(AccountService) private readonly accounts: AccountService,
+        @Inject(TimeCoachService) private readonly timeCoach: TimeCoachService
     ) {
         this.repo = new HouseholdScopedRepository(em, TimeTemplate);
         this.entries = new HouseholdScopedRepository(em, TimeEntry);
@@ -72,7 +74,9 @@ export class TimeTemplateService {
             rows.push(row);
         }
         await this.em.flush();
-        return this.withLearned(account.id, rows);
+        const result = await this.withLearned(account.id, rows);
+        await this.timeCoach.refresh();
+        return result;
     }
 
     // ====================================================================

@@ -114,6 +114,8 @@ export function DayLogForm({ householdId, entries, defaultOn, onSaved }: Props) 
             await Promise.all([
                 queryClient.invalidateQueries({ queryKey: apiQuery.energy.time.summary.key() }),
                 queryClient.invalidateQueries({ queryKey: apiQuery.energy.time.list.key() }),
+                queryClient.invalidateQueries({ queryKey: apiQuery.coach.feed.key() }),
+                queryClient.invalidateQueries({ queryKey: apiQuery.energy.dashboard.get.key() }),
             ]);
             setOverrides({});
             showToast(`${formatDayLabel(on)} saved`, 'success');

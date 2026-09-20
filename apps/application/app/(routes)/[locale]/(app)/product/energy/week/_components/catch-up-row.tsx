@@ -52,6 +52,8 @@ export function CatchUpRow({ householdId, templates, entries, from, selected, on
                 queryClient.invalidateQueries({
                     queryKey: apiQuery.energy.timeTemplates.list.key(),
                 }),
+                queryClient.invalidateQueries({ queryKey: apiQuery.coach.feed.key() }),
+                queryClient.invalidateQueries({ queryKey: apiQuery.energy.dashboard.get.key() }),
             ]);
             showToast(`${formatDayLabel(day)} logged as typical`, 'success');
         },

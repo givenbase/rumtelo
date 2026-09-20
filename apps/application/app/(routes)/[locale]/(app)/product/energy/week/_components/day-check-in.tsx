@@ -89,6 +89,8 @@ export function DayCheckIn({
                 queryClient.invalidateQueries({
                     queryKey: apiQuery.energy.timeTemplates.list.key(),
                 }),
+                queryClient.invalidateQueries({ queryKey: apiQuery.coach.feed.key() }),
+                queryClient.invalidateQueries({ queryKey: apiQuery.energy.dashboard.get.key() }),
             ]);
             setDraft(null);
             showToast(`${isToday ? 'Today' : formatDayLabel(day)} logged`, 'success');
