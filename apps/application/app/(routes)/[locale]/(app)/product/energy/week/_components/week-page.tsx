@@ -42,6 +42,7 @@ import { DayLogForm } from './day-log-form';
 import { TimeBandCard } from './time-band-card';
 import { TimeSources } from './time-sources';
 import { previewWeekSummary } from './week-fixture';
+import { WeekForecast } from './week-forecast';
 import { WeekSetupWizard } from './week-setup-wizard';
 
 const METRIC_LABEL: Record<EnergyMetric, string> = {
@@ -87,11 +88,16 @@ function emptySummary(week: string): TimeWeekSummary {
 export function WeekPageClient() {
     const { householdId, userId } = useAuth();
     const live = isLiveData(householdId);
-    const thisWeek = weekKeyOf(todayIso());
+    const today = todayIso();
+    const thisWeek = weekKeyOf(today);
+    // One week ahead is visible: that is where the plan lives before the week starts.
+    const lastWeek = shiftWeek(thisWeek, 1);
     const [week, setWeek] = useState(thisWeek);
-    const [day, setDay] = useState(todayIso);
+    const [day, setDay] = useState(today);
     const [logMode, setLogMode] = useState<LogMode>('checkIn');
     const range = weekRangeOf(week);
+    // The check-in never leaves the week that holds the selected day; you cannot log the future.
+    const logRange = weekRangeOf(weekKeyOf(day));
 
     // Picking a day anywhere moves the visible week with it, and vice versa.
     const selectDay = (iso: string) => {
@@ -100,7 +106,7 @@ export function WeekPageClient() {
     };
     const selectWeek = (key: string) => {
         setWeek(key);
-        setDay(key === thisWeek ? todayIso() : weekRangeOf(key).from);
+        setDay(key >= thisWeek ? today : weekRangeOf(key).from);
     };
 
     const energyQuery = useLiveQuery(
@@ -115,7 +121,12 @@ export function WeekPageClient() {
     );
     const entriesQuery = useLiveQuery(
         apiQuery.energy.time.list.queryOptions({
-            input: { householdId: householdId!, from: range.from, to: range.to },
+            // Covers both the visible week and the week being logged when they differ.
+            input: {
+                householdId: householdId!,
+                from: range.from < logRange.from ? range.from : logRange.from,
+                to: range.to > logRange.to ? range.to : logRange.to,
+            },
         }),
         EMPTY_ENTRIES,
         live
@@ -266,7 +277,7 @@ export function WeekPageClient() {
                                     householdId={householdId}
                                     templates={templates}
                                     entries={myEntries}
-                                    from={range.from}
+                                    from={logRange.from}
                                     selected={day}
                                     onSelect={selectDay}
                                 />
@@ -281,13 +292,19 @@ export function WeekPageClient() {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <Eyebrow>
-                            {week === thisWeek ? 'This week' : week} · {formatDayLabel(range.from)}{' '}
-                            – {formatDayLabel(range.to)}
+                            {week === thisWeek
+                                ? 'This week'
+                                : week === lastWeek
+                                  ? 'Next week'
+                                  : week}{' '}
+                            · {formatDayLabel(range.from)} – {formatDayLabel(range.to)}
                         </Eyebrow>
                         <p className="mt-1 font-mono text-xs text-fg-muted">
                             {hasData
                                 ? `${summary.daysLogged} of 7 days logged`
-                                : 'Nothing logged yet for this week'}
+                                : week > thisWeek
+                                  ? 'Not started yet'
+                                  : 'Nothing logged yet for this week'}
                         </p>
                     </div>
                     <div className="flex items-center gap-1">
@@ -312,12 +329,23 @@ export function WeekPageClient() {
                             size="sm"
                             variant="ghost"
                             aria-label="Next week"
-                            disabled={week >= thisWeek}
+                            disabled={week >= lastWeek}
                             onClick={() => selectWeek(shiftWeek(week, 1))}>
                             →
                         </Button>
                     </div>
                 </div>
+
+                {/* ── The week as it will land ── */}
+                {live && week >= thisWeek && !needsSetup ? (
+                    <WeekForecast
+                        templates={templates}
+                        entries={myEntries}
+                        from={range.from}
+                        today={today}
+                        onEditWeek={() => setLogMode('setup')}
+                    />
+                ) : null}
 
                 {/* ── 168-hour bar ── */}
                 <div>
@@ -406,11 +434,25 @@ export function WeekPageClient() {
                     </div>
                 ) : (
                     <div className="grid gap-1 rounded-xl border border-dashed border-line p-5 text-sm text-fg-muted">
-                        <span className="font-medium text-fg">No days logged this week.</span>
-                        <span>
-                            Log one day above and the 168-hour bar, the sweet-spot check and the
-                            per-category bands fill in from your own minutes.
-                        </span>
+                        {week > thisWeek ? (
+                            <>
+                                <span className="font-medium text-fg">Not started yet.</span>
+                                <span>
+                                    The plan above is next week at your typical shape. Once it
+                                    starts, each check-in replaces a planned day with a real one.
+                                </span>
+                            </>
+                        ) : (
+                            <>
+                                <span className="font-medium text-fg">
+                                    No days logged this week.
+                                </span>
+                                <span>
+                                    Log one day above and the 168-hour bar, the sweet-spot check and
+                                    the per-category bands fill in from your own minutes.
+                                </span>
+                            </>
+                        )}
                     </div>
                 )}
 
