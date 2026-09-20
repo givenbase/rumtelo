@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 
 import { EnergyDashboardModule } from './dashboard/dashboard.module';
 import { LogModule } from './log/log.module';
+import { TimeTemplateModule } from './time-template/time-template.module';
+import { TimeModule } from './time/time.module';
 import { EnergyWeekCheckModule } from './week-check/week-check.module';
 
 /**
@@ -10,7 +12,19 @@ import { EnergyWeekCheckModule } from './week-check/week-check.module';
  * Mirrors the Energie portal in the application navigation.
  */
 @Module({
-    imports: [LogModule, EnergyWeekCheckModule, EnergyDashboardModule],
-    exports: [LogModule, EnergyWeekCheckModule, EnergyDashboardModule],
+    imports: [
+        LogModule,
+        TimeModule,
+        TimeTemplateModule,
+        EnergyWeekCheckModule,
+        EnergyDashboardModule,
+    ],
+    exports: [
+        LogModule,
+        TimeModule,
+        TimeTemplateModule,
+        EnergyWeekCheckModule,
+        EnergyDashboardModule,
+    ],
 })
 export class EnergyModule {}
