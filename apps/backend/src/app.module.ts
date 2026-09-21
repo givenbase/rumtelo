@@ -14,7 +14,7 @@ import { OrpcErrorFilter } from './common/filters/orpc-error.filter';
 import { HouseholdContextModule } from './common/household/household-context.module';
 import { CapabilityAccessModule } from './common/capability';
 import { MarkErrorsDefinedPlugin } from './common/plugins/mark-errors-defined.plugin';
-import { RedisModule } from './common/redis';
+import { RedisModule, createThrottlerOptions } from './common/redis';
 import { mapDatabaseConstraintErrorInterceptor } from './common/utils/database-constraint-error.util';
 import { createAuth } from './modules/auth/engine/auth.config';
 import { FeatureModules } from './modules/index';
@@ -30,7 +30,7 @@ export class AppModule {
                 MikroOrmModule.forRoot(ormConfig),
                 RedisModule,
                 ScheduleModule.forRoot(),
-                ThrottlerModule.forRoot([{ ttl: 60_000, limit: 240 }]),
+                ThrottlerModule.forRoot(createThrottlerOptions()),
                 BetterAuthModule.forRoot({ auth: createAuth(env) }),
                 ORPCModule.forRoot({
                     interceptors: [mapDatabaseConstraintErrorInterceptor],

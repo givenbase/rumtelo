@@ -7,6 +7,7 @@ import { Pool } from 'pg';
 import { v7 as uuidv7 } from 'uuid';
 
 import type { Env } from '../../../common/config/env.config';
+import { createBetterAuthSecondaryStorage } from '../../../common/redis/better-auth-redis.storage';
 import { EmailService } from '../../backoffice/communication/email';
 
 import { householdAccessControl, householdRoles } from './access-control.config';
@@ -75,12 +76,16 @@ export function createAuth(env: Env) {
         ? resolveCrossSubdomainCookieDomain(env.DOMAIN_WEB, env.DOMAIN_APP)
         : undefined;
 
+    const secondaryStorage = createBetterAuthSecondaryStorage(env.DATABASE_REDIS_URL);
+
     return betterAuth({
         database: pool,
         secret: env.BETTER_AUTH_SECRET,
         // Public origin — private DOMAIN_BACK is for service-to-service only.
         baseURL: env.DOMAIN_BACK_PUBLIC,
         trustedOrigins,
+        // Rate limits + session cache share Redis when DATABASE_REDIS_URL is valid.
+        secondaryStorage,
 
         /**
          * Sign-up body may include Account profile fields (firstName, …).
@@ -94,7 +99,7 @@ export function createAuth(env: Env) {
                 if (!body || typeof body.email !== 'string') return;
                 const parsed = SignUpAccountProfile.safeParse(body);
                 if (!parsed.success) return;
-                stashSignUpAccountProfile(body.email, toSignUpAccountProfile(parsed.data));
+                await stashSignUpAccountProfile(body.email, toSignUpAccountProfile(parsed.data));
             }),
         },
 
@@ -102,7 +107,7 @@ export function createAuth(env: Env) {
             user: {
                 create: {
                     after: async user => {
-                        const profile = takeSignUpAccountProfile(user.email);
+                        const profile = await takeSignUpAccountProfile(user.email);
                         try {
                             await insertAccountForSignUp(pool, user.id, profile);
                         } catch (error) {
