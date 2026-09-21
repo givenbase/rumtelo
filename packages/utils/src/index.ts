@@ -1,5 +1,10 @@
 export { cn } from './cn';
 export {
+    extractErrorMessage,
+    getOrpcValidationIssues,
+    type OrpcValidationIssue,
+} from './api-errors';
+export {
     DEFAULT_CURRENCY,
     currencySymbol,
     formatMoney,

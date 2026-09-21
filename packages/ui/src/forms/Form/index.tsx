@@ -84,7 +84,14 @@ function FormItem({ className, ...props }: React.ComponentProps<'div'>) {
     );
 }
 
-function FormLabel({ className, ...props }: React.ComponentProps<typeof LabelPrimitive.Root>) {
+type FormLabelProps = React.ComponentProps<typeof LabelPrimitive.Root> & {
+    /** Shows a muted “optional” badge after the label. */
+    optional?: boolean;
+    /** Shows a danger “*” after the label (prefer schema-driven required). */
+    required?: boolean;
+};
+
+function FormLabel({ className, children, optional, required, ...props }: FormLabelProps) {
     const { error, formItemId } = useFormField();
 
     return (
@@ -93,8 +100,17 @@ function FormLabel({ className, ...props }: React.ComponentProps<typeof LabelPri
             data-error={!!error}
             className={cn('data-[error=true]:text-destructive', className)}
             htmlFor={formItemId}
-            {...props}
-        />
+            {...props}>
+            {children}
+            {required ? (
+                <span className="text-danger" aria-hidden>
+                    *
+                </span>
+            ) : null}
+            {optional && !required ? (
+                <span className="text-xs font-normal text-fg-faint">optional</span>
+            ) : null}
+        </Label>
     );
 }
 

@@ -195,7 +195,7 @@ export function SignUpForm() {
                         name="middleName"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Middle name</FormLabel>
+                                <FormLabel optional>Middle name</FormLabel>
                                 <FormControl>
                                     <Input
                                         autoComplete="additional-name"
@@ -252,7 +252,7 @@ export function SignUpForm() {
                             name="phone"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Phone</FormLabel>
+                                    <FormLabel optional>Phone</FormLabel>
                                     <FormControl>
                                         <Phone
                                             autoComplete="tel"
@@ -274,7 +274,7 @@ export function SignUpForm() {
                             name="dateOfBirth"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Birthday</FormLabel>
+                                    <FormLabel optional>Birthday</FormLabel>
                                     <FormControl>
                                         <Input
                                             type="date"

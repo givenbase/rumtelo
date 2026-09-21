@@ -6,7 +6,7 @@ import { cn } from '@rumtelo/utils';
 
 import 'react-phone-number-input/style.css';
 
-import controlClasses from '../Input/styles';
+import { fieldWrapperClasses } from '../Input/styles';
 
 export type PhoneProps = {
     className?: string;
@@ -31,8 +31,8 @@ export function Phone({ className, defaultCountry = 'NL', onChange, value, ...pr
     return (
         <PhoneInput
             className={cn(
-                controlClasses,
-                'flex items-center gap-2 [&_.PhoneInputCountry]:shrink-0',
+                fieldWrapperClasses,
+                'gap-2 px-3 [&_.PhoneInputCountry]:shrink-0',
                 '[&_.PhoneInputInput]:min-w-0 [&_.PhoneInputInput]:flex-1',
                 '[&_.PhoneInputInput]:border-none [&_.PhoneInputInput]:bg-transparent',
                 '[&_.PhoneInputInput]:p-0 [&_.PhoneInputInput]:text-sm [&_.PhoneInputInput]:text-fg',

@@ -76,9 +76,7 @@ export function VerifyPanel() {
           : AUTH_VERIFY.subtitle_no_target;
 
     const signUpHref = `/sign-up${
-        Object.keys(continueQuery).length
-            ? `?${new URLSearchParams(continueQuery).toString()}`
-            : ''
+        Object.keys(continueQuery).length ? `?${new URLSearchParams(continueQuery).toString()}` : ''
     }`;
 
     return (
@@ -110,9 +108,7 @@ export function VerifyPanel() {
                         </p>
                     ) : null}
 
-                    {sent ? (
-                        <p className="text-sm text-fg-secondary">{AUTH_VERIFY.sent}</p>
-                    ) : null}
+                    {sent ? <p className="text-sm text-fg-secondary">{AUTH_VERIFY.sent}</p> : null}
 
                     <div className="flex flex-col gap-3 sm:flex-row">
                         <Button
