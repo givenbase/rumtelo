@@ -3,6 +3,8 @@
  * Cross-cutting prefs under `/settings/general/…` and `/settings/data/…`.
  * Account stays at `/settings`.
  */
+import { isProductEnabled } from './launch-products';
+
 export type SettingsTab =
     | 'account'
     | 'plan'
@@ -47,7 +49,7 @@ export const SETTINGS_HREF: Record<SettingsTab, string> = {
 };
 
 /** Grouped nav — general first, then products, then data. */
-export const SETTINGS_SECTIONS: SettingsNavSection[] = [
+const ALL_SETTINGS_SECTIONS: SettingsNavSection[] = [
     {
         title: 'General',
         product: 'platform',
@@ -106,6 +108,11 @@ export const SETTINGS_SECTIONS: SettingsNavSection[] = [
         items: [{ key: 'export', label: 'Export', sub: 'Excel or CSV' }],
     },
 ];
+
+/** Launch-filtered — production hides Energy/Soul settings. */
+export const SETTINGS_SECTIONS: SettingsNavSection[] = ALL_SETTINGS_SECTIONS.filter(section =>
+    isProductEnabled(section.product)
+);
 
 /** Flat list for lookups — order follows sections. */
 export const SETTINGS_TABS: SettingsNavItem[] = SETTINGS_SECTIONS.flatMap(section => section.items);

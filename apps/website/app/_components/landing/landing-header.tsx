@@ -11,6 +11,7 @@ import {
     useMarketingSession,
 } from '@/app/_components/marketing-session-provider';
 import { appHomeUrl, appPlanSettingsUrl, appSignInUrl, webSignUpPath } from '@/lib/portal-urls';
+import { isRegistrationOpen } from '@/lib/maintenance';
 
 import { Cta } from './landing-primitives';
 
@@ -63,10 +64,12 @@ export function LandingHeader() {
     }, [accountOpen]);
 
     const close = () => setOpen(false);
-    const navLinks = NAV_LINKS.map(link =>
-        link.href === '#signup' && isAuthenticated
-            ? { href: appHomeUrl(), label: 'Dashboard' }
-            : link
+    const registrationOpen = isRegistrationOpen();
+    const navLinks = NAV_LINKS.filter(link => registrationOpen || link.href !== '#signup').map(
+        link =>
+            link.href === '#signup' && isAuthenticated
+                ? { href: appHomeUrl(), label: 'Dashboard' }
+                : link
     );
 
     const name = user?.name?.trim() || 'Account';
@@ -217,11 +220,13 @@ export function LandingHeader() {
                                 Sign in
                             </Cta>
 
-                            <Cta
-                                href={webSignUpPath()}
-                                className="hidden whitespace-nowrap sm:inline-flex">
-                                Start free
-                            </Cta>
+                            {registrationOpen ? (
+                                <Cta
+                                    href={webSignUpPath()}
+                                    className="hidden whitespace-nowrap sm:inline-flex">
+                                    Start free
+                                </Cta>
+                            ) : null}
                         </>
                     )}
 
@@ -295,13 +300,15 @@ export function LandingHeader() {
                                     onClick={close}>
                                     Sign in
                                 </Cta>
-                                <Cta
-                                    href={webSignUpPath()}
-                                    size="lg"
-                                    className="w-full"
-                                    onClick={close}>
-                                    Start free — no card
-                                </Cta>
+                                {registrationOpen ? (
+                                    <Cta
+                                        href={webSignUpPath()}
+                                        size="lg"
+                                        className="w-full"
+                                        onClick={close}>
+                                        Start free — no card
+                                    </Cta>
+                                ) : null}
                             </>
                         )}
                     </div>

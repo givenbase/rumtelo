@@ -26,6 +26,3 @@ export function CoachMark({ className, size = 'md' }: CoachMarkProps) {
         </span>
     );
 }
-
-/** @deprecated Use CoachMark — helpers are the Coach’s on-screen guides. */
-export const HelperMark = CoachMark;

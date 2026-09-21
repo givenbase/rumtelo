@@ -5,7 +5,8 @@ import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } f
 import { Typography } from '@rumtelo/ui';
 
 import { PORTALS, PORTALS_SECTION } from '@/lib/landing-content';
-import { webSignUpPath } from '@/lib/portal-urls';
+import { webSignUpPath, appSignInUrl } from '@/lib/portal-urls';
+import { isRegistrationOpen } from '@/lib/maintenance';
 
 import { LandingIcon } from './landing-icon';
 import { LandingPortalScreen } from './landing-portal-screen';
@@ -199,8 +200,10 @@ export function LandingPortals() {
                         </ul>
 
                         <div className="flex flex-wrap items-center gap-3 pt-1">
-                            <Cta href={webSignUpPath()} size="md">
-                                Start with {portal.name}
+                            <Cta
+                                href={isRegistrationOpen() ? webSignUpPath() : appSignInUrl()}
+                                size="md">
+                                {isRegistrationOpen() ? `Start with ${portal.name}` : 'Sign in'}
                             </Cta>
                             <button
                                 type="button"

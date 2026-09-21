@@ -1,8 +1,13 @@
 import type { EntityManager } from '@mikro-orm/postgresql';
 
 import { Seeder } from '@mikro-orm/seeder';
-import type { CapabilityKey } from '@rumtelo/contracts';
+import {
+    isLaunchDeferredProduct,
+    productOfCapability,
+    type CapabilityKey,
+} from '@rumtelo/contracts';
 
+import { isLaunchProductsDeferred } from '../../../common/config/launch-products.util';
 import { PlanCapabilityGrant } from '../../../modules/backoffice/plan/plan-capability-grant/plan-capability-grant.entity';
 import { PlanCapability } from '../../../modules/backoffice/plan/plan-capability/plan-capability.entity';
 import {
@@ -23,6 +28,9 @@ import { PLAN_SEED } from '../../../modules/backoffice/plan/seed/plan.seed-data'
  *   3. plan_capability         (FK → feature)
  *   4. plan
  *   5. plan_capability_grant   (FK → plan, capability)
+ *
+ * Production (`db:seed:prod`): Energy/Soul products stay in catalog with
+ * `isActive=false` and no grants. Staging keeps the full surface.
  */
 export class PlanSeeder extends Seeder {
     async run(em: EntityManager): Promise<void> {
@@ -34,24 +42,30 @@ export class PlanSeeder extends Seeder {
         await em.flush();
     }
 
+    private productActive(productKey: string): boolean {
+        if (!isLaunchProductsDeferred()) return true;
+        return !isLaunchDeferredProduct(productKey);
+    }
+
     private async seedProducts(em: EntityManager): Promise<void> {
         const keys = PLAN_PRODUCT_SEED.map(row => row.key);
         const existingRows = await em.find(PlanProduct, { key: { $in: keys } });
         const existingByKey = new Map(existingRows.map(row => [row.key, row]));
 
         for (const row of PLAN_PRODUCT_SEED) {
+            const isActive = this.productActive(row.key);
             const existing = existingByKey.get(row.key);
             if (existing) {
                 existing.name = row.name;
                 existing.sortOrder = row.sortOrder;
-                existing.isActive = true;
+                existing.isActive = isActive;
                 continue;
             }
             em.create(PlanProduct, {
                 key: row.key,
                 name: row.name,
                 sortOrder: row.sortOrder,
-                isActive: true,
+                isActive,
             } as never);
         }
         await em.flush();
@@ -69,13 +83,14 @@ export class PlanSeeder extends Seeder {
         for (const row of PLAN_FEATURE_SEED) {
             const product = productByKey.get(row.productKey);
             if (!product) continue;
+            const isActive = this.productActive(row.productKey);
             const pair = `${row.productKey}:${row.key}`;
             const existing = existingByPair.get(pair);
             if (existing) {
                 existing.name = row.name;
                 existing.description = row.description;
                 existing.sortOrder = row.sortOrder;
-                existing.isActive = true;
+                existing.isActive = isActive;
                 continue;
             }
             em.create(PlanFeature, {
@@ -83,7 +98,7 @@ export class PlanSeeder extends Seeder {
                 name: row.name,
                 description: row.description,
                 sortOrder: row.sortOrder,
-                isActive: true,
+                isActive,
                 product,
             } as never);
         }
@@ -109,13 +124,15 @@ export class PlanSeeder extends Seeder {
         for (const row of PLAN_CAPABILITY_SEED) {
             const feature = featureByCapabilityKey.get(row.key);
             if (!feature) continue;
+            const productKey = productOfCapability(row.key);
+            const isActive = this.productActive(productKey);
             const existing = existingByKey.get(row.key);
             if (existing) {
                 existing.name = row.name;
                 existing.description = row.description;
                 existing.kind = row.kind;
                 existing.sortOrder = row.sortOrder;
-                existing.isActive = true;
+                existing.isActive = isActive;
                 existing.feature = feature;
                 continue;
             }
@@ -125,7 +142,7 @@ export class PlanSeeder extends Seeder {
                 description: row.description,
                 kind: row.kind,
                 sortOrder: row.sortOrder,
-                isActive: true,
+                isActive,
                 feature,
             } as never);
         }
@@ -172,15 +189,20 @@ export class PlanSeeder extends Seeder {
         );
         const pairOf = (grant: PlanCapabilityGrant) => `${grant.plan.key}:${grant.capability.key}`;
         const existingPairs = new Set(existingGrants.map(pairOf));
-        const desiredPairs = new Set(
-            PLAN_CAPABILITY_GRANT_SEED.map(row => `${row.planKey}:${row.capabilityKey}`)
-        );
+
+        const defer = isLaunchProductsDeferred();
+        const grantSeed = defer
+            ? PLAN_CAPABILITY_GRANT_SEED.filter(
+                  row => !isLaunchDeferredProduct(productOfCapability(row.capabilityKey))
+              )
+            : PLAN_CAPABILITY_GRANT_SEED;
+        const desiredPairs = new Set(grantSeed.map(row => `${row.planKey}:${row.capabilityKey}`));
 
         for (const grant of existingGrants) {
             if (!desiredPairs.has(pairOf(grant))) em.remove(grant);
         }
 
-        for (const row of PLAN_CAPABILITY_GRANT_SEED) {
+        for (const row of grantSeed) {
             if (existingPairs.has(`${row.planKey}:${row.capabilityKey}`)) continue;
             const plan = planByKey.get(row.planKey);
             const capability = capabilityByKey.get(row.capabilityKey);

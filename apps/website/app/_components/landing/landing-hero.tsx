@@ -13,7 +13,8 @@ import {
     PROOF,
     TICKER,
 } from '@/lib/landing-content';
-import { appHomeUrl, appPlanSettingsUrl, webSignUpPath } from '@/lib/portal-urls';
+import { appHomeUrl, appPlanSettingsUrl, appSignInUrl, webSignUpPath } from '@/lib/portal-urls';
+import { isRegistrationOpen } from '@/lib/maintenance';
 
 import { Typography } from '@rumtelo/ui';
 
@@ -200,9 +201,15 @@ export function LandingHero() {
                             </>
                         ) : (
                             <>
-                                <Cta href={webSignUpPath()} size="lg">
-                                    {HERO.ctaPrimary}
-                                </Cta>
+                                {isRegistrationOpen() ? (
+                                    <Cta href={webSignUpPath()} size="lg">
+                                        {HERO.ctaPrimary}
+                                    </Cta>
+                                ) : (
+                                    <Cta href={appSignInUrl()} size="lg">
+                                        Sign in
+                                    </Cta>
+                                )}
                                 <Cta href="#jars" variant="ghost" size="lg">
                                     {HERO.ctaSecondary}
                                 </Cta>

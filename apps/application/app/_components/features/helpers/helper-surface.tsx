@@ -45,6 +45,3 @@ export function CoachGuideSurface({
         </HelperGate>
     );
 }
-
-/** @deprecated Use CoachGuideSurface */
-export const HelperSurface = CoachGuideSurface;

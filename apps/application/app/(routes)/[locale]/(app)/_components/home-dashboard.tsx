@@ -10,11 +10,12 @@ import { useSearchParams } from 'next/navigation';
 import { CoachKind } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Eyebrow, Typography } from '@rumtelo/ui';
-import { formatPeriod, toPeriodKey, describePeriodTravel } from '@rumtelo/utils';
+import { formatPeriod, toPeriodKey, describePeriodTravel, cn } from '@rumtelo/utils';
 
 import type { CoachVerdictMessage, CoachRecapItem } from '@/components/features/home/coach-verdict';
 
 import { jarChrome } from '@/app/_lib/jar-meta';
+import { isProductEnabled } from '@/app/_lib/launch-products';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { isLiveData } from '@/app/_lib/preview';
@@ -58,7 +59,10 @@ const FALLBACK_RECAP: CoachRecapItem[] = [
         tint: 'var(--color-portal-soul)',
         href: '/product/soul',
     },
-];
+].filter(item => {
+    const product = item.portal.toLowerCase();
+    return isProductEnabled(product);
+});
 
 export function HomeDashboardClient() {
     const queryClient = useQueryClient();
@@ -326,7 +330,13 @@ export function HomeDashboardClient() {
                 />
             </HeroKluis>
 
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <div
+                className={cn(
+                    'grid grid-cols-1 gap-4',
+                    isProductEnabled('energy') || isProductEnabled('soul')
+                        ? 'lg:grid-cols-3'
+                        : 'lg:grid-cols-1'
+                )}>
                 <PortalWidget
                     tint="var(--color-jar-lts)"
                     icon="↗"
@@ -341,28 +351,32 @@ export function HomeDashboardClient() {
                     ]}
                     tagline="Cutting costs has a floor; raising income does not."
                 />
-                <PortalWidget
-                    tint="var(--color-jar-play)"
-                    icon={'✳\uFE0E'}
-                    title="Energy"
-                    href="/product/energy"
-                    stats={[
-                        { label: 'TRAINED THIS WEEK', value: '—' },
-                        { label: 'SLEEP SCORE', value: '—' },
-                    ]}
-                    tagline="A tired mind spends; a rested mind directs."
-                />
-                <PortalWidget
-                    tint="var(--color-portal-soul)"
-                    icon="✦"
-                    title="Soul"
-                    href="/product/soul"
-                    stats={[
-                        { label: 'STILLNESS TODAY', value: '—' },
-                        { label: 'WHY', value: dashboard.why ? '✓' : '—' },
-                    ]}
-                    tagline="A calm mind directs money. A restless one spends it."
-                />
+                {isProductEnabled('energy') && (
+                    <PortalWidget
+                        tint="var(--color-jar-play)"
+                        icon={'✳\uFE0E'}
+                        title="Energy"
+                        href="/product/energy"
+                        stats={[
+                            { label: 'TRAINED THIS WEEK', value: '—' },
+                            { label: 'SLEEP SCORE', value: '—' },
+                        ]}
+                        tagline="A tired mind spends; a rested mind directs."
+                    />
+                )}
+                {isProductEnabled('soul') && (
+                    <PortalWidget
+                        tint="var(--color-portal-soul)"
+                        icon="✦"
+                        title="Soul"
+                        href="/product/soul"
+                        stats={[
+                            { label: 'STILLNESS TODAY', value: '—' },
+                            { label: 'WHY', value: dashboard.why ? '✓' : '—' },
+                        ]}
+                        tagline="A calm mind directs money. A restless one spends it."
+                    />
+                )}
             </div>
 
             <MonthScoreLog

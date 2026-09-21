@@ -11,6 +11,7 @@ import { useOptionalPlanIntent } from '@/app/_components/plan-intent-provider';
 import { useOptionalSignUpDraft } from '@/app/_components/sign-up-draft-provider';
 import { useMarketingSession } from '@/app/_components/marketing-session-provider';
 import { ASSURANCES, SIGNUP_SECTION } from '@/lib/landing-content';
+import { isRegistrationOpen } from '@/lib/maintenance';
 import { appHomeUrl, appPlanSettingsUrl, appSignInUrl, webSignUpPath } from '@/lib/portal-urls';
 import { planIntentQuery } from '@rumtelo/utils';
 
@@ -112,6 +113,33 @@ export function LandingSignupForm() {
                                 size="lg"
                                 className="w-full sm:w-auto">
                                 Plan & billing
+                            </Cta>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    if (!isRegistrationOpen()) {
+        return (
+            <section
+                id="signup"
+                className="mx-auto max-w-6xl px-4 py-12 pb-14 lg:px-6 lg:py-20 lg:pb-24">
+                <div className="overflow-hidden rounded-3xl border border-line bg-surface shadow-lg ring-1 ring-fg/8 ring-inset dark:ring-white/8">
+                    <span className="block h-1 bg-(image:--gradient-accent)" />
+                    <div className="flex flex-col gap-6 p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:p-10">
+                        <div className="min-w-0">
+                            <SectionHeading
+                                eyebrow="COMING SOON"
+                                headline="New accounts open shortly"
+                                lead="Registration is paused while we finish launch. Already on the team? Sign in with your Rumtelo account."
+                                headlineClassName="max-w-lg"
+                            />
+                        </div>
+                        <div className="flex w-full max-w-sm flex-col gap-2 sm:flex-row lg:w-auto lg:max-w-none lg:shrink-0">
+                            <Cta href={appSignInUrl()} size="lg" className="w-full sm:w-auto">
+                                Sign in
                             </Cta>
                         </div>
                     </div>

@@ -31,11 +31,6 @@ export function resolveVendorBrand(input: ResolveVendorInput): VendorBrand | nul
     return null;
 }
 
-/** @deprecated Prefer resolveVendorBrand — kept for debt form call sites. */
-export function resolveLenderBrand(name: string): VendorBrand | null {
-    return resolveVendorBrand({ name });
-}
-
 /** Hostname from a website URL, without leading www. */
 export function domainFromWebsite(website: string | null | undefined): string | null {
     if (!website?.trim()) return null;
@@ -50,11 +45,6 @@ export function domainFromWebsite(website: string | null | undefined): string | 
 /** Favicon CDN — no API key. Swap to Brandfetch/Logo.dev later if needed. */
 export function vendorLogoUrl(domain: string, size = 64): string {
     return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=${size}`;
-}
-
-/** @deprecated Prefer vendorLogoUrl */
-export function lenderLogoUrl(domain: string, size = 64): string {
-    return vendorLogoUrl(domain, size);
 }
 
 export type PartyMark = {

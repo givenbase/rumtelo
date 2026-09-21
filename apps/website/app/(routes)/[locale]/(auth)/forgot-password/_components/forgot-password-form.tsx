@@ -25,6 +25,7 @@ import { ForgotPasswordForm as ForgotPasswordFormSchema } from '@rumtelo/contrac
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { requestPasswordReset } from '@/lib/auth';
+import { isRegistrationOpen } from '@/lib/maintenance';
 import { appSignInUrl, webOrigin } from '@/lib/portal-urls';
 
 export function ForgotPasswordForm() {
@@ -106,10 +107,14 @@ export function ForgotPasswordForm() {
                 <a href={appSignInUrl()} className="font-semibold text-accent hover:underline">
                     {AUTH_FORGOT_PASSWORD.back_to_sign_in}
                 </a>
-                {' · '}
-                <Link href="/sign-up" className="font-semibold text-accent hover:underline">
-                    {AUTH_FORGOT_PASSWORD.back_to_sign_up}
-                </Link>
+                {isRegistrationOpen() ? (
+                    <>
+                        {' · '}
+                        <Link href="/sign-up" className="font-semibold text-accent hover:underline">
+                            {AUTH_FORGOT_PASSWORD.back_to_sign_up}
+                        </Link>
+                    </>
+                ) : null}
             </Typography>
         </div>
     );

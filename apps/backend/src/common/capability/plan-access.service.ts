@@ -1,6 +1,7 @@
 import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import {
     hasCapability,
+    isCapabilityDeferredAtLaunch,
     withinLimit,
     type CapabilityKey,
     type PlanKey,
@@ -8,6 +9,7 @@ import {
 } from '@rumtelo/contracts';
 
 import { HouseholdBillingService } from '../../modules/auth/household/household-billing/household-billing.service';
+import { isLaunchProductsDeferred } from '../config/launch-products.util';
 import { currentHouseholdId } from '../household/household.context';
 
 /** Shared plan access checks for services (limits + capability). */
@@ -22,6 +24,9 @@ export class PlanAccessService {
     }
 
     async assertCapability(capabilityKey: CapabilityKey): Promise<void> {
+        if (isLaunchProductsDeferred() && isCapabilityDeferredAtLaunch(capabilityKey)) {
+            throw new ForbiddenException(`${capabilityKey} is not available yet`);
+        }
         const planKey = await this.planKeyForCurrentHousehold();
         if (!hasCapability(capabilityKey, planKey)) {
             throw new ForbiddenException(`Plan does not include ${capabilityKey}`);

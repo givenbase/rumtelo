@@ -102,5 +102,14 @@ export function isDemoAccountEmail(email: string | null | undefined): boolean {
 
 export function isDemoHouseholdSlug(slug: string | null | undefined): boolean {
     if (!slug) return false;
-    return DEMO_HOUSEHOLD_SLUGS.has(slug);
+    return DEMO_HOUSEHOLD_SLUGS.has(slug.trim().toLowerCase());
+}
+
+/**
+ * Staff allowlist for maintenance / early access.
+ * Any `*@rumtelo.com` address (includes seeded demo personas).
+ */
+export function isRumteloStaffEmail(email: string | null | undefined): boolean {
+    if (!email) return false;
+    return email.trim().toLowerCase().endsWith('@rumtelo.com');
 }

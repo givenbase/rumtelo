@@ -91,6 +91,8 @@ function main() {
 
     // Local process still listens here; remote URLs come from GitHub files.
     merged.NODE_ENV = target;
+    merged.APP_ENV = target;
+    merged.NEXT_PUBLIC_APP_ENV = target;
     merged.PORT = merged.PORT || '3002';
     merged.LOG_LEVEL = merged.LOG_LEVEL || (target === 'production' ? 'info' : 'debug');
     merged.DATABASE_SYNC = 'false';
@@ -109,6 +111,8 @@ function main() {
 
     const preferredOrder = [
         'NODE_ENV',
+        'APP_ENV',
+        'NEXT_PUBLIC_APP_ENV',
         'PORT',
         'LOG_LEVEL',
         'DOMAIN_APP',

@@ -9,7 +9,8 @@ import { Typography } from '@rumtelo/ui';
 
 import { useMarketingSession } from '@/app/_components/marketing-session-provider';
 import { PLANS, PRICING_SECTION } from '@/lib/landing-content';
-import { appHomeUrl, appPlanSettingsUrl, webSignUpPath } from '@/lib/portal-urls';
+import { appHomeUrl, appPlanSettingsUrl, appSignInUrl, webSignUpPath } from '@/lib/portal-urls';
+import { isRegistrationOpen } from '@/lib/maintenance';
 
 import { Cta, SectionHeading } from './landing-primitives';
 import { formatCatalogMajor, formatCatalogMajorExact } from './landing-money';
@@ -27,6 +28,13 @@ function ctaForPlan(args: {
     const { planKey, planName, free, currentPlan, isAuthenticated, hasHousehold } = args;
 
     if (!isAuthenticated) {
+        if (!isRegistrationOpen()) {
+            return {
+                href: appSignInUrl(),
+                label: 'Sign in',
+                current: false,
+            };
+        }
         return {
             href: webSignUpPath(
                 planKey === PlanKey.BASIC
@@ -160,7 +168,7 @@ export function LandingPricing() {
                     });
                     // Guest CTAs still respect the billing toggle for paid plans.
                     const href =
-                        !isAuthenticated && plan.key !== PlanKey.BASIC
+                        !isAuthenticated && plan.key !== PlanKey.BASIC && isRegistrationOpen()
                             ? webSignUpPath(
                                   planIntentQuery(planIntentFromPlanKey(plan.key, billing))
                               )

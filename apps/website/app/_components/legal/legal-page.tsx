@@ -5,7 +5,8 @@ import { RumteloLogo } from '@rumtelo/brand';
 import { Typography } from '@rumtelo/ui';
 
 import { Cta } from '@/components/landing/landing-primitives';
-import { webSignUpPath } from '@/lib/portal-urls';
+import { isRegistrationOpen } from '@/lib/maintenance';
+import { appSignInUrl, webSignUpPath } from '@/lib/portal-urls';
 
 export function LegalPage({
     title,
@@ -23,7 +24,9 @@ export function LegalPage({
                     <Link href="/" className="flex items-center gap-2">
                         <RumteloLogo variant="wordmark" className="h-6 w-auto max-w-34" />
                     </Link>
-                    <Cta href={webSignUpPath()}>Start free</Cta>
+                    <Cta href={isRegistrationOpen() ? webSignUpPath() : appSignInUrl()}>
+                        {isRegistrationOpen() ? 'Start free' : 'Sign in'}
+                    </Cta>
                 </div>
             </header>
             <main className="mx-auto max-w-3xl px-4 py-12 lg:px-6 lg:py-16">

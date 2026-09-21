@@ -2,6 +2,7 @@ import type { EntityManager } from '@mikro-orm/postgresql';
 
 import { Seeder } from '@mikro-orm/seeder';
 
+import { isLaunchProductsDeferred } from '../../common/config/launch-products.util';
 import { PlanSeeder } from './plan/PlanSeeder';
 import { AudienceSeeder } from './product/money/AudienceSeeder';
 import { CategoryTemplateSeeder } from './product/money/CategoryTemplateSeeder';
@@ -26,10 +27,12 @@ import { DemoHouseholdSeeder } from './demo/DemoHouseholdSeeder';
 /**
  * Root seeder — backoffice product catalogs first, then plans, then demo data.
  * Layout mirrors backoffice/product/{money|growth} and backoffice/plan.
+ *
+ * Production (`db:seed:prod`): skips demo households. Staging keeps them.
  */
 export class DatabaseSeeder extends Seeder {
     async run(em: EntityManager): Promise<void> {
-        return this.call(em, [
+        const seeders = [
             // Lookups first — presets link to them by FK.
             JarTemplateSeeder,
             CategoryTemplateSeeder,
@@ -51,7 +54,8 @@ export class DatabaseSeeder extends Seeder {
             BookPresetSeeder,
             WatchPresetSeeder,
             PlanSeeder,
-            DemoHouseholdSeeder,
-        ]);
+            ...(isLaunchProductsDeferred() ? [] : [DemoHouseholdSeeder]),
+        ];
+        return this.call(em, seeders);
     }
 }

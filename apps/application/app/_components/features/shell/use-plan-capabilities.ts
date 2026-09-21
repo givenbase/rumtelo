@@ -15,6 +15,7 @@ import {
     withinLimit,
     type PlanLimitKey,
 } from '@/app/_lib/plan';
+import { isCapabilityEnabledAtLaunch, isProductEnabled } from '@/app/_lib/launch-products';
 import { capabilityAccessForPath, capabilityKeyForPathname } from '@/app/_lib/capability-access';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 
@@ -32,13 +33,17 @@ export function usePlanCapabilities() {
             caps,
             access: PLAN_ACCESS[plan],
             grantedKeys: caps.capabilityKeys,
-            productsWithGrants: productsWithGrants(plan),
+            productsWithGrants: productsWithGrants(plan).filter(product =>
+                isProductEnabled(product)
+            ),
             featuresForProduct: (product: Parameters<typeof featuresForProduct>[1]) =>
                 featuresForProduct(plan, product),
             hasCapability: (capabilityKey: string | null | undefined) =>
-                !planReady || hasCapability(capabilityKey, plan),
+                isCapabilityEnabledAtLaunch(capabilityKey) &&
+                (!planReady || hasCapability(capabilityKey, plan)),
             isCapabilityLocked: (capabilityKey: string | null | undefined) =>
-                planReady && isCapabilityLocked(capabilityKey, plan),
+                !isCapabilityEnabledAtLaunch(capabilityKey) ||
+                (planReady && isCapabilityLocked(capabilityKey, plan)),
             requiredPlanFor: (capabilityKey: string) => minPlanForCapability(capabilityKey),
             limitFor: (key: PlanLimitKey) => limitFor(plan, key),
             withinLimit: (key: PlanLimitKey, occupied: number) => withinLimit(plan, key, occupied),
@@ -46,7 +51,11 @@ export function usePlanCapabilities() {
             capabilityKeyForPath: capabilityKeyForPathname,
             accessForPath: (pathname: string) =>
                 capabilityAccessForPath(pathname, plan, (key, nextPlan) =>
-                    planReady ? isCapabilityLocked(key, nextPlan) : false
+                    !isCapabilityEnabledAtLaunch(key)
+                        ? true
+                        : planReady
+                          ? isCapabilityLocked(key, nextPlan)
+                          : false
                 ),
         }),
         [plan, planReady, caps]

@@ -3,9 +3,10 @@
  * Source of truth lives under the plane/product tree; prefer public imports via
  * `@rumtelo/contracts/{domain}`.
  */
-export * from '../common/schemas';
+export * from '../common/common.schema';
 export * from '../backoffice/plan/plan.schema';
 export * from '../backoffice/plan/plan.util';
+export * from '../backoffice/plan/launch-products';
 export * from '../public/platform/schemas';
 export * from '../public/product/money/schemas';
 export * from '../public/product/growth/schemas';

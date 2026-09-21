@@ -15,8 +15,8 @@ export {
     useHelpersEnabled as useCoachGuidesEnabled,
 } from './provider';
 export { HelperGate, HelperGate as CoachGuideGate } from './helper-gate';
-export { CoachMark, HelperMark } from './helper-mark';
-export { CoachGuideSurface, HelperSurface } from './helper-surface';
+export { CoachMark } from './helper-mark';
+export { CoachGuideSurface } from './helper-surface';
 export { CoachTipCard } from './coach-tip-card';
 export { WhyCaption } from './why-caption';
 export { JarGuideCard } from './jar-guide-card';

@@ -6,10 +6,12 @@
  *
  * `capabilityKey`: always a catalog key from CAPABILITIES (`{product}-{feature}`).
  */
+import { isProductEnabled } from './launch-products';
 import { CAPABILITIES } from './plan';
 import { productPath } from './routes';
 
-export const NAV_GROUPS = [
+/** Full portal IA — filtered by launch surface for `NAV_GROUPS` / `BOTTOM_TABS`. */
+const ALL_NAV_GROUPS = [
     {
         key: 'home',
         label: 'Home',
@@ -174,17 +176,20 @@ export const TOP_PILL_LABELS: Record<string, string> = {
     soul: 'Soul',
 };
 
-export type NavGroup = (typeof NAV_GROUPS)[number];
+export type NavGroup = (typeof ALL_NAV_GROUPS)[number];
 export type NavChild = NavGroup['children'][number];
 
-/** Bottom tabs — design `SHORT` map EN column. */
-export const BOTTOM_TABS = [
-    { href: '/', label: 'Home', glyph: '◇' },
-    { href: productPath('money'), label: 'Money', glyph: '◈' },
-    { href: productPath('growth'), label: 'Growth', glyph: '↗' },
-    { href: productPath('energy'), label: 'Energy', glyph: '✳\uFE0E' },
-    { href: productPath('soul'), label: 'Soul', glyph: '✦' },
-] as const;
+/** Launch-filtered portals — production hides Energy/Soul. */
+export const NAV_GROUPS: readonly NavGroup[] = ALL_NAV_GROUPS.filter(group =>
+    isProductEnabled(group.key)
+);
+
+/** Bottom tabs — design `SHORT` map EN column (same launch filter as nav). */
+export const BOTTOM_TABS = NAV_GROUPS.map(group => ({
+    href: group.href,
+    label: TOP_PILL_LABELS[group.key] ?? group.label,
+    glyph: group.icon,
+}));
 
 /** True when `pathname` is exactly `href` or a nested route under it. */
 export function pathMatchesNavHref(pathname: string, href: string): boolean {

@@ -8,5 +8,5 @@
  * Mirror: apps/backend/src/modules/public/product/money/
  */
 export * from './enums';
-export { Cadence, FlowDirection, CADENCE_TO_MONTHLY } from '../../../common/enums';
+export { Cadence, FlowDirection, CADENCE_TO_MONTHLY } from '../../../common/common.enums';
 export * from './schemas';

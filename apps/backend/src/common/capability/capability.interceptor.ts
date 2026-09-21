@@ -7,16 +7,22 @@ import {
     type NestInterceptor,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { hasCapability, type CapabilityKey } from '@rumtelo/contracts';
+import {
+    hasCapability,
+    isCapabilityDeferredAtLaunch,
+    type CapabilityKey,
+} from '@rumtelo/contracts';
 import { Observable } from 'rxjs';
 
 import { HouseholdBillingService } from '../../modules/auth/household/household-billing/household-billing.service';
+import { isLaunchProductsDeferred } from '../config/launch-products.util';
 import { currentHouseholdId, householdStorage } from '../household/household.context';
 import { REQUIRE_CAPABILITY_KEY } from './require-capability.decorator';
 
 /**
  * Enforces @RequireCapability after household scope is established.
  * Loads planKey from household billing (contracts hasCapability).
+ * Production launch also blocks deferred products (Energy/Soul).
  */
 @Injectable()
 export class CapabilityInterceptor implements NestInterceptor {
@@ -45,7 +51,11 @@ export class CapabilityInterceptor implements NestInterceptor {
         }
         const householdId = currentHouseholdId();
         const planKey = await this.billing.getPlanKey(householdId);
+        const defer = isLaunchProductsDeferred();
         for (const key of keys) {
+            if (defer && isCapabilityDeferredAtLaunch(key)) {
+                throw new ForbiddenException(`${key} is not available yet`);
+            }
             if (!hasCapability(key, planKey)) {
                 throw new ForbiddenException(`Plan does not include ${key}`);
             }

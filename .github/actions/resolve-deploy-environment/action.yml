@@ -20,7 +20,7 @@ outputs:
         description: Backend NODE_ENV (production for both deployed envs — Rumtelo has no staging NODE_ENV)
         value: ${{ steps.resolve.outputs.node_env }}
     next_public_app_env:
-        description: Optional label for future NEXT_PUBLIC_APP_ENV (staging | production)
+        description: NEXT_PUBLIC_APP_ENV / APP_ENV (staging | production) — launch product surface
         value: ${{ steps.resolve.outputs.next_public_app_env }}
     is_production:
         description: 'true when GitHub environment is production'

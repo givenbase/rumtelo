@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { BRAND_TAGLINE } from '@rumtelo/i18n';
 import { Card, Section, Typography } from '@rumtelo/ui';
 
+import { isProductEnabled } from '@/app/_lib/launch-products';
 import { productPath } from '@/app/_lib/routes';
 import { PageContent } from '@/components/layout/page-content';
 
@@ -27,24 +28,28 @@ const MEANING = [
 const WIDER = [
     {
         portal: 'Money',
+        product: 'money',
         line: 'Money gets a job.',
         body: 'Six jars. One calm overview. Fixed costs, inbox, and the week check keep the picture current.',
         href: productPath('money/jars'),
     },
     {
         portal: 'Growth',
+        product: 'growth',
         line: 'Ambition with a plan — not a guess.',
         body: 'Income, goals, and net worth so “earn more” has a map, not a vibe.',
         href: productPath('growth/income'),
     },
     {
         portal: 'Energy',
+        product: 'energy',
         line: 'A tired head spends. A rested head decides.',
         body: 'Sleep, training, food — the floor under every money choice. Life leaks too, not only the balance.',
         href: productPath('energy/week'),
     },
     {
         portal: 'Soul',
+        product: 'soul',
         line: 'Know the why — not only the spend.',
         body: 'Intention and stillness so the plan survives a hard week. Direction, not only discipline.',
         href: productPath('soul/intent'),
@@ -56,6 +61,9 @@ const WIDER = [
  * Brand: docs/brand/quotes.md · positioning.md
  */
 export default function WhyFoundationPage() {
+    const wider = WIDER.filter(item => isProductEnabled(item.product));
+    const launchWide = isProductEnabled('energy') || isProductEnabled('soul');
+
     return (
         <PageContent width="prose" className="animate-rise">
             <Section eyebrow="✦ Why Rumtelo">
@@ -103,12 +111,13 @@ export default function WhyFoundationPage() {
                         size="sm"
                         color="muted"
                         className="mt-3 max-w-prose text-pretty">
-                        Money is the door. Energy, growth, and soul complete the overview — so you
-                        stop wondering where it went, what you’re running on, and why it matters.
+                        {launchWide
+                            ? 'Money is the door. Energy, growth, and soul complete the overview — so you stop wondering where it went, what you’re running on, and why it matters.'
+                            : 'Money is the door. Growth completes the overview — so you stop wondering where it went and where the next paycheck is going.'}
                     </Typography>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
-                    {WIDER.map(item => (
+                    {wider.map(item => (
                         <Link
                             key={item.portal}
                             href={item.href}

@@ -32,9 +32,6 @@ export const AUTH_QUOTES_APP: readonly BrandQuote[] = [
     brand.auth_quotes_app.why,
 ];
 
-/** @deprecated Prefer AUTH_QUOTES_WEB or AUTH_QUOTES_APP. */
-export const AUTH_QUOTES = AUTH_QUOTES_WEB;
-
 export const AUTH_SIGN_IN = auth.sign_in;
 export const AUTH_SIGN_UP = auth.sign_up;
 export const AUTH_VERIFY = auth.verify;

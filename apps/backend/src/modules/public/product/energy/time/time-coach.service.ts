@@ -16,6 +16,7 @@ import {
 } from '@rumtelo/contracts';
 
 import { PlanAccessService } from '../../../../../common/capability';
+import { isLaunchProductsDeferred } from '../../../../../common/config/launch-products.util';
 import { HouseholdScopedRepository } from '../../../../../common/household/household-scoped.repository';
 import { currentWeek } from '../../../../../common/utils/period.util';
 import { AccountService } from '../../../../auth/user/account/account.service';
@@ -74,6 +75,7 @@ export class TimeCoachService implements OnModuleInit {
 
     /** Evaluate the current person's week and upsert the inbox. */
     async refresh(): Promise<void> {
+        if (isLaunchProductsDeferred()) return;
         const planKey = await this.planAccess.planKeyForCurrentHousehold();
         if (!hasCapability(CAPABILITIES.energyWeek, planKey)) return;
 

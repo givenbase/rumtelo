@@ -17,7 +17,7 @@ import {
     updateHref,
 } from '@/app/_lib/create-routes';
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
-import { claimFixedCostMatches } from '@/app/_lib/fixed-cost-match';
+import { suggestFixedCostForTx } from '@/app/_lib/fixed-cost-match';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
@@ -233,15 +233,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
     const linkedBill = tx?.fixedCostId
         ? activeFixed.find(item => item.id === tx.fixedCostId)
         : undefined;
-    const suggestedBillId =
-        !linkedBill && tx
-            ? [...claimFixedCostMatches(activeFixed, [tx]).matchByFixedCostId.entries()].find(
-                  ([, matched]) => matched.id === tx.id
-              )?.[0]
-            : undefined;
-    const suggestedBill = suggestedBillId
-        ? activeFixed.find(item => item.id === suggestedBillId)
-        : undefined;
+    const suggestedBill = !linkedBill && tx ? suggestFixedCostForTx(tx, activeFixed) : undefined;
 
     if (live && (listQuery.isLoading || periodQuery.isLoading || inboxQuery.isLoading) && !tx) {
         return <p className="text-sm text-fg-muted">Loading…</p>;

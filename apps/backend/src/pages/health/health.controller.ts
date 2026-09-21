@@ -15,6 +15,7 @@ import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
 import { type FastifyReply } from 'fastify';
 
 import { RedisService } from '../../common/redis';
+import { loadEnv } from '../../common/config/env.config';
 import { renderBrandPage } from '../shared/brand-shell';
 
 type ProbeStatus = 'connected' | 'disconnected' | 'error' | 'disabled';
@@ -47,8 +48,10 @@ export class HealthController {
         ]);
 
         const ok = database === 'connected';
+        const maintenance = loadEnv().MAINTENANCE;
         const body = {
             status: ok ? 'ok' : 'degraded',
+            maintenance,
             timestamp: new Date().toISOString(),
             uptime: process.uptime(),
             environment: process.env.NODE_ENV ?? 'development',

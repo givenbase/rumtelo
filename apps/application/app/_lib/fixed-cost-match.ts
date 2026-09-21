@@ -138,29 +138,3 @@ export function suggestFixedCostForTx(
     }
     return undefined;
 }
-
-/**
- * @deprecated Prefer settlements + claimLinkedFixedCostTxIds. Kept for suggestion maps.
- * Match each fixed cost to at most one period payment (heuristic).
- */
-export function claimFixedCostMatches(
-    fixedCosts: readonly FixedCost[],
-    transactions: readonly Transaction[]
-) {
-    const claimedTxIds = new Set<string>();
-    const matchByFixedCostId = new Map<string, Transaction>();
-
-    for (const item of fixedCosts) {
-        const monthly = monthlyAmount(item.amount, item.cadence);
-        const match = transactions.find(
-            tx =>
-                !claimedTxIds.has(tx.id) && !tx.fixedCostId && txMatchesFixedCost(tx, item, monthly)
-        );
-        if (match) {
-            claimedTxIds.add(match.id);
-            matchByFixedCostId.set(item.id, match);
-        }
-    }
-
-    return { claimedTxIds, matchByFixedCostId };
-}

@@ -15,6 +15,12 @@ const boolish = (fallback: boolean) =>
 const EnvSchema = z.object({
     // ── Runtime ──────────────────────────────────────────────────────────
     NODE_ENV: z.enum(['development', 'test', 'staging', 'production']).default('development'),
+    /**
+     * Deploy label — staging vs production when NODE_ENV is `production` on both
+     * Railway envs. Drives launch product deferral (Energy/Soul off in production).
+     * Local: `pnpm env:use staging|production` sets this; seed scripts can rely on NODE_ENV.
+     */
+    APP_ENV: z.enum(['development', 'staging', 'production']).optional(),
     /** Local listen port. Railway injects PORT automatically. */
     PORT: z.coerce.number().default(3002),
     LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
@@ -71,6 +77,12 @@ const EnvSchema = z.object({
      */
     BILLING_PREVIEW_BYPASS: boolish(false),
 
+    /**
+     * Scheduled maintenance flag — mirrored by Next `NEXT_PUBLIC_MAINTENANCE`.
+     * Exposed on `/health` so monitors and the app can agree.
+     */
+    MAINTENANCE: boolish(false),
+
     // ── AI / maps (optional) ──────────────────────────────────────────────
     OPENAI_API_KEY: z.string().optional(),
     OPENAI_MODEL: z.string().optional(),
@@ -110,6 +122,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     const normalized: NodeJS.ProcessEnv = {
         ...source,
         NODE_ENV: blankToUndefined(source.NODE_ENV),
+        APP_ENV: blankToUndefined(source.APP_ENV),
         DATABASE_URL: blankToUndefined(source.DATABASE_URL),
         DATABASE_REDIS_URL: blankToUndefined(source.DATABASE_REDIS_URL ?? source.REDIS_URL),
         EMAIL_FROM: blankToUndefined(source.EMAIL_FROM),

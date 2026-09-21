@@ -18,6 +18,11 @@ export const env = createEnv({
         NEXT_PUBLIC_DOMAIN_APP: portalOrigin('http://localhost:3000'),
         NEXT_PUBLIC_DOMAIN_WEB: portalOrigin('http://localhost:3001'),
         NEXT_PUBLIC_DOMAIN_BACK: portalOrigin('http://localhost:3002'),
+        /**
+         * Scheduled maintenance — hide registration; login stays.
+         * Alias: `MAINTENANCE` accepted as fallback.
+         */
+        NEXT_PUBLIC_MAINTENANCE: z.enum(['true', 'false']).optional(),
     },
 
     emptyStringAsUndefined: true,
@@ -27,6 +32,7 @@ export const env = createEnv({
         NEXT_PUBLIC_DOMAIN_APP: process.env.NEXT_PUBLIC_DOMAIN_APP,
         NEXT_PUBLIC_DOMAIN_WEB: process.env.NEXT_PUBLIC_DOMAIN_WEB,
         NEXT_PUBLIC_DOMAIN_BACK: process.env.NEXT_PUBLIC_DOMAIN_BACK,
+        NEXT_PUBLIC_MAINTENANCE: process.env.NEXT_PUBLIC_MAINTENANCE ?? process.env.MAINTENANCE,
         NODE_ENV: process.env.NODE_ENV,
         SKIP_ENV_VALIDATION: process.env.SKIP_ENV_VALIDATION,
     },

@@ -508,7 +508,14 @@ function AppShellInner({ children }: { children: ReactNode }) {
 
             {/* ── BOTTOM NAV (mobile) ───────────────────────────────────────── */}
             <nav
-                className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-line bg-chrome pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden"
+                className={cn(
+                    'fixed inset-x-0 bottom-0 z-50 grid border-t border-line bg-chrome pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden',
+                    BOTTOM_TABS.length <= 3
+                        ? 'grid-cols-3'
+                        : BOTTOM_TABS.length === 4
+                          ? 'grid-cols-4'
+                          : 'grid-cols-5'
+                )}
                 aria-label="Mobile navigation">
                 {BOTTOM_TABS.map((tab, i) => {
                     const active = NAV_GROUPS[i] === activeGroup;
