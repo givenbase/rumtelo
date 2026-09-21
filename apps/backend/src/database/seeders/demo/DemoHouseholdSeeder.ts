@@ -48,12 +48,16 @@ import { FixedCost } from '../../../modules/public/product/money/plan/fixed-cost
 import { IncomeAmountPeriod } from '../../../modules/public/product/money/plan/income/income-amount-period.entity';
 import { IncomeSource } from '../../../modules/public/product/money/plan/income/income-source.entity';
 import { Jar } from '../../../modules/public/product/money/plan/jar/jar.entity';
+import { Category } from '../../../modules/public/product/money/plan/jar/category.entity';
 import { Debt } from '../../../modules/public/product/money/targets/debt/debt.entity';
 import { Goal } from '../../../modules/public/product/money/targets/goal/goal.entity';
 import { Asset } from '../../../modules/public/product/growth/asset/asset.entity';
 import { LearnSkillFocus } from '../../../modules/public/product/growth/learn/focus/focus.entity';
 import { LearnProgress } from '../../../modules/public/product/growth/learn/progress/progress.entity';
 import { Gratitude } from '../../../modules/public/product/soul/gratitude/gratitude.entity';
+import { CategoryTemplate } from '../../../modules/backoffice/product/money/template/category/category.entity';
+import { FixedCostPreset } from '../../../modules/backoffice/product/money/preset/fixed-cost/fixed-cost.entity';
+import { MerchantPreset } from '../../../modules/backoffice/product/money/preset/merchant/merchant.entity';
 
 loadEnvFiles();
 
@@ -97,6 +101,59 @@ type JarMap = {
     give: Jar;
     all: Jar[];
 };
+
+/** Demo fixed-cost labels → category template name (when catalog name differs). */
+const DEMO_FIXED_CATEGORY: Record<string, string> = {
+    Rent: 'Housing',
+    Mortgage: 'Housing',
+    'Property tax escrow': 'Taxes',
+    Utilities: 'Utilities',
+    Groceries: 'Groceries',
+    Phone: 'Subscriptions',
+    'Phone + internet': 'Subscriptions',
+    'Transit pass': 'Transport',
+    'Health + life insurance': 'Insurance',
+    Coworking: 'Other',
+    'Software stack': 'Subscriptions',
+    'Brokerage fees': 'Index funds',
+    'Learning subscriptions': 'Courses',
+    'Charitable giving': 'Donations',
+};
+
+/**
+ * Demo tx counterparty/description needles → category under the row's jar.
+ * Used when no merchant preset matches (or jar differs from the catalog default).
+ */
+const DEMO_TX_CATEGORY: Array<{ includes: string; category: string }> = [
+    { includes: 'landlord', category: 'Housing' },
+    { includes: 'rent', category: 'Housing' },
+    { includes: 'mortgage', category: 'Housing' },
+    { includes: 'supermarket', category: 'Groceries' },
+    { includes: 'whole foods', category: 'Groceries' },
+    { includes: 'grocer', category: 'Groceries' },
+    { includes: 'pharmacy', category: 'Pharmacy' },
+    { includes: 'transit', category: 'Transport' },
+    { includes: 'bus', category: 'Transport' },
+    { includes: 'uber eats', category: 'Eating out' },
+    { includes: 'uber', category: 'Transport' },
+    { includes: 'mobile', category: 'Subscriptions' },
+    { includes: 'phone', category: 'Subscriptions' },
+    { includes: 'cafe', category: 'Eating out' },
+    { includes: 'coffee', category: 'Eating out' },
+    { includes: 'bookstore', category: 'Books' },
+    { includes: 'learnco', category: 'Courses' },
+    { includes: 'masterclass', category: 'Courses' },
+    { includes: 'vanguard', category: 'Index funds' },
+    { includes: 'broker', category: 'Index funds' },
+    { includes: 'dividend', category: 'Index funds' },
+    { includes: 'givedirectly', category: 'Donations' },
+    { includes: 'visa', category: 'Debt payments' },
+    { includes: 'credit card', category: 'Debt payments' },
+    { includes: 'leaseco', category: 'Transport' },
+    { includes: 'car lease', category: 'Transport' },
+    { includes: 'finco', category: 'Debt payments' },
+    { includes: 'laptop loan', category: 'Debt payments' },
+];
 
 /**
  * Seeds three plan personas (Basic / Plus / Max) with better-auth users,
@@ -323,6 +380,10 @@ export class DemoHouseholdSeeder extends Seeder {
 
         await em.flush();
 
+        // Jar-sorted demo rows still need categoryId — otherwise Six Jars shows Uncategorized.
+        await this.linkDemoCategories(em, householdId, jars);
+        await em.flush();
+
         if (demo.persona === 'max') {
             const assetCount = await em.count(Asset, { household: householdId });
             if (assetCount === 0) this.seedMaxAssets(em, householdId);
@@ -375,6 +436,22 @@ export class DemoHouseholdSeeder extends Seeder {
             targetOn: monthsAhead(8),
             why: demo.why,
             icon: '🛟',
+            sortOrder: 0,
+        } as never);
+        // Car fund preset — name is a catalog brand so the goal form shows the marque logo.
+        em.create(Goal, {
+            household: householdId,
+            jar: jars.lts,
+            kind: GoalKind.SAVE,
+            status: GoalStatus.ACTIVE,
+            name: 'Toyota',
+            target: toMinorUnits(4_500),
+            saved: toMinorUnits(180),
+            monthlyContribution: toMinorUnits(75),
+            targetOn: monthsAhead(36),
+            why: 'Used hatchback — stop borrowing for wheels.',
+            icon: '🚗',
+            sortOrder: 1,
         } as never);
 
         const checking = this.createBank(em, householdId, {
@@ -552,6 +629,21 @@ export class DemoHouseholdSeeder extends Seeder {
             targetOn: monthsAhead(24),
             why: 'Always resetting after slow months.',
             icon: '🛟',
+            sortOrder: 0,
+        } as never);
+        em.create(Goal, {
+            household: householdId,
+            jar: jars.lts,
+            kind: GoalKind.SAVE,
+            status: GoalStatus.ACTIVE,
+            name: 'Volkswagen',
+            target: toMinorUnits(12_000),
+            saved: toMinorUnits(1_850),
+            monthlyContribution: toMinorUnits(250),
+            targetOn: monthsAhead(30),
+            why: 'Family hatch — save the deposit before shopping.',
+            icon: '🚗',
+            sortOrder: 1,
         } as never);
         em.create(Goal, {
             household: householdId,
@@ -1047,6 +1139,21 @@ export class DemoHouseholdSeeder extends Seeder {
             targetOn: monthsAhead(18),
             why: 'Cash-flowing rental next door to current unit.',
             icon: '🏠',
+            sortOrder: 0,
+        } as never);
+        em.create(Goal, {
+            household: householdId,
+            jar: jars.lts,
+            kind: GoalKind.SAVE,
+            status: GoalStatus.ACTIVE,
+            name: 'Tesla',
+            target: toMinorUnits(18_000),
+            saved: toMinorUnits(4_200),
+            monthlyContribution: toMinorUnits(500),
+            targetOn: monthsAhead(24),
+            why: 'Upgrade from the current car — pay cash, not lease.',
+            icon: '🚗',
+            sortOrder: 1,
         } as never);
         em.create(Goal, {
             household: householdId,
@@ -1485,6 +1592,139 @@ export class DemoHouseholdSeeder extends Seeder {
                 note: row.note ?? null,
             } as never);
         }
+    }
+
+    /**
+     * Copy category templates into the household and attach them to demo fixed
+     * costs / transactions (catalog presets + demo name hints).
+     * Without this, jar-sorted rows stay categoryId=null → UI "Uncategorized".
+     */
+    private async linkDemoCategories(
+        em: EntityManager,
+        householdId: string,
+        jars: Jar[]
+    ): Promise<void> {
+        const templates = await em.find(
+            CategoryTemplate,
+            { isActive: true },
+            { populate: ['jarTemplate'] }
+        );
+        if (templates.length === 0) return;
+
+        const jarByKey = new Map(jars.map(jar => [jar.key, jar]));
+        const existing = await em.find(Category, { household: householdId }, { populate: ['jar'] });
+        const categoryByJarName = new Map(
+            existing.map(category => [
+                `${category.jar.id}::${category.name.toLowerCase()}`,
+                category,
+            ])
+        );
+
+        const ensureCategory = (jar: Jar, name: string, sortOrder = 0): Category => {
+            const key = `${jar.id}::${name.toLowerCase()}`;
+            const found = categoryByJarName.get(key);
+            if (found) return found;
+            const category = em.create(Category, {
+                household: householdId,
+                jar,
+                name,
+                budgeted: 0,
+                sortOrder,
+            } as never);
+            em.persist(category);
+            categoryByJarName.set(key, category);
+            return category;
+        };
+
+        for (const template of templates) {
+            const jar = jarByKey.get(template.jarTemplate.key);
+            if (!jar) continue;
+            ensureCategory(jar, template.name, template.sortOrder);
+        }
+        await em.flush();
+
+        const resolveCategory = (jar: Jar, categoryName: string): Category | null => {
+            const existingCategory = categoryByJarName.get(
+                `${jar.id}::${categoryName.toLowerCase()}`
+            );
+            if (existingCategory) return existingCategory;
+            // Demo jar may differ from catalog default (e.g. Uber on Play) — still tag it.
+            return ensureCategory(jar, categoryName);
+        };
+
+        const fixedPresets = await em.find(
+            FixedCostPreset,
+            { isActive: true },
+            { populate: ['categoryTemplate', 'jarTemplate'] }
+        );
+
+        const uncategorizedFixed = await em.find(
+            FixedCost,
+            { household: householdId, category: null, isActive: true },
+            { populate: ['jar'] }
+        );
+        for (const row of uncategorizedFixed) {
+            const hinted = DEMO_FIXED_CATEGORY[row.name];
+            if (hinted) {
+                row.category = resolveCategory(row.jar, hinted);
+                continue;
+            }
+
+            const needle = row.name.toLowerCase();
+            const matches = fixedPresets
+                .filter(preset => {
+                    const presetName = preset.name.toLowerCase();
+                    return (
+                        presetName === needle ||
+                        presetName.includes(needle) ||
+                        needle.includes(presetName)
+                    );
+                })
+                .sort((left, right) => right.name.length - left.name.length);
+
+            const sameJar = matches.find(preset => preset.jarTemplate.key === row.jar.key);
+            const preset = sameJar ?? matches[0];
+            if (!preset?.categoryTemplate) continue;
+            row.category = resolveCategory(row.jar, preset.categoryTemplate.name);
+        }
+
+        const merchants = await em.find(
+            MerchantPreset,
+            { isActive: true },
+            { populate: ['categoryTemplate', 'jarTemplate', 'matching'] }
+        );
+        const needles: Array<{ needle: string; merchant: MerchantPreset }> = [];
+        for (const merchant of merchants) {
+            const matching = merchant.matching;
+            if (!matching) continue;
+            needles.push({ needle: matching.matchValue.toLowerCase(), merchant });
+            for (const alias of matching.aliases ?? []) {
+                if (alias.trim()) needles.push({ needle: alias.toLowerCase(), merchant });
+            }
+        }
+        needles.sort((left, right) => right.needle.length - left.needle.length);
+
+        const uncategorizedTxs = await em.find(
+            Transaction,
+            { household: householdId, category: null, jar: { $ne: null } },
+            { populate: ['jar'] }
+        );
+        for (const tx of uncategorizedTxs) {
+            if (!tx.jar) continue;
+            const haystack = `${tx.counterparty ?? ''} ${tx.description ?? ''}`.toLowerCase();
+
+            const hit = needles.find(entry => haystack.includes(entry.needle));
+            const merchantCategory = hit?.merchant.categoryTemplate;
+            if (merchantCategory) {
+                tx.category = resolveCategory(tx.jar, merchantCategory.name);
+                continue;
+            }
+
+            const hint = DEMO_TX_CATEGORY.find(entry => haystack.includes(entry.includes));
+            if (hint) tx.category = resolveCategory(tx.jar, hint.category);
+        }
+
+        await em.flush();
     }
 
     /** Hash + upsert Better Auth credential so demo passwords stay in sync on re-seed. */
