@@ -50,9 +50,9 @@ function apiErrorMessage(apiError: unknown): string | null {
 export function FormErrorBox<T extends FieldValues>({
     apiError,
     className,
-    description = 'Controleer de gemarkeerde velden en probeer opnieuw.',
+    description = 'Check the highlighted fields and try again.',
     form,
-    title = 'Formulier onvolledig',
+    title = 'Form incomplete',
 }: FormErrorBoxProps<T>) {
     const fieldErrors = flattenErrors(form.formState.errors);
     const apiMessage = apiErrorMessage(apiError);

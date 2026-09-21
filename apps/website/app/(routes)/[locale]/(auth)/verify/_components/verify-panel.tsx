@@ -16,7 +16,7 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-    Input,
+    Email,
     bindFormSubmit,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
@@ -138,10 +138,10 @@ export function VerifyPanel() {
                                 <FormItem>
                                     <FormLabel>Email</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="email"
-                                            autoComplete="email"
+                                        <Email
                                             placeholder="you@example.com"
+                                            autoComplete="email"
+                                            readOnly={Boolean(emailDefault)}
                                             disabled={busy || cooldown > 0}
                                             {...field}
                                         />

@@ -6,6 +6,8 @@
 
 import { z } from 'zod';
 
+import { OptionalAuthPhone } from '../../../common/phone.schema';
+
 export const AUTH_MIN_PASSWORD_LENGTH = 8;
 
 export const AuthEmail = z.email('Enter a valid email');
@@ -28,6 +30,7 @@ export const SignInForm = z.object({
 /**
  * Full sign-up — first + last required (seed `auth.user.name`); middle/phone/DOB optional.
  * Display name is composed once at signup and can be changed later in settings.
+ * Phone is E.164 when set (from the Phone field).
  */
 export const SignUpForm = z.object({
     firstName: AuthFirstName,
@@ -35,7 +38,7 @@ export const SignUpForm = z.object({
     lastName: AuthLastName,
     email: AuthEmail,
     password: AuthPassword,
-    phone: z.string().trim().max(32),
+    phone: OptionalAuthPhone,
     dateOfBirth: z.union([z.literal(''), z.iso.date()]),
 });
 
@@ -44,6 +47,7 @@ export const SignUpAccountProfile = z.object({
     firstName: AuthFirstName,
     middleName: z.string().trim().max(80).optional(),
     lastName: AuthLastName,
+    /** Already validated E.164 on SignUpForm when set. */
     phone: z.string().trim().max(32).optional(),
     dateOfBirth: z.union([z.literal(''), z.iso.date()]).optional(),
 });

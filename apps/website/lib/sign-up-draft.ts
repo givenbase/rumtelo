@@ -1,6 +1,6 @@
 /**
  * Landing → `/sign-up` draft (first / last / email).
- * sessionStorage only — same-origin website, never put PII in the URL.
+ * sessionStorage for same-tab hand-off; `/verify` also accepts `?email=` as fallback.
  */
 
 export const SIGN_UP_DRAFT_STORAGE_KEY = 'rumtelo.signUpDraft';

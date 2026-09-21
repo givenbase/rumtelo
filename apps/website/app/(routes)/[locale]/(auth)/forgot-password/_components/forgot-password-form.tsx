@@ -15,7 +15,7 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-    Input,
+    Email,
     bindFormSubmit,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
@@ -84,9 +84,7 @@ export function ForgotPasswordForm() {
                                 <FormItem>
                                     <FormLabel>Email</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="email"
-                                            autoComplete="email"
+                                        <Email
                                             placeholder="you@example.com"
                                             disabled={busy}
                                             {...field}

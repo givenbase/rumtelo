@@ -14,4 +14,6 @@ export const Input = React.forwardRef<
 });
 Input.displayName = 'Input';
 
+export type InputProps = React.ComponentPropsWithoutRef<typeof Input>;
+
 export { controlClasses };

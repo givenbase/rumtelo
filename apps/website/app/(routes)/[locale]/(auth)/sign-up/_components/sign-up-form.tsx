@@ -16,6 +16,9 @@ import {
     FormLabel,
     FormMessage,
     Input,
+    Email,
+    Phone,
+    Password,
     bindFormSubmit,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
@@ -88,7 +91,8 @@ export function SignUpForm() {
 
         const name = composeDisplayName(values.firstName, values.middleName, values.lastName);
 
-        // Keep draft for verify (email) without putting PII in the URL.
+        // Draft for same-tab hand-off; email also in the URL so `/verify` still
+        // prefills if sessionStorage is empty (new tab, storage blocked, refresh).
         signUpDraft?.setDraft({
             firstName: values.firstName,
             lastName: values.lastName,
@@ -114,8 +118,9 @@ export function SignUpForm() {
             return;
         }
 
-        const verifyQs = new URLSearchParams(planIntentQuery(intent)).toString();
-        router.push(verifyQs ? `/verify?${verifyQs}` : '/verify');
+        const verifyParams = new URLSearchParams(planIntentQuery(intent));
+        verifyParams.set('email', values.email);
+        router.push(`/verify?${verifyParams.toString()}`);
         router.refresh();
     }
 
@@ -211,9 +216,7 @@ export function SignUpForm() {
                             <FormItem>
                                 <FormLabel>Email</FormLabel>
                                 <FormControl>
-                                    <Input
-                                        type="email"
-                                        autoComplete="email"
+                                    <Email
                                         placeholder="you@example.com"
                                         disabled={busy}
                                         {...field}
@@ -231,8 +234,7 @@ export function SignUpForm() {
                             <FormItem>
                                 <FormLabel>Password</FormLabel>
                                 <FormControl>
-                                    <Input
-                                        type="password"
+                                    <Password
                                         autoComplete="new-password"
                                         placeholder={`At least ${AUTH_MIN_PASSWORD_LENGTH} characters`}
                                         disabled={busy}
@@ -252,12 +254,14 @@ export function SignUpForm() {
                                 <FormItem>
                                     <FormLabel>Phone</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="tel"
+                                        <Phone
                                             autoComplete="tel"
                                             placeholder="Optional"
                                             disabled={busy}
-                                            {...field}
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            onBlur={field.onBlur}
+                                            name={field.name}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -284,7 +288,6 @@ export function SignUpForm() {
                             )}
                         />
                     </div>
-
                     <Button type="submit" className="mt-1 w-full" disabled={busy}>
                         {busy ? 'Working…' : 'Create account'}
                     </Button>
