@@ -2,6 +2,7 @@ import { Migrator } from '@mikro-orm/migrations';
 import { defineConfig } from '@mikro-orm/postgresql';
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 import { SeedManager } from '@mikro-orm/seeder';
+import { shouldDeferLaunchProducts } from '@rumtelo/contracts';
 
 import { loadEnvFiles } from './src/common/config/load-env';
 
@@ -10,10 +11,28 @@ loadEnvFiles();
 
 const isProd = process.env.NODE_ENV === 'production';
 
+/**
+ * Production launch defers Energy/Soul concept schemas — exclude those entities
+ * so Nest / `db:gen` do not touch MVP tables that will be redesigned later.
+ * Staging / local keep the full entity graph for QA.
+ */
+const deferLaunchProducts = shouldDeferLaunchProducts({
+    appEnv: process.env.APP_ENV,
+    nodeEnv: process.env.NODE_ENV,
+});
+
+const entityGlobs = deferLaunchProducts
+    ? [
+          './src/**/*.entity.ts',
+          '!./src/modules/public/product/energy/**/*.entity.ts',
+          '!./src/modules/public/product/soul/**/*.entity.ts',
+      ]
+    : ['./src/**/*.entity.ts'];
+
 export default defineConfig({
     // Source entities — tsx / Nest load .ts; TsMorph reads these paths for metadata.
-    entities: ['./src/**/*.entity.ts'],
-    entitiesTs: ['./src/**/*.entity.ts'],
+    entities: entityGlobs,
+    entitiesTs: entityGlobs,
     clientUrl: process.env.DATABASE_URL,
     driverOptions:
         process.env.DATABASE_SSL === 'true'
