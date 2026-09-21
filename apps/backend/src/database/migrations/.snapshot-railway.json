@@ -238,6 +238,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -297,6 +325,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -725,6 +771,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -784,6 +858,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -1239,6 +1331,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -1298,6 +1418,1124 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
+          ]
+        },
+        "money_flow_direction": {
+          "name": "money_flow_direction",
+          "schema": "public",
+          "items": [
+            "IN",
+            "OUT"
+          ]
+        },
+        "money_giving_cause": {
+          "name": "money_giving_cause",
+          "schema": "public",
+          "items": [
+            "GLOBAL_HEALTH",
+            "POVERTY",
+            "EDUCATION",
+            "CLIMATE",
+            "ANIMALS",
+            "COMMUNITY",
+            "EMERGENCY",
+            "WATER"
+          ]
+        },
+        "money_goal_kind": {
+          "name": "money_goal_kind",
+          "schema": "public",
+          "items": [
+            "SAVE",
+            "EARN",
+            "GIVE"
+          ]
+        },
+        "money_goal_status": {
+          "name": "money_goal_status",
+          "schema": "public",
+          "items": [
+            "ACTIVE",
+            "REACHED",
+            "PAUSED",
+            "ARCHIVED"
+          ]
+        },
+        "money_income_kind": {
+          "name": "money_income_kind",
+          "schema": "public",
+          "items": [
+            "SALARY",
+            "FREELANCE",
+            "BENEFIT",
+            "RENTAL",
+            "DIVIDEND",
+            "OTHER"
+          ]
+        },
+        "money_jar_key": {
+          "name": "money_jar_key",
+          "schema": "public",
+          "items": [
+            "NECESSITIES",
+            "FINANCIAL_FREEDOM",
+            "EDUCATION",
+            "LONG_TERM_SAVINGS",
+            "PLAY",
+            "GIVE"
+          ]
+        },
+        "money_merchant_highlight": {
+          "name": "money_merchant_highlight",
+          "schema": "public",
+          "items": [
+            "FEATURED",
+            "NEW",
+            "POPULAR"
+          ]
+        },
+        "money_month_score_event_kind": {
+          "name": "money_month_score_event_kind",
+          "schema": "public",
+          "items": [
+            "JAR_HELD",
+            "JAR_OVERSPENT",
+            "INBOX_CLEARED",
+            "WEEK_CHECK_DONE",
+            "GOAL_REACHED",
+            "DEBT_CLEARED",
+            "INCOME_LOGGED",
+            "STREAK_KEPT"
+          ]
+        },
+        "money_rule_field": {
+          "name": "money_rule_field",
+          "schema": "public",
+          "items": [
+            "DESCRIPTION",
+            "COUNTERPARTY",
+            "AMOUNT"
+          ]
+        },
+        "money_rule_matcher": {
+          "name": "money_rule_matcher",
+          "schema": "public",
+          "items": [
+            "CONTAINS",
+            "EQUALS",
+            "STARTS_WITH",
+            "REGEX"
+          ]
+        },
+        "money_spending_style": {
+          "name": "money_spending_style",
+          "schema": "public",
+          "items": [
+            "SPENDER",
+            "SAVER",
+            "BALANCED",
+            "UNKNOWN"
+          ]
+        },
+        "money_transaction_source": {
+          "name": "money_transaction_source",
+          "schema": "public",
+          "items": [
+            "MANUAL",
+            "CSV",
+            "BANK",
+            "RECURRING"
+          ]
+        },
+        "money_transaction_status": {
+          "name": "money_transaction_status",
+          "schema": "public",
+          "items": [
+            "INBOX",
+            "SORTED",
+            "IGNORED"
+          ]
+        },
+        "money_week_check_stage": {
+          "name": "money_week_check_stage",
+          "schema": "public",
+          "items": [
+            "LOOK",
+            "REDIRECT",
+            "INTEND",
+            "DONE"
+          ]
+        },
+        "platform_coach_kind": {
+          "name": "platform_coach_kind",
+          "schema": "public",
+          "items": [
+            "NUDGE",
+            "WIN",
+            "WARNING",
+            "INSIGHT",
+            "WEEK_CHECK"
+          ]
+        },
+        "platform_currency": {
+          "name": "platform_currency",
+          "schema": "public",
+          "items": [
+            "EUR",
+            "USD",
+            "GBP"
+          ]
+        },
+        "platform_household_kind": {
+          "name": "platform_household_kind",
+          "schema": "public",
+          "items": [
+            "FAMILY",
+            "PARTNERS",
+            "FRIENDS",
+            "SOLO"
+          ]
+        }
+      },
+      "comment": null
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "household_id": {
+          "name": "household_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "note": {
+          "name": "note",
+          "type": "varchar(280)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 280,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "minutes": {
+          "name": "minutes",
+          "type": "int2",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 16,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "smallint"
+        },
+        "logged_on": {
+          "name": "logged_on",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 0,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "date"
+        },
+        "category": {
+          "name": "category",
+          "type": "energy_time_category",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "energy_time_category"
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        }
+      },
+      "name": "energy_time_entry",
+      "schema": "public",
+      "indexes": [
+        {
+          "columnNames": [
+            "account_id",
+            "logged_on",
+            "category"
+          ],
+          "composite": true,
+          "constraint": true,
+          "keyName": "energy_time_entry_account_id_logged_on_category_unique",
+          "unique": true,
+          "primary": false
+        },
+        {
+          "columnNames": [
+            "household_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "energy_time_entry_household_id_index",
+          "unique": false,
+          "primary": false
+        },
+        {
+          "columnNames": [
+            "household_id",
+            "logged_on"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "energy_time_entry_household_id_logged_on_index",
+          "unique": false,
+          "primary": false
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "energy_time_entry_pkey",
+          "unique": true,
+          "primary": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "energy_time_entry_account_id_foreign": {
+          "columnNames": [
+            "account_id"
+          ],
+          "constraintName": "energy_time_entry_account_id_foreign",
+          "localTableName": "public.energy_time_entry",
+          "referencedTableName": "auth.account",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        },
+        "energy_time_entry_household_id_foreign": {
+          "columnNames": [
+            "household_id"
+          ],
+          "constraintName": "energy_time_entry_household_id_foreign",
+          "localTableName": "public.energy_time_entry",
+          "referencedTableName": "auth.household",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        }
+      },
+      "nativeEnums": {
+        "auth_locale": {
+          "name": "auth_locale",
+          "schema": "public",
+          "items": [
+            "NL",
+            "EN"
+          ]
+        },
+        "auth_theme": {
+          "name": "auth_theme",
+          "schema": "public",
+          "items": [
+            "LIGHT",
+            "DARK",
+            "SYSTEM"
+          ]
+        },
+        "backoffice_capability_kind": {
+          "name": "backoffice_capability_kind",
+          "schema": "public",
+          "items": [
+            "screen",
+            "action"
+          ]
+        },
+        "backoffice_plan_key": {
+          "name": "backoffice_plan_key",
+          "schema": "public",
+          "items": [
+            "BASIC",
+            "PLUS",
+            "MAX"
+          ]
+        },
+        "energy_metric": {
+          "name": "energy_metric",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "TRAIN",
+            "FOOD",
+            "MIND"
+          ]
+        },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
+        "growth_learn_progress_status": {
+          "name": "growth_learn_progress_status",
+          "schema": "public",
+          "items": [
+            "QUEUE",
+            "NOW",
+            "DONE"
+          ]
+        },
+        "growth_learn_watch_kind": {
+          "name": "growth_learn_watch_kind",
+          "schema": "public",
+          "items": [
+            "FILM",
+            "VIDEO",
+            "SERIES"
+          ]
+        },
+        "money_account_kind": {
+          "name": "money_account_kind",
+          "schema": "public",
+          "items": [
+            "CHECKING",
+            "SAVINGS",
+            "CREDIT",
+            "CASH",
+            "INVESTMENT"
+          ]
+        },
+        "money_cadence": {
+          "name": "money_cadence",
+          "schema": "public",
+          "items": [
+            "WEEKLY",
+            "MONTHLY",
+            "QUARTERLY",
+            "YEARLY",
+            "ONCE"
+          ]
+        },
+        "money_debt_kind": {
+          "name": "money_debt_kind",
+          "schema": "public",
+          "items": [
+            "CREDIT_CARD",
+            "LOAN",
+            "STUDENT",
+            "MORTGAGE",
+            "FAMILY",
+            "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
+          ]
+        },
+        "money_flow_direction": {
+          "name": "money_flow_direction",
+          "schema": "public",
+          "items": [
+            "IN",
+            "OUT"
+          ]
+        },
+        "money_giving_cause": {
+          "name": "money_giving_cause",
+          "schema": "public",
+          "items": [
+            "GLOBAL_HEALTH",
+            "POVERTY",
+            "EDUCATION",
+            "CLIMATE",
+            "ANIMALS",
+            "COMMUNITY",
+            "EMERGENCY",
+            "WATER"
+          ]
+        },
+        "money_goal_kind": {
+          "name": "money_goal_kind",
+          "schema": "public",
+          "items": [
+            "SAVE",
+            "EARN",
+            "GIVE"
+          ]
+        },
+        "money_goal_status": {
+          "name": "money_goal_status",
+          "schema": "public",
+          "items": [
+            "ACTIVE",
+            "REACHED",
+            "PAUSED",
+            "ARCHIVED"
+          ]
+        },
+        "money_income_kind": {
+          "name": "money_income_kind",
+          "schema": "public",
+          "items": [
+            "SALARY",
+            "FREELANCE",
+            "BENEFIT",
+            "RENTAL",
+            "DIVIDEND",
+            "OTHER"
+          ]
+        },
+        "money_jar_key": {
+          "name": "money_jar_key",
+          "schema": "public",
+          "items": [
+            "NECESSITIES",
+            "FINANCIAL_FREEDOM",
+            "EDUCATION",
+            "LONG_TERM_SAVINGS",
+            "PLAY",
+            "GIVE"
+          ]
+        },
+        "money_merchant_highlight": {
+          "name": "money_merchant_highlight",
+          "schema": "public",
+          "items": [
+            "FEATURED",
+            "NEW",
+            "POPULAR"
+          ]
+        },
+        "money_month_score_event_kind": {
+          "name": "money_month_score_event_kind",
+          "schema": "public",
+          "items": [
+            "JAR_HELD",
+            "JAR_OVERSPENT",
+            "INBOX_CLEARED",
+            "WEEK_CHECK_DONE",
+            "GOAL_REACHED",
+            "DEBT_CLEARED",
+            "INCOME_LOGGED",
+            "STREAK_KEPT"
+          ]
+        },
+        "money_rule_field": {
+          "name": "money_rule_field",
+          "schema": "public",
+          "items": [
+            "DESCRIPTION",
+            "COUNTERPARTY",
+            "AMOUNT"
+          ]
+        },
+        "money_rule_matcher": {
+          "name": "money_rule_matcher",
+          "schema": "public",
+          "items": [
+            "CONTAINS",
+            "EQUALS",
+            "STARTS_WITH",
+            "REGEX"
+          ]
+        },
+        "money_spending_style": {
+          "name": "money_spending_style",
+          "schema": "public",
+          "items": [
+            "SPENDER",
+            "SAVER",
+            "BALANCED",
+            "UNKNOWN"
+          ]
+        },
+        "money_transaction_source": {
+          "name": "money_transaction_source",
+          "schema": "public",
+          "items": [
+            "MANUAL",
+            "CSV",
+            "BANK",
+            "RECURRING"
+          ]
+        },
+        "money_transaction_status": {
+          "name": "money_transaction_status",
+          "schema": "public",
+          "items": [
+            "INBOX",
+            "SORTED",
+            "IGNORED"
+          ]
+        },
+        "money_week_check_stage": {
+          "name": "money_week_check_stage",
+          "schema": "public",
+          "items": [
+            "LOOK",
+            "REDIRECT",
+            "INTEND",
+            "DONE"
+          ]
+        },
+        "platform_coach_kind": {
+          "name": "platform_coach_kind",
+          "schema": "public",
+          "items": [
+            "NUDGE",
+            "WIN",
+            "WARNING",
+            "INSIGHT",
+            "WEEK_CHECK"
+          ]
+        },
+        "platform_currency": {
+          "name": "platform_currency",
+          "schema": "public",
+          "items": [
+            "EUR",
+            "USD",
+            "GBP"
+          ]
+        },
+        "platform_household_kind": {
+          "name": "platform_household_kind",
+          "schema": "public",
+          "items": [
+            "FAMILY",
+            "PARTNERS",
+            "FRIENDS",
+            "SOLO"
+          ]
+        }
+      },
+      "comment": null
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "household_id": {
+          "name": "household_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "weekdays": {
+          "name": "weekdays",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "json"
+        },
+        "minutes": {
+          "name": "minutes",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "json"
+        },
+        "kind": {
+          "name": "kind",
+          "type": "energy_time_day_kind",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [
+            "WORKDAY",
+            "DAY_OFF"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "energy_time_day_kind"
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        }
+      },
+      "name": "energy_time_template",
+      "schema": "public",
+      "indexes": [
+        {
+          "columnNames": [
+            "account_id",
+            "kind"
+          ],
+          "composite": true,
+          "constraint": true,
+          "keyName": "energy_time_template_account_id_kind_unique",
+          "unique": true,
+          "primary": false
+        },
+        {
+          "columnNames": [
+            "household_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "energy_time_template_household_id_index",
+          "unique": false,
+          "primary": false
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "energy_time_template_pkey",
+          "unique": true,
+          "primary": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "energy_time_template_account_id_foreign": {
+          "columnNames": [
+            "account_id"
+          ],
+          "constraintName": "energy_time_template_account_id_foreign",
+          "localTableName": "public.energy_time_template",
+          "referencedTableName": "auth.account",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        },
+        "energy_time_template_household_id_foreign": {
+          "columnNames": [
+            "household_id"
+          ],
+          "constraintName": "energy_time_template_household_id_foreign",
+          "localTableName": "public.energy_time_template",
+          "referencedTableName": "auth.household",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        }
+      },
+      "nativeEnums": {
+        "auth_locale": {
+          "name": "auth_locale",
+          "schema": "public",
+          "items": [
+            "NL",
+            "EN"
+          ]
+        },
+        "auth_theme": {
+          "name": "auth_theme",
+          "schema": "public",
+          "items": [
+            "LIGHT",
+            "DARK",
+            "SYSTEM"
+          ]
+        },
+        "backoffice_capability_kind": {
+          "name": "backoffice_capability_kind",
+          "schema": "public",
+          "items": [
+            "screen",
+            "action"
+          ]
+        },
+        "backoffice_plan_key": {
+          "name": "backoffice_plan_key",
+          "schema": "public",
+          "items": [
+            "BASIC",
+            "PLUS",
+            "MAX"
+          ]
+        },
+        "energy_metric": {
+          "name": "energy_metric",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "TRAIN",
+            "FOOD",
+            "MIND"
+          ]
+        },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
+        "growth_learn_progress_status": {
+          "name": "growth_learn_progress_status",
+          "schema": "public",
+          "items": [
+            "QUEUE",
+            "NOW",
+            "DONE"
+          ]
+        },
+        "growth_learn_watch_kind": {
+          "name": "growth_learn_watch_kind",
+          "schema": "public",
+          "items": [
+            "FILM",
+            "VIDEO",
+            "SERIES"
+          ]
+        },
+        "money_account_kind": {
+          "name": "money_account_kind",
+          "schema": "public",
+          "items": [
+            "CHECKING",
+            "SAVINGS",
+            "CREDIT",
+            "CASH",
+            "INVESTMENT"
+          ]
+        },
+        "money_cadence": {
+          "name": "money_cadence",
+          "schema": "public",
+          "items": [
+            "WEEKLY",
+            "MONTHLY",
+            "QUARTERLY",
+            "YEARLY",
+            "ONCE"
+          ]
+        },
+        "money_debt_kind": {
+          "name": "money_debt_kind",
+          "schema": "public",
+          "items": [
+            "CREDIT_CARD",
+            "LOAN",
+            "STUDENT",
+            "MORTGAGE",
+            "FAMILY",
+            "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -1674,6 +2912,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -1733,6 +2999,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -2146,6 +3430,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -2205,6 +3517,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -2602,6 +3932,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -2661,6 +4019,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -3042,6 +4418,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -3101,6 +4505,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -3618,6 +5040,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -3677,6 +5127,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -4067,6 +5535,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -4126,6 +5622,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -4585,6 +6099,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -4644,6 +6186,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -5020,6 +6580,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -5079,6 +6667,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -5430,6 +7036,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -5489,6 +7123,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -5990,6 +7642,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -6049,6 +7729,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -6531,6 +8229,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -6590,6 +8316,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -6990,6 +8734,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -7049,6 +8821,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -7401,6 +9191,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -7460,6 +9278,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -7907,6 +9743,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -7966,6 +9830,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -8414,6 +10296,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -8473,6 +10383,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -9050,6 +10978,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -9109,6 +11065,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -9714,6 +11688,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -9773,6 +11775,657 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
+          ]
+        },
+        "money_flow_direction": {
+          "name": "money_flow_direction",
+          "schema": "public",
+          "items": [
+            "IN",
+            "OUT"
+          ]
+        },
+        "money_giving_cause": {
+          "name": "money_giving_cause",
+          "schema": "public",
+          "items": [
+            "GLOBAL_HEALTH",
+            "POVERTY",
+            "EDUCATION",
+            "CLIMATE",
+            "ANIMALS",
+            "COMMUNITY",
+            "EMERGENCY",
+            "WATER"
+          ]
+        },
+        "money_goal_kind": {
+          "name": "money_goal_kind",
+          "schema": "public",
+          "items": [
+            "SAVE",
+            "EARN",
+            "GIVE"
+          ]
+        },
+        "money_goal_status": {
+          "name": "money_goal_status",
+          "schema": "public",
+          "items": [
+            "ACTIVE",
+            "REACHED",
+            "PAUSED",
+            "ARCHIVED"
+          ]
+        },
+        "money_income_kind": {
+          "name": "money_income_kind",
+          "schema": "public",
+          "items": [
+            "SALARY",
+            "FREELANCE",
+            "BENEFIT",
+            "RENTAL",
+            "DIVIDEND",
+            "OTHER"
+          ]
+        },
+        "money_jar_key": {
+          "name": "money_jar_key",
+          "schema": "public",
+          "items": [
+            "NECESSITIES",
+            "FINANCIAL_FREEDOM",
+            "EDUCATION",
+            "LONG_TERM_SAVINGS",
+            "PLAY",
+            "GIVE"
+          ]
+        },
+        "money_merchant_highlight": {
+          "name": "money_merchant_highlight",
+          "schema": "public",
+          "items": [
+            "FEATURED",
+            "NEW",
+            "POPULAR"
+          ]
+        },
+        "money_month_score_event_kind": {
+          "name": "money_month_score_event_kind",
+          "schema": "public",
+          "items": [
+            "JAR_HELD",
+            "JAR_OVERSPENT",
+            "INBOX_CLEARED",
+            "WEEK_CHECK_DONE",
+            "GOAL_REACHED",
+            "DEBT_CLEARED",
+            "INCOME_LOGGED",
+            "STREAK_KEPT"
+          ]
+        },
+        "money_rule_field": {
+          "name": "money_rule_field",
+          "schema": "public",
+          "items": [
+            "DESCRIPTION",
+            "COUNTERPARTY",
+            "AMOUNT"
+          ]
+        },
+        "money_rule_matcher": {
+          "name": "money_rule_matcher",
+          "schema": "public",
+          "items": [
+            "CONTAINS",
+            "EQUALS",
+            "STARTS_WITH",
+            "REGEX"
+          ]
+        },
+        "money_spending_style": {
+          "name": "money_spending_style",
+          "schema": "public",
+          "items": [
+            "SPENDER",
+            "SAVER",
+            "BALANCED",
+            "UNKNOWN"
+          ]
+        },
+        "money_transaction_source": {
+          "name": "money_transaction_source",
+          "schema": "public",
+          "items": [
+            "MANUAL",
+            "CSV",
+            "BANK",
+            "RECURRING"
+          ]
+        },
+        "money_transaction_status": {
+          "name": "money_transaction_status",
+          "schema": "public",
+          "items": [
+            "INBOX",
+            "SORTED",
+            "IGNORED"
+          ]
+        },
+        "money_week_check_stage": {
+          "name": "money_week_check_stage",
+          "schema": "public",
+          "items": [
+            "LOOK",
+            "REDIRECT",
+            "INTEND",
+            "DONE"
+          ]
+        },
+        "platform_coach_kind": {
+          "name": "platform_coach_kind",
+          "schema": "public",
+          "items": [
+            "NUDGE",
+            "WIN",
+            "WARNING",
+            "INSIGHT",
+            "WEEK_CHECK"
+          ]
+        },
+        "platform_currency": {
+          "name": "platform_currency",
+          "schema": "public",
+          "items": [
+            "EUR",
+            "USD",
+            "GBP"
+          ]
+        },
+        "platform_household_kind": {
+          "name": "platform_household_kind",
+          "schema": "public",
+          "items": [
+            "FAMILY",
+            "PARTNERS",
+            "FRIENDS",
+            "SOLO"
+          ]
+        }
+      },
+      "comment": null
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "household_id": {
+          "name": "household_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "period": {
+          "name": "period",
+          "type": "varchar(7)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 7,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "note": {
+          "name": "note",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "amount": {
+          "name": "amount",
+          "type": "int8",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": 64,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "bigint"
+        },
+        "paid_at": {
+          "name": "paid_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "status": {
+          "name": "status",
+          "type": "money_fixed_cost_settlement_status",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "'PAID'",
+          "comment": null,
+          "enumItems": [
+            "PAID",
+            "SKIPPED"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "money_fixed_cost_settlement_status"
+        },
+        "source": {
+          "name": "source",
+          "type": "money_fixed_cost_settlement_source",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "'MARK_PAID'",
+          "comment": null,
+          "enumItems": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "money_fixed_cost_settlement_source"
+        },
+        "fixed_cost_id": {
+          "name": "fixed_cost_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "transaction_id": {
+          "name": "transaction_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        }
+      },
+      "name": "money_fixed_cost_settlement",
+      "schema": "public",
+      "indexes": [
+        {
+          "columnNames": [
+            "fixed_cost_id",
+            "period"
+          ],
+          "composite": true,
+          "constraint": true,
+          "keyName": "money_fixed_cost_settlement_fixed_cost_id_period_unique",
+          "unique": true,
+          "primary": false
+        },
+        {
+          "columnNames": [
+            "household_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "money_fixed_cost_settlement_household_id_index",
+          "unique": false,
+          "primary": false
+        },
+        {
+          "columnNames": [
+            "period"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "money_fixed_cost_settlement_period_index",
+          "unique": false,
+          "primary": false
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "money_fixed_cost_settlement_pkey",
+          "unique": true,
+          "primary": true
+        },
+        {
+          "columnNames": [
+            "transaction_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "money_fixed_cost_settlement_transaction_id_index",
+          "unique": false,
+          "primary": false
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "money_fixed_cost_settlement_fixed_cost_id_foreign": {
+          "columnNames": [
+            "fixed_cost_id"
+          ],
+          "constraintName": "money_fixed_cost_settlement_fixed_cost_id_foreign",
+          "localTableName": "public.money_fixed_cost_settlement",
+          "referencedTableName": "public.money_fixed_cost",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        },
+        "money_fixed_cost_settlement_household_id_foreign": {
+          "columnNames": [
+            "household_id"
+          ],
+          "constraintName": "money_fixed_cost_settlement_household_id_foreign",
+          "localTableName": "public.money_fixed_cost_settlement",
+          "referencedTableName": "auth.household",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        },
+        "money_fixed_cost_settlement_transaction_id_foreign": {
+          "columnNames": [
+            "transaction_id"
+          ],
+          "constraintName": "money_fixed_cost_settlement_transaction_id_foreign",
+          "localTableName": "public.money_fixed_cost_settlement",
+          "referencedTableName": "public.money_transaction",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "set null"
+        }
+      },
+      "nativeEnums": {
+        "auth_locale": {
+          "name": "auth_locale",
+          "schema": "public",
+          "items": [
+            "NL",
+            "EN"
+          ]
+        },
+        "auth_theme": {
+          "name": "auth_theme",
+          "schema": "public",
+          "items": [
+            "LIGHT",
+            "DARK",
+            "SYSTEM"
+          ]
+        },
+        "backoffice_capability_kind": {
+          "name": "backoffice_capability_kind",
+          "schema": "public",
+          "items": [
+            "screen",
+            "action"
+          ]
+        },
+        "backoffice_plan_key": {
+          "name": "backoffice_plan_key",
+          "schema": "public",
+          "items": [
+            "BASIC",
+            "PLUS",
+            "MAX"
+          ]
+        },
+        "energy_metric": {
+          "name": "energy_metric",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "TRAIN",
+            "FOOD",
+            "MIND"
+          ]
+        },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
+        "growth_learn_progress_status": {
+          "name": "growth_learn_progress_status",
+          "schema": "public",
+          "items": [
+            "QUEUE",
+            "NOW",
+            "DONE"
+          ]
+        },
+        "growth_learn_watch_kind": {
+          "name": "growth_learn_watch_kind",
+          "schema": "public",
+          "items": [
+            "FILM",
+            "VIDEO",
+            "SERIES"
+          ]
+        },
+        "money_account_kind": {
+          "name": "money_account_kind",
+          "schema": "public",
+          "items": [
+            "CHECKING",
+            "SAVINGS",
+            "CREDIT",
+            "CASH",
+            "INVESTMENT"
+          ]
+        },
+        "money_cadence": {
+          "name": "money_cadence",
+          "schema": "public",
+          "items": [
+            "WEEKLY",
+            "MONTHLY",
+            "QUARTERLY",
+            "YEARLY",
+            "ONCE"
+          ]
+        },
+        "money_debt_kind": {
+          "name": "money_debt_kind",
+          "schema": "public",
+          "items": [
+            "CREDIT_CARD",
+            "LOAN",
+            "STUDENT",
+            "MORTGAGE",
+            "FAMILY",
+            "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -10374,6 +13027,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -10433,6 +13114,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -10838,6 +13537,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -10897,6 +13624,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -11357,6 +14102,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -11416,6 +14189,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -11880,6 +14671,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -11939,6 +14758,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -12379,6 +15216,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -12438,6 +15303,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -12885,6 +15768,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -12944,6 +15855,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -13462,6 +16391,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -13521,6 +16478,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -14003,6 +16978,22 @@
           "enumItems": [],
           "mappedType": "uuid"
         },
+        "fixed_cost_id": {
+          "name": "fixed_cost_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
         "applied_rule_id": {
           "name": "applied_rule_id",
           "type": "uuid",
@@ -14060,6 +17051,16 @@
           "composite": false,
           "constraint": false,
           "keyName": "money_transaction_debt_id_index",
+          "unique": false,
+          "primary": false
+        },
+        {
+          "columnNames": [
+            "fixed_cost_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "money_transaction_fixed_cost_id_index",
           "unique": false,
           "primary": false
         },
@@ -14181,6 +17182,19 @@
           "updateRule": "cascade",
           "deleteRule": "set null"
         },
+        "money_transaction_fixed_cost_id_foreign": {
+          "columnNames": [
+            "fixed_cost_id"
+          ],
+          "constraintName": "money_transaction_fixed_cost_id_foreign",
+          "localTableName": "public.money_transaction",
+          "referencedTableName": "public.money_fixed_cost",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "set null"
+        },
         "money_transaction_household_id_foreign": {
           "columnNames": [
             "household_id"
@@ -14253,6 +17267,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -14312,6 +17354,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -14742,6 +17802,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -14801,6 +17889,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -15229,6 +18335,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -15288,6 +18422,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -15676,6 +18828,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -15735,6 +18915,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -16178,6 +19376,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -16237,6 +19463,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -16610,6 +19854,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -16669,6 +19941,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -17093,6 +20383,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -17152,6 +20470,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -17519,6 +20855,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -17578,6 +20942,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -17825,6 +21207,22 @@
           "enumItems": [],
           "mappedType": "uuid"
         },
+        "key": {
+          "name": "key",
+          "type": "varchar(80)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 80,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
         "period": {
           "name": "period",
           "type": "varchar(7)",
@@ -17927,11 +21325,39 @@
           ],
           "mappedType": "unknown",
           "nativeEnumName": "platform_coach_kind"
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
         }
       },
       "name": "platform_coach_message",
       "schema": "public",
       "indexes": [
+        {
+          "columnNames": [
+            "household_id",
+            "account_id",
+            "key"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "platform_coach_message_household_id_account_id_key_index",
+          "unique": false,
+          "primary": false
+        },
         {
           "columnNames": [
             "household_id"
@@ -17966,6 +21392,19 @@
       ],
       "checks": [],
       "foreignKeys": {
+        "platform_coach_message_account_id_foreign": {
+          "columnNames": [
+            "account_id"
+          ],
+          "constraintName": "platform_coach_message_account_id_foreign",
+          "localTableName": "public.platform_coach_message",
+          "referencedTableName": "auth.account",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        },
         "platform_coach_message_household_id_foreign": {
           "columnNames": [
             "household_id"
@@ -18023,6 +21462,34 @@
             "TRAIN",
             "FOOD",
             "MIND"
+          ]
+        },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
           ]
         },
         "growth_learn_progress_status": {
@@ -18084,6 +21551,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -18567,6 +22052,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -18626,6 +22139,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -19041,6 +22572,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -19100,6 +22659,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -19523,6 +23100,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -19582,6 +23187,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -20098,6 +23721,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -20157,6 +23808,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -20540,6 +24209,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -20599,6 +24296,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -21054,6 +24769,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -21113,6 +24856,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -21418,6 +25179,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -21477,6 +25266,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -22014,6 +25821,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -22073,6 +25908,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -22488,6 +26341,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -22547,6 +26428,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -22994,6 +26893,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -23053,6 +26980,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -23476,6 +27421,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -23535,6 +27508,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -23942,6 +27933,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -24001,6 +28020,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -24390,6 +28427,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -24449,6 +28514,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -24954,6 +29037,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -25013,6 +29124,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -25318,6 +29447,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -25377,6 +29534,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -25766,6 +29941,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -25825,6 +30028,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -26304,6 +30525,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -26363,6 +30612,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -26825,6 +31092,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -26884,6 +31179,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -27314,6 +31627,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -27373,6 +31714,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -27828,6 +32187,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -27887,6 +32274,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -28254,6 +32659,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -28313,6 +32746,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -28662,6 +33113,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -28721,6 +33200,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -29086,6 +33583,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -29145,6 +33670,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -29558,6 +34101,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -29617,6 +34188,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -30123,6 +34712,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -30182,6 +34799,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -30487,6 +35122,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -30546,6 +35209,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -30969,6 +35650,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -31028,6 +35737,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -31441,6 +36168,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -31500,6 +36255,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -31905,6 +36678,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -31964,6 +36765,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -32340,6 +37159,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -32399,6 +37246,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -32770,6 +37635,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -32829,6 +37722,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -33212,6 +38123,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -33271,6 +38210,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -33612,6 +38569,34 @@
             "MIND"
           ]
         },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
         "growth_learn_progress_status": {
           "name": "growth_learn_progress_status",
           "schema": "public",
@@ -33671,6 +38656,24 @@
             "OPEN",
             "TERM",
             "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
           ]
         },
         "money_flow_direction": {
@@ -33898,6 +38901,34 @@
         "MIND"
       ]
     },
+    "energy_time_category": {
+      "name": "energy_time_category",
+      "schema": "public",
+      "items": [
+        "SLEEP",
+        "PERSONAL_CARE",
+        "PAID_WORK",
+        "STUDY",
+        "HOUSEHOLD_CARE",
+        "FAMILY_CARE",
+        "VOLUNTEERING",
+        "SOCIAL",
+        "EXERCISE",
+        "HOBBIES",
+        "SCREEN",
+        "STILLNESS",
+        "TRAVEL",
+        "FREE_OTHER"
+      ]
+    },
+    "energy_time_day_kind": {
+      "name": "energy_time_day_kind",
+      "schema": "public",
+      "items": [
+        "WORKDAY",
+        "DAY_OFF"
+      ]
+    },
     "growth_learn_progress_status": {
       "name": "growth_learn_progress_status",
       "schema": "public",
@@ -33957,6 +38988,24 @@
         "OPEN",
         "TERM",
         "DEADLINE"
+      ]
+    },
+    "money_fixed_cost_settlement_source": {
+      "name": "money_fixed_cost_settlement_source",
+      "schema": "public",
+      "items": [
+        "MATCHED",
+        "MARK_PAID",
+        "SKIP",
+        "LINKED"
+      ]
+    },
+    "money_fixed_cost_settlement_status": {
+      "name": "money_fixed_cost_settlement_status",
+      "schema": "public",
+      "items": [
+        "PAID",
+        "SKIPPED"
       ]
     },
     "money_flow_direction": {

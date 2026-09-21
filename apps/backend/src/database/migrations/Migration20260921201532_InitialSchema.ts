@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260918195934_InitialSchema extends Migration {
+export class Migration20260921201532_InitialSchema extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create schema if not exists "backoffice";`);
@@ -30,8 +30,12 @@ export class Migration20260918195934_InitialSchema extends Migration {
     this.addSql(`create type "backoffice_capability_kind" as enum ('screen', 'action');`);
     this.addSql(`create type "money_rule_field" as enum ('DESCRIPTION', 'COUNTERPARTY', 'AMOUNT');`);
     this.addSql(`create type "money_rule_matcher" as enum ('CONTAINS', 'EQUALS', 'STARTS_WITH', 'REGEX');`);
+    this.addSql(`create type "energy_time_category" as enum ('SLEEP', 'PERSONAL_CARE', 'PAID_WORK', 'STUDY', 'HOUSEHOLD_CARE', 'FAMILY_CARE', 'VOLUNTEERING', 'SOCIAL', 'EXERCISE', 'HOBBIES', 'SCREEN', 'STILLNESS', 'TRAVEL', 'FREE_OTHER');`);
+    this.addSql(`create type "energy_time_day_kind" as enum ('WORKDAY', 'DAY_OFF');`);
     this.addSql(`create type "money_transaction_status" as enum ('INBOX', 'SORTED', 'IGNORED');`);
     this.addSql(`create type "money_transaction_source" as enum ('MANUAL', 'CSV', 'BANK', 'RECURRING');`);
+    this.addSql(`create type "money_fixed_cost_settlement_status" as enum ('PAID', 'SKIPPED');`);
+    this.addSql(`create type "money_fixed_cost_settlement_source" as enum ('MATCHED', 'MARK_PAID', 'SKIP', 'LINKED');`);
     this.addSql(`create type "growth_learn_watch_kind" as enum ('FILM', 'VIDEO', 'SERIES');`);
     this.addSql(`create table "backoffice"."reference_growth_asset_kind" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "key" varchar(64) not null, "name" varchar(120) not null, "sort_order" int not null default 0, "is_active" boolean not null default true, "description" text null, "can_pay" boolean not null default false, "icon" varchar(8) null, constraint "reference_growth_asset_kind_pkey" primary key ("id"));`);
     this.addSql(`alter table "backoffice"."reference_growth_asset_kind" add constraint "reference_growth_asset_kind_key_unique" unique ("key");`);
@@ -45,6 +49,9 @@ export class Migration20260918195934_InitialSchema extends Migration {
 
     this.addSql(`create table "auth"."household" ("id" uuid not null, "name" text not null, "slug" text not null, "logo" text null, "created_at" timestamptz not null, "metadata" text null, constraint "household_pkey" primary key ("id"));`);
     this.addSql(`alter table "auth"."household" add constraint "household_slug_unique" unique ("slug");`);
+
+    this.addSql(`create table "growth_asset" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "name" varchar(120) not null, "kind_key" varchar(64) not null, "preset_key" varchar(64) null, "value" bigint not null, "flow" bigint not null default 0, constraint "growth_asset_pkey" primary key ("id"));`);
+    this.addSql(`create index "growth_asset_household_id_index" on "growth_asset" ("household_id");`);
 
     this.addSql(`create table "auth"."user" ("id" uuid not null, "name" text not null, "email" text not null, "email_verified" boolean not null, "image" text null, "created_at" timestamptz not null default CURRENT_TIMESTAMP, "updated_at" timestamptz not null default CURRENT_TIMESTAMP, "two_factor_enabled" boolean null, constraint "user_pkey" primary key ("id"));`);
     this.addSql(`alter table "auth"."user" add constraint "user_email_unique" unique ("email");`);
@@ -75,8 +82,9 @@ export class Migration20260918195934_InitialSchema extends Migration {
     this.addSql(`create table "backoffice"."reference_growth_book_preset" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "key" varchar(64) not null, "name" varchar(120) not null, "sort_order" int not null default 0, "is_active" boolean not null default true, "description" text not null, "author" varchar(120) not null, "skill" varchar(64) not null default 'MONEY', "topic" varchar(64) not null, "cover_id" int null, "isbn13" varchar(13) null, "spending_styles" jsonb not null default '[]', "url" varchar(280) not null, "min_plan" "public"."backoffice_plan_key" not null, constraint "reference_growth_book_preset_pkey" primary key ("id"));`);
     this.addSql(`alter table "backoffice"."reference_growth_book_preset" add constraint "reference_growth_book_preset_key_unique" unique ("key");`);
 
-    this.addSql(`create table "platform_coach_message" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "period" varchar(7) not null, "text" text not null, "cta_label" varchar(60) null, "cta_href" varchar(200) null, "dismissed_at" timestamptz null, "kind" "public"."platform_coach_kind" not null default 'NUDGE', constraint "platform_coach_message_pkey" primary key ("id"));`);
+    this.addSql(`create table "platform_coach_message" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "key" varchar(80) null, "period" varchar(7) not null, "text" text not null, "cta_label" varchar(60) null, "cta_href" varchar(200) null, "dismissed_at" timestamptz null, "kind" "public"."platform_coach_kind" not null default 'NUDGE', "account_id" uuid null, constraint "platform_coach_message_pkey" primary key ("id"));`);
     this.addSql(`create index "platform_coach_message_household_id_index" on "platform_coach_message" ("household_id");`);
+    this.addSql(`create index "platform_coach_message_household_id_account_id_key_index" on "platform_coach_message" ("household_id", "account_id", "key");`);
     this.addSql(`create index "platform_coach_message_household_id_period_index" on "platform_coach_message" ("household_id", "period");`);
 
     this.addSql(`create table "money_debt" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "name" varchar(120) not null, "balance" bigint not null, "original_balance" bigint not null, "interest_rate" numeric(5,2) not null default 0.00, "minimum_payment" bigint not null default 0, "extra_payment" bigint not null default 0, "term_payments" smallint null, "due_day" smallint null, "started_on" date null, "maturity_on" date null, "closed_on" date null, "kind" "public"."money_debt_kind" not null default 'LOAN', "schedule_kind" "public"."money_debt_schedule_kind" not null default 'OPEN', "payment_cadence" "public"."money_cadence" not null default 'MONTHLY', constraint "money_debt_pkey" primary key ("id"));`);
@@ -251,9 +259,19 @@ export class Migration20260918195934_InitialSchema extends Migration {
     this.addSql(`create index "soul_week_check_household_id_index" on "soul_week_check" ("household_id");`);
     this.addSql(`alter table "soul_week_check" add constraint "soul_week_check_household_id_week_unique" unique ("household_id", "week");`);
 
-    this.addSql(`create table "money_transaction" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "description" varchar(280) not null, "note" text null, "counterparty" varchar(160) null, "amount" bigint not null, "inflow_key" varchar(64) null, "applied_merchant_key" varchar(64) null, "dedupe_key" varchar(64) null, "booked_on" date not null, "status" "public"."money_transaction_status" not null default 'INBOX', "source" "public"."money_transaction_source" not null default 'MANUAL', "account_id" uuid null, "jar_id" uuid null, "category_id" uuid null, "debt_id" uuid null, "applied_rule_id" uuid null, constraint "money_transaction_pkey" primary key ("id"));`);
+    this.addSql(`create table "energy_time_entry" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "note" varchar(280) null, "minutes" smallint not null, "logged_on" date not null, "category" "public"."energy_time_category" not null, "account_id" uuid not null, constraint "energy_time_entry_pkey" primary key ("id"));`);
+    this.addSql(`create index "energy_time_entry_household_id_index" on "energy_time_entry" ("household_id");`);
+    this.addSql(`create index "energy_time_entry_household_id_logged_on_index" on "energy_time_entry" ("household_id", "logged_on");`);
+    this.addSql(`alter table "energy_time_entry" add constraint "energy_time_entry_account_id_logged_on_category_unique" unique ("account_id", "logged_on", "category");`);
+
+    this.addSql(`create table "energy_time_template" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "weekdays" jsonb not null, "minutes" jsonb not null, "kind" "public"."energy_time_day_kind" not null, "account_id" uuid not null, constraint "energy_time_template_pkey" primary key ("id"));`);
+    this.addSql(`create index "energy_time_template_household_id_index" on "energy_time_template" ("household_id");`);
+    this.addSql(`alter table "energy_time_template" add constraint "energy_time_template_account_id_kind_unique" unique ("account_id", "kind");`);
+
+    this.addSql(`create table "money_transaction" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "description" varchar(280) not null, "note" text null, "counterparty" varchar(160) null, "amount" bigint not null, "inflow_key" varchar(64) null, "applied_merchant_key" varchar(64) null, "dedupe_key" varchar(64) null, "booked_on" date not null, "status" "public"."money_transaction_status" not null default 'INBOX', "source" "public"."money_transaction_source" not null default 'MANUAL', "account_id" uuid null, "jar_id" uuid null, "category_id" uuid null, "debt_id" uuid null, "fixed_cost_id" uuid null, "applied_rule_id" uuid null, constraint "money_transaction_pkey" primary key ("id"));`);
     this.addSql(`create index "money_transaction_household_id_index" on "money_transaction" ("household_id");`);
     this.addSql(`create index "money_transaction_applied_rule_id_index" on "money_transaction" ("applied_rule_id");`);
+    this.addSql(`create index "money_transaction_fixed_cost_id_index" on "money_transaction" ("fixed_cost_id");`);
     this.addSql(`create index "money_transaction_debt_id_index" on "money_transaction" ("debt_id");`);
     this.addSql(`create index "money_transaction_category_id_index" on "money_transaction" ("category_id");`);
     this.addSql(`create index "money_transaction_jar_id_index" on "money_transaction" ("jar_id");`);
@@ -261,6 +279,12 @@ export class Migration20260918195934_InitialSchema extends Migration {
     this.addSql(`create index "money_transaction_household_id_status_index" on "money_transaction" ("household_id", "status");`);
     this.addSql(`create index "money_transaction_household_id_booked_on_index" on "money_transaction" ("household_id", "booked_on");`);
     this.addSql(`alter table "money_transaction" add constraint "money_transaction_household_id_dedupe_key_unique" unique ("household_id", "dedupe_key");`);
+
+    this.addSql(`create table "money_fixed_cost_settlement" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "period" varchar(7) not null, "note" text null, "amount" bigint null, "paid_at" timestamptz null, "status" "public"."money_fixed_cost_settlement_status" not null default 'PAID', "source" "public"."money_fixed_cost_settlement_source" not null default 'MARK_PAID', "fixed_cost_id" uuid not null, "transaction_id" uuid null, constraint "money_fixed_cost_settlement_pkey" primary key ("id"));`);
+    this.addSql(`create index "money_fixed_cost_settlement_household_id_index" on "money_fixed_cost_settlement" ("household_id");`);
+    this.addSql(`create index "money_fixed_cost_settlement_transaction_id_index" on "money_fixed_cost_settlement" ("transaction_id");`);
+    this.addSql(`create index "money_fixed_cost_settlement_period_index" on "money_fixed_cost_settlement" ("period");`);
+    this.addSql(`alter table "money_fixed_cost_settlement" add constraint "money_fixed_cost_settlement_fixed_cost_id_period_unique" unique ("fixed_cost_id", "period");`);
 
     this.addSql(`create table "backoffice"."reference_money_transaction_in_preset" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "key" varchar(64) not null, "name" varchar(120) not null, "sort_order" int not null default 0, "is_active" boolean not null default true, "group_name" varchar(64) not null, "icon" varchar(8) null, "jar_key" "public"."money_jar_key" null, constraint "reference_money_transaction_in_preset_pkey" primary key ("id"));`);
     this.addSql(`alter table "backoffice"."reference_money_transaction_in_preset" add constraint "reference_money_transaction_in_preset_key_unique" unique ("key");`);
@@ -284,6 +308,8 @@ export class Migration20260918195934_InitialSchema extends Migration {
 
     this.addSql(`alter table "backoffice"."reference_growth_asset_preset" add constraint "reference_growth_asset_preset_kind_id_foreign" foreign key ("kind_id") references "backoffice"."reference_growth_asset_kind" ("id") on update cascade on delete restrict;`);
 
+    this.addSql(`alter table "growth_asset" add constraint "growth_asset_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
+
     this.addSql(`alter table "auth"."two_factor" add constraint "two_factor_user_id_foreign" foreign key ("user_id") references "auth"."user" ("id") on update cascade on delete cascade;`);
 
     this.addSql(`alter table "auth"."session" add constraint "session_user_id_foreign" foreign key ("user_id") references "auth"."user" ("id") on update cascade on delete cascade;`);
@@ -303,6 +329,7 @@ export class Migration20260918195934_InitialSchema extends Migration {
     this.addSql(`alter table "money_bank_account" add constraint "money_bank_account_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
 
     this.addSql(`alter table "platform_coach_message" add constraint "platform_coach_message_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
+    this.addSql(`alter table "platform_coach_message" add constraint "platform_coach_message_account_id_foreign" foreign key ("account_id") references "auth"."account" ("id") on update cascade on delete cascade;`);
 
     this.addSql(`alter table "money_debt" add constraint "money_debt_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
 
@@ -401,12 +428,23 @@ export class Migration20260918195934_InitialSchema extends Migration {
 
     this.addSql(`alter table "soul_week_check" add constraint "soul_week_check_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
 
+    this.addSql(`alter table "energy_time_entry" add constraint "energy_time_entry_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
+    this.addSql(`alter table "energy_time_entry" add constraint "energy_time_entry_account_id_foreign" foreign key ("account_id") references "auth"."account" ("id") on update cascade on delete cascade;`);
+
+    this.addSql(`alter table "energy_time_template" add constraint "energy_time_template_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
+    this.addSql(`alter table "energy_time_template" add constraint "energy_time_template_account_id_foreign" foreign key ("account_id") references "auth"."account" ("id") on update cascade on delete cascade;`);
+
     this.addSql(`alter table "money_transaction" add constraint "money_transaction_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
     this.addSql(`alter table "money_transaction" add constraint "money_transaction_account_id_foreign" foreign key ("account_id") references "money_bank_account" ("id") on update cascade on delete set null;`);
     this.addSql(`alter table "money_transaction" add constraint "money_transaction_jar_id_foreign" foreign key ("jar_id") references "money_jar" ("id") on update cascade on delete set null;`);
     this.addSql(`alter table "money_transaction" add constraint "money_transaction_category_id_foreign" foreign key ("category_id") references "money_category" ("id") on update cascade on delete set null;`);
     this.addSql(`alter table "money_transaction" add constraint "money_transaction_debt_id_foreign" foreign key ("debt_id") references "money_debt" ("id") on update cascade on delete set null;`);
+    this.addSql(`alter table "money_transaction" add constraint "money_transaction_fixed_cost_id_foreign" foreign key ("fixed_cost_id") references "money_fixed_cost" ("id") on update cascade on delete set null;`);
     this.addSql(`alter table "money_transaction" add constraint "money_transaction_applied_rule_id_foreign" foreign key ("applied_rule_id") references "money_sort_rule" ("id") on update cascade on delete set null;`);
+
+    this.addSql(`alter table "money_fixed_cost_settlement" add constraint "money_fixed_cost_settlement_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
+    this.addSql(`alter table "money_fixed_cost_settlement" add constraint "money_fixed_cost_settlement_fixed_cost_id_foreign" foreign key ("fixed_cost_id") references "money_fixed_cost" ("id") on update cascade on delete cascade;`);
+    this.addSql(`alter table "money_fixed_cost_settlement" add constraint "money_fixed_cost_settlement_transaction_id_foreign" foreign key ("transaction_id") references "money_transaction" ("id") on update cascade on delete set null;`);
 
     this.addSql(`alter table "backoffice"."reference_growth_lever_preset" add constraint "reference_growth_lever_preset_min_wealth_stage_id_foreign" foreign key ("min_wealth_stage_id") references "backoffice"."reference_growth_wealth_stage" ("id") on update cascade on delete restrict;`);
 
