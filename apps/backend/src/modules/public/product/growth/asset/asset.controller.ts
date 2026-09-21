@@ -11,6 +11,18 @@ export class AssetController {
     constructor(@Inject(AssetService) private readonly assets: AssetService) {}
 
     // ====================================================================
+    // ? CREATE Operations
+    // ====================================================================
+
+    /** File a new holding for this household. */
+    @Implement(contract.growth.assets.create)
+    create() {
+        return implement(contract.growth.assets.create).handler(({ input }) =>
+            this.assets.create(input)
+        );
+    }
+
+    // ====================================================================
     // ? READ Operations
     // ====================================================================
 

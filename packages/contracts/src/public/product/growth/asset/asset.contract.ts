@@ -12,6 +12,12 @@ import { Asset } from './asset.schema';
 const ok = z.object({ ok: z.literal(true) });
 
 // ====================================================================
+// ? CREATE Operations
+// ====================================================================
+
+export const assetCreate = oc.input(Asset.omit({ id: true })).output(Asset);
+
+// ====================================================================
 // ? READ Operations
 // ====================================================================
 
@@ -33,6 +39,7 @@ export const assetRemove = oc.input(z.object({ householdId: HouseholdId, id: Id 
 
 /** Nested contract object mounted at `contract.growth.assets`. */
 export const assetContract = {
+    create: assetCreate,
     list: assetList,
     get: assetGet,
     update: assetUpdate,

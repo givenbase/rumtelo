@@ -49,6 +49,7 @@ export function GrowthPortalHubClient() {
     const income = data?.incomeMonthly ?? 0;
     const spanIncome = traveling ? income * horizon : income;
     const learn = data?.learnQueued ?? 0;
+    const learnProgress = data?.learnProgressPct ?? 0;
     const netWorth = data?.netWorth;
     const progress = data?.goalsProgressPct ?? 0;
     const fulfilled = useMemo(() => {
@@ -105,7 +106,7 @@ export function GrowthPortalHubClient() {
                 value: String(learn),
                 note: 'books in your queue',
                 color: 'var(--color-jar-edu)',
-                chart: { kind: 'ring', pct: 0 },
+                chart: { kind: 'ring', pct: learnProgress },
                 href: '/product/growth/learn',
             },
             {

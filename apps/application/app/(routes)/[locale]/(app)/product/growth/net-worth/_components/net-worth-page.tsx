@@ -7,7 +7,15 @@ import { AccentCard, Button, Card, EmptyState, Eyebrow, Section, Typography } fr
 import { cn } from '@rumtelo/utils';
 
 import { useLiveQuery } from '@rumtelo/hooks';
-import type { Asset, AssetKind } from '@rumtelo/contracts';
+import {
+    netWorthDebtCents,
+    netWorthHoldingsCents,
+    netWorthJarsCents,
+    type Asset,
+    type AssetKind,
+    type Debt,
+    type JarBalance,
+} from '@rumtelo/contracts';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { CREATE_HREF, assetDetailHref, createAssetHref } from '@/app/_lib/create-routes';
@@ -16,13 +24,15 @@ import { ListToolbar } from '@/components/layout/list-toolbar';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
-const TOTAL_DEBT = 0;
 const EMPTY_KINDS: AssetKind[] = [];
 const EMPTY_ASSETS: Asset[] = [];
+const EMPTY_DEBTS: Debt[] = [];
+const EMPTY_JARS: JarBalance[] = [];
 
 /**
  * BOARD — net worth board + assets + month score + level ladder + log.
  * Design: Kluis Finance App.dc.html:1236-1357 (MIJN VERMOGEN).
+ * Formula: holdings + LTS/Freedom jars − open debts.
  */
 export function NetWorthPageClient() {
     const { formatMoney } = useHouseholdCurrency();
@@ -42,18 +52,38 @@ export function NetWorthPageClient() {
         EMPTY_ASSETS,
         live
     );
+    const debtsQuery = useLiveQuery(
+        apiQuery.money.debts.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        EMPTY_DEBTS,
+        live
+    );
+    const jarsQuery = useLiveQuery(
+        apiQuery.money.jars.balances.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        EMPTY_JARS,
+        live
+    );
     const kinds = kindsQuery.data ?? EMPTY_KINDS;
     const [filter, setFilter] = useState('all');
-    const holdings = (assetsQuery.data ?? EMPTY_ASSETS).map(asset => {
+    const assetRows = assetsQuery.data ?? EMPTY_ASSETS;
+    const debtRows = debtsQuery.data ?? EMPTY_DEBTS;
+    const jarRows = jarsQuery.data ?? EMPTY_JARS;
+    const holdings = assetRows.map(asset => {
         const kind = kinds.find(row => row.key === asset.kindKey);
         return { ...asset, locked: kind ? !kind.canPay : false };
     });
 
-    const assetWorth = holdings.reduce((total, holding) => total + holding.value, 0);
+    const assetWorth = netWorthHoldingsCents(assetRows);
+    const jarsCash = netWorthJarsCents(jarRows);
+    const totalDebt = netWorthDebtCents(debtRows);
     const monthlyPassive = holdings
         .filter(holding => !holding.locked)
         .reduce((total, holding) => total + holding.flow, 0);
-    const netWorth = assetWorth - TOTAL_DEBT;
+    const totalValue = assetWorth + jarsCash;
+    const netWorth = totalValue - totalDebt;
 
     const presentKinds = kinds.filter(kind =>
         holdings.some(holding => holding.kindKey === kind.key)
@@ -102,9 +132,8 @@ export function NetWorthPageClient() {
                     Where your money stands — not how it moves.
                 </Typography>
                 <Typography as="p" variant="lead" size="default" className="mt-2">
-                    Everything you own minus everything you owe. A tile turns gold the moment it
-                    pays you every month — that is the difference between owning something and
-                    having it.
+                    Everything you own minus everything you owe. Holdings plus Long-term savings and
+                    Financial Freedom — not this month’s spending jars.
                 </Typography>
             </div>
 
@@ -118,10 +147,16 @@ export function NetWorthPageClient() {
                     {(
                         [
                             {
-                                label: 'Total value',
+                                label: 'Holdings',
                                 value: formatMoney(assetWorth),
                                 tone: 'text-fg',
                                 rail: 'var(--color-accent)',
+                            },
+                            {
+                                label: 'LTS + Freedom',
+                                value: formatMoney(jarsCash),
+                                tone: 'text-fg',
+                                rail: 'var(--color-jar-lts)',
                             },
                             {
                                 label: 'Monthly income',
@@ -132,14 +167,8 @@ export function NetWorthPageClient() {
                                 ink: 'var(--color-jar-give)',
                             },
                             {
-                                label: 'Your life costs',
-                                value: formatMoney(0),
-                                tone: 'text-fg',
-                                rail: 'var(--color-fg-muted)',
-                            },
-                            {
                                 label: 'Total debt',
-                                value: formatMoney(TOTAL_DEBT),
+                                value: formatMoney(totalDebt),
                                 tone: 'text-danger',
                                 rail: 'var(--color-danger)',
                             },
@@ -178,16 +207,18 @@ export function NetWorthPageClient() {
                     size="sm"
                     color="muted"
                     className="mt-4 border-t border-line pt-4 text-pretty">
-                    Your net worth is <strong className="text-fg">{formatMoney(netWorth)}</strong>.
-                    Everything you add to Financial Freedom works for you — forever.
+                    Your net worth is <strong className="text-fg">{formatMoney(netWorth)}</strong>
+                    {' — '}
+                    {formatMoney(totalValue)} owned minus {formatMoney(totalDebt)} owed. Put
+                    spaargeld in LTS/Freedom or as a Cash asset — not both.
                 </Typography>
             </AccentCard>
 
             {holdings.length === 0 ? (
                 <EmptyState
                     icon="↗"
-                    title="Nog geen data"
-                    body="Voeg je eerste asset toe om je vermogen te volgen. Binnenkort koppel je ook schulden en maandscore hier."
+                    title="Nog geen holdings"
+                    body="Voeg je eerste asset toe (bijvoorbeeld een belegging). LTS- en Freedom-jars en schulden tellen al mee. Zet spaargeld niet dubbel als Cash-asset én in die jars."
                 />
             ) : (
                 <>
@@ -342,7 +373,7 @@ export function NetWorthPageClient() {
                 <EmptyState
                     icon="◇"
                     title="Nog geen data"
-                    body="Maandscore, levels en log komen zodra je vermogen en schulden hier gekoppeld zijn."
+                    body="Maandscore, levels en log komen later. Holdings, jars en schulden tellen al mee in je netto vermogen."
                 />
             </Section>
         </div>

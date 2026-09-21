@@ -172,7 +172,7 @@ export function AssetForm({
 
     const saveMutation = useMutation({
         mutationFn: async (values: AssetFormValues) => {
-            if (!householdId || !entityId) throw new Error('No household');
+            if (!householdId) throw new Error('No household');
             const cents = parseAmountToMinorUnits(values.value);
             if (cents === null || cents <= 0) throw new Error('Invalid amount');
             const kind = kinds.find(row => row.key === values.kind);
@@ -182,20 +182,24 @@ export function AssetForm({
                     : values.flow?.trim()
                       ? (parseAmountToMinorUnits(values.flow) ?? 0)
                       : 0;
-            return api.growth.assets.update({
-                id: entityId,
+            const payload = {
                 householdId,
                 name: values.name.trim(),
                 kindKey: values.kind,
                 presetKey,
                 value: cents,
                 flow: flowCents,
-            });
+            };
+            if (mode === 'edit' && entityId) {
+                return api.growth.assets.update({ id: entityId, ...payload });
+            }
+            return api.growth.assets.create(payload);
         },
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: apiQuery.growth.assets.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.growth.assets.get.key() });
-            showToast('Asset updated', 'success');
+            void queryClient.invalidateQueries({ queryKey: apiQuery.growth.dashboard.get.key() });
+            showToast(mode === 'edit' ? 'Asset updated' : 'Asset added', 'success');
             dismiss();
         },
         onError: () => showToast('Save failed', 'error'),
@@ -209,6 +213,7 @@ export function AssetForm({
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: apiQuery.growth.assets.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.growth.assets.get.key() });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.growth.dashboard.get.key() });
             showToast('Asset deleted', 'success');
             dismiss();
         },
@@ -216,13 +221,12 @@ export function AssetForm({
     });
 
     async function onSubmit(values: AssetFormValues) {
-        if (mode !== 'edit' || !entityId) {
-            showToast('Not on the board yet — an asset has nowhere to be stored.', 'success');
-            dismiss();
-            return;
-        }
         if (!live) {
             showToast('Sign in to save this asset', 'error');
+            return;
+        }
+        if (mode === 'edit' && !entityId) {
+            showToast('Missing asset', 'error');
             return;
         }
         await saveMutation.mutateAsync(values);

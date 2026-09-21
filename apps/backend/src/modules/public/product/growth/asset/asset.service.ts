@@ -2,6 +2,7 @@ import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable } from '@nestjs/common';
 import type { Asset as AssetDto } from '@rumtelo/contracts';
 
+import { currentHouseholdId } from '../../../../../common/household/household.context';
 import { HouseholdScopedRepository } from '../../../../../common/household/household-scoped.repository';
 import { Asset } from './asset.entity';
 
@@ -23,6 +24,23 @@ export class AssetService {
 
     constructor(@Inject(EntityManager) private readonly em: EntityManager) {
         this.assets = new HouseholdScopedRepository(em, Asset);
+    }
+
+    // ====================================================================
+    // ? CREATE Operations
+    // ====================================================================
+
+    async create(input: Omit<AssetDto, 'id'>): Promise<AssetDto> {
+        const row = this.em.create(Asset, {
+            household: currentHouseholdId(),
+            name: input.name,
+            kindKey: input.kindKey,
+            presetKey: input.presetKey,
+            value: input.value,
+            flow: input.flow,
+        } as never);
+        await this.em.persist(row).flush();
+        return toDto(row);
     }
 
     // ====================================================================
