@@ -26,9 +26,9 @@ import { monthlyAmount, toPeriodKey } from '@rumtelo/utils';
 
 import { debtDetailHref, txDetailHref, updateHref } from '@/app/_lib/create-routes';
 import {
-    claimFixedCostMatches,
     fixedCostLifecycle,
     fixedCostStatus,
+    isFixedCostCounting,
     lifecycleLabel,
     todayIsoDate,
 } from '@/app/_lib/fixed-cost-match';
@@ -61,12 +61,14 @@ import {
 function statusLabel(status: ReturnType<typeof fixedCostStatus>) {
     if (status === 'taken') return 'Taken this period';
     if (status === 'due') return 'Still due';
+    if (status === 'skipped') return 'Skipped this period';
     return 'Planned';
 }
 
 function invalidateFixedCostQueries(queryClient: ReturnType<typeof useQueryClient>) {
     void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.key() });
     void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
+    void queryClient.invalidateQueries({ queryKey: apiQuery.money.transactions.key() });
 }
 
 type ConfirmKind = 'pause' | 'end' | null;
@@ -105,6 +107,17 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
         { items: [], nextCursor: null },
         live
     );
+    const settlementsQuery = useLiveQuery(
+        apiQuery.money.fixedCosts.listSettlements.queryOptions({
+            input: {
+                householdId: householdId!,
+                fixedCostId,
+                period: periodKey,
+            },
+        }),
+        [] as never,
+        live
+    );
     const merchantsQuery = useLiveQuery(
         apiQuery.money.catalogs.merchantPresets.list.queryOptions({
             input: { householdId: householdId! },
@@ -127,6 +140,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
     const givingOrgs = givingOrgsQuery.data ?? [];
     const categoryTemplates = categoryTemplatesQuery.data ?? [];
     const periodTxs = periodTxQuery.data?.items ?? [];
+    const settlement = (settlementsQuery.data ?? [])[0];
 
     const lifecycleMutation = useMutation({
         mutationFn: async (patch: { isActive: boolean; endsOn?: string | null }) => {
@@ -146,6 +160,38 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
             else showToast('Bill paused', 'success');
         },
         onError: () => showToast('Could not update status', 'error'),
+    });
+
+    const settleMutation = useMutation({
+        mutationFn: async (action: 'paid' | 'skip' | 'unlink') => {
+            if (!householdId || !item) throw new Error('No household');
+            if (action === 'paid') {
+                return api.money.fixedCosts.markPaid({
+                    householdId,
+                    fixedCostId: item.id,
+                    period: periodKey,
+                });
+            }
+            if (action === 'skip') {
+                return api.money.fixedCosts.skip({
+                    householdId,
+                    fixedCostId: item.id,
+                    period: periodKey,
+                });
+            }
+            if (!settlement) throw new Error('No settlement');
+            return api.money.fixedCosts.unlinkSettlement({
+                householdId,
+                id: settlement.id,
+            });
+        },
+        onSuccess: (_data, action) => {
+            invalidateFixedCostQueries(queryClient);
+            if (action === 'paid') showToast('Marked paid for this period', 'success');
+            else if (action === 'skip') showToast('Skipped this period', 'success');
+            else showToast('Period reopened', 'success');
+        },
+        onError: () => showToast('Could not update settlement', 'error'),
     });
 
     function openPauseConfirm() {
@@ -195,10 +241,13 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
     }
 
     const monthly = monthlyAmount(Math.abs(item.amount), item.cadence);
-    const { matchByFixedCostId } = claimFixedCostMatches([item], periodTxs);
-    const match = matchByFixedCostId.get(item.id);
-    const status = fixedCostStatus(item, match, period);
+    const linkedTx = settlement?.transactionId
+        ? periodTxs.find(tx => tx.id === settlement.transactionId)
+        : undefined;
+    const status = fixedCostStatus(item, settlement, period);
     const lifecycle = fixedCostLifecycle(item);
+    const canSettle = lifecycle === 'active' && isFixedCostCounting(item);
+    const settleBusy = settleMutation.isPending;
     const company = item.counterparty?.trim() || item.name;
     const subtitle =
         item.counterparty?.trim() && item.counterparty.trim() !== item.name.trim()
@@ -441,7 +490,9 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                         ? 'border-success/30 text-success'
                                         : status === 'due'
                                           ? 'border-danger/30 text-danger'
-                                          : undefined
+                                          : status === 'skipped'
+                                            ? 'border-line text-fg-muted'
+                                            : undefined
                                 }>
                                 {statusLabel(status)}
                             </MetaChip>
@@ -523,19 +574,19 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                     <Typography as="h2" variant="eyebrow" color="primary">
                         ✦ This period’s payment
                     </Typography>
-                    <Card className="p-0">
-                        {match ? (
+                    <Card className="grid gap-0 p-0">
+                        {linkedTx ? (
                             <MoneyPartyRow
-                                title={match.counterparty?.trim() || match.description}
+                                title={linkedTx.counterparty?.trim() || linkedTx.description}
                                 subtitle={
-                                    match.counterparty?.trim() &&
-                                    match.description !== match.counterparty.trim()
-                                        ? match.description
+                                    linkedTx.counterparty?.trim() &&
+                                    linkedTx.description !== linkedTx.counterparty.trim()
+                                        ? linkedTx.description
                                         : null
                                 }
                                 mark={partyMark(
                                     findPartyVendor(
-                                        match.counterparty?.trim() || match.description,
+                                        linkedTx.counterparty?.trim() || linkedTx.description,
                                         merchants,
                                         givingOrgs
                                     ),
@@ -545,16 +596,61 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                         categoryTemplates,
                                     })
                                 )}
-                                amount={formatMoney(match.amount)}
-                                amountClassName={match.amount < 0 ? 'text-fg' : 'text-success'}
-                                badges={<MetaChip>{formatBookedDate(match.bookedOn)}</MetaChip>}
-                                href={txDetailHref(match.id)}
+                                amount={formatMoney(linkedTx.amount)}
+                                amountClassName={linkedTx.amount < 0 ? 'text-fg' : 'text-success'}
+                                badges={<MetaChip>{formatBookedDate(linkedTx.bookedOn)}</MetaChip>}
+                                href={txDetailHref(linkedTx.id)}
                             />
+                        ) : status === 'taken' ? (
+                            <Typography as="p" size="sm" color="muted" className="px-5 py-4">
+                                Marked paid
+                                {settlement?.paidAt
+                                    ? ` · ${formatBookedDate(settlement.paidAt.slice(0, 10))}`
+                                    : ''}
+                                {settlement?.amount !== null && settlement?.amount !== undefined
+                                    ? ` · ${formatMoney(settlement.amount)}`
+                                    : ''}
+                                . No linked transaction yet.
+                            </Typography>
+                        ) : status === 'skipped' ? (
+                            <Typography as="p" size="sm" color="muted" className="px-5 py-4">
+                                Skipped for this period — it won&apos;t show as still due.
+                            </Typography>
                         ) : (
                             <Typography as="p" size="sm" color="muted" className="px-5 py-4">
-                                No matching payment logged in this period yet.
+                                No payment linked for this period yet.
                             </Typography>
                         )}
+                        {canSettle ? (
+                            <div className="flex flex-wrap gap-2 border-t border-line px-5 py-3">
+                                {status !== 'taken' ? (
+                                    <Button
+                                        type="button"
+                                        disabled={settleBusy || !live}
+                                        onClick={() => settleMutation.mutate('paid')}>
+                                        Mark paid
+                                    </Button>
+                                ) : null}
+                                {status !== 'skipped' ? (
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        disabled={settleBusy || !live}
+                                        onClick={() => settleMutation.mutate('skip')}>
+                                        Skip period
+                                    </Button>
+                                ) : null}
+                                {settlement ? (
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        disabled={settleBusy || !live}
+                                        onClick={() => settleMutation.mutate('unlink')}>
+                                        Reopen period
+                                    </Button>
+                                ) : null}
+                            </div>
+                        ) : null}
                     </Card>
                 </section>
             ) : null}

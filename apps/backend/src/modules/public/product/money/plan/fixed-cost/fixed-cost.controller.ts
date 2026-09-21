@@ -35,6 +35,33 @@ export class FixedCostController {
         );
     }
 
+    /** Mark a bill paid for a calendar month. */
+    @Implement(contract.money.fixedCosts.markPaid)
+    markPaid() {
+        return implement(contract.money.fixedCosts.markPaid).handler(({ input }) =>
+            this.fixedCosts.markPaid({
+                fixedCostId: input.fixedCostId,
+                period: input.period,
+                paidAt: input.paidAt,
+                amount: input.amount,
+                transactionId: input.transactionId,
+                note: input.note,
+            })
+        );
+    }
+
+    /** Skip a bill for a calendar month (intentionally not paid). */
+    @Implement(contract.money.fixedCosts.skip)
+    skip() {
+        return implement(contract.money.fixedCosts.skip).handler(({ input }) =>
+            this.fixedCosts.skip({
+                fixedCostId: input.fixedCostId,
+                period: input.period,
+                note: input.note,
+            })
+        );
+    }
+
     // ====================================================================
     // ? READ Operations
     // ====================================================================
@@ -51,6 +78,17 @@ export class FixedCostController {
     @Implement(contract.money.fixedCosts.byJar)
     byJar() {
         return implement(contract.money.fixedCosts.byJar).handler(() => this.fixedCosts.byJar());
+    }
+
+    /** Settlements for a bill and/or month. */
+    @Implement(contract.money.fixedCosts.listSettlements)
+    listSettlements() {
+        return implement(contract.money.fixedCosts.listSettlements).handler(({ input }) =>
+            this.fixedCosts.listSettlements({
+                fixedCostId: input.fixedCostId,
+                period: input.period,
+            })
+        );
     }
 
     // ====================================================================
@@ -75,6 +113,14 @@ export class FixedCostController {
     remove() {
         return implement(contract.money.fixedCosts.remove).handler(({ input }) =>
             this.fixedCosts.remove(input.id)
+        );
+    }
+
+    /** Remove a period settlement and clear any linked transaction. */
+    @Implement(contract.money.fixedCosts.unlinkSettlement)
+    unlinkSettlement() {
+        return implement(contract.money.fixedCosts.unlinkSettlement).handler(({ input }) =>
+            this.fixedCosts.unlinkSettlement(input.id)
         );
     }
 }

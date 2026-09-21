@@ -5,6 +5,7 @@ import { HouseholdEntity } from '../../../../../../common/database/household.ent
 import { MoneyType } from '../../../../../../common/database/money.type';
 import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import { FixedCost } from '../../plan/fixed-cost/fixed-cost.entity';
 import { Category } from '../../plan/jar/category.entity';
 import { Jar } from '../../plan/jar/jar.entity';
 import { Debt } from '../../targets/debt/debt.entity';
@@ -31,6 +32,7 @@ import { SortRule } from '../sort-rule/sort-rule.entity';
 @Index({ properties: ['jar'] })
 @Index({ properties: ['category'] })
 @Index({ properties: ['debt'] })
+@Index({ properties: ['fixedCost'] })
 @Index({ properties: ['appliedRule'] })
 // Idempotent imports: the same statement line can never land twice in one household.
 @Unique({ properties: ['household', 'dedupeKey'] })
@@ -106,6 +108,10 @@ export class Transaction extends HouseholdEntity {
     /** Outflow linked as a payment toward this debt. */
     @ManyToOne(() => Debt, { nullable: true, deleteRule: 'set null' })
     debt: Debt | null = null;
+
+    /** Row settles this recurring bill for the booked month. */
+    @ManyToOne(() => FixedCost, { nullable: true, deleteRule: 'set null' })
+    fixedCost: FixedCost | null = null;
 
     /**
      * Rule that auto-sorted this row — keeps the automation visible and undoable.

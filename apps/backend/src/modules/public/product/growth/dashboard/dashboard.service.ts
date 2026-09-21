@@ -54,8 +54,7 @@ export class GrowthDashboardService {
 
         const learnQueued = shelf.progress.filter(
             row =>
-                row.status === LearnProgressStatus.NOW ||
-                row.status === LearnProgressStatus.QUEUE
+                row.status === LearnProgressStatus.NOW || row.status === LearnProgressStatus.QUEUE
         ).length;
         const learnDone = shelf.progress.filter(
             row => row.status === LearnProgressStatus.DONE

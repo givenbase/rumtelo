@@ -6,6 +6,7 @@ import type {
     Category,
     CategoryTemplate,
     FixedCost,
+    FixedCostSettlement,
     GivingOrganisation,
     MerchantPreset,
     Transaction,
@@ -15,8 +16,9 @@ import { cn, categoryVariance, monthlyAmount } from '@rumtelo/utils';
 
 import { cadenceLabel } from '@/app/_lib/jar-chrome';
 import {
-    claimFixedCostMatches,
+    claimLinkedFixedCostTxIds,
     fixedCostStatus,
+    settlementsByFixedCostId,
     type FixedCostStatus,
 } from '@/app/_lib/fixed-cost-match';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
@@ -34,6 +36,9 @@ function statusChip(status: FixedCostStatus) {
     }
     if (status === 'due') {
         return <MetaChip className="border-danger/30 text-danger">Still due</MetaChip>;
+    }
+    if (status === 'skipped') {
+        return <MetaChip className="border-line text-fg-muted">Skipped</MetaChip>;
     }
     return <MetaChip>Planned</MetaChip>;
 }
@@ -56,6 +61,7 @@ export function JarCategoryBreakdown({
     categories,
     fixedCosts,
     transactions,
+    settlements = [],
     period,
     jarKey,
     jarIcon,
@@ -68,6 +74,8 @@ export function JarCategoryBreakdown({
     categories: readonly CategoryRow[];
     fixedCosts: readonly FixedCost[];
     transactions: readonly Transaction[];
+    /** Period settlements — status source of truth when provided. */
+    settlements?: readonly FixedCostSettlement[];
     period: { year: number; month: number };
     jarKey: string;
     jarIcon?: string | null;
@@ -151,9 +159,11 @@ export function JarCategoryBreakdown({
             left.name.localeCompare(right.name)
     );
 
-    const { claimedTxIds, matchByFixedCostId: fixedMatchById } = allowFixedCosts
-        ? claimFixedCostMatches(fixedCosts, transactions)
-        : { claimedTxIds: new Set<string>(), matchByFixedCostId: new Map<string, Transaction>() };
+    const settlementById = settlementsByFixedCostId(settlements);
+    const claimedTxIds = allowFixedCosts
+        ? claimLinkedFixedCostTxIds(transactions, settlements)
+        : new Set<string>();
+    const txById = new Map(transactions.map(tx => [tx.id, tx]));
 
     function toggle(id: string) {
         setOpenIds(previous => {
@@ -187,12 +197,15 @@ export function JarCategoryBreakdown({
 
                 const fixedRows = categoryFixed.map(item => {
                     const monthly = monthlyAmount(item.amount, item.cadence);
-                    const match = fixedMatchById.get(item.id);
+                    const settlement = settlementById.get(item.id);
+                    const match = settlement?.transactionId
+                        ? txById.get(settlement.transactionId)
+                        : undefined;
                     return {
                         item,
                         monthly,
                         match,
-                        status: fixedCostStatus(item, match, period, today),
+                        status: fixedCostStatus(item, settlement, period, today),
                     };
                 });
 

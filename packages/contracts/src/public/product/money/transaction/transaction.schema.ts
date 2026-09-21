@@ -36,6 +36,11 @@ export const Transaction = z.object({
      * (balance was reduced when the link was established).
      */
     debtId: Id.nullable(),
+    /**
+     * When set, this row settles a fixed-cost period (see FixedCostSettlement).
+     * Mutually exclusive with debtId on sort in MVP.
+     */
+    fixedCostId: Id.nullable(),
     /** Negative = money out, positive = money in. Minor units. */
     amount: Money,
     bookedOn: IsoDate,
@@ -74,6 +79,7 @@ export const CreateTransaction = z.object({
     jarId: Id.nullish(),
     categoryId: Id.nullish(),
     debtId: Id.nullish(),
+    fixedCostId: Id.nullish(),
     amount: Money,
     bookedOn: IsoDate,
     description: z.string().min(1).max(280),
@@ -91,6 +97,11 @@ export const SortTransaction = z.object({
     categoryId: Id.nullish(),
     /** Link this outflow as a debt payment (reduces balance on first link). */
     debtId: Id.nullish(),
+    /**
+     * Link this row as settling a fixed cost for the booked month.
+     * MVP: mutually exclusive with debtId on the same call.
+     */
+    fixedCostId: Id.nullish(),
     createRule: z.boolean().default(false),
 });
 

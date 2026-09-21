@@ -133,6 +133,20 @@ export enum TransactionSource {
     RECURRING = 'RECURRING',
 }
 
+/** Whether a fixed-cost period was settled with a payment or intentionally skipped. */
+export enum FixedCostSettlementStatus {
+    PAID = 'PAID',
+    SKIPPED = 'SKIPPED',
+}
+
+/** How the period settlement was recorded. */
+export enum FixedCostSettlementSource {
+    MATCHED = 'MATCHED',
+    MARK_PAID = 'MARK_PAID',
+    SKIP = 'SKIP',
+    LINKED = 'LINKED',
+}
+
 export enum RuleField {
     DESCRIPTION = 'DESCRIPTION',
     COUNTERPARTY = 'COUNTERPARTY',

@@ -6,6 +6,7 @@ import { useState } from 'react';
 import type {
     CategoryTemplate,
     FixedCost,
+    FixedCostSettlement,
     GivingOrganisation,
     MerchantPreset,
     Transaction,
@@ -31,6 +32,7 @@ export type JarDrilldownExtras = {
     period: { year: number; month: number };
     fixedCosts: readonly FixedCost[];
     transactions: readonly Transaction[];
+    settlements?: readonly FixedCostSettlement[];
     categoryTemplates: readonly Pick<CategoryTemplate, 'name' | 'icon'>[];
     merchants: readonly MerchantPreset[];
     givingOrgs: readonly Pick<GivingOrganisation, 'name' | 'website'>[];
@@ -84,6 +86,7 @@ export function JarDrilldownTable({
                                         )}
                                         fixedCosts={jarFixed}
                                         transactions={jarTxs}
+                                        settlements={extras.settlements}
                                         period={extras.period}
                                         jarKey={jar.key ?? ''}
                                         jarIcon={jar.icon}

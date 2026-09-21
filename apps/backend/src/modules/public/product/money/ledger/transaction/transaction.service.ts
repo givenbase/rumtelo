@@ -9,6 +9,10 @@ import { MerchantPresetService } from '../../../../../backoffice/product/money/p
 import { Category } from '../../plan/jar/category.entity';
 import { Jar } from '../../plan/jar/jar.entity';
 import { applyDebtLinkChange } from '../../targets/debt/debt-link.util';
+import {
+    applyFixedCostLinkChange,
+    clearFixedCostLinkOnTransaction,
+} from '../../plan/fixed-cost/fixed-cost-link.util';
 import { BankAccount } from '../bank-account/bank-account.entity';
 import { SortRuleService } from '../sort-rule/sort-rule.service';
 import { parseStatementCsv } from './csv/csv-parser';
@@ -37,6 +41,7 @@ export class TransactionService {
         jarId?: string | null;
         categoryId?: string | null;
         debtId?: string | null;
+        fixedCostId?: string | null;
         amount: number;
         bookedOn: string;
         description: string;
@@ -44,6 +49,11 @@ export class TransactionService {
         inflowKey?: string | null;
         note?: string | null;
     }) {
+        if (input.debtId && input.fixedCostId) {
+            throw new BadRequestException(
+                'Link either a debt or a fixed cost on one transaction, not both.'
+            );
+        }
         if (input.jarId) {
             await assertJarAllowsOutflow(this.em, input.jarId, input.amount);
         }
@@ -53,6 +63,7 @@ export class TransactionService {
             jar: input.jarId ? this.em.getReference(Jar, input.jarId) : null,
             category: input.categoryId ? this.em.getReference(Category, input.categoryId) : null,
             debt: null,
+            fixedCost: null,
             amount: input.amount,
             bookedOn: input.bookedOn,
             description: input.description,
@@ -69,6 +80,10 @@ export class TransactionService {
 
         if (input.debtId) {
             await applyDebtLinkChange(this.em, entity, input.debtId);
+            await this.em.flush();
+        }
+        if (input.fixedCostId) {
+            await applyFixedCostLinkChange(this.em, entity, input.fixedCostId);
             await this.em.flush();
         }
 
@@ -174,7 +189,7 @@ export class TransactionService {
             orderBy: { bookedOn: 'DESC' },
             limit: filter.limit + 1,
         });
-        await this.em.populate(rows, ['debt']);
+        await this.em.populate(rows, ['debt', 'fixedCost']);
         const hasMore = rows.length > filter.limit;
         const page = hasMore ? rows.slice(0, filter.limit) : rows;
         return { items: page.map(toDto), nextCursor: hasMore ? (page.at(-1)?.id ?? null) : null };
@@ -193,10 +208,16 @@ export class TransactionService {
         jarId: string,
         categoryId?: string | null,
         createRule = false,
-        debtId?: string | null
+        debtId?: string | null,
+        fixedCostId?: string | null
     ) {
+        if (debtId && fixedCostId) {
+            throw new BadRequestException(
+                'Link either a debt or a fixed cost on one transaction, not both.'
+            );
+        }
         const entity = await this.transactions.findOneOrFail({ id: transactionId });
-        await this.em.populate(entity, ['debt']);
+        await this.em.populate(entity, ['debt', 'fixedCost']);
         await assertJarAllowsOutflow(this.em, jarId, entity.amount);
         entity.jar = this.em.getReference(Jar, jarId);
         entity.category = categoryId ? this.em.getReference(Category, categoryId) : null;
@@ -239,7 +260,17 @@ export class TransactionService {
         }
 
         if (debtId !== undefined) {
+            if (entity.fixedCost && debtId) {
+                await applyFixedCostLinkChange(this.em, entity, null);
+            }
             await applyDebtLinkChange(this.em, entity, debtId);
+        }
+
+        if (fixedCostId !== undefined) {
+            if (entity.debt && fixedCostId) {
+                await applyDebtLinkChange(this.em, entity, null);
+            }
+            await applyFixedCostLinkChange(this.em, entity, fixedCostId);
         }
 
         await this.em.flush();
@@ -265,11 +296,23 @@ export class TransactionService {
         id: string,
         patch: Partial<
             Pick<Transaction, 'description' | 'amount' | 'note' | 'status' | 'counterparty'>
-        > & { categoryId?: string | null; inflowKey?: string | null; debtId?: string | null }
+        > & {
+            categoryId?: string | null;
+            inflowKey?: string | null;
+            debtId?: string | null;
+            fixedCostId?: string | null;
+        }
     ) {
         const entity = await this.transactions.findOneOrFail({ id });
-        await this.em.populate(entity, ['debt']);
-        const { categoryId, inflowKey, debtId, ...fields } = patch;
+        await this.em.populate(entity, ['debt', 'fixedCost']);
+        const { categoryId, inflowKey, debtId, fixedCostId, ...fields } = patch;
+
+        if (debtId && fixedCostId) {
+            throw new BadRequestException(
+                'Link either a debt or a fixed cost on one transaction, not both.'
+            );
+        }
+
         Object.assign(entity, fields);
         if (categoryId !== undefined) {
             entity.category = categoryId ? this.em.getReference(Category, categoryId) : null;
@@ -279,8 +322,20 @@ export class TransactionService {
         } else if (inflowKey !== undefined) {
             entity.inflowKey = inflowKey?.trim() || null;
         }
+        if (fields.status === TransactionStatus.IGNORED && entity.fixedCost) {
+            await clearFixedCostLinkOnTransaction(this.em, entity);
+        }
         if (debtId !== undefined) {
+            if (entity.fixedCost && debtId) {
+                await applyFixedCostLinkChange(this.em, entity, null);
+            }
             await applyDebtLinkChange(this.em, entity, debtId);
+        }
+        if (fixedCostId !== undefined) {
+            if (entity.debt && fixedCostId) {
+                await applyDebtLinkChange(this.em, entity, null);
+            }
+            await applyFixedCostLinkChange(this.em, entity, fixedCostId);
         }
         await this.em.flush();
         return toDto(entity);
@@ -292,9 +347,12 @@ export class TransactionService {
 
     async remove(id: string) {
         const entity = await this.transactions.findOneOrFail({ id });
-        await this.em.populate(entity, ['debt']);
+        await this.em.populate(entity, ['debt', 'fixedCost']);
         if (entity.debt) {
             await applyDebtLinkChange(this.em, entity, null);
+        }
+        if (entity.fixedCost) {
+            await clearFixedCostLinkOnTransaction(this.em, entity);
         }
         await this.em.remove(entity).flush();
     }
@@ -318,6 +376,7 @@ export function toDto(transaction: Transaction) {
         jarId: transaction.jar?.id ?? null,
         categoryId: transaction.category?.id ?? null,
         debtId: transaction.debt?.id ?? null,
+        fixedCostId: transaction.fixedCost?.id ?? null,
         amount: transaction.amount,
         bookedOn: transaction.bookedOn,
         description: transaction.description,

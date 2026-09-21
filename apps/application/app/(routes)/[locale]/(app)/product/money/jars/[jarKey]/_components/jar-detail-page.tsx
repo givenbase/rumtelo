@@ -15,7 +15,7 @@ import {
     toPeriodKey,
 } from '@rumtelo/utils';
 
-import { claimFixedCostMatches } from '@/app/_lib/fixed-cost-match';
+import { claimLinkedFixedCostTxIds } from '@/app/_lib/fixed-cost-match';
 import { activeSaveGoalsOnJar, focusSaveGoal } from '@/app/_lib/goal-focus';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
@@ -111,6 +111,14 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
         live && Boolean(jar?.id)
     );
 
+    const settlementsQuery = useLiveQuery(
+        apiQuery.money.fixedCosts.listSettlements.queryOptions({
+            input: { householdId: householdId!, period: periodKey },
+        }),
+        [] as never,
+        live
+    );
+
     const fixedGroup = (byJarQuery.data ?? []).find(group => group.jarKey === jarKey);
     const fixedOut = (fixedGroup?.items ?? []).filter(
         item => item.direction === 'OUT' && isFixedCostCounting(item)
@@ -119,7 +127,8 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
     const transactions = [...(txQuery.data?.items ?? [])].sort((left, right) =>
         right.bookedOn.localeCompare(left.bookedOn)
     );
-    const { claimedTxIds } = claimFixedCostMatches(fixedOut, transactions);
+    const settlements = settlementsQuery.data ?? [];
+    const claimedTxIds = claimLinkedFixedCostTxIds(transactions, settlements);
     const leftoverPeriodTxs = transactions.filter(tx => !claimedTxIds.has(tx.id));
 
     if (!jar) {
@@ -290,6 +299,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                         )}
                         fixedCosts={fixedOut}
                         transactions={transactions}
+                        settlements={settlements}
                         period={period}
                         jarKey={jarKey}
                         jarIcon={jar.icon ?? catalog?.icon}

@@ -71,7 +71,8 @@ export class TransactionController {
                 input.jarId,
                 input.categoryId,
                 input.createRule,
-                input.debtId
+                input.debtId,
+                input.fixedCostId
             )
         );
     }
@@ -97,6 +98,7 @@ export class TransactionController {
                 inflowKey: input.inflowKey,
                 categoryId: input.categoryId,
                 debtId: input.debtId,
+                fixedCostId: input.fixedCostId,
             })
         );
     }

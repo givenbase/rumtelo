@@ -280,7 +280,10 @@ export class DebtService {
         const payments = await this.em.find(
             Transaction,
             { debt: debt.id, household: currentHouseholdId() },
-            { orderBy: { bookedOn: 'DESC' }, populate: ['account', 'jar', 'category', 'debt'] }
+            {
+                orderBy: { bookedOn: 'DESC' },
+                populate: ['account', 'jar', 'category', 'debt', 'fixedCost'],
+            }
         );
         const linked = await this.em.findOne(
             FixedCost,
@@ -411,6 +414,7 @@ function toPaymentDto(transaction: Transaction) {
         jarId: transaction.jar?.id ?? null,
         categoryId: transaction.category?.id ?? null,
         debtId: transaction.debt?.id ?? null,
+        fixedCostId: transaction.fixedCost?.id ?? null,
         amount: transaction.amount,
         bookedOn: transaction.bookedOn,
         description: transaction.description,

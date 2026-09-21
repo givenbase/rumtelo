@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
-import type { Debt, Jar, Transaction } from '@rumtelo/contracts';
+import type { Debt, FixedCost, Jar, Transaction } from '@rumtelo/contracts';
 import { JarKey } from '@rumtelo/contracts';
 import { Button, VendorMark } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
@@ -22,6 +22,7 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 
 type InboxJarOption = Pick<Jar, 'id' | 'key' | 'name' | 'subtitle'>;
 type InboxDebtOption = Pick<Debt, 'id' | 'name'>;
+type InboxFixedCostOption = Pick<FixedCost, 'id' | 'name' | 'counterparty'>;
 
 function suggestJarKey(amount: number): JarKey {
     if (amount > 0) return JarKey.NECESSITIES;
@@ -43,6 +44,7 @@ export function InboxSortCard({
     transaction,
     jars,
     debts = [],
+    suggestedFixedCost,
     suggestedJarId,
     logoDomain,
     onConfirm,
@@ -53,6 +55,8 @@ export function InboxSortCard({
     jars: readonly InboxJarOption[];
     /** Open debts — optional “apply as payment” for outflows. */
     debts?: readonly InboxDebtOption[];
+    /** Suggested recurring bill to link (heuristic). */
+    suggestedFixedCost?: InboxFixedCostOption | null;
     suggestedJarId?: string;
     /** From merchant catalog match when known. */
     logoDomain?: string | null;
@@ -60,7 +64,8 @@ export function InboxSortCard({
         transactionId: string,
         jarId: string,
         createRule?: boolean,
-        debtId?: string | null
+        debtId?: string | null,
+        fixedCostId?: string | null
     ) => Promise<void>;
     /** Prefer for “Other” — opens transaction detail. */
     detailHref?: string;
@@ -72,6 +77,7 @@ export function InboxSortCard({
     const categoryTemplatesQuery = useCategoryTemplates(isLiveData(householdId));
     const [pickedJarId, setPickedJarId] = useState<string | null>(null);
     const [debtId, setDebtId] = useState<string | null>(null);
+    const [linkFixedCost, setLinkFixedCost] = useState(Boolean(suggestedFixedCost));
     const [picking, setPicking] = useState(false);
     const [done, setDone] = useState(false);
     const [pending, setPending] = useState<'sort' | 'rule' | null>(null);
@@ -100,7 +106,8 @@ export function InboxSortCard({
         Boolean(suggestedJarId) ||
         suggestJarKey(transaction.amount) === 'NECESSITIES' ||
         Math.abs(transaction.amount) < 2_000;
-    const canApplyDebt = transaction.amount < 0 && debts.length > 0;
+    const canApplyDebt = transaction.amount < 0 && debts.length > 0 && !linkFixedCost;
+    const canLinkFixed = Boolean(suggestedFixedCost) && !debtId;
 
     if (done) return null;
 
@@ -112,7 +119,13 @@ export function InboxSortCard({
         }
         setPending(createRule ? 'rule' : 'sort');
         try {
-            await onConfirm(transaction.id, jarId, createRule, canApplyDebt ? debtId : null);
+            await onConfirm(
+                transaction.id,
+                jarId,
+                createRule,
+                canApplyDebt ? debtId : null,
+                canLinkFixed && linkFixedCost ? suggestedFixedCost!.id : null
+            );
             setDone(true);
         } finally {
             setPending(null);
@@ -216,6 +229,31 @@ export function InboxSortCard({
                 ) : null}
             </div>
 
+            {suggestedFixedCost ? (
+                <div className="flex items-start gap-3 rounded-xl border border-line bg-raised px-3.5 py-3 text-left">
+                    <input
+                        id="inbox-link-fixed-cost"
+                        type="checkbox"
+                        className="mt-1"
+                        checked={linkFixedCost && canLinkFixed}
+                        disabled={Boolean(debtId)}
+                        aria-label={`Link to fixed cost ${suggestedFixedCost.counterparty?.trim() || suggestedFixedCost.name}`}
+                        onChange={event => {
+                            setLinkFixedCost(event.target.checked);
+                            if (event.target.checked) setDebtId(null);
+                        }}
+                    />
+                    <label htmlFor="inbox-link-fixed-cost" className="min-w-0 cursor-pointer">
+                        <span className="block font-mono text-[10px] tracking-widest text-fg-muted uppercase">
+                            Link to fixed cost
+                        </span>
+                        <span className="mt-0.5 block text-sm text-fg">
+                            {suggestedFixedCost.counterparty?.trim() || suggestedFixedCost.name}
+                        </span>
+                    </label>
+                </div>
+            ) : null}
+
             {canApplyDebt ? (
                 <div className="grid gap-2">
                     <label
@@ -226,7 +264,11 @@ export function InboxSortCard({
                     <select
                         id="inbox-apply-debt"
                         value={debtId ?? ''}
-                        onChange={event => setDebtId(event.target.value || null)}
+                        onChange={event => {
+                            const next = event.target.value || null;
+                            setDebtId(next);
+                            if (next) setLinkFixedCost(false);
+                        }}
                         className="h-10 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg outline-none focus:border-accent">
                         <option value="">Don’t link</option>
                         {debts.map(debt => (

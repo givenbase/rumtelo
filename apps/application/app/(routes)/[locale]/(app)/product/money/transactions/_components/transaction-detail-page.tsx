@@ -5,7 +5,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import type { Transaction } from '@rumtelo/contracts';
-import { FlowDirection, TransactionSource, TransactionStatus } from '@rumtelo/contracts';
+import { TransactionSource, TransactionStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card, Typography, VendorMark } from '@rumtelo/ui';
 import { isFixedCostCounting, toPeriodKey } from '@rumtelo/utils';
@@ -229,17 +229,18 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
         ? merchants.find(merchant => merchant.key === tx.appliedMerchantKey)
         : undefined;
 
-    const activeFixedOut = (fixedQuery.data ?? []).filter(
-        item => isFixedCostCounting(item) && item.direction === FlowDirection.OUT
-    );
-    const matchedFixed =
-        tx && tx.amount < 0
-            ? [...claimFixedCostMatches(activeFixedOut, [tx]).matchByFixedCostId.entries()].find(
+    const activeFixed = (fixedQuery.data ?? []).filter(item => isFixedCostCounting(item));
+    const linkedBill = tx?.fixedCostId
+        ? activeFixed.find(item => item.id === tx.fixedCostId)
+        : undefined;
+    const suggestedBillId =
+        !linkedBill && tx
+            ? [...claimFixedCostMatches(activeFixed, [tx]).matchByFixedCostId.entries()].find(
                   ([, matched]) => matched.id === tx.id
               )?.[0]
             : undefined;
-    const linkedBill = matchedFixed
-        ? activeFixedOut.find(item => item.id === matchedFixed)
+    const suggestedBill = suggestedBillId
+        ? activeFixed.find(item => item.id === suggestedBillId)
         : undefined;
 
     if (live && (listQuery.isLoading || periodQuery.isLoading || inboxQuery.isLoading) && !tx) {
@@ -306,10 +307,20 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
         related.push(
             <RelatedRow
                 key="bill"
-                label="Recurring bill"
+                label="Fixed cost"
                 value={linkedBill.counterparty?.trim() || linkedBill.name}
-                hint="Looks like this period’s payment for that bill"
+                hint="Linked settlement for this period"
                 href={fixedDetailHref(linkedBill.id)}
+            />
+        );
+    } else if (suggestedBill) {
+        related.push(
+            <RelatedRow
+                key="bill-suggest"
+                label="Looks like"
+                value={suggestedBill.counterparty?.trim() || suggestedBill.name}
+                hint="Suggested recurring bill — link when sorting"
+                href={fixedDetailHref(suggestedBill.id)}
             />
         );
     }
@@ -473,6 +484,13 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                         <Link href={debtDetailHref(tx.debtId)}>
                             <MetaChip className="hover:border-accent-hover hover:text-accent">
                                 Debt
+                            </MetaChip>
+                        </Link>
+                    ) : null}
+                    {tx.fixedCostId ? (
+                        <Link href={fixedDetailHref(tx.fixedCostId)}>
+                            <MetaChip className="hover:border-accent-hover hover:text-accent">
+                                Fixed cost
                             </MetaChip>
                         </Link>
                     ) : null}

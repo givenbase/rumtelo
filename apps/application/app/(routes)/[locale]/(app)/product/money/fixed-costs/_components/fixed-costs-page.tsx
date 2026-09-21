@@ -18,11 +18,11 @@ import {
 import { CREATE_HREF, fixedDetailHref, updateHref } from '@/app/_lib/create-routes';
 import { bgClassToCssVar, cadenceLabel } from '@/app/_lib/jar-chrome';
 import {
-    claimFixedCostMatches,
     fixedCostLifecycle,
     fixedCostStatus,
     isFixedCostCounting,
     lifecycleLabel,
+    settlementsByFixedCostId,
     type FixedCostStatus,
 } from '@/app/_lib/fixed-cost-match';
 import { evaluateNecessitiesPressure } from '@/app/_lib/necessities-pressure';
@@ -54,6 +54,9 @@ function statusChip(status: FixedCostStatus) {
     }
     if (status === 'due') {
         return <MetaChip className="border-danger/30 text-danger">Still due</MetaChip>;
+    }
+    if (status === 'skipped') {
+        return <MetaChip className="border-line text-fg-muted">Skipped</MetaChip>;
     }
     return <MetaChip>Planned</MetaChip>;
 }
@@ -88,6 +91,14 @@ export function FixedCostsPageClient() {
             input: { householdId: householdId!, period: periodKey, limit: 200 },
         }),
         { items: [], nextCursor: null },
+        live
+    );
+
+    const settlementsQuery = useLiveQuery(
+        apiQuery.money.fixedCosts.listSettlements.queryOptions({
+            input: { householdId: householdId!, period: periodKey },
+        }),
+        [] as never,
         live
     );
 
@@ -143,7 +154,8 @@ export function FixedCostsPageClient() {
     const inactiveFixedCosts = allFixedOut.filter(item => !isFixedCostCounting(item));
 
     const periodTransactions = periodTxQuery.data?.items ?? [];
-    const { matchByFixedCostId } = claimFixedCostMatches(fixedCosts, periodTransactions);
+    const settlementById = settlementsByFixedCostId(settlementsQuery.data ?? []);
+    const txById = new Map(periodTransactions.map(tx => [tx.id, tx]));
 
     const incomeSources =
         live && incomeQuery.data?.length
@@ -349,14 +361,17 @@ export function FixedCostsPageClient() {
                                                           const due = formatDueDay(
                                                               fixedCost.dueDay
                                                           );
-                                                          const match = matchByFixedCostId.get(
+                                                          const settlement = settlementById.get(
                                                               fixedCost.id
                                                           );
                                                           const status = fixedCostStatus(
                                                               fixedCost,
-                                                              match,
+                                                              settlement,
                                                               period
                                                           );
+                                                          const linkedTx = settlement?.transactionId
+                                                              ? txById.get(settlement.transactionId)
+                                                              : undefined;
                                                           return (
                                                               <MoneyPartyRow
                                                                   key={fixedCost.id}
@@ -391,10 +406,10 @@ export function FixedCostsPageClient() {
                                                                                   fixedCost.cadence
                                                                               )}
                                                                           </MetaChip>
-                                                                          {match ? (
+                                                                          {linkedTx ? (
                                                                               <MetaChip>
                                                                                   {formatBookedDate(
-                                                                                      match.bookedOn
+                                                                                      linkedTx.bookedOn
                                                                                   )}
                                                                               </MetaChip>
                                                                           ) : null}

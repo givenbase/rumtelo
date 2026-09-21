@@ -7,7 +7,7 @@ import { useState } from 'react';
 
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card, EmptyState, Typography } from '@rumtelo/ui';
-import { cn } from '@rumtelo/utils';
+import { cn, toPeriodKey } from '@rumtelo/utils';
 
 import {
     JarKey,
@@ -16,6 +16,7 @@ import {
     TransactionStatus,
     jarCapabilitiesFor,
     type Debt,
+    type FixedCost,
     type Jar,
     type MerchantPreset,
     type Rule,
@@ -23,6 +24,7 @@ import {
 } from '@rumtelo/contracts';
 
 import { createTxHref, txDetailHref } from '@/app/_lib/create-routes';
+import { suggestFixedCostForTx } from '@/app/_lib/fixed-cost-match';
 import { matchMerchantJarKey } from '@/app/_lib/merchant-match';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
@@ -56,6 +58,7 @@ const FIELD_LABEL: Record<RuleField, string> = {
 const EMPTY_TRANSACTIONS: Transaction[] = [];
 const EMPTY_JARS: Jar[] = [];
 const EMPTY_DEBTS: Debt[] = [];
+const EMPTY_FIXED: FixedCost[] = [];
 const EMPTY_RULES: Rule[] = [];
 const EMPTY_MERCHANTS: MerchantPreset[] = [];
 const EMPTY_TRANSACTION_PAGE = { items: EMPTY_TRANSACTIONS, nextCursor: null };
@@ -69,12 +72,13 @@ function fallbackJarKey(amount: number): JarKey {
 export function TransactionsPageClient() {
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
-    const { showToast } = useAppShell();
+    const { showToast, period } = useAppShell();
     const { formatMoney } = useHouseholdCurrency();
     const [tab, setTab] = useState<Tab>('INBOX');
     const [ledgerLayout, setLedgerLayout] = useState<'list' | 'jar'>('list');
     const [openJarIds, setOpenJarIds] = useState<Set<string>>(() => new Set());
     const live = isLiveData(householdId);
+    const periodKey = toPeriodKey(period.year, period.month);
 
     const inboxQuery = useLiveQuery(
         apiQuery.money.transactions.inbox.queryOptions({ input: { householdId: householdId! } }),
@@ -102,6 +106,20 @@ export function TransactionsPageClient() {
         live
     );
 
+    const fixedCostsQuery = useLiveQuery(
+        apiQuery.money.fixedCosts.list.queryOptions({ input: { householdId: householdId! } }),
+        EMPTY_FIXED,
+        live
+    );
+
+    const settlementsQuery = useLiveQuery(
+        apiQuery.money.fixedCosts.listSettlements.queryOptions({
+            input: { householdId: householdId!, period: periodKey },
+        }),
+        [] as never,
+        live
+    );
+
     const rulesQuery = useLiveQuery(
         apiQuery.money.rules.list.queryOptions({ input: { householdId: householdId! } }),
         EMPTY_RULES,
@@ -121,6 +139,8 @@ export function TransactionsPageClient() {
     const inbox = inboxQuery.data ?? EMPTY_TRANSACTIONS;
     const jars = jarsQuery.data ?? EMPTY_JARS;
     const debts = debtsQuery.data ?? EMPTY_DEBTS;
+    const fixedCosts = fixedCostsQuery.data ?? EMPTY_FIXED;
+    const settlements = settlementsQuery.data ?? [];
     const spendableJars = jars.filter(jar => jarCapabilitiesFor(jar.key).canSpend);
     const jarById = new Map(jars.map(jar => [jar.id, jar]));
     const rules = rulesQuery.data ?? EMPTY_RULES;
@@ -138,11 +158,13 @@ export function TransactionsPageClient() {
             jarId,
             createRule,
             debtId,
+            fixedCostId,
         }: {
             transactionId: string;
             jarId: string;
             createRule?: boolean;
             debtId?: string | null;
+            fixedCostId?: string | null;
         }) => {
             if (!householdId) throw new Error('No household');
             return api.money.transactions.sort({
@@ -151,6 +173,7 @@ export function TransactionsPageClient() {
                 jarId,
                 createRule: createRule ?? false,
                 debtId: debtId ?? null,
+                fixedCostId: fixedCostId ?? null,
             });
         },
         onSuccess: (_data, vars) => {
@@ -162,12 +185,17 @@ export function TransactionsPageClient() {
             });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.key() });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.key() });
             if (vars.createRule) {
                 void queryClient.invalidateQueries({ queryKey: apiQuery.money.rules.list.key() });
                 showToast('Sorted and rule saved', 'success');
             } else {
                 showToast(
-                    vars.debtId ? 'Sorted and applied to debt' : 'Transaction sorted',
+                    vars.fixedCostId
+                        ? 'Sorted and linked to fixed cost'
+                        : vars.debtId
+                          ? 'Sorted and applied to debt'
+                          : 'Transaction sorted',
                     'success'
                 );
             }
@@ -297,22 +325,35 @@ export function TransactionsPageClient() {
                             const title =
                                 transaction.counterparty?.trim() || transaction.description;
                             const catalog = findCatalogMerchantFromFeed(title, merchants);
+                            const suggestedFixed = suggestFixedCostForTx(
+                                transaction,
+                                fixedCosts,
+                                settlements
+                            );
                             return (
                                 <InboxSortCard
                                     key={transaction.id}
                                     transaction={transaction}
                                     jars={transaction.amount < 0 ? spendableJars : jars}
                                     debts={debts}
+                                    suggestedFixedCost={suggestedFixed}
                                     suggestedJarId={resolveJarId(suggestedKey)}
                                     logoDomain={catalog?.logoDomain}
                                     onConfirm={
                                         live
-                                            ? async (transactionId, jarId, createRule, debtId) => {
+                                            ? async (
+                                                  transactionId,
+                                                  jarId,
+                                                  createRule,
+                                                  debtId,
+                                                  fixedCostId
+                                              ) => {
                                                   await sortMutation.mutateAsync({
                                                       transactionId,
                                                       jarId,
                                                       createRule,
                                                       debtId,
+                                                      fixedCostId,
                                                   });
                                               }
                                             : undefined

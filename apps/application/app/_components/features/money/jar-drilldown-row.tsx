@@ -51,6 +51,7 @@ export function JarDrilldownRow({
                             )}
                             fixedCosts={jarFixed}
                             transactions={jarTxs}
+                            settlements={extras.settlements}
                             period={extras.period}
                             jarKey={jar.key ?? ''}
                             jarIcon={jar.icon}
