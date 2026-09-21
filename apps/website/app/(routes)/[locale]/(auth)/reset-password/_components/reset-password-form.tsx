@@ -16,7 +16,7 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-    Input,
+    Password,
     bindFormSubmit,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
@@ -106,8 +106,7 @@ export function ResetPasswordForm() {
                                 <FormItem>
                                     <FormLabel>New password</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="password"
+                                        <Password
                                             autoComplete="new-password"
                                             placeholder={`At least ${AUTH_MIN_PASSWORD_LENGTH} characters`}
                                             disabled={busy}
@@ -125,8 +124,7 @@ export function ResetPasswordForm() {
                                 <FormItem>
                                     <FormLabel>Confirm password</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="password"
+                                        <Password
                                             autoComplete="new-password"
                                             disabled={busy}
                                             {...field}

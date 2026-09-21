@@ -26,10 +26,6 @@ const launchDeferred = isLaunchProductsDeferred();
         // until the models are redesigned (see LAUNCH_DEFERRED_PRODUCTS).
         ...(launchDeferred ? [] : [EnergyModule, SoulModule]),
     ],
-    exports: [
-        MoneyModule,
-        GrowthModule,
-        ...(launchDeferred ? [] : [EnergyModule, SoulModule]),
-    ],
+    exports: [MoneyModule, GrowthModule, ...(launchDeferred ? [] : [EnergyModule, SoulModule])],
 })
 export class ProductModule {}

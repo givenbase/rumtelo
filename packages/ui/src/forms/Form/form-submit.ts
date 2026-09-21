@@ -41,9 +41,8 @@ export function createFormInvalidHandler(
     return <T extends FieldValues>(errors: FieldErrors<T>) => {
         logFormValidationErrors(errors);
         notify?.({
-            description:
-                messages?.description ?? 'Controleer de verplichte velden en probeer opnieuw.',
-            title: messages?.title ?? 'Formulier onvolledig',
+            description: messages?.description ?? 'Check the required fields and try again.',
+            title: messages?.title ?? 'Form incomplete',
         });
     };
 }

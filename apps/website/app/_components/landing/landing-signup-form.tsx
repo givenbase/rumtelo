@@ -17,6 +17,7 @@ import { planIntentQuery } from '@rumtelo/utils';
 
 import { LandingIcon } from './landing-icon';
 import { Cta, SectionHeading } from './landing-primitives';
+import { Email } from '@rumtelo/ui';
 
 const PLAN_SHORT = { BASIC: 'Basic', PLUS: 'Plus', MAX: 'Max' } as const;
 
@@ -219,8 +220,7 @@ export function LandingSignupForm() {
                                         <span className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase">
                                             {field.label}
                                         </span>
-                                        <input
-                                            type={field.type}
+                                        <Email
                                             autoComplete={field.autoComplete}
                                             placeholder={field.ph}
                                             disabled={isSubmitting}

@@ -78,6 +78,7 @@
         "@orpc/openapi-client": "1.13.0",
         "@orpc/server": "^1.13.0",
         "@orpc/tanstack-query": "^1.13.0",
+        "libphonenumber-js": "^1.12.8",
         "zod": "^4.0.0"
     },
     "devDependencies": {

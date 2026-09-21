@@ -1,29 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-import {
-    Button,
-    Typography,
-    Form,
-    FormControl,
-    FormErrorBox,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-    Input,
-    bindFormSubmit,
-    createFormInvalidHandler,
-} from '@rumtelo/ui';
+import { Button, Typography } from '@rumtelo/ui';
 import { AUTH_VERIFY } from '@rumtelo/i18n';
-import { VerifyEmailForm as VerifyEmailFormSchema } from '@rumtelo/contracts';
-
-import { zodResolver } from '@hookform/resolvers/zod';
 
 import { sendVerificationEmail } from '@/lib/auth';
 import { appSignInAfterAuthUrl, appSignInUrl } from '@/lib/portal-urls';
@@ -37,36 +20,27 @@ function withEmail(template: string, email: string): string {
     return template.replaceAll('{email}', email);
 }
 
+/**
+ * Post-sign-up gate. Email is locked from draft / `?email=` — never an editable field.
+ * Cold visits without a known address go back to sign-in / sign-up.
+ */
 export function VerifyPanel() {
     const searchParams = useSearchParams();
     const planIntent = useOptionalPlanIntent();
     const signUpDraft = useOptionalSignUpDraft();
     const emailFromDraft = signUpDraft?.draft?.email?.trim() ?? '';
     const emailFromQuery = searchParams.get('email')?.trim() ?? '';
-    const emailDefault = emailFromDraft || emailFromQuery;
+    const lockedEmail = emailFromDraft || emailFromQuery;
     const status = searchParams.get('status');
     const confirmed = status === 'confirmed' || status === 'ok';
     const continueQuery = {
         ...planIntentQuery(planIntent?.intent ?? null),
     };
 
-    const [apiError, setApiError] = useState<unknown>(null);
+    const [apiError, setApiError] = useState<string | null>(null);
     const [sent, setSent] = useState(false);
+    const [busy, setBusy] = useState(false);
     const [cooldown, setCooldown] = useState(0);
-
-    const form = useForm<VerifyEmailFormSchema>({
-        defaultValues: { email: emailDefault },
-        mode: 'onTouched',
-        resolver: zodResolver(VerifyEmailFormSchema),
-    });
-
-    const onInvalid = createFormInvalidHandler();
-
-    useEffect(() => {
-        if (emailDefault) {
-            form.reset({ email: emailDefault });
-        }
-    }, [emailDefault, form]);
 
     useEffect(() => {
         if (cooldown <= 0) return;
@@ -74,14 +48,17 @@ export function VerifyPanel() {
         return () => window.clearTimeout(id);
     }, [cooldown]);
 
-    async function onSubmit(values: VerifyEmailFormSchema) {
-        if (cooldown > 0) return;
+    async function onResend() {
+        if (!lockedEmail || cooldown > 0 || busy) return;
         setApiError(null);
+        setBusy(true);
 
         const result = await sendVerificationEmail({
-            email: values.email,
+            email: lockedEmail,
             callbackURL: '/verify?status=confirmed',
         });
+
+        setBusy(false);
 
         if (result.error) {
             setApiError(result.error.message ?? 'Could not resend');
@@ -92,13 +69,15 @@ export function VerifyPanel() {
         setCooldown(RESEND_COOLDOWN_SEC);
     }
 
-    const busy = form.formState.isSubmitting;
-    const watchedEmail = useWatch({ control: form.control, name: 'email' }) ?? '';
     const subtitle = confirmed
         ? AUTH_VERIFY.confirmed
-        : watchedEmail.trim()
-          ? withEmail(AUTH_VERIFY.subtitle, watchedEmail.trim())
+        : lockedEmail
+          ? withEmail(AUTH_VERIFY.subtitle, lockedEmail)
           : AUTH_VERIFY.subtitle_no_target;
+
+    const signUpHref = `/sign-up${
+        Object.keys(continueQuery).length ? `?${new URLSearchParams(continueQuery).toString()}` : ''
+    }`;
 
     return (
         <div className="grid gap-6">
@@ -119,73 +98,50 @@ export function VerifyPanel() {
                     onClick={() => signUpDraft?.clearDraft()}>
                     {AUTH_VERIFY.continue}
                 </Button>
+            ) : lockedEmail ? (
+                <div className="grid gap-4">
+                    {apiError ? (
+                        <p
+                            role="alert"
+                            className="rounded-lg border border-danger/30 bg-danger/5 px-4 py-3 text-sm text-danger">
+                            {apiError}
+                        </p>
+                    ) : null}
+
+                    {sent ? <p className="text-sm text-fg-secondary">{AUTH_VERIFY.sent}</p> : null}
+
+                    <div className="flex flex-col gap-3 sm:flex-row">
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            disabled={busy || cooldown > 0}
+                            className="sm:flex-1"
+                            onClick={() => void onResend()}>
+                            {cooldown > 0
+                                ? AUTH_VERIFY.resend_in.replaceAll('{seconds}', String(cooldown))
+                                : busy
+                                  ? 'Working…'
+                                  : AUTH_VERIFY.resend}
+                        </Button>
+                        <Button
+                            as="a"
+                            href={appSignInAfterAuthUrl(continueQuery)}
+                            variant="secondary"
+                            className="sm:flex-1">
+                            {AUTH_VERIFY.continue}
+                        </Button>
+                    </div>
+                </div>
             ) : (
-                <Form {...form}>
-                    <form
-                        className="grid gap-4"
-                        method="post"
-                        onSubmit={bindFormSubmit(form, onSubmit, onInvalid)}>
-                        <FormErrorBox apiError={apiError} form={form} />
-
-                        {sent ? (
-                            <p className="text-sm text-fg-secondary">{AUTH_VERIFY.sent}</p>
-                        ) : null}
-
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Email</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="email"
-                                            autoComplete="email"
-                                            placeholder="you@example.com"
-                                            disabled={busy || cooldown > 0}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <div className="flex flex-col gap-3 sm:flex-row">
-                            <Button
-                                type="submit"
-                                variant="secondary"
-                                disabled={busy || cooldown > 0}
-                                className="sm:flex-1">
-                                {cooldown > 0
-                                    ? AUTH_VERIFY.resend_in.replaceAll(
-                                          '{seconds}',
-                                          String(cooldown)
-                                      )
-                                    : busy
-                                      ? 'Working…'
-                                      : AUTH_VERIFY.resend}
-                            </Button>
-                            <Button
-                                as="a"
-                                href={appSignInAfterAuthUrl(continueQuery)}
-                                variant="secondary"
-                                className="sm:flex-1">
-                                {AUTH_VERIFY.continue}
-                            </Button>
-                        </div>
-                    </form>
-                </Form>
+                <div className="grid gap-4">
+                    <Button as="a" href={appSignInUrl(continueQuery)} className="w-full">
+                        {AUTH_VERIFY.continue}
+                    </Button>
+                </div>
             )}
 
             <Typography as="p" size="sm" color="muted" className="text-center">
-                <Link
-                    href={`/sign-up${
-                        Object.keys(continueQuery).length
-                            ? `?${new URLSearchParams(continueQuery).toString()}`
-                            : ''
-                    }`}
-                    className="font-semibold text-accent hover:underline">
+                <Link href={signUpHref} className="font-semibold text-accent hover:underline">
                     {AUTH_VERIFY.back_to_sign_up}
                 </Link>
                 {' · '}

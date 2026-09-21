@@ -29,6 +29,9 @@ import {
     DangerZone,
     Field,
     Input,
+    Email,
+    Phone,
+    Password,
     Meter,
     Select,
     StubNotice,
@@ -451,10 +454,9 @@ export function AccountSettings() {
                             aria-label="Last name"
                             placeholder="Last name"
                         />
-                        <Input
-                            type="tel"
+                        <Phone
                             value={phoneDraft}
-                            onChange={event => setPhoneDraft(event.target.value)}
+                            onChange={setPhoneDraft}
                             aria-label="Phone"
                             placeholder="Phone (optional)"
                         />
@@ -674,9 +676,8 @@ export function AccountSettings() {
             <SettingsInkCard eyebrow="Password" blurb="Change the password for this email account.">
                 <div className="grid gap-3 py-2.5">
                     <Field label="Current password" htmlFor="cur-pw">
-                        <Input
+                        <Password
                             id="cur-pw"
-                            type="password"
                             value={currentPassword}
                             onChange={event => setCurrentPassword(event.target.value)}
                             placeholder="••••••••••••"
@@ -684,9 +685,8 @@ export function AccountSettings() {
                         />
                     </Field>
                     <Field label="New password" htmlFor="new-pw" hint="Minimum 8 characters.">
-                        <Input
+                        <Password
                             id="new-pw"
-                            type="password"
                             value={newPassword}
                             onChange={event => setNewPassword(event.target.value)}
                             placeholder="••••••••••••"
@@ -746,9 +746,8 @@ export function AccountSettings() {
                     ) : (
                         <>
                             <Field label="Invite (email)" htmlFor="invite-email">
-                                <Input
+                                <Email
                                     id="invite-email"
-                                    type="email"
                                     value={inviteEmail}
                                     onChange={event => setInviteEmail(event.target.value)}
                                     placeholder="partner@example.com"

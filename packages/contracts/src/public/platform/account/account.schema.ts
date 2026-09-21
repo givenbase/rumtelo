@@ -9,6 +9,7 @@ import { z } from 'zod';
 
 import { Locale, Theme } from '../../../common/common.enums';
 import { Id, UserId } from '../../../common/common.schema';
+import { OptionalNullableE164Phone } from '../../../common/phone.schema';
 import { SpendingStyle } from '../enums';
 
 const PersonName = z.string().trim().min(1).max(80);
@@ -27,6 +28,7 @@ export const AccountProfile = z.object({
     firstName: z.string().trim().max(80).nullable(),
     middleName: z.string().trim().max(80).nullable(),
     lastName: z.string().trim().max(80).nullable(),
+    /** Stored E.164 when set; lenient on read for any legacy rows. */
     phone: z.string().trim().max(32).nullable(),
     /** ISO calendar date `YYYY-MM-DD`. */
     dateOfBirth: z.iso.date().nullable(),
@@ -39,7 +41,7 @@ export const AccountProfilePatch = z.object({
     firstName: OptionalPersonName,
     middleName: OptionalPersonName,
     lastName: OptionalPersonName,
-    phone: z.string().trim().max(32).nullable().optional(),
+    phone: OptionalNullableE164Phone,
     dateOfBirth: z.iso.date().nullable().optional(),
 });
 

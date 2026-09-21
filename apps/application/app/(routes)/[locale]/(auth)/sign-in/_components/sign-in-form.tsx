@@ -15,7 +15,8 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-    Input,
+    Email,
+    Password,
     bindFormSubmit,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
@@ -235,9 +236,7 @@ export function SignInForm() {
                             <FormItem>
                                 <FormLabel>Email</FormLabel>
                                 <FormControl>
-                                    <Input
-                                        type="email"
-                                        autoComplete="email"
+                                    <Email
                                         placeholder="you@example.com"
                                         disabled={busy}
                                         {...field}
@@ -255,11 +254,11 @@ export function SignInForm() {
                             <FormItem>
                                 <FormLabel>Password</FormLabel>
                                 <FormControl>
-                                    <Input
-                                        type="password"
+                                    <Password
                                         autoComplete="current-password"
                                         placeholder="••••••••••••"
                                         disabled={busy}
+                                        showToggle
                                         {...field}
                                     />
                                 </FormControl>

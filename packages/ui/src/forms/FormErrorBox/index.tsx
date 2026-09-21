@@ -2,7 +2,7 @@
 
 import type { FieldValues, UseFormReturn } from 'react-hook-form';
 
-import { cn } from '@rumtelo/utils';
+import { cn, extractErrorMessage, getOrpcValidationIssues } from '@rumtelo/utils';
 
 type FormErrorBoxProps<T extends FieldValues> = {
     apiError?: unknown;
@@ -12,11 +12,10 @@ type FormErrorBoxProps<T extends FieldValues> = {
     title?: string;
 };
 
-function flattenErrors(
-    obj: Record<string, unknown>,
-    prefix = ''
-): { message: string; path: string }[] {
-    return Object.entries(obj).reduce<{ message: string; path: string }[]>((acc, [key, value]) => {
+type ErrorItem = { message: string; path: string };
+
+function flattenErrors(obj: Record<string, unknown>, prefix = ''): ErrorItem[] {
+    return Object.entries(obj).reduce<ErrorItem[]>((acc, [key, value]) => {
         const path = prefix ? `${prefix}.${key}` : key;
         if (value && typeof value === 'object' && 'message' in value) {
             acc.push({ message: String(value.message), path });
@@ -34,34 +33,53 @@ function flattenErrors(
     }, []);
 }
 
-function apiErrorMessage(apiError: unknown): string | null {
-    if (!apiError) return null;
-    if (typeof apiError === 'string') return apiError;
-    if (apiError instanceof Error) return apiError.message;
-    if (typeof apiError === 'object' && apiError !== null && 'message' in apiError) {
-        return String(apiError.message);
+function processApiError(error: unknown): ErrorItem[] {
+    if (!error) return [];
+
+    const issues = getOrpcValidationIssues(error);
+    if (issues.length > 0) {
+        return issues.map(issue => ({
+            message: issue.message,
+            path: issue.path || 'api',
+        }));
     }
-    return null;
+
+    return [{ message: extractErrorMessage(error), path: 'api' }];
+}
+
+/** `firstName` → `First name`; `api` stays as-is. */
+function formatFieldName(path: string): string {
+    if (path === 'api' || path === 'root') return 'API';
+
+    const fieldName = path.split('.').pop() || path;
+    return fieldName
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/[._-]+/g, ' ')
+        .replace(/^./, str => str.toUpperCase())
+        .trim();
 }
 
 /**
  * Central validation / API error summary for create/edit forms.
+ * Understands RHF field errors and oRPC `{ data: { issues } }` payloads.
  */
 export function FormErrorBox<T extends FieldValues>({
     apiError,
     className,
-    description = 'Controleer de gemarkeerde velden en probeer opnieuw.',
+    description = 'Check the highlighted fields and try again.',
     form,
-    title = 'Formulier onvolledig',
+    title = 'Form incomplete',
 }: FormErrorBoxProps<T>) {
     const fieldErrors = flattenErrors(form.formState.errors);
-    const apiMessage = apiErrorMessage(apiError);
+    const apiErrors = apiError ? processApiError(apiError) : [];
+    const errorItems = [...fieldErrors, ...apiErrors];
 
-    if (fieldErrors.length === 0 && !apiMessage) return null;
+    if (errorItems.length === 0) return null;
 
     return (
         <div
             role="alert"
+            aria-live="polite"
             className={cn(
                 'rounded-lg border border-danger/30 bg-danger/5 px-4 py-3 text-sm text-danger',
                 className
@@ -69,13 +87,21 @@ export function FormErrorBox<T extends FieldValues>({
             <p className="font-semibold">{title}</p>
             <p className="mt-0.5 text-danger/80">{description}</p>
             <ul className="mt-2 list-inside list-disc space-y-0.5">
-                {apiMessage ? <li>{apiMessage}</li> : null}
-                {fieldErrors.map(err => (
-                    <li key={err.path}>
-                        <span className="font-medium">{err.path}</span>: {err.message}
+                {errorItems.map(err => (
+                    <li key={`${err.path}:${err.message}`}>
+                        {err.path === 'api' || err.path === 'root' ? (
+                            err.message
+                        ) : (
+                            <>
+                                <span className="font-medium">{formatFieldName(err.path)}</span>:{' '}
+                                {err.message}
+                            </>
+                        )}
                     </li>
                 ))}
             </ul>
         </div>
     );
 }
+
+export type { FormErrorBoxProps };
