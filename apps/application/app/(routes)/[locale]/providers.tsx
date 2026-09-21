@@ -40,17 +40,23 @@ export function Providers({ children }: { children: ReactNode }) {
     return (
         <ThemeProvider>
             <QueryClientProvider client={queryClient}>
-                <Suspense fallback={<BrandLoader fullScreen label="Loading" />}>
-                    <PlanIntentProvider>
-                        <AuthProvider>
+                {/*
+                  Auth must sit above the Suspense that catches useSearchParams
+                  (PlanIntentProvider / route pages). If AuthProvider is inside that
+                  boundary, a suspend unmounts it and concurrent renders can throw
+                  “useAuth must be used inside <AuthProvider>”.
+                */}
+                <AuthProvider>
+                    <Suspense fallback={<BrandLoader fullScreen label="Loading" />}>
+                        <PlanIntentProvider>
                             <HouseholdHeaderSync>
                                 <AccountThemeProvider>
                                     <AppShellProvider>{children}</AppShellProvider>
                                 </AccountThemeProvider>
                             </HouseholdHeaderSync>
-                        </AuthProvider>
-                    </PlanIntentProvider>
-                </Suspense>
+                        </PlanIntentProvider>
+                    </Suspense>
+                </AuthProvider>
             </QueryClientProvider>
         </ThemeProvider>
     );
