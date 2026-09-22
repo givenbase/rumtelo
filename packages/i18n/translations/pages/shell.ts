@@ -1,10 +1,155 @@
-/** App chrome — header / nav labels. */
+/** App chrome — header / nav / period / menu / gates. */
 const shell = {
     tagline: 'Stop wondering where it went.',
     settings: 'Settings',
     period: 'Period',
+    period_select: 'Select period',
+    period_select_relative: 'Select period, {label}',
+    period_looking_back: 'Looking back',
+    period_looking_ahead: 'Looking ahead',
+    period_quick: 'Quick period',
+    period_months: 'Months',
+    period_prev_year: 'Previous year',
+    period_next_year: 'Next year',
     sign_in: 'Sign in',
     sign_up: 'Create account',
+    home: 'Home',
+    menu: {
+        settings: 'Settings',
+        settings_sub: 'Account, plan, language',
+        my_plan: 'My plan',
+        my_plan_sub: 'What you use and pay',
+        sign_out: 'Sign out',
+        sign_out_sub: 'You stay signed in for 30 days',
+        language: 'Language',
+        language_sub: 'App language',
+        appearance: 'Appearance',
+        appearance_sub: 'Light or dark',
+        theme_light: '☀ Light',
+        theme_dark: '☾ Dark',
+    },
+    period_options: {
+        this_month: 'This month',
+        last_month: 'Last month',
+        next_month: 'Next month',
+    },
+    quick_add: {
+        title: 'Add',
+        fab_label: 'Quick add',
+        close: 'Close',
+        open_aria: 'Quick add',
+        close_aria: 'Close quick add',
+        transaction: 'Transaction',
+        fixed_cost: 'Fixed cost',
+        debt: 'Debt',
+        goal: 'Goal',
+        income: 'Income',
+        training: 'Training',
+        asset: 'Asset',
+        move_money: 'Move money',
+    },
+    forms: {
+        tx_create: {
+            title: 'New transaction',
+            description: 'Out for spend, In for gifts, refunds, and jar top-ups.',
+        },
+        tx_update: {
+            title: 'Edit transaction',
+            description: 'Update direction, amount, jar, or note.',
+        },
+        fixed_create: {
+            title: 'New fixed cost',
+            description: 'What leaves a jar every month?',
+        },
+        fixed_update: {
+            title: 'Edit fixed cost',
+        },
+        debt_create: {
+            title: 'New debt',
+            description: 'Pick the type, then who you owe.',
+        },
+        debt_update: {
+            title: 'Edit debt',
+        },
+        income_create: {
+            title: 'New income',
+            description: 'Add an income source that feeds your jars.',
+        },
+        income_update: {
+            title: 'Edit income',
+        },
+        goal_create: {
+            title: 'New goal',
+            description: 'Give savings a destination.',
+        },
+        goal_update: {
+            title: 'Edit goal',
+        },
+        asset_create: {
+            title: 'New asset',
+            description: 'What you own, and whether it pays you.',
+        },
+        asset_update: {
+            title: 'Edit asset',
+            description: 'Change the name, the class, or what it is worth.',
+        },
+        session_create: {
+            title: 'New training',
+        },
+        move_create: {
+            title: 'Move money',
+            description:
+                'Pick from and to. Available this month shifts; your split stays the same.',
+            description_from_jar: 'Pick where it goes — this jar is already the source.',
+        },
+    },
+    period_travel: {
+        viewing: 'Viewing',
+        this_month: 'This month',
+        months_ago_one: '1 month ago',
+        months_ago_other: '{count} months ago',
+        months_ahead_one: '1 month ahead',
+        months_ahead_other: '{count} months ahead',
+        year_one: '1 year',
+        years_other: '{count} years',
+        month_one: '1 month',
+        months_other: '{count} months',
+        years_ago_one: '1 year ago',
+        years_ago_other: '{count} years ago',
+        years_ahead_one: '1 year ahead',
+        years_ahead_other: '{count} years ahead',
+        years_months_ago: '{years} {months} ago',
+        years_months_ahead: '{years} {months} ahead',
+        days_ago_one: '≈ 1 day ago',
+        days_ago_other: '≈ {count} days ago',
+        days_ahead_one: '≈ 1 day ahead',
+        days_ahead_other: '≈ {count} days ahead',
+    },
+    aria: {
+        switch_product: 'Switch product',
+        close_product_menu: 'Close product menu',
+        main_nav: 'Main navigation',
+        user_menu: 'User menu',
+        close_menu: 'Close menu',
+        mobile_nav: 'Mobile navigation',
+    },
+    gates: {
+        maintenance_title: 'Briefly offline',
+        maintenance_body: 'We are doing a short update. Try again in a few minutes.',
+        maintenance_api_down_title: 'Rumtelo is briefly offline',
+        maintenance_api_down_body:
+            'We cannot reach the API right now. Your jars and data are safe — try again in a moment.',
+        maintenance_update_title: 'Rumtelo is getting ready',
+        maintenance_update_body:
+            'We are finishing a short update. Only the Rumtelo team can sign in for now.',
+        locked_title: 'Upgrade to open this',
+        locked_body: 'This part of Rumtelo is on a higher plan.',
+        locked_plan_title: 'Available in the {plan} plan',
+        locked_plan_aria: 'Plan upgrade required',
+        upgrade_cta: 'Upgrade to {plan}',
+        back_to_dashboard: 'Back to dashboard',
+        back_to_website: 'Back to website',
+    },
 } as const;
 
 export default shell;

@@ -1,3 +1,9 @@
 export { default as dashboard } from './dashboard';
+export { default as landing } from './landing';
+export { default as legal } from './legal';
+export { default as meta } from './meta';
+export { default as nav } from './nav';
 export { default as onboarding } from './onboarding';
+export { default as settings } from './settings';
 export { default as shell } from './shell';
+export { default as why } from './why';

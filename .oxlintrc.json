@@ -44,7 +44,7 @@
             "warn",
             {
                 "min": 2,
-                "exceptions": ["_", "i", "j", "k"],
+                "exceptions": ["_", "i", "j", "k", "t"],
                 "properties": "never",
                 "checkGeneric": false
             }

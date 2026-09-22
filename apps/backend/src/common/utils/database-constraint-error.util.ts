@@ -182,14 +182,27 @@ export function mapToOrpcClientError(error: unknown): unknown {
     if (error instanceof HttpException) {
         const status = error.getStatus();
         const body = error.getResponse();
-        const message =
-            typeof body === 'string'
-                ? body
-                : body && typeof body === 'object' && 'message' in body
-                  ? Array.isArray(body.message)
-                      ? (body as { message: string[] }).message.join(', ')
-                      : String(body.message)
-                  : error.message;
+        let message: string;
+        let params: Record<string, string | number> | undefined;
+
+        if (typeof body === 'string') {
+            message = body;
+        } else if (body && typeof body === 'object') {
+            const row = body as { message?: unknown; params?: unknown };
+            if (Array.isArray(row.message)) {
+                message = row.message.join(', ');
+            } else if (typeof row.message === 'string' && row.message.trim()) {
+                message = row.message.trim();
+            } else {
+                message = error.message;
+            }
+            if (row.params && typeof row.params === 'object' && !Array.isArray(row.params)) {
+                params = row.params as Record<string, string | number>;
+            }
+        } else {
+            message = error.message;
+        }
+
         const code =
             status === HttpStatus.UNAUTHORIZED
                 ? 'UNAUTHORIZED'
@@ -204,7 +217,13 @@ export function mapToOrpcClientError(error: unknown): unknown {
                         : status >= 500
                           ? 'INTERNAL_SERVER_ERROR'
                           : 'BAD_REQUEST';
-        return new ORPCError(code, { message });
+        return new ORPCError(code, {
+            message,
+            data: {
+                message,
+                ...(params ? { params } : {}),
+            },
+        });
     }
 
     return error;

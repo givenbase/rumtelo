@@ -14,11 +14,13 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { type Theme } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
 import { ThemeToggle, useTheme } from '@rumtelo/ui';
 
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { accountThemeFromCss, cssThemeFromAccount, type CssTheme } from '@rumtelo/utils';
+import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 type AccountThemeCtx = {
@@ -89,13 +91,21 @@ export function useAccountTheme(): AccountThemeCtx {
 /** Shell toggle — flips light/dark and saves the explicit preference to the account. */
 export function AccountThemeToggle(props: ComponentProps<typeof ThemeToggle>) {
     const { setAccountTheme } = useAccountTheme();
+    const { showToast } = useAppShell();
+    const tToast = useTranslations('pages.settings.toasts');
+    const tTheme = useTranslations('ui.theme');
+    const { resolvedTheme } = useTheme();
+    const themeAriaLabel =
+        resolvedTheme === 'dark' ? tTheme('switch_to_light') : tTheme('switch_to_dark');
 
     return (
         <ThemeToggle
             {...props}
+            aria-label={props['aria-label'] ?? themeAriaLabel}
             onThemeChange={(next: Exclude<CssTheme, 'system'>) => {
                 void setAccountTheme(accountThemeFromCss(next)).catch(error => {
                     console.error('theme save failed', error);
+                    showToast(tToast('theme_failed'), 'error');
                 });
             }}
         />

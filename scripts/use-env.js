@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Build a local `.env.{staging|production}` from the GitHub Environment sync files
- * (same values CI uses). Galighticus-style: keep root `.env` for local Docker;
+ * (same values CI uses). Keep root `.env` for local Docker;
  * use NODE_ENV=staging|production to load the remote target.
  *
  *   pnpm env:use production

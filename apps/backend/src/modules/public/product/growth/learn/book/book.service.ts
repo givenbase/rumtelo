@@ -93,13 +93,13 @@ export class BookService {
             });
             if (!response.ok) {
                 throw new ORPCError('BAD_GATEWAY', {
-                    message: 'The book catalog did not answer.',
+                    message: 'book_catalog_unavailable',
                 });
             }
             body = (await response.json()) as { docs?: OpenLibraryDoc[] };
         } catch (error) {
             if (error instanceof ORPCError) throw error;
-            throw new ORPCError('BAD_GATEWAY', { message: 'The book catalog did not answer.' });
+            throw new ORPCError('BAD_GATEWAY', { message: 'book_catalog_unavailable' });
         }
 
         const hits: LearnBookHit[] = [];

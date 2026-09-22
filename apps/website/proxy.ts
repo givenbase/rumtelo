@@ -4,7 +4,7 @@ import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
 
 /**
- * Website proxy: next-intl locale detection (Galighticus pattern).
+ * Website proxy: next-intl locale detection.
  * Marketing pages are public — no Better Auth gate here.
  */
 const intlMiddleware = createMiddleware(routing);

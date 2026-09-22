@@ -12,11 +12,7 @@ export default function Page() {
     const meta = formRoute('goalCreate');
 
     return (
-        <FormRoutePageShell
-            title={meta.title}
-            description={meta.description}
-            closeHref={meta.closeHref}
-            width={meta.width}>
+        <FormRoutePageShell meta={meta}>
             <GoalCreatePage
                 embedded
                 defaultKind={goalKindFromParams(searchParams)}

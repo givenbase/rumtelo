@@ -1,6 +1,8 @@
 import { EntityManager } from '@mikro-orm/postgresql';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 
+import { apiBadRequest } from '../../../../../../common/errors/api-user-error';
+
 import {
     Cadence,
     FixedCostSettlementSource,
@@ -85,7 +87,7 @@ export class FixedCostService {
     }) {
         const fixedCost = await this.repo.findOneOrFail({ id: input.fixedCostId });
         if (!isFixedCostCounting(fixedCost)) {
-            throw new BadRequestException('Paused or ended bills cannot take new settlements.');
+            throw apiBadRequest('bill_paused_no_settlement');
         }
 
         if (input.transactionId) {
@@ -160,7 +162,7 @@ export class FixedCostService {
     async skip(input: { fixedCostId: string; period: string; note?: string | null }) {
         const fixedCost = await this.repo.findOneOrFail({ id: input.fixedCostId });
         if (!isFixedCostCounting(fixedCost)) {
-            throw new BadRequestException('Paused or ended bills cannot take new settlements.');
+            throw apiBadRequest('bill_paused_no_settlement');
         }
 
         let settlement = await this.settlements.findOne({

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { useTranslations } from '@rumtelo/i18n';
 import { Typography } from '@rumtelo/ui';
 
 import {
@@ -30,8 +31,11 @@ export function LandingPortalScreen({
     /** Lets the stage pause auto-advance while a video is open. */
     onVideoToggle?: (open: boolean) => void;
 }) {
+    const t = useTranslations('pages.landing');
     const [videoOpen, setVideoOpen] = useState(false);
     const hasVideo = Boolean(portal.media);
+    const portalName = t(`portals.${portal.key}.name`);
+    const screenTitle = t(`portal_demo.screens.${portal.key}`);
 
     const toggleVideo = () => {
         const next = !videoOpen;
@@ -42,7 +46,7 @@ export function LandingPortalScreen({
     return (
         <div
             className="relative min-w-0 overflow-hidden rounded-2xl border border-line bg-surface shadow-lg ring-1 ring-fg/8 ring-inset dark:ring-white/8"
-            aria-label={`${portal.name} in the app — ${portal.demo.screen}`}>
+            aria-label={t('portal_demo.screen_aria', { portal: portalName, screen: screenTitle })}>
             <span
                 className="absolute inset-x-0 top-0 block h-1"
                 style={{ background: portal.colorVar }}
@@ -57,7 +61,7 @@ export function LandingPortalScreen({
                         aria-hidden
                     />
                     <span className="truncate font-mono text-[10px] font-medium tracking-widest text-fg-faint uppercase">
-                        {portal.demo.screen}
+                        {screenTitle}
                     </span>
                 </span>
 
@@ -66,7 +70,7 @@ export function LandingPortalScreen({
                         type="button"
                         onClick={toggleVideo}
                         className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-line bg-raised px-2.5 py-1 font-mono text-[10px] font-semibold tracking-widest text-fg-muted uppercase transition-colors hover:text-fg">
-                        <span aria-hidden>←</span> Back to demo
+                        <span aria-hidden>←</span> {t('portal_demo.back')}
                     </button>
                 ) : null}
             </div>
@@ -98,7 +102,7 @@ export function LandingPortalScreen({
                                 <button
                                     type="button"
                                     onClick={toggleVideo}
-                                    aria-label={`Watch ${portal.name} in action — short video, no sound`}
+                                    aria-label={t('portal_demo.watch_aria', { portal: portalName })}
                                     className="group absolute inset-0 flex cursor-pointer items-end rounded-xl text-left focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
                                     <span
                                         className="flex w-full animate-[demoPop_520ms_var(--ease-out)_both] items-center justify-between gap-3 bg-linear-to-t from-surface via-surface/92 to-transparent px-2 pt-14 pb-2"
@@ -121,15 +125,15 @@ export function LandingPortalScreen({
                                             </span>
                                             <span className="grid gap-0.5">
                                                 <Typography as="h4" weight="semibold">
-                                                    Watch {portal.name} in action
+                                                    {t('portal_demo.watch', { portal: portalName })}
                                                 </Typography>
                                                 <span className="font-mono text-[10px] font-medium tracking-widest text-fg-faint uppercase">
-                                                    Short video · no sound
+                                                    {t('portal_demo.watch_sub')}
                                                 </span>
                                             </span>
                                         </span>
                                         <span className="hidden font-mono text-[10px] font-semibold tracking-widest text-fg-muted uppercase transition-colors group-hover:text-fg sm:inline">
-                                            Play →
+                                            {t('portal_demo.play')}
                                         </span>
                                     </span>
                                 </button>
@@ -148,11 +152,11 @@ export function LandingPortalScreen({
                     />
                     <span className="grid gap-0.5">
                         <span className="font-mono text-[10px] font-medium tracking-widest text-accent uppercase">
-                            The Coach
+                            {t('portal_demo.coach')}
                         </span>
                         {/* Reserve two lines so a one-line tip doesn't change the card height */}
                         <span className="min-h-10 text-sm leading-snug text-fg-secondary">
-                            {portal.demo.coach}
+                            {t(`portal_demo.coach_lines.${portal.key}`)}
                         </span>
                     </span>
                 </div>
@@ -178,16 +182,19 @@ function DemoScreen({ portalKey }: { portalKey: Portal['key'] }) {
 /* ─────────────────────────── money · inbox sorting ─────────────────────────── */
 
 function MoneyDemo() {
+    const t = useTranslations('pages.landing');
     const { rows, overLine } = PORTAL_DEMO_MONEY;
     return (
         <div className="flex h-full flex-col justify-between gap-2">
             {rows.map((row, index) => (
                 <div
-                    key={row.label}
+                    key={row.key}
                     className="grid animate-[demoRow_420ms_var(--ease-out)_both] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-lg border border-line bg-surface px-3 py-2"
                     style={{ animationDelay: `${index * 260}ms` }}>
                     <span className="grid min-w-0 gap-0.5">
-                        <span className="truncate text-sm text-fg">{row.label}</span>
+                        <span className="truncate text-sm text-fg">
+                            {t(`portal_demo.money_rows.${row.key}.label`)}
+                        </span>
                         <span
                             className="inline-flex animate-[demoPop_380ms_var(--ease-out)_both] items-center gap-1.5 font-mono text-[10px] font-medium tracking-wide uppercase"
                             style={{
@@ -198,7 +205,7 @@ function MoneyDemo() {
                                 className="size-1.5 rounded-full"
                                 style={{ background: row.colorVar }}
                             />
-                            {row.jar}
+                            {t(`portal_demo.money_rows.${row.key}.jar`)}
                         </span>
                     </span>
                     <span
@@ -217,10 +224,13 @@ function MoneyDemo() {
                     background: 'color-mix(in oklab, var(--color-jar-play) 10%, transparent)',
                 }}>
                 <span className="font-mono text-[10px] font-semibold tracking-widest text-jar-play uppercase">
-                    {overLine.jar} · {overLine.over} over its line
+                    {t('portal_demo.money_over', {
+                        jar: t(`jars.${overLine.jarKey}.name`),
+                        over: overLine.over,
+                    })}
                 </span>
                 <span className="font-mono text-[10px] font-medium tracking-wide text-fg-faint uppercase">
-                    signal, not a verdict
+                    {t('portal_demo.signal')}
                 </span>
             </div>
         </div>
@@ -230,7 +240,8 @@ function MoneyDemo() {
 /* ─────────────────────────── growth · goals + income curve ─────────────────────────── */
 
 function GrowthDemo() {
-    const { goals, income, incomeLabel } = PORTAL_DEMO_GROWTH;
+    const t = useTranslations('pages.landing');
+    const { goals, income } = PORTAL_DEMO_GROWTH;
     const width = 320;
     const height = 90;
     const min = Math.min(...income);
@@ -253,10 +264,10 @@ function GrowthDemo() {
             <div className="rounded-xl border border-line bg-surface px-3 py-2.5">
                 <div className="mb-1.5 flex items-baseline justify-between gap-3">
                     <span className="font-mono text-[10px] font-medium tracking-widest text-fg-faint uppercase">
-                        Income · six months
+                        {t('portal_demo.growth_income')}
                     </span>
                     <span className="font-mono text-xs font-semibold text-jar-lts">
-                        {incomeLabel}
+                        {t('portal_demo.growth_income_label')}
                     </span>
                 </div>
                 <svg
@@ -292,11 +303,13 @@ function GrowthDemo() {
             <div className="grid gap-2">
                 {goals.map((goal, index) => (
                     <div
-                        key={goal.name}
+                        key={goal.key}
                         className="grid animate-[demoRow_420ms_var(--ease-out)_both] gap-1"
                         style={{ animationDelay: `${600 + index * 220}ms` }}>
                         <div className="flex items-baseline justify-between gap-3">
-                            <span className="truncate text-sm text-fg">{goal.name}</span>
+                            <span className="truncate text-sm text-fg">
+                                {t(`portal_demo.growth_goals.${goal.key}.name`)}
+                            </span>
                             <span className="font-mono text-xs font-semibold text-jar-lts">
                                 {goal.pct}%
                             </span>
@@ -311,7 +324,7 @@ function GrowthDemo() {
                             />
                         </div>
                         <span className="font-mono text-[10px] font-medium tracking-wide text-fg-faint uppercase">
-                            {goal.meta}
+                            {t(`portal_demo.growth_goals.${goal.key}.meta`)}
                         </span>
                     </div>
                 ))}
@@ -323,7 +336,8 @@ function GrowthDemo() {
 /* ─────────────────────────── energy · sleep bars + 168 hours ─────────────────────────── */
 
 function EnergyDemo() {
-    const { nights, floor, days, hours } = PORTAL_DEMO_ENERGY;
+    const t = useTranslations('pages.landing');
+    const { nights, floor, dayKeys, hours } = PORTAL_DEMO_ENERGY;
     const maxHours = 9;
     const total = hours.reduce((sum, item) => sum + item.value, 0);
 
@@ -332,10 +346,12 @@ function EnergyDemo() {
             <div className="rounded-xl border border-line bg-surface p-3">
                 <div className="mb-3 flex items-baseline justify-between gap-3">
                     <span className="font-mono text-[10px] font-medium tracking-widest text-fg-faint uppercase">
-                        Sleep · floor {floor}h
+                        {t('portal_demo.energy_sleep', { floor })}
                     </span>
                     <span className="font-mono text-xs font-semibold text-jar-play">
-                        {nights.filter(night => night < floor).length} nights under
+                        {t('portal_demo.energy_nights', {
+                            count: nights.filter(night => night < floor).length,
+                        })}
                     </span>
                 </div>
                 <div className="grid gap-1.5">
@@ -350,7 +366,7 @@ function EnergyDemo() {
                             const under = value < floor;
                             return (
                                 <span
-                                    key={`${days[index]}-${value}`}
+                                    key={`${dayKeys[index]}-${value}`}
                                     className="block flex-1 origin-bottom animate-[demoGrow_620ms_var(--ease-out)_both] rounded-md"
                                     style={{
                                         height: `${(value / maxHours) * 100}%`,
@@ -364,11 +380,11 @@ function EnergyDemo() {
                         })}
                     </div>
                     <div className="grid grid-cols-7 gap-2">
-                        {days.map(day => (
+                        {dayKeys.map(dayKey => (
                             <span
-                                key={day}
+                                key={dayKey}
                                 className="text-center font-mono text-[10px] text-fg-faint">
-                                {day}
+                                {t(`portal_demo.energy_days.${dayKey}`)}
                             </span>
                         ))}
                     </div>
@@ -378,14 +394,14 @@ function EnergyDemo() {
             <div className="grid gap-2">
                 <div className="flex items-baseline justify-between">
                     <span className="font-mono text-[10px] font-medium tracking-widest text-fg-faint uppercase">
-                        Your 168 hours
+                        {t('portal_demo.energy_hours_label')}
                     </span>
                     <span className="font-mono text-xs font-medium text-fg">{total}h</span>
                 </div>
                 <div className="flex h-2.5 gap-0.5 overflow-hidden rounded-full bg-sunken">
                     {hours.map((item, index) => (
                         <span
-                            key={item.label}
+                            key={item.key}
                             className="h-full animate-[demoFill_800ms_var(--ease-out)_both]"
                             style={{
                                 width: `${(item.value / total) * 100}%`,
@@ -398,13 +414,14 @@ function EnergyDemo() {
                 <div className="flex flex-wrap gap-x-4 gap-y-1">
                     {hours.map(item => (
                         <span
-                            key={item.label}
+                            key={item.key}
                             className="inline-flex items-center gap-1.5 font-mono text-[10px] text-fg-muted">
                             <span
                                 className="size-1.5 rounded-full"
                                 style={{ background: item.colorVar }}
                             />
-                            {item.label} <span className="text-fg-faint">{item.value}h</span>
+                            {t(`portal_demo.energy_hours.${item.key}`)}{' '}
+                            <span className="text-fg-faint">{item.value}h</span>
                         </span>
                     ))}
                 </div>
@@ -416,7 +433,8 @@ function EnergyDemo() {
 /* ─────────────────────────── soul · stillness + gratitude + intention ─────────────────────────── */
 
 function SoulDemo() {
-    const { stillnessSeconds, streakDays, gratitude, intention } = PORTAL_DEMO_SOUL;
+    const t = useTranslations('pages.landing');
+    const { stillnessSeconds, streakDays, gratitudeKeys } = PORTAL_DEMO_SOUL;
     const radius = 34;
     const circumference = 2 * Math.PI * radius;
 
@@ -454,24 +472,24 @@ function SoulDemo() {
                     </text>
                 </svg>
                 <span className="font-mono text-[10px] font-medium tracking-widest text-fg-faint uppercase">
-                    Stillness · day {streakDays}
+                    {t('portal_demo.soul_stillness', { day: streakDays })}
                 </span>
             </div>
 
             <div className="grid gap-3">
                 <div className="grid gap-1.5">
                     <span className="font-mono text-[10px] font-medium tracking-widest text-fg-faint uppercase">
-                        Gratitude · today
+                        {t('portal_demo.soul_gratitude_label')}
                     </span>
-                    {gratitude.map((line, index) => (
+                    {gratitudeKeys.map((gratitudeKey, index) => (
                         <span
-                            key={line}
+                            key={gratitudeKey}
                             className="flex animate-[demoRow_420ms_var(--ease-out)_both] items-baseline gap-2 text-sm text-fg-secondary"
                             style={{ animationDelay: `${400 + index * 380}ms` }}>
                             <span className="text-portal-soul" aria-hidden>
                                 ✦
                             </span>
-                            {line}
+                            {t(`portal_demo.soul_gratitude.${gratitudeKey}`)}
                         </span>
                     ))}
                 </div>
@@ -479,10 +497,10 @@ function SoulDemo() {
                     className="animate-[demoPop_420ms_var(--ease-out)_both] rounded-lg border border-line bg-surface px-3 py-2.5"
                     style={{ animationDelay: '1600ms' }}>
                     <span className="block font-mono text-[10px] font-medium tracking-widest text-portal-soul uppercase">
-                        Intention · this week
+                        {t('portal_demo.soul_intention_label')}
                     </span>
                     <Typography as="h4" weight="medium" className="mt-1">
-                        {intention}
+                        {t('portal_demo.soul_intention')}
                         <span
                             className="ml-0.5 inline-block h-4 w-px translate-y-0.5 animate-[demoBlink_1s_steps(1)_infinite] bg-portal-soul"
                             aria-hidden

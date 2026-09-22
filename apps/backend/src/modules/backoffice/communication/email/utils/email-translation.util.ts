@@ -1,5 +1,5 @@
 /**
- * Email translation utilities — same pattern as Galighticus.
+ * Email translation utilities.
  */
 
 export type EmailLanguageObject = Record<string, Record<string, string>>;

@@ -20,11 +20,13 @@ import {
     bindFormSubmit,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
-import { AUTH_SIGN_IN } from '@rumtelo/i18n';
-import { SignInForm as SignInFormSchema } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
+import type { z } from 'zod';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 
+import { useApiErrorFallbacks, useApiErrorMessage } from '@/app/_lib/api-error-messages';
+import { useAuthFormSchemas } from '@/app/_lib/auth-form-schemas';
 import {
     sendVerificationEmail,
     signIn,
@@ -40,14 +42,15 @@ function safeRedirectPath(value: string | null): string {
     return '/';
 }
 
-function withEmail(template: string, email: string): string {
-    return template.replaceAll('{email}', email);
-}
-
 const isDev = process.env.NODE_ENV !== 'production';
 const RESEND_COOLDOWN_SEC = 60;
 
 export function SignInForm() {
+    const t = useTranslations();
+    const { signIn: signInSchema } = useAuthFormSchemas();
+    type SignInValues = z.infer<typeof signInSchema>;
+    const errorMessages = useApiErrorFallbacks();
+    const formatApiMessage = useApiErrorMessage();
     const router = useRouter();
     const searchParams = useSearchParams();
     const redirectTo = safeRedirectPath(searchParams.get('redirectTo'));
@@ -59,13 +62,16 @@ export function SignInForm() {
     const [resendPending, setResendPending] = useState(false);
     const [cooldown, setCooldown] = useState(0);
 
-    const form = useForm<SignInFormSchema>({
+    const form = useForm<SignInValues>({
         defaultValues: { email: '', password: '' },
         mode: 'onTouched',
-        resolver: zodResolver(SignInFormSchema),
+        resolver: zodResolver(signInSchema),
     });
 
-    const onInvalid = createFormInvalidHandler();
+    const onInvalid = createFormInvalidHandler(undefined, {
+        title: t('ui.form.incomplete_title'),
+        description: t('ui.form.incomplete_description'),
+    });
 
     useEffect(() => {
         if (cooldown <= 0) return;
@@ -73,7 +79,7 @@ export function SignInForm() {
         return () => window.clearTimeout(id);
     }, [cooldown]);
 
-    async function submitCredentials(values: SignInFormSchema) {
+    async function submitCredentials(values: SignInValues) {
         setApiError(null);
         setVerification(null);
 
@@ -99,7 +105,12 @@ export function SignInForm() {
                 return;
             }
 
-            setApiError(result.error.message ?? 'Sign in failed');
+            const raw = result.error.message?.trim() ?? '';
+            setApiError(
+                raw || code
+                    ? formatApiMessage(raw, code || undefined)
+                    : t('features.auth.notifications.login_failure')
+            );
             return;
         }
 
@@ -118,7 +129,20 @@ export function SignInForm() {
         setResendPending(false);
 
         if (result.error) {
-            setApiError(result.error.message ?? 'Could not resend');
+            const errorCode =
+                typeof result.error === 'object' && result.error && 'code' in result.error
+                    ? (result.error as { code?: unknown }).code
+                    : undefined;
+            const code =
+                typeof errorCode === 'string' || typeof errorCode === 'number'
+                    ? String(errorCode)
+                    : '';
+            const raw = result.error.message?.trim() ?? '';
+            setApiError(
+                raw || code
+                    ? formatApiMessage(raw, code || undefined)
+                    : t('common.message.error.resend_failed')
+            );
             return;
         }
 
@@ -131,9 +155,9 @@ export function SignInForm() {
     return (
         <div className="grid gap-6">
             <div>
-                <Typography as="h1">{AUTH_SIGN_IN.title}</Typography>
+                <Typography as="h1">{t('features.auth.sign_in.title')}</Typography>
                 <Typography as="p" size="sm" color="muted" className="mt-1">
-                    {AUTH_SIGN_IN.subtitle}
+                    {t('features.auth.sign_in.subtitle')}
                 </Typography>
             </div>
 
@@ -142,12 +166,16 @@ export function SignInForm() {
                     className="grid gap-3 rounded-xl border border-warning/30 bg-warning/10 p-4"
                     role="status">
                     <Typography as="h4" weight="semibold" className="text-sm">
-                        {AUTH_SIGN_IN.verification.title}
+                        {t('features.auth.sign_in.verification.title')}
                     </Typography>
                     <Typography as="p" size="sm" color="secondary">
                         {verification.sent
-                            ? withEmail(AUTH_SIGN_IN.verification.sent, verification.email)
-                            : withEmail(AUTH_SIGN_IN.verification.required, verification.email)}
+                            ? t('features.auth.sign_in.verification.sent', {
+                                  email: verification.email,
+                              })
+                            : t('features.auth.sign_in.verification.required', {
+                                  email: verification.email,
+                              })}
                     </Typography>
                     <div className="flex flex-wrap gap-2">
                         <Button
@@ -157,25 +185,24 @@ export function SignInForm() {
                             disabled={resendPending || cooldown > 0}
                             onClick={() => void onResendVerification()}>
                             {cooldown > 0
-                                ? AUTH_SIGN_IN.verification.resend_in.replaceAll(
-                                      '{seconds}',
-                                      String(cooldown)
-                                  )
-                                : AUTH_SIGN_IN.verification.resend}
+                                ? t('features.auth.sign_in.verification.resend_in', {
+                                      seconds: cooldown,
+                                  })
+                                : t('features.auth.sign_in.verification.resend')}
                         </Button>
                         <Button
                             as="a"
                             href={webVerifyUrl(verification.email)}
                             size="sm"
                             variant="secondary">
-                            {AUTH_SIGN_IN.verification.open_verify}
+                            {t('features.auth.sign_in.verification.open_verify')}
                         </Button>
                         <Button
                             type="button"
                             size="sm"
                             variant="ghost"
                             onClick={() => setVerification(null)}>
-                            {AUTH_SIGN_IN.verification.dismiss}
+                            {t('features.auth.sign_in.verification.dismiss')}
                         </Button>
                     </div>
                 </div>
@@ -184,7 +211,7 @@ export function SignInForm() {
             {isDev ? (
                 <div className="grid gap-2 rounded-xl border border-line bg-raised/40 p-3">
                     <p className="font-mono text-[10px] tracking-widest text-fg-faint uppercase">
-                        Demo accounts
+                        {t('features.auth.sign_in.demo.heading')}
                     </p>
                     <div className="flex flex-wrap gap-2">
                         {DEMO_ACCOUNTS.map(account => (
@@ -211,7 +238,7 @@ export function SignInForm() {
                         ))}
                     </div>
                     <Typography as="p" variant="caption" color="muted">
-                        Passwords:{' '}
+                        {t('features.auth.sign_in.demo.passwords')}{' '}
                         {DEMO_ACCOUNTS.map((account, index) => (
                             <span key={account.persona}>
                                 {index > 0 ? ' / ' : null}
@@ -227,17 +254,39 @@ export function SignInForm() {
                     className="grid gap-4"
                     method="post"
                     onSubmit={bindFormSubmit(form, submitCredentials, onInvalid)}>
-                    <FormErrorBox apiError={apiError} form={form} />
+                    <FormErrorBox
+                        apiError={apiError}
+                        errorMessages={errorMessages}
+                        resolveUserMessage={formatApiMessage}
+                        form={form}
+                        title={t('ui.form.incomplete_title')}
+                        description={t('ui.form.incomplete_description_highlighted')}
+                        fieldLabels={{
+                            api: t('ui.form.fields.api'),
+                            root: t('ui.form.fields.api'),
+                            email: t('ui.form.fields.email'),
+                            password: t('ui.form.fields.password'),
+                            firstName: t('ui.form.fields.first_name'),
+                            lastName: t('ui.form.fields.last_name'),
+                            phone: t('ui.form.fields.phone'),
+                            name: t('ui.form.fields.name'),
+                            amount: t('ui.form.fields.amount'),
+                            note: t('ui.form.fields.note'),
+                            date: t('ui.form.fields.date'),
+                            confirmPassword: t('ui.form.fields.confirm_password'),
+                            newPassword: t('ui.form.fields.new_password'),
+                        }}
+                    />
 
                     <FormField
                         control={form.control}
                         name="email"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Email</FormLabel>
+                                <FormLabel>{t('ui.form.fields.email')}</FormLabel>
                                 <FormControl>
                                     <Email
-                                        placeholder="you@example.com"
+                                        placeholder={t('ui.form.fields.email_placeholder')}
                                         disabled={busy}
                                         {...field}
                                     />
@@ -252,13 +301,15 @@ export function SignInForm() {
                         name="password"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Password</FormLabel>
+                                <FormLabel>{t('ui.form.fields.password')}</FormLabel>
                                 <FormControl>
                                     <Password
                                         autoComplete="current-password"
-                                        placeholder="••••••••••••"
+                                        placeholder={t('ui.form.fields.password_mask')}
                                         disabled={busy}
                                         showToggle
+                                        showPasswordLabel={t('ui.form.show_password')}
+                                        hidePasswordLabel={t('ui.form.hide_password')}
                                         {...field}
                                     />
                                 </FormControl>
@@ -271,12 +322,16 @@ export function SignInForm() {
                         <a
                             href={webForgotPasswordUrl()}
                             className="text-sm font-medium text-accent hover:underline">
-                            {AUTH_SIGN_IN.forgot_password}
+                            {t('features.auth.sign_in.forgot_password')}
                         </a>
                     </div>
 
-                    <Button type="submit" className="mt-1 w-full" disabled={busy}>
-                        {busy ? 'Working…' : 'Sign in'}
+                    <Button
+                        type="submit"
+                        className="mt-1 w-full"
+                        disabled={busy}
+                        data-testid="sign-in-submit">
+                        {busy ? t('ui.form.working') : t('features.auth.sign_in.submit')}
                     </Button>
                 </form>
             </Form>
@@ -286,14 +341,16 @@ export function SignInForm() {
                     <span className="w-full border-t border-line" />
                 </div>
                 <div className="relative flex justify-center">
-                    <span className="bg-bg px-3 text-xs text-fg-faint">or</span>
+                    <span className="bg-bg px-3 text-xs text-fg-faint">
+                        {t('features.auth.sign_in.or_divider')}
+                    </span>
                 </div>
             </div>
 
             <Typography as="p" size="sm" color="muted" className="text-center">
-                No account yet?{' '}
+                {t('features.auth.sign_in.no_account')}{' '}
                 <a href={webSignUpUrl()} className="font-semibold text-accent hover:underline">
-                    {AUTH_SIGN_IN.create_account}
+                    {t('features.auth.sign_in.create_account')}
                 </a>
             </Typography>
         </div>

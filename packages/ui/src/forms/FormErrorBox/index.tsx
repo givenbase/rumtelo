@@ -2,13 +2,23 @@
 
 import type { FieldValues, UseFormReturn } from 'react-hook-form';
 
-import { cn, extractErrorMessage, getOrpcValidationIssues } from '@rumtelo/utils';
+import {
+    cn,
+    extractErrorMessage,
+    getOrpcValidationIssues,
+    type ExtractErrorMessageFallbacks,
+} from '@rumtelo/utils';
 
 type FormErrorBoxProps<T extends FieldValues> = {
     apiError?: unknown;
     className?: string;
     description?: string;
+    errorMessages?: ExtractErrorMessageFallbacks;
+    /** Optional path → label map so field names stay locale-aware. */
+    fieldLabels?: Record<string, string>;
     form: UseFormReturn<T>;
+    /** Optional post-process for known English API messages. */
+    resolveUserMessage?: (raw: string) => string;
     title?: string;
 };
 
@@ -33,26 +43,35 @@ function flattenErrors(obj: Record<string, unknown>, prefix = ''): ErrorItem[] {
     }, []);
 }
 
-function processApiError(error: unknown): ErrorItem[] {
+function processApiError(
+    error: unknown,
+    messages?: ExtractErrorMessageFallbacks,
+    resolveUserMessage?: (raw: string) => string
+): ErrorItem[] {
     if (!error) return [];
+
+    const localize = (message: string) => resolveUserMessage?.(message) ?? message;
 
     const issues = getOrpcValidationIssues(error);
     if (issues.length > 0) {
         return issues.map(issue => ({
-            message: issue.message,
+            message: localize(issue.message),
             path: issue.path || 'api',
         }));
     }
 
-    return [{ message: extractErrorMessage(error), path: 'api' }];
+    return [{ message: localize(extractErrorMessage(error, messages)), path: 'api' }];
 }
 
-/** `firstName` → `First name`; `api` stays as-is. */
-function formatFieldName(path: string): string {
-    if (path === 'api' || path === 'root') return 'API';
+/** `firstName` → `First name`; `api` stays as-is. Prefer `fieldLabels` from i18n. */
+function formatFieldName(path: string, fieldLabels?: Record<string, string>): string {
+    if (path === 'api' || path === 'root') return fieldLabels?.api ?? fieldLabels?.root ?? 'API';
 
-    const fieldName = path.split('.').pop() || path;
-    return fieldName
+    const leaf = path.split('.').pop() || path;
+    const mapped = fieldLabels?.[path] ?? fieldLabels?.[leaf];
+    if (mapped) return mapped;
+
+    return leaf
         .replace(/([A-Z])/g, ' $1')
         .replace(/[._-]+/g, ' ')
         .replace(/^./, str => str.toUpperCase())
@@ -67,11 +86,14 @@ export function FormErrorBox<T extends FieldValues>({
     apiError,
     className,
     description = 'Check the highlighted fields and try again.',
+    errorMessages,
+    fieldLabels,
     form,
+    resolveUserMessage,
     title = 'Form incomplete',
 }: FormErrorBoxProps<T>) {
     const fieldErrors = flattenErrors(form.formState.errors);
-    const apiErrors = apiError ? processApiError(apiError) : [];
+    const apiErrors = apiError ? processApiError(apiError, errorMessages, resolveUserMessage) : [];
     const errorItems = [...fieldErrors, ...apiErrors];
 
     if (errorItems.length === 0) return null;
@@ -93,8 +115,10 @@ export function FormErrorBox<T extends FieldValues>({
                             err.message
                         ) : (
                             <>
-                                <span className="font-medium">{formatFieldName(err.path)}</span>:{' '}
-                                {err.message}
+                                <span className="font-medium">
+                                    {formatFieldName(err.path, fieldLabels)}
+                                </span>
+                                : {err.message}
                             </>
                         )}
                     </li>

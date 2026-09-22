@@ -1,5 +1,8 @@
+'use client';
+
 import type { TimeCategorySummary } from '@rumtelo/contracts';
 import { TIME_REFERENCE, TimeBandStatus, TimeKind } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
 import { Badge } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
@@ -7,8 +10,12 @@ import {
     TIME_CATEGORY_META,
     TIME_KIND_META,
     TIME_STATUS_META,
+    formatBandHours,
     formatBandRange,
     formatMinutes,
+    timeCategoryHint,
+    timeCategoryName,
+    timeStatusName,
 } from '@/app/_lib/time-meta';
 
 import { TimeSources } from './time-sources';
@@ -23,6 +30,8 @@ type Props = {
  * against it; when there is not, the card says so instead of inventing a norm.
  */
 export function TimeBandCard({ summary, daysLogged }: Props) {
+    const tRoot = useTranslations();
+    const tm = useTranslations('features.energy.week.meta');
     const meta = TIME_CATEGORY_META[summary.category];
     const reference = TIME_REFERENCE[summary.category];
     const kind = TIME_KIND_META[summary.kind];
@@ -32,12 +41,16 @@ export function TimeBandCard({ summary, daysLogged }: Props) {
 
     const rangeText = band
         ? [
-              formatBandRange(band.targetLow, band.targetHigh, perDay),
+              formatBandRange(band.targetLow, band.targetHigh, perDay, tRoot),
               band.floor !== null
-                  ? `floor ${formatBandRange(band.floor, null, perDay)?.replace('≥ ', '')}`
+                  ? tm('floor', {
+                        range: formatBandHours(band.floor, perDay, tRoot),
+                    })
                   : null,
               band.ceiling !== null
-                  ? `ceiling ${formatBandRange(null, band.ceiling, perDay)?.replace('≤ ', '')}`
+                  ? tm('ceiling', {
+                        range: formatBandHours(band.ceiling, perDay, tRoot),
+                    })
                   : null,
           ]
               .filter(Boolean)
@@ -54,25 +67,29 @@ export function TimeBandCard({ summary, daysLogged }: Props) {
             <div className="flex items-start justify-between gap-2">
                 <span className="flex items-center gap-2 font-mono text-xs font-medium tracking-wider text-fg-muted uppercase">
                     <span aria-hidden>{meta.icon}</span>
-                    {meta.name}
+                    {timeCategoryName(tm, summary.category)}
                 </span>
                 {band ? (
-                    <Badge tone={statusMeta.tone}>{statusMeta.name}</Badge>
+                    <Badge tone={statusMeta.tone}>{timeStatusName(tm, status)}</Badge>
                 ) : (
                     <span className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                        your call
+                        {tm('your_call')}
                     </span>
                 )}
             </div>
 
             <span className="flex items-baseline gap-2">
                 <span className="font-display text-2xl font-semibold text-fg tabular-nums">
-                    {formatMinutes(perDay ? summary.dailyAverage : summary.minutes)}
+                    {formatMinutes(perDay ? summary.dailyAverage : summary.minutes, tRoot)}
                 </span>
                 <span className="font-mono text-xs text-fg-faint">
                     {perDay
-                        ? '/ day'
-                        : `/ week${daysLogged > 0 && daysLogged < 7 ? ` (${daysLogged}d)` : ''}`}
+                        ? tm('per_day_suffix')
+                        : `${tm('per_week_suffix')}${
+                              daysLogged > 0 && daysLogged < 7
+                                  ? tm('partial_days', { count: daysLogged })
+                                  : ''
+                          }`}
                 </span>
             </span>
 
@@ -81,7 +98,9 @@ export function TimeBandCard({ summary, daysLogged }: Props) {
                     'text-xs leading-snug',
                     band ? 'text-fg-secondary' : 'text-fg-muted'
                 )}>
-                {rangeText ? `${rangeText} ${perDay ? 'per day' : 'per week'}` : meta.hint}
+                {rangeText
+                    ? `${rangeText} ${perDay ? tm('per_day') : tm('per_week')}`
+                    : timeCategoryHint(tm, summary.category)}
             </span>
 
             <TimeSources sources={reference.sources} />

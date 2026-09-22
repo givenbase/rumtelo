@@ -1,7 +1,7 @@
 /**
  * Create Rumtelo Plus / Max Stripe Products + recurring Prices (idempotent).
  *
- * Mirrors Meltizo's website-plan-package.stripe.ts pattern: stable lookup_keys
+ * Seeds Stripe plans with stable lookup_keys
  * so test and live accounts share the same code paths after seeding each one.
  *
  * Usage:

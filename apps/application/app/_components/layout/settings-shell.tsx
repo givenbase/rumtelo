@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { Typography } from '@rumtelo/ui';
+import { useTranslations } from '@rumtelo/i18n';
 import { cn } from '@rumtelo/utils';
 
 import {
@@ -26,10 +27,11 @@ function NavLink({
     /** Single-line rail item (desktop). */
     compact?: boolean;
 }) {
+    const t = useTranslations();
     return (
         <Link
             href={settingsHref(tab.key)}
-            title={tab.sub}
+            title={t(tab.subKey)}
             className={cn(
                 'transition-colors',
                 compact
@@ -56,10 +58,10 @@ function NavLink({
                         aria-hidden>
                         {active ? '✦' : '·'}
                     </span>
-                    <span className="min-w-0 truncate">{tab.label}</span>
+                    <span className="min-w-0 truncate">{t(tab.labelKey)}</span>
                 </>
             ) : (
-                tab.label
+                t(tab.labelKey)
             )}
         </Link>
     );
@@ -70,6 +72,7 @@ function NavLink({
  * (`/settings/product/money/jars`), not query params — each section is a real page.
  */
 export function SettingsShell({ children }: { children: ReactNode }) {
+    const t = useTranslations();
     const pathname = usePathname();
     const activeTab = settingsTabFromPathname(pathname);
 
@@ -77,23 +80,23 @@ export function SettingsShell({ children }: { children: ReactNode }) {
         <PageContent width="wide" className="animate-rise">
             <header className="mb-5 max-w-[60ch]">
                 <p className="font-mono text-[10px] font-medium tracking-[0.16em] text-accent uppercase">
-                    ✦ Settings
+                    ✦ {t('pages.shell.settings')}
                 </p>
                 <Typography
                     as="h1"
                     size="sm"
                     className="mt-1.5 text-[clamp(1.375rem,3.5vw,1.875rem)] lg:text-[clamp(1.375rem,3.5vw,1.875rem)]">
-                    Everything you set once.
+                    {t('pages.settings.chrome.title')}
                 </Typography>
                 <Typography as="p" size="sm" color="muted" className="mt-1.5 text-pretty">
-                    Rules and choices live here. The numbers themselves live on their own screens.
+                    {t('pages.settings.chrome.lead')}
                 </Typography>
             </header>
 
             <div className="flex flex-col gap-5 md:flex-row md:items-start md:gap-6">
                 {/* Mobile: one horizontal chip row */}
                 <nav
-                    aria-label="Settings sections"
+                    aria-label={t('pages.shell.settings')}
                     className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 md:hidden">
                     {SETTINGS_SECTIONS.flatMap(section => section.items).map(tab => (
                         <NavLink key={tab.key} tab={tab} active={tab.key === activeTab} />
@@ -102,12 +105,12 @@ export function SettingsShell({ children }: { children: ReactNode }) {
 
                 {/* Desktop: compact grouped rail */}
                 <nav
-                    aria-label="Settings navigation"
+                    aria-label={t('pages.shell.settings')}
                     className="hidden shrink-0 content-start gap-3 md:grid md:w-40">
                     {SETTINGS_SECTIONS.map(section => (
-                        <div key={section.title} className="grid gap-px">
+                        <div key={section.titleKey} className="grid gap-px">
                             <p className="px-2.5 pb-1 font-mono text-[9px] font-semibold tracking-[0.16em] text-fg-faint uppercase">
-                                {section.title}
+                                {t(section.titleKey)}
                             </p>
                             <ul className="grid gap-px">
                                 {section.items.map(tab => (

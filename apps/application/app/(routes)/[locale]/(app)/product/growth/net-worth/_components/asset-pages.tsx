@@ -3,6 +3,7 @@
 import { apiQuery } from '@/app/_lib/api-hooks';
 
 import { useLiveQuery } from '@rumtelo/hooks';
+import { useTranslations } from '@rumtelo/i18n';
 import { Typography } from '@rumtelo/ui';
 
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
@@ -11,6 +12,7 @@ import { AssetForm } from '@/components/features/forms/asset-form';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 export function AssetUpdatePage({ id, embedded = false }: { id: string; embedded?: boolean }) {
+    const t = useTranslations('features.growth.net_worth.detail');
     const { householdId } = useAuth();
     const live = isLiveData(householdId);
 
@@ -26,14 +28,14 @@ export function AssetUpdatePage({ id, embedded = false }: { id: string; embedded
     if (live && query.isLoading && !row) {
         return (
             <Typography as="p" size="sm" color="muted">
-                Loading…
+                {t('loading')}
             </Typography>
         );
     }
     if (!row) {
         return (
             <Typography as="p" size="sm" color="muted">
-                Asset not found.
+                {t('not_found')}
             </Typography>
         );
     }

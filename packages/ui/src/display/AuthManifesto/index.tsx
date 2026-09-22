@@ -13,25 +13,58 @@ export type AuthManifestoQuote = {
 
 export type AuthManifestoFooter = 'portals' | 'jars';
 
+export type AuthManifestoStripItem = {
+    name: string;
+    short: string;
+    tone: string;
+    share: number;
+};
+
+export type AuthManifestoStrip = {
+    eyebrow: string;
+    line: string;
+    items: readonly AuthManifestoStripItem[];
+};
+
 const ROTATE_MS = 7000;
 
 /** Four product portals — visual only. */
-const PORTALS = [
-    { name: 'Money', short: 'MONEY', tone: 'bg-jar-give', share: 25 },
-    { name: 'Growth', short: 'GROWTH', tone: 'bg-jar-lts', share: 25 },
-    { name: 'Energy', short: 'ENERGY', tone: 'bg-jar-play', share: 25 },
-    { name: 'Soul', short: 'SOUL', tone: 'bg-portal-soul', share: 25 },
-] as const;
+const PORTALS: AuthManifestoStrip = {
+    eyebrow: 'Four portals',
+    line: 'Money. Growth. Energy. Soul — in balance.',
+    items: [
+        { name: 'Money', short: 'MONEY', tone: 'bg-jar-give', share: 25 },
+        { name: 'Growth', short: 'GROWTH', tone: 'bg-jar-lts', share: 25 },
+        { name: 'Energy', short: 'ENERGY', tone: 'bg-jar-play', share: 25 },
+        { name: 'Soul', short: 'SOUL', tone: 'bg-portal-soul', share: 25 },
+    ],
+};
 
 /** Canonical six-jar split — visual only; households set their own. */
-const JARS = [
-    { name: 'Necessity', short: 'NEC', tone: 'bg-jar-nec', share: 55 },
-    { name: 'Freedom', short: 'FF', tone: 'bg-jar-ff', share: 10 },
-    { name: 'Education', short: 'EDU', tone: 'bg-jar-edu', share: 10 },
-    { name: 'Savings', short: 'LTS', tone: 'bg-jar-lts', share: 10 },
-    { name: 'Play', short: 'PLAY', tone: 'bg-jar-play', share: 10 },
-    { name: 'Give', short: 'GIVE', tone: 'bg-jar-give', share: 5 },
-] as const;
+const JARS: AuthManifestoStrip = {
+    eyebrow: 'Six jars',
+    line: 'Paycheck in. Already assigned.',
+    items: [
+        { name: 'Necessity', short: 'NEC', tone: 'bg-jar-nec', share: 55 },
+        { name: 'Freedom', short: 'FF', tone: 'bg-jar-ff', share: 10 },
+        { name: 'Education', short: 'EDU', tone: 'bg-jar-edu', share: 10 },
+        { name: 'Savings', short: 'LTS', tone: 'bg-jar-lts', share: 10 },
+        { name: 'Play', short: 'PLAY', tone: 'bg-jar-play', share: 10 },
+        { name: 'Give', short: 'GIVE', tone: 'bg-jar-give', share: 5 },
+    ],
+};
+
+/** Tone/share for callers merging i18n labels. */
+export const AUTH_MANIFESTO_PORTAL_VISUALS = PORTALS.items.map(({ tone, share }) => ({
+    tone,
+    share,
+}));
+
+/** Tone/share for callers merging i18n labels. */
+export const AUTH_MANIFESTO_JAR_VISUALS = JARS.items.map(({ tone, share }) => ({
+    tone,
+    share,
+}));
 
 const QUOTE_SHADOW = '0 0 1px rgb(255 255 255 / 0.35), 0 2px 18px rgb(255 255 255 / 0.18)';
 
@@ -45,6 +78,8 @@ export function AuthManifesto({
     autoRotate = true,
     footer = 'portals',
     initialIndex = 0,
+    tablistAriaLabel = 'Brand lines',
+    strip: stripProp,
 }: {
     quotes: readonly AuthManifestoQuote[];
     reduceMotion: boolean;
@@ -53,6 +88,9 @@ export function AuthManifesto({
     footer?: AuthManifestoFooter;
     /** Which quote to open on (e.g. sign-up leads with how-it-works). */
     initialIndex?: number;
+    tablistAriaLabel?: string;
+    /** Bottom strip copy + labels; defaults to English portals/jars by footer. */
+    strip?: AuthManifestoStrip;
 }) {
     const [quoteIndex, setQuoteIndex] = useState(() => {
         if (quotes.length === 0) return 0;
@@ -71,18 +109,7 @@ export function AuthManifesto({
     const quote = quotes[quoteIndex] ?? quotes[0];
     if (!quote) return null;
 
-    const strip =
-        footer === 'jars'
-            ? {
-                  eyebrow: 'Six jars',
-                  line: 'Paycheck in. Already assigned.',
-                  items: JARS,
-              }
-            : {
-                  eyebrow: 'Four portals',
-                  line: 'Money. Growth. Energy. Soul — in balance.',
-                  items: PORTALS,
-              };
+    const strip = stripProp ?? (footer === 'jars' ? JARS : PORTALS);
 
     return (
         <div className="absolute inset-0 z-10 flex flex-col justify-end">
@@ -128,7 +155,7 @@ export function AuthManifesto({
                     <div
                         className="relative mt-4 flex gap-2"
                         role="tablist"
-                        aria-label="Brand lines">
+                        aria-label={tablistAriaLabel}>
                         {quotes.map((item, index) => {
                             const active = index === quoteIndex;
                             return (

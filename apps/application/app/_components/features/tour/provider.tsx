@@ -14,12 +14,15 @@ import { usePathname, useRouter } from 'next/navigation';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Joyride, STATUS, type Step, type Styles } from 'react-joyride';
+import { useTranslations } from '@rumtelo/i18n';
 
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
+import { useApiError } from '@/app/_lib/api-error-messages';
+import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
-import { FULL_TOUR_CHAPTERS, chrome, pathWithoutLocale } from './content';
+import { buildFullTourChapters, pathWithoutLocale } from './content';
 import { TourOfferDialog } from './offer-dialog';
 import {
     defaultTourProgress,
@@ -101,6 +104,20 @@ export function PageTourProvider({ children }: { children: ReactNode }) {
     const pathname = usePathname() ?? '/';
     const { userId } = useAuth();
     const queryClient = useQueryClient();
+    const t = useTranslations('features.tour');
+    const { showToast } = useAppShell();
+    const apiError = useApiError();
+    const fullTourChapters = useMemo(() => buildFullTourChapters(t), [t]);
+    const joyrideLocale = useMemo(
+        () => ({
+            back: t('chrome.joyride.back'),
+            close: t('chrome.joyride.close'),
+            last: t('chrome.joyride.last'),
+            next: t('chrome.joyride.next'),
+            skip: t('chrome.joyride.skip'),
+        }),
+        [t]
+    );
 
     const settingsQuery = useQuery({
         ...apiQuery.account.settings.queryOptions(),
@@ -155,12 +172,13 @@ export function PageTourProvider({ children }: { children: ReactNode }) {
                         })
                         .catch(error => {
                             console.error('tour progress save failed', error);
+                            showToast(apiError(error), 'error');
                         });
                 }
                 return next;
             });
         },
-        [queryClient, userId]
+        [apiError, queryClient, showToast, userId]
     );
 
     const launchSteps = useCallback(
@@ -210,7 +228,7 @@ export function PageTourProvider({ children }: { children: ReactNode }) {
 
     const goToSeriesIndex = useCallback(
         (index: number) => {
-            const chapter = FULL_TOUR_CHAPTERS[index];
+            const chapter = fullTourChapters[index];
             if (!chapter) {
                 resumeHrefRef.current = null;
                 seriesModeRef.current = false;
@@ -238,7 +256,7 @@ export function PageTourProvider({ children }: { children: ReactNode }) {
                 router.push(chapter.href);
             }
         },
-        [launchSteps, pathname, persist, router]
+        [fullTourChapters, launchSteps, pathname, persist, router]
     );
 
     const acceptTourOffer = useCallback(() => {
@@ -252,7 +270,7 @@ export function PageTourProvider({ children }: { children: ReactNode }) {
         setSteps([]);
         activeTourIdRef.current = null;
 
-        const seriesIds = new Set(FULL_TOUR_CHAPTERS.map(chapter => chapter.id));
+        const seriesIds = new Set(fullTourChapters.map(chapter => chapter.id));
         persist(previous => {
             const tours = { ...previous.tours };
             for (const id of seriesIds) {
@@ -267,13 +285,13 @@ export function PageTourProvider({ children }: { children: ReactNode }) {
             };
         });
         requestAnimationFrame(() => goToSeriesIndex(0));
-    }, [goToSeriesIndex, persist]);
+    }, [fullTourChapters, goToSeriesIndex, persist]);
 
     useEffect(() => {
         let timer: number | undefined;
         if (hydrated && progress.seriesActive && !run && !startingRef.current) {
             const expected = resumeHrefRef.current;
-            const chapter = FULL_TOUR_CHAPTERS[progress.seriesIndex];
+            const chapter = fullTourChapters[progress.seriesIndex];
             if (
                 expected &&
                 chapter &&
@@ -289,7 +307,15 @@ export function PageTourProvider({ children }: { children: ReactNode }) {
         return () => {
             if (timer !== undefined) window.clearTimeout(timer);
         };
-    }, [hydrated, progress.seriesActive, progress.seriesIndex, pathname, run, launchSteps]);
+    }, [
+        fullTourChapters,
+        hydrated,
+        progress.seriesActive,
+        progress.seriesIndex,
+        pathname,
+        run,
+        launchSteps,
+    ]);
 
     const value = useMemo<PageTourContextValue>(
         () => ({
@@ -340,13 +366,7 @@ export function PageTourProvider({ children }: { children: ReactNode }) {
                         skipBeacon: true,
                     }}
                     styles={JOYRIDE_STYLES}
-                    locale={{
-                        back: chrome.joyride.back,
-                        close: chrome.joyride.close,
-                        last: chrome.joyride.last,
-                        next: chrome.joyride.next,
-                        skip: chrome.joyride.skip,
-                    }}
+                    locale={joyrideLocale}
                     onEvent={data => {
                         const finished =
                             data.type === 'tour:end' ||

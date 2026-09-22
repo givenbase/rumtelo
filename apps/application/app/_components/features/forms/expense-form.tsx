@@ -1,6 +1,7 @@
 'use client';
 
 import { api } from '@/app/_lib/api';
+import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
@@ -20,7 +21,8 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { CategoryTemplate, MerchantPreset } from '@rumtelo/contracts';
 import { JarKey, defaultGiveCategoryTemplate, jarCapabilitiesFor } from '@rumtelo/contracts';
-import { z } from 'zod';
+
+import { useTranslations } from '@rumtelo/i18n';
 
 import { parseAmountToMinorUnits, todayIsoDate } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
@@ -34,6 +36,7 @@ import { ConfirmActionButton } from './confirm-action-button';
 import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
 import { ExpenseIntentField, type ExpenseIntentSelection } from './expense-intent-field';
 import { FormInput } from './form-input';
+import { createExpenseFormSchema, type ExpenseFormSchemaValues } from './form-zod';
 import { PresetNameField } from './preset-name-field';
 
 function resolveInflowKey(
@@ -47,29 +50,7 @@ function resolveInflowKey(
 
 type GivePayeeMode = 'known' | 'coach';
 
-const GIVE_PAYEE_MODES: ReadonlyArray<{ id: GivePayeeMode; label: string }> = [
-    { id: 'known', label: 'I know who' },
-    { id: 'coach', label: 'Help me choose' },
-];
-
-const expenseFormSchema = z.object({
-    amount: z
-        .string()
-        .min(1, 'Amount is required')
-        .refine(
-            value => {
-                const cents = parseAmountToMinorUnits(value);
-                return cents !== null && cents > 0;
-            },
-            { message: 'Enter a valid amount' }
-        ),
-    note: z.string().max(280),
-    jarId: z.string().min(1, 'Choose a jar'),
-    /** Free-text label for Transaction In (gift, tax return, …). */
-    label: z.string().max(120),
-});
-
-export type ExpenseFormValues = z.infer<typeof expenseFormSchema> & {
+export type ExpenseFormValues = ExpenseFormSchemaValues & {
     /** Edit hydrate only — not submitted as description anymore */
     description?: string;
     counterparty?: string | null;
@@ -201,7 +182,7 @@ function buildIntentFromDefaults(
 }
 
 /**
- * Canonical create/edit form — Galighticus pattern:
+ * Canonical create/edit form:
  * useForm + zodResolver → FormCreateEditShell(embedded) → FormField wrappers.
  * Create: money.transactions.create. Edit: update + sort into the chosen jar.
  */
@@ -217,7 +198,17 @@ export function ExpenseForm({
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { symbol } = useHouseholdCurrency();
+    const t = useTranslations();
+    const tFixed = useTranslations('features.money.fixed_form');
+    const tExpense = useTranslations('features.money.expense_form');
+    const tForm = useTranslations('ui.form');
+    const tBtn = useTranslations('ui.button.actions');
+    const givePayeeModes: ReadonlyArray<{ id: GivePayeeMode; label: string }> = [
+        { id: 'known', label: tFixed('give_known') },
+        { id: 'coach', label: tFixed('give_coach') },
+    ];
     const { showToast } = useAppShell();
+    const apiError = useApiError();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
     const propDirection: 'out' | 'in' = directionProp === 'in' ? 'in' : 'out';
@@ -317,7 +308,9 @@ export function ExpenseForm({
     const intent = intentOverride ?? resolvedIntent ?? EMPTY_INTENT;
     const intentReady = mode === 'create' || resolvedIntent !== null;
 
-    const form = useForm<z.infer<typeof expenseFormSchema>>({
+    const expenseFormSchema = useMemo(() => createExpenseFormSchema(tForm), [tForm]);
+
+    const form = useForm<ExpenseFormSchemaValues>({
         defaultValues: {
             amount: defaultValues?.amount ?? '',
             note: defaultValues?.note ?? '',
@@ -418,19 +411,29 @@ export function ExpenseForm({
         if (jar) form.setValue('jarId', jar.id);
     }, [intent.jarKey, jarChoices, form, lockJar]);
 
-    const onError = createFormInvalidHandler(({ title, description }) => {
-        showToast(description ?? title, 'error');
-    });
+    const onError = createFormInvalidHandler(
+        ({ title, description }) => {
+            showToast(description ?? title, 'error');
+        },
+        {
+            title: tForm('incomplete_title'),
+            description: tForm('incomplete_description'),
+        }
+    );
 
     const saveMutation = useMutation({
-        mutationFn: async (values: z.infer<typeof expenseFormSchema>) => {
+        mutationFn: async (values: ExpenseFormSchemaValues) => {
             if (!householdId) throw new Error('No household');
             if (!isIn && !intent.vendor.trim() && !intent.categoryKey) {
-                throw new Error(isGive ? 'Choose who you gave to' : 'Pick a vendor or type');
+                throw new Error(
+                    isGive
+                        ? t('common.message.entity.give_required')
+                        : t('common.message.entity.vendor_or_type')
+                );
             }
             const label = values.label.trim();
             if (isIn && !label) {
-                throw new Error('Say where this money came from');
+                throw new Error(t('common.message.entity.income_source_required'));
             }
             const cents = parseAmountToMinorUnits(values.amount);
             if (cents === null || cents <= 0) throw new Error('Invalid amount');
@@ -439,8 +442,8 @@ export function ExpenseForm({
             const vendor = isIn ? label : intent.vendor.trim();
             const note = values.note.trim();
             const description = isIn
-                ? note || label || 'Money in'
-                : note || intent.categoryName?.trim() || vendor || 'Transaction';
+                ? note || label || tExpense('money_in')
+                : note || intent.categoryName?.trim() || vendor || tExpense('default_description');
 
             let categoryId: string | null = null;
             if (!isIn && intent.categoryName) {
@@ -502,13 +505,16 @@ export function ExpenseForm({
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.key() });
             showToast(
-                mode === 'edit' ? 'Transaction updated' : isIn ? 'In saved' : 'Out saved',
+                mode === 'edit'
+                    ? t('common.message.success.updated', {
+                          entity: t('common.message.entity.names.transaction'),
+                      })
+                    : t('common.message.success.saved'),
                 'success'
             );
             dismiss();
         },
-        onError: error =>
-            showToast(error instanceof Error ? error.message : 'Save failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const removeMutation = useMutation({
@@ -525,23 +531,28 @@ export function ExpenseForm({
             });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
-            showToast('Transaction deleted', 'success');
+            showToast(t('common.message.entity.transaction_deleted'), 'success');
             dismiss();
         },
-        onError: () => showToast('Delete failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
-    async function onSubmit(values: z.infer<typeof expenseFormSchema>) {
+    async function onSubmit(values: ExpenseFormSchemaValues) {
         if (!live) {
-            showToast('Sign in to save transactions', 'error');
+            showToast(t('common.message.entity.sign_in_transactions'), 'error');
             return;
         }
         if (!isIn && !intent.vendor && !intent.categoryKey) {
-            showToast(isGive ? 'Choose who you gave to' : 'Pick a vendor or a type first', 'error');
+            showToast(
+                isGive
+                    ? t('common.message.entity.give_required')
+                    : t('common.message.entity.vendor_required'),
+                'error'
+            );
             return;
         }
         if (isIn && !values.label.trim()) {
-            showToast('Say where this money came from (gift, tax return, …)', 'error');
+            showToast(t('common.message.entity.income_source_required'), 'error');
             return;
         }
         await saveMutation.mutateAsync(values);
@@ -566,12 +577,12 @@ export function ExpenseForm({
                 <div className="grid gap-2">
                     <Button type="submit" className="w-full" disabled={busy}>
                         {saveMutation.isPending || form.formState.isSubmitting
-                            ? 'Working…'
+                            ? tForm('working')
                             : mode === 'edit'
-                              ? 'Save changes'
+                              ? tForm('save_changes')
                               : isIn
-                                ? 'Save in'
-                                : 'Save out'}
+                                ? tExpense('save_in')
+                                : tExpense('save_out')}
                     </Button>
                     {mode === 'edit' && entityId ? (
                         <ConfirmActionButton
@@ -583,8 +594,8 @@ export function ExpenseForm({
                                 removeMutation.isPending
                             }
                             pending={removeMutation.isPending}
-                            label="Delete"
-                            confirmLabel="Click again to delete"
+                            label={tBtn('delete')}
+                            confirmLabel={tForm('confirm_delete')}
                             onConfirm={() => void removeMutation.mutateAsync()}
                         />
                     ) : null}
@@ -592,13 +603,13 @@ export function ExpenseForm({
             }>
             <div className="grid gap-2">
                 <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
-                    Direction
+                    {tExpense('direction')}
                 </p>
                 <div className="flex gap-1 rounded-full bg-raised p-1">
                     {(
                         [
-                            ['out', 'Out'],
-                            ['in', 'In'],
+                            ['out', tExpense('direction_out')],
+                            ['in', tExpense('direction_in')],
                         ] as const
                     ).map(([key, label]) => (
                         <button
@@ -623,7 +634,7 @@ export function ExpenseForm({
             {isIn ? null : lockJar && selectedJar ? (
                 <div className="grid gap-1.5">
                     <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
-                        Jar
+                        {tForm('jar')}
                     </p>
                     <div className="flex items-center gap-3 rounded-xl border border-accent/40 bg-accent-soft px-3 py-3">
                         <span className="text-lg" aria-hidden>
@@ -632,7 +643,7 @@ export function ExpenseForm({
                         <div className="min-w-0 flex-1">
                             <p className="text-sm font-semibold text-fg">{selectedJar.name}</p>
                             <p className="font-mono text-[10px] tracking-wide text-fg-muted uppercase">
-                                This jar
+                                {tExpense('this_jar')}
                             </p>
                         </div>
                     </div>
@@ -643,13 +654,13 @@ export function ExpenseForm({
                     name="jarId"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Jar</FormLabel>
+                            <FormLabel>{tForm('jar')}</FormLabel>
                             <FormControl>
                                 <select
                                     className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
                                     {...field}>
                                     {jarChoices.length === 0 ? (
-                                        <option value="">No jars — complete setup first</option>
+                                        <option value="">{tExpense('no_jars')}</option>
                                     ) : (
                                         jarChoices.map(jar => (
                                             <option key={jar.id} value={jar.id}>
@@ -672,7 +683,7 @@ export function ExpenseForm({
                     name="label"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Where did it come from?</FormLabel>
+                            <FormLabel>{tExpense('where_from')}</FormLabel>
                             <FormControl>
                                 <PresetNameField
                                     value={field.value}
@@ -701,8 +712,8 @@ export function ExpenseForm({
                                         setInflowKey(null);
                                     }}
                                     options={transactionInPresets}
-                                    placeholder="Gift, tax return…"
-                                    freeTextPlaceholder="Describe where it came from…"
+                                    placeholder={tExpense('inflow_placeholder')}
+                                    freeTextPlaceholder={tFixed('name_free_placeholder')}
                                     disabled={busy}
                                     onSelect={preset => {
                                         setInflowKey(preset.key);
@@ -725,17 +736,16 @@ export function ExpenseForm({
             ) : isGive ? (
                 <div className="grid gap-3">
                     <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
-                        To whom
+                        {tExpense('to_whom')}
                     </p>
                     <p className="text-xs leading-relaxed text-fg-muted">
-                        One-time gift — shows on Give and in Out transactions. For a recurring gift,
-                        add a fixed cost instead.
+                        {tExpense('give_one_time_hint')}
                     </p>
                     <div
                         className="flex flex-wrap gap-2"
                         role="group"
-                        aria-label="How do you want to pick?">
-                        {GIVE_PAYEE_MODES.map(option => {
+                        aria-label={tForm('aria.pick_mode')}>
+                        {givePayeeModes.map(option => {
                             const on = givePayeeMode === option.id;
                             return (
                                 <button
@@ -754,13 +764,10 @@ export function ExpenseForm({
                             );
                         })}
                     </div>
-                    <p className="text-xs leading-relaxed text-fg-faint">
-                        I know who — type whoever you already give to. Help me choose — Coach
-                        shortlist with independent checks (Doneer Effectief, GiveWell, ACE, CBF).
-                    </p>
+                    <p className="text-xs leading-relaxed text-fg-faint">{tFixed('give_hint')}</p>
                     {givePayeeMode === 'known' ? (
                         <FormInput
-                            placeholder="e.g. Giro555, your church, KWF"
+                            placeholder={tFixed('give_placeholder')}
                             value={intent.vendor}
                             disabled={busy}
                             onChange={event => {
@@ -781,7 +788,7 @@ export function ExpenseForm({
             ) : (
                 <div className="grid gap-2">
                     <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
-                        What was it?
+                        {tExpense('what_was_it')}
                     </p>
                     <ExpenseIntentField
                         value={intent}
@@ -800,9 +807,15 @@ export function ExpenseForm({
                 name="amount"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Amount ({symbol})</FormLabel>
+                        <FormLabel>
+                            {tForm('fields.amount')} ({symbol})
+                        </FormLabel>
                         <FormControl>
-                            <FormInput inputMode="decimal" placeholder="0,00" {...field} />
+                            <FormInput
+                                inputMode="decimal"
+                                placeholder={tForm('amount_zero')}
+                                {...field}
+                            />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -812,14 +825,14 @@ export function ExpenseForm({
             {!isIn && openDebts.length > 0 ? (
                 <div className="grid gap-1.5">
                     <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
-                        Apply to debt
+                        {tExpense('apply_to_debt')}
                     </p>
                     <select
                         value={debtId ?? ''}
                         disabled={busy}
                         onChange={event => setDebtId(event.target.value || null)}
                         className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none">
-                        <option value="">Don’t link</option>
+                        <option value="">{tExpense('dont_link')}</option>
                         {openDebts.map(debt => (
                             <option key={debt.id} value={debt.id}>
                                 {debt.name}
@@ -833,7 +846,7 @@ export function ExpenseForm({
                 lockJar && selectedJar ? (
                     <div className="grid gap-1.5">
                         <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
-                            Into jar
+                            {tExpense('into_jar')}
                         </p>
                         <div className="flex items-center gap-3 rounded-xl border border-accent/40 bg-accent-soft px-3 py-3">
                             <span className="text-lg" aria-hidden>
@@ -842,7 +855,7 @@ export function ExpenseForm({
                             <div className="min-w-0 flex-1">
                                 <p className="text-sm font-semibold text-fg">{selectedJar.name}</p>
                                 <p className="font-mono text-[10px] tracking-wide text-fg-muted uppercase">
-                                    This jar
+                                    {tExpense('this_jar')}
                                 </p>
                             </div>
                         </div>
@@ -853,13 +866,13 @@ export function ExpenseForm({
                         name="jarId"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Into jar</FormLabel>
+                                <FormLabel>{tExpense('into_jar')}</FormLabel>
                                 <FormControl>
                                     <select
                                         className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
                                         {...field}>
                                         {jarChoices.length === 0 ? (
-                                            <option value="">No jars — complete setup first</option>
+                                            <option value="">{tExpense('no_jars')}</option>
                                         ) : (
                                             jarChoices.map(jar => (
                                                 <option key={jar.id} value={jar.id}>
@@ -883,13 +896,13 @@ export function ExpenseForm({
                     name="note"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Note</FormLabel>
+                            <FormLabel>{tForm('fields.note')}</FormLabel>
                             <FormControl>
                                 <FormInput
                                     placeholder={
                                         isIn
-                                            ? 'Optional — e.g. from aunt'
-                                            : 'Optional — e.g. kids lunch'
+                                            ? tExpense('note_placeholder_in')
+                                            : tExpense('note_placeholder_out')
                                     }
                                     {...field}
                                 />
@@ -903,7 +916,7 @@ export function ExpenseForm({
                     type="button"
                     className="justify-self-start font-mono text-xs tracking-wide text-accent uppercase hover:underline"
                     onClick={() => setShowNote(true)}>
-                    Add note
+                    {tExpense('add_note')}
                 </button>
             )}
         </FormCreateEditShell>

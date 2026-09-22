@@ -13,15 +13,32 @@ export type PasswordProps = Omit<InputProps, 'type' | 'endAction'> & {
      * @default true
      */
     showToggle?: boolean;
+    /** Accessible label when password is hidden. Pass from `useTranslations`. */
+    showPasswordLabel?: string;
+    /** Accessible label when password is visible. Pass from `useTranslations`. */
+    hidePasswordLabel?: string;
 };
 
 /**
  * Password field with show/hide — same chrome as {@link Input}.
  * Prefer this over raw `<Input type="password">` on auth forms.
+ * Pass `showPasswordLabel` / `hidePasswordLabel` from the app for locale-aware a11y.
  */
 const Password = React.forwardRef<HTMLInputElement, PasswordProps>(
-    ({ showToggle = true, disabled, readOnly, autoComplete, ...props }, ref) => {
+    (
+        {
+            showToggle = true,
+            showPasswordLabel = 'Show password',
+            hidePasswordLabel = 'Hide password',
+            disabled,
+            readOnly,
+            autoComplete,
+            ...props
+        },
+        ref
+    ) => {
         const [visible, setVisible] = useState(false);
+        const toggleLabel = visible ? hidePasswordLabel : showPasswordLabel;
 
         return (
             <Input
@@ -36,8 +53,8 @@ const Password = React.forwardRef<HTMLInputElement, PasswordProps>(
                         <button
                             type="button"
                             className="inline-flex size-8 items-center justify-center rounded-md text-fg-muted transition-colors hover:text-fg disabled:opacity-50"
-                            title={visible ? 'Hide password' : 'Show password'}
-                            aria-label={visible ? 'Hide password' : 'Show password'}
+                            title={toggleLabel}
+                            aria-label={toggleLabel}
                             disabled={disabled}
                             onClick={() => setVisible(previous => !previous)}>
                             {visible ? (

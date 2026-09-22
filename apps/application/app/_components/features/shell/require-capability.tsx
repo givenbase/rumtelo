@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 
+import { useTranslations } from '@rumtelo/i18n';
 import { BrandLoader } from '@rumtelo/ui';
 
 import { PlanKey } from '@/app/_lib/plan';
@@ -20,11 +21,12 @@ export function RequireCapability({
     capabilityKey: string;
     children: ReactNode;
 }) {
+    const t = useTranslations('ui.statusPage');
     const { planReady } = useAppShell();
     const { isCapabilityLocked, requiredPlanFor } = usePlanCapabilities();
 
     if (!planReady) {
-        return <BrandLoader label="Loading" />;
+        return <BrandLoader label={t('loading')} />;
     }
 
     if (!isCapabilityLocked(capabilityKey)) return children;

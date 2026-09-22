@@ -72,10 +72,13 @@ export function fixedCostStatus(
     return today.getDate() >= dueDay ? 'due' : 'upcoming';
 }
 
-export function lifecycleLabel(lifecycle: FixedCostLifecycle): string {
-    if (lifecycle === 'paused') return 'Paused';
-    if (lifecycle === 'ended') return 'Ended';
-    return 'Active';
+export function lifecycleLabel(
+    lifecycle: FixedCostLifecycle,
+    labels: { active: string; paused: string; ended: string }
+): string {
+    if (lifecycle === 'paused') return labels.paused;
+    if (lifecycle === 'ended') return labels.ended;
+    return labels.active;
 }
 
 /** ISO calendar date (UTC) for endsOn when ending a bill. */

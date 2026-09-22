@@ -2,8 +2,17 @@ export { cn } from './cn';
 export {
     extractErrorMessage,
     getOrpcValidationIssues,
+    type ExtractErrorMessageFallbacks,
     type OrpcValidationIssue,
 } from './api-errors';
+export {
+    resolveApiUserMessage,
+    parseApiUserMessage,
+    extractApiErrorPayload,
+    isIbanApiErrorMessage,
+    type ApiErrorParams,
+    type ParsedApiUserError,
+} from './api-user-message';
 export {
     DEFAULT_CURRENCY,
     currencySymbol,
@@ -60,6 +69,7 @@ export {
     projectGoalsAtHorizon,
     projectDebtsAtHorizon,
     coachPeriodTravelCopy,
+    COACH_PERIOD_TRAVEL_COPY_DEFAULTS,
     travelForPeriod,
     endOfPeriodIso,
     type StackShare,
@@ -71,6 +81,7 @@ export {
     type GoalAtPeriod,
     type DebtsAtPeriod,
     type CoachPeriodTravelCopyInput,
+    type CoachPeriodTravelCopyStrings,
 } from './period-stack';
 export {
     simulatePayoff,

@@ -17,9 +17,7 @@ export function createThrottlerOptions(): ThrottlerModuleOptions {
     const redis = getOptionalRedis();
     if (redis) {
         const url = loadEnv().DATABASE_REDIS_URL;
-        console.log(
-            `[Throttler] storage → Redis (${url ? redactRedisUrl(url) : 'redis://'})`
-        );
+        console.log(`[Throttler] storage → Redis (${url ? redactRedisUrl(url) : 'redis://'})`);
         return {
             throttlers: [...DEFAULT_THROTTLERS],
             storage: new ThrottlerStorageRedisService(redis),

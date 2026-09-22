@@ -18,6 +18,19 @@ export type DatePickerProps = {
     disabled?: boolean;
     id?: string;
     className?: string;
+    /** BCP 47 locale — forwarded to the calendar grid. */
+    locale?: string;
+    /** Optional a11y labels — forwarded to the calendar grid. */
+    labels?: {
+        previousMonth?: string;
+        nextMonth?: string;
+        month?: string;
+        year?: string;
+        today?: string;
+        pickADay?: string;
+    };
+    /** Close button when the popover calendar is open. Pass from `useTranslations`. */
+    closeLabel?: string;
     /** When true, calendar stays open under the field (good inside dialogs). */
     inline?: boolean;
 };
@@ -32,6 +45,9 @@ export function DatePicker({
     disabled,
     id,
     className,
+    locale,
+    labels,
+    closeLabel = 'Close',
     inline = false,
 }: DatePickerProps) {
     const autoId = useId();
@@ -72,7 +88,9 @@ export function DatePicker({
                     'inline-flex items-center justify-between gap-2 text-left',
                     !value && 'text-fg-faint'
                 )}>
-                <span className="truncate">{value ? formatDisplayDate(value) : placeholder}</span>
+                <span className="truncate">
+                    {value ? formatDisplayDate(value, locale) : placeholder}
+                </span>
                 <CalendarIcon className="size-4 shrink-0 text-fg-muted" aria-hidden />
             </button>
 
@@ -85,6 +103,8 @@ export function DatePicker({
                         value={value}
                         min={min}
                         max={max}
+                        locale={locale}
+                        labels={labels}
                         onSelect={iso => {
                             onChange?.(iso);
                             if (!inline) setOpen(false);
@@ -97,7 +117,7 @@ export function DatePicker({
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setOpen(false)}>
-                                Close
+                                {closeLabel}
                             </Button>
                         </div>
                     ) : null}

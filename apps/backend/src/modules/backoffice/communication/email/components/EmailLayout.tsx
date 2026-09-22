@@ -23,7 +23,7 @@ interface EmailLayoutProps {
 }
 
 /**
- * Cool gray outer canvas + white card — mirrors app surfaces (Galighticus EmailLayout pattern).
+ * Cool gray outer canvas + white card — mirrors app surfaces.
  */
 const EmailLayout: React.FC<EmailLayoutProps> = ({
     children,

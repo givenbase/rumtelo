@@ -2,20 +2,37 @@
 
 import { useState } from 'react';
 
-import { PLAN_RANK, PlanKey } from '@rumtelo/contracts';
+import { PLAN_LIMITS, PLAN_RANK, PlanKey } from '@rumtelo/contracts';
 import { planIntentFromPlanKey, planIntentQuery } from '@rumtelo/utils';
 
 import { Typography } from '@rumtelo/ui';
 
 import { useMarketingSession } from '@/app/_components/marketing-session-provider';
-import { PLANS, PRICING_SECTION } from '@/lib/landing-content';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
+
+import { PLANS } from '@/lib/landing-content';
+import { planSlug } from '@/lib/landing-plans';
 import { appHomeUrl, appPlanSettingsUrl, appSignInUrl, webSignUpPath } from '@/lib/portal-urls';
 import { isRegistrationOpen } from '@/lib/maintenance';
 
 import { Cta, SectionHeading } from './landing-primitives';
 import { formatCatalogMajor, formatCatalogMajorExact } from './landing-money';
 
-const PLAN_NAMES = { BASIC: 'Basic', PLUS: 'Plus', MAX: 'Max' } as const;
+const PLAN_FEAT_KEYS = ['f1', 'f2', 'f3', 'f4', 'f5', 'f6'] as const;
+
+function planFeatureLines(
+    tPlans: (key: string, values?: Record<string, string | number>) => string,
+    key: PlanKey
+): string[] {
+    const slug = planSlug(key);
+    const limits = PLAN_LIMITS[key];
+    return PLAN_FEAT_KEYS.map(f =>
+        tPlans(`${slug}.${f}`, {
+            maxGoals: limits.maxGoals ?? 0,
+            maxMembers: limits.maxMembers ?? 0,
+        })
+    );
+}
 
 function ctaForPlan(args: {
     planKey: PlanKey;
@@ -24,14 +41,15 @@ function ctaForPlan(args: {
     currentPlan: PlanKey | null;
     isAuthenticated: boolean;
     hasHousehold: boolean;
+    t: (key: string, values?: Record<string, string | number>) => string;
 }): { href: string; label: string; current: boolean } {
-    const { planKey, planName, free, currentPlan, isAuthenticated, hasHousehold } = args;
+    const { planKey, planName, free, currentPlan, isAuthenticated, hasHousehold, t } = args;
 
     if (!isAuthenticated) {
         if (!isRegistrationOpen()) {
             return {
                 href: appSignInUrl(),
-                label: 'Sign in',
+                label: t('cta_sign_in'),
                 current: false,
             };
         }
@@ -41,7 +59,7 @@ function ctaForPlan(args: {
                     ? { plan: PlanKey.BASIC }
                     : planIntentQuery(planIntentFromPlanKey(planKey, 'month'))
             ),
-            label: free ? 'Start free' : `Choose ${planName} · pay after setup`,
+            label: free ? t('cta_start_free') : t('cta_choose', { plan: planName }),
             current: false,
         };
     }
@@ -49,7 +67,7 @@ function ctaForPlan(args: {
     if (!hasHousehold) {
         return {
             href: appHomeUrl(),
-            label: 'Finish setup in the app',
+            label: t('cta_finish_setup'),
             current: false,
         };
     }
@@ -57,7 +75,7 @@ function ctaForPlan(args: {
     if (currentPlan === planKey) {
         return {
             href: appPlanSettingsUrl(),
-            label: 'Your plan · manage',
+            label: t('cta_your_plan'),
             current: true,
         };
     }
@@ -65,19 +83,22 @@ function ctaForPlan(args: {
     if (currentPlan && PLAN_RANK[planKey] > PLAN_RANK[currentPlan]) {
         return {
             href: appPlanSettingsUrl(),
-            label: `Upgrade to ${planName}`,
+            label: t('cta_upgrade_to', { plan: planName }),
             current: false,
         };
     }
 
     return {
         href: appPlanSettingsUrl(),
-        label: `Switch to ${planName}`,
+        label: t('cta_switch_to', { plan: planName }),
         current: false,
     };
 }
 
 export function LandingPricing() {
+    const t = useTranslations('pages.landing.pricing_section');
+    const tPlans = useTranslations('pages.landing.plans');
+    const appLocale = useLocale();
     const [billing, setBilling] = useState<'month' | 'year'>('month');
     const yearly = billing === 'year';
     const {
@@ -89,24 +110,20 @@ export function LandingPricing() {
 
     const lead = isAuthenticated
         ? currentPlan
-            ? `You’re on ${PLAN_NAMES[currentPlan]}. Upgrade, switch or manage billing in the app — changes apply to your household.`
+            ? t('lead_on_plan', { plan: tPlans(`${planSlug(currentPlan)}.name`) })
             : planPending
-              ? 'Loading your plan…'
+              ? t('lead_loading')
               : householdId
-                ? 'Open Plan & billing in the app to upgrade or change your package.'
-                : 'Finish household setup in the app, then you can upgrade or change your plan here.'
-        : PRICING_SECTION.lead;
+                ? t('lead_manage')
+                : t('lead_setup')
+        : t('lead');
 
     return (
         <section id="pricing" className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-20">
             <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
                 <SectionHeading
-                    eyebrow={PRICING_SECTION.eyebrow}
-                    headline={
-                        isAuthenticated
-                            ? 'Your plan and what you can change'
-                            : PRICING_SECTION.headline
-                    }
+                    eyebrow={t('eyebrow')}
+                    headline={isAuthenticated ? t('headline_auth') : t('headline')}
                     lead={lead}
                     headlineClassName="max-w-lg"
                     className="min-w-0"
@@ -115,7 +132,7 @@ export function LandingPricing() {
                 {/* Billing toggle */}
                 <div
                     role="tablist"
-                    aria-label="Billing period"
+                    aria-label={t('billing_aria')}
                     className="flex w-full gap-1 rounded-full border border-line bg-raised p-1 sm:w-auto">
                     {(['month', 'year'] as const).map(period => {
                         const active = billing === period;
@@ -132,12 +149,12 @@ export function LandingPricing() {
                                         : 'text-fg-muted hover:text-fg'
                                 }`}>
                                 {period === 'month' ? (
-                                    'Monthly'
+                                    t('interval_monthly')
                                 ) : (
                                     <>
-                                        <span className="sm:hidden">Yearly</span>
+                                        <span className="sm:hidden">{t('interval_yearly')}</span>
                                         <span className="hidden sm:inline">
-                                            Yearly · 2 months free
+                                            {t('interval_yearly_full')}
                                         </span>
                                     </>
                                 )}
@@ -152,20 +169,26 @@ export function LandingPricing() {
                     const rec = plan.key === PlanKey.PLUS;
                     const free = plan.monthly === 0;
                     const price = free ? 0 : yearly ? plan.yearly : plan.monthly;
-                    const per = free ? '' : yearly ? '/year' : '/month';
+                    const per = free ? '' : yearly ? t('per_year_short') : t('per_month_short');
                     const sub = free
-                        ? 'no card needed'
+                        ? t('no_card')
                         : yearly
-                          ? `${formatCatalogMajorExact(plan.yearly / 12)}/month billed yearly`
-                          : 'cancel any month';
+                          ? t('billed_yearly', {
+                                amount: formatCatalogMajorExact(plan.yearly / 12, appLocale),
+                            })
+                          : t('cancel_any');
+                    const slug = planSlug(plan.key);
+                    const planName = tPlans(`${slug}.name`);
                     const action = ctaForPlan({
                         planKey: plan.key,
-                        planName: plan.name,
+                        planName,
                         free,
                         currentPlan,
                         isAuthenticated,
                         hasHousehold: Boolean(householdId),
+                        t,
                     });
+                    const feats = planFeatureLines(tPlans, plan.key);
                     // Guest CTAs still respect the billing toggle for paid plans.
                     const href =
                         !isAuthenticated && plan.key !== PlanKey.BASIC && isRegistrationOpen()
@@ -194,21 +217,21 @@ export function LandingPricing() {
                             />
 
                             <div className="flex flex-wrap items-center justify-between gap-2.5 px-6 pt-6">
-                                <Typography as="h2">{plan.name}</Typography>
+                                <Typography as="h2">{planName}</Typography>
                                 <span
                                     className={`rounded-full border px-3 py-1 font-mono text-xs font-semibold tracking-wide whitespace-nowrap uppercase ${
                                         isCurrent || rec
                                             ? 'border-transparent bg-(image:--gradient-accent) text-on-accent'
                                             : 'border-line text-fg-faint'
                                     }`}>
-                                    {isCurrent ? 'Your plan' : plan.tag}
+                                    {isCurrent ? t('your_plan') : tPlans(`${slug}.tag`)}
                                 </span>
                             </div>
 
                             <div className="px-6 pt-4">
                                 <span className="flex flex-wrap items-baseline gap-1.5">
                                     <span className="font-display text-4xl leading-none font-semibold tracking-tight text-accent">
-                                        {formatCatalogMajor(price)}
+                                        {formatCatalogMajor(price, appLocale)}
                                     </span>
                                     <span className="font-mono text-xs font-medium text-fg-faint">
                                         {per}
@@ -224,11 +247,11 @@ export function LandingPricing() {
                                 size="sm"
                                 color="secondary"
                                 className="mx-6 my-4 text-pretty">
-                                {plan.line}
+                                {tPlans(`${slug}.line`)}
                             </Typography>
 
                             <ul className="mx-0 mb-5 grid gap-2 border-t border-line px-6 pt-4">
-                                {plan.feats.map(feature => (
+                                {feats.map(feature => (
                                     <li key={feature} className="flex min-w-0 items-baseline gap-2">
                                         <span
                                             className="shrink-0 font-mono text-xs text-accent"
@@ -255,8 +278,7 @@ export function LandingPricing() {
             </div>
 
             <p className="mt-5 text-center font-mono text-xs font-medium tracking-wide text-fg-faint">
-                Prices in euro, VAT included. Basic may stay free or become a small fee later —
-                nothing you enter is ever locked away.
+                {t('footnote')}
             </p>
         </section>
     );

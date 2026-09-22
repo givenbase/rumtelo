@@ -4,10 +4,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
 import { PlanKey } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
 import { Button, Typography } from '@rumtelo/ui';
 
 import { api } from '@/app/_lib/api';
-import { PLAN_LABELS } from '@/app/_lib/plan';
+import { useApiError } from '@/app/_lib/api-error-messages';
+import { planLabel } from '@/app/_lib/plan';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useOptionalPlanIntent } from '@/components/features/shell/plan-intent-provider';
@@ -17,8 +19,10 @@ import { useOptionalPlanIntent } from '@/components/features/shell/plan-intent-p
  * open Stripe Checkout automatically once setup succeeded.
  */
 export function UpgradeCheckoutOverlay({ open, onSkip }: { open: boolean; onSkip: () => void }) {
+    const t = useTranslations();
     const { householdId } = useAuth();
     const { showToast } = useAppShell();
+    const apiError = useApiError();
     const planIntent = useOptionalPlanIntent();
     const intent = planIntent?.intent ?? null;
     const [busy, setBusy] = useState(false);
@@ -26,7 +30,9 @@ export function UpgradeCheckoutOverlay({ open, onSkip }: { open: boolean; onSkip
 
     const checkout = useMutation({
         mutationFn: async () => {
-            if (!householdId || !intent) throw new Error('Missing household or plan');
+            if (!householdId || !intent) {
+                throw new Error(t('pages.settings.plan.missing_household_or_plan'));
+            }
             return api.billing.createCheckoutSession({
                 householdId,
                 planKey: intent.planKey,
@@ -40,12 +46,17 @@ export function UpgradeCheckoutOverlay({ open, onSkip }: { open: boolean; onSkip
                 return;
             }
             if (result.applied) {
-                showToast(`${PLAN_LABELS[intent!.planKey]} is active`, 'success');
+                showToast(
+                    t('pages.settings.toasts.plan_active', {
+                        plan: planLabel(intent!.planKey, t),
+                    }),
+                    'success'
+                );
                 onSkip();
             }
         },
-        onError: () => {
-            showToast('Could not start Stripe checkout — try Settings → Plan', 'error');
+        onError: (error: unknown) => {
+            showToast(apiError(error), 'error');
             setBusy(false);
             autoStarted.current = false;
         },
@@ -68,8 +79,11 @@ export function UpgradeCheckoutOverlay({ open, onSkip }: { open: boolean; onSkip
     if (!open || !intent || !householdId) return null;
     if (intent.planKey !== PlanKey.PLUS && intent.planKey !== PlanKey.MAX) return null;
 
-    const label = PLAN_LABELS[intent.planKey];
-    const period = intent.interval === 'year' ? 'yearly' : 'monthly';
+    const label = planLabel(intent.planKey, t);
+    const intervalLabel =
+        intent.interval === 'year'
+            ? t('features.auth.sign_up.plan_yearly')
+            : t('features.auth.sign_up.plan_monthly');
     const opening = busy || checkout.isPending;
 
     return (
@@ -78,18 +92,21 @@ export function UpgradeCheckoutOverlay({ open, onSkip }: { open: boolean; onSkip
             <div
                 role="dialog"
                 aria-modal="true"
-                aria-label={`Upgrade to ${label}`}
+                aria-label={t('pages.shell.gates.upgrade_cta', { plan: label })}
                 className="fixed top-1/2 left-1/2 z-71 w-full max-w-md -translate-1/2 animate-rise rounded-2xl border border-line-strong bg-surface p-6 shadow-xl">
                 <Typography as="p" variant="eyebrow" color="primary">
-                    Finish your upgrade
+                    {t('pages.settings.plan.upgrade_overlay_eyebrow')}
                 </Typography>
                 <Typography as="h2" className="mt-2">
-                    {opening ? `Opening Stripe for ${label}…` : `Add payment for ${label}`}
+                    {opening
+                        ? t('pages.settings.plan.opening_stripe_for', { plan: label })
+                        : t('pages.settings.plan.add_payment_for', { plan: label })}
                 </Typography>
                 <Typography as="p" size="sm" color="muted" className="mt-2">
-                    You chose {label} ({period}) on the website. Account setup is done — next is
-                    Stripe Checkout to activate the plan. You can skip and stay on Basic, then
-                    upgrade anytime in Settings → Plan.
+                    {t('pages.settings.plan.upgrade_overlay_body', {
+                        plan: label,
+                        interval: intervalLabel,
+                    })}
                 </Typography>
 
                 <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-end">
@@ -100,7 +117,7 @@ export function UpgradeCheckoutOverlay({ open, onSkip }: { open: boolean; onSkip
                             planIntent?.clearIntent();
                             onSkip();
                         }}>
-                        Stay on Basic
+                        {t('pages.settings.plan.stay_on_basic')}
                     </Button>
                     <Button
                         disabled={opening}
@@ -108,7 +125,9 @@ export function UpgradeCheckoutOverlay({ open, onSkip }: { open: boolean; onSkip
                             setBusy(true);
                             checkout.mutate();
                         }}>
-                        {opening ? 'Opening Stripe…' : `Continue to Stripe`}
+                        {opening
+                            ? t('pages.settings.plan.opening_stripe')
+                            : t('pages.settings.plan.continue_to_stripe')}
                     </Button>
                 </div>
             </div>

@@ -48,7 +48,7 @@ Browser ──HTTPS──► Application (public) ── /api/auth   ├─► B
 | `DATABASE_URL` | Backend | `${{Postgres.DATABASE_URL}}` — must include `/dbname` path |
 | `DATABASE_SSL` | Backend | `true` |
 | `DATABASE_SYNC` | Backend | `false` |
-| `DATABASE_REDIS_URL` | Backend | `${{Redis.REDIS_URL}}` (`redis://` / `rediss://`) |
+| `DATABASE_REDIS_URL` | Backend | `${{Redis.REDIS_URL}}` (`redis://` / `rediss://`) — Better Auth rate limits + session cache, Nest HTTP Throttler, sign-up stash; Nest health probe |
 | `DOMAIN_BACK` | Backend + Application + Website (server) | `http://${{Backend.RAILWAY_PRIVATE_DOMAIN}}:${{Backend.PORT}}` — see note below |
 | `DOMAIN_BACK_PUBLIC` | Backend | `https://${{Backend.RAILWAY_PUBLIC_DOMAIN}}` |
 | `DOMAIN_APP` / `DOMAIN_WEB` | Backend | Public HTTPS — no www (`https://app.rumtelo.com`, `https://rumtelo.com`) |

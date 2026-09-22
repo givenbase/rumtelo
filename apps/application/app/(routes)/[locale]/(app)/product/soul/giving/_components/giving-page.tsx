@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 
 import type { FixedCost, Goal } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus, JarKey, TransactionStatus } from '@rumtelo/contracts';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card, Meter, Section, Typography } from '@rumtelo/ui';
 import {
@@ -26,7 +27,6 @@ import {
     goalDetailHref,
 } from '@/app/_lib/create-routes';
 import { cadenceLabel } from '@/app/_lib/jar-chrome';
-import { WHY_GIVE } from '@/app/_lib/giving';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
 import { productPath } from '@/app/_lib/routes';
@@ -67,12 +67,12 @@ function yearStartIso(): string {
     return `${new Date().getUTCFullYear()}-01-01`;
 }
 
-function pledgeMonth(iso: string | null): string | null {
+function pledgeMonth(iso: string | null, locale: string): string | null {
     if (!iso) return null;
     const year = Number(iso.slice(0, 4));
     const month = Number(iso.slice(5, 7));
     if (!year || !month) return null;
-    return new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric' }).format(
+    return new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric' }).format(
         new Date(Date.UTC(year, month - 1, 1))
     );
 }
@@ -81,7 +81,12 @@ function pledgeMonth(iso: string | null): string | null {
  * Soul → Giving. Money owns the flow (jar, fixed cost, ledger); this page owns the
  * meaning: why the Give jar exists, where it goes, and how to choose a place well.
  */
+const GIVING_CHECKS = ['1', '2', '3', '4'] as const;
+
 export function GivingPageClient() {
+    const t = useTranslations('features.soul.giving');
+    const tChips = useTranslations('features.money.chips');
+    const locale = useLocale();
     const { householdId } = useAuth();
     const { period } = useAppShell();
     const router = useRouter();
@@ -223,14 +228,14 @@ export function GivingPageClient() {
 
     return (
         <div className="grid animate-rise gap-6">
-            <Section eyebrow="Giving" title={WHY_GIVE.headline}>
+            <Section eyebrow={t('eyebrow')} title={t('headline')}>
                 <Typography as="p" variant="lead" size="default">
-                    {WHY_GIVE.body[0]}
+                    {t('lead')}
                 </Typography>
             </Section>
 
             <ListToolbar
-                createLabel="+ Add a recurring gift"
+                createLabel={t('add_recurring')}
                 createHref={createFixedHref({ jarId: giveJar?.id, payeeMode: 'known' })}
                 secondary={
                     <Button
@@ -238,7 +243,7 @@ export function GivingPageClient() {
                         href={productPath('money/jars/give')}
                         size="sm"
                         variant="ghost">
-                        Open the Give jar
+                        {t('open_jar')}
                     </Button>
                 }
             />
@@ -248,11 +253,11 @@ export function GivingPageClient() {
                 <Card className="grid gap-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                         <Typography as="span" variant="eyebrow" color="primary">
-                            ✦ This year
+                            ✦ {t('this_year')}
                         </Typography>
                         {giveJar ? (
                             <span className="font-mono text-xs text-fg-faint">
-                                Give jar · {giveJar.percentage}%
+                                {t('jar_pct', { pct: giveJar.percentage })}
                             </span>
                         ) : null}
                     </div>
@@ -280,26 +285,41 @@ export function GivingPageClient() {
                                         </span>
                                     )}
                                     <Typography as="span" variant="caption" className="font-mono">
-                                        of {formatMoney(pledge.target)} pledged
+                                        {t('pledged_of', { amount: formatMoney(pledge.target) })}
                                     </Typography>
                                 </div>
                             </div>
                             <Meter value={pledgeProgress} />
                             <Typography as="p" size="sm" color="secondary">
                                 {pledgeAt?.fulfilledByPeriod
-                                    ? `Reached ${pledgeMonth(pledgeAt.reachedOn) ?? 'by then'}. The jar keeps flowing — that was the point.`
+                                    ? t('reached_by', {
+                                          when:
+                                              pledgeMonth(pledgeAt.reachedOn, locale) ??
+                                              t('reached_by_fallback'),
+                                      })
                                     : pledge.status === GoalStatus.REACHED
-                                      ? 'Pledge met. The jar keeps flowing — that was the point.'
+                                      ? t('pledge_met')
                                       : neededPerMonth !== null && monthsLeft !== null
                                         ? monthlyPlanned >= neededPerMonth
-                                            ? `${formatMoney(monthlyPlanned)} leaves every month — enough to land the pledge with ${monthsLeft} ${monthsLeft === 1 ? 'month' : 'months'} to go.`
-                                            : `${formatMoney(neededPerMonth)} a month would land it; ${formatMoney(monthlyPlanned)} is planned. The gap is a choice, not a failure.`
-                                        : 'No date on this pledge yet.'}
+                                            ? t(
+                                                  monthsLeft === 1
+                                                      ? 'pledge_on_track'
+                                                      : 'pledge_on_track_plural',
+                                                  {
+                                                      planned: formatMoney(monthlyPlanned),
+                                                      months: monthsLeft,
+                                                  }
+                                              )
+                                            : t('pledge_gap', {
+                                                  needed: formatMoney(neededPerMonth),
+                                                  planned: formatMoney(monthlyPlanned),
+                                              })
+                                        : t('pledge_no_date')}
                             </Typography>
                             <Link
                                 href={goalDetailHref(pledge.id)}
                                 className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-line-strong py-2.5 font-mono text-xs tracking-wide text-fg-muted uppercase transition-colors hover:border-accent-hover hover:text-accent">
-                                Open pledge ›
+                                {t('open_pledge')}
                             </Link>
                         </>
                     ) : (
@@ -310,19 +330,18 @@ export function GivingPageClient() {
                                         {formatMoney(givenThisYear)}
                                     </span>
                                     <Typography as="span" variant="caption" className="font-mono">
-                                        given so far
+                                        {t('given_so_far')}
                                     </Typography>
                                 </div>
                             </div>
                             <Typography as="p" size="sm" color="secondary">
-                                A pledge gives the jar a finish line for the year. Every sorted
-                                amount that leaves Give counts toward it — nothing to move by hand.
+                                {t('pledge_pitch')}
                             </Typography>
                             <Button
                                 as={Link}
                                 href={createGoalHref({ kind: GoalKind.GIVE })}
                                 size="sm">
-                                Set a pledge for this year
+                                {t('set_pledge')}
                             </Button>
                         </>
                     )}
@@ -332,31 +351,27 @@ export function GivingPageClient() {
                 <Card className="grid gap-4 p-0">
                     <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
                         <Typography as="span" variant="eyebrow" color="primary">
-                            ✦ Where it goes
+                            ✦ {t('where_goes')}
                         </Typography>
                         <span className="font-mono text-xs text-fg-secondary">
-                            {formatMoney(monthlyPlanned)}/mo planned
+                            {t('planned_mo', { amount: formatMoney(monthlyPlanned) })}
                         </span>
                     </div>
 
                     <div className="grid gap-px">
                         {giveFixed.length === 0 ? (
                             <Typography as="p" size="sm" color="muted" className="px-5 pb-1">
-                                Nothing leaves the Give jar automatically yet.
+                                {t('empty_auto')}
                             </Typography>
                         ) : (
                             giveFixed.map(item => {
                                 const company = item.counterparty?.trim() || item.name;
-                                const due = formatDueDay(item.dueDay);
+                                const due = formatDueDay(item.dueDay, tChips);
                                 return (
                                     <MoneyPartyRow
                                         key={item.id}
                                         title={company}
-                                        subtitle={
-                                            item.counterparty
-                                                ? item.name
-                                                : 'No organisation named yet'
-                                        }
+                                        subtitle={item.counterparty ? item.name : t('no_org')}
                                         mark={partyMark(
                                             findPartyVendor(company, merchants, givingOrgs),
                                             catalogMarkChrome({
@@ -366,11 +381,15 @@ export function GivingPageClient() {
                                                 categoryTemplates,
                                             })
                                         )}
-                                        amount={`${formatMoney(item.monthly)}/mo`}
+                                        amount={tChips('amount_per_month', {
+                                            amount: formatMoney(item.monthly),
+                                        })}
                                         badges={
                                             <>
                                                 {due ? <MetaChip>{due}</MetaChip> : null}
-                                                <MetaChip>{cadenceLabel(item.cadence)}</MetaChip>
+                                                <MetaChip>
+                                                    {cadenceLabel(item.cadence, tChips)}
+                                                </MetaChip>
                                             </>
                                         }
                                         href={fixedDetailHref(item.id)}
@@ -382,11 +401,11 @@ export function GivingPageClient() {
 
                     <div className="border-t border-line px-5 py-4">
                         <Typography as="p" variant="eyebrow" color="muted" className="mb-2">
-                            Received this year
+                            {t('received_year')}
                         </Typography>
                         {recipients.length === 0 ? (
                             <Typography as="p" size="sm" color="muted">
-                                No sorted giving in the ledger yet this year.
+                                {t('empty_ledger')}
                             </Typography>
                         ) : (
                             <ul className="grid gap-1.5">
@@ -414,20 +433,17 @@ export function GivingPageClient() {
                     <div className="flex flex-wrap items-center gap-2">
                         <CoachMark size="sm" />
                         <Typography as="span" variant="eyebrow" color="primary">
-                            To whom
+                            {t('to_whom')}
                         </Typography>
                     </div>
                     <Typography as="p" size="sm" color="secondary">
-                        How do you want to pick who receives this gift?
+                        {t('pick_who')}
                     </Typography>
-                    <div
-                        className="flex flex-wrap gap-2"
-                        role="group"
-                        aria-label="How do you want to pick?">
+                    <div className="flex flex-wrap gap-2" role="group" aria-label={t('pick_aria')}>
                         {(
                             [
-                                { id: 'known' as const, label: 'I know who' },
-                                { id: 'coach' as const, label: 'Help me choose' },
+                                { id: 'known' as const, label: t('pick_known') },
+                                { id: 'coach' as const, label: t('pick_coach') },
                             ] as const
                         ).map(option => {
                             const on = givePickMode === option.id;
@@ -466,8 +482,7 @@ export function GivingPageClient() {
                         })}
                     </div>
                     <Typography as="p" variant="caption" className="text-fg-faint">
-                        I know who — type whoever you already give to. Help me choose — Coach
-                        shortlist with independent checks (Doneer Effectief, GiveWell, ACE, CBF).
+                        {t('pick_hint')}
                     </Typography>
                 </div>
 
@@ -493,17 +508,17 @@ export function GivingPageClient() {
                     className="grid gap-3"
                     data-feature-helper="giving-checks"
                     data-coach-guide="giving-checks"
-                    aria-label="The Coach: four checks for any organisation">
+                    aria-label={t('checks_aria')}>
                     <div className="flex flex-wrap items-center gap-2">
                         <CoachMark size="sm" />
                         <Typography as="span" variant="eyebrow" color="primary">
-                            Four checks for any organisation
+                            {t('checks_heading')}
                         </Typography>
                     </div>
                     <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
-                        {WHY_GIVE.checks.map((check, index) => (
+                        {GIVING_CHECKS.map((key, index) => (
                             <div
-                                key={check.title}
+                                key={key}
                                 className="grid gap-2 rounded-2xl border border-t-4 border-line bg-surface p-5 shadow-md ring-1 ring-accent/10"
                                 style={{ borderTopColor: 'var(--color-jar-give)' }}>
                                 <Typography
@@ -513,9 +528,9 @@ export function GivingPageClient() {
                                     className="text-fg-faint">
                                     0{index + 1}
                                 </Typography>
-                                <Typography as="h3">{check.title}</Typography>
+                                <Typography as="h3">{t(`check_${key}_title`)}</Typography>
                                 <Typography as="p" size="sm" color="muted">
-                                    {check.body}
+                                    {t(`check_${key}_body`)}
                                 </Typography>
                             </div>
                         ))}
@@ -523,8 +538,8 @@ export function GivingPageClient() {
                 </section>
             </HelperGate>
 
-            <CoachTipCard title="Why this is in a money app">
-                {WHY_GIVE.body[1]} {WHY_GIVE.body[2]}
+            <CoachTipCard title={t('coach_tip_title')}>
+                {t('coach_tip_1')} {t('coach_tip_2')}
             </CoachTipCard>
         </div>
     );

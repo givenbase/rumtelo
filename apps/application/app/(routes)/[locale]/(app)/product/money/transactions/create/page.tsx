@@ -19,11 +19,7 @@ export default function Page() {
     const meta = formRoute('txCreate');
 
     return (
-        <FormRoutePageShell
-            title={meta.title}
-            description={meta.description}
-            closeHref={meta.closeHref}
-            width={meta.width}>
+        <FormRoutePageShell meta={meta}>
             <ExpenseCreatePage
                 embedded
                 defaultJarId={prefill?.jarId}

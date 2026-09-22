@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
+import { useTranslations } from '@rumtelo/i18n';
+
 import type {
     CategoryTemplate,
     FixedCost,
@@ -49,6 +51,7 @@ export function JarDrilldownTable({
     jars: JarDrilldownItem[];
     extras?: JarDrilldownExtras;
 }) {
+    const t = useTranslations('features.money.jars.drilldown');
     const [openId, setOpenId] = useState<string | null>(null);
 
     return (
@@ -102,7 +105,7 @@ export function JarDrilldownTable({
                                         size="sm"
                                         color="muted"
                                         className="px-5 py-3">
-                                        Open the jar for category detail.
+                                        {t('category_detail_hint')}
                                     </Typography>
                                 )}
                                 {href ? (
@@ -110,7 +113,7 @@ export function JarDrilldownTable({
                                         <Link
                                             href={href}
                                             className="inline-flex font-mono text-xs font-semibold tracking-wide text-fg-muted uppercase hover:text-accent">
-                                            Open jar ▸
+                                            {t('open_jar_link')}
                                         </Link>
                                     </div>
                                 ) : null}

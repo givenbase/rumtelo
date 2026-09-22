@@ -1,89 +1,60 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { getTranslations } from '@rumtelo/i18n';
+
 import { LegalPage } from '@/components/legal/legal-page';
 
-export const metadata: Metadata = {
-    title: 'Data Processing · Rumtelo',
-    description: 'How Rumtelo processes personal data as controller and with processors.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const t = await getTranslations('pages.legal.data_processing');
+    return {
+        title: `${t('title')} · Rumtelo`,
+        description: t('intro_prefix'),
+    };
+}
 
-export default function DataProcessingPage() {
+export default async function DataProcessingPage() {
+    const t = await getTranslations('pages.legal.data_processing');
+
     return (
-        <LegalPage title="Data Processing" updated="10 September 2026">
+        <LegalPage title={t('title')} updated={t('updated')}>
             <p>
-                This page summarises how Rumtelo processes personal data under the GDPR. For the
-                full picture, also read our{' '}
+                {t('intro_prefix')}{' '}
                 <Link href="/privacy" className="text-accent hover:underline">
-                    Privacy Policy
+                    {t('privacy_link')}
                 </Link>
                 .
             </p>
 
-            <h2>Roles</h2>
-            <p>
-                For your Rumtelo account and household data, Rumtelo acts as the{' '}
-                <strong className="font-medium text-fg">data controller</strong>. When we use
-                infrastructure or payment providers, they act as processors under contract.
-            </p>
+            <h2>{t('sections.roles.title')}</h2>
+            <p>{t('sections.roles.body')}</p>
 
-            <h2>Purposes and legal bases</h2>
+            <h2>{t('sections.purposes.title')}</h2>
             <ul>
-                <li>
-                    <strong className="font-medium text-fg">Contract</strong> — create and run your
-                    account, show jars, Coach tips, and product features you use.
-                </li>
-                <li>
-                    <strong className="font-medium text-fg">Legitimate interest</strong> — security,
-                    fraud prevention, product improvement (with safeguards).
-                </li>
-                <li>
-                    <strong className="font-medium text-fg">Consent</strong> — optional bank connect
-                    or marketing where required.
-                </li>
-                <li>
-                    <strong className="font-medium text-fg">Legal obligation</strong> — tax and
-                    accounting records for paid plans.
-                </li>
+                <li>{t('sections.purposes.items.contract')}</li>
+                <li>{t('sections.purposes.items.interest')}</li>
+                <li>{t('sections.purposes.items.consent')}</li>
+                <li>{t('sections.purposes.items.obligation')}</li>
             </ul>
 
-            <h2>Categories of data</h2>
-            <p>
-                Identity and contact data; authentication credentials (hashed); household financial
-                and practice data you enter or import; technical logs.
-            </p>
+            <h2>{t('sections.categories.title')}</h2>
+            <p>{t('sections.categories.body')}</p>
 
-            <h2>Processors (typical)</h2>
+            <h2>{t('sections.processors.title')}</h2>
             <ul>
-                <li>EU cloud hosting (application, database, backups) — Amsterdam region.</li>
-                <li>Email delivery for verification and account messages.</li>
-                <li>Payment processor for paid plans (card details never stored by Rumtelo).</li>
-                <li>
-                    Optional PSD2/AIS provider for live bank sync when enabled — read-only, after
-                    you connect.
-                </li>
+                {(t.raw('sections.processors.items') as string[]).map(item => (
+                    <li key={item}>{item}</li>
+                ))}
             </ul>
 
-            <h2>International transfers</h2>
-            <p>
-                We prefer EU processing. If a processor transfers data outside the EEA, we require
-                appropriate safeguards (e.g. Standard Contractual Clauses).
-            </p>
+            <h2>{t('sections.transfers.title')}</h2>
+            <p>{t('sections.transfers.body')}</p>
 
-            <h2>Subprocessors and changes</h2>
-            <p>
-                Processor list may change as the product grows. Material changes that affect how
-                your data is processed will be reflected here or in the Privacy Policy.
-            </p>
+            <h2>{t('sections.subprocessors.title')}</h2>
+            <p>{t('sections.subprocessors.body')}</p>
 
-            <h2>Contact / DPO</h2>
-            <p>
-                Privacy requests:{' '}
-                <a href="mailto:support@rumtelo.com" className="text-accent hover:underline">
-                    support@rumtelo.com
-                </a>
-                . You may also lodge a complaint with the Dutch Autoriteit Persoonsgegevens.
-            </p>
+            <h2>{t('sections.contact.title')}</h2>
+            <p>{t('sections.contact.body')}</p>
         </LegalPage>
     );
 }

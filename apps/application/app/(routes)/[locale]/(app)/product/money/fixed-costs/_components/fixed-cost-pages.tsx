@@ -3,6 +3,7 @@
 import { apiQuery } from '@/app/_lib/api-hooks';
 
 import { useLiveQuery } from '@rumtelo/hooks';
+import { useTranslations } from '@rumtelo/i18n';
 import { Typography } from '@rumtelo/ui';
 
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
@@ -44,6 +45,7 @@ export function FixedCostCreatePage({
 }
 
 export function FixedCostUpdatePage({ id, embedded = false }: { id: string; embedded?: boolean }) {
+    const t = useTranslations('features.money.fixed.detail');
     const { householdId } = useAuth();
     const live = isLiveData(householdId);
 
@@ -57,12 +59,12 @@ export function FixedCostUpdatePage({ id, embedded = false }: { id: string; embe
     if (live && query.isLoading && !row) {
         return (
             <Typography as="p" size="sm" color="muted">
-                Loading…
+                {t('loading')}
             </Typography>
         );
     }
     if (!row) {
-        return <p className="text-sm text-fg-muted">Fixed cost not found.</p>;
+        return <p className="text-sm text-fg-muted">{t('not_found')}</p>;
     }
 
     return (

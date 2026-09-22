@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
+import { useTranslations } from '@rumtelo/i18n';
 import { AccentCard, Button, Card, EmptyState, Eyebrow, Section, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
@@ -35,6 +36,7 @@ const EMPTY_JARS: JarBalance[] = [];
  * Formula: holdings + LTS/Freedom jars − open debts.
  */
 export function NetWorthPageClient() {
+    const t = useTranslations('features.growth.net_worth');
     const { formatMoney } = useHouseholdCurrency();
     const { householdId } = useAuth();
     const live = isLiveData(householdId);
@@ -115,10 +117,10 @@ export function NetWorthPageClient() {
             total,
             flow,
             flowLabel: !meta.canPay
-                ? 'no income'
+                ? t('flow_none')
                 : flow > 0
-                  ? `+ ${formatMoney(flow)} p/m`
-                  : 'no income p/m',
+                  ? t('flow_per_month', { amount: formatMoney(flow) })
+                  : t('flow_none_pm'),
         });
     }
 
@@ -126,48 +128,49 @@ export function NetWorthPageClient() {
         <div className="grid animate-rise gap-8">
             <div>
                 <Typography as="span" variant="eyebrow" color="primary">
-                    ✦ MY NET WORTH
+                    {t('page_eyebrow')}
                 </Typography>
                 <Typography as="h1" className="mt-2">
-                    Where your money stands — not how it moves.
+                    {t('page_title')}
                 </Typography>
                 <Typography as="p" variant="lead" size="default" className="mt-2">
-                    Everything you own minus everything you owe. Holdings plus Long-term savings and
-                    Financial Freedom — not this month’s spending jars.
+                    {t('page_lead')}
                 </Typography>
             </div>
 
-            <ListToolbar createLabel="+ Add asset" createHref={CREATE_HREF.asset} />
+            <ListToolbar createLabel={t('add_asset')} createHref={CREATE_HREF.asset} />
 
             <AccentCard tint="var(--color-accent)">
                 <Typography as="span" variant="eyebrow" color="primary">
-                    ✦ How far this takes you
+                    {t('horizon_eyebrow')}
                 </Typography>
                 <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
                     {(
                         [
                             {
-                                label: 'Holdings',
+                                label: t('stat_holdings'),
                                 value: formatMoney(assetWorth),
                                 tone: 'text-fg',
                                 rail: 'var(--color-accent)',
                             },
                             {
-                                label: 'LTS + Freedom',
+                                label: t('stat_jars'),
                                 value: formatMoney(jarsCash),
                                 tone: 'text-fg',
                                 rail: 'var(--color-jar-lts)',
                             },
                             {
-                                label: 'Monthly income',
+                                label: t('stat_monthly_income'),
                                 value:
-                                    monthlyPassive === 0 ? 'None yet' : formatMoney(monthlyPassive),
+                                    monthlyPassive === 0
+                                        ? t('none_yet')
+                                        : formatMoney(monthlyPassive),
                                 tone: '',
                                 rail: 'var(--color-jar-give)',
                                 ink: 'var(--color-jar-give)',
                             },
                             {
-                                label: 'Total debt',
+                                label: t('stat_debt'),
                                 value: formatMoney(totalDebt),
                                 tone: 'text-danger',
                                 rail: 'var(--color-danger)',
@@ -207,28 +210,28 @@ export function NetWorthPageClient() {
                     size="sm"
                     color="muted"
                     className="mt-4 border-t border-line pt-4 text-pretty">
-                    Your net worth is <strong className="text-fg">{formatMoney(netWorth)}</strong>
-                    {' — '}
-                    {formatMoney(totalValue)} owned minus {formatMoney(totalDebt)} owed. Put
-                    spaargeld in LTS/Freedom or as a Cash asset — not both.
+                    {t('summary', {
+                        net: formatMoney(netWorth),
+                        owned: formatMoney(totalValue),
+                        owed: formatMoney(totalDebt),
+                    })}
                 </Typography>
             </AccentCard>
 
             {holdings.length === 0 ? (
-                <EmptyState
-                    icon="↗"
-                    title="Nog geen holdings"
-                    body="Voeg je eerste asset toe (bijvoorbeeld een belegging). LTS- en Freedom-jars en schulden tellen al mee. Zet spaargeld niet dubbel als Cash-asset én in die jars."
-                />
+                <EmptyState icon="↗" title={t('empty_title')} body={t('empty_body')} />
             ) : (
                 <>
                     <div className="flex flex-wrap items-center gap-2">
                         <span className="mr-1 font-mono text-xs font-medium tracking-widest text-fg-muted uppercase">
-                            Show
+                            {t('show')}
                         </span>
                         {(
                             [
-                                { key: 'all' as const, label: `All  ${holdings.length}` },
+                                {
+                                    key: 'all' as const,
+                                    label: `${t('filter_all')}  ${holdings.length}`,
+                                },
                                 ...presentKinds.map(k => ({
                                     key: k.key,
                                     label: `${k.name}  ${holdings.filter(holding => holding.kindKey === k.key).length}`,
@@ -261,8 +264,10 @@ export function NetWorthPageClient() {
                                             </Typography>
                                             <span className="font-mono text-xs tracking-wide text-fg-muted uppercase">
                                                 {group.items.length === 1
-                                                    ? '1 asset'
-                                                    : `${group.items.length} assets`}
+                                                    ? t('asset_one')
+                                                    : t('asset_many', {
+                                                          count: group.items.length,
+                                                      })}
                                             </span>
                                         </div>
                                         <Typography
@@ -293,7 +298,7 @@ export function NetWorthPageClient() {
                                         size="sm"
                                         variant="secondary"
                                         className="self-center">
-                                        + Add {group.name}
+                                        {t('add_kind', { name: group.name })}
                                     </Button>
                                 </div>
                                 <div className="grid gap-3.5 p-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -322,12 +327,12 @@ export function NetWorthPageClient() {
                                                 <div className="grid gap-2 p-4">
                                                     <span className="font-mono text-xs font-medium tracking-wide text-fg-muted uppercase">
                                                         {holding.kindKey === 'PENSION'
-                                                            ? 'Locked until pension'
+                                                            ? t('holding_pension')
                                                             : holding.locked
-                                                              ? 'Does not pay you'
+                                                              ? t('holding_locked')
                                                               : pays
-                                                                ? 'Pays you monthly'
-                                                                : 'Appreciates in value'}
+                                                                ? t('holding_pays')
+                                                                : t('holding_appreciates')}
                                                     </span>
                                                     <Typography
                                                         as="h3"
@@ -336,14 +341,16 @@ export function NetWorthPageClient() {
                                                         {holding.name}
                                                     </Typography>
                                                     <div className="flex justify-between font-mono text-xs">
-                                                        <span className="text-fg-muted">Value</span>
+                                                        <span className="text-fg-muted">
+                                                            {t('value')}
+                                                        </span>
                                                         <span className="text-fg-secondary">
                                                             {formatMoney(holding.value)}
                                                         </span>
                                                     </div>
                                                     <div className="flex justify-between font-mono text-xs">
                                                         <span className="text-fg-muted">
-                                                            Monthly income
+                                                            {t('monthly_income')}
                                                         </span>
                                                         <span
                                                             className={
@@ -352,10 +359,14 @@ export function NetWorthPageClient() {
                                                                     : 'text-fg-muted'
                                                             }>
                                                             {holding.locked
-                                                                ? 'not available yet'
+                                                                ? t('not_available_yet')
                                                                 : pays
-                                                                  ? `+ ${formatMoney(holding.flow)} p/m`
-                                                                  : formatMoney(0) + ' p/m'}
+                                                                  ? t('flow_per_month', {
+                                                                        amount: formatMoney(
+                                                                            holding.flow
+                                                                        ),
+                                                                    })
+                                                                  : `${formatMoney(0)} ${t('per_month_short')}`}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -369,11 +380,11 @@ export function NetWorthPageClient() {
                 </>
             )}
 
-            <Section eyebrow="Month score" title="Binnenkort">
+            <Section eyebrow={t('month_score_eyebrow')} title={t('month_score_title')}>
                 <EmptyState
                     icon="◇"
-                    title="Nog geen data"
-                    body="Maandscore, levels en log komen later. Holdings, jars en schulden tellen al mee in je netto vermogen."
+                    title={t('month_score_empty_title')}
+                    body={t('month_score_empty_body')}
                 />
             </Section>
         </div>

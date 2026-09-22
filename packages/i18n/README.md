@@ -9,10 +9,10 @@ Internationalization for Rumtelo: `next-intl` + TypeScript sources under `transl
 - After changing `translations/`, run:
 
 ```bash
-pnpm --filter @rumtelo/i18n generate
+pnpm i18n:gen
 ```
 
-That rebuilds `languages/en.json` and fills **missing** keys in other locales from English (no DeepL API calls).
+That rebuilds `languages/en.json`, fills **missing** NL keys from English, then translates leaves still identical to EN via DeepL (`DEEPL_API_KEY` in `packages/i18n/.env`). For JSON-only sync without DeepL: `pnpm i18n:generate`.
 
 ## Usage
 
@@ -26,10 +26,15 @@ t('features.brand.tagline');
 
 Apps load messages via `i18n/request.ts` + `next-intl` plugin (see `apps/application/i18n/request.ts`).
 
-Brand lockups that are not yet on `useTranslations` can import `BRAND_TAGLINE` / `AUTH_QUOTES` — those re-export from the same `translations/` modules.
+## Status
+
+- **EN source of truth:** `translations/**/*.ts` → `pnpm i18n:gen` rebuilds `en.json`, fills missing NL from EN, then DeepL-translates identical leaves.
+- **NL via DeepL:** `pnpm i18n:gen` fills missing keys then translates leaves still identical to EN. Existing Dutch in `nl.json` is kept. Standalone: `pnpm i18n:translate:nl`.
+- **Wired:** Application and website UI chrome use `next-intl` (`useTranslations` / `getTranslations`).
+- **Still EN by design:** `@rumtelo/ui` defaults, API freeform fields, learn catalog merchants, Stripe catalog, throw messages.
 
 ## Scope
 
-**In scope:** next-intl routing helpers, locale metadata, common action/status/message, ui button/form, Rumtelo brand + auth + shell/onboarding/dashboard. **EN first, NL second.**
+**In scope:** next-intl routing helpers, locale metadata, common action/status/message, ui button/form, Rumtelo brand + auth + shell/onboarding/dashboard. **EN first, NL second.** Optional DeepL fill for `nl.json`.
 
-**Out of scope:** POS, shop, checkout, student portal, admin commerce, DeepL scripts, i18next mobile stacks, healthcare vocabulary.
+**Out of scope:** POS, shop, checkout, student portal, admin commerce, i18next mobile stacks, healthcare vocabulary.

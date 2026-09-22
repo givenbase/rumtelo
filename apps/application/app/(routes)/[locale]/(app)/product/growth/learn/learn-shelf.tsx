@@ -2,7 +2,9 @@
 
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
+import { useApiError } from '@/app/_lib/api-error-messages';
 import { isLiveData } from '@/app/_lib/preview';
+import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { type LearnProgressStatus, type LearnShelf as LearnShelfDto } from '@rumtelo/contracts';
@@ -109,6 +111,8 @@ function useLocalShelf(): LearnShelfApi {
 
 function useRemoteShelf(live: boolean, householdId: string | null): LearnShelfApi {
     const queryClient = useQueryClient();
+    const { showToast } = useAppShell();
+    const apiError = useApiError();
     const options = apiQuery.growth.learn.list.queryOptions({
         input: { householdId: householdId ?? '00000000-0000-4000-8000-000000000000' },
     });
@@ -148,16 +152,19 @@ function useRemoteShelf(live: boolean, householdId: string | null): LearnShelfAp
         mutationFn: (input: Parameters<typeof api.growth.learn.save>[0]) =>
             api.growth.learn.save(input),
         onSettled: refresh,
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
     const remove = useMutation({
         mutationFn: (input: Parameters<typeof api.growth.learn.remove>[0]) =>
             api.growth.learn.remove(input),
         onSettled: refresh,
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
     const focus = useMutation({
         mutationFn: (input: Parameters<typeof api.growth.learn.focus>[0]) =>
             api.growth.learn.focus(input),
         onSettled: refresh,
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     return useMemo(() => {

@@ -1,37 +1,38 @@
+'use client';
+
 import Link from 'next/link';
 
 import { Typography } from '@rumtelo/ui';
+import { useTranslations } from '@rumtelo/i18n';
 import { cn } from '@rumtelo/utils';
 
-import type { FormRouteWidth } from '@/app/_lib/form-route-meta';
+import type { FormRouteMeta } from '@/app/_lib/form-route-meta';
 
 type FormRoutePageShellProps = {
     children: React.ReactNode;
     closeHref?: string;
-    description?: string;
-    title: string;
-    width?: FormRouteWidth;
+    meta: FormRouteMeta;
 };
 
 /**
  * Full-page twin of RouteModalShell — same header tokens, card chrome, and body padding
  * so hard-refresh / direct URL create+update match the soft-nav sheet.
  */
-export function FormRoutePageShell({
-    children,
-    closeHref,
-    description,
-    title,
-    width = 'default',
-}: FormRoutePageShellProps) {
+export function FormRoutePageShell({ children, closeHref, meta }: FormRoutePageShellProps) {
+    const t = useTranslations();
+    const title = t(meta.titleKey);
+    const description = meta.descriptionKey ? t(meta.descriptionKey) : undefined;
+    const width = meta.width ?? 'default';
+    const dismissHref = closeHref ?? meta.closeHref;
+
     return (
         <div className="animate-rise px-4 py-6 sm:py-10">
             <div className={cn('mx-auto w-full', width === 'wide' ? 'max-w-lg' : 'max-w-md')}>
-                {closeHref ? (
+                {dismissHref ? (
                     <Link
-                        href={closeHref}
+                        href={dismissHref}
                         className="mb-3 inline-flex text-sm font-medium text-fg-muted transition-colors hover:text-fg">
-                        ← Back
+                        {t('ui.button.actions.back_arrow')}
                     </Link>
                 ) : null}
                 <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-xl">

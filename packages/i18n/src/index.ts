@@ -1,6 +1,8 @@
 export * from './locale-metadata';
 export * from './locales';
 export * from './next-intl';
+export { LocaleSwitcher, type LocaleChromeTone } from './locale-switcher';
+export { useApiError, useApiErrorMessage, useApiErrorFallbacks } from './use-api-error';
 export {
     AUTH_QUOTES_WEB,
     AUTH_QUOTES_APP,

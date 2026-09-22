@@ -1,6 +1,6 @@
 import { productPath } from './routes';
 
-/** Canonical create/update paths for money + growth entities (Meltizo shape). */
+/** Canonical create/update paths for money + growth entities. */
 export const CREATE_HREF = {
     tx: productPath('money/transactions/create'),
     fixed: productPath('money/fixed-costs/create'),

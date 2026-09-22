@@ -2,11 +2,8 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { PayoffStrategy, type JarKey } from '@rumtelo/contracts';
 import {
-    coachPeriodTravelCopy,
     endOfPeriodIso,
-    formatMoney,
     jarCoverage,
-    parsePeriodKey,
     projectDebtsAtHorizon,
     projectGoalsAtHorizon,
     stackPlannedAllocations,
@@ -178,24 +175,6 @@ export class DashboardService {
         });
 
         const baselineAllocatedTotal = sum(baselineJars.map(jar => jar.allocated));
-        const stamp = formatStamp(period);
-        const moneyFmt = (cents: number) =>
-            formatMoney(cents, { currency: settings.currency ?? 'EUR', locale: 'en-GB' });
-        const travelCoachText = stackedMode
-            ? coachPeriodTravelCopy({
-                  travel: meta.travel,
-                  stamp,
-                  horizon,
-                  stackedTotal: allocatedTotal,
-                  formatMoney: moneyFmt,
-                  jarHighlights: jars.slice(0, 2).map(jar => {
-                      const base = baselineJars.find(row => row.id === jar.id);
-                      return `${jar.name} ${moneyFmt(base?.allocated ?? 0)} → ${moneyFmt(jar.allocated)}`;
-                  }),
-                  goalsAtPeriod: projectedGoals,
-                  debtsAtPeriod: debtList.length > 0 ? debtsAtPeriod : null,
-              })
-            : null;
 
         // Keep avgLeftOver / playLeft monthly (baseline), not stacked.
         const avgLeftOver = sum(baselineJars.map(jar => jar.available));
@@ -233,7 +212,8 @@ export class DashboardService {
             baselineJars: stackedMode
                 ? baselineJars.map(jar => ({ id: jar.id, allocated: jar.allocated }))
                 : null,
-            travelCoachText,
+            /** Built on the client from travel + jar params — see buildPeriodTravelCoachText. */
+            travelCoachText: null,
         };
     }
 }
@@ -287,18 +267,12 @@ function scaleJarsForHorizon(
 /**
  * Month names come from Intl rather than a hardcoded table: the product ships
  * NL and EN, and a lookup array would need maintaining per locale.
- * TODO: take the locale from HouseholdSettings instead of defaulting to nl-NL.
+ * Prefer client `formatPeriod(period, locale)` for display — dashboard UI no
+ * longer reads this field; kept on the wire for API consumers.
  */
 function formatPeriod(period: string, locale = 'nl-NL'): string {
     const [year, month] = period.split('-').map(Number);
     return new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(
         new Date(Date.UTC(year ?? 1970, (month ?? 1) - 1, 1))
-    );
-}
-
-function formatStamp(period: string): string {
-    const { year, month } = parsePeriodKey(period);
-    return new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric' }).format(
-        new Date(Date.UTC(year, month - 1, 1))
     );
 }

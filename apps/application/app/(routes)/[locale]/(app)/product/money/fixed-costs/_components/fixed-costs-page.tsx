@@ -4,6 +4,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { useState } from 'react';
 
 import { DEFAULT_JAR_SPLIT, jarCapabilitiesFor, JarKey } from '@rumtelo/contracts';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Card, Typography } from '@rumtelo/ui';
 import {
@@ -48,17 +49,17 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 type Tab = 'ERUIT' | 'ERIN';
 
-function statusChip(status: FixedCostStatus) {
+function statusChip(status: FixedCostStatus, t: (key: string) => string) {
     if (status === 'taken') {
-        return <MetaChip className="border-success/30 text-success">Taken</MetaChip>;
+        return <MetaChip className="border-success/30 text-success">{t('status_taken')}</MetaChip>;
     }
     if (status === 'due') {
-        return <MetaChip className="border-danger/30 text-danger">Still due</MetaChip>;
+        return <MetaChip className="border-danger/30 text-danger">{t('status_due')}</MetaChip>;
     }
     if (status === 'skipped') {
-        return <MetaChip className="border-line text-fg-muted">Skipped</MetaChip>;
+        return <MetaChip className="border-line text-fg-muted">{t('status_skipped')}</MetaChip>;
     }
-    return <MetaChip>Planned</MetaChip>;
+    return <MetaChip>{t('status_planned')}</MetaChip>;
 }
 
 /**
@@ -68,9 +69,12 @@ function statusChip(status: FixedCostStatus) {
  * → “When Necessities can’t fit in 55%”.
  */
 export function FixedCostsPageClient() {
+    const t = useTranslations('features.money.fixed');
+    const tChips = useTranslations('features.money.chips');
     const { householdId } = useAuth();
     const { period } = useAppShell();
     const { formatMoney } = useHouseholdCurrency();
+    const appLocale = useLocale();
     const [tab, setTab] = useState<Tab>('ERUIT');
     const [jarFilter, setJarFilter] = useState<string | null>(null);
     const [openJarKeys, setOpenJarKeys] = useState<Set<string>>(() => new Set());
@@ -221,15 +225,18 @@ export function FixedCostsPageClient() {
         <div className="grid animate-rise gap-8">
             <div>
                 <Typography as="span" variant="eyebrow" color="primary">
-                    ✦ FIXED COSTS &amp; INCOME
+                    ✦ {t('eyebrow')}
                 </Typography>
                 <Typography as="h1" className="mt-2">
-                    Set it up once. Then it runs automatically.
+                    {t('title')}
                 </Typography>
                 {traveling ? (
                     <Typography as="p" variant="lead" size="default" className="mt-2">
-                        Over {horizon} months that&apos;s {formatMoney(outTotal * horizon)} out and{' '}
-                        {formatMoney(NET * horizon)} in. Each row stays the monthly amount.
+                        {t('travel_lead', {
+                            months: horizon,
+                            outTotal: formatMoney(outTotal * horizon),
+                            netTotal: formatMoney(NET * horizon),
+                        })}
                     </Typography>
                 ) : null}
             </div>
@@ -239,7 +246,7 @@ export function FixedCostsPageClient() {
 
             <div data-tour="fixed-tabs">
                 <ListToolbar
-                    createLabel={tab === 'ERUIT' ? '+ Add fixed cost' : '+ Add income'}
+                    createLabel={tab === 'ERUIT' ? t('add_fixed') : t('add_income')}
                     createHref={tab === 'ERUIT' ? CREATE_HREF.fixed : CREATE_HREF.income}
                     secondary={
                         <span
@@ -247,11 +254,15 @@ export function FixedCostsPageClient() {
                                 'font-mono text-xs font-medium',
                                 leftover >= 0 ? 'text-success' : 'text-danger'
                             )}>
-                            {leftover >= 0 ? '+ ' : ''}
-                            {formatMoney(leftover)} left after costs
                             {traveling
-                                ? ` · ${formatMoney(leftover * horizon)} over ${horizon} mo`
-                                : ''}
+                                ? t('leftover_travel', {
+                                      amount: `${leftover >= 0 ? '+ ' : ''}${formatMoney(leftover)}`,
+                                      horizon: formatMoney(leftover * horizon),
+                                      months: horizon,
+                                  })
+                                : t('leftover', {
+                                      amount: `${leftover >= 0 ? '+ ' : ''}${formatMoney(leftover)}`,
+                                  })}
                         </span>
                     }>
                     {(['ERUIT', 'ERIN'] as const).map(tabKey => (
@@ -265,7 +276,7 @@ export function FixedCostsPageClient() {
                                     ? 'border-accent/40 bg-accent-soft text-accent'
                                     : 'border-line text-fg-muted hover:border-line-strong hover:text-fg'
                             )}>
-                            {tabKey === 'ERUIT' ? 'Out' : 'In'}
+                            {tabKey === 'ERUIT' ? t('tab_out') : t('tab_in')}
                             <span
                                 className={cn(
                                     'rounded-full px-2 py-0.5 font-mono text-xs',
@@ -286,7 +297,7 @@ export function FixedCostsPageClient() {
                         <Card className="p-0">
                             <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
                                 <Typography as="span" variant="eyebrow" color="primary">
-                                    ✦ Every month out
+                                    ✦ {t('every_month_out')}
                                 </Typography>
                                 <span className="font-mono text-sm text-fg-secondary">
                                     {formatMoney(outTotal)}
@@ -296,9 +307,7 @@ export function FixedCostsPageClient() {
                             <div className="grid">
                                 {groupedFixedCosts.length === 0 ? (
                                     <p className="px-5 py-4 text-sm text-fg-muted">
-                                        {jarFilter
-                                            ? 'No fixed costs in this jar.'
-                                            : 'No fixed costs yet.'}
+                                        {jarFilter ? t('empty_jar') : t('empty_all')}
                                     </p>
                                 ) : (
                                     groupedFixedCosts.map(group => {
@@ -359,7 +368,8 @@ export function FixedCostsPageClient() {
                                                                   ? fixedCost.name
                                                                   : null;
                                                           const due = formatDueDay(
-                                                              fixedCost.dueDay
+                                                              fixedCost.dueDay,
+                                                              tChips
                                                           );
                                                           const settlement = settlementById.get(
                                                               fixedCost.id
@@ -395,7 +405,7 @@ export function FixedCostsPageClient() {
                                                                   )}
                                                                   badges={
                                                                       <>
-                                                                          {statusChip(status)}
+                                                                          {statusChip(status, t)}
                                                                           {due ? (
                                                                               <MetaChip>
                                                                                   {due}
@@ -403,13 +413,15 @@ export function FixedCostsPageClient() {
                                                                           ) : null}
                                                                           <MetaChip>
                                                                               {cadenceLabel(
-                                                                                  fixedCost.cadence
+                                                                                  fixedCost.cadence,
+                                                                                  tChips
                                                                               )}
                                                                           </MetaChip>
                                                                           {linkedTx ? (
                                                                               <MetaChip>
                                                                                   {formatBookedDate(
-                                                                                      linkedTx.bookedOn
+                                                                                      linkedTx.bookedOn,
+                                                                                      appLocale
                                                                                   )}
                                                                               </MetaChip>
                                                                           ) : null}
@@ -420,10 +432,14 @@ export function FixedCostsPageClient() {
                                                                               fixedCost.amount
                                                                           ) ? (
                                                                               <MetaChip>
-                                                                                  {formatMoney(
-                                                                                      fixedCost.monthly
+                                                                                  {tChips(
+                                                                                      'amount_per_month',
+                                                                                      {
+                                                                                          amount: formatMoney(
+                                                                                              fixedCost.monthly
+                                                                                          ),
+                                                                                      }
                                                                                   )}
-                                                                                  /mo
                                                                               </MetaChip>
                                                                           ) : null}
                                                                       </>
@@ -477,10 +493,8 @@ export function FixedCostsPageClient() {
                             </div>
                         </Card>
 
-                        <CoachTipCard title="Subscription check">
-                            Check every quarter that everything here still applies. Small amounts
-                            add up — a subscription you don&apos;t use is money you throw away
-                            monthly. Healthy: less than 20% of Necessity goes to recurring services.
+                        <CoachTipCard title={t('coach_subscription_title')}>
+                            {t('coach_subscription_body')}
                         </CoachTipCard>
                     </div>
 
@@ -488,7 +502,7 @@ export function FixedCostsPageClient() {
                         <Card className="p-0">
                             <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
                                 <Typography as="span" variant="eyebrow" color="muted">
-                                    ✦ Paused &amp; ended
+                                    ✦ {t('paused_ended')}
                                 </Typography>
                                 <span className="font-mono text-xs text-fg-faint">
                                     {inactiveFixedCosts.length}
@@ -529,7 +543,11 @@ export function FixedCostsPageClient() {
                                                 badges={
                                                     <>
                                                         <MetaChip className="text-fg-muted">
-                                                            {lifecycleLabel(lifecycle)}
+                                                            {lifecycleLabel(lifecycle, {
+                                                                active: t('lifecycle_active'),
+                                                                paused: t('lifecycle_paused'),
+                                                                ended: t('lifecycle_ended'),
+                                                            })}
                                                         </MetaChip>
                                                         <JarBadge
                                                             jarKey={fixedCost.jarKey}
@@ -557,7 +575,7 @@ export function FixedCostsPageClient() {
                     <Card className="p-0">
                         <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
                             <Typography as="span" variant="eyebrow" color="primary">
-                                ✦ Every month in
+                                ✦ {t('every_month_in')}
                             </Typography>
                             <span className="font-mono text-sm text-success">
                                 {formatMoney(NET)}
@@ -566,7 +584,7 @@ export function FixedCostsPageClient() {
 
                         <div className="grid">
                             {incomeSources.map((source, i) => {
-                                const due = formatDueDay(source.dueDay);
+                                const due = formatDueDay(source.dueDay, tChips);
                                 return (
                                     <MoneyPartyRow
                                         key={source.id ?? i}
@@ -583,10 +601,14 @@ export function FixedCostsPageClient() {
                                         badges={
                                             <>
                                                 {due ? <MetaChip>{due}</MetaChip> : null}
-                                                <MetaChip>{cadenceLabel(source.cadence)}</MetaChip>
+                                                <MetaChip>
+                                                    {cadenceLabel(source.cadence, tChips)}
+                                                </MetaChip>
                                                 {source.cadence !== 'MONTHLY' ? (
                                                     <MetaChip>
-                                                        {formatMoney(source.monthly)}/mo
+                                                        {tChips('amount_per_month', {
+                                                            amount: formatMoney(source.monthly),
+                                                        })}
                                                     </MetaChip>
                                                 ) : null}
                                             </>
@@ -603,7 +625,7 @@ export function FixedCostsPageClient() {
 
                         <div className="border-t border-line px-5 py-4">
                             <Typography as="p" variant="eyebrow" color="muted" className="mb-3">
-                                How this is split
+                                {t('how_split')}
                             </Typography>
                             <div className="flex flex-wrap gap-2">
                                 {splitJars.map(j => (
@@ -622,18 +644,16 @@ export function FixedCostsPageClient() {
                         </div>
                     </Card>
 
-                    <CoachTipCard title="Is this enough?">
-                        {formatMoney(NET)}/mo. Fixed costs take{' '}
-                        <strong className="text-fg">{commitmentRatio}%</strong> — that&apos;s{' '}
+                    <CoachTipCard title={t('coach_enough_title')}>
+                        {tChips('amount_per_month', { amount: formatMoney(NET) })}.{' '}
+                        {t('coach_enough_ratio_line', { ratio: commitmentRatio })}{' '}
                         {commitmentRatio < 50
-                            ? 'comfortable'
+                            ? t('coach_enough_comfortable')
                             : commitmentRatio <= 55
-                              ? 'on the edge of the Necessities goal'
-                              : 'above the 55% Necessities goal'}
+                              ? t('coach_enough_edge')
+                              : t('coach_enough_above')}
                         .{' '}
-                        {commitmentRatio > 55
-                            ? 'Simplify bills and/or raise income — do not raid Financial Freedom.'
-                            : 'Under 55% there is room to build. The real ceiling is income, not only cutting costs.'}
+                        {commitmentRatio > 55 ? t('coach_enough_simplify') : t('coach_enough_room')}
                     </CoachTipCard>
                 </div>
             )}

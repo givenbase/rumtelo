@@ -1,5 +1,7 @@
 import { EntityManager } from '@mikro-orm/postgresql';
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+
+import { apiBadRequest } from '../../../../../../common/errors/api-user-error';
 
 import {
     Cadence,
@@ -92,7 +94,7 @@ export class DebtService {
         note?: string | null;
     }) {
         if (input.amount <= 0) {
-            throw new BadRequestException('Payment amount must be positive');
+            throw apiBadRequest('payment_amount_positive');
         }
 
         const debt = await this.repo.findOneOrFail({ id: input.debtId });

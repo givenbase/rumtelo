@@ -6,25 +6,24 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
 import { Button, Typography } from '@rumtelo/ui';
-import { AUTH_VERIFY } from '@rumtelo/i18n';
+import { useTranslations } from '@rumtelo/i18n';
 
 import { sendVerificationEmail } from '@/lib/auth';
 import { appSignInAfterAuthUrl, appSignInUrl } from '@/lib/portal-urls';
 import { useOptionalPlanIntent } from '@/app/_components/plan-intent-provider';
 import { useOptionalSignUpDraft } from '@/app/_components/sign-up-draft-provider';
+import { useApiErrorMessage } from '@/app/_lib/api-error-messages';
 import { planIntentQuery } from '@rumtelo/utils';
 
 const RESEND_COOLDOWN_SEC = 60;
-
-function withEmail(template: string, email: string): string {
-    return template.replaceAll('{email}', email);
-}
 
 /**
  * Post-sign-up gate. Email is locked from draft / `?email=` — never an editable field.
  * Cold visits without a known address go back to sign-in / sign-up.
  */
 export function VerifyPanel() {
+    const t = useTranslations();
+    const formatApiMessage = useApiErrorMessage();
     const searchParams = useSearchParams();
     const planIntent = useOptionalPlanIntent();
     const signUpDraft = useOptionalSignUpDraft();
@@ -61,7 +60,20 @@ export function VerifyPanel() {
         setBusy(false);
 
         if (result.error) {
-            setApiError(result.error.message ?? 'Could not resend');
+            const errorCode =
+                typeof result.error === 'object' && result.error && 'code' in result.error
+                    ? (result.error as { code?: unknown }).code
+                    : undefined;
+            const code =
+                typeof errorCode === 'string' || typeof errorCode === 'number'
+                    ? String(errorCode)
+                    : '';
+            const raw = result.error.message?.trim() ?? '';
+            setApiError(
+                raw || code
+                    ? formatApiMessage(raw, code || undefined)
+                    : t('common.message.error.resend_failed')
+            );
             return;
         }
 
@@ -70,10 +82,10 @@ export function VerifyPanel() {
     }
 
     const subtitle = confirmed
-        ? AUTH_VERIFY.confirmed
+        ? t('features.auth.verify.confirmed')
         : lockedEmail
-          ? withEmail(AUTH_VERIFY.subtitle, lockedEmail)
-          : AUTH_VERIFY.subtitle_no_target;
+          ? t('features.auth.verify.subtitle', { email: lockedEmail })
+          : t('features.auth.verify.subtitle_no_target');
 
     const signUpHref = `/sign-up${
         Object.keys(continueQuery).length ? `?${new URLSearchParams(continueQuery).toString()}` : ''
@@ -83,7 +95,9 @@ export function VerifyPanel() {
         <div className="grid gap-6">
             <div>
                 <Typography as="h1" className="text-2xl lg:text-2xl">
-                    {confirmed ? AUTH_VERIFY.confirmed_title : AUTH_VERIFY.title}
+                    {confirmed
+                        ? t('features.auth.verify.confirmed_title')
+                        : t('features.auth.verify.title')}
                 </Typography>
                 <Typography as="p" size="sm" color="muted" className="mt-1">
                     {subtitle}
@@ -96,7 +110,7 @@ export function VerifyPanel() {
                     href={appSignInAfterAuthUrl(continueQuery)}
                     className="w-full"
                     onClick={() => signUpDraft?.clearDraft()}>
-                    {AUTH_VERIFY.continue}
+                    {t('features.auth.verify.continue')}
                 </Button>
             ) : lockedEmail ? (
                 <div className="grid gap-4">
@@ -108,7 +122,11 @@ export function VerifyPanel() {
                         </p>
                     ) : null}
 
-                    {sent ? <p className="text-sm text-fg-secondary">{AUTH_VERIFY.sent}</p> : null}
+                    {sent ? (
+                        <p className="text-sm text-fg-secondary">
+                            {t('features.auth.verify.sent')}
+                        </p>
+                    ) : null}
 
                     <div className="flex flex-col gap-3 sm:flex-row">
                         <Button
@@ -118,37 +136,37 @@ export function VerifyPanel() {
                             className="sm:flex-1"
                             onClick={() => void onResend()}>
                             {cooldown > 0
-                                ? AUTH_VERIFY.resend_in.replaceAll('{seconds}', String(cooldown))
+                                ? t('features.auth.verify.resend_in', { seconds: cooldown })
                                 : busy
-                                  ? 'Working…'
-                                  : AUTH_VERIFY.resend}
+                                  ? t('ui.form.working')
+                                  : t('features.auth.verify.resend')}
                         </Button>
                         <Button
                             as="a"
                             href={appSignInAfterAuthUrl(continueQuery)}
                             variant="secondary"
                             className="sm:flex-1">
-                            {AUTH_VERIFY.continue}
+                            {t('features.auth.verify.continue')}
                         </Button>
                     </div>
                 </div>
             ) : (
                 <div className="grid gap-4">
                     <Button as="a" href={appSignInUrl(continueQuery)} className="w-full">
-                        {AUTH_VERIFY.continue}
+                        {t('features.auth.verify.continue')}
                     </Button>
                 </div>
             )}
 
             <Typography as="p" size="sm" color="muted" className="text-center">
                 <Link href={signUpHref} className="font-semibold text-accent hover:underline">
-                    {AUTH_VERIFY.back_to_sign_up}
+                    {t('features.auth.verify.back_to_sign_up')}
                 </Link>
                 {' · '}
                 <a
                     href={appSignInUrl(continueQuery)}
                     className="font-semibold text-accent hover:underline">
-                    {AUTH_VERIFY.back_to_sign_in}
+                    {t('features.auth.verify.back_to_sign_in')}
                 </a>
             </Typography>
         </div>

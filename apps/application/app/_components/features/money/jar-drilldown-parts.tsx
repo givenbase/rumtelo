@@ -1,6 +1,7 @@
 'use client';
 
 import type { Category, JarBalance } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
 import { cn, categoryVariance } from '@rumtelo/utils';
 
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -40,6 +41,7 @@ function JarDrilldownBody({
     spent: number;
     committedOut: number;
 }) {
+    const t = useTranslations('features.money.jars');
     const { formatMoney } = useHouseholdCurrency();
     const showDelta =
         jar.baselineAllocated !== null &&
@@ -99,7 +101,7 @@ function JarDrilldownBody({
                             {formatMoney(jar.available)}
                         </div>
                         <div className="font-mono text-xs text-fg-faint">
-                            of {formatMoney(jar.allocated)}
+                            {t('of_amount', { amount: formatMoney(jar.allocated) })}
                         </div>
                     </>
                 )}
@@ -117,6 +119,7 @@ export function JarDrilldownTrigger({
     open: boolean;
     onToggle: () => void;
 }) {
+    const t = useTranslations('features.money.jars.drilldown');
     const spent = jar.spent ?? 0;
     const committedOut = jar.committedOut ?? Math.max(0, jar.allocated - spent - jar.available);
 
@@ -125,7 +128,11 @@ export function JarDrilldownTrigger({
             type="button"
             onClick={onToggle}
             aria-expanded={open}
-            aria-label={open ? `Hide ${jar.name} categories` : `Show ${jar.name} categories`}
+            aria-label={
+                open
+                    ? t('hide_categories', { name: jar.name })
+                    : t('show_categories', { name: jar.name })
+            }
             className="grid w-full gap-2 px-1.5 py-2.5 text-left transition-colors outline-none hover:bg-raised focus-visible:ring-2 focus-visible:ring-accent/25 focus-visible:ring-inset">
             <span className="flex items-center gap-3 sm:grid sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_auto_auto] sm:gap-3">
                 <JarDrilldownBody jar={jar} spent={spent} committedOut={committedOut} />
@@ -152,9 +159,12 @@ export function JarDrilldownTrigger({
 
 export function JarCategoryTable({ categories }: { categories: JarCategory[] }) {
     const { formatMoney } = useHouseholdCurrency();
+    const t = useTranslations('features.money.jars.detail');
     if (categories.length === 0) {
         return (
-            <p className="border-t border-line py-1.5 text-sm text-fg-faint">No categories yet.</p>
+            <p className="border-t border-line py-1.5 text-sm text-fg-faint">
+                {t('no_categories')}
+            </p>
         );
     }
 
@@ -170,10 +180,10 @@ export function JarCategoryTable({ categories }: { categories: JarCategory[] }) 
                             <span className="text-sm text-fg-secondary">{category.name}</span>
                             <span className="flex flex-wrap justify-between gap-x-3 gap-y-1 font-mono text-xs tabular-nums">
                                 <span className="text-fg-muted">
-                                    Planned {formatMoney(category.budgeted)}
+                                    {t('planned')} {formatMoney(category.budgeted)}
                                 </span>
                                 <span className="text-fg">
-                                    Spent {formatMoney(category.actual)}
+                                    {t('spent')} {formatMoney(category.actual)}
                                 </span>
                                 <span className={over ? 'text-danger' : 'text-success'}>
                                     {formatMoney(diff, { signed: true })}
@@ -188,10 +198,10 @@ export function JarCategoryTable({ categories }: { categories: JarCategory[] }) 
                 <table className="w-full min-w-0 border-collapse">
                     <thead>
                         <tr className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase">
-                            <th className="pb-2 text-left font-medium">Category</th>
-                            <th className="w-20 pb-2 text-right font-medium">Planned</th>
-                            <th className="w-20 pb-2 text-right font-medium">Spent</th>
-                            <th className="w-24 pb-2 text-right font-medium">Over / under</th>
+                            <th className="pb-2 text-left font-medium">{t('category')}</th>
+                            <th className="w-20 pb-2 text-right font-medium">{t('planned')}</th>
+                            <th className="w-20 pb-2 text-right font-medium">{t('spent')}</th>
+                            <th className="w-24 pb-2 text-right font-medium">{t('over_under')}</th>
                         </tr>
                     </thead>
                     <tbody>

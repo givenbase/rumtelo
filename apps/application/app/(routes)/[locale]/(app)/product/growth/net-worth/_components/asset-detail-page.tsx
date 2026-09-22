@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import type { AssetKind } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
+import { useTranslations } from '@rumtelo/i18n';
 import { Button, Card, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
@@ -17,17 +18,24 @@ import { EditIcon } from '@/components/features/ui/action-icons';
 
 const EMPTY_KINDS: AssetKind[] = [];
 
-function statusLine(kindKey: string, locked: boolean, pays: boolean): string {
-    if (kindKey === 'PENSION') return 'Locked until pension';
-    if (locked) return 'Does not pay you';
-    if (pays) return 'Pays you monthly';
-    return 'Appreciates in value';
+function statusLine(
+    kindKey: string,
+    locked: boolean,
+    pays: boolean,
+    t: ReturnType<typeof useTranslations<'features.growth.net_worth'>>
+): string {
+    if (kindKey === 'PENSION') return t('holding_pension');
+    if (locked) return t('holding_locked');
+    if (pays) return t('holding_pays');
+    return t('holding_appreciates');
 }
 
 /**
  * One holding. Edit opens the update sheet; this page is for reading it.
  */
 export function AssetDetailPageClient({ assetId }: { assetId: string }) {
+    const t = useTranslations('features.growth.net_worth');
+    const tAction = useTranslations('common.action');
     const { householdId } = useAuth();
     const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
@@ -53,7 +61,7 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
     if (live && assetQuery.isLoading && !asset) {
         return (
             <Typography as="p" size="sm" color="muted">
-                Loading…
+                {t('detail.loading')}
             </Typography>
         );
     }
@@ -63,9 +71,9 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                 <Link
                     href={boardHref}
                     className="font-mono text-xs tracking-wide text-accent uppercase hover:underline">
-                    ← Net worth
+                    {t('detail.back')}
                 </Link>
-                <p className="text-sm text-fg-muted">Asset not found.</p>
+                <p className="text-sm text-fg-muted">{t('detail.not_found')}</p>
             </div>
         );
     }
@@ -74,7 +82,7 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
     const locked = kind ? !kind.canPay : false;
     const pays = !locked && asset.flow > 0;
     const income = locked
-        ? 'Not available yet'
+        ? t('not_available_yet')
         : pays
           ? `+ ${formatMoney(asset.flow)}`
           : formatMoney(0);
@@ -86,7 +94,7 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                     <Link
                         href={boardHref}
                         className="w-fit font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
-                        ← Net worth
+                        {t('detail.back')}
                     </Link>
                     <div className="flex items-start gap-3">
                         <span
@@ -96,9 +104,9 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                         </span>
                         <div>
                             <p className="font-mono text-[10px] tracking-widest text-fg-muted uppercase">
-                                {kind?.name ?? 'Asset'}
+                                {kind?.name ?? t('kind_fallback')}
                                 {' · '}
-                                {statusLine(asset.kindKey, locked, pays)}
+                                {statusLine(asset.kindKey, locked, pays, t)}
                             </p>
                             <h1 className="mt-0.5 text-2xl font-semibold tracking-tight text-fg">
                                 {asset.name}
@@ -108,7 +116,7 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                 </div>
                 <Button as={Link} href={updateHref('asset', asset.id)} variant="secondary">
                     <EditIcon />
-                    Edit
+                    {tAction('edit')}
                 </Button>
             </div>
 
@@ -118,7 +126,7 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                         <span aria-hidden className="w-1 shrink-0 bg-accent" />
                         <div className="grid min-w-0 gap-1.5 px-3.5 py-3">
                             <p className="font-mono text-[10px] tracking-wider text-fg-muted uppercase">
-                                Value
+                                {t('value')}
                             </p>
                             <p className="font-display text-xl leading-none font-semibold tracking-tight text-fg sm:text-2xl">
                                 {formatMoney(asset.value)}
@@ -132,7 +140,7 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                         />
                         <div className="grid min-w-0 gap-1.5 px-3.5 py-3">
                             <p className="font-mono text-[10px] tracking-wider text-fg-muted uppercase">
-                                Monthly income
+                                {t('monthly_income')}
                             </p>
                             <p
                                 className={cn(

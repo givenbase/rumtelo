@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 
 import type { Goal } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import {
     describePeriodTravel,
@@ -22,6 +23,10 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 export function GrowthPortalHubClient() {
+    const t = useTranslations();
+    const tCoach = useTranslations('features.coach');
+    const tc = useTranslations('features.growth.hub.cards');
+    const shell = growthPortalShell(t);
     const { householdId } = useAuth();
     const { period } = useAppShell();
     const { formatMoney } = useHouseholdCurrency();
@@ -75,21 +80,28 @@ export function GrowthPortalHubClient() {
     }, [traveling, goalsQuery.data, travel.monthsDelta, travel.direction, periodKey]);
 
     const props: PortalHubProps = {
-        ...growthPortalShell,
-        coach: pickPortalCoach(data?.coach ?? [], growthPortalShell.fallbackCoach),
+        ...shell,
+        coach: pickPortalCoach(data?.coach ?? [], shell.fallbackCoach, tCoach, t),
         cards: [
             {
-                name: 'Goals',
+                name: tc('goals.name'),
                 value: traveling ? String(fulfilled) : String(goalsActive),
-                note: traveling ? `reached by then · ${goalsActive} open now` : 'goals in progress',
+                note: traveling
+                    ? tc('goals.note_travel', { active: String(goalsActive) })
+                    : tc('goals.note_current'),
                 color: 'var(--color-jar-lts)',
                 chart: { kind: 'ring', pct: progress },
                 href: '/product/growth/goals',
             },
             {
-                name: 'Income',
+                name: tc('income.name'),
                 value: formatMoney(spanIncome),
-                note: traveling ? `${formatMoney(income)}/mo · ${horizon} months` : 'per month now',
+                note: traveling
+                    ? tc('income.note_travel', {
+                          monthly: formatMoney(income),
+                          months: String(horizon),
+                      })
+                    : tc('income.note_current'),
                 color: 'var(--color-accent)',
                 chart: { kind: 'bars', bars: [0, 0, 0, 0, 0, 0, 0] },
                 delta: traveling
@@ -102,17 +114,17 @@ export function GrowthPortalHubClient() {
                 href: '/product/growth/income',
             },
             {
-                name: 'Learn',
+                name: tc('learn.name'),
                 value: String(learn),
-                note: 'books in your queue',
+                note: tc('learn.note'),
                 color: 'var(--color-jar-edu)',
                 chart: { kind: 'ring', pct: learnProgress },
                 href: '/product/growth/learn',
             },
             {
-                name: 'Net worth',
+                name: tc('net_worth.name'),
                 value: netWorth === null || netWorth === undefined ? '—' : formatMoney(netWorth),
-                note: 'truly yours',
+                note: tc('net_worth.note'),
                 color: 'var(--color-jar-ff)',
                 chart: { kind: 'bars', bars: [0, 0, 0, 0, 0, 0, 0] },
                 href: '/product/growth/net-worth',

@@ -15,7 +15,7 @@ import { loadEnv } from '../../../../common/config/env.config';
 /**
  * Outbound email — Rumtelo writes (backoffice). Households never send.
  *
- * Templates are React Email components (Galighticus pattern) rendered via
+ * Templates are React Email components rendered via
  * `@react-email/render` — never hand-rolled HTML strings.
  *
  * Providers:
@@ -82,7 +82,7 @@ export class EmailService {
         return true;
     }
 
-    /** Render React Email template + send (Galighticus `sendTemplatedEmail`). */
+    /** Render React Email template + send. */
     private async sendTemplatedEmail(
         to: string,
         subject: string,

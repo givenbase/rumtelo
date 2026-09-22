@@ -3,6 +3,8 @@ const auth = {
     sign_in: {
         title: 'Welcome back',
         subtitle: 'Sign in to pick up where you left off.',
+        submit: 'Sign in',
+        no_account: 'No account yet?',
         verification: {
             title: 'Verify your email',
             required: 'Confirm {email} before signing in. Check your inbox for the link.',
@@ -14,10 +16,24 @@ const auth = {
         },
         forgot_password: 'Forgot password?',
         create_account: 'Create an account',
+        or_divider: 'or',
+        demo: {
+            heading: 'Demo accounts',
+            passwords: 'Passwords:',
+        },
     },
     sign_up: {
         title: 'Create your account',
         subtitle: 'Six jars. One calm overview.',
+        submit: 'Create account',
+        have_account: 'Already have an account?',
+        password_hint: 'At least {count} characters',
+        plan_intent:
+            'You chose {plan} ({interval}). After setup we’ll take you to Stripe to add payment and finish the upgrade.',
+        plan_yearly: 'yearly',
+        plan_monthly: 'monthly',
+        middle_name: 'Middle name',
+        birthday: 'Birthday',
     },
     /** Pending verification gate — email today; phone / etc. later. */
     verify: {

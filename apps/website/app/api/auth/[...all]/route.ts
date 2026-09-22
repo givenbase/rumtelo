@@ -1,5 +1,5 @@
 /**
- * Better Auth API Route Handler — proxies to Nest (Galighticus pattern).
+ * Better Auth API Route Handler — proxies to Nest.
  * Cookies bind to DOMAIN_WEB for sign-up / verify / reset flows.
  */
 

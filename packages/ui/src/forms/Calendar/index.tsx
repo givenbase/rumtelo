@@ -22,6 +22,24 @@ const MONTHS_SHORT = [
     'Dec',
 ] as const;
 
+/** Monday-first weekday short labels (Mon=0 … Sun=6). */
+function weekdayShortNames(locale: string): readonly string[] {
+    const formatter = new Intl.DateTimeFormat(locale, { weekday: 'short' });
+    const monday = new Date(2025, 0, 6);
+    return Array.from({ length: 7 }, (_, index) => {
+        const date = new Date(monday);
+        date.setDate(monday.getDate() + index);
+        return formatter.format(date);
+    });
+}
+
+function monthShortNames(locale: string): readonly string[] {
+    const formatter = new Intl.DateTimeFormat(locale, { month: 'short' });
+    return Array.from({ length: 12 }, (_, monthIndex) =>
+        formatter.format(new Date(2025, monthIndex, 1))
+    );
+}
+
 /** Parse YYYY-MM-DD as a local calendar date (avoids UTC day shifts). */
 export function parseIsoDate(iso: string): Date {
     const parts = iso.split('-').map(Number);
@@ -38,9 +56,9 @@ export function toIsoDate(date: Date): string {
     return `${year}-${month}-${day}`;
 }
 
-export function formatDisplayDate(iso: string): string {
+export function formatDisplayDate(iso: string, locale?: string): string {
     const date = parseIsoDate(iso);
-    return date.toLocaleDateString(undefined, {
+    return date.toLocaleDateString(locale, {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
@@ -112,10 +130,29 @@ export type CalendarProps = {
     min?: string | null;
     max?: string | null;
     className?: string;
+    /** BCP 47 locale — localizes weekday/month captions via Intl when set. */
+    locale?: string;
+    /** Optional a11y labels — English defaults when omitted. */
+    labels?: {
+        previousMonth?: string;
+        nextMonth?: string;
+        month?: string;
+        year?: string;
+        today?: string;
+        pickADay?: string;
+    };
 };
 
 /** Branded month grid — use instead of native `type="date"` pickers. */
-export function Calendar({ value, onSelect, min, max, className }: CalendarProps) {
+export function Calendar({ value, onSelect, min, max, className, locale, labels }: CalendarProps) {
+    const previousMonthLabel = labels?.previousMonth ?? 'Previous month';
+    const nextMonthLabel = labels?.nextMonth ?? 'Next month';
+    const monthLabel = labels?.month ?? 'Month';
+    const yearLabel = labels?.year ?? 'Year';
+    const todayLabel = labels?.today ?? 'Today';
+    const pickADayLabel = labels?.pickADay ?? 'Pick a day';
+    const weekdays = useMemo(() => (locale ? weekdayShortNames(locale) : WEEKDAYS), [locale]);
+    const monthsShort = useMemo(() => (locale ? monthShortNames(locale) : MONTHS_SHORT), [locale]);
     const selected = value ? parseIsoDate(value) : null;
     const minDate = min ? parseIsoDate(min) : null;
     const maxDate = max ? parseIsoDate(max) : null;
@@ -188,7 +225,7 @@ export function Calendar({ value, onSelect, min, max, className }: CalendarProps
             <div className="mb-3 flex items-center justify-between gap-1.5">
                 <button
                     type="button"
-                    aria-label="Previous month"
+                    aria-label={previousMonthLabel}
                     disabled={!canGoPrev}
                     onClick={() => setVisibleMonth(current => addMonths(current, -1))}
                     className="grid size-8 shrink-0 place-items-center rounded-full border border-line text-fg-muted transition-colors hover:border-accent-hover hover:text-accent disabled:pointer-events-none disabled:opacity-40">
@@ -197,15 +234,15 @@ export function Calendar({ value, onSelect, min, max, className }: CalendarProps
 
                 <div className="flex min-w-0 flex-1 items-center justify-center gap-1">
                     <label className="relative inline-flex min-w-0">
-                        <span className="sr-only">Month</span>
+                        <span className="sr-only">{monthLabel}</span>
                         <select
-                            aria-label="Month"
+                            aria-label={monthLabel}
                             className={cn(captionSelectClass, 'min-w-0 flex-1')}
                             value={visibleMonth.getMonth()}
                             onChange={event =>
                                 jumpTo(visibleMonth.getFullYear(), Number(event.target.value))
                             }>
-                            {MONTHS_SHORT.map((label, monthIndex) => (
+                            {monthsShort.map((label, monthIndex) => (
                                 <option
                                     key={label}
                                     value={monthIndex}
@@ -228,9 +265,9 @@ export function Calendar({ value, onSelect, min, max, className }: CalendarProps
                         </span>
                     </label>
                     <label className="relative inline-flex">
-                        <span className="sr-only">Year</span>
+                        <span className="sr-only">{yearLabel}</span>
                         <select
-                            aria-label="Year"
+                            aria-label={yearLabel}
                             className={captionSelectClass}
                             value={visibleMonth.getFullYear()}
                             onChange={event =>
@@ -252,7 +289,7 @@ export function Calendar({ value, onSelect, min, max, className }: CalendarProps
 
                 <button
                     type="button"
-                    aria-label="Next month"
+                    aria-label={nextMonthLabel}
                     disabled={!canGoNext}
                     onClick={() => setVisibleMonth(current => addMonths(current, 1))}
                     className="grid size-8 shrink-0 place-items-center rounded-full border border-line text-fg-muted transition-colors hover:border-accent-hover hover:text-accent disabled:pointer-events-none disabled:opacity-40">
@@ -261,7 +298,7 @@ export function Calendar({ value, onSelect, min, max, className }: CalendarProps
             </div>
 
             <div className="mb-1 grid grid-cols-7 gap-0.5">
-                {WEEKDAYS.map(day => (
+                {weekdays.map(day => (
                     <div
                         key={day}
                         className="grid h-8 place-items-center font-mono text-[10px] tracking-wide text-fg-faint uppercase">
@@ -288,7 +325,7 @@ export function Calendar({ value, onSelect, min, max, className }: CalendarProps
                             key={iso}
                             type="button"
                             disabled={disabled}
-                            aria-label={formatDisplayDate(iso)}
+                            aria-label={formatDisplayDate(iso, locale)}
                             aria-pressed={isSelected}
                             onClick={() => onSelect?.(iso)}
                             className={cn(
@@ -320,14 +357,14 @@ export function Calendar({ value, onSelect, min, max, className }: CalendarProps
                         onSelect?.(iso);
                     }}
                     className="font-mono text-[11px] tracking-wide text-accent uppercase hover:underline disabled:pointer-events-none disabled:opacity-40">
-                    Today
+                    {todayLabel}
                 </button>
                 {selected ? (
                     <span className="font-mono text-[11px] text-fg-muted">
-                        {formatDisplayDate(toIsoDate(selected))}
+                        {formatDisplayDate(toIsoDate(selected), locale)}
                     </span>
                 ) : (
-                    <span className="font-mono text-[11px] text-fg-faint">Pick a day</span>
+                    <span className="font-mono text-[11px] text-fg-faint">{pickADayLabel}</span>
                 )}
             </div>
         </div>

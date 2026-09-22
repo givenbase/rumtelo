@@ -1,22 +1,23 @@
+import { getTranslations } from '@rumtelo/i18n';
 import { EmptyState, Section, Typography } from '@rumtelo/ui';
 
-export const metadata = { title: 'Sleep' };
+export async function generateMetadata() {
+    const t = await getTranslations('features.energy.sleep');
+    return { title: t('eyebrow') };
+}
 
-export default function SleepPage() {
+export default async function SleepPage() {
+    const t = await getTranslations('features.energy.sleep');
+
     return (
         <div className="grid animate-rise gap-6">
-            <Section eyebrow="My sleep" title="The floor everything else stands on.">
+            <Section eyebrow={t('eyebrow')} title={t('title')}>
                 <Typography as="p" variant="lead" size="default">
-                    Sleep is not a budget you distribute — it is the input that determines how well
-                    the rest of your day works. Deep sleep restores you; REM sleep sharpens you.
+                    {t('lead')}
                 </Typography>
             </Section>
 
-            <EmptyState
-                icon="🌙"
-                title="Nog geen data"
-                body="Slaaptracking komt binnenkort. Tot die tijd: noteer je uren in je weekoverzicht."
-            />
+            <EmptyState icon="🌙" title={t('empty_title')} body={t('empty_body')} />
         </div>
     );
 }

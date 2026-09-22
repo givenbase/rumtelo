@@ -1,5 +1,4 @@
 import {
-    ForbiddenException,
     Inject,
     Injectable,
     type CallHandler,
@@ -16,6 +15,7 @@ import { Observable } from 'rxjs';
 
 import { HouseholdBillingService } from '../../modules/auth/household/household-billing/household-billing.service';
 import { isLaunchProductsDeferred } from '../config/launch-products.util';
+import { apiForbidden } from '../errors/api-user-error';
 import { currentHouseholdId, householdStorage } from '../household/household.context';
 import { REQUIRE_CAPABILITY_KEY } from './require-capability.decorator';
 
@@ -47,17 +47,17 @@ export class CapabilityInterceptor implements NestInterceptor {
 
     private async assertGranted(keys: CapabilityKey[]): Promise<void> {
         if (!householdStorage.getStore()?.householdId) {
-            throw new ForbiddenException('Household context required for capability check');
+            throw apiForbidden('household_context_required');
         }
         const householdId = currentHouseholdId();
         const planKey = await this.billing.getPlanKey(householdId);
         const defer = isLaunchProductsDeferred();
         for (const key of keys) {
             if (defer && isCapabilityDeferredAtLaunch(key)) {
-                throw new ForbiddenException(`${key} is not available yet`);
+                throw apiForbidden('capability_unavailable');
             }
             if (!hasCapability(key, planKey)) {
-                throw new ForbiddenException(`Plan does not include ${key}`);
+                throw apiForbidden('plan_missing_capability');
             }
         }
     }

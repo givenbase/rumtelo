@@ -12,11 +12,7 @@ export default function Page() {
     const meta = formRoute('fixedCreate');
 
     return (
-        <FormRoutePageShell
-            title={meta.title}
-            description={meta.description}
-            closeHref={meta.closeHref}
-            width={meta.width}>
+        <FormRoutePageShell meta={meta}>
             <FixedCostCreatePage
                 embedded
                 defaultValues={fixedCostPrefillFromParams(searchParams)}

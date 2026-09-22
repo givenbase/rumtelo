@@ -31,7 +31,7 @@ function authUserFirstName(user: { name?: string | null; email: string }): strin
  * organization, member, invitation, two_factor) and migrates them via
  * `pn auth:migrate`. The sibling folders here (user/, member/, …) map read-only
  * MikroORM entities over the same tables so the rest of the backend gets typed,
- * relational reads — better-auth stays the single writer (Galighticus pattern).
+ * relational reads — better-auth stays the single writer.
  *
  * Column names are snake_case like every other schema. better-auth is camelCase
  * internally, so each model maps its fields explicitly below. Plugin-added
@@ -55,7 +55,7 @@ export function createAuth(env: Env) {
         ssl: env.DATABASE_SSL ? { rejectUnauthorized: false } : undefined,
         /**
          * better-auth is schema-unaware, so its pool connects with search_path
-         * pinned to the `auth` schema (Galighticus pattern). Its tables live
+         * pinned to the `auth` schema. Its tables live
          * there, namespaced like every other domain — never in `public`.
          */
         options: '-c search_path=auth',

@@ -3,6 +3,7 @@
 import { apiQuery } from '@/app/_lib/api-hooks';
 
 import { useLiveQuery } from '@rumtelo/hooks';
+import { useTranslations } from '@rumtelo/i18n';
 import { Typography } from '@rumtelo/ui';
 
 import type { Transaction } from '@rumtelo/contracts';
@@ -49,6 +50,7 @@ export function ExpenseCreatePage({
 }
 
 export function ExpenseUpdatePage({ id, embedded = false }: { id: string; embedded?: boolean }) {
+    const t = useTranslations('features.money.transactions.detail');
     const { householdId } = useAuth();
     const live = isLiveData(householdId);
 
@@ -80,12 +82,12 @@ export function ExpenseUpdatePage({ id, embedded = false }: { id: string; embedd
     if (live && (listQuery.isLoading || inboxQuery.isLoading) && !tx) {
         return (
             <Typography as="p" size="sm" color="muted">
-                Loading…
+                {t('loading')}
             </Typography>
         );
     }
     if (!tx) {
-        return <p className="text-sm text-fg-muted">Transaction not found.</p>;
+        return <p className="text-sm text-fg-muted">{t('not_found')}</p>;
     }
 
     return (

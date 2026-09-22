@@ -1,5 +1,7 @@
 import { EntityManager } from '@mikro-orm/postgresql';
-import { BadRequestException, ConflictException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+
+import { apiBadRequest, apiConflict } from '../../../../../../common/errors/api-user-error';
 
 import { type AccountKind } from '@rumtelo/contracts';
 import { isValidIban, normalizeIban } from '@rumtelo/utils';
@@ -24,7 +26,7 @@ export class BankAccountService {
         const iban = normalizeOptionalIban(input.iban);
         // UNIQUE(household, iban) backs this; the pre-check turns a 500 into a clear 409.
         if (iban && (await this.repo.findOne({ iban }))) {
-            throw new ConflictException('This IBAN is already linked to an account.');
+            throw apiConflict('iban_already_linked');
         }
         const account = this.em.create(BankAccount, {
             household: currentHouseholdId(),
@@ -50,7 +52,7 @@ export class BankAccountService {
 function normalizeOptionalIban(value: string | null | undefined): string | null {
     if (value === null || value === undefined || !value.trim()) return null;
     if (!isValidIban(value)) {
-        throw new BadRequestException('Invalid IBAN — check the number and try again.');
+        throw apiBadRequest('invalid_iban');
     }
     return normalizeIban(value);
 }

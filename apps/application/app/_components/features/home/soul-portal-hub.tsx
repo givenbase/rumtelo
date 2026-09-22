@@ -11,6 +11,8 @@ import {
 } from '@rumtelo/utils';
 import { useMemo } from 'react';
 
+import { useTranslations } from '@rumtelo/i18n';
+
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { pickPortalCoach } from '@/app/_lib/portal-coach';
 import { isLiveData } from '@/app/_lib/preview';
@@ -34,6 +36,10 @@ type PledgeGoal = Pick<
 >;
 
 export function SoulPortalHubClient() {
+    const t = useTranslations();
+    const tCoach = useTranslations('features.coach');
+    const tc = useTranslations('features.soul.hub.cards');
+    const shell = soulPortalShell(t);
     const { householdId } = useAuth();
     const { period } = useAppShell();
     const { formatMoney } = useHouseholdCurrency();
@@ -93,14 +99,25 @@ export function SoulPortalHubClient() {
     const intention = data?.intention;
     const centres = data?.centresNamedToday ?? 0;
 
+    const givingNote = pledge
+        ? pledgeAt?.fulfilledByPeriod
+            ? tc('giving.reached_by_then', { target: formatMoney(pledge.target) })
+            : traveling
+              ? tc('giving.now_of_target', {
+                    saved: formatMoney(pledge.saved),
+                    target: formatMoney(pledge.target),
+                })
+              : tc('giving.pledged_this_year', { target: formatMoney(pledge.target) })
+        : tc('giving.no_pledge');
+
     const props: PortalHubProps = {
-        ...soulPortalShell,
-        coach: pickPortalCoach(data?.coach ?? [], soulPortalShell.fallbackCoach),
+        ...shell,
+        coach: pickPortalCoach(data?.coach ?? [], shell.fallbackCoach, tCoach, t),
         cards: [
             {
-                name: 'Stillness',
+                name: tc('stillness.name'),
                 value: streak === null || streak === undefined ? '—' : String(streak),
-                note: 'days in a row',
+                note: tc('stillness.note'),
                 color: 'var(--color-portal-soul)',
                 chart: {
                     kind: 'bars',
@@ -114,23 +131,17 @@ export function SoulPortalHubClient() {
                 href: '/product/soul/stillness',
             },
             {
-                name: 'Gratitude',
+                name: tc('gratitude.name'),
                 value: String(thanks),
-                note: 'things noted this week',
+                note: tc('gratitude.note'),
                 color: 'var(--color-jar-give)',
                 chart: { kind: 'ring', pct: Math.min(100, thanks * 20) },
                 href: '/product/soul/gratitude',
             },
             {
-                name: 'Giving',
+                name: tc('giving.name'),
                 value: pledge ? formatMoney(pledgeSaved) : '—',
-                note: pledge
-                    ? pledgeAt?.fulfilledByPeriod
-                        ? `reached by then · of ${formatMoney(pledge.target)}`
-                        : traveling
-                          ? `${formatMoney(pledge.saved)} now · of ${formatMoney(pledge.target)}`
-                          : `of ${formatMoney(pledge.target)} pledged this year`
-                    : 'no pledge yet',
+                note: givingNote,
                 color: 'var(--color-jar-give)',
                 chart: {
                     kind: 'ring',
@@ -150,17 +161,17 @@ export function SoulPortalHubClient() {
                 href: '/product/soul/giving',
             },
             {
-                name: 'Intent',
-                value: intention ? 'Set' : '—',
-                note: intention ? intention.slice(0, 42) : 'for this week',
+                name: tc('intent.name'),
+                value: intention ? tc('intent.set') : '—',
+                note: intention ? intention.slice(0, 42) : tc('intent.note_empty'),
                 color: 'var(--color-accent)',
                 chart: { kind: 'ring', pct: intention ? 100 : 0 },
                 href: '/product/soul/intent',
             },
             {
-                name: 'Centres',
+                name: tc('centres.name'),
                 value: String(centres),
-                note: 'centres named today',
+                note: tc('centres.note'),
                 color: 'var(--color-jar-edu)',
                 chart: { kind: 'ring', pct: 0 },
                 href: '/product/soul/centres',

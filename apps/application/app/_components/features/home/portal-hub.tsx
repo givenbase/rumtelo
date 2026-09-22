@@ -4,10 +4,12 @@ import type { ReactNode } from 'react';
 
 import Link from 'next/link';
 
+import { useTranslations } from '@rumtelo/i18n';
 import { Button, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { capabilityKeyForPathname } from '@/app/_lib/capability-access';
+import { coachKindDisplay } from '@/app/_lib/coach-kind-label';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
 
 interface HubCard {
@@ -40,6 +42,8 @@ export interface PortalHubProps {
  * Energy and Soul's own overview screen.
  */
 export function PortalHub({ tint, icon, eyebrow, title, line, coach, cards }: PortalHubProps) {
+    const t = useTranslations('features.coach');
+    const tKind = useTranslations('features.coach.verdict');
     const { isCapabilityLocked } = usePlanCapabilities();
     const coachLocked = isCapabilityLocked(capabilityKeyForPathname(coach.href));
 
@@ -70,12 +74,12 @@ export function PortalHub({ tint, icon, eyebrow, title, line, coach, cards }: Po
                             style={{ background: coach.dot }}
                         />
                         <Typography as="span" variant="eyebrow" color="primary">
-                            The Coach
+                            {t('page_title')}
                         </Typography>
                         <span
                             className="font-mono text-xs font-medium tracking-widest uppercase"
                             style={{ color: coach.dot }}>
-                            · {coach.kind}
+                            · {coachKindDisplay(coach.kind, tKind)}
                         </span>
                     </span>
                     <Typography
@@ -87,7 +91,7 @@ export function PortalHub({ tint, icon, eyebrow, title, line, coach, cards }: Po
                     </Typography>
                 </div>
                 <Button as={Link} href={coach.href} size="sm">
-                    {coachLocked ? `🔒 ${coach.cta}` : coach.cta}
+                    {coachLocked ? t('helpers.locked_cta', { cta: coach.cta }) : coach.cta}
                 </Button>
             </div>
 

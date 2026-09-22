@@ -14,36 +14,19 @@ import {
 } from '@rumtelo/ui';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { useTranslations } from '@rumtelo/i18n';
+import { useMemo } from 'react';
 
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 
-const stubSchema = z.object({
-    label: z.string().min(1, 'Name is required').max(80),
-    amount: z.string().optional(),
-});
+import { createStubFormSchema, type StubFormSchemaValues } from './form-zod';
 
-type StubValues = z.infer<typeof stubSchema>;
+type StubValues = StubFormSchemaValues;
 
 export type StubKind = 'session' | 'asset';
-
-const KIND_COPY: Record<
-    StubKind,
-    { submit: string; amountLabel?: (symbol: string) => string; labelPlaceholder: string }
-> = {
-    session: {
-        submit: 'Save training',
-        labelPlaceholder: 'e.g. running',
-    },
-    asset: {
-        submit: 'Save asset',
-        amountLabel: symbol => `Value (${symbol})`,
-        labelPlaceholder: 'e.g. bicycle',
-    },
-};
 
 type SheetStubFormProps = {
     kind: StubKind;
@@ -64,11 +47,16 @@ export function SheetStubForm({
     mode = 'create',
     onSuccess,
 }: SheetStubFormProps) {
+    const tStub = useTranslations('features.energy.stub_form');
+    const tUiForm = useTranslations('ui.form');
     const { showToast } = useAppShell();
     const dismiss = useFormDismiss(onSuccess);
-    const copy = KIND_COPY[kind];
     const { symbol } = useHouseholdCurrency();
-    const amountLabel = copy.amountLabel?.(symbol);
+    const submitLabel = kind === 'session' ? tStub('save_training') : tStub('save_asset');
+    const amountLabel = kind === 'asset' ? tStub('value_label', { symbol }) : undefined;
+    const labelPlaceholder =
+        kind === 'session' ? tStub('label_placeholder_session') : tStub('label_placeholder_asset');
+    const stubSchema = useMemo(() => createStubFormSchema(tUiForm), [tUiForm]);
 
     const form = useForm<StubValues>({
         defaultValues: {
@@ -78,12 +66,23 @@ export function SheetStubForm({
         resolver: zodResolver(stubSchema),
     });
 
-    const onError = createFormInvalidHandler(({ title, description }) => {
-        showToast(description ?? title, 'error');
-    });
+    const onError = createFormInvalidHandler(
+        ({ title, description }) => {
+            showToast(description ?? title, 'error');
+        },
+        {
+            title: tUiForm('incomplete_title'),
+            description: tUiForm('incomplete_description'),
+        }
+    );
 
     async function onSubmit() {
-        showToast(mode === 'edit' ? 'Saved (local)' : `${copy.submit} done (local)`, 'success');
+        showToast(
+            mode === 'edit'
+                ? tStub('saved_local')
+                : tStub('saved_local_done', { action: submitLabel }),
+            'success'
+        );
         dismiss();
     }
 
@@ -95,7 +94,7 @@ export function SheetStubForm({
             onSubmit={onSubmit}
             sidebar={
                 <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                    {form.formState.isSubmitting ? 'Working…' : copy.submit}
+                    {form.formState.isSubmitting ? tUiForm('working') : submitLabel}
                 </Button>
             }>
             <FormField
@@ -103,9 +102,9 @@ export function SheetStubForm({
                 name="label"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Name</FormLabel>
+                        <FormLabel>{tUiForm('fields.name')}</FormLabel>
                         <FormControl>
-                            <FormInput placeholder={copy.labelPlaceholder} {...field} />
+                            <FormInput placeholder={labelPlaceholder} {...field} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -120,7 +119,11 @@ export function SheetStubForm({
                         <FormItem>
                             <FormLabel>{amountLabel}</FormLabel>
                             <FormControl>
-                                <FormInput inputMode="decimal" placeholder="0,00" {...field} />
+                                <FormInput
+                                    inputMode="decimal"
+                                    placeholder={tUiForm('amount_zero')}
+                                    {...field}
+                                />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -128,9 +131,7 @@ export function SheetStubForm({
                 />
             ) : null}
 
-            <p className="text-xs text-fg-faint">
-                No live API for this type yet — the form pattern is ready.
-            </p>
+            <p className="text-xs text-fg-faint">{tStub('no_api_yet')}</p>
         </FormCreateEditShell>
     );
 }

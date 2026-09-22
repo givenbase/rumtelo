@@ -2,7 +2,6 @@ import type { FastifyRequest } from 'fastify';
 
 import {
     Inject,
-    ForbiddenException,
     Injectable,
     type CallHandler,
     type ExecutionContext,
@@ -12,6 +11,7 @@ import { AuthService } from '@thallesp/nestjs-better-auth';
 import { fromNodeHeaders } from 'better-auth/node';
 import { Observable } from 'rxjs';
 
+import { apiForbidden } from '../errors/api-user-error';
 import { toAuthHeaders } from './auth-headers.util';
 import { authHeadersStorage, householdStorage, type HouseholdContext } from './household.context';
 import { MembershipService } from './membership.service';
@@ -53,7 +53,7 @@ export class HouseholdScopeInterceptor implements NestInterceptor {
 
     private async resolve(req: Req): Promise<{ ctx: HouseholdContext; headers: Headers }> {
         if (!this.authService?.api) {
-            throw new ForbiddenException('Auth is not ready');
+            throw apiForbidden('auth_not_ready');
         }
 
         if (!req.user) {
@@ -65,7 +65,7 @@ export class HouseholdScopeInterceptor implements NestInterceptor {
         }
 
         const userId = req.user?.id;
-        if (!userId) throw new ForbiddenException('Not authenticated');
+        if (!userId) throw apiForbidden('not_authenticated');
 
         const pathname = (req.url ?? '').split('?')[0] ?? '';
         const isOnboard = pathname.endsWith('/household/onboard');
@@ -77,10 +77,10 @@ export class HouseholdScopeInterceptor implements NestInterceptor {
             return { ctx: { userId, householdId: null, role: 'OWNER' }, headers };
         }
 
-        if (!householdId) throw new ForbiddenException('No household selected');
+        if (!householdId) throw apiForbidden('no_household_selected');
 
         const role = await this.membership.roleFor(userId, householdId);
-        if (!role) throw new ForbiddenException('Not a member of this household');
+        if (!role) throw apiForbidden('not_household_member');
 
         return { ctx: { userId, householdId, role }, headers };
     }

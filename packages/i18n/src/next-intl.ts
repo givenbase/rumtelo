@@ -33,5 +33,10 @@ export const { redirect, usePathname, useRouter, Link } = createNavigation(routi
 
 export { useNextIntlTranslations as useTranslations };
 
+export { useLocale } from 'next-intl';
+
+/** Server Components — same message catalog as `useTranslations`. */
+export { getTranslations } from 'next-intl/server';
+
 /** Pass `t` into helpers without repeating `ReturnType<typeof useTranslations>`. */
 export type TranslateFn = ReturnType<typeof useNextIntlTranslations>;

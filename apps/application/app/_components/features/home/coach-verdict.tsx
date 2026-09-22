@@ -5,13 +5,17 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 import type { CoachMessage } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
 import { Button, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
+
+import { coachKindDisplay } from '@/app/_lib/coach-kind-label';
+import { resolveCoachMessage } from '@/app/_lib/coach-message-copy';
 
 /** Display fields for the rotating coach card (full DTO may omit CTA when informational). */
 export type CoachVerdictMessage = Pick<
     CoachMessage,
-    'id' | 'kind' | 'text' | 'ctaLabel' | 'ctaHref'
+    'id' | 'key' | 'kind' | 'text' | 'ctaLabel' | 'ctaHref'
 >;
 
 export interface CoachRecapItem {
@@ -22,11 +26,14 @@ export interface CoachRecapItem {
     href: string;
 }
 
-const KIND_META: Record<string, { label: string; dot: string }> = {
-    NUDGE: { label: 'Attention', dot: 'var(--color-warning)' },
-    WIN: { label: 'Win', dot: 'var(--color-success)' },
-    ON_TRACK: { label: 'On track', dot: 'var(--color-success)' },
-    ALERT: { label: 'Alert', dot: 'var(--color-danger)' },
+const KIND_DOTS: Record<string, string> = {
+    NUDGE: 'var(--color-warning)',
+    WIN: 'var(--color-success)',
+    WARNING: 'var(--color-danger)',
+    INSIGHT: 'var(--color-accent)',
+    WEEK_CHECK: 'var(--color-accent)',
+    ON_TRACK: 'var(--color-success)',
+    ALERT: 'var(--color-danger)',
 };
 
 /**
@@ -44,10 +51,17 @@ export function CoachVerdict({
     messages: readonly CoachVerdictMessage[];
     recap: CoachRecapItem[];
 }) {
+    const t = useTranslations('features.coach.verdict');
+    const tCoach = useTranslations('features.coach');
+    const tRoot = useTranslations();
     const [index, setIndex] = useState(0);
     const msg = messages[index] ?? messages[0];
     if (!msg) return null;
-    const meta = KIND_META[msg.kind] ?? { label: msg.kind, dot: 'var(--color-accent)' };
+    const copy = resolveCoachMessage(msg, tCoach, tRoot);
+    const meta = {
+        label: coachKindDisplay(msg.kind, t),
+        dot: KIND_DOTS[msg.kind] ?? 'var(--color-accent)',
+    };
 
     const prev = () => setIndex(previous => (previous - 1 + messages.length) % messages.length);
     const next = () => setIndex(previous => (previous + 1) % messages.length);
@@ -58,7 +72,7 @@ export function CoachVerdict({
             <div className="grid gap-3.5 px-5 pt-4.5 pb-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <Typography as="span" variant="eyebrow" color="primary">
-                        ✦ The Coach
+                        {t('eyebrow')}
                     </Typography>
                     <span className="flex items-center gap-2">
                         <span className="size-1.75 rounded-full" style={{ background: meta.dot }} />
@@ -77,7 +91,7 @@ export function CoachVerdict({
                     size="lg"
                     weight="medium"
                     className="max-w-prose leading-snug text-pretty lg:text-2xl">
-                    {msg.text}
+                    {copy.text}
                 </Typography>
 
                 <div className="flex flex-wrap items-center gap-3.5">
@@ -85,10 +99,10 @@ export function CoachVerdict({
                     <span className="flex items-center gap-1.5">
                         {messages.map((message, i) => (
                             <button
-                                key={message.text}
+                                key={message.id}
                                 type="button"
                                 onClick={() => setIndex(i)}
-                                aria-label={`Message ${i + 1}`}
+                                aria-label={t('message_n', { n: i + 1 })}
                                 className={cn(
                                     'h-1 rounded-full transition-all duration-300',
                                     i === index ? 'w-6 bg-accent' : 'w-2.5 bg-line-strong'
@@ -102,7 +116,7 @@ export function CoachVerdict({
                         <button
                             type="button"
                             onClick={prev}
-                            aria-label="Previous"
+                            aria-label={t('previous')}
                             className="grid size-6.5 place-items-center rounded-full border border-line text-fg-muted transition-colors hover:border-accent-hover hover:text-accent">
                             ←
                         </button>
@@ -112,7 +126,7 @@ export function CoachVerdict({
                         <button
                             type="button"
                             onClick={next}
-                            aria-label="Next"
+                            aria-label={t('next')}
                             className="grid size-6.5 place-items-center rounded-full border border-line text-fg-muted transition-colors hover:border-accent-hover hover:text-accent">
                             →
                         </button>
@@ -126,15 +140,15 @@ export function CoachVerdict({
                                 if (typeof navigator !== 'undefined' && navigator.share) {
                                     void navigator.share({
                                         title: 'Rumtelo',
-                                        text: msg.text,
+                                        text: copy.text,
                                         url: window.location.href,
                                     });
                                 }
                             }}>
-                            Share
+                            {t('share')}
                         </button>
                         <Button as={Link} href={msg.ctaHref ?? '/'} size="sm">
-                            {msg.ctaLabel ?? 'Open'}
+                            {copy.ctaLabel ?? t('open')}
                         </Button>
                     </span>
                 </div>
@@ -166,7 +180,7 @@ export function CoachVerdict({
                     href="/product/coach"
                     className="col-span-2 flex items-center justify-center border-t border-line px-4.5 py-2.5 transition-colors hover:text-accent sm:col-span-1 sm:ml-auto sm:border-t-0 sm:border-l">
                     <Typography as="span" variant="eyebrow" color="muted" className="text-fg-faint">
-                        Detail
+                        {t('detail')}
                     </Typography>
                 </Link>
             </div>

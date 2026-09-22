@@ -19,8 +19,20 @@ import {
 export type LearnFormat = 'BOOK' | 'FILM' | 'SERIES' | 'VIDEO' | 'COURSE';
 export type LearnStatus = 'NOW' | 'QUEUE' | 'DONE' | 'SHELF';
 
+/** Stable keys for outbound link CTAs — resolved via `features.growth.learn.catalog.links.*`. */
+export type LearnLinkKey =
+    | 'get_book'
+    | 'read_free'
+    | 'author'
+    | 'watch'
+    | 'trailer'
+    | 'where_to_watch'
+    | 'watch_on_youtube'
+    | 'view_on_udemy'
+    | 'view_on_masterclass';
+
 /** One link out. We recommend and point; we never host. */
-export type LearnLink = { label: string; href: string };
+export type LearnLink = { labelKey: LearnLinkKey; href: string };
 
 export type LearnPiece = {
     id: string;
@@ -115,7 +127,7 @@ export const PIECES: readonly LearnPiece[] = [
         use: 'Interviews, raises, rooms, and the one-to-one. A practical class, not a lecture series.',
         status: 'SHELF',
         primary: {
-            label: 'View on Udemy',
+            labelKey: 'view_on_udemy',
             href: 'https://www.udemy.com/course/the-complete-communication-skills-master-class-for-life/',
         },
         partner: 'UDEMY',
@@ -129,7 +141,7 @@ export const PIECES: readonly LearnPiece[] = [
         use: 'Cut a hundred messages down to the three a stranger can repeat.',
         status: 'SHELF',
         primary: {
-            label: 'View on Udemy',
+            labelKey: 'view_on_udemy',
             href: 'https://www.udemy.com/course/how-to-create-winning-messages/',
         },
         partner: 'UDEMY',
@@ -143,7 +155,7 @@ export const PIECES: readonly LearnPiece[] = [
         use: 'Tactical empathy for the conversations where the number, or the no, actually matters.',
         status: 'SHELF',
         primary: {
-            label: 'View on Masterclass',
+            labelKey: 'view_on_masterclass',
             href: 'https://www.masterclass.com/classes/chris-voss-teaches-the-art-of-negotiation',
         },
         partner: 'MASTERCLASS',
@@ -157,7 +169,7 @@ export const PIECES: readonly LearnPiece[] = [
         use: 'How to frame an offer so the right person can say yes without being pushed.',
         status: 'SHELF',
         primary: {
-            label: 'View on Masterclass',
+            labelKey: 'view_on_masterclass',
             href: 'https://www.masterclass.com/classes/daniel-pink-teaches-sales-and-persuasion',
         },
         partner: 'MASTERCLASS',
@@ -171,7 +183,7 @@ export const PIECES: readonly LearnPiece[] = [
         use: 'Invent, sell, and get a product known — bootstrapped, not borrowed.',
         status: 'SHELF',
         primary: {
-            label: 'View on Masterclass',
+            labelKey: 'view_on_masterclass',
             href: 'https://www.masterclass.com/classes/sara-blakely-teaches-self-made-entrepreneurship',
         },
         partner: 'MASTERCLASS',
@@ -187,7 +199,7 @@ export const PIECES: readonly LearnPiece[] = [
         use: 'Three priorities, then the capital follows. How Disney was steered, not decorated.',
         status: 'SHELF',
         primary: {
-            label: 'View on Masterclass',
+            labelKey: 'view_on_masterclass',
             href: 'https://www.masterclass.com/classes/bob-iger-teaches-business-strategy-and-leadership',
         },
         partner: 'MASTERCLASS',
@@ -202,7 +214,7 @@ export const PIECES: readonly LearnPiece[] = [
         use: 'A point of view, a room that can hold it, and the edit that makes the work recognizable.',
         status: 'SHELF',
         primary: {
-            label: 'View on Masterclass',
+            labelKey: 'view_on_masterclass',
             href: 'https://www.masterclass.com/classes/anna-wintour-teaches-creativity-and-leadership',
         },
         partner: 'MASTERCLASS',
@@ -216,7 +228,7 @@ export const PIECES: readonly LearnPiece[] = [
         use: 'How a strange fact becomes a sentence someone else can retell.',
         status: 'SHELF',
         primary: {
-            label: 'View on Masterclass',
+            labelKey: 'view_on_masterclass',
             href: 'https://www.masterclass.com/classes/malcolm-gladwell-teaches-writing',
         },
         partner: 'MASTERCLASS',
@@ -230,7 +242,7 @@ export const PIECES: readonly LearnPiece[] = [
         use: 'Intention and obstacle. The same shape as a hard conversation.',
         status: 'SHELF',
         primary: {
-            label: 'View on Masterclass',
+            labelKey: 'view_on_masterclass',
             href: 'https://www.masterclass.com/classes/aaron-sorkin-teaches-screenwriting',
         },
         partner: 'MASTERCLASS',
@@ -244,7 +256,7 @@ export const PIECES: readonly LearnPiece[] = [
         use: 'Say the thing, then say it so the room stays. A class on holding attention.',
         status: 'SHELF',
         primary: {
-            label: 'View on Masterclass',
+            labelKey: 'view_on_masterclass',
             href: 'https://www.masterclass.com/classes/shonda-rhimes-teaches-writing-for-television',
         },
         partner: 'MASTERCLASS',
@@ -258,7 +270,7 @@ export const PIECES: readonly LearnPiece[] = [
         use: 'One product people can name, then the discipline to keep it that.',
         status: 'SHELF',
         primary: {
-            label: 'View on Masterclass',
+            labelKey: 'view_on_masterclass',
             href: 'https://www.masterclass.com/classes/diane-von-furstenberg-teaches-building-a-fashion-business',
         },
         partner: 'MASTERCLASS',
@@ -272,7 +284,7 @@ export const PIECES: readonly LearnPiece[] = [
         use: 'Search, ads, and the page a stranger lands on. Practical, not a brand manifesto.',
         status: 'SHELF',
         primary: {
-            label: 'View on Udemy',
+            labelKey: 'view_on_udemy',
             href: 'https://www.udemy.com/course/the-complete-digital-marketing-course-12-courses-in-1/',
         },
         partner: 'UDEMY',
@@ -436,13 +448,13 @@ export function storeLink(isbn13: string, store: BookStore, tags: StoreTags): Le
         const href = tags.bolPartnerId
             ? `https://partner.bol.com/click/click?p=2&t=url&s=${encodeURIComponent(tags.bolPartnerId)}&url=${encodeURIComponent(target)}&f=TXL`
             : target;
-        return { label: 'Get the book', href };
+        return { labelKey: 'get_book', href };
     }
     const isbn10 = isbn13To10(isbn13);
     const url = new URL(isbn10 ? `https://www.amazon.nl/dp/${isbn10}` : 'https://www.amazon.nl/s');
     if (!isbn10) url.searchParams.set('k', isbn13);
     if (tags.amazonTag) url.searchParams.set('tag', tags.amazonTag);
-    return { label: 'Get the book', href: url.toString() };
+    return { labelKey: 'get_book', href: url.toString() };
 }
 
 /** Public-domain hosts we point at with "Read free". */
@@ -457,7 +469,7 @@ export function asLearnSkill(skill: string): LearnSkill {
 
 export function bookToPiece(book: LearnBookPreset, store: BookStore, tags: StoreTags): LearnPiece {
     const pointer: LearnLink = {
-        label: isFreeText(book.url) ? 'Read free' : 'Author',
+        labelKey: isFreeText(book.url) ? 'read_free' : 'author',
         href: book.url,
     };
     return {
@@ -503,7 +515,7 @@ export function addedBookToPiece(book: LearnBook, store: BookStore, tags: StoreT
 
 export function watchToPiece(watch: LearnWatchPreset): LearnPiece {
     const video = watch.format === LearnWatchKind.VIDEO;
-    const pointer: LearnLink = { label: video ? 'Watch' : 'Trailer', href: watch.url };
+    const pointer: LearnLink = { labelKey: video ? 'watch' : 'trailer', href: watch.url };
     return {
         id: watch.key,
         format: watch.format,
@@ -514,8 +526,8 @@ export function watchToPiece(watch: LearnWatchPreset): LearnPiece {
         status: 'SHELF',
         youtubeId: watch.youtubeId ?? undefined,
         primary: watch.watchUrl
-            ? { label: 'Where to watch', href: watch.watchUrl }
-            : { label: video ? 'Watch' : 'Watch on YouTube', href: watch.url },
+            ? { labelKey: 'where_to_watch', href: watch.watchUrl }
+            : { labelKey: video ? 'watch' : 'watch_on_youtube', href: watch.url },
         secondary: watch.watchUrl ? pointer : undefined,
         topic: watch.topic,
         minPlan: watch.minPlan,

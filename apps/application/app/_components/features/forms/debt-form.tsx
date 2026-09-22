@@ -1,9 +1,10 @@
 'use client';
 
 import { api } from '@/app/_lib/api';
+import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import { useLiveQuery } from '@rumtelo/hooks';
@@ -21,7 +22,8 @@ import {
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Cadence, DebtKind, DebtScheduleKind, JarKey } from '@rumtelo/contracts';
-import { z } from 'zod';
+
+import { useTranslations } from '@rumtelo/i18n';
 
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { partyMark } from '@/app/_lib/vendor-brands';
@@ -33,6 +35,7 @@ import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
+import { createDebtFormSchema, type DebtFormSchemaValues } from './form-zod';
 import { ChipSearch, matchesChipQuery } from './chip-search';
 import { ConfirmActionButton } from './confirm-action-button';
 import { FormInput } from './form-input';
@@ -40,88 +43,7 @@ import { merchantsToNameOptions } from './merchant-name-options';
 import { PresetNameField, type NamePresetOption } from './preset-name-field';
 import type { MerchantPreset } from '@rumtelo/contracts';
 
-const moneyInput = z
-    .string()
-    .min(1, 'Amount is required')
-    .refine(
-        value => {
-            const cents = parseAmountToMinorUnits(value);
-            return cents !== null && cents >= 0;
-        },
-        { message: 'Enter a valid amount' }
-    );
-
-const debtFormSchema = z
-    .object({
-        name: z.string().min(1, 'Who you owe is required').max(120),
-        balance: moneyInput,
-        interestRate: z
-            .string()
-            .min(1, 'Interest rate is required')
-            .refine(
-                value => {
-                    const parsed = Number(value.replace(',', '.'));
-                    return Number.isFinite(parsed) && parsed >= 0 && parsed <= 100;
-                },
-                { message: 'Interest must be between 0 and 100' }
-            ),
-        minimumPayment: z.string().optional(),
-        extraPayment: z.string().optional(),
-        dueDay: z.string().optional(),
-        startedOn: z.string().optional(),
-        scheduleKind: z.enum(DebtScheduleKind),
-        paymentCadence: z.enum([
-            Cadence.WEEKLY,
-            Cadence.MONTHLY,
-            Cadence.QUARTERLY,
-            Cadence.YEARLY,
-        ]),
-        termPayments: z.string().optional(),
-        maturityOn: z.string().optional(),
-        linkFixedCost: z.boolean(),
-        kind: z.enum(DebtKind),
-    })
-    .superRefine((value, ctx) => {
-        if (value.scheduleKind === DebtScheduleKind.TERM) {
-            const count = Number(value.termPayments);
-            if (!Number.isFinite(count) || count < 1) {
-                ctx.addIssue({
-                    code: 'custom',
-                    path: ['termPayments'],
-                    message: 'Enter how many payments',
-                });
-            }
-        }
-        if (value.scheduleKind === DebtScheduleKind.DEADLINE && !value.maturityOn?.trim()) {
-            ctx.addIssue({
-                code: 'custom',
-                path: ['maturityOn'],
-                message: 'Pick a deadline',
-            });
-        }
-    });
-
-export type DebtFormValues = z.infer<typeof debtFormSchema>;
-
-const SCHEDULE_OPTIONS: ReadonlyArray<{
-    id: DebtScheduleKind;
-    label: string;
-    hint: string;
-}> = [
-    { id: DebtScheduleKind.OPEN, label: 'Open', hint: 'No fixed end' },
-    { id: DebtScheduleKind.TERM, label: 'Fixed payments', hint: 'e.g. 24 times' },
-    { id: DebtScheduleKind.DEADLINE, label: 'Deadline', hint: 'Pay off by a date' },
-];
-
-const CADENCE_OPTIONS: ReadonlyArray<{
-    id: DebtFormValues['paymentCadence'];
-    label: string;
-}> = [
-    { id: Cadence.WEEKLY, label: 'Weekly' },
-    { id: Cadence.MONTHLY, label: 'Monthly' },
-    { id: Cadence.QUARTERLY, label: 'Quarterly' },
-    { id: Cadence.YEARLY, label: 'Yearly' },
-];
+export type DebtFormValues = DebtFormSchemaValues;
 
 type DebtFormProps = {
     defaultValues?: Partial<DebtFormValues>;
@@ -141,7 +63,42 @@ export function DebtForm({
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { symbol } = useHouseholdCurrency();
+    const t = useTranslations();
+    const tDebt = useTranslations('features.money.debt.form');
+    const tForm = useTranslations('ui.form');
+    const tBtn = useTranslations('ui.button.actions');
+    const scheduleOptions: ReadonlyArray<{
+        id: DebtScheduleKind;
+        label: string;
+        hint: string;
+    }> = [
+        {
+            id: DebtScheduleKind.OPEN,
+            label: tDebt('schedule_open'),
+            hint: tDebt('schedule_open_hint'),
+        },
+        {
+            id: DebtScheduleKind.TERM,
+            label: tDebt('schedule_term'),
+            hint: tDebt('schedule_term_hint'),
+        },
+        {
+            id: DebtScheduleKind.DEADLINE,
+            label: tDebt('schedule_deadline'),
+            hint: tDebt('schedule_deadline_hint'),
+        },
+    ];
+    const cadenceOptions: ReadonlyArray<{
+        id: DebtFormValues['paymentCadence'];
+        label: string;
+    }> = [
+        { id: Cadence.WEEKLY, label: tDebt('cadence_weekly') },
+        { id: Cadence.MONTHLY, label: tDebt('cadence_monthly') },
+        { id: Cadence.QUARTERLY, label: tDebt('cadence_quarterly') },
+        { id: Cadence.YEARLY, label: tDebt('cadence_yearly') },
+    ];
     const { showToast } = useAppShell();
+    const apiError = useApiError();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
     const [typeKey, setTypeKey] = useState<string | null>(null);
@@ -185,6 +142,8 @@ export function DebtForm({
     /** Suggested lenders + full merchant catalog (banks, BNPL, …) for typeahead. */
     const fromMerchants = merchantsToNameOptions(merchants);
     const lenderOptions: NamePresetOption[] = fromMerchants;
+    const debtFormSchema = useMemo(() => createDebtFormSchema(tForm), [tForm]);
+
     const form = useForm<DebtFormValues>({
         defaultValues: {
             name: defaultValues?.name ?? '',
@@ -204,9 +163,15 @@ export function DebtForm({
         resolver: zodResolver(debtFormSchema),
     });
 
-    const onError = createFormInvalidHandler(({ title, description }) => {
-        showToast(description ?? title, 'error');
-    });
+    const onError = createFormInvalidHandler(
+        ({ title, description }) => {
+            showToast(description ?? title, 'error');
+        },
+        {
+            title: tForm('incomplete_title'),
+            description: tForm('incomplete_description'),
+        }
+    );
 
     const scheduleKind = useWatch({ control: form.control, name: 'scheduleKind' });
     const paymentCadence = useWatch({ control: form.control, name: 'paymentCadence' });
@@ -281,10 +246,17 @@ export function DebtForm({
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.key() });
-            showToast(mode === 'edit' ? 'Debt updated' : 'Debt saved', 'success');
+            showToast(
+                mode === 'edit'
+                    ? t('common.message.success.updated', {
+                          entity: t('common.message.entity.names.debt'),
+                      })
+                    : t('common.message.success.saved'),
+                'success'
+            );
             dismiss();
         },
-        onError: () => showToast('Save failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const removeMutation = useMutation({
@@ -295,19 +267,19 @@ export function DebtForm({
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.plan.key() });
-            showToast('Debt deleted', 'success');
+            showToast(t('common.message.entity.debt_deleted'), 'success');
             dismiss();
         },
-        onError: () => showToast('Delete failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     async function onSubmit(values: DebtFormValues) {
         if (!live) {
-            showToast('Sign in to save debts', 'error');
+            showToast(t('common.message.error.sign_in_to_save'), 'error');
             return;
         }
         if (mode === 'create' && !typeKey) {
-            showToast('Pick a debt type first', 'error');
+            showToast(t('features.money.debt.pick_type_first'), 'error');
             return;
         }
         await saveMutation.mutateAsync(values);
@@ -328,10 +300,10 @@ export function DebtForm({
                 <div className="grid gap-2">
                     <Button type="submit" className="w-full" disabled={busy}>
                         {saveMutation.isPending || form.formState.isSubmitting
-                            ? 'Working…'
+                            ? tForm('working')
                             : mode === 'edit'
-                              ? 'Save changes'
-                              : 'Save debt'}
+                              ? tForm('save_changes')
+                              : tDebt('save')}
                     </Button>
                     {mode === 'edit' && entityId ? (
                         <ConfirmActionButton
@@ -339,8 +311,8 @@ export function DebtForm({
                             className="w-full text-danger hover:bg-danger/10 hover:text-danger"
                             disabled={busy}
                             pending={removeMutation.isPending}
-                            label="Delete"
-                            confirmLabel="Click again to delete"
+                            label={tBtn('delete')}
+                            confirmLabel={tForm('confirm_delete')}
                             onConfirm={() => void removeMutation.mutateAsync()}
                         />
                     ) : null}
@@ -350,7 +322,7 @@ export function DebtForm({
                 <>
                     <div className="grid gap-2">
                         <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
-                            What kind of debt?
+                            {tDebt('kind_heading')}
                         </p>
                         {selectedType ? (
                             <div className="flex flex-wrap items-center gap-2 rounded-lg border border-line bg-raised px-3 py-2.5 text-sm">
@@ -368,14 +340,14 @@ export function DebtForm({
                                         form.setValue('name', '');
                                         form.setValue('kind', DebtKind.LOAN);
                                     }}>
-                                    Change
+                                    {tForm('change')}
                                 </button>
                             </div>
                         ) : (
                             <PresetNameField
                                 value={typeQuery}
                                 onChange={setTypeQuery}
-                                placeholder="e.g. student loan"
+                                placeholder={tDebt('type_placeholder')}
                                 options={debtTypes}
                                 onSelect={opt => {
                                     const full = debtTypes.find(preset => preset.key === opt.key);
@@ -393,18 +365,20 @@ export function DebtForm({
                     {selectedType ? (
                         <div className="grid gap-2">
                             <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
-                                Who do you owe?
+                                {tDebt('who_heading')}
                             </p>
                             {lendersForType.length > 0 && !customLender ? (
                                 <div className="grid gap-2">
                                     <ChipSearch
                                         value={lenderQuery}
                                         onChange={setLenderQuery}
-                                        placeholder="Search lender"
+                                        placeholder={tDebt('lender_search')}
                                         disabled={busy}
                                     />
                                     {lenderQuery.trim() && visibleLenders.length === 0 ? (
-                                        <p className="text-sm text-fg-muted">No matches</p>
+                                        <p className="text-sm text-fg-muted">
+                                            {tForm('no_matches')}
+                                        </p>
                                     ) : null}
                                     <div className="flex flex-wrap gap-1.5">
                                         {visibleLenders.map(lender => {
@@ -456,7 +430,7 @@ export function DebtForm({
                                                     shouldValidate: false,
                                                 });
                                             }}>
-                                            Other…
+                                            {tForm('other')}
                                         </button>
                                     </div>
                                 </div>
@@ -474,10 +448,10 @@ export function DebtForm({
                                                     options={lenderOptions}
                                                     placeholder={
                                                         lendersForType.length > 0
-                                                            ? 'Search lender or bank…'
-                                                            : 'e.g. ING, DUO, Klarna'
+                                                            ? tDebt('lender_search_or_bank')
+                                                            : tDebt('lender_example')
                                                     }
-                                                    freeTextPlaceholder="Type a lender name…"
+                                                    freeTextPlaceholder={tDebt('lender_free')}
                                                     disabled={busy}
                                                     onSelect={opt => {
                                                         field.onChange(opt.name);
@@ -509,14 +483,14 @@ export function DebtForm({
                         name="name"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Who do you owe?</FormLabel>
+                                <FormLabel>{tDebt('who_label')}</FormLabel>
                                 <FormControl>
                                     <PresetNameField
                                         value={field.value}
                                         onChange={field.onChange}
                                         options={lenderOptions}
-                                        placeholder="e.g. ING, DUO"
-                                        freeTextPlaceholder="Type a lender name…"
+                                        placeholder={tDebt('lender_example_short')}
+                                        freeTextPlaceholder={tDebt('lender_free')}
                                         disabled={busy}
                                         onSelect={opt => {
                                             field.onChange(opt.name);
@@ -532,17 +506,19 @@ export function DebtForm({
                         name="kind"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Type</FormLabel>
+                                <FormLabel>{tForm('type')}</FormLabel>
                                 <FormControl>
                                     <select
                                         className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
                                         {...field}>
-                                        <option value="CREDIT_CARD">Credit card</option>
-                                        <option value="LOAN">Loan</option>
-                                        <option value="STUDENT">Student loan</option>
-                                        <option value="MORTGAGE">Mortgage</option>
-                                        <option value="FAMILY">Family</option>
-                                        <option value="OTHER">Other</option>
+                                        <option value="CREDIT_CARD">
+                                            {tDebt('kind_credit_card')}
+                                        </option>
+                                        <option value="LOAN">{tDebt('kind_loan')}</option>
+                                        <option value="STUDENT">{tDebt('kind_student')}</option>
+                                        <option value="MORTGAGE">{tDebt('kind_mortgage')}</option>
+                                        <option value="FAMILY">{tDebt('kind_family')}</option>
+                                        <option value="OTHER">{tDebt('kind_other')}</option>
                                     </select>
                                 </FormControl>
                                 <FormMessage />
@@ -557,9 +533,13 @@ export function DebtForm({
                 name="balance"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Balance ({symbol})</FormLabel>
+                        <FormLabel>{tDebt('balance', { symbol })}</FormLabel>
                         <FormControl>
-                            <FormInput inputMode="decimal" placeholder="0,00" {...field} />
+                            <FormInput
+                                inputMode="decimal"
+                                placeholder={tForm('amount_zero')}
+                                {...field}
+                            />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -571,9 +551,13 @@ export function DebtForm({
                 name="interestRate"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Interest rate (% per year)</FormLabel>
+                        <FormLabel>{tDebt('interest')}</FormLabel>
                         <FormControl>
-                            <FormInput inputMode="decimal" placeholder="12,9" {...field} />
+                            <FormInput
+                                inputMode="decimal"
+                                placeholder={tDebt('interest_placeholder')}
+                                {...field}
+                            />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -585,9 +569,13 @@ export function DebtForm({
                 name="minimumPayment"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Minimum payment ({symbol})</FormLabel>
+                        <FormLabel>{tDebt('minimum', { symbol })}</FormLabel>
                         <FormControl>
-                            <FormInput inputMode="decimal" placeholder="0,00" {...field} />
+                            <FormInput
+                                inputMode="decimal"
+                                placeholder={tForm('amount_zero')}
+                                {...field}
+                            />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -599,9 +587,13 @@ export function DebtForm({
                 name="extraPayment"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Extra per period ({symbol})</FormLabel>
+                        <FormLabel>{tDebt('extra', { symbol })}</FormLabel>
                         <FormControl>
-                            <FormInput inputMode="decimal" placeholder="0,00" {...field} />
+                            <FormInput
+                                inputMode="decimal"
+                                placeholder={tForm('amount_zero')}
+                                {...field}
+                            />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -610,10 +602,10 @@ export function DebtForm({
 
             <div className="grid gap-2">
                 <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
-                    How often do you pay?
+                    {tDebt('cadence_heading')}
                 </p>
                 <div className="flex flex-wrap gap-1.5">
-                    {CADENCE_OPTIONS.map(option => {
+                    {cadenceOptions.map(option => {
                         const selected = paymentCadence === option.id;
                         return (
                             <button
@@ -642,9 +634,13 @@ export function DebtForm({
                 name="dueDay"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Due day (1–31)</FormLabel>
+                        <FormLabel>{tDebt('due_day')}</FormLabel>
                         <FormControl>
-                            <FormInput inputMode="numeric" placeholder="e.g. 28" {...field} />
+                            <FormInput
+                                inputMode="numeric"
+                                placeholder={tDebt('due_day_placeholder')}
+                                {...field}
+                            />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -656,9 +652,13 @@ export function DebtForm({
                 name="startedOn"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Payments start</FormLabel>
+                        <FormLabel>{tDebt('started_on')}</FormLabel>
                         <FormControl>
-                            <FormInput type="date" {...field} />
+                            <FormInput
+                                type="date"
+                                pickerAriaLabel={tForm('aria.open_date_picker')}
+                                {...field}
+                            />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -667,10 +667,10 @@ export function DebtForm({
 
             <div className="grid gap-2">
                 <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
-                    Schedule
+                    {tDebt('schedule_heading')}
                 </p>
                 <div className="grid gap-2 sm:grid-cols-3">
-                    {SCHEDULE_OPTIONS.map(option => {
+                    {scheduleOptions.map(option => {
                         const selected = scheduleKind === option.id;
                         return (
                             <button
@@ -711,9 +711,13 @@ export function DebtForm({
                     name="termPayments"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Number of payments</FormLabel>
+                            <FormLabel>{tDebt('term_count')}</FormLabel>
                             <FormControl>
-                                <FormInput inputMode="numeric" placeholder="e.g. 24" {...field} />
+                                <FormInput
+                                    inputMode="numeric"
+                                    placeholder={tDebt('term_placeholder')}
+                                    {...field}
+                                />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -727,9 +731,13 @@ export function DebtForm({
                     name="maturityOn"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Pay off by</FormLabel>
+                            <FormLabel>{tDebt('pay_off_by')}</FormLabel>
                             <FormControl>
-                                <FormInput type="date" {...field} />
+                                <FormInput
+                                    type="date"
+                                    pickerAriaLabel={tForm('aria.open_date_picker')}
+                                    {...field}
+                                />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -753,10 +761,10 @@ export function DebtForm({
                             />
                             <label htmlFor="debt-link-fixed-cost" className="cursor-pointer">
                                 <span className="block text-sm font-medium text-fg">
-                                    Also add as Necessities fixed cost
+                                    {tDebt('link_fixed_title')}
                                 </span>
                                 <Typography as="span" variant="caption" className="mt-0.5 block">
-                                    Keeps the planned payment in your jar budget at this cadence.
+                                    {tDebt('link_fixed_body')}
                                 </Typography>
                             </label>
                         </div>

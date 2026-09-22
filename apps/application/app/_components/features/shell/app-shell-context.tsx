@@ -13,6 +13,7 @@ import {
 } from 'react';
 
 import { Locale, type PlanKey } from '@rumtelo/contracts';
+import { LocalesEnum, useLocale, usePathname, useRouter } from '@rumtelo/i18n';
 import { useQuery } from '@tanstack/react-query';
 
 import { DEFAULT_PLAN } from '@/app/_lib/plan';
@@ -50,12 +51,17 @@ interface AppShellCtx {
     setPeriod: (period: Period) => void;
     locale: Locale;
     toggleLocale: () => void;
+    /** Switch UI + next-intl locale to a specific value. */
+    setLocale: (next: Locale) => void;
 }
 
 const AppShellContext = createContext<AppShellCtx | null>(null);
 
 export function AppShellProvider({ children }: { children: ReactNode }) {
     const { householdId, isPending: authPending, isAuthenticated } = useAuth();
+    const intlLocale = useLocale();
+    const router = useRouter();
+    const pathname = usePathname();
     const [toast, setToast] = useState<Toast | null>(null);
     const toastTimer = useRef<ReturnType<typeof setTimeout>>(null);
     const toastId = useRef(0);
@@ -63,7 +69,9 @@ export function AppShellProvider({ children }: { children: ReactNode }) {
     const [quickOpen, setQuickOpen] = useState(false);
     const [onboardingOpen, setOnboardingOpen] = useState(false);
     const [onboardingStep, setOnboardingStep] = useState(0);
-    const [locale, setLocale] = useState<Locale>(Locale.EN);
+    /** Mirror next-intl cookie/locale — derive, don't sync via effect. */
+    const locale: Locale =
+        intlLocale === LocalesEnum.Dutch || intlLocale === 'nl' ? Locale.NL : Locale.EN;
 
     const now = new Date();
     const [period, setPeriod] = useState<Period>({
@@ -126,10 +134,19 @@ export function AppShellProvider({ children }: { children: ReactNode }) {
         setOnboardingOpen(true);
     }, []);
 
-    const toggleLocale = useCallback(
-        () => setLocale(previous => (previous === Locale.NL ? Locale.EN : Locale.NL)),
-        []
+    const setLocale = useCallback(
+        (next: Locale) => {
+            const code = next === Locale.NL ? LocalesEnum.Dutch : LocalesEnum.English;
+            if (intlLocale !== code) {
+                router.replace(pathname, { locale: code });
+            }
+        },
+        [intlLocale, pathname, router]
     );
+
+    const toggleLocale = useCallback(() => {
+        setLocale(locale === Locale.NL ? Locale.EN : Locale.NL);
+    }, [locale, setLocale]);
 
     useEffect(() => {
         const handler = (event: KeyboardEvent) => {
@@ -166,6 +183,7 @@ export function AppShellProvider({ children }: { children: ReactNode }) {
             setPeriod,
             locale,
             toggleLocale,
+            setLocale,
         }),
         [
             toast,
@@ -186,6 +204,7 @@ export function AppShellProvider({ children }: { children: ReactNode }) {
             setPeriod,
             locale,
             toggleLocale,
+            setLocale,
         ]
     );
 

@@ -7,8 +7,6 @@ export type SplitTipSeverity = 'info' | 'warn';
 export type SplitTip = {
     id: string;
     severity: SplitTipSeverity;
-    /** Short coach line — plain English, one thought. */
-    message: string;
     /** Optional jar keys this tip reacts to. */
     jars?: JarKey[];
 };

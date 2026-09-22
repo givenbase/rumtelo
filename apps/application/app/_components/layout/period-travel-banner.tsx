@@ -1,35 +1,31 @@
 'use client';
 
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { cn, describePeriodTravel } from '@rumtelo/utils';
 
+import { formatPeriodTravelLabels } from '@/app/_lib/period-travel-i18n';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 
-const MONTHS_SHORT = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-] as const;
+function formatPeriodStamp(year: number, month: number, locale: string): string {
+    return new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric' }).format(
+        new Date(year, month - 1, 1)
+    );
+}
 
 /**
  * Persistent chrome when the selected budget month is not “now”.
  * Compact stamp only — full Looking Ahead / Looking Back narration lives in The Coach card.
  */
 export function PeriodTravelBanner() {
+    const t = useTranslations('pages.shell');
+    const locale = useLocale();
     const { period, setPeriod } = useAppShell();
     const travel = describePeriodTravel(period);
+    const labels = formatPeriodTravelLabels(travel, t);
 
     if (travel.direction === 'current') return null;
 
-    const stamp = `${MONTHS_SHORT[period.month - 1]} ${period.year}`;
+    const stamp = formatPeriodStamp(period.year, period.month, locale);
     const past = travel.direction === 'past';
 
     return (
@@ -45,14 +41,14 @@ export function PeriodTravelBanner() {
                         'font-mono text-[10px] font-semibold tracking-[0.14em] uppercase',
                         past ? 'text-amber-800 dark:text-amber-300' : 'text-accent'
                     )}>
-                    {past ? 'Looking back' : 'Looking ahead'}
+                    {past ? t('period_looking_back') : t('period_looking_ahead')}
                 </p>
                 <p className="mt-0.5 text-sm text-fg">
-                    Viewing <span className="font-medium">{stamp}</span>
+                    {t('period_travel.viewing')} <span className="font-medium">{stamp}</span>
                     <span className="text-fg-muted">
                         {' '}
-                        · {travel.relativeLabel}
-                        {travel.daysLabel ? ` · ${travel.daysLabel}` : ''}
+                        · {labels.relativeLabel}
+                        {labels.daysLabel ? ` · ${labels.daysLabel}` : ''}
                     </span>
                 </p>
             </div>
@@ -68,7 +64,7 @@ export function PeriodTravelBanner() {
                         ? 'border-amber-600/40 text-amber-900 hover:bg-amber-500/15 dark:text-amber-200'
                         : 'border-accent/50 text-accent hover:bg-accent-soft'
                 )}>
-                This month
+                {t('period_options.this_month')}
             </button>
         </div>
     );

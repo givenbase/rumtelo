@@ -15,7 +15,7 @@ const TAB =
  */
 export function ListToolbar({
     children,
-    createLabel = '+ Add',
+    createLabel = '',
     createHref,
     onCreate,
     createSlot,
@@ -33,12 +33,13 @@ export function ListToolbar({
     secondary?: ReactNode;
 }) {
     const createButton = createHref ? (
-        <Button as={Link} href={createHref} size="sm">
+        <Button as={Link} href={createHref} size="sm" data-testid="list-toolbar-create">
             {createLabel}
         </Button>
     ) : (
         <Button
             size="sm"
+            data-testid="list-toolbar-create"
             onClick={() => {
                 onCreate?.();
             }}>

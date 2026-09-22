@@ -1,6 +1,7 @@
 'use client';
 
 import { api } from '@/app/_lib/api';
+import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
@@ -21,7 +22,8 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { IncomeAmountPeriod, IncomeSourcePreset } from '@rumtelo/contracts';
 import { Cadence, IncomeKind } from '@rumtelo/contracts';
-import { z } from 'zod';
+
+import { useTranslations } from '@rumtelo/i18n';
 
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
@@ -31,18 +33,9 @@ import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 import { ConfirmActionButton } from './confirm-action-button';
+import { createIncomeFormSchema, type IncomeFormSchemaValues } from './form-zod';
 import { FormInput } from './form-input';
 import { PresetNameField } from './preset-name-field';
-
-/** Picker groups — same role as fixed-cost category names. */
-const INCOME_KIND_GROUP: Record<IncomeKind, string> = {
-    [IncomeKind.SALARY]: 'Employment',
-    [IncomeKind.FREELANCE]: 'Freelance',
-    [IncomeKind.BENEFIT]: 'Benefits',
-    [IncomeKind.RENTAL]: 'Rental',
-    [IncomeKind.DIVIDEND]: 'Investments',
-    [IncomeKind.OTHER]: 'Other',
-};
 
 const INCOME_KIND_ICON: Record<IncomeKind, string> = {
     [IncomeKind.SALARY]: '💼',
@@ -53,24 +46,7 @@ const INCOME_KIND_ICON: Record<IncomeKind, string> = {
     [IncomeKind.OTHER]: '✨',
 };
 
-const incomeFormSchema = z.object({
-    name: z.string().min(1, 'Name is required').max(120),
-    amount: z
-        .string()
-        .min(1, 'Amount is required')
-        .refine(
-            value => {
-                const cents = parseAmountToMinorUnits(value);
-                return cents !== null && cents > 0;
-            },
-            { message: 'Enter a valid amount' }
-        ),
-    kind: z.enum(IncomeKind),
-    cadence: z.enum(Cadence),
-    amountEffectiveFrom: z.string().optional(),
-});
-
-export type IncomeFormValues = z.infer<typeof incomeFormSchema>;
+export type IncomeFormValues = IncomeFormSchemaValues;
 
 type IncomeFormProps = {
     defaultValues?: Partial<IncomeFormValues>;
@@ -98,7 +74,12 @@ export function IncomeForm({
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { symbol, formatMoney } = useHouseholdCurrency();
+    const t = useTranslations();
+    const tIncome = useTranslations('features.money.income_form');
+    const tForm = useTranslations('ui.form');
+    const tBtn = useTranslations('ui.button.actions');
     const { showToast } = useAppShell();
+    const apiError = useApiError();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
 
@@ -109,18 +90,39 @@ export function IncomeForm({
         [],
         live
     );
+    const incomeKindGroup = (kind: IncomeKind): string => {
+        switch (kind) {
+            case IncomeKind.SALARY:
+                return tIncome('kind_group_employment');
+            case IncomeKind.FREELANCE:
+                return tIncome('kind_group_freelance');
+            case IncomeKind.BENEFIT:
+                return tIncome('kind_group_benefits');
+            case IncomeKind.RENTAL:
+                return tIncome('kind_group_rental');
+            case IncomeKind.DIVIDEND:
+                return tIncome('kind_group_investments');
+            case IncomeKind.OTHER:
+                return tIncome('kind_group_other');
+            default:
+                return kind;
+        }
+    };
+
     const presetOptions = useMemo(
         () =>
             (presetsQuery.data ?? []).map(
                 preset =>
                     ({
                         ...preset,
-                        group: INCOME_KIND_GROUP[preset.kind] ?? preset.kind,
+                        group: incomeKindGroup(preset.kind),
                         icon: preset.icon ?? INCOME_KIND_ICON[preset.kind] ?? null,
                     }) satisfies IncomeSourcePreset & { group: string; icon: string | null }
             ),
-        [presetsQuery.data]
+        [presetsQuery.data, tIncome]
     );
+
+    const incomeFormSchema = useMemo(() => createIncomeFormSchema(tForm), [tForm]);
 
     const form = useForm<IncomeFormValues>({
         defaultValues: {
@@ -133,9 +135,15 @@ export function IncomeForm({
         resolver: zodResolver(incomeFormSchema),
     });
 
-    const onError = createFormInvalidHandler(({ title, description }) => {
-        showToast(description ?? title, 'error');
-    });
+    const onError = createFormInvalidHandler(
+        ({ title, description }) => {
+            showToast(description ?? title, 'error');
+        },
+        {
+            title: tForm('incomplete_title'),
+            description: tForm('incomplete_description'),
+        }
+    );
 
     const saveMutation = useMutation({
         mutationFn: async (values: IncomeFormValues) => {
@@ -173,10 +181,17 @@ export function IncomeForm({
             void queryClient.invalidateQueries({
                 queryKey: apiQuery.money.goals.projections.key(),
             });
-            showToast(mode === 'edit' ? 'Income updated' : 'Income saved', 'success');
+            showToast(
+                mode === 'edit'
+                    ? t('common.message.success.updated', {
+                          entity: t('common.message.entity.names.income'),
+                      })
+                    : t('common.message.success.saved'),
+                'success'
+            );
             dismiss();
         },
-        onError: () => showToast('Save failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const removeMutation = useMutation({
@@ -189,15 +204,15 @@ export function IncomeForm({
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.goals.list.key() });
-            showToast('Income deleted', 'success');
+            showToast(t('common.message.entity.income_deleted'), 'success');
             dismiss();
         },
-        onError: () => showToast('Delete failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     async function onSubmit(values: IncomeFormValues) {
         if (!live) {
-            showToast('Sign in to save income', 'error');
+            showToast(t('common.message.entity.sign_in_income'), 'error');
             return;
         }
         await saveMutation.mutateAsync(values);
@@ -215,10 +230,10 @@ export function IncomeForm({
                 <div className="grid gap-2">
                     <Button type="submit" className="w-full" disabled={busy}>
                         {saveMutation.isPending || form.formState.isSubmitting
-                            ? 'Working…'
+                            ? tForm('working')
                             : mode === 'edit'
-                              ? 'Save changes'
-                              : 'Save income'}
+                              ? tForm('save_changes')
+                              : tIncome('save')}
                     </Button>
                     {mode === 'edit' && entityId ? (
                         <ConfirmActionButton
@@ -226,8 +241,8 @@ export function IncomeForm({
                             className="w-full text-danger hover:bg-danger/10 hover:text-danger"
                             disabled={busy}
                             pending={removeMutation.isPending}
-                            label="Delete"
-                            confirmLabel="Click again to delete"
+                            label={tBtn('delete')}
+                            confirmLabel={tForm('confirm_delete')}
                             onConfirm={() => void removeMutation.mutateAsync()}
                         />
                     ) : null}
@@ -238,14 +253,14 @@ export function IncomeForm({
                 name="name"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Name</FormLabel>
+                        <FormLabel>{tForm('fields.name')}</FormLabel>
                         <FormControl>
                             {mode === 'create' ? (
                                 <PresetNameField
                                     value={field.value}
                                     onChange={field.onChange}
-                                    placeholder="e.g. salary"
-                                    freeTextPlaceholder="Describe where it came from…"
+                                    placeholder={tIncome('name_placeholder')}
+                                    freeTextPlaceholder={tIncome('free_text_placeholder')}
                                     options={presetOptions}
                                     lockPresets
                                     freeTextKeys={['OTHER']}
@@ -263,7 +278,7 @@ export function IncomeForm({
                                     }}
                                 />
                             ) : (
-                                <FormInput placeholder="e.g. salary" {...field} />
+                                <FormInput placeholder={tIncome('name_placeholder')} {...field} />
                             )}
                         </FormControl>
                         <FormMessage />
@@ -277,10 +292,16 @@ export function IncomeForm({
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>
-                            {mode === 'edit' ? `New amount (${symbol})` : `Amount (${symbol})`}
+                            {mode === 'edit'
+                                ? tIncome('amount_new', { symbol })
+                                : tIncome('amount', { symbol })}
                         </FormLabel>
                         <FormControl>
-                            <FormInput inputMode="decimal" placeholder="0,00" {...field} />
+                            <FormInput
+                                inputMode="decimal"
+                                placeholder={tForm('amount_zero')}
+                                {...field}
+                            />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -293,9 +314,13 @@ export function IncomeForm({
                     name="amountEffectiveFrom"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Effective from</FormLabel>
+                            <FormLabel>{tIncome('effective_from')}</FormLabel>
                             <FormControl>
-                                <FormInput type="date" {...field} />
+                                <FormInput
+                                    type="date"
+                                    pickerAriaLabel={tForm('aria.open_date_picker')}
+                                    {...field}
+                                />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -308,16 +333,20 @@ export function IncomeForm({
                 name="cadence"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>How often</FormLabel>
+                        <FormLabel>{tIncome('how_often')}</FormLabel>
                         <FormControl>
                             <select
                                 className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
                                 {...field}>
-                                <option value={Cadence.WEEKLY}>Weekly</option>
-                                <option value={Cadence.MONTHLY}>Monthly</option>
-                                <option value={Cadence.QUARTERLY}>Quarterly</option>
-                                <option value={Cadence.YEARLY}>Yearly</option>
-                                <option value={Cadence.ONCE}>One-time</option>
+                                <option value={Cadence.WEEKLY}>{tIncome('cadence_weekly')}</option>
+                                <option value={Cadence.MONTHLY}>
+                                    {tIncome('cadence_monthly')}
+                                </option>
+                                <option value={Cadence.QUARTERLY}>
+                                    {tIncome('cadence_quarterly')}
+                                </option>
+                                <option value={Cadence.YEARLY}>{tIncome('cadence_yearly')}</option>
+                                <option value={Cadence.ONCE}>{tIncome('cadence_once')}</option>
                             </select>
                         </FormControl>
                         <FormMessage />
@@ -330,17 +359,17 @@ export function IncomeForm({
                 name="kind"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Type</FormLabel>
+                        <FormLabel>{tIncome('type')}</FormLabel>
                         <FormControl>
                             <select
                                 className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
                                 {...field}>
-                                <option value="SALARY">Salary</option>
-                                <option value="FREELANCE">Freelance</option>
-                                <option value="BENEFIT">Benefit</option>
-                                <option value="RENTAL">Rental income</option>
-                                <option value="DIVIDEND">Dividend</option>
-                                <option value="OTHER">Other</option>
+                                <option value="SALARY">{tIncome('kind_salary')}</option>
+                                <option value="FREELANCE">{tIncome('kind_freelance')}</option>
+                                <option value="BENEFIT">{tIncome('kind_benefit')}</option>
+                                <option value="RENTAL">{tIncome('kind_rental')}</option>
+                                <option value="DIVIDEND">{tIncome('kind_dividend')}</option>
+                                <option value="OTHER">{tIncome('kind_other')}</option>
                             </select>
                         </FormControl>
                         <FormMessage />
@@ -351,7 +380,7 @@ export function IncomeForm({
             {mode === 'edit' && periods.length > 0 ? (
                 <div className="grid gap-2 border-t border-line pt-4">
                     <Typography as="p" variant="eyebrow" color="muted">
-                        Amount history
+                        {tIncome('amount_history')}
                     </Typography>
                     <ul className="grid gap-1.5">
                         {periods.map(period => (

@@ -1,5 +1,5 @@
 /**
- * Same-origin API proxy — Galighticus website `/api/[...path]` pattern.
+ * Same-origin API proxy to the Nest backend.
  *
  * Browser → `{DOMAIN_APP}/api/backend/money/jars/list`
  * Proxy  → `{DOMAIN_BACK}/money/jars/list` (Nest; private on Railway)

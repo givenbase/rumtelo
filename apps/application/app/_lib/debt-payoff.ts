@@ -8,6 +8,7 @@
 
 import type { Debt } from '@rumtelo/contracts';
 import { PayoffStrategy } from '@rumtelo/contracts';
+import type { TranslateFn } from '@rumtelo/i18n';
 import {
     orderDebtsByStrategy as orderDebtsByStrategyShared,
     simulatePayoff as simulatePayoffShared,
@@ -93,12 +94,23 @@ export function formatDebtFreeMonth(date: Date | null): string {
 }
 
 /** Display month for a clear date — e.g. "Oct 2026". */
-export function formatClearedMonth(date: Date | null): string {
+export function formatClearedMonth(date: Date | null, locale: string): string {
     if (!date) return '—';
-    return new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric' }).format(date);
+    return new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric' }).format(date);
 }
 
-export function payoffStrategyLabel(strategy: PayoffStrategy): string {
+/** Scoped to `features.money.debt` when `t` is passed. */
+export function payoffStrategyLabel(strategy: PayoffStrategy, t?: TranslateFn): string {
+    if (t) {
+        switch (strategy) {
+            case PayoffStrategy.SNOWBALL:
+                return t('strategy_snowball');
+            case PayoffStrategy.MINIMAL:
+                return t('strategy_minimal');
+            default:
+                return t('strategy_avalanche');
+        }
+    }
     switch (strategy) {
         case PayoffStrategy.SNOWBALL:
             return 'Snowball';

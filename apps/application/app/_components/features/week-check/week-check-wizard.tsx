@@ -1,33 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import type { JarBalance } from '@rumtelo/contracts';
 import { WeekCheckStage } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
 import { Button, Eyebrow, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 type WizardJar = Pick<JarBalance, 'id' | 'key' | 'name' | 'icon' | 'available' | 'overspent'>;
-
-const STEPS = [
-    {
-        key: WeekCheckStage.LOOK,
-        label: 'Look',
-        sub: 'What happened this week?',
-    },
-    {
-        key: WeekCheckStage.REDIRECT,
-        label: 'Direct',
-        sub: 'Where does the surplus go?',
-    },
-    {
-        key: WeekCheckStage.INTEND,
-        label: 'Intend',
-        sub: 'What is your intention for next week?',
-    },
-] as const;
 
 /**
  * Three-step WEEKTELLING wizard (design: `week-check`).
@@ -55,16 +38,41 @@ export function WeekCheckWizard({
         }
     ) => Promise<unknown>;
 }) {
+    const t = useTranslations('features.money.week_check');
+    const tForm = useTranslations('ui.form');
+    const { formatMoney } = useHouseholdCurrency();
+
+    const steps = useMemo(
+        () =>
+            [
+                {
+                    key: WeekCheckStage.LOOK,
+                    label: t('look_label'),
+                    sub: t('look_sub'),
+                },
+                {
+                    key: WeekCheckStage.REDIRECT,
+                    label: t('direct_label'),
+                    sub: t('direct_sub'),
+                },
+                {
+                    key: WeekCheckStage.INTEND,
+                    label: t('intend_label'),
+                    sub: t('intend_sub'),
+                },
+            ] as const,
+        [t]
+    );
+
     const stageIndex =
         initialStage && initialStage !== WeekCheckStage.DONE
-            ? STEPS.findIndex(stageItem => stageItem.key === initialStage)
+            ? steps.findIndex(stageItem => stageItem.key === initialStage)
             : 0;
     const [step, setStep] = useState(Math.max(0, stageIndex));
     const [intent, setIntent] = useState('');
     const [redirectJarId, setRedirectJarId] = useState<string | null>(null);
-    const { formatMoney } = useHouseholdCurrency();
 
-    const current = STEPS[step]!;
+    const current = steps[step]!;
 
     async function goNext() {
         if (onStepComplete) {
@@ -76,7 +84,7 @@ export function WeekCheckWizard({
                       : undefined;
             await onStepComplete(current.key, payload);
         }
-        if (step < STEPS.length - 1) setStep(previous => previous + 1);
+        if (step < steps.length - 1) setStep(previous => previous + 1);
     }
 
     async function finish() {
@@ -89,7 +97,7 @@ export function WeekCheckWizard({
         <div className="grid gap-6">
             {/* Step indicator strip */}
             <div className="flex items-stretch overflow-hidden rounded-2xl border border-line bg-surface shadow-md">
-                {STEPS.map((stageItem, i) => (
+                {steps.map((stageItem, i) => (
                     <button
                         key={stageItem.key}
                         type="button"
@@ -108,7 +116,7 @@ export function WeekCheckWizard({
                             weight="semibold"
                             color={i === step ? 'primary' : 'muted'}
                             className={i === step ? undefined : 'text-fg-faint'}>
-                            Step {i + 1}
+                            {t('step', { n: i + 1 })}
                         </Typography>
                         <Typography
                             as="h4"
@@ -141,12 +149,12 @@ export function WeekCheckWizard({
                 {current.key === WeekCheckStage.LOOK && (
                     <div className="grid gap-5">
                         <div>
-                            <Eyebrow>✦ Look</Eyebrow>
+                            <Eyebrow>{t('look_eyebrow')}</Eyebrow>
                             <Typography as="h2" className="mt-1.5">
-                                What did you do this week?
+                                {t('look_title')}
                             </Typography>
                             <Typography as="p" size="sm" color="muted" className="mt-1">
-                                No judgment. Information is all we need.
+                                {t('look_lead')}
                             </Typography>
                         </div>
                         <div className="grid gap-2">
@@ -177,24 +185,14 @@ export function WeekCheckWizard({
                 {current.key === WeekCheckStage.REDIRECT && (
                     <div className="grid gap-5">
                         <div>
-                            <Eyebrow>✦ Direct</Eyebrow>
+                            <Eyebrow>{t('direct_eyebrow')}</Eyebrow>
                             <Typography as="h2" className="mt-1.5">
-                                Distribute surplus
+                                {t('direct_title')}
                             </Typography>
                             <Typography as="p" size="sm" color="muted" className="mt-1">
-                                {surplus > 0 ? (
-                                    <>
-                                        <span className="font-semibold text-fg">
-                                            {formatMoney(surplus)}
-                                        </span>{' '}
-                                        has no direction yet. Send it where it works.
-                                    </>
-                                ) : (
-                                    <>
-                                        No surplus this week — nothing to redirect. Continue when
-                                        you&apos;re ready.
-                                    </>
-                                )}
+                                {surplus > 0
+                                    ? t('direct_surplus', { amount: formatMoney(surplus) })
+                                    : t('direct_none')}
                             </Typography>
                         </div>
                         {surplus > 0 ? (
@@ -221,8 +219,8 @@ export function WeekCheckWizard({
                                                 className="h-8 px-3 text-xs"
                                                 onClick={() => setRedirectJarId(jar.id)}>
                                                 {redirectJarId === jar.id
-                                                    ? 'Selected'
-                                                    : 'Send here'}
+                                                    ? tForm('selected')
+                                                    : t('send_here')}
                                             </Button>
                                         </div>
                                     ))}
@@ -235,25 +233,25 @@ export function WeekCheckWizard({
                 {current.key === WeekCheckStage.INTEND && (
                     <div className="grid gap-5">
                         <div>
-                            <Eyebrow>✦ Intend</Eyebrow>
+                            <Eyebrow>{t('intend_eyebrow')}</Eyebrow>
                             <Typography as="h2" className="mt-1.5">
-                                My intention for next week
+                                {t('intend_title')}
                             </Typography>
                             <Typography as="p" size="sm" color="muted" className="mt-1">
-                                One sentence. What will you do differently?
+                                {t('intend_lead')}
                             </Typography>
                         </div>
                         <textarea
                             rows={4}
                             value={intent}
                             onChange={event => setIntent(event.target.value)}
-                            placeholder="Write your intention here..."
+                            placeholder={t('intend_placeholder')}
                             className="w-full resize-none rounded-xl border border-line bg-raised px-4 py-3 text-sm text-fg transition-colors placeholder:text-fg-faint focus:border-accent focus:outline-none"
-                            aria-label="Intention for next week"
+                            aria-label={t('intend_aria')}
                         />
                         {intent.trim().length > 0 && (
                             <Typography as="p" size="xs" color="muted">
-                                Good. Remember this when the week feels hard.
+                                {t('intend_encourage')}
                             </Typography>
                         )}
                     </div>
@@ -264,16 +262,16 @@ export function WeekCheckWizard({
             <div className="flex items-center justify-between gap-3">
                 {step > 0 ? (
                     <Button variant="ghost" onClick={() => setStep(previous => previous - 1)}>
-                        ← Back
+                        {t('back')}
                     </Button>
                 ) : (
                     <span />
                 )}
 
-                {step < STEPS.length - 1 ? (
-                    <Button onClick={() => void goNext()}>Next →</Button>
+                {step < steps.length - 1 ? (
+                    <Button onClick={() => void goNext()}>{t('next')}</Button>
                 ) : (
-                    <Button onClick={() => void finish()}>Complete week check ✓</Button>
+                    <Button onClick={() => void finish()}>{t('complete')}</Button>
                 )}
             </div>
         </div>

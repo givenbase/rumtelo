@@ -10,6 +10,7 @@ import {
     type LearnBook,
     type LearnWatchPreset,
 } from '@rumtelo/contracts';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import {
     Button,
@@ -47,19 +48,13 @@ import {
     FORMAT_ORDER,
     PIECES,
     SKILLS,
-    aboutLabel,
     aboutOf,
     bookSuggested,
     bookToPiece,
     bookVisible,
-    formatLabel,
-    formatPlural,
     matchesSearch,
-    partnerLabel,
-    pickLabel,
     skillDef,
     storeFor,
-    storeName,
     addedBookToPiece,
     watchToPiece,
     type LearnFormat,
@@ -67,6 +62,7 @@ import {
     type LearnSkill,
     type LearnStatus,
 } from './learn-catalog';
+import { useLearnCatalogLabels } from './learn-labels';
 
 const EMPTY_BOOKS: LearnBookPreset[] = [];
 const EMPTY_WATCH: LearnWatchPreset[] = [];
@@ -137,13 +133,6 @@ function byPriority(pieces: readonly LearnPiece[], rankById: Record<string, numb
     });
 }
 
-function partnerLine(plan: PlanKey): string {
-    if (plan === PlanKey.MAX) {
-        return 'Courses on Max are on Masterclass. Basic and Plus point at Udemy instead. Books, films, and series open as the plan allows — we recommend them, we do not host them.';
-    }
-    return 'Courses on Basic and Plus are on Udemy. Max points at Masterclass instead. Books, films, and series open as the plan allows — we recommend them, we do not host them.';
-}
-
 /** MasterClass header mark and wordmark. Their paths, our color. Not the course photo. */
 const MASTERCLASS_MARK =
     'M11.843 12.6 9.775 5H4.033v1.22h.545c.68 0 1.242.421 1.45 1.199l3.162 11.58h2.88l1.412-5.14-.02-.019c-.921 0-1.375-.36-1.619-1.24m11.612 5.179c-.677 0-1.223-.48-1.43-1.22L18.865 5H14.46l3.82 13.999H24v-1.22zM0 17.776V19h5.088v-1.224z';
@@ -151,8 +140,11 @@ const MASTERCLASS_WORD =
     'M13.048 3.619 9.121 14.695H8.064L3.891 3.619l-1.03 8.54a4 4 0 0 0-.044.493c0 1.031.449 1.242 1.963 1.321v.722H0v-.722c1.179-.062 1.576-.29 1.699-1.215L3.002 2.457c.141-1.118-.396-1.444-1.761-1.532V.229h4.675c.044.45.141.802.308 1.259l3.372 8.989 3.126-9.016c.167-.449.29-.783.326-1.233h4.595v.696c-1.329.088-1.866.414-1.716 1.532l1.259 10.301c.123.969.555 1.154 1.699 1.215v.722h-6.682v-.722c1.426-.079 1.919-.29 1.919-1.321 0-.123-.018-.334-.035-.493zm14.905 8.786c0 .704.167 1.154.687 1.154.308 0 .599-.097.827-.202l.123.449c-.599.704-1.382 1.1-2.333 1.1-1.144 0-1.866-.687-2.069-1.823-.661.872-1.735 1.779-3.249 1.779-1.655 0-2.747-1.012-2.747-2.668 0-1.752 1.259-2.501 2.809-3.055l3.125-1.135V6.26c0-1.197-.397-2.042-1.453-2.042-.968 0-1.549.246-1.857.678.643.15 1.012.66 1.012 1.303 0 .89-.616 1.471-1.567 1.471-.889 0-1.452-.581-1.452-1.488 0-1.734 1.778-2.606 4.094-2.606 2.624 0 4.05.951 4.05 3.39zm-2.826.185V8.76l-1.779.704c-.871.352-1.426.81-1.426 1.963 0 1.083.493 1.822 1.611 1.822.599.001 1.013-.227 1.594-.659m4.798 1.304-.132-2.853h.766c.458 1.796 1.488 3.143 3.081 3.143 1.119 0 1.946-.519 1.946-1.656 0-1.118-.748-1.549-2.377-2.13-2.193-.766-3.328-1.638-3.328-3.54 0-2.086 1.567-3.284 3.821-3.284 1.347 0 2.483.335 3.372.89v2.501h-.704c-.352-1.471-1.197-2.685-2.668-2.685-1.048 0-1.673.616-1.673 1.532 0 .924.643 1.383 2.236 1.981 2.228.766 3.53 1.611 3.53 3.636 0 2.193-1.628 3.478-4.173 3.478-1.575-.001-2.852-.415-3.697-1.013M42.243 3.76h2.694v.933h-2.694v6.858c0 1.241.475 1.779 1.452 1.779.555 0 1.013-.186 1.524-.555l.273.352c-.66 1.03-1.7 1.779-3.205 1.779-1.673 0-2.914-.889-2.914-3.205V4.693h-1.285v-.44c1.426-.661 2.623-1.796 3.513-3.161h.643zm12.493 4.111v.475H48.01c-.079 2.879 1.391 4.613 3.416 4.613 1.408 0 2.333-.616 3.082-1.69l.308.185c-.519 2.043-2.025 3.451-4.385 3.451-2.993 0-5-2.21-5-5.38 0-3.513 2.272-5.952 5.089-5.952 2.763.002 4.216 1.824 4.216 4.298m-6.665-.264h4.094c0-1.963-.511-3.284-1.858-3.284-1.364 0-2.086 1.382-2.236 3.284m27.478-6.365.044 3.302h-.81C74.308 2.167 73.093.89 71.085.89c-2.835 0-4.138 2.826-4.138 6.348 0 3.838 1.514 6.779 4.323 6.779 1.946 0 3.266-1.224 3.971-4.218h.845l-.326 3.883c-1.197.766-2.817 1.223-4.754 1.223-4.491 0-7.263-2.809-7.263-7.07C63.743 3.02 66.948 0 71.006 0c1.84 0 3.363.449 4.543 1.242m5.212 11.868c0 .722.308.846 1.285.907v.678h-5.441v-.678c.951-.062 1.285-.185 1.285-.907V2.105l-1.24-.643v-.431l3.654-.995h.458zm7.58-.529v-3.82l-1.778.704c-.846.326-1.409.802-1.409 1.963 0 1.074.502 1.822 1.594 1.822.599 0 1.012-.228 1.593-.669m4.808 1.313-.123-2.853h.766c.449 1.796 1.488 3.143 3.073 3.143 1.118 0 1.972-.519 1.972-1.656 0-1.118-.766-1.549-2.404-2.13-2.192-.766-3.328-1.638-3.328-3.54 0-2.086 1.567-3.284 3.847-3.284 1.32 0 2.456.335 3.346.89v2.501h-.704c-.343-1.471-1.198-2.685-2.641-2.685-1.074 0-1.7.616-1.7 1.532 0 .924.643 1.383 2.237 1.981 2.236.766 3.557 1.611 3.557 3.636 0 2.193-1.655 3.478-4.199 3.478-1.569-.001-2.854-.415-3.699-1.013m8.954 0-.106-2.853h.766c.449 1.796 1.505 3.143 3.081 3.143 1.109 0 1.963-.519 1.963-1.656 0-1.118-.783-1.549-2.377-2.13-2.219-.766-3.354-1.638-3.354-3.54 0-2.086 1.576-3.284 3.847-3.284 1.32 0 2.456.335 3.354.89v2.501h-.704c-.335-1.471-1.207-2.685-2.65-2.685-1.075 0-1.673.616-1.673 1.532 0 .924.616 1.383 2.21 1.981 2.255.765 3.54 1.61 3.54 3.635 0 2.193-1.637 3.478-4.182 3.478-1.55 0-2.853-.414-3.715-1.012m-10.918-1.489c0 .704.158 1.154.678 1.154.308 0 .599-.097.828-.202l.123.449c-.599.704-1.383 1.1-2.333 1.1-1.135 0-1.867-.687-2.069-1.823-.66.872-1.734 1.779-3.249 1.779-1.655 0-2.747-1.012-2.747-2.668 0-1.752 1.259-2.501 2.809-3.055l3.126-1.135V6.26c0-1.197-.396-2.042-1.444-2.042-.977 0-1.559.246-1.867.678.643.15 1.013.66 1.013 1.303 0 .89-.617 1.471-1.567 1.471-.889 0-1.452-.581-1.452-1.488 0-1.734 1.778-2.606 4.094-2.606 2.633 0 4.059.951 4.059 3.39v5.439zM60.212 4.94c0 1.012.599 1.655 1.506 1.655.995 0 1.62-.643 1.62-1.549 0-.933-.563-1.471-1.364-1.471-1.118 0-1.84.784-2.65 3.064l.079-3.064h-.475L55.23 4.694v.386l1.241.748v7.281c0 .722-.335.846-1.285.907v.678h5.873v-.678c-1.259-.106-1.735-.229-1.735-1.057V7.651c.458-1.286 1.18-2.175 2.377-2.879z';
 
 function MasterclassMark() {
+    const tLearn = useTranslations('features.growth.learn');
     return (
-        <span className="inline-flex items-center gap-2 text-fg" aria-label="MasterClass">
+        <span
+            className="inline-flex items-center gap-2 text-fg"
+            aria-label={tLearn('partners.MASTERCLASS')}>
             <svg viewBox="0 0 24 24" className="size-7 shrink-0" fill="none" aria-hidden>
                 <path fill="currentColor" d={MASTERCLASS_MARK} />
             </svg>
@@ -164,6 +156,7 @@ function MasterclassMark() {
 }
 
 function MediaCover({ piece, className }: { piece: LearnPiece; className?: string }) {
+    const labels = useLearnCatalogLabels();
     const [failedSrc, setFailedSrc] = useState<string | null>(null);
     const src = piece.youtubeId
         ? `https://i.ytimg.com/vi/${piece.youtubeId}/hqdefault.jpg`
@@ -209,7 +202,7 @@ function MediaCover({ piece, className }: { piece: LearnPiece; className?: strin
                     ) : (
                         <>
                             <span className="font-mono text-[10px] tracking-widest text-fg-muted uppercase">
-                                {partnerLabel(piece.partner)}
+                                {labels.partnerLabel(piece.partner)}
                             </span>
                             <span className="text-sm leading-snug font-medium text-fg">
                                 {piece.title}
@@ -254,16 +247,22 @@ function Outbound({
 
 /** The store, the streaming page, or the class. The author, free text, or trailer sits with the description. */
 function PieceLinks({ piece }: { piece: LearnPiece }) {
+    const labels = useLearnCatalogLabels();
     return (
         <Outbound href={piece.primary.href} primary>
-            {piece.primary.label}
+            {labels.linkLabel(piece.primary.labelKey)}
         </Outbound>
     );
 }
 
 function PieceSecondary({ piece }: { piece: LearnPiece }) {
+    const labels = useLearnCatalogLabels();
     if (!piece.secondary) return null;
-    return <Outbound href={piece.secondary.href}>{piece.secondary.label}</Outbound>;
+    return (
+        <Outbound href={piece.secondary.href}>
+            {labels.linkLabel(piece.secondary.labelKey)}
+        </Outbound>
+    );
 }
 
 const PICK: readonly LearnStatus[] = ['QUEUE', 'NOW', 'DONE'];
@@ -272,16 +271,24 @@ function todayIso(): string {
     return new Date().toISOString().slice(0, 10);
 }
 
+type LearnT = (key: string, values?: Record<string, string | number>) => string;
+
 /** "12 days left", "Due today", "3 days over". Whole days, local calendar. */
-export function dueLine(iso: string): { text: string; over: boolean } {
+export function dueLine(iso: string, t: LearnT): { text: string; over: boolean } {
     const due = new Date(`${iso}T00:00:00`);
     const now = new Date();
     now.setHours(0, 0, 0, 0);
     const days = Math.round((due.getTime() - now.getTime()) / 86_400_000);
-    if (days === 0) return { text: 'Due today', over: false };
-    if (days === 1) return { text: 'Due tomorrow', over: false };
-    if (days < 0) return { text: `${-days} day${days === -1 ? '' : 's'} over`, over: true };
-    return { text: `${days} days left`, over: false };
+    if (days === 0) return { text: t('due_today'), over: false };
+    if (days === 1) return { text: t('due_tomorrow'), over: false };
+    if (days < 0) {
+        const over = -days;
+        return {
+            text: over === 1 ? t('due_over', { days: over }) : t('due_over_many', { days: over }),
+            over: true,
+        };
+    }
+    return { text: t('due_left', { days }), over: false };
 }
 
 /** The one thing we ask about progress: when do you want to be done? */
@@ -294,19 +301,33 @@ function FinishBy({
     onChange: (iso: string) => void;
     className?: string;
 }) {
-    const line = value ? dueLine(value) : null;
+    const locale = useLocale();
+    const t = useTranslations();
+    const tForm = useTranslations('ui.form');
+    const tLearn = useTranslations('features.growth.learn');
+    const line = value ? dueLine(value, tLearn) : null;
     return (
         <div
             className={cn(
                 'flex flex-wrap items-center gap-2 font-mono text-[10px] tracking-wide text-fg-muted uppercase',
                 className
             )}>
-            <span>Finish by</span>
+            <span>{tLearn('finish_by')}</span>
             <DatePicker
                 value={value ?? null}
                 min={todayIso()}
                 onChange={onChange}
-                placeholder="Pick a date"
+                locale={locale}
+                placeholder={t('ui.form.pick_a_date')}
+                labels={{
+                    previousMonth: tForm('previous_month'),
+                    nextMonth: tForm('next_month'),
+                    month: tForm('month'),
+                    year: tForm('year'),
+                    today: tForm('today'),
+                    pickADay: tForm('pick_a_day'),
+                }}
+                closeLabel={t('ui.button.actions.close')}
                 className="w-40 font-sans text-xs tracking-normal normal-case"
             />
             {line ? (
@@ -338,8 +359,9 @@ function PieceAdjust({
     withStatus?: boolean;
     children: (parts: { button: ReactNode; body: ReactNode }) => ReactNode;
 }) {
+    const tLearn = useTranslations('features.growth.learn');
     const [open, setOpen] = useState(false);
-    const line = due ? dueLine(due) : null;
+    const line = due ? dueLine(due, tLearn) : null;
     const canDate = status === 'NOW' || status === 'QUEUE';
 
     const button = (
@@ -350,7 +372,7 @@ function PieceAdjust({
             aria-expanded={open}
             onClick={() => setOpen(current => !current)}>
             <EditIcon />
-            {open ? 'Done' : 'Edit'}
+            {open ? tLearn('edit_done') : tLearn('edit')}
         </Button>
     );
 
@@ -365,7 +387,7 @@ function PieceAdjust({
                 'font-mono text-[10px] tracking-wide uppercase',
                 line.over ? 'text-danger' : 'text-fg-muted'
             )}>
-            Finish by · {line.text}
+            {tLearn('finish_by_line', { text: line.text })}
         </p>
     ) : null;
 
@@ -381,8 +403,14 @@ function StatusPick({
     status: LearnStatus;
     onPick: (status: LearnStatus) => void;
 }) {
+    const tLearn = useTranslations('features.growth.learn');
+    const labels = useLearnCatalogLabels();
+
     return (
-        <div role="group" aria-label="Where this sits" className="flex flex-wrap gap-1.5">
+        <div
+            role="group"
+            aria-label={tLearn('status_group_aria')}
+            className="flex flex-wrap gap-1.5">
             {PICK.map(key => {
                 const on = status === key;
                 return (
@@ -397,7 +425,7 @@ function StatusPick({
                                 ? 'border-accent/40 bg-accent-soft text-accent'
                                 : 'border-line text-fg-muted hover:border-line-strong hover:text-fg'
                         )}>
-                        {pickLabel(format, key)}
+                        {labels.pickLabel(format, key)}
                     </button>
                 );
             })}
@@ -421,13 +449,17 @@ function FilterMenu({
 }) {
     const current = options.find(option => option.on) ?? options[0];
     const skillKeys = new Set<string>(SKILLS.map(skill => skill.key));
+    const tLearn = useTranslations('features.growth.learn');
     const groups = [
         { name: '', rows: options.filter(option => option.key === 'ALL') },
         {
-            name: 'Sections',
+            name: tLearn('filter_sections'),
             rows: options.filter(option => option.key !== 'ALL' && !skillKeys.has(option.key)),
         },
-        { name: 'Skills', rows: options.filter(option => skillKeys.has(option.key)) },
+        {
+            name: tLearn('filter_skills'),
+            rows: options.filter(option => skillKeys.has(option.key)),
+        },
     ].filter(group => group.rows.length > 0);
     return (
         <div className="grid gap-2.5 px-4 py-3.5">
@@ -567,6 +599,9 @@ function FilterLane({
 }
 
 export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
+    const t = useTranslations();
+    const tLearn = useTranslations('features.growth.learn');
+    const labels = useLearnCatalogLabels();
     const { householdId } = useAuth();
     const { plan } = usePlanCapabilities();
     const { locale } = useAppShell();
@@ -707,24 +742,20 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
                     <Link
                         href="/product/growth/learn"
                         className="mb-3 block w-fit font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
-                        ← Learn
+                        {tLearn('back')}
                     </Link>
                 ) : null}
                 <Typography as="span" variant="eyebrow" color="primary">
-                    {browsing ? '✦ THE LIBRARY' : '✦ WHAT I LEARN'}
+                    {browsing ? tLearn('eyebrow_library') : tLearn('eyebrow_shelf')}
                 </Typography>
                 <Typography as="h1" className="mt-2">
-                    {browsing
-                        ? 'What we recommend. We do not host it.'
-                        : "Distribution has a floor. Learning doesn't."}
+                    {browsing ? tLearn('title_library') : tLearn('title_shelf')}
                 </Typography>
                 <Typography as="p" variant="lead" size="default" className="mt-2">
-                    {browsing
-                        ? 'Search, then narrow by what it is and what it is about. Mark a title and it lands on Learn.'
-                        : 'A skill is the decision. A book, film, series, video, or course is how you work it. We recommend what to get and who to support — we never host the work.'}
+                    {browsing ? tLearn('lead_library') : tLearn('lead_shelf')}
                 </Typography>
                 <p className="mt-2 max-w-2xl text-sm text-pretty text-fg-muted">
-                    {partnerLine(plan)}
+                    {plan === PlanKey.MAX ? tLearn('partner_max') : tLearn('partner_default')}
                 </p>
             </div>
 
@@ -737,13 +768,12 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
                         size="sm"
                         color="secondary"
                         className="min-w-0 flex-1 basis-72 text-pretty">
-                        Your Education jar is where this spending lives. What raises your earning
-                        power pays itself back into Financial Freedom.
+                        {tLearn('jar_banner')}
                     </Typography>
                     <Link
                         href="/product/money/jars"
                         className="flex-none rounded-full border border-line-strong px-4 py-2.5 font-mono text-xs tracking-wide whitespace-nowrap text-fg-secondary uppercase transition-colors hover:border-accent-hover hover:text-accent">
-                        View Education jar ›
+                        {tLearn('jar_cta')}
                     </Link>
                 </div>
             )}
@@ -759,18 +789,18 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
                                         setAddSeed('');
                                         setAddOpen(true);
                                     }}>
-                                    Add learning
+                                    {tLearn('add_learning')}
                                 </Button>
                             ) : null}
                             <Button as={Link} href={LIBRARY_HREF} size="sm">
-                                Browse library
+                                {tLearn('browse_library')}
                             </Button>
                         </div>
                     }>
                     {(
                         [
-                            ['FOCUS', 'Focus', focusPieces.length],
-                            ['DONE', 'Done', donePieces.length],
+                            ['FOCUS', tLearn('tab_focus'), focusPieces.length],
+                            ['DONE', tLearn('tab_done'), donePieces.length],
                         ] as const
                     ).map(([key, label, count]) => (
                         <ListToolbarTab key={key} active={tab === key} onClick={() => setTab(key)}>
@@ -788,19 +818,19 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
                             type="search"
                             value={search}
                             onChange={event => setSearch(event.target.value)}
-                            placeholder="Search a title, author, or subject"
-                            aria-label="Search the library"
+                            placeholder={tLearn('search_placeholder')}
+                            aria-label={tLearn('search_aria')}
                             className="min-w-0 flex-1 basis-64"
                         />
                         <span className="font-mono text-xs text-fg-muted">
-                            {shown.length} of {catalog.length}
+                            {tLearn('count_of', { shown: shown.length, total: catalog.length })}
                         </span>
                         {filtering ? (
                             <button
                                 type="button"
                                 onClick={resetFilters}
                                 className="font-mono text-[11px] tracking-wide text-accent uppercase">
-                                Clear
+                                {t('ui.button.actions.clear')}
                             </button>
                         ) : null}
                         {live && householdId ? (
@@ -810,16 +840,19 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
                                     setAddSeed(search.trim());
                                     setAddOpen(true);
                                 }}>
-                                Add learning
+                                {tLearn('add_learning')}
                             </Button>
                         ) : null}
                     </div>
                     <FilterLane
-                        label="What"
+                        label={tLearn('filter_what')}
                         divided
                         options={(['ALL', ...formatsPresent] as const).map(key => ({
                             key,
-                            label: key === 'ALL' ? 'Everything' : formatPlural(key),
+                            label:
+                                key === 'ALL'
+                                    ? tLearn('filter_everything')
+                                    : labels.formatPlural(key),
                             count:
                                 key === 'ALL'
                                     ? searched.length
@@ -829,10 +862,11 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
                         }))}
                     />
                     <FilterMenu
-                        label="About"
+                        label={tLearn('filter_about')}
                         options={(['ALL', ...aboutsPresent] as const).map(key => ({
                             key,
-                            label: key === 'ALL' ? 'Anything' : aboutLabel(key),
+                            label:
+                                key === 'ALL' ? tLearn('filter_anything') : labels.aboutLabel(key),
                             count:
                                 key === 'ALL'
                                     ? searched.length
@@ -887,19 +921,19 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
                     icon="✦"
                     title={
                         tab === 'DONE'
-                            ? 'Nothing finished yet.'
+                            ? tLearn('done_empty_title')
                             : filtering
-                              ? 'Nothing matches.'
-                              : 'Nothing on this shelf.'
+                              ? tLearn('filter_empty_title')
+                              : tLearn('shelf_empty_title')
                     }
                     body={
                         filtering
                             ? search.trim()
-                                ? 'Nothing we recommend matches. Add it from the public catalog.'
-                                : 'Try another word, or clear the filters.'
+                                ? tLearn('filter_search_body')
+                                : tLearn('filter_body')
                             : tab === 'DONE'
-                              ? 'Mark a title as read, watched, or finished and it lands here.'
-                              : 'Pick one. Say if you need it, or if you already have it.'
+                              ? tLearn('done_empty_body')
+                              : tLearn('shelf_empty_body')
                     }
                     action={
                         browsing && live && householdId && search.trim() ? (
@@ -909,7 +943,7 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
                                     setAddSeed(search.trim());
                                     setAddOpen(true);
                                 }}>
-                                Add learning
+                                {tLearn('add_learning')}
                             </Button>
                         ) : undefined
                     }
@@ -925,7 +959,7 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
                             <section key={format} className="grid gap-3">
                                 <div className="flex items-baseline justify-between gap-3 px-1">
                                     <Typography as="h2" variant="eyebrow" color="primary">
-                                        ✦ {formatPlural(format).toUpperCase()}
+                                        ✦ {labels.formatPlural(format).toUpperCase()}
                                     </Typography>
                                     <span className="font-mono text-xs text-fg-muted">
                                         {items.length}
@@ -952,13 +986,13 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
                                                                 <div className="flex items-start justify-between gap-3">
                                                                     <div className="flex min-w-0 flex-wrap items-center gap-2">
                                                                         <span className="font-mono text-[10px] tracking-widest text-fg-muted uppercase">
-                                                                            {aboutLabel(
+                                                                            {labels.aboutLabel(
                                                                                 aboutOf(piece)
                                                                             )}
                                                                         </span>
                                                                         {forYou ? (
                                                                             <span className="rounded-full bg-accent-soft px-2 py-0.5 font-mono text-[10px] tracking-widest text-accent uppercase">
-                                                                                For you
+                                                                                {tLearn('for_you')}
                                                                             </span>
                                                                         ) : null}
                                                                     </div>
@@ -979,10 +1013,10 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
                                                                     <div className="grid gap-2">
                                                                         <span className="font-mono text-[10px] tracking-widest text-accent uppercase">
                                                                             {status === 'SHELF'
-                                                                                ? partnerLabel(
+                                                                                ? labels.partnerLabel(
                                                                                       piece.partner
                                                                                   )
-                                                                                : pickLabel(
+                                                                                : labels.pickLabel(
                                                                                       piece.format,
                                                                                       status
                                                                                   )}
@@ -1017,11 +1051,10 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
 
             {shown.length > 0 || recommended.length > 0 ? (
                 <p className="px-1 text-center text-xs text-pretty text-fg-faint">
-                    Books open at {storeName(store)}. Films and series open on JustWatch, which
-                    shows where they stream in your country. Courses open at Udemy or Masterclass.
+                    {tLearn('footer_stores', { store: labels.storeName(store) })}
                     {HAS_PARTNER_TAGS
-                        ? ' Some of these links earn Rumtelo a small commission. The price is the same for you.'
-                        : ' We recommend and point — we never host the work.'}
+                        ? tLearn('footer_commission')
+                        : tLearn('footer_no_commission')}
                 </p>
             ) : null}
             {live && householdId ? (
@@ -1053,12 +1086,15 @@ function ReadingList({
     onDue: (id: string, iso: string) => void;
     onMove: (shift: { from: number; dir: -1 | 1 }) => void;
 }) {
+    const tLearn = useTranslations('features.growth.learn');
+    const labels = useLearnCatalogLabels();
+
     if (pieces.length === 0) {
         return (
             <EmptyState
                 icon="✦"
-                title="Nothing picked yet."
-                body="The coach has a few below. Mark one and it lands here, in the order you want to take it."
+                title={tLearn('reading_empty_title')}
+                body={tLearn('reading_empty_body')}
             />
         );
     }
@@ -1067,7 +1103,7 @@ function ReadingList({
         <Card className="p-0">
             <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-3.5">
                 <Typography as="span" variant="eyebrow" color="primary">
-                    ✦ To read
+                    ✦ {tLearn('reading_heading')}
                 </Typography>
                 <span className="font-mono text-xs text-fg-muted">{pieces.length}</span>
             </div>
@@ -1107,7 +1143,7 @@ function ReadingList({
                                             <p className="truncate text-sm font-medium text-fg">
                                                 {piece.title}
                                                 <span className="ml-2 font-mono text-[10px] tracking-wide text-accent uppercase">
-                                                    {pickLabel(piece.format, status)}
+                                                    {labels.pickLabel(piece.format, status)}
                                                 </span>
                                             </p>
                                             <PieceLine
@@ -1115,7 +1151,7 @@ function ReadingList({
                                                 className="mt-0.5 truncate text-xs text-fg-muted italic"
                                             />
                                             <p className="mt-1 font-mono text-[11px] text-fg-faint">
-                                                {piece.by} · {aboutLabel(aboutOf(piece))}
+                                                {piece.by} · {labels.aboutLabel(aboutOf(piece))}
                                             </p>
                                             {body ? <div className="mt-3">{body}</div> : null}
                                         </div>
@@ -1123,7 +1159,7 @@ function ReadingList({
                                             <div className="flex gap-1">
                                                 <button
                                                     type="button"
-                                                    aria-label="Earlier"
+                                                    aria-label={tLearn('move_earlier')}
                                                     disabled={index === 0}
                                                     onClick={() => onMove({ from: index, dir: -1 })}
                                                     className="grid size-7 place-items-center rounded-full border border-line font-mono text-xs text-fg-muted hover:border-accent-hover hover:text-accent disabled:opacity-30">
@@ -1131,7 +1167,7 @@ function ReadingList({
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    aria-label="Later"
+                                                    aria-label={tLearn('move_later')}
                                                     disabled={index === pieces.length - 1}
                                                     onClick={() => onMove({ from: index, dir: 1 })}
                                                     className="grid size-7 place-items-center rounded-full border border-line font-mono text-xs text-fg-muted hover:border-accent-hover hover:text-accent disabled:opacity-30">
@@ -1168,12 +1204,14 @@ function PieceGroups({
     onStatus: (id: string, status: LearnStatus) => void;
     onDue: (id: string, iso: string) => void;
 }) {
+    const tLearn = useTranslations('features.growth.learn');
+    const labels = useLearnCatalogLabels();
     const coach = useHelpersEnabled();
     const groups = recommended
         ? []
         : FORMAT_ORDER.map(format => ({
               key: format,
-              label: formatLabel(format).toUpperCase(),
+              label: labels.formatLabel(format).toUpperCase(),
               items: pieces.filter(piece => piece.format === format),
           })).filter(group => group.items.length > 0);
 
@@ -1194,7 +1232,9 @@ function PieceGroups({
                                 <p className="truncate text-sm font-medium text-fg">
                                     {piece.title}
                                     <span className="ml-2 font-mono text-[10px] tracking-wide text-accent uppercase">
-                                        {status === 'SHELF' ? '' : pickLabel(piece.format, status)}
+                                        {status === 'SHELF'
+                                            ? ''
+                                            : labels.pickLabel(piece.format, status)}
                                     </span>
                                 </p>
                                 <PieceLine
@@ -1202,7 +1242,7 @@ function PieceGroups({
                                     className="mt-0.5 truncate text-xs text-fg-muted italic"
                                 />
                                 <p className="mt-1 font-mono text-[11px] text-fg-faint">
-                                    {piece.by} · {aboutLabel(aboutOf(piece))}
+                                    {piece.by} · {labels.aboutLabel(aboutOf(piece))}
                                 </p>
                                 {piece.secondary ? (
                                     <div className="mt-1">
@@ -1230,15 +1270,14 @@ function PieceGroups({
                         <div className="flex min-w-0 flex-wrap items-center gap-2">
                             {coach ? <CoachMark size="sm" /> : null}
                             <Typography as="span" variant="eyebrow" color="primary">
-                                {coach ? 'Not on your list' : '✦ Recommended'}
+                                {coach ? tLearn('coach_not_on_list') : tLearn('recommended')}
                             </Typography>
                         </div>
                         <span className="font-mono text-xs text-fg-muted">{pieces.length}</span>
                     </div>
                     {coach ? (
                         <p className="text-sm leading-relaxed text-pretty text-fg-secondary">
-                            These are not need-to-read yet. Mark one and it joins the list, at the
-                            end.
+                            {tLearn('coach_recommended_body')}
                         </p>
                     ) : null}
                 </div>

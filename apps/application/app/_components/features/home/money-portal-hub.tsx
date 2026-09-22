@@ -1,10 +1,13 @@
 'use client';
 
 import { CoachKind } from '@rumtelo/contracts';
-import { toPeriodKey } from '@rumtelo/utils';
+import { useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
+import { describePeriodTravel, toPeriodKey } from '@rumtelo/utils';
+import { useLocale } from 'next-intl';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
+import { buildPeriodTravelCoachText } from '@/app/_lib/period-travel-coach-copy';
 import { pickPortalCoach } from '@/app/_lib/portal-coach';
 import { isLiveData } from '@/app/_lib/preview';
 import { moneyPortalShell } from '@/app/_lib/portal-hubs';
@@ -13,16 +16,23 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
-function formatDebtFree(on: string | null): string {
+function formatDebtFree(on: string | null, locale: string): string {
     if (!on) return '—';
     const [year, month] = on.split('-').map(Number);
     if (!year || !month) return '—';
-    return new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric' }).format(
+    return new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric' }).format(
         new Date(Date.UTC(year, month - 1, 1))
     );
 }
 
 export function MoneyPortalHubClient() {
+    const t = useTranslations();
+    const tCoach = useTranslations('features.coach');
+    const tShell = useTranslations('pages.shell');
+    const th = useTranslations('features.money.hub');
+    const tc = useTranslations('features.money.hub.cards');
+    const locale = useLocale();
+    const shell = moneyPortalShell(t);
     const { householdId } = useAuth();
     const { period } = useAppShell();
     const { formatMoney } = useHouseholdCurrency();
@@ -52,38 +62,70 @@ export function MoneyPortalHubClient() {
     const debtsAt = data?.debtsAtPeriod;
     const goalsAt = data?.goalsAtPeriod ?? [];
     const fulfilled = goalsAt.filter(goal => goal.fulfilledByPeriod).length;
+    const monthsHorizon = String(data?.travel?.monthsHorizon ?? '—');
 
     const debtValue =
         stacked && debtsAt
             ? debtsAt.clearedByPeriod
-                ? 'Free'
+                ? tc('debt.free')
                 : `${formatMoney(debtsAt.totalOriginal)} → ${formatMoney(debtsAt.totalRemaining)}`
-            : formatDebtFree(data?.debtFreeOn ?? null);
+            : formatDebtFree(data?.debtFreeOn ?? null, locale);
 
     const debtNote =
         stacked && debtsAt
             ? debtsAt.clearedByPeriod
-                ? 'cleared by this month'
-                : `${debtsAt.monthsRemaining ?? '—'} months still to free`
+                ? tc('debt.cleared_by_month')
+                : tc('debt.months_still_to_free', {
+                      months: String(debtsAt.monthsRemaining ?? '—'),
+                  })
             : data?.debtMonthsRemaining !== null && data?.debtMonthsRemaining !== undefined
-              ? `${data.debtMonthsRemaining} months to free`
-              : 'the month you are free';
+              ? tc('debt.months_to_free', { months: String(data.debtMonthsRemaining) })
+              : tc('debt.month_you_are_free');
 
     const jarsNote = stacked
         ? goalsAt.length
-            ? `${fulfilled}/${goalsAt.length} goals on track · put through over ${data?.travel?.monthsHorizon ?? '—'} mo`
-            : `put through over ${data?.travel?.monthsHorizon ?? '—'} months`
-        : 'jars on track this month';
+            ? tc('jars.note_stacked_goals', {
+                  fulfilled: String(fulfilled),
+                  total: String(goalsAt.length),
+                  months: monthsHorizon,
+              })
+            : tc('jars.note_stacked_horizon', { months: monthsHorizon })
+        : tc('jars.note_period');
 
-    const coachMessages = data?.travelCoachText
+    const baselineById = new Map(
+        (data?.baselineJars ?? []).map(jar => [jar.id, jar.allocated] as const)
+    );
+    const periodTravelCoachText =
+        stacked && data
+            ? buildPeriodTravelCoachText({
+                  period: periodKey,
+                  locale,
+                  travel: describePeriodTravel(period),
+                  monthsHorizon: data.travel.monthsHorizon,
+                  stackedTotal: data.allocatedTotal,
+                  formatMoney,
+                  goalsAtPeriod: data.goalsAtPeriod,
+                  jarHighlights: data.jars.slice(0, 2).map(jar => ({
+                      name: jar.name,
+                      from: baselineById.get(jar.id) ?? jar.allocated,
+                      to: jar.allocated,
+                  })),
+                  tCoach,
+                  tShell,
+              })
+            : null;
+
+    const coachMessages = periodTravelCoachText
         ? [
               {
+                  key: null,
                   kind: CoachKind.WIN,
-                  text: data.travelCoachText,
-                  ctaLabel: 'See overview',
+                  text: periodTravelCoachText,
+                  ctaLabel: th('see_overview'),
                   ctaHref: '/',
               },
-              ...(data.coach ?? []).map(message => ({
+              ...(data?.coach ?? []).map(message => ({
+                  key: message.key,
                   kind: message.kind,
                   text: message.text,
                   ctaLabel: message.ctaLabel,
@@ -91,6 +133,7 @@ export function MoneyPortalHubClient() {
               })),
           ]
         : (data?.coach ?? []).map(message => ({
+              key: message.key,
               kind: message.kind,
               text: message.text,
               ctaLabel: message.ctaLabel,
@@ -98,11 +141,11 @@ export function MoneyPortalHubClient() {
           }));
 
     const props: PortalHubProps = {
-        ...moneyPortalShell,
-        coach: pickPortalCoach(coachMessages, moneyPortalShell.fallbackCoach),
+        ...shell,
+        coach: pickPortalCoach(coachMessages, shell.fallbackCoach, tCoach, t),
         cards: [
             {
-                name: 'Jars',
+                name: tc('jars.name'),
                 value: `${onTrack} / ${total}`,
                 note: jarsNote,
                 color: 'var(--color-jar-nec)',
@@ -110,15 +153,15 @@ export function MoneyPortalHubClient() {
                 href: '/product/money/jars',
             },
             {
-                name: 'Transactions',
+                name: tc('transactions.name'),
                 value: formatMoney(spent),
-                note: stacked ? 'booked across span' : 'booked this month',
+                note: stacked ? tc('transactions.note_stacked') : tc('transactions.note_month'),
                 color: 'var(--color-jar-play)',
                 chart: { kind: 'bars', bars: [0, 0, 0, 0, 0, 0, 0] },
                 href: '/product/money/transactions',
             },
             {
-                name: 'Debt',
+                name: tc('debt.name'),
                 value: debtValue,
                 note: debtNote,
                 color: 'var(--color-danger)',
@@ -126,9 +169,9 @@ export function MoneyPortalHubClient() {
                 href: '/product/money/debt',
             },
             {
-                name: 'Fixed costs',
+                name: tc('fixed_costs.name'),
                 value: formatMoney(fixed),
-                note: 'fixed costs per month',
+                note: tc('fixed_costs.note'),
                 color: 'var(--color-jar-nec)',
                 chart: { kind: 'ring', pct: fixedRing, tone: 'brand' },
                 href: '/product/money/fixed-costs',

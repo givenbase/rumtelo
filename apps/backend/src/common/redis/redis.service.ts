@@ -6,7 +6,7 @@ import { loadEnv } from '../config/env.config';
 import { isRedisUrl, redactRedisUrl } from './redis-url.util';
 
 /**
- * Thin ioredis wrapper (Galighticus pattern).
+ * Thin ioredis wrapper.
  *
  * Reads `DATABASE_REDIS_URL`. When unset, invalid, or unreachable, stays disabled —
  * callers check `isAvailable` and fall back in-memory if needed.

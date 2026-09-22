@@ -2,6 +2,7 @@
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 
+import { useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Typography } from '@rumtelo/ui';
 
@@ -15,6 +16,7 @@ export function IncomeCreatePage({ embedded = false }: { embedded?: boolean }) {
 }
 
 export function IncomeUpdatePage({ id, embedded = false }: { id: string; embedded?: boolean }) {
+    const t = useTranslations('features.growth.income');
     const { householdId } = useAuth();
     const live = isLiveData(householdId);
 
@@ -28,14 +30,14 @@ export function IncomeUpdatePage({ id, embedded = false }: { id: string; embedde
     if (live && query.isLoading && !row) {
         return (
             <Typography as="p" size="sm" color="muted">
-                Loading…
+                {t('loading')}
             </Typography>
         );
     }
     if (!row) {
         return (
             <Typography as="p" size="sm" color="muted">
-                Income source not found.
+                {t('not_found')}
             </Typography>
         );
     }

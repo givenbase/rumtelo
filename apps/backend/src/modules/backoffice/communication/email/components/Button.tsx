@@ -15,7 +15,7 @@ interface ButtonProps {
     variant?: 'outline' | 'primary' | 'secondary';
 }
 
-/** Solid teal CTA — Galighticus Button pattern, Rumtelo tokens. */
+/** Solid teal CTA — Rumtelo tokens. */
 const Button: React.FC<ButtonProps> = ({
     href,
     children,

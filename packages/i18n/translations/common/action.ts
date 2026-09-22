@@ -1,6 +1,6 @@
 /**
  * Common action phrases — parameterized with {entity} where useful.
- * Trimmed Galighticus spine; no healthcare / POS vocabulary.
+ * Shared action labels — no healthcare / POS vocabulary.
  */
 const action = {
     create: 'Create {entity}',

@@ -90,6 +90,8 @@ export function StatusPage({
     reset,
     homeHref = '/',
     homeLabel,
+    retryLabel = 'Try again',
+    goBackLabel = 'Go back',
     title,
     description,
 }: StatusPageProps) {
@@ -188,7 +190,7 @@ export function StatusPage({
                 <div className="mt-7 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:justify-center">
                     {reset ? (
                         <StatusAction tone="primary" onClick={reset}>
-                            Try again
+                            {retryLabel}
                         </StatusAction>
                     ) : null}
                     <StatusAction tone={reset ? 'secondary' : 'primary'} href={homeHref}>
@@ -203,7 +205,7 @@ export function StatusPage({
                                 window.location.href = homeHref;
                             }
                         }}>
-                        Go back
+                        {goBackLabel}
                     </StatusAction>
                 </div>
             </div>

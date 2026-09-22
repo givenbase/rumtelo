@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useLocale } from 'next-intl';
+import { useState } from 'react';
 
 import type { Goal, JarBalance } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
 import { Card, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
@@ -55,8 +57,8 @@ function roundToStep(major: number) {
     return Math.round(major / SIM_STEP_MAJOR) * SIM_STEP_MAJOR;
 }
 
-function formatMonthYear(date: Date) {
-    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+function formatMonthYear(date: Date, locale: string) {
+    return new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric' }).format(date);
 }
 
 /** Slider bounds anchored on real income, stretched so the Earn target is reachable. */
@@ -96,6 +98,8 @@ export function IncomeSimulator({
     goals,
     className,
 }: IncomeSimulatorProps) {
+    const t = useTranslations('features.growth.income_simulator');
+    const locale = useLocale();
     const coachGuidesEnabled = useHelpersEnabled();
     const { formatMoney } = useHouseholdCurrency();
 
@@ -156,46 +160,53 @@ export function IncomeSimulator({
     const pace = paceInput ? evaluateGoalPace({ ...paceInput, wantMonths }) : null;
 
     const goalReached = pace?.verdict === 'reached';
-    const jarName = goalJar?.name ?? 'No jar';
-    const doneLabel = pace?.doneOn ? formatMonthYear(pace.doneOn) : '—';
-    const yourDateLabel = goal?.targetOn ? formatMonthYear(new Date(goal.targetOn)) : null;
+    const jarName = goalJar?.name ?? t('no_jar');
+    const doneLabel = pace?.doneOn ? formatMonthYear(pace.doneOn, locale) : t('date_unknown');
+    const yourDateLabel = goal?.targetOn ? formatMonthYear(new Date(goal.targetOn), locale) : null;
     const followsYourDate = wantOverrideMonths === null && pace?.planMonths !== null;
 
-    const paceTip = useMemo<PaceTip | null>(() => {
-        if (!goal || !pace) return null;
+    let paceTip: PaceTip | null = null;
+    if (goal && pace) {
         const need = formatMoney(pace.needCents);
 
         switch (pace.verdict) {
             case 'no-plan':
-                return {
-                    body: 'No monthly amount, so there is no date.',
-                    action: 'Set monthly amount',
+                paceTip = {
+                    body: t('tip_no_plan'),
+                    action: t('tip_set_monthly_amount'),
                     tone: 'default',
                 };
+                break;
             case 'on-target':
             case 'ahead':
-                return null;
+                break;
             case 'behind-room':
-                return {
-                    body: `${need}/mo would finish this in ${wantMonths} months. The jar has room.`,
-                    action: 'Raise monthly amount',
+                paceTip = {
+                    body: t('tip_behind_room', { need, months: wantMonths }),
+                    action: t('tip_raise_monthly_amount'),
                     tone: 'default',
                 };
+                break;
             case 'behind-income':
-                if (pace.jarFlowCents === null) {
-                    return {
-                        body: `${need}/mo would finish this in ${wantMonths} months. Fund it from a jar to see if income covers that.`,
-                        tone: 'warning',
-                    };
-                }
-                return {
-                    body: `${need}/mo would finish this in ${wantMonths} months. ${jarName} cannot cover that here.`,
-                    tone: 'warning',
-                };
+                paceTip =
+                    pace.jarFlowCents === null
+                        ? {
+                              body: t('tip_behind_income_no_jar', { need, months: wantMonths }),
+                              tone: 'warning',
+                          }
+                        : {
+                              body: t('tip_behind_income', {
+                                  need,
+                                  months: wantMonths,
+                                  jar: jarName,
+                              }),
+                              tone: 'warning',
+                          };
+                break;
             default:
-                return null;
+                break;
         }
-    }, [goal, jarName, pace, wantMonths, formatMoney]);
+    }
 
     const planFits = pace?.jarHeadroomCents === null ? null : (pace?.jarHeadroomCents ?? 0) >= 0;
 
@@ -221,13 +232,13 @@ export function IncomeSimulator({
             type="button"
             onClick={goToNextGoal}
             className="font-mono text-xs font-medium tracking-wide text-accent uppercase underline-offset-2 hover:underline">
-            Next: {nextGoal.name}
+            {t('next_goal', { name: nextGoal.name })}
         </button>
     ) : (
         <Link
             href={CREATE_HREF.goal}
             className="font-mono text-xs font-medium tracking-wide text-accent uppercase underline-offset-2 hover:underline">
-            + Add goal
+            {t('add_goal')}
         </Link>
     );
 
@@ -243,21 +254,21 @@ export function IncomeSimulator({
                 <div className="flex flex-wrap items-center gap-2">
                     {coachGuidesEnabled ? <CoachMark size="sm" /> : null}
                     <Typography as="span" variant="eyebrow" color="primary">
-                        {coachGuidesEnabled ? 'What a raise does' : '✦ What a raise does'}
+                        {coachGuidesEnabled ? t('eyebrow') : t('eyebrow_with_mark')}
                     </Typography>
                 </div>
                 {clearedName ? (
                     <p className="mt-2 max-w-prose text-sm leading-relaxed text-pretty text-fg-secondary">
-                        {clearedName} is reached. I won&apos;t pick a higher number.{' '}
+                        {t('cleared_intro', { name: clearedName })}{' '}
                         <Link
                             href={createGoalHref({ kind: GoalKind.EARN })}
                             className="font-medium text-accent underline-offset-2 hover:underline">
-                            Set the next target
+                            {t('set_next_target')}
                         </Link>
                     </p>
                 ) : (
                     <p className="mt-2 max-w-prose text-sm leading-relaxed text-pretty text-fg-muted">
-                        Drag the monthly net. The split stays; each jar moves with it.
+                        {t('intro')}
                     </p>
                 )}
 
@@ -270,7 +281,7 @@ export function IncomeSimulator({
                         value={simMajor}
                         onChange={event => setSimOverrideMajor(Number(event.target.value))}
                         className="min-w-0 flex-1 accent-accent"
-                        aria-label="Simulate income"
+                        aria-label={t('aria_simulate_income')}
                     />
                     <span className="shrink-0 font-display text-2xl font-semibold tracking-tight text-accent sm:min-w-36 sm:text-3xl">
                         {formatMoney(simCents)}
@@ -289,7 +300,7 @@ export function IncomeSimulator({
                                     ? 'border-accent/40 bg-accent-soft text-accent'
                                     : 'border-line text-fg-secondary hover:border-accent hover:text-accent'
                             )}>
-                            Now {formatMoney(range.current * 100)}
+                            {t('now', { amount: formatMoney(range.current * 100) })}
                         </button>
                     ) : null}
                     {targetMajor !== null ? (
@@ -303,13 +314,14 @@ export function IncomeSimulator({
                                     ? 'border-accent/40 bg-accent-soft text-accent'
                                     : 'border-line text-fg-secondary hover:border-accent hover:text-accent'
                             )}>
-                            Target {formatMoney(targetMajor * 100)}
+                            {t('target', { amount: formatMoney(targetMajor * 100) })}
                         </button>
                     ) : null}
                     {netCents > 0 && simDeltaPct !== 0 ? (
                         <span className="text-fg-secondary">
-                            {simDeltaPct > 0 ? '+' : ''}
-                            {simDeltaPct}% vs now
+                            {t('vs_now', {
+                                pct: `${simDeltaPct > 0 ? '+' : ''}${simDeltaPct}`,
+                            })}
                         </span>
                     ) : null}
                 </div>
@@ -334,7 +346,7 @@ export function IncomeSimulator({
                                 </div>
                                 {now !== null && now !== then ? (
                                     <div className="mt-0.5 font-mono text-[11px] text-fg-faint">
-                                        now {formatMoney(now)}
+                                        {t('jar_now', { amount: formatMoney(now) })}
                                     </div>
                                 ) : null}
                             </div>
@@ -367,7 +379,7 @@ export function IncomeSimulator({
                                         {goalItem.name}
                                         {reached ? (
                                             <span className="font-mono text-[10px] tracking-wide uppercase">
-                                                Done
+                                                {t('done')}
                                             </span>
                                         ) : null}
                                     </button>
@@ -376,11 +388,11 @@ export function IncomeSimulator({
                         </div>
                     ) : (
                         <div className="my-4 rounded-xl border border-line bg-raised px-3.5 py-4 text-sm text-fg-secondary">
-                            No goals yet. Add one to see when this income gets you there.
+                            {t('no_goals_yet')}
                             <Link
                                 href={CREATE_HREF.goal}
                                 className="mt-3 block font-mono text-xs font-medium tracking-wide text-accent uppercase underline-offset-2 hover:underline">
-                                + Add goal
+                                {t('add_goal')}
                             </Link>
                         </div>
                     )}
@@ -405,14 +417,19 @@ export function IncomeSimulator({
                                     />
                                 </span>
                                 <span className="font-mono text-xs font-medium text-fg-faint">
-                                    {formatMoney(goal.saved)} of {formatMoney(goal.target)}
+                                    {t('saved_of_target', {
+                                        saved: formatMoney(goal.saved),
+                                        target: formatMoney(goal.target),
+                                    })}
                                     {!goalReached && pace.plannedCents > 0
-                                        ? ` · ${formatMoney(pace.plannedCents)}/mo planned`
+                                        ? t('planned_per_month', {
+                                              amount: formatMoney(pace.plannedCents),
+                                          })
                                         : null}
                                 </span>
                                 {goalReached ? (
                                     <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-fg-secondary">
-                                        <span>Done.</span>
+                                        <span>{t('done_sentence')}</span>
                                         {reachedAction}
                                     </p>
                                 ) : pace.jarFlowCents !== null && pace.jarHeadroomCents !== null ? (
@@ -423,38 +440,44 @@ export function IncomeSimulator({
                                                 planFits ? 'text-success' : 'text-danger'
                                             )}>
                                             {planFits
-                                                ? `${formatMoney(pace.jarHeadroomCents)} free`
-                                                : `${formatMoney(-pace.jarHeadroomCents)} short`}
+                                                ? t('amount_free', {
+                                                      amount: formatMoney(pace.jarHeadroomCents),
+                                                  })
+                                                : t('amount_short', {
+                                                      amount: formatMoney(-pace.jarHeadroomCents),
+                                                  })}
                                         </span>{' '}
-                                        in {jarName} after bills and other goals.
+                                        {t('jar_headroom', { jar: jarName })}
                                     </p>
                                 ) : (
                                     <p className="mt-1 text-sm text-pretty text-fg-secondary">
-                                        Not funded from a jar, so income does not change this date.
+                                        {t('not_funded_from_jar')}
                                     </p>
                                 )}
                             </div>
                             <div className="grid w-full gap-3.5 sm:w-52">
                                 <span className="grid gap-1">
                                     <span className="font-mono text-xs font-medium tracking-wide whitespace-nowrap text-fg-faint uppercase">
-                                        Done around
+                                        {t('done_around')}
                                     </span>
                                     <span className="font-display text-2xl leading-none font-semibold tracking-tight text-accent">
-                                        {goalReached ? 'Done' : doneLabel}
+                                        {goalReached ? t('done') : doneLabel}
                                     </span>
                                     {!goalReached && pace.monthsAtPlan !== null ? (
                                         <span className="font-mono text-[11px] text-fg-muted">
-                                            {pace.monthsAtPlan} months at{' '}
-                                            {formatMoney(pace.plannedCents)}/mo
+                                            {t('months_at_plan', {
+                                                months: pace.monthsAtPlan,
+                                                amount: formatMoney(pace.plannedCents),
+                                            })}
                                         </span>
                                     ) : null}
                                 </span>
                                 <span className="grid gap-1">
                                     <span className="font-mono text-xs font-medium tracking-wide whitespace-nowrap text-fg-faint uppercase">
-                                        Your date
+                                        {t('your_date')}
                                     </span>
                                     <span className="font-mono text-base font-medium text-fg">
-                                        {yourDateLabel ?? 'Not set'}
+                                        {yourDateLabel ?? t('not_set')}
                                     </span>
                                 </span>
                             </div>
@@ -465,7 +488,7 @@ export function IncomeSimulator({
                         <>
                             <div className="mt-4 flex flex-wrap items-center gap-3.5">
                                 <span className="font-mono text-xs font-medium tracking-wide whitespace-nowrap text-fg-faint uppercase">
-                                    {yourDateLabel ? 'I want it in' : 'Or I want it in'}
+                                    {yourDateLabel ? t('i_want_it_in') : t('or_i_want_it_in')}
                                 </span>
                                 <input
                                     type="range"
@@ -477,12 +500,14 @@ export function IncomeSimulator({
                                         setWantOverrideMonths(Number(event.target.value))
                                     }
                                     className="min-w-0 flex-1 accent-accent"
-                                    aria-label="Target months"
+                                    aria-label={t('aria_target_months')}
                                 />
                                 <span className="font-mono text-sm font-medium whitespace-nowrap text-fg-secondary">
-                                    {wantMonths} months
+                                    {t('months_count', { months: wantMonths })}
                                     {followsYourDate ? (
-                                        <span className="text-fg-faint"> · your date</span>
+                                        <span className="text-fg-faint">
+                                            {t('your_date_suffix')}
+                                        </span>
                                     ) : null}
                                 </span>
                                 {wantOverrideMonths !== null ? (
@@ -490,7 +515,9 @@ export function IncomeSimulator({
                                         type="button"
                                         onClick={() => setWantOverrideMonths(null)}
                                         className="font-mono text-xs text-accent underline-offset-2 hover:underline">
-                                        {yourDateLabel ? 'Reset to your date' : 'Reset to pace'}
+                                        {yourDateLabel
+                                            ? t('reset_to_your_date')
+                                            : t('reset_to_pace')}
                                     </button>
                                 ) : null}
                             </div>

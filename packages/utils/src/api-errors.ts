@@ -100,9 +100,25 @@ export function getOrpcValidationIssues(error: unknown): OrpcValidationIssue[] {
     return [];
 }
 
+export type ExtractErrorMessageFallbacks = {
+    invalidValue?: string;
+    unexpected?: string;
+    generic?: string;
+};
+
+const DEFAULT_ERROR_MESSAGES: Required<ExtractErrorMessageFallbacks> = {
+    invalidValue: 'Invalid value',
+    unexpected: 'An unexpected error occurred. Please try again.',
+    generic: 'An error occurred. Please try again.',
+};
+
 /** User-facing message from string / Error / oRPC-shaped payloads. */
-export function extractErrorMessage(error: unknown): string {
-    if (!error) return 'An unexpected error occurred. Please try again.';
+export function extractErrorMessage(
+    error: unknown,
+    messages: ExtractErrorMessageFallbacks = {}
+): string {
+    const fallback = { ...DEFAULT_ERROR_MESSAGES, ...messages };
+    if (!error) return fallback.unexpected;
 
     if (typeof error === 'string' && error.trim()) return error.trim();
 
@@ -120,7 +136,7 @@ export function extractErrorMessage(error: unknown): string {
                 .join('; ');
         }
 
-        return error.message || 'An error occurred. Please try again.';
+        return error.message || fallback.generic;
     }
 
     if (typeof error === 'object' && error !== null) {
@@ -136,5 +152,5 @@ export function extractErrorMessage(error: unknown): string {
         if (typeof row.error === 'string' && row.error.trim()) return row.error.trim();
     }
 
-    return 'An unexpected error occurred. Please try again.';
+    return fallback.unexpected;
 }

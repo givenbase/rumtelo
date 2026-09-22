@@ -33,6 +33,28 @@ const brand = {
             support: 'Not just money. Where your life goes.',
         },
     },
+    /** Auth manifesto chrome — bottom strip + tablist aria (UI stays i18n-agnostic). */
+    auth_manifesto: {
+        brand_lines_aria: 'Brand lines',
+        portals_eyebrow: 'Four portals',
+        portals_line: 'Money. Growth. Energy. Soul — in balance.',
+        jars_eyebrow: 'Six jars',
+        jars_line: 'Paycheck in. Already assigned.',
+        portals: {
+            money: { name: 'Money', short: 'MONEY' },
+            growth: { name: 'Growth', short: 'GROWTH' },
+            energy: { name: 'Energy', short: 'ENERGY' },
+            soul: { name: 'Soul', short: 'SOUL' },
+        },
+        jars: {
+            necessity: { name: 'Necessity', short: 'NEC' },
+            freedom: { name: 'Freedom', short: 'FF' },
+            education: { name: 'Education', short: 'EDU' },
+            savings: { name: 'Savings', short: 'LTS' },
+            play: { name: 'Play', short: 'PLAY' },
+            give: { name: 'Give', short: 'GIVE' },
+        },
+    },
     /** Application auth — pull them back into the habit. */
     auth_quotes_app: {
         money_picture: {

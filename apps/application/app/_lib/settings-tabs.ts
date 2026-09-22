@@ -21,14 +21,14 @@ export const DEFAULT_TAB: SettingsTab = 'account';
 
 export type SettingsNavItem = {
     key: SettingsTab;
-    label: string;
-    sub: string;
+    labelKey: string;
+    subKey: string;
     /** Product child / screen this settings page configures, when applicable. */
     productChild?: string;
 };
 
 export type SettingsNavSection = {
-    title: string;
+    titleKey: string;
     /** `platform` / `data` or a product key. */
     product: 'platform' | 'money' | 'growth' | 'energy' | 'soul' | 'data';
     items: SettingsNavItem[];
@@ -51,61 +51,97 @@ export const SETTINGS_HREF: Record<SettingsTab, string> = {
 /** Grouped nav — general first, then products, then data. */
 const ALL_SETTINGS_SECTIONS: SettingsNavSection[] = [
     {
-        title: 'General',
+        titleKey: 'pages.settings.sections.general',
         product: 'platform',
         items: [
-            { key: 'account', label: 'Account', sub: 'Profile, sign-in, language' },
-            { key: 'plan', label: 'Plan', sub: 'What you use and pay' },
+            {
+                key: 'account',
+                labelKey: 'pages.settings.tabs.account.label',
+                subKey: 'pages.settings.tabs.account.sub',
+            },
+            {
+                key: 'plan',
+                labelKey: 'pages.settings.tabs.plan.label',
+                subKey: 'pages.settings.tabs.plan.sub',
+            },
         ],
     },
     {
-        title: 'Money',
+        titleKey: 'pages.settings.sections.money',
         product: 'money',
         items: [
-            { key: 'jars', label: 'Jars', sub: 'Split, accounts, coach', productChild: 'jars' },
-            { key: 'debt', label: 'Debt', sub: 'Payoff method', productChild: 'debt' },
-            { key: 'bank', label: 'Bank', sub: 'Accounts and PSD2', productChild: 'account' },
+            {
+                key: 'jars',
+                labelKey: 'pages.settings.tabs.jars.label',
+                subKey: 'pages.settings.tabs.jars.sub',
+                productChild: 'jars',
+            },
+            {
+                key: 'debt',
+                labelKey: 'pages.settings.tabs.debt.label',
+                subKey: 'pages.settings.tabs.debt.sub',
+                productChild: 'debt',
+            },
+            {
+                key: 'bank',
+                labelKey: 'pages.settings.tabs.bank.label',
+                subKey: 'pages.settings.tabs.bank.sub',
+                productChild: 'account',
+            },
             {
                 key: 'automation',
-                label: 'Automation',
-                sub: 'Rules without asking',
+                labelKey: 'pages.settings.tabs.automation.label',
+                subKey: 'pages.settings.tabs.automation.sub',
                 productChild: 'rule',
             },
         ],
     },
     {
-        title: 'Growth',
+        titleKey: 'pages.settings.sections.growth',
         product: 'growth',
-        items: [{ key: 'goals', label: 'Goals', sub: 'Planning horizon', productChild: 'goals' }],
+        items: [
+            {
+                key: 'goals',
+                labelKey: 'pages.settings.tabs.goals.label',
+                subKey: 'pages.settings.tabs.goals.sub',
+                productChild: 'goals',
+            },
+        ],
     },
     {
-        title: 'Energy',
+        titleKey: 'pages.settings.sections.energy',
         product: 'energy',
         items: [
             {
                 key: 'week',
-                label: 'Week',
-                sub: 'Hours, sleep and weight',
+                labelKey: 'pages.settings.tabs.week.label',
+                subKey: 'pages.settings.tabs.week.sub',
                 productChild: 'week',
             },
         ],
     },
     {
-        title: 'Soul',
+        titleKey: 'pages.settings.sections.soul',
         product: 'soul',
         items: [
             {
                 key: 'stillness',
-                label: 'Stillness',
-                sub: 'Minutes a day and reminders',
+                labelKey: 'pages.settings.tabs.stillness.label',
+                subKey: 'pages.settings.tabs.stillness.sub',
                 productChild: 'stillness',
             },
         ],
     },
     {
-        title: 'Data',
+        titleKey: 'pages.settings.sections.data',
         product: 'data',
-        items: [{ key: 'export', label: 'Export', sub: 'Excel or CSV' }],
+        items: [
+            {
+                key: 'export',
+                labelKey: 'pages.settings.tabs.export.label',
+                subKey: 'pages.settings.tabs.export.sub',
+            },
+        ],
     },
 ];
 

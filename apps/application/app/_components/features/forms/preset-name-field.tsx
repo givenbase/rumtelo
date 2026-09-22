@@ -6,6 +6,8 @@ import type { CatalogItemBase } from '@rumtelo/contracts';
 import { VendorMark } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
+import { useTranslations } from '@rumtelo/i18n';
+
 import { partyMark } from '@/app/_lib/vendor-brands';
 
 import { FormInput } from './form-input';
@@ -98,14 +100,17 @@ export function PresetNameField({
     onSelect,
     onClear,
     options,
-    placeholder = 'e.g. rent',
-    freeTextPlaceholder = 'Type a custom name…',
+    placeholder,
+    freeTextPlaceholder,
     disabled,
     id,
     lockPresets = false,
     freeTextKeys = EMPTY_FREE_TEXT_KEYS,
     initialLockedKey = null,
 }: PresetNameFieldProps) {
+    const tForm = useTranslations('ui.form');
+    const resolvedPlaceholder = placeholder ?? tForm('name_example');
+    const resolvedFreeTextPlaceholder = freeTextPlaceholder ?? tForm('type_custom_name');
     const [open, setOpen] = useState(false);
     const [locked, setLocked] = useState<NamePresetOption | null>(() =>
         resolveLockedPreset(lockPresets, initialLockedKey, freeTextKeys, options)
@@ -196,10 +201,8 @@ export function PresetNameField({
 
     const showLockedChip = Boolean(lockPresets && locked);
     const inputValue = searchOnly ? filterQuery : value;
-    const inputPlaceholder = awaitingCustom ? freeTextPlaceholder : placeholder;
-    const emptyHint = lockPresets
-        ? 'No matches — pick Other for a custom name.'
-        : 'No matches — keep typing for a custom name.';
+    const inputPlaceholder = awaitingCustom ? resolvedFreeTextPlaceholder : resolvedPlaceholder;
+    const emptyHint = lockPresets ? tForm('no_matches_other') : tForm('no_matches_keep_typing');
 
     return (
         <div ref={rootRef} className="relative">
@@ -222,7 +225,7 @@ export function PresetNameField({
                     <button
                         type="button"
                         disabled={disabled}
-                        aria-label="Clear selection"
+                        aria-label={tForm('aria.clear_selection')}
                         className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-fg-muted hover:bg-fg/5 hover:text-fg disabled:opacity-40"
                         onClick={clearLock}>
                         <span aria-hidden>×</span>
@@ -230,7 +233,7 @@ export function PresetNameField({
                     <button
                         type="button"
                         disabled={disabled || options.length === 0}
-                        aria-label="Show suggestions"
+                        aria-label={tForm('aria.show_suggestions')}
                         className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-accent/15 text-accent hover:bg-accent/25 disabled:opacity-40"
                         onClick={() => setOpen(previous => !previous)}>
                         <span className="text-xs tracking-widest" aria-hidden>
@@ -275,7 +278,7 @@ export function PresetNameField({
                     <button
                         type="button"
                         disabled={disabled || options.length === 0}
-                        aria-label="Show suggestions"
+                        aria-label={tForm('aria.show_suggestions')}
                         className="absolute top-1/2 right-2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md bg-accent/15 text-accent hover:bg-accent/25 disabled:opacity-40"
                         onClick={() => setOpen(previous => !previous)}>
                         <span className="text-xs tracking-widest" aria-hidden>

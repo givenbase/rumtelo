@@ -5,35 +5,38 @@ import { useCallback, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@rumtelo/ui';
+import { useTranslations } from '@rumtelo/i18n';
 import { cn } from '@rumtelo/utils';
+
+import type { FormRouteMeta } from '@/app/_lib/form-route-meta';
 
 type RouteModalShellProps = {
     children: React.ReactNode;
     closeHref?: string;
     /** Push closeHref on dismiss (direct URL entry). Default uses router.back() for intercept. */
     closeWithHref?: boolean;
-    description?: string;
+    meta: FormRouteMeta;
     /** Controlled dismiss override — skips router.back / closeHref. */
     onDismiss?: () => void;
-    title: string;
-    width?: 'default' | 'wide';
 };
 
 /**
  * Shared overlay for create/edit via Next.js intercepting routes.
  * Soft nav → this sheet over the list. Hard refresh → full page (no shell).
- * Dismiss / success default: router.back() — Galighticus AdminRouteModalShell pattern.
+ * Dismiss / success default: router.back().
  */
 export function RouteModalShell({
     children,
     closeHref,
     closeWithHref = false,
-    description,
+    meta,
     onDismiss,
-    title,
-    width = 'default',
 }: RouteModalShellProps) {
+    const t = useTranslations();
     const router = useRouter();
+    const title = t(meta.titleKey);
+    const description = meta.descriptionKey ? t(meta.descriptionKey) : undefined;
+    const width = meta.width ?? 'default';
     const [open, setOpen] = useState(true);
     const isClosingRef = useRef(false);
 
@@ -73,6 +76,7 @@ export function RouteModalShell({
             <SheetContent
                 side="right"
                 showCloseButton
+                closeLabel={t('ui.button.actions.close')}
                 className={cn(
                     'flex flex-col gap-0 overflow-hidden border-line bg-surface p-0 shadow-xl',
                     // Overrides the Sheet default (sm:max-w-lg). Forms need room for

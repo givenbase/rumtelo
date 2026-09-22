@@ -8,6 +8,7 @@ import { useEffect, useMemo } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import { useLiveQuery } from '@rumtelo/hooks';
+import { useTranslations } from '@rumtelo/i18n';
 import {
     FormControl,
     FormField,
@@ -22,8 +23,8 @@ import type { Jar, JarCapabilities } from '@rumtelo/contracts';
 import { jarCapabilitiesFor } from '@rumtelo/contracts';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 
+import { useApiError } from '@/app/_lib/api-error-messages';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { parseAmountToMinorUnits, todayIsoDate } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
@@ -33,28 +34,9 @@ import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 
-const moveSchema = z
-    .object({
-        fromJarId: z.string().min(1, 'Choose a jar to take from'),
-        toJarId: z.string().min(1, 'Choose a jar to send to'),
-        amount: z
-            .string()
-            .min(1, 'Amount is required')
-            .refine(
-                value => {
-                    const cents = parseAmountToMinorUnits(value);
-                    return cents !== null && cents > 0;
-                },
-                { message: 'Enter a valid amount' }
-            ),
-        note: z.string().max(280),
-    })
-    .refine(values => values.fromJarId !== values.toJarId, {
-        message: 'Pick two different jars',
-        path: ['toJarId'],
-    });
+import { createMoveMoneyFormSchema, type MoveMoneyFormSchemaValues } from './form-zod';
 
-type MoveValues = z.infer<typeof moveSchema>;
+type MoveValues = MoveMoneyFormSchemaValues;
 
 type MoveMoneyFormProps = {
     embedded?: boolean;
@@ -72,21 +54,21 @@ type JarPick = Pick<Jar, 'id' | 'key' | 'name'> &
 
 type MoveEligibility = { ok: true } | { ok: false; reason: string };
 
-function moveFromEligibility(jar: JarPick): MoveEligibility {
+type MoveT = (key: string, values?: Record<string, string | number>) => string;
+
+function moveFromEligibility(jar: JarPick, t: MoveT): MoveEligibility {
     if (!jar.canSpend) {
         return {
             ok: false,
-            reason: jar.canInvest
-                ? 'Protected — invest only, never move out'
-                : 'This jar cannot send money',
+            reason: jar.canInvest ? t('eligibility.protected') : t('eligibility.cannot_send'),
         };
     }
     if (jar.available === null) return { ok: true };
     if (jar.available < 0) {
-        return { ok: false, reason: 'Overspent — nothing left to move' };
+        return { ok: false, reason: t('eligibility.overspent') };
     }
     if (jar.available === 0) {
-        return { ok: false, reason: 'Nothing left to move' };
+        return { ok: false, reason: t('eligibility.nothing_left') };
     }
     return { ok: true };
 }
@@ -95,11 +77,13 @@ function JarBalance({
     cents,
     afterCents,
     formatMoney,
+    leftLabel,
 }: {
     cents: number | null;
     /** When set, shows current → projected balance after the move. */
     afterCents?: number | null;
     formatMoney: (cents: number) => string;
+    leftLabel: (amount: string) => string;
 }) {
     if (cents === null) return null;
     const showAfter = afterCents !== undefined && afterCents !== null && afterCents !== cents;
@@ -110,7 +94,7 @@ function JarBalance({
                     'shrink-0 font-mono text-[11px] font-semibold tabular-nums',
                     cents < 0 ? 'text-danger' : 'text-fg-muted'
                 )}>
-                {formatMoney(cents)} left
+                {leftLabel(formatMoney(cents))}
             </span>
         );
     }
@@ -140,11 +124,17 @@ function LockedFromJar({
     eligibility,
     afterCents,
     formatMoney,
+    leftLabel,
+    cannotSend,
+    sendingFrom,
 }: {
     jar: JarPick;
     eligibility: MoveEligibility | null;
     afterCents?: number | null;
     formatMoney: (cents: number) => string;
+    leftLabel: (amount: string) => string;
+    cannotSend: string;
+    sendingFrom: string;
 }) {
     const blocked = eligibility !== null && !eligibility.ok;
     return (
@@ -160,13 +150,14 @@ function LockedFromJar({
                 <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-fg">{jar.name}</p>
                     <p className="font-mono text-[10px] tracking-wide text-fg-muted uppercase">
-                        {blocked ? 'Cannot send from here' : 'Sending from here'}
+                        {blocked ? cannotSend : sendingFrom}
                     </p>
                 </div>
                 <JarBalance
                     cents={jar.available}
                     afterCents={blocked ? undefined : afterCents}
                     formatMoney={formatMoney}
+                    leftLabel={leftLabel}
                 />
             </div>
             {blocked ? <p className="text-xs text-danger">{eligibility.reason}</p> : null}
@@ -194,7 +185,14 @@ function JarChoice({
     afterCents,
     onSelect,
     formatMoney,
-}: JarChoiceProps) {
+    leftLabel,
+    selectedLabel,
+    tapToChoose,
+}: JarChoiceProps & {
+    leftLabel: (amount: string) => string;
+    selectedLabel: string;
+    tapToChoose: string;
+}) {
     if (disabled) {
         return (
             <div
@@ -219,7 +217,7 @@ function JarChoice({
                         </span>
                     ) : null}
                 </div>
-                <JarBalance cents={jar.available} formatMoney={formatMoney} />
+                <JarBalance cents={jar.available} formatMoney={formatMoney} leftLabel={leftLabel} />
             </div>
         );
     }
@@ -262,13 +260,14 @@ function JarChoice({
                         'mt-0.5 block font-mono text-[10px] tracking-wide uppercase',
                         selected ? 'text-accent' : 'text-fg-faint'
                     )}>
-                    {selected ? 'Selected' : 'Tap to choose'}
+                    {selected ? selectedLabel : tapToChoose}
                 </span>
             </div>
             <JarBalance
                 cents={jar.available}
                 afterCents={selected ? afterCents : undefined}
                 formatMoney={formatMoney}
+                leftLabel={leftLabel}
             />
         </button>
     );
@@ -283,6 +282,11 @@ export function MoveMoneyForm({
     defaultFromJarId,
     onSuccess,
 }: MoveMoneyFormProps) {
+    const t = useTranslations('features.money.move');
+    const tTx = useTranslations('features.money.transactions');
+    const tForm = useTranslations('ui.form');
+    const apiError = useApiError();
+    const leftLabel = (amount: string) => t('left', { amount });
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { symbol, formatMoney } = useHouseholdCurrency();
@@ -324,6 +328,8 @@ export function MoveMoneyForm({
         });
     }, [jarsQuery.data, balancesQuery.data, catalogByKey]);
 
+    const moveSchema = useMemo(() => createMoveMoneyFormSchema(tForm), [tForm]);
+
     const form = useForm<MoveValues>({
         defaultValues: {
             fromJarId: defaultFromJarId ?? '',
@@ -340,7 +346,7 @@ export function MoveMoneyForm({
 
     const fromJar = jars.find(j => j.id === fromJarId);
     const toJar = jars.find(j => j.id === toJarId);
-    const fromEligibility = fromJar ? moveFromEligibility(fromJar) : null;
+    const fromEligibility = fromJar ? moveFromEligibility(fromJar, t) : null;
     const maxMoveCents =
         fromJar && fromEligibility?.ok && fromJar.available !== null && fromJar.available > 0
             ? fromJar.available
@@ -372,30 +378,33 @@ export function MoveMoneyForm({
         mutationFn: async (values: MoveValues) => {
             const cents = parseAmountToMinorUnits(values.amount);
             if (cents === null || cents <= 0) {
-                throw new Error('Enter a valid amount');
+                throw new Error(tForm('validation.valid_amount'));
             }
             const source = jars.find(j => j.id === values.fromJarId);
-            if (!source) throw new Error('Choose a jar to take from');
-            const eligibility = moveFromEligibility(source);
+            if (!source) throw new Error(tForm('validation.choose_from_jar'));
+            const eligibility = moveFromEligibility(source, t);
             if (!eligibility.ok) {
                 throw new Error(eligibility.reason);
             }
             if (source.available !== null && cents > source.available) {
                 throw new Error(
-                    `You can move at most ${formatMoney(source.available)} from ${source.name}`
+                    t('error_max_move', {
+                        amount: formatMoney(source.available),
+                        jar: source.name,
+                    })
                 );
             }
             if (values.fromJarId === values.toJarId) {
-                throw new Error('Pick two different jars');
+                throw new Error(tForm('validation.different_jars'));
             }
             const date = todayIsoDate();
             const note = values.note.trim();
             const fromName = source.name;
-            const toName = jars.find(j => j.id === values.toJarId)?.name ?? 'jar';
+            const toName = jars.find(j => j.id === values.toJarId)?.name ?? tTx('jar_fallback');
 
             await api.money.transactions.create({
                 householdId: householdId!,
-                description: `Moved to ${toName}`,
+                description: t('description_moved_to', { to: toName }),
                 amount: -cents,
                 bookedOn: date,
                 jarId: values.fromJarId,
@@ -406,7 +415,7 @@ export function MoveMoneyForm({
             });
             await api.money.transactions.create({
                 householdId: householdId!,
-                description: `Moved from ${fromName}`,
+                description: t('description_moved_from', { from: fromName }),
                 amount: cents,
                 bookedOn: date,
                 jarId: values.toJarId,
@@ -425,11 +434,11 @@ export function MoveMoneyForm({
                 }),
                 queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() }),
             ]);
-            showToast('Money moved between jars', 'success');
+            showToast(t('toast_moved'), 'success');
             dismiss();
         },
         onError: (error: Error) => {
-            showToast(error.message || 'Could not move money', 'error');
+            showToast(apiError(error), 'error');
         },
     });
 
@@ -439,13 +448,16 @@ export function MoveMoneyForm({
 
     async function onSubmit(values: MoveValues) {
         if (!live) {
-            showToast('Sign in to move money', 'error');
+            showToast(t('toast_sign_in'), 'error');
             return;
         }
         await mutation.mutateAsync(values);
     }
 
-    const onError = createFormInvalidHandler();
+    const onError = createFormInvalidHandler(undefined, {
+        title: tForm('incomplete_title'),
+        description: tForm('incomplete_description'),
+    });
 
     const body = (
         <div className="space-y-5">
@@ -455,7 +467,7 @@ export function MoveMoneyForm({
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel className="font-mono text-[10px] font-bold tracking-wider text-fg-muted uppercase">
-                            From
+                            {t('from')}
                         </FormLabel>
                         {fromLocked && fromJar ? (
                             <LockedFromJar
@@ -463,15 +475,18 @@ export function MoveMoneyForm({
                                 eligibility={fromEligibility}
                                 afterCents={fromAfterCents}
                                 formatMoney={formatMoney}
+                                leftLabel={leftLabel}
+                                cannotSend={t('cannot_send')}
+                                sendingFrom={t('sending_from')}
                             />
                         ) : (
                             <FormControl>
                                 <div
                                     role="radiogroup"
-                                    aria-label="Jar to take from"
+                                    aria-label={t('aria_from')}
                                     className="flex flex-col gap-2">
                                     {jars.map(jar => {
-                                        const eligibility = moveFromEligibility(jar);
+                                        const eligibility = moveFromEligibility(jar, t);
                                         const selected = field.value === jar.id;
                                         return (
                                             <JarChoice
@@ -485,6 +500,9 @@ export function MoveMoneyForm({
                                                 afterCents={selected ? fromAfterCents : undefined}
                                                 onSelect={() => field.onChange(jar.id)}
                                                 formatMoney={formatMoney}
+                                                leftLabel={leftLabel}
+                                                selectedLabel={t('selected')}
+                                                tapToChoose={t('tap_to_choose')}
                                             />
                                         );
                                     })}
@@ -497,10 +515,10 @@ export function MoveMoneyForm({
             />
 
             {!fromJarId ? (
-                <p className="text-[11px] text-fg-faint">Choose a source jar first.</p>
+                <p className="text-[11px] text-fg-faint">{t('choose_source_first')}</p>
             ) : fromEligibility && !fromEligibility.ok ? (
                 <p className="rounded-xl border border-danger/30 bg-danger/10 px-3 py-2.5 text-sm text-danger">
-                    Pick a different source jar — this one can’t send money out.
+                    {t('source_blocked')}
                 </p>
             ) : (
                 <>
@@ -510,7 +528,7 @@ export function MoveMoneyForm({
                         render={({ field }) => (
                             <FormItem>
                                 <div className="flex items-center justify-between gap-2">
-                                    <FormLabel>Amount ({symbol})</FormLabel>
+                                    <FormLabel>{t('amount', { symbol })}</FormLabel>
                                     {maxMoveCents > 0 ? (
                                         <button
                                             type="button"
@@ -525,7 +543,7 @@ export function MoveMoneyForm({
                                                     }
                                                 )
                                             }>
-                                            Use max ({formatMoney(maxMoveCents)})
+                                            {t('use_max', { amount: formatMoney(maxMoveCents) })}
                                         </button>
                                     ) : null}
                                 </div>
@@ -540,14 +558,17 @@ export function MoveMoneyForm({
                                                 ? (maxMoveCents / 100).toFixed(2)
                                                 : undefined
                                         }
-                                        placeholder="0.00"
+                                        placeholder={tForm('amount_zero_dot')}
                                         disabled={!canSubmit}
                                         {...field}
                                     />
                                 </FormControl>
                                 {maxMoveCents > 0 && fromJar ? (
                                     <p className="text-[11px] text-fg-faint">
-                                        Max from {fromJar.name}: {formatMoney(maxMoveCents)}
+                                        {t('max_from', {
+                                            jar: fromJar.name,
+                                            amount: formatMoney(maxMoveCents),
+                                        })}
                                     </p>
                                 ) : null}
                                 <FormMessage />
@@ -557,7 +578,7 @@ export function MoveMoneyForm({
 
                     <div className="flex justify-center" aria-hidden>
                         <span className="rounded-full border border-line bg-raised px-2.5 py-0.5 font-mono text-[10px] font-bold tracking-wider text-fg-muted uppercase">
-                            ↓ to
+                            {t('to_arrow')}
                         </span>
                     </div>
 
@@ -567,12 +588,12 @@ export function MoveMoneyForm({
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel className="font-mono text-[10px] font-bold tracking-wider text-fg-muted uppercase">
-                                    To
+                                    {t('to')}
                                 </FormLabel>
                                 <FormControl>
                                     <div
                                         role="radiogroup"
-                                        aria-label="Jar to send to"
+                                        aria-label={t('aria_to')}
                                         className="flex flex-col gap-2">
                                         {jars
                                             .filter(jar => jar.id !== fromJarId)
@@ -593,6 +614,9 @@ export function MoveMoneyForm({
                                                         afterCents={previewAfter}
                                                         onSelect={() => field.onChange(jar.id)}
                                                         formatMoney={formatMoney}
+                                                        leftLabel={leftLabel}
+                                                        selectedLabel={t('selected')}
+                                                        tapToChoose={t('tap_to_choose')}
                                                     />
                                                 );
                                             })}
@@ -600,7 +624,7 @@ export function MoveMoneyForm({
                                 </FormControl>
                                 {!field.value ? (
                                     <p className="text-[11px] text-fg-faint">
-                                        Choose where the money should land.
+                                        {t('choose_destination')}
                                     </p>
                                 ) : null}
                                 <FormMessage />
@@ -611,30 +635,25 @@ export function MoveMoneyForm({
                     {fromJar && toJar && fromEligibility?.ok ? (
                         <div className="space-y-1.5 rounded-xl border border-accent/30 bg-accent-soft/60 px-3 py-2.5 text-sm text-fg-muted">
                             <p>
-                                Moving{' '}
-                                {moveCents !== null && moveCents > 0 ? (
-                                    <span className="font-semibold text-accent tabular-nums">
-                                        {formatMoney(moveCents)}
-                                    </span>
-                                ) : (
-                                    <span className="text-fg-faint">…</span>
-                                )}{' '}
-                                from <span className="font-semibold text-fg">{fromJar.name}</span>
-                                <span className="mx-1 text-fg-faint">→</span>
-                                <span className="font-semibold text-fg">{toJar.name}</span>
+                                {t('moving_preview', {
+                                    amount:
+                                        moveCents !== null && moveCents > 0
+                                            ? formatMoney(moveCents)
+                                            : '…',
+                                    from: fromJar.name,
+                                    to: toJar.name,
+                                })}
                             </p>
                             {toAfterCents !== null ? (
                                 <p className="font-mono text-[11px] text-fg-faint">
-                                    {toJar.name}{' '}
-                                    <span className="text-fg-muted">
-                                        {toJar.available !== null
-                                            ? formatMoney(toJar.available)
-                                            : '—'}
-                                    </span>
-                                    <span className="mx-1">→</span>
-                                    <span className="font-semibold text-accent tabular-nums">
-                                        {formatMoney(toAfterCents)}
-                                    </span>
+                                    {t('balance_after', {
+                                        jar: toJar.name,
+                                        before:
+                                            toJar.available !== null
+                                                ? formatMoney(toJar.available)
+                                                : '—',
+                                        after: formatMoney(toAfterCents),
+                                    })}
                                 </p>
                             ) : null}
                         </div>
@@ -645,9 +664,9 @@ export function MoveMoneyForm({
                         name="note"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Note</FormLabel>
+                                <FormLabel>{t('note')}</FormLabel>
                                 <FormControl>
-                                    <FormInput placeholder="Optional — why this move" {...field} />
+                                    <FormInput placeholder={t('note_placeholder')} {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -666,13 +685,11 @@ export function MoveMoneyForm({
             onSubmit={onSubmit}
             sidebar={
                 <div className="grid gap-2">
-                    <p className="text-xs text-fg-muted">
-                        Only jars with money left can send. Financial Freedom stays invested.
-                    </p>
+                    <p className="text-xs text-fg-muted">{t('sidebar_hint')}</p>
                     <Button type="submit" className="w-full" disabled={busy}>
                         {mutation.isPending || form.formState.isSubmitting
-                            ? 'Moving…'
-                            : 'Move money'}
+                            ? t('moving')
+                            : t('submit')}
                     </Button>
                     <Button
                         type="button"
@@ -680,7 +697,7 @@ export function MoveMoneyForm({
                         className="w-full"
                         disabled={mutation.isPending}
                         onClick={dismiss}>
-                        Cancel
+                        {t('cancel')}
                     </Button>
                 </div>
             }>

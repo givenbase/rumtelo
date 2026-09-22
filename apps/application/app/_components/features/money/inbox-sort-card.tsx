@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 
 import type { Debt, FixedCost, Jar, Transaction } from '@rumtelo/contracts';
 import { JarKey } from '@rumtelo/contracts';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Button, VendorMark } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
@@ -72,6 +73,10 @@ export function InboxSortCard({
     onChange?: (transaction: Transaction, jarId: string) => void;
 }) {
     const { formatMoney } = useHouseholdCurrency();
+    const appLocale = useLocale();
+    const tTx = useTranslations('features.money.transactions');
+    const tSort = useTranslations('features.money.transactions.inbox_sort');
+    const tExpense = useTranslations('features.money.expense_form');
     const { householdId } = useAuth();
     const { byKey: catalogByKey } = useJarCatalog();
     const categoryTemplatesQuery = useCategoryTemplates(isLiveData(householdId));
@@ -154,7 +159,7 @@ export function InboxSortCard({
                                 transaction.description !== transaction.counterparty.trim()
                                     ? transaction.description
                                     : null,
-                                formatBookedDate(transaction.bookedOn),
+                                formatBookedDate(transaction.bookedOn, appLocale),
                             ]
                                 .filter(Boolean)
                                 .join(' · ')}
@@ -176,14 +181,14 @@ export function InboxSortCard({
                     onClick={() => setPicking(previous => !previous)}
                     className="flex flex-wrap items-center gap-2.5 rounded-xl border border-line bg-raised px-3.5 py-3 text-left transition-colors hover:border-line-strong">
                     <span className="font-mono text-xs tracking-widest text-fg-muted uppercase">
-                        Looks like
+                        {tTx('detail.looks_like')}
                     </span>
                     <span
                         className="size-2 shrink-0 rounded-sm"
                         style={{ background: bgClassToCssVar(jarChrome(suggestedKey).color) }}
                     />
                     <span className="text-sm text-fg">
-                        {selected?.name ?? catalog?.name ?? 'Jar'}
+                        {selected?.name ?? catalog?.name ?? tTx('jar_fallback')}
                     </span>
                     {selected?.subtitle ? (
                         <span className="text-sm text-fg-muted">· {selected.subtitle}</span>
@@ -193,7 +198,7 @@ export function InboxSortCard({
                             'ml-auto font-mono text-xs whitespace-nowrap',
                             confident ? 'text-fg-faint' : 'text-warning'
                         )}>
-                        {confident ? 'fairly certain' : 'not sure — please check'}
+                        {confident ? tSort('fairly_certain') : tSort('not_sure_check')}
                     </span>
                 </button>
 
@@ -237,7 +242,10 @@ export function InboxSortCard({
                         className="mt-1"
                         checked={linkFixedCost && canLinkFixed}
                         disabled={Boolean(debtId)}
-                        aria-label={`Link to fixed cost ${suggestedFixedCost.counterparty?.trim() || suggestedFixedCost.name}`}
+                        aria-label={tSort('link_fixed_aria', {
+                            name:
+                                suggestedFixedCost.counterparty?.trim() || suggestedFixedCost.name,
+                        })}
                         onChange={event => {
                             setLinkFixedCost(event.target.checked);
                             if (event.target.checked) setDebtId(null);
@@ -245,7 +253,7 @@ export function InboxSortCard({
                     />
                     <label htmlFor="inbox-link-fixed-cost" className="min-w-0 cursor-pointer">
                         <span className="block font-mono text-[10px] tracking-widest text-fg-muted uppercase">
-                            Link to fixed cost
+                            {tSort('link_fixed_cost')}
                         </span>
                         <span className="mt-0.5 block text-sm text-fg">
                             {suggestedFixedCost.counterparty?.trim() || suggestedFixedCost.name}
@@ -259,7 +267,7 @@ export function InboxSortCard({
                     <label
                         htmlFor="inbox-apply-debt"
                         className="font-mono text-[10px] tracking-widest text-fg-muted uppercase">
-                        Apply to debt
+                        {tExpense('apply_to_debt')}
                     </label>
                     <select
                         id="inbox-apply-debt"
@@ -270,7 +278,7 @@ export function InboxSortCard({
                             if (next) setLinkFixedCost(false);
                         }}
                         className="h-10 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg outline-none focus:border-accent">
-                        <option value="">Don’t link</option>
+                        <option value="">{tExpense('dont_link')}</option>
                         {debts.map(debt => (
                             <option key={debt.id} value={debt.id}>
                                 {debt.name}
@@ -285,18 +293,18 @@ export function InboxSortCard({
                     size="sm"
                     onClick={() => void confirm(false)}
                     disabled={pending !== null || !jarId}>
-                    {pending === 'sort' ? 'Working…' : 'Correct'}
+                    {pending === 'sort' ? tTx('working') : tSort('correct')}
                 </Button>
                 <Button
                     variant="secondary"
                     size="sm"
                     onClick={() => void confirm(true)}
                     disabled={pending !== null || !onConfirm || !jarId}>
-                    {pending === 'rule' ? 'Working…' : 'Always this'}
+                    {pending === 'rule' ? tTx('working') : tSort('always_this')}
                 </Button>
                 {detailHref ? (
                     <Button as={Link} href={detailHref} variant="ghost" size="sm">
-                        Other
+                        {tSort('other')}
                     </Button>
                 ) : (
                     <Button
@@ -304,7 +312,7 @@ export function InboxSortCard({
                         size="sm"
                         disabled={pending !== null || !jarId}
                         onClick={() => onChange?.(transaction, jarId)}>
-                        Other
+                        {tSort('other')}
                     </Button>
                 )}
             </div>

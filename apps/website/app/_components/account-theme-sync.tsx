@@ -13,7 +13,8 @@ import {
 } from 'react';
 
 import { type Theme } from '@rumtelo/contracts';
-import { ThemeToggle, useTheme } from '@rumtelo/ui';
+import { useTranslations } from '@rumtelo/i18n';
+import { ThemeToggle, toast, useTheme } from '@rumtelo/ui';
 import { accountThemeFromCss, cssThemeFromAccount, type CssTheme } from '@rumtelo/utils';
 
 import { useMarketingSession } from '@/app/_components/marketing-session-provider';
@@ -97,13 +98,20 @@ export function useAccountTheme(): AccountThemeCtx {
 /** Theme toggle — persists to account settings when signed in. */
 export function AccountThemeToggle(props: ComponentProps<typeof ThemeToggle>) {
     const { setAccountTheme } = useAccountTheme();
+    const tToast = useTranslations('pages.settings.toasts');
+    const tTheme = useTranslations('ui.theme');
+    const { resolvedTheme } = useTheme();
+    const themeAriaLabel =
+        resolvedTheme === 'dark' ? tTheme('switch_to_light') : tTheme('switch_to_dark');
 
     return (
         <ThemeToggle
             {...props}
+            aria-label={props['aria-label'] ?? themeAriaLabel}
             onThemeChange={(next: Exclude<CssTheme, 'system'>) => {
                 void setAccountTheme(accountThemeFromCss(next)).catch(error => {
                     console.error('theme save failed', error);
+                    toast.error(tToast('theme_failed'));
                 });
             }}
         />

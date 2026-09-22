@@ -19,7 +19,7 @@ export interface AccountVerificationTemplateProps {
 
 /**
  * Account email verification — Better Auth `emailVerification.sendVerificationEmail`.
- * React Email components (Galighticus pattern).
+ * React Email components.
  */
 export const AccountVerificationTemplate: React.FC<AccountVerificationTemplateProps> = ({
     firstName,

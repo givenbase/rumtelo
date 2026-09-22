@@ -6,6 +6,7 @@ import { useMemo } from 'react';
 
 import type { Goal, GoalProjection } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
+import { useTranslations, type TranslateFn } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card, Meter, Typography } from '@rumtelo/ui';
 import {
@@ -18,6 +19,7 @@ import {
 } from '@rumtelo/utils';
 
 import { createMoveHref, goalDetailHref, updateHref } from '@/app/_lib/create-routes';
+import { givingCauseCopy } from '@/app/_lib/giving';
 import { isFocusSaveGoal, saveGoalProgressCents, saveGoalRank } from '@/app/_lib/goal-focus';
 import { evaluateGoalPace, type GoalPaceVerdict } from '@/app/_lib/goal-pace';
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
@@ -32,26 +34,12 @@ import { JarBadge, MetaChip, formatBookedDate } from '@/components/features/mone
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { EditIcon } from '@/components/features/ui/action-icons';
+import { useLocale } from 'next-intl';
 
-const EN_MONTHS = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-] as const;
-
-function kindEyebrow(kind: GoalKind): string {
-    if (kind === GoalKind.EARN) return 'Earn · monthly net';
-    if (kind === GoalKind.GIVE) return 'Give · yearly pledge';
-    return 'Save · toward a jar';
+function kindEyebrow(kind: GoalKind, t: TranslateFn): string {
+    if (kind === GoalKind.EARN) return t('kind_earn');
+    if (kind === GoalKind.GIVE) return t('kind_give');
+    return t('kind_save');
 }
 
 function kindTint(kind: GoalKind): string {
@@ -67,11 +55,11 @@ function kindIcon(goal: Goal): string {
     return '🎯';
 }
 
-function formatMonthYear(iso: string | null | undefined): string | null {
+function formatMonthYear(iso: string | null | undefined, locale: string): string | null {
     if (!iso) return null;
     const date = new Date(iso);
     if (Number.isNaN(date.getTime())) return null;
-    return `${EN_MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+    return new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric' }).format(date);
 }
 
 function todayIso(): string {
@@ -86,8 +74,11 @@ function paceAdvice(input: {
     jarName: string | null;
     headroom: number | null;
     siblingCount: number;
+    locale: string;
+    t: TranslateFn;
 }): { title: string; body: string }[] {
-    const { goal, verdict, projection, formatMoney, jarName, headroom, siblingCount } = input;
+    const { goal, verdict, projection, formatMoney, jarName, headroom, siblingCount, locale, t } =
+        input;
     const tips: { title: string; body: string }[] = [];
 
     if (
@@ -95,21 +86,21 @@ function paceAdvice(input: {
         (goal.saved >= goal.target && goal.kind !== GoalKind.EARN)
     ) {
         tips.push({
-            title: 'You made it',
-            body: 'Protect the win. Keep the habit that got you here — even a smaller monthly amount keeps the muscle warm.',
+            title: t('advice_made_it_title'),
+            body: t('advice_made_it_body'),
         });
         return tips;
     }
 
     if (goal.kind === GoalKind.EARN) {
         tips.push({
-            title: 'Income is the engine',
-            body: 'Raise net by growing inflow or trimming what leaves before the jars. The earn target is a lifestyle floor, not a wish.',
+            title: t('advice_earn_engine_title'),
+            body: t('advice_earn_engine_body'),
         });
         if (projection && !projection.onTrack) {
             tips.push({
-                title: 'Still short of the floor',
-                body: 'Open Income and check sources. A dated raise or a cut in fixed out often closes the gap faster than hoping.',
+                title: t('advice_earn_short_title'),
+                body: t('advice_earn_short_body'),
             });
         }
         return tips;
@@ -117,62 +108,74 @@ function paceAdvice(input: {
 
     if (goal.kind === GoalKind.GIVE) {
         tips.push({
-            title: 'Giving is a planned outflow',
+            title: t('advice_give_planned_title'),
             body: jarName
-                ? `Money that leaves ${jarName} counts toward this pledge. Automate a monthly give if willpower is the bottleneck.`
-                : 'Automate a monthly give if willpower is the bottleneck — the pledge fills from what actually left the Give jar.',
+                ? t('advice_give_planned_body_jar', { jar: jarName })
+                : t('advice_give_planned_body'),
         });
         if (projection && projection.shortfallPerMonth > 0) {
             tips.push({
-                title: 'Close the monthly gap',
-                body: `About ${formatMoney(projection.shortfallPerMonth)} more per month lands the pledge on time. A fixed give in Necessities or Give makes it boring — in a good way.`,
+                title: t('advice_give_gap_title'),
+                body: t('advice_give_gap_body', {
+                    amount: formatMoney(projection.shortfallPerMonth),
+                }),
             });
         }
         return tips;
     }
 
-    // SAVE
     if (verdict === 'no-plan' || goal.monthlyContribution <= 0) {
         tips.push({
-            title: 'Set a monthly amount',
-            body: 'A target without a pace is a wish. Pick what this jar can spare each month — then the finish date appears.',
+            title: t('advice_save_amount_title'),
+            body: t('advice_save_amount_body'),
         });
     } else if (
         verdict === 'ahead' ||
         (projection?.onTrack && projection.monthsRemaining !== null)
     ) {
         tips.push({
-            title: 'On pace — keep the rhythm',
+            title: t('advice_save_pace_title'),
             body: projection?.projectedDate
-                ? `At ${formatMoney(goal.monthlyContribution)} /mo you land around ${formatMonthYear(projection.projectedDate)}. Consistency beats heroic months.`
-                : 'You are moving. Consistency beats heroic months.',
+                ? t('advice_save_pace_body_date', {
+                      monthly: formatMoney(goal.monthlyContribution),
+                      date: formatMonthYear(projection.projectedDate, locale) ?? '',
+                  })
+                : t('advice_save_pace_body'),
         });
     } else if (verdict === 'behind-room' && headroom !== null && headroom > 0) {
         tips.push({
-            title: 'Room in the jar',
-            body: `${jarName ?? 'This jar'} still has about ${formatMoney(headroom)} of headroom after fixed costs and other goals. Nudging the monthly plan uses money you already allocate.`,
+            title: t('advice_save_room_title'),
+            body: t('advice_save_room_body', {
+                jar: jarName ?? t('this_jar'),
+                amount: formatMoney(headroom),
+            }),
         });
     } else if (verdict === 'behind-income' || (projection && !projection.onTrack)) {
         tips.push({
-            title: 'The plan needs fuel',
+            title: t('advice_save_fuel_title'),
             body:
                 projection && projection.shortfallPerMonth > 0
-                    ? `Roughly ${formatMoney(projection.shortfallPerMonth)} more per month (or a longer date) gets you there. Raise income, free jar flow, or ease the deadline — pick one lever.`
-                    : 'Raise income, free jar flow, or ease the deadline — pick one lever instead of pushing all three.',
+                    ? t('advice_save_fuel_body_gap', {
+                          amount: formatMoney(projection.shortfallPerMonth),
+                      })
+                    : t('advice_save_fuel_body'),
         });
     }
 
     if (siblingCount > 0 && jarName) {
         tips.push({
-            title: `${siblingCount} other goal${siblingCount === 1 ? '' : 's'} share ${jarName}`,
-            body: 'They compete for the same monthly flow. Make one the focus so the jar is not stretched thin.',
+            title:
+                siblingCount === 1
+                    ? t('advice_siblings_title', { count: siblingCount, jar: jarName })
+                    : t('advice_siblings_title_plural', { count: siblingCount, jar: jarName }),
+            body: t('advice_siblings_body'),
         });
     }
 
     if (tips.length === 0) {
         tips.push({
-            title: 'One decision at a time',
-            body: 'Name the next transfer. Goals move when money moves — not when you revisit the number.',
+            title: t('advice_default_title'),
+            body: t('advice_default_body'),
         });
     }
 
@@ -187,6 +190,11 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
     const { householdId } = useAuth();
     const { period } = useAppShell();
     const { formatMoney } = useHouseholdCurrency();
+    const t = useTranslations();
+    const td = useTranslations('features.growth.goals.detail');
+    const tGoals = useTranslations('features.growth.goals');
+    const tAction = useTranslations('common.action');
+    const locale = useLocale();
     const live = isLiveData(householdId);
     const { byKey: jarByKey } = useJarCatalog();
 
@@ -226,7 +234,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
     if (live && goalsQuery.isLoading && !goal) {
         return (
             <Typography as="p" size="sm" color="muted">
-                Loading…
+                {td('loading')}
             </Typography>
         );
     }
@@ -237,10 +245,10 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                 <Link
                     href="/product/growth/goals"
                     className="w-fit font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
-                    ← Goals
+                    {td('back')}
                 </Link>
                 <Typography as="p" size="sm" color="muted">
-                    Goal not found.
+                    {td('not_found')}
                 </Typography>
             </div>
         );
@@ -304,9 +312,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
               })[0] ?? null);
     const shown = atPeriod?.projectedSaved ?? current;
     const reachedByThen = atPeriod?.fulfilledByPeriod === true;
-    const reachedMonth = atPeriod?.reachedOn
-        ? `${EN_MONTHS[Number(atPeriod.reachedOn.slice(5, 7)) - 1] ?? ''} ${atPeriod.reachedOn.slice(0, 4)}`.trim()
-        : null;
+    const reachedMonth = atPeriod?.reachedOn ? formatMonthYear(atPeriod.reachedOn, locale) : null;
     const progress = goal.target > 0 ? Math.min(1, Math.max(0, shown / goal.target)) : 0;
     const remaining = Math.max(0, goal.target - shown);
     const reached =
@@ -348,34 +354,36 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
         jarName: jar?.name ?? null,
         headroom: pace?.jarHeadroomCents ?? null,
         siblingCount: siblings.length,
+        locale,
+        t: td,
     });
 
     const related: Array<{ title: string; subtitle: string; href: string }> = [];
     if (jarHref && jar) {
         related.push({
             title: jar.name,
-            subtitle: 'Open jar',
+            subtitle: td('open_jar'),
             href: jarHref,
         });
     }
     if (goal.kind === GoalKind.GIVE) {
         related.push({
-            title: 'Giving',
-            subtitle: 'Pledge & organisations',
+            title: td('giving'),
+            subtitle: td('giving_sub'),
             href: productPath('soul/giving'),
         });
     }
     if (goal.kind === GoalKind.EARN) {
         related.push({
-            title: 'Income',
-            subtitle: 'Sources & monthly net',
+            title: td('income'),
+            subtitle: td('income_sub'),
             href: productPath('growth/income'),
         });
     }
     if (jar && goal.kind === GoalKind.SAVE) {
         related.push({
-            title: 'Move money',
-            subtitle: `Feed ${jar.name}`,
+            title: td('move_money'),
+            subtitle: td('feed_jar', { name: jar.name }),
             href: createMoveHref({
                 returnTo: goalDetailHref(goal.id),
             }),
@@ -389,7 +397,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                     <Link
                         href="/product/growth/goals"
                         className="w-fit font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
-                        ← Goals
+                        {td('back')}
                     </Link>
                     <div className="flex items-start gap-3">
                         <span
@@ -403,7 +411,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                         </span>
                         <div>
                             <p className="font-mono text-[10px] tracking-widest text-fg-muted uppercase">
-                                {kindEyebrow(goal.kind)}
+                                {kindEyebrow(goal.kind, td)}
                             </p>
                             <h1 className="mt-0.5 text-2xl font-semibold tracking-tight text-fg">
                                 {goal.name}
@@ -423,7 +431,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                     ) : null}
                     <Button as={Link} href={updateHref('goal', goal.id)} variant="secondary">
                         <EditIcon />
-                        Edit
+                        {tAction('edit')}
                     </Button>
                 </div>
             </div>
@@ -433,8 +441,8 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                     <div>
                         <p className="font-mono text-[10px] tracking-wider text-fg-muted uppercase">
                             {goal.kind === GoalKind.SAVE && isFocus && !reached
-                                ? 'Jar toward focus'
-                                : 'Progress'}
+                                ? td('jar_toward_focus')
+                                : td('progress')}
                         </p>
                         <div className="mt-1 flex flex-wrap items-baseline gap-2">
                             {atPeriod && atPeriod.projectedSaved !== current ? (
@@ -449,15 +457,15 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                                 </span>
                             )}
                             <span className="font-mono text-xs text-fg-muted">
-                                of {formatMoney(goal.target)}
-                                {isEarn ? ' /mo' : ''}
+                                {tGoals('of')} {formatMoney(goal.target)}
+                                {isEarn ? tGoals('per_month') : ''}
                             </span>
                         </div>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                         {rank !== null && !reached ? (
                             <MetaChip className="border-accent/30 text-accent">
-                                {isFocus ? 'Focus · #1' : `#${rank}`}
+                                {isFocus ? td('focus_rank') : td('rank', { rank })}
                             </MetaChip>
                         ) : null}
                         <MetaChip
@@ -469,12 +477,12 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                                       : 'border-success/30 text-success'
                             }>
                             {reachedByThen && reachedMonth
-                                ? `Reached ${reachedMonth}`
+                                ? td('reached_month', { month: reachedMonth })
                                 : reached
-                                  ? 'Reached'
+                                  ? td('reached')
                                   : projection?.onTrack === false
-                                    ? 'Needs attention'
-                                    : 'On track'}
+                                    ? td('needs_attention')
+                                    : td('on_track')}
                         </MetaChip>
                         <MetaChip>{Math.round(progress * 100)}%</MetaChip>
                     </div>
@@ -482,22 +490,29 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                 <Meter value={progress} />
                 <p className="font-mono text-xs text-fg-muted">
                     {reachedByThen && reachedMonth
-                        ? `◇ Reached ${reachedMonth}`
+                        ? td('reached_marker', { when: reachedMonth })
                         : reached
                           ? goal.fulfilledOn
-                              ? `◇ Reached ${formatBookedDate(goal.fulfilledOn)}`
-                              : '◇ Target met'
+                              ? td('reached_marker', {
+                                    when: formatBookedDate(goal.fulfilledOn, locale),
+                                })
+                              : td('target_met')
                           : isEarn
-                            ? `◇ ${formatMoney(remaining)} still to earn each month`
+                            ? td('earn_remaining', { amount: formatMoney(remaining) })
                             : goal.kind === GoalKind.GIVE
-                              ? `◇ ${formatMoney(remaining)} left on the pledge${
-                                    goal.targetOn ? ` · by ${goal.targetOn.slice(0, 4)}` : ''
-                                }`
-                              : `◇ ${formatMoney(goal.monthlyContribution)} /mo · ${
-                                    formatMonthYear(projection?.projectedDate) ??
-                                    formatMonthYear(goal.targetOn) ??
-                                    'date open'
-                                }`}
+                              ? td('give_remaining', {
+                                    amount: formatMoney(remaining),
+                                    by: goal.targetOn
+                                        ? td('give_by', { year: goal.targetOn.slice(0, 4) })
+                                        : '',
+                                })
+                              : td('save_pace', {
+                                    monthly: formatMoney(goal.monthlyContribution),
+                                    date:
+                                        formatMonthYear(projection?.projectedDate, locale) ??
+                                        formatMonthYear(goal.targetOn, locale) ??
+                                        td('date_open'),
+                                })}
                 </p>
                 {goal.why?.trim() ? (
                     <p className="border-t border-line pt-4 text-sm leading-relaxed text-fg-secondary italic">
@@ -510,7 +525,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                 <Card className="grid gap-4 p-5">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                         <p className="font-mono text-[10px] tracking-wider text-fg-muted uppercase">
-                            Jar context
+                            {td('jar_context')}
                         </p>
                         {jarHref ? (
                             <Link
@@ -541,7 +556,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                             <>
                                 <div>
                                     <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                        Available
+                                        {td('available')}
                                     </dt>
                                     <dd className="mt-0.5 font-mono text-fg">
                                         {formatMoney(jarBalance.available)}
@@ -549,7 +564,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                                 </div>
                                 <div>
                                     <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                        Fixed out
+                                        {td('fixed_out')}
                                     </dt>
                                     <dd className="mt-0.5 font-mono text-fg">
                                         {formatMoney(jarBalance.committedOut)}
@@ -560,7 +575,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                         {pace?.jarHeadroomCents !== null && pace?.jarHeadroomCents !== undefined ? (
                             <div>
                                 <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                    Headroom
+                                    {td('headroom')}
                                 </dt>
                                 <dd
                                     className={`mt-0.5 font-mono ${
@@ -574,7 +589,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                     {siblings.length > 0 ? (
                         <div className="grid gap-2 border-t border-line pt-3">
                             <p className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                Other goals on this jar
+                                {td('other_goals')}
                             </p>
                             <ul className="grid gap-1.5">
                                 {siblings.map(sibling => {
@@ -608,7 +623,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
 
             <section className="grid gap-3">
                 <Typography as="h2" variant="eyebrow" color="primary">
-                    ✦ How to get there
+                    {td('how_to_get_there')}
                 </Typography>
                 <div className="grid gap-3">
                     {advice.map(tip => (
@@ -623,7 +638,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
             {related.length > 0 ? (
                 <section className="grid gap-3">
                     <Typography as="h2" variant="eyebrow" color="primary">
-                        ✦ Opportunities
+                        {td('opportunities')}
                     </Typography>
                     <Card className="p-0">
                         {related.map(item => (
@@ -638,7 +653,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                                     </span>
                                 </span>
                                 <span className="font-mono text-xs text-accent uppercase">
-                                    Open ›
+                                    {td('open_link')}
                                 </span>
                             </Link>
                         ))}
@@ -647,12 +662,14 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
             ) : null}
 
             <Card className="grid gap-3 p-5">
-                <p className="font-mono text-[10px] tracking-wider text-fg-muted uppercase">Plan</p>
+                <p className="font-mono text-[10px] tracking-wider text-fg-muted uppercase">
+                    {td('plan')}
+                </p>
                 <dl className="grid gap-2 text-sm sm:grid-cols-2">
                     {!isEarn ? (
                         <div>
                             <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                Monthly
+                                {td('monthly')}
                             </dt>
                             <dd className="mt-0.5 text-fg">
                                 {formatMoney(goal.monthlyContribution)}
@@ -662,27 +679,31 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                     {goal.targetOn ? (
                         <div>
                             <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                Target date
+                                {td('target_date')}
                             </dt>
-                            <dd className="mt-0.5 text-fg">{formatBookedDate(goal.targetOn)}</dd>
+                            <dd className="mt-0.5 text-fg">
+                                {formatBookedDate(goal.targetOn, locale)}
+                            </dd>
                         </div>
                     ) : null}
                     {projection?.projectedDate ? (
                         <div>
                             <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                At current pace
+                                {td('at_current_pace')}
                             </dt>
                             <dd className="mt-0.5 text-fg">
-                                {formatMonthYear(projection.projectedDate)}
+                                {formatMonthYear(projection.projectedDate, locale)}
                             </dd>
                         </div>
                     ) : null}
                     {goal.cause ? (
                         <div>
                             <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                Cause
+                                {td('cause')}
                             </dt>
-                            <dd className="mt-0.5 text-fg">{goal.cause.replaceAll('_', ' ')}</dd>
+                            <dd className="mt-0.5 text-fg">
+                                {givingCauseCopy(t, goal.cause).name}
+                            </dd>
                         </div>
                     ) : null}
                 </dl>

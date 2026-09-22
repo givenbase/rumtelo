@@ -12,11 +12,7 @@ export default function Page() {
     const meta = formRoute('assetCreate');
 
     return (
-        <FormRoutePageShell
-            title={meta.title}
-            description={meta.description}
-            closeHref={meta.closeHref}
-            width={meta.width}>
+        <FormRoutePageShell meta={meta}>
             <AssetForm embedded lockedKind={assetKindFromParams(searchParams)} />
         </FormRoutePageShell>
     );

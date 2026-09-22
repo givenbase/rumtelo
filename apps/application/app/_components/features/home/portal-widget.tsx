@@ -1,5 +1,8 @@
+'use client';
+
 import Link from 'next/link';
 
+import { useTranslations } from '@rumtelo/i18n';
 import { AccentCard, Typography } from '@rumtelo/ui';
 
 export interface PortalWidgetStat {
@@ -30,6 +33,7 @@ export function PortalWidget({
     stats: PortalWidgetStat[];
     tagline: string;
 }) {
+    const t = useTranslations('pages.dashboard');
     return (
         <AccentCard tint={tint} className="flex h-full min-w-0 flex-col gap-3.5 p-5">
             {/* Header row */}
@@ -46,7 +50,7 @@ export function PortalWidget({
                 <Link
                     href={href}
                     className="font-mono text-xs font-medium text-fg-faint transition-colors hover:text-accent">
-                    Open ▸
+                    {t('open_portal')}
                 </Link>
             </div>
 

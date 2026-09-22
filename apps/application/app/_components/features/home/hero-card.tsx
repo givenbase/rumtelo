@@ -1,7 +1,10 @@
+'use client';
+
 import type { ReactNode } from 'react';
 
 import Link from 'next/link';
 
+import { useTranslations } from '@rumtelo/i18n';
 import { Eyebrow, HeroNumber, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
@@ -24,6 +27,7 @@ export function HeroCard({
     children,
     incomeHref = '/product/growth/income',
     jarsHref = '/product/money/jars',
+    eyebrow,
 }: {
     total: string;
     incomeBreakdown: string;
@@ -31,14 +35,18 @@ export function HeroCard({
     children: ReactNode;
     incomeHref?: string;
     jarsHref?: string;
+    /** Eyebrow from i18n (pages.dashboard.hero.*). */
+    eyebrow: string;
 }) {
+    const t = useTranslations('pages.dashboard.hero');
+
     return (
         <div className="rounded-2xl border border-accent-hover bg-surface p-6 shadow-glow sm:p-7">
             <div className="flex flex-wrap items-start justify-between gap-6">
                 <Link
                     href={incomeHref}
                     className="group rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-accent/25">
-                    <Eyebrow>Money · Allocated this month</Eyebrow>
+                    <Eyebrow>{eyebrow}</Eyebrow>
                     <HeroNumber className="mt-2.5 text-4xl leading-none transition-colors group-hover:text-accent sm:text-5xl">
                         {total}
                     </HeroNumber>
@@ -49,7 +57,7 @@ export function HeroCard({
                         className="mt-2 group-hover:text-fg-secondary">
                         {incomeBreakdown}
                         <span className="ml-1.5 font-mono text-xs tracking-wide text-fg-faint uppercase group-hover:text-accent">
-                            See income ▸
+                            {t('see_income')}
                         </span>
                     </Typography>
                 </Link>
@@ -91,11 +99,11 @@ export function HeroCard({
             <div className="my-6 h-px bg-line" />
 
             <div className="flex items-center justify-between">
-                <Eyebrow>✦ The six jars</Eyebrow>
+                <Eyebrow>{t('six_jars')}</Eyebrow>
                 <Link
                     href={jarsHref}
                     className="font-mono text-xs font-semibold tracking-wide text-fg-muted uppercase hover:text-accent">
-                    See all ▸
+                    {t('see_all_jars')}
                 </Link>
             </div>
             <div className="mt-3">{children}</div>

@@ -1,12 +1,14 @@
 'use client';
 
 import { api } from '@/app/_lib/api';
+import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import { useLiveQuery } from '@rumtelo/hooks';
+import { useTranslations } from '@rumtelo/i18n';
 import {
     FormControl,
     FormField,
@@ -29,7 +31,6 @@ import {
     matchesAudience,
 } from '@rumtelo/contracts';
 import { cn } from '@rumtelo/utils';
-import { z } from 'zod';
 
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
@@ -43,6 +44,7 @@ import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 
+import { createFixedCostFormSchema, type FixedCostFormSchemaValues } from './form-zod';
 import { ChipSearch, matchesChipQuery } from './chip-search';
 import { ConfirmActionButton } from './confirm-action-button';
 import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
@@ -60,38 +62,11 @@ const MAX_VENDOR_CHIPS = 16;
 
 export type GivePayeeMode = 'known' | 'coach' | 'manual';
 
-/** Two user-facing paths. `manual` is a URL alias of “I know who”. */
-const GIVE_PAYEE_MODES: ReadonlyArray<{ id: GivePayeeMode; label: string }> = [
-    { id: 'known', label: 'I know who' },
-    { id: 'coach', label: 'Help me choose' },
-];
-
 function isKnowWho(mode: GivePayeeMode | null): boolean {
     return mode === 'known' || mode === 'manual';
 }
 
-const moneyInput = z
-    .string()
-    .min(1, 'Amount is required')
-    .refine(
-        value => {
-            const cents = parseAmountToMinorUnits(value);
-            return cents !== null && cents > 0;
-        },
-        { message: 'Enter a valid amount' }
-    );
-
-const fixedCostFormSchema = z.object({
-    name: z.string().min(1, 'Name is required').max(120),
-    /** Who receives it — the organisation for Give, the landlord for rent. */
-    counterparty: z.string().max(160).optional(),
-    amount: moneyInput,
-    jarId: z.string().min(1, 'Choose a jar'),
-    categoryId: z.string().nullable().optional(),
-    dueDay: z.string().optional(),
-});
-
-export type FixedCostFormValues = z.infer<typeof fixedCostFormSchema>;
+export type FixedCostFormValues = FixedCostFormSchemaValues;
 
 type FixedCostFormProps = {
     defaultValues?: Partial<FixedCostFormValues>;
@@ -121,10 +96,19 @@ export function FixedCostForm({
     entityId,
     onSuccess,
 }: FixedCostFormProps) {
+    const t = useTranslations();
+    const tFixed = useTranslations('features.money.fixed_form');
+    const tForm = useTranslations('ui.form');
+    const tBtn = useTranslations('ui.button.actions');
+    const givePayeeModes: ReadonlyArray<{ id: GivePayeeMode; label: string }> = [
+        { id: 'known', label: tFixed('give_known') },
+        { id: 'coach', label: tFixed('give_coach') },
+    ];
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { symbol } = useHouseholdCurrency();
     const { showToast } = useAppShell();
+    const apiError = useApiError();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
     /** Preset category template key — resolved to a household category on save. */
@@ -283,6 +267,8 @@ export function FixedCostForm({
         // Brands first so “netflix” hits Netflix before “Streaming video”.
         return [...fromMerchants, ...fromPresets];
     }, [merchants, fixedCostPresets, categoryByKey, audienceFilter, baselineAudienceKeys]);
+
+    const fixedCostFormSchema = useMemo(() => createFixedCostFormSchema(tForm), [tForm]);
 
     const form = useForm<FixedCostFormValues>({
         defaultValues: {
@@ -448,9 +434,15 @@ export function FixedCostForm({
         form.setValue('counterparty', '', { shouldDirty: false });
     }
 
-    const onError = createFormInvalidHandler(({ title, description }) => {
-        showToast(description ?? title, 'error');
-    });
+    const onError = createFormInvalidHandler(
+        ({ title, description }) => {
+            showToast(description ?? title, 'error');
+        },
+        {
+            title: tForm('incomplete_title'),
+            description: tForm('incomplete_description'),
+        }
+    );
 
     const saveMutation = useMutation({
         mutationFn: async (values: FixedCostFormValues) => {
@@ -525,10 +517,15 @@ export function FixedCostForm({
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.byJar.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
-            showToast(mode === 'edit' ? 'Fixed cost updated' : 'Fixed cost saved', 'success');
+            showToast(
+                mode === 'edit'
+                    ? t('common.message.entity.fixed_updated')
+                    : t('common.message.entity.fixed_saved'),
+                'success'
+            );
             dismiss();
         },
-        onError: () => showToast('Save failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const removeMutation = useMutation({
@@ -540,15 +537,15 @@ export function FixedCostForm({
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.byJar.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
-            showToast('Fixed cost deleted', 'success');
+            showToast(t('common.message.entity.fixed_deleted'), 'success');
             dismiss();
         },
-        onError: () => showToast('Delete failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     async function onSubmit(values: FixedCostFormValues) {
         if (!live) {
-            showToast('Sign in to save fixed costs', 'error');
+            showToast(t('common.message.entity.sign_in_fixed'), 'error');
             return;
         }
         await saveMutation.mutateAsync(values);
@@ -608,10 +605,10 @@ export function FixedCostForm({
                 <div className="grid gap-2">
                     <Button type="submit" className="w-full" disabled={busy}>
                         {saveMutation.isPending || form.formState.isSubmitting
-                            ? 'Working…'
+                            ? tForm('working')
                             : mode === 'edit'
-                              ? 'Save changes'
-                              : 'Save fixed cost'}
+                              ? tForm('save_changes')
+                              : tFixed('save')}
                     </Button>
                     {mode === 'edit' && entityId ? (
                         <ConfirmActionButton
@@ -623,8 +620,8 @@ export function FixedCostForm({
                                 removeMutation.isPending
                             }
                             pending={removeMutation.isPending}
-                            label="Delete"
-                            confirmLabel="Click again to delete"
+                            label={tBtn('delete')}
+                            confirmLabel={tForm('confirm_delete')}
                             onConfirm={() => void removeMutation.mutateAsync()}
                         />
                     ) : null}
@@ -635,12 +632,12 @@ export function FixedCostForm({
                 name="name"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Name</FormLabel>
+                        <FormLabel>{tForm('fields.name')}</FormLabel>
                         {mode === 'create' ? (
                             <div
                                 className="flex flex-wrap gap-1.5"
                                 role="group"
-                                aria-label="Filter bill types">
+                                aria-label={tForm('aria.filter_bill_types')}>
                                 <button
                                     type="button"
                                     aria-pressed={audienceFilter === null}
@@ -651,7 +648,7 @@ export function FixedCostForm({
                                             ? 'border-accent/40 bg-accent-soft text-accent'
                                             : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
                                     )}>
-                                    All
+                                    {tFixed('filter_all')}
                                 </button>
                                 {audienceChips.map(audience => {
                                     const on = audienceFilter === audience.key;
@@ -696,8 +693,8 @@ export function FixedCostForm({
                                 <PresetNameField
                                     value={field.value}
                                     onChange={field.onChange}
-                                    placeholder="e.g. Netflix, rent"
-                                    freeTextPlaceholder="Type a custom bill name…"
+                                    placeholder={tFixed('name_placeholder')}
+                                    freeTextPlaceholder={tFixed('name_free_placeholder')}
                                     options={nameOptions}
                                     lockPresets
                                     freeTextKeys={['OTHER']}
@@ -778,7 +775,10 @@ export function FixedCostForm({
                                     }}
                                 />
                             ) : (
-                                <FormInput placeholder="e.g. rent" {...field} />
+                                <FormInput
+                                    placeholder={tFixed('name_edit_placeholder')}
+                                    {...field}
+                                />
                             )}
                         </FormControl>
                         <FormMessage />
@@ -791,9 +791,13 @@ export function FixedCostForm({
                 name="amount"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Amount per month ({symbol})</FormLabel>
+                        <FormLabel>{tFixed('amount_label', { symbol })}</FormLabel>
                         <FormControl>
-                            <FormInput inputMode="decimal" placeholder="0,00" {...field} />
+                            <FormInput
+                                inputMode="decimal"
+                                placeholder={tForm('amount_zero')}
+                                {...field}
+                            />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -805,7 +809,7 @@ export function FixedCostForm({
                 name="jarId"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Jar</FormLabel>
+                        <FormLabel>{tForm('jar')}</FormLabel>
                         <FormControl>
                             <select
                                 className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
@@ -821,7 +825,7 @@ export function FixedCostForm({
                                     setGiveModeHydrated(false);
                                 }}>
                                 {billJars.length === 0 ? (
-                                    <option value="">No jars — complete setup first</option>
+                                    <option value="">{tFixed('no_jars')}</option>
                                 ) : (
                                     billJars.map(jar => (
                                         <option key={jar.id} value={jar.id}>
@@ -842,7 +846,7 @@ export function FixedCostForm({
                 name="categoryId"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Category</FormLabel>
+                        <FormLabel>{tForm('category')}</FormLabel>
                         <FormControl>
                             <select
                                 className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
@@ -855,8 +859,8 @@ export function FixedCostForm({
                                 }}>
                                 <option value="">
                                     {pendingLabel
-                                        ? `From preset (${pendingLabel})`
-                                        : 'Auto from name / preset'}
+                                        ? tFixed('category_from_preset', { name: pendingLabel })
+                                        : tFixed('category_auto')}
                                 </option>
                                 {jarCategories.map(category => (
                                     <option key={category.id} value={category.id}>
@@ -875,16 +879,14 @@ export function FixedCostForm({
                 name="counterparty"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>
-                            {isGive ? 'To whom (organisation)' : 'Paid to (optional)'}
-                        </FormLabel>
+                        <FormLabel>{isGive ? tFixed('to_whom') : tFixed('paid_to')}</FormLabel>
                         {isGive ? (
                             <div className="grid gap-3">
                                 <div
                                     className="flex flex-wrap gap-2"
                                     role="group"
-                                    aria-label="How do you want to pick?">
-                                    {GIVE_PAYEE_MODES.map(option => {
+                                    aria-label={tForm('aria.pick_mode')}>
+                                    {givePayeeModes.map(option => {
                                         const on =
                                             givePayeeMode === option.id ||
                                             (option.id === 'known' && givePayeeMode === 'manual');
@@ -906,15 +908,13 @@ export function FixedCostForm({
                                     })}
                                 </div>
                                 <p className="text-xs leading-relaxed text-fg-faint">
-                                    I know who — type whoever you already give to. Help me choose —
-                                    Coach shortlist with independent checks (Doneer Effectief,
-                                    GiveWell, ACE, CBF).
+                                    {tFixed('give_hint')}
                                 </p>
 
                                 {isKnowWho(givePayeeMode) ? (
                                     <FormControl>
                                         <FormInput
-                                            placeholder="e.g. Giro555, your church, KWF"
+                                            placeholder={tFixed('give_placeholder')}
                                             {...field}
                                         />
                                     </FormControl>
@@ -954,11 +954,13 @@ export function FixedCostForm({
                                         <ChipSearch
                                             value={vendorQuery}
                                             onChange={setVendorQuery}
-                                            placeholder="Search vendor"
+                                            placeholder={tForm('search_vendor')}
                                             disabled={busy}
                                         />
                                         {vendorQuery.trim() && visibleVendors.length === 0 ? (
-                                            <p className="text-sm text-fg-muted">No matches</p>
+                                            <p className="text-sm text-fg-muted">
+                                                {tForm('no_matches')}
+                                            </p>
                                         ) : null}
                                         <div className="flex flex-wrap gap-1.5">
                                             {visibleVendors.map(merchant => {
@@ -1016,7 +1018,7 @@ export function FixedCostForm({
                                                         shouldValidate: false,
                                                     });
                                                 }}>
-                                                Other…
+                                                {tForm('other')}
                                             </button>
                                         </div>
                                     </div>
@@ -1026,8 +1028,8 @@ export function FixedCostForm({
                                         <FormInput
                                             placeholder={
                                                 vendorsForCategory.length > 0
-                                                    ? 'Payee name'
-                                                    : 'e.g. landlord, insurer'
+                                                    ? tFixed('payee_name')
+                                                    : tFixed('payee_placeholder')
                                             }
                                             {...field}
                                         />
@@ -1049,7 +1051,7 @@ export function FixedCostForm({
                 name="dueDay"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Due day (day of month)</FormLabel>
+                        <FormLabel>{tFixed('due_day')}</FormLabel>
                         <FormControl>
                             <FormInput type="number" min={1} max={31} placeholder="1" {...field} />
                         </FormControl>

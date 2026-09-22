@@ -6,6 +6,7 @@ import { useLiveQuery } from '@rumtelo/hooks';
 
 import type { Goal } from '@rumtelo/contracts';
 import { GoalKind } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
 import { Typography } from '@rumtelo/ui';
 
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
@@ -34,6 +35,7 @@ export function GoalCreatePage({
 }
 
 export function GoalUpdatePage({ id, embedded = false }: { id: string; embedded?: boolean }) {
+    const t = useTranslations('features.growth.goals.detail');
     const { householdId } = useAuth();
     const live = isLiveData(householdId);
 
@@ -47,14 +49,14 @@ export function GoalUpdatePage({ id, embedded = false }: { id: string; embedded?
     if (live && query.isLoading && !row) {
         return (
             <Typography as="p" size="sm" color="muted">
-                Loading…
+                {t('loading')}
             </Typography>
         );
     }
     if (!row) {
         return (
             <Typography as="p" size="sm" color="muted">
-                Goal not found.
+                {t('not_found')}
             </Typography>
         );
     }

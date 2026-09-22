@@ -16,6 +16,8 @@ import {
     toPeriodKey,
 } from '@rumtelo/utils';
 
+import { useTranslations } from '@rumtelo/i18n';
+
 import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
 import { isLiveData } from '@/app/_lib/preview';
 import { IncomeSimulator } from '@/components/features/growth/income-simulator';
@@ -37,6 +39,7 @@ function dayBefore(iso: string): string {
 }
 
 export function IncomePageClient() {
+    const t = useTranslations('features.growth.income');
     const { householdId } = useAuth();
     const { period } = useAppShell();
     const { formatMoney } = useHouseholdCurrency();
@@ -122,14 +125,14 @@ export function IncomePageClient() {
             <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
                     <Typography as="span" variant="eyebrow" color="primary">
-                        ✦ MY INCOME
+                        {t('page_eyebrow')}
                     </Typography>
                     <Typography as="h1" className="mt-1 text-2xl sm:text-3xl lg:text-3xl">
-                        What comes in each month.
+                        {t('page_title')}
                     </Typography>
                 </div>
                 <Button as={Link} href={CREATE_HREF.income} size="sm">
-                    + Add income
+                    {t('add_income')}
                 </Button>
             </div>
 
@@ -142,10 +145,10 @@ export function IncomePageClient() {
                             <div className="grid gap-1">
                                 <Eyebrow>
                                     {travel.direction === 'future'
-                                        ? 'Through then'
+                                        ? t('through_then')
                                         : travel.direction === 'past'
-                                          ? 'Then'
-                                          : 'Now'}
+                                          ? t('then_label')
+                                          : t('now')}
                                 </Eyebrow>
                                 <p className="font-display text-2xl leading-none font-semibold tracking-tight text-fg sm:text-3xl">
                                     {traveling ? (
@@ -164,8 +167,13 @@ export function IncomePageClient() {
                                 </p>
                                 <p className="font-mono text-[11px] leading-snug text-fg-muted">
                                     {traveling
-                                        ? `${formatMoney(monthlyNet)}/mo · ${horizon} months`
-                                        : `${formatMoney(monthlyNet * 12)}/yr`}
+                                        ? t('subline_travel', {
+                                              amount: formatMoney(monthlyNet),
+                                              months: horizon,
+                                          })
+                                        : t('subline_annual', {
+                                              amount: formatMoney(monthlyNet * 12),
+                                          })}
                                     {delta && delta.absolute !== 0 && !traveling ? (
                                         <>
                                             <br />
@@ -183,7 +191,7 @@ export function IncomePageClient() {
                                 </p>
                             </div>
                             <div className="grid gap-1">
-                                <Eyebrow>Target</Eyebrow>
+                                <Eyebrow>{t('target')}</Eyebrow>
                                 <p
                                     className="font-display text-2xl leading-none font-semibold tracking-tight sm:text-3xl"
                                     style={{
@@ -193,10 +201,10 @@ export function IncomePageClient() {
                                     }}>
                                     {formatMoney(target)}
                                 </p>
-                                <p className="font-mono text-[11px] text-fg-muted">/mo net</p>
+                                <p className="font-mono text-[11px] text-fg-muted">{t('mo_net')}</p>
                             </div>
                             <div className="grid gap-1">
-                                <Eyebrow>Gap</Eyebrow>
+                                <Eyebrow>{t('gap')}</Eyebrow>
                                 <p
                                     className={`font-display text-2xl leading-none font-semibold tracking-tight sm:text-3xl ${
                                         gap < 0 ? 'text-success' : 'text-warning'
@@ -204,7 +212,11 @@ export function IncomePageClient() {
                                     {gap < 0 ? `+${formatMoney(-gap)}` : formatMoney(gap)}
                                 </p>
                                 <p className="font-mono text-[11px] text-fg-muted">
-                                    {gap < 0 ? 'over' : gap === 0 ? 'met' : 'to go'}
+                                    {gap < 0
+                                        ? t('gap_over')
+                                        : gap === 0
+                                          ? t('gap_met')
+                                          : t('gap_to_go')}
                                 </p>
                             </div>
                         </div>
@@ -226,14 +238,12 @@ export function IncomePageClient() {
                 <Card className="p-0">
                     <div className="border-b border-line px-4 py-2.5 sm:px-5">
                         <Typography as="span" variant="eyebrow" color="primary">
-                            ✦ Income sources
+                            {t('sources_heading')}
                         </Typography>
                     </div>
                     {sources.length === 0 ? (
                         <p className="px-4 py-3.5 text-sm text-fg-muted sm:px-5">
-                            {live
-                                ? 'No income sources yet — add one to feed your jars.'
-                                : 'Sign in to manage income sources.'}
+                            {live ? t('empty_live') : t('empty_guest')}
                         </p>
                     ) : (
                         <div className="grid gap-px">

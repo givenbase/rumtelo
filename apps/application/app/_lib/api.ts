@@ -1,10 +1,9 @@
 /**
- * Application oRPC client — Galighticus pattern.
+ * Application oRPC client.
  *
  * Same-origin base URL so the browser sends Better Auth cookies; Next
  * `/api/backend/[...path]` proxies to Nest and forwards Cookie / Origin.
  *
- * @see apps/website app/_lib/api.ts in galighticus-platform
  */
 
 import { createClient, type AppClient } from '@rumtelo/contracts';
