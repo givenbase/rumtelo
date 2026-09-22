@@ -1,11 +1,11 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260921201532_InitialSchema extends Migration {
+export class Migration20260922112448_InitialSchema extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create schema if not exists "backoffice";`);
     this.addSql(`create schema if not exists "auth";`);
-    this.addSql(`create type "auth_locale" as enum ('NL', 'EN');`);
+    this.addSql(`create type "auth_locale" as enum ('EN', 'NL', 'ES', 'FR');`);
     this.addSql(`create type "auth_theme" as enum ('LIGHT', 'DARK', 'SYSTEM');`);
     this.addSql(`create type "money_spending_style" as enum ('SPENDER', 'SAVER', 'BALANCED', 'UNKNOWN');`);
     this.addSql(`create type "money_account_kind" as enum ('CHECKING', 'SAVINGS', 'CREDIT', 'CASH', 'INVESTMENT');`);
@@ -288,6 +288,11 @@ export class Migration20260921201532_InitialSchema extends Migration {
 
     this.addSql(`create table "backoffice"."reference_money_transaction_in_preset" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "key" varchar(64) not null, "name" varchar(120) not null, "sort_order" int not null default 0, "is_active" boolean not null default true, "group_name" varchar(64) not null, "icon" varchar(8) null, "jar_key" "public"."money_jar_key" null, constraint "reference_money_transaction_in_preset_pkey" primary key ("id"));`);
     this.addSql(`alter table "backoffice"."reference_money_transaction_in_preset" add constraint "reference_money_transaction_in_preset_key_unique" unique ("key");`);
+
+    this.addSql(`create table "backoffice"."reference_translation" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "entity_type" varchar(50) not null, "field_name" varchar(50) not null, "entity_key" varchar(80) not null, "locale" varchar(8) not null, "text" text not null, constraint "reference_translation_pkey" primary key ("id"));`);
+    this.addSql(`create index "reference_translation_entity_key_index" on "backoffice"."reference_translation" ("entity_key");`);
+    this.addSql(`create index "reference_translation_entity_type_locale_index" on "backoffice"."reference_translation" ("entity_type", "locale");`);
+    this.addSql(`alter table "backoffice"."reference_translation" add constraint "reference_translation_entity_type_entity_key_fiel_d7253_unique" unique ("entity_type", "entity_key", "field_name", "locale");`);
 
     this.addSql(`create table "backoffice"."reference_growth_watch_preset" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "key" varchar(64) not null, "name" varchar(120) not null, "sort_order" int not null default 0, "is_active" boolean not null default true, "description" text not null, "creator" varchar(120) not null, "skill" varchar(64) not null default 'MONEY', "topic" varchar(64) not null, "youtube_id" varchar(16) null, "spending_styles" jsonb not null default '[]', "url" varchar(280) not null, "watch_url" varchar(280) null, "format" "public"."growth_learn_watch_kind" not null, "min_plan" "public"."backoffice_plan_key" not null, constraint "reference_growth_watch_preset_pkey" primary key ("id"));`);
     this.addSql(`alter table "backoffice"."reference_growth_watch_preset" add constraint "reference_growth_watch_preset_key_unique" unique ("key");`);

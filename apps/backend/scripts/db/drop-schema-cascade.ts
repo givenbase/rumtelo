@@ -90,7 +90,9 @@ async function main(): Promise<void> {
         console.error(
             '\n💡 If this timed out on locks, stop the backend / Railway deploy using this DB, then retry.'
         );
-        console.error('💡 To wipe the whole database instead: pnpm --filter @rumtelo/backend schema:drop:db');
+        console.error(
+            '💡 To wipe the whole database instead: pnpm --filter @rumtelo/backend schema:drop:db'
+        );
         process.exit(1);
     } finally {
         client.release();
