@@ -21,6 +21,7 @@ import { ConfigService } from '@nestjs/config';
 import type { Env } from '../../../../common/config/env.config';
 import { apiForbidden } from '../../../../common/errors/api-user-error';
 import { isDemoHouseholdSlug } from '@rumtelo/contracts/platform';
+import { Audience } from '../../../backoffice/product/money/catalog/audience/audience.entity';
 import { AuthHousehold } from '../managed/household/auth-household.entity';
 import { AuthMember } from '../managed/member/auth-member.entity';
 import { HouseholdBilling } from '../household-billing/household-billing.entity';
@@ -75,7 +76,6 @@ export class HouseholdSettingsService {
             weekCheck: { ...DEFAULT_WEEK_CHECK_SETTINGS },
             features: { ...DEFAULT_FEATURE_SETTINGS },
             answers: {},
-            audienceKeys: [],
             onboardedAt: new Date(),
         } as never);
         this.em.persist(
@@ -93,7 +93,11 @@ export class HouseholdSettingsService {
 
     /** Settings row is created lazily so onboarding never has to pre-seed it. */
     async get(householdId: string): Promise<HouseholdSettingsDto> {
-        let row = await this.em.findOne(HouseholdSettings, { household: householdId });
+        let row: HouseholdSettings | null = await this.em.findOne(
+            HouseholdSettings,
+            { household: householdId },
+            { populate: ['audiences'] }
+        );
         if (!row) {
             row = this.em.create(HouseholdSettings, { household: householdId } as never);
             await this.em.persist(row).flush();
@@ -111,7 +115,11 @@ export class HouseholdSettingsService {
         patch: Omit<HouseholdSettingsPatch, 'householdId'>,
         opts?: { allowPaidUpgrade?: boolean; allowStripeBillingSync?: boolean }
     ): Promise<HouseholdSettingsDto> {
-        let row = await this.em.findOne(HouseholdSettings, { household: householdId });
+        let row: HouseholdSettings | null = await this.em.findOne(
+            HouseholdSettings,
+            { household: householdId },
+            { populate: ['audiences'] }
+        );
         if (!row) {
             row = this.em.create(HouseholdSettings, { household: householdId } as never);
             this.em.persist(row);
@@ -163,7 +171,11 @@ export class HouseholdSettingsService {
             row.answers = { ...row.answers, ...patch.answers };
         }
         if (patch.audienceKeys !== undefined) {
-            row.audienceKeys = patch.audienceKeys;
+            const audiences =
+                patch.audienceKeys.length > 0
+                    ? await this.em.find(Audience, { key: { $in: patch.audienceKeys } })
+                    : [];
+            row.audiences.set(audiences);
         }
 
         await this.em.flush();
@@ -229,7 +241,7 @@ function toSettingsDto(row: HouseholdSettings, planKey: PlanKey): HouseholdSetti
         weekCheck: { ...DEFAULT_WEEK_CHECK_SETTINGS, ...row.weekCheck },
         features: { ...DEFAULT_FEATURE_SETTINGS, ...row.features },
         answers: row.answers ?? {},
-        audienceKeys: row.audienceKeys ?? [],
+        audienceKeys: row.audiences.getItems().map(audience => audience.key),
         onboardedAt: row.onboardedAt ? row.onboardedAt.toISOString() : null,
     };
 }

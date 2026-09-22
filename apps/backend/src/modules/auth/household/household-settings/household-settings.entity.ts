@@ -1,4 +1,4 @@
-import { Entity, Enum, Property, Unique } from '@mikro-orm/core';
+import { Collection, Entity, Enum, ManyToMany, Property, Unique } from '@mikro-orm/core';
 import {
     Currency,
     HouseholdKind,
@@ -13,6 +13,7 @@ import {
 import { entityConfig } from '../../../../common/database/entity-config.util';
 import { HouseholdEntity } from '../../../../common/database/household.entity';
 import { NativeEnum } from '../../../../common/database/native-enum.util';
+import { Audience } from '../../../backoffice/product/money/catalog/audience/audience.entity';
 
 export const DEFAULT_MONEY_SETTINGS: HouseholdMoneySettings = {
     periodStartDay: 1,
@@ -80,14 +81,6 @@ export class HouseholdSettings extends HouseholdEntity {
     answers: HouseholdAnswers = {};
 
     /**
-     * Lifestyle tags (student, renter, homeowner, …) — `Audience.key` catalog
-     * rows, set once in Settings. Drives bill-picker recommendations across
-     * the board instead of a per-form filter.
-     */
-    @Property({ type: 'json' })
-    audienceKeys: string[] = [];
-
-    /**
      * When board setup finished (`household.onboard`). Null = incomplete household.
      */
     @Property({ type: 'timestamptz', nullable: true })
@@ -101,4 +94,15 @@ export class HouseholdSettings extends HouseholdEntity {
     /** One accounting currency for every member's money view. */
     @Enum(NativeEnum({ Currency, domain: 'platform', defaultValue: Currency.EUR }))
     currency: Currency = Currency.EUR;
+
+    // ? RELATIONSHIPS
+    /**
+     * Lifestyle tags (student, renter, homeowner, …), set once in Settings —
+     * drives bill-picker recommendations across the board instead of a
+     * per-form filter. Cross-schema owning side (N:M into backoffice).
+     */
+    @ManyToMany(() => Audience, undefined, {
+        pivotTable: 'backoffice.household_settings_audience',
+    })
+    audiences = new Collection<Audience>(this);
 }
