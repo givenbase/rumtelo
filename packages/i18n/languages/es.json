@@ -68,6 +68,7 @@
                     "invitation_create_failed": "No se ha podido crear la invitación",
                     "jar_split_total": "El reparto del bote debe sumar el 100 %; recibido {total} %",
                     "book_catalog_unavailable": "El catálogo de libros no me dio respuesta.",
+                    "contact_send_failed": "No se ha podido enviar tu mensaje. Inténtalo de nuevo o envíanos un correo electrónico directamente.",
                     "not_authenticated": "No autenticado",
                     "no_household_selected": "No se ha seleccionado ningún hogar",
                     "not_household_member": "No forma parte de este hogar",
@@ -236,6 +237,7 @@
                 "amount_required": "Es necesario indicar el importe",
                 "valid_amount": "Introduce una cantidad válida",
                 "name_required": "Es obligatorio introducir el nombre",
+                "message_min": "El mensaje debe tener al menos {count} caracteres.",
                 "choose_jar": "Elige un tarro",
                 "choose_from_jar": "Elige un tarro del que sacar algo",
                 "choose_to_jar": "Elige un tarro para enviar a",
@@ -1179,7 +1181,7 @@
                     "reached_marker": "◇ Alcanzado {when}",
                     "target_met": "◇ Objetivo alcanzado",
                     "earn_remaining": "◇ {amount} aún por ganar cada mes",
-                    "give_remaining": "◇ {amount} left on the pledge{by}",
+                    "give_remaining": "◇ Quedan {amount} de la recaudación prevista{by}",
                     "give_by": " · por {year}",
                     "save_pace": "◇ {monthly} al mes · {date}",
                     "date_open": "fecha de apertura",
@@ -1783,7 +1785,7 @@
                 "inbox_chip": "Bandeja de entrada",
                 "rules_help": "Se dan prioridad a las coincidencias de la primera búsqueda. Las reglas inactivas (0 coincidencias) se pueden eliminar sin problema.",
                 "rule_if": "Si {field} {matcher} «{value}»",
-                "rule_meta": "→ {jar} · prio {priority} · {hits}",
+                "rule_meta": "→ {jar} · prioridad {priority} · {hits}",
                 "rule_off": " · desactivado",
                 "matcher_contains": "contiene",
                 "matcher_equals": "es",
@@ -2845,15 +2847,15 @@
                 "title": "Rumtelo — Deja de preguntarte dónde se ha metido.",
                 "description": "El dinero se va. Descubrirás por qué. Rumtelo le da un propósito a cada cantidad en cuanto llega y, a continuación, amplía la perspectiva para abarcar tu energía, tu crecimiento y el porqué de todo ello —con la ayuda de un coach, en diez minutos a la semana—. Creado en Ámsterdam. Empezar es gratis.",
                 "keywords": [
-                    "money overview",
-                    "six jars",
-                    "jar budgeting",
-                    "personal finance coach",
-                    "financial freedom",
-                    "week check",
-                    "energy sleep money",
-                    "geld overzicht",
-                    "potjes methode"
+                    "Resumen financiero",
+                    "seis tarros",
+                    "presupuestación de JAR",
+                    "asesor de finanzas personales",
+                    "libertad financiera",
+                    "revisión semanal",
+                    "energía, sueño, dinero",
+                    "resumen de pagos",
+                    "método de los botes"
                 ]
             },
             "header": {
@@ -3273,8 +3275,10 @@
                     "questions": "Preguntas",
                     "privacy": "Política de privacidad",
                     "terms": "Condiciones de uso",
+                    "cookies": "Política de cookies",
                     "data_processing": "Tratamiento de datos",
-                    "support": "support@rumtelo.com",
+                    "legal_hub": "Todo lo legal",
+                    "support": "Ponte en contacto",
                     "press": "Prensa y colaboraciones"
                 },
                 "copyright": "© {year} Rumtelo",
@@ -3397,6 +3401,8 @@
                 "terms_link": "Términos",
                 "terms_mid": " y ",
                 "privacy_link": "Política de privacidad",
+                "terms_after_before": ". He leído el ",
+                "cookies_link": "Política de cookies",
                 "terms_after": ". Rumtelo solo lee datos bancarios, y solo después de que yo mismo lo conecte.",
                 "field_first_name": "Nombre",
                 "field_last_name": "Apellido",
@@ -3421,143 +3427,407 @@
                 "eyebrow": "Aviso legal",
                 "last_updated": "Última actualización · {date}",
                 "questions": "¿Alguna pregunta?",
+                "contact_link": "Contáctanos",
+                "legal_hub_link": "Todo lo relativo a cuestiones jurídicas",
                 "back_home": "Volver a Rumtelo",
                 "start_free": "Empieza gratis",
                 "sign_in": "Iniciar sesión"
             },
             "terms": {
                 "title": "Condiciones de uso",
-                "updated": "10 de septiembre de 2026",
-                "intro": "Al crear una cuenta o utilizar Rumtelo, aceptas estas condiciones. Si no estás de acuerdo, no utilices el servicio.",
+                "updated": "22 de septiembre de 2026",
+                "intro": "Las presentes Condiciones de servicio («Condiciones») constituyen un acuerdo vinculante entre tú y el operador de Rumtelo («Rumtelo», «nosotros», «nos»). Al crear una cuenta, hacer clic en «Aceptar» o utilizar rumtelo.com, la aplicación de Rumtelo o los servicios relacionados (el «Servicio»), aceptas estas Condiciones, así como nuestra Política de privacidad y nuestra Política de cookies. Si no estás de acuerdo, no utilices el Servicio.",
                 "sections": {
+                    "operator": {
+                        "title": "Con quién firmas el contrato",
+                        "body": "Rumtelo opera desde Ámsterdam, Países Bajos. Los datos de identificación de la empresa (denominación social, número de la Cámara de Comercio, número de IVA y dirección, cuando se publique) figuran en nuestra página de información de la empresa. Contacto: support@rumtelo.com."
+                    },
                     "what": {
-                        "title": "Qué es Rumtelo",
-                        "body": "Rumtelo es una guía personal y un asesor en materia de finanzas, crecimiento, energía y bienestar espiritual. Se trata de formación y herramientas, no de un banco, una agencia de valores ni un asesor financiero autorizado. Las sugerencias que ofrece no constituyen asesoramiento personal en materia de inversiones."
+                        "title": "Qué es Rumtelo — y qué no es—",
+                        "body": "Rumtelo es una herramienta de gestión personal y un asesor educativo en materia de dinero, crecimiento, energía y bienestar espiritual. Ayuda a las familias a ver en qué se gasta el dinero, a fijarse objetivos y a hacer un balance semanal. Se trata de un software y de un servicio educativo, no de un producto financiero regulado.",
+                        "items": [
+                            "No somos un banco, una entidad de pago, un emisor de dinero electrónico ni un depositario. Nunca retenemos tu dinero ni lo transferimos entre cuentas.",
+                            "No soy un corredor de bolsa, una empresa de inversión ni un asesor financiero autorizado. Los consejos y sugerencias del coach tienen carácter informativo general y no constituyen asesoramiento personalizado en materia de inversiones, impuestos, crédito o cuestiones legales.",
+                            "No soy profesional de la medicina, la psicología ni el bienestar. Las funciones relacionadas con la energía y el alma son herramientas opcionales de registro personal, no constituyen un diagnóstico ni un tratamiento.",
+                            "Los libros y métodos que mencionamos siguen siendo propiedad de sus respectivos autores. Rumtelo es una entidad independiente y no está afiliada a ellos ni cuenta con su respaldo."
+                        ],
+                        "after": "Tú eres el único responsable de las decisiones relacionadas con el dinero, la salud y la vida. Si necesitas asesoramiento regulado, consulta a un profesional autorizado en tu país."
+                    },
+                    "eligibility": {
+                        "title": "Requisitos y edad",
+                        "body": "El Servicio está destinado a personas físicas mayores de 18 años y con capacidad para celebrar un contrato vinculante. No debes utilizar Rumtelo si eres menor de 18 años o si la legislación aplicable te prohíbe su uso (incluidas las listas de sanciones de la UE o de EE. UU.). Al registrarte, confirmas que cumples estas condiciones."
                     },
                     "account": {
-                        "title": "Tu cuenta",
+                        "title": "Tu cuenta y tu unidad familiar",
                         "items": [
-                            "You must provide accurate registration details and keep your login safe.",
-                            "You are responsible for activity under your account.",
-                            "Household members you invite share access to that household’s data."
+                            "Facilita datos de registro correctos (incluidos el nombre y el correo electrónico) y manténlos actualizados. La fecha de nacimiento, si la facilitas, debe ser correcta.",
+                            "Mantén la confidencialidad de tus datos de acceso y de los códigos de autenticación de dos factores. Eres responsable de la actividad que se realice en tu cuenta, salvo que nos hayas informado sin demora de un acceso no autorizado.",
+                            "Un hogar es un espacio de trabajo compartido. Las personas a las que invites podrán ver los frascos, las transacciones, los objetivos y los datos relacionados de ese hogar. Invita solo a personas en las que confíes y únicamente si tienes permiso para compartir esos datos con ellas.",
+                            "Si te invitan, debes utilizar los datos del hogar únicamente para la visión general del propio hogar, sin copiar, publicar ni hacer un uso indebido de la información de otros miembros.",
+                            "Podemos rechazar, suspender o cerrar una cuenta que contenga datos inexactos, se utilice de forma abusiva o suponga un riesgo legal o de seguridad."
                         ]
                     },
                     "use": {
                         "title": "Uso aceptable",
-                        "body": "Utiliza Rumtelo de forma legal. No intentes burlar la seguridad, extraer datos del servicio, acosar a otros usuarios ni realizar ingeniería inversa del producto más allá de lo que permite la ley."
+                        "body": "Utiliza el Servicio únicamente con fines lícitos, personales o domésticos. No debes:",
+                        "items": [
+                            "Infringir la ley, vulnerar los derechos de terceros o publicar contenidos ilegales, perjudiciales o engañosos.",
+                            "Explorar, analizar o atacar la seguridad; eludir los controles de acceso; o sobrecargar el Servicio.",
+                            "Extraer, recopilar o exportar a granel el Servicio más allá de lo que te proporcionamos (por ejemplo, tu propia exportación), o realizar ingeniería inversa del producto, salvo en los casos en que lo permita la legislación vigente.",
+                            "Utilizar el Servicio para ofrecer un producto de la competencia, para entrenar un modelo público con nuestro software o con los resultados de Coach, o para enviar spam.",
+                            "No presentes a Rumtelo como un banco, una asesoría o un servicio médico, ni lo utilices para tomar decisiones automatizadas sobre otras personas (créditos, contratación, seguros).",
+                            "Comparte una cuenta de forma que se eludan los límites del plan, salvo en el caso de los miembros de tu familia que invites."
+                        ]
                     },
-                    "billing": {
-                        "title": "Planes y facturación",
-                        "body": "El plan Basic puede ser gratuito. Los planes de pago (Plus, Max) se renuevan automáticamente hasta que se cancelen. Los precios incluyen el IVA aplicable cuando así se indica. Se puede cancelar en cualquier momento; el contenido que hayas introducido seguirá siendo accesible a menos que elimines la cuenta."
+                    "content": {
+                        "title": "Tus datos y nuestra autorización para prestar el Servicio",
+                        "body": "Usted conserva la titularidad de los datos del hogar y de la cuenta que introduzca o importe («Su Contenido»). Usted concede a Rumtelo una licencia limitada, mundial y no exclusiva para alojar, almacenar, tratar, mostrar y realizar copias de seguridad de Su Contenido con el único fin de prestar, proteger y mejorar el Servicio, así como para cumplir con la legislación vigente. Dicha licencia finaliza cuando Su Contenido se elimina de nuestros sistemas operativos y caducan las copias de seguridad residuales, salvo en los casos en que debamos conservar una copia (por ejemplo, facturas).",
+                        "after": "Declaras que tienes derecho a enviar Tu Contenido —incluidos los extractos bancarios que importes y los datos sobre los miembros de tu hogar— y que dicho contenido no infringe la ley ni las presentes Condiciones."
                     },
                     "ip": {
-                        "title": "Propiedad intelectual",
-                        "body": "El software, la marca y el diseño de Rumtelo son de nuestra propiedad. Tus datos domésticos te pertenecen a ti. Los libros y métodos a los que hacemos referencia siguen siendo propiedad de sus autores; Rumtelo es independiente y no está afiliado a ellos ni cuenta con su respaldo."
+                        "title": "Nuestra propiedad intelectual",
+                        "body": "El Servicio, incluyendo el software, el diseño, la marca, los textos de Coach, los catálogos y la documentación, es propiedad de Rumtelo o de nuestros licenciantes. Le concedemos un derecho personal, intransferible y no exclusivo para utilizar el Servicio durante su suscripción o acceso gratuito, únicamente en la medida en que lo pongamos a su disposición. No podrá copiar, revender ni crear productos derivados del Servicio, salvo en los casos permitidos por la legislación imperativa."
+                    },
+                    "billing": {
+                        "title": "Planes, precios e IVA",
+                        "body": "El plan Basic puede ofrecerse de forma gratuita. Los planes de pago (por ejemplo, Plus y Max) son suscripciones que se facturan por adelantado, mensualmente o anualmente, hasta que se cancelen. Los precios se muestran antes de realizar el pago. Cuando se aplica el IVA u otro impuesto similar, este se incluye o se indica según sea obligatorio en tu país. Cobramos a través de nuestro proveedor de pagos (Stripe). No almacenamos los números completos de las tarjetas.",
+                        "after": "Un plan gratuito no garantiza que todas las funciones actuales sigan siendo gratuitas. Si introducimos un cargo por algún servicio que ya utilices, te lo comunicaremos con antelación y podrás dar de baja tu suscripción."
+                    },
+                    "withdrawal": {
+                        "title": "Plazo de reflexión (consumidores del EEE y del Reino Unido) y cancelación",
+                        "body": "Si eres un consumidor del EEE o del Reino Unido, normalmente dispones de 14 días a partir de la fecha de celebración del contrato de pago para ejercer el derecho de desistimiento, sin necesidad de justificar los motivos, de conformidad con la Directiva sobre los derechos de los consumidores (y su equivalente en el Reino Unido).",
+                        "items": [
+                            "Para rescindir el contrato, envía un correo electrónico a support@rumtelo.com desde la dirección asociada a tu cuenta en un plazo de 14 días, o utiliza cualquiera de las opciones de rescisión o cancelación que te ofrecemos. Te reembolsaremos las tasas abonadas por el contrato rescindido mediante el mismo medio de pago, sin demoras indebidas y en un plazo de 14 días a partir de la notificación.",
+                            "El servicio es digital y comienza en el momento en que se crea tu cuenta. Si nos solicitas que comencemos de inmediato y aceptas que perderás el derecho de desistimiento una vez que el servicio se haya prestado íntegramente, la legislación de la UE y del Reino Unido permite dicha pérdida. En el caso de una suscripción en curso que solo se haya ejecutado parcialmente, podremos deducir un importe proporcional al periodo ya prestado.",
+                            "Una vez finalizado el periodo de reflexión, puedes cancelar un plan de pago en cualquier momento. La cancelación surtirá efecto al final del periodo de facturación actual, salvo que se indique lo contrario durante el proceso de pago. Conservarás acceso de lectura al contenido que hayas introducido, a menos que elimines la cuenta.",
+                            "Las devoluciones iniciadas de mala fe tras haber utilizado el Servicio pueden dar lugar a la suspensión del mismo. Ponte en contacto con nosotros primero: solucionaremos los errores de facturación."
+                        ]
                     },
                     "availability": {
-                        "title": "Disponibilidad",
-                        "body": "Nuestro objetivo es ofrecer un servicio fiable, pero no garantizamos un acceso ininterrumpido. Las funciones marcadas como «próximamente» (por ejemplo, la sincronización bancaria en tiempo real o los dispositivos) pueden lanzarse más adelante o sufrir modificaciones."
+                        "title": "Disponibilidad, versión beta y cambios",
+                        "body": "Nuestro objetivo es ofrecer un servicio fiable, pero no garantizamos un acceso ininterrumpido, sin errores ni completo. El servicio puede verse interrumpido por trabajos de mantenimiento, averías o causas de fuerza mayor (incluidos fallos de los proveedores de alojamiento web, de pago o de correo electrónico). Las funciones marcadas como «próximamente», «vista previa» o «beta» —incluidas la sincronización bancaria en tiempo real y los dispositivos— pueden cambiar, lanzarse más tarde o no lanzarse nunca. Podemos modificar, limitar o suspender funciones. Si un cambio reduce de forma sustancial las prestaciones de un plan de pago que ya hayas adquirido, te lo notificaremos con una antelación razonable y podrás cancelarlo."
+                    },
+                    "third_parties": {
+                        "title": "Servicios de terceros",
+                        "body": "Los pagos, el envío de correos electrónicos, el alojamiento web y las conexiones bancarias opcionales son servicios prestados por terceros según sus propias condiciones. No nos hacemos responsables de las acciones independientes de dichos proveedores, salvo en los casos en que la ley nos obligue a ello. El acceso bancario opcional, cuando esté disponible, es de solo lectura a través de un proveedor de información de cuentas con licencia PSD2, una vez que lo hayas configurado tú mismo."
+                    },
+                    "disclaimers": {
+                        "title": "Avisos legales",
+                        "body": "En la medida en que lo permitan la legislación neerlandesa y la de la UE, el Servicio se presta «tal cual» y «según disponibilidad». No garantizamos que las sugerencias, los saldos, las importaciones o las puntuaciones de Coach sean completas, estén actualizadas o sean adecuadas para ninguna decisión financiera o sanitaria concreta. Nada de lo dispuesto en estas Condiciones limita una garantía o un derecho de conformidad que no pueda limitarse para los consumidores, incluida la conformidad legal de los contenidos y servicios digitales con arreglo a la legislación de la UE."
                     },
                     "liability": {
-                        "title": "Responsabilidad civil",
-                        "body": "En la medida en que lo permitan la legislación neerlandesa y la de la UE, Rumtelo se ofrece «tal cual». No nos hacemos responsables de las decisiones que tomes con tu dinero basándote en el producto. Nada de lo dispuesto en estas condiciones limita la responsabilidad que no pueda limitarse por ley."
+                        "title": "Responsabilidad",
+                        "body": "No excluimos ni limitamos la responsabilidad que la ley no nos permite excluir: dolo, imprudencia temeraria, muerte o lesiones personales causadas por nuestra negligencia, fraude, responsabilidad por productos defectuosos o derechos obligatorios de los consumidores.",
+                        "items": [
+                            "No nos hacemos responsables de las decisiones relacionadas con inversiones, gastos, impuestos o salud que tomes al utilizar el Servicio, ni de las pérdidas causadas por datos introducidos incorrectamente, por los miembros a los que hayas invitado o por un banco o proveedor de pagos externo.",
+                            "No nos hacemos responsables de pérdidas indirectas o consecuentes (lucro cesante, pérdida de datos tras haber rechazado la exportación, interrupción de la actividad comercial), salvo que la legislación imperativa disponga lo contrario.",
+                            "En los casos en que la responsabilidad pueda limitarse legalmente, nuestra responsabilidad total por todas las reclamaciones derivadas del Servicio se limita a las tarifas que nos hayas abonado en los 12 meses anteriores a la reclamación (o a 100 € si no has abonado nada), salvo en los casos no excluibles mencionados anteriormente.",
+                            "Si utilizas el Servicio como consumidor en el EEE o en el Reino Unido, estos límites se aplicarán únicamente en la medida en que sean justos y estén permitidos. Las cláusulas abusivas no son vinculantes para ti."
+                        ]
+                    },
+                    "indemnity": {
+                        "title": "Tu responsabilidad en caso de uso indebido",
+                        "body": "Deberás indemnizar a Rumtelo por las pérdidas, los gastos legales razonables y las reclamaciones que se deriven de tu Contenido, del incumplimiento de estas Condiciones por tu parte o del uso ilícito del Servicio, salvo en la medida en que hayamos sido nosotros los causantes de la pérdida y salvo cuando ello constituya una cláusula abusiva para un consumidor."
+                    },
+                    "suspend": {
+                        "title": "Suspensión y rescisión",
+                        "body": "Puede dejar de utilizar el Servicio y eliminar su cuenta en cualquier momento. Podemos suspender o rescindir su acceso si incumple de forma sustancial estas Condiciones, si la ley nos obliga a hacerlo o si dejamos de prestar el Servicio. En caso de rescisión, gestionaremos su contenido tal y como se describe en la Política de privacidad (exportación previa solicitud cuando sea factible; eliminación de los sistemas activos; copias de seguridad limitadas y conservación legal). Las cuotas pendientes seguirán siendo exigibles, salvo que usted se dé de baja de forma válida o que la culpa sea nuestra."
+                    },
+                    "changes": {
+                        "title": "Modificaciones de estas condiciones",
+                        "body": "Podemos actualizar estas Condiciones. La nueva versión entrará en vigor a partir de la fecha indicada en «Última actualización», o más tarde si así lo indicamos. En caso de un cambio sustancial que afecte a los usuarios de pago, lo notificaremos con una antelación razonable (por ejemplo, mediante correo electrónico o un aviso dentro de la aplicación). Si no estás de acuerdo, deja de utilizar el Servicio y cancélalo antes de que el cambio entre en vigor. El uso continuado después de esa fecha implica que aceptas las nuevas Condiciones, salvo en los casos en que la legislación imperativa exija un nuevo acuerdo."
                     },
                     "law": {
-                        "title": "Legislación aplicable",
-                        "body": "Las presentes condiciones se rigen por la legislación de los Países Bajos. Las controversias se someterán a la competencia de los tribunales de Ámsterdam, sin perjuicio de las protecciones obligatorias de los consumidores."
+                        "title": "Legislación aplicable y resolución de controversias",
+                        "body": "Las presentes Condiciones se rigen por la legislación de los Países Bajos, sin tener en cuenta las normas de conflicto de leyes que pudieran dar lugar a la aplicación de otra legislación, salvo que, si eres un consumidor, también conserves las protecciones obligatorias del país en el que resides.",
+                        "after": "Los tribunales de Ámsterdam son competentes, sin perjuicio de su derecho como consumidor a interponer una demanda en su lugar de residencia, ni de nuestro derecho a solicitar medidas cautelares cuando la ley lo permita. Los consumidores del EEE también pueden recurrir a la plataforma de resolución de litigios en línea de la UE o a un organismo de resolución alternativa de litigios (ADR) notificado; no estamos obligados a recurrir a un organismo de ADR concreto, salvo que la ley así lo exija. No le exigimos que renuncie a sus derechos a participar en demandas colectivas o a un juicio con jurado cuando dicha renuncia sea ilegal (incluidos los consumidores del EEE y del Reino Unido)."
+                    },
+                    "us_terms": {
+                        "title": "Visitantes en Estados Unidos",
+                        "body": "Si accedes al Servicio desde Estados Unidos, lo haces por iniciativa propia. El Servicio se ofrece desde los Países Bajos y no está dirigido a ningún estado de EE. UU. como producto financiero local. Las leyes estatales de EE. UU. en materia de consumo y privacidad pueden otorgarte derechos adicionales; consulta la Política de privacidad. En la medida en que un tribunal de EE. UU. aplicara estas Condiciones, las exenciones de responsabilidad y los límites de responsabilidad anteriores se aplicarán en la medida máxima permitida por la legislación de ese estado, y las partes inaplicables quedarán separadas."
+                    },
+                    "miscellaneous": {
+                        "title": "General",
+                        "items": [
+                            "Si una disposición fuera nula, el resto seguirá vigente. En los casos en que la ley lo permita, se aplicará una disposición válida que se acerque lo más posible a la nula.",
+                            "Las presentes Condiciones, junto con la Política de privacidad, la Política de cookies y cualquier detalle del plan que se muestre al finalizar la compra, constituyen el acuerdo completo relativo al Servicio.",
+                            "No podrás ceder el contrato sin nuestro consentimiento. Nosotros podremos cederlo en caso de reorganización o venta del Servicio, siempre que ello no suponga una merma de tus derechos como consumidor.",
+                            "Nos comunicamos en inglés. Las traducciones se ofrecen a título informativo. Si una traducción entra en conflicto con el texto en inglés, prevalecerá el texto en inglés, salvo que la legislación de consumo obligatoria de tu país disponga lo contrario.",
+                            "El hecho de no hacer valer una cláusula no constituye una renuncia."
+                        ]
                     },
                     "contact": {
-                        "title": "Contacto"
+                        "title": "Contacto",
+                        "body": "Preguntas sobre estas Condiciones: support@rumtelo.com o la página de contacto. En esta página encontrarás una copia de estas Condiciones para que puedas guardarla."
                     }
                 }
             },
             "privacy": {
                 "title": "Política de privacidad",
-                "updated": "10 de septiembre de 2026",
-                "intro": "Rumtelo («nosotros», «nos») se ha creado en Ámsterdam y aloja sus datos en la UE. Esta política explica qué datos recopilamos, por qué lo hacemos y cuáles son tus derechos en virtud del RGPD.",
+                "updated": "22 de septiembre de 2026",
+                "intro": "La presente Política de privacidad explica cómo Rumtelo («nosotros», «nos») recopila, utiliza, comparte y protege los datos personales cuando utilizas rumtelo.com, la aplicación de Rumtelo y los servicios relacionados. Se ha redactado de conformidad con el Reglamento General de Protección de Datos de la UE (RGPD / AVG), la normativa neerlandesa complementaria y la normativa sobre privacidad electrónica, el RGPD del Reino Unido en los casos en que siga siendo aplicable, y las leyes estatales de privacidad de EE. UU. (incluidas la CCPA y la CPRA de California). Almacenamos los datos de los hogares en la UE.",
                 "sections": {
                     "who": {
-                        "title": "Quiénes somos",
-                        "body": "Rumtelo opera desde Ámsterdam, Países Bajos. Contacto: support@rumtelo.com."
+                        "title": "Quiénes somos (responsable del tratamiento)",
+                        "body": "El responsable del tratamiento es el operador de Rumtelo, con sede en Ámsterdam, Países Bajos. Contacto para consultas sobre privacidad: support@rumtelo.com. La denominación social, el número de la Cámara de Comercio (KvK), el número de IVA y la dirección postal figuran en la página de información de la empresa, cuando estén disponibles, y se facilitarán previa solicitud. No hemos designado a un delegado de protección de datos porque el artículo 37 del RGPD no lo exige dada nuestra envergadura actual; dicha dirección de contacto es su punto de contacto en materia de privacidad."
+                    },
+                    "scope": {
+                        "title": "¿De quién son los datos y qué servicios?",
+                        "body": "Esta política se aplica a los visitantes del sitio web, a las personas que crean una cuenta y a los miembros del hogar invitados. Abarca los datos relativos a la cuenta, el dinero, el crecimiento, la energía y el alma que introduzcas o importes, así como los registros técnicos y los registros de facturación. No se aplica a los sitios web de terceros a los que enlazamos. Si actuamos únicamente como encargados del tratamiento para un futuro cliente empresarial, dicha relación se regirá por un acuerdo de tratamiento de datos independiente; en el caso de las cuentas familiares, Rumtelo es el responsable del tratamiento."
                     },
                     "collect": {
                         "title": "Qué datos recopilamos",
+                        "body": "Solo recopilamos los datos que necesitamos para gestionar el resumen de gastos del hogar y ofrecer asesoramiento. Las categorías incluyen:",
                         "items": [
-                            "Account details you provide (name, email, password hash).",
-                            "Household money data you enter or import (jars, transactions, goals, debt, and related product data).",
-                            "Optional energy and soul practice data you choose to log (sleep, training, intention, and similar).",
-                            "Basic technical logs needed to keep the service secure and working."
+                            "Datos de identidad y contacto: nombre, dirección de correo electrónico, fecha de nacimiento (opcional), preferencias de idioma y configuración regional.",
+                            "Seguridad de la cuenta: hash de la contraseña (nunca almacenamos tu contraseña en texto sin cifrar), identificadores de sesión, estado de la autenticación de dos factores (opcional) y claves secretas que debemos conservar para que funcione la autenticación de dos factores, así como el estado de la verificación por correo electrónico.",
+                            "Datos sobre las finanzas domésticas que introduces o importas: fondos, transacciones, objetivos, deudas, distribución de ingresos, revisiones semanales y datos relacionados con los productos.",
+                            "Datos opcionales sobre crecimiento, energía y estado de ánimo que decidas registrar (por ejemplo, objetivos, sueño, entrenamiento, alimentación, descanso, intenciones). Puedes utilizar Rumtelo sin rellenar esos campos.",
+                            "Miembros del hogar: a quién invitas, su correo electrónico y su función en el hogar.",
+                            "Facturación: plan, fechas de renovación, identificadores de cliente y de suscripción de Stripe. Los números de tarjeta los recopila Stripe, no nosotros.",
+                            "Los mensajes de asistencia que nos envíes y los archivos que adjuntes.",
+                            "Datos técnicos necesarios para garantizar la seguridad y el buen funcionamiento del Servicio: dirección IP, agente de usuario, marcas de tiempo, país aproximado deducido a partir de la IP, registros de errores e identificadores de cookies descritos en la Política de cookies.",
+                            "Datos bancarios opcionales, solo si importas extractos o, posteriormente, conectas una fuente de datos bancaria en tiempo real de solo lectura: metadatos de la cuenta y transacciones que facilita el proveedor. No recibimos tu contraseña bancaria."
+                        ]
+                    },
+                    "special": {
+                        "title": "Datos de categorías especiales y datos sensibles",
+                        "body": "Los registros de actividad (sueño, entrenamiento, alimentación, descanso) y las notas sobre el estado de ánimo o las intenciones pueden revelar información relacionada con la salud o de carácter filosófico. Según el RGPD, estos datos pueden pertenecer a una categoría especial (artículo 9). Solo los tratamos si decides utilizar esas funciones. Al introducir esos datos, nos das tu consentimiento explícito para almacenarlos y mostrártelos a ti y a los miembros de tu hogar a los que invites, así como para utilizarlos con el fin de generar consejos del Coach dentro del producto. Puedes dejar de registrar datos y solicitarnos que los eliminemos. No utilizamos estos datos con fines publicitarios, para evaluar tu solvencia crediticia ni para deducir características para terceros.",
+                        "after": "La «información personal sensible» de EE. UU. (incluidos datos financieros precisos de cuentas y registros relacionados con la salud) se utiliza únicamente para ofrecerte las funciones que solicitas. No la vendemos ni la compartimos con fines de publicidad comportamental en distintos contextos."
+                    },
+                    "sources": {
+                        "title": "Cómo obtenemos los datos",
+                        "items": [
+                            "Directamente de ti: registro, uso del producto, importaciones, asistencia técnica.",
+                            "De forma automática: cookies y registros del servidor cuando utilizas la página web o la aplicación (consulta la Política de cookies).",
+                            "De personas que te invitan a un grupo (nombre y correo electrónico para que podamos enviarte la invitación).",
+                            "De los procesadores que conectes: Stripe para el estado de los pagos; un proveedor PSD2/AIS si activas la sincronización bancaria en tiempo real; informes de entrega de correo electrónico para los mensajes transaccionales."
                         ]
                     },
                     "use": {
-                        "title": "Cómo lo utilizamos",
-                        "body": "Para gestionar tu cuenta, mostrarte el resumen y los consejos del entrenador, mejorar el producto y cumplir con las obligaciones legales. No vendemos tus datos personales."
+                        "title": "Finalidades y fundamentos jurídicos (RGPD)",
+                        "body": "No vendemos datos personales. Los utilizamos para los siguientes fines. Cada uno de ellos cuenta con una base jurídica en el RGPD (artículo 6; artículo 9 cuando se trata de datos de categorías especiales):",
+                        "items": [
+                            "Contrato (art. 6, apartado 1, letra b)) — crear y autenticar tu cuenta, gestionar el espacio de trabajo doméstico, mostrar los tarros, los consejos del Coach y los portales que utilizas, facilitar la exportación y enviar correos electrónicos transaccionales (verificación, restablecimiento, seguridad).",
+                            "Intereses legítimos (art. 6, apartado 1, letra f) — garantizar la seguridad del Servicio, prevenir abusos y fraudes, solucionar fallos, conocer el uso agregado del producto sin crear perfiles publicitarios y interponer o defender reclamaciones legales. Puede oponerse; dejaremos de hacerlo a menos que tengamos motivos imperiosos para seguir adelante.",
+                            "Consentimiento (art. 6, apartado 1, letra a), y, en su caso, art. 9, apartado 2, letra a)): registros opcionales de consumo energético o de actividad; conexión opcional con la cuenta bancaria; cualquier correo electrónico de marketing futuro o cookies no esenciales. Puede retirar su consentimiento en cualquier momento sin que ello afecte al tratamiento realizado antes de dicha retirada.",
+                            "Obligación legal (art. 6, apartado 1, letra c) — registros fiscales, contables y relacionados con la legislación en materia de consumo para los planes de pago; responder a las solicitudes legítimas de las autoridades."
+                        ]
+                    },
+                    "automated": {
+                        "title": "Elaboración de perfiles y decisiones automatizadas",
+                        "body": "El Coach puede generar sugerencias a partir de los datos que ya hayas almacenado (por ejemplo, un frasco que supere el límite). Se trata de una ayuda integrada en el producto, no de una decisión que tenga efectos jurídicos o de importancia similar para ti (artículo 22 del RGPD). No utilizamos únicamente el tratamiento automatizado para conceder crédito, fijar un precio específico para ti o denegar una cuenta sin revisión humana cuando la ley así lo exija. Puedes ignorar los consejos del Coach; nunca mueven dinero."
+                    },
+                    "household": {
+                        "title": "Compartir vivienda",
+                        "body": "Rumtelo se basa en un hogar, no en un libro de cuentas secreto individual. Los miembros a los que invites podrán acceder a los datos de ese hogar. Debes tener un motivo legítimo para compartir con ellos los datos de otro adulto (por ejemplo, que hayan dado su consentimiento o que gestionéis juntos el presupuesto familiar). No invites a menores de edad. Si ya no quieres que alguien vea el hogar, elimínalo; le retiraremos el acceso a partir de ese momento."
                     },
                     "bank": {
-                        "title": "Datos bancarios",
-                        "body": "Las conexiones bancarias son opcionales. Cuando la sincronización bancaria en tiempo real está disponible, el acceso es de solo lectura a través de un proveedor con licencia PSD2, y solo después de que tú mismo lo hayas conectado. La importación de extractos está siempre bajo tu control."
+                        "title": "Datos bancarios y pagos",
+                        "body": "Las conexiones bancarias son opcionales y, cuando están activas, son de solo lectura a través de un proveedor de servicios de información de cuentas con licencia PSD2, una vez que te hayas autenticado con tu banco. Nunca iniciamos pagos desde tu cuenta bancaria. La importación de extractos está siempre bajo tu control. Las tarjetas de pago para las suscripciones a Rumtelo son procesadas por Stripe; recibimos la confirmación, el estado del plan y los identificadores, pero no el número completo de la tarjeta (PAN) ni el CVC."
                     },
-                    "hosting": {
-                        "title": "Dónde vive",
-                        "body": "Los datos se alojan en servidores de la UE (región de Ámsterdam) y están cifrados tanto en tránsito (TLS) como en reposo. Los encargados del tratamiento con los que colaboramos actúan conforme a las condiciones de tratamiento de datos."
+                    "cookies": {
+                        "title": "Cookies y tecnologías similares",
+                        "body": "Utilizamos cookies estrictamente necesarias para mantenerte conectado, recordar el plan que elegiste antes de registrarte y aplicar tu idioma. Actualmente no utilizamos cookies publicitarias ni de análisis de terceros. Los detalles, los nombres y los plazos de conservación figuran en la Política de cookies. Si más adelante añadimos cookies no esenciales, solicitaremos primero tu consentimiento cuando así lo exijan la normativa sobre privacidad electrónica y la Ley de Telecomunicaciones neerlandesa."
                     },
-                    "rights": {
-                        "title": "Tus derechos",
-                        "body": "Puedes acceder a tus datos, corregirlos, exportarlos o eliminarlos. Si cancelas un plan de pago, tus «jars», transacciones y objetivos seguirán estando disponibles, a menos que nos pidas que eliminemos la cuenta. Para ejercer tus derechos, envía un correo electrónico a support@rumtelo.com."
+                    "recipients": {
+                        "title": "Con quién compartimos los datos",
+                        "body": "Solo compartimos datos personales con:",
+                        "items": [
+                            "Los miembros de tu familia a los que invites, en la medida en que lo requiera el producto.",
+                            "Encargados del tratamiento que actúan siguiendo nuestras instrucciones en virtud de un contrato: alojamiento en la nube de la UE (Railway, región de Ámsterdam) para aplicaciones, bases de datos y copias de seguridad; Resend para el correo electrónico transaccional; Stripe para los pagos de los planes de pago.",
+                            "Un proveedor opcional de PSD2/AIS si conectas una fuente de datos bancarios en tiempo real.",
+                            "Asesores profesionales (contables, abogados) sujetos a la confidencialidad, cuando sea necesario.",
+                            "A las autoridades, si así lo exige la ley o si es necesario para proteger a los usuarios, el Servicio o nuestros derechos legales.",
+                            "Un comprador o sucesor, en caso de que nos reorganicemos o vendamos el Servicio, bajo protección y notificación continuadas cuando así lo exija la ley."
+                        ],
+                        "after": "No vendemos datos personales ni los compartimos con fines de publicidad comportamental en distintos contextos. No permitimos que los encargados del tratamiento utilicen los datos de tu hogar para sus propias campañas de marketing."
+                    },
+                    "transfers": {
+                        "title": "Traspasos internacionales",
+                        "body": "Los datos del hogar en el producto se alojan en la Unión Europea (región de Ámsterdam). Algunos encargados del tratamiento se encuentran en países fuera del EEE o pueden acceder a datos desde ellos; en concreto, Stripe (empresas del grupo en EE. UU.) y Resend (correo electrónico, Estados Unidos). Cuando esto ocurre, recurrimos a una decisión de adecuación, si existe, o a las cláusulas contractuales tipo (y medidas complementarias cuando sea necesario) previstas en el capítulo V del RGPD. Puede solicitarnos más detalles sobre las garantías en support@rumtelo.com."
                     },
                     "retention": {
-                        "title": "Retención",
-                        "body": "Conservamos los datos de la cuenta y del hogar mientras su cuenta esté activa, y durante un periodo limitado tras su eliminación cuando así lo exija la ley (por ejemplo, los registros de facturación)."
+                        "title": "Durante cuánto tiempo conservamos los datos",
+                        "items": [
+                            "Datos de la cuenta y de los productos del hogar: mientras la cuenta esté activa.",
+                            "Una vez que hayas eliminado la cuenta, eliminaremos los datos personales activos sin demora injustificada, normalmente en un plazo de 30 días, y posteriormente los de las copias de seguridad cifradas dentro de un plazo de rotación limitado (por lo general, hasta 90 días), salvo que se aplique un plazo de retención legal más largo.",
+                            "Facturación, facturas y documentos fiscales: hasta 7 años después del ejercicio en que se realizó la transacción, tal y como exige la normativa fiscal neerlandesa en materia de conservación de documentos.",
+                            "Registros de seguridad y del servidor: normalmente entre 30 y 90 días; solo se conservarán durante más tiempo si es necesario para investigar un caso de abuso.",
+                            "Correos electrónicos de asistencia: se conservan el tiempo necesario para resolver la solicitud y para su archivo durante un breve periodo; posteriormente, se eliminan o se minimizan.",
+                            "Registros de consentimiento (por ejemplo, que has aceptado estas políticas): durante la vigencia de la cuenta y durante un periodo razonable posterior, para que podamos demostrar lo que has aceptado."
+                        ]
+                    },
+                    "security": {
+                        "title": "Seguridad",
+                        "body": "Utilizamos TLS para los datos en tránsito, cifrado de datos en reposo para las bases de datos alojadas, contraseñas con hash, autenticación de dos factores opcional, acceso limitado al ámbito doméstico en la aplicación y acceso con el mínimo de privilegios para los operadores. Ningún método es perfecto; también debe mantener a salvo su dispositivo y sus credenciales. Si una violación de la seguridad pudiera suponer un alto riesgo para sus derechos, se lo notificaremos a usted y a la Autoriteit Persoonsgegevens, tal y como exigen los artículos 33 y 34 del RGPD."
+                    },
+                    "rights_gdpr": {
+                        "title": "Tus derechos (EEE, Reino Unido y similares)",
+                        "body": "Sin perjuicio de los límites legales, puedes solicitarnos: acceder a tus datos; rectificarlos; suprimirlos; restringir su tratamiento; oponerte al tratamiento basado en intereses legítimos; recibir una copia transferible de los datos que nos hayas facilitado; y retirar tu consentimiento. También puede exportar los datos de su hogar desde el producto, siempre que exista dicha función, o enviar un correo electrónico a support@rumtelo.com desde la dirección que figura en su cuenta. Le responderemos en el plazo de un mes (prorrogable en dos meses en caso de solicitudes complejas, previa notificación). Es posible que tengamos que verificar que eres tú. Puedes presentar una reclamación ante la Autoriteit Persoonsgegevens (autoriteitpersoonsgegevens.nl) o, si resides en otro Estado del EEE o en el Reino Unido, ante tu autoridad local. Preferimos resolver el problema primero."
+                    },
+                    "rights_us": {
+                        "title": "Tus derechos en Estados Unidos",
+                        "body": "Si eres residente en California o en otro estado de EE. UU. que cuente con una ley de privacidad exhaustiva (por ejemplo, Virginia, Colorado, Connecticut, Utah, Texas u Oregón), puede tener derecho a conocer o acceder a sus datos personales, rectificarlos, suprimirlos, obtener una copia de los mismos, oponerse a la «venta» o al «intercambio» de información personal, así como a limitar el uso de información personal sensible, y a no ser objeto de discriminación por ejercer dichos derechos. Puede recurrir a un representante autorizado cuando la legislación lo permita, previa presentación de una prueba de su representación.",
+                        "items": [
+                            "No vendemos información personal ni la compartimos con fines de publicidad comportamental entre contextos, tal y como se definen dichos términos en la CCPA/CPRA. Por lo tanto, nuestra forma de actuar ya se ajusta a lo establecido en la solicitud de «No vender ni compartir»; envíanos un correo electrónico si deseas que te lo confirmemos por escrito.",
+                            "En esta política (aviso en el momento de la recogida) se describen las categorías de datos que recopilamos, las fuentes, los fines, los destinatarios y el plazo de conservación. En los últimos 12 meses no hemos vendido ni compartido información personal con fines publicitarios.",
+                            "Para ejercer tus derechos en EE. UU., envía un correo electrónico a support@rumtelo.com desde la dirección de tu cuenta, indicando en el asunto «Solicitud de privacidad en EE. UU.» y tu estado. Verificaremos la solicitud y te responderemos dentro del plazo establecido por la ley (por lo general, 45 días según la CCPA, prorrogable según lo permitido).",
+                            "Ley «Shine the Light» de California: no facilitamos datos personales a terceros para que los utilicen con fines de marketing directo.",
+                            "No tenemos conocimiento de que vendamos o compartamos los datos personales de consumidores menores de 16 años."
+                        ]
+                    },
+                    "children": {
+                        "title": "Niños",
+                        "body": "Rumtelo no está dirigido a menores. Debes tener 18 años o más. No recopilamos deliberadamente datos personales de menores de 18 años (ni de menores de 13 años, según la ley COPPA). Si crees que un menor ha creado una cuenta, envía un correo electrónico a support@rumtelo.com y la eliminaremos."
+                    },
+                    "changes": {
+                        "title": "Modificaciones de esta política",
+                        "body": "Es posible que actualicemos esta política. La nueva fecha de «Última actualización» aparecerá en esta página. Si un cambio es sustancial (una nueva finalidad, una nueva categoría de destinatarios o una nueva transferencia internacional que te afecte), te lo comunicaremos por los medios adecuados cuando sea necesario; por ejemplo, por correo electrónico o mediante un aviso en el producto. El uso continuado tras la fecha de entrada en vigor implica que has tomado conocimiento de la actualización. Cuando un cambio requiera un nuevo consentimiento, te lo solicitaremos."
+                    },
+                    "contact": {
+                        "title": "Contacto y reclamaciones",
+                        "body": "Solicitudes y consultas sobre privacidad: support@rumtelo.com. Datos de la empresa: la página de información de la empresa. Autoridad de control en los Países Bajos: Autoriteit Persoonsgegevens, Apartado de correos 93374, 2509 AJ La Haya, https://www.autoriteitpersoonsgegevens.nl."
+                    }
+                }
+            },
+            "cookies": {
+                "title": "Política de cookies",
+                "updated": "22 de septiembre de 2026",
+                "intro": "La presente Política de cookies explica cómo Rumtelo utiliza las cookies y otras tecnologías similares en rumtelo.com y en la aplicación de Rumtelo. Complementa la Política de privacidad y cumple con la normativa de la UE sobre privacidad electrónica y la Ley de Telecomunicaciones de los Países Bajos. Cuando una cookie no sea estrictamente necesaria, solicitaremos tu consentimiento antes de instalarla.",
+                "sections": {
+                    "what": {
+                        "title": "¿Qué son las cookies?",
+                        "body": "Las cookies son pequeños archivos de texto que se almacenan en tu dispositivo. También utilizamos tecnologías similares, como sessionStorage, con los mismos fines (por ejemplo, recordar un plan que hayas elegido en localhost). Pueden ser de origen propio (establecidas por nosotros) o de terceros (establecidas por otros). Actualmente, solo establecemos cookies de origen propio."
+                    },
+                    "how": {
+                        "title": "Cómo los utilizamos hoy en día",
+                        "body": "A fecha de la indicada anteriormente, Rumtelo utiliza cookies únicamente porque el Servicio no puede funcionar de forma segura sin ellas (estrictamente necesarias). No instalamos cookies publicitarias, píxeles de seguimiento de redes sociales ni cookies de análisis de terceros. Si esto cambiara, actualizaremos esta página y solicitaremos el consentimiento cuando sea necesario; no activaremos el seguimiento sin avisar."
+                    },
+                    "necessary": {
+                        "title": "Cookies estrictamente necesarias",
+                        "body": "Son necesarias para prestarte un servicio que has solicitado. La normativa neerlandesa y de la UE permite su uso sin necesidad de consentimiento. Entre ellas se incluyen:",
+                        "items": [
+                            "Cookies de autenticación y de sesión establecidas por nuestro sistema de inicio de sesión (Better Auth), con el prefijo «rumtelo». Estas cookies mantienen tu sesión activa en rumtelo.com y app.rumtelo.com, conservan la sesión y permiten el funcionamiento de funciones de seguridad como la autenticación de dos factores. Normalmente son de tipo HttpOnly y Secure en entorno de producción, y duran lo que dura la sesión o un periodo de inicio de sesión renovable.",
+                            "rumtelo_pending_plan — guarda el plan de pago (Plus/Max) y la periodicidad de facturación que has seleccionado en la página web de marketing, para que podamos continuar con el proceso de pago una vez que hayas creado una cuenta. Cocie propia. Normalmente, unos días.",
+                            "Preferencia de configuración regional o idioma que next-intl puede almacenar para que el sitio web se mantenga en el idioma que hayas elegido (por ejemplo, NEXT_LOCALE). Cookie propia. Hasta aproximadamente un año.",
+                            "Atributos de seguridad de dichas cookies (SameSite, Secure, valores firmados) para reducir el uso indebido entre sitios web. No se trata de un rastreador comercial independiente."
+                        ]
+                    },
+                    "storage": {
+                        "title": "Almacenamiento local y de sesión",
+                        "body": "En algunos dispositivos también utilizamos sessionStorage (clave «rumtelo.pendingPlan») como alternativa para el plan que hayas elegido, ya que la página web y la aplicación pueden ejecutarse en puertos diferentes durante el desarrollo local. Ese valor permanece en esa pestaña del navegador y no se envía a los anunciantes."
+                    },
+                    "manage": {
+                        "title": "Cómo puedes gestionar las cookies",
+                        "body": "Puedes eliminar o bloquear las cookies en la configuración de tu navegador. Si bloqueas las cookies estrictamente necesarias, es posible que no se puedan realizar el inicio de sesión, el cambio de cuenta familiar y la transferencia del proceso de pago; se trata de una limitación técnica, no de una sanción. Actualmente no ofrecemos un banner de consentimiento porque no instalamos cookies opcionales. Si más adelante añadimos cookies de análisis o de marketing, aparecerá un banner o un centro de preferencias y podrás rechazarlas."
+                    },
+                    "third": {
+                        "title": "Terceros",
+                        "body": "Los servicios de pago (Stripe) y de correo electrónico (Resend) pueden establecer sus propias cookies si visitas su proceso de pago alojado o si tu cliente de correo carga contenido remoto. Dichas cookies se rigen por las políticas de dichos proveedores. Nuestras páginas de productos no incorporan redes publicitarias. La conexión bancaria opcional, cuando esté disponible, te guiará a través del proceso propio del proveedor autorizado."
                     },
                     "changes": {
                         "title": "Cambios",
-                        "body": "Es posible que actualicemos esta política. Los cambios sustanciales se indicarán en esta página con una nueva fecha de «Última actualización»."
+                        "body": "Actualizaremos esta página cuando se produzcan cambios en el uso que hacemos de las cookies. La fecha de «Última actualización» es la fecha de entrada en vigor."
+                    },
+                    "contact": {
+                        "title": "Contacto",
+                        "body": "Preguntas: support@rumtelo.com. Consulta también la Política de privacidad y la página de información sobre la empresa."
                     }
                 }
             },
             "data_processing": {
                 "title": "Tratamiento de datos",
-                "updated": "10 de septiembre de 2026",
-                "intro_prefix": "En esta página se resume cómo Rumtelo trata los datos personales conforme al RGPD. Para obtener una visión completa, lee también nuestra",
+                "updated": "22 de septiembre de 2026",
+                "intro_prefix": "Esta página constituye nuestro registro público sobre cómo Rumtelo trata los datos personales con arreglo al RGPD (funciones, fundamentos jurídicos, encargados del tratamiento y transferencias). No sustituye a un acuerdo de encargado del tratamiento firmado en caso de que tratemos datos siguiendo las instrucciones de un cliente empresarial. En el caso de las cuentas de particulares, nosotros somos los responsables del tratamiento. Lee esto junto con nuestra",
                 "privacy_link": "Política de privacidad",
                 "sections": {
                     "roles": {
                         "title": "Funciones",
-                        "body": "En lo que respecta a tu cuenta de Rumtelo y a los datos de tu hogar, Rumtelo actúa como responsable del tratamiento de datos. Cuando utilizamos proveedores de infraestructura o de pagos, estos actúan como encargados del tratamiento en virtud de un contrato."
+                        "body": "En lo que respecta a tu cuenta de Rumtelo y a los datos de tu hogar, Rumtelo es el responsable del tratamiento (artículo 4, apartado 7, del RGPD). Los proveedores de infraestructura, correo electrónico y pagos son encargados del tratamiento (artículo 4, apartado 8, y artículo 28): solo pueden tratar los datos siguiendo nuestras instrucciones documentadas, garantizando la confidencialidad y la seguridad, y procediendo a su supresión o devolución al término del contrato. Un proveedor opcional de PSD2/AIS suele ser un responsable independiente o un encargado del tratamiento de la conexión bancaria que establezcas; nosotros solo recibimos la información de la cuenta que tú autorices. Los miembros del hogar a los que invites son usuarios independientes, no nuestros encargados del tratamiento."
                     },
                     "purposes": {
                         "title": "Finalidades y fundamentos jurídicos",
-                        "items": {
-                            "contract": "Contrato: crea y gestiona tu cuenta, muestra los frascos, los consejos del entrenador y las características de los productos que utilizas.",
-                            "interest": "Interés legítimo: seguridad, prevención del fraude, mejora de los productos (con medidas de protección).",
-                            "consent": "Consentimiento: conexión bancaria opcional o comunicaciones de marketing cuando sea necesario.",
-                            "obligation": "Obligación legal: registros fiscales y contables para los planes de pago."
-                        }
+                        "items": [
+                            "Contrato: crea y gestiona tu cuenta, el espacio de trabajo doméstico, los tarros, los consejos del entrenador, la exportación y las funciones del producto que utilices.",
+                            "Interés legítimo: seguridad, prevención del fraude y los abusos, fiabilidad y mejora del producto que no requiera perfiles publicitarios; sopesado frente a tus derechos, con la posibilidad de excluirte de los análisis de mejora en caso de que, en su momento, incorporemos métricas opcionales.",
+                            "Consentimiento: conexión bancaria opcional; registros opcionales de energía y del alma (y consentimiento explícito según el artículo 9 cuando dichos registros constituyan datos de categorías especiales); cualquier cookie futura de marketing o no esencial.",
+                            "Obligación legal: registros fiscales, contables y de consumidores para los planes de pago; solicitudes legítimas."
+                        ]
                     },
                     "categories": {
                         "title": "Categorías de datos",
-                        "body": "Datos de identidad y de contacto; credenciales de autenticación (con hash); datos financieros del hogar y de la consulta que introduzcas o importes; registros técnicos."
+                        "body": "Datos de identidad y de contacto; credenciales de autenticación (con hash) y datos de sesión; datos financieros y de prácticas del hogar que introduzcas o importes; composición del hogar; identificadores de facturación; contenido de ayuda; registros técnicos. Datos de categorías especiales únicamente si los introduces en portales opcionales. No recopilamos números de identificación oficiales ni los números completos de las tarjetas de pago (PAN)."
                     },
                     "processors": {
-                        "title": "Procesadores (típicos)",
+                        "title": "Procesadores que utilizamos (MVP)",
                         "items": [
-                            "EU cloud hosting (application, database, backups) — Amsterdam region.",
-                            "Email delivery for verification and account messages.",
-                            "Payment processor for paid plans (card details never stored by Rumtelo).",
-                            "Optional PSD2/AIS provider for live bank sync when enabled — read-only, after you connect."
+                            "Ferrocarriles (UE, región de Ámsterdam): alojamiento de aplicaciones, base de datos PostgreSQL, copias de seguridad. Ubicación de los datos de los hogares en reposo: Unión Europea.",
+                            "Resend — correo electrónico transaccional (verificación, restablecimiento de contraseña, seguridad). El tratamiento de los datos puede realizarse en Estados Unidos, al amparo de las cláusulas contractuales tipo.",
+                            "Stripe Payments Europe, Limited (y las empresas del grupo Stripe): proceso de pago de suscripciones, portal del cliente, facturas y registros de pagos a efectos fiscales. Los datos de las tarjetas se gestionan en los sistemas de Stripe. Las transferencias a Estados Unidos se realizan mediante las herramientas de transferencia de Stripe conformes al RGPD.",
+                            "Opcional, solo si lo activas más adelante: un proveedor de información de cuentas con licencia PSD2 para la sincronización bancaria en modo de solo lectura. Indicaremos aquí el nombre del proveedor antes de que se active dicha función."
                         ]
+                    },
+                    "measures": {
+                        "title": "Medidas de seguridad (resumen)",
+                        "body": "TLS en tránsito; cifrado en reposo en la base de datos alojada; hash de contraseñas; autenticación de dos factores (2FA) opcional; aislamiento de los hogares a nivel de fila en la aplicación; acceso limitado a los operadores que lo necesiten; copias de seguridad en la misma región de la UE. Los encargados del tratamiento están obligados a aplicar las medidas técnicas y organizativas adecuadas con arreglo al artículo 28."
                     },
                     "transfers": {
                         "title": "Traspasos internacionales",
-                        "body": "Preferimos que el tratamiento de datos se realice en la UE. Si un encargado del tratamiento transfiere datos fuera del EEE, exigimos que se apliquen las garantías adecuadas (por ejemplo, cláusulas contractuales tipo)."
+                        "body": "Preferimos que el tratamiento de datos se realice en la UE. Las bases de datos de los hogares permanecen en la región de Ámsterdam. Si un encargado del tratamiento accede a los datos desde fuera del EEE (actualmente, el correo electrónico y los pagos), exigimos las garantías del capítulo V —principalmente las cláusulas contractuales tipo de la UE, además de las medidas complementarias del proveedor—. No transferimos los registros de los hogares a un servidor de EE. UU. para su almacenamiento."
                     },
                     "subprocessors": {
-                        "title": "Subencargados del tratamiento y modificaciones",
-                        "body": "La lista de encargados del tratamiento puede sufrir modificaciones a medida que el producto evolucione. Los cambios sustanciales que afecten al tratamiento de tus datos se reflejarán aquí o en la Política de privacidad."
+                        "title": "Cambios en los procesadores",
+                        "body": "Podemos sustituir a un encargado del tratamiento (por ejemplo, un proveedor de alojamiento web o de correo electrónico de la UE diferente) si el nuevo proveedor ofrece una protección equivalente o superior. Los cambios sustanciales que afecten a la forma en que se tratan tus datos se reflejarán en esta página o en la Política de privacidad, con la correspondiente notificación cuando así lo exija la ley. Esta página constituye la lista pública de subencargados del tratamiento para usuarios particulares."
+                    },
+                    "rights": {
+                        "title": "Solicitudes",
+                        "body": "Acceso, rectificación, exportación, supresión, limitación, oposición y retirada del consentimiento: support@rumtelo.com. Tramitaremos las solicitudes tal y como se establece en la Política de privacidad. Autoridad de control: Autoriteit Persoonsgegevens, Países Bajos. Si es una empresa que necesita un acuerdo firmado conforme al artículo 28, póngase en contacto con nosotros; las cuentas de consumidores particulares no lo necesitan, ya que no somos su encargado del tratamiento."
                     },
                     "contact": {
-                        "title": "Contacto / Delegado de Protección de Datos",
-                        "body": "Solicitudes relacionadas con la privacidad: support@rumtelo.com. También puede presentar una reclamación ante la Autoriteit Persoonsgegevens de los Países Bajos."
+                        "title": "Contacto",
+                        "body": "Preguntas sobre privacidad y tratamiento de datos: support@rumtelo.com. Datos de identificación de la empresa: Página de información de la empresa."
+                    }
+                }
+            },
+            "company": {
+                "title": "Información sobre la empresa",
+                "updated": "22 de septiembre de 2026",
+                "intro": "En esta página se identifica quién gestiona Rumtelo, tal y como se exige para un servicio de la sociedad de la información establecido en los Países Bajos (incluido el artículo 15d del Libro 3 del Código Civil neerlandés y las normas de contacto de la Ley de Servicios Digitales de la UE). Se trata de nuestro aviso legal.",
+                "sections": {
+                    "identity": {
+                        "title": "Operador",
+                        "items": [
+                            "Nombre comercial: Rumtelo",
+                            "Lugar de establecimiento: Ámsterdam, Países Bajos",
+                            "Denominación social, número de la Cámara de Comercio (KvK), número de IVA y dirección de contacto: se publicarán aquí cuando estén disponibles para la entidad operadora, y siempre estarán disponibles previa solicitud en support@rumtelo.com.",
+                            "Actividad: visión general del presupuesto familiar y asesoramiento educativo (dinero, crecimiento, energía, espíritu). No es un banco, una entidad de pago ni un asesor financiero autorizado."
+                        ]
+                    },
+                    "contact": {
+                        "title": "Puntos de contacto",
+                        "items": [
+                            "Producto, cuentas, facturación y privacidad: support@rumtelo.com",
+                            "Prensa y colaboraciones: info@rumtelo.com",
+                            "Punto único de contacto de la Ley de Servicios Digitales (usuarios y autoridades): support@rumtelo.com, idiomas: inglés o neerlandés, hora de Ámsterdam.",
+                            "Página de contacto: rumtelo.com/support/contact"
+                        ]
+                    },
+                    "hosting": {
+                        "title": "Alojamiento y datos",
+                        "body": "El servicio está alojado en la Unión Europea (región de Ámsterdam) en Railway. Las prácticas relativas a los datos personales se describen en la Política de privacidad, la Política de cookies y la página de tratamiento de datos."
+                    },
+                    "authorities": {
+                        "title": "Autoridades",
+                        "items": [
+                            "Protección de datos (Países Bajos): Autoriteit Persoonsgegevens — https://www.autoriteitpersoonsgegevens.nl",
+                            "Supervisión del consumo y del mercado (Países Bajos): Autoriteit Consument & Markt (ACM)",
+                            "Los usuarios del EEE también pueden ponerse en contacto con su autoridad local de protección de datos o utilizar la plataforma de resolución de litigios en línea de la UE para los litigios en materia de consumo."
+                        ]
+                    },
+                    "regulated": {
+                        "title": "Lo que no somos",
+                        "body": "Rumtelo no cuenta con la autorización del De Nederlandsche Bank ni de la AFM como banco, empresa de inversión o asesor. El servicio de coaching tiene carácter formativo. La sincronización bancaria opcional, cuando se ofrezca, se prestará a través de un tercero que cuente con su propia licencia PSD2. No gestionamos tu dinero."
                     }
                 }
             }
@@ -4306,6 +4576,117 @@
                 "upgrade_cta": "Actualizar a {plan}",
                 "back_to_dashboard": "Volver al panel de control",
                 "back_to_website": "Volver a la página web"
+            }
+        },
+        "support": {
+            "common": {
+                "eyebrow": "Asistencia",
+                "back_home": "Volver a Rumtelo",
+                "start_free": "Empieza gratis",
+                "sign_in": "Iniciar sesión"
+            },
+            "hub": {
+                "title": "Asistencia",
+                "description": "Documentos legales y cómo ponerse en contacto con nosotros. Rumtelo opera desde Ámsterdam; respondemos por correo electrónico.",
+                "cards": {
+                    "legal": {
+                        "title": "Aviso legal",
+                        "body": "Política de privacidad, condiciones de uso, cookies y cómo tratamos tus datos.",
+                        "cta": "Ver documentos"
+                    },
+                    "contact": {
+                        "title": "Contacto",
+                        "body": "Ayuda con la cuenta, solicitudes relacionadas con la privacidad o prensa.",
+                        "cta": "Ponte en contacto con nosotros"
+                    }
+                }
+            },
+            "legal": {
+                "title": "Aviso legal",
+                "description": "Políticas de uso de Rumtelo. Redactadas con el fin de ofrecer una visión general para los hogares —no constituyen asesoramiento bancario ni de inversión— y ajustadas al RGPD, a la normativa de la UE en materia de consumo y a los avisos de privacidad de los estados de EE. UU.",
+                "read_document": "Leer el documento",
+                "footer_kicker": "¿Necesitas algo más?",
+                "footer_contact": "Contáctanos",
+                "documents": {
+                    "privacy": {
+                        "title": "Política de privacidad",
+                        "short": "Qué datos recopilamos, por qué, el RGPD y los derechos de privacidad en EE. UU."
+                    },
+                    "terms": {
+                        "title": "Condiciones de uso",
+                        "short": "Cuentas, facturación, plazo de desistimiento, responsabilidad y legislación aplicable."
+                    },
+                    "cookies": {
+                        "title": "Política de cookies",
+                        "short": "Cookies necesarias, almacenamiento y cómo puedes gestionarlas."
+                    },
+                    "data_processing": {
+                        "title": "Tratamiento de datos",
+                        "short": "Funciones, fundamentos jurídicos, encargados del tratamiento designados y transferencias a la UE."
+                    },
+                    "company": {
+                        "title": "Información sobre la empresa",
+                        "short": "Quién gestiona Rumtelo, los puntos de contacto y las autoridades."
+                    }
+                }
+            },
+            "contact": {
+                "title": "Contacto",
+                "description": "Somos un pequeño equipo con sede en Ámsterdam. El correo electrónico es la forma más rápida de ponerse en contacto con nosotros; incluye la dirección de correo electrónico de tu cuenta cuando nos escribas sobre el producto.",
+                "expect_kicker": "Qué puedes esperar",
+                "expect": {
+                    "response": {
+                        "title": "Respuesta por correo electrónico",
+                        "body": "Leemos todos los mensajes y respondemos tan pronto como podemos, normalmente en unos días laborables."
+                    },
+                    "privacy": {
+                        "title": "Solicitudes relacionadas con la privacidad",
+                        "body": "Acceso, corrección, exportación o eliminación: envía un correo electrónico al servicio de asistencia utilizando la dirección que figura en tu cuenta."
+                    },
+                    "legal": {
+                        "title": "Lo primero son las políticas",
+                        "body": "Encontrarás muchas respuestas en las secciones de «Privacidad» y «Condiciones de uso». Consúltalas antes de escribir."
+                    }
+                },
+                "form_kicker": "Enviar un mensaje",
+                "form": {
+                    "name": "Nombre",
+                    "name_placeholder": "Tu nombre",
+                    "email": "Correo electrónico",
+                    "email_placeholder": "you@example.com",
+                    "topic": "Tema",
+                    "message": "Mensaje",
+                    "message_placeholder": "¿En qué podemos ayudarte?",
+                    "submit": "Enviar mensaje",
+                    "submitting": "Enviando…",
+                    "success_title": "Mensaje enviado",
+                    "success_body": "Gracias; hemos recibido tu mensaje y te responderemos a la dirección de correo electrónico que nos has facilitado.",
+                    "send_another": "Enviar otro mensaje",
+                    "topics": {
+                        "support": "Asistencia técnica para productos",
+                        "press": "Prensa y colaboraciones",
+                        "privacy": "Solicitud de protección de datos",
+                        "other": "Otros"
+                    }
+                },
+                "channels_kicker": "Canales",
+                "channels": {
+                    "support": {
+                        "title": "Asistencia técnica para productos",
+                        "body": "Preguntas sobre la cuenta, el hogar, la facturación o los productos.",
+                        "email": "support@rumtelo.com",
+                        "cta": "Asistencia por correo electrónico"
+                    },
+                    "press": {
+                        "title": "Prensa y colaboraciones",
+                        "body": "Medios de comunicación, colaboraciones y consultas generales sobre la empresa.",
+                        "email": "info@rumtelo.com",
+                        "cta": "Correo a info"
+                    }
+                },
+                "legal_kicker": "Documentos jurídicos",
+                "legal_cta": "Consultar la información legal",
+                "location": "Ámsterdam, Países Bajos"
             }
         },
         "why": {

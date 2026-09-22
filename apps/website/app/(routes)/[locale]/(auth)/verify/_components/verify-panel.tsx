@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 
-import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
 import { Button, Typography } from '@rumtelo/ui';
@@ -19,7 +18,8 @@ const RESEND_COOLDOWN_SEC = 60;
 
 /**
  * Post-sign-up gate. Email is locked from draft / `?email=` — never an editable field.
- * Cold visits without a known address go back to sign-in / sign-up.
+ * Awaiting verify: one job (resend). Confirmed: continue into the app.
+ * Cold visits without a known address go back to sign-in.
  */
 export function VerifyPanel() {
     const t = useTranslations();
@@ -87,10 +87,6 @@ export function VerifyPanel() {
           ? t('features.auth.verify.subtitle', { email: lockedEmail })
           : t('features.auth.verify.subtitle_no_target');
 
-    const signUpHref = `/sign-up${
-        Object.keys(continueQuery).length ? `?${new URLSearchParams(continueQuery).toString()}` : ''
-    }`;
-
     return (
         <div className="grid gap-6">
             <div>
@@ -128,47 +124,24 @@ export function VerifyPanel() {
                         </p>
                     ) : null}
 
-                    <div className="flex flex-col gap-3 sm:flex-row">
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            disabled={busy || cooldown > 0}
-                            className="sm:flex-1"
-                            onClick={() => void onResend()}>
-                            {cooldown > 0
-                                ? t('features.auth.verify.resend_in', { seconds: cooldown })
-                                : busy
-                                  ? t('ui.form.working')
-                                  : t('features.auth.verify.resend')}
-                        </Button>
-                        <Button
-                            as="a"
-                            href={appSignInAfterAuthUrl(continueQuery)}
-                            variant="secondary"
-                            className="sm:flex-1">
-                            {t('features.auth.verify.continue')}
-                        </Button>
-                    </div>
-                </div>
-            ) : (
-                <div className="grid gap-4">
-                    <Button as="a" href={appSignInUrl(continueQuery)} className="w-full">
-                        {t('features.auth.verify.continue')}
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        disabled={busy || cooldown > 0}
+                        className="w-full"
+                        onClick={() => void onResend()}>
+                        {cooldown > 0
+                            ? t('features.auth.verify.resend_in', { seconds: cooldown })
+                            : busy
+                              ? t('ui.form.working')
+                              : t('features.auth.verify.resend')}
                     </Button>
                 </div>
-            )}
-
-            <Typography as="p" size="sm" color="muted" className="text-center">
-                <Link href={signUpHref} className="font-semibold text-accent hover:underline">
-                    {t('features.auth.verify.back_to_sign_up')}
-                </Link>
-                {' · '}
-                <a
-                    href={appSignInUrl(continueQuery)}
-                    className="font-semibold text-accent hover:underline">
+            ) : (
+                <Button as="a" href={appSignInUrl(continueQuery)} className="w-full">
                     {t('features.auth.verify.back_to_sign_in')}
-                </a>
-            </Typography>
+                </Button>
+            )}
         </div>
     );
 }

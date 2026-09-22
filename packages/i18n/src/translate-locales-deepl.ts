@@ -48,7 +48,13 @@ function walkStrings(node: Json, path: string[], visit: (path: string[], value: 
         visit(path, node);
         return;
     }
-    if (!node || typeof node !== 'object' || Array.isArray(node)) return;
+    if (Array.isArray(node)) {
+        for (const [index, value] of node.entries()) {
+            walkStrings(value, [...path, String(index)], visit);
+        }
+        return;
+    }
+    if (!node || typeof node !== 'object') return;
     for (const [key, value] of Object.entries(node)) {
         walkStrings(value, [...path, key], visit);
     }
@@ -57,23 +63,40 @@ function walkStrings(node: Json, path: string[], visit: (path: string[], value: 
 function getAt(root: Json, path: string[]): Json | undefined {
     let current: Json | undefined = root;
     for (const key of path) {
-        if (!current || typeof current !== 'object' || Array.isArray(current)) return undefined;
+        if (Array.isArray(current)) {
+            current = current[Number(key)];
+            continue;
+        }
+        if (!current || typeof current !== 'object') return undefined;
         current = current[key];
     }
     return current;
 }
 
 function setAt(root: Record<string, Json>, path: string[], value: string) {
-    let current: Record<string, Json> = root;
+    let current: Json = root;
     for (let i = 0; i < path.length - 1; i++) {
         const key = path[i]!;
-        const next = current[key];
-        if (!next || typeof next !== 'object' || Array.isArray(next)) {
-            current[key] = {};
+        if (Array.isArray(current)) {
+            current = current[Number(key)] as Json;
+            continue;
         }
-        current = current[key] as Record<string, Json>;
+        if (!current || typeof current !== 'object') return;
+        const record = current as Record<string, Json>;
+        const next = record[key];
+        if (!next || typeof next !== 'object') {
+            record[key] = {};
+        }
+        current = record[key] as Json;
     }
-    current[path[path.length - 1]!] = value;
+    const last = path[path.length - 1]!;
+    if (Array.isArray(current)) {
+        current[Number(last)] = value;
+        return;
+    }
+    if (current && typeof current === 'object') {
+        current[last] = value;
+    }
 }
 
 function protectPlaceholders(text: string): { masked: string; keys: string[] } {

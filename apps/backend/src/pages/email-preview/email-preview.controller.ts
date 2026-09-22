@@ -15,6 +15,7 @@ const TEMPLATES = [
     EmailTemplate.HOUSEHOLD_INVITE,
     EmailTemplate.ACCOUNT_VERIFICATION,
     EmailTemplate.PASSWORD_RESET,
+    EmailTemplate.CONTACT_FORM,
 ] as const;
 type TemplateId = (typeof TEMPLATES)[number];
 
@@ -22,6 +23,7 @@ const TEMPLATE_LABELS: Record<TemplateId, string> = {
     [EmailTemplate.HOUSEHOLD_INVITE]: 'Household invite',
     [EmailTemplate.ACCOUNT_VERIFICATION]: 'Account verification',
     [EmailTemplate.PASSWORD_RESET]: 'Password reset',
+    [EmailTemplate.CONTACT_FORM]: 'Contact form',
 };
 
 /**
@@ -111,6 +113,18 @@ export class EmailPreviewController {
                         firstName: 'Anna',
                         resetUrl: 'https://rumtelo.local/reset-password?token=demo',
                         expiresInHours: 1,
+                    },
+                    'en'
+                );
+            case EmailTemplate.CONTACT_FORM:
+                return renderTemplate(
+                    EmailTemplate.CONTACT_FORM,
+                    {
+                        name: 'Anna de Vries',
+                        email: 'anna@example.com',
+                        topic: 'Product support',
+                        message:
+                            'I have a question about my household jars and how Coach tips work.',
                     },
                     'en'
                 );

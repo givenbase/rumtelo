@@ -68,6 +68,7 @@
                     "invitation_create_failed": "Uitnodiging kon niet worden aangemaakt",
                     "jar_split_total": "De potverdeling moet samen 100% zijn; ontvangen: {total}%",
                     "book_catalog_unavailable": "De boekencatalogus gaf geen antwoord.",
+                    "contact_send_failed": "Je bericht kon niet worden verzonden. Probeer het nog eens of stuur ons rechtstreeks een e-mail.",
                     "not_authenticated": "Niet aangemeld",
                     "no_household_selected": "Er is geen huishouden geselecteerd",
                     "not_household_member": "Geen lid van dit huishouden",
@@ -236,6 +237,7 @@
                 "amount_required": "Het bedrag moet worden ingevuld",
                 "valid_amount": "Voer een geldig bedrag in",
                 "name_required": "Naam is verplicht",
+                "message_min": "Het bericht moet minimaal {count} tekens bevatten",
                 "choose_jar": "Kies een pot",
                 "choose_from_jar": "Kies een pot om uit te nemen",
                 "choose_to_jar": "Kies een pot om naar te sturen",
@@ -3273,8 +3275,10 @@
                     "questions": "Vragen",
                     "privacy": "Privacybeleid",
                     "terms": "Gebruiksvoorwaarden",
+                    "cookies": "Cookiebeleid",
                     "data_processing": "Gegevensverwerking",
-                    "support": "support@rumtelo.com",
+                    "legal_hub": "Alle juridische documenten",
+                    "support": "Neem contact op",
                     "press": "Pers & samenwerkingsverbanden"
                 },
                 "copyright": "© {year} Rumtelo",
@@ -3397,7 +3401,9 @@
                 "terms_link": "Voorwaarden",
                 "terms_mid": " en ",
                 "privacy_link": "Privacybeleid",
-                "terms_after": ". Rumtelo leest uitsluitend bankgegevens — en alleen nadat ik de koppeling zelf heb ingesteld.",
+                "terms_after_before": ". Ik heb de ",
+                "cookies_link": "Cookiebeleid",
+                "terms_after": ". Rumtelo leest uitsluitend bankgegevens — en alleen nadat ik de koppeling zelf heb gemaakt.",
                 "field_first_name": "Voornaam",
                 "field_last_name": "Achternaam",
                 "field_email": "E-mail",
@@ -3421,143 +3427,407 @@
                 "eyebrow": "Juridisch",
                 "last_updated": "Laatst bijgewerkt · {date}",
                 "questions": "Vragen?",
+                "contact_link": "Neem contact met ons op",
+                "legal_hub_link": "Alle juridische",
                 "back_home": "Terug naar Rumtelo",
                 "start_free": "Gratis beginnen",
                 "sign_in": "Inloggen"
             },
             "terms": {
                 "title": "Gebruiksvoorwaarden",
-                "updated": "10 september 2026",
-                "intro": "Door een account aan te maken of Rumtelo te gebruiken, ga je akkoord met deze voorwaarden. Als je hier niet mee akkoord gaat, maak dan geen gebruik van de dienst.",
+                "updated": "22 september 2026",
+                "intro": "Deze gebruiksvoorwaarden (“Voorwaarden”) vormen een bindende overeenkomst tussen u en de exploitant van Rumtelo (“Rumtelo”, “wij”, “ons”). Door een account aan te maken, op ‘Accepteren’ te klikken of gebruik te maken van rumtelo.com, de Rumtelo-app of aanverwante diensten (de ‘Dienst’), gaat u akkoord met deze Voorwaarden en met ons Privacybeleid en Cookiebeleid. Als u hiermee niet akkoord gaat, mag u geen gebruik maken van de Dienst.",
                 "sections": {
+                    "operator": {
+                        "title": "Met wie sluit je een overeenkomst af?",
+                        "body": "Rumtelo wordt beheerd vanuit Amsterdam, Nederland. De bedrijfsgegevens (officiële naam, KvK-nummer, btw-nummer en adres, indien gepubliceerd) staan vermeld op onze pagina met bedrijfsinformatie. Contact: support@rumtelo.com."
+                    },
                     "what": {
-                        "title": "Wat Rumtelo is",
-                        "body": "Rumtelo is een persoonlijk overzicht en een coach op het gebied van geld, groei, energie en zielsontwikkeling. Het biedt voorlichting en hulpmiddelen — het is geen bank, makelaar of erkend financieel adviseur. De suggesties zijn geen persoonlijk beleggingsadvies."
+                        "title": "Wat Rumtelo wel is — en wat het niet is",
+                        "body": "Rumtelo is een persoonlijke overzicht- en ontwikkelingscoach op het gebied van geld, groei, energie en zielsontwikkeling. Het helpt een huishouden inzicht te krijgen in waar het geld naartoe gaat, doelen te stellen en de week te evalueren. Het is software en een educatief hulpmiddel — geen gereguleerd financieel product.",
+                        "items": [
+                            "Wij zijn geen bank, betalingsinstelling, uitgever van elektronisch geld of bewaarder. Wij bewaren uw geld nooit en maken het ook nooit over tussen rekeningen.",
+                            "Geen makelaar, beleggingsonderneming of erkend financieel adviseur. De tips en suggesties van de coach zijn bedoeld als algemene voorlichting en vormen geen persoonlijk advies op het gebied van beleggingen, belastingen, krediet of juridische zaken.",
+                            "Geen medisch, psychologisch of wellness-behandelaar. De functies op het gebied van energie en de ziel zijn optionele hulpmiddelen om zelf je voortgang bij te houden, en geen diagnose of behandeling.",
+                            "De boeken en methoden die we noemen, blijven eigendom van de betreffende auteurs. Rumtelo is onafhankelijk en is niet aan hen verbonden, noch wordt het door hen aanbevolen."
+                        ],
+                        "after": "Je blijft zelf volledig verantwoordelijk voor beslissingen over geld, gezondheid en je leven. Als je gereglementeerd advies nodig hebt, raadpleeg dan een bevoegde deskundige in jouw land."
+                    },
+                    "eligibility": {
+                        "title": "Toelatingsvoorwaarden en leeftijd",
+                        "body": "De Dienst is bedoeld voor natuurlijke personen die ten minste 18 jaar oud zijn en in staat zijn een bindende overeenkomst aan te gaan. U mag Rumtelo niet gebruiken als u jonger bent dan 18 jaar of als de toepasselijke wetgeving u het gebruik ervan verbiedt (met inbegrip van sanctielijsten van de EU of de VS). Door u te registreren bevestigt u dat aan deze voorwaarden is voldaan."
                     },
                     "account": {
-                        "title": "Uw account",
+                        "title": "Uw rekening en huishouden",
                         "items": [
-                            "U moet correcte registratiegegevens opgeven en uw inloggegevens veilig bewaren.",
-                            "U bent verantwoordelijk voor alle activiteiten die onder uw account plaatsvinden.",
-                            "De gezinsleden die je uitnodigt, krijgen gezamenlijke toegang tot de gegevens van dat gezin."
+                            "Geef juiste registratiegegevens op (waaronder naam en e-mailadres) en houd deze up-to-date. Als je je geboortedatum opgeeft, moet deze kloppen.",
+                            "Houd uw inloggegevens en codes voor tweefactorauthenticatie vertrouwelijk. U bent verantwoordelijk voor alle activiteiten die via uw account plaatsvinden, tenzij u ons onmiddellijk op de hoogte hebt gesteld van ongeoorloofde toegang.",
+                            "Een huishouden is een gedeelde werkruimte. Mensen die je uitnodigt, kunnen de potjes, transacties, doelen en bijbehorende gegevens van dat huishouden zien. Nodig alleen mensen uit die je vertrouwt, en doe dat alleen als je toestemming hebt om die gegevens met hen te delen.",
+                            "Als u bent uitgenodigd, mag u de gegevens van het huishouden uitsluitend gebruiken om zelf een overzicht van het huishouden te krijgen — u mag de gegevens van andere leden niet kopiëren, publiceren of misbruiken.",
+                            "We kunnen een account weigeren, opschorten of sluiten als dit onjuist of misbruikmakend is, of een veiligheids- of juridisch risico vormt."
                         ]
                     },
                     "use": {
                         "title": "Toegestaan gebruik",
-                        "body": "Gebruik Rumtelo op rechtmatige wijze. Probeer niet de beveiliging te omzeilen, gegevens van de dienst te scrapen, andere gebruikers te misbruiken of het product te reverse-engineeren voor zover dit wettelijk niet is toegestaan."
+                        "body": "Gebruik de Dienst uitsluitend voor wettige, persoonlijke of huishoudelijke doeleinden. Het is u niet toegestaan om:",
+                        "items": [
+                            "De wet overtreden, inbreuk maken op de rechten van anderen of onwettige, schadelijke of misleidende inhoud uploaden.",
+                            "De beveiliging onderzoeken, scannen of aanvallen; toegangscontroles omzeilen; of de Dienst overbelasten.",
+                            "De Dienst schrapen, verzamelen of in bulk exporteren buiten het kader van wat wij u aanbieden (bijvoorbeeld uw eigen export), of het product reverse-engineeren, tenzij dit op grond van dwingend recht is toegestaan.",
+                            "Gebruik de Dienst niet om een concurrerend product aan te bieden, om een openbaar model te trainen op basis van onze software of de output van Coach, of om spam te versturen.",
+                            "Rumtelo ten onrechte voorstellen als een bank, adviseur of medische dienst, of het gebruiken om geautomatiseerde beslissingen te nemen over anderen (krediet, aanwerving, verzekering).",
+                            "Deel een account op een manier waarmee je de limieten van het abonnement omzeilt, met uitzondering van echte gezinsleden die je uitnodigt."
+                        ]
                     },
-                    "billing": {
-                        "title": "Abonnementen en facturering",
-                        "body": "Het Basic-abonnement is mogelijk gratis. Betaalde abonnementen (Plus, Max) worden automatisch verlengd totdat ze worden opgezegd. De prijzen zijn inclusief de geldende btw, waar aangegeven. Je kunt op elk moment opzeggen; de inhoud die je hebt ingevoerd blijft leesbaar, tenzij je het account verwijdert."
+                    "content": {
+                        "title": "Uw gegevens en onze licentie om de Dienst te exploiteren",
+                        "body": "U behoudt het eigendom van de huishoud- en accountgegevens die u invoert of importeert (“Uw inhoud”). U verleent Rumtelo een beperkte, wereldwijde, niet-exclusieve licentie om Uw inhoud te hosten, op te slaan, te verwerken, weer te geven en back-ups van te maken, uitsluitend om de Dienst te leveren, te beveiligen en te verbeteren, en om aan de wet te voldoen. Die licentie eindigt wanneer Uw inhoud uit onze actieve systemen wordt verwijderd en de resterende back-ups vervallen, tenzij we een kopie moeten bewaren (bijvoorbeeld facturen).",
+                        "after": "U verklaart dat u het recht hebt om Uw Inhoud in te dienen — met inbegrip van de bankafschriften die u importeert en gegevens over leden van uw huishouden — en dat deze geen inbreuk maakt op de wet of deze Voorwaarden."
                     },
                     "ip": {
-                        "title": "Intellectuele eigendom",
-                        "body": "De software, het merk en het ontwerp van Rumtelo zijn ons eigendom. Uw huishoudgegevens zijn uw eigendom. Boeken en methoden waarnaar we verwijzen, blijven eigendom van hun auteurs — Rumtelo is onafhankelijk en is niet aan hen gelieerd en wordt door hen niet onderschreven."
+                        "title": "Onze intellectuele eigendom",
+                        "body": "De Dienst, met inbegrip van software, ontwerp, merk, Coach-teksten, catalogi en documentatie, is eigendom van Rumtelo of onze licentiegevers. Wij verlenen u een persoonlijk, niet-overdraagbaar en niet-exclusief recht om de Dienst te gebruiken gedurende de looptijd van uw abonnement of gratis toegang, uitsluitend op de wijze waarop wij deze beschikbaar stellen. U mag de Dienst niet kopiëren, doorverkopen of er afgeleide producten van maken, tenzij dit op grond van dwingend recht is toegestaan."
+                    },
+                    "billing": {
+                        "title": "Plannen, prijzen en btw",
+                        "body": "Het Basic-abonnement wordt mogelijk gratis aangeboden. Betaalde abonnementen (zoals Plus en Max) zijn abonnementen die vooraf worden gefactureerd, maandelijks of jaarlijks, totdat ze worden opgezegd. De prijzen worden weergegeven voordat je betaalt. Indien btw of een soortgelijke belasting van toepassing is, is deze inbegrepen of wordt deze weergegeven zoals vereist in jouw land. We brengen de kosten in rekening via onze betalingsprovider (Stripe). Wij slaan geen volledige kaartnummers op.",
+                        "after": "Een gratis abonnement biedt geen garantie dat alle huidige functies gratis blijven. Als we kosten gaan aanrekenen voor iets dat je nu al gebruikt, zullen we je daar van tevoren over informeren en kun je je abonnement opzeggen."
+                    },
+                    "withdrawal": {
+                        "title": "Bedenktijd (consumenten in de EER/het VK) en annulering",
+                        "body": "Als u een consument bent in de EER of het Verenigd Koninkrijk, hebt u op grond van de Richtlijn inzake consumentenrechten (en de Britse tegenhanger daarvan) doorgaans 14 dagen vanaf de dag waarop de betaalde overeenkomst is gesloten om de overeenkomst zonder opgave van redenen te herroepen.",
+                        "items": [
+                            "Om je terug te trekken, stuur je binnen 14 dagen een e-mail naar support@rumtelo.com vanaf het e-mailadres dat bij je account hoort, of maak je gebruik van een van de door ons aangeboden opties voor terugtrekking of annulering. Wij zullen de voor het opgezegde contract betaalde kosten via dezelfde betaalmethode terugbetalen, zonder onnodige vertraging en binnen 14 dagen na ontvangst van de kennisgeving.",
+                            "De dienst is digitaal en gaat in zodra uw account is aangemaakt. Als u ons vraagt om onmiddellijk te beginnen en ermee instemt dat u het herroepingsrecht verliest zodra de dienst volledig is uitgevoerd, staat de EU-/VK-wetgeving dit verlies toe. Bij een doorlopend abonnement dat nog maar gedeeltelijk is gelopen, kunnen wij een bedrag inhouden dat evenredig is aan de reeds geleverde periode.",
+                            "Na de bedenktijd kun je een betaald abonnement op elk moment opzeggen. De opzegging gaat in aan het einde van de lopende factureringsperiode, tenzij we bij het afrekenen anders aangeven. Je behoudt leesrechten voor de inhoud die je hebt ingevoerd, tenzij je het account verwijdert.",
+                            "Terugboekingen die te kwader trouw worden geïnitieerd nadat u de Dienst hebt gebruikt, kunnen leiden tot opschorting. Neem eerst contact met ons op — wij lossen factureringsfouten op."
+                        ]
                     },
                     "availability": {
-                        "title": "Beschikbaarheid",
-                        "body": "We streven naar een betrouwbare dienstverlening, maar kunnen geen ononderbroken toegang garanderen. Functies die zijn gemarkeerd met ‘binnenkort beschikbaar’ (bijv. live banksynchronisatie, apparaten) kunnen later worden gelanceerd of worden gewijzigd."
+                        "title": "Beschikbaarheid, bètaversie en wijzigingen",
+                        "body": "We streven naar een betrouwbare Dienst, maar garanderen geen ononderbroken, foutloze of volledige toegang. Onderhoud, storingen of overmacht (waaronder storingen bij hosting-, betalings- of e-mailproviders) kunnen de Dienst onderbreken. Functies die zijn gemarkeerd als „binnenkort beschikbaar“, „preview“ of „bèta“ — waaronder live banksynchronisatie en apparaten — kunnen veranderen, later worden uitgebracht of helemaal niet worden uitgebracht. We kunnen functies wijzigen, beperken of stopzetten. Als een wijziging de omvang van een betaald abonnement dat u al hebt aangeschaft wezenlijk vermindert, zullen we u hiervan tijdig op de hoogte stellen en kunt u het abonnement opzeggen."
+                    },
+                    "third_parties": {
+                        "title": "Diensten van derden",
+                        "body": "Betalingen, e-mailverzending, hosting en optionele bankkoppelingen worden door derde partijen aangeboden op basis van hun eigen voorwaarden. Wij zijn niet verantwoordelijk voor de onafhankelijke handelingen van deze aanbieders, tenzij de wet ons hiervoor aansprakelijk stelt. Optionele banktoegang, indien beschikbaar, is alleen-lezen via een PSD2-gecertificeerde aanbieder van rekeninginformatie, nadat u zelf de koppeling hebt ingesteld."
+                    },
+                    "disclaimers": {
+                        "title": "Aansprakelijkheidsverklaringen",
+                        "body": "Voor zover toegestaan door de Nederlandse en EU-wetgeving, wordt de Dienst aangeboden „zoals hij is“ en „zoals hij beschikbaar is“. Wij garanderen niet dat de suggesties, saldi, geïmporteerde gegevens of scores van Coach volledig, actueel of geschikt zijn voor een bepaalde financiële of gezondheidsbeslissing. Niets in deze Voorwaarden beperkt een garantie of conformiteitsrecht dat voor consumenten niet mag worden beperkt — met inbegrip van de wettelijke conformiteit van digitale inhoud en diensten krachtens de EU-wetgeving."
                     },
                     "liability": {
                         "title": "Aansprakelijkheid",
-                        "body": "Voor zover toegestaan door de Nederlandse en EU-wetgeving, wordt Rumtelo aangeboden „in de huidige staat“. Wij zijn niet aansprakelijk voor beslissingen die u op basis van het product neemt met betrekking tot uw geld. Niets in deze voorwaarden beperkt de aansprakelijkheid die wettelijk niet kan worden beperkt."
+                        "body": "Wij sluiten geen aansprakelijkheid uit en beperken deze evenmin voor zover de wet ons dit niet toestaat: opzet, grove nalatigheid, overlijden of lichamelijk letsel veroorzaakt door onze nalatigheid, fraude, productaansprakelijkheid of dwingende consumentenrechten.",
+                        "items": [
+                            "Wij zijn niet aansprakelijk voor beslissingen op het gebied van beleggingen, uitgaven, belastingen of gezondheid die u neemt via de Dienst, noch voor verliezen die worden veroorzaakt door gegevens die u onjuist hebt ingevoerd, door leden die u hebt uitgenodigd, of door een externe bank of betalingsprovider.",
+                            "Wij zijn niet aansprakelijk voor indirecte schade of gevolgschade (gederfde winst, verlies van gegevens nadat u de export hebt geweigerd, bedrijfsonderbreking), tenzij dwingende wettelijke bepalingen anders voorschrijven.",
+                            "Voor zover aansprakelijkheid wettelijk mag worden beperkt, is onze totale aansprakelijkheid voor alle vorderingen die voortvloeien uit de Dienst beperkt tot de vergoedingen die u ons in de 12 maanden voorafgaand aan de vordering hebt betaald (of € 100 indien u niets hebt betaald), met uitzondering van de hierboven genoemde niet-uitsluitbare grondslagen.",
+                            "Als u de Dienst als consument in de EER of het Verenigd Koninkrijk gebruikt, gelden deze beperkingen alleen voor zover ze redelijk en toegestaan zijn. Onredelijke voorwaarden zijn niet bindend voor u."
+                        ]
+                    },
+                    "indemnity": {
+                        "title": "Uw aansprakelijkheid bij misbruik",
+                        "body": "U zult Rumtelo schadeloosstellen voor verliezen, redelijke juridische kosten en vorderingen die voortvloeien uit Uw Inhoud, uw schending van deze Voorwaarden of uw onrechtmatig gebruik van de Dienst — behalve voor zover wij het verlies hebben veroorzaakt, en behalve wanneer dit een oneerlijke voorwaarde voor een consument zou zijn."
+                    },
+                    "suspend": {
+                        "title": "Opschorting en beëindiging",
+                        "body": "U kunt op elk moment stoppen met het gebruik van de Dienst en uw account verwijderen. Wij kunnen de toegang opschorten of beëindigen indien u deze Voorwaarden op wezenlijke wijze schendt, indien wij hiertoe wettelijk verplicht zijn, of indien wij de Dienst stopzetten. Bij beëindiging zullen wij uw inhoud behandelen zoals beschreven in het privacybeleid (exporteren op verzoek indien haalbaar; verwijdering uit actieve systemen; beperkte back-up en wettelijk vereiste bewaring). Openstaande kosten blijven verschuldigd, tenzij u zich op geldige gronden terugtrekt of wij in gebreke zijn gebleven."
+                    },
+                    "changes": {
+                        "title": "Wijzigingen in deze voorwaarden",
+                        "body": "We kunnen deze Voorwaarden bijwerken. De nieuwe versie is van kracht vanaf de datum vermeld bij ‘Laatst bijgewerkt’, of later indien wij dat aangeven. Bij een wezenlijke wijziging die gevolgen heeft voor betalende gebruikers, zullen wij dit redelijkerwijs van tevoren aankondigen (bijvoorbeeld via e-mail of een melding in het product). Als u hiermee niet akkoord gaat, dient u het gebruik van de Dienst te staken en uw abonnement op te zeggen voordat de wijziging van kracht wordt. Als u de Dienst na die datum blijft gebruiken, betekent dit dat u de nieuwe Voorwaarden aanvaardt, tenzij dwingend recht een nieuwe overeenkomst vereist."
                     },
                     "law": {
-                        "title": "Toepasselijk recht",
-                        "body": "Op deze voorwaarden is Nederlands recht van toepassing. Geschillen vallen onder de bevoegdheid van de rechtbanken te Amsterdam, onverminderd de dwingende bepalingen inzake consumentenbescherming."
+                        "title": "Toepasselijk recht en geschillen",
+                        "body": "Op deze Voorwaarden is het Nederlandse recht van toepassing, zonder dat rekening wordt gehouden met collisieregels die een ander recht zouden voorschrijven — met dien verstande dat, indien u een consument bent, u tevens de dwingende beschermingsbepalingen van het land waar u woont behoudt.",
+                        "after": "De rechtbanken van Amsterdam zijn bevoegd, onverminderd uw recht als consument om een procedure aan te spannen in uw woonplaats, en onverminderd ons recht om voorlopige maatregelen te vorderen waar de wet dit toestaat. Consumenten uit de EER kunnen ook gebruikmaken van het EU-platform voor online geschillenbeslechting of een aangemelde ADR-instantie; wij zijn niet verplicht om een bepaalde ADR-instantie in te schakelen, tenzij de wet dit voorschrijft. Wij verlangen niet dat u afstand doet van uw rechten op collectieve vorderingen of juryrechtspraak wanneer een dergelijke afstand onwettig zou zijn (ook voor consumenten uit de EER en het Verenigd Koninkrijk)."
+                    },
+                    "us_terms": {
+                        "title": "Bezoekers in de Verenigde Staten",
+                        "body": "Als u de Dienst vanuit de Verenigde Staten gebruikt, doet u dat op eigen initiatief. De Dienst wordt aangeboden vanuit Nederland en is niet gericht op enige Amerikaanse staat als lokaal financieel product. De consumenten- en privacywetgeving van Amerikaanse staten kan u extra rechten verlenen; zie het Privacybeleid. Voor zover een Amerikaanse rechtbank deze Voorwaarden zou toepassen, gelden de bovenstaande uitsluitingen en aansprakelijkheidsbeperkingen voor zover maximaal toegestaan door de wetgeving van die staat, en worden niet-afdwingbare bepalingen buiten beschouwing gelaten."
+                    },
+                    "miscellaneous": {
+                        "title": "Algemeen",
+                        "items": [
+                            "Indien een bepaling ongeldig is, blijft de rest van kracht. Voor zover de wet dit toestaat, geldt een geldige bepaling die zo dicht mogelijk bij de ongeldige bepaling aansluit.",
+                            "Deze Voorwaarden, samen met het Privacybeleid, het Cookiebeleid en alle abonnementsdetails die bij het afrekenen worden weergegeven, vormen de volledige overeenkomst met betrekking tot de Dienst.",
+                            "U mag de overeenkomst niet overdragen zonder onze toestemming. Wij mogen de overeenkomst overdragen in het kader van een reorganisatie of verkoop van de Dienst, op voorwaarde dat uw consumentenrechten hierdoor niet worden aangetast.",
+                            "We communiceren in het Engels. Vertalingen zijn bedoeld als extra service. Indien een vertaling in strijd is met de Engelse tekst, prevaleert de Engelse tekst — tenzij de dwingende consumentenwetgeving van uw land anders voorschrijft.",
+                            "Het niet afdwingen van een bepaling houdt geen afstand van rechten in."
+                        ]
                     },
                     "contact": {
-                        "title": "Contact"
+                        "title": "Contact",
+                        "body": "Vragen over deze voorwaarden: support@rumtelo.com of via de contactpagina. Op deze pagina vind je een kopie van deze voorwaarden, zodat je deze kunt bewaren."
                     }
                 }
             },
             "privacy": {
                 "title": "Privacybeleid",
-                "updated": "10 september 2026",
-                "intro": "Rumtelo (“wij”, “ons”) is opgericht in Amsterdam en slaat gegevens op binnen de EU. In dit beleid wordt uitgelegd welke gegevens we verzamelen, waarom we dat doen en welke rechten u hebt op grond van de AVG.",
+                "updated": "22 september 2026",
+                "intro": "In dit privacybeleid wordt uitgelegd hoe Rumtelo (“wij”, “ons”) persoonsgegevens verzamelt, gebruikt, deelt en beschermt wanneer u rumtelo.com, de Rumtelo-app en aanverwante diensten gebruikt. Dit beleid is opgesteld in overeenstemming met de Algemene Verordening Gegevensbescherming (AVG) van de EU, aanvullende Nederlandse en e-privacyregels, de Britse AVG waar deze nog van toepassing is, en privacywetten van Amerikaanse staten (waaronder de Californische CCPA/CPRA). Wij hosten huishoudgegevens in de EU.",
                 "sections": {
                     "who": {
-                        "title": "Wie wij zijn",
-                        "body": "Rumtelo wordt beheerd vanuit Amsterdam, Nederland. Contact: support@rumtelo.com."
+                        "title": "Wie wij zijn (verwerkingsverantwoordelijke)",
+                        "body": "De verwerkingsverantwoordelijke is de exploitant van Rumtelo, gevestigd in Amsterdam, Nederland. Contactpersoon voor verzoeken inzake privacy: support@rumtelo.com. De officiële bedrijfsnaam, het KvK-nummer, het btw-nummer en het postadres worden, indien beschikbaar, vermeld op de pagina met bedrijfsinformatie en worden op verzoek verstrekt. Wij hebben geen functionaris voor gegevensbescherming aangesteld, omdat artikel 37 van de AVG dit bij onze huidige omvang niet vereist; het bovenstaande e-mailadres is uw aanspreekpunt voor privacyzaken."
+                    },
+                    "scope": {
+                        "title": "Wiens gegevens en welke diensten?",
+                        "body": "Dit beleid is van toepassing op bezoekers van de website, mensen die een account aanmaken en uitgenodigde gezinsleden. Het heeft betrekking op gegevens over accounts, geld, groei, energie en de ziel die u invoert of importeert, technische logbestanden en factureringsgegevens. Het is niet van toepassing op websites van derden waarnaar wij linken. Indien wij uitsluitend optreden als verwerker voor een toekomstige zakelijke klant, zal die relatie onder een afzonderlijke gegevensverwerkingsovereenkomst vallen — voor huishoudelijke accounts is Rumtelo de verwerkingsverantwoordelijke."
                     },
                     "collect": {
                         "title": "Welke gegevens we verzamelen",
+                        "body": "We verzamelen alleen die gegevens die we nodig hebben om een overzicht van het huishouden bij te houden en begeleiding te bieden. De categorieën zijn onder meer:",
                         "items": [
-                            "De accountgegevens die u verstrekt (naam, e-mailadres, wachtwoordhash).",
-                            "Gegevens over huishoudgeld die u invoert of importeert (spaarpotten, transacties, doelen, schulden en bijbehorende productgegevens).",
-                            "Optionele gegevens over energie- en zielsbeoefening die je zelf wilt bijhouden (slaap, training, intentie en dergelijke).",
-                            "Technische logbestanden die nodig zijn om de dienst veilig en operationeel te houden."
+                            "Identiteits- en contactgegevens: naam, e-mailadres, optionele geboortedatum, taal- en landinstellingen.",
+                            "Accountbeveiliging: wachtwoordhash (we slaan je wachtwoord nooit in leesbare tekst op), sessie-ID’s, de status van optionele tweefactorauthenticatie en de geheimen die we moeten bewaren om 2FA te kunnen gebruiken, de status van e-mailverificatie.",
+                            "Gegevens over uw huishoudgeld die u invoert of importeert: spaarpotten, transacties, doelen, schulden, inkomensverdeling, wekelijkse controles en bijbehorende productgegevens.",
+                            "Optionele gegevens over groei, energie en je innerlijke welzijn die je zelf kunt vastleggen (bijvoorbeeld doelen, slaap, training, voeding, rust, intenties). Je kunt Rumtelo gebruiken zonder deze velden in te vullen.",
+                            "Leden van het huishouden: wie je uitnodigt, hun e-mailadres en hun rol binnen het huishouden.",
+                            "Facturering: abonnement, verlengingsdata, Stripe-klant- en abonnements-ID’s. Creditcardnummers worden door Stripe verzameld, niet door ons.",
+                            "De ondersteuningsberichten die u ons stuurt, en de bijlagen die u meestuurt.",
+                            "Technische gegevens die nodig zijn om de Dienst veilig en operationeel te houden: IP-adres, user-agent, tijdstempels, het geschatte land op basis van het IP-adres, foutenlogboeken en cookie-identificatiegegevens zoals beschreven in het cookiebeleid.",
+                            "Optionele bankgegevens, uitsluitend als je afschriften importeert of later een live, alleen-lezen bankkoppeling instelt: rekeninggegevens en transacties die de aanbieder terugstuurt. Wij ontvangen je bankwachtwoord niet."
+                        ]
+                    },
+                    "special": {
+                        "title": "Gegevens van bijzondere categorieën en gevoelige gegevens",
+                        "body": "Energie-logboeken (slaap, training, voeding, rust) en aantekeningen over je gemoedstoestand of intenties kunnen informatie over je gezondheid of filosofische opvattingen onthullen. Op grond van de AVG kan het hier gaan om gegevens van bijzondere categorieën (artikel 9). We verwerken deze gegevens alleen als je ervoor kiest om deze functies te gebruiken. Door deze gegevens in te voeren, geeft u uitdrukkelijk toestemming aan ons om deze op te slaan en weer te geven aan u en aan de gezinsleden die u uitnodigt, en om deze te gebruiken voor het genereren van Coach-tips binnen het product. U kunt het bijhouden van gegevens stopzetten en ons vragen deze te verwijderen. Wij gebruiken deze gegevens niet voor reclame, het beoordelen van uw kredietwaardigheid of het afleiden van kenmerken ten behoeve van derden.",
+                        "after": "Amerikaanse „gevoelige persoonlijke gegevens” (waaronder gedetailleerde financiële rekeninggegevens en gezondheidsgerelateerde logbestanden) worden uitsluitend gebruikt om de door jou gevraagde functies te leveren. We verkopen deze gegevens niet en delen ze evenmin voor contextoverschrijdende gedragsgerichte reclame."
+                    },
+                    "sources": {
+                        "title": "Hoe we gegevens verzamelen",
+                        "items": [
+                            "Rechtstreeks van jou — registratie, productgebruik, import, ondersteuning.",
+                            "Automatisch — cookies en serverlogbestanden wanneer u de website of app gebruikt (zie het cookiebeleid).",
+                            "Van mensen die je uitnodigen voor een bijeenkomst bij hen thuis (naam en e-mailadres, zodat we de uitnodiging kunnen versturen).",
+                            "Van de diensten die je koppelt: Stripe voor de betalingsstatus; een PSD2/AIS-aanbieder als je realtime banksynchronisatie inschakelt; rapporten over de bezorging van e-mails voor transactionele berichten."
                         ]
                     },
                     "use": {
-                        "title": "Hoe we het gebruiken",
-                        "body": "Om je account te beheren, je overzicht en de tips van de coach weer te geven, het product te verbeteren en aan wettelijke verplichtingen te voldoen. Wij verkopen je persoonsgegevens niet."
+                        "title": "Doeleinden en rechtsgrondslagen (AVG)",
+                        "body": "Wij verkopen geen persoonsgegevens. Wij gebruiken deze voor de volgende doeleinden. Voor elk doel geldt een rechtsgrondslag op grond van de AVG (artikel 6; artikel 9 wanneer het om bijzondere categorieën gegevens gaat):",
+                        "items": [
+                            "Contract (art. 6, lid 1, onder b)) — het aanmaken en verifiëren van je account, het beheren van de huishoudelijke werkruimte, het weergeven van potjes, Coach-tips en portalen die je gebruikt, het aanbieden van exportmogelijkheden en het verzenden van transactionele e-mails (verificatie, wachtwoordherstel, beveiliging).",
+                            "Gerechtvaardigde belangen (art. 6, lid 1, onder f)) — de veiligheid van de Dienst waarborgen, misbruik en fraude voorkomen, storingen verhelpen, inzicht krijgen in het geaggregeerde productgebruik zonder advertentieprofielen aan te maken, en rechtsvorderingen instellen of verdedigen. U kunt hiertegen bezwaar maken; wij zullen hiermee stoppen, tenzij wij dwingende redenen hebben.",
+                            "Toestemming (art. 6, lid 1, onder a) en, indien van toepassing, art. 9, lid 2, onder a)) — optionele energie-/soul-logs; optionele bankkoppeling; eventuele toekomstige marketing-e-mails of niet-essentiële cookies. U kunt uw toestemming te allen tijde intrekken, zonder dat dit gevolgen heeft voor de verwerking vóór de intrekking.",
+                            "Wettelijke verplichting (art. 6, lid 1, onder c)) — administratie op het gebied van belastingen, boekhouding en consumentenrecht voor betaalde abonnementen; reageren op rechtmatige verzoeken van autoriteiten."
+                        ]
+                    },
+                    "automated": {
+                        "title": "Profilering en geautomatiseerde besluitvorming",
+                        "body": "De Coach kan suggesties genereren op basis van gegevens die je al hebt opgeslagen (bijvoorbeeld een potje dat de limiet overschrijdt). Dit is hulp binnen het product, geen beslissing die juridische of vergelijkbare ingrijpende gevolgen voor jou heeft (AVG, artikel 22). We maken geen uitsluitend gebruik van geautomatiseerde verwerking om krediet te verlenen, een prijs exclusief voor u vast te stellen of een account te weigeren zonder menselijke beoordeling wanneer de wet dit vereist. U kunt de tips van de Coach negeren; deze hebben nooit invloed op geldstromen."
+                    },
+                    "household": {
+                        "title": "Woningdelen",
+                        "body": "Rumtelo is opgezet rond een huishouden, niet rond een enkel geheim grootboek. Leden die je uitnodigt, krijgen toegang tot de gegevens van dat huishouden. Je moet een rechtmatige reden hebben om de gegevens van een andere volwassene met hen te delen (bijvoorbeeld omdat zij hiermee hebben ingestemd, of omdat jullie samen een gezamenlijk huishoudbudget beheren). Nodig geen minderjarigen uit. Als je niet langer wilt dat iemand het huishouden kan zien, verwijder die persoon dan; wij zullen vanaf dat moment zijn of haar toegang blokkeren."
                     },
                     "bank": {
-                        "title": "Bankgegevens",
-                        "body": "Bankkoppelingen zijn optioneel. Wanneer realtime banksynchronisatie beschikbaar is, is de toegang alleen-lezen via een PSD2-gelicentieerde aanbieder, en pas nadat u zelf de koppeling hebt ingesteld. Het importeren van afschriften gebeurt altijd onder uw eigen controle."
+                        "title": "Bankgegevens en betalingen",
+                        "body": "Bankkoppelingen zijn optioneel en, indien geactiveerd, alleen-lezen via een PSD2-gecertificeerde aanbieder van rekeninginformatiediensten, nadat u zich bij uw bank hebt geauthenticeerd. Wij initiëren nooit betalingen vanaf uw bankrekening. Het importeren van rekeningafschriften gebeurt altijd onder uw controle. Betaalkaarten voor Rumtelo-abonnementen worden verwerkt door Stripe; wij ontvangen een bevestiging, de status van het abonnement en identificatiegegevens, maar niet het volledige kaartnummer (PAN) of de CVC-code."
                     },
-                    "hosting": {
-                        "title": "Waar het voorkomt",
-                        "body": "De gegevens worden gehost op servers in de EU (regio Amsterdam) en zijn zowel tijdens de overdracht (TLS) als in rust versleuteld. De verwerkers waarmee wij samenwerken, handelen op basis van voorwaarden voor gegevensverwerking."
+                    "cookies": {
+                        "title": "Cookies en soortgelijke technologieën",
+                        "body": "We gebruiken strikt noodzakelijke cookies om je ingelogd te houden, om het abonnement te onthouden dat je vóór je aanmelding hebt gekozen en om je taalinstelling toe te passen. We gebruiken momenteel geen advertentie- of analytische cookies van derden. Details, namen en geldigheidsduur staan vermeld in het cookiebeleid. Als we later niet-essentiële cookies toevoegen, zullen we eerst toestemming vragen wanneer de ePrivacy-regels en de Nederlandse Telecommunicatiewet dit vereisen."
                     },
-                    "rights": {
-                        "title": "Uw rechten",
-                        "body": "Je kunt je gegevens inzien, corrigeren, exporteren of verwijderen. Als je een betaald abonnement opzegt, blijven je potjes, transacties en doelen toegankelijk, tenzij je ons vraagt om het account te verwijderen. Om je rechten uit te oefenen, stuur je een e-mail naar support@rumtelo.com."
+                    "recipients": {
+                        "title": "Met wie we gegevens delen",
+                        "body": "Wij delen persoonsgegevens uitsluitend met:",
+                        "items": [
+                            "Leden van uw huishouden die u uitnodigt, voor zover het product dit vereist.",
+                            "Verwerkers die op basis van een overeenkomst in onze opdracht handelen: EU-cloudhosting (Railway, regio Amsterdam) voor applicaties, databases en back-ups; Resend voor transactionele e-mails; Stripe voor betalingen in het kader van betaalde abonnementen.",
+                            "Een optionele PSD2/AIS-aanbieder als u een live bankkoppeling instelt.",
+                            "Professionele adviseurs (accountant, advocaat) die zich aan de geheimhoudingsplicht houden, indien nodig.",
+                            "Aan de autoriteiten, indien dit wettelijk verplicht is, of indien wij gebruikers, de Dienst of onze wettelijke rechten moeten beschermen.",
+                            "Een koper of opvolger in het geval van een reorganisatie of verkoop van de Dienst, met behoud van de bescherming en kennisgeving waar de wet dit voorschrijft."
+                        ],
+                        "after": "Wij verkopen geen persoonsgegevens en delen deze ook niet voor contextoverschrijdende gedragsgerichte reclame. Wij staan niet toe dat verwerkers uw gezinsgegevens gebruiken voor hun eigen marketingdoeleinden."
+                    },
+                    "transfers": {
+                        "title": "Internationale overboekingen",
+                        "body": "Huishoudgegevens in het product worden gehost in de Europese Unie (regio Amsterdam). Sommige verwerkers zijn gevestigd in landen buiten de EER of hebben toegang tot gegevens vanuit die landen — met name Stripe (groepsmaatschappijen in de VS) en Resend (e-mail, Verenigde Staten). In dat geval maken we gebruik van een adequaatheidsbesluit, indien dit bestaat, of van standaardcontractbepalingen (en aanvullende maatregelen waar nodig) op grond van hoofdstuk V van de AVG. U kunt ons om meer informatie over de waarborgen vragen via support@rumtelo.com."
                     },
                     "retention": {
-                        "title": "Behoud",
-                        "body": "Wij bewaren account- en huishoudgegevens zolang uw account actief is, en gedurende een beperkte periode na verwijdering indien dit wettelijk verplicht is (bijvoorbeeld factuurgegevens)."
+                        "title": "Hoe lang we gegevens bewaren",
+                        "items": [
+                            "Account- en huishoudgegevens in het product — zolang het account actief is.",
+                            "Nadat u het account hebt verwijderd, verwijderen wij de actieve persoonsgegevens zonder onnodige vertraging, doorgaans binnen 30 dagen, en vervolgens uit de versleutelde back-ups binnen een beperkte bewaartermijn (meestal maximaal 90 dagen), tenzij er een langere wettelijke bewaarplicht van toepassing is.",
+                            "Facturering, facturen en belastinggegevens — tot 7 jaar na het jaar waarin de transactie plaatsvond, zoals vereist volgens de Nederlandse fiscale bewaarplicht.",
+                            "Beveiligings- en serverlogboeken — doorgaans 30 tot 90 dagen; langer alleen indien nodig voor onderzoek naar misbruik.",
+                            "Ondersteuningsmails — zo lang als nodig is om het verzoek af te handelen en voor een korte archivering, daarna worden ze verwijderd of tot een minimum beperkt.",
+                            "Gegevens over toestemming (bijvoorbeeld dat u akkoord bent gegaan met dit beleid) — gedurende de looptijd van het account en een redelijke periode daarna, zodat we kunnen aantonen waarmee u akkoord bent gegaan."
+                        ]
+                    },
+                    "security": {
+                        "title": "Beveiliging",
+                        "body": "We maken gebruik van TLS tijdens de overdracht, versleuteling in rust voor gehoste databases, gehashte wachtwoorden, optionele tweefactorauthenticatie, toegang op huishoudniveau in de applicatie en toegang met zo min mogelijk rechten voor beheerders. Geen enkele methode is perfect; u moet ook uw apparaat en inloggegevens veilig bewaren. Als een inbreuk waarschijnlijk een hoog risico voor uw rechten met zich meebrengt, zullen wij u en de Autoriteit Persoonsgegevens hiervan op de hoogte stellen, zoals vereist door de artikelen 33 en 34 van de AVG."
+                    },
+                    "rights_gdpr": {
+                        "title": "Uw rechten (EER, VK en soortgelijke gebieden)",
+                        "body": "Binnen de wettelijke grenzen kunt u ons vragen om: inzage in uw gegevens; deze te corrigeren; deze te wissen; de verwerking te beperken; bezwaar te maken tegen verwerking op basis van gerechtvaardigde belangen; een overdraagbare kopie te ontvangen van de gegevens die u hebt verstrekt; en uw toestemming in te trekken. U kunt ook huishoudgegevens exporteren uit het product indien die functie beschikbaar is, of een e-mail sturen naar support@rumtelo.com vanaf het adres dat in uw account staat vermeld. Wij zullen binnen één maand reageren (bij complexe verzoeken kan deze termijn met twee maanden worden verlengd, mits u hiervan op de hoogte wordt gesteld). Het kan zijn dat wij moeten verifiëren of u de rechthebbende bent. U kunt een klacht indienen bij de Autoriteit Persoonsgegevens (autoriteitpersoonsgegevens.nl) of, als u in een andere EER-lidstaat of het Verenigd Koninkrijk woont, bij uw lokale autoriteit. Wij geven er de voorkeur aan om het probleem eerst op te lossen."
+                    },
+                    "rights_us": {
+                        "title": "Uw rechten in de Verenigde Staten",
+                        "body": "Als u inwoner bent van Californië of een andere Amerikaanse staat met een uitgebreide privacywet (bijvoorbeeld Virginia, Colorado, Connecticut, Utah, Texas of Oregon), heeft u mogelijk het recht op inzage, correctie, verwijdering en het verkrijgen van een kopie van uw persoonsgegevens, het recht om u af te melden voor de „verkoop“ of het „delen“ van persoonsgegevens, het recht om het gebruik van gevoelige persoonsgegevens te beperken, en het recht om niet gediscrimineerd te worden vanwege het uitoefenen van deze rechten. U kunt gebruikmaken van een bevoegde vertegenwoordiger indien de wet dit toestaat, mits u een bewijs van volmacht kunt overleggen.",
+                        "items": [
+                            "Wij verkopen geen persoonsgegevens en delen deze ook niet voor contextoverschrijdende gedragsgerichte reclame, zoals deze termen zijn gedefinieerd in de CCPA/CPRA. Een verzoek om „niet te verkopen of te delen” is dan ook al onze gangbare werkwijze; stuur ons een e-mail als u hiervan een schriftelijke bevestiging wilt ontvangen.",
+                            "In dit beleid (kennisgeving bij het verzamelen) worden de categorieën gegevens die wij verzamelen, de bronnen, de doeleinden, de ontvangers en de bewaartermijnen beschreven. In de afgelopen 12 maanden hebben wij geen persoonsgegevens verkocht of gedeeld voor reclamedoeleinden.",
+                            "Om uw rechten in de VS uit te oefenen, stuurt u een e-mail naar support@rumtelo.com vanaf het e-mailadres van uw account, met als onderwerp „US privacy request” en de vermelding van de staat waarin u woont. Wij zullen het verzoek controleren en binnen de wettelijke termijn reageren (doorgaans 45 dagen volgens de CCPA, met mogelijkheid tot verlenging indien toegestaan).",
+                            "California “Shine the Light”: wij verstrekken geen persoonsgegevens aan derden voor hun eigen direct marketing.",
+                            "Wij hebben geen concrete kennis van het feit dat wij de persoonsgegevens van consumenten jonger dan 16 jaar verkopen of delen."
+                        ]
+                    },
+                    "children": {
+                        "title": "Kinderen",
+                        "body": "Rumtelo is niet bedoeld voor kinderen. Je moet 18 jaar of ouder zijn. We verzamelen niet bewust persoonsgegevens van personen jonger dan 18 jaar (of jonger dan 13 jaar in het kader van de COPPA). Als je denkt dat een minderjarige een account heeft aangemaakt, stuur dan een e-mail naar support@rumtelo.com, dan zullen we het account verwijderen."
+                    },
+                    "changes": {
+                        "title": "Wijzigingen in dit beleid",
+                        "body": "We kunnen dit beleid bijwerken. De nieuwe datum onder ‘Laatst bijgewerkt’ wordt op deze pagina weergegeven. Als een wijziging wezenlijk is (nieuw doel, nieuwe categorie ontvangers of een nieuwe internationale gegevensoverdracht die gevolgen voor u heeft), zullen we u waar nodig hierover apart informeren — bijvoorbeeld via e-mail of een melding in het product. Als u het product na de ingangsdatum blijft gebruiken, betekent dit dat u de update hebt gezien. Wanneer een wijziging nieuwe toestemming vereist, zullen wij u hierom vragen."
+                    },
+                    "contact": {
+                        "title": "Contact en klachten",
+                        "body": "Verzoeken en vragen inzake privacy: support@rumtelo.com. Bedrijfsgegevens: de pagina met bedrijfsinformatie. Toezichthoudende autoriteit in Nederland: Autoriteit Persoonsgegevens, Postbus 93374, 2509 AJ Den Haag, https://www.autoriteitpersoonsgegevens.nl."
+                    }
+                }
+            },
+            "cookies": {
+                "title": "Cookiebeleid",
+                "updated": "22 september 2026",
+                "intro": "In dit cookiebeleid wordt uitgelegd hoe Rumtelo cookies en soortgelijke technologieën gebruikt op rumtelo.com en in de Rumtelo-app. Dit beleid vormt een aanvulling op het privacybeleid en voldoet aan de EU-e-privacyregels en de Nederlandse Telecommunicatiewet. Wanneer een cookie niet strikt noodzakelijk is, vragen we om toestemming voordat we deze plaatsen.",
+                "sections": {
+                    "what": {
+                        "title": "Wat zijn cookies?",
+                        "body": "Cookies zijn kleine tekstbestanden die op je apparaat worden opgeslagen. We gebruiken ook vergelijkbare technologieën, zoals sessionStorage, voor dezelfde doeleinden (bijvoorbeeld om een abonnement te onthouden dat je op localhost hebt gekozen). Dit kunnen first-party-cookies zijn (door ons geplaatst) of third-party-cookies (door iemand anders geplaatst). Momenteel plaatsen we uitsluitend first-party-cookies."
+                    },
+                    "how": {
+                        "title": "Hoe we ze tegenwoordig gebruiken",
+                        "body": "Vanaf de hierboven vermelde datum maakt Rumtelo uitsluitend gebruik van cookies omdat de Dienst zonder deze cookies niet veilig kan functioneren (strikt noodzakelijk). Wij plaatsen geen advertentiecookies, trackingpixels van sociale media of analytische cookies van derden. Mocht hierin verandering komen, dan zullen wij deze pagina bijwerken en waar nodig toestemming vragen — wij zullen tracking niet stilletjes inschakelen."
+                    },
+                    "necessary": {
+                        "title": "Absoluut noodzakelijke cookies",
+                        "body": "Deze gegevens zijn nodig om de door u gevraagde dienst te kunnen leveren. Volgens de Nederlandse en EU-regelgeving is dit zonder toestemming toegestaan. Het gaat onder meer om:",
+                        "items": [
+                            "Authenticatie- en sessiecookies die door ons aanmeldingssysteem (Better Auth) worden geplaatst, met het voorvoegsel “rumtelo.” — deze zorgen ervoor dat je ingelogd blijft op rumtelo.com en app.rumtelo.com, houden een sessie in stand en ondersteunen beveiligingsfuncties zoals tweefactorauthenticatie. Deze zijn doorgaans van het type HttpOnly, Secure in de productieomgeving, en blijven geldig gedurende de sessie of een doorlopende inlogperiode.",
+                            "rumtelo_pending_plan — onthoudt het betaalde abonnement (Plus/Max) en de factureringsperiode die je op de marketingsite hebt gekozen, zodat we het afrekenen kunnen voortzetten nadat je een account hebt aangemaakt. First-party. Meestal een paar dagen.",
+                            "Locale/taalvoorkeur die next-intl kan opslaan, zodat de website in de door u gekozen taal blijft (bijvoorbeeld NEXT_LOCALE). Eigen cookie. Maximaal ongeveer een jaar.",
+                            "Beveiligingskenmerken van die cookies (SameSite, Secure, ondertekende waarden) om misbruik tussen websites te beperken. Dit zijn geen afzonderlijke commerciële trackers."
+                        ]
+                    },
+                    "storage": {
+                        "title": "Lokale opslag en sessieopslag",
+                        "body": "Op sommige apparaten gebruiken we ook sessionStorage (sleutel rumtelo.pendingPlan) als alternatief voor het door jou gekozen plan, omdat de website en de app tijdens lokale ontwikkeling mogelijk op verschillende poorten draaien. Die waarde blijft in dat browsertabblad staan en wordt niet naar adverteerders verzonden."
+                    },
+                    "manage": {
+                        "title": "Hoe u cookies kunt beheren",
+                        "body": "U kunt cookies verwijderen of blokkeren via de instellingen van uw browser. Als u strikt noodzakelijke cookies blokkeert, kan het inloggen, het wisselen van huishouden en het doorgeven van het afrekenproces mislukken — dit is een technische beperking, geen sanctie. We bieden momenteel geen toestemmingsbanner aan, omdat we geen optionele cookies plaatsen. Als we later analytische of marketingcookies toevoegen, verschijnt er een banner of voorkeurscentrum en kunt u deze weigeren."
+                    },
+                    "third": {
+                        "title": "Derden",
+                        "body": "Betaling (Stripe) en e-mail (Resend) kunnen hun eigen cookies plaatsen als u hun gehoste afrekenpagina bezoekt of als uw e-mailprogramma inhoud van externe bronnen laadt. Deze cookies vallen onder het beleid van die aanbieders. Onze productpagina’s bevatten geen ingebedde advertentienetwerken. Indien beschikbaar, leidt de optionele bankverbinding u door het eigen proces van de erkende aanbieder."
                     },
                     "changes": {
                         "title": "Wijzigingen",
-                        "body": "Het is mogelijk dat we dit beleid bijwerken. Belangrijke wijzigingen worden op deze pagina vermeld met een nieuwe datum bij ‘Laatst bijgewerkt’."
+                        "body": "We zullen deze pagina bijwerken zodra ons gebruik van cookies verandert. De datum onder ‘Laatst bijgewerkt’ is de ingangsdatum."
+                    },
+                    "contact": {
+                        "title": "Contact",
+                        "body": "Vragen: support@rumtelo.com. Zie ook het privacybeleid en de pagina met bedrijfsinformatie."
                     }
                 }
             },
             "data_processing": {
                 "title": "Gegevensverwerking",
-                "updated": "10 september 2026",
-                "intro_prefix": "Op deze pagina wordt samengevat hoe Rumtelo persoonsgegevens verwerkt in het kader van de AVG. Lees voor een volledig overzicht ook onze",
+                "updated": "22 september 2026",
+                "intro_prefix": "Deze pagina is ons openbaar overzicht van de manier waarop Rumtelo persoonsgegevens verwerkt in het kader van de AVG (rollen, rechtsgrondslagen, verwerkers en doorgiften). Dit vervangt geen ondertekende verwerkersovereenkomst indien wij ooit gegevens verwerken in opdracht van een zakelijke klant. Voor particuliere accounts zijn wij de verwerkingsverantwoordelijke. Lees dit in combinatie met onze",
                 "privacy_link": "Privacybeleid",
                 "sections": {
                     "roles": {
                         "title": "Functies",
-                        "body": "Wat betreft uw Rumtelo-account en uw gezinsgegevens fungeert Rumtelo als verwerkingsverantwoordelijke. Wanneer wij gebruikmaken van infrastructuur- of betalingsproviders, treden deze op als verwerkers op basis van een overeenkomst."
+                        "body": "Wat betreft uw Rumtelo-account en uw huishoudgegevens is Rumtelo de verwerkingsverantwoordelijke (Artikel 4, lid 7, van de AVG). Leveranciers van infrastructuur, e-mail en betalingsdiensten zijn verwerkers (artikel 4, lid 8, en artikel 28) — zij mogen gegevens uitsluitend verwerken volgens onze gedocumenteerde instructies, met inachtneming van vertrouwelijkheid en beveiliging, en moeten deze aan het einde van de overeenkomst verwijderen of teruggeven. Een optionele PSD2/AIS-aanbieder is doorgaans een onafhankelijke verwerkingsverantwoordelijke of een verwerker van de bankverbinding die u tot stand brengt; wij ontvangen uitsluitend de rekeninggegevens waarvoor u toestemming hebt gegeven. Huishoudleden die u uitnodigt, zijn afzonderlijke gebruikers en geen verwerkers van ons."
                     },
                     "purposes": {
-                        "title": "Doeleinden en rechtsgrondslagen",
-                        "items": {
-                            "contract": "Contract — maak je account aan en beheer deze, toon potjes, tips van de coach en productfuncties die je gebruikt.",
-                            "interest": "Gerechtvaardigd belang — beveiliging, fraudepreventie, productverbetering (met waarborgen).",
-                            "consent": "Toestemming — optionele koppeling met de bank of marketing, indien vereist.",
-                            "obligation": "Wettelijke verplichting — belasting- en boekhoudkundige gegevens voor betaalde abonnementen."
-                        }
+                        "title": "Doelstellingen en rechtsgrondslagen",
+                        "items": [
+                            "Contract — het aanmaken en beheren van je account, je huishoudelijke werkruimte, potjes, tips van je Coach, exportmogelijkheden en de productfuncties die je gebruikt.",
+                            "Gerechtvaardigd belang — beveiliging, preventie van fraude en misbruik, betrouwbaarheid en productverbetering waarvoor geen advertentieprofielen nodig zijn; afgewogen tegen uw rechten, met een mogelijkheid om u af te melden voor analyse ten behoeve van verbetering, mochten we ooit optionele metingen toevoegen.",
+                            "Toestemming — optionele koppeling met de bank; optionele energie- en soul-logs (en uitdrukkelijke toestemming overeenkomstig artikel 9 wanneer die logs tot de bijzondere categorieën gegevens behoren); eventuele toekomstige marketing- of niet-essentiële cookies.",
+                            "Wettelijke verplichting — belasting-, boekhoud- en consumentengegevens voor betaalde abonnementen; rechtmatige verzoeken."
+                        ]
                     },
                     "categories": {
                         "title": "Categorieën van gegevens",
-                        "body": "Identiteits- en contactgegevens; authenticatiegegevens (gehasht); financiële gegevens van het huishouden en praktijkgegevens die u invoert of importeert; technische logbestanden."
+                        "body": "Identiteits- en contactgegevens; authenticatiegegevens (gehasht) en sessiegegevens; financiële en praktijkgegevens van uw huishouden die u invoert of importeert; samenstelling van het huishouden; factureringsgegevens; ondersteunende inhoud; technische logbestanden. Gegevens van bijzondere categorieën worden alleen verzameld als u deze invoert in optionele portalen. Wij verzamelen geen officiële identiteitsnummers of volledige PAN-nummers van betaalkaarten."
                     },
                     "processors": {
-                        "title": "Processoren (typisch)",
+                        "title": "De processors die we gebruiken (MVP)",
                         "items": [
-                            "EU-cloudhosting (applicaties, databases, back-ups) — regio Amsterdam.",
-                            "Verzending van e-mails voor verificatie en accountberichten.",
-                            "Betaalverwerker voor betaalde abonnementen (kaartgegevens worden nooit door Rumtelo opgeslagen).",
-                            "Optionele PSD2/AIS-aanbieder voor realtime banksynchronisatie wanneer deze is ingeschakeld — alleen-lezen, nadat je verbinding hebt gemaakt."
+                            "Spoorwegen (EU, regio Amsterdam) — hosting van applicaties, PostgreSQL-database, back-ups. Locatie van opgeslagen huishoudgegevens: Europese Unie.",
+                            "Resend — transactionele e-mail (verificatie, wachtwoord opnieuw instellen, beveiliging). De verwerking kan plaatsvinden in de Verenigde Staten, op basis van standaardcontractbepalingen.",
+                            "Stripe Payments Europe, Limited (en bedrijven binnen de Stripe-groep) — afrekenen van abonnementen, klantenportaal, facturen, fiscaal relevante betalingsgegevens. Kaartgegevens worden verwerkt in de systemen van Stripe. Bij doorgiften naar de Verenigde Staten wordt gebruikgemaakt van de GDPR-doorgiftetools van Stripe.",
+                            "Optioneel, alleen als je deze functie later inschakelt: een PSD2-gecertificeerde aanbieder van rekeninggegevens voor banksynchronisatie in de leesmodus. We zullen de naam van de aanbieder hier vermelden zodra deze functie beschikbaar komt."
                         ]
+                    },
+                    "measures": {
+                        "title": "Beveiligingsmaatregelen (samenvatting)",
+                        "body": "TLS tijdens verzending; versleuteling in rust op de gehoste database; wachtwoordhashing; optionele tweefactorauthenticatie (2FA); isolatie van huishoudens op rijniveau in de applicatie; toegang beperkt tot operators die deze nodig hebben; back-ups in dezelfde EU-regio. Verwerkers zijn verplicht om passende technische en organisatorische maatregelen te nemen overeenkomstig artikel 28."
                     },
                     "transfers": {
                         "title": "Internationale overboekingen",
-                        "body": "Wij geven de voorkeur aan verwerking binnen de EU. Als een verwerker gegevens buiten de EER doorgeeft, eisen wij passende waarborgen (bijvoorbeeld standaardcontractbepalingen)."
+                        "body": "Wij geven de voorkeur aan verwerking binnen de EU. De huishouddatabases blijven in de regio Amsterdam. Als een verwerker gegevens raadpleegt vanuit een locatie buiten de EER (momenteel e-mail en betalingen), eisen wij de waarborgen van hoofdstuk V — voornamelijk de standaardcontractbepalingen van de EU, aangevuld met aanvullende maatregelen van de leverancier. Wij dragen huishoudregisters niet over aan een Amerikaanse host voor opslag."
                     },
                     "subprocessors": {
-                        "title": "Subverwerkers en wijzigingen",
-                        "body": "De lijst met verwerkers kan veranderen naarmate het product zich verder ontwikkelt. Wezenlijke wijzigingen die van invloed zijn op de manier waarop uw gegevens worden verwerkt, worden hier of in het privacybeleid vermeld."
+                        "title": "Wijzigingen met betrekking tot verwerkers",
+                        "body": "We kunnen een verwerker vervangen (bijvoorbeeld door een andere EU-host of e-mailprovider) als de nieuwe leverancier een gelijkwaardige of betere bescherming biedt. Wezenlijke wijzigingen die van invloed zijn op de manier waarop uw gegevens worden verwerkt, worden op deze pagina of in het privacybeleid vermeld, waarbij we u hiervan op de hoogte stellen wanneer de wet dit vereist. Deze pagina bevat de openbare lijst met subverwerkers voor particuliere gebruikers."
+                    },
+                    "rights": {
+                        "title": "Verzoeken",
+                        "body": "Toegang, correctie, export, verwijdering, beperking, bezwaar en intrekking van toestemming: support@rumtelo.com. Wij behandelen verzoeken zoals uiteengezet in het privacybeleid. Toezichthoudende autoriteit: Autoriteit Persoonsgegevens, Nederland. Als u een bedrijf bent dat een ondertekende overeenkomst op grond van artikel 28 nodig heeft, neem dan contact met ons op — voor particuliere consumentenaccounts is dit niet nodig; wij zijn in dat geval niet uw verwerker."
                     },
                     "contact": {
-                        "title": "Contact / Functionaris voor gegevensbescherming",
-                        "body": "Verzoeken inzake privacy: support@rumtelo.com. U kunt ook een klacht indienen bij de Nederlandse Autoriteit Persoonsgegevens."
+                        "title": "Contact",
+                        "body": "Vragen over privacy en gegevensverwerking: support@rumtelo.com. Bedrijfsgegevens: Pagina met bedrijfsinformatie."
+                    }
+                }
+            },
+            "company": {
+                "title": "Bedrijfsgegevens",
+                "updated": "22 september 2026",
+                "intro": "Op deze pagina wordt vermeld wie Rumtelo exploiteert, zoals vereist voor een in Nederland gevestigde dienst van de informatiemaatschappij (met inbegrip van Boek 3, artikel 15d van het Burgerlijk Wetboek en de contactregels van de EU-wet inzake digitale diensten). Dit is ons colofon / onze juridische verklaring.",
+                "sections": {
+                    "identity": {
+                        "title": "Operator",
+                        "items": [
+                            "Handelsnaam: Rumtelo",
+                            "Vestigingsplaats: Amsterdam, Nederland",
+                            "Geregistreerde officiële naam, KvK-nummer, btw-nummer en bezoekadres: worden hier gepubliceerd zodra deze gegevens voor de exploitant beschikbaar zijn, en zijn altijd op verzoek verkrijgbaar via support@rumtelo.com.",
+                            "Activiteit: huishoudoverzicht en educatieve coach (geld, groei, energie, ziel). Geen bank, betalingsinstelling of erkend financieel adviseur."
+                        ]
+                    },
+                    "contact": {
+                        "title": "Contactpunten",
+                        "items": [
+                            "Product, accounts, facturering en privacy: support@rumtelo.com",
+                            "Pers en samenwerkingsverbanden: info@rumtelo.com",
+                            "Enig aanspreekpunt voor de Wet op digitale diensten (gebruikers en overheden): support@rumtelo.com, taal: Engels of Nederlands, Amsterdamse tijd.",
+                            "Contactpagina: rumtelo.com/support/contact"
+                        ]
+                    },
+                    "hosting": {
+                        "title": "Hosting en gegevens",
+                        "body": "De Dienst wordt gehost in de Europese Unie (regio Amsterdam) bij Railway. Het beleid inzake persoonsgegevens wordt beschreven in het privacybeleid, het cookiebeleid en op de pagina over gegevensverwerking."
+                    },
+                    "authorities": {
+                        "title": "Autoriteiten",
+                        "items": [
+                            "Gegevensbescherming (Nederland): Autoriteit Persoonsgegevens — https://www.autoriteitpersoonsgegevens.nl",
+                            "Consumenten- en markttoezicht (Nederland): Autoriteit Consument & Markt (ACM)",
+                            "Gebruikers uit de EER kunnen ook contact opnemen met hun lokale gegevensbeschermingsautoriteit of gebruikmaken van het EU-platform voor online geschillenbeslechting voor consumentengeschillen."
+                        ]
+                    },
+                    "regulated": {
+                        "title": "Wat we niet zijn",
+                        "body": "Rumtelo is niet door De Nederlandsche Bank of de AFM erkend als bank, beleggingsonderneming of adviseur. De dienstverlening van de coach is educatief van aard. Een eventuele banksynchronisatie, indien aangeboden, wordt verzorgd door een derde partij die over een eigen PSD2-vergunning beschikt. Wij verplaatsen uw geld niet."
                     }
                 }
             }
@@ -4306,6 +4576,117 @@
                 "upgrade_cta": "Upgrade naar {plan}",
                 "back_to_dashboard": "Terug naar het dashboard",
                 "back_to_website": "Terug naar de website"
+            }
+        },
+        "support": {
+            "common": {
+                "eyebrow": "Ondersteuning",
+                "back_home": "Terug naar Rumtelo",
+                "start_free": "Gratis beginnen",
+                "sign_in": "Inloggen"
+            },
+            "hub": {
+                "title": "Ondersteuning",
+                "description": "Juridische documenten en hoe u contact met ons kunt opnemen. Rumtelo wordt vanuit Amsterdam beheerd — wij beantwoorden e-mails.",
+                "cards": {
+                    "legal": {
+                        "title": "Juridisch",
+                        "body": "Privacy, gebruiksvoorwaarden, cookies en hoe wij uw gegevens verwerken.",
+                        "cta": "Documenten bekijken"
+                    },
+                    "contact": {
+                        "title": "Contact",
+                        "body": "Hulp bij je account, verzoeken inzake privacy of perszaken.",
+                        "cta": "Neem contact op"
+                    }
+                }
+            },
+            "legal": {
+                "title": "Juridisch",
+                "description": "Gebruiksvoorwaarden voor Rumtelo. Opgesteld ter informatie voor huishoudens — dit is geen bank- of beleggingsadvies — en in overeenstemming met de AVG, de EU-consumentenwetgeving en de privacyverklaringen van Amerikaanse staten.",
+                "read_document": "Document lezen",
+                "footer_kicker": "Heb je nog iets anders nodig?",
+                "footer_contact": "Neem contact met ons op",
+                "documents": {
+                    "privacy": {
+                        "title": "Privacybeleid",
+                        "short": "Welke gegevens we verzamelen, waarom, de AVG en privacyrechten in de VS."
+                    },
+                    "terms": {
+                        "title": "Gebruiksvoorwaarden",
+                        "short": "Boekhouding, facturering, bedenktijd, aansprakelijkheid en toepasselijk recht."
+                    },
+                    "cookies": {
+                        "title": "Cookiebeleid",
+                        "short": "Noodzakelijke cookies, opslag en hoe je deze kunt beheren."
+                    },
+                    "data_processing": {
+                        "title": "Gegevensverwerking",
+                        "short": "Functies, rechtsgrondslagen, aangewezen verwerkers en doorgiften naar de EU."
+                    },
+                    "company": {
+                        "title": "Bedrijfsgegevens",
+                        "short": "Wie beheert Rumtelo, de contactpunten en de autoriteiten?"
+                    }
+                }
+            },
+            "contact": {
+                "title": "Contact",
+                "description": "Wij zijn een klein team in Amsterdam. E-mail is de snelste manier om contact met ons op te nemen — vermeld het e-mailadres van je account als je ons schrijft over het product.",
+                "expect_kicker": "Wat je kunt verwachten",
+                "expect": {
+                    "response": {
+                        "title": "E-mailantwoord",
+                        "body": "We lezen elk bericht en beantwoorden het zo snel mogelijk, meestal binnen enkele werkdagen."
+                    },
+                    "privacy": {
+                        "title": "Verzoeken inzake privacy",
+                        "body": "Inzage, correctie, export of verwijdering — neem contact op via e-mail met het adres dat in je account staat vermeld."
+                    },
+                    "legal": {
+                        "title": "Beleid staat voorop",
+                        "body": "Veel antwoorden zijn te vinden onder ‘Privacy’ en ‘Gebruiksvoorwaarden’. Bekijk die eerst voordat je iets schrijft."
+                    }
+                },
+                "form_kicker": "Een bericht sturen",
+                "form": {
+                    "name": "Naam",
+                    "name_placeholder": "Je naam",
+                    "email": "E-mail",
+                    "email_placeholder": "you@example.com",
+                    "topic": "Onderwerp",
+                    "message": "Bericht",
+                    "message_placeholder": "Hoe kunnen we u helpen?",
+                    "submit": "Bericht verzenden",
+                    "submitting": "Bezig met verzenden…",
+                    "success_title": "Bericht verzonden",
+                    "success_body": "Bedankt — we hebben je bericht ontvangen en zullen reageren via het e-mailadres dat je hebt opgegeven.",
+                    "send_another": "Stuur nog een bericht",
+                    "topics": {
+                        "support": "Productondersteuning",
+                        "press": "Pers & samenwerkingsverbanden",
+                        "privacy": "Verzoek inzake privacy",
+                        "other": "Overige"
+                    }
+                },
+                "channels_kicker": "Kanalen",
+                "channels": {
+                    "support": {
+                        "title": "Productondersteuning",
+                        "body": "Vragen over uw account, huishouden, facturering of producten.",
+                        "email": "support@rumtelo.com",
+                        "cta": "E-mailondersteuning"
+                    },
+                    "press": {
+                        "title": "Pers & samenwerkingsverbanden",
+                        "body": "Media, samenwerkingsverbanden en algemene vragen over het bedrijf.",
+                        "email": "info@rumtelo.com",
+                        "cta": "E-mail info"
+                    }
+                },
+                "legal_kicker": "Juridische documenten",
+                "legal_cta": "Bekijk de juridische informatie",
+                "location": "Amsterdam, Nederland"
             }
         },
         "why": {

@@ -68,6 +68,7 @@ const form = {
         amount_required: 'Amount is required',
         valid_amount: 'Enter a valid amount',
         name_required: 'Name is required',
+        message_min: 'Message must be at least {count} characters',
         choose_jar: 'Choose a jar',
         choose_from_jar: 'Choose a jar to take from',
         choose_to_jar: 'Choose a jar to send to',
