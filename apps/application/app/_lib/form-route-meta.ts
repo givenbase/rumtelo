@@ -1,10 +1,12 @@
+import { getTranslations } from '@rumtelo/i18n';
+
 import { productPath } from './routes';
 
 export type FormRouteWidth = 'default' | 'wide';
 
 export type FormRouteMeta = {
-    title: string;
-    description?: string;
+    titleKey: string;
+    descriptionKey?: string;
     closeHref: string;
     width?: FormRouteWidth;
 };
@@ -15,72 +17,72 @@ export type FormRouteMeta = {
  */
 export const FORM_ROUTE = {
     txCreate: {
-        title: 'New transaction',
-        description: 'Out for spend, In for gifts, refunds, and jar top-ups.',
+        titleKey: 'pages.shell.forms.tx_create.title',
+        descriptionKey: 'pages.shell.forms.tx_create.description',
         closeHref: productPath('money/transactions'),
     },
     txUpdate: {
-        title: 'Edit transaction',
-        description: 'Update direction, amount, jar, or note.',
+        titleKey: 'pages.shell.forms.tx_update.title',
+        descriptionKey: 'pages.shell.forms.tx_update.description',
         closeHref: productPath('money/transactions'),
     },
     fixedCreate: {
-        title: 'New fixed cost',
-        description: 'What leaves a jar every month?',
+        titleKey: 'pages.shell.forms.fixed_create.title',
+        descriptionKey: 'pages.shell.forms.fixed_create.description',
         closeHref: productPath('money/fixed-costs'),
     },
     fixedUpdate: {
-        title: 'Edit fixed cost',
+        titleKey: 'pages.shell.forms.fixed_update.title',
         closeHref: productPath('money/fixed-costs'),
     },
     debtCreate: {
-        title: 'New debt',
-        description: 'Pick the type, then who you owe.',
+        titleKey: 'pages.shell.forms.debt_create.title',
+        descriptionKey: 'pages.shell.forms.debt_create.description',
         closeHref: productPath('money/debt'),
     },
     debtUpdate: {
-        title: 'Edit debt',
+        titleKey: 'pages.shell.forms.debt_update.title',
         closeHref: productPath('money/debt'),
     },
     incomeCreate: {
-        title: 'New income',
-        description: 'Add an income source that feeds your jars.',
+        titleKey: 'pages.shell.forms.income_create.title',
+        descriptionKey: 'pages.shell.forms.income_create.description',
         closeHref: productPath('growth/income'),
     },
     incomeUpdate: {
-        title: 'Edit income',
+        titleKey: 'pages.shell.forms.income_update.title',
         closeHref: productPath('growth/income'),
     },
     goalCreate: {
-        title: 'New goal',
-        description: 'Give savings a destination.',
+        titleKey: 'pages.shell.forms.goal_create.title',
+        descriptionKey: 'pages.shell.forms.goal_create.description',
         closeHref: productPath('growth/goals'),
     },
     goalUpdate: {
-        title: 'Edit goal',
+        titleKey: 'pages.shell.forms.goal_update.title',
         closeHref: productPath('growth/goals'),
     },
     assetCreate: {
-        title: 'New asset',
-        description: 'What you own, and whether it pays you.',
+        titleKey: 'pages.shell.forms.asset_create.title',
+        descriptionKey: 'pages.shell.forms.asset_create.description',
         closeHref: productPath('growth/net-worth'),
     },
     assetUpdate: {
-        title: 'Edit asset',
-        description: 'Change the name, the class, or what it is worth.',
+        titleKey: 'pages.shell.forms.asset_update.title',
+        descriptionKey: 'pages.shell.forms.asset_update.description',
         closeHref: productPath('growth/net-worth'),
     },
     sessionCreate: {
-        title: 'New training',
+        titleKey: 'pages.shell.forms.session_create.title',
         closeHref: productPath('energy/training'),
     },
     moveCreate: {
-        title: 'Move money',
-        description: 'Pick from and to. Available this month shifts; your split stays the same.',
+        titleKey: 'pages.shell.forms.move_create.title',
+        descriptionKey: 'pages.shell.forms.move_create.description',
         closeHref: productPath('money/jars'),
         width: 'wide',
     },
-} as const;
+} as const satisfies Record<string, FormRouteMeta>;
 
 export type FormRouteKey = keyof typeof FORM_ROUTE;
 
@@ -89,12 +91,18 @@ export function formRoute(key: FormRouteKey): FormRouteMeta {
     return FORM_ROUTE[key];
 }
 
+/** Document title for full-page create/update routes (client pages use via layout). */
+export async function formRouteMetadata(key: FormRouteKey) {
+    const t = await getTranslations();
+    return { title: t(formRoute(key).titleKey) };
+}
+
 export function moveCreateMeta(fromJarId?: string): FormRouteMeta {
     const base = formRoute('moveCreate');
     return {
         ...base,
-        description: fromJarId
-            ? 'Pick where it goes — this jar is already the source.'
-            : base.description,
+        descriptionKey: fromJarId
+            ? 'pages.shell.forms.move_create.description_from_jar'
+            : base.descriptionKey,
     };
 }

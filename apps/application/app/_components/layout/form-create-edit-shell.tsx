@@ -2,9 +2,11 @@
 
 import type { FieldErrors, FieldValues, UseFormReturn } from 'react-hook-form';
 
+import { useTranslations } from '@rumtelo/i18n';
 import { Form, FormErrorBox, bindFormSubmit, createFormInvalidHandler } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
+import { useApiErrorFallbacks, useApiErrorMessage } from '@/app/_lib/api-error-messages';
 import { ignorePasswordManagersForm } from '@/app/_lib/ignore-password-managers';
 
 type FormCreateEditShellProps<T extends FieldValues> = {
@@ -62,7 +64,7 @@ function AutofillDecoys() {
 /**
  * Form + layout for create/edit.
  * In embedded (sheet) mode: full-width fields with a sticky footer action bar.
- * Same contract as Galighticus FormCreateEditShell — forms stay reusable in page or modal.
+ * Shared create/edit shell — forms stay reusable in page or modal.
  */
 export function FormCreateEditShell<T extends FieldValues>({
     apiError,
@@ -73,7 +75,43 @@ export function FormCreateEditShell<T extends FieldValues>({
     onSubmit,
     sidebar,
 }: FormCreateEditShellProps<T>) {
-    const handleSubmit = bindFormSubmit(form, onSubmit, onError ?? createFormInvalidHandler());
+    const tForm = useTranslations('ui.form');
+    const errorMessages = useApiErrorFallbacks();
+    const formatApiMessage = useApiErrorMessage();
+    const invalidMessages = {
+        title: tForm('incomplete_title'),
+        description: tForm('incomplete_description'),
+    };
+    const handleSubmit = bindFormSubmit(
+        form,
+        onSubmit,
+        onError ?? createFormInvalidHandler(undefined, invalidMessages)
+    );
+    const errorBox = (
+        <FormErrorBox
+            apiError={apiError}
+            errorMessages={errorMessages}
+            resolveUserMessage={formatApiMessage}
+            form={form}
+            title={tForm('incomplete_title')}
+            description={tForm('incomplete_description_highlighted')}
+            fieldLabels={{
+                api: tForm('fields.api'),
+                root: tForm('fields.api'),
+                email: tForm('fields.email'),
+                password: tForm('fields.password'),
+                firstName: tForm('fields.first_name'),
+                lastName: tForm('fields.last_name'),
+                phone: tForm('fields.phone'),
+                name: tForm('fields.name'),
+                amount: tForm('fields.amount'),
+                note: tForm('fields.note'),
+                date: tForm('fields.date'),
+                confirmPassword: tForm('fields.confirm_password'),
+                newPassword: tForm('fields.new_password'),
+            }}
+        />
+    );
 
     if (embedded) {
         return (
@@ -85,7 +123,7 @@ export function FormCreateEditShell<T extends FieldValues>({
                     onSubmit={handleSubmit}>
                     <AutofillDecoys />
                     <div className="min-w-0 flex-1 space-y-4">
-                        <FormErrorBox apiError={apiError} form={form} />
+                        {errorBox}
                         <fieldset className={cn('min-w-0 border-0 p-0', formFieldStackClass)}>
                             {children}
                         </fieldset>
@@ -110,7 +148,7 @@ export function FormCreateEditShell<T extends FieldValues>({
                 )}>
                 <AutofillDecoys />
                 <div className="min-w-0 flex-1 space-y-4">
-                    <FormErrorBox apiError={apiError} form={form} />
+                    {errorBox}
                     <fieldset className={cn('min-w-0 border-0 p-0', formFieldStackClass)}>
                         {children}
                     </fieldset>

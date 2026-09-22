@@ -23,14 +23,22 @@
     },
     "scripts": {
         "generate": "tsx ./src/generate-languages.ts",
+        "translate:locales": "tsx ./src/translate-locales-deepl.ts",
+        "translate-with-deepl": "tsx ./src/generate-languages.ts && tsx ./src/translate-locales-deepl.ts",
         "check-types": "tsc --pretty --noEmit",
+        "test": "node --import tsx --test src/**/*.test.ts",
         "clean": "rm -rf .turbo dist"
     },
     "dependencies": {
+        "@rumtelo/contracts": "workspace:*",
+        "@rumtelo/utils": "workspace:*",
         "next-intl": "^4.6.1"
     },
     "devDependencies": {
         "@rumtelo/typescript-config": "workspace:*",
+        "@types/react": "19.2.18",
+        "deepl-node": "^1.28.0",
+        "react": "19.2.8",
         "tsx": "^4.23.13",
         "typescript": "5.9.3"
     },

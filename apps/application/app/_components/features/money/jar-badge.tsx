@@ -47,16 +47,19 @@ export function MetaChip({ children, className }: { children: ReactNode; classNa
     );
 }
 
-export function formatDueDay(dueDay: number | null | undefined): string | null {
+export function formatDueDay(
+    dueDay: number | null | undefined,
+    t: (key: string, values?: Record<string, string | number>) => string
+): string | null {
     if (dueDay === null || dueDay === undefined) return null;
-    return `Day ${dueDay}`;
+    return t('due_day', { day: dueDay });
 }
 
 /** ISO `YYYY-MM-DD` → short date, UTC so bookedOn does not shift. */
-export function formatBookedDate(iso: string): string {
+export function formatBookedDate(iso: string, locale: string): string {
     const [year, month, day] = iso.split('-').map(Number);
     if (!year || !month || !day) return iso;
-    return new Date(Date.UTC(year, month - 1, day)).toLocaleDateString(undefined, {
+    return new Date(Date.UTC(year, month - 1, day)).toLocaleDateString(locale, {
         day: 'numeric',
         month: 'short',
         timeZone: 'UTC',

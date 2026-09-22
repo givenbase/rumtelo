@@ -8,6 +8,7 @@ import type {
     MerchantHighlight,
     MerchantPreset,
 } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
 import { Typography, VendorMark } from '@rumtelo/ui';
 
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
@@ -44,17 +45,6 @@ type ExpenseIntentFieldProps = {
     id?: string;
 };
 
-const HIGHLIGHT_LABEL: Record<MerchantHighlight, string> = {
-    FEATURED: 'Featured',
-    NEW: 'New',
-    POPULAR: 'Popular',
-};
-
-const PICK_MODES: ReadonlyArray<{ id: ExpensePickMode; label: string }> = [
-    { id: 'list', label: 'Pick from list' },
-    { id: 'manual', label: 'Type a name' },
-];
-
 function matchesMerchant(merchant: MerchantPreset, needle: string) {
     return matchesChipQuery(needle, merchant);
 }
@@ -84,6 +74,17 @@ export function ExpenseIntentField({
     disabled,
     id,
 }: ExpenseIntentFieldProps) {
+    const t = useTranslations('features.money.expense_intent');
+    const tForm = useTranslations('ui.form');
+    const highlightLabel = (highlight: MerchantHighlight) => {
+        if (highlight === 'FEATURED') return t('highlight_featured');
+        if (highlight === 'NEW') return t('highlight_new');
+        return t('highlight_popular');
+    };
+    const pickModes: ReadonlyArray<{ id: ExpensePickMode; label: string }> = [
+        { id: 'list', label: t('pick_from_list') },
+        { id: 'manual', label: t('type_a_name') },
+    ];
     const [pickMode, setPickMode] = useState<ExpensePickMode>('list');
     const [query, setQuery] = useState('');
     const [open, setOpen] = useState(false);
@@ -290,8 +291,8 @@ export function ExpenseIntentField({
                     <div
                         className="flex flex-wrap gap-2"
                         role="group"
-                        aria-label="How do you want to pick?">
-                        {PICK_MODES.map(option => {
+                        aria-label={tForm('aria.pick_mode')}>
+                        {pickModes.map(option => {
                             const on = pickMode === option.id;
                             return (
                                 <button
@@ -310,10 +311,7 @@ export function ExpenseIntentField({
                             );
                         })}
                     </div>
-                    <p className="text-xs leading-relaxed text-fg-faint">
-                        Pick from this jar’s catalog when you know the shop or type — or type a
-                        custom name.
-                    </p>
+                    <p className="text-xs leading-relaxed text-fg-faint">{t('catalog_hint')}</p>
                 </div>
             ) : null}
 
@@ -342,7 +340,7 @@ export function ExpenseIntentField({
                         ) : (
                             <span className="font-medium">
                                 {categoryIcon ? `${categoryIcon} ` : ''}
-                                {value.categoryName ?? 'Selected'}
+                                {value.categoryName ?? tForm('selected')}
                             </span>
                         )}
                     </div>
@@ -351,7 +349,7 @@ export function ExpenseIntentField({
                         disabled={disabled}
                         className="font-mono text-xs tracking-wide text-accent uppercase hover:underline"
                         onClick={clearSelection}>
-                        Change
+                        {tForm('change')}
                     </button>
                 </div>
             ) : pickMode === 'manual' ? (
@@ -360,7 +358,7 @@ export function ExpenseIntentField({
                     name="rumtelo-expense-vendor-manual"
                     value={query}
                     disabled={disabled}
-                    placeholder="Vendor name — e.g. corner shop"
+                    placeholder={t('vendor_manual_placeholder')}
                     onChange={event => setQuery(event.target.value)}
                     onKeyDown={event => {
                         if (event.key === 'Enter') {
@@ -379,7 +377,7 @@ export function ExpenseIntentField({
                         name="rumtelo-expense-vendor"
                         value={query}
                         disabled={disabled}
-                        placeholder="Vendor or type — e.g. AH, groceries"
+                        placeholder={t('vendor_search_placeholder')}
                         role="combobox"
                         aria-expanded={open}
                         aria-controls={listboxId}
@@ -403,7 +401,7 @@ export function ExpenseIntentField({
                     <button
                         type="button"
                         disabled={disabled}
-                        aria-label="Show suggestions"
+                        aria-label={tForm('aria.show_suggestions')}
                         className="absolute top-1/2 right-2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md bg-accent/15 text-accent hover:bg-accent/25 disabled:opacity-40"
                         onClick={() => setOpen(previous => !previous)}>
                         <span className="text-xs tracking-widest" aria-hidden>
@@ -419,15 +417,17 @@ export function ExpenseIntentField({
                                 <div className="grid gap-1 px-3 py-2">
                                     <p className="text-bg/60">
                                         {jarKey && scopedCategories.length === 0 && !needle
-                                            ? 'No types for this jar yet — type a custom name instead.'
-                                            : `No matches — press Enter to use “${query.trim() || '…'}” as vendor.`}
+                                            ? t('no_types_custom')
+                                            : t('no_matches_enter', {
+                                                  name: query.trim() || '…',
+                                              })}
                                     </p>
                                     {query.trim() ? (
                                         <button
                                             type="button"
                                             className="rounded-md px-2 py-1.5 text-left hover:bg-bg/10"
                                             onClick={() => commitCustomVendor(query)}>
-                                            Use “{query.trim()}” as vendor
+                                            {t('use_as_vendor', { name: query.trim() })}
                                         </button>
                                     ) : null}
                                 </div>
@@ -436,7 +436,7 @@ export function ExpenseIntentField({
                                     {merchantHits.length > 0 ? (
                                         <div>
                                             <div className="px-3 pt-2 pb-1 text-[10px] font-semibold tracking-wider text-bg/50 uppercase">
-                                                Vendors
+                                                {t('vendors')}
                                             </div>
                                             <ul>
                                                 {merchantHits.map(merchant => {
@@ -461,8 +461,8 @@ export function ExpenseIntentField({
                                                     const categoryName =
                                                         category?.name ??
                                                         merchant.categoryTemplateKey;
-                                                    const highlightLabel = merchant.highlight
-                                                        ? HIGHLIGHT_LABEL[merchant.highlight]
+                                                    const badgeLabel = merchant.highlight
+                                                        ? highlightLabel(merchant.highlight)
                                                         : null;
                                                     return (
                                                         <li key={`m-${merchant.key}`}>
@@ -488,9 +488,9 @@ export function ExpenseIntentField({
                                                                         {' '}
                                                                         · {categoryName}
                                                                     </span>
-                                                                    {highlightLabel ? (
+                                                                    {badgeLabel ? (
                                                                         <span className="ml-1 text-[10px] tracking-wide text-bg/60 uppercase">
-                                                                            {highlightLabel}
+                                                                            {badgeLabel}
                                                                         </span>
                                                                     ) : null}
                                                                 </span>
@@ -504,7 +504,7 @@ export function ExpenseIntentField({
                                     {categoryHits.length > 0 ? (
                                         <div>
                                             <div className="px-3 pt-2 pb-1 text-[10px] font-semibold tracking-wider text-bg/50 uppercase">
-                                                Types
+                                                {t('types')}
                                             </div>
                                             <ul>
                                                 {categoryHits.map(category => (
@@ -536,7 +536,7 @@ export function ExpenseIntentField({
                                             type="button"
                                             className="mt-1 w-full border-t border-bg/10 px-3 py-2 text-left text-bg/70 hover:bg-bg/10"
                                             onClick={() => commitCustomVendor(query)}>
-                                            Use “{query.trim()}” as vendor
+                                            {t('use_as_vendor', { name: query.trim() })}
                                         </button>
                                     ) : null}
                                 </>
@@ -549,18 +549,18 @@ export function ExpenseIntentField({
             {showVendorPrompt ? (
                 <div className="grid gap-2">
                     <p className="font-mono text-[10px] tracking-wider text-fg-muted uppercase">
-                        Know the vendor?
+                        {t('know_vendor')}
                     </p>
                     {vendorsForCategory.length > 0 ? (
                         <div className="grid gap-2">
                             <ChipSearch
                                 value={vendorChipQuery}
                                 onChange={setVendorChipQuery}
-                                placeholder="Search vendor"
+                                placeholder={tForm('search_vendor')}
                                 disabled={disabled}
                             />
                             {vendorChipQuery.trim() && visibleVendorChips.length === 0 ? (
-                                <p className="text-sm text-fg-muted">No matches</p>
+                                <p className="text-sm text-fg-muted">{tForm('no_matches')}</p>
                             ) : null}
                             <div className="flex flex-wrap gap-1.5">
                                 {visibleVendorChips.map(merchant => {
@@ -580,8 +580,8 @@ export function ExpenseIntentField({
                                             merchantJarKey: merchant.jarKey,
                                         })
                                     );
-                                    const highlightLabel = merchant.highlight
-                                        ? HIGHLIGHT_LABEL[merchant.highlight]
+                                    const badgeLabel = merchant.highlight
+                                        ? highlightLabel(merchant.highlight)
                                         : null;
                                     return (
                                         <button
@@ -598,9 +598,9 @@ export function ExpenseIntentField({
                                                 size={20}
                                             />
                                             {merchant.name}
-                                            {highlightLabel ? (
+                                            {badgeLabel ? (
                                                 <span className="text-[10px] tracking-wide text-fg-muted uppercase">
-                                                    {highlightLabel}
+                                                    {badgeLabel}
                                                 </span>
                                             ) : null}
                                         </button>
@@ -611,14 +611,14 @@ export function ExpenseIntentField({
                                     disabled={disabled}
                                     className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
                                     onClick={() => setCustomVendor(true)}>
-                                    Other…
+                                    {tForm('other')}
                                 </button>
                                 <button
                                     type="button"
                                     disabled={disabled}
                                     className="rounded-xl px-3 py-1.5 text-sm text-fg-faint hover:text-fg-muted"
                                     onClick={() => setSkippedVendor(true)}>
-                                    Skip
+                                    {tForm('skip')}
                                 </button>
                             </div>
                         </div>
@@ -629,21 +629,21 @@ export function ExpenseIntentField({
                                 disabled={disabled}
                                 className="rounded-full border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
                                 onClick={() => setCustomVendor(true)}>
-                                Add vendor…
+                                {tForm('add_vendor')}
                             </button>
                             <button
                                 type="button"
                                 disabled={disabled}
                                 className="rounded-full px-3 py-1.5 text-sm text-fg-faint hover:text-fg-muted"
                                 onClick={() => setSkippedVendor(true)}>
-                                Skip
+                                {tForm('skip')}
                             </button>
                         </div>
                     )}
                     {customVendor ? (
                         <div className="relative grid gap-1.5">
                             <FormInput
-                                placeholder="Type vendor name — e.g. Zara"
+                                placeholder={t('vendor_type_placeholder')}
                                 disabled={disabled}
                                 value={query}
                                 autoComplete="off"
@@ -708,7 +708,7 @@ export function ExpenseIntentField({
                                                 disabled={disabled}
                                                 className="w-full px-3 py-2 text-left text-sm text-fg-muted hover:bg-accent-soft hover:text-accent"
                                                 onClick={() => commitCustomVendor(query)}>
-                                                Use “{query.trim()}” as vendor
+                                                {t('use_as_vendor', { name: query.trim() })}
                                             </button>
                                         </li>
                                     ) : null}
@@ -719,7 +719,7 @@ export function ExpenseIntentField({
                                     disabled={disabled}
                                     className="rounded-xl border border-dashed border-line px-3 py-2 text-left text-sm text-fg-muted hover:border-accent hover:text-accent"
                                     onClick={() => commitCustomVendor(query)}>
-                                    No match — use “{query.trim()}” as vendor
+                                    {t('no_match_use', { name: query.trim() })}
                                 </button>
                             ) : null}
                         </div>
@@ -729,7 +729,7 @@ export function ExpenseIntentField({
 
             {value.source === 'custom' && value.vendor && !value.categoryKey ? (
                 <Typography as="p" size="sm" color="muted">
-                    Pick a jar below — or change and choose a type so we can categorize it.
+                    {t('custom_jar_hint')}
                 </Typography>
             ) : null}
         </div>

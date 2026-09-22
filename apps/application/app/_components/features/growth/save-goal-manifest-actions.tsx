@@ -5,6 +5,7 @@ import { useState } from 'react';
 
 import type { Goal } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
 import {
     Button,
     Dialog,
@@ -14,7 +15,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@rumtelo/ui';
-
+import { useApiError } from '@/app/_lib/api-error-messages';
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { isFocusSaveGoal, saveGoalRank } from '@/app/_lib/goal-focus';
@@ -38,6 +39,9 @@ export function SaveGoalManifestActions({
     jarAvailableCents,
     formatMoney,
 }: Props) {
+    const t = useTranslations('features.growth.goals');
+    const tUi = useTranslations();
+    const apiError = useApiError();
     const queryClient = useQueryClient();
     const { showToast } = useAppShell();
     const [achieveOpen, setAchieveOpen] = useState(false);
@@ -64,10 +68,10 @@ export function SaveGoalManifestActions({
         mutationFn: () => api.money.goals.setFocus({ householdId, id: goal.id }),
         onSuccess: async () => {
             await invalidate();
-            showToast('This is your focus now', 'success');
+            showToast(t('toast_focus'), 'success');
         },
         onError: (error: Error) => {
-            showToast(error.message || 'Could not set focus', 'error');
+            showToast(apiError(error), 'error');
         },
     });
 
@@ -77,15 +81,13 @@ export function SaveGoalManifestActions({
         onSuccess: async (_data, mode) => {
             await invalidate();
             showToast(
-                mode === 'spend'
-                    ? 'Goal claimed — spent from the jar'
-                    : 'Goal achieved — cash stays in the jar',
+                mode === 'spend' ? t('toast_achieve_spend') : t('toast_achieve_keep'),
                 'success'
             );
             setAchieveOpen(false);
         },
         onError: (error: Error) => {
-            showToast(error.message || 'Could not mark achieved', 'error');
+            showToast(apiError(error), 'error');
         },
     });
 
@@ -98,7 +100,7 @@ export function SaveGoalManifestActions({
             <div className="flex flex-wrap items-center gap-2">
                 {rank !== null ? (
                     <span className="rounded-full border border-line bg-raised px-2.5 py-1 font-mono text-[10px] font-semibold tracking-wide text-fg-muted uppercase">
-                        {isFocus ? 'Focus · #1' : `Priority · #${rank}`}
+                        {isFocus ? t('focus_badge') : t('priority_badge', { rank: String(rank) })}
                     </span>
                 ) : null}
                 {!isFocus ? (
@@ -108,7 +110,7 @@ export function SaveGoalManifestActions({
                         variant="secondary"
                         disabled={busy}
                         onClick={() => focusMutation.mutate()}>
-                        {focusMutation.isPending ? 'Setting…' : 'Make focus'}
+                        {focusMutation.isPending ? t('setting_focus') : t('make_focus')}
                     </Button>
                 ) : null}
                 <Button
@@ -116,7 +118,7 @@ export function SaveGoalManifestActions({
                     size="sm"
                     disabled={busy}
                     onClick={() => setAchieveOpen(true)}>
-                    Mark achieved
+                    {t('mark_achieved')}
                 </Button>
             </div>
 
@@ -125,15 +127,21 @@ export function SaveGoalManifestActions({
                 onOpenChange={open => {
                     if (!open && !busy) setAchieveOpen(false);
                 }}>
-                <DialogContent className="sm:max-w-md">
+                <DialogContent className="sm:max-w-md" closeLabel={tUi('ui.button.actions.close')}>
                     <DialogHeader>
-                        <DialogTitle>Claim “{goal.name}”?</DialogTitle>
+                        <DialogTitle>{t('claim_title', { name: goal.name })}</DialogTitle>
                         <DialogDescription>
                             {canAfford
-                                ? `The jar has ${formatMoney(jarAvailableCents)} — enough for ${formatMoney(goal.target)}.`
+                                ? t('claim_enough', {
+                                      available: formatMoney(jarAvailableCents),
+                                      target: formatMoney(goal.target),
+                                  })
                                 : jarAvailableCents !== null
-                                  ? `Jar has ${formatMoney(jarAvailableCents)}; target is ${formatMoney(goal.target)}. You can still claim and keep cash in the jar, or spend what you can later.`
-                                  : `Mark this goal reached. Choose whether money leaves the jar now.`}
+                                  ? t('claim_short', {
+                                        available: formatMoney(jarAvailableCents),
+                                        target: formatMoney(goal.target),
+                                    })
+                                  : t('claim_default')}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter className="flex-col gap-2 sm:flex-col">
@@ -142,7 +150,9 @@ export function SaveGoalManifestActions({
                             disabled={busy}
                             onClick={() => achieveMutation.mutate('keep')}
                             className="w-full">
-                            {achieveMutation.isPending ? 'Saving…' : 'Achieved — keep in jar'}
+                            {achieveMutation.isPending
+                                ? t('achieve_keep_pending')
+                                : t('achieve_keep')}
                         </Button>
                         <Button
                             type="button"
@@ -151,8 +161,8 @@ export function SaveGoalManifestActions({
                             onClick={() => achieveMutation.mutate('spend')}
                             className="w-full">
                             {canAfford
-                                ? `Ordered — spend ${formatMoney(goal.target)}`
-                                : 'Spend (need full target in jar)'}
+                                ? t('achieve_spend', { amount: formatMoney(goal.target) })
+                                : t('achieve_spend_blocked')}
                         </Button>
                         <Button
                             type="button"
@@ -160,7 +170,7 @@ export function SaveGoalManifestActions({
                             disabled={busy}
                             onClick={() => setAchieveOpen(false)}
                             className="w-full">
-                            Cancel
+                            {t('cancel')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

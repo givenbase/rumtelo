@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import { Typography } from '@rumtelo/ui';
+import { useTranslations } from '@rumtelo/i18n';
 import { cn } from '@rumtelo/utils';
 
 import { CREATE_HREF, type CreateKind } from '@/app/_lib/create-routes';
@@ -12,18 +13,20 @@ import {
     usePlanCapabilities,
 } from '@/components/features/shell/use-plan-capabilities';
 
-const QUICK_ITEMS: { label: string; kind: CreateKind }[] = [
-    { label: 'Transaction', kind: 'tx' },
-    { label: 'Fixed cost', kind: 'fixed' },
-    { label: 'Debt', kind: 'debt' },
-    { label: 'Goal', kind: 'goal' },
-    { label: 'Income', kind: 'income' },
-    { label: 'Training', kind: 'session' },
-    { label: 'Asset', kind: 'asset' },
-    { label: 'Move money', kind: 'move' },
+const QUICK_ITEMS: { labelKey: string; kind: CreateKind }[] = [
+    { labelKey: 'pages.shell.quick_add.transaction', kind: 'tx' },
+    { labelKey: 'pages.shell.quick_add.fixed_cost', kind: 'fixed' },
+    { labelKey: 'pages.shell.quick_add.debt', kind: 'debt' },
+    { labelKey: 'pages.shell.quick_add.goal', kind: 'goal' },
+    { labelKey: 'pages.shell.quick_add.income', kind: 'income' },
+    { labelKey: 'pages.shell.quick_add.training', kind: 'session' },
+    { labelKey: 'pages.shell.quick_add.asset', kind: 'asset' },
+    { labelKey: 'pages.shell.quick_add.move_money', kind: 'move' },
 ];
 
 export function QuickAddFab() {
+    const t = useTranslations();
+    const tQuick = useTranslations('pages.shell.quick_add');
     const { quickOpen, toggleQuick, setQuickOpen } = useAppShell();
     const { isCapabilityLocked } = usePlanCapabilities();
 
@@ -39,7 +42,7 @@ export function QuickAddFab() {
                         weight="semibold"
                         color="muted"
                         className="mb-1 text-fg-faint">
-                        Quick add
+                        {t('pages.shell.quick_add.title')}
                     </Typography>
                     {QUICK_ITEMS.map(item => {
                         const capabilityKey = CREATE_KIND_CAPABILITY[item.kind];
@@ -59,7 +62,7 @@ export function QuickAddFab() {
                                         🔒
                                     </span>
                                 )}
-                                {item.label}
+                                {t(item.labelKey)}
                             </Link>
                         );
                     })}
@@ -79,7 +82,7 @@ export function QuickAddFab() {
                             ? 'gap-2.5 px-3.5 py-3 sm:px-4'
                             : 'gap-2 p-2.5 pr-3 hover:gap-2.5 hover:px-3.5 hover:py-3 focus-visible:gap-2.5 focus-visible:px-3.5 focus-visible:py-3 sm:hover:px-4'
                     )}
-                    aria-label={quickOpen ? 'Close quick add' : 'Quick add'}
+                    aria-label={quickOpen ? tQuick('close_aria') : tQuick('open_aria')}
                     aria-expanded={quickOpen}
                     aria-keyshortcuts="Meta+K Control+K">
                     <span className="grid size-6.5 shrink-0 place-items-center rounded-lg bg-on-accent/20 text-lg leading-none">
@@ -92,7 +95,7 @@ export function QuickAddFab() {
                                 ? 'max-w-28 opacity-100'
                                 : 'max-w-0 opacity-0 group-hover:max-w-28 group-hover:opacity-100 group-focus-visible:max-w-28 group-focus-visible:opacity-100'
                         )}>
-                        {quickOpen ? 'Close' : 'Quick add'}
+                        {quickOpen ? tQuick('close') : tQuick('fab_label')}
                     </span>
                     <span className="shrink-0 rounded-md bg-on-accent/15 px-1.75 py-1 font-mono text-xs font-medium tracking-wide">
                         ⌘K

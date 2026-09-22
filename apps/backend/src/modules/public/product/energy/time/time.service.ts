@@ -1,5 +1,5 @@
 import { EntityManager } from '@mikro-orm/postgresql';
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
     bandStatus,
     CAPABILITIES,
@@ -13,6 +13,7 @@ import {
 import type { TimeEntry as TimeEntryDto, TimeWeekSummary } from '@rumtelo/contracts';
 
 import { PlanAccessService } from '../../../../../common/capability';
+import { apiNotFound } from '../../../../../common/errors/api-user-error';
 import { HouseholdScopedRepository } from '../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../common/household/household.context';
 import { currentWeek } from '../../../../../common/utils/period.util';
@@ -180,7 +181,7 @@ export class TimeService {
     async delete(input: { id: string }): Promise<void> {
         const { account } = await this.accounts.ensureCurrentAccount();
         const row = await this.repo.findOne({ id: input.id, account: account.id });
-        if (!row) throw new NotFoundException('Time entry not found');
+        if (!row) throw apiNotFound('time_entry_not_found');
         await this.em.remove(row).flush();
         await this.timeCoach.refresh();
     }

@@ -1,10 +1,11 @@
 /**
- * Merge translations TypeScript modules into languages/en.json, then fill
- * missing keys in other locale JSON files from English (does not call DeepL).
+ * Merge translations TypeScript modules into languages/en.json, then sync
+ * other locale JSON files: fill missing keys from English and drop keys that
+ * no longer exist in EN (does not call DeepL).
  *
- * Galighticus uses DeepL for non-English; Rumtelo starts with a local merge so
- * we never spend API quota from automation. Prefer adding English under
- * translations/ first; Dutch overrides live in languages/nl.json until DeepL.
+ * Prefer adding English under translations/ first. For other locales: run
+ * `pnpm --filter @rumtelo/i18n translate:locales` after generate — it translates
+ * leaves still identical to EN via DeepL and keeps existing overrides.
  *
  * Run: pnpm --filter @rumtelo/i18n generate
  */
@@ -12,7 +13,8 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { basename, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { locales, LocalesEnum } from './next-intl';
+import { locales } from './next-intl';
+import { DEFAULT_INTL_LOCALE } from '@rumtelo/contracts';
 
 const packageRoot = join(fileURLToPath(import.meta.url), '../..');
 const translationsDir = join(packageRoot, 'translations');
@@ -31,24 +33,30 @@ async function loadTranslations(): Promise<Record<string, Record<string, unknown
 
         const bucket: Record<string, unknown> = {};
         out[section] = bucket;
-        const files = readdirSync(sectionDir).filter(
-            file => file.endsWith('.ts') && file !== 'index.ts'
-        );
+        const files = readdirSync(sectionDir)
+            .filter(file => file.endsWith('.ts') && file !== 'index.ts')
+            .sort((left, right) => left.localeCompare(right));
 
-        await Promise.all(
+        // Load in parallel, then assign in sorted file order so en.json key
+        // order is stable across runs (Promise settlement order is not).
+        const loaded = await Promise.all(
             files.map(async file => {
                 const moduleName = basename(file, '.ts');
                 const modulePath = join(sectionDir, file);
-                // Prefer file URL without query/hash — language keys off the path.
                 const mod = await import(pathToFileURL(modulePath).href);
                 if (!mod.default) {
                     console.warn(`No default export: ${section}/${file}`);
-                    return;
+                    return null;
                 }
-                bucket[moduleName] = mod.default;
                 console.log(`Loaded ${section}.${moduleName}`);
+                return { moduleName, value: mod.default as unknown };
             })
         );
+
+        for (const entry of loaded) {
+            if (!entry) continue;
+            bucket[entry.moduleName] = entry.value;
+        }
     }
 
     return out;
@@ -58,40 +66,60 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-/** Deep-merge: keep `existing` values, add missing keys from `fallback`. */
+/**
+ * Keep `existing` values for keys present in `fallback`, add missing from `fallback`,
+ * and drop keys that no longer exist in English (prevents stale NL orphans).
+ */
 function fillMissing(existing: Json, fallback: Json): Json {
     if (!isPlainObject(fallback)) return existing ?? fallback;
     if (!isPlainObject(existing)) return structuredClone(fallback);
 
-    const result: Record<string, Json> = { ...(existing as Record<string, Json>) };
+    const result: Record<string, Json> = {};
     for (const [key, value] of Object.entries(fallback)) {
-        if (!(key in result) || result[key] === undefined || result[key] === null) {
+        if (!(key in existing) || existing[key] === undefined || existing[key] === null) {
             result[key] = structuredClone(value);
         } else {
-            result[key] = fillMissing(result[key], value);
+            result[key] = fillMissing(existing[key], value);
         }
     }
     return result;
+}
+
+/** Write JSON only when serialized content differs (avoids dirty mtimes / git noise). */
+function writeJsonIfChanged(filePath: string, data: Json, label?: string): boolean {
+    const next = `${JSON.stringify(data, null, 4)}\n`;
+    if (existsSync(filePath)) {
+        const prev = readFileSync(filePath, 'utf8');
+        if (prev === next) {
+            console.log(`Unchanged ${filePath}`);
+            return false;
+        }
+    }
+    writeFileSync(filePath, next, 'utf8');
+    console.log(label ?? `Wrote ${filePath}`);
+    return true;
 }
 
 async function main() {
     mkdirSync(languagesDir, { recursive: true });
 
     const english = (await loadTranslations()) as unknown as Json;
-    const enPath = join(languagesDir, `${LocalesEnum.English}.json`);
-    writeFileSync(enPath, `${JSON.stringify(english, null, 4)}\n`, 'utf8');
-    console.log(`Wrote ${enPath}`);
+    const enPath = join(languagesDir, `${DEFAULT_INTL_LOCALE}.json`);
+    writeJsonIfChanged(enPath, english);
 
     for (const locale of locales) {
-        if (locale === LocalesEnum.English) continue;
+        if (locale === DEFAULT_INTL_LOCALE) continue;
         const path = join(languagesDir, `${locale}.json`);
         let current: Json = {};
         if (existsSync(path)) {
             current = JSON.parse(readFileSync(path, 'utf8')) as Json;
         }
         const merged = fillMissing(current, english);
-        writeFileSync(path, `${JSON.stringify(merged, null, 4)}\n`, 'utf8');
-        console.log(`Wrote ${path} (filled missing from en)`);
+        writeJsonIfChanged(
+            path,
+            merged,
+            `Wrote ${path} (synced from en — filled missing, pruned orphans)`
+        );
     }
 }
 

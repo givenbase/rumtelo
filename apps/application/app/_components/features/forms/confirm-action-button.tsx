@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { useTranslations } from '@rumtelo/i18n';
 import { Button, type ButtonProps } from '@rumtelo/ui';
 
 type ConfirmActionButtonProps = {
@@ -16,13 +17,15 @@ type ConfirmActionButtonProps = {
 export function ConfirmActionButton({
     label,
     confirmLabel,
-    pendingLabel = 'Deleting…',
+    pendingLabel,
     pending,
     disabled,
     onConfirm,
     ...props
 }: ConfirmActionButtonProps) {
+    const tForm = useTranslations('ui.form');
     const [armed, setArmed] = useState(false);
+    const pendingText = pendingLabel ?? tForm('deleting');
 
     return (
         <Button
@@ -38,7 +41,7 @@ export function ConfirmActionButton({
                 onConfirm();
             }}
             {...props}>
-            {pending ? pendingLabel : armed ? confirmLabel : label}
+            {pending ? pendingText : armed ? confirmLabel : label}
         </Button>
     );
 }

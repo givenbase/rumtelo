@@ -6,8 +6,10 @@ import { useState } from 'react';
 import type { TimeTemplate } from '@rumtelo/contracts';
 import { TimeDayKind } from '@rumtelo/contracts';
 import { Button, Eyebrow } from '@rumtelo/ui';
+import { useTranslations } from '@rumtelo/i18n';
 import { cn } from '@rumtelo/utils';
 
+import { useApiError } from '@/app/_lib/api-error-messages';
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
@@ -16,12 +18,12 @@ import type { DayMinutes } from './day-shape';
 import {
     DEFAULT_SHAPE,
     DEFAULT_WEEKDAYS,
-    WEEKDAY_SHORT,
     dayOffFromWorkday,
     describeShape,
     finalizeDay,
     overDay,
     shapeFromMinutes,
+    weekdayShort,
 } from './day-shape';
 import { ShapeEditor } from './shape-editor';
 
@@ -41,6 +43,11 @@ type Props = {
  * the two shapes the daily check-in copies from.
  */
 export function WeekSetupWizard({ householdId, templates, onDone, onCancel }: Props) {
+    const t = useTranslations();
+    const tw = useTranslations('features.energy.week.setup');
+    const ts = useTranslations('features.energy.week.shape');
+    const apiError = useApiError();
+    const weekdays = weekdayShort(ts);
     const queryClient = useQueryClient();
     const { showToast } = useAppShell();
 
@@ -88,10 +95,10 @@ export function WeekSetupWizard({ householdId, templates, onDone, onCancel }: Pr
                 queryClient.invalidateQueries({ queryKey: apiQuery.coach.feed.key() }),
                 queryClient.invalidateQueries({ queryKey: apiQuery.energy.dashboard.get.key() }),
             ]);
-            showToast('Your typical week is set', 'success');
+            showToast(t('common.message.entity.week_set'), 'success');
             onDone();
         },
-        onError: (error: Error) => showToast(error.message || 'Could not save', 'error'),
+        onError: (error: Error) => showToast(apiError(error), 'error'),
     });
 
     const canContinue =
@@ -101,18 +108,18 @@ export function WeekSetupWizard({ householdId, templates, onDone, onCancel }: Pr
         <div className="grid gap-6">
             <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                    <Eyebrow>How does your week mostly look?</Eyebrow>
+                    <Eyebrow>{tw('eyebrow')}</Eyebrow>
                     <p className="mt-2 max-w-prose text-sm leading-relaxed text-fg-muted">
                         {step === 'weekdays'
-                            ? 'Three quick screens. Afterwards, logging a day is one question.'
+                            ? tw('lead_weekdays')
                             : step === 'workday'
-                              ? 'A typical workday. Rough answers are fine — you correct the days that differ.'
+                              ? tw('lead_workday')
                               : workdays.length === 0
-                                ? 'A typical day. Most of it is yours to steer, so that comes first.'
-                                : 'A typical day off. We started from your workday — no work, an hour more sleep, half the travel. Most of the day is now yours to steer, so that comes first; below it, change what else differs.'}
+                                ? tw('lead_dayoff_none')
+                                : tw('lead_dayoff')}
                     </p>
                 </div>
-                <ol className="flex items-center gap-1.5" aria-label="Progress">
+                <ol className="flex items-center gap-1.5" aria-label={tw('progress_aria')}>
                     {STEPS.map((candidate, index) => (
                         <li
                             key={candidate}
@@ -128,11 +135,9 @@ export function WeekSetupWizard({ householdId, templates, onDone, onCancel }: Pr
 
             {step === 'weekdays' ? (
                 <fieldset className="grid gap-3">
-                    <legend className="text-sm font-medium text-fg">
-                        Which days do you usually work?
-                    </legend>
+                    <legend className="text-sm font-medium text-fg">{tw('weekdays_legend')}</legend>
                     <div className="flex flex-wrap gap-2">
-                        {WEEKDAY_SHORT.map((name, index) => {
+                        {weekdays.map((name, index) => {
                             const day = index + 1;
                             const on = workdays.includes(day);
                             return (
@@ -162,10 +167,13 @@ export function WeekSetupWizard({ householdId, templates, onDone, onCancel }: Pr
                     </div>
                     <p className="text-xs text-fg-muted">
                         {workdays.length === 0
-                            ? 'No workdays — every day uses your day-off shape.'
+                            ? tw('weekdays_none')
                             : workdays.length === 7
-                              ? 'Seven workdays — every day uses your workday shape.'
-                              : `${workdays.length} workdays, ${daysOff.length} days off. Shift work? Pick whatever is most common; single days are easy to flip later.`}
+                              ? tw('weekdays_all')
+                              : tw('weekdays_mixed', {
+                                    workdays: workdays.length,
+                                    off: daysOff.length,
+                                })}
                     </p>
                 </fieldset>
             ) : step === 'workday' ? (
@@ -184,9 +192,9 @@ export function WeekSetupWizard({ householdId, templates, onDone, onCancel }: Pr
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
                 <span className="font-mono text-xs text-fg-muted">
                     {step === 'workday'
-                        ? describeShape(workday)
+                        ? describeShape(workday, ts)
                         : step === 'dayOff'
-                          ? describeShape(dayOff)
+                          ? describeShape(dayOff, ts)
                           : ''}
                 </span>
                 <div className="flex items-center gap-2">
@@ -196,11 +204,11 @@ export function WeekSetupWizard({ householdId, templates, onDone, onCancel }: Pr
                             variant="ghost"
                             size="sm"
                             onClick={() => setStep(STEPS[stepIndex - 1]!)}>
-                            Back
+                            {t('ui.button.actions.back')}
                         </Button>
                     ) : onCancel ? (
                         <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
-                            Cancel
+                            {t('ui.button.actions.cancel')}
                         </Button>
                     ) : null}
                     {step === 'dayOff' ? (
@@ -208,7 +216,7 @@ export function WeekSetupWizard({ householdId, templates, onDone, onCancel }: Pr
                             type="button"
                             disabled={!canContinue || saveMutation.isPending}
                             onClick={() => saveMutation.mutate()}>
-                            {saveMutation.isPending ? 'Saving…' : 'Save my typical week'}
+                            {saveMutation.isPending ? t('ui.form.saving') : tw('save_typical')}
                         </Button>
                     ) : (
                         <Button
@@ -221,7 +229,7 @@ export function WeekSetupWizard({ householdId, templates, onDone, onCancel }: Pr
                                     saveMutation.mutate();
                                 else setStep(STEPS[stepIndex + 1]!);
                             }}>
-                            Continue
+                            {t('ui.button.actions.continue')}
                         </Button>
                     )}
                 </div>

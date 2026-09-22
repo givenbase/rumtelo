@@ -1,0 +1,62 @@
+import type { IntlLocale } from '@rumtelo/contracts';
+
+/**
+ * Non-English goal preset names, keyed by intl locale then preset key.
+ * Do not include `en`; English lives on the preset row.
+ */
+export const GOAL_PRESET_TRANSLATIONS: Partial<Record<IntlLocale, Record<string, string>>> = {
+    nl: {
+        EMERGENCY_FUND: 'Noodfonds',
+        HOME: 'Een plek helemaal voor mezelf',
+        CAR: 'Autofonds',
+        WEDDING: 'Bruiloft',
+        SABBATICAL: 'Sabbatical',
+        ADVENTURE_VACATION: 'Avontuurlijke vakantie',
+        DREAM_TRIP: 'Droomreis',
+        INVESTMENT_BUFFER: 'Beleggingsbuffer',
+        PORTFOLIO_START: 'Begin met beleggen',
+        BUSINESS_SEED: 'Een bedrijf starten',
+        BUSINESS_RUNWAY: 'Bedrijfsduur',
+        EDUCATION_FUND: 'Onderwijsfonds',
+        TUITION: 'Collegegeld',
+        CAREER_SWITCH: 'Carrièreverandering',
+        GIVING_PLEDGE: 'Een toezegging doen',
+        OTHER: 'Overige',
+    },
+    es: {
+        EMERGENCY_FUND: 'Fondo de emergencia',
+        HOME: 'Un lugar para mí sola',
+        CAR: 'Fondo para el coche',
+        WEDDING: 'Boda',
+        SABBATICAL: 'Año sabático',
+        ADVENTURE_VACATION: 'Vacaciones de aventura',
+        DREAM_TRIP: 'El viaje de mis sueños',
+        INVESTMENT_BUFFER: 'Reserva de inversión',
+        PORTFOLIO_START: 'Empieza a invertir',
+        BUSINESS_SEED: 'Poner en marcha un negocio',
+        BUSINESS_RUNWAY: 'Perspectivas de negocio',
+        EDUCATION_FUND: 'Fondo para la educación',
+        TUITION: 'Matrícula',
+        CAREER_SWITCH: 'Cambio de carrera profesional',
+        GIVING_PLEDGE: 'Compromiso de donación',
+        OTHER: 'Otros',
+    },
+    fr: {
+        EMERGENCY_FUND: "Fonds d'urgence",
+        HOME: 'Un endroit à moi',
+        CAR: 'Fonds automobile',
+        WEDDING: 'Mariage',
+        SABBATICAL: 'Congé sabbatique',
+        ADVENTURE_VACATION: "Vacances d'aventure",
+        DREAM_TRIP: 'Le voyage de rêve',
+        INVESTMENT_BUFFER: "Réserve d'investissement",
+        PORTFOLIO_START: 'Commencez à investir',
+        BUSINESS_SEED: 'Créer une entreprise',
+        BUSINESS_RUNWAY: "Perspectives de développement de l'entreprise",
+        EDUCATION_FUND: "Fonds pour l'éducation",
+        TUITION: 'Frais de scolarité',
+        CAREER_SWITCH: 'Changement de carrière',
+        GIVING_PLEDGE: 'Engagement de don',
+        OTHER: 'Autres',
+    },
+};

@@ -4,7 +4,7 @@ import { AuthUser } from '../user/auth-user.entity';
 
 /**
  * better-auth's credential store, renamed from `account` to `provider`
- * (Galighticus pattern) — it holds sign-in provider links per user: the
+ * Holds sign-in provider links per user: the
  * password hash for email-and-password, OAuth tokens for social providers.
  * Nothing profile-like lives here; the Rumtelo-owned `account` entity lives in
  * `modules/auth/user/account`.

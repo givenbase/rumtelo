@@ -4,6 +4,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 
 import Link from 'next/link';
 
+import { useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Typography } from '@rumtelo/ui';
 import { toPeriodKey } from '@rumtelo/utils';
@@ -11,6 +12,7 @@ import { toPeriodKey } from '@rumtelo/utils';
 import { CREATE_HREF, createTxHref } from '@/app/_lib/create-routes';
 import { necessitiesPressureFromJar } from '@/app/_lib/necessities-pressure';
 import { isLiveData } from '@/app/_lib/preview';
+import { resolveJarSubtitle } from '@/app/_lib/jar-copy';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { productPath } from '@/app/_lib/routes';
@@ -29,6 +31,7 @@ import { ListToolbar } from '@/components/layout/list-toolbar';
  * Income what-ifs live on Growth → Income (`IncomeSimulator`) — the lever there is income.
  */
 export function JarsPageClient() {
+    const t = useTranslations('features.money.jars');
     const { householdId } = useAuth();
     const { period } = useAppShell();
     const periodKey = toPeriodKey(period.year, period.month);
@@ -57,14 +60,13 @@ export function JarsPageClient() {
         <div className="grid animate-rise gap-8">
             <div>
                 <Typography as="span" variant="eyebrow" color="primary">
-                    ✦ THE SIX JARS
+                    ✦ {t('eyebrow')}
                 </Typography>
                 <Typography as="h1" className="mt-2">
-                    Every coin gets a job before it arrives.
+                    {t('title')}
                 </Typography>
                 <Typography as="p" variant="lead" size="default" className="mt-2">
-                    Income lands, the split happens the same second. Financial Freedom is never
-                    spent — only invested.
+                    {t('lead')}
                 </Typography>
             </div>
 
@@ -72,24 +74,27 @@ export function JarsPageClient() {
                 <ListToolbar
                     secondary={
                         <span className="font-mono text-xs font-medium text-fg-faint">
-                            {onTarget} / {jars.length} on track
+                            {t('on_track', { on: onTarget, total: jars.length })}
                         </span>
                     }
                     createSlot={
                         <div className="flex flex-wrap items-center gap-2">
                             <Button as={Link} href={CREATE_HREF.move} size="sm" variant="secondary">
-                                Move between jars
+                                {t('move_between')}
                             </Button>
                             <Button as={Link} href={createTxHref()} size="sm">
-                                + Add transaction
+                                {t('add_transaction')}
                             </Button>
                         </div>
                     }>
                     <span className="rounded-full border border-accent/30 bg-accent-soft px-4 py-2 font-mono text-xs font-medium tracking-wide text-accent uppercase">
-                        {jars.length} jars · {Math.round(totalPct * 10) / 10}% allocated
+                        {t('allocated', {
+                            count: jars.length,
+                            pct: Math.round(totalPct * 10) / 10,
+                        })}
                     </span>
                     <span className="font-mono text-xs font-medium text-fg-faint">
-                        Tap a jar for fixed costs, spends, and what is left
+                        {t('tap_hint')}
                     </span>
                 </ListToolbar>
             </div>
@@ -112,7 +117,12 @@ export function JarsPageClient() {
                                     id: jar.id,
                                     key: jar.key,
                                     name: jar.name,
-                                    subtitle: jar.subtitle ?? catalog?.subtitle ?? '',
+                                    subtitle: resolveJarSubtitle(
+                                        t,
+                                        jar.key,
+                                        jar.subtitle,
+                                        catalog?.subtitle
+                                    ),
                                     icon: jar.icon ?? catalog?.icon ?? '◇',
                                     color: jarChrome(jar.key).color,
                                     percentage: jar.percentage,
@@ -134,15 +144,18 @@ export function JarsPageClient() {
 
                 <div className="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 font-mono text-xs text-fg-faint">
                     <span>
-                        {onTarget} / {jars.length} jars on track
                         {stacked
-                            ? ` · stacked over ${dashboardQuery.data?.travel?.monthsHorizon ?? '—'} months`
-                            : ' this period'}
+                            ? t('footer_stacked', {
+                                  on: onTarget,
+                                  total: jars.length,
+                                  months: dashboardQuery.data?.travel?.monthsHorizon ?? '—',
+                              })
+                            : t('footer_period', { on: onTarget, total: jars.length })}
                     </span>
                     <Link
                         href={productPath('growth/income')}
                         className="text-accent underline-offset-2 hover:underline">
-                        What would a raise do to these jars? → Income
+                        {t('income_link')}
                     </Link>
                 </div>
             </div>

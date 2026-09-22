@@ -5,6 +5,7 @@ const button = {
         cancel: 'Cancel',
         submit: 'Submit',
         back: 'Back',
+        back_arrow: '← Back',
         next: 'Next',
         continue: 'Continue',
         save: 'Save',
@@ -21,6 +22,9 @@ const button = {
         sign_in: 'Sign in',
         sign_up: 'Create account',
         sign_out: 'Sign out',
+        try_again: 'Try again',
+        dismiss: 'Dismiss',
+        resend: 'Resend',
     },
 } as const;
 

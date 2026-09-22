@@ -20,18 +20,22 @@ import {
     TimeEvidence,
     TimeKind,
 } from '@rumtelo/contracts';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Badge, Button, Card, Eyebrow, Section, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { isLiveData } from '@/app/_lib/preview';
 import {
-    TIME_EVIDENCE_META,
     TIME_KIND_META,
     TIME_KIND_ORDER,
     TIME_STATUS_META,
     formatBandRange,
     formatMinutes,
+    timeEvidenceBlurb,
+    timeEvidenceName,
+    timeKindName,
+    timeStatusName,
 } from '@/app/_lib/time-meta';
 import { formatDayLabel, shiftWeek, todayIso, weekKeyOf, weekRangeOf } from '@/app/_lib/week-key';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -44,13 +48,6 @@ import { TimeSources } from './time-sources';
 import { previewWeekSummary } from './week-fixture';
 import { WeekForecast } from './week-forecast';
 import { WeekSetupWizard } from './week-setup-wizard';
-
-const METRIC_LABEL: Record<EnergyMetric, string> = {
-    [EnergyMetric.SLEEP]: 'Sleep',
-    [EnergyMetric.TRAIN]: 'Training',
-    [EnergyMetric.FOOD]: 'Nutrition',
-    [EnergyMetric.MIND]: 'Stillness',
-};
 
 const TREND_ICON: Record<EnergyTrend, string> = {
     [EnergyTrend.UP]: '↑',
@@ -86,6 +83,16 @@ function emptySummary(week: string): TimeWeekSummary {
 }
 
 export function WeekPageClient() {
+    const locale = useLocale();
+    const t = useTranslations('features.energy.week');
+    const tRoot = useTranslations();
+    const tm = useTranslations('features.energy.week.meta');
+    const metricLabel: Record<EnergyMetric, string> = {
+        [EnergyMetric.SLEEP]: t('metric_sleep'),
+        [EnergyMetric.TRAIN]: t('metric_train'),
+        [EnergyMetric.FOOD]: t('metric_food'),
+        [EnergyMetric.MIND]: t('metric_mind'),
+    };
     const { householdId, userId } = useAuth();
     const live = isLiveData(householdId);
     const today = todayIso();
@@ -161,10 +168,10 @@ export function WeekPageClient() {
     );
 
     const memberName = (accountId: string, index: number) => {
-        if (accountId === myAccountId) return 'You';
+        if (accountId === myAccountId) return t('member_you');
         return (
             membersQuery.data.find(member => member.accountId === accountId)?.displayName ??
-            `Member ${index + 1}`
+            t('member_fallback', { n: index + 1 })
         );
     };
 
@@ -182,7 +189,8 @@ export function WeekPageClient() {
     const discretionaryRange = formatBandRange(
         DISCRETIONARY_BAND.targetLow,
         DISCRETIONARY_BAND.targetHigh,
-        true
+        true,
+        tRoot
     );
 
     const orderedCategories = TIME_CATEGORY_ORDER.map(category =>
@@ -191,11 +199,9 @@ export function WeekPageClient() {
 
     return (
         <div className="grid animate-rise gap-6">
-            <Section eyebrow="My week" title="Every hour gets a job too.">
+            <Section eyebrow={t('eyebrow')} title={t('title')}>
                 <Typography as="p" variant="lead" size="default">
-                    Log where a day went, in hours. The week is compared with what public-health
-                    bodies and field studies on three continents actually found — not with your jar
-                    percentages.
+                    {t('lead')}
                 </Typography>
             </Section>
 
@@ -207,7 +213,7 @@ export function WeekPageClient() {
                             key={stat.metric}
                             className="flex items-center gap-3 rounded-xl border border-line bg-raised px-4 py-2.5">
                             <span className="font-mono text-xs font-medium tracking-wide text-fg-muted uppercase">
-                                {METRIC_LABEL[stat.metric]}
+                                {metricLabel[stat.metric]}
                             </span>
                             <span className="font-mono text-base font-semibold text-fg">
                                 {Math.round(stat.average7d)}
@@ -234,10 +240,9 @@ export function WeekPageClient() {
                         <>
                             <div className="flex flex-wrap items-start justify-between gap-3">
                                 <div>
-                                    <Eyebrow>Every category</Eyebrow>
+                                    <Eyebrow>{t('log_everything')}</Eyebrow>
                                     <p className="mt-2 max-w-prose text-sm leading-relaxed text-fg-muted">
-                                        The full diary, in hours. Rough is fine — quarter-hours are
-                                        finer than national time-use surveys ask for.
+                                        {t('log_everything_body')}
                                     </p>
                                 </div>
                                 <Button
@@ -245,7 +250,7 @@ export function WeekPageClient() {
                                     size="sm"
                                     variant="ghost"
                                     onClick={() => setLogMode('checkIn')}>
-                                    Back to quick log
+                                    {t('back_quick')}
                                 </Button>
                             </div>
                             <DayLogForm
@@ -261,7 +266,7 @@ export function WeekPageClient() {
                         </>
                     ) : (
                         <>
-                            <Eyebrow>Log a day</Eyebrow>
+                            <Eyebrow>{t('log_day')}</Eyebrow>
                             <DayCheckIn
                                 key={day}
                                 householdId={householdId}
@@ -293,18 +298,19 @@ export function WeekPageClient() {
                     <div>
                         <Eyebrow>
                             {week === thisWeek
-                                ? 'This week'
+                                ? t('this_week')
                                 : week === lastWeek
-                                  ? 'Next week'
+                                  ? t('next_week')
                                   : week}{' '}
-                            · {formatDayLabel(range.from)} – {formatDayLabel(range.to)}
+                            · {formatDayLabel(range.from, locale)} –{' '}
+                            {formatDayLabel(range.to, locale)}
                         </Eyebrow>
                         <p className="mt-1 font-mono text-xs text-fg-muted">
                             {hasData
-                                ? `${summary.daysLogged} of 7 days logged`
+                                ? t('days_logged', { logged: summary.daysLogged })
                                 : week > thisWeek
-                                  ? 'Not started yet'
-                                  : 'Nothing logged yet for this week'}
+                                  ? t('not_started')
+                                  : t('nothing_logged')}
                         </p>
                     </div>
                     <div className="flex items-center gap-1">
@@ -312,7 +318,7 @@ export function WeekPageClient() {
                             type="button"
                             size="sm"
                             variant="ghost"
-                            aria-label="Previous week"
+                            aria-label={t('prev_week')}
                             onClick={() => selectWeek(shiftWeek(week, -1))}>
                             ←
                         </Button>
@@ -322,13 +328,13 @@ export function WeekPageClient() {
                             variant="ghost"
                             disabled={week === thisWeek}
                             onClick={() => selectWeek(thisWeek)}>
-                            Today
+                            {t('today')}
                         </Button>
                         <Button
                             type="button"
                             size="sm"
                             variant="ghost"
-                            aria-label="Next week"
+                            aria-label={t('next_week_btn')}
                             disabled={week >= lastWeek}
                             onClick={() => selectWeek(shiftWeek(week, 1))}>
                             →
@@ -349,13 +355,13 @@ export function WeekPageClient() {
 
                 {/* ── 168-hour bar ── */}
                 <div>
-                    <Eyebrow>Your week has 168 hours</Eyebrow>
+                    <Eyebrow>{t('hours_168')}</Eyebrow>
                     <div className="mt-3 flex h-3 gap-0.5 overflow-hidden rounded-full bg-sunken">
                         {hasData &&
                             TIME_KIND_ORDER.map(kind => (
                                 <span
                                     key={kind}
-                                    title={`${TIME_KIND_META[kind].name} — ${formatMinutes(kindMinutes[kind])}`}
+                                    title={`${timeKindName(tm, kind)} — ${formatMinutes(kindMinutes[kind], tRoot)}`}
                                     className="block h-full"
                                     style={{
                                         width: `${(kindMinutes[kind] / barTotal) * 100}%`,
@@ -373,21 +379,21 @@ export function WeekPageClient() {
                                     className="size-2 rounded-sm"
                                     style={{ background: TIME_KIND_META[kind].color }}
                                 />
-                                {TIME_KIND_META[kind].name}{' '}
-                                {hasData ? formatMinutes(kindMinutes[kind]) : '—'}
+                                {timeKindName(tm, kind)}{' '}
+                                {hasData ? formatMinutes(kindMinutes[kind], tRoot) : '—'}
                             </span>
                         ))}
                         {hasData && summary.unloggedMinutes > 0 ? (
                             <span className="flex items-baseline gap-2 font-mono text-xs text-fg-faint">
                                 <span className="size-2 rounded-sm bg-sunken" />
-                                Unlogged {formatMinutes(summary.unloggedMinutes)}
+                                {t('unlogged', {
+                                    time: formatMinutes(summary.unloggedMinutes, tRoot),
+                                })}
                             </span>
                         ) : null}
                     </div>
                     <p className="mt-3 max-w-prose text-sm leading-relaxed text-fg-muted">
-                        Body, paid and unpaid are the split every national time-use survey uses. The
-                        last slice is the part you steer — and the only one where the amount has a
-                        sweet spot rather than a minimum.
+                        {t('bar_lead')}
                     </p>
                 </div>
 
@@ -395,26 +401,28 @@ export function WeekPageClient() {
                 <div className="grid gap-3 border-t border-line pt-5 sm:grid-cols-[auto_1fr] sm:items-start sm:gap-6">
                     <div>
                         <Typography as="span" variant="eyebrow" color="primary">
-                            Of which you steer
+                            {t('steer')}
                         </Typography>
                         <div className="mt-1 flex items-baseline gap-2">
                             <span className="font-display text-3xl font-semibold text-accent tabular-nums">
-                                {hasData ? formatMinutes(summary.discretionary.dailyAverage) : '—'}
+                                {hasData
+                                    ? formatMinutes(summary.discretionary.dailyAverage, tRoot)
+                                    : '—'}
                             </span>
-                            <span className="font-mono text-xs text-fg-faint">/ day</span>
+                            <span className="font-mono text-xs text-fg-faint">{t('per_day')}</span>
                         </div>
                     </div>
                     <div className="grid gap-2">
                         <div className="flex flex-wrap items-center gap-2">
                             {hasData ? (
                                 <Badge tone={discretionaryStatus.tone}>
-                                    {discretionaryStatus.name}
+                                    {timeStatusName(tm, summary.discretionary.status)}
                                 </Badge>
                             ) : null}
                             <span className="text-sm text-fg-secondary">
-                                Sweet spot {discretionaryRange} a day. Under two hours reads as
-                                stress; past five, well-being only holds when the time is social or
-                                purposeful.
+                                {discretionaryRange
+                                    ? t('sweet_spot', { range: discretionaryRange })
+                                    : null}
                             </span>
                         </div>
                         <TimeSources sources={DISCRETIONARY_SOURCES} />
@@ -436,21 +444,17 @@ export function WeekPageClient() {
                     <div className="grid gap-1 rounded-xl border border-dashed border-line p-5 text-sm text-fg-muted">
                         {week > thisWeek ? (
                             <>
-                                <span className="font-medium text-fg">Not started yet.</span>
-                                <span>
-                                    The plan above is next week at your typical shape. Once it
-                                    starts, each check-in replaces a planned day with a real one.
+                                <span className="font-medium text-fg">
+                                    {t('empty_future_title')}
                                 </span>
+                                <span>{t('empty_future_body')}</span>
                             </>
                         ) : (
                             <>
                                 <span className="font-medium text-fg">
-                                    No days logged this week.
+                                    {t('empty_current_title')}
                                 </span>
-                                <span>
-                                    Log one day above and the 168-hour bar, the sweet-spot check and
-                                    the per-category bands fill in from your own minutes.
-                                </span>
+                                <span>{t('empty_current_body')}</span>
                             </>
                         )}
                     </div>
@@ -460,11 +464,10 @@ export function WeekPageClient() {
                 {summary.members.length > 1 ? (
                     <div className="border-t border-line pt-5">
                         <Typography as="span" variant="eyebrow" color="primary">
-                            ✦ Where the hours land in this household
+                            ✦ {t('household_heading')}
                         </Typography>
                         <p className="mt-2 max-w-prose text-sm leading-relaxed text-fg-secondary">
-                            Paid and unpaid hours side by side, per person. In every national survey
-                            this is where the largest gap hides.
+                            {t('household_lead')}
                         </p>
                         <div className="mt-4 grid gap-3">
                             {summary.members.map((member, index) => {
@@ -482,10 +485,20 @@ export function WeekPageClient() {
                                                 {memberName(member.accountId, index)}
                                             </span>
                                             <span className="font-mono text-xs text-fg-muted">
-                                                paid {formatMinutes(member.minutes[TimeKind.PAID])}{' '}
-                                                · unpaid{' '}
-                                                {formatMinutes(member.minutes[TimeKind.UNPAID])} ·{' '}
-                                                {member.daysLogged}d
+                                                {t('member_paid', {
+                                                    time: formatMinutes(
+                                                        member.minutes[TimeKind.PAID],
+                                                        tRoot
+                                                    ),
+                                                })}{' '}
+                                                ·{' '}
+                                                {t('member_unpaid', {
+                                                    time: formatMinutes(
+                                                        member.minutes[TimeKind.UNPAID],
+                                                        tRoot
+                                                    ),
+                                                })}{' '}
+                                                · {member.daysLogged}d
                                             </span>
                                         </div>
                                         <div className="flex h-2 gap-0.5 overflow-hidden rounded-full bg-sunken">
@@ -493,7 +506,7 @@ export function WeekPageClient() {
                                                 <span
                                                     key={kind}
                                                     className="block h-full"
-                                                    title={`${TIME_KIND_META[kind].name} — ${formatMinutes(member.minutes[kind])}`}
+                                                    title={`${timeKindName(tm, kind)} — ${formatMinutes(member.minutes[kind], tRoot)}`}
                                                     style={{
                                                         width: `${(member.minutes[kind] / total) * 100}%`,
                                                         background: TIME_KIND_META[kind].color,
@@ -511,7 +524,7 @@ export function WeekPageClient() {
                 {/* ── How to read the bands ── */}
                 <div className="grid gap-3 border-t border-line pt-5">
                     <Typography as="span" variant="eyebrow" color="primary">
-                        ✦ How to read the bands
+                        ✦ {t('bands_heading')}
                     </Typography>
                     <div className="grid gap-2 sm:grid-cols-3">
                         {(Object.values(TimeEvidence) as TimeEvidence[]).map(evidence => (
@@ -519,20 +532,16 @@ export function WeekPageClient() {
                                 key={evidence}
                                 className="grid gap-1 rounded-xl border border-line bg-raised p-3">
                                 <span className="font-mono text-xs font-semibold tracking-wide text-fg uppercase">
-                                    {TIME_EVIDENCE_META[evidence].name}
+                                    {timeEvidenceName(tm, evidence)}
                                 </span>
                                 <span className="text-xs leading-relaxed text-fg-muted">
-                                    {TIME_EVIDENCE_META[evidence].blurb}
+                                    {timeEvidenceBlurb(tm, evidence)}
                                 </span>
                             </div>
                         ))}
                     </div>
                     <p className="max-w-prose text-sm leading-relaxed text-fg-muted">
-                        Targets come mostly from Canadian and WHO guidelines. Floors are set lower
-                        on purpose: Japan’s ministry of health accepts six hours of sleep, and
-                        people in Tanzania and Namibia without electricity average 6.4. Categories
-                        marked “your call” have no defensible number anywhere — set your own target
-                        and hold yourself to it, but do not let anyone call it medicine.
+                        {t('bands_footer')}
                     </p>
                 </div>
             </Card>

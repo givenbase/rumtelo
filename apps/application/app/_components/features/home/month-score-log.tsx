@@ -1,6 +1,11 @@
+'use client';
+
 import type { MonthScoreEvent } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
 import { Eyebrow } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
+
+import { monthScoreLevelLabel } from '@/app/_lib/month-score-copy';
 
 export type { MonthScoreEvent };
 
@@ -17,25 +22,38 @@ function dayOfMonth(isoDate: string): number {
 export function MonthScoreLog({
     score,
     daysLeft,
+    level,
     events,
 }: {
     score: number;
     daysLeft: number;
+    level: number;
     events: readonly Pick<MonthScoreEvent, 'occurredOn' | 'text' | 'points' | 'kind'>[];
 }) {
+    const t = useTranslations('pages.dashboard.month_score');
+    const tDashboard = useTranslations('pages.dashboard');
+    const levelLabel = monthScoreLevelLabel(tDashboard, level);
+
     return (
         <div className="rounded-2xl border border-line bg-surface p-6 shadow-md">
             {/* Header */}
             <div className="flex flex-wrap items-center justify-between gap-3.5">
-                <Eyebrow>✦ Month score</Eyebrow>
+                <Eyebrow>{t('eyebrow')}</Eyebrow>
                 <span className="flex items-baseline gap-2">
                     <span className="font-mono text-xs font-medium tracking-widest text-fg-faint uppercase">
-                        Score
+                        {t('label')}
                     </span>
                     <span className="font-display text-2xl font-semibold tracking-tight text-accent">
                         {score}
                     </span>
-                    <span className="font-mono text-xs text-fg-faint">{daysLeft} days left</span>
+                    <span className="font-mono text-xs font-medium tracking-wide text-fg-muted uppercase">
+                        {levelLabel}
+                    </span>
+                    <span className="font-mono text-xs text-fg-faint">
+                        {daysLeft === 1
+                            ? t('days_left_one')
+                            : t('days_left_other', { count: daysLeft })}
+                    </span>
                 </span>
             </div>
 

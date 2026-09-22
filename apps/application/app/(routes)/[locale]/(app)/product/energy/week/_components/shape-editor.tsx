@@ -3,12 +3,13 @@
 import { useState } from 'react';
 
 import { TimeCategory } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
 import { cn } from '@rumtelo/utils';
 
 import { formatMinutes } from '@/app/_lib/time-meta';
 
 import type { DayMinutes, ShapeQuestion } from './day-shape';
-import { ANCHORS, FREE_SPLIT, MORE, freeAssigned, freeRemainder } from './day-shape';
+import { buildAnchors, buildFreeSplit, buildMore, freeAssigned, freeRemainder } from './day-shape';
 import { HourChips } from './hour-chips';
 
 type Props = {
@@ -36,11 +37,18 @@ export function ShapeEditor({
     onChange,
     variant = 'workday',
     reference,
-    referenceLabel = 'on a workday',
+    referenceLabel,
 }: Props) {
+    const tRoot = useTranslations();
+    const ts = useTranslations('features.energy.week.shape');
     const dayOff = variant === 'dayOff';
     const [splitOpen, setSplitOpen] = useState(() => dayOff || freeAssigned(value) > 0);
     const [moreOpen, setMoreOpen] = useState(false);
+
+    const anchors = buildAnchors(ts);
+    const freeSplit = buildFreeSplit(ts);
+    const more = buildMore(ts);
+    const hintLabel = referenceLabel ?? ts('editor.reference_workday');
 
     const remainder = freeRemainder(value);
     const assigned = freeAssigned(value);
@@ -64,14 +72,14 @@ export function ShapeEditor({
                 onChange={set(question.category)}
                 hint={
                     referenceMinutes !== undefined
-                        ? `${referenceLabel}: ${referenceMinutes === 0 ? 'none' : formatMinutes(referenceMinutes)}`
+                        ? `${hintLabel}: ${referenceMinutes === 0 ? ts('editor.hint_none') : formatMinutes(referenceMinutes, tRoot)}`
                         : undefined
                 }
             />
         );
     };
 
-    const anchors = ANCHORS.filter(
+    const visibleAnchors = anchors.filter(
         question => !(dayOff && question.category === TimeCategory.PAID_WORK)
     );
 
@@ -84,22 +92,23 @@ export function ShapeEditor({
                     : 'border-accent/30 bg-accent/5 text-fg'
             )}>
             {remainder < 0 ? (
-                <>That is {formatMinutes(-remainder)} more than a day has.</>
+                <>{ts('editor.over_day', { time: formatMinutes(-remainder, tRoot) })}</>
             ) : (
                 <>
-                    That leaves{' '}
-                    <span className="font-mono font-semibold tabular-nums">
-                        {formatMinutes(remainder)}
-                    </span>{' '}
-                    you steer
+                    {ts('editor.remainder_leaves', { time: formatMinutes(remainder, tRoot) })}
                     {assigned > 0 ? (
                         unsplit < 0 ? (
-                            <> — you split {formatMinutes(-unsplit)} more than that.</>
+                            <>{ts('editor.split_over', { time: formatMinutes(-unsplit, tRoot) })}</>
                         ) : (
                             <>
-                                {' '}
-                                · {formatMinutes(assigned)} split
-                                {unsplit > 0 ? `, ${formatMinutes(unsplit)} unspecified` : ''}
+                                {ts('editor.split_assigned', {
+                                    assigned: formatMinutes(assigned, tRoot),
+                                })}
+                                {unsplit > 0
+                                    ? ts('editor.split_unspecified', {
+                                          time: formatMinutes(unsplit, tRoot),
+                                      })
+                                    : ''}
                             </>
                         )
                     ) : (
@@ -117,27 +126,25 @@ export function ShapeEditor({
                 onClick={() => setSplitOpen(open => !open)}
                 className="justify-self-start font-mono text-xs text-fg-muted hover:text-fg">
                 {splitOpen ? '▾' : '▸'}{' '}
-                {dayOff
-                    ? 'Where does that free time usually go?'
-                    : 'Roughly how does that free time go?'}{' '}
-                <span className="text-fg-faint">optional</span>
+                {dayOff ? ts('editor.split_toggle_dayoff') : ts('editor.split_toggle_workday')}{' '}
+                <span className="text-fg-faint">{ts('editor.optional')}</span>
             </button>
             {splitOpen ? (
-                <div className="grid gap-4 border-l border-line pl-4">{FREE_SPLIT.map(chips)}</div>
+                <div className="grid gap-4 border-l border-line pl-4">{freeSplit.map(chips)}</div>
             ) : null}
         </div>
     );
 
-    const more = (
+    const moreSection = (
         <div className="grid gap-3">
             <button
                 type="button"
                 onClick={() => setMoreOpen(open => !open)}
                 className="justify-self-start font-mono text-xs text-fg-muted hover:text-fg">
-                {moreOpen ? '▾' : '▸'} More — eating & hygiene, study, hobbies, volunteering
+                {moreOpen ? '▾' : '▸'} {ts('editor.more_toggle')}
             </button>
             {moreOpen ? (
-                <div className="grid gap-4 border-l border-line pl-4">{MORE.map(chips)}</div>
+                <div className="grid gap-4 border-l border-line pl-4">{more.map(chips)}</div>
             ) : null}
         </div>
     );
@@ -150,21 +157,21 @@ export function ShapeEditor({
                 {split}
                 <div className="grid gap-3 border-t border-line pt-5">
                     <p className="font-mono text-xs tracking-wide text-fg-muted uppercase">
-                        What changes from a workday
+                        {ts('editor.dayoff_section')}
                     </p>
-                    <div className="grid gap-4">{anchors.map(chips)}</div>
+                    <div className="grid gap-4">{visibleAnchors.map(chips)}</div>
                 </div>
-                {more}
+                {moreSection}
             </div>
         );
     }
 
     return (
         <div className="grid gap-5">
-            <div className="grid gap-4">{anchors.map(chips)}</div>
+            <div className="grid gap-4">{visibleAnchors.map(chips)}</div>
             {remainderBox}
             {split}
-            {more}
+            {moreSection}
         </div>
     );
 }

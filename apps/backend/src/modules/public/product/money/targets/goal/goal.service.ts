@@ -1,5 +1,7 @@
 import { EntityManager } from '@mikro-orm/postgresql';
-import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+
+import { apiBadRequest } from '../../../../../../common/errors/api-user-error';
 import { CAPABILITIES, type GivingCause, GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { earnGoalProgress } from '@rumtelo/utils';
 
@@ -327,13 +329,13 @@ export class GoalService {
         const entity = await this.repo.findOneOrFail({ id });
         await this.em.populate(entity, ['jar']);
         if (entity.kind !== GoalKind.SAVE) {
-            throw new BadRequestException('Only SAVE goals have jar focus');
+            throw apiBadRequest('goal_save_only_jar_focus');
         }
         if (!entity.jar) {
-            throw new BadRequestException('SAVE goal needs a jar before it can be focus');
+            throw apiBadRequest('goal_save_needs_jar_focus');
         }
         if (entity.status !== GoalStatus.ACTIVE) {
-            throw new BadRequestException('Only active goals can be focus');
+            throw apiBadRequest('goal_only_active_focus');
         }
         await this.reindexJarFocus(entity.jar.id, entity.id);
         await this.em.refresh(entity);
@@ -348,20 +350,20 @@ export class GoalService {
         const entity = await this.repo.findOneOrFail({ id });
         await this.em.populate(entity, ['jar']);
         if (entity.kind !== GoalKind.SAVE) {
-            throw new BadRequestException('Only SAVE goals can be marked achieved this way');
+            throw apiBadRequest('goal_save_only_achieved');
         }
         if (entity.status === GoalStatus.REACHED) {
             return toDto(entity);
         }
         if (entity.status !== GoalStatus.ACTIVE) {
-            throw new BadRequestException('Goal is not active');
+            throw apiBadRequest('goal_not_active');
         }
         const jarId = entity.jar?.id ?? null;
         const target = entity.target;
 
         if (mode === 'spend') {
             if (!jarId) {
-                throw new BadRequestException('Goal has no jar to spend from');
+                throw apiBadRequest('goal_no_jar_spend');
             }
             await this.transactions.create({
                 jarId,

@@ -1,4 +1,5 @@
-import { LocalesEnum, locales, type Locale } from '@rumtelo/i18n';
+import { Locale, toIntlLocale } from '@rumtelo/contracts';
+import { locales } from '@rumtelo/i18n';
 import { hasLocale } from 'next-intl';
 import { getRequestConfig } from 'next-intl/server';
 
@@ -10,12 +11,13 @@ import { getRequestConfig } from 'next-intl/server';
  * `createNavigation` when `@rumtelo/i18n` is imported from `proxy.ts`.
  */
 export default getRequestConfig(async ({ locale, requestLocale }) => {
+    const fallback = toIntlLocale(Locale.NL);
     // Prefer an explicit override (Server Actions / Route Handlers).
     if (!locale) {
         const paramValue = await requestLocale;
-        locale = hasLocale(locales, paramValue) ? paramValue : LocalesEnum.Dutch;
-    } else if (!locales.includes(locale as Locale)) {
-        locale = LocalesEnum.Dutch;
+        locale = hasLocale(locales, paramValue) ? paramValue : fallback;
+    } else if (!hasLocale(locales, locale)) {
+        locale = fallback;
     }
 
     return {

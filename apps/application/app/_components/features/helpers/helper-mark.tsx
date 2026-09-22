@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from '@rumtelo/i18n';
 import { cn } from '@rumtelo/utils';
 
 type CoachMarkProps = {
@@ -13,6 +14,8 @@ type CoachMarkProps = {
  * Same voice as /product/coach — informatie, nooit schaamte.
  */
 export function CoachMark({ className, size = 'md' }: CoachMarkProps) {
+    const t = useTranslations('features.coach.helpers');
+
     return (
         <span
             className={cn(
@@ -20,9 +23,9 @@ export function CoachMark({ className, size = 'md' }: CoachMarkProps) {
                 size === 'sm' ? 'px-1.5 py-0.5 text-[8px]' : 'px-2 py-0.5 text-[9px]',
                 className
             )}
-            title="From The Coach — turn on-screen tips on or off in Settings → Account">
+            title={t('mark_title')}>
             <span aria-hidden>✦</span>
-            The Coach
+            {t('mark_label')}
         </span>
     );
 }

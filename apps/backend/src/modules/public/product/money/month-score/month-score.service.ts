@@ -1,23 +1,27 @@
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable } from '@nestjs/common';
-import { DEFAULT_CURRENCY, formatMoney } from '@rumtelo/utils';
 
 import { HouseholdScopedRepository } from '../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../common/household/household.context';
 import { sum } from '../../../../../common/utils/money.util';
 import { daysInPeriod } from '../../../../../common/utils/period.util';
-import { HouseholdSettings } from '../../../../auth/household/household-settings/household-settings.entity';
 import { JarService } from '../plan/jar/jar.service';
 import { MonthScore } from './month-score.entity';
 import { MonthScoreEvent } from './month-score-event.entity';
 
-/** Level thresholds are cumulative score. Labels follow the product's steering language. */
-export const LEVELS = [
-    { index: 1, label: 'Beginner', threshold: 0, unlocks: ['Zes potten', 'Inbox'] },
-    { index: 2, label: 'Navigator', threshold: 120, unlocks: ['Week check'] },
-    { index: 3, label: 'Stuurman', threshold: 320, unlocks: ['Doelen', 'Schulden'] },
-    { index: 4, label: 'Kapitein', threshold: 640, unlocks: ['Energie-laag'] },
-    { index: 5, label: 'Kompas', threshold: 1080, unlocks: ['Coach', 'Export'] },
+import type { MonthScoreUnlockKey } from '@rumtelo/contracts';
+
+/** Level thresholds are cumulative score. Display labels and unlock copy live in client i18n. */
+export const LEVELS: {
+    index: number;
+    threshold: number;
+    unlocks: MonthScoreUnlockKey[];
+}[] = [
+    { index: 1, threshold: 0, unlocks: ['six_jars', 'inbox'] },
+    { index: 2, threshold: 120, unlocks: ['week_check'] },
+    { index: 3, threshold: 320, unlocks: ['goals', 'debts'] },
+    { index: 4, threshold: 640, unlocks: ['energy_layer'] },
+    { index: 5, threshold: 1080, unlocks: ['coach', 'export'] },
 ];
 
 @Injectable()
@@ -56,7 +60,6 @@ export class MonthScoreService {
             daysLeft: Math.max(0, daysInPeriod(period) - new Date().getUTCDate()),
             isClosed: monthScore?.isClosed ?? false,
             level: level.index,
-            levelLabel: level.label,
             events: events.map(event => ({
                 id: event.id,
                 householdId: event.household,
@@ -116,10 +119,6 @@ export class MonthScoreService {
         const income = await this.jars.monthlyNetIncome();
         const allocated = sum(jarRows.map(jar => jar.allocated));
         const spent = sum(jarRows.map(jar => jar.spent));
-        const settings = await this.em.findOne(HouseholdSettings, {
-            household: currentHouseholdId(),
-        });
-        const currency = settings?.currency ?? DEFAULT_CURRENCY;
 
         const spendable = jarRows.filter(jar => jar.capabilities?.canSpend);
         const held = spendable.filter(jar => !jar.overspent).length;
@@ -139,10 +138,7 @@ export class MonthScoreService {
             );
 
         const availableTotal = sum(jarRows.map(jar => jar.available));
-        const headline =
-            availableTotal >= 0
-                ? `${formatMoney(availableTotal, { currency, locale: 'nl-NL' })} over deze periode`
-                : 'Eén of meer potten zijn overschreden';
+        const headlineKey = availableTotal >= 0 ? ('surplus' as const) : ('overspent' as const);
 
         return {
             period,
@@ -153,7 +149,7 @@ export class MonthScoreService {
             score,
             bestJar: best?.name ?? null,
             worstJar: worst?.overspent ? worst.name : null,
-            headline,
+            headlineKey,
         };
     }
 }

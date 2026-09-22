@@ -11,6 +11,7 @@ import type {
     MerchantPreset,
     Transaction,
 } from '@rumtelo/contracts';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Typography } from '@rumtelo/ui';
 import { cn, categoryVariance, monthlyAmount } from '@rumtelo/utils';
 
@@ -30,17 +31,25 @@ import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 
 type CategoryRow = Pick<Category, 'id' | 'name' | 'budgeted' | 'actual'>;
 
-function statusChip(status: FixedCostStatus) {
+function statusChip(
+    status: FixedCostStatus,
+    plannedLabel: string,
+    tFixed: ReturnType<typeof useTranslations<'features.money.fixed'>>
+) {
     if (status === 'taken') {
-        return <MetaChip className="border-success/30 text-success">Taken</MetaChip>;
+        return (
+            <MetaChip className="border-success/30 text-success">{tFixed('status_taken')}</MetaChip>
+        );
     }
     if (status === 'due') {
-        return <MetaChip className="border-danger/30 text-danger">Still due</MetaChip>;
+        return <MetaChip className="border-danger/30 text-danger">{tFixed('status_due')}</MetaChip>;
     }
     if (status === 'skipped') {
-        return <MetaChip className="border-line text-fg-muted">Skipped</MetaChip>;
+        return (
+            <MetaChip className="border-line text-fg-muted">{tFixed('status_skipped')}</MetaChip>
+        );
     }
-    return <MetaChip>Planned</MetaChip>;
+    return <MetaChip>{plannedLabel}</MetaChip>;
 }
 
 function categoryIcon(
@@ -86,6 +95,10 @@ export function JarCategoryBreakdown({
     allowFixedCosts: boolean;
 }) {
     const { formatMoney } = useHouseholdCurrency();
+    const appLocale = useLocale();
+    const tFixed = useTranslations('features.money.fixed');
+    const tJars = useTranslations('features.money.jars.detail');
+    const tChips = useTranslations('features.money.chips');
     const [openIds, setOpenIds] = useState<Set<string>>(() => new Set());
     const today = new Date();
 
@@ -130,7 +143,7 @@ export function JarCategoryBreakdown({
         const totals = bucketTotals(key);
         rows.push({
             id: key,
-            name: 'Other',
+            name: tJars('bucket_other'),
             budgeted: totals.budgeted,
             actual: totals.actual,
             synthetic: true,
@@ -145,7 +158,7 @@ export function JarCategoryBreakdown({
         const totals = bucketTotals(uncategorizedKey);
         rows.push({
             id: uncategorizedKey,
-            name: 'Uncategorized',
+            name: tJars('bucket_uncategorized'),
             budgeted: totals.budgeted,
             actual: totals.actual,
             synthetic: true,
@@ -177,7 +190,7 @@ export function JarCategoryBreakdown({
     if (rows.length === 0) {
         return (
             <Typography as="p" size="sm" color="muted" className="px-5 py-4">
-                No categories yet.
+                {tJars('no_categories')}
             </Typography>
         );
     }
@@ -235,8 +248,11 @@ export function JarCategoryBreakdown({
                                         {category.name}
                                     </span>
                                     <span className="mt-0.5 block font-mono text-[11px] text-fg-faint sm:hidden">
-                                        Planned {formatMoney(category.budgeted)} · Spent{' '}
-                                        {formatMoney(category.actual)}
+                                        {tFixed('status_planned')} {formatMoney(category.budgeted)}{' '}
+                                        ·{' '}
+                                        {tJars('mobile_spent', {
+                                            amount: formatMoney(category.actual),
+                                        })}
                                     </span>
                                 </span>
                                 <span className="hidden min-w-0 flex-1 items-center justify-end gap-6 sm:flex">
@@ -268,7 +284,9 @@ export function JarCategoryBreakdown({
                                     'font-mono text-xs tabular-nums sm:hidden',
                                     over ? 'text-danger' : 'text-success'
                                 )}>
-                                {formatMoney(diff, { signed: true })} over / under
+                                {tJars('mobile_over_under', {
+                                    amount: formatMoney(diff, { signed: true }),
+                                })}
                             </span>
                         </button>
 
@@ -280,7 +298,7 @@ export function JarCategoryBreakdown({
                                         size="sm"
                                         color="muted"
                                         className="px-5 py-3">
-                                        Nothing booked in this category yet.
+                                        {tJars('nothing_booked')}
                                     </Typography>
                                 ) : (
                                     <ul className="grid">
@@ -291,7 +309,7 @@ export function JarCategoryBreakdown({
                                                 item.counterparty.trim() !== item.name.trim()
                                                     ? item.name
                                                     : null;
-                                            const due = formatDueDay(item.dueDay);
+                                            const due = formatDueDay(item.dueDay, tChips);
                                             return (
                                                 <li key={`fc-${item.id}`}>
                                                     <MoneyPartyRow
@@ -313,24 +331,39 @@ export function JarCategoryBreakdown({
                                                         amount={formatMoney(-Math.abs(monthly))}
                                                         badges={
                                                             <>
-                                                                {statusChip(status)}
+                                                                {statusChip(
+                                                                    status,
+                                                                    tFixed('status_planned'),
+                                                                    tFixed
+                                                                )}
                                                                 {due ? (
                                                                     <MetaChip>{due}</MetaChip>
                                                                 ) : null}
                                                                 <MetaChip>
-                                                                    {cadenceLabel(item.cadence)}
+                                                                    {cadenceLabel(
+                                                                        item.cadence,
+                                                                        tChips
+                                                                    )}
                                                                 </MetaChip>
                                                                 {match ? (
                                                                     <MetaChip>
                                                                         {formatBookedDate(
-                                                                            match.bookedOn
+                                                                            match.bookedOn,
+                                                                            appLocale
                                                                         )}
                                                                     </MetaChip>
                                                                 ) : null}
                                                                 {Math.abs(monthly) !==
                                                                 Math.abs(item.amount) ? (
                                                                     <MetaChip>
-                                                                        {formatMoney(monthly)}/mo
+                                                                        {tChips(
+                                                                            'amount_per_month',
+                                                                            {
+                                                                                amount: formatMoney(
+                                                                                    monthly
+                                                                                ),
+                                                                            }
+                                                                        )}
                                                                     </MetaChip>
                                                                 ) : null}
                                                             </>
@@ -374,10 +407,13 @@ export function JarCategoryBreakdown({
                                                         badges={
                                                             <>
                                                                 <MetaChip className="border-success/30 text-success">
-                                                                    Taken
+                                                                    {tFixed('status_taken')}
                                                                 </MetaChip>
                                                                 <MetaChip>
-                                                                    {formatBookedDate(tx.bookedOn)}
+                                                                    {formatBookedDate(
+                                                                        tx.bookedOn,
+                                                                        appLocale
+                                                                    )}
                                                                 </MetaChip>
                                                             </>
                                                         }

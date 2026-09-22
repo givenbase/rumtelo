@@ -4,7 +4,7 @@
  * The original `design/Kluis Landing.dc.html` was a money-only landing. The current
  * page follows a what → how → trust → price arc:
  * hero → portals → jars → the Coach → principles → why we exist → pricing → FAQ → sign-up.
- * Copy lives in `lib/landing-content.ts`.
+ * Copy lives in `@rumtelo/i18n` (`pages.landing.*`); structure in `lib/landing-content.ts`.
  *
  * Cut on purpose to keep the page light: Problem (hero already names it), Loop (covered by
  * jars + Coach + principles), Proof (Why already carries the founders).

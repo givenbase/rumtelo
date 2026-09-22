@@ -10,7 +10,6 @@ import { contract } from '../routers';
  * RPCLink — so the browser sends `{ householdName: … }` instead of `{ json: {…} }`.
  *
  * @see https://orpc.dev/docs/openapi/client/openapi-link
- * @see Galighticus `packages/api/src/client/client.ts`
  */
 export type AppClient = JsonifiedClient<ContractRouterClient<typeof contract>>;
 

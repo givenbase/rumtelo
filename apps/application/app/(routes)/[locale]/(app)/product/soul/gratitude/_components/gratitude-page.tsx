@@ -7,16 +7,23 @@ import { useRef, useState } from 'react';
 
 import type { Gratitude } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Button, Eyebrow, Input, Section, Typography } from '@rumtelo/ui';
 import { currentWeekKey } from '@rumtelo/utils';
 
 import { isLiveData } from '@/app/_lib/preview';
+import { useApiError } from '@/app/_lib/api-error-messages';
+import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { PageContent } from '@/components/layout/page-content';
 
 export function GratitudePageClient() {
+    const t = useTranslations('features.soul.gratitude');
+    const locale = useLocale();
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
+    const { showToast } = useAppShell();
+    const apiError = useApiError();
     const live = isLiveData(householdId);
     const weekKey = currentWeekKey();
 
@@ -43,6 +50,7 @@ export function GratitudePageClient() {
             setText('');
             inputRef.current?.focus();
         },
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const entries = (listQuery.data ?? []) as ReadonlyArray<Gratitude>;
@@ -52,7 +60,7 @@ export function GratitudePageClient() {
     function formatDay(entry: Pick<Gratitude, 'createdAt'>): string {
         if (entry.createdAt) {
             const date = new Date(entry.createdAt);
-            return date.toLocaleDateString('en-US', { weekday: 'short' });
+            return date.toLocaleDateString(locale, { weekday: 'short' });
         }
         return '';
     }
@@ -70,9 +78,9 @@ export function GratitudePageClient() {
 
     return (
         <PageContent width="narrow" className="grid animate-rise gap-6">
-            <Section eyebrow="Gratitude" title="One thing per day.">
+            <Section eyebrow={t('eyebrow')} title={t('title')}>
                 <Typography as="p" color="muted">
-                    Not because it changes your balance, but because it changes how you see it.
+                    {t('lead')}
                 </Typography>
             </Section>
 
@@ -81,7 +89,7 @@ export function GratitudePageClient() {
                 <Input
                     ref={inputRef}
                     className="w-full min-w-0 flex-1 sm:min-w-65"
-                    placeholder="What are you grateful for?"
+                    placeholder={t('placeholder')}
                     value={text}
                     onChange={event => setText(event.target.value)}
                     onKeyDown={event => {
@@ -93,14 +101,14 @@ export function GratitudePageClient() {
                     type="button"
                     onClick={handleAdd}
                     disabled={!text.trim() || createMutation.isPending}>
-                    {createMutation.isPending ? '…' : 'Add'}
+                    {createMutation.isPending ? '…' : t('add')}
                 </Button>
             </div>
 
             {/* ── Entries list ── */}
             {empty ? (
                 <Typography as="p" size="sm" color="muted">
-                    Nothing written yet. The week check will ask you here.
+                    {t('empty')}
                 </Typography>
             ) : (
                 <div className="grid gap-2.5">
@@ -117,7 +125,7 @@ export function GratitudePageClient() {
                             </span>
                             <button
                                 type="button"
-                                aria-label="Delete"
+                                aria-label={t('delete_aria')}
                                 className="shrink-0 text-base leading-none text-fg-faint transition-colors hover:text-danger">
                                 ×
                             </button>
@@ -127,10 +135,9 @@ export function GratitudePageClient() {
             )}
 
             <div className="border-t border-line pt-3">
-                <Eyebrow>This week</Eyebrow>
+                <Eyebrow>{t('this_week_eyebrow')}</Eyebrow>
                 <Typography as="p" size="sm" color="muted" className="mt-2">
-                    One line per week during the week check. No more than that — it is a check-in,
-                    not a journal.
+                    {t('this_week_body')}
                 </Typography>
             </div>
         </PageContent>

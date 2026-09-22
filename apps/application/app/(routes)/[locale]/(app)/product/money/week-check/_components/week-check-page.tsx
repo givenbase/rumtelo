@@ -6,9 +6,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { WeekCheckStage } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
+import { useTranslations } from '@rumtelo/i18n';
 import { Eyebrow, Typography } from '@rumtelo/ui';
 import { currentWeekKey, toPeriodKey } from '@rumtelo/utils';
 
+import { useApiError } from '@/app/_lib/api-error-messages';
 import { isLiveData } from '@/app/_lib/preview';
 import { WeekCheckWizard } from '@/components/features/week-check/week-check-wizard';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
@@ -18,10 +20,12 @@ import { PageContent } from '@/components/layout/page-content';
 export function WeekCheckPageClient() {
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
-    const { period } = useAppShell();
+    const { period, showToast } = useAppShell();
+    const apiError = useApiError();
     const week = currentWeekKey();
     const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);
+    const t = useTranslations('features.money.week_check');
 
     const weekCheckQuery = useLiveQuery(
         apiQuery.money.weekCheck.current.queryOptions({
@@ -69,6 +73,7 @@ export function WeekCheckPageClient() {
                 queryKey: apiQuery.money.weekCheck.current.key(),
             });
         },
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const jars = (jarsQuery.data ?? []).map(j => ({
@@ -85,13 +90,12 @@ export function WeekCheckPageClient() {
     return (
         <PageContent width="narrow" className="grid gap-8">
             <div>
-                <Eyebrow>Ten minutes a week</Eyebrow>
+                <Eyebrow>{t('page_eyebrow')}</Eyebrow>
                 <Typography as="h1" className="mt-2">
-                    The week check
+                    {t('page_title')}
                 </Typography>
                 <Typography as="p" size="sm" color="muted" className="mt-2 max-w-prose">
-                    Rumtelo does not ask for your evenings. One week check — look, direct, set
-                    intention — beats worrying every single day.
+                    {t('page_lead')}
                 </Typography>
             </div>
 

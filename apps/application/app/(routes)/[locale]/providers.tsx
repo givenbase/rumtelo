@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Suspense, useEffect, useState, type ReactNode } from 'react';
 
+import { useTranslations } from '@rumtelo/i18n';
 import { ThemeProvider, BrandLoader } from '@rumtelo/ui';
 
 import { setClientHouseholdId } from '@/app/_lib/household-api-context';
@@ -18,6 +19,11 @@ function HouseholdHeaderSync({ children }: { children: ReactNode }) {
         setClientHouseholdId(householdId);
     }, [householdId]);
     return children;
+}
+
+function ProvidersFallback() {
+    const t = useTranslations('ui.statusPage');
+    return <BrandLoader fullScreen label={t('loading')} />;
 }
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -47,7 +53,7 @@ export function Providers({ children }: { children: ReactNode }) {
                   “useAuth must be used inside <AuthProvider>”.
                 */}
                 <AuthProvider>
-                    <Suspense fallback={<BrandLoader fullScreen label="Loading" />}>
+                    <Suspense fallback={<ProvidersFallback />}>
                         <PlanIntentProvider>
                             <HouseholdHeaderSync>
                                 <AccountThemeProvider>

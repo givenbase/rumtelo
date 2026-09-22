@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { Input } from '@rumtelo/ui';
+import { Input, type InputProps } from '@rumtelo/ui';
 
 import { ignorePasswordManagers, safeAutofillName } from '@/app/_lib/ignore-password-managers';
 
@@ -10,10 +10,10 @@ import { ignorePasswordManagers, safeAutofillName } from '@/app/_lib/ignore-pass
  * Money-form text input — same as UI Input, but hard-discourages browser /
  * password-manager autofill (Chrome + LastPass ignore a plain autocomplete=off).
  */
-export const FormInput = React.forwardRef<
-    HTMLInputElement,
-    React.InputHTMLAttributes<HTMLInputElement>
->(function FormInput({ name, onFocus, ...props }, ref) {
+export const FormInput = React.forwardRef<HTMLInputElement, InputProps>(function FormInput(
+    { name, onFocus, ...props },
+    ref
+) {
     return (
         <Input
             ref={ref}

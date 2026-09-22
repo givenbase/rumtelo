@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 import type { Transaction } from '@rumtelo/contracts';
 import { TransactionSource, TransactionStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Button, Card, Typography, VendorMark } from '@rumtelo/ui';
 import { isFixedCostCounting, toPeriodKey } from '@rumtelo/utils';
 
@@ -18,6 +19,7 @@ import {
 } from '@/app/_lib/create-routes';
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
 import { suggestFixedCostForTx } from '@/app/_lib/fixed-cost-match';
+import { resolveJarSubtitle } from '@/app/_lib/jar-copy';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
@@ -56,33 +58,39 @@ function samePartyKey(
     return description ? `d:${description}` : '';
 }
 
-function partyDisplayName(row: Transaction) {
-    return row.counterparty?.trim() || row.description.trim() || 'this payee';
+function partyDisplayName(row: Transaction, fallback: string) {
+    return row.counterparty?.trim() || row.description.trim() || fallback;
 }
 
-function sourceLabel(source: TransactionSource) {
+function sourceLabel(
+    source: TransactionSource,
+    t: ReturnType<typeof useTranslations<'features.money.transactions.detail'>>
+) {
     switch (source) {
         case TransactionSource.MANUAL:
-            return 'Entered manually';
+            return t('source_manual');
         case TransactionSource.CSV:
-            return 'CSV import';
+            return t('source_csv');
         case TransactionSource.BANK:
-            return 'Bank feed';
+            return t('source_bank');
         case TransactionSource.RECURRING:
-            return 'From a recurring plan';
+            return t('source_recurring');
         default:
             return String(source);
     }
 }
 
-function statusLabel(status: TransactionStatus) {
+function statusLabel(
+    status: TransactionStatus,
+    t: ReturnType<typeof useTranslations<'features.money.transactions.detail'>>
+) {
     switch (status) {
         case TransactionStatus.INBOX:
-            return 'Waiting in inbox';
+            return t('status_inbox');
         case TransactionStatus.SORTED:
-            return 'Sorted into a jar';
+            return t('status_sorted');
         case TransactionStatus.IGNORED:
-            return 'Ignored (not in budget maths)';
+            return t('status_ignored');
         default:
             return String(status);
     }
@@ -94,12 +102,14 @@ function RelatedRow({
     hint,
     href,
     leading,
+    openLinkLabel,
 }: {
     label: string;
     value: string;
     hint?: string | null;
     href?: string;
     leading?: { icon: string; tone?: string | null };
+    openLinkLabel: string;
 }) {
     const body = (
         <>
@@ -125,7 +135,9 @@ function RelatedRow({
                 ) : null}
             </span>
             {href ? (
-                <span className="shrink-0 font-mono text-xs text-accent uppercase">Open ›</span>
+                <span className="shrink-0 font-mono text-xs text-accent uppercase">
+                    {openLinkLabel}
+                </span>
             ) : null}
         </>
     );
@@ -151,9 +163,14 @@ function RelatedRow({
  * Transaction detail — read first; related links into jar / bill / debt; Edit opens the form.
  */
 export function TransactionDetailPageClient({ transactionId }: { transactionId: string }) {
+    const tTx = useTranslations('features.money.transactions.detail');
+    const tTransactions = useTranslations('features.money.transactions');
+    const tJars = useTranslations('features.money.jars');
+    const tAction = useTranslations('common.action');
     const { householdId } = useAuth();
     const { period } = useAppShell();
     const { formatMoney } = useHouseholdCurrency();
+    const appLocale = useLocale();
     const live = isLiveData(householdId);
     const periodKey = toPeriodKey(period.year, period.month);
     const { byKey: jarByKey } = useJarCatalog();
@@ -207,6 +224,13 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
         [] as never,
         live
     );
+    const transactionInQuery = useLiveQuery(
+        apiQuery.money.catalogs.transactionInPresets.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [] as never,
+        live
+    );
 
     const fromList = listQuery.data?.items?.find(row => row.id === transactionId);
     const fromPeriod = periodQuery.data?.items?.find(row => row.id === transactionId);
@@ -236,7 +260,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
     const suggestedBill = !linkedBill && tx ? suggestFixedCostForTx(tx, activeFixed) : undefined;
 
     if (live && (listQuery.isLoading || periodQuery.isLoading || inboxQuery.isLoading) && !tx) {
-        return <p className="text-sm text-fg-muted">Loading…</p>;
+        return <p className="text-sm text-fg-muted">{tTx('loading')}</p>;
     }
     if (!tx) {
         return (
@@ -244,9 +268,9 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                 <Link
                     href="/product/money/transactions"
                     className="w-fit font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
-                    ← Transactions
+                    {tTx('back')}
                 </Link>
-                <p className="text-sm text-fg-muted">Transaction not found.</p>
+                <p className="text-sm text-fg-muted">{tTx('not_found')}</p>
             </div>
         );
     }
@@ -275,11 +299,19 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
         related.push(
             <RelatedRow
                 key="jar"
-                label="Jar"
+                label={tTransactions('jar_fallback')}
                 value={jar.name}
-                hint={jar.subtitle ?? jar.key}
+                hint={
+                    resolveJarSubtitle(
+                        tJars,
+                        jar.key,
+                        jar.subtitle,
+                        jarByKey.get(jar.key)?.subtitle
+                    ) || jar.key
+                }
                 leading={{ icon: jarIcon, tone: jarTone }}
                 href={jarHref}
+                openLinkLabel={tTx('open_link')}
             />
         );
     }
@@ -287,11 +319,15 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
         related.push(
             <RelatedRow
                 key="category"
-                label="Category"
+                label={tTx('category')}
                 value={category.name}
-                hint={`On ${jar?.name ?? 'jar'} · planned ${formatMoney(category.budgeted)}`}
+                hint={tTx('hint_on_jar_planned', {
+                    jar: jar?.name ?? tTransactions('jar_fallback'),
+                    amount: formatMoney(category.budgeted),
+                })}
                 leading={{ icon: categoryIcon, tone: jarTone }}
                 href={jarHref}
+                openLinkLabel={tTx('open_link')}
             />
         );
     }
@@ -299,20 +335,22 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
         related.push(
             <RelatedRow
                 key="bill"
-                label="Fixed cost"
+                label={tTx('fixed_cost')}
                 value={linkedBill.counterparty?.trim() || linkedBill.name}
-                hint="Linked settlement for this period"
+                hint={tTx('hint_linked_settlement')}
                 href={fixedDetailHref(linkedBill.id)}
+                openLinkLabel={tTx('open_link')}
             />
         );
     } else if (suggestedBill) {
         related.push(
             <RelatedRow
                 key="bill-suggest"
-                label="Looks like"
+                label={tTx('looks_like')}
                 value={suggestedBill.counterparty?.trim() || suggestedBill.name}
-                hint="Suggested recurring bill — link when sorting"
+                hint={tTx('hint_suggested_bill')}
                 href={fixedDetailHref(suggestedBill.id)}
+                openLinkLabel={tTx('open_link')}
             />
         );
     }
@@ -320,14 +358,18 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
         related.push(
             <RelatedRow
                 key="debt"
-                label="Debt payment"
-                value={debt?.name ?? 'Linked debt'}
+                label={tTx('debt_payment')}
+                value={debt?.name ?? tTx('linked_debt_fallback')}
                 hint={
                     debt
-                        ? `${formatMoney(debt.balance)} left · ${debt.interestRate}% APR`
-                        : 'Applied to a debt balance'
+                        ? tTx('hint_debt_remaining', {
+                              balance: formatMoney(debt.balance),
+                              rate: debt.interestRate,
+                          })
+                        : tTx('hint_applied_debt')
                 }
                 href={debtDetailHref(tx.debtId)}
+                openLinkLabel={tTx('open_link')}
             />
         );
     }
@@ -335,20 +377,22 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
         related.push(
             <RelatedRow
                 key="rule"
-                label="Sorted by rule"
-                value={`“${appliedRule.matchValue}” → jar`}
-                hint="Manage rules on the Transactions page"
+                label={tTx('sorted_by_rule')}
+                value={tTx('rule_to_jar', { value: appliedRule.matchValue })}
+                hint={tTx('hint_manage_rules')}
                 href="/product/money/transactions"
+                openLinkLabel={tTx('open_link')}
             />
         );
     } else if (appliedMerchant) {
         related.push(
             <RelatedRow
                 key="merchant"
-                label="Sorted from catalog"
+                label={tTx('sorted_from_catalog')}
                 value={appliedMerchant.name}
-                hint="No household rule matched — the merchant catalog placed this"
+                hint={tTx('hint_catalog_sorted')}
                 href="/product/money/transactions"
+                openLinkLabel={tTx('open_link')}
             />
         );
     }
@@ -356,10 +400,11 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
         related.push(
             <RelatedRow
                 key="inbox"
-                label="Needs sorting"
-                value="Still in the inbox"
-                hint="Assign a jar to include it in the budget"
+                label={tTx('needs_sorting')}
+                value={tTx('inbox_still')}
+                hint={tTx('inbox_assign_jar')}
                 href="/product/money/transactions"
+                openLinkLabel={tTx('open_link')}
             />
         );
     }
@@ -372,7 +417,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
               .sort((left, right) => right.bookedOn.localeCompare(left.bookedOn))
               .slice(0, SAME_PARTY_HISTORY_LIMIT)
         : [];
-    const historyLabel = partyDisplayName(tx);
+    const historyLabel = partyDisplayName(tx, tTx('this_payee'));
 
     return (
         <div className="grid animate-rise gap-8">
@@ -381,7 +426,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                     <Link
                         href="/product/money/transactions"
                         className="w-fit font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
-                        ← Transactions
+                        {tTx('back')}
                     </Link>
                     <div className="flex items-center gap-3">
                         <VendorMark
@@ -396,21 +441,22 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                                 {title}
                             </h1>
                             <p className="mt-0.5 font-mono text-xs text-fg-muted">
-                                {formatBookedDate(tx.bookedOn)} · {statusLabel(tx.status)}
+                                {formatBookedDate(tx.bookedOn, appLocale)} ·{' '}
+                                {statusLabel(tx.status, tTx)}
                             </p>
                         </div>
                     </div>
                 </div>
                 <Button as={Link} href={updateHref('tx', tx.id)} variant="secondary">
                     <EditIcon />
-                    Edit
+                    {tAction('edit')}
                 </Button>
             </div>
 
             <Card className="grid gap-4 p-5">
                 <div>
                     <p className="font-mono text-[10px] tracking-wider text-fg-muted uppercase">
-                        Amount
+                        {tTx('amount')}
                     </p>
                     <p
                         className={`mt-1 text-2xl font-semibold ${
@@ -420,7 +466,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                     </p>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
-                    <MetaChip>{formatBookedDate(tx.bookedOn)}</MetaChip>
+                    <MetaChip>{formatBookedDate(tx.bookedOn, appLocale)}</MetaChip>
                     {jar && jarHref ? (
                         <Link
                             href={jarHref}
@@ -475,58 +521,64 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                     {tx.debtId ? (
                         <Link href={debtDetailHref(tx.debtId)}>
                             <MetaChip className="hover:border-accent-hover hover:text-accent">
-                                Debt
+                                {tTx('debt_chip')}
                             </MetaChip>
                         </Link>
                     ) : null}
                     {tx.fixedCostId ? (
                         <Link href={fixedDetailHref(tx.fixedCostId)}>
                             <MetaChip className="hover:border-accent-hover hover:text-accent">
-                                Fixed cost
+                                {tTx('fixed_cost')}
                             </MetaChip>
                         </Link>
                     ) : null}
-                    {tx.status === TransactionStatus.INBOX ? <MetaChip>Inbox</MetaChip> : null}
+                    {tx.status === TransactionStatus.INBOX ? (
+                        <MetaChip>{tTransactions('inbox_chip')}</MetaChip>
+                    ) : null}
                 </div>
             </Card>
 
             <Card className="grid gap-3 p-5">
                 <p className="font-mono text-[10px] tracking-wider text-fg-muted uppercase">
-                    Details
+                    {tTx('details')}
                 </p>
                 <dl className="grid gap-2 text-sm sm:grid-cols-2">
                     {tx.counterparty?.trim() ? (
                         <div>
                             <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                Counterparty
+                                {tTx('counterparty')}
                             </dt>
                             <dd className="mt-0.5 text-fg">{tx.counterparty}</dd>
                         </div>
                     ) : null}
                     <div>
                         <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                            Source
+                            {tTx('source')}
                         </dt>
-                        <dd className="mt-0.5 text-fg">{sourceLabel(tx.source)}</dd>
+                        <dd className="mt-0.5 text-fg">{sourceLabel(tx.source, tTx)}</dd>
                     </div>
                     {tx.inflowKey ? (
                         <div>
                             <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                Inflow type
+                                {tTx('inflow_type')}
                             </dt>
-                            <dd className="mt-0.5 text-fg">{tx.inflowKey.replaceAll('_', ' ')}</dd>
+                            <dd className="mt-0.5 text-fg">
+                                {transactionInQuery.data?.find(
+                                    preset => preset.key === tx.inflowKey
+                                )?.name ?? tx.inflowKey}
+                            </dd>
                         </div>
                     ) : null}
                     <div className="sm:col-span-2">
                         <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                            Description
+                            {tTx('description')}
                         </dt>
-                        <dd className="mt-0.5 text-fg">{tx.description || '—'}</dd>
+                        <dd className="mt-0.5 text-fg">{tx.description || tTx('empty_dash')}</dd>
                     </div>
                     {tx.note?.trim() ? (
                         <div className="sm:col-span-2">
                             <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                Note
+                                {tTx('note')}
                             </dt>
                             <dd className="mt-0.5 text-fg-secondary">{tx.note}</dd>
                         </div>
@@ -537,7 +589,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
             {related.length > 0 ? (
                 <section className="grid gap-3">
                     <Typography as="h2" variant="eyebrow" color="primary">
-                        ✦ Related
+                        {tTx('related')}
                     </Typography>
                     <Card className="p-0">{related}</Card>
                 </section>
@@ -546,7 +598,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
             {samePartyHistory.length > 0 ? (
                 <section className="grid gap-3">
                     <Typography as="h2" variant="eyebrow" color="primary">
-                        ✦ Also from {historyLabel}
+                        {tTx('also_from', { payee: historyLabel })}
                     </Typography>
                     <Card className="p-0">
                         <ul className="grid">
@@ -584,7 +636,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                                             badges={
                                                 <>
                                                     <MetaChip>
-                                                        {formatBookedDate(row.bookedOn)}
+                                                        {formatBookedDate(row.bookedOn, appLocale)}
                                                     </MetaChip>
                                                     {rowJar ? (
                                                         <JarBadge

@@ -1,5 +1,5 @@
 import { EntityManager } from '@mikro-orm/postgresql';
-import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 
 import type {
     AccountSettings as AccountSettingsDto,
@@ -7,6 +7,7 @@ import type {
 } from '@rumtelo/contracts';
 
 import { DEFAULT_ACCOUNT_TOUR_PROGRESS, Locale, SpendingStyle, Theme } from '@rumtelo/contracts';
+import { apiNotFound } from '../../../../../common/errors/api-user-error';
 import { currentUserId } from '../../../../../common/household/household.context';
 import { Account } from '../account.entity';
 import { AccountSettings } from './account-settings.entity';
@@ -108,7 +109,7 @@ export class AccountSettingsService {
 
     async findOne(id: string): Promise<AccountSettingsDto> {
         const row = await this.em.findOne(AccountSettings, { id }, { populate: ['account'] });
-        if (!row) throw new NotFoundException(`Account settings ${id} not found`);
+        if (!row) throw apiNotFound('account_settings_not_found');
         return toDto(row);
     }
 
@@ -139,7 +140,7 @@ export class AccountSettingsService {
      */
     async delete(id: string): Promise<{ ok: true }> {
         const row = await this.em.findOne(AccountSettings, { id });
-        if (!row) throw new NotFoundException(`Account settings ${id} not found`);
+        if (!row) throw apiNotFound('account_settings_not_found');
         await this.em.remove(row).flush();
         return { ok: true };
     }

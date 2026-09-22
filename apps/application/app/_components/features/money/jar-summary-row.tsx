@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import type { JarBalance } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
 import { Typography } from '@rumtelo/ui';
 import { cn, jarCoverage, moneyDelta } from '@rumtelo/utils';
 
@@ -39,6 +40,7 @@ export type JarSummaryModel = Pick<
  * Compact tappable jar row for the jars list — opens /product/money/jars/{slug}.
  */
 export function JarSummaryRow({ jar }: { jar: JarSummaryModel }) {
+    const t = useTranslations('features.money.jars');
     const { formatMoney } = useHouseholdCurrency();
     const coverage = jarCoverage({
         allocated: jar.allocated,
@@ -50,16 +52,22 @@ export function JarSummaryRow({ jar }: { jar: JarSummaryModel }) {
     const showDelta = baseline !== null && baseline !== undefined && baseline !== jar.allocated;
     const allocationDelta = showDelta ? moneyDelta(baseline, jar.allocated) : null;
     const activity =
-        jar.committedOut > 0 || jar.spent > 0 || jar.credited > 0
+        jar.committedOut > 0 || jar.spent > 0 || jar.credited > 0 || jar.categoryCount > 0
             ? [
-                  jar.committedOut > 0 ? `${formatMoney(jar.committedOut)} fixed` : null,
-                  jar.credited > 0 ? `${formatMoney(jar.credited)} added` : null,
-                  jar.spent > 0 ? `${formatMoney(jar.spent)} spent` : null,
-                  jar.categoryCount > 0 ? `${jar.categoryCount} categories` : null,
+                  jar.committedOut > 0
+                      ? t('activity_fixed', { amount: formatMoney(jar.committedOut) })
+                      : null,
+                  jar.credited > 0
+                      ? t('activity_added', { amount: formatMoney(jar.credited) })
+                      : null,
+                  jar.spent > 0 ? t('activity_spent', { amount: formatMoney(jar.spent) }) : null,
+                  jar.categoryCount > 0
+                      ? t('activity_categories', { count: jar.categoryCount })
+                      : null,
               ]
                   .filter(Boolean)
                   .join(' · ')
-            : 'Nothing planned or spent this month';
+            : t('summary_nothing');
 
     return (
         <Link
@@ -97,7 +105,9 @@ export function JarSummaryRow({ jar }: { jar: JarSummaryModel }) {
                         />
                     ) : (
                         <span className="font-mono text-xs text-fg-faint">
-                            of {formatMoney(jar.allocated + jar.credited)}
+                            {t('of_amount', {
+                                amount: formatMoney(jar.allocated + jar.credited),
+                            })}
                         </span>
                     )}
                 </span>

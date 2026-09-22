@@ -113,7 +113,7 @@ export class TimeCoachService implements OnModuleInit {
         const missingPast = this.pastUnlogged(from, today, loggedDays);
         if (missingPast >= CATCH_UP_MIN_DAYS) {
             drafts.push({
-                key: `${TIME_COACH_KEY_PREFIX}catch_up:${week}`,
+                key: `${TIME_COACH_KEY_PREFIX}catch_up:${week}:${missingPast}`,
                 kind: CoachKind.NUDGE,
                 text: `${missingPast} days this week are not logged. Tap typical under each to catch up in one go.`,
                 ctaLabel: 'Open my week',
@@ -126,7 +126,7 @@ export class TimeCoachService implements OnModuleInit {
         const workCeiling = TIME_REFERENCE[TimeCategory.PAID_WORK].band?.ceiling;
         if (workCeiling !== null && workCeiling !== undefined && work >= workCeiling) {
             drafts.push({
-                key: `${TIME_COACH_KEY_PREFIX}work_ceiling:${week}`,
+                key: `${TIME_COACH_KEY_PREFIX}work_ceiling:${week}:${work}`,
                 kind: CoachKind.WARNING,
                 text: `At your typical shape this week lands at ${formatCoachHours(work)} of work. Above 55h, WHO/ILO found +35% stroke risk.`,
                 ctaLabel: 'See the week',
@@ -138,7 +138,7 @@ export class TimeCoachService implements OnModuleInit {
         const movingFloor = TIME_REFERENCE[TimeCategory.EXERCISE].band?.targetLow;
         if (movingFloor !== null && movingFloor !== undefined && moving < movingFloor) {
             drafts.push({
-                key: `${TIME_COACH_KEY_PREFIX}exercise_floor:${week}`,
+                key: `${TIME_COACH_KEY_PREFIX}exercise_floor:${week}:${moving}:${movingFloor}`,
                 kind: CoachKind.INSIGHT,
                 text: `Your typical week has ${formatCoachHours(moving)} of movement in it. WHO’s floor is ${formatCoachHours(movingFloor)}.`,
                 ctaLabel: 'Open my week',
@@ -155,7 +155,7 @@ export class TimeCoachService implements OnModuleInit {
             namedFree === 0
         ) {
             drafts.push({
-                key: `${TIME_COACH_KEY_PREFIX}free_unsplit:${week}`,
+                key: `${TIME_COACH_KEY_PREFIX}free_unsplit:${week}:${freeDaily}`,
                 kind: CoachKind.NUDGE,
                 text: `${formatCoachHours(freeDaily)} a day you steer, none of it named. Worth splitting once — the sweet spot only holds when it is social or purposeful.`,
                 ctaLabel: 'Change my typical week',
@@ -170,7 +170,7 @@ export class TimeCoachService implements OnModuleInit {
         const jetlag = offSleep - workSleep;
         if (jetlag > JETLAG_MINUTES) {
             drafts.push({
-                key: `${TIME_COACH_KEY_PREFIX}social_jetlag`,
+                key: `${TIME_COACH_KEY_PREFIX}social_jetlag:${jetlag}`,
                 kind: CoachKind.INSIGHT,
                 text: `You sleep in ${formatCoachHours(jetlag)} on days off. That gap is social jetlag — it tracks with mood and metabolic outcomes on its own.`,
                 ctaLabel: 'Open my week',
@@ -246,7 +246,7 @@ export class TimeCoachService implements OnModuleInit {
         const typical = median(days.map(([, minutes]) => minutes));
         if (typical < stated + DRIFT_GAP_MINUTES) return null;
         return {
-            key: `${TIME_COACH_KEY_PREFIX}work_drift`,
+            key: `${TIME_COACH_KEY_PREFIX}work_drift:${stated}:${typical}:${days.length}`,
             kind: CoachKind.INSIGHT,
             text: `You set ${formatCoachHours(stated)} of work; your last ${days.length} workdays median ${formatCoachHours(typical)}.`,
             ctaLabel: 'Open my week',

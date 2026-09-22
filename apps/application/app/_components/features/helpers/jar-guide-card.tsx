@@ -4,9 +4,18 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { JarKey } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
 import { cn } from '@rumtelo/utils';
 
 import { createFixedHref, createTxHref } from '@/app/_lib/create-routes';
+import {
+    jarGuideAllowedLabel,
+    jarGuideLinkLabel,
+    jarGuideNote,
+    jarGuideNotAllowed,
+    jarGuideSubLabel,
+    jarGuideSubNote,
+} from '@/app/_lib/jar-copy';
 import { productPath } from '@/app/_lib/routes';
 import { settingsHref } from '@/app/_lib/settings-tabs';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -30,6 +39,9 @@ type JarGuideCardProps = {
  * Hidden when Coach guides are off (Help or Settings → Account).
  */
 export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: JarGuideCardProps) {
+    const t = useTranslations('features.coach.jar_guide');
+    const tJars = useTranslations('features.money.jars');
+    const tCoach = useTranslations('features.coach.helpers');
     const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
     const coachGuidesEnabled = useHelpersEnabled();
@@ -45,7 +57,7 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
             className={cn('grid gap-2.5', className)}
             data-feature-helper="jar-guide"
             data-coach-guide="jar"
-            aria-label="The Coach for this jar">
+            aria-label={t('aria')}>
             <div className="flex flex-wrap items-center gap-2">
                 <span
                     className="grid size-7 place-items-center rounded-lg bg-accent/12 text-sm"
@@ -53,20 +65,22 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
                     {catalog?.icon ?? '✦'}
                 </span>
                 <h2 className="font-mono text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
-                    What can I use this for?
+                    {t('heading')}
                 </h2>
                 <CoachMark size="sm" />
             </div>
 
             <div className="overflow-hidden rounded-2xl border border-accent/20 bg-surface shadow-sm ring-1 ring-accent/10">
                 <div className="border-b border-line bg-gradient-to-br from-accent/8 via-raised to-surface px-4 py-3.5">
-                    <p className="text-sm leading-relaxed text-pretty text-fg">{guide.note}</p>
+                    <p className="text-sm leading-relaxed text-pretty text-fg">
+                        {jarGuideNote(tJars, jarKey, guide.note)}
+                    </p>
                 </div>
 
                 <div className="grid gap-4 px-4 py-4">
                     <div>
                         <p className="mb-2 font-mono text-[10px] font-semibold tracking-[0.12em] text-fg-faint uppercase">
-                            This may go to
+                            {t('allowed')}
                         </p>
                         <ul className="flex flex-wrap gap-1.5">
                             {guide.allowed.map(item => (
@@ -76,7 +90,7 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
                                     <span className="text-sm leading-none" aria-hidden>
                                         {item.icon}
                                     </span>
-                                    {item.label}
+                                    {jarGuideAllowedLabel(tJars, jarKey, item.label)}
                                 </li>
                             ))}
                         </ul>
@@ -85,11 +99,10 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
                     {isGive ? (
                         <div className="grid gap-2">
                             <p className="font-mono text-[10px] font-semibold tracking-[0.12em] text-fg-faint uppercase">
-                                Who should receive it?
+                                {t('give_who')}
                             </p>
                             <p className="text-xs leading-relaxed text-fg-muted">
-                                Pick a cause, then an organisation with independent checks — same
-                                Coach shortlist as on Why &amp; where.
+                                {t('give_hint')}
                             </p>
                             <GivingFinder
                                 defaultOpen
@@ -114,8 +127,7 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
                                 }}
                             />
                             <p className="text-[11px] leading-relaxed text-fg-faint">
-                                Choosing an organisation opens a recurring gift (fixed cost). For a
-                                one-time gift, use{' '}
+                                {t('give_recurring_hint')}{' '}
                                 <Link
                                     href={
                                         jarId
@@ -123,7 +135,7 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
                                             : createTxHref({ direction: 'out' })
                                     }
                                     className="font-medium text-accent underline-offset-2 hover:underline">
-                                    Add transaction
+                                    {t('add_transaction')}
                                 </Link>
                                 .
                             </p>
@@ -133,7 +145,7 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
                     {guide.subs && guide.subs.length > 0 ? (
                         <div className="rounded-xl border border-dashed border-line bg-raised/40 px-3 py-3">
                             <p className="mb-2.5 font-mono text-[10px] font-semibold tracking-[0.12em] text-fg-faint uppercase">
-                                Split inside this jar
+                                {t('split_inside')}
                             </p>
                             <div className="grid gap-2.5">
                                 {guide.subs.map(sub => (
@@ -143,7 +155,7 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
                                                 {sub.icon ? (
                                                     <span aria-hidden>{sub.icon}</span>
                                                 ) : null}
-                                                {sub.label}
+                                                {jarGuideSubLabel(tJars, jarKey, sub.label)}
                                             </span>
                                             <span className="text-accent tabular-nums">
                                                 {formatMoney(
@@ -163,7 +175,7 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
                             </div>
                             {guide.subNote ? (
                                 <p className="mt-2.5 text-xs leading-relaxed text-pretty text-accent">
-                                    {guide.subNote}
+                                    {jarGuideSubNote(tJars, jarKey, guide.subNote)}
                                 </p>
                             ) : null}
                         </div>
@@ -174,7 +186,7 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
                             🚫
                         </span>
                         <p className="text-xs leading-relaxed text-pretty text-fg-secondary">
-                            {guide.notAllowed}
+                            {jarGuideNotAllowed(tJars, jarKey, guide.notAllowed)}
                         </p>
                     </div>
 
@@ -186,7 +198,7 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
                                     href={link.href}
                                     className="inline-flex items-center gap-1.5 rounded-full border border-line bg-raised px-3 py-2 text-xs font-semibold text-fg transition-colors hover:border-accent hover:bg-accent/10 hover:text-accent">
                                     <span aria-hidden>{link.icon}</span>
-                                    {link.label}
+                                    {jarGuideLinkLabel(tJars, jarKey, link.href, link.label)}
                                     <span className="text-fg-faint" aria-hidden>
                                         →
                                     </span>
@@ -196,17 +208,17 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
                     ) : null}
 
                     <p className="text-[11px] leading-relaxed text-fg-faint">
-                        The Coach — tips without shame.{' '}
+                        {t('footer')}{' '}
                         <Link
                             href={productPath('coach')}
                             className="font-medium text-accent underline-offset-2 hover:underline">
-                            Open The Coach
+                            {tCoach('open_coach')}
                         </Link>
                         {' · '}
                         <Link
                             href={settingsHref('account')}
                             className="font-medium text-accent underline-offset-2 hover:underline">
-                            Turn tips off
+                            {t('turn_off')}
                         </Link>
                         .
                     </p>

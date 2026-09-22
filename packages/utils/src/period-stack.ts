@@ -380,6 +380,23 @@ export function projectDebtsAtHorizon(input: {
     };
 }
 
+export type CoachPeriodTravelCopyStrings = {
+    lookingBack: (stamp: string, relativeLabel: string, money: string, horizon: number) => string;
+    lookingAhead: (stamp: string, money: string, horizon: number) => string;
+    paceNeeded: (name: string, moneyPerMonth: string) => string;
+    pastNote: string;
+};
+
+export const COACH_PERIOD_TRAVEL_COPY_DEFAULTS: CoachPeriodTravelCopyStrings = {
+    lookingBack: (stamp, relativeLabel, money, horizon) =>
+        `Looking back at ${stamp} (${relativeLabel}): about ${money} moved through your jars across ${horizon} month${horizon === 1 ? '' : 's'}.`,
+    lookingAhead: (stamp, money, horizon) =>
+        `By ${stamp}, if you keep this plan, about ${money} will have moved through your jars across ${horizon} month${horizon === 1 ? '' : 's'}.`,
+    paceNeeded: (name, moneyPerMonth) =>
+        `${name} still needs pace — roughly ${moneyPerMonth}/mo net to make the date.`,
+    pastNote: 'Lifetime goal saved and live debt are not rewound for past months.',
+};
+
 export type CoachPeriodTravelCopyInput = {
     travel: PeriodTravel;
     stamp: string;
@@ -392,6 +409,8 @@ export type CoachPeriodTravelCopyInput = {
     debtsAtPeriod?: DebtsAtPeriod | null;
     /** Format cents → display; defaults to raw minor units. */
     formatMoney?: (cents: number) => string;
+    /** Override English defaults when locale is known (e.g. Nest or client `t`). */
+    copy?: Partial<CoachPeriodTravelCopyStrings>;
 };
 
 /** One Coach-voice paragraph for Looking Ahead / Looking Back.
@@ -401,17 +420,15 @@ export function coachPeriodTravelCopy(input: CoachPeriodTravelCopyInput): string
     const money = input.formatMoney ?? ((cents: number) => String(cents));
     const { travel, stamp, horizon, stackedTotal } = input;
     const past = travel.direction === 'past';
+    const copy = { ...COACH_PERIOD_TRAVEL_COPY_DEFAULTS, ...input.copy };
+    const stackedLabel = money(stackedTotal);
 
     const parts: string[] = [];
 
     if (past) {
-        parts.push(
-            `Looking back at ${stamp} (${travel.relativeLabel}): about ${money(stackedTotal)} moved through your jars across ${horizon} month${horizon === 1 ? '' : 's'}.`
-        );
+        parts.push(copy.lookingBack(stamp, travel.relativeLabel, stackedLabel, horizon));
     } else {
-        parts.push(
-            `By ${stamp}, if you keep this plan, about ${money(stackedTotal)} will have moved through your jars across ${horizon} month${horizon === 1 ? '' : 's'}.`
-        );
+        parts.push(copy.lookingAhead(stamp, stackedLabel, horizon));
     }
 
     if (input.jarHighlights?.length) {
@@ -421,13 +438,11 @@ export function coachPeriodTravelCopy(input: CoachPeriodTravelCopyInput): string
     // Income shortfall tip only — fulfilled goals / debt remaining are on the strip.
     const short = (input.goalsAtPeriod ?? []).find(goal => goal.incomeNeededCents !== null);
     if (short?.incomeNeededCents !== null && short?.incomeNeededCents !== undefined) {
-        parts.push(
-            `${short.name} still needs pace — roughly ${money(short.incomeNeededCents)}/mo net to make the date.`
-        );
+        parts.push(copy.paceNeeded(short.name, money(short.incomeNeededCents)));
     }
 
     if (past) {
-        parts.push('Lifetime goal saved and live debt are not rewound for past months.');
+        parts.push(copy.pastNote);
     }
 
     return parts.join(' ');

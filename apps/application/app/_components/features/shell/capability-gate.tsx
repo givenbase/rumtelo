@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 
 import { usePathname } from 'next/navigation';
 
+import { useTranslations } from '@rumtelo/i18n';
 import { BrandLoader } from '@rumtelo/ui';
 
 import { PlanKey } from '@/app/_lib/plan';
@@ -16,13 +17,14 @@ import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabi
  * renders only LockedGate (no page content). Shows BrandLoader until plan is ready.
  */
 export function CapabilityGate({ children }: { children: ReactNode }) {
+    const t = useTranslations();
     const pathname = usePathname();
     const { planReady } = useAppShell();
     const { accessForPath } = usePlanCapabilities();
     const access = accessForPath(pathname);
 
     if (!planReady) {
-        return <BrandLoader label="Loading" />;
+        return <BrandLoader label={t('ui.statusPage.loading')} />;
     }
 
     if (!access.locked) return children;

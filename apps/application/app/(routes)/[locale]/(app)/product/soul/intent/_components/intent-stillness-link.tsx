@@ -2,9 +2,11 @@
 
 import Link from 'next/link';
 
+import { useTranslations } from '@rumtelo/i18n';
 import { Button } from '@rumtelo/ui';
 
 export function IntentStillnessLink() {
+    const t = useTranslations('features.soul.intent');
     return (
         <Button
             as={Link}
@@ -12,7 +14,7 @@ export function IntentStillnessLink() {
             variant="ghost"
             size="sm"
             className="justify-self-start">
-            Go to stillness →
+            {t('stillness_link')}
         </Button>
     );
 }

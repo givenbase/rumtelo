@@ -4,7 +4,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 
 import { BRAND_ASSETS, BRAND_METADATA_ICONS } from '@rumtelo/brand';
-import { locales } from '@rumtelo/i18n';
+import { getTranslations, locales } from '@rumtelo/i18n';
 
 import { Providers } from './providers';
 
@@ -30,46 +30,39 @@ const mono = IBM_Plex_Mono({
     display: 'swap',
 });
 
-const TITLE = 'Rumtelo — Stop wondering where it went.';
-const DESCRIPTION =
-    'Money leaves. You’ll know why. Rumtelo gives every amount a job the second it lands, then widens the picture to your energy, growth and why — with a Coach, in ten minutes a week. Built in Amsterdam. Free to start.';
+export async function generateMetadata(): Promise<Metadata> {
+    const t = await getTranslations('pages.landing.meta');
+    const title = t('title');
+    const description = t('description');
+    const keywords = t.raw('keywords') as string[];
 
-export const metadata: Metadata = {
-    title: TITLE,
-    description: DESCRIPTION,
-    applicationName: 'Rumtelo',
-    icons: BRAND_METADATA_ICONS,
-    manifest: BRAND_ASSETS.manifest,
-    appleWebApp: {
-        title: 'Rumtelo',
-        capable: true,
-        statusBarStyle: 'default',
-    },
-    keywords: [
-        'money overview',
-        'six jars',
-        'jar budgeting',
-        'personal finance coach',
-        'financial freedom',
-        'week check',
-        'energy sleep money',
-        'geld overzicht',
-        'potjes methode',
-    ],
-    openGraph: {
-        type: 'website',
-        siteName: 'Rumtelo',
-        title: TITLE,
-        description: DESCRIPTION,
-        locale: 'en',
-        alternateLocale: ['nl'],
-    },
-    twitter: {
-        card: 'summary_large_image',
-        title: TITLE,
-        description: DESCRIPTION,
-    },
-};
+    return {
+        title,
+        description,
+        applicationName: 'Rumtelo',
+        icons: BRAND_METADATA_ICONS,
+        manifest: BRAND_ASSETS.manifest,
+        appleWebApp: {
+            title: 'Rumtelo',
+            capable: true,
+            statusBarStyle: 'default',
+        },
+        keywords,
+        openGraph: {
+            type: 'website',
+            siteName: 'Rumtelo',
+            title,
+            description,
+            locale: 'en',
+            alternateLocale: ['nl'],
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title,
+            description,
+        },
+    };
+}
 
 export const viewport: Viewport = {
     themeColor: [

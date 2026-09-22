@@ -3,11 +3,16 @@ import Redis from 'ioredis';
 
 import { loadEnv } from '../config/env.config';
 
+import { isRedisUrl, redactRedisUrl } from './redis-url.util';
+
 /**
- * Thin ioredis wrapper (Galighticus pattern).
+ * Thin ioredis wrapper.
  *
  * Reads `DATABASE_REDIS_URL`. When unset, invalid, or unreachable, stays disabled —
  * callers check `isAvailable` and fall back in-memory if needed.
+ *
+ * Better Auth uses its own client via {@link createBetterAuthSecondaryStorage}
+ * (bootstrapped outside Nest DI).
  */
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
@@ -67,26 +72,5 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
         } catch {
             return false;
         }
-    }
-}
-
-function isRedisUrl(url: string): boolean {
-    try {
-        const parsed = new URL(url);
-        return parsed.protocol === 'redis:' || parsed.protocol === 'rediss:';
-    } catch {
-        return false;
-    }
-}
-
-/** Log-safe: keep scheme/host, drop credentials. */
-function redactRedisUrl(url: string): string {
-    try {
-        const parsed = new URL(url);
-        parsed.password = '';
-        parsed.username = '';
-        return parsed.toString();
-    } catch {
-        return url.slice(0, 48);
     }
 }

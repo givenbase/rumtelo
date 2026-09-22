@@ -5,7 +5,7 @@ import { getSessionCookie } from 'better-auth/cookies';
 import { routing } from './i18n/routing';
 
 /**
- * Next.js 16 Proxy: next-intl + Better Auth cookie checks (Galighticus pattern).
+ * Next.js 16 Proxy: next-intl + Better Auth cookie checks.
  *
  * Per Better Auth:
  * - Uses getSessionCookie() for fast, optimistic session checks

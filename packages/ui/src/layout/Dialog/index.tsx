@@ -45,9 +45,12 @@ function DialogContent({
     className,
     children,
     showCloseButton = true,
+    closeLabel,
     ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
     showCloseButton?: boolean;
+    /** Required when `showCloseButton` — pass from `useTranslations('ui.button.actions.close')`. */
+    closeLabel?: string;
 }) {
     return (
         <DialogPortal data-slot="dialog-portal">
@@ -65,7 +68,7 @@ function DialogContent({
                         data-slot="dialog-close"
                         className="absolute top-4 right-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
                         <XIcon />
-                        <span className="sr-only">Close</span>
+                        <span className="sr-only">{closeLabel ?? ''}</span>
                     </DialogPrimitive.Close>
                 )}
             </DialogPrimitive.Content>
@@ -86,10 +89,13 @@ function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
 function DialogFooter({
     className,
     showCloseButton = false,
+    closeLabel,
     children,
     ...props
 }: React.ComponentProps<'div'> & {
     showCloseButton?: boolean;
+    /** Required when `showCloseButton` — pass from `useTranslations('ui.button.actions.close')`. */
+    closeLabel?: string;
 }) {
     return (
         <div
@@ -102,7 +108,7 @@ function DialogFooter({
                     <button
                         type="button"
                         className="inline-flex h-9 items-center justify-center rounded-lg border border-line px-4 text-sm font-medium text-fg hover:bg-raised">
-                        Close
+                        {closeLabel ?? ''}
                     </button>
                 </DialogPrimitive.Close>
             )}

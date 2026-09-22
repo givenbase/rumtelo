@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 
+import { useTranslations } from '@rumtelo/i18n';
 import { cn } from '@rumtelo/utils';
 
 import { HelperGate } from './helper-gate';
@@ -23,18 +24,21 @@ type CoachGuideSurfaceProps = {
  */
 export function CoachGuideSurface({
     children,
-    label = 'The Coach',
+    label,
     className,
     showMark = true,
     markSize = 'md',
 }: CoachGuideSurfaceProps) {
+    const t = useTranslations('features.coach');
+    const resolvedLabel = label ?? t('helpers.mark_label');
+
     return (
         <HelperGate>
             <div
                 className={cn('relative', className)}
                 data-feature-helper
                 data-coach-guide
-                aria-label={label}>
+                aria-label={resolvedLabel}>
                 {showMark ? (
                     <div className="mb-2 flex items-center gap-2">
                         <CoachMark size={markSize} />

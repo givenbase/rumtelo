@@ -5,8 +5,12 @@ import { useSyncExternalStore } from 'react';
 
 import { cn } from '../lib/utils';
 
+/** `inverse` = light chrome on dark / black surfaces. */
+export type ChromeTone = 'default' | 'inverse';
+
 type ThemeToggleProps = {
     className?: string;
+    tone?: ChromeTone;
     /** Accessible name when icon alone is not enough. */
     'aria-label'?: string;
     /**
@@ -20,12 +24,18 @@ function subscribe() {
     return () => undefined;
 }
 
+const toneClass: Record<ChromeTone, string> = {
+    default: 'border-line text-fg-secondary hover:bg-raised hover:text-fg',
+    inverse: 'border-white/30 text-white hover:border-white/55 hover:bg-white/10 hover:text-white',
+};
+
 /**
  * Light / dark toggle via `next-themes`. Waits for client mount so the icon
  * matches the resolved theme without a hydration mismatch.
  */
 export function ThemeToggle({
     className,
+    tone = 'default',
     'aria-label': ariaLabel,
     onThemeChange,
 }: ThemeToggleProps) {
@@ -51,7 +61,8 @@ export function ThemeToggle({
                 onThemeChange?.(next);
             }}
             className={cn(
-                'grid size-9 place-items-center rounded-lg border border-line text-fg-secondary transition-colors hover:bg-raised hover:text-fg disabled:opacity-60',
+                'grid size-9 place-items-center rounded-lg border transition-colors disabled:opacity-60',
+                toneClass[tone],
                 className
             )}
             suppressHydrationWarning>

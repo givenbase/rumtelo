@@ -1,12 +1,14 @@
 'use client';
 
 import { api } from '@/app/_lib/api';
+import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useState } from 'react';
 
 import { FlowDirection } from '@rumtelo/contracts';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import {
     Button,
@@ -58,11 +60,14 @@ import {
     ResumeIcon,
 } from '@/components/features/ui/action-icons';
 
-function statusLabel(status: ReturnType<typeof fixedCostStatus>) {
-    if (status === 'taken') return 'Taken this period';
-    if (status === 'due') return 'Still due';
-    if (status === 'skipped') return 'Skipped this period';
-    return 'Planned';
+function statusLabel(
+    status: ReturnType<typeof fixedCostStatus>,
+    t: ReturnType<typeof useTranslations<'features.money.fixed'>>
+) {
+    if (status === 'taken') return t('detail_status_taken');
+    if (status === 'due') return t('detail_status_due');
+    if (status === 'skipped') return t('detail_status_skipped');
+    return t('detail_status_planned');
 }
 
 function invalidateFixedCostQueries(queryClient: ReturnType<typeof useQueryClient>) {
@@ -79,7 +84,14 @@ type ConfirmKind = 'pause' | 'end' | null;
  */
 export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string }) {
     const { householdId } = useAuth();
+    const locale = useLocale();
+    const t = useTranslations('features.money.fixed');
+    const tUi = useTranslations();
+    const tForm = useTranslations('ui.form');
+    const tAction = useTranslations('common.action');
+    const tChips = useTranslations('features.money.chips');
     const { period, showToast } = useAppShell();
+    const apiError = useApiError();
     const queryClient = useQueryClient();
     const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
@@ -155,11 +167,11 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
         onSuccess: (_data, patch) => {
             invalidateFixedCostQueries(queryClient);
             setConfirmKind(null);
-            if (patch.isActive) showToast('Bill is active again', 'success');
-            else if (patch.endsOn) showToast('Bill ended', 'success');
-            else showToast('Bill paused', 'success');
+            if (patch.isActive) showToast(t('toast_active'), 'success');
+            else if (patch.endsOn) showToast(t('toast_ended'), 'success');
+            else showToast(t('toast_paused'), 'success');
         },
-        onError: () => showToast('Could not update status', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const settleMutation = useMutation({
@@ -187,11 +199,11 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
         },
         onSuccess: (_data, action) => {
             invalidateFixedCostQueries(queryClient);
-            if (action === 'paid') showToast('Marked paid for this period', 'success');
-            else if (action === 'skip') showToast('Skipped this period', 'success');
-            else showToast('Period reopened', 'success');
+            if (action === 'paid') showToast(t('toast_paid'), 'success');
+            else if (action === 'skip') showToast(t('toast_skipped'), 'success');
+            else showToast(t('toast_reopened'), 'success');
         },
-        onError: () => showToast('Could not update settlement', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     function openPauseConfirm() {
@@ -212,7 +224,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
         const today = todayIsoDate();
         const endsOn = endWhen === 'today' ? today : endDate;
         if (!endsOn || endsOn > today) {
-            showToast('Pick a date today or earlier', 'error');
+            showToast(t('toast_pick_date'), 'error');
             return;
         }
         lifecycleMutation.mutate({ isActive: false, endsOn });
@@ -221,7 +233,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
     if (live && listQuery.isLoading && !item) {
         return (
             <Typography as="p" size="sm" color="muted">
-                Loading…
+                {t('detail.loading')}
             </Typography>
         );
     }
@@ -231,10 +243,10 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                 <Link
                     href="/product/money/fixed-costs"
                     className="w-fit font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
-                    ← Fixed costs
+                    {t('detail.back')}
                 </Link>
                 <Typography as="p" size="sm" color="muted">
-                    Fixed cost not found.
+                    {t('detail.not_found')}
                 </Typography>
             </div>
         );
@@ -262,7 +274,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
             categoryTemplates,
         })
     );
-    const due = formatDueDay(item.dueDay);
+    const due = formatDueDay(item.dueDay, tChips);
     const signedMonthly =
         item.direction === FlowDirection.IN ? Math.abs(monthly) : -Math.abs(monthly);
     const jarHref = jar?.key ? `/product/money/jars/${jarKeyToSlug(jar.key)}` : null;
@@ -278,7 +290,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                     <Link
                         href="/product/money/fixed-costs"
                         className="w-fit font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
-                        ← Fixed costs
+                        {t('detail.back')}
                     </Link>
                     <div className="flex items-center gap-3">
                         <VendorMark
@@ -307,7 +319,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                 disabled={busy || !live}
                                 onClick={openPauseConfirm}>
                                 <PauseIcon />
-                                Pause
+                                {t('pause_short')}
                             </Button>
                             <Button
                                 type="button"
@@ -315,7 +327,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                 disabled={busy || !live}
                                 onClick={openEndConfirm}>
                                 <EndIcon />
-                                End
+                                {t('end_short')}
                             </Button>
                         </>
                     ) : null}
@@ -327,7 +339,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                 disabled={busy || !live}
                                 onClick={() => lifecycleMutation.mutate({ isActive: true })}>
                                 <ResumeIcon />
-                                Resume
+                                {t('resume_short')}
                             </Button>
                             <Button
                                 type="button"
@@ -335,7 +347,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                 disabled={busy || !live}
                                 onClick={openEndConfirm}>
                                 <EndIcon />
-                                End
+                                {t('end_short')}
                             </Button>
                         </>
                     ) : null}
@@ -348,12 +360,12 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                 lifecycleMutation.mutate({ isActive: true, endsOn: null })
                             }>
                             <ReactivateIcon />
-                            Reactivate
+                            {t('reactivate_short')}
                         </Button>
                     ) : null}
                     <Button as={Link} href={updateHref('fixed', item.id)} variant="secondary">
                         <EditIcon />
-                        Edit
+                        {tAction('edit')}
                     </Button>
                 </div>
             </div>
@@ -363,15 +375,12 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                 onOpenChange={open => {
                     if (!open && !busy) setConfirmKind(null);
                 }}>
-                <DialogContent className="sm:max-w-md">
+                <DialogContent className="sm:max-w-md" closeLabel={tUi('ui.button.actions.close')}>
                     {confirmKind === 'pause' ? (
                         <>
                             <DialogHeader>
-                                <DialogTitle>Pause this bill?</DialogTitle>
-                                <DialogDescription>
-                                    It stays on your list but won&apos;t count toward jar pressure
-                                    or “still due” until you resume.
-                                </DialogDescription>
+                                <DialogTitle>{t('confirm_pause_title')}</DialogTitle>
+                                <DialogDescription>{t('confirm_pause_body')}</DialogDescription>
                             </DialogHeader>
                             <DialogFooter>
                                 <Button
@@ -379,11 +388,11 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                     variant="secondary"
                                     disabled={busy}
                                     onClick={() => setConfirmKind(null)}>
-                                    Cancel
+                                    {tAction('cancel')}
                                 </Button>
                                 <Button type="button" disabled={busy} onClick={confirmPause}>
                                     <PauseIcon />
-                                    {busy ? 'Pausing…' : 'Pause bill'}
+                                    {busy ? t('pausing') : t('pause_bill')}
                                 </Button>
                             </DialogFooter>
                         </>
@@ -391,15 +400,12 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                     {confirmKind === 'end' ? (
                         <>
                             <DialogHeader>
-                                <DialogTitle>End this bill?</DialogTitle>
-                                <DialogDescription>
-                                    It stops counting in your plan. You can reactivate it later if
-                                    needed.
-                                </DialogDescription>
+                                <DialogTitle>{t('confirm_end_title')}</DialogTitle>
+                                <DialogDescription>{t('confirm_end_body')}</DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-3">
                                 <p className="font-mono text-[10px] tracking-wider text-fg-muted uppercase">
-                                    When did it end?
+                                    {t('when_ended')}
                                 </p>
                                 <div className="flex flex-wrap gap-2">
                                     <button
@@ -415,7 +421,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                                 ? 'border-accent/40 bg-accent-soft text-accent'
                                                 : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
                                         )}>
-                                        Today
+                                        {t('today')}
                                     </button>
                                     <button
                                         type="button"
@@ -427,19 +433,28 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                                 ? 'border-accent/40 bg-accent-soft text-accent'
                                                 : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
                                         )}>
-                                        Earlier date
+                                        {t('earlier_date')}
                                     </button>
                                 </div>
                                 {endWhen === 'earlier' ? (
                                     <div className="grid gap-1.5">
                                         <span className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                            End date
+                                            {t('end_date')}
                                         </span>
                                         <Calendar
                                             value={endDate}
                                             max={todayIsoDate()}
                                             onSelect={setEndDate}
+                                            locale={locale}
                                             className="w-full max-w-none"
+                                            labels={{
+                                                previousMonth: tForm('previous_month'),
+                                                nextMonth: tForm('next_month'),
+                                                month: tForm('month'),
+                                                year: tForm('year'),
+                                                today: tForm('today'),
+                                                pickADay: tForm('pick_a_day'),
+                                            }}
                                         />
                                     </div>
                                 ) : null}
@@ -450,11 +465,11 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                     variant="secondary"
                                     disabled={busy}
                                     onClick={() => setConfirmKind(null)}>
-                                    Cancel
+                                    {tAction('cancel')}
                                 </Button>
                                 <Button type="button" disabled={busy} onClick={confirmEnd}>
                                     <EndIcon />
-                                    {busy ? 'Ending…' : 'End bill'}
+                                    {busy ? t('ending') : t('end_bill')}
                                 </Button>
                             </DialogFooter>
                         </>
@@ -466,7 +481,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                 <div className="flex flex-wrap items-end justify-between gap-3">
                     <div>
                         <p className="font-mono text-[10px] tracking-wider text-fg-muted uppercase">
-                            This period
+                            {t('this_period')}
                         </p>
                         <p className="mt-1 text-2xl font-semibold text-fg">
                             {formatMoney(signedMonthly)}
@@ -481,7 +496,11 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                       ? 'border-line text-fg-muted'
                                       : 'border-fg-faint/40 text-fg-faint'
                             }>
-                            {lifecycleLabel(lifecycle)}
+                            {lifecycleLabel(lifecycle, {
+                                active: t('lifecycle_active'),
+                                paused: t('lifecycle_paused'),
+                                ended: t('lifecycle_ended'),
+                            })}
                         </MetaChip>
                         {lifecycle === 'active' ? (
                             <MetaChip
@@ -494,17 +513,20 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                             ? 'border-line text-fg-muted'
                                             : undefined
                                 }>
-                                {statusLabel(status)}
+                                {statusLabel(status, t)}
                             </MetaChip>
                         ) : null}
                     </div>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
-                    <MetaChip>{cadenceLabel(item.cadence)}</MetaChip>
+                    <MetaChip>{cadenceLabel(item.cadence, tChips)}</MetaChip>
                     {due ? <MetaChip>{due}</MetaChip> : null}
                     {Math.abs(monthly) !== Math.abs(item.amount) ? (
                         <MetaChip>
-                            {formatMoney(item.amount)} / {cadenceLabel(item.cadence).toLowerCase()}
+                            {tChips('amount_per_cadence', {
+                                amount: formatMoney(item.amount),
+                                cadence: cadenceLabel(item.cadence, tChips, { case: 'lower' }),
+                            })}
                         </MetaChip>
                     ) : null}
                     {jar && jarHref ? (
@@ -534,34 +556,40 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
             </Card>
 
             <Card className="grid gap-3 p-5">
-                <p className="font-mono text-[10px] tracking-wider text-fg-muted uppercase">Plan</p>
+                <p className="font-mono text-[10px] tracking-wider text-fg-muted uppercase">
+                    {t('detail.plan_heading')}
+                </p>
                 <dl className="grid gap-2 text-sm sm:grid-cols-2">
                     <div>
                         <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                            Amount
+                            {t('detail.amount')}
                         </dt>
                         <dd className="mt-0.5 text-fg">{formatMoney(Math.abs(item.amount))}</dd>
                     </div>
                     <div>
                         <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                            Direction
+                            {t('detail.direction')}
                         </dt>
                         <dd className="mt-0.5 text-fg">
-                            {item.direction === FlowDirection.IN ? 'Money in' : 'Money out'}
+                            {item.direction === FlowDirection.IN
+                                ? t('detail.money_in')
+                                : t('detail.money_out')}
                         </dd>
                     </div>
                     {item.endsOn ? (
                         <div>
                             <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                Ends
+                                {t('detail.ends')}
                             </dt>
-                            <dd className="mt-0.5 text-fg">{formatBookedDate(item.endsOn)}</dd>
+                            <dd className="mt-0.5 text-fg">
+                                {formatBookedDate(item.endsOn, locale)}
+                            </dd>
                         </div>
                     ) : null}
                     {item.note ? (
                         <div className="sm:col-span-2">
                             <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                Note
+                                {t('detail.note')}
                             </dt>
                             <dd className="mt-0.5 text-fg-secondary">{item.note}</dd>
                         </div>
@@ -572,7 +600,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
             {lifecycle === 'active' ? (
                 <section className="grid gap-3">
                     <Typography as="h2" variant="eyebrow" color="primary">
-                        ✦ This period’s payment
+                        {t('detail.period_heading')}
                     </Typography>
                     <Card className="grid gap-0 p-0">
                         {linkedTx ? (
@@ -598,27 +626,31 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                 )}
                                 amount={formatMoney(linkedTx.amount)}
                                 amountClassName={linkedTx.amount < 0 ? 'text-fg' : 'text-success'}
-                                badges={<MetaChip>{formatBookedDate(linkedTx.bookedOn)}</MetaChip>}
+                                badges={
+                                    <MetaChip>
+                                        {formatBookedDate(linkedTx.bookedOn, locale)}
+                                    </MetaChip>
+                                }
                                 href={txDetailHref(linkedTx.id)}
                             />
                         ) : status === 'taken' ? (
                             <Typography as="p" size="sm" color="muted" className="px-5 py-4">
-                                Marked paid
+                                {t('detail.marked_paid')}
                                 {settlement?.paidAt
-                                    ? ` · ${formatBookedDate(settlement.paidAt.slice(0, 10))}`
+                                    ? ` · ${formatBookedDate(settlement.paidAt.slice(0, 10), locale)}`
                                     : ''}
                                 {settlement?.amount !== null && settlement?.amount !== undefined
                                     ? ` · ${formatMoney(settlement.amount)}`
                                     : ''}
-                                . No linked transaction yet.
+                                . {t('detail.no_linked_tx')}
                             </Typography>
                         ) : status === 'skipped' ? (
                             <Typography as="p" size="sm" color="muted" className="px-5 py-4">
-                                Skipped for this period — it won&apos;t show as still due.
+                                {t('detail.skipped_period')}
                             </Typography>
                         ) : (
                             <Typography as="p" size="sm" color="muted" className="px-5 py-4">
-                                No payment linked for this period yet.
+                                {t('detail.no_payment_linked')}
                             </Typography>
                         )}
                         {canSettle ? (
@@ -628,7 +660,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                         type="button"
                                         disabled={settleBusy || !live}
                                         onClick={() => settleMutation.mutate('paid')}>
-                                        Mark paid
+                                        {t('detail.mark_paid')}
                                     </Button>
                                 ) : null}
                                 {status !== 'skipped' ? (
@@ -637,7 +669,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                         variant="secondary"
                                         disabled={settleBusy || !live}
                                         onClick={() => settleMutation.mutate('skip')}>
-                                        Skip period
+                                        {t('detail.skip_period')}
                                     </Button>
                                 ) : null}
                                 {settlement ? (
@@ -646,7 +678,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                         variant="secondary"
                                         disabled={settleBusy || !live}
                                         onClick={() => settleMutation.mutate('unlink')}>
-                                        Reopen period
+                                        {t('detail.reopen_period')}
                                     </Button>
                                 ) : null}
                             </div>
@@ -658,14 +690,16 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
             {item.debtId ? (
                 <section className="grid gap-3">
                     <Typography as="h2" variant="eyebrow" color="primary">
-                        ✦ Linked debt
+                        {t('detail.linked_debt_heading')}
                     </Typography>
                     <Card className="p-0">
                         <Link
                             href={debtDetailHref(item.debtId)}
                             className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left hover:bg-raised">
-                            <span className="text-sm text-fg">Open linked debt</span>
-                            <span className="font-mono text-xs text-accent uppercase">Open ›</span>
+                            <span className="text-sm text-fg">{t('detail.open_linked_debt')}</span>
+                            <span className="font-mono text-xs text-accent uppercase">
+                                {t('detail.open_link')}
+                            </span>
                         </Link>
                     </Card>
                 </section>

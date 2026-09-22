@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
@@ -15,6 +16,10 @@ function scoreLabel(score: number | null | undefined): string {
 }
 
 export function EnergyPortalHubClient() {
+    const t = useTranslations();
+    const tCoach = useTranslations('features.coach');
+    const tc = useTranslations('features.energy.hub.cards');
+    const shell = energyPortalShell(t);
     const { householdId } = useAuth();
     const live = isLiveData(householdId);
 
@@ -33,21 +38,21 @@ export function EnergyPortalHubClient() {
     const weekDone = data?.weekCheckCompleted === true;
 
     const props: PortalHubProps = {
-        ...energyPortalShell,
-        coach: pickPortalCoach(data?.coach ?? [], energyPortalShell.fallbackCoach),
+        ...shell,
+        coach: pickPortalCoach(data?.coach ?? [], shell.fallbackCoach, tCoach, t),
         cards: [
             {
-                name: 'Week',
-                value: weekDone ? 'Done' : 'Open',
-                note: 'week check',
+                name: tc('week.name'),
+                value: weekDone ? tc('week.done') : tc('week.open'),
+                note: tc('week.note'),
                 color: 'var(--color-accent)',
                 chart: { kind: 'ring', pct: weekDone ? 100 : 0 },
                 href: '/product/energy/week',
             },
             {
-                name: 'Sleep',
+                name: tc('sleep.name'),
                 value: scoreLabel(sleep),
-                note: '7-day score',
+                note: tc('sleep.note'),
                 color: 'var(--color-jar-lts)',
                 chart: {
                     kind: 'bars',
@@ -59,17 +64,17 @@ export function EnergyPortalHubClient() {
                 href: '/product/energy/sleep',
             },
             {
-                name: 'Training',
+                name: tc('training.name'),
                 value: String(sessions),
-                note: 'sessions this week',
+                note: tc('training.note'),
                 color: 'var(--color-jar-ff)',
                 chart: { kind: 'ring', pct: Math.min(100, sessions * 25) },
                 href: '/product/energy/training',
             },
             {
-                name: 'Food',
+                name: tc('food.name'),
                 value: scoreLabel(food),
-                note: '7-day score',
+                note: tc('food.note'),
                 color: 'var(--color-jar-play)',
                 chart: {
                     kind: 'ring',

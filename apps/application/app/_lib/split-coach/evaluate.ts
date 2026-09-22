@@ -31,13 +31,12 @@ export function evaluateSplitCoach(
 
     if (play > SPLIT_SOFT_CEILING[JarKey.PLAY]) {
         tips.push({
-            id: 'play-above-default',
+            id:
+                spendingStyle === SpendingStyle.SAVER
+                    ? 'play-above-default-saver'
+                    : 'play-above-default',
             severity: 'warn',
             jars: [JarKey.PLAY, JarKey.FINANCIAL_FREEDOM, JarKey.LONG_TERM_SAVINGS],
-            message:
-                spendingStyle === SpendingStyle.SAVER
-                    ? 'Play above 10% can be healthy if you under-spend joy — just don’t fund it by cutting Financial Freedom.'
-                    : 'Play above 10% usually comes from Financial Freedom or Long Term Savings. Those two buy your future; Play spends this month.',
         });
     }
 
@@ -46,8 +45,6 @@ export function evaluateSplitCoach(
             id: 'give-above-default',
             severity: 'info',
             jars: [JarKey.GIVE, JarKey.FINANCIAL_FREEDOM],
-            message:
-                'Give above 5% is generous — keep Financial Freedom at least at 10% so giving doesn’t replace paying yourself first.',
         });
     }
 
@@ -56,8 +53,6 @@ export function evaluateSplitCoach(
             id: 'edu-above-soft',
             severity: 'info',
             jars: [JarKey.EDUCATION, JarKey.FINANCIAL_FREEDOM],
-            message:
-                'Education raises earning power — still protect Financial Freedom at 10% so learning doesn’t crowd out investing.',
         });
     }
 
@@ -66,8 +61,6 @@ export function evaluateSplitCoach(
             id: 'ff-below-default',
             severity: 'warn',
             jars: [JarKey.FINANCIAL_FREEDOM],
-            message:
-                'Financial Freedom under 10% means you’re paying everyone else first. Put yourself back in the split before raising Play or Give.',
         });
     }
 
@@ -76,8 +69,6 @@ export function evaluateSplitCoach(
             id: 'lts-below-default',
             severity: 'warn',
             jars: [JarKey.LONG_TERM_SAVINGS],
-            message:
-                'Long Term Savings under 10% leaves no buffer for planned big things. Raise this before expanding Play.',
         });
     }
 
@@ -89,8 +80,6 @@ export function evaluateSplitCoach(
             id: 'future-vs-fun',
             severity: 'warn',
             jars: [JarKey.PLAY, JarKey.GIVE, JarKey.FINANCIAL_FREEDOM, JarKey.LONG_TERM_SAVINGS],
-            message:
-                'You’re funding today (Play / Give) while shrinking tomorrow (Freedom + Long Term). Prefer raising those two before fun.',
         });
     }
 
@@ -101,8 +90,6 @@ export function evaluateSplitCoach(
             id: 'nec-high',
             severity: 'info',
             jars: [JarKey.NECESSITIES],
-            message:
-                'Necessity above 60% squeezes every other jar. Cutting fixed costs usually helps more than cutting Freedom.',
         });
     }
 
@@ -111,8 +98,6 @@ export function evaluateSplitCoach(
             id: 'nec-low',
             severity: 'warn',
             jars: [JarKey.NECESSITIES],
-            message:
-                'Necessity under 45% is tight for most households — check rent, insurance and debt instalments still fit.',
         });
     }
 
@@ -126,8 +111,6 @@ export function evaluateSplitCoach(
             id: 'spender-ff',
             severity: 'info',
             jars: [JarKey.PLAY, JarKey.FINANCIAL_FREEDOM],
-            message:
-                'Your pattern leans spender — try +1–2% into Financial Freedom before adding more Play.',
         });
     }
 
@@ -136,8 +119,6 @@ export function evaluateSplitCoach(
             id: 'saver-play',
             severity: 'info',
             jars: [JarKey.PLAY],
-            message:
-                'Your pattern leans saver — a little more Play can make the plan sustainable. Joy that is planned is not waste.',
         });
     }
 

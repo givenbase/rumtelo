@@ -13,11 +13,7 @@ export default function Page() {
     const meta = moveCreateMeta(fromJarId);
 
     return (
-        <FormRoutePageShell
-            title={meta.title}
-            description={meta.description}
-            closeHref={returnTo || formRoute('moveCreate').closeHref}
-            width={meta.width}>
+        <FormRoutePageShell meta={meta} closeHref={returnTo || formRoute('moveCreate').closeHref}>
             <MoveMoneyForm embedded defaultFromJarId={fromJarId} />
         </FormRoutePageShell>
     );

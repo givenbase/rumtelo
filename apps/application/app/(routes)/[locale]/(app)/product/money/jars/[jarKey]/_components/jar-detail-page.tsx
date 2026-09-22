@@ -4,6 +4,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import Link from 'next/link';
 
 import { GoalKind, GoalStatus, JarKey, jarCapabilitiesFor } from '@rumtelo/contracts';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card, Typography } from '@rumtelo/ui';
 import {
@@ -17,6 +18,7 @@ import {
 
 import { claimLinkedFixedCostTxIds } from '@/app/_lib/fixed-cost-match';
 import { activeSaveGoalsOnJar, focusSaveGoal } from '@/app/_lib/goal-focus';
+import { resolveJarSubtitle } from '@/app/_lib/jar-copy';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
@@ -47,9 +49,12 @@ import {
  * goals, period transactions, guide, and CTAs.
  */
 export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
+    const t = useTranslations('features.money.jars.detail');
+    const tJars = useTranslations('features.money.jars');
     const { householdId } = useAuth();
     const { period } = useAppShell();
     const { formatMoney } = useHouseholdCurrency();
+    const appLocale = useLocale();
     const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);
     const { byKey: catalogByKey } = useJarCatalog();
@@ -137,10 +142,10 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                 <Link
                     href="/product/money/jars"
                     className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
-                    ← Jars
+                    {t('back_jars')}
                 </Link>
                 <Typography as="p" size="sm" color="muted">
-                    Loading jar…
+                    {t('loading_jar')}
                 </Typography>
             </div>
         );
@@ -208,7 +213,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                 <Link
                     href="/product/money/jars"
                     className="w-fit font-mono text-xs font-medium tracking-wide text-fg-faint uppercase transition-colors hover:text-accent">
-                    ← Jars
+                    {t('back_jars')}
                 </Link>
 
                 <div className="flex flex-wrap items-start justify-between gap-4">
@@ -219,7 +224,8 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                         <div className="grid min-w-0 gap-1">
                             <Typography as="h1">{jar.name}</Typography>
                             <p className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase">
-                                {jar.subtitle ?? catalog?.subtitle ?? ''} · {jar.percentage}% of net
+                                {resolveJarSubtitle(tJars, jarKey, jar.subtitle, catalog?.subtitle)}{' '}
+                                · {t('pct_of_net', { pct: jar.percentage })}
                             </p>
                             {allocationDelta ? (
                                 <MoneyDeltaLabel
@@ -242,10 +248,10 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                                     })}
                                     size="sm"
                                     variant="secondary">
-                                    Move between jars
+                                    {tJars('move_between')}
                                 </Button>
                                 <Button as={Link} href={createTxHref({ jarId: jar.id })} size="sm">
-                                    + Add transaction
+                                    {tJars('add_transaction')}
                                 </Button>
                             </>
                         ) : null}
@@ -263,7 +269,9 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                 showCommitted={allowsFixedCosts}
                 footnote={
                     stacked
-                        ? `Stacked over ${dashboardQuery.data?.travel?.monthsHorizon ?? '—'} months. Activity below is still the selected month.`
+                        ? t('stacked_footnote', {
+                              months: dashboardQuery.data?.travel?.monthsHorizon ?? '—',
+                          })
                         : undefined
                 }
             />
@@ -272,24 +280,24 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
             <section className="grid gap-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                     <Typography as="h2" variant="eyebrow" color="primary">
-                        ✦ Categories this month
+                        {t('categories_month')}
                     </Typography>
                     {allowsFixedCosts ? (
                         <Link
                             href="/product/money/fixed-costs"
                             className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
-                            All fixed costs ›
+                            {t('all_fixed_costs')}
                         </Link>
                     ) : null}
                 </div>
                 <Card className="p-0">
                     <div className="hidden items-center gap-3 border-b border-line px-5 py-2 font-mono text-xs font-medium tracking-wide text-fg-faint uppercase sm:flex">
                         <span className="w-9 shrink-0" aria-hidden />
-                        <span className="min-w-0 flex-1">Category</span>
+                        <span className="min-w-0 flex-1">{t('category')}</span>
                         <span className="flex min-w-0 flex-1 items-center justify-end gap-6">
-                            <span className="w-20 text-right">Planned</span>
-                            <span className="w-20 text-right">Spent</span>
-                            <span className="w-24 text-right">Over / under</span>
+                            <span className="w-20 text-right">{t('planned')}</span>
+                            <span className="w-20 text-right">{t('spent')}</span>
+                            <span className="w-24 text-right">{t('over_under')}</span>
                         </span>
                         <span className="w-3 shrink-0" aria-hidden />
                     </div>
@@ -316,18 +324,18 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                 <section className="grid gap-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                         <Typography as="h2" variant="eyebrow" color="primary">
-                            ✦ Goals on this jar
+                            {t('goals_on_jar')}
                         </Typography>
                         <Link
                             href={addGoalHref}
                             className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
-                            + Add goal
+                            {t('add_goal')}
                         </Link>
                     </div>
                     {focusGoal ? (
                         <Card className="grid gap-2 border-accent/30 bg-accent-soft/50 p-4">
                             <p className="font-mono text-[10px] tracking-wider text-accent uppercase">
-                                Focus · #1 of {saveQueue.length}
+                                {t('focus_of', { total: saveQueue.length })}
                             </p>
                             <div className="flex flex-wrap items-center justify-between gap-3">
                                 <Link
@@ -344,9 +352,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                                     / {formatMoney(focusGoal.target)}
                                 </span>
                             </div>
-                            <p className="text-xs text-fg-muted">
-                                Fill this jar first — then claim the goal when you&apos;re ready.
-                            </p>
+                            <p className="text-xs text-fg-muted">{t('fill_jar_first')}</p>
                         </Card>
                     ) : null}
                     <Card className="p-0">
@@ -362,20 +368,18 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
             <section className="grid gap-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                     <Typography as="h2" variant="eyebrow" color="primary">
-                        ✦ Other activity this period
+                        {t('other_activity')}
                     </Typography>
                     <Link
                         href="/product/money/transactions"
                         className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
-                        All transactions ›
+                        {t('all_transactions')}
                     </Link>
                 </div>
                 <Card className="p-0">
                     {leftoverPeriodTxs.length === 0 ? (
                         <Typography as="p" size="sm" color="muted" className="px-5 py-4">
-                            {transactions.length === 0
-                                ? 'No transactions sorted into this jar this month.'
-                                : 'All period payments are nested under categories above.'}
+                            {transactions.length === 0 ? t('no_tx_month') : t('all_nested')}
                         </Typography>
                     ) : (
                         <ul className="grid">
@@ -405,7 +409,9 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                                                 tx.amount < 0 ? 'text-fg' : 'text-success'
                                             }
                                             badges={
-                                                <MetaChip>{formatBookedDate(tx.bookedOn)}</MetaChip>
+                                                <MetaChip>
+                                                    {formatBookedDate(tx.bookedOn, appLocale)}
+                                                </MetaChip>
                                             }
                                             href={txDetailHref(tx.id)}
                                         />

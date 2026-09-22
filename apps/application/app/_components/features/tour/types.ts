@@ -1,6 +1,6 @@
 /**
  * Tour / Help types.
- * Copy keys live under `content/copy` — later hoist to `@rumtelo/i18n` (`features.tour.*`).
+ * User-facing copy comes from `@rumtelo/i18n` (`features.tour.*`) via i18n-builders.
  */
 
 export type PageHelpSection = {

@@ -7,6 +7,7 @@ import { Pool } from 'pg';
 import { v7 as uuidv7 } from 'uuid';
 
 import type { Env } from '../../../common/config/env.config';
+import { createBetterAuthSecondaryStorage } from '../../../common/redis/better-auth-redis.storage';
 import { EmailService } from '../../backoffice/communication/email';
 
 import { householdAccessControl, householdRoles } from './access-control.config';
@@ -30,7 +31,7 @@ function authUserFirstName(user: { name?: string | null; email: string }): strin
  * organization, member, invitation, two_factor) and migrates them via
  * `pn auth:migrate`. The sibling folders here (user/, member/, …) map read-only
  * MikroORM entities over the same tables so the rest of the backend gets typed,
- * relational reads — better-auth stays the single writer (Galighticus pattern).
+ * relational reads — better-auth stays the single writer.
  *
  * Column names are snake_case like every other schema. better-auth is camelCase
  * internally, so each model maps its fields explicitly below. Plugin-added
@@ -54,7 +55,7 @@ export function createAuth(env: Env) {
         ssl: env.DATABASE_SSL ? { rejectUnauthorized: false } : undefined,
         /**
          * better-auth is schema-unaware, so its pool connects with search_path
-         * pinned to the `auth` schema (Galighticus pattern). Its tables live
+         * pinned to the `auth` schema. Its tables live
          * there, namespaced like every other domain — never in `public`.
          */
         options: '-c search_path=auth',
@@ -75,12 +76,16 @@ export function createAuth(env: Env) {
         ? resolveCrossSubdomainCookieDomain(env.DOMAIN_WEB, env.DOMAIN_APP)
         : undefined;
 
+    const secondaryStorage = createBetterAuthSecondaryStorage(env.DATABASE_REDIS_URL);
+
     return betterAuth({
         database: pool,
         secret: env.BETTER_AUTH_SECRET,
         // Public origin — private DOMAIN_BACK is for service-to-service only.
         baseURL: env.DOMAIN_BACK_PUBLIC,
         trustedOrigins,
+        // Rate limits + session cache share Redis when DATABASE_REDIS_URL is valid.
+        secondaryStorage,
 
         /**
          * Sign-up body may include Account profile fields (firstName, …).
@@ -94,7 +99,7 @@ export function createAuth(env: Env) {
                 if (!body || typeof body.email !== 'string') return;
                 const parsed = SignUpAccountProfile.safeParse(body);
                 if (!parsed.success) return;
-                stashSignUpAccountProfile(body.email, toSignUpAccountProfile(parsed.data));
+                await stashSignUpAccountProfile(body.email, toSignUpAccountProfile(parsed.data));
             }),
         },
 
@@ -102,7 +107,7 @@ export function createAuth(env: Env) {
             user: {
                 create: {
                     after: async user => {
-                        const profile = takeSignUpAccountProfile(user.email);
+                        const profile = await takeSignUpAccountProfile(user.email);
                         try {
                             await insertAccountForSignUp(pool, user.id, profile);
                         } catch (error) {

@@ -12,7 +12,6 @@ import {
 import { EntityManager } from '@mikro-orm/postgresql';
 import {
     BadRequestException,
-    ForbiddenException,
     Inject,
     Injectable,
     ServiceUnavailableException,
@@ -20,6 +19,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 
 import type { Env } from '../../../../common/config/env.config';
+import { apiForbidden } from '../../../../common/errors/api-user-error';
 import { isDemoHouseholdSlug } from '@rumtelo/contracts/platform';
 import { AuthHousehold } from '../managed/household/auth-household.entity';
 import { AuthMember } from '../managed/member/auth-member.entity';
@@ -209,7 +209,7 @@ export class HouseholdSettingsService {
     private async assertNotDemoHousehold(householdId: string): Promise<void> {
         const household = await this.em.findOne(AuthHousehold, { id: householdId });
         if (isDemoHouseholdSlug(household?.slug)) {
-            throw new ForbiddenException('Demo households cannot change plans');
+            throw apiForbidden('demo_no_plan_change');
         }
     }
 }

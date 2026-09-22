@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -18,18 +18,21 @@ import { cn } from '@rumtelo/utils';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { AssetKind, AssetPreset } from '@rumtelo/contracts';
-import { z } from 'zod';
 
 import { api } from '@/app/_lib/api';
+import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
+import { useTranslations } from '@rumtelo/i18n';
+
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 
+import { createAssetFormSchema, type AssetFormSchemaValues } from './form-zod';
 import { FormInput } from './form-input';
 import { type NamePresetOption, PresetNameField } from './preset-name-field';
 import { ConfirmActionButton } from './confirm-action-button';
@@ -37,33 +40,7 @@ import { ConfirmActionButton } from './confirm-action-button';
 const EMPTY_KINDS: AssetKind[] = [];
 const EMPTY_PRESETS: AssetPreset[] = [];
 
-const moneyInput = z
-    .string()
-    .min(1, 'Amount is required')
-    .refine(
-        value => {
-            const cents = parseAmountToMinorUnits(value);
-            return cents !== null && cents > 0;
-        },
-        { message: 'Enter a valid amount' }
-    );
-
-const assetFormSchema = z
-    .object({
-        kind: z.string().min(1).max(64),
-        name: z.string().min(1, 'Name is required').max(80),
-        value: moneyInput,
-        flow: z.string().optional(),
-    })
-    .superRefine((values, ctx) => {
-        if (!values.flow?.trim()) return;
-        const cents = parseAmountToMinorUnits(values.flow);
-        if (cents === null || cents < 0) {
-            ctx.addIssue({ code: 'custom', path: ['flow'], message: 'Enter a valid amount' });
-        }
-    });
-
-type AssetFormValues = z.infer<typeof assetFormSchema>;
+type AssetFormValues = AssetFormSchemaValues;
 
 type AssetFormDefaults = {
     kind: string;
@@ -92,7 +69,12 @@ export function AssetForm({
     defaultValues,
     lockedKind,
 }: AssetFormProps) {
+    const t = useTranslations();
+    const tAsset = useTranslations('features.growth.asset_form');
+    const tForm = useTranslations('ui.form');
+    const tBtn = useTranslations('ui.button.actions');
     const { showToast } = useAppShell();
+    const apiError = useApiError();
     const dismiss = useFormDismiss(onSuccess);
     const { symbol } = useHouseholdCurrency();
     const { householdId } = useAuth();
@@ -116,6 +98,8 @@ export function AssetForm({
     );
     const kinds = kindsQuery.data ?? EMPTY_KINDS;
     const presets = presetsQuery.data ?? EMPTY_PRESETS;
+
+    const assetFormSchema = useMemo(() => createAssetFormSchema(tForm), [tForm]);
 
     const form = useForm<AssetFormValues>({
         defaultValues: {
@@ -146,9 +130,15 @@ export function AssetForm({
             };
         });
 
-    const onError = createFormInvalidHandler(({ title, description }) => {
-        showToast(description ?? title, 'error');
-    });
+    const onError = createFormInvalidHandler(
+        ({ title, description }) => {
+            showToast(description ?? title, 'error');
+        },
+        {
+            title: tForm('incomplete_title'),
+            description: tForm('incomplete_description'),
+        }
+    );
 
     function selectKind(next: string) {
         const current = form.getValues('name');
@@ -199,10 +189,19 @@ export function AssetForm({
             void queryClient.invalidateQueries({ queryKey: apiQuery.growth.assets.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.growth.assets.get.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.growth.dashboard.get.key() });
-            showToast(mode === 'edit' ? 'Asset updated' : 'Asset added', 'success');
+            showToast(
+                mode === 'edit'
+                    ? t('common.message.success.updated', {
+                          entity: t('common.message.entity.names.asset'),
+                      })
+                    : t('common.message.success.created', {
+                          entity: t('common.message.entity.names.asset'),
+                      }),
+                'success'
+            );
             dismiss();
         },
-        onError: () => showToast('Save failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const removeMutation = useMutation({
@@ -214,19 +213,19 @@ export function AssetForm({
             void queryClient.invalidateQueries({ queryKey: apiQuery.growth.assets.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.growth.assets.get.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.growth.dashboard.get.key() });
-            showToast('Asset deleted', 'success');
+            showToast(t('common.message.entity.asset_deleted'), 'success');
             dismiss();
         },
-        onError: () => showToast('Delete failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     async function onSubmit(values: AssetFormValues) {
         if (!live) {
-            showToast('Sign in to save this asset', 'error');
+            showToast(t('common.message.entity.sign_in_asset'), 'error');
             return;
         }
         if (mode === 'edit' && !entityId) {
-            showToast('Missing asset', 'error');
+            showToast(t('common.message.entity.missing_asset'), 'error');
             return;
         }
         await saveMutation.mutateAsync(values);
@@ -243,7 +242,11 @@ export function AssetForm({
             sidebar={
                 <div className="grid gap-2">
                     <Button type="submit" className="w-full" disabled={busy}>
-                        {busy ? 'Working…' : mode === 'edit' ? 'Save changes' : 'Save asset'}
+                        {busy
+                            ? tForm('working')
+                            : mode === 'edit'
+                              ? tForm('save_changes')
+                              : tAsset('save')}
                     </Button>
                     {mode === 'edit' && entityId ? (
                         <ConfirmActionButton
@@ -251,8 +254,8 @@ export function AssetForm({
                             className="w-full text-danger hover:bg-danger/10 hover:text-danger"
                             disabled={busy}
                             pending={removeMutation.isPending}
-                            label="Delete"
-                            confirmLabel="Click again to delete"
+                            label={tBtn('delete')}
+                            confirmLabel={tForm('confirm_delete')}
                             onConfirm={() => void removeMutation.mutateAsync()}
                         />
                     ) : null}
@@ -263,12 +266,12 @@ export function AssetForm({
                 name="kind"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Type</FormLabel>
+                        <FormLabel>{tAsset('type')}</FormLabel>
                         <FormControl>
                             <div
                                 className="grid gap-2 sm:grid-cols-2"
                                 role="radiogroup"
-                                aria-label="Asset type">
+                                aria-label={tForm('aria.asset_type')}>
                                 {visibleKinds.map(option => {
                                     const on = field.value === option.key;
                                     return (
@@ -319,13 +322,13 @@ export function AssetForm({
                 name="name"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Name</FormLabel>
+                        <FormLabel>{tForm('fields.name')}</FormLabel>
                         <FormControl>
                             <PresetNameField
                                 value={field.value}
                                 options={suggestions}
-                                placeholder="Start typing, or pick one"
-                                freeTextPlaceholder="Type the name"
+                                placeholder={tAsset('name_placeholder')}
+                                freeTextPlaceholder={tAsset('name_free_placeholder')}
                                 onChange={value => {
                                     field.onChange(value);
                                     const preset = presets.find(row => row.key === presetKey);
@@ -344,9 +347,13 @@ export function AssetForm({
                 name="value"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Value ({symbol})</FormLabel>
+                        <FormLabel>{tAsset('value', { symbol })}</FormLabel>
                         <FormControl>
-                            <FormInput inputMode="decimal" placeholder="0,00" {...field} />
+                            <FormInput
+                                inputMode="decimal"
+                                placeholder={tForm('amount_zero')}
+                                {...field}
+                            />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -359,22 +366,22 @@ export function AssetForm({
                     name="flow"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Pays you each month ({symbol})</FormLabel>
+                            <FormLabel>{tAsset('flow', { symbol })}</FormLabel>
                             <FormControl>
-                                <FormInput inputMode="decimal" placeholder="0,00" {...field} />
+                                <FormInput
+                                    inputMode="decimal"
+                                    placeholder={tForm('amount_zero')}
+                                    {...field}
+                                />
                             </FormControl>
-                            <p className="text-xs text-fg-faint">
-                                Leave empty if it only sits there.
-                            </p>
+                            <p className="text-xs text-fg-faint">{tAsset('flow_hint')}</p>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
             ) : picked ? (
                 <p className="text-sm text-pretty text-fg-muted">
-                    {picked.key === 'PENSION'
-                        ? 'Locked until you stop working. It counts in the total, not as monthly income.'
-                        : 'It counts in the total, not as monthly income.'}
+                    {picked.key === 'PENSION' ? tAsset('locked_pension') : tAsset('locked_default')}
                 </p>
             ) : null}
         </FormCreateEditShell>

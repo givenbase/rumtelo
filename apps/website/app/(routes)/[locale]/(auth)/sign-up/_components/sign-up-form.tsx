@@ -22,23 +22,21 @@ import {
     bindFormSubmit,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
-import {
-    AUTH_MIN_PASSWORD_LENGTH,
-    SignUpForm as SignUpFormSchema,
-    composeDisplayName,
-} from '@rumtelo/contracts';
-import { AUTH_SIGN_UP } from '@rumtelo/i18n';
+import { AUTH_MIN_PASSWORD_LENGTH, composeDisplayName } from '@rumtelo/contracts';
+import type { SignUpForm as SignUpFormSchema } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { planIntentQuery, type PendingPlanIntent } from '@rumtelo/utils';
 
+import { useAuthFormSchemas } from '@/app/_lib/auth-form-schemas';
+import { useApiErrorFallbacks, useApiErrorMessage } from '@/app/_lib/api-error-messages';
 import { signUp } from '@/lib/auth';
+import { planSlug } from '@/lib/landing-plans';
 import { appSignInUrl } from '@/lib/portal-urls';
 import { useOptionalPlanIntent } from '@/app/_components/plan-intent-provider';
 import { useOptionalSignUpDraft } from '@/app/_components/sign-up-draft-provider';
-
-const PLAN_LABELS = { PLUS: 'Plus', MAX: 'Max' } as const;
 
 function verifyCallbackUrl(intent: PendingPlanIntent | null): string {
     const params = new URLSearchParams({ status: 'confirmed' });
@@ -50,6 +48,11 @@ function verifyCallbackUrl(intent: PendingPlanIntent | null): string {
 }
 
 export function SignUpForm() {
+    const t = useTranslations();
+    const tPlans = useTranslations('pages.landing.plans');
+    const schemas = useAuthFormSchemas();
+    const errorMessages = useApiErrorFallbacks();
+    const formatApiMessage = useApiErrorMessage();
     const router = useRouter();
     const planIntent = useOptionalPlanIntent();
     const signUpDraft = useOptionalSignUpDraft();
@@ -69,7 +72,7 @@ export function SignUpForm() {
             dateOfBirth: '',
         },
         mode: 'onTouched',
-        resolver: zodResolver(SignUpFormSchema),
+        resolver: zodResolver(schemas.signUp),
     });
 
     useEffect(() => {
@@ -84,15 +87,16 @@ export function SignUpForm() {
         });
     }, [draft, form]);
 
-    const onError = createFormInvalidHandler();
+    const onError = createFormInvalidHandler(undefined, {
+        title: t('ui.form.incomplete_title'),
+        description: t('ui.form.incomplete_description'),
+    });
 
     async function onSubmit(values: SignUpFormSchema) {
         setApiError(null);
 
         const name = composeDisplayName(values.firstName, values.middleName, values.lastName);
 
-        // Draft for same-tab hand-off; email also in the URL so `/verify` still
-        // prefills if sessionStorage is empty (new tab, storage blocked, refresh).
         signUpDraft?.setDraft({
             firstName: values.firstName,
             lastName: values.lastName,
@@ -104,7 +108,6 @@ export function SignUpForm() {
             email: values.email,
             password: values.password,
             callbackURL: verifyCallbackUrl(intent),
-            // Forwarded to Nest → stashed → `auth.account` (not Better Auth user columns).
             firstName: values.firstName,
             middleName: values.middleName || undefined,
             lastName: values.lastName,
@@ -114,7 +117,20 @@ export function SignUpForm() {
 
         if (result.error) {
             form.setValue('password', '');
-            setApiError(result.error.message ?? 'Registration failed');
+            const errorCode =
+                typeof result.error === 'object' && result.error && 'code' in result.error
+                    ? (result.error as { code?: unknown }).code
+                    : undefined;
+            const code =
+                typeof errorCode === 'string' || typeof errorCode === 'number'
+                    ? String(errorCode)
+                    : '';
+            const raw = result.error.message?.trim() ?? '';
+            setApiError(
+                raw || code
+                    ? formatApiMessage(raw, code || undefined)
+                    : t('common.message.error.generic')
+            );
             return;
         }
 
@@ -129,16 +145,19 @@ export function SignUpForm() {
     return (
         <div className="grid gap-6">
             <div>
-                <Typography as="h1">{AUTH_SIGN_UP.title}</Typography>
+                <Typography as="h1">{t('features.auth.sign_up.title')}</Typography>
                 <Typography as="p" size="sm" color="muted" className="mt-1">
-                    {AUTH_SIGN_UP.subtitle}
+                    {t('features.auth.sign_up.subtitle')}
                 </Typography>
                 {intent ? (
                     <p className="mt-3 rounded-lg border border-accent/35 bg-accent-soft/40 px-3 py-2 text-sm text-fg-secondary">
-                        You chose{' '}
-                        <span className="font-semibold text-fg">{PLAN_LABELS[intent.planKey]}</span>
-                        {intent.interval === 'year' ? ' (yearly)' : ' (monthly)'}. After setup we’ll
-                        take you to Stripe to add payment and finish the upgrade.
+                        {t('features.auth.sign_up.plan_intent', {
+                            plan: tPlans(`${planSlug(intent.planKey)}.name`),
+                            interval:
+                                intent.interval === 'year'
+                                    ? t('features.auth.sign_up.plan_yearly')
+                                    : t('features.auth.sign_up.plan_monthly'),
+                        })}
                     </p>
                 ) : null}
             </div>
@@ -148,7 +167,29 @@ export function SignUpForm() {
                     className="grid gap-4"
                     method="post"
                     onSubmit={bindFormSubmit(form, onSubmit, onError)}>
-                    <FormErrorBox apiError={apiError} form={form} />
+                    <FormErrorBox
+                        apiError={apiError}
+                        errorMessages={errorMessages}
+                        resolveUserMessage={formatApiMessage}
+                        form={form}
+                        title={t('ui.form.incomplete_title')}
+                        description={t('ui.form.incomplete_description_highlighted')}
+                        fieldLabels={{
+                            api: t('ui.form.fields.api'),
+                            root: t('ui.form.fields.api'),
+                            email: t('ui.form.fields.email'),
+                            password: t('ui.form.fields.password'),
+                            firstName: t('ui.form.fields.first_name'),
+                            lastName: t('ui.form.fields.last_name'),
+                            phone: t('ui.form.fields.phone'),
+                            name: t('ui.form.fields.name'),
+                            amount: t('ui.form.fields.amount'),
+                            note: t('ui.form.fields.note'),
+                            date: t('ui.form.fields.date'),
+                            confirmPassword: t('ui.form.fields.confirm_password'),
+                            newPassword: t('ui.form.fields.new_password'),
+                        }}
+                    />
 
                     <div className="grid gap-4 sm:grid-cols-2">
                         <FormField
@@ -156,11 +197,11 @@ export function SignUpForm() {
                             name="firstName"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>First name</FormLabel>
+                                    <FormLabel>{t('ui.form.fields.first_name')}</FormLabel>
                                     <FormControl>
                                         <Input
                                             autoComplete="given-name"
-                                            placeholder="Given"
+                                            placeholder={t('ui.form.fields.first_name')}
                                             disabled={busy}
                                             {...field}
                                         />
@@ -175,11 +216,11 @@ export function SignUpForm() {
                             name="lastName"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Last name</FormLabel>
+                                    <FormLabel>{t('ui.form.fields.last_name')}</FormLabel>
                                     <FormControl>
                                         <Input
                                             autoComplete="family-name"
-                                            placeholder="Family"
+                                            placeholder={t('ui.form.fields.last_name')}
                                             disabled={busy}
                                             {...field}
                                         />
@@ -195,11 +236,13 @@ export function SignUpForm() {
                         name="middleName"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel optional>Middle name</FormLabel>
+                                <FormLabel optional>
+                                    {t('features.auth.sign_up.middle_name')}
+                                </FormLabel>
                                 <FormControl>
                                     <Input
                                         autoComplete="additional-name"
-                                        placeholder="Optional"
+                                        placeholder={t('ui.form.optional')}
                                         disabled={busy}
                                         {...field}
                                     />
@@ -214,10 +257,10 @@ export function SignUpForm() {
                         name="email"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Email</FormLabel>
+                                <FormLabel>{t('ui.form.fields.email')}</FormLabel>
                                 <FormControl>
                                     <Email
-                                        placeholder="you@example.com"
+                                        placeholder={t('ui.form.fields.email_placeholder')}
                                         disabled={busy}
                                         {...field}
                                     />
@@ -232,12 +275,16 @@ export function SignUpForm() {
                         name="password"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Password</FormLabel>
+                                <FormLabel>{t('ui.form.fields.password')}</FormLabel>
                                 <FormControl>
                                     <Password
                                         autoComplete="new-password"
-                                        placeholder={`At least ${AUTH_MIN_PASSWORD_LENGTH} characters`}
+                                        placeholder={t('features.auth.sign_up.password_hint', {
+                                            count: AUTH_MIN_PASSWORD_LENGTH,
+                                        })}
                                         disabled={busy}
+                                        showPasswordLabel={t('ui.form.show_password')}
+                                        hidePasswordLabel={t('ui.form.hide_password')}
                                         {...field}
                                     />
                                 </FormControl>
@@ -252,11 +299,11 @@ export function SignUpForm() {
                             name="phone"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel optional>Phone</FormLabel>
+                                    <FormLabel optional>{t('ui.form.fields.phone')}</FormLabel>
                                     <FormControl>
                                         <Phone
                                             autoComplete="tel"
-                                            placeholder="Optional"
+                                            placeholder={t('ui.form.optional')}
                                             disabled={busy}
                                             value={field.value}
                                             onChange={field.onChange}
@@ -274,12 +321,15 @@ export function SignUpForm() {
                             name="dateOfBirth"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel optional>Birthday</FormLabel>
+                                    <FormLabel optional>
+                                        {t('features.auth.sign_up.birthday')}
+                                    </FormLabel>
                                     <FormControl>
                                         <Input
                                             type="date"
                                             autoComplete="bday"
                                             disabled={busy}
+                                            pickerAriaLabel={t('ui.form.aria.open_date_picker')}
                                             {...field}
                                         />
                                     </FormControl>
@@ -289,15 +339,15 @@ export function SignUpForm() {
                         />
                     </div>
                     <Button type="submit" className="mt-1 w-full" disabled={busy}>
-                        {busy ? 'Working…' : 'Create account'}
+                        {busy ? t('ui.form.working') : t('features.auth.sign_up.submit')}
                     </Button>
                 </form>
             </Form>
 
             <Typography as="p" size="sm" color="muted" className="text-center">
-                Already have an account?{' '}
+                {t('features.auth.sign_up.have_account')}{' '}
                 <a href={appSignInUrl()} className="font-semibold text-accent hover:underline">
-                    Sign in
+                    {t('ui.button.actions.sign_in')}
                 </a>
             </Typography>
         </div>

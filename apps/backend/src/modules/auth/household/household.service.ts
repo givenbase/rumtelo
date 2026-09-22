@@ -21,6 +21,7 @@ import { AuthService } from '@thallesp/nestjs-better-auth';
 
 import type { Auth } from '../engine/auth.config';
 
+import { apiBadRequest } from '../../../common/errors/api-user-error';
 import { currentUserId, currentAuthHeaders } from '../../../common/household/household.context';
 import { mapToOrpcClientError } from '../../../common/utils/database-constraint-error.util';
 import { EmailService } from '../../backoffice/communication/email';
@@ -93,7 +94,7 @@ export class HouseholdService {
             },
             headers,
         });
-        if (!result?.id) throw new BadRequestException('Could not create invitation');
+        if (!result?.id) throw apiBadRequest('invitation_create_failed');
 
         const org = await this.em.findOne(AuthHousehold, { id: householdId });
         await this.email.sendHouseholdInvite({
@@ -153,7 +154,7 @@ export class HouseholdService {
 
     async current(householdId: string) {
         const org = await this.em.findOne(AuthHousehold, { id: householdId });
-        if (!org) throw new BadRequestException('Household not found');
+        if (!org) throw apiBadRequest('household_not_found');
 
         const settings = await this.householdSettings.get(householdId);
         return {
@@ -201,7 +202,7 @@ export class HouseholdService {
             0
         );
         if (Math.abs(splitTotal - 100) > 0.01) {
-            throw new BadRequestException(`Jar split must total 100%, received ${splitTotal}%`);
+            throw apiBadRequest('jar_split_total', { total: splitTotal });
         }
 
         const slug = await this.uniqueOrgSlug(input.householdName);
@@ -211,7 +212,7 @@ export class HouseholdService {
                 body: { name: input.householdName, slug },
                 headers,
             });
-            if (!created?.id) throw new BadRequestException('Could not create household');
+            if (!created?.id) throw apiBadRequest('household_create_failed');
             org = { id: created.id, name: created.name, slug: created.slug };
         } catch (error) {
             throw mapToOrpcClientError(error);

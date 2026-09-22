@@ -1,5 +1,5 @@
 /**
- * React helpers for oRPC — Galighticus pattern.
+ * React helpers for oRPC.
  *
  * Apps own a module-level `createClient` singleton (`app/_lib/api.ts`) and
  * `createAPIUtils(client)`. This package only provides the utils factory.

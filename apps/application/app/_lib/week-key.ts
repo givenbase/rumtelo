@@ -56,7 +56,7 @@ export function shiftDay(iso: string, delta: number): string {
     return toIsoDate(date);
 }
 
-export function formatDayLabel(iso: string, locale = 'en'): string {
+export function formatDayLabel(iso: string, locale: string): string {
     return utcDate(iso).toLocaleDateString(locale, {
         weekday: 'short',
         day: 'numeric',

@@ -13,7 +13,8 @@ import {
     DEFAULT_JAR_SPLIT,
     HouseholdRole,
     IncomeStability,
-    Locale,
+    type Locale,
+    LOCALES,
     SpendingStyle,
     PayoffStrategy,
     Theme,
@@ -23,6 +24,7 @@ import {
     type JarKey,
 } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import {
     Badge,
     Button,
@@ -46,6 +48,7 @@ import {
     formatMoney as formatMoneyExplicit,
     formatPercent,
     formatPlanPrice,
+    extractErrorMessage,
     formatIban,
     isValidIban,
     nlIbanBankCode,
@@ -54,6 +57,8 @@ import {
     toPeriodKey,
 } from '@rumtelo/utils';
 
+import { useApiError } from '@/app/_lib/api-error-messages';
+import { isIbanApiErrorMessage } from '@/app/_lib/api-user-message';
 import { changePassword, signOut, updateOrganization } from '@/app/_lib/auth';
 import { env } from '@/app/_utils/get-env';
 import { useAccountTheme } from '@/components/features/shell/account-theme-sync';
@@ -70,7 +75,7 @@ import {
     diffPlans,
     lockCopyFor,
     memberLimitLabel,
-    PLAN_LABELS,
+    planLabel,
     PLAN_RANK,
     PlanKey,
 } from '@/app/_lib/plan';
@@ -78,7 +83,7 @@ import { isLiveData, PREVIEW_MODE } from '@/app/_lib/preview';
 import { isDemoAccountEmail } from '@rumtelo/contracts/platform';
 import { evaluateSplitCoach, pctByJarKey } from '@/app/_lib/split-coach';
 import { JAR_CHROME } from '@/app/_lib/jar-meta';
-import { chrome as tourChrome, usePageTour } from '@/components/features/tour';
+import { usePageTour } from '@/components/features/tour';
 import { useFeatureHelpers } from '@/components/features/helpers';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -98,13 +103,16 @@ const JAR_COLOR: Record<string, string> = Object.fromEntries(
     Object.entries(JAR_CHROME).map(([key, chrome]) => [key, chrome.color])
 );
 
-const ACCOUNT_KIND_LABEL: Record<string, string> = {
-    CHECKING: 'Checking',
-    SAVINGS: 'Savings',
-    CREDIT: 'Credit card',
-    CASH: 'Cash',
-    INVESTMENT: 'Investment',
-};
+function accountKindLabel(kind: string, t: (key: string) => string): string {
+    const key = {
+        CHECKING: 'pages.settings.panels.bank.checking',
+        SAVINGS: 'pages.settings.panels.bank.savings',
+        CREDIT: 'pages.settings.panels.bank.credit',
+        CASH: 'pages.settings.panels.bank.cash',
+        INVESTMENT: 'pages.settings.panels.bank.investment',
+    }[kind];
+    return key ? t(key) : kind;
+}
 
 /** True when the field is empty or still only a bank stub / previous stub. */
 function isIbanStub(value: string): boolean {
@@ -122,32 +130,18 @@ function nlIbanPrefix(bankCode: string): string {
 }
 
 const CURRENCY_OPTIONS = [
-    { code: Currency.EUR, sampleLocale: 'nl-NL', persist: true as const },
-    { code: Currency.USD, sampleLocale: 'en-US', persist: true as const },
-    { code: Currency.GBP, sampleLocale: 'en-GB', persist: true as const },
-    { code: 'CHF', sampleLocale: 'de-CH', persist: false as const },
+    { code: Currency.EUR, persist: true as const },
+    { code: Currency.USD, persist: true as const },
+    { code: Currency.GBP, persist: true as const },
+    { code: 'CHF', persist: false as const },
 ];
 
-const AUTO_RULES = [
-    {
-        key: 'split',
-        name: 'Auto-split on income',
-        desc: 'Everything that arrives goes straight into the jars, 55/10/10/10/10/5.',
-        defaultOn: true,
-    },
-    {
-        key: 'guard',
-        name: 'Jar guard',
-        desc: 'Warn as soon as a jar passes 90% of its allocation.',
-        defaultOn: true,
-    },
-    {
-        key: 'sweep',
-        name: 'Sweep surplus',
-        desc: 'Whatever is left in Necessity on the 1st moves to Financial Freedom.',
-        defaultOn: true,
-    },
-] as const;
+const AUTO_RULE_KEYS = ['split', 'guard', 'sweep'] as const;
+const AUTO_RULE_DEFAULTS: Record<(typeof AUTO_RULE_KEYS)[number], boolean> = {
+    split: true,
+    guard: true,
+    sweep: true,
+};
 
 function initials(name: string, email: string): string {
     const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -159,13 +153,16 @@ function initials(name: string, email: string): string {
 }
 
 export function AccountSettings() {
+    const t = useTranslations();
+    const appLocale = useLocale();
     const queryClient = useQueryClient();
     const router = useRouter();
     const { session, householdId, refreshSession } = useAuth();
-    const { showToast, locale, toggleLocale, plan } = useAppShell();
+    const { showToast, locale, setLocale, plan } = useAppShell();
     const { restartFullTour } = usePageTour();
     const { helpersEnabled, setHelpersEnabled } = useFeatureHelpers();
     const live = isLiveData(householdId);
+    const apiError = useApiError();
 
     const user = session?.user;
     const profileQuery = useLiveQuery(apiQuery.account.profile.queryOptions(), null, Boolean(user));
@@ -202,7 +199,7 @@ export function AccountSettings() {
     const memberCount = membersQuery.data?.length ?? 0;
     const invitesAllowed = canInviteOnPlan(activePlan);
     const seatOpen = canAddHouseholdMember(activePlan, memberCount);
-    const inviteCopy = lockCopyFor(CAPABILITIES.platformInvite, PlanKey.PLUS);
+    const inviteCopy = lockCopyFor(CAPABILITIES.platformInvite, PlanKey.PLUS, t);
 
     const currency =
         settingsQuery.data?.currency ?? householdQuery.data?.currency ?? DEFAULT_CURRENCY;
@@ -231,9 +228,9 @@ export function AccountSettings() {
                 queryClient.invalidateQueries({ queryKey: apiQuery.account.profile.key() }),
             ]);
             setEditingName(false);
-            showToast('Profile saved', 'success');
+            showToast(t('pages.settings.saved'), 'success');
         },
-        onError: () => showToast('Profile save failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const savePassword = useMutation({
@@ -243,14 +240,16 @@ export function AccountSettings() {
                 newPassword,
                 revokeOtherSessions: true,
             });
-            if (result.error) throw new Error(result.error.message ?? 'Password change failed');
+            if (result.error) {
+                throw new Error(result.error.message ?? t('pages.settings.toasts.password_failed'));
+            }
         },
         onSuccess: () => {
             setCurrentPassword('');
             setNewPassword('');
-            showToast('Password changed', 'success');
+            showToast(t('pages.settings.toasts.password_changed'), 'success');
         },
-        onError: () => showToast('Password change failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const invite = useMutation({
@@ -265,9 +264,9 @@ export function AccountSettings() {
         onSuccess: () => {
             setInviteEmail('');
             void queryClient.invalidateQueries({ queryKey: apiQuery.household.members.key() });
-            showToast('Invitation sent', 'success');
+            showToast(t('pages.settings.toasts.invitation_sent'), 'success');
         },
-        onError: () => showToast('Invitation failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const saveLocale = useMutation({
@@ -275,11 +274,11 @@ export function AccountSettings() {
             return api.account.updateSettings({ locale: next });
         },
         onSuccess: (_data, next) => {
-            if (locale !== next) toggleLocale();
+            if (locale !== next) setLocale(next);
             void queryClient.invalidateQueries({ queryKey: apiQuery.account.settings.key() });
-            showToast('Language saved', 'success');
+            showToast(t('pages.settings.toasts.language_saved'), 'success');
         },
-        onError: () => showToast('Language save failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const saveCurrency = useMutation({
@@ -291,9 +290,9 @@ export function AccountSettings() {
             setCurrencyDraft(null);
             void queryClient.invalidateQueries({ queryKey: apiQuery.household.settings.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.household.current.key() });
-            showToast('Currency saved', 'success');
+            showToast(t('pages.settings.toasts.currency_saved'), 'success');
         },
-        onError: () => showToast('Currency save failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const savePeriod = useMutation({
@@ -307,14 +306,14 @@ export function AccountSettings() {
         onSuccess: () => {
             setPeriodDayDraft(null);
             void queryClient.invalidateQueries({ queryKey: apiQuery.household.settings.key() });
-            showToast('Period saved', 'success');
+            showToast(t('pages.settings.toasts.period_saved'), 'success');
         },
-        onError: () => showToast('Period save failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const saveTheme = useMutation({
         mutationFn: async (next: Theme) => setAccountTheme(next),
-        onError: () => showToast('Theme save failed', 'error'),
+        onError: () => showToast(t('pages.settings.toasts.theme_failed'), 'error'),
     });
 
     const saveSpendingStyle = useMutation({
@@ -323,9 +322,9 @@ export function AccountSettings() {
         },
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: apiQuery.account.settings.key() });
-            showToast('Money style saved', 'success');
+            showToast(t('pages.settings.toasts.money_style_saved'), 'success');
         },
-        onError: () => showToast('Money style save failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const saveIncomeStability = useMutation({
@@ -335,19 +334,19 @@ export function AccountSettings() {
         },
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: apiQuery.household.settings.key() });
-            showToast('Income stability saved', 'success');
+            showToast(t('pages.settings.toasts.income_stability_saved'), 'success');
         },
-        onError: () => showToast('Income stability save failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     function pickLocale(next: Locale) {
         if (live) saveLocale.mutate(next);
-        else if (locale !== next) toggleLocale();
+        else if (locale !== next) setLocale(next);
     }
 
     function pickCurrency(code: string, persist: boolean) {
         if (!persist) {
-            showToast('CHF support is coming soon', 'info');
+            showToast(t('pages.settings.toasts.chf_coming'), 'info');
             return;
         }
         setCurrencyDraft(code);
@@ -360,12 +359,13 @@ export function AccountSettings() {
             await signOut();
             router.push('/sign-in');
         } catch {
-            showToast('Sign out failed', 'error');
+            showToast(t('pages.settings.toasts.sign_out_failed'), 'error');
             setSigningOut(false);
         }
     }
 
-    const displayName = profileQuery.data?.displayName?.trim() || user?.name?.trim() || 'Guest';
+    const displayName =
+        profileQuery.data?.displayName?.trim() || user?.name?.trim() || t('pages.settings.guest');
     const displayEmail = profileQuery.data?.email ?? user?.email ?? '';
     const activeLang = accountSettingsQuery.data?.locale ?? locale;
 
@@ -382,8 +382,8 @@ export function AccountSettings() {
     return (
         <SettingsPanel>
             <SettingsInkCard
-                eyebrow="Profile"
-                blurb="Greeting name starts from your legal name at signup — change it anytime. Legal name, phone, and birthday live on your account.">
+                eyebrow={t('pages.settings.panels.profile.eyebrow')}
+                blurb={t('pages.settings.panels.profile.blurb')}>
                 <SettingsRow>
                     <div className="flex min-w-0 items-center gap-3.5">
                         <div className="grid size-8 shrink-0 place-items-center rounded-full bg-accent font-mono text-[10px] font-bold text-on-accent">
@@ -394,17 +394,21 @@ export function AccountSettings() {
                                 <Input
                                     value={nameDraft}
                                     onChange={event => setNameDraft(event.target.value)}
-                                    aria-label="Display name"
-                                    placeholder="Display name"
+                                    aria-label={t('pages.settings.account.display_name')}
+                                    placeholder={t('pages.settings.account.display_name')}
                                 />
-                                <p className="truncate font-mono text-[10px] text-fg-muted">
+                                <p
+                                    className="truncate font-mono text-[10px] text-fg-muted"
+                                    aria-label={t('pages.settings.account.email')}>
                                     {displayEmail}
                                 </p>
                             </div>
                         ) : (
                             <span className="grid min-w-0 gap-px">
                                 <span className="truncate text-sm text-fg">{displayName}</span>
-                                <span className="truncate font-mono text-[10px] text-fg-muted">
+                                <span
+                                    className="truncate font-mono text-[10px] text-fg-muted"
+                                    aria-label={t('pages.settings.account.email')}>
                                     {displayEmail || '—'}
                                 </span>
                             </span>
@@ -413,13 +417,13 @@ export function AccountSettings() {
                     {editingName ? (
                         <div className="flex gap-2">
                             <Button variant="ghost" size="sm" onClick={() => setEditingName(false)}>
-                                Cancel
+                                {t('pages.settings.cancel')}
                             </Button>
                             <Button
                                 size="sm"
                                 disabled={saveProfile.isPending || !nameDraft.trim()}
                                 onClick={() => saveProfile.mutate()}>
-                                {saveProfile.isPending ? '…' : 'Save'}
+                                {saveProfile.isPending ? '…' : t('pages.settings.account.save')}
                             </Button>
                         </div>
                     ) : (
@@ -429,7 +433,7 @@ export function AccountSettings() {
                             className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
                             onClick={beginEditProfile}>
                             <EditIcon />
-                            Edit
+                            {t('pages.settings.edit')}
                         </Button>
                     )}
                 </SettingsRow>
@@ -439,32 +443,33 @@ export function AccountSettings() {
                         <Input
                             value={firstNameDraft}
                             onChange={event => setFirstNameDraft(event.target.value)}
-                            aria-label="First name"
-                            placeholder="First name"
+                            aria-label={t('pages.settings.panels.profile.first_name')}
+                            placeholder={t('pages.settings.panels.profile.first_name')}
                         />
                         <Input
                             value={middleNameDraft}
                             onChange={event => setMiddleNameDraft(event.target.value)}
-                            aria-label="Middle name"
-                            placeholder="Middle name (optional)"
+                            aria-label={t('pages.settings.panels.profile.middle_name')}
+                            placeholder={t('pages.settings.panels.profile.middle_name_optional')}
                         />
                         <Input
                             value={lastNameDraft}
                             onChange={event => setLastNameDraft(event.target.value)}
-                            aria-label="Last name"
-                            placeholder="Last name"
+                            aria-label={t('pages.settings.panels.profile.last_name')}
+                            placeholder={t('pages.settings.panels.profile.last_name')}
                         />
                         <Phone
                             value={phoneDraft}
                             onChange={setPhoneDraft}
-                            aria-label="Phone"
-                            placeholder="Phone (optional)"
+                            aria-label={t('pages.settings.panels.profile.phone')}
+                            placeholder={t('pages.settings.panels.profile.phone_optional')}
                         />
                         <Input
                             type="date"
                             value={dobDraft}
                             onChange={event => setDobDraft(event.target.value)}
-                            aria-label="Date of birth"
+                            aria-label={t('pages.settings.panels.profile.date_of_birth')}
+                            pickerAriaLabel={t('ui.form.aria.open_date_picker')}
                         />
                     </div>
                 ) : profileQuery.data ? (
@@ -473,39 +478,51 @@ export function AccountSettings() {
                             title={
                                 [profileQuery.data.firstName, profileQuery.data.lastName]
                                     .filter(Boolean)
-                                    .join(' ') || 'Legal name'
+                                    .join(' ') || t('pages.settings.legal_name')
                             }
                             sub={
                                 [
                                     profileQuery.data.phone,
                                     profileQuery.data.dateOfBirth
-                                        ? `Born ${profileQuery.data.dateOfBirth}`
+                                        ? t('pages.settings.born', {
+                                              date: profileQuery.data.dateOfBirth,
+                                          })
                                         : null,
                                 ]
                                     .filter(Boolean)
-                                    .join(' · ') || 'Add name, phone, and date of birth'
+                                    .join(' · ') || t('pages.settings.panels.profile.add_details')
                             }
                         />
                     </SettingsRow>
                 ) : null}
 
                 <SettingsRow>
-                    <SettingsRowLabel title="Sign-in method" sub="Email, through Better Auth" />
-                    <SettingsPill tone="accent">Connected</SettingsPill>
+                    <SettingsRowLabel
+                        title={t('pages.settings.rows.sign_in_method.title')}
+                        sub={t('pages.settings.rows.sign_in_method.sub')}
+                    />
+                    <SettingsPill tone="accent">
+                        {t('pages.settings.rows.sign_in_method.connected')}
+                    </SettingsPill>
                 </SettingsRow>
 
                 <SettingsRow>
                     <SettingsRowLabel
-                        title="Two-factor"
-                        sub="A code from your phone on every new device"
+                        title={t('pages.settings.rows.two_factor.title')}
+                        sub={t('pages.settings.rows.two_factor.sub')}
                     />
-                    <SettingsPill tone="neutral">Off</SettingsPill>
+                    <SettingsPill tone="neutral">
+                        {t('pages.settings.rows.two_factor.off')}
+                    </SettingsPill>
                 </SettingsRow>
 
                 <SettingsRow>
-                    <SettingsRowLabel title="Language" sub="Applies to every screen" />
+                    <SettingsRowLabel
+                        title={t('pages.settings.account.language')}
+                        sub={t('pages.settings.account.language_sub')}
+                    />
                     <div className="flex gap-1 rounded-full border border-line bg-raised p-0.5">
-                        {([Locale.EN, Locale.NL] as const).map(code => {
+                        {LOCALES.map(code => {
                             const on = activeLang === code;
                             return (
                                 <button
@@ -526,7 +543,10 @@ export function AccountSettings() {
                 </SettingsRow>
 
                 <SettingsRow>
-                    <SettingsRowLabel title="Currency" sub="How every amount is written" />
+                    <SettingsRowLabel
+                        title={t('pages.settings.account.currency')}
+                        sub={t('pages.settings.account.currency_sub')}
+                    />
                     <div className="flex flex-wrap justify-end gap-1.5">
                         {CURRENCY_OPTIONS.map(opt => {
                             const on = activeCurrency === opt.code;
@@ -551,7 +571,7 @@ export function AccountSettings() {
                                     <span className="font-mono text-[10.5px] text-fg-muted">
                                         {formatMoneyExplicit(430_000, {
                                             currency: opt.code === 'CHF' ? 'CHF' : opt.code,
-                                            locale: opt.sampleLocale,
+                                            locale: appLocale,
                                         })}
                                     </span>
                                 </button>
@@ -562,8 +582,8 @@ export function AccountSettings() {
 
                 <SettingsRow last>
                     <SettingsRowLabel
-                        title="Sign out"
-                        sub="You stay signed in for 30 days on this device"
+                        title={t('pages.settings.account.sign_out')}
+                        sub={t('pages.settings.panels.sign_out_sub')}
                     />
                     <Button
                         variant="secondary"
@@ -571,38 +591,41 @@ export function AccountSettings() {
                         className="rounded-full border-danger/40 font-mono text-[10px] tracking-[0.12em] text-danger uppercase hover:border-danger"
                         disabled={signingOut}
                         onClick={() => void handleSignOut()}>
-                        {signingOut ? '…' : 'Sign out'}
+                        {signingOut ? '…' : t('pages.settings.account.sign_out')}
                     </Button>
                 </SettingsRow>
             </SettingsInkCard>
 
             <SettingsInkCard
-                eyebrow="How you handle money"
-                blurb="Personal style — partners can differ. Tips on the jar split use this. Debt payoff order lives under Debt settings for the whole board.">
+                eyebrow={t('pages.settings.panels.money_style.eyebrow')}
+                blurb={t('pages.settings.panels.money_style.blurb')}>
                 <SettingsRow>
-                    <SettingsRowLabel title="I tend to…" sub="Descriptive, never a verdict" />
+                    <SettingsRowLabel
+                        title={t('pages.settings.rows.spending_style.title')}
+                        sub={t('pages.settings.rows.spending_style.sub')}
+                    />
                     <div className="flex flex-wrap justify-end gap-1.5">
                         {(
                             [
                                 {
                                     key: SpendingStyle.SPENDER,
-                                    label: 'Spender',
-                                    sub: 'Joy first',
+                                    label: t('pages.settings.panels.money_style.spender'),
+                                    sub: t('pages.settings.panels.money_style.spender_sub'),
                                 },
                                 {
                                     key: SpendingStyle.SAVER,
-                                    label: 'Saver',
-                                    sub: 'Future first',
+                                    label: t('pages.settings.panels.money_style.saver'),
+                                    sub: t('pages.settings.panels.money_style.saver_sub'),
                                 },
                                 {
                                     key: SpendingStyle.BALANCED,
-                                    label: 'Balanced',
-                                    sub: 'Both',
+                                    label: t('pages.settings.panels.money_style.balanced'),
+                                    sub: t('pages.settings.panels.money_style.balanced_sub'),
                                 },
                                 {
                                     key: SpendingStyle.UNKNOWN,
-                                    label: 'Not sure',
-                                    sub: 'Neutral tips',
+                                    label: t('pages.settings.panels.money_style.not_sure'),
+                                    sub: t('pages.settings.panels.money_style.not_sure_sub'),
                                 },
                             ] as const
                         ).map(option => {
@@ -639,15 +662,24 @@ export function AccountSettings() {
                 </SettingsRow>
                 <SettingsRow last>
                     <SettingsRowLabel
-                        title="Income month to month"
-                        sub="Shared board picture — steady, uneven, or none right now"
+                        title={t('pages.settings.rows.income_stability.title')}
+                        sub={t('pages.settings.rows.income_stability.sub')}
                     />
                     <div className="flex flex-wrap gap-1 rounded-full border border-line bg-raised p-0.5">
                         {(
                             [
-                                { key: IncomeStability.STABLE, label: 'Stable' },
-                                { key: IncomeStability.VARIABLE, label: 'Variable' },
-                                { key: IncomeStability.NONE, label: 'None' },
+                                {
+                                    key: IncomeStability.STABLE,
+                                    label: t('pages.settings.panels.money_style.stable'),
+                                },
+                                {
+                                    key: IncomeStability.VARIABLE,
+                                    label: t('pages.settings.panels.money_style.variable'),
+                                },
+                                {
+                                    key: IncomeStability.NONE,
+                                    label: t('pages.settings.panels.money_style.none'),
+                                },
                             ] as const
                         ).map(option => {
                             const on =
@@ -673,23 +705,32 @@ export function AccountSettings() {
                 </SettingsRow>
             </SettingsInkCard>
 
-            <SettingsInkCard eyebrow="Password" blurb="Change the password for this email account.">
+            <SettingsInkCard
+                eyebrow={t('pages.settings.panels.password.eyebrow')}
+                blurb={t('pages.settings.panels.password.blurb')}>
                 <div className="grid gap-3 py-2.5">
-                    <Field label="Current password" htmlFor="cur-pw">
+                    <Field label={t('pages.settings.panels.password.current')} htmlFor="cur-pw">
                         <Password
                             id="cur-pw"
                             value={currentPassword}
                             onChange={event => setCurrentPassword(event.target.value)}
-                            placeholder="••••••••••••"
+                            placeholder={t('ui.form.fields.password_mask')}
+                            showPasswordLabel={t('ui.form.show_password')}
+                            hidePasswordLabel={t('ui.form.hide_password')}
                             autoComplete="current-password"
                         />
                     </Field>
-                    <Field label="New password" htmlFor="new-pw" hint="Minimum 8 characters.">
+                    <Field
+                        label={t('pages.settings.panels.password.next')}
+                        htmlFor="new-pw"
+                        hint={t('pages.settings.panels.password.hint')}>
                         <Password
                             id="new-pw"
                             value={newPassword}
                             onChange={event => setNewPassword(event.target.value)}
-                            placeholder="••••••••••••"
+                            placeholder={t('ui.form.fields.password_mask')}
+                            showPasswordLabel={t('ui.form.show_password')}
+                            hidePasswordLabel={t('ui.form.hide_password')}
                             autoComplete="new-password"
                         />
                     </Field>
@@ -702,15 +743,17 @@ export function AccountSettings() {
                                 newPassword.length < 8
                             }
                             onClick={() => savePassword.mutate()}>
-                            {savePassword.isPending ? 'Working…' : 'Change password'}
+                            {savePassword.isPending
+                                ? t('pages.settings.working')
+                                : t('pages.settings.panels.password.change')}
                         </Button>
                     </div>
                 </div>
             </SettingsInkCard>
 
             <SettingsInkCard
-                eyebrow="Household"
-                blurb={`${memberLimitLabel(activePlan)}. Members share jars, rules, and transaction history.`}>
+                eyebrow={t('pages.settings.panels.household.eyebrow')}
+                blurb={`${memberLimitLabel(activePlan, t)}. ${t('pages.settings.panels.household.blurb_suffix')}`}>
                 <div className="grid gap-3 py-2.5">
                     {live && (membersQuery.data?.length ?? 0) > 0 ? (
                         <ul className="divide-y divide-line rounded-lg border border-line">
@@ -731,7 +774,10 @@ export function AccountSettings() {
                             ))}
                         </ul>
                     ) : (
-                        <StubNotice what="Members appear here once you have a household." />
+                        <StubNotice
+                            prefix={t('ui.statusPage.scaffold')}
+                            what={t('pages.settings.panels.household.members_stub')}
+                        />
                     )}
                     {!invitesAllowed ? (
                         <p className="text-sm text-fg-muted">
@@ -740,17 +786,22 @@ export function AccountSettings() {
                         </p>
                     ) : !seatOpen ? (
                         <p className="text-sm text-fg-muted">
-                            Seat limit reached ({memberLimitLabel(activePlan)}). Upgrade to Max for
-                            unlimited members.
+                            {t('pages.settings.panels.household.seat_limit', {
+                                limit: memberLimitLabel(activePlan, t),
+                            })}
                         </p>
                     ) : (
                         <>
-                            <Field label="Invite (email)" htmlFor="invite-email">
+                            <Field
+                                label={t('pages.settings.panels.household.invite_email')}
+                                htmlFor="invite-email">
                                 <Email
                                     id="invite-email"
                                     value={inviteEmail}
                                     onChange={event => setInviteEmail(event.target.value)}
-                                    placeholder="partner@example.com"
+                                    placeholder={t(
+                                        'pages.settings.panels.household.invite_placeholder'
+                                    )}
                                     disabled={!live}
                                 />
                             </Field>
@@ -761,7 +812,9 @@ export function AccountSettings() {
                                         !live || invite.isPending || !inviteEmail.includes('@')
                                     }
                                     onClick={() => invite.mutate()}>
-                                    {invite.isPending ? 'Working…' : 'Invite'}
+                                    {invite.isPending
+                                        ? t('pages.settings.working')
+                                        : t('pages.settings.invite')}
                                 </Button>
                             </div>
                         </>
@@ -770,19 +823,28 @@ export function AccountSettings() {
             </SettingsInkCard>
 
             <SettingsInkCard
-                eyebrow="Display"
-                blurb="Theme and the day the budget month rolls over.">
+                eyebrow={t('pages.settings.panels.display.eyebrow')}
+                blurb={t('pages.settings.panels.display.blurb')}>
                 <SettingsRow>
                     <SettingsRowLabel
-                        title="Appearance"
-                        sub="Synced to your account across browsers and devices."
+                        title={t('pages.settings.rows.appearance.title')}
+                        sub={t('pages.settings.rows.appearance.sub')}
                     />
                     <div className="flex gap-1 rounded-full border border-line bg-raised p-0.5">
                         {(
                             [
-                                { value: Theme.SYSTEM, label: 'System' },
-                                { value: Theme.LIGHT, label: 'Light' },
-                                { value: Theme.DARK, label: 'Dark' },
+                                {
+                                    value: Theme.SYSTEM,
+                                    label: t('pages.settings.panels.display.system'),
+                                },
+                                {
+                                    value: Theme.LIGHT,
+                                    label: t('pages.settings.panels.display.light'),
+                                },
+                                {
+                                    value: Theme.DARK,
+                                    label: t('pages.settings.panels.display.dark'),
+                                },
                             ] as const
                         ).map(option => {
                             const on = activeTheme === option.value;
@@ -807,9 +869,9 @@ export function AccountSettings() {
                 <SettingsRow last>
                     <div className="grid w-full gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
                         <Field
-                            label="Day the month rolls over"
+                            label={t('pages.settings.panels.display.period_day')}
                             htmlFor="period-day"
-                            hint="Income after this day counts for next month.">
+                            hint={t('pages.settings.panels.display.period_day_hint')}>
                             <Input
                                 id="period-day"
                                 type="number"
@@ -829,57 +891,59 @@ export function AccountSettings() {
                             variant="secondary"
                             disabled={!live || savePeriod.isPending}
                             onClick={() => savePeriod.mutate()}>
-                            {savePeriod.isPending ? 'Working…' : 'Save'}
+                            {savePeriod.isPending
+                                ? t('pages.settings.working')
+                                : t('pages.settings.save')}
                         </Button>
                     </div>
                 </SettingsRow>
             </SettingsInkCard>
 
             <SettingsInkCard
-                eyebrow="The Coach"
-                blurb="The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the inbox at Home → The Coach holds tip cards across money, growth, energy, and soul.">
+                eyebrow={t('pages.settings.panels.coach.eyebrow')}
+                blurb={t('pages.settings.panels.coach.blurb')}>
                 <Toggle
                     checked={helpersEnabled}
-                    label="Show The Coach on screens"
+                    label={t('pages.settings.panels.coach.toggle')}
                     hint={
                         helpersEnabled
-                            ? 'On — look for the ✦ The Coach mark. Inbox stays at Home → The Coach.'
-                            : 'Off — on-screen tips hidden. The Coach inbox still available anytime.'
+                            ? t('pages.settings.panels.coach.hint_on')
+                            : t('pages.settings.panels.coach.hint_off')
                     }
                     onCheckedChange={setHelpersEnabled}
                 />
             </SettingsInkCard>
 
             <SettingsInkCard
-                eyebrow={tourChrome.settings.eyebrow}
-                blurb={tourChrome.settings.blurb}>
+                eyebrow={t('features.tour.chrome.settings.eyebrow')}
+                blurb={t('features.tour.chrome.settings.blurb')}>
                 <SettingsRow last>
                     <SettingsRowLabel
-                        title={tourChrome.settings.row_title}
-                        sub={tourChrome.settings.row_sub}
+                        title={t('features.tour.chrome.settings.row_title')}
+                        sub={t('features.tour.chrome.settings.row_sub')}
                     />
                     <Button type="button" variant="secondary" onClick={restartFullTour}>
-                        {tourChrome.settings.restart}
+                        {t('features.tour.chrome.settings.restart')}
                     </Button>
                 </SettingsRow>
             </SettingsInkCard>
 
             <DangerZone
-                title="Delete account"
-                body="Your household, jars, and full transaction history will be deleted. This cannot be undone — export your data first."
-                action="Delete account"
-                onAction={() =>
-                    showToast('Account deletion coming soon — export your data first.', 'info')
-                }
+                title={t('pages.settings.account.delete_account')}
+                body={t('pages.settings.delete.body')}
+                action={t('pages.settings.account.delete_account')}
+                onAction={() => showToast(t('pages.settings.toasts.delete_coming'), 'info')}
             />
         </SettingsPanel>
     );
 }
 
 export function JarsSettings() {
+    const t = useTranslations();
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { showToast } = useAppShell();
+    const apiError = useApiError();
     const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
 
@@ -950,9 +1014,9 @@ export function JarsSettings() {
             setPctDraft(null);
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
-            showToast('Split saved', 'success');
+            showToast(t('pages.settings.toasts.split_saved'), 'success');
         },
-        onError: () => showToast('Split save failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     function resetDefaults() {
@@ -974,13 +1038,18 @@ export function JarsSettings() {
     return (
         <SettingsPanel>
             <SettingsInkCard
-                eyebrow="Where each jar sits"
-                blurb="Mix freely — Necessity on your current account, the rest as pots, Financial Freedom on a real savings account."
+                eyebrow={t('pages.settings.panels.jars_placement.eyebrow')}
+                blurb={t('pages.settings.panels.jars_placement.blurb')}
                 badge={
                     <SettingsPill tone="accent">
                         {accounts.length
-                            ? `${accounts.length} account${accounts.length === 1 ? '' : 's'}`
-                            : 'No accounts'}
+                            ? t(
+                                  accounts.length === 1
+                                      ? 'pages.settings.panels.jars_placement.accounts_one'
+                                      : 'pages.settings.panels.jars_placement.accounts_other',
+                                  { count: accounts.length }
+                              )
+                            : t('pages.settings.panels.jars_placement.no_accounts')}
                     </SettingsPill>
                 }>
                 {jars.map((jar, i) => {
@@ -1006,7 +1075,8 @@ export function JarsSettings() {
                                                 'font-mono text-[10px]',
                                                 label ? 'text-fg-secondary' : 'text-warning'
                                             )}>
-                                            {label ?? 'Not set — add a bank account'}
+                                            {label ??
+                                                t('pages.settings.panels.jars_placement.not_set')}
                                         </span>
                                     </span>
                                 </span>
@@ -1020,7 +1090,9 @@ export function JarsSettings() {
                                             current === jar.id ? null : jar.id
                                         )
                                     }>
-                                    {isEditing ? 'Close' : 'Change'}
+                                    {isEditing
+                                        ? t('pages.settings.panels.jars_placement.close')
+                                        : t('pages.settings.panels.jars_placement.change')}
                                 </Button>
                             </SettingsRow>
                             {isEditing ? (
@@ -1038,7 +1110,13 @@ export function JarsSettings() {
                                                     }));
                                                     setEditingJarId(null);
                                                     showToast(
-                                                        `${jar.name} → ${account.name}`,
+                                                        t(
+                                                            'pages.settings.panels.jars_placement.seat_saved',
+                                                            {
+                                                                jar: jar.name,
+                                                                account: account.name,
+                                                            }
+                                                        ),
                                                         'success'
                                                     );
                                                 }}
@@ -1052,7 +1130,7 @@ export function JarsSettings() {
                                                     {account.name}
                                                 </span>
                                                 <span className="font-mono text-[10px] text-fg-muted">
-                                                    {ACCOUNT_KIND_LABEL[account.kind] ??
+                                                    {accountKindLabel(account.kind, t) ??
                                                         account.kind}
                                                     {account.iban
                                                         ? ` · ${account.iban.slice(-4)}`
@@ -1069,8 +1147,8 @@ export function JarsSettings() {
             </SettingsInkCard>
 
             <SettingsInkCard
-                eyebrow="Income split"
-                blurb="Where income goes on arrival — must total 100%."
+                eyebrow={t('pages.settings.panels.income_split.eyebrow')}
+                blurb={t('pages.settings.panels.income_split.blurb')}
                 badge={
                     <Badge tone={balanced ? 'success' : 'danger'}>{formatPercent(total)}</Badge>
                 }>
@@ -1125,7 +1203,7 @@ export function JarsSettings() {
                     {coachTips.length > 0 ? (
                         <div className="grid gap-1.5 border-t border-line py-2">
                             <p className="font-mono text-[9px] tracking-[0.14em] text-accent uppercase">
-                                Coach
+                                {t('features.coach.helpers.mark_label')}
                             </p>
                             {coachTips.map(tip => (
                                 <div
@@ -1136,7 +1214,9 @@ export function JarsSettings() {
                                             ? 'border-amber-500/40 bg-amber-500/5'
                                             : 'border-line bg-raised/40'
                                     )}>
-                                    <p className="text-xs leading-snug text-fg">{tip.message}</p>
+                                    <p className="text-xs leading-snug text-fg">
+                                        {t(`features.coach.split_tips.${tip.id}`)}
+                                    </p>
                                     <Button
                                         variant="ghost"
                                         size="sm"
@@ -1147,7 +1227,7 @@ export function JarsSettings() {
                                                 [tip.id]: true,
                                             }))
                                         }>
-                                        Got it
+                                        {t('features.coach.got_it')}
                                     </Button>
                                 </div>
                             ))}
@@ -1156,18 +1236,23 @@ export function JarsSettings() {
 
                     <div className="flex justify-end gap-2 border-t border-line py-2">
                         <Button variant="ghost" size="sm" onClick={resetDefaults}>
-                            Reset
+                            {t('ui.button.actions.reset')}
                         </Button>
                         <Button
                             size="sm"
                             disabled={!live || !balanced || saveSplit.isPending}
                             onClick={() => saveSplit.mutate()}>
-                            {saveSplit.isPending ? 'Working…' : 'Save'}
+                            {saveSplit.isPending
+                                ? t('pages.settings.working')
+                                : t('pages.settings.save')}
                         </Button>
                     </div>
                     {!live ? (
                         <div className="pb-2">
-                            <StubNotice what="Sign in and complete setup to save the split." />
+                            <StubNotice
+                                prefix={t('ui.statusPage.scaffold')}
+                                what={t('pages.settings.panels.income_split.sign_in_stub')}
+                            />
                         </div>
                     ) : null}
                 </div>
@@ -1177,9 +1262,11 @@ export function JarsSettings() {
 }
 
 export function DebtSettings() {
+    const t = useTranslations();
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { showToast } = useAppShell();
+    const apiError = useApiError();
     const live = isLiveData(householdId);
 
     const settingsQuery = useLiveQuery(
@@ -1201,47 +1288,47 @@ export function DebtSettings() {
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: apiQuery.household.settings.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.plan.key() });
-            showToast('Payoff method saved', 'success');
+            showToast(t('pages.settings.toasts.payoff_saved'), 'success');
         },
-        onError: () => showToast('Payoff method save failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     return (
         <SettingsPanel>
             <SettingsInkCard
-                eyebrow="How you pay off debt"
-                blurb="One household choice for the Debt screen. Avalanche, Snowball, or Minimal — switch any time; the Debt list and Coach compare follow."
+                eyebrow={t('pages.settings.panels.debt_payoff.eyebrow')}
+                blurb={t('pages.settings.panels.debt_payoff.blurb')}
                 badge={
                     <SettingsPill tone="accent">
                         {strategy === PayoffStrategy.AVALANCHE
-                            ? 'Avalanche'
+                            ? t('pages.settings.panels.debt_payoff.avalanche')
                             : strategy === PayoffStrategy.SNOWBALL
-                              ? 'Snowball'
-                              : 'Minimal only'}
+                              ? t('pages.settings.panels.debt_payoff.snowball')
+                              : t('pages.settings.panels.debt_payoff.minimal')}
                     </SettingsPill>
                 }>
                 {(
                     [
                         {
                             key: PayoffStrategy.AVALANCHE,
-                            name: 'Avalanche',
-                            tag: 'Cheapest',
-                            desc: 'Highest interest rate first. Costs least over the full payoff.',
-                            metric: 'Interest saved · Freedom date sooner on expensive debt',
+                            name: t('pages.settings.panels.debt_payoff.avalanche'),
+                            tag: t('pages.settings.panels.debt_payoff.avalanche_tag'),
+                            desc: t('pages.settings.panels.debt_payoff.avalanche_desc'),
+                            metric: t('pages.settings.panels.debt_payoff.avalanche_metric'),
                         },
                         {
                             key: PayoffStrategy.SNOWBALL,
-                            name: 'Snowball',
-                            tag: 'Momentum',
-                            desc: 'Smallest balance first. Clears debts faster for a quick win.',
-                            metric: 'Wins sooner · Slightly more interest overall',
+                            name: t('pages.settings.panels.debt_payoff.snowball'),
+                            tag: t('pages.settings.panels.debt_payoff.snowball_tag'),
+                            desc: t('pages.settings.panels.debt_payoff.snowball_desc'),
+                            metric: t('pages.settings.panels.debt_payoff.snowball_metric'),
                         },
                         {
                             key: PayoffStrategy.MINIMAL,
-                            name: 'Minimal only',
-                            tag: 'Baseline',
-                            desc: 'Pay each contractual minimum only — no extra, no rollover.',
-                            metric: 'Slowest path · Useful as a comparison baseline',
+                            name: t('pages.settings.panels.debt_payoff.minimal'),
+                            tag: t('pages.settings.panels.debt_payoff.minimal_tag'),
+                            desc: t('pages.settings.panels.debt_payoff.minimal_desc'),
+                            metric: t('pages.settings.panels.debt_payoff.minimal_metric'),
                         },
                     ] as const
                 ).map((option, index, list) => {
@@ -1294,6 +1381,8 @@ export function DebtSettings() {
 }
 
 export function BankSettings() {
+    const t = useTranslations();
+    const apiError = useApiError();
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { showToast } = useAppShell();
@@ -1331,9 +1420,13 @@ export function BankSettings() {
             ...merchantsToNameOptions(bankList, {
                 categoryTemplateKey: bankingCategoryKey ?? undefined,
             }),
-            { key: 'OTHER', name: 'Other', group: 'Custom' },
+            {
+                key: 'OTHER',
+                name: t('pages.settings.panels.bank.preset_other'),
+                group: t('pages.settings.panels.bank.preset_custom'),
+            },
         ];
-    }, [bankList, bankingCategoryKey]);
+    }, [bankList, bankingCategoryKey, t]);
 
     const bankByKey = useMemo(() => new Map(bankList.map(bank => [bank.key, bank])), [bankList]);
 
@@ -1390,14 +1483,18 @@ export function BankSettings() {
         const trimmed = iban.trim();
         if (!trimmed || isIbanStub(trimmed)) return null;
         if (!isValidIban(trimmed)) {
-            throw new Error('Invalid IBAN');
+            throw new Error('invalid_iban');
         }
         const expected = selectedBank?.ibanBankCode?.toUpperCase() ?? null;
         if (expected) {
             const actual = nlIbanBankCode(trimmed);
             if (actual && actual !== expected) {
                 throw new Error(
-                    `IBAN bank code is ${actual}, expected ${expected} for ${selectedBank?.name}`
+                    t('pages.settings.panels.bank.iban_bank_mismatch', {
+                        actual,
+                        expected,
+                        bank: selectedBank?.name ?? '',
+                    })
                 );
             }
         }
@@ -1408,10 +1505,10 @@ export function BankSettings() {
     const selectedIbanCode = selectedBank?.ibanBankCode?.toUpperCase() ?? undefined;
     const ibanPlaceholder = selectedIbanCode
         ? formatNlIbanStub(selectedIbanCode)
-        : 'NL00 BANK 0000 0000 00';
+        : t('pages.settings.panels.bank.iban_placeholder');
     const ibanHint = selectedIbanCode
-        ? `Starts with NL00 ${selectedIbanCode} — paste the rest from your statement.`
-        : 'Optional — validated when filled (ISO IBAN check).';
+        ? t('pages.settings.panels.bank.iban_hint_prefix', { code: selectedIbanCode })
+        : t('pages.settings.panels.bank.iban_hint_optional');
 
     const createAccount = useMutation({
         mutationFn: async () => {
@@ -1426,7 +1523,7 @@ export function BankSettings() {
             ) {
                 accountName = `${bank.name} · ${accountName}`;
             }
-            if (!accountName) throw new Error('Name required');
+            if (!accountName) throw new Error(t('pages.settings.panels.bank.name_required'));
             const resolvedIban = resolveIbanForSubmit();
             return api.money.accounts.create({
                 householdId,
@@ -1439,21 +1536,22 @@ export function BankSettings() {
         onSuccess: () => {
             resetAddForm();
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.accounts.list.key() });
-            showToast('Account added', 'success');
+            showToast(t('pages.settings.toasts.account_added'), 'success');
         },
         onError: error => {
-            const message = error instanceof Error ? error.message : '';
-            if (message.includes('IBAN') || message.includes('iban')) {
+            const raw = extractErrorMessage(error);
+            const message = apiError(error);
+            if (isIbanApiErrorMessage(raw) || /iban/i.test(message)) {
                 setIbanError(message);
                 showToast(message, 'error');
                 return;
             }
-            showToast('Account add failed', 'error');
+            showToast(t('pages.settings.toasts.account_add_failed'), 'error');
         },
     });
 
     const accounts = accountsQuery.data ?? [];
-    const kindLabel = ACCOUNT_KIND_LABEL;
+    const kindLabel = (kind: string) => accountKindLabel(kind, t);
 
     const canSubmit =
         live &&
@@ -1465,11 +1563,15 @@ export function BankSettings() {
     return (
         <SettingsPanel>
             <SettingsInkCard
-                eyebrow="Bank connection"
-                blurb="Read-only — Rumtelo never moves money. Disconnect any time."
-                badge={<SettingsPill>Not connected</SettingsPill>}>
+                eyebrow={t('pages.settings.panels.bank.eyebrow')}
+                blurb={t('pages.settings.panels.bank.blurb')}
+                badge={
+                    <SettingsPill>{t('pages.settings.panels.bank.not_connected')}</SettingsPill>
+                }>
                 {bankList.length === 0 ? (
-                    <p className="py-2.5 text-sm text-fg-muted">Loading banks…</p>
+                    <p className="py-2.5 text-sm text-fg-muted">
+                        {t('pages.settings.panels.bank.loading_banks')}
+                    </p>
                 ) : (
                     bankList.map((bank, i) => {
                         const mark = vendorMarkSrc({
@@ -1489,8 +1591,10 @@ export function BankSettings() {
                                     size="sm"
                                     className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
                                     disabled
-                                    onClick={() => showToast('Bank connect coming soon', 'info')}>
-                                    Connect
+                                    onClick={() =>
+                                        showToast(t('pages.settings.toasts.bank_coming'), 'info')
+                                    }>
+                                    {t('pages.settings.panels.bank.connect')}
                                 </Button>
                             </SettingsRow>
                         );
@@ -1499,19 +1603,21 @@ export function BankSettings() {
             </SettingsInkCard>
 
             <SettingsInkCard
-                eyebrow="Manual accounts"
-                blurb="CSV import always works. Pick a bank from the list, then add the account for recognition during import."
+                eyebrow={t('pages.settings.panels.bank.manual_eyebrow')}
+                blurb={t('pages.settings.panels.bank.manual_blurb')}
                 badge={
                     <Button
                         size="sm"
                         variant="secondary"
                         className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
                         onClick={() => setAdding(true)}>
-                        + Add account
+                        {t('pages.settings.panels.bank.add_account')}
                     </Button>
                 }>
                 {accounts.length === 0 ? (
-                    <p className="py-2.5 text-sm text-fg-muted">No accounts yet.</p>
+                    <p className="py-2.5 text-sm text-fg-muted">
+                        {t('pages.settings.panels.bank.no_accounts_yet')}
+                    </p>
                 ) : (
                     accounts.map((account, i) => {
                         const bank = resolveBankForAccount(account.name);
@@ -1533,10 +1639,10 @@ export function BankSettings() {
                                     ) : null}
                                     <SettingsRowLabel
                                         title={account.name}
-                                        sub={`${account.iban ?? 'No IBAN'} · ${formatMoney(account.balance)}`}
+                                        sub={`${account.iban ?? t('pages.settings.panels.bank.no_iban')} · ${formatMoney(account.balance)}`}
                                     />
                                 </div>
-                                <Badge>{kindLabel[account.kind] ?? account.kind}</Badge>
+                                <Badge>{kindLabel(account.kind)}</Badge>
                             </SettingsRow>
                         );
                     })
@@ -1546,10 +1652,12 @@ export function BankSettings() {
                     <div className="grid gap-3 border-t border-line py-2.5">
                         <div className="grid gap-2">
                             <span className="font-mono text-[10px] tracking-[0.14em] text-fg-faint uppercase">
-                                Which bank?
+                                {t('pages.settings.panels.bank.which_bank')}
                             </span>
                             {bankList.length === 0 ? (
-                                <p className="text-sm text-fg-muted">Loading banks…</p>
+                                <p className="text-sm text-fg-muted">
+                                    {t('pages.settings.panels.bank.loading_banks')}
+                                </p>
                             ) : (
                                 <div className="grid gap-2">
                                     <PresetNameField
@@ -1566,8 +1674,10 @@ export function BankSettings() {
                                             setLabel(value);
                                         }}
                                         options={bankNameOptions}
-                                        placeholder="Search bank — e.g. ING, Bunq"
-                                        freeTextPlaceholder="Type a bank name…"
+                                        placeholder={t('pages.settings.panels.bank.search_bank')}
+                                        freeTextPlaceholder={t(
+                                            'pages.settings.panels.bank.type_bank_name'
+                                        )}
                                         lockPresets
                                         freeTextKeys={['OTHER']}
                                         initialLockedKey={
@@ -1624,22 +1734,29 @@ export function BankSettings() {
                             )}
                         </div>
                         <Field
-                            label="Account label"
+                            label={t('pages.settings.panels.bank.account_label')}
                             htmlFor="acc-name"
-                            hint="Shown in jar seats and CSV import — e.g. Operating checking.">
+                            hint={t('pages.settings.panels.bank.account_label_hint')}>
                             <Input
                                 id="acc-name"
                                 placeholder={
                                     bankKey
-                                        ? `${bankByKey.get(bankKey)?.name ?? 'Bank'} checking`
-                                        : 'Operating checking'
+                                        ? t('pages.settings.panels.bank.bank_checking', {
+                                              bank:
+                                                  bankByKey.get(bankKey)?.name ??
+                                                  t('pages.settings.panels.bank.bank_fallback'),
+                                          })
+                                        : t('pages.settings.panels.bank.operating_checking')
                                 }
                                 value={label}
                                 onChange={event => setLabel(event.target.value)}
                                 disabled={!live}
                             />
                         </Field>
-                        <Field label="IBAN" htmlFor="acc-iban" hint={ibanError ?? ibanHint}>
+                        <Field
+                            label={t('pages.settings.panels.bank.iban')}
+                            htmlFor="acc-iban"
+                            hint={ibanError ?? ibanHint}>
                             <Input
                                 id="acc-iban"
                                 placeholder={ibanPlaceholder}
@@ -1653,9 +1770,7 @@ export function BankSettings() {
                                     const trimmed = iban.trim();
                                     if (!trimmed || isIbanStub(trimmed)) return;
                                     if (!isValidIban(trimmed)) {
-                                        setIbanError(
-                                            'Invalid IBAN — check the number and try again.'
-                                        );
+                                        setIbanError(t('pages.settings.panels.bank.invalid_iban'));
                                         return;
                                     }
                                     const expected = selectedIbanCode ?? null;
@@ -1663,7 +1778,14 @@ export function BankSettings() {
                                         const actual = nlIbanBankCode(trimmed);
                                         if (actual && actual !== expected) {
                                             setIbanError(
-                                                `This IBAN is ${actual}, but ${selectedBank?.name} uses ${expected}.`
+                                                t(
+                                                    'pages.settings.panels.bank.iban_bank_mismatch_short',
+                                                    {
+                                                        actual,
+                                                        expected,
+                                                        bank: selectedBank?.name ?? '',
+                                                    }
+                                                )
                                             );
                                             return;
                                         }
@@ -1674,25 +1796,37 @@ export function BankSettings() {
                                 disabled={!live}
                             />
                         </Field>
-                        <Field label="Type" htmlFor="acc-kind">
+                        <Field label={t('pages.settings.panels.bank.type')} htmlFor="acc-kind">
                             <Select
                                 id="acc-kind"
                                 value={kind}
                                 onChange={event => setKind(event.target.value as AccountKind)}
                                 disabled={!live}>
-                                <option value={AccountKind.CHECKING}>Checking</option>
-                                <option value={AccountKind.SAVINGS}>Savings</option>
-                                <option value={AccountKind.CREDIT}>Credit card</option>
-                                <option value={AccountKind.CASH}>Cash</option>
-                                <option value={AccountKind.INVESTMENT}>Investment</option>
+                                <option value={AccountKind.CHECKING}>
+                                    {kindLabel(AccountKind.CHECKING)}
+                                </option>
+                                <option value={AccountKind.SAVINGS}>
+                                    {kindLabel(AccountKind.SAVINGS)}
+                                </option>
+                                <option value={AccountKind.CREDIT}>
+                                    {kindLabel(AccountKind.CREDIT)}
+                                </option>
+                                <option value={AccountKind.CASH}>
+                                    {kindLabel(AccountKind.CASH)}
+                                </option>
+                                <option value={AccountKind.INVESTMENT}>
+                                    {kindLabel(AccountKind.INVESTMENT)}
+                                </option>
                             </Select>
                         </Field>
                         <div className="flex justify-end gap-2">
                             <Button variant="ghost" onClick={resetAddForm}>
-                                Cancel
+                                {t('pages.settings.cancel')}
                             </Button>
                             <Button disabled={!canSubmit} onClick={() => createAccount.mutate()}>
-                                {createAccount.isPending ? 'Working…' : 'Add'}
+                                {createAccount.isPending
+                                    ? t('pages.settings.working')
+                                    : t('pages.settings.panels.bank.add')}
                             </Button>
                         </div>
                     </div>
@@ -1703,13 +1837,14 @@ export function BankSettings() {
 }
 
 export function GrowthSettings() {
+    const t = useTranslations();
     const [horizon, setHorizon] = useState(24);
 
     return (
         <SettingsPanel>
             <SettingsInkCard
-                eyebrow="Planning horizon"
-                blurb="How far ahead the goal and freedom calculations look. Shorter feels urgent, longer shows the compounding.">
+                eyebrow={t('pages.settings.panels.growth.eyebrow')}
+                blurb={t('pages.settings.panels.growth.blurb')}>
                 <div className="flex flex-wrap items-center gap-3 py-3">
                     <input
                         type="range"
@@ -1719,7 +1854,7 @@ export function GrowthSettings() {
                         value={horizon}
                         onChange={event => setHorizon(Number(event.target.value))}
                         className="min-w-0 flex-1 accent-(--color-accent)"
-                        aria-label="Planning horizon in months"
+                        aria-label={t('pages.settings.panels.growth.horizon_aria')}
                     />
                     <Typography
                         as="h3"
@@ -1727,16 +1862,20 @@ export function GrowthSettings() {
                         weight="semibold"
                         color="primary"
                         className="whitespace-nowrap">
-                        {horizon} months
+                        {t('pages.settings.panels.growth.months', { count: horizon })}
                     </Typography>
                 </div>
             </SettingsInkCard>
-            <StubNotice what="Horizon persists with growth settings when that API lands." />
+            <StubNotice
+                prefix={t('ui.statusPage.scaffold')}
+                what={t('pages.settings.panels.growth.stub')}
+            />
         </SettingsPanel>
     );
 }
 
 export function EnergySettings() {
+    const t = useTranslations();
     const [weekHours, setWeekHours] = useState(48);
     const [sleepHours, setSleepHours] = useState(7.5);
     const [weightKg, setWeightKg] = useState(78);
@@ -1744,11 +1883,11 @@ export function EnergySettings() {
     return (
         <SettingsPanel>
             <SettingsInkCard
-                eyebrow="Your baseline"
-                blurb="Three numbers the Energy portal builds on. Everything else — sessions, targets, advice — is derived from these.">
+                eyebrow={t('pages.settings.panels.energy.eyebrow')}
+                blurb={t('pages.settings.panels.energy.blurb')}>
                 <SettingsRow>
                     <span className="w-36 shrink-0 font-mono text-[9px] tracking-[0.14em] text-fg-faint uppercase">
-                        Steered hours p/w
+                        {t('pages.settings.panels.energy.steered_label')}
                     </span>
                     <input
                         type="range"
@@ -1758,7 +1897,7 @@ export function EnergySettings() {
                         value={weekHours}
                         onChange={event => setWeekHours(Number(event.target.value))}
                         className="min-w-35 flex-1 accent-(--color-accent)"
-                        aria-label="Steered hours per week"
+                        aria-label={t('pages.settings.panels.energy.steered_aria')}
                     />
                     <span className="min-w-14 font-display text-lg font-semibold text-accent">
                         {weekHours}h
@@ -1766,7 +1905,7 @@ export function EnergySettings() {
                 </SettingsRow>
                 <SettingsRow>
                     <span className="w-36 shrink-0 font-mono text-[9px] tracking-[0.14em] text-fg-faint uppercase">
-                        Sleep per night
+                        {t('pages.settings.panels.energy.sleep_label')}
                     </span>
                     <input
                         type="range"
@@ -1776,7 +1915,7 @@ export function EnergySettings() {
                         value={sleepHours}
                         onChange={event => setSleepHours(Number(event.target.value))}
                         className="min-w-35 flex-1 accent-(--color-accent)"
-                        aria-label="Sleep hours per night"
+                        aria-label={t('pages.settings.panels.energy.sleep_aria')}
                     />
                     <span className="min-w-14 font-display text-lg font-semibold text-accent">
                         {sleepHours}h
@@ -1784,7 +1923,7 @@ export function EnergySettings() {
                 </SettingsRow>
                 <SettingsRow last>
                     <span className="w-36 shrink-0 font-mono text-[9px] tracking-[0.14em] text-fg-faint uppercase">
-                        Weight
+                        {t('pages.settings.panels.energy.weight_label')}
                     </span>
                     <input
                         type="range"
@@ -1794,26 +1933,30 @@ export function EnergySettings() {
                         value={weightKg}
                         onChange={event => setWeightKg(Number(event.target.value))}
                         className="min-w-35 flex-1 accent-(--color-accent)"
-                        aria-label="Weight in kilograms"
+                        aria-label={t('pages.settings.panels.energy.weight_aria')}
                     />
                     <span className="min-w-14 font-display text-lg font-semibold text-accent">
                         {weightKg} kg
                     </span>
                 </SettingsRow>
             </SettingsInkCard>
-            <StubNotice what="Wearable sync and persistence — coming soon." />
+            <StubNotice
+                prefix={t('ui.statusPage.scaffold')}
+                what={t('pages.settings.panels.energy.stub')}
+            />
         </SettingsPanel>
     );
 }
 
 export function SoulSettings() {
+    const t = useTranslations();
     const [mindMin, setMindMin] = useState(10);
 
     return (
         <SettingsPanel>
             <SettingsInkCard
-                eyebrow="Your daily stillness"
-                blurb="How long you sit. Short and daily beats long and occasional — this is the one practice that costs nothing and protects every jar.">
+                eyebrow={t('pages.settings.panels.stillness.eyebrow')}
+                blurb={t('pages.settings.panels.stillness.blurb')}>
                 <div className="flex flex-wrap items-center gap-3 py-3">
                     <input
                         type="range"
@@ -1823,22 +1966,27 @@ export function SoulSettings() {
                         value={mindMin}
                         onChange={event => setMindMin(Number(event.target.value))}
                         className="min-w-0 flex-1 accent-(--color-accent)"
-                        aria-label="Daily stillness minutes"
+                        aria-label={t('pages.settings.panels.stillness.minutes_aria')}
                     />
                     <span className="font-display text-xl font-semibold tracking-tight whitespace-nowrap text-accent">
-                        {mindMin} min
+                        {t('pages.settings.panels.stillness.minutes', { count: mindMin })}
                     </span>
                 </div>
             </SettingsInkCard>
-            <StubNotice what="Intention templates and reminders — coming soon." />
+            <StubNotice
+                prefix={t('ui.statusPage.scaffold')}
+                what={t('pages.settings.panels.stillness.stub')}
+            />
         </SettingsPanel>
     );
 }
 
 export function AutomationSettings() {
+    const t = useTranslations();
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { showToast } = useAppShell();
+    const apiError = useApiError();
     const live = isLiveData(householdId);
 
     const householdQuery = useLiveQuery(
@@ -1852,7 +2000,7 @@ export function AutomationSettings() {
 
     const [rules, setRules] = useState(
         () =>
-            Object.fromEntries(AUTO_RULES.map(rule => [rule.key, rule.defaultOn])) as Record<
+            Object.fromEntries(AUTO_RULE_KEYS.map(key => [key, AUTO_RULE_DEFAULTS[key]])) as Record<
                 string,
                 boolean
             >
@@ -1867,35 +2015,38 @@ export function AutomationSettings() {
             setHhNameDraft(null);
             void queryClient.invalidateQueries({ queryKey: apiQuery.household.current.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.household.list.key() });
-            showToast('Household updated', 'success');
+            showToast(t('pages.settings.toasts.household_updated'), 'success');
         },
-        onError: () => showToast('Household save failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     return (
         <SettingsPanel>
             <SettingsInkCard
-                eyebrow="What Rumtelo does by itself"
-                blurb="Three rules. Everything off means Rumtelo only shows, never acts. The Coach settings live under Account.">
-                {AUTO_RULES.map((rule, i) => (
+                eyebrow={t('pages.settings.panels.automation.eyebrow')}
+                blurb={t('pages.settings.panels.automation.blurb')}>
+                {AUTO_RULE_KEYS.map((key, i) => (
                     <button
-                        key={rule.key}
+                        key={key}
                         type="button"
-                        onClick={() => setRules(prev => ({ ...prev, [rule.key]: !prev[rule.key] }))}
+                        onClick={() => setRules(prev => ({ ...prev, [key]: !prev[key] }))}
                         className={cn(
                             'flex w-full flex-wrap items-center justify-between gap-2 py-2.5 text-left',
-                            i < AUTO_RULES.length - 1 && 'border-b border-line'
+                            i < AUTO_RULE_KEYS.length - 1 && 'border-b border-line'
                         )}>
-                        <SettingsRowLabel title={rule.name} sub={rule.desc} />
+                        <SettingsRowLabel
+                            title={t(`pages.settings.panels.automation.rules.${key}.name`)}
+                            sub={t(`pages.settings.panels.automation.rules.${key}.desc`)}
+                        />
                         <span
                             className={cn(
                                 'relative h-5 w-9 shrink-0 rounded-full transition-colors',
-                                rules[rule.key] ? 'bg-accent' : 'bg-raised'
+                                rules[key] ? 'bg-accent' : 'bg-raised'
                             )}>
                             <span
                                 className={cn(
                                     'absolute top-0.5 size-3.5 rounded-full bg-surface transition-[left]',
-                                    rules[rule.key] ? 'left-[18px]' : 'left-0.5'
+                                    rules[key] ? 'left-[18px]' : 'left-0.5'
                                 )}
                             />
                         </span>
@@ -1904,10 +2055,10 @@ export function AutomationSettings() {
             </SettingsInkCard>
 
             <SettingsInkCard
-                eyebrow="Household name"
-                blurb="Shown in the shell and on shared invites.">
+                eyebrow={t('pages.settings.panels.automation.household_name')}
+                blurb={t('pages.settings.panels.automation.household_blurb')}>
                 <div className="grid gap-3 py-2.5">
-                    <Field label="Name" htmlFor="hh-name">
+                    <Field label={t('pages.settings.panels.automation.name')} htmlFor="hh-name">
                         <Input
                             id="hh-name"
                             value={hhName}
@@ -1920,23 +2071,31 @@ export function AutomationSettings() {
                             variant="secondary"
                             disabled={!live || saveHouseholdName.isPending || !hhName.trim()}
                             onClick={() => saveHouseholdName.mutate()}>
-                            {saveHouseholdName.isPending ? 'Working…' : 'Save'}
+                            {saveHouseholdName.isPending
+                                ? t('pages.settings.working')
+                                : t('pages.settings.save')}
                         </Button>
                     </div>
                 </div>
             </SettingsInkCard>
 
-            <StubNotice what="Automation rules persist with household settings when that API lands. The Coach is under Account. Theme and language live under Account too." />
+            <StubNotice
+                prefix={t('ui.statusPage.scaffold')}
+                what={t('pages.settings.panels.automation.stub')}
+            />
         </SettingsPanel>
     );
 }
 
 export function PlanSettings() {
+    const t = useTranslations();
+    const appLocale = useLocale();
     const queryClient = useQueryClient();
     const router = useRouter();
     const searchParams = useSearchParams();
     const { householdId, user } = useAuth();
     const { showToast, plan, setPlan } = useAppShell();
+    const apiError = useApiError();
     const [billing, setBilling] = useState<'month' | 'year'>('month');
     const [pendingPlan, setPendingPlan] = useState<PlanKey | null>(null);
     const isDemoAccount = isDemoAccountEmail(user?.email);
@@ -1964,7 +2123,7 @@ export function PlanSettings() {
     const freePlanSwitch = PREVIEW_MODE || billingStatus.data?.previewBypass;
     /** No Stripe and no bypass — paid upgrades blocked; stay on Basic. */
     const billingUnavailable = !stripeLive && !freePlanSwitch;
-    const pendingDiff = pendingPlan ? diffPlans(plan, pendingPlan) : null;
+    const pendingDiff = pendingPlan ? diffPlans(plan, pendingPlan, t) : null;
     const pendingNeedsCheckout =
         Boolean(pendingPlan) &&
         pendingPlan !== PlanKey.BASIC &&
@@ -1983,16 +2142,16 @@ export function PlanSettings() {
         void queryClient.invalidateQueries({ queryKey: apiQuery.billing.status.key() });
 
         if (checkoutResult === 'success') {
-            showToast('Payment received — plan updates when Stripe confirms', 'success');
+            showToast(t('pages.settings.toasts.payment_received'), 'success');
             clearPlanIntent({
                 domainUrls: [env.NEXT_PUBLIC_DOMAIN_WEB, env.NEXT_PUBLIC_DOMAIN_APP],
             });
         } else if (billingReturn === 'return') {
-            showToast('Billing updated — syncing from Stripe', 'info');
+            showToast(t('pages.settings.toasts.billing_updated'), 'info');
         }
 
         router.replace('/settings/general/plan');
-    }, [searchParams, queryClient, router, showToast]);
+    }, [searchParams, queryClient, router, showToast, t]);
 
     const savePlan = useMutation({
         mutationFn: async (next: PlanKey) => {
@@ -2004,9 +2163,12 @@ export function PlanSettings() {
             setPendingPlan(null);
             void queryClient.invalidateQueries({ queryKey: apiQuery.household.settings.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.billing.status.key() });
-            showToast(`${PLAN_LABELS[data.planKey]} selected`, 'success');
+            showToast(
+                t('pages.settings.toasts.plan_selected', { plan: planLabel(data.planKey, t) }),
+                'success'
+            );
         },
-        onError: () => showToast('Could not update plan', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const scheduleDowngrade = useMutation({
@@ -2020,23 +2182,27 @@ export function PlanSettings() {
             void queryClient.invalidateQueries({ queryKey: apiQuery.household.settings.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.billing.status.key() });
             const until = data.periodEndsAt
-                ? new Date(data.periodEndsAt).toLocaleDateString(undefined, {
+                ? new Date(data.periodEndsAt).toLocaleDateString(appLocale, {
                       year: 'numeric',
                       month: 'short',
                       day: 'numeric',
                   })
                 : null;
-            const nextLabel = data.scheduledPlanKey
-                ? PLAN_LABELS[data.scheduledPlanKey as PlanKey]
-                : null;
+            const nextLabel = data.scheduledPlanKey ? planLabel(data.scheduledPlanKey, t) : null;
             showToast(
                 until && nextLabel
-                    ? `${PLAN_LABELS[data.planKey]} until ${until}, then ${nextLabel}`
-                    : `${PLAN_LABELS[data.planKey]} kept until period end`,
+                    ? t('pages.settings.toasts.plan_until_then', {
+                          plan: planLabel(data.planKey, t),
+                          until,
+                          next: nextLabel,
+                      })
+                    : t('pages.settings.toasts.plan_kept_until', {
+                          plan: planLabel(data.planKey, t),
+                      }),
                 'success'
             );
         },
-        onError: () => showToast('Could not schedule plan change', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const checkout = useMutation({
@@ -2058,10 +2224,13 @@ export function PlanSettings() {
                 setPendingPlan(null);
                 void queryClient.invalidateQueries({ queryKey: apiQuery.household.settings.key() });
                 void queryClient.invalidateQueries({ queryKey: apiQuery.billing.status.key() });
-                showToast(`${PLAN_LABELS[next]} upgraded`, 'success');
+                showToast(
+                    t('pages.settings.toasts.plan_upgraded', { plan: planLabel(next, t) }),
+                    'success'
+                );
             }
         },
-        onError: () => showToast('Could not start Stripe Checkout', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const openPortal = useMutation({
@@ -2072,25 +2241,24 @@ export function PlanSettings() {
         onSuccess: ({ url }) => {
             window.location.assign(url);
         },
-        onError: () =>
-            showToast(
-                'Could not open Stripe billing portal — enable Customer Portal in Stripe Dashboard',
-                'error'
-            ),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     function choosePlan(next: PlanKey) {
         if (isDemoAccount) {
-            showToast('Demo accounts stay on their seeded plan', 'info');
+            showToast(t('pages.settings.toasts.demo_plan'), 'info');
             return;
         }
         if (plan === next) {
-            showToast(`Already on ${PLAN_LABELS[next]}`, 'info');
+            showToast(
+                t('pages.settings.toasts.already_on_plan', { plan: planLabel(next, t) }),
+                'info'
+            );
             return;
         }
         const upgrading = PLAN_RANK[next] > PLAN_RANK[plan];
         if (upgrading && billingUnavailable) {
-            showToast('Paid plans are unavailable until Stripe billing is configured', 'error');
+            showToast(t('pages.settings.toasts.stripe_unconfigured'), 'error');
             return;
         }
         setPendingPlan(next);
@@ -2099,7 +2267,7 @@ export function PlanSettings() {
     function confirmPlanChange() {
         if (!pendingPlan || !pendingDiff) return;
         if (pendingDiff.direction === 'upgrade' && billingUnavailable) {
-            showToast('Paid plans are unavailable until Stripe billing is configured', 'error');
+            showToast(t('pages.settings.toasts.stripe_unconfigured'), 'error');
             setPendingPlan(null);
             return;
         }
@@ -2141,25 +2309,33 @@ export function PlanSettings() {
             key: PlanKey.BASIC,
             priceM: 0,
             priceY: 0,
-            tag: `From ${formatPlanPrice(0)}`,
-            line: 'Solo board — the six jars and the practice underneath. No bank needed.',
-            feats: `${memberLimitLabel(PlanKey.BASIC)} · Solo only · MONEY jars · Learn · Coach`,
+            tag: t('pages.settings.panels.plan.card_basic_tag', {
+                price: formatPlanPrice(0),
+            }),
+            line: t('pages.settings.panels.plan.card_basic_line'),
+            feats: t('pages.settings.panels.plan.card_basic_feats', {
+                members: memberLimitLabel(PlanKey.BASIC, t),
+            }),
         },
         {
             key: PlanKey.PLUS,
             priceM: 9,
             priceY: 90,
-            tag: 'Most chosen',
-            line: 'Share the board with family or friends — debt, energy week, and goals.',
-            feats: `${memberLimitLabel(PlanKey.PLUS)} · Any household kind · Debt · ENERGY · Goals`,
+            tag: t('pages.settings.panels.plan.card_plus_tag'),
+            line: t('pages.settings.panels.plan.card_plus_line'),
+            feats: t('pages.settings.panels.plan.card_plus_feats', {
+                members: memberLimitLabel(PlanKey.PLUS, t),
+            }),
         },
         {
             key: PlanKey.MAX,
             priceM: 19,
             priceY: 190,
-            tag: 'All four portals',
-            line: 'Unlimited household, income curve, learning, and net worth.',
-            feats: `${memberLimitLabel(PlanKey.MAX)} · GROWTH · Masterclass · Net worth`,
+            tag: t('pages.settings.panels.plan.card_max_tag'),
+            line: t('pages.settings.panels.plan.card_max_line'),
+            feats: t('pages.settings.panels.plan.card_max_feats', {
+                members: memberLimitLabel(PlanKey.MAX, t),
+            }),
         },
     ];
 
@@ -2181,14 +2357,14 @@ export function PlanSettings() {
     return (
         <SettingsPanel>
             <SettingsInkCard
-                eyebrow="What you use and pay"
-                blurb="Three plans: Basic, Plus, and Max. Start on Basic — nothing you have entered is ever locked away."
+                eyebrow={t('pages.settings.panels.plan.eyebrow')}
+                blurb={t('pages.settings.panels.plan.blurb')}
                 badge={
                     <div className="flex gap-1 rounded-full bg-raised p-1">
                         {(
                             [
-                                ['month', 'Monthly'],
-                                ['year', 'Yearly · 2 months free'],
+                                ['month', t('pages.settings.panels.plan.monthly')],
+                                ['year', t('pages.settings.panels.plan.yearly')],
                             ] as const
                         ).map(([k, label]) => (
                             <button
@@ -2224,14 +2400,20 @@ export function PlanSettings() {
                                 <div className="grid min-w-0 gap-1">
                                     <span className="flex flex-wrap items-baseline gap-2">
                                         <Typography as="h3" weight="semibold">
-                                            {PLAN_LABELS[card.key]}
+                                            {planLabel(card.key, t)}
                                         </Typography>
                                         <span className="font-display text-lg font-semibold tracking-tight text-accent">
                                             {price}
                                         </span>
                                         {cents > 0 ? (
                                             <span className="font-mono text-[10px] text-fg-muted">
-                                                {yearly ? '/year' : '/month'}
+                                                {yearly
+                                                    ? t(
+                                                          'pages.settings.panels.plan.per_year_suffix'
+                                                      )
+                                                    : t(
+                                                          'pages.settings.panels.plan.per_month_suffix'
+                                                      )}
                                             </span>
                                         ) : null}
                                         <span className="rounded-full border border-line px-2 py-0.5 font-mono text-[8px] tracking-widest text-fg-secondary uppercase">
@@ -2239,15 +2421,15 @@ export function PlanSettings() {
                                         </span>
                                         {cur && scheduledPlanKey && periodEndsAt ? (
                                             <span className="font-mono text-[10px] tracking-wide text-fg-muted uppercase">
-                                                until{' '}
-                                                {new Date(periodEndsAt).toLocaleDateString(
-                                                    undefined,
-                                                    {
+                                                {t('pages.settings.panels.plan.scheduled_until', {
+                                                    until: new Date(
+                                                        periodEndsAt
+                                                    ).toLocaleDateString(appLocale, {
                                                         month: 'short',
                                                         day: 'numeric',
-                                                    }
-                                                )}{' '}
-                                                → {PLAN_LABELS[scheduledPlanKey as PlanKey]}
+                                                    }),
+                                                    next: planLabel(scheduledPlanKey, t),
+                                                })}
                                             </span>
                                         ) : null}
                                     </span>
@@ -2271,19 +2453,19 @@ export function PlanSettings() {
                                     }
                                     onClick={() => choosePlan(card.key)}>
                                     {cur
-                                        ? 'Current'
+                                        ? t('pages.settings.panels.plan.status_current')
                                         : isDemoAccount
-                                          ? 'Locked'
+                                          ? t('pages.settings.panels.plan.status_locked')
                                           : billingUnavailable &&
                                               PLAN_RANK[card.key] > PLAN_RANK[plan]
-                                            ? 'Unavailable'
+                                            ? t('pages.settings.panels.plan.status_unavailable')
                                             : busy
                                               ? '…'
                                               : PLAN_RANK[card.key] < PLAN_RANK[plan]
-                                                ? 'Downgrade'
+                                                ? t('pages.settings.panels.plan.downgrade')
                                                 : card.key === PlanKey.BASIC
-                                                  ? 'Choose Basic'
-                                                  : 'Upgrade'}
+                                                  ? t('pages.settings.panels.plan.choose_basic')
+                                                  : t('pages.settings.panels.plan.upgrade')}
                                 </Button>
                             </div>
                         );
@@ -2293,17 +2475,17 @@ export function PlanSettings() {
 
             {stripeLive && !isDemoAccount ? (
                 <SettingsInkCard
-                    eyebrow="Payment & invoices"
+                    eyebrow={t('pages.settings.panels.plan.payment_eyebrow')}
                     blurb={
                         hasActiveSubscription
-                            ? 'Update your card, download invoices, or change the subscription in Stripe. Changes sync back here via webhooks.'
-                            : 'Add a payment method in Stripe before or after you upgrade. Subscription changes sync back here via webhooks.'
+                            ? t('pages.settings.panels.plan.payment_blurb_active')
+                            : t('pages.settings.panels.plan.payment_blurb_inactive')
                     }>
                     <div className="flex flex-wrap items-center justify-between gap-3 py-2">
                         <p className="text-xs leading-snug text-fg-muted">
                             {hasActiveSubscription
-                                ? 'Opens Stripe Customer Portal for this household.'
-                                : 'Creates a Stripe customer for this household if needed.'}
+                                ? t('pages.settings.panels.plan.portal_hint_active')
+                                : t('pages.settings.panels.plan.portal_hint_inactive')}
                         </p>
                         <Button
                             type="button"
@@ -2312,7 +2494,9 @@ export function PlanSettings() {
                             className="shrink-0 rounded-full font-mono text-[10px] tracking-widest uppercase"
                             disabled={busy}
                             onClick={() => openPortal.mutate()}>
-                            {openPortal.isPending ? '…' : 'Manage billing'}
+                            {openPortal.isPending
+                                ? '…'
+                                : t('pages.settings.panels.plan.manage_billing')}
                         </Button>
                     </div>
                 </SettingsInkCard>
@@ -2331,14 +2515,15 @@ export function PlanSettings() {
                 onConfirm={confirmPlanChange}
             />
             <StubNotice
+                prefix={t('ui.statusPage.scaffold')}
                 what={
                     isDemoAccount
-                        ? 'Demo account — plan is fixed for this persona. Sign up with your own email to change plans.'
+                        ? t('pages.settings.panels.plan.stub_demo')
                         : PREVIEW_MODE || freePlanSwitch
-                          ? 'Preview / bypass — plan switches are free (no Stripe Checkout).'
+                          ? t('pages.settings.panels.plan.stub_preview')
                           : billingUnavailable
-                            ? 'Stripe not configured — paid upgrades are locked. Households stay on Basic until billing is enabled.'
-                            : 'Upgrades charge now. Downgrades keep your current plan until the paid period ends. Manage card & invoices via Stripe Portal.'
+                            ? t('pages.settings.panels.plan.stub_stripe')
+                            : t('pages.settings.panels.plan.stub_billing')
                 }
             />
         </SettingsPanel>
@@ -2346,6 +2531,7 @@ export function PlanSettings() {
 }
 
 export function ExportSettings() {
+    const t = useTranslations();
     const { householdId } = useAuth();
     const { showToast, period } = useAppShell();
     const live = isLiveData(householdId);
@@ -2381,11 +2567,21 @@ export function ExportSettings() {
                 'text/csv;charset=utf-8'
             );
             showToast(
-                `${rows.length} transaction${rows.length === 1 ? '' : 's'} exported${periodOnly ? ` for ${periodKey}` : ''}`,
+                t(
+                    rows.length === 1
+                        ? 'pages.settings.toasts.csv_exported_one'
+                        : 'pages.settings.toasts.csv_exported_other',
+                    {
+                        count: String(rows.length),
+                        periodSuffix: periodOnly
+                            ? t('pages.settings.toasts.csv_period_suffix', { period: periodKey })
+                            : '',
+                    }
+                ),
                 'success'
             );
         } catch {
-            showToast('CSV export failed', 'error');
+            showToast(t('pages.settings.toasts.csv_failed'), 'error');
         } finally {
             setBusy(null);
         }
@@ -2423,44 +2619,79 @@ export function ExportSettings() {
                 JSON.stringify(payload, null, 2),
                 'application/json'
             );
-            showToast('Full export downloaded', 'success');
+            showToast(t('pages.settings.toasts.export_ok'), 'success');
         } catch {
-            showToast('JSON export failed', 'error');
+            showToast(t('pages.settings.toasts.json_failed'), 'error');
         } finally {
             setBusy(null);
         }
     }
 
+    const periodKey = toPeriodKey(period.year, period.month);
+
     const sheets = [
-        { name: 'Jars', rows: '6 rows', cols: 'key · name · % · allocated', fullOnly: true },
-        { name: 'Income', rows: 'sources', cols: 'label · amount · kind', fullOnly: true },
-        { name: 'Fixed costs', rows: 'recurring', cols: 'name · amount · jar', fullOnly: true },
         {
-            name: 'Transactions',
-            rows: scope === 'month' ? 'this month' : 'ledger',
-            cols: 'date · desc · amount · jar',
+            name: t('pages.settings.panels.export.sheet_jars'),
+            rows: t('pages.settings.panels.export.sheet_jars_rows'),
+            cols: t('pages.settings.panels.export.sheet_jars_cols'),
+            fullOnly: true,
+        },
+        {
+            name: t('pages.settings.panels.export.sheet_income'),
+            rows: t('pages.settings.panels.export.sheet_income_rows'),
+            cols: t('pages.settings.panels.export.sheet_income_cols'),
+            fullOnly: true,
+        },
+        {
+            name: t('pages.settings.panels.export.sheet_fixed'),
+            rows: t('pages.settings.panels.export.sheet_fixed_rows'),
+            cols: t('pages.settings.panels.export.sheet_fixed_cols'),
+            fullOnly: true,
+        },
+        {
+            name: t('pages.settings.panels.export.sheet_transactions'),
+            rows:
+                scope === 'month'
+                    ? t('pages.settings.panels.export.sheet_transactions_rows_month')
+                    : t('pages.settings.panels.export.sheet_transactions_rows_ledger'),
+            cols: t('pages.settings.panels.export.sheet_transactions_cols'),
             fullOnly: false,
         },
-        { name: 'Debts', rows: 'balances', cols: 'name · rate · balance', fullOnly: true },
-        { name: 'Goals', rows: 'targets', cols: 'name · target · jar', fullOnly: true },
-        { name: 'Rules', rows: 'automation', cols: 'match · jar · priority', fullOnly: true },
+        {
+            name: t('pages.settings.panels.export.sheet_debts'),
+            rows: t('pages.settings.panels.export.sheet_debts_rows'),
+            cols: t('pages.settings.panels.export.sheet_debts_cols'),
+            fullOnly: true,
+        },
+        {
+            name: t('pages.settings.panels.export.sheet_goals'),
+            rows: t('pages.settings.panels.export.sheet_goals_rows'),
+            cols: t('pages.settings.panels.export.sheet_goals_cols'),
+            fullOnly: true,
+        },
+        {
+            name: t('pages.settings.panels.export.sheet_rules'),
+            rows: t('pages.settings.panels.export.sheet_rules_rows'),
+            cols: t('pages.settings.panels.export.sheet_rules_cols'),
+            fullOnly: true,
+        },
     ];
 
     const scopes = [
         {
             key: 'all' as const,
-            label: 'Everything',
-            desc: 'Every sheet in one JSON file',
+            label: t('pages.settings.panels.export.scope_everything'),
+            desc: t('pages.settings.panels.export.scope_everything_desc'),
         },
         {
             key: 'tx' as const,
-            label: 'Transactions only',
-            desc: 'All transactions as CSV',
+            label: t('pages.settings.panels.export.scope_tx'),
+            desc: t('pages.settings.panels.export.scope_tx_desc'),
         },
         {
             key: 'month' as const,
-            label: 'This month only',
-            desc: `Transactions for ${toPeriodKey(period.year, period.month)}`,
+            label: t('pages.settings.panels.export.this_month'),
+            desc: t('pages.settings.panels.export.scope_month_desc', { period: periodKey }),
         },
     ];
 
@@ -2469,11 +2700,11 @@ export function ExportSettings() {
     return (
         <SettingsPanel>
             <SettingsInkCard
-                eyebrow="Everything to Excel or CSV"
-                blurb="One file with a tab per subject — jars, income, fixed costs, transactions, debts, what you own, goals. Handy for your accountant, an administrator, or your own archive.">
+                eyebrow={t('pages.settings.panels.export.eyebrow')}
+                blurb={t('pages.settings.panels.export.blurb')}>
                 <div className="grid gap-2.5 border-b border-line py-2.5">
                     <p className="font-mono text-[9px] font-medium tracking-[0.14em] text-fg-faint uppercase">
-                        What goes in
+                        {t('pages.settings.panels.export.what_goes_in')}
                     </p>
                     <div className="grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-2.5">
                         {scopes.map(option => {
@@ -2514,7 +2745,7 @@ export function ExportSettings() {
 
                 <div className="grid gap-1.5 border-b border-line py-2.5">
                     <p className="font-mono text-[9px] font-medium tracking-[0.14em] text-fg-faint uppercase">
-                        Tabs in the file
+                        {t('pages.settings.panels.export.tabs_heading')}
                     </p>
                     <div className="grid gap-1">
                         {visibleSheets.map(sh => (
@@ -2541,12 +2772,9 @@ export function ExportSettings() {
                             className="min-w-0 flex-1 rounded-full font-mono text-[10.5px] tracking-[0.13em] uppercase sm:min-w-[190px]"
                             disabled={!live || busy !== null}
                             onClick={() => {
-                                showToast(
-                                    'Excel multi-sheet export coming soon — use CSV or JSON for now.',
-                                    'info'
-                                );
+                                showToast(t('pages.settings.panels.export.excel_coming'), 'info');
                             }}>
-                            Download Excel (.xls)
+                            {t('pages.settings.panels.export.download_excel')}
                         </Button>
                         <Button
                             variant="secondary"
@@ -2556,14 +2784,22 @@ export function ExportSettings() {
                                 if (scope === 'all') void exportJson();
                                 else void exportCsv(scope === 'month');
                             }}>
-                            {busy ? 'Working…' : scope === 'all' ? 'Download JSON' : 'Download CSV'}
+                            {busy
+                                ? t('pages.settings.working')
+                                : scope === 'all'
+                                  ? t('pages.settings.panels.export.download_json')
+                                  : t('pages.settings.panels.export.download_csv')}
                         </Button>
                     </div>
                     <p className="font-mono text-[10.5px] leading-relaxed text-pretty text-fg-muted">
-                        Excel with a real tab per subject is coming. JSON is the full archive; CSV
-                        is transactions only — pick this month when you want the current period.
+                        {t('pages.settings.panels.export.format_note')}
                     </p>
-                    {!live ? <StubNotice what="Sign in to download exports." /> : null}
+                    {!live ? (
+                        <StubNotice
+                            prefix={t('ui.statusPage.scaffold')}
+                            what={t('pages.settings.panels.export.sign_in_stub')}
+                        />
+                    ) : null}
                 </div>
             </SettingsInkCard>
         </SettingsPanel>

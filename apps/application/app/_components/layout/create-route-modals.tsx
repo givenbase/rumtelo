@@ -41,7 +41,7 @@ export function TxCreateModalShell({
 }) {
     const meta = formRoute('txCreate');
     return (
-        <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
+        <RouteModalShell closeHref={closeHref} meta={meta}>
             <ExpenseCreatePage
                 embedded
                 defaultJarId={defaultJarId}
@@ -55,7 +55,7 @@ export function TxCreateModalShell({
 export function TxUpdateModalShell({ closeHref, id }: ShellProps & { id: string }) {
     const meta = formRoute('txUpdate');
     return (
-        <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
+        <RouteModalShell closeHref={closeHref} meta={meta}>
             <ExpenseUpdatePage id={id} embedded />
         </RouteModalShell>
     );
@@ -67,7 +67,7 @@ export function FixedCostCreateModalShell({
 }: ShellProps & { defaultValues?: FixedCostCreatePrefill }) {
     const meta = formRoute('fixedCreate');
     return (
-        <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
+        <RouteModalShell closeHref={closeHref} meta={meta}>
             <FixedCostCreatePage embedded defaultValues={defaultValues} />
         </RouteModalShell>
     );
@@ -76,7 +76,7 @@ export function FixedCostCreateModalShell({
 export function FixedCostUpdateModalShell({ closeHref, id }: ShellProps & { id: string }) {
     const meta = formRoute('fixedUpdate');
     return (
-        <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
+        <RouteModalShell closeHref={closeHref} meta={meta}>
             <FixedCostUpdatePage id={id} embedded />
         </RouteModalShell>
     );
@@ -85,7 +85,7 @@ export function FixedCostUpdateModalShell({ closeHref, id }: ShellProps & { id: 
 export function DebtCreateModalShell({ closeHref }: ShellProps) {
     const meta = formRoute('debtCreate');
     return (
-        <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
+        <RouteModalShell closeHref={closeHref} meta={meta}>
             <DebtCreatePage embedded />
         </RouteModalShell>
     );
@@ -94,7 +94,7 @@ export function DebtCreateModalShell({ closeHref }: ShellProps) {
 export function DebtUpdateModalShell({ closeHref, id }: ShellProps & { id: string }) {
     const meta = formRoute('debtUpdate');
     return (
-        <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
+        <RouteModalShell closeHref={closeHref} meta={meta}>
             <DebtUpdatePage id={id} embedded />
         </RouteModalShell>
     );
@@ -103,7 +103,7 @@ export function DebtUpdateModalShell({ closeHref, id }: ShellProps & { id: strin
 export function IncomeCreateModalShell({ closeHref }: ShellProps) {
     const meta = formRoute('incomeCreate');
     return (
-        <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
+        <RouteModalShell closeHref={closeHref} meta={meta}>
             <IncomeCreatePage embedded />
         </RouteModalShell>
     );
@@ -112,7 +112,7 @@ export function IncomeCreateModalShell({ closeHref }: ShellProps) {
 export function IncomeUpdateModalShell({ closeHref, id }: ShellProps & { id: string }) {
     const meta = formRoute('incomeUpdate');
     return (
-        <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
+        <RouteModalShell closeHref={closeHref} meta={meta}>
             <IncomeUpdatePage id={id} embedded />
         </RouteModalShell>
     );
@@ -125,7 +125,7 @@ export function GoalCreateModalShell({
 }: ShellProps & { defaultKind?: GoalKind; defaultJarId?: string }) {
     const meta = formRoute('goalCreate');
     return (
-        <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
+        <RouteModalShell closeHref={closeHref} meta={meta}>
             <GoalCreatePage embedded defaultKind={defaultKind} defaultJarId={defaultJarId} />
         </RouteModalShell>
     );
@@ -134,7 +134,7 @@ export function GoalCreateModalShell({
 export function GoalUpdateModalShell({ closeHref, id }: ShellProps & { id: string }) {
     const meta = formRoute('goalUpdate');
     return (
-        <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
+        <RouteModalShell closeHref={closeHref} meta={meta}>
             <GoalUpdatePage id={id} embedded />
         </RouteModalShell>
     );
@@ -146,7 +146,7 @@ export function AssetCreateModalShell({
 }: ShellProps & { lockedKind?: string }) {
     const meta = formRoute('assetCreate');
     return (
-        <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
+        <RouteModalShell closeHref={closeHref} meta={meta}>
             <AssetForm embedded lockedKind={lockedKind} />
         </RouteModalShell>
     );
@@ -155,7 +155,7 @@ export function AssetCreateModalShell({
 export function AssetUpdateModalShell({ closeHref, id }: ShellProps & { id: string }) {
     const meta = formRoute('assetUpdate');
     return (
-        <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
+        <RouteModalShell closeHref={closeHref} meta={meta}>
             <AssetUpdatePage id={id} embedded />
         </RouteModalShell>
     );
@@ -164,7 +164,7 @@ export function AssetUpdateModalShell({ closeHref, id }: ShellProps & { id: stri
 export function SessionCreateModalShell({ closeHref }: ShellProps) {
     const meta = formRoute('sessionCreate');
     return (
-        <RouteModalShell closeHref={closeHref} title={meta.title} description={meta.description}>
+        <RouteModalShell closeHref={closeHref} meta={meta}>
             <SheetStubForm kind="session" mode="create" embedded />
         </RouteModalShell>
     );
@@ -176,11 +176,7 @@ export function MoveMoneyCreateModalShell({
 }: ShellProps & { defaultFromJarId?: string }) {
     const meta = moveCreateMeta(defaultFromJarId);
     return (
-        <RouteModalShell
-            closeHref={closeHref}
-            width={meta.width ?? 'wide'}
-            title={meta.title}
-            description={meta.description}>
+        <RouteModalShell closeHref={closeHref} meta={meta}>
             <MoveMoneyForm embedded defaultFromJarId={defaultFromJarId} />
         </RouteModalShell>
     );

@@ -1,0 +1,45 @@
+/** App navigation labels — resolve with `t(labelKey)` in the shell. */
+const nav = {
+    groups: {
+        home: 'Home',
+        money: 'My money',
+        growth: 'My growth',
+        energy: 'My energy',
+        soul: 'My soul',
+    },
+    pills: {
+        home: 'Home',
+        money: 'Money',
+        growth: 'Growth',
+        energy: 'Energy',
+        soul: 'Soul',
+    },
+    children: {
+        home_overview: 'Overview',
+        coach: 'The Coach',
+        why: 'Why',
+        money_overview: 'Overview',
+        jars: 'Jars',
+        transactions: 'Transactions',
+        debt: 'Debt',
+        fixed_costs: 'Fixed costs',
+        growth_overview: 'Overview',
+        goals: 'Goals',
+        income: 'Income',
+        learn: 'Learn',
+        net_worth: 'Net worth',
+        energy_overview: 'Overview',
+        week: 'Week',
+        sleep: 'Sleep',
+        training: 'Training',
+        food: 'Food',
+        soul_overview: 'Overview',
+        stillness: 'Stillness',
+        gratitude: 'Gratitude',
+        giving: 'Giving',
+        intent: 'Intent',
+        centres: 'Centres',
+    },
+} as const;
+
+export default nav;

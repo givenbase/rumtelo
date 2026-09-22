@@ -1,6 +1,7 @@
 'use client';
 
 import type { JarBalance } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
 import { cn, jarCoverage } from '@rumtelo/utils';
 
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
@@ -19,9 +20,6 @@ type JarCoverageStripProps = Pick<JarBalance, 'allocated' | 'spent' | 'committed
     showCommitted?: boolean;
 };
 
-const DEFAULT_BILLS_FOOTNOTE =
-    'Available = allocated + added − spent − fixed. Booking the same bill as a transaction and a fixed cost will count twice until payments are linked.';
-
 /** Hero available figure + bar + optional three-stat strip for jar detail. */
 export function JarCoverageStrip({
     allocated,
@@ -33,6 +31,7 @@ export function JarCoverageStrip({
     showCommitted = true,
     footnote,
 }: JarCoverageStripProps) {
+    const t = useTranslations('features.money.jar_coverage');
     const { formatMoney } = useHouseholdCurrency();
     const committed = showCommitted ? committedOut : 0;
     const coverage = jarCoverage({ allocated, spent, credited, committedOut: committed });
@@ -42,8 +41,8 @@ export function JarCoverageStrip({
         footnote !== undefined
             ? footnote
             : showCommitted
-              ? DEFAULT_BILLS_FOOTNOTE
-              : 'Available = allocated + added − spent.';
+              ? t('footnote_bills')
+              : t('footnote_simple');
 
     return (
         <div
@@ -59,10 +58,13 @@ export function JarCoverageStrip({
                         {formatMoney(coverage.available)}
                     </span>
                     <span className="font-mono text-xs font-medium text-fg-faint">
-                        available of {formatMoney(envelope)}
+                        {t('available_of', { amount: formatMoney(envelope) })}
                         {credited > 0
-                            ? ` (${formatMoney(allocated)} + ${formatMoney(credited)} added)`
-                            : ' allocated'}
+                            ? t('added_breakdown', {
+                                  allocated: formatMoney(allocated),
+                                  added: formatMoney(credited),
+                              })
+                            : t('allocated_only')}
                     </span>
                 </div>
 
@@ -81,12 +83,12 @@ export function JarCoverageStrip({
                             'grid gap-3 sm:grid-cols-2',
                             showCommitted ? 'lg:grid-cols-4' : 'lg:grid-cols-3'
                         )}>
-                        <CoverageStat label="Allocated" value={allocated} />
-                        <CoverageStat label="Added" value={credited} />
+                        <CoverageStat label={t('allocated')} value={allocated} />
+                        <CoverageStat label={t('added')} value={credited} />
                         {showCommitted ? (
-                            <CoverageStat label="Fixed (committed)" value={committedOut} />
+                            <CoverageStat label={t('fixed_committed')} value={committedOut} />
                         ) : null}
-                        <CoverageStat label="Spent" value={spent} />
+                        <CoverageStat label={t('spent')} value={spent} />
                     </div>
                 ) : null}
 

@@ -2,7 +2,7 @@
 
 import { Suspense, type ReactNode } from 'react';
 
-import { ThemeProvider } from '@rumtelo/ui';
+import { ThemeProvider, Toaster } from '@rumtelo/ui';
 
 import { AccountThemeProvider } from '@/app/_components/account-theme-sync';
 import { MarketingSessionProvider } from '@/app/_components/marketing-session-provider';
@@ -21,6 +21,7 @@ export function Providers({ children }: { children: ReactNode }) {
                     </AccountThemeProvider>
                 </MarketingSessionProvider>
             </Suspense>
+            <Toaster />
         </ThemeProvider>
     );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import {
     Button,
     Dialog,
@@ -10,7 +11,7 @@ import {
     DialogTitle,
 } from '@rumtelo/ui';
 
-import { PLAN_LABELS, type PlanChangeDiff } from '@/app/_lib/plan';
+import { planLabel, type PlanChangeDiff } from '@/app/_lib/plan';
 
 type PlanChangeDialogProps = {
     open: boolean;
@@ -26,11 +27,11 @@ type PlanChangeDialogProps = {
     onConfirm: () => void;
 };
 
-function formatPeriodEnd(iso: string | null | undefined): string | null {
+function formatPeriodEnd(iso: string | null | undefined, locale: string): string | null {
     if (!iso) return null;
     const date = new Date(iso);
     if (Number.isNaN(date.getTime())) return null;
-    return date.toLocaleDateString(undefined, {
+    return date.toLocaleDateString(locale, {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
@@ -83,48 +84,63 @@ export function PlanChangeDialog({
     onOpenChange,
     onConfirm,
 }: PlanChangeDialogProps) {
+    const t = useTranslations();
+    const tp = useTranslations('pages.settings.plan');
+    const locale = useLocale();
+
     if (!diff) return null;
 
-    const toLabel = PLAN_LABELS[diff.to];
-    const fromLabel = PLAN_LABELS[diff.from];
+    const toLabel = planLabel(diff.to, t);
+    const fromLabel = planLabel(diff.from, t);
     const upgrading = diff.direction === 'upgrade';
-    const endsLabel = formatPeriodEnd(periodEndsAt);
+    const endsLabel = formatPeriodEnd(periodEndsAt, locale);
+    const periodFallback = tp('period_end_fallback');
 
     const confirmLabel = busy
         ? '…'
         : stripeCheckout
-          ? `Continue to pay — ${toLabel}`
+          ? tp('confirm_stripe', { plan: toLabel })
           : upgrading
-            ? `Upgrade to ${toLabel}`
+            ? tp('confirm_upgrade', { plan: toLabel })
             : periodEndDowngrade
-              ? `Schedule ${toLabel}`
-              : `Downgrade to ${toLabel}`;
+              ? tp('confirm_schedule', { plan: toLabel })
+              : tp('confirm_downgrade', { plan: toLabel });
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-h-none sm:max-w-xl sm:overflow-visible">
+            <DialogContent
+                className="max-h-[90dvh] overflow-y-auto sm:max-h-none sm:max-w-xl sm:overflow-visible"
+                closeLabel={t('ui.button.actions.close')}>
                 <DialogHeader>
                     <DialogTitle>
-                        {upgrading ? `Upgrade to ${toLabel}?` : `Downgrade to ${toLabel}?`}
+                        {upgrading
+                            ? tp('upgrade_title', { plan: toLabel })
+                            : tp('downgrade_title', { plan: toLabel })}
                     </DialogTitle>
                     <DialogDescription>
                         {upgrading
                             ? stripeCheckout
-                                ? `You are moving from ${fromLabel} to ${toLabel}. You will be charged now for the billing period — that period is paid through until it ends.`
-                                : `You are moving from ${fromLabel} to ${toLabel}. Review what unlocks before you continue.`
+                                ? tp('desc_upgrade_stripe', { from: fromLabel, to: toLabel })
+                                : tp('desc_upgrade', { from: fromLabel, to: toLabel })
                             : periodEndDowngrade
-                              ? `You keep ${fromLabel} until ${endsLabel ?? 'the end of your billing period'}. Then you move to ${toLabel}. No refund for unused days — your data stays.`
-                              : `You are moving from ${fromLabel} to ${toLabel}. Features below will be disabled until you upgrade again — your data stays.`}
+                              ? tp('desc_downgrade_period', {
+                                    from: fromLabel,
+                                    to: toLabel,
+                                    ends: endsLabel ?? periodFallback,
+                                })
+                              : tp('desc_downgrade', { from: fromLabel, to: toLabel })}
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="grid gap-3 py-1 sm:gap-4">
-                    <ChangeList title="You unlock" tone="gain" items={diff.gained} />
+                    <ChangeList title={tp('unlock')} tone="gain" items={diff.gained} />
                     <ChangeList
                         title={
                             periodEndDowngrade
-                                ? `Disabled after ${endsLabel ?? 'period end'}`
-                                : 'Disabled on this plan'
+                                ? tp('disabled_after', {
+                                      date: endsLabel ?? tp('period_end_short'),
+                                  })
+                                : tp('disabled_on_plan')
                         }
                         tone="loss"
                         items={diff.lost}
@@ -133,7 +149,7 @@ export function PlanChangeDialog({
                     {diff.limitChanges.length > 0 ? (
                         <div className="grid gap-1.5">
                             <p className="font-mono text-[10px] font-medium tracking-widest text-fg-muted uppercase">
-                                Limits
+                                {tp('limits')}
                             </p>
                             <ul className="grid gap-1">
                                 {diff.limitChanges.map(change => (
@@ -161,16 +177,15 @@ export function PlanChangeDialog({
 
                     {upgrading && stripeCheckout ? (
                         <p className="rounded-md border border-line bg-surface px-2.5 py-2 text-xs leading-snug text-fg-secondary">
-                            After you pay, {toLabel} unlocks immediately. If you later downgrade,
-                            you keep {toLabel} until the paid period ends.
+                            {tp('after_pay_note', { plan: toLabel })}
                         </p>
                     ) : null}
 
                     {!upgrading ? (
                         <p className="rounded-md border border-line bg-surface px-2.5 py-2 text-xs leading-snug text-fg-secondary">
                             {periodEndDowngrade
-                                ? 'Nothing is deleted. You will not be charged again for the higher plan after this period.'
-                                : 'Nothing you have entered is deleted. Gated screens and actions stay locked until you return to a higher plan.'}
+                                ? tp('downgrade_period_note')
+                                : tp('downgrade_lock_note')}
                         </p>
                     ) : null}
                 </div>
@@ -181,7 +196,7 @@ export function PlanChangeDialog({
                         variant="ghost"
                         disabled={busy}
                         onClick={() => onOpenChange(false)}>
-                        Cancel
+                        {t('ui.button.actions.cancel')}
                     </Button>
                     <Button
                         type="button"

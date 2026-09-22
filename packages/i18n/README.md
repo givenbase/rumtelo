@@ -2,17 +2,19 @@
 
 Internationalization for Rumtelo: `next-intl` + TypeScript sources under `translations/` → generated JSON in `languages/`.
 
+**Locale list:** contracts `Locale` in `@rumtelo/contracts` (`common.enums`) — single source of truth. Intl tags are `Lowercase<Locale>`.
+
 ## Source of truth
 
 - **Edit copy only** under [`translations/`](./translations/) (`common/`, `ui/`, `features/`, `pages/`).
-- **Do not hand-edit** [`languages/*.json`](./languages/) as the long-term workflow — they are generated. A one-time Dutch seed may exist until DeepL is wired.
+- **Do not hand-edit** [`languages/*.json`](./languages/) — they are generated.
 - After changing `translations/`, run:
 
 ```bash
-pnpm --filter @rumtelo/i18n generate
+pnpm i18n:gen
 ```
 
-That rebuilds `languages/en.json` and fills **missing** keys in other locales from English (no DeepL API calls).
+That rebuilds `languages/en.json`, fills missing keys for other locales from English, then DeepL-translates leaves still identical to EN (`DEEPL_API_KEY` in `packages/i18n/.env`). JSON-only: `pnpm i18n:generate`.
 
 ## Usage
 
@@ -26,10 +28,9 @@ t('features.brand.tagline');
 
 Apps load messages via `i18n/request.ts` + `next-intl` plugin (see `apps/application/i18n/request.ts`).
 
-Brand lockups that are not yet on `useTranslations` can import `BRAND_TAGLINE` / `AUTH_QUOTES` — those re-export from the same `translations/` modules.
+## Status
 
-## Scope
-
-**In scope:** next-intl routing helpers, locale metadata, common action/status/message, ui button/form, Rumtelo brand + auth + shell/onboarding/dashboard. **EN first, NL second.**
-
-**Out of scope:** POS, shop, checkout, student portal, admin commerce, DeepL scripts, i18next mobile stacks, healthcare vocabulary.
+- **EN source of truth:** `translations/**/*.ts` → `pnpm i18n:gen`.
+- **Locales via DeepL:** `pnpm i18n:translate:locales` (or full `pnpm i18n:gen`).
+- **Wired:** Application and website UI chrome use `next-intl`.
+- **Still EN by design:** `@rumtelo/ui` defaults, API freeform fields, learn catalog merchants, Stripe catalog, throw messages.

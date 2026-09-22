@@ -14,16 +14,15 @@ import {
     Input,
 } from '@rumtelo/ui';
 
+import { useTranslations } from '@rumtelo/i18n';
+
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
+import { useApiError } from '@/app/_lib/api-error-messages';
+import { useAppShell } from '@/components/features/shell/app-shell-context';
 
-import {
-    ABOUT_ORDER,
-    aboutFields,
-    aboutLabel,
-    asLearnSkill,
-    type LearnSkill,
-} from './learn-catalog';
+import { ABOUT_ORDER, aboutFields, asLearnSkill, type LearnSkill } from './learn-catalog';
+import { useLearnCatalogLabels } from './learn-labels';
 
 type AddLearningDialogProps = {
     open: boolean;
@@ -47,14 +46,15 @@ export function AddLearningDialog({
     books,
     onPick,
 }: AddLearningDialogProps) {
+    const tLearn = useTranslations('features.growth.learn');
+    const tUi = useTranslations();
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent className="sm:max-w-lg" closeLabel={tUi('ui.button.actions.close')}>
                 <DialogHeader>
-                    <DialogTitle>Add learning</DialogTitle>
-                    <DialogDescription>
-                        Search by title. We save where to find it, not the book itself.
-                    </DialogDescription>
+                    <DialogTitle>{tLearn('add_learning')}</DialogTitle>
+                    <DialogDescription>{tLearn('add_learning_description')}</DialogDescription>
                 </DialogHeader>
                 {open ? (
                     <AddLearningForm
@@ -84,7 +84,11 @@ function AddLearningForm({
     onPick: (pieceKey: string, skill: LearnSkill) => void;
     onDone: () => void;
 }) {
+    const tLearn = useTranslations('features.growth.learn');
+    const labels = useLearnCatalogLabels();
     const queryClient = useQueryClient();
+    const { showToast } = useAppShell();
+    const apiError = useApiError();
     const [query, setQuery] = useState(initialQuery);
     const [about, setAbout] = useState('MIND');
     const [hits, setHits] = useState<LearnBookHit[]>([]);
@@ -96,6 +100,7 @@ function AddLearningForm({
             setHits(next);
             setSearched(true);
         },
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
     const add = useMutation({
         mutationFn: (input: LearnBookDraft) =>
@@ -107,6 +112,7 @@ function AddLearningForm({
             });
             onDone();
         },
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     function runSearch() {
@@ -138,15 +144,15 @@ function AddLearningForm({
                     type="search"
                     value={query}
                     onChange={event => setQuery(event.target.value)}
-                    placeholder="The 5 Love Languages"
-                    aria-label="Search the public catalog"
+                    placeholder={tLearn('search_catalog_placeholder')}
+                    aria-label={tLearn('search_catalog_aria')}
                     className="min-w-0 flex-1"
                 />
                 <Button
                     type="submit"
                     size="sm"
                     disabled={query.trim().length < 2 || search.isPending}>
-                    Search
+                    {tLearn('search')}
                 </Button>
             </form>
 
@@ -161,17 +167,15 @@ function AddLearningForm({
                                 ? 'rounded-full bg-accent-soft px-2.5 py-1 font-mono text-[11px] tracking-wide text-accent uppercase'
                                 : 'rounded-full px-2.5 py-1 font-mono text-[11px] tracking-wide text-fg-muted uppercase'
                         }>
-                        {aboutLabel(option)}
+                        {labels.aboutLabel(option)}
                     </button>
                 ))}
             </div>
 
             {search.isError ? (
-                <p className="text-sm text-danger">The catalog did not answer. Try again.</p>
+                <p className="text-sm text-danger">{tLearn('catalog_error')}</p>
             ) : null}
-            {add.isError ? (
-                <p className="text-sm text-danger">That title could not be saved.</p>
-            ) : null}
+            {add.isError ? <p className="text-sm text-danger">{tLearn('save_error')}</p> : null}
 
             {hits.length > 0 ? (
                 <ul className="grid max-h-72 gap-2 overflow-auto">
@@ -191,14 +195,14 @@ function AddLearningForm({
                                     </span>
                                 </span>
                                 <span className="flex-none font-mono text-[11px] tracking-wide text-accent uppercase">
-                                    Add
+                                    {tLearn('add_button')}
                                 </span>
                             </button>
                         </li>
                     ))}
                 </ul>
             ) : searched && !search.isPending ? (
-                <p className="text-sm text-fg-muted">Nothing under that name.</p>
+                <p className="text-sm text-fg-muted">{tLearn('nothing_found')}</p>
             ) : null}
         </div>
     );

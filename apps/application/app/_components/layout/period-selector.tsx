@@ -1,41 +1,26 @@
 'use client';
 
 import { useState } from 'react';
+import { useLocale } from 'next-intl';
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@rumtelo/ui';
+import { useTranslations } from '@rumtelo/i18n';
 import { cn, describePeriodTravel } from '@rumtelo/utils';
 
+import { formatPeriodTravelLabels } from '@/app/_lib/period-travel-i18n';
 import { useAppShell, type Period } from '@/components/features/shell/app-shell-context';
 
-const MONTHS_SHORT = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-] as const;
+function monthShort(period: Period, locale: string): string {
+    return new Intl.DateTimeFormat(locale, { month: 'short' }).format(
+        new Date(period.year, period.month - 1, 1)
+    );
+}
 
-const MONTHS_LONG = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-] as const;
+function monthLong(period: Period, locale: string): string {
+    return new Intl.DateTimeFormat(locale, { month: 'long' }).format(
+        new Date(period.year, period.month - 1, 1)
+    );
+}
 
 function encode(period: Period): string {
     return `${period.year}-${String(period.month).padStart(2, '0')}`;
@@ -70,15 +55,17 @@ function isBefore(left: Period, right: Period): boolean {
     return left.year < right.year || (left.year === right.year && left.month < right.month);
 }
 
-function labelShort(period: Period): string {
-    return `${MONTHS_SHORT[period.month - 1]} ${period.year}`;
+function labelShort(period: Period, locale: string): string {
+    return `${monthShort(period, locale)} ${period.year}`;
 }
 
 /**
- * Budget-period month picker — Galighticus PopoverMonthPicker pattern:
+ * Budget-period month picker:
  * hero read-out, quick jumps, year nav, 3×4 month grid.
  */
 export function PeriodSelector() {
+    const t = useTranslations('pages.shell');
+    const locale = useLocale();
     const { period, setPeriod } = useAppShell();
     const [open, setOpen] = useState(false);
     const [viewYear, setViewYear] = useState(period.year);
@@ -91,6 +78,7 @@ export function PeriodSelector() {
     const lastMonth = encode(shiftPeriod(current, -1));
     const nextMonth = encode(shiftPeriod(current, 1));
     const travel = describePeriodTravel(period);
+    const labels = formatPeriodTravelLabels(travel, t);
 
     function handleOpenChange(next: boolean) {
         setOpen(next);
@@ -114,15 +102,15 @@ export function PeriodSelector() {
         <DropdownMenu open={open} onOpenChange={handleOpenChange} modal={false}>
             <div className="relative flex items-center gap-2">
                 <span className="hidden font-mono text-[9.5px] font-medium tracking-[0.15em] text-fg-faint uppercase sm:inline">
-                    Period
+                    {t('period')}
                 </span>
                 <DropdownMenuTrigger asChild>
                     <button
                         type="button"
                         aria-label={
                             travel.direction === 'current'
-                                ? 'Select period'
-                                : `Select period, ${travel.relativeLabel}`
+                                ? t('period_select')
+                                : t('period_select_relative', { label: labels.relativeLabel })
                         }
                         aria-expanded={open}
                         className={cn(
@@ -147,10 +135,10 @@ export function PeriodSelector() {
                                   ? '↪'
                                   : '◇'}
                         </span>
-                        <span className="truncate">{labelShort(period)}</span>
+                        <span className="truncate">{labelShort(period, locale)}</span>
                         {travel.direction !== 'current' ? (
                             <span className="hidden truncate text-[9px] normal-case opacity-80 sm:inline">
-                                · {travel.relativeLabel}
+                                · {labels.relativeLabel}
                             </span>
                         ) : null}
                         <span className="text-[9px] opacity-70" aria-hidden>
@@ -180,22 +168,22 @@ export function PeriodSelector() {
                     />
                     <p className="text-[13px] text-fg-muted italic">
                         {travel.direction === 'current'
-                            ? 'This month'
+                            ? t('period_options.this_month')
                             : travel.direction === 'past'
-                              ? 'Looking back'
-                              : 'Looking ahead'}
+                              ? t('period_looking_back')
+                              : t('period_looking_ahead')}
                     </p>
                     <div className="mt-1.5 flex items-end gap-2.5">
                         <p className="font-display text-[34px] leading-none font-semibold tracking-tight text-fg">
-                            {MONTHS_SHORT[period.month - 1]}
+                            {monthShort(period, locale)}
                         </p>
                         <div className="mb-0.5 min-w-0">
                             <p className="text-sm leading-tight font-medium text-fg">
-                                {MONTHS_LONG[period.month - 1]}
+                                {monthLong(period, locale)}
                             </p>
                             <p className="text-xs leading-tight text-fg-muted">
                                 {period.year}
-                                {travel.direction !== 'current' ? ` · ${travel.relativeLabel}` : ''}
+                                {travel.direction !== 'current' ? ` · ${labels.relativeLabel}` : ''}
                             </p>
                         </div>
                     </div>
@@ -204,12 +192,12 @@ export function PeriodSelector() {
                 <div
                     className="flex flex-wrap items-center gap-1 border-b border-line px-3 py-2"
                     role="listbox"
-                    aria-label="Quick period">
+                    aria-label={t('period_quick')}>
                     {(
                         [
-                            { label: 'This month', key: thisMonth },
-                            { label: 'Last month', key: lastMonth },
-                            { label: 'Next month', key: nextMonth },
+                            { labelKey: 'period_options.this_month', key: thisMonth },
+                            { labelKey: 'period_options.last_month', key: lastMonth },
+                            { labelKey: 'period_options.next_month', key: nextMonth },
                         ] as const
                     ).map((option, index) => {
                         const selected = value === option.key;
@@ -231,7 +219,7 @@ export function PeriodSelector() {
                                             ? 'font-semibold text-accent'
                                             : 'text-fg-muted hover:text-fg'
                                     )}>
-                                    {option.label}
+                                    {t(option.labelKey)}
                                 </button>
                             </span>
                         );
@@ -242,7 +230,7 @@ export function PeriodSelector() {
                     <div className="mb-3 flex items-center gap-1">
                         <button
                             type="button"
-                            aria-label="Previous year"
+                            aria-label={t('period_prev_year')}
                             disabled={viewYear <= minYear}
                             onPointerDown={event => event.preventDefault()}
                             onClick={() => setViewYear(previous => Math.max(minYear, previous - 1))}
@@ -254,7 +242,7 @@ export function PeriodSelector() {
                         </p>
                         <button
                             type="button"
-                            aria-label="Next year"
+                            aria-label={t('period_next_year')}
                             disabled={viewYear >= maxYear}
                             onPointerDown={event => event.preventDefault()}
                             onClick={() => setViewYear(previous => Math.min(maxYear, previous + 1))}
@@ -263,13 +251,17 @@ export function PeriodSelector() {
                         </button>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-1" role="listbox" aria-label="Months">
-                        {MONTHS_SHORT.map((label, monthIndex) => {
+                    <div
+                        className="grid grid-cols-3 gap-1"
+                        role="listbox"
+                        aria-label={t('period_months')}>
+                        {Array.from({ length: 12 }, (_, monthIndex) => {
                             const next: Period = { year: viewYear, month: monthIndex + 1 };
                             const key = encode(next);
                             const selected = value === key;
                             const isCurrent = thisMonth === key;
                             const disabled = isBefore(next, floor) || isAfter(next, horizon);
+                            const label = monthShort(next, locale);
                             return (
                                 <button
                                     key={key}

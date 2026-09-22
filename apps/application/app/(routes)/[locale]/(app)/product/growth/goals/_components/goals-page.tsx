@@ -3,10 +3,12 @@
 import { apiQuery } from '@/app/_lib/api-hooks';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+import { useLocale } from 'next-intl';
 
 import type { Goal } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
+import { useTranslations, type TranslateFn } from '@rumtelo/i18n';
 import { AccentCard, Card, EmptyState, Meter, Typography } from '@rumtelo/ui';
 import {
     cn,
@@ -20,6 +22,7 @@ import {
 } from '@rumtelo/utils';
 
 import { CREATE_HREF, goalDetailHref } from '@/app/_lib/create-routes';
+import { formatPeriodTravelLabels } from '@/app/_lib/period-travel-i18n';
 import { isFocusSaveGoal, saveGoalRank } from '@/app/_lib/goal-focus';
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
 import { jarChrome } from '@/app/_lib/jar-meta';
@@ -37,45 +40,50 @@ type KindFilter = 'ALL' | GoalKind;
 /** Few goals → featured cards; more → grouped compact list. */
 const FEATURED_MAX = 2;
 
-const EN_MONTHS = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-] as const;
-
 const KIND_ORDER: GoalKind[] = [GoalKind.SAVE, GoalKind.EARN, GoalKind.GIVE];
 
-function eta(saved: number, target: number, monthlyContribution: number): string {
-    if (monthlyContribution <= 0) return 'Unknown';
+function formatMonthYear(iso: string | null | undefined, locale: string): string | null {
+    if (!iso) return null;
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) {
+        const [year, month] = iso.split('-').map(Number);
+        if (!year || !month) return null;
+        return new Intl.DateTimeFormat(locale, {
+            month: 'short',
+            year: 'numeric',
+        }).format(new Date(year, month - 1, 1));
+    }
+    return new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric' }).format(date);
+}
+
+function eta(
+    saved: number,
+    target: number,
+    monthlyContribution: number,
+    locale: string,
+    t: TranslateFn
+): string {
+    if (monthlyContribution <= 0) return t('progress_unknown');
     const months = Math.ceil((target - saved) / monthlyContribution);
     const date = new Date();
     date.setMonth(date.getMonth() + months);
-    return `${EN_MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+    return new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric' }).format(date);
 }
 
 function todayIso(): string {
     return new Date().toISOString().slice(0, 10);
 }
 
-function kindLabel(kind: GoalKind): string {
-    if (kind === GoalKind.EARN) return 'Earn';
-    if (kind === GoalKind.GIVE) return 'Give';
-    return 'Save';
+function kindLabel(kind: GoalKind, t: TranslateFn): string {
+    if (kind === GoalKind.EARN) return t('kind_earn');
+    if (kind === GoalKind.GIVE) return t('kind_give');
+    return t('kind_save');
 }
 
-function kindEyebrow(kind: GoalKind): string {
-    if (kind === GoalKind.EARN) return 'Earn · monthly net';
-    if (kind === GoalKind.GIVE) return 'Give · yearly pledge';
-    return 'Save · toward a jar';
+function kindEyebrow(kind: GoalKind, tDetail: TranslateFn): string {
+    if (kind === GoalKind.EARN) return tDetail('kind_earn');
+    if (kind === GoalKind.GIVE) return tDetail('kind_give');
+    return tDetail('kind_save');
 }
 
 function kindTint(kind: GoalKind): string {
@@ -97,11 +105,8 @@ type GoalProgress = {
     subline: string;
 };
 
-function formatReachedMonth(iso: string | null): string | null {
-    if (!iso) return null;
-    const [year, month] = iso.split('-').map(Number);
-    if (!year || !month) return null;
-    return `${EN_MONTHS[month - 1]} ${year}`;
+function formatReachedMonth(iso: string | null, locale: string): string | null {
+    return formatMonthYear(iso, locale);
 }
 
 function goalProgress(
@@ -109,11 +114,13 @@ function goalProgress(
     currentNet: number,
     tab: Tab,
     formatMoney: (amount: number) => string,
+    locale: string,
+    t: TranslateFn,
     projection?: GoalAtPeriod | null
 ): GoalProgress {
     const isEarn = goal.kind === GoalKind.EARN;
     const isGive = goal.kind === GoalKind.GIVE;
-    const reachedLabel = formatReachedMonth(projection?.reachedOn ?? null);
+    const reachedLabel = formatReachedMonth(projection?.reachedOn ?? null, locale);
     const traveling =
         projection !== null &&
         projection !== undefined &&
@@ -126,10 +133,12 @@ function goalProgress(
             progress: goal.target > 0 ? Math.min(1, earn.current / goal.target) : 0,
             subline:
                 tab === 'REACHED' && goal.fulfilledOn
-                    ? `Reached ${formatReachedMonth(goal.fulfilledOn) ?? goal.fulfilledOn}`
+                    ? t('progress_reached', {
+                          when: formatReachedMonth(goal.fulfilledOn, locale) ?? goal.fulfilledOn,
+                      })
                     : earn.reached
-                      ? 'Target met'
-                      : `${formatMoney(earn.remaining)} still to earn`,
+                      ? t('progress_target_met')
+                      : t('progress_earn_remaining', { amount: formatMoney(earn.remaining) }),
         };
     }
 
@@ -137,7 +146,7 @@ function goalProgress(
         return {
             current: projection.projectedSaved,
             progress: 1,
-            subline: `Reached ${reachedLabel} on this plan`,
+            subline: t('progress_reached_plan', { when: reachedLabel }),
         };
     }
 
@@ -148,26 +157,43 @@ function goalProgress(
             progress: goal.target > 0 ? Math.min(1, current / goal.target) : 0,
             subline:
                 tab === 'REACHED'
-                    ? `Pledge met${goal.fulfilledOn ? ` · ${formatReachedMonth(goal.fulfilledOn) ?? goal.fulfilledOn}` : ''}`
-                    : `${formatMoney(Math.max(0, goal.target - current))} left${
-                          goal.targetOn ? ` · by ${goal.targetOn.slice(0, 4)}` : ''
-                      }`,
+                    ? t('progress_pledge_met', {
+                          when: goal.fulfilledOn
+                              ? ` · ${formatReachedMonth(goal.fulfilledOn, locale) ?? goal.fulfilledOn}`
+                              : '',
+                      })
+                    : t('progress_pledge_left', {
+                          amount: formatMoney(Math.max(0, goal.target - current)),
+                          by: goal.targetOn
+                              ? t('progress_by_year', { year: goal.targetOn.slice(0, 4) })
+                              : '',
+                      }),
         };
     }
 
     const current = traveling ? (projection?.projectedSaved ?? goal.saved) : goal.saved;
-    const etaLabel = eta(goal.saved, goal.target, goal.monthlyContribution);
+    const etaLabel = eta(goal.saved, goal.target, goal.monthlyContribution, locale, t);
 
     return {
         current,
         progress: goal.target > 0 ? Math.min(1, current / goal.target) : 0,
         subline: traveling
-            ? `${formatMoney(goal.monthlyContribution)} /mo · reaches ${etaLabel}`
-            : `${formatMoney(goal.monthlyContribution)} /mo · by ${etaLabel}`,
+            ? t('progress_pace_reaches', {
+                  monthly: formatMoney(goal.monthlyContribution),
+                  date: etaLabel,
+              })
+            : t('progress_pace_by', {
+                  monthly: formatMoney(goal.monthlyContribution),
+                  date: etaLabel,
+              }),
     };
 }
 
 export function GoalsPageClient() {
+    const t = useTranslations('features.growth.goals');
+    const tDetail = useTranslations('features.growth.goals.detail');
+    const tShell = useTranslations('pages.shell');
+    const locale = useLocale();
     const { householdId } = useAuth();
     const { period } = useAppShell();
     const [tab, setTab] = useState<Tab>('ON_TRACK');
@@ -212,10 +238,11 @@ export function GoalsPageClient() {
     const goals = useMemo((): ReadonlyArray<Goal> => goalsQuery.data ?? [], [goalsQuery.data]);
 
     const travel = describePeriodTravel(period);
+    const travelLabels = formatPeriodTravelLabels(travel, tShell);
     const traveling = travel.direction !== 'current';
     const periodKey = toPeriodKey(period.year, period.month);
 
-    const projectionById = useMemo(() => {
+    const projectionById = (() => {
         if (!traveling) return new Map<string, GoalAtPeriod>();
         const rows = projectGoalsAtHorizon({
             monthsDelta: travel.monthsDelta,
@@ -236,43 +263,34 @@ export function GoalsPageClient() {
             })),
         });
         return new Map(rows.map(row => [row.goalId, row]));
-    }, [traveling, travel.monthsDelta, travel.direction, periodKey, goals, jarById]);
+    })();
 
-    const active = useMemo(
-        () =>
-            goals.filter(goal => {
-                const projected = projectionById.get(goal.id);
-                if (traveling && projected?.fulfilledByPeriod) return false;
-                if (goal.status === GoalStatus.ARCHIVED || goal.status === GoalStatus.REACHED)
-                    return false;
-                if (goal.kind === GoalKind.EARN) {
-                    return !earnGoalProgress({ target: goal.target, currentNet }).reached;
-                }
-                return goal.saved < goal.target;
-            }),
-        [goals, currentNet, projectionById, traveling]
-    );
-    const reached = useMemo(
-        () =>
-            goals.filter(goal => {
-                const projected = projectionById.get(goal.id);
-                if (traveling && projected?.fulfilledByPeriod) return true;
-                if (travel.direction === 'past') {
-                    return Boolean(projected?.fulfilledByPeriod);
-                }
-                if (goal.status === GoalStatus.REACHED) return true;
-                if (goal.kind === GoalKind.EARN) {
-                    return earnGoalProgress({ target: goal.target, currentNet }).reached;
-                }
-                return goal.saved >= goal.target;
-            }),
-        [goals, currentNet, projectionById, traveling, travel.direction]
-    );
+    const active = goals.filter(goal => {
+        const projected = projectionById.get(goal.id);
+        if (traveling && projected?.fulfilledByPeriod) return false;
+        if (goal.status === GoalStatus.ARCHIVED || goal.status === GoalStatus.REACHED) return false;
+        if (goal.kind === GoalKind.EARN) {
+            return !earnGoalProgress({ target: goal.target, currentNet }).reached;
+        }
+        return goal.saved < goal.target;
+    });
+    const reached = goals.filter(goal => {
+        const projected = projectionById.get(goal.id);
+        if (traveling && projected?.fulfilledByPeriod) return true;
+        if (travel.direction === 'past') {
+            return Boolean(projected?.fulfilledByPeriod);
+        }
+        if (goal.status === GoalStatus.REACHED) return true;
+        if (goal.kind === GoalKind.EARN) {
+            return earnGoalProgress({ target: goal.target, currentNet }).reached;
+        }
+        return goal.saved >= goal.target;
+    });
     const tabGoals = tab === 'ON_TRACK' ? active : reached;
 
     const kindsPresent = KIND_ORDER.filter(kind => tabGoals.some(goal => goal.kind === kind));
 
-    const saveJarKeys = useMemo(() => {
+    const saveJarKeys = (() => {
         const keys = new Set<string>();
         for (const goal of tabGoals) {
             if (goal.kind !== GoalKind.SAVE || !goal.jarId) continue;
@@ -280,7 +298,7 @@ export function GoalsPageClient() {
             if (jar) keys.add(jar.key);
         }
         return [...keys];
-    }, [tabGoals, jarById]);
+    })();
 
     const shown = tabGoals.filter(goal => {
         if (kindFilter !== 'ALL' && goal.kind !== kindFilter) return false;
@@ -318,21 +336,21 @@ export function GoalsPageClient() {
         <div className="grid animate-rise gap-8">
             <div>
                 <Typography as="span" variant="eyebrow" color="primary">
-                    ✦ GOALS
+                    {t('page_eyebrow')}
                 </Typography>
                 <Typography as="h1" className="mt-2">
-                    Every goal is a decision you&apos;ve already made.
+                    {t('page_title')}
                 </Typography>
                 <Typography as="p" variant="lead" size="default" className="mt-2">
                     {traveling
                         ? travel.direction === 'future'
-                            ? `Looking ahead ${travel.relativeLabel}. Goals that finish on this plan move to Reached, with the month they land.`
-                            : `Looking back ${travel.relativeLabel}. Only goals already fulfilled by then count as reached.`
-                        : 'Save toward a jar, raise what you earn, or keep a give pledge. Direction first — the number follows.'}
+                            ? t('page_lead_future', { label: travelLabels.relativeLabel })
+                            : t('page_lead_past', { label: travelLabels.relativeLabel })
+                        : t('page_lead')}
                 </Typography>
             </div>
 
-            <ListToolbar createLabel="+ Add goal" createHref={CREATE_HREF.goal}>
+            <ListToolbar createLabel={t('add_goal')} createHref={CREATE_HREF.goal}>
                 {(['ON_TRACK', 'REACHED'] as const).map(tabKey => {
                     const count = tabKey === 'ON_TRACK' ? active.length : reached.length;
                     return (
@@ -350,7 +368,7 @@ export function GoalsPageClient() {
                                     ? 'border-accent/40 bg-accent-soft text-accent'
                                     : 'border-line text-fg-muted hover:border-line-strong hover:text-fg'
                             )}>
-                            {tabKey === 'ON_TRACK' ? 'On track' : 'Reached'}
+                            {tabKey === 'ON_TRACK' ? t('tab_on_track') : t('tab_reached')}
                             <span className="opacity-70">{count}</span>
                         </button>
                     );
@@ -362,7 +380,7 @@ export function GoalsPageClient() {
                     {kindsPresent.length > 1
                         ? (['ALL', ...kindsPresent] as const).map(key => {
                               const on = kindFilter === key;
-                              const label = key === 'ALL' ? 'All' : kindLabel(key);
+                              const label = key === 'ALL' ? t('filter_all') : kindLabel(key, t);
                               const count =
                                   key === 'ALL'
                                       ? tabGoals.length
@@ -430,21 +448,32 @@ export function GoalsPageClient() {
             {shown.length === 0 ? (
                 <EmptyState
                     icon="🎯"
-                    title={tab === 'REACHED' ? 'Nothing reached yet.' : 'No goals here.'}
+                    title={tab === 'REACHED' ? t('reached_empty_title') : t('empty_title')}
                     body={
                         tab === 'REACHED'
-                            ? 'Keep going — your first touchdown is coming.'
+                            ? t('reached_empty_body')
                             : kindFilter !== 'ALL' || jarFilter
-                              ? 'Nothing in this filter. Try All, or add a goal.'
-                              : 'Add a goal to give yourself a finish line.'
+                              ? t('empty_filter_body')
+                              : t('empty_body')
                     }
                 />
             ) : featured ? (
                 <div className="grid gap-4 sm:grid-cols-2">
                     {shown.map(goal => {
                         const projection = traveling ? (projectionById.get(goal.id) ?? null) : null;
-                        const stats = goalProgress(goal, currentNet, tab, formatMoney, projection);
-                        const reachedLabel = formatReachedMonth(projection?.reachedOn ?? null);
+                        const stats = goalProgress(
+                            goal,
+                            currentNet,
+                            tab,
+                            formatMoney,
+                            locale,
+                            t,
+                            projection
+                        );
+                        const reachedLabel = formatReachedMonth(
+                            projection?.reachedOn ?? null,
+                            locale
+                        );
                         const jar = goal.jarId ? jarById.get(goal.jarId) : null;
                         const focus = isFocusSaveGoal(goal, goals);
                         const rank = saveGoalRank(goal, goals);
@@ -458,11 +487,11 @@ export function GoalsPageClient() {
                                     className="h-full transition-colors hover:border-accent-hover">
                                     <div className="flex flex-wrap items-center gap-2">
                                         <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-raised px-2.5 py-1 font-mono text-[10px] tracking-widest text-fg-secondary uppercase">
-                                            {kindIcon(goal)} {kindEyebrow(goal.kind)}
+                                            {kindIcon(goal)} {kindEyebrow(goal.kind, tDetail)}
                                         </span>
                                         {focus ? (
                                             <span className="inline-flex items-center rounded-full border border-accent/40 bg-accent-soft px-2.5 py-1 font-mono text-[10px] tracking-widest text-accent uppercase">
-                                                Focus
+                                                {t('focus')}
                                             </span>
                                         ) : rank !== null && rank > 1 ? (
                                             <span className="inline-flex items-center rounded-full border border-line bg-raised px-2.5 py-1 font-mono text-[10px] tracking-widest text-fg-faint uppercase">
@@ -471,7 +500,7 @@ export function GoalsPageClient() {
                                         ) : null}
                                         {projection?.fulfilledByPeriod && reachedLabel ? (
                                             <span className="inline-flex items-center rounded-full border border-success/40 bg-success/10 px-2.5 py-1 font-mono text-[10px] tracking-widest text-success uppercase">
-                                                Reached {reachedLabel}
+                                                {t('reached_badge', { when: reachedLabel })}
                                             </span>
                                         ) : null}
                                         {jar && goal.kind === GoalKind.SAVE ? (
@@ -494,8 +523,8 @@ export function GoalsPageClient() {
                                             {formatMoney(stats.current)}
                                         </span>
                                         <span className="font-mono text-xs text-fg-muted">
-                                            of {formatMoney(goal.target)}
-                                            {goal.kind === GoalKind.EARN ? ' /mo' : ''}
+                                            {t('of')} {formatMoney(goal.target)}
+                                            {goal.kind === GoalKind.EARN ? t('per_month') : ''}
                                         </span>
                                         <span className="ml-auto font-mono text-xs text-fg-faint">
                                             {Math.round(stats.progress * 100)}%
@@ -520,16 +549,19 @@ export function GoalsPageClient() {
                             <Card key={group.kind} className="p-0">
                                 <button
                                     type="button"
-                                    aria-label={`${kindLabel(group.kind)} goals (${group.items.length})`}
+                                    aria-label={t('group_aria', {
+                                        kind: kindLabel(group.kind, t),
+                                        count: group.items.length,
+                                    })}
                                     aria-expanded={open}
                                     onClick={() => toggleKind(group.kind)}
                                     className="flex w-full items-center justify-between gap-3 border-b border-line px-5 py-3.5 text-left hover:bg-raised/60">
                                     <div>
                                         <Typography as="span" variant="eyebrow" color="primary">
-                                            ✦ {kindLabel(group.kind).toUpperCase()}
+                                            ✦ {kindLabel(group.kind, t).toUpperCase()}
                                         </Typography>
                                         <p className="mt-0.5 font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                            {kindEyebrow(group.kind)}
+                                            {kindEyebrow(group.kind, tDetail)}
                                         </p>
                                     </div>
                                     <span className="flex items-center gap-2">
@@ -556,10 +588,13 @@ export function GoalsPageClient() {
                                                 currentNet,
                                                 tab,
                                                 formatMoney,
+                                                locale,
+                                                t,
                                                 projection
                                             );
                                             const reachedLabel = formatReachedMonth(
-                                                projection?.reachedOn ?? null
+                                                projection?.reachedOn ?? null,
+                                                locale
                                             );
                                             const jar = goal.jarId ? jarById.get(goal.jarId) : null;
                                             const pct = Math.round(stats.progress * 100);
@@ -581,7 +616,7 @@ export function GoalsPageClient() {
                                                                     {goal.name}
                                                                     {focus ? (
                                                                         <span className="ml-2 font-mono text-[10px] tracking-wide text-accent uppercase">
-                                                                            Focus
+                                                                            {t('focus')}
                                                                         </span>
                                                                     ) : rank !== null &&
                                                                       rank > 1 ? (
@@ -592,7 +627,9 @@ export function GoalsPageClient() {
                                                                     {projection?.fulfilledByPeriod &&
                                                                     reachedLabel ? (
                                                                         <span className="ml-2 font-mono text-[10px] tracking-wide text-success uppercase">
-                                                                            Reached {reachedLabel}
+                                                                            {t('reached_badge', {
+                                                                                when: reachedLabel,
+                                                                            })}
                                                                         </span>
                                                                     ) : null}
                                                                 </p>
@@ -611,9 +648,10 @@ export function GoalsPageClient() {
                                                                     {formatMoney(stats.current)}
                                                                 </p>
                                                                 <p className="font-mono text-[10px] text-fg-faint">
-                                                                    of {formatMoney(goal.target)}
+                                                                    {t('of')}{' '}
+                                                                    {formatMoney(goal.target)}
                                                                     {goal.kind === GoalKind.EARN
-                                                                        ? '/mo'
+                                                                        ? t('per_month')
                                                                         : ''}
                                                                 </p>
                                                             </div>

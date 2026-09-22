@@ -5,12 +5,19 @@ import { useMemo, useState } from 'react';
 
 import type { TimeEntry } from '@rumtelo/contracts';
 import { TIME_CATEGORY_ORDER, TimeCategory } from '@rumtelo/contracts';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Button, Input, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
+import { useApiError } from '@/app/_lib/api-error-messages';
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
-import { TIME_CATEGORY_META, formatMinutes } from '@/app/_lib/time-meta';
+import {
+    TIME_CATEGORY_META,
+    formatMinutes,
+    timeCategoryHint,
+    timeCategoryName,
+} from '@/app/_lib/time-meta';
 import { formatDayLabel, shiftDay, todayIso } from '@/app/_lib/week-key';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 
@@ -20,10 +27,15 @@ const EMPTY_DAY: HoursByCategory = Object.fromEntries(
     Object.values(TimeCategory).map(category => [category, ''])
 ) as HoursByCategory;
 
+type PresetKey = 'workday' | 'weekend';
+
 /** Starting points, not norms — every value is editable before saving. */
-const PRESETS: ReadonlyArray<{ name: string; hours: Partial<Record<TimeCategory, number>> }> = [
+const PRESETS: ReadonlyArray<{
+    key: PresetKey;
+    hours: Partial<Record<TimeCategory, number>>;
+}> = [
     {
-        name: 'Workday',
+        key: 'workday',
         hours: {
             [TimeCategory.SLEEP]: 7.5,
             [TimeCategory.PERSONAL_CARE]: 1.5,
@@ -37,7 +49,7 @@ const PRESETS: ReadonlyArray<{ name: string; hours: Partial<Record<TimeCategory,
         },
     },
     {
-        name: 'Weekend day',
+        key: 'weekend',
         hours: {
             [TimeCategory.SLEEP]: 8.5,
             [TimeCategory.PERSONAL_CARE]: 1.5,
@@ -82,6 +94,11 @@ type Props = {
  * round-trip so the diary is the source of truth.
  */
 export function DayLogForm({ householdId, entries, defaultOn, onSaved }: Props) {
+    const locale = useLocale();
+    const t = useTranslations();
+    const td = useTranslations('features.energy.week.day_log');
+    const tm = useTranslations('features.energy.week.meta');
+    const apiError = useApiError();
     const queryClient = useQueryClient();
     const { showToast } = useAppShell();
     const [on, setOn] = useState(defaultOn ?? todayIso);
@@ -118,11 +135,11 @@ export function DayLogForm({ householdId, entries, defaultOn, onSaved }: Props) 
                 queryClient.invalidateQueries({ queryKey: apiQuery.energy.dashboard.get.key() }),
             ]);
             setOverrides({});
-            showToast(`${formatDayLabel(on)} saved`, 'success');
+            showToast(td('toast_saved', { day: formatDayLabel(on, locale) }), 'success');
             onSaved?.(on);
         },
         onError: (error: Error) => {
-            showToast(error.message || 'Could not save this day', 'error');
+            showToast(apiError(error), 'error');
         },
     });
 
@@ -159,7 +176,7 @@ export function DayLogForm({ householdId, entries, defaultOn, onSaved }: Props) 
                         type="button"
                         size="sm"
                         variant="ghost"
-                        aria-label="Previous day"
+                        aria-label={td('prev_day')}
                         onClick={() => changeDay(shiftDay(on, -1))}>
                         ←
                     </Button>
@@ -167,7 +184,8 @@ export function DayLogForm({ householdId, entries, defaultOn, onSaved }: Props) 
                         type="date"
                         value={on}
                         max={todayIso()}
-                        aria-label="Day to log"
+                        aria-label={td('day_aria')}
+                        pickerAriaLabel={t('ui.form.aria.open_date_picker')}
                         onChange={event => changeDay(event.target.value)}
                         className="w-auto"
                     />
@@ -175,25 +193,29 @@ export function DayLogForm({ householdId, entries, defaultOn, onSaved }: Props) 
                         type="button"
                         size="sm"
                         variant="ghost"
-                        aria-label="Next day"
+                        aria-label={td('next_day')}
                         disabled={on >= todayIso()}
                         onClick={() => changeDay(shiftDay(on, 1))}>
                         →
                     </Button>
                     {hasExisting ? (
-                        <span className="font-mono text-xs text-fg-muted">logged · editing</span>
+                        <span className="font-mono text-xs text-fg-muted">
+                            {td('logged_editing')}
+                        </span>
                     ) : null}
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-xs text-fg-faint uppercase">Start from</span>
+                    <span className="font-mono text-xs text-fg-faint uppercase">
+                        {td('start_from')}
+                    </span>
                     {PRESETS.map(preset => (
                         <Button
-                            key={preset.name}
+                            key={preset.key}
                             type="button"
                             size="sm"
                             variant="secondary"
                             onClick={() => applyPreset(preset)}>
-                            {preset.name}
+                            {preset.key === 'workday' ? td('preset_workday') : td('preset_weekend')}
                         </Button>
                     ))}
                     <Button
@@ -201,7 +223,7 @@ export function DayLogForm({ householdId, entries, defaultOn, onSaved }: Props) 
                         size="sm"
                         variant="ghost"
                         onClick={() => setOverrides({ ...EMPTY_DAY })}>
-                        Clear
+                        {t('ui.button.actions.clear')}
                     </Button>
                 </div>
             </div>
@@ -218,7 +240,7 @@ export function DayLogForm({ householdId, entries, defaultOn, onSaved }: Props) 
                             className="grid gap-1.5 rounded-xl border border-line bg-raised p-3">
                             <span className="flex items-center gap-2 text-sm font-medium text-fg">
                                 <span aria-hidden>{meta.icon}</span>
-                                {meta.name}
+                                {timeCategoryName(tm, category)}
                             </span>
                             <span className="flex items-center gap-2">
                                 <Input
@@ -235,7 +257,9 @@ export function DayLogForm({ householdId, entries, defaultOn, onSaved }: Props) 
                                 />
                                 <span className="font-mono text-xs text-fg-faint">h</span>
                             </span>
-                            <span className="text-xs leading-snug text-fg-muted">{meta.hint}</span>
+                            <span className="text-xs leading-snug text-fg-muted">
+                                {timeCategoryHint(tm, category)}
+                            </span>
                         </label>
                     );
                 })}
@@ -248,17 +272,23 @@ export function DayLogForm({ householdId, entries, defaultOn, onSaved }: Props) 
                     size="sm"
                     className={cn(overDay ? 'text-danger' : 'text-fg-muted')}>
                     <span className="font-mono font-semibold text-fg tabular-nums">
-                        {formatMinutes(totalMinutes)}
+                        {formatMinutes(totalMinutes, t)}
                     </span>{' '}
-                    of 24h accounted for
+                    {td('total_suffix')}
                     {overDay
-                        ? ' — a day only has 24 hours'
+                        ? td('over_day')
                         : totalMinutes > 0 && totalMinutes < 1440
-                          ? ` · ${formatMinutes(1440 - totalMinutes)} unlogged`
+                          ? td('unlogged', {
+                                time: formatMinutes(1440 - totalMinutes, t),
+                            })
                           : ''}
                 </Typography>
                 <Button type="submit" disabled={overDay || saveMutation.isPending || !dirty}>
-                    {saveMutation.isPending ? 'Saving…' : hasExisting ? 'Update day' : 'Save day'}
+                    {saveMutation.isPending
+                        ? t('ui.form.saving')
+                        : hasExisting
+                          ? td('update_day')
+                          : td('save_day')}
                 </Button>
             </div>
         </form>

@@ -3,14 +3,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import type { TimeEntry, TimeTemplate } from '@rumtelo/contracts';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { cn } from '@rumtelo/utils';
 
+import { useApiError } from '@/app/_lib/api-error-messages';
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { formatDayLabel, shiftDay, todayIso } from '@/app/_lib/week-key';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 
-import { WEEKDAY_SHORT, finalizeDay, templateForDay } from './day-shape';
+import { finalizeDay, templateForDay, weekdayShort } from './day-shape';
 
 type Props = {
     householdId: string;
@@ -27,6 +29,10 @@ type Props = {
  * caught up in seconds; tapping a chip focuses that day in the check-in above.
  */
 export function CatchUpRow({ householdId, templates, entries, from, selected, onSelect }: Props) {
+    const locale = useLocale();
+    const tc = useTranslations('features.energy.week.catch_up');
+    const ts = useTranslations('features.energy.week.shape');
+    const apiError = useApiError();
     const queryClient = useQueryClient();
     const { showToast } = useAppShell();
     const today = todayIso();
@@ -35,7 +41,7 @@ export function CatchUpRow({ householdId, templates, entries, from, selected, on
     const typicalMutation = useMutation({
         mutationFn: (day: string) => {
             const owner = templateForDay(templates, day);
-            if (!owner) throw new Error('Set up your typical week first');
+            if (!owner) throw new Error(tc('setup_typical_week_first'));
             const full = finalizeDay(owner.defaults);
             return api.energy.time.create({
                 householdId,
@@ -55,12 +61,12 @@ export function CatchUpRow({ householdId, templates, entries, from, selected, on
                 queryClient.invalidateQueries({ queryKey: apiQuery.coach.feed.key() }),
                 queryClient.invalidateQueries({ queryKey: apiQuery.energy.dashboard.get.key() }),
             ]);
-            showToast(`${formatDayLabel(day)} logged as typical`, 'success');
+            showToast(tc('toast_typical', { day: formatDayLabel(day, locale) }), 'success');
         },
-        onError: (error: Error) => showToast(error.message || 'Could not log', 'error'),
+        onError: (error: Error) => showToast(apiError(error), 'error'),
     });
 
-    const days = WEEKDAY_SHORT.map((name, index) => {
+    const days = weekdayShort(ts).map((name, index) => {
         const iso = shiftDay(from, index);
         return { name, iso, logged: loggedDays.has(iso), future: iso > today };
     });
@@ -77,7 +83,13 @@ export function CatchUpRow({ householdId, templates, entries, from, selected, on
                                 type="button"
                                 disabled={day.future}
                                 aria-pressed={isSelected}
-                                aria-label={`${formatDayLabel(day.iso)}${day.logged ? ', logged' : day.future ? '' : ', not logged'}`}
+                                aria-label={`${formatDayLabel(day.iso, locale)}${
+                                    day.logged
+                                        ? tc('aria_logged')
+                                        : day.future
+                                          ? ''
+                                          : tc('aria_not_logged')
+                                }`}
                                 onClick={() => onSelect(day.iso)}
                                 className={cn(
                                     'grid h-12 place-items-center rounded-xl border font-mono text-xs transition-colors',
@@ -105,7 +117,7 @@ export function CatchUpRow({ householdId, templates, entries, from, selected, on
                                     disabled={typicalMutation.isPending}
                                     onClick={() => typicalMutation.mutate(day.iso)}
                                     className="font-mono text-[10px] text-fg-muted hover:text-fg disabled:opacity-50">
-                                    typical
+                                    {tc('typical')}
                                 </button>
                             ) : (
                                 <span className="h-[15px]" />
@@ -116,8 +128,11 @@ export function CatchUpRow({ householdId, templates, entries, from, selected, on
             </div>
             {missing > 0 ? (
                 <p className="font-mono text-xs text-fg-muted">
-                    {missing} {missing === 1 ? 'day' : 'days'} not logged — tap{' '}
-                    <span className="text-fg">typical</span> under a day to fill it in one go.
+                    {tc('missing_intro', {
+                        count: missing,
+                        unit: missing === 1 ? tc('missing_unit_one') : tc('missing_unit_many'),
+                    })}{' '}
+                    <span className="text-fg">{tc('typical')}</span> {tc('missing_outro')}
                 </p>
             ) : null}
         </div>

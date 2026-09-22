@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
 
 import { Typography } from '@rumtelo/ui';
+import { useTranslations } from '@rumtelo/i18n';
 
-import { PORTALS, PORTALS_SECTION } from '@/lib/landing-content';
+import { PORTALS } from '@/lib/landing-content';
 import { webSignUpPath, appSignInUrl } from '@/lib/portal-urls';
 import { isRegistrationOpen } from '@/lib/maintenance';
 
@@ -15,11 +16,19 @@ import { Cta, SectionHeading } from './landing-primitives';
 /** How long each portal stays on stage before the next one auto-advances. */
 const AUTO_ADVANCE_MS = 9000;
 
+const PORTAL_FEATURE_KEYS = {
+    money: ['f1', 'f2', 'f3', 'f4', 'f5'],
+    growth: ['f1', 'f2', 'f3', 'f4'],
+    energy: ['f1', 'f2', 'f3', 'f4'],
+    soul: ['f1', 'f2', 'f3', 'f4'],
+} as const;
+
 /**
  * Money is the door; the rest of the picture opens here.
  * One portal on stage at a time — the same "you are always inside exactly one" as the app.
  */
 export function LandingPortals() {
+    const t = useTranslations('pages.landing');
     const [index, setIndex] = useState(0);
     const [paused, setPaused] = useState(false);
     const [reducedMotion, setReducedMotion] = useState(false);
@@ -78,9 +87,9 @@ export function LandingPortals() {
     return (
         <section id="portals" className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-20">
             <SectionHeading
-                eyebrow={PORTALS_SECTION.eyebrow}
-                headline={PORTALS_SECTION.headline}
-                lead={PORTALS_SECTION.lead}
+                eyebrow={t('portals_section.eyebrow')}
+                headline={t('portals_section.headline')}
+                lead={t('portals_section.lead')}
                 headlineClassName="max-w-2xl"
             />
 
@@ -96,7 +105,7 @@ export function LandingPortals() {
                 {/* The switch — the same strip that sits at the top of the app, now live */}
                 <div
                     role="tablist"
-                    aria-label="Portals"
+                    aria-label={t('header.portals')}
                     tabIndex={-1}
                     onKeyDown={onKeyDown}
                     className="mt-8 inline-flex max-w-full flex-wrap gap-1 rounded-full border border-line bg-raised p-1">
@@ -124,7 +133,7 @@ export function LandingPortals() {
                                     className="size-1.5 rounded-full"
                                     style={{ background: item.colorVar }}
                                 />
-                                {item.name}
+                                {t(`portals.${item.key}.name`)}
                                 {active && showProgress ? (
                                     <span
                                         key={cycle}
@@ -161,13 +170,14 @@ export function LandingPortals() {
                                 variant="eyebrow"
                                 color="muted"
                                 className="text-fg-faint">
-                                {portal.dutch} · {index + 1} / {PORTALS.length}
+                                {t(`portals.${portal.key}.alt_name`)} · {index + 1} /{' '}
+                                {PORTALS.length}
                             </Typography>
                         </span>
 
                         <span className="grid gap-1.5">
                             <Typography as="h2" size="lg" weight="semibold">
-                                {portal.name}
+                                {t(`portals.${portal.key}.name`)}
                             </Typography>
                             <Typography
                                 as="h3"
@@ -175,18 +185,18 @@ export function LandingPortals() {
                                 weight="medium"
                                 className="leading-snug text-balance"
                                 style={{ color: portal.colorVar }}>
-                                {portal.hook}
+                                {t(`portals.${portal.key}.line`)}
                             </Typography>
                         </span>
 
                         <span className="font-mono text-xs font-medium tracking-wide text-fg-muted">
-                            {portal.question}
+                            {t(`portals.${portal.key}.question`)}
                         </span>
 
                         <ul className="grid gap-2.5 border-t border-line pt-4">
-                            {portal.features.map((feature, featureIndex) => (
+                            {PORTAL_FEATURE_KEYS[portal.key].map((featKey, featureIndex) => (
                                 <li
-                                    key={feature}
+                                    key={featKey}
                                     className="flex animate-[demoRow_360ms_var(--ease-out)_both] items-baseline gap-2.5 text-sm leading-snug text-fg-secondary"
                                     style={{ animationDelay: `${120 + featureIndex * 70}ms` }}>
                                     <span
@@ -194,7 +204,7 @@ export function LandingPortals() {
                                         style={{ background: portal.colorVar }}
                                         aria-hidden
                                     />
-                                    {feature}
+                                    {t(`portal_features.${portal.key}.${featKey}`)}
                                 </li>
                             ))}
                         </ul>
@@ -203,13 +213,17 @@ export function LandingPortals() {
                             <Cta
                                 href={isRegistrationOpen() ? webSignUpPath() : appSignInUrl()}
                                 size="md">
-                                {isRegistrationOpen() ? `Start with ${portal.name}` : 'Sign in'}
+                                {isRegistrationOpen()
+                                    ? t('portal_cta.start_with', {
+                                          portal: t(`portals.${portal.key}.name`),
+                                      })
+                                    : t('portal_cta.sign_in')}
                             </Cta>
                             <button
                                 type="button"
                                 onClick={() => select(index + 1, true)}
                                 className="font-mono text-xs font-semibold tracking-widest text-fg-muted uppercase transition-colors hover:text-accent">
-                                Next portal →
+                                {t('portal_cta.next_portal')}
                             </button>
                         </div>
                     </article>

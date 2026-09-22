@@ -13,6 +13,10 @@ export interface StatusPageProps {
     homeHref?: string;
     /** Label for the home link. */
     homeLabel?: string;
+    /** Label for the retry button when `reset` is set. Defaults to English fallback. */
+    retryLabel?: string;
+    /** Label for the history-back button. Defaults to English fallback. */
+    goBackLabel?: string;
     /** Retry handler — typically `router.refresh()` + error-boundary `reset()` in `startTransition`. */
     reset?: () => void;
     /** Override auto status code. Pass `0` / falsy to hide. */

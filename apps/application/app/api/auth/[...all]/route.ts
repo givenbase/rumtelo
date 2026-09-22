@@ -1,7 +1,7 @@
 /**
  * Better Auth API Route Handler — proxies to the Nest backend via @rumtelo/utils.
  *
- * Same-origin `/api/auth` so session cookies bind to DOMAIN_APP (Galighticus pattern).
+ * Same-origin `/api/auth` so session cookies bind to DOMAIN_APP.
  * Server forwards to DOMAIN_BACK (private on Railway).
  *
  * @see https://www.better-auth.com/docs/integrations/next

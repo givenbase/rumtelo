@@ -4,6 +4,7 @@
  * `@rumtelo/contracts/{domain}`.
  */
 export * from '../common/common.schema';
+export * from '../common/api-error-message';
 export * from '../backoffice/plan/plan.schema';
 export * from '../backoffice/plan/plan.util';
 export * from '../backoffice/plan/launch-products';

@@ -6,19 +6,19 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
 import { RumteloLogo } from '@rumtelo/brand';
-import { cn, accountThemeFromCss } from '@rumtelo/utils';
-import { Locale } from '@rumtelo/contracts';
+import { LocaleSwitcher, useTranslations } from '@rumtelo/i18n';
 import { useTheme } from '@rumtelo/ui';
+import { cn, accountThemeFromCss } from '@rumtelo/utils';
 
 import { signOut } from '@/app/_lib/auth';
 import {
     BOTTOM_TABS,
     NAV_GROUPS,
-    TOP_PILL_LABELS,
+    TOP_PILL_LABEL_KEYS,
     resolveNavChildForPath,
     resolveNavGroupForPath,
 } from '@/app/_lib/nav';
-import { PLAN_LABELS } from '@/app/_lib/plan';
+import { planLabel } from '@/app/_lib/plan';
 import { settingsHrefForPathname } from '@/app/_lib/settings-tabs';
 import { useAccountTheme } from '@/components/features/shell/account-theme-sync';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
@@ -38,26 +38,31 @@ import { ToastPill } from './toast';
 // ── Menu items ───────────────────────────────────────────────────────────────
 
 interface MenuItem {
-    label: string;
-    sub: string;
+    labelKey: string;
+    subKey: string;
     href: string | null;
     danger: boolean;
 }
 
 const MENU_ITEMS: MenuItem[] = [
     {
-        label: 'Settings',
-        sub: 'Household prefs for this screen',
+        labelKey: 'pages.shell.menu.settings',
+        subKey: 'pages.shell.menu.settings_sub',
         href: '__settings__',
         danger: false,
     },
     {
-        label: 'My plan',
-        sub: 'Manage your subscription',
+        labelKey: 'pages.shell.menu.my_plan',
+        subKey: 'pages.shell.menu.my_plan_sub',
         href: '/settings/general/plan',
         danger: false,
     },
-    { label: 'Sign out', sub: 'You stay signed in for 30 days', href: null, danger: true },
+    {
+        labelKey: 'pages.shell.menu.sign_out',
+        subKey: 'pages.shell.menu.sign_out_sub',
+        href: null,
+        danger: true,
+    },
 ];
 
 // ── Subnav tint — each group borrows a jar hue (design: TINTS) ───────────────
@@ -94,23 +99,23 @@ export { useAppShell } from '@/components/features/shell/app-shell-context';
 // ── Inner shell (has access to context) ──────────────────────────────────────
 
 function AppShellInner({ children }: { children: ReactNode }) {
+    const t = useTranslations();
     const pathname = usePathname();
     const router = useRouter();
     const [menuOpen, setMenuOpen] = useState(false);
     const [portalOpen, setPortalOpen] = useState(false);
     const [subOpen, setSubOpen] = useState(false);
     const [signingOut, setSigningOut] = useState(false);
-    const { toggleLocale, locale, plan } = useAppShell();
+    const { plan, showToast } = useAppShell();
     const { setAccountTheme } = useAccountTheme();
     const { resolvedTheme } = useTheme();
     const { isCapabilityLocked, accessForPath } = usePlanCapabilities();
     const { session } = useAuth();
 
     const isDark = resolvedTheme === 'dark';
-    const localeLabel = locale === Locale.NL ? 'NL' : 'EN';
-    const planLabel = PLAN_LABELS[plan];
+    const planName = planLabel(plan, t);
 
-    const userName = session?.user?.name?.trim() || 'Guest';
+    const userName = session?.user?.name?.trim() || t('pages.settings.guest');
     const userEmail = session?.user?.email ?? '';
     const userInitials = (() => {
         const parts = userName.split(/\s+/).filter(Boolean);
@@ -142,14 +147,16 @@ function AppShellInner({ children }: { children: ReactNode }) {
         const next = isDark ? 'light' : 'dark';
         void setAccountTheme(accountThemeFromCss(next)).catch(error => {
             console.error('theme save failed', error);
+            showToast(t('pages.settings.toasts.theme_failed'), 'error');
         });
     }
 
     const activeGroup = resolveNavGroupForPath(pathname);
     const activeChild = resolveNavChildForPath(pathname);
     const access = accessForPath(pathname);
-    const activePortalLabel =
-        (activeGroup && (TOP_PILL_LABELS[activeGroup.key] ?? activeGroup.label)) || 'Home';
+    const activePortalLabel = activeGroup
+        ? t(TOP_PILL_LABEL_KEYS[activeGroup.key] ?? activeGroup.labelKey)
+        : t('pages.shell.home');
 
     return (
         <div className="min-h-dvh bg-bg bg-(image:--gradient-page) bg-top bg-no-repeat">
@@ -173,7 +180,7 @@ function AppShellInner({ children }: { children: ReactNode }) {
                                 setSubOpen(false);
                                 setPortalOpen(previous => !previous);
                             }}
-                            aria-label="Switch product"
+                            aria-label={t('pages.shell.aria.switch_product')}
                             aria-expanded={portalOpen}
                             className="flex w-full max-w-[14rem] items-center justify-between gap-2 rounded-full border border-line-strong bg-sunken px-3.5 py-2 shadow-sm transition-colors hover:border-accent-hover">
                             <span className="flex min-w-0 items-center gap-2">
@@ -198,7 +205,7 @@ function AppShellInner({ children }: { children: ReactNode }) {
                             <>
                                 <button
                                     type="button"
-                                    aria-label="Close product menu"
+                                    aria-label={t('pages.shell.aria.close_product_menu')}
                                     onClick={() => setPortalOpen(false)}
                                     className="fixed inset-0 z-30 cursor-default"
                                 />
@@ -227,7 +234,10 @@ function AppShellInner({ children }: { children: ReactNode }) {
                                                     {group.icon}
                                                 </span>
                                                 <span className="font-mono text-xs font-semibold tracking-widest uppercase">
-                                                    {TOP_PILL_LABELS[group.key] ?? group.label}
+                                                    {t(
+                                                        TOP_PILL_LABEL_KEYS[group.key] ??
+                                                            group.labelKey
+                                                    )}
                                                 </span>
                                             </Link>
                                         );
@@ -239,8 +249,9 @@ function AppShellInner({ children }: { children: ReactNode }) {
 
                     {/* Portal pill bar — desktop, truly centered */}
                     <nav
+                        data-testid="main-nav"
                         className="pointer-events-none absolute inset-x-0 hidden justify-center md:flex"
-                        aria-label="Main navigation">
+                        aria-label={t('pages.shell.aria.main_nav')}>
                         <div className="pointer-events-auto flex items-center gap-0.5 rounded-full border border-line bg-sunken p-1 shadow-md">
                             {NAV_GROUPS.map(group => {
                                 const active = group === activeGroup;
@@ -255,7 +266,7 @@ function AppShellInner({ children }: { children: ReactNode }) {
                                                 : 'text-fg-secondary hover:text-accent'
                                         )}>
                                         <span aria-hidden>{group.icon}</span>
-                                        {TOP_PILL_LABELS[group.key] ?? group.label}
+                                        {t(TOP_PILL_LABEL_KEYS[group.key] ?? group.labelKey)}
                                     </Link>
                                 );
                             })}
@@ -271,7 +282,7 @@ function AppShellInner({ children }: { children: ReactNode }) {
                                 setSubOpen(false);
                                 setMenuOpen(previous => !previous);
                             }}
-                            aria-label="User menu"
+                            aria-label={t('pages.shell.aria.user_menu')}
                             aria-expanded={menuOpen}
                             className="grid size-9 place-items-center rounded-full bg-accent font-mono text-xs font-bold text-on-accent transition hover:brightness-110 active:scale-95">
                             {userInitials}
@@ -281,7 +292,7 @@ function AppShellInner({ children }: { children: ReactNode }) {
                             <>
                                 <button
                                     type="button"
-                                    aria-label="Close menu"
+                                    aria-label={t('pages.shell.aria.close_menu')}
                                     onClick={() => setMenuOpen(false)}
                                     className="fixed inset-0 z-30 cursor-default"
                                 />
@@ -302,34 +313,35 @@ function AppShellInner({ children }: { children: ReactNode }) {
                                     </div>
 
                                     <div className="grid gap-0.5 border-b border-line p-2">
-                                        <button
-                                            type="button"
-                                            onClick={toggleLocale}
-                                            className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-raised">
+                                        <div className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5">
                                             <span className="grid gap-0.5">
-                                                <span className="text-sm text-fg">Language</span>
+                                                <span className="text-sm text-fg">
+                                                    {t('pages.shell.menu.language')}
+                                                </span>
                                                 <span className="text-xs leading-tight text-fg-faint">
-                                                    App language
+                                                    {t('pages.shell.menu.language_sub')}
                                                 </span>
                                             </span>
-                                            <span className="rounded-full border border-line px-2.5 py-1 font-mono text-xs font-semibold tracking-wide text-fg-muted uppercase">
-                                                {localeLabel}
-                                            </span>
-                                        </button>
+                                            <LocaleSwitcher />
+                                        </div>
                                         <button
                                             type="button"
                                             onClick={handleToggleTheme}
                                             className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-raised">
                                             <span className="grid gap-0.5">
-                                                <span className="text-sm text-fg">Appearance</span>
+                                                <span className="text-sm text-fg">
+                                                    {t('pages.shell.menu.appearance')}
+                                                </span>
                                                 <span className="text-xs leading-tight text-fg-faint">
-                                                    Light or dark
+                                                    {t('pages.shell.menu.appearance_sub')}
                                                 </span>
                                             </span>
                                             <span
                                                 className="rounded-full border border-line px-2.5 py-1 font-mono text-xs font-semibold tracking-wide text-fg-muted"
                                                 suppressHydrationWarning>
-                                                {isDark ? '☾ Dark' : '☀ Light'}
+                                                {isDark
+                                                    ? t('pages.shell.menu.theme_dark')
+                                                    : t('pages.shell.menu.theme_light')}
                                             </span>
                                         </button>
                                     </div>
@@ -347,15 +359,15 @@ function AppShellInner({ children }: { children: ReactNode }) {
                                                                     ? 'text-danger'
                                                                     : 'text-fg'
                                                             )}>
-                                                            {item.label}
+                                                            {t(item.labelKey)}
                                                         </span>
                                                         <span className="text-xs leading-tight text-fg-faint">
-                                                            {item.sub}
+                                                            {t(item.subKey)}
                                                         </span>
                                                     </span>
                                                     {isPlan ? (
                                                         <span className="shrink-0 rounded-full border border-line px-2.5 py-1 font-mono text-xs font-semibold tracking-wide text-fg-muted">
-                                                            {planLabel}
+                                                            {planName}
                                                         </span>
                                                     ) : null}
                                                 </>
@@ -368,7 +380,7 @@ function AppShellInner({ children }: { children: ReactNode }) {
                                                         : item.href;
                                                 return (
                                                     <Link
-                                                        key={item.label}
+                                                        key={item.labelKey}
                                                         href={href}
                                                         onClick={() => setMenuOpen(false)}
                                                         className={cn(
@@ -384,7 +396,7 @@ function AppShellInner({ children }: { children: ReactNode }) {
 
                                             return (
                                                 <button
-                                                    key={item.label}
+                                                    key={item.labelKey}
                                                     type="button"
                                                     disabled={signingOut}
                                                     onClick={() => void handleSignOut()}
@@ -425,7 +437,7 @@ function AppShellInner({ children }: { children: ReactNode }) {
                                                     🔒
                                                 </span>
                                             )}
-                                            {child.label}
+                                            {t(child.labelKey)}
                                         </Link>
                                     );
                                 })}
@@ -446,8 +458,8 @@ function AppShellInner({ children }: { children: ReactNode }) {
                                         activeGroup.children.some(
                                             navChild => navChild.href === activeChild.href
                                         )
-                                            ? activeChild.label
-                                            : activeGroup.children[0].label}
+                                            ? t(activeChild.labelKey)
+                                            : t(activeGroup.children[0].labelKey)}
                                     </span>
                                     <span className="shrink-0 text-xs opacity-70" aria-hidden>
                                         ▾
@@ -471,7 +483,7 @@ function AppShellInner({ children }: { children: ReactNode }) {
                                                             🔒
                                                         </span>
                                                     )}
-                                                    {child.label}
+                                                    {t(child.labelKey)}
                                                 </Link>
                                             );
                                         })}
@@ -489,7 +501,7 @@ function AppShellInner({ children }: { children: ReactNode }) {
                                     href={settingsHrefForPathname(pathname)}
                                     className="hidden items-center gap-1.5 rounded-full border border-line px-3.5 py-1.5 font-mono text-xs font-medium tracking-wide text-fg-faint uppercase transition-colors hover:border-accent-hover hover:text-accent sm:flex">
                                     <span aria-hidden>◇</span>
-                                    Settings
+                                    {t('pages.shell.settings')}
                                 </Link>
                             </div>
                         </div>
@@ -516,7 +528,7 @@ function AppShellInner({ children }: { children: ReactNode }) {
                           ? 'grid-cols-4'
                           : 'grid-cols-5'
                 )}
-                aria-label="Mobile navigation">
+                aria-label={t('pages.shell.aria.mobile_nav')}>
                 {BOTTOM_TABS.map((tab, i) => {
                     const active = NAV_GROUPS[i] === activeGroup;
                     return (
@@ -530,7 +542,7 @@ function AppShellInner({ children }: { children: ReactNode }) {
                             <span aria-hidden className="text-base">
                                 {tab.glyph}
                             </span>
-                            {tab.label}
+                            {t(tab.labelKey)}
                         </Link>
                     );
                 })}

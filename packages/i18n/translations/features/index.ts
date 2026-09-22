@@ -1,2 +1,9 @@
 export { default as auth } from './auth';
 export { default as brand } from './brand';
+export { default as capabilities } from './capabilities';
+export { default as coach } from './coach';
+export { default as energy } from './energy';
+export { default as growth } from './growth';
+export { default as money } from './money';
+export { default as soul } from './soul';
+export { default as tour } from './tour';

@@ -6,26 +6,29 @@ import Link from 'next/link';
 import { RumteloLogo } from '@rumtelo/brand';
 import { AccountThemeToggle } from '@/app/_components/account-theme-sync';
 
+import { LocaleSwitcher, useTranslations } from '@rumtelo/i18n';
+
 import {
     initialsFromUser,
     useMarketingSession,
 } from '@/app/_components/marketing-session-provider';
+import { planSlug } from '@/lib/landing-plans';
 import { appHomeUrl, appPlanSettingsUrl, appSignInUrl, webSignUpPath } from '@/lib/portal-urls';
 import { isRegistrationOpen } from '@/lib/maintenance';
 
 import { Cta } from './landing-primitives';
 
-const NAV_LINKS = [
-    { href: '#portals', label: 'Portals' },
-    { href: '#jars', label: 'How it works' },
-    { href: '#pricing', label: 'Pricing' },
-    { href: '#faq', label: 'Questions' },
-    { href: '#signup', label: 'Create account' },
+const NAV_LINK_KEYS = [
+    { href: '#portals', labelKey: 'portals' },
+    { href: '#jars', labelKey: 'how_it_works' },
+    { href: '#pricing', labelKey: 'pricing' },
+    { href: '#faq', labelKey: 'questions' },
+    { href: '#signup', labelKey: 'create_account' },
 ] as const;
 
-const PLAN_SHORT = { BASIC: 'Basic', PLUS: 'Plus', MAX: 'Max' } as const;
-
 export function LandingHeader() {
+    const t = useTranslations('pages.landing.header');
+    const tPlans = useTranslations('pages.landing.plans');
     const [open, setOpen] = useState(false);
     const [accountOpen, setAccountOpen] = useState(false);
     const menuId = useId();
@@ -65,17 +68,17 @@ export function LandingHeader() {
 
     const close = () => setOpen(false);
     const registrationOpen = isRegistrationOpen();
-    const navLinks = NAV_LINKS.filter(link => registrationOpen || link.href !== '#signup').map(
+    const navLinks = NAV_LINK_KEYS.filter(link => registrationOpen || link.href !== '#signup').map(
         link =>
             link.href === '#signup' && isAuthenticated
-                ? { href: appHomeUrl(), label: 'Dashboard' }
-                : link
+                ? { href: appHomeUrl(), label: t('dashboard'), labelKey: 'dashboard' as const }
+                : { href: link.href, label: t(link.labelKey), labelKey: link.labelKey }
     );
 
-    const name = user?.name?.trim() || 'Account';
+    const name = user?.name?.trim() || t('account');
     const email = user?.email?.trim() || '';
     const initials = initialsFromUser(user?.name, user?.email);
-    const planLabel = planKey ? PLAN_SHORT[planKey] : null;
+    const planLabel = planKey ? tPlans(`${planSlug(planKey)}.name`) : null;
 
     return (
         <header className="sticky top-0 z-20 border-b border-line bg-chrome/95 backdrop-blur-md">
@@ -88,7 +91,7 @@ export function LandingHeader() {
                 </Link>
 
                 <nav
-                    aria-label="Primary"
+                    aria-label={t('aria_primary')}
                     className="ml-auto hidden items-center gap-5 lg:flex xl:gap-6">
                     {navLinks
                         .filter(link => link.href !== '#signup' && !link.href.startsWith('http'))
@@ -103,6 +106,7 @@ export function LandingHeader() {
                 </nav>
 
                 <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2 lg:ml-4">
+                    <LocaleSwitcher triggerClassName="h-9 shrink-0 rounded-full bg-transparent px-2 text-fg-muted hover:border-accent hover:bg-transparent hover:text-accent sm:h-8" />
                     <AccountThemeToggle className="size-9 shrink-0 rounded-full bg-transparent text-sm text-fg-muted hover:border-accent hover:bg-transparent hover:text-accent sm:size-8" />
 
                     {!isPending && isAuthenticated ? (
@@ -110,14 +114,14 @@ export function LandingHeader() {
                             <Cta
                                 href={appHomeUrl()}
                                 className="hidden whitespace-nowrap sm:inline-flex">
-                                Open app
+                                {t('open_app')}
                             </Cta>
 
                             <div className="relative">
                                 <button
                                     type="button"
                                     onClick={() => setAccountOpen(previous => !previous)}
-                                    aria-label="Account menu"
+                                    aria-label={t('account')}
                                     aria-expanded={accountOpen}
                                     className="relative grid size-9 place-items-center overflow-hidden rounded-full bg-accent font-mono text-xs font-bold text-on-accent transition hover:brightness-110 active:scale-95">
                                     {user?.image ? (
@@ -136,7 +140,7 @@ export function LandingHeader() {
                                     <>
                                         <button
                                             type="button"
-                                            aria-label="Close account menu"
+                                            aria-label={t('menu')}
                                             onClick={() => setAccountOpen(false)}
                                             className="fixed inset-0 z-30 cursor-default"
                                         />
@@ -163,7 +167,7 @@ export function LandingHeader() {
                                                     </p>
                                                     {planLabel ? (
                                                         <p className="mt-1 font-mono text-[11px] font-semibold tracking-wide text-accent uppercase">
-                                                            {planLabel} plan
+                                                            {t('plan_named', { plan: planLabel })}
                                                         </p>
                                                     ) : null}
                                                 </div>
@@ -174,10 +178,10 @@ export function LandingHeader() {
                                                     onClick={() => setAccountOpen(false)}
                                                     className="grid gap-0.5 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-raised">
                                                     <span className="text-sm text-fg">
-                                                        Open dashboard
+                                                        {t('dashboard')}
                                                     </span>
                                                     <span className="text-xs text-fg-faint">
-                                                        Continue in the app
+                                                        {t('continue_in_app')}
                                                     </span>
                                                 </Link>
                                                 <Link
@@ -185,10 +189,10 @@ export function LandingHeader() {
                                                     onClick={() => setAccountOpen(false)}
                                                     className="grid gap-0.5 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-raised">
                                                     <span className="text-sm text-fg">
-                                                        Plan & billing
+                                                        {t('plan_billing')}
                                                     </span>
                                                     <span className="text-xs text-fg-faint">
-                                                        Upgrade, downgrade or manage
+                                                        {t('manage_plan')}
                                                     </span>
                                                 </Link>
                                                 <button
@@ -199,10 +203,10 @@ export function LandingHeader() {
                                                     }}
                                                     className="grid gap-0.5 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-raised">
                                                     <span className="text-sm text-danger">
-                                                        Sign out
+                                                        {t('sign_out')}
                                                     </span>
                                                     <span className="text-xs text-fg-faint">
-                                                        Leave this browser session
+                                                        {t('sign_out_sub')}
                                                     </span>
                                                 </button>
                                             </div>
@@ -217,14 +221,14 @@ export function LandingHeader() {
                                 href={appSignInUrl()}
                                 variant="ghost"
                                 className="hidden whitespace-nowrap sm:inline-flex">
-                                Sign in
+                                {t('sign_in')}
                             </Cta>
 
                             {registrationOpen ? (
                                 <Cta
                                     href={webSignUpPath()}
                                     className="hidden whitespace-nowrap sm:inline-flex">
-                                    Start free
+                                    {t('start_free')}
                                 </Cta>
                             ) : null}
                         </>
@@ -235,7 +239,7 @@ export function LandingHeader() {
                         className="grid size-9 shrink-0 place-items-center rounded-full border border-line text-fg-muted transition-colors hover:border-accent hover:text-accent lg:hidden"
                         aria-expanded={open}
                         aria-controls={menuId}
-                        aria-label={open ? 'Close menu' : 'Open menu'}
+                        aria-label={open ? t('close_menu') : t('open_menu')}
                         onClick={() => setOpen(previous => !previous)}>
                         <span className="relative block size-4" aria-hidden>
                             <span
@@ -260,7 +264,7 @@ export function LandingHeader() {
 
             <div id={menuId} hidden={!open} className="border-t border-line bg-chrome lg:hidden">
                 <nav
-                    aria-label="Mobile"
+                    aria-label={t('aria_mobile')}
                     className="mx-auto flex w-full max-w-6xl flex-col gap-0.5 px-4 py-3 pb-5">
                     {navLinks.map(link => (
                         <Link
@@ -279,7 +283,7 @@ export function LandingHeader() {
                                     size="lg"
                                     className="w-full"
                                     onClick={close}>
-                                    Open dashboard
+                                    {t('dashboard')}
                                 </Cta>
                                 <Cta
                                     href={appPlanSettingsUrl()}
@@ -287,7 +291,7 @@ export function LandingHeader() {
                                     size="lg"
                                     className="w-full"
                                     onClick={close}>
-                                    Plan & billing
+                                    {t('plan_billing')}
                                 </Cta>
                             </>
                         ) : (
@@ -298,7 +302,7 @@ export function LandingHeader() {
                                     size="lg"
                                     className="w-full"
                                     onClick={close}>
-                                    Sign in
+                                    {t('sign_in')}
                                 </Cta>
                                 {registrationOpen ? (
                                     <Cta
@@ -306,7 +310,7 @@ export function LandingHeader() {
                                         size="lg"
                                         className="w-full"
                                         onClick={close}>
-                                        Start free — no card
+                                        {t('start_free_no_card')}
                                     </Cta>
                                 ) : null}
                             </>

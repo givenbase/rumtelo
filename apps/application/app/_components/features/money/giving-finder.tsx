@@ -6,15 +6,16 @@ import { useMemo, useState } from 'react';
 import type { GivingCause, GivingOrganisation } from '@rumtelo/contracts';
 import { JarKey } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
+import { useTranslations } from '@rumtelo/i18n';
 import { VendorMark } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import {
     GIVING_CAUSE_CATALOG,
     GIVING_SIGNAL_TIER_ORDER,
-    GIVING_SIGNAL_TIERS,
-    givingCauseMeta,
+    givingCauseCopy,
     givingEvaluatorMeta,
+    givingSignalTiers,
 } from '@/app/_lib/giving';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
@@ -38,7 +39,7 @@ type GivingFinderProps = {
 };
 
 /**
- * The Coach: "Where do you want to help?"
+ * The Coach — features.money.giving_finder.title
  * Cause chips → vetted organisations with their independent signals.
  * Rumtelo shows who checked them and what that check measures — nothing more.
  */
@@ -50,6 +51,10 @@ export function GivingFinder({
     defaultOpen = false,
     className,
 }: GivingFinderProps) {
+    const t = useTranslations('features.money.giving_finder');
+    const tForm = useTranslations('ui.form');
+    const tRoot = useTranslations();
+    const signalTiers = givingSignalTiers(tRoot);
     const { householdId } = useAuth();
     const live = isLiveData(householdId);
     const [open, setOpen] = useState(defaultOpen);
@@ -108,7 +113,7 @@ export function GivingFinder({
         [organisations, cause]
     );
 
-    const activeCause = cause ? givingCauseMeta(cause) : null;
+    const activeCause = cause ? givingCauseCopy(tRoot, cause) : null;
 
     return (
         <div
@@ -121,7 +126,7 @@ export function GivingFinder({
                 <div className="flex flex-wrap items-center gap-2">
                     <CoachMark size="sm" />
                     <p className="font-mono text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
-                        Where do you want to help?
+                        {t('title')}
                     </p>
                 </div>
                 {!defaultOpen ? (
@@ -130,43 +135,42 @@ export function GivingFinder({
                         onClick={() => setOpen(previous => !previous)}
                         aria-expanded={open}
                         className="font-mono text-xs font-medium tracking-wide text-fg-muted uppercase hover:text-accent">
-                        {open ? 'Hide' : 'Help me choose'}
+                        {open ? t('hide') : t('help_choose')}
                     </button>
                 ) : null}
             </div>
 
             {!open ? (
-                <p className="text-sm leading-relaxed text-fg-secondary">
-                    Pick a cause, and see organisations that publish what they spend and what
-                    changed — checked by people outside the organisation.
-                </p>
+                <p className="text-sm leading-relaxed text-fg-secondary">{t('collapsed_lead')}</p>
             ) : (
                 <>
                     <p className="text-sm leading-relaxed text-fg-secondary">
-                        Pick a cause first. Each organisation shows who checked it and what that
-                        check actually measures — you decide what counts.
+                        {t('expanded_lead')}
                     </p>
                     <ul
                         className="flex flex-wrap gap-x-4 gap-y-1"
-                        aria-label="How to read the badges">
+                        aria-label={tForm('aria.read_badges')}>
                         {GIVING_SIGNAL_TIER_ORDER.map(key => (
                             <li
                                 key={key}
                                 className="flex items-center gap-1.5 font-mono text-[10px] text-fg-faint"
-                                title={GIVING_SIGNAL_TIERS[key].line}>
+                                title={signalTiers[key].line}>
                                 <span
                                     className={cn(
                                         'inline-block size-2 rounded-full border',
-                                        GIVING_SIGNAL_TIERS[key].className
+                                        signalTiers[key].className
                                     )}
                                     aria-hidden
                                 />
-                                {GIVING_SIGNAL_TIERS[key].label}
+                                {signalTiers[key].label}
                             </li>
                         ))}
                     </ul>
 
-                    <div className="flex flex-wrap gap-2" role="group" aria-label="Cause">
+                    <div
+                        className="flex flex-wrap gap-2"
+                        role="group"
+                        aria-label={tForm('aria.cause')}>
                         {causesWithRows.map(meta => {
                             const on = cause === meta.key;
                             return (
@@ -186,7 +190,7 @@ export function GivingFinder({
                                             : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
                                     )}>
                                     <span aria-hidden>{meta.icon}</span>
-                                    {meta.name}
+                                    {givingCauseCopy(tRoot, meta.key).name}
                                 </button>
                             );
                         })}
@@ -197,19 +201,13 @@ export function GivingFinder({
                     ) : null}
 
                     {!live ? (
-                        <p className="text-sm text-fg-muted">Sign in to see the list.</p>
+                        <p className="text-sm text-fg-muted">{t('sign_in')}</p>
                     ) : query.isLoading ? (
-                        <p className="text-sm text-fg-muted">Loading the list…</p>
+                        <p className="text-sm text-fg-muted">{t('loading')}</p>
                     ) : causesWithRows.length === 0 ? (
-                        <p className="text-sm text-fg-muted">
-                            The list is empty right now. Use I know who and type the name — the four
-                            checks still apply.
-                        </p>
+                        <p className="text-sm text-fg-muted">{t('empty_list')}</p>
                     ) : cause && shown.length === 0 ? (
-                        <p className="text-sm text-fg-muted">
-                            Nothing on the list for this cause yet. Use I know who and type the name
-                            — the four checks still apply.
-                        </p>
+                        <p className="text-sm text-fg-muted">{t('empty_cause')}</p>
                     ) : (
                         <ul className="grid gap-2">
                             {shown.map(organisation => (
@@ -242,6 +240,10 @@ function GivingOrganisationCard({
     selected: boolean;
     onPick: () => void;
 }) {
+    const t = useTranslations('features.money.giving_finder');
+    const tForm = useTranslations('ui.form');
+    const tRoot = useTranslations();
+    const signalTiers = givingSignalTiers(tRoot);
     const { byKey: jarByKey } = useJarCatalog();
     const where = [organisation.scope, organisation.country].filter(Boolean).join(' · ');
     const mark = partyMark(
@@ -288,16 +290,16 @@ function GivingOrganisationCard({
                             ? 'border-accent bg-accent text-on-accent'
                             : 'border-line-strong text-fg-muted hover:border-accent-hover hover:text-accent'
                     )}>
-                    {selected ? '✓ Chosen' : 'Give here'}
+                    {selected ? t('chosen') : t('give_here')}
                 </button>
             </div>
 
             <p className="text-sm leading-relaxed text-fg-secondary">{organisation.description}</p>
 
-            <ul className="flex flex-wrap gap-1.5" aria-label="Independent signals">
+            <ul className="flex flex-wrap gap-1.5" aria-label={tForm('aria.independent_signals')}>
                 {organisation.signals.map(signal => {
                     const evaluator = givingEvaluatorMeta(signal.evaluator);
-                    const tier = GIVING_SIGNAL_TIERS[evaluator?.tier ?? 'governance'];
+                    const tier = signalTiers[evaluator?.tier ?? 'governance'];
                     const text = `${evaluator?.name ?? signal.evaluator} · ${signal.label}${
                         signal.year ? ` (${signal.year})` : ''
                     }`;
@@ -341,7 +343,7 @@ function GivingOrganisationCard({
                     target="_blank"
                     rel="noreferrer noopener"
                     className="font-mono text-xs font-medium tracking-wide text-fg-muted uppercase hover:text-accent">
-                    Website ↗
+                    {t('website')}
                 </a>
             </div>
         </div>

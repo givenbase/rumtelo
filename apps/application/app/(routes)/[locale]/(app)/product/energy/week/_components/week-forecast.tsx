@@ -12,6 +12,7 @@ import {
     TimeKind,
     bandStatus,
 } from '@rumtelo/contracts';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Badge, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
@@ -20,10 +21,12 @@ import {
     TIME_KIND_ORDER,
     TIME_STATUS_META,
     formatMinutes,
+    timeKindName,
+    timeStatusName,
 } from '@/app/_lib/time-meta';
 import { formatDayLabel, shiftDay } from '@/app/_lib/week-key';
 
-import { DAY_KIND_NAME, WEEKDAY_SHORT, finalizeDay, templateForDay } from './day-shape';
+import { dayKindName, finalizeDay, templateForDay, weekdayShort } from './day-shape';
 
 type Props = {
     templates: ReadonlyArray<TimeTemplate>;
@@ -37,7 +40,7 @@ type Props = {
 
 type PlannedDay = {
     iso: string;
-    name: (typeof WEEKDAY_SHORT)[number];
+    name: string;
     kind: TimeDayKind;
     logged: boolean;
     minutes: Record<TimeCategory, number>;
@@ -60,8 +63,14 @@ function sumEntries(rows: ReadonlyArray<TimeEntry>): Record<TimeCategory, number
  * work and exercise bands — meaningless on three days — finally get to speak.
  */
 export function WeekForecast({ templates, entries, from, today, onEditWeek }: Props) {
+    const locale = useLocale();
+    const tRoot = useTranslations();
+    const tf = useTranslations('features.energy.week.forecast');
+    const ts = useTranslations('features.energy.week.shape');
+    const tm = useTranslations('features.energy.week.meta');
+    const weekdays = weekdayShort(ts);
     const days = useMemo<PlannedDay[]>(() => {
-        return WEEKDAY_SHORT.map((name, index) => {
+        return weekdays.map((name, index) => {
             const iso = shiftDay(from, index);
             const rows = entries.filter(entry => entry.on === iso);
             if (rows.length > 0) {
@@ -86,7 +95,7 @@ export function WeekForecast({ templates, entries, from, today, onEditWeek }: Pr
                 minutes: finalizeDay(owner?.defaults ?? {}),
             };
         });
-    }, [templates, entries, from]);
+    }, [templates, entries, from, weekdays]);
 
     const loggedCount = days.filter(day => day.logged).length;
     if (templates.length === 0 || loggedCount === 7) return null;
@@ -120,14 +129,14 @@ export function WeekForecast({ templates, entries, from, today, onEditWeek }: Pr
                     {label}
                 </span>
                 <span className="font-mono text-lg font-semibold text-fg tabular-nums">
-                    {formatMinutes(perDay ? Math.round(minutes / 7) : minutes)}
+                    {formatMinutes(perDay ? Math.round(minutes / 7) : minutes, tRoot)}
                     {perDay ? (
-                        <span className="text-xs font-normal text-fg-faint"> / day</span>
+                        <span className="text-xs font-normal text-fg-faint"> {tf('per_day')}</span>
                     ) : null}
                 </span>
                 {band ? (
                     <span className="justify-self-start">
-                        <Badge tone={meta.tone}>{meta.name}</Badge>
+                        <Badge tone={meta.tone}>{timeStatusName(tm, status)}</Badge>
                     </span>
                 ) : null}
             </div>
@@ -136,10 +145,10 @@ export function WeekForecast({ templates, entries, from, today, onEditWeek }: Pr
 
     const isThisWeek = today >= from && today <= shiftDay(from, 6);
     const title = !isThisWeek
-        ? 'Next week, at your typical shape'
+        ? tf('title_next')
         : loggedCount === 0
-          ? 'This week, at your typical shape'
-          : 'How this week is shaping up';
+          ? tf('title_current_empty')
+          : tf('title_current');
 
     return (
         <div className="grid gap-4 rounded-2xl border border-accent/30 bg-accent/5 p-5">
@@ -149,17 +158,23 @@ export function WeekForecast({ templates, entries, from, today, onEditWeek }: Pr
                         ✦ {title}
                     </Typography>
                     <p className="mt-1 font-mono text-xs text-fg-muted">
-                        {workdays} {workdays === 1 ? 'workday' : 'workdays'}, {7 - workdays} off
+                        {workdays === 1
+                            ? tf('workday_one', { count: workdays })
+                            : tf('workdays_many', { count: workdays })}
+                        , {tf('off', { count: 7 - workdays })}
                         {loggedCount > 0
-                            ? ` · ${loggedCount} logged, ${7 - loggedCount} planned as typical`
-                            : ' · nothing logged yet, every day planned as typical'}
+                            ? tf('logged_planned', {
+                                  logged: loggedCount,
+                                  planned: 7 - loggedCount,
+                              })
+                            : tf('all_planned')}
                     </p>
                 </div>
                 <button
                     type="button"
                     onClick={onEditWeek}
                     className="font-mono text-xs text-fg-muted underline-offset-2 hover:text-fg hover:underline">
-                    Change my typical week
+                    {tf('change_typical_week')}
                 </button>
             </div>
 
@@ -168,7 +183,14 @@ export function WeekForecast({ templates, entries, from, today, onEditWeek }: Pr
                 {days.map(day => (
                     <div
                         key={day.iso}
-                        title={`${formatDayLabel(day.iso)} — ${day.logged ? 'logged' : `planned as a typical ${DAY_KIND_NAME[day.kind]}`}`}
+                        title={
+                            day.logged
+                                ? tf('day_logged', { day: formatDayLabel(day.iso, locale) })
+                                : tf('day_planned', {
+                                      day: formatDayLabel(day.iso, locale),
+                                      kind: dayKindName(ts, day.kind),
+                                  })
+                        }
                         className={cn(
                             'grid h-12 place-items-center rounded-xl border font-mono text-xs',
                             day.logged
@@ -182,7 +204,11 @@ export function WeekForecast({ templates, entries, from, today, onEditWeek }: Pr
                                 'text-[10px]',
                                 day.kind === TimeDayKind.WORKDAY ? 'text-fg-muted' : 'text-accent'
                             )}>
-                            {day.logged ? '●' : day.kind === TimeDayKind.WORKDAY ? 'work' : 'off'}
+                            {day.logged
+                                ? '●'
+                                : day.kind === TimeDayKind.WORKDAY
+                                  ? tf('work')
+                                  : tf('off_short')}
                         </span>
                     </div>
                 ))}
@@ -195,7 +221,10 @@ export function WeekForecast({ templates, entries, from, today, onEditWeek }: Pr
                         <span
                             key={`${kind}-logged`}
                             className="block h-full"
-                            title={`${TIME_KIND_META[kind].name} logged — ${formatMinutes(kindMinutes[kind].logged)}`}
+                            title={tf('kind_logged', {
+                                kind: timeKindName(tm, kind),
+                                time: formatMinutes(kindMinutes[kind].logged, tRoot),
+                            })}
                             style={{
                                 width: `${(kindMinutes[kind].logged / weekTotal) * 100}%`,
                                 background: TIME_KIND_META[kind].color,
@@ -204,7 +233,10 @@ export function WeekForecast({ templates, entries, from, today, onEditWeek }: Pr
                         <span
                             key={`${kind}-planned`}
                             className="block h-full opacity-40"
-                            title={`${TIME_KIND_META[kind].name} planned — ${formatMinutes(kindMinutes[kind].planned)}`}
+                            title={tf('kind_planned', {
+                                kind: timeKindName(tm, kind),
+                                time: formatMinutes(kindMinutes[kind].planned, tRoot),
+                            })}
                             style={{
                                 width: `${(kindMinutes[kind].planned / weekTotal) * 100}%`,
                                 background: TIME_KIND_META[kind].color,
@@ -221,8 +253,11 @@ export function WeekForecast({ templates, entries, from, today, onEditWeek }: Pr
                                 className="size-2 rounded-sm"
                                 style={{ background: TIME_KIND_META[kind].color }}
                             />
-                            {TIME_KIND_META[kind].name}{' '}
-                            {formatMinutes(kindMinutes[kind].logged + kindMinutes[kind].planned)}
+                            {timeKindName(tm, kind)}{' '}
+                            {formatMinutes(
+                                kindMinutes[kind].logged + kindMinutes[kind].planned,
+                                tRoot
+                            )}
                         </span>
                     ))}
                 </div>
@@ -231,29 +266,25 @@ export function WeekForecast({ templates, entries, from, today, onEditWeek }: Pr
             {/* ── What the bands say about the full week ── */}
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {stat(
-                    'Work',
+                    tf('stat_work'),
                     totals[TimeCategory.PAID_WORK],
                     TIME_REFERENCE[TimeCategory.PAID_WORK].band
                 )}
                 {stat(
-                    'Sleep',
+                    tf('stat_sleep'),
                     totals[TimeCategory.SLEEP],
                     TIME_REFERENCE[TimeCategory.SLEEP].band,
                     true
                 )}
                 {stat(
-                    'Moving',
+                    tf('stat_moving'),
                     totals[TimeCategory.EXERCISE],
                     TIME_REFERENCE[TimeCategory.EXERCISE].band
                 )}
-                {stat('You steer', free, DISCRETIONARY_BAND, true)}
+                {stat(tf('stat_steer'), free, DISCRETIONARY_BAND, true)}
             </div>
 
-            <p className="max-w-prose text-sm leading-relaxed text-fg-muted">
-                Solid is what you logged; faded is what your typical days would add. Check in each
-                day and the plan turns into the record. A day that will not go to plan? Log it when
-                it comes — the check-in lets you flip it.
-            </p>
+            <p className="max-w-prose text-sm leading-relaxed text-fg-muted">{tf('lead')}</p>
         </div>
     );
 }

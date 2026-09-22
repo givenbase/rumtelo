@@ -32,18 +32,31 @@ export const MonthScore = z.object({
     maxScore: z.int(),
     daysLeft: z.int(),
     isClosed: z.boolean(),
+    /** Level index (1–5). Display label comes from client i18n. */
     level: z.int().min(1),
-    levelLabel: z.string(),
     events: z.array(MonthScoreEvent),
 });
 
+/** Stable unlock keys — client maps to `pages.dashboard.levels.unlocks.*`. */
+export const MonthScoreUnlockKey = z.enum([
+    'six_jars',
+    'inbox',
+    'week_check',
+    'goals',
+    'debts',
+    'energy_layer',
+    'coach',
+    'export',
+]);
+
 export const Level = z.object({
     index: z.int().min(1),
-    label: z.string(),
     /** Cumulative score needed to enter this level. */
     threshold: z.int(),
-    unlocks: z.array(z.string()),
+    unlocks: z.array(MonthScoreUnlockKey),
 });
+
+export const PeriodRecapHeadlineKey = z.enum(['surplus', 'overspent']);
 
 /** End-of-period recap shown before the next month begins. */
 export const PeriodRecap = z.object({
@@ -55,7 +68,8 @@ export const PeriodRecap = z.object({
     score: z.int(),
     bestJar: z.string().nullable(),
     worstJar: z.string().nullable(),
-    headline: z.string(),
+    /** Client maps to `pages.dashboard.recap.*`. */
+    headlineKey: PeriodRecapHeadlineKey,
 });
 
 // Inferred types (same-module merge for consumers)
@@ -63,3 +77,5 @@ export type MonthScoreEvent = z.infer<typeof MonthScoreEvent>;
 export type MonthScore = z.infer<typeof MonthScore>;
 export type Level = z.infer<typeof Level>;
 export type PeriodRecap = z.infer<typeof PeriodRecap>;
+export type MonthScoreUnlockKey = z.infer<typeof MonthScoreUnlockKey>;
+export type PeriodRecapHeadlineKey = z.infer<typeof PeriodRecapHeadlineKey>;

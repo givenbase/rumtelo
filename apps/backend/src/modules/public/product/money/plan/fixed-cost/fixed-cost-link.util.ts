@@ -1,5 +1,5 @@
 import { type EntityManager } from '@mikro-orm/postgresql';
-import { BadRequestException } from '@nestjs/common';
+import { apiBadRequest } from '../../../../../../common/errors/api-user-error';
 
 import {
     FixedCostSettlementSource,
@@ -20,10 +20,10 @@ export function periodFromBookedOn(bookedOn: string): string {
 
 function assertDirectionMatches(fixedCost: FixedCost, amount: number) {
     if (fixedCost.direction === FlowDirection.OUT && amount >= 0) {
-        throw new BadRequestException('Link an outflow to settle an outgoing bill.');
+        throw apiBadRequest('bill_link_outflow');
     }
     if (fixedCost.direction === FlowDirection.IN && amount <= 0) {
-        throw new BadRequestException('Link an inflow to settle a recurring credit.');
+        throw apiBadRequest('bill_link_inflow');
     }
 }
 
@@ -63,7 +63,7 @@ export async function applyFixedCostLinkChange(
             household: currentHouseholdId(),
         });
         if (!isFixedCostCounting(fixedCost)) {
-            throw new BadRequestException('Paused or ended bills cannot take new settlements.');
+            throw apiBadRequest('bill_paused_no_settlement');
         }
         assertDirectionMatches(fixedCost, transaction.amount);
         transaction.fixedCost = fixedCost;

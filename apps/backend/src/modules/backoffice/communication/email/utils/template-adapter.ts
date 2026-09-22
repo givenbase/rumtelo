@@ -9,7 +9,7 @@ import HouseholdInviteTemplate from '../templates/household/household-invite';
 
 const logger = new Logger('EmailTemplateAdapter');
 
-/** Email template ids — Galighticus `EmailTemplate` enum pattern. */
+/** Email template ids. */
 export enum EmailTemplate {
     ACCOUNT_VERIFICATION = 'account-verification',
     PASSWORD_RESET = 'password-reset',

@@ -1,5 +1,5 @@
 /**
- * @rumtelo/ui — design-system package (Galighticus-style categories).
+ * @rumtelo/ui — design-system package.
  *
  * categories:
  * - forms      controls + RHF Form helpers
@@ -8,7 +8,7 @@
  * - layout     Section, Sheet, Dialog, Tabs
  * - display    Meter, StatTile, HeroNumber
  * - navigation DropdownMenu
- * - theme      ThemeProvider, ThemeToggle, useTheme
+ * - theme      ThemeProvider, ThemeToggle (tone: default | inverse), useTheme
  */
 export * from './forms';
 export * from './cards';

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 
+import { useTranslations } from '@rumtelo/i18n';
 import { Button } from '@rumtelo/ui';
 
 import { CREATE_HREF } from '@/app/_lib/create-routes';
@@ -22,23 +23,32 @@ export function NecessitiesPressureCard({
     /** `plan` = fixed-costs overview; `jar` = jars list (envelope already known). */
     variant?: 'plan' | 'jar';
 }) {
+    const t = useTranslations('features.money.necessities_pressure');
     const { formatMoney } = useHouseholdCurrency();
     if (!pressure.active) return null;
 
     const shortfallLine =
         pressure.shortfallCents > 0
-            ? `Necessities is short ${formatMoney(pressure.shortfallCents)}/mo against its ${pressure.necessitiesPct}% envelope.`
-            : `Fixed costs take ${pressure.commitmentRatio}% of income — above the ${pressure.necessitiesPct}% Necessities goal.`;
+            ? t('shortfall_line', {
+                  amount: formatMoney(pressure.shortfallCents),
+                  pct: pressure.necessitiesPct,
+              })
+            : t('commitment_line', {
+                  ratio: pressure.commitmentRatio,
+                  pct: pressure.necessitiesPct,
+              });
 
     return (
         <CoachTipCard
-            title="Necessities under pressure"
+            title={t('title')}
             tone="warning"
             meta={
                 variant === 'plan' && pressure.envelopeCents > 0 ? (
                     <>
-                        Envelope {formatMoney(pressure.envelopeCents)}/mo · fixed OUT{' '}
-                        {pressure.commitmentRatio}% of income
+                        {t('meta', {
+                            envelope: formatMoney(pressure.envelopeCents),
+                            ratio: pressure.commitmentRatio,
+                        })}
                     </>
                 ) : undefined
             }
@@ -50,7 +60,7 @@ export function NecessitiesPressureCard({
                             href={productPath('money/fixed-costs')}
                             size="sm"
                             variant="secondary">
-                            Review fixed costs
+                            {t('review_fixed')}
                         </Button>
                     ) : (
                         <Button
@@ -58,17 +68,15 @@ export function NecessitiesPressureCard({
                             href={productPath('money/jars/necessities')}
                             size="sm"
                             variant="secondary">
-                            Open Necessities jar
+                            {t('open_jar')}
                         </Button>
                     )}
                     <Button as={Link} href={CREATE_HREF.income} size="sm">
-                        + Raise income
+                        {t('raise_income')}
                     </Button>
                 </>
             }>
-            {shortfallLine} That is common at the start — {pressure.necessitiesPct}% is a goal to
-            work toward. Simplify bills and/or raise income. Do not raid Financial Freedom to paper
-            over rent.
+            {shortfallLine} {t('body', { pct: pressure.necessitiesPct })}
         </CoachTipCard>
     );
 }

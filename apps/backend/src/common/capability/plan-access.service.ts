@@ -1,4 +1,6 @@
-import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+
+import { apiForbidden } from '../errors/api-user-error';
 import {
     hasCapability,
     isCapabilityDeferredAtLaunch,
@@ -25,18 +27,18 @@ export class PlanAccessService {
 
     async assertCapability(capabilityKey: CapabilityKey): Promise<void> {
         if (isLaunchProductsDeferred() && isCapabilityDeferredAtLaunch(capabilityKey)) {
-            throw new ForbiddenException(`${capabilityKey} is not available yet`);
+            throw apiForbidden('capability_unavailable');
         }
         const planKey = await this.planKeyForCurrentHousehold();
         if (!hasCapability(capabilityKey, planKey)) {
-            throw new ForbiddenException(`Plan does not include ${capabilityKey}`);
+            throw apiForbidden('plan_missing_capability');
         }
     }
 
     async assertWithinLimit(limitKey: PlanLimitKey, occupied: number): Promise<void> {
         const planKey = await this.planKeyForCurrentHousehold();
         if (!withinLimit(planKey, limitKey, occupied)) {
-            throw new ForbiddenException(`Plan limit reached for ${limitKey}`);
+            throw apiForbidden('plan_limit_reached');
         }
     }
 }

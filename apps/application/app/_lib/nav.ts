@@ -5,6 +5,7 @@
  * Platform settings stay at `/settings/…`. Auth stays unprefixed.
  *
  * `capabilityKey`: always a catalog key from CAPABILITIES (`{product}-{feature}`).
+ * Labels are i18n keys under `pages.nav.*` — resolve with `t(labelKey)` in the shell.
  */
 import { isProductEnabled } from './launch-products';
 import { CAPABILITIES } from './plan';
@@ -14,166 +15,174 @@ import { productPath } from './routes';
 const ALL_NAV_GROUPS = [
     {
         key: 'home',
-        label: 'Home',
+        labelKey: 'pages.nav.groups.home',
         icon: '◇',
         href: '/',
         children: [
-            { href: '/', label: 'Overview', capabilityKey: CAPABILITIES.homeOverview },
+            {
+                href: '/',
+                labelKey: 'pages.nav.children.home_overview',
+                capabilityKey: CAPABILITIES.homeOverview,
+            },
             {
                 href: productPath('coach'),
-                label: 'The Coach',
+                labelKey: 'pages.nav.children.coach',
                 capabilityKey: CAPABILITIES.homeCoach,
             },
-            { href: productPath('why'), label: 'Why', capabilityKey: CAPABILITIES.homeWhy },
+            {
+                href: productPath('why'),
+                labelKey: 'pages.nav.children.why',
+                capabilityKey: CAPABILITIES.homeWhy,
+            },
         ],
     },
     {
         key: 'money',
-        label: 'My money',
+        labelKey: 'pages.nav.groups.money',
         icon: '◈',
         href: productPath('money'),
         children: [
             {
                 href: productPath('money'),
-                label: 'Overview',
+                labelKey: 'pages.nav.children.money_overview',
                 capabilityKey: CAPABILITIES.moneyOverview,
             },
             {
                 href: productPath('money/jars'),
-                label: 'Jars',
+                labelKey: 'pages.nav.children.jars',
                 capabilityKey: CAPABILITIES.moneyJars,
             },
             {
                 href: productPath('money/transactions'),
-                label: 'Transactions',
+                labelKey: 'pages.nav.children.transactions',
                 capabilityKey: CAPABILITIES.moneySpending,
             },
             {
                 href: productPath('money/debt'),
-                label: 'Debt',
+                labelKey: 'pages.nav.children.debt',
                 capabilityKey: CAPABILITIES.moneyDebt,
             },
             {
                 href: productPath('money/fixed-costs'),
-                label: 'Fixed costs',
+                labelKey: 'pages.nav.children.fixed_costs',
                 capabilityKey: CAPABILITIES.moneyFixedCosts,
             },
         ],
     },
     {
         key: 'growth',
-        label: 'My growth',
+        labelKey: 'pages.nav.groups.growth',
         icon: '↗',
         href: productPath('growth'),
         children: [
             {
                 href: productPath('growth'),
-                label: 'Overview',
+                labelKey: 'pages.nav.children.growth_overview',
                 capabilityKey: CAPABILITIES.growthOverview,
             },
             {
                 href: productPath('growth/goals'),
-                label: 'Goals',
+                labelKey: 'pages.nav.children.goals',
                 capabilityKey: CAPABILITIES.growthGoals,
             },
             {
                 href: productPath('growth/income'),
-                label: 'Income',
+                labelKey: 'pages.nav.children.income',
                 capabilityKey: CAPABILITIES.growthIncome,
             },
             {
                 href: productPath('growth/learn'),
-                label: 'Learn',
+                labelKey: 'pages.nav.children.learn',
                 capabilityKey: CAPABILITIES.growthLearn,
             },
             {
                 href: productPath('growth/net-worth'),
-                label: 'Net worth',
+                labelKey: 'pages.nav.children.net_worth',
                 capabilityKey: CAPABILITIES.growthNetWorth,
             },
         ],
     },
     {
         key: 'energy',
-        label: 'My energy',
+        labelKey: 'pages.nav.groups.energy',
         // U+2733 + VS15 (text) — bare ✳ becomes the green ❇️ emoji on Apple fonts
         icon: '✳\uFE0E',
         href: productPath('energy'),
         children: [
             {
                 href: productPath('energy'),
-                label: 'Overview',
+                labelKey: 'pages.nav.children.energy_overview',
                 capabilityKey: CAPABILITIES.energyOverview,
             },
             {
                 href: productPath('energy/week'),
-                label: 'Week',
+                labelKey: 'pages.nav.children.week',
                 capabilityKey: CAPABILITIES.energyWeek,
             },
             {
                 href: productPath('energy/sleep'),
-                label: 'Sleep',
+                labelKey: 'pages.nav.children.sleep',
                 capabilityKey: CAPABILITIES.energySleep,
             },
             {
                 href: productPath('energy/training'),
-                label: 'Training',
+                labelKey: 'pages.nav.children.training',
                 capabilityKey: CAPABILITIES.energyTraining,
             },
             {
                 href: productPath('energy/food'),
-                label: 'Food',
+                labelKey: 'pages.nav.children.food',
                 capabilityKey: CAPABILITIES.energyFood,
             },
         ],
     },
     {
         key: 'soul',
-        label: 'My soul',
+        labelKey: 'pages.nav.groups.soul',
         icon: '✦',
         href: productPath('soul'),
         children: [
             {
                 href: productPath('soul'),
-                label: 'Overview',
+                labelKey: 'pages.nav.children.soul_overview',
                 capabilityKey: CAPABILITIES.soulOverview,
             },
             {
                 href: productPath('soul/stillness'),
-                label: 'Stillness',
+                labelKey: 'pages.nav.children.stillness',
                 capabilityKey: CAPABILITIES.soulStillness,
             },
             {
                 href: productPath('soul/gratitude'),
-                label: 'Gratitude',
+                labelKey: 'pages.nav.children.gratitude',
                 capabilityKey: CAPABILITIES.soulGratitude,
             },
             {
                 href: productPath('soul/giving'),
-                label: 'Giving',
+                labelKey: 'pages.nav.children.giving',
                 capabilityKey: CAPABILITIES.soulGiving,
             },
             {
                 href: productPath('soul/intent'),
-                label: 'Intent',
+                labelKey: 'pages.nav.children.intent',
                 capabilityKey: CAPABILITIES.soulIntent,
             },
             {
                 href: productPath('soul/centres'),
-                label: 'Centres',
+                labelKey: 'pages.nav.children.centres',
                 capabilityKey: CAPABILITIES.soulCentres,
             },
         ],
     },
 ] as const;
 
-/** Compact labels for the desktop portal pill bar (design SHORT map, EN). */
-export const TOP_PILL_LABELS: Record<string, string> = {
-    home: 'Home',
-    money: 'Money',
-    growth: 'Growth',
-    energy: 'Energy',
-    soul: 'Soul',
+/** Compact labels for the desktop portal pill bar (design SHORT map). */
+export const TOP_PILL_LABEL_KEYS: Record<string, string> = {
+    home: 'pages.nav.pills.home',
+    money: 'pages.nav.pills.money',
+    growth: 'pages.nav.pills.growth',
+    energy: 'pages.nav.pills.energy',
+    soul: 'pages.nav.pills.soul',
 };
 
 export type NavGroup = (typeof ALL_NAV_GROUPS)[number];
@@ -184,10 +193,10 @@ export const NAV_GROUPS: readonly NavGroup[] = ALL_NAV_GROUPS.filter(group =>
     isProductEnabled(group.key)
 );
 
-/** Bottom tabs — design `SHORT` map EN column (same launch filter as nav). */
+/** Bottom tabs — design `SHORT` map (same launch filter as nav). */
 export const BOTTOM_TABS = NAV_GROUPS.map(group => ({
     href: group.href,
-    label: TOP_PILL_LABELS[group.key] ?? group.label,
+    labelKey: TOP_PILL_LABEL_KEYS[group.key] ?? group.labelKey,
     glyph: group.icon,
 }));
 

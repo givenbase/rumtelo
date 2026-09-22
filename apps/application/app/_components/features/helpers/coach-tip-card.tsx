@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 
+import { useTranslations } from '@rumtelo/i18n';
 import { cn } from '@rumtelo/utils';
 
 import { CoachMark } from './helper-mark';
@@ -33,6 +34,7 @@ export function CoachTipCard({
     tone = 'default',
     className,
 }: CoachTipCardProps) {
+    const t = useTranslations('features.coach.helpers');
     const enabled = useHelpersEnabled();
     if (!enabled) return null;
 
@@ -46,7 +48,7 @@ export function CoachTipCard({
                 className
             )}
             data-coach-guide="tip"
-            aria-label={`The Coach: ${title}`}>
+            aria-label={t('tip_aria', { title })}>
             <div className="flex flex-wrap items-center gap-2">
                 <CoachMark size="sm" />
                 <p

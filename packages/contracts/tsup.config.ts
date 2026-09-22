@@ -40,7 +40,7 @@ export default defineConfig(options => [
     },
     {
         ...shared,
-        // Types resolve from src via package.json exports (Galighticus). Emitting
+        // Types resolve from src via package.json exports. Emitting
         // a portable .d.ts for createAPIUtils hits TS7056 and breaks app inference.
         dts: false,
         entry: { react: 'src/client/react.tsx' },

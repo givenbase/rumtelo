@@ -1,12 +1,14 @@
 'use client';
 
 import { api } from '@/app/_lib/api';
+import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import { useLiveQuery } from '@rumtelo/hooks';
+import { useTranslations, type TranslateFn } from '@rumtelo/i18n';
 import {
     FormControl,
     FormField,
@@ -19,11 +21,15 @@ import {
 } from '@rumtelo/ui';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { GoalPreset } from '@rumtelo/contracts';
-import { GivingCause, GoalKind, GoalStatus, JarKey } from '@rumtelo/contracts';
-import { z } from 'zod';
+import {
+    type GoalPreset,
+    type GivingCause,
+    GoalKind,
+    GoalStatus,
+    JarKey,
+} from '@rumtelo/contracts';
 
-import { GIVING_CAUSE_CATALOG, WHY_GIVE, givingCauseMeta } from '@/app/_lib/giving';
+import { GIVING_CAUSE_CATALOG, givingCauseCopy, givingCauseMeta } from '@/app/_lib/giving';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -35,62 +41,39 @@ import { GivingFinder } from '@/components/features/money/giving-finder';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
+import { createGoalFormSchema, type GoalFormSchemaValues } from './form-zod';
 import { ChipSearch, matchesChipQuery } from './chip-search';
 import { ConfirmActionButton } from './confirm-action-button';
 import { FormInput } from './form-input';
 import { PresetNameField } from './preset-name-field';
 
-const moneyInput = z
-    .string()
-    .min(1, 'Amount is required')
-    .refine(
-        value => {
-            const cents = parseAmountToMinorUnits(value);
-            return cents !== null && cents > 0;
-        },
-        { message: 'Enter a valid amount' }
-    );
-
-const goalFormSchema = z.object({
-    kind: z.enum(GoalKind),
-    name: z.string().min(1, 'Name is required').max(120),
-    target: moneyInput,
-    monthlyContribution: z.string().optional(),
-    jarId: z.string().optional(),
-    why: z.string().max(500).optional(),
-    /** GIVE: cause reserved for this pledge; null = any giving. */
-    cause: z.enum(GivingCause).nullable().optional(),
-    /** GIVE: organisation catalog key when named. */
-    givingOrganisationKey: z.string().max(64).nullable().optional(),
-});
-
-export type GoalFormValues = z.infer<typeof goalFormSchema>;
+export type GoalFormValues = GoalFormSchemaValues;
 
 type GiveTargetMode = 'open' | 'org' | 'manual';
 
 const GOAL_KIND_OPTIONS: ReadonlyArray<{
     id: GoalKind;
     icon: string;
-    label: string;
-    line: string;
+    labelKey: 'kind_save' | 'kind_earn' | 'kind_give';
+    lineKey: 'kind_save_line' | 'kind_earn_line' | 'kind_give_line';
 }> = [
     {
         id: GoalKind.SAVE,
         icon: '🎯',
-        label: 'Save',
-        line: 'Put money aside in a jar',
+        labelKey: 'kind_save',
+        lineKey: 'kind_save_line',
     },
     {
         id: GoalKind.EARN,
         icon: '📈',
-        label: 'Earn',
-        line: 'Reach a monthly income target',
+        labelKey: 'kind_earn',
+        lineKey: 'kind_earn_line',
     },
     {
         id: GoalKind.GIVE,
         icon: '💛',
-        label: 'Give',
-        line: 'Pledge what you’ll give this year',
+        labelKey: 'kind_give',
+        lineKey: 'kind_give_line',
     },
 ];
 
@@ -100,21 +83,24 @@ const NOT_A_CAR_BRAND = new Set(['LEASEPLAN', 'ALPHERA']);
 /** First chip row on Car fund. The rest sit behind More — same dashed chip as other pickers. */
 const CAR_BRAND_PREVIEW = 12;
 
-const GIVE_TARGET_MODES: ReadonlyArray<{ id: GiveTargetMode; label: string }> = [
-    { id: 'manual', label: 'I know who' },
-    { id: 'org', label: 'Help me choose' },
-    { id: 'open', label: 'Keep it open' },
+const GIVE_TARGET_MODES: ReadonlyArray<{ id: GiveTargetMode; labelKey: string }> = [
+    { id: 'manual', labelKey: 'give_mode_manual' },
+    { id: 'org', labelKey: 'give_mode_org' },
+    { id: 'open', labelKey: 'give_mode_open' },
 ];
 
-function givePledgeName(cause: GivingCause | null | undefined) {
-    if (!cause) return 'Give pledge this year';
-    const meta = givingCauseMeta(cause);
-    return meta ? `${meta.name} pledge` : 'Give pledge this year';
+function givePledgeName(cause: GivingCause | null | undefined, t: TranslateFn): string {
+    if (!cause) return t('features.growth.goals.form.pledge_year');
+    const copy = givingCauseCopy(t, cause);
+    return t('features.growth.goals.form.pledge_named', { name: copy.name });
 }
 
-function resolveGiveTargetMode(defaults: Partial<GoalFormValues> | undefined): GiveTargetMode {
+function resolveGiveTargetMode(
+    defaults: Partial<GoalFormValues> | undefined,
+    t: TranslateFn
+): GiveTargetMode {
     if (defaults?.givingOrganisationKey?.trim()) return 'org';
-    if (defaults?.name?.trim() && defaults.name !== givePledgeName(defaults.cause ?? null)) {
+    if (defaults?.name?.trim() && defaults.name !== givePledgeName(defaults.cause ?? null, t)) {
         return 'manual';
     }
     return 'open';
@@ -135,14 +121,19 @@ export function GoalForm({
     entityId,
     onSuccess,
 }: GoalFormProps) {
+    const t = useTranslations();
+    const tGoals = useTranslations('features.growth.goals');
+    const tForm = useTranslations('features.growth.goals.form');
+    const tUiForm = useTranslations('ui.form');
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { symbol } = useHouseholdCurrency();
     const { showToast } = useAppShell();
+    const apiError = useApiError();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
     const [giveTargetMode, setGiveTargetMode] = useState<GiveTargetMode>(() =>
-        resolveGiveTargetMode(defaultValues)
+        resolveGiveTargetMode(defaultValues, t)
     );
     const [goalPresetKey, setGoalPresetKey] = useState<string | null>(null);
     const [showAllCarBrands, setShowAllCarBrands] = useState(false);
@@ -168,10 +159,10 @@ export function GoalForm({
                 preset =>
                     ({
                         ...preset,
-                        group: preset.key === 'OTHER' ? 'Other' : undefined,
+                        group: preset.key === 'OTHER' ? tGoals('preset_group_other') : undefined,
                     }) satisfies GoalPreset & { group?: string }
             ),
-        [presetsQuery.data]
+        [presetsQuery.data, tGoals]
     );
     const merchantsQuery = useLiveQuery(
         apiQuery.money.catalogs.merchantPresets.list.queryOptions({
@@ -189,6 +180,8 @@ export function GoalForm({
         [merchantsQuery.data]
     );
     const selectedIcon = useRef<string | null>(null);
+
+    const goalFormSchema = useMemo(() => createGoalFormSchema(tUiForm), [tUiForm]);
 
     const form = useForm<GoalFormValues>({
         defaultValues: {
@@ -241,9 +234,15 @@ export function GoalForm({
         }
     }, [jars, form, isEarn, isGive]);
 
-    const onError = createFormInvalidHandler(({ title, description }) => {
-        showToast(description ?? title, 'error');
-    });
+    const onError = createFormInvalidHandler(
+        ({ title, description }) => {
+            showToast(description ?? title, 'error');
+        },
+        {
+            title: tUiForm('incomplete_title'),
+            description: tUiForm('incomplete_description'),
+        }
+    );
 
     function selectKind(next: GoalKind) {
         if (next === kind) return;
@@ -251,7 +250,7 @@ export function GoalForm({
         if (next === GoalKind.GIVE) {
             form.setValue('cause', null);
             form.setValue('givingOrganisationKey', null);
-            form.setValue('name', givePledgeName(null), { shouldDirty: false });
+            form.setValue('name', givePledgeName(null, t), { shouldDirty: false });
             setGiveTargetMode('open');
             selectedIcon.current = '💛';
             return;
@@ -268,7 +267,7 @@ export function GoalForm({
         form.setValue('cause', next, { shouldDirty: true });
         if (giveTargetMode === 'open') {
             form.setValue('givingOrganisationKey', null);
-            form.setValue('name', givePledgeName(next), { shouldDirty: true });
+            form.setValue('name', givePledgeName(next, t), { shouldDirty: true });
             const meta = next ? givingCauseMeta(next) : null;
             selectedIcon.current = meta?.icon ?? '💛';
         }
@@ -279,7 +278,7 @@ export function GoalForm({
         setGiveTargetMode(next);
         form.setValue('givingOrganisationKey', null);
         if (next === 'open') {
-            form.setValue('name', givePledgeName(cause ?? null), { shouldDirty: true });
+            form.setValue('name', givePledgeName(cause ?? null, t), { shouldDirty: true });
             const meta = cause ? givingCauseMeta(cause) : null;
             selectedIcon.current = meta?.icon ?? '💛';
             return;
@@ -290,8 +289,8 @@ export function GoalForm({
             return;
         }
         // org — wait for GivingFinder pick; keep cause-based name until then.
-        if (!name?.trim() || name === givePledgeName(cause ?? null)) {
-            form.setValue('name', givePledgeName(cause ?? null), { shouldDirty: false });
+        if (!name?.trim() || name === givePledgeName(cause ?? null, t)) {
+            form.setValue('name', givePledgeName(cause ?? null, t), { shouldDirty: false });
         }
     }
 
@@ -352,10 +351,15 @@ export function GoalForm({
             void queryClient.invalidateQueries({
                 queryKey: apiQuery.money.goals.projections.key(),
             });
-            showToast(mode === 'edit' ? 'Goal updated' : 'Goal saved', 'success');
+            showToast(
+                mode === 'edit'
+                    ? t('common.message.entity.goal_updated')
+                    : t('common.message.entity.goal_saved'),
+                'success'
+            );
             dismiss();
         },
-        onError: () => showToast('Save failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const removeMutation = useMutation({
@@ -368,22 +372,22 @@ export function GoalForm({
             void queryClient.invalidateQueries({
                 queryKey: apiQuery.money.goals.projections.key(),
             });
-            showToast('Goal deleted', 'success');
+            showToast(t('common.message.entity.goal_deleted'), 'success');
             dismiss();
         },
-        onError: () => showToast('Delete failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     async function onSubmit(values: GoalFormValues) {
         if (!live) {
-            showToast('Sign in to save goals', 'error');
+            showToast(t('common.message.entity.sign_in_goals'), 'error');
             return;
         }
         await saveMutation.mutateAsync(values);
     }
 
     const busy = form.formState.isSubmitting || saveMutation.isPending || removeMutation.isPending;
-    const activeCause = cause ? givingCauseMeta(cause) : null;
+    const activeCause = cause ? givingCauseCopy(t, cause) : null;
 
     return (
         <FormCreateEditShell
@@ -395,10 +399,10 @@ export function GoalForm({
                 <div className="grid gap-2">
                     <Button type="submit" className="w-full" disabled={busy}>
                         {saveMutation.isPending || form.formState.isSubmitting
-                            ? 'Working…'
+                            ? tUiForm('working')
                             : mode === 'edit'
-                              ? 'Save changes'
-                              : 'Save goal'}
+                              ? tUiForm('save_changes')
+                              : tForm('save_goal')}
                     </Button>
                     {mode === 'edit' && entityId ? (
                         <ConfirmActionButton
@@ -406,8 +410,8 @@ export function GoalForm({
                             className="w-full text-danger hover:bg-danger/10 hover:text-danger"
                             disabled={busy}
                             pending={removeMutation.isPending}
-                            label="Delete"
-                            confirmLabel="Click again to delete"
+                            label={tUiForm('delete')}
+                            confirmLabel={tUiForm('confirm_delete')}
                             onConfirm={() => void removeMutation.mutateAsync()}
                         />
                     ) : null}
@@ -418,12 +422,12 @@ export function GoalForm({
                 name="kind"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Goal type</FormLabel>
+                        <FormLabel>{tForm('goal_type')}</FormLabel>
                         <FormControl>
                             <div
                                 className="grid gap-2 sm:grid-cols-3"
                                 role="radiogroup"
-                                aria-label="Goal type">
+                                aria-label={tForm('goal_type')}>
                                 {GOAL_KIND_OPTIONS.map(option => {
                                     const on = field.value === option.id;
                                     return (
@@ -449,11 +453,11 @@ export function GoalForm({
                                                             ? 'text-sm font-semibold text-accent'
                                                             : 'text-sm font-semibold text-fg'
                                                     }>
-                                                    {option.label}
+                                                    {tForm(option.labelKey)}
                                                 </span>
                                             </span>
                                             <span className="text-xs leading-snug text-fg-muted">
-                                                {option.line}
+                                                {tForm(option.lineKey)}
                                             </span>
                                         </button>
                                     );
@@ -468,14 +472,13 @@ export function GoalForm({
             {isGive ? (
                 <>
                     <CoachTipCard
-                        title="A pledge, not a pot"
+                        title={tForm('pledge_tip_title')}
                         meta={
                             <a href={soulPath('giving')} className="hover:text-accent">
-                                Why giving is in a money app → Soul
+                                {tForm('pledge_tip_link')}
                             </a>
                         }>
-                        {WHY_GIVE.body[1]} Every sorted amount that leaves your Give jar this year
-                        counts toward it — nothing to move by hand.
+                        {t('features.soul.giving.coach_tip_1')} {tForm('pledge_tip_body')}
                     </CoachTipCard>
 
                     <FormField
@@ -483,12 +486,12 @@ export function GoalForm({
                         name="cause"
                         render={() => (
                             <FormItem>
-                                <FormLabel>Cause (purpose)</FormLabel>
+                                <FormLabel>{tForm('cause_label')}</FormLabel>
                                 <FormControl>
                                     <div
                                         className="flex flex-wrap gap-2"
                                         role="group"
-                                        aria-label="Giving cause">
+                                        aria-label={tForm('cause_aria')}>
                                         <button
                                             type="button"
                                             disabled={busy}
@@ -499,7 +502,7 @@ export function GoalForm({
                                                     ? 'rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
                                                     : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
                                             }>
-                                            Any cause
+                                            {tForm('cause_any')}
                                         </button>
                                         {GIVING_CAUSE_CATALOG.map(meta => {
                                             const on = cause === meta.key;
@@ -518,7 +521,7 @@ export function GoalForm({
                                                             : 'flex items-center gap-1.5 rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
                                                     }>
                                                     <span aria-hidden>{meta.icon}</span>
-                                                    {meta.name}
+                                                    {givingCauseCopy(t, meta.key).name}
                                                 </button>
                                             );
                                         })}
@@ -530,7 +533,7 @@ export function GoalForm({
                                     </p>
                                 ) : (
                                     <p className="text-xs leading-relaxed text-fg-faint">
-                                        Open pledge — any giving from the Give jar counts.
+                                        {tForm('cause_open_hint')}
                                     </p>
                                 )}
                                 <FormMessage />
@@ -540,12 +543,12 @@ export function GoalForm({
 
                     <div className="grid gap-2">
                         <p className="font-mono text-[10px] font-semibold tracking-widest text-fg-faint uppercase">
-                            Organisation
+                            {tForm('organisation')}
                         </p>
                         <div
                             className="flex flex-wrap gap-2"
                             role="group"
-                            aria-label="How specific is this pledge?">
+                            aria-label={tForm('give_mode_aria')}>
                             {GIVE_TARGET_MODES.map(option => {
                                 const on = giveTargetMode === option.id;
                                 return (
@@ -560,15 +563,13 @@ export function GoalForm({
                                                 ? 'rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
                                                 : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
                                         }>
-                                        {option.label}
+                                        {tForm(option.labelKey)}
                                     </button>
                                 );
                             })}
                         </div>
                         <p className="text-xs leading-relaxed text-fg-faint">
-                            I know who — type whoever you already give to. Help me choose — Coach
-                            shortlist with independent checks. Keep it open — name the cause only,
-                            no organisation yet.
+                            {tForm('give_mode_hint')}
                         </p>
                     </div>
 
@@ -600,14 +601,18 @@ export function GoalForm({
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>
-                            {isGive ? (giveTargetMode === 'open' ? 'Pledge name' : 'Name') : 'Name'}
+                            {isGive
+                                ? giveTargetMode === 'open'
+                                    ? tForm('pledge_name')
+                                    : tUiForm('fields.name')
+                                : tUiForm('fields.name')}
                         </FormLabel>
                         <FormControl>
                             {mode === 'create' && !isEarn && !isGive ? (
                                 <PresetNameField
                                     value={field.value}
-                                    placeholder="e.g. emergency fund"
-                                    freeTextPlaceholder="Type a custom goal name…"
+                                    placeholder={tForm('name_placeholder_save')}
+                                    freeTextPlaceholder={tForm('name_free_placeholder')}
                                     options={presetOptions}
                                     lockPresets
                                     freeTextKeys={['OTHER']}
@@ -642,19 +647,19 @@ export function GoalForm({
                             ) : isGive && giveTargetMode === 'org' ? (
                                 <FormInput
                                     readOnly
-                                    placeholder="Pick from Help me choose above"
+                                    placeholder={tForm('pick_from_finder')}
                                     {...field}
                                 />
                             ) : (
                                 <FormInput
                                     placeholder={
                                         isEarn
-                                            ? `e.g. ${symbol}5k net income`
+                                            ? tForm('name_placeholder_earn', { symbol })
                                             : isGive
                                               ? giveTargetMode === 'manual'
-                                                  ? 'e.g. local food bank'
-                                                  : 'e.g. Health pledge'
-                                              : 'e.g. emergency fund'
+                                                  ? tForm('pledge_placeholder_manual')
+                                                  : tForm('pledge_placeholder_open')
+                                              : tForm('name_placeholder_save')
                                     }
                                     {...field}
                                 />
@@ -671,15 +676,15 @@ export function GoalForm({
                 carBrands.some(brand => brand.name.toLowerCase() === name.trim().toLowerCase())) ? (
                 <div className="grid gap-2">
                     <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
-                        Which car?
+                        {tForm('which_car')}
                     </p>
                     <ChipSearch
                         value={carBrandQuery}
                         onChange={setCarBrandQuery}
-                        placeholder="Search brand"
+                        placeholder={tForm('search_brand')}
                     />
                     {carBrandSearch && visibleCarBrands.length === 0 ? (
-                        <p className="text-sm text-fg-muted">No matches</p>
+                        <p className="text-sm text-fg-muted">{tUiForm('no_matches')}</p>
                     ) : null}
                     <div className="flex flex-wrap gap-1.5">
                         {visibleCarBrands.map(brand => {
@@ -723,7 +728,7 @@ export function GoalForm({
                                 type="button"
                                 className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
                                 onClick={() => setShowAllCarBrands(true)}>
-                                More
+                                {tForm('more')}
                             </button>
                         ) : null}
                     </div>
@@ -737,13 +742,17 @@ export function GoalForm({
                     <FormItem>
                         <FormLabel>
                             {isEarn
-                                ? `Monthly net (${symbol})`
+                                ? tForm('monthly_net', { symbol })
                                 : isGive
-                                  ? `Pledge for the year (${symbol})`
-                                  : `Target amount (${symbol})`}
+                                  ? tForm('pledge_for_year', { symbol })
+                                  : tForm('target_amount', { symbol })}
                         </FormLabel>
                         <FormControl>
-                            <FormInput inputMode="decimal" placeholder="0,00" {...field} />
+                            <FormInput
+                                inputMode="decimal"
+                                placeholder={tUiForm('amount_zero')}
+                                {...field}
+                            />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -759,11 +768,15 @@ export function GoalForm({
                             <FormItem>
                                 <FormLabel>
                                     {isGive
-                                        ? `Planned per month (${symbol})`
-                                        : `Monthly contribution (${symbol})`}
+                                        ? tForm('planned_per_month', { symbol })
+                                        : tForm('monthly_contribution', { symbol })}
                                 </FormLabel>
                                 <FormControl>
-                                    <FormInput inputMode="decimal" placeholder="0,00" {...field} />
+                                    <FormInput
+                                        inputMode="decimal"
+                                        placeholder={tUiForm('amount_zero')}
+                                        {...field}
+                                    />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -776,7 +789,7 @@ export function GoalForm({
                             name="jarId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Jar</FormLabel>
+                                    <FormLabel>{tUiForm('jar')}</FormLabel>
                                     <FormControl>
                                         <select
                                             className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
@@ -802,9 +815,9 @@ export function GoalForm({
                 name="why"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Why (optional)</FormLabel>
+                        <FormLabel>{tForm('why_label')}</FormLabel>
                         <FormControl>
-                            <FormInput placeholder="Briefly why this matters" {...field} />
+                            <FormInput placeholder={tForm('why_placeholder')} {...field} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>

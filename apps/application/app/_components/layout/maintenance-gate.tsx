@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 
+import { useTranslations } from '@rumtelo/i18n';
 import { BrandLoader, StatusPage } from '@rumtelo/ui';
 
 import { signOut } from '@/app/_lib/auth';
@@ -21,6 +22,7 @@ const POLL_MS = 20_000;
  * `@rumtelo.com` staff may enter while the API is healthy and the flag is on.
  */
 export function MaintenanceGate({ children }: { children: ReactNode }) {
+    const t = useTranslations();
     const { user, isPending, isAuthenticated } = useAuth();
     const flagOn = isMaintenanceFlagEnabled();
     const [apiReady, setApiReady] = useState<boolean | null>(null);
@@ -49,7 +51,7 @@ export function MaintenanceGate({ children }: { children: ReactNode }) {
     }, []);
 
     if (apiReady === null || isPending) {
-        return <BrandLoader fullScreen label="Loading" />;
+        return <BrandLoader fullScreen label={t('ui.statusPage.loading')} />;
     }
 
     const surfaceActive = isMaintenanceSurfaceActive({ flagOn, apiReady });
@@ -64,17 +66,23 @@ export function MaintenanceGate({ children }: { children: ReactNode }) {
         <div className="relative min-h-dvh">
             <StatusPage
                 type="maintenance"
-                title={apiDown ? 'Rumtelo is briefly offline' : 'Rumtelo is getting ready'}
+                title={
+                    apiDown
+                        ? t('pages.shell.gates.maintenance_api_down_title')
+                        : t('pages.shell.gates.maintenance_update_title')
+                }
                 description={
                     apiDown
-                        ? 'We cannot reach the API right now. Your jars and data are safe — try again in a moment.'
-                        : 'We are finishing a short update. Only the Rumtelo team can sign in for now.'
+                        ? t('pages.shell.gates.maintenance_api_down_body')
+                        : t('pages.shell.gates.maintenance_update_body')
                 }
                 homeHref={webHome}
-                homeLabel="Back to website"
+                homeLabel={t('pages.shell.gates.back_to_website')}
                 reset={() => {
                     void refreshHealth();
                 }}
+                retryLabel={t('ui.statusPage.try_again')}
+                goBackLabel={t('ui.statusPage.go_back')}
             />
             {isAuthenticated ? (
                 <div className="pointer-events-none fixed inset-x-0 bottom-8 z-10 flex justify-center px-4">
@@ -87,7 +95,7 @@ export function MaintenanceGate({ children }: { children: ReactNode }) {
                                 window.location.href = `${webHome}/`;
                             })();
                         }}>
-                        Sign out
+                        {t('pages.shell.menu.sign_out')}
                     </button>
                 </div>
             ) : null}

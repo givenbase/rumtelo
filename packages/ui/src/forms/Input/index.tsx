@@ -19,6 +19,8 @@ export type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
     startAffix?: React.ReactNode;
     /** Trailing control inside the field shell (clear, generate, show/hide). */
     endAction?: React.ReactNode;
+    /** aria-label for the native date/time picker button. English fallback when omitted. */
+    pickerAriaLabel?: string;
 };
 
 /** date / month / time — keep typing, surface a visible picker affordance. */
@@ -29,7 +31,7 @@ const temporalFieldClass =
     '[&::-webkit-calendar-picker-indicator]:p-0 [&::-webkit-calendar-picker-indicator]:opacity-0';
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-    ({ className, endAction, startAffix, type, ...props }, ref) => {
+    ({ className, endAction, pickerAriaLabel, startAffix, type, ...props }, ref) => {
         const inputRef = React.useRef<HTMLInputElement | null>(null);
         const isTemporal = Boolean(type && TEMPORAL_INPUT_TYPES.has(type));
 
@@ -62,7 +64,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             (isTemporal ? (
                 <button
                     type="button"
-                    aria-label="Open date picker"
+                    aria-label={pickerAriaLabel ?? 'Open date picker'}
                     className="inline-flex size-8 items-center justify-center rounded-md text-fg-muted transition-colors hover:text-fg disabled:opacity-50"
                     disabled={props.disabled}
                     onClick={openNativePicker}>

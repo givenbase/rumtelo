@@ -1,7 +1,7 @@
 'use client';
 
 import { api } from '@/app/_lib/api';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import {
     Currency,
@@ -11,9 +11,11 @@ import {
     Locale,
     SpendingStyle,
 } from '@rumtelo/contracts';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Button, Field, Input, Typography } from '@rumtelo/ui';
 import { cn, formatMoney, currencySymbol } from '@rumtelo/utils';
 
+import { useApiError } from '@/app/_lib/api-error-messages';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { writeHelpersEnabled } from '@/app/_lib/feature-helpers';
@@ -23,33 +25,44 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 import { useOptionalPlanIntent } from '@/components/features/shell/plan-intent-provider';
 
 const ONBOARDING_CURRENCIES = [
-    { code: Currency.EUR, sampleLocale: 'nl-NL' },
-    { code: Currency.USD, sampleLocale: 'en-US' },
-    { code: Currency.GBP, sampleLocale: 'en-GB' },
+    { code: Currency.EUR },
+    { code: Currency.USD },
+    { code: Currency.GBP },
 ] as const;
 
-const STEPS = [
-    {
-        title: 'Welcome to Rumtelo',
-        body: 'Stop wondering where it went. Six jars, one calm overview.',
-    },
-    {
-        title: 'Your income',
-        body: 'Pick the currency for this household, then your net monthly income.',
-    },
-    { title: 'The six jars', body: 'Your income is split immediately — pay your future first.' },
-    {
-        title: 'How you handle money',
-        body: 'Soft labels only — so tips fit you. Partners can choose differently later.',
-    },
-    { title: 'Your why', body: 'One sentence on your dashboard. The check when money gets tight.' },
-    {
-        title: 'The Coach stays with you',
-        body: 'On-screen tips (marked ✦ The Coach) stay on while you learn — tips without shame. Open The Coach anytime for next moves. Turn tips off later in Settings → Account.',
-    },
-];
+const STEP_KEYS = ['welcome', 'income', 'jars', 'money_style', 'why', 'coach'] as const;
+
+const JAR_NAME_KEYS: Record<
+    JarKey,
+    | 'features.brand.auth_manifesto.jars.necessity.name'
+    | 'features.brand.auth_manifesto.jars.freedom.name'
+    | 'features.brand.auth_manifesto.jars.savings.name'
+    | 'features.brand.auth_manifesto.jars.education.name'
+    | 'features.brand.auth_manifesto.jars.play.name'
+    | 'features.brand.auth_manifesto.jars.give.name'
+> = {
+    [JarKey.NECESSITIES]: 'features.brand.auth_manifesto.jars.necessity.name',
+    [JarKey.FINANCIAL_FREEDOM]: 'features.brand.auth_manifesto.jars.freedom.name',
+    [JarKey.LONG_TERM_SAVINGS]: 'features.brand.auth_manifesto.jars.savings.name',
+    [JarKey.EDUCATION]: 'features.brand.auth_manifesto.jars.education.name',
+    [JarKey.PLAY]: 'features.brand.auth_manifesto.jars.play.name',
+    [JarKey.GIVE]: 'features.brand.auth_manifesto.jars.give.name',
+};
 
 export function OnboardingOverlay() {
+    const t = useTranslations('pages.onboarding');
+    const tRoot = useTranslations();
+    const apiError = useApiError();
+    const appLocale = useLocale();
+    const steps = useMemo(
+        () =>
+            STEP_KEYS.map(key => ({
+                title: t(key),
+                body: t(`${key}_body`),
+            })),
+        [t]
+    );
+
     const { session, householdId, isPending, setActiveHousehold, refreshSession } = useAuth();
     const {
         onboardingOpen,
@@ -71,7 +84,9 @@ export function OnboardingOverlay() {
         if (session) openOnboarding();
     }, [session, householdId, isPending, openOnboarding, closeOnboarding]);
 
-    const [householdName, setHouseholdName] = useState('My household');
+    const defaultHouseholdName = t('household_default');
+    const [householdNameDraft, setHouseholdNameDraft] = useState<string | null>(null);
+    const householdName = householdNameDraft ?? defaultHouseholdName;
     const [currency, setCurrency] = useState<Currency>(Currency.EUR);
     const [monthlyIncome, setMonthlyIncome] = useState('4300');
     const [why, setWhy] = useState('');
@@ -84,7 +99,7 @@ export function OnboardingOverlay() {
             ? catalogJars
             : (Object.values(JarKey) as JarKey[]).map(key => ({
                   key,
-                  name: key,
+                  name: tRoot(JAR_NAME_KEYS[key]),
                   icon: '◇',
                   pct: DEFAULT_JAR_SPLIT[key],
                   text: jarChrome(key).text,
@@ -94,8 +109,8 @@ export function OnboardingOverlay() {
     if (householdId) return null;
     if (!onboardingOpen) return null;
 
-    const step = STEPS[onboardingStep] ?? STEPS[0]!;
-    const isLast = onboardingStep >= STEPS.length - 1;
+    const step = steps[onboardingStep] ?? steps[0]!;
+    const isLast = onboardingStep >= steps.length - 1;
 
     async function finish() {
         setPending(true);
@@ -114,22 +129,16 @@ export function OnboardingOverlay() {
             });
             await setActiveHousehold(household.id);
             await refreshSession();
-            // Beginners start with Coach guides on; they can turn them off in Settings later.
             writeHelpersEnabled(true);
             closeOnboarding(true);
-            showToast('Household created', 'success');
+            showToast(t('household_created'), 'success');
 
-            // Paid plan from marketing → PendingPlanCheckout opens Stripe after this closes.
             if (!planIntent?.intent) {
                 requestTourOffer();
             }
         } catch (error) {
             console.error('onboard failed', error);
-            const message =
-                error instanceof Error && error.message
-                    ? error.message
-                    : 'Setup failed — please try again';
-            showToast(message, 'error');
+            showToast(apiError(error), 'error');
         } finally {
             setPending(false);
         }
@@ -141,11 +150,11 @@ export function OnboardingOverlay() {
             <div
                 role="dialog"
                 aria-modal="true"
-                aria-label="Welcome to Rumtelo"
+                aria-label={t('dialog_label')}
                 className="fixed top-1/2 left-1/2 z-71 w-full max-w-md -translate-1/2 animate-rise rounded-2xl border border-line-strong bg-surface p-6 shadow-xl">
                 <div className="mb-5 flex items-center justify-between">
                     <p className="font-mono text-xs font-semibold tracking-widest text-accent uppercase">
-                        Step {onboardingStep + 1} of {STEPS.length}
+                        {t('step_of', { current: onboardingStep + 1, total: steps.length })}
                     </p>
                 </div>
 
@@ -158,12 +167,12 @@ export function OnboardingOverlay() {
                     <div className="mt-4 grid gap-3">
                         <div>
                             <p className="mb-2 font-mono text-[10px] tracking-[0.12em] text-fg-muted uppercase">
-                                Currency
+                                {t('currency')}
                             </p>
                             <div
                                 className="flex flex-wrap gap-1.5"
                                 role="group"
-                                aria-label="Currency">
+                                aria-label={t('currency')}>
                                 {ONBOARDING_CURRENCIES.map(option => {
                                     const on = currency === option.code;
                                     return (
@@ -188,7 +197,7 @@ export function OnboardingOverlay() {
                                             <span className="font-mono text-[10.5px] text-fg-muted">
                                                 {formatMoney(430_000, {
                                                     currency: option.code,
-                                                    locale: option.sampleLocale,
+                                                    locale: appLocale,
                                                 })}
                                             </span>
                                         </button>
@@ -197,7 +206,9 @@ export function OnboardingOverlay() {
                             </div>
                         </div>
                         <Field
-                            label={`Net monthly income (${currencySymbol(currency)})`}
+                            label={t('net_income_label', {
+                                symbol: currencySymbol(currency),
+                            })}
                             htmlFor="income">
                             <Input
                                 id="income"
@@ -206,11 +217,11 @@ export function OnboardingOverlay() {
                                 onChange={event => setMonthlyIncome(event.target.value)}
                             />
                         </Field>
-                        <Field label="Household name" htmlFor="hh-name">
+                        <Field label={t('household_name')} htmlFor="hh-name">
                             <Input
                                 id="hh-name"
                                 value={householdName}
-                                onChange={event => setHouseholdName(event.target.value)}
+                                onChange={event => setHouseholdNameDraft(event.target.value)}
                             />
                         </Field>
                     </div>
@@ -235,15 +246,27 @@ export function OnboardingOverlay() {
                     <div className="mt-4 grid gap-4">
                         <div>
                             <p className="mb-2 font-mono text-[10px] tracking-[0.12em] text-fg-muted uppercase">
-                                I tend to…
+                                {t('spending_style_label')}
                             </p>
                             <div className="flex flex-wrap gap-1.5">
                                 {(
                                     [
-                                        { key: SpendingStyle.SPENDER, label: 'Spender' },
-                                        { key: SpendingStyle.SAVER, label: 'Saver' },
-                                        { key: SpendingStyle.BALANCED, label: 'Balanced' },
-                                        { key: SpendingStyle.UNKNOWN, label: 'Not sure' },
+                                        {
+                                            key: SpendingStyle.SPENDER,
+                                            label: t('spending_styles.spender'),
+                                        },
+                                        {
+                                            key: SpendingStyle.SAVER,
+                                            label: t('spending_styles.saver'),
+                                        },
+                                        {
+                                            key: SpendingStyle.BALANCED,
+                                            label: t('spending_styles.balanced'),
+                                        },
+                                        {
+                                            key: SpendingStyle.UNKNOWN,
+                                            label: t('spending_styles.unknown'),
+                                        },
                                     ] as const
                                 ).map(option => (
                                     <button
@@ -263,14 +286,23 @@ export function OnboardingOverlay() {
                         </div>
                         <div>
                             <p className="mb-2 font-mono text-[10px] tracking-[0.12em] text-fg-muted uppercase">
-                                Income month to month
+                                {t('income_stability_label')}
                             </p>
                             <div className="flex gap-1.5">
                                 {(
                                     [
-                                        { key: IncomeStability.STABLE, label: 'Stable' },
-                                        { key: IncomeStability.VARIABLE, label: 'Variable' },
-                                        { key: IncomeStability.NONE, label: 'None' },
+                                        {
+                                            key: IncomeStability.STABLE,
+                                            label: t('income_stability.stable'),
+                                        },
+                                        {
+                                            key: IncomeStability.VARIABLE,
+                                            label: t('income_stability.variable'),
+                                        },
+                                        {
+                                            key: IncomeStability.NONE,
+                                            label: t('income_stability.none'),
+                                        },
                                     ] as const
                                 ).map(option => (
                                     <button
@@ -293,12 +325,12 @@ export function OnboardingOverlay() {
 
                 {onboardingStep === 4 && (
                     <div className="mt-4">
-                        <Field label="Why are you here?" htmlFor="why">
+                        <Field label={t('why_label')} htmlFor="why">
                             <Input
                                 id="why"
                                 value={why}
                                 onChange={event => setWhy(event.target.value)}
-                                placeholder="e.g. Stop guessing where the money went"
+                                placeholder={t('why_placeholder')}
                             />
                         </Field>
                     </div>
@@ -306,9 +338,9 @@ export function OnboardingOverlay() {
 
                 <div className="mt-6 flex items-center justify-between gap-3">
                     <div className="flex gap-1">
-                        {STEPS.map((_, index) => (
+                        {steps.map((_, index) => (
                             <span
-                                key={STEPS[index]!.title}
+                                key={steps[index]!.title}
                                 className={cn(
                                     'h-1.5 rounded-full transition-all',
                                     index === onboardingStep ? 'w-5 bg-accent' : 'w-1.5 bg-sunken'
@@ -322,16 +354,16 @@ export function OnboardingOverlay() {
                                 variant="secondary"
                                 size="sm"
                                 onClick={() => setOnboardingStep(onboardingStep - 1)}>
-                                Back
+                                {t('back')}
                             </Button>
                         )}
                         {isLast ? (
                             <Button size="sm" disabled={pending} onClick={() => void finish()}>
-                                {pending ? 'Creating…' : 'Start'}
+                                {pending ? t('creating') : t('start')}
                             </Button>
                         ) : (
                             <Button size="sm" onClick={() => setOnboardingStep(onboardingStep + 1)}>
-                                Next
+                                {t('next')}
                             </Button>
                         )}
                     </div>

@@ -3,16 +3,10 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useMarketingSession } from '@/app/_components/marketing-session-provider';
-import {
-    DEMO_INCOME_DEFAULT,
-    DEMO_INCOME_LINE,
-    FLOATERS,
-    HERO,
-    HERO_VIDEO,
-    JARS,
-    PROOF,
-    TICKER,
-} from '@/lib/landing-content';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
+
+import { DEMO_INCOME_DEFAULT, FLOATERS, HERO_VIDEO, JARS, TICKER } from '@/lib/landing-content';
+import { planSlug } from '@/lib/landing-plans';
 import { appHomeUrl, appPlanSettingsUrl, appSignInUrl, webSignUpPath } from '@/lib/portal-urls';
 import { isRegistrationOpen } from '@/lib/maintenance';
 
@@ -21,14 +15,17 @@ import { Typography } from '@rumtelo/ui';
 import { Cta, Eyebrow } from './landing-primitives';
 import { formatCatalogMajor } from './landing-money';
 
-const PLAN_SHORT = { BASIC: 'Basic', PLUS: 'Plus', MAX: 'Max' } as const;
-
 function ease(value: number) {
     const clamped = Math.min(1, Math.max(0, value));
     return 1 - Math.pow(1 - clamped, 3);
 }
 
+const PROOF_KEYS = ['time', 'jars', 'portals', 'free'] as const;
+
 export function LandingHero() {
+    const t = useTranslations('pages.landing');
+    const tPlans = useTranslations('pages.landing.plans');
+    const appLocale = useLocale();
     const income = DEMO_INCOME_DEFAULT;
     const [landP, setLandP] = useState(1);
     const [splitP, setSplitP] = useState(1);
@@ -90,14 +87,14 @@ export function LandingHero() {
         };
     }, []);
 
-    const demoIncome = formatCatalogMajor(Math.round(income * landP));
+    const demoIncome = formatCatalogMajor(Math.round(income * landP), appLocale);
     const demoPct = Math.round(100 * splitP) + '%';
     const demoStage =
         splitP >= 1
-            ? 'THIS MONTH · EVERY AMOUNT HAS A JOB'
+            ? t('hero.demo_stage_complete')
             : landP >= 1
-              ? 'SPLITTING ACROSS SIX JARS…'
-              : 'INCOME LANDING…';
+              ? t('hero.demo_stage_splitting')
+              : t('hero.demo_stage_landing');
 
     return (
         <section className="relative overflow-hidden border-b border-line">
@@ -128,7 +125,7 @@ export function LandingHero() {
                 aria-hidden>
                 {FLOATERS.map(fl => (
                     <span
-                        key={fl.text}
+                        key={fl.key}
                         data-float
                         className="absolute font-mono font-medium tracking-normal whitespace-nowrap opacity-0"
                         style={{
@@ -139,7 +136,7 @@ export function LandingHero() {
                             ['--fl-o' as string]: fl.opacity,
                             animation: `floatUp ${fl.dur} linear ${fl.delay} infinite`,
                         }}>
-                        {fl.text}
+                        {t(`floaters.${fl.key}`)}
                     </span>
                 ))}
 
@@ -150,13 +147,13 @@ export function LandingHero() {
                         className="inline-flex animate-[tickerX_52s_linear_infinite] gap-10 pr-10 whitespace-nowrap">
                         {TICKER.map(tk => (
                             <span
-                                key={tk.key}
+                                key={tk.id}
                                 className="inline-flex items-center gap-2 font-mono text-xs font-medium tracking-widest text-fg-faint opacity-55">
                                 <span
                                     className="size-1 shrink-0 rounded-full"
                                     style={{ background: tk.dot }}
                                 />
-                                {tk.text}
+                                {t(`ticker.${tk.key}`)}
                             </span>
                         ))}
                     </div>
@@ -168,50 +165,56 @@ export function LandingHero() {
                 {/* Left column */}
                 <div className="min-w-0 flex-1 animate-[rise_520ms_var(--ease-out)_both] md:basis-96">
                     <Eyebrow>
-                        {HERO.eyebrow.split(' · ').map((word, index, words) => (
-                            <span key={word} className="inline-flex items-center gap-x-2">
-                                <span>{word}</span>
-                                {index < words.length - 1 ? (
-                                    <span aria-hidden className="text-accent/70">
-                                        ·
-                                    </span>
-                                ) : null}
-                            </span>
-                        ))}
+                        {t('hero.eyebrow')
+                            .split(' · ')
+                            .map((word, index, words) => (
+                                <span key={word} className="inline-flex items-center gap-x-2">
+                                    <span>{word}</span>
+                                    {index < words.length - 1 ? (
+                                        <span aria-hidden className="text-accent/70">
+                                            ·
+                                        </span>
+                                    ) : null}
+                                </span>
+                            ))}
                     </Eyebrow>
                     <Typography
                         as="h1"
                         size="lg"
                         weight="bold"
                         className="my-4 max-w-md leading-[1.05] sm:leading-[1.02] lg:max-w-lg">
-                        {HERO.headline}
+                        {t('hero.headline')}
                     </Typography>
                     <Typography as="p" variant="lead" className="mb-7">
-                        {HERO.lead}
+                        {t('hero.lead')}
                     </Typography>
                     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                         {isAuthenticated ? (
                             <>
                                 <Cta href={appHomeUrl()} size="lg">
-                                    Open dashboard
+                                    {t('hero.open_dashboard')}
                                 </Cta>
                                 <Cta href={appPlanSettingsUrl()} variant="ghost" size="lg">
-                                    {planKey ? `Manage ${PLAN_SHORT[planKey]}` : 'Manage plan'}
+                                    {planKey
+                                        ? t('hero.manage_plan_named', {
+                                              plan: tPlans(`${planSlug(planKey)}.name`),
+                                          })
+                                        : t('hero.manage_plan')}
                                 </Cta>
                             </>
                         ) : (
                             <>
                                 {isRegistrationOpen() ? (
                                     <Cta href={webSignUpPath()} size="lg">
-                                        {HERO.ctaPrimary}
+                                        {t('hero.cta_primary')}
                                     </Cta>
                                 ) : (
                                     <Cta href={appSignInUrl()} size="lg">
-                                        Sign in
+                                        {t('header.sign_in')}
                                     </Cta>
                                 )}
                                 <Cta href="#jars" variant="ghost" size="lg">
-                                    {HERO.ctaSecondary}
+                                    {t('hero.cta_secondary')}
                                 </Cta>
                             </>
                         )}
@@ -219,13 +222,13 @@ export function LandingHero() {
 
                     {/* Proof stats */}
                     <div className="mt-9 grid grid-cols-2 gap-x-6 gap-y-5 sm:flex sm:flex-wrap">
-                        {PROOF.map(item => (
-                            <span key={item.label} className="grid gap-0.5">
+                        {PROOF_KEYS.map(key => (
+                            <span key={key} className="grid gap-0.5">
                                 <span className="font-display text-2xl font-semibold tracking-tight text-fg">
-                                    {item.value}
+                                    {t(`proof.${key}.value`)}
                                 </span>
                                 <span className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase">
-                                    {item.label}
+                                    {t(`proof.${key}.label`)}
                                 </span>
                             </span>
                         ))}
@@ -251,7 +254,9 @@ export function LandingHero() {
                         <div className="my-2.5 mb-1 font-display text-4xl font-semibold tracking-tight text-fg lg:text-5xl">
                             {demoIncome}
                         </div>
-                        <div className="mb-5 text-sm text-fg-muted">{DEMO_INCOME_LINE}</div>
+                        <div className="mb-5 text-sm text-fg-muted">
+                            {t('hero.demo_income_line')}
+                        </div>
 
                         {/* Bar */}
                         <div className="mb-5 flex h-2.5 gap-0.5 overflow-hidden rounded-full bg-sunken">
@@ -274,13 +279,16 @@ export function LandingHero() {
                                         className="size-2 rounded-sm"
                                         style={{ background: j.colorVar }}
                                     />
-                                    <span className="min-w-0 text-sm text-fg-strong">{j.name}</span>
+                                    <span className="min-w-0 text-sm text-fg-strong">
+                                        {t(`jars.${j.key}.name`)}
+                                    </span>
                                     <span className="font-mono text-xs font-medium text-fg-faint">
                                         {j.pct}%
                                     </span>
                                     <span className="font-mono text-sm font-medium text-fg">
                                         {formatCatalogMajor(
-                                            Math.round(((income * j.pct) / 100) * splitP)
+                                            Math.round(((income * j.pct) / 100) * splitP),
+                                            appLocale
                                         )}
                                     </span>
                                 </span>
@@ -292,12 +300,10 @@ export function LandingHero() {
                             <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-accent" />
                             <span className="grid gap-0.5">
                                 <span className="font-mono text-[10px] font-medium tracking-widest text-accent uppercase">
-                                    The Coach · this week
+                                    {t('hero.demo_coach_eyebrow')}
                                 </span>
                                 <span className="text-sm leading-snug text-fg-secondary">
-                                    Every amount has a job. Safe to spend today:{' '}
-                                    <span className="font-mono font-medium text-fg">€64</span>.
-                                    Sleep was 7h20 — a good week to decide things.
+                                    {t('hero.demo_coach_line')}
                                 </span>
                             </span>
                         </div>

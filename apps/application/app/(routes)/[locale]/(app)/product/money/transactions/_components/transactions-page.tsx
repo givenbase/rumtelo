@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import { useLiveQuery } from '@rumtelo/hooks';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Button, Card, EmptyState, Typography } from '@rumtelo/ui';
 import { cn, toPeriodKey } from '@rumtelo/utils';
 
@@ -23,6 +24,7 @@ import {
     type Transaction,
 } from '@rumtelo/contracts';
 
+import { useApiError } from '@/app/_lib/api-error-messages';
 import { createTxHref, txDetailHref } from '@/app/_lib/create-routes';
 import { suggestFixedCostForTx } from '@/app/_lib/fixed-cost-match';
 import { matchMerchantJarKey } from '@/app/_lib/merchant-match';
@@ -42,17 +44,17 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 type Tab = 'INBOX' | 'OUT' | 'IN' | 'RULES';
 
-const MATCHER_LABEL: Record<RuleMatcher, string> = {
-    [RuleMatcher.CONTAINS]: 'contains',
-    [RuleMatcher.EQUALS]: 'is',
-    [RuleMatcher.STARTS_WITH]: 'starts with',
-    [RuleMatcher.REGEX]: 'regex',
+const MATCHER_KEY: Record<RuleMatcher, string> = {
+    [RuleMatcher.CONTAINS]: 'matcher_contains',
+    [RuleMatcher.EQUALS]: 'matcher_equals',
+    [RuleMatcher.STARTS_WITH]: 'matcher_starts_with',
+    [RuleMatcher.REGEX]: 'matcher_regex',
 };
 
-const FIELD_LABEL: Record<RuleField, string> = {
-    [RuleField.DESCRIPTION]: 'description',
-    [RuleField.COUNTERPARTY]: 'counterparty',
-    [RuleField.AMOUNT]: 'amount',
+const FIELD_KEY: Record<RuleField, string> = {
+    [RuleField.DESCRIPTION]: 'field_description',
+    [RuleField.COUNTERPARTY]: 'field_counterparty',
+    [RuleField.AMOUNT]: 'field_amount',
 };
 
 const EMPTY_TRANSACTIONS: Transaction[] = [];
@@ -70,10 +72,13 @@ function fallbackJarKey(amount: number): JarKey {
 }
 
 export function TransactionsPageClient() {
+    const t = useTranslations('features.money.transactions');
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { showToast, period } = useAppShell();
+    const apiError = useApiError();
     const { formatMoney } = useHouseholdCurrency();
+    const appLocale = useLocale();
     const [tab, setTab] = useState<Tab>('INBOX');
     const [ledgerLayout, setLedgerLayout] = useState<'list' | 'jar'>('list');
     const [openJarIds, setOpenJarIds] = useState<Set<string>>(() => new Set());
@@ -188,19 +193,19 @@ export function TransactionsPageClient() {
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.key() });
             if (vars.createRule) {
                 void queryClient.invalidateQueries({ queryKey: apiQuery.money.rules.list.key() });
-                showToast('Sorted and rule saved', 'success');
+                showToast(t('toast_sorted'), 'success');
             } else {
                 showToast(
                     vars.fixedCostId
-                        ? 'Sorted and linked to fixed cost'
+                        ? t('toast_sorted_fixed')
                         : vars.debtId
-                          ? 'Sorted and applied to debt'
-                          : 'Transaction sorted',
+                          ? t('toast_sorted_debt')
+                          : t('toast_sorted_tx'),
                     'success'
                 );
             }
         },
-        onError: () => showToast('Sort failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const replayMutation = useMutation({
@@ -219,12 +224,17 @@ export function TransactionsPageClient() {
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
             showToast(
                 result.sorted > 0
-                    ? `${result.sorted} transaction${result.sorted === 1 ? '' : 's'} sorted`
-                    : 'No matches — inbox unchanged',
+                    ? t(
+                          result.sorted === 1
+                              ? 'toast_rules_sorted_one'
+                              : 'toast_rules_sorted_other',
+                          { count: String(result.sorted) }
+                      )
+                    : t('toast_rules_no_match'),
                 result.sorted > 0 ? 'success' : 'info'
             );
         },
-        onError: () => showToast('Apply rules failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     const removeRuleMutation = useMutation({
@@ -234,9 +244,9 @@ export function TransactionsPageClient() {
         },
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.rules.list.key() });
-            showToast('Rule deleted', 'success');
+            showToast(t('toast_rule_deleted'), 'success');
         },
-        onError: () => showToast('Delete failed', 'error'),
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     function resolveJarId(fallbackKey: JarKey): string {
@@ -253,19 +263,18 @@ export function TransactionsPageClient() {
         <div className="grid animate-rise gap-8">
             <div>
                 <Typography as="span" variant="eyebrow" color="primary">
-                    ✦ TRANSACTIONS
+                    {t('eyebrow')}
                 </Typography>
                 <Typography as="h1" className="mt-2">
-                    Only what changes. Fixed costs are elsewhere.
+                    {t('title')}
                 </Typography>
                 <Typography as="p" variant="lead" size="default" className="mt-2">
-                    Out is spend. In is a gift, tax return, refund, or money you add to a jar.
-                    Connecting a bank is a setting.
+                    {t('lead')}
                 </Typography>
             </div>
 
             <ListToolbar
-                createLabel={tab === 'IN' ? '+ Add in' : '+ Add out'}
+                createLabel={tab === 'IN' ? t('add_in') : t('add_out')}
                 createHref={createTxHref({ direction: tab === 'IN' ? 'in' : 'out' })}
                 secondary={
                     live && (tab === 'INBOX' || tab === 'RULES') && rules.length > 0 ? (
@@ -274,16 +283,16 @@ export function TransactionsPageClient() {
                             size="sm"
                             disabled={replayMutation.isPending}
                             onClick={() => void replayMutation.mutateAsync()}>
-                            {replayMutation.isPending ? 'Working…' : 'Apply rules'}
+                            {replayMutation.isPending ? t('working') : t('apply_rules')}
                         </Button>
                     ) : null
                 }>
                 {(
                     [
-                        ['INBOX', 'To sort'],
-                        ['OUT', 'Out'],
-                        ['IN', 'In'],
-                        ['RULES', 'Rules'],
+                        ['INBOX', t('tab_inbox')],
+                        ['OUT', t('tab_out')],
+                        ['IN', t('tab_in')],
+                        ['RULES', t('tab_rules')],
                     ] as const
                 ).map(([id, label]) => (
                     <button
@@ -315,8 +324,8 @@ export function TransactionsPageClient() {
                 (inbox.length === 0 ? (
                     <EmptyState
                         icon="✓"
-                        title="Nothing left to sort."
-                        body="Every payment has a jar. Come back tomorrow — or connect a bank below."
+                        title={t('inbox_empty_title')}
+                        body={t('inbox_empty_body')}
                     />
                 ) : (
                     <div className="grid gap-3">
@@ -369,15 +378,16 @@ export function TransactionsPageClient() {
                 <div className="grid gap-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                         <Typography as="p" size="sm" color="muted">
-                            {tab === 'OUT'
-                                ? 'Money that left a jar. Tap a row to edit or delete it.'
-                                : 'Gifts, refunds, tax returns, and jar top-ups. Tap a row to edit.'}
+                            {tab === 'OUT' ? t('out_lead') : t('in_lead')}
                         </Typography>
-                        <div className="flex gap-1" role="group" aria-label="Ledger layout">
+                        <div
+                            className="flex gap-1"
+                            role="group"
+                            aria-label={t('ledger_layout_aria')}>
                             {(
                                 [
-                                    { key: 'list' as const, label: 'List' },
-                                    { key: 'jar' as const, label: 'By jar' },
+                                    { key: 'list' as const, label: t('layout_list') },
+                                    { key: 'jar' as const, label: t('layout_by_jar') },
                                 ] as const
                             ).map(option => (
                                 <button
@@ -406,9 +416,7 @@ export function TransactionsPageClient() {
                                         size="sm"
                                         color="muted"
                                         className="px-5 py-4">
-                                        {tab === 'OUT'
-                                            ? 'No out transactions in this period yet.'
-                                            : 'No in transactions in this period yet.'}
+                                        {tab === 'OUT' ? t('empty_out') : t('empty_in')}
                                     </Typography>
                                 );
                             }
@@ -459,10 +467,13 @@ export function TransactionsPageClient() {
                                         badges={
                                             <>
                                                 <MetaChip>
-                                                    {formatBookedDate(transaction.bookedOn)}
+                                                    {formatBookedDate(
+                                                        transaction.bookedOn,
+                                                        appLocale
+                                                    )}
                                                 </MetaChip>
                                                 {transaction.status === TransactionStatus.INBOX ? (
-                                                    <MetaChip>Inbox</MetaChip>
+                                                    <MetaChip>{t('inbox_chip')}</MetaChip>
                                                 ) : (
                                                     <JarBadge jarKey={jar?.key} name={jar?.name} />
                                                 )}
@@ -492,8 +503,8 @@ export function TransactionsPageClient() {
                                     });
                             }
                             const ordered = [...groups.entries()].sort((left, right) => {
-                                const leftName = left[1].jar?.name ?? 'Unassigned';
-                                const rightName = right[1].jar?.name ?? 'Unassigned';
+                                const leftName = left[1].jar?.name ?? t('unassigned');
+                                const rightName = right[1].jar?.name ?? t('unassigned');
                                 return leftName.localeCompare(rightName);
                             });
 
@@ -502,7 +513,7 @@ export function TransactionsPageClient() {
                                     {ordered.map(([jarId, group]) => {
                                         const open =
                                             openJarIds.size === 0 ? true : openJarIds.has(jarId);
-                                        const label = group.jar?.name ?? 'Unassigned';
+                                        const label = group.jar?.name ?? t('unassigned');
                                         return (
                                             <div key={jarId}>
                                                 <button
@@ -563,20 +574,19 @@ export function TransactionsPageClient() {
                 (!live ? (
                     <EmptyState
                         icon="◇"
-                        title="Sign in to manage rules."
-                        body="Rules automatically sort inbox transactions into the right jar."
+                        title={t('rules_sign_in_title')}
+                        body={t('rules_sign_in_body')}
                     />
                 ) : rules.length === 0 ? (
                     <EmptyState
                         icon="◇"
-                        title="No rules yet."
-                        body="Choose “Always this” on an inbox item to teach a rule. Manage them here afterwards."
+                        title={t('rules_empty_title')}
+                        body={t('rules_empty_body')}
                     />
                 ) : (
                     <div className="grid gap-3">
                         <Typography as="p" size="sm" color="muted">
-                            First match wins, by priority. Dead rules (0 hits) can safely be
-                            deleted.
+                            {t('rules_help')}
                         </Typography>
                         <Card className="overflow-hidden p-0">
                             <div className="grid gap-px">
@@ -588,16 +598,24 @@ export function TransactionsPageClient() {
                                             className="flex items-center justify-between gap-3 border-b border-line px-5 py-3.5 last:border-b-0">
                                             <div className="min-w-0">
                                                 <p className="text-sm text-fg">
-                                                    If {FIELD_LABEL[rule.field]}{' '}
-                                                    {MATCHER_LABEL[rule.matcher]}{' '}
-                                                    <span className="font-mono text-sm">
-                                                        “{rule.matchValue}”
-                                                    </span>
+                                                    {t('rule_if', {
+                                                        field: t(FIELD_KEY[rule.field]),
+                                                        matcher: t(MATCHER_KEY[rule.matcher]),
+                                                        value: rule.matchValue,
+                                                    })}
                                                 </p>
                                                 <p className="mt-1 font-mono text-xs tracking-normal text-fg-faint uppercase">
-                                                    → {jar?.name ?? 'Jar'} · prio {rule.priority} ·{' '}
-                                                    {rule.hitCount} hits
-                                                    {!rule.isActive ? ' · off' : ''}
+                                                    {t('rule_meta', {
+                                                        jar: jar?.name ?? t('jar_fallback'),
+                                                        priority: String(rule.priority),
+                                                        hits: t(
+                                                            rule.hitCount === 1
+                                                                ? 'hits_one'
+                                                                : 'hits_other',
+                                                            { count: String(rule.hitCount) }
+                                                        ),
+                                                    })}
+                                                    {!rule.isActive ? t('rule_off') : ''}
                                                 </p>
                                             </div>
                                             <ConfirmActionButton
@@ -606,8 +624,8 @@ export function TransactionsPageClient() {
                                                 className="text-danger hover:bg-danger/10 hover:text-danger"
                                                 disabled={removeRuleMutation.isPending}
                                                 pending={removeRuleMutation.isPending}
-                                                label="Delete"
-                                                confirmLabel="Click again to delete"
+                                                label={t('delete')}
+                                                confirmLabel={t('delete_confirm')}
                                                 onConfirm={() =>
                                                     void removeRuleMutation.mutateAsync(rule.id)
                                                 }

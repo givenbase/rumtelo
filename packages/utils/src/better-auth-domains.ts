@@ -1,6 +1,6 @@
 /**
  * Shared domain helpers for Better Auth trustedOrigins, CORS, and cross-subdomain cookies.
- * Pattern from galighticus-platform `packages/utils/src/better-auth-domains.ts`.
+ * Derive trusted origins / cookie domains for better-auth.
  */
 
 /** e.g. `https://app.rumtelo.com` → `rumtelo.com` */

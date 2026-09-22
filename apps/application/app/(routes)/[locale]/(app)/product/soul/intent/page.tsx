@@ -1,3 +1,4 @@
+import { getTranslations } from '@rumtelo/i18n';
 import { Eyebrow, Section, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
@@ -5,29 +6,32 @@ import { PageContent } from '@/components/layout/page-content';
 
 import { IntentStillnessLink } from './_components/intent-stillness-link';
 
-export const metadata = { title: 'Intention' };
+export async function generateMetadata() {
+    const t = await getTranslations('features.soul.intent');
+    return { title: t('eyebrow') };
+}
 
-const CURRENT_INTENT = 'Ten minutes of stillness before I open my inbox.';
-
-export default function IntentPage() {
-    const hasIntent = Boolean(CURRENT_INTENT);
+export default async function IntentPage() {
+    const t = await getTranslations('features.soul.intent');
+    const exampleIntent = t('example');
+    const hasIntent = Boolean(exampleIntent);
 
     return (
         <PageContent width="narrow" className="grid animate-rise gap-6">
-            <Section eyebrow="Intention" title="One sentence for this week.">
+            <Section eyebrow={t('eyebrow')} title={t('title')}>
                 <Typography as="p" variant="lead" size="default">
-                    Not a resolution. An instruction to yourself, small enough to keep.
+                    {t('lead')}
                 </Typography>
             </Section>
 
             {/* ── Intent card ── */}
             <div className="grid gap-4 rounded-2xl border border-accent/35 bg-surface p-6 shadow-glow">
-                <Eyebrow>My intention</Eyebrow>
+                <Eyebrow>{t('my_intention')}</Eyebrow>
 
                 <input
                     type="text"
-                    defaultValue={CURRENT_INTENT}
-                    placeholder="Write one sentence for this week…"
+                    defaultValue={exampleIntent}
+                    placeholder={t('placeholder')}
                     className={cn(
                         'w-full rounded-xl border border-line-strong bg-raised p-4',
                         'font-display text-lg tracking-tight text-fg lg:text-xl',
@@ -38,7 +42,7 @@ export default function IntentPage() {
 
                 {hasIntent && (
                     <Typography as="p" variant="eyebrow" color="success">
-                        ✦ Set for this week
+                        {t('set_for_week')}
                     </Typography>
                 )}
 
@@ -47,9 +51,7 @@ export default function IntentPage() {
 
             {/* ── Tip ── */}
             <Typography as="p" size="sm" color="muted" className="text-fg-faint">
-                A good intention is small, concrete, and about behaviour — not an outcome. &quot;I
-                check my jars every Sunday&quot; works better than &quot;I am more financially
-                aware.&quot;
+                {t('tip')}
             </Typography>
         </PageContent>
     );

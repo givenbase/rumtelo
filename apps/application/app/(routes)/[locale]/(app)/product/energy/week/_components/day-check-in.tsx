@@ -5,8 +5,9 @@ import { useState } from 'react';
 
 import type { TimeEntry, TimeTemplate } from '@rumtelo/contracts';
 import { TimeDayKind } from '@rumtelo/contracts';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Button } from '@rumtelo/ui';
-
+import { useApiError } from '@/app/_lib/api-error-messages';
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { formatDayLabel, shiftDay, todayIso } from '@/app/_lib/week-key';
@@ -14,7 +15,7 @@ import { useAppShell } from '@/components/features/shell/app-shell-context';
 
 import type { DayMinutes } from './day-shape';
 import {
-    DAY_KIND_NAME,
+    dayKindName,
     describeShape,
     finalizeDay,
     overDay,
@@ -53,6 +54,11 @@ export function DayCheckIn({
     onEditEverything,
     onEditWeek,
 }: Props) {
+    const locale = useLocale();
+    const t = useTranslations();
+    const tc = useTranslations('features.energy.week.checkin');
+    const ts = useTranslations('features.energy.week.shape');
+    const apiError = useApiError();
     const queryClient = useQueryClient();
     const { showToast } = useAppShell();
 
@@ -69,7 +75,8 @@ export function DayCheckIn({
     const adjusting = draft !== null;
 
     const isToday = day === todayIso();
-    const dayName = isToday ? 'today' : formatDayLabel(day);
+    const dayName = isToday ? tc('today_word') : formatDayLabel(day, locale);
+    const dayLabel = isToday ? t('features.energy.week.today') : formatDayLabel(day, locale);
 
     const saveMutation = useMutation({
         mutationFn: (shape: DayMinutes) => {
@@ -93,9 +100,9 @@ export function DayCheckIn({
                 queryClient.invalidateQueries({ queryKey: apiQuery.energy.dashboard.get.key() }),
             ]);
             setDraft(null);
-            showToast(`${isToday ? 'Today' : formatDayLabel(day)} logged`, 'success');
+            showToast(tc('toast_logged', { day: dayLabel }), 'success');
         },
-        onError: (error: Error) => showToast(error.message || 'Could not log this day', 'error'),
+        onError: (error: Error) => showToast(apiError(error), 'error'),
     });
 
     const changeDay = (next: string) => {
@@ -108,7 +115,10 @@ export function DayCheckIn({
     const busy = saveMutation.isPending;
     const learnedNote =
         template?.learned && template.learnedDays >= 3
-            ? `Based on your last ${template.learnedDays} ${DAY_KIND_NAME[kind]}s`
+            ? tc('learned_note', {
+                  count: template.learnedDays,
+                  kind: dayKindName(ts, kind),
+              })
             : null;
 
     return (
@@ -119,18 +129,18 @@ export function DayCheckIn({
                     type="button"
                     size="sm"
                     variant="ghost"
-                    aria-label="Previous day"
+                    aria-label={tc('prev_day')}
                     onClick={() => changeDay(shiftDay(day, -1))}>
                     ←
                 </Button>
                 <span className="font-mono text-xs tracking-wide text-fg-muted uppercase">
-                    {isToday ? 'Today' : formatDayLabel(day)}
+                    {dayLabel}
                 </span>
                 <Button
                     type="button"
                     size="sm"
                     variant="ghost"
-                    aria-label="Next day"
+                    aria-label={tc('next_day')}
                     disabled={isToday}
                     onClick={() => changeDay(shiftDay(day, 1))}>
                     →
@@ -141,18 +151,18 @@ export function DayCheckIn({
                 /* ── Adjust ── */
                 <div className="grid gap-5">
                     <p className="text-lg font-medium text-fg">
-                        What was different about {dayName}?
+                        {tc('adjust_question', { day: dayName })}
                     </p>
                     <ShapeEditor
                         idPrefix={`day-${day}`}
                         value={draft}
                         onChange={setDraft}
                         reference={defaults}
-                        referenceLabel={`typical ${DAY_KIND_NAME[kind]}`}
+                        referenceLabel={tc('reference_typical', { kind: dayKindName(ts, kind) })}
                     />
                     <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
                         <span className="font-mono text-xs text-fg-muted">
-                            {describeShape(draft)}
+                            {describeShape(draft, ts)}
                         </span>
                         <div className="flex items-center gap-2">
                             <Button
@@ -161,13 +171,17 @@ export function DayCheckIn({
                                 size="sm"
                                 disabled={busy}
                                 onClick={() => setDraft(null)}>
-                                Cancel
+                                {t('ui.button.actions.cancel')}
                             </Button>
                             <Button
                                 type="button"
                                 disabled={busy || overDay(draft)}
                                 onClick={() => saveMutation.mutate(draft)}>
-                                {busy ? 'Saving…' : logged ? 'Update day' : 'Log day'}
+                                {busy
+                                    ? t('ui.form.saving')
+                                    : logged
+                                      ? tc('update_day')
+                                      : tc('log_day')}
                             </Button>
                         </div>
                     </div>
@@ -176,19 +190,23 @@ export function DayCheckIn({
                 /* ── Already logged ── */
                 <div className="grid gap-3">
                     <p className="text-lg font-medium text-fg">
-                        {isToday ? 'Today is' : `${formatDayLabel(day)} was`} logged.
+                        {isToday
+                            ? tc('logged_title_today')
+                            : tc('logged_title_day', { day: formatDayLabel(day, locale) })}
                     </p>
-                    <p className="font-mono text-sm text-fg-secondary">{describeShape(logged)}</p>
+                    <p className="font-mono text-sm text-fg-secondary">
+                        {describeShape(logged, ts)}
+                    </p>
                     <div className="flex flex-wrap items-center gap-2">
                         <Button
                             type="button"
                             size="sm"
                             variant="secondary"
                             onClick={() => setDraft(logged)}>
-                            Adjust
+                            {tc('adjust')}
                         </Button>
                         <Button type="button" size="sm" variant="ghost" onClick={onEditEverything}>
-                            Edit every category
+                            {tc('edit_every_category')}
                         </Button>
                     </div>
                 </div>
@@ -197,10 +215,13 @@ export function DayCheckIn({
                 <div className="grid gap-4">
                     <div className="grid gap-1">
                         <p className="text-lg font-medium text-fg">
-                            Was {dayName} a typical {DAY_KIND_NAME[kind]}?
+                            {tc('typical_question', {
+                                day: dayName,
+                                kind: dayKindName(ts, kind),
+                            })}
                         </p>
                         <p className="font-mono text-sm text-fg-secondary">
-                            {describeShape(defaults)}
+                            {describeShape(defaults, ts)}
                         </p>
                         {learnedNote ? (
                             <p className="text-xs text-fg-faint">{learnedNote}</p>
@@ -211,29 +232,29 @@ export function DayCheckIn({
                             type="button"
                             disabled={busy || !template}
                             onClick={() => saveMutation.mutate(defaults)}>
-                            {busy ? 'Logging…' : 'Yes, log it'}
+                            {busy ? tc('logging') : tc('yes_log')}
                         </Button>
                         <Button
                             type="button"
                             variant="secondary"
                             disabled={busy || !template}
                             onClick={() => setDraft(defaults)}>
-                            Mostly — adjust
+                            {tc('mostly_adjust')}
                         </Button>
                         <Button
                             type="button"
                             variant="ghost"
                             disabled={busy}
                             onClick={() => setKindOverride(otherKind)}>
-                            It was a {DAY_KIND_NAME[otherKind]}
+                            {tc('other_kind', { kind: dayKindName(ts, otherKind) })}
                         </Button>
                     </div>
                     <div className="flex flex-wrap gap-4 font-mono text-xs text-fg-muted">
                         <button type="button" onClick={onEditEverything} className="hover:text-fg">
-                            Edit every category
+                            {tc('edit_every_category')}
                         </button>
                         <button type="button" onClick={onEditWeek} className="hover:text-fg">
-                            Change my typical week
+                            {tc('change_typical_week')}
                         </button>
                     </div>
                 </div>

@@ -6,7 +6,7 @@ import { config as loadDotenv } from 'dotenv';
 
 /**
  * Load the first matching .env file into process.env.
- * Same pattern as galighticus-platform `shared/config/env/load-env.ts`:
+ * Load env files in priority order:
  * dotenv does **not** override keys already set (Railway / CI win).
  *
  * Safe to call multiple times.

@@ -2,7 +2,7 @@
 
 Shared oRPC contract, Zod schemas, and TypeScript enums for app + backend.
 
-Inspired by `@galighticus/api`. This README is **normative**: follow it in every new or
+This README is **normative**: follow it in every new or
 moved leaf. Reviews must reject violations.
 
 ---

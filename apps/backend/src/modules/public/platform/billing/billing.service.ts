@@ -12,6 +12,7 @@ import { PlanKey, PLAN_RANK } from '@rumtelo/contracts';
 import Stripe from 'stripe';
 
 import type { Env } from '../../../../common/config/env.config';
+import { apiBadRequest } from '../../../../common/errors/api-user-error';
 import { isDemoHouseholdSlug } from '@rumtelo/contracts/platform';
 import { AuthHousehold } from '../../../auth/household/managed/household/auth-household.entity';
 import { HouseholdBillingService } from '../../../auth/household/household-billing/household-billing.service';
@@ -251,7 +252,7 @@ export class BillingService {
             );
         }
         if (input.planKey === PlanKey.PLUS && snap.planKey !== PlanKey.MAX) {
-            throw new BadRequestException('Only Max can schedule a downgrade to Plus');
+            throw apiBadRequest('plan_downgrade_max_only');
         }
 
         // Preview / no Stripe: apply immediately.
@@ -685,7 +686,7 @@ export class BillingService {
         return this.billing.findHouseholdIdByStripeSubscriptionId(subscription.id);
     }
 
-    /** Resolve `price_…` via lookup key (Meltizo-style). */
+    /** Resolve `price_…` via Stripe lookup key. */
     private async priceIdFor(
         planKey: PaidPlanKey,
         interval: BillingInterval

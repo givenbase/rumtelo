@@ -1,22 +1,23 @@
+import { getTranslations } from '@rumtelo/i18n';
 import { EmptyState, Section, Typography } from '@rumtelo/ui';
 
-export const metadata = { title: 'Nutrition' };
+export async function generateMetadata() {
+    const t = await getTranslations('features.energy.food');
+    return { title: t('eyebrow') };
+}
 
-export default function FoodPage() {
+export default async function FoodPage() {
+    const t = await getTranslations('features.energy.food');
+
     return (
         <div className="grid animate-rise gap-6">
-            <Section eyebrow="Nutrition" title="Two numbers are enough to start.">
+            <Section eyebrow={t('eyebrow')} title={t('title')}>
                 <Typography as="p" variant="lead" size="default">
-                    Enough protein to keep what you build, and enough total to fuel it — without
-                    turning meals into bookkeeping.
+                    {t('title')}
                 </Typography>
             </Section>
 
-            <EmptyState
-                icon="🥗"
-                title="Nog geen data"
-                body="Voeding volgen komt binnenkort. Binnenkort zie je hier eiwit en calorieën per dag."
-            />
+            <EmptyState icon="🍽" title={t('empty_title')} body={t('empty_body')} />
         </div>
     );
 }

@@ -1,6 +1,9 @@
+export { MESSAGE_CATALOGS } from './message-catalogs';
 export * from './locale-metadata';
 export * from './locales';
 export * from './next-intl';
+export { LocaleSwitcher, type LocaleChromeTone } from './locale-switcher';
+export { useApiError, useApiErrorMessage, useApiErrorFallbacks } from './use-api-error';
 export {
     AUTH_QUOTES_WEB,
     AUTH_QUOTES_APP,
@@ -13,8 +16,3 @@ export {
     BRAND_TAGLINE,
     type BrandQuote,
 } from './brand';
-
-import { LocalesEnum } from './next-intl';
-
-/** Default UI locale — English first, Dutch second. */
-export const DEFAULT_LOCALE = LocalesEnum.English;

@@ -15,6 +15,7 @@ import {
     TimeDayKind,
     TimeKind,
 } from '@rumtelo/contracts';
+import type { TranslateFn } from '@rumtelo/i18n';
 
 export type DayMinutes = Partial<Record<TimeCategory, number>>;
 
@@ -28,37 +29,123 @@ export type ShapeQuestion = {
     options: readonly number[];
 };
 
-export const ANCHORS: readonly ShapeQuestion[] = [
+type ShapeQuestionDef = {
+    category: TimeCategory;
+    questionKey: string;
+    dayOffQuestionKey?: string;
+    options: readonly number[];
+};
+
+const ANCHOR_DEFS: readonly ShapeQuestionDef[] = [
     {
         category: TimeCategory.SLEEP,
-        question: 'How long do you sleep?',
-        dayOffQuestion: 'Do you sleep in?',
+        questionKey: 'sleep',
+        dayOffQuestionKey: 'sleep_dayoff',
         options: [5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 10],
     },
     {
         category: TimeCategory.PAID_WORK,
-        question: 'How long do you work?',
+        questionKey: 'paid_work',
         options: [0, 4, 6, 7, 8, 9, 10, 12],
     },
     {
         category: TimeCategory.HOUSEHOLD_CARE,
-        question: 'Home — cooking, cleaning, shopping, admin?',
-        dayOffQuestion: 'The house — chores, groceries, the admin pile?',
+        questionKey: 'household_care',
+        dayOffQuestionKey: 'household_care_dayoff',
         options: [0, 0.5, 1, 1.5, 2, 3, 4],
     },
     {
         category: TimeCategory.FAMILY_CARE,
-        question: 'Caring for children or adults?',
-        dayOffQuestion: 'Time with the people you care for?',
+        questionKey: 'family_care',
+        dayOffQuestionKey: 'family_care_dayoff',
         options: [0, 0.5, 1, 2, 3, 5, 8],
     },
     {
         category: TimeCategory.TRAVEL,
-        question: 'Getting around?',
-        dayOffQuestion: 'Out and about — driving, cycling, transit?',
+        questionKey: 'travel',
+        dayOffQuestionKey: 'travel_dayoff',
         options: [0, 0.5, 1, 1.5, 2, 3],
     },
 ];
+
+const FREE_SPLIT_DEFS: readonly ShapeQuestionDef[] = [
+    {
+        category: TimeCategory.EXERCISE,
+        questionKey: 'exercise',
+        options: [0, 0.5, 1, 1.5, 2, 3],
+    },
+    {
+        category: TimeCategory.SOCIAL,
+        questionKey: 'social',
+        options: [0, 0.5, 1, 1.5, 2, 3, 4],
+    },
+    {
+        category: TimeCategory.SCREEN,
+        questionKey: 'screen',
+        options: [0, 0.5, 1, 1.5, 2, 3, 4],
+    },
+    {
+        category: TimeCategory.STILLNESS,
+        questionKey: 'stillness',
+        options: [0, 0.25, 0.5, 1, 1.5],
+    },
+];
+
+const MORE_DEFS: readonly ShapeQuestionDef[] = [
+    {
+        category: TimeCategory.PERSONAL_CARE,
+        questionKey: 'personal_care',
+        options: [0.5, 1, 1.5, 2, 3],
+    },
+    { category: TimeCategory.STUDY, questionKey: 'study', options: [0, 1, 2, 4, 6, 8] },
+    { category: TimeCategory.HOBBIES, questionKey: 'hobbies', options: [0, 0.5, 1, 2, 3] },
+    {
+        category: TimeCategory.VOLUNTEERING,
+        questionKey: 'volunteering',
+        options: [0, 0.5, 1, 2, 3],
+    },
+];
+
+const WEEKDAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
+
+function resolveQuestions(
+    defs: readonly ShapeQuestionDef[],
+    t: TranslateFn
+): readonly ShapeQuestion[] {
+    return defs.map(def => ({
+        category: def.category,
+        question: t(`questions.${def.questionKey}`),
+        dayOffQuestion: def.dayOffQuestionKey ? t(`questions.${def.dayOffQuestionKey}`) : undefined,
+        options: def.options,
+    }));
+}
+
+export function buildAnchors(t: TranslateFn): readonly ShapeQuestion[] {
+    return resolveQuestions(ANCHOR_DEFS, t);
+}
+
+export function buildFreeSplit(t: TranslateFn): readonly ShapeQuestion[] {
+    return resolveQuestions(FREE_SPLIT_DEFS, t);
+}
+
+export function buildMore(t: TranslateFn): readonly ShapeQuestion[] {
+    return resolveQuestions(MORE_DEFS, t);
+}
+
+export function dayKindName(t: TranslateFn, kind: TimeDayKind): string {
+    return kind === TimeDayKind.WORKDAY ? t('day_kind.workday') : t('day_kind.day_off');
+}
+
+export function weekdayShort(t: TranslateFn): readonly string[] {
+    return WEEKDAY_KEYS.map(key => t(`weekday_short.${key}`));
+}
+
+function shapeHours(minutes: number): string {
+    const rounded = Math.round((minutes / 60) * 4) / 4;
+    const whole = Math.floor(rounded);
+    const glyph = { 0.25: '¼', 0.5: '½', 0.75: '¾' }[rounded - whole] ?? '';
+    return `${whole === 0 && glyph ? '' : whole}${glyph}h`;
+}
 
 /**
  * A first guess at a day off from the workday just described, so the second screen
@@ -75,46 +162,10 @@ export function dayOffFromWorkday(workday: DayMinutes): DayMinutes {
     );
     shape[TimeCategory.TRAVEL] = Math.round((workday[TimeCategory.TRAVEL] ?? 60) / 2 / 15) * 15;
     // Free-time split does not carry over: a day off spends it differently.
-    for (const question of FREE_SPLIT) delete shape[question.category];
+    for (const def of FREE_SPLIT_DEFS) delete shape[def.category];
     delete shape[TimeCategory.FREE_OTHER];
     return shape;
 }
-
-/** Optional second layer: how the free remainder is spent. */
-export const FREE_SPLIT: readonly ShapeQuestion[] = [
-    {
-        category: TimeCategory.EXERCISE,
-        question: 'Moving — sport, training, brisk walks',
-        options: [0, 0.5, 1, 1.5, 2, 3],
-    },
-    {
-        category: TimeCategory.SOCIAL,
-        question: 'People — friends, family, going out',
-        options: [0, 0.5, 1, 1.5, 2, 3, 4],
-    },
-    {
-        category: TimeCategory.SCREEN,
-        question: 'Screen — TV, scrolling, gaming',
-        options: [0, 0.5, 1, 1.5, 2, 3, 4],
-    },
-    {
-        category: TimeCategory.STILLNESS,
-        question: 'Stillness — rest, meditation, prayer',
-        options: [0, 0.25, 0.5, 1, 1.5],
-    },
-];
-
-/** Rarely needed, behind "more". */
-export const MORE: readonly ShapeQuestion[] = [
-    {
-        category: TimeCategory.PERSONAL_CARE,
-        question: 'Eating, washing, dressing',
-        options: [0.5, 1, 1.5, 2, 3],
-    },
-    { category: TimeCategory.STUDY, question: 'Study', options: [0, 1, 2, 4, 6, 8] },
-    { category: TimeCategory.HOBBIES, question: 'Hobbies', options: [0, 0.5, 1, 2, 3] },
-    { category: TimeCategory.VOLUNTEERING, question: 'Volunteering', options: [0, 0.5, 1, 2, 3] },
-];
 
 export const PERSONAL_CARE_DEFAULT = 90;
 
@@ -141,13 +192,6 @@ export const DEFAULT_WEEKDAYS: Record<TimeDayKind, number[]> = {
     [TimeDayKind.WORKDAY]: [1, 2, 3, 4, 5],
     [TimeDayKind.DAY_OFF]: [6, 7],
 };
-
-export const DAY_KIND_NAME: Record<TimeDayKind, string> = {
-    [TimeDayKind.WORKDAY]: 'workday',
-    [TimeDayKind.DAY_OFF]: 'day off',
-};
-
-export const WEEKDAY_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 
 const isFree = (category: TimeCategory) => TIME_CATEGORY_KIND[category] === TimeKind.FREE;
 
@@ -212,23 +256,17 @@ export function templateForDay(
 }
 
 /** "7.5h sleep · 8h work · 2h home & care · 1h travel · 5h you steer" */
-export function describeShape(minutes: DayMinutes): string {
-    const hours = (value: number) => {
-        const rounded = Math.round((value / 60) * 4) / 4;
-        const whole = Math.floor(rounded);
-        const glyph = { 0.25: '¼', 0.5: '½', 0.75: '¾' }[rounded - whole] ?? '';
-        return `${whole === 0 && glyph ? '' : whole}${glyph}h`;
-    };
+export function describeShape(minutes: DayMinutes, t: TranslateFn): string {
     const parts: string[] = [];
     const sleep = minutes[TimeCategory.SLEEP] ?? 0;
     const work = minutes[TimeCategory.PAID_WORK] ?? 0;
     const home =
         (minutes[TimeCategory.HOUSEHOLD_CARE] ?? 0) + (minutes[TimeCategory.FAMILY_CARE] ?? 0);
     const travel = minutes[TimeCategory.TRAVEL] ?? 0;
-    if (sleep) parts.push(`${hours(sleep)} sleep`);
-    if (work) parts.push(`${hours(work)} work`);
-    if (home) parts.push(`${hours(home)} home & care`);
-    if (travel) parts.push(`${hours(travel)} travel`);
-    parts.push(`${hours(Math.max(0, freeRemainder(minutes)))} you steer`);
+    if (sleep) parts.push(t('describe.sleep', { hours: shapeHours(sleep) }));
+    if (work) parts.push(t('describe.work', { hours: shapeHours(work) }));
+    if (home) parts.push(t('describe.home_care', { hours: shapeHours(home) }));
+    if (travel) parts.push(t('describe.travel', { hours: shapeHours(travel) }));
+    parts.push(t('describe.you_steer', { hours: shapeHours(Math.max(0, freeRemainder(minutes))) }));
     return parts.join(' · ');
 }

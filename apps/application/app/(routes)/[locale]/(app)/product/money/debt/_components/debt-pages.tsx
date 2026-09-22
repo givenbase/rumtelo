@@ -4,6 +4,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 
 import { Cadence, DebtScheduleKind } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
+import { useTranslations } from '@rumtelo/i18n';
 import { Typography } from '@rumtelo/ui';
 
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
@@ -16,6 +17,7 @@ export function DebtCreatePage({ embedded = false }: { embedded?: boolean }) {
 }
 
 export function DebtUpdatePage({ id, embedded = false }: { id: string; embedded?: boolean }) {
+    const t = useTranslations('features.money.debt.detail');
     const { householdId } = useAuth();
     const live = isLiveData(householdId);
 
@@ -29,12 +31,12 @@ export function DebtUpdatePage({ id, embedded = false }: { id: string; embedded?
     if (live && query.isLoading && !row) {
         return (
             <Typography as="p" size="sm" color="muted">
-                Loading…
+                {t('loading')}
             </Typography>
         );
     }
     if (!row) {
-        return <p className="text-sm text-fg-muted">Debt not found.</p>;
+        return <p className="text-sm text-fg-muted">{t('not_found')}</p>;
     }
 
     return (

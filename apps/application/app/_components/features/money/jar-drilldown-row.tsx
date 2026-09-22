@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
+import { useTranslations } from '@rumtelo/i18n';
+
 import { FlowDirection, jarCapabilitiesFor } from '@rumtelo/contracts';
 import { isFixedCostCounting } from '@rumtelo/utils';
 
@@ -22,6 +24,7 @@ export function JarDrilldownRow({
     jar: JarDrilldownItem;
     extras?: JarDrilldownExtras;
 }) {
+    const t = useTranslations('features.money.jars.detail');
     const [open, setOpen] = useState(false);
     const href = jar.href ?? (jar.key ? `/product/money/jars/${jarKeyToSlug(jar.key)}` : undefined);
     const jarFixed = extras
@@ -67,7 +70,7 @@ export function JarDrilldownRow({
                             <Link
                                 href={href}
                                 className="inline-flex font-mono text-xs font-semibold tracking-wide text-fg-muted uppercase hover:text-accent">
-                                Open jar ▸
+                                {t('open_jar_link')}
                             </Link>
                         </div>
                     ) : null}
