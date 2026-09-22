@@ -411,13 +411,18 @@ export function TransactionsPageClient() {
                             const items = tab === 'OUT' ? outItems : inItems;
                             if (items.length === 0) {
                                 return (
-                                    <Typography
-                                        as="p"
-                                        size="sm"
-                                        color="muted"
-                                        className="px-5 py-4">
-                                        {tab === 'OUT' ? t('empty_out') : t('empty_in')}
-                                    </Typography>
+                                    <EmptyState
+                                        variant="compact"
+                                        className="border-0 bg-transparent"
+                                        title={
+                                            tab === 'OUT'
+                                                ? t('empty_out_title')
+                                                : t('empty_in_title')
+                                        }
+                                        body={
+                                            tab === 'OUT' ? t('empty_out_body') : t('empty_in_body')
+                                        }
+                                    />
                                 );
                             }
 

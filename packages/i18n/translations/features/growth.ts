@@ -432,8 +432,10 @@ const growth = {
         loading: 'Loading…',
         not_found: 'Income source not found.',
         sources_heading: '✦ Income sources',
-        empty_live: 'No income sources yet — add one to feed your jars.',
-        empty_guest: 'Sign in to manage income sources.',
+        empty_live_title: 'No income sources yet.',
+        empty_live_body: 'Add one to feed your jars.',
+        empty_guest_title: 'Sign in to manage income.',
+        empty_guest_body: 'Income sources show up here once you are signed in.',
     },
     income_simulator: {
         eyebrow: 'What a raise does',

@@ -97,13 +97,20 @@ EmptyContent.displayName = 'EmptyContent';
 /**
  * Convenience empty panel — prefer compound {@link Empty} pieces for custom layouts.
  */
-export function EmptyState({ icon, title, body, action, variant = 'default' }: EmptyStateProps) {
+export function EmptyState({
+    icon,
+    title,
+    body,
+    action,
+    variant = 'default',
+    className,
+}: EmptyStateProps) {
     return (
-        <Empty variant={variant}>
+        <Empty variant={variant} className={className}>
             <EmptyHeader>
                 {icon ? <EmptyMedia>{icon}</EmptyMedia> : null}
                 <EmptyTitle>{title}</EmptyTitle>
-                <EmptyDescription>{body}</EmptyDescription>
+                {body ? <EmptyDescription>{body}</EmptyDescription> : null}
             </EmptyHeader>
             {action ? <EmptyContent>{action}</EmptyContent> : null}
         </Empty>

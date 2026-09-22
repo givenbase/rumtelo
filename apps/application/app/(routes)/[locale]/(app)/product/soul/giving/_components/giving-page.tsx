@@ -10,7 +10,7 @@ import type { FixedCost, Goal } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus, JarKey, TransactionStatus } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Button, Card, Meter, Section, Typography } from '@rumtelo/ui';
+import { Button, Card, EmptyState, Meter, Section, Typography } from '@rumtelo/ui';
 import {
     describePeriodTravel,
     endOfPeriodIso,
@@ -360,9 +360,12 @@ export function GivingPageClient() {
 
                     <div className="grid gap-px">
                         {giveFixed.length === 0 ? (
-                            <Typography as="p" size="sm" color="muted" className="px-5 pb-1">
-                                {t('empty_auto')}
-                            </Typography>
+                            <EmptyState
+                                variant="compact"
+                                className="border-0 bg-transparent"
+                                title={t('empty_auto_title')}
+                                body={t('empty_auto_body')}
+                            />
                         ) : (
                             giveFixed.map(item => {
                                 const company = item.counterparty?.trim() || item.name;
@@ -404,9 +407,12 @@ export function GivingPageClient() {
                             {t('received_year')}
                         </Typography>
                         {recipients.length === 0 ? (
-                            <Typography as="p" size="sm" color="muted">
-                                {t('empty_ledger')}
-                            </Typography>
+                            <EmptyState
+                                variant="compact"
+                                className="border-0 bg-transparent"
+                                title={t('empty_ledger_title')}
+                                body={t('empty_ledger_body')}
+                            />
                         ) : (
                             <ul className="grid gap-1.5">
                                 {recipients.slice(0, 6).map(row => (

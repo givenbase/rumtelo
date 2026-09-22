@@ -30,6 +30,7 @@ import {
     Input,
     Select,
     VendorMark,
+    EmptyState,
 } from '@rumtelo/ui';
 import {
     cn,
@@ -299,9 +300,12 @@ export function BankSettings() {
                     </Button>
                 }>
                 {accounts.length === 0 ? (
-                    <p className="py-2.5 text-sm text-fg-muted">
-                        {t('pages.settings.panels.bank.no_accounts_yet')}
-                    </p>
+                    <EmptyState
+                        variant="compact"
+                        className="border-0 bg-transparent"
+                        title={t('pages.settings.panels.bank.no_accounts_yet_title')}
+                        body={t('pages.settings.panels.bank.no_accounts_yet_body')}
+                    />
                 ) : (
                     accounts.map((account, i) => {
                         const bank = resolveBankForAccount(account.name);

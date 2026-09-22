@@ -6,7 +6,7 @@ import { useMemo } from 'react';
 
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { AccentCard, Button, Card, Eyebrow, Typography } from '@rumtelo/ui';
+import { AccentCard, Button, Card, EmptyState, Eyebrow, Typography } from '@rumtelo/ui';
 import {
     incomeDelta,
     monthlyNetAsOf,
@@ -242,9 +242,12 @@ export function IncomePageClient() {
                         </Typography>
                     </div>
                     {sources.length === 0 ? (
-                        <p className="px-4 py-3.5 text-sm text-fg-muted sm:px-5">
-                            {live ? t('empty_live') : t('empty_guest')}
-                        </p>
+                        <EmptyState
+                            variant="compact"
+                            className="border-0 bg-transparent"
+                            title={live ? t('empty_live_title') : t('empty_guest_title')}
+                            body={live ? t('empty_live_body') : t('empty_guest_body')}
+                        />
                     ) : (
                         <div className="grid gap-px">
                             {sources.map(source => (

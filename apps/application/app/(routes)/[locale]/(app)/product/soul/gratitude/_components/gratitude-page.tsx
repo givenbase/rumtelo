@@ -8,7 +8,7 @@ import { useRef, useState } from 'react';
 import type { Gratitude } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
-import { Button, Eyebrow, Input, Section, Typography } from '@rumtelo/ui';
+import { Button, EmptyState, Eyebrow, Input, Section, Typography } from '@rumtelo/ui';
 import { currentWeekKey } from '@rumtelo/utils';
 
 import { isLiveData } from '@/app/_lib/preview';
@@ -107,9 +107,7 @@ export function GratitudePageClient() {
 
             {/* ── Entries list ── */}
             {empty ? (
-                <Typography as="p" size="sm" color="muted">
-                    {t('empty')}
-                </Typography>
+                <EmptyState icon="✦" title={t('empty_title')} body={t('empty_body')} />
             ) : (
                 <div className="grid gap-2.5">
                     {entries.map(entry => (
