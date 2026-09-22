@@ -4,13 +4,13 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
-import { Typography } from '@rumtelo/ui';
 
 import type { Transaction } from '@rumtelo/contracts';
 
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { ExpenseForm, type ExpenseFormValues } from '@/components/features/forms/expense-form';
+import { resolveEntityForEdit } from '@/components/features/forms/use-entity-for-edit';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 const EMPTY_TRANSACTIONS: Transaction[] = [];
@@ -79,38 +79,36 @@ export function ExpenseUpdatePage({ id, embedded = false }: { id: string; embedd
     const tx = fromList ?? fromInbox;
     const transactionInPresets = transactionInQuery.data ?? [];
 
-    if (live && (listQuery.isLoading || inboxQuery.isLoading) && !tx) {
-        return (
-            <Typography as="p" size="sm" color="muted">
-                {t('loading')}
-            </Typography>
-        );
-    }
-    if (!tx) {
-        return <p className="text-sm text-fg-muted">{t('not_found')}</p>;
-    }
+    const loaded = resolveEntityForEdit({
+        t,
+        loading: live && (listQuery.isLoading || inboxQuery.isLoading),
+        row: tx,
+        mapRow: row => ({
+            description: row.description,
+            counterparty: row.counterparty,
+            note: row.note ?? '',
+            categoryId: row.categoryId,
+            inflowKey: row.inflowKey,
+            amount: minorUnitsToAmountInput(Math.abs(row.amount)),
+            jarId: row.jarId ?? '',
+            label:
+                row.amount >= 0
+                    ? row.counterparty?.trim() ||
+                      transactionInPresets.find(preset => preset.key === row.inflowKey)?.name ||
+                      ''
+                    : '',
+        }),
+    });
+
+    if (loaded.status !== 'ready') return loaded.node;
 
     return (
         <ExpenseForm
             mode="edit"
-            entityId={tx.id}
+            entityId={loaded.row.id}
             embedded={embedded}
-            direction={tx.amount >= 0 ? 'in' : 'out'}
-            defaultValues={{
-                description: tx.description,
-                counterparty: tx.counterparty,
-                note: tx.note ?? '',
-                categoryId: tx.categoryId,
-                inflowKey: tx.inflowKey,
-                amount: minorUnitsToAmountInput(Math.abs(tx.amount)),
-                jarId: tx.jarId ?? '',
-                label:
-                    tx.amount >= 0
-                        ? tx.counterparty?.trim() ||
-                          transactionInPresets.find(preset => preset.key === tx.inflowKey)?.name ||
-                          ''
-                        : '',
-            }}
+            direction={loaded.row.amount >= 0 ? 'in' : 'out'}
+            defaultValues={loaded.values}
         />
     );
 }

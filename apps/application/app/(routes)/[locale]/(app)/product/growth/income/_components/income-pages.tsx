@@ -1,14 +1,9 @@
 'use client';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
-
-import { useTranslations } from '@rumtelo/i18n';
-import { useLiveQuery } from '@rumtelo/hooks';
-import { Typography } from '@rumtelo/ui';
-
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
-import { isLiveData } from '@/app/_lib/preview';
 import { IncomeForm } from '@/components/features/forms/income-form';
+import { useEntityForEdit } from '@/components/features/forms/use-entity-for-edit';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 export function IncomeCreatePage({ embedded = false }: { embedded?: boolean }) {
@@ -16,44 +11,30 @@ export function IncomeCreatePage({ embedded = false }: { embedded?: boolean }) {
 }
 
 export function IncomeUpdatePage({ id, embedded = false }: { id: string; embedded?: boolean }) {
-    const t = useTranslations('features.growth.income');
     const { householdId } = useAuth();
-    const live = isLiveData(householdId);
+    const loaded = useEntityForEdit({
+        translationNamespace: 'features.growth.income',
+        listOptions: apiQuery.money.income.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        id,
+        mapRow: row => ({
+            name: row.name,
+            amount: minorUnitsToAmountInput(row.amount),
+            kind: row.kind,
+            cadence: row.cadence,
+        }),
+    });
 
-    const query = useLiveQuery(
-        apiQuery.money.income.list.queryOptions({ input: { householdId: householdId! } }),
-        [] as never,
-        live
-    );
-    const row = (query.data ?? []).find(source => source.id === id);
-
-    if (live && query.isLoading && !row) {
-        return (
-            <Typography as="p" size="sm" color="muted">
-                {t('loading')}
-            </Typography>
-        );
-    }
-    if (!row) {
-        return (
-            <Typography as="p" size="sm" color="muted">
-                {t('not_found')}
-            </Typography>
-        );
-    }
+    if (loaded.status !== 'ready') return loaded.node;
 
     return (
         <IncomeForm
             mode="edit"
-            entityId={row.id}
+            entityId={loaded.row.id}
             embedded={embedded}
-            periods={row.periods ?? []}
-            defaultValues={{
-                name: row.name,
-                amount: minorUnitsToAmountInput(row.amount),
-                kind: row.kind,
-                cadence: row.cadence,
-            }}
+            periods={loaded.row.periods ?? []}
+            defaultValues={loaded.values}
         />
     );
 }

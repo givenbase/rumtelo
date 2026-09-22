@@ -42,7 +42,8 @@ import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 import { createGoalFormSchema, type GoalFormSchemaValues } from './form-zod';
-import { ChipSearch, matchesChipQuery } from './chip-search';
+import { CatalogChipPicker } from './catalog-chip-picker';
+import { matchesChipQuery } from './chip-search';
 import { ConfirmActionButton } from './confirm-action-button';
 import { FormInput } from './form-input';
 import { PresetNameField } from './preset-name-field';
@@ -678,16 +679,23 @@ export function GoalForm({
                     <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
                         {tForm('which_car')}
                     </p>
-                    <ChipSearch
-                        value={carBrandQuery}
-                        onChange={setCarBrandQuery}
+                    <CatalogChipPicker
+                        query={carBrandQuery}
+                        onQueryChange={setCarBrandQuery}
+                        items={visibleCarBrands}
                         placeholder={tForm('search_brand')}
-                    />
-                    {carBrandSearch && visibleCarBrands.length === 0 ? (
-                        <p className="text-sm text-fg-muted">{tUiForm('no_matches')}</p>
-                    ) : null}
-                    <div className="flex flex-wrap gap-1.5">
-                        {visibleCarBrands.map(brand => {
+                        noMatchesLabel={tUiForm('no_matches')}
+                        trailing={
+                            !carBrandSearch && visibleCarBrands.length < carBrands.length ? (
+                                <button
+                                    type="button"
+                                    className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
+                                    onClick={() => setShowAllCarBrands(true)}>
+                                    {tForm('more')}
+                                </button>
+                            ) : null
+                        }
+                        renderChip={brand => {
                             const selected = name.trim().toLowerCase() === brand.name.toLowerCase();
                             const mark = partyMark(
                                 {
@@ -699,7 +707,6 @@ export function GoalForm({
                             );
                             return (
                                 <button
-                                    key={brand.key}
                                     type="button"
                                     className={
                                         selected
@@ -722,16 +729,8 @@ export function GoalForm({
                                     {brand.name}
                                 </button>
                             );
-                        })}
-                        {!carBrandSearch && visibleCarBrands.length < carBrands.length ? (
-                            <button
-                                type="button"
-                                className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
-                                onClick={() => setShowAllCarBrands(true)}>
-                                {tForm('more')}
-                            </button>
-                        ) : null}
-                    </div>
+                        }}
+                    />
                 </div>
             ) : null}
 

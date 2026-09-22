@@ -1,18 +1,12 @@
 'use client';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
-
-import { useLiveQuery } from '@rumtelo/hooks';
-
+import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
+import { GoalForm } from '@/components/features/forms/goal-form';
+import { useEntityForEdit } from '@/components/features/forms/use-entity-for-edit';
+import { useAuth } from '@/components/features/shell/auth-provider';
 import type { Goal } from '@rumtelo/contracts';
 import { GoalKind } from '@rumtelo/contracts';
-import { useTranslations } from '@rumtelo/i18n';
-import { Typography } from '@rumtelo/ui';
-
-import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
-import { isLiveData } from '@/app/_lib/preview';
-import { GoalForm } from '@/components/features/forms/goal-form';
-import { useAuth } from '@/components/features/shell/auth-provider';
 
 export function GoalCreatePage({
     embedded = false,
@@ -20,7 +14,6 @@ export function GoalCreatePage({
     defaultJarId,
 }: {
     embedded?: boolean;
-    /** Cross-route prefill — e.g. GIVE from Soul → Giving. */
     defaultKind?: GoalKind;
     defaultJarId?: string;
 }) {
@@ -35,47 +28,33 @@ export function GoalCreatePage({
 }
 
 export function GoalUpdatePage({ id, embedded = false }: { id: string; embedded?: boolean }) {
-    const t = useTranslations('features.growth.goals.detail');
     const { householdId } = useAuth();
-    const live = isLiveData(householdId);
+    const loaded = useEntityForEdit({
+        translationNamespace: 'features.growth.goals.detail',
+        listOptions: apiQuery.money.goals.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        id,
+        mapRow: (row: Goal) => ({
+            kind: row.kind ?? GoalKind.SAVE,
+            name: row.name,
+            target: minorUnitsToAmountInput(row.target),
+            monthlyContribution: minorUnitsToAmountInput(row.monthlyContribution),
+            jarId: row.jarId ?? '',
+            why: row.why ?? '',
+            cause: row.cause ?? null,
+            givingOrganisationKey: row.givingOrganisationKey ?? null,
+        }),
+    });
 
-    const query = useLiveQuery(
-        apiQuery.money.goals.list.queryOptions({ input: { householdId: householdId! } }),
-        [] as never,
-        live
-    );
-    const row = (query.data ?? []).find((goal): goal is Goal => goal.id === id);
-
-    if (live && query.isLoading && !row) {
-        return (
-            <Typography as="p" size="sm" color="muted">
-                {t('loading')}
-            </Typography>
-        );
-    }
-    if (!row) {
-        return (
-            <Typography as="p" size="sm" color="muted">
-                {t('not_found')}
-            </Typography>
-        );
-    }
+    if (loaded.status !== 'ready') return loaded.node;
 
     return (
         <GoalForm
             mode="edit"
-            entityId={row.id}
+            entityId={loaded.row.id}
             embedded={embedded}
-            defaultValues={{
-                kind: row.kind ?? GoalKind.SAVE,
-                name: row.name,
-                target: minorUnitsToAmountInput(row.target),
-                monthlyContribution: minorUnitsToAmountInput(row.monthlyContribution),
-                jarId: row.jarId ?? '',
-                why: row.why ?? '',
-                cause: row.cause ?? null,
-                givingOrganisationKey: row.givingOrganisationKey ?? null,
-            }}
+            defaultValues={loaded.values}
         />
     );
 }

@@ -1,7 +1,8 @@
 'use client';
 
-import { ChipSearch, matchesChipQuery } from './chip-search';
 import type { ReactNode } from 'react';
+
+import { ChipSearch, matchesChipQuery } from './chip-search';
 
 type ChipItem = {
     key: string;
@@ -10,7 +11,7 @@ type ChipItem = {
 };
 
 /**
- * Shared search + filtered chip row used by debt/fixed-cost/expense vendor pickers.
+ * Shared search + filtered chip row used by debt/fixed-cost/expense/goal pickers.
  */
 export function CatalogChipPicker<T extends ChipItem>({
     query,
@@ -21,6 +22,7 @@ export function CatalogChipPicker<T extends ChipItem>({
     disabled,
     otherLabel,
     onOther,
+    trailing,
     renderChip,
 }: {
     query: string;
@@ -29,8 +31,11 @@ export function CatalogChipPicker<T extends ChipItem>({
     placeholder: string;
     noMatchesLabel: string;
     disabled?: boolean;
-    otherLabel: string;
-    onOther: () => void;
+    /** Optional dashed “other / more” chip. */
+    otherLabel?: string;
+    onOther?: () => void;
+    /** Extra controls after chips (e.g. “more” when not searching). */
+    trailing?: ReactNode;
     renderChip: (item: T) => ReactNode;
 }) {
     const visible = items.filter(item => matchesChipQuery(query, item));
@@ -46,17 +51,20 @@ export function CatalogChipPicker<T extends ChipItem>({
             {query.trim() && visible.length === 0 ? (
                 <p className="text-sm text-fg-muted">{noMatchesLabel}</p>
             ) : null}
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
                 {visible.map(item => (
                     <span key={item.key}>{renderChip(item)}</span>
                 ))}
-                <button
-                    type="button"
-                    disabled={disabled}
-                    className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
-                    onClick={onOther}>
-                    {otherLabel}
-                </button>
+                {otherLabel && onOther ? (
+                    <button
+                        type="button"
+                        disabled={disabled}
+                        className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
+                        onClick={onOther}>
+                        {otherLabel}
+                    </button>
+                ) : null}
+                {trailing}
             </div>
         </div>
     );

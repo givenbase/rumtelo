@@ -297,8 +297,8 @@ export function AccountSettings() {
     }, [serverPeriodDay]);
 
     return (
-        <Form {...profileForm}>
-            <SettingsPanel>
+        <SettingsPanel>
+            <Form {...profileForm}>
                 <SettingsInkCard
                     eyebrow={t('pages.settings.panels.profile.eyebrow')}
                     blurb={t('pages.settings.panels.profile.blurb')}>
@@ -597,360 +597,247 @@ export function AccountSettings() {
                         </Button>
                     </SettingsRow>
                 </SettingsInkCard>
+            </Form>
 
-                <SettingsInkCard
-                    eyebrow={t('pages.settings.panels.money_style.eyebrow')}
-                    blurb={t('pages.settings.panels.money_style.blurb')}>
-                    <SettingsRow>
-                        <SettingsRowLabel
-                            title={t('pages.settings.rows.spending_style.title')}
-                            sub={t('pages.settings.rows.spending_style.sub')}
-                        />
-                        <div className="flex flex-wrap justify-end gap-1.5">
-                            {(
-                                [
-                                    {
-                                        key: SpendingStyle.SPENDER,
-                                        label: t('pages.settings.panels.money_style.spender'),
-                                        sub: t('pages.settings.panels.money_style.spender_sub'),
-                                    },
-                                    {
-                                        key: SpendingStyle.SAVER,
-                                        label: t('pages.settings.panels.money_style.saver'),
-                                        sub: t('pages.settings.panels.money_style.saver_sub'),
-                                    },
-                                    {
-                                        key: SpendingStyle.BALANCED,
-                                        label: t('pages.settings.panels.money_style.balanced'),
-                                        sub: t('pages.settings.panels.money_style.balanced_sub'),
-                                    },
-                                    {
-                                        key: SpendingStyle.UNKNOWN,
-                                        label: t('pages.settings.panels.money_style.not_sure'),
-                                        sub: t('pages.settings.panels.money_style.not_sure_sub'),
-                                    },
-                                ] as const
-                            ).map(option => {
-                                const on =
-                                    (accountSettingsQuery.data?.spendingStyle ??
-                                        SpendingStyle.UNKNOWN) === option.key;
-                                return (
-                                    <button
-                                        key={option.key}
-                                        type="button"
-                                        onClick={() => {
-                                            if (live) saveSpendingStyle.mutate(option.key);
-                                        }}
-                                        className={cn(
-                                            'grid min-w-[4.5rem] gap-0.5 rounded-[10px] border px-3 py-2 text-left transition-colors',
-                                            on
-                                                ? 'border-accent bg-accent-soft'
-                                                : 'border-line hover:border-accent/50'
-                                        )}>
-                                        <span
-                                            className={cn(
-                                                'text-xs font-medium',
-                                                on ? 'text-accent' : 'text-fg'
-                                            )}>
-                                            {option.label}
-                                        </span>
-                                        <span className="font-mono text-[9px] text-fg-muted">
-                                            {option.sub}
-                                        </span>
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </SettingsRow>
-                    <SettingsRow last>
-                        <SettingsRowLabel
-                            title={t('pages.settings.rows.income_stability.title')}
-                            sub={t('pages.settings.rows.income_stability.sub')}
-                        />
-                        <div className="flex flex-wrap gap-1 rounded-full border border-line bg-raised p-0.5">
-                            {(
-                                [
-                                    {
-                                        key: IncomeStability.STABLE,
-                                        label: t('pages.settings.panels.money_style.stable'),
-                                    },
-                                    {
-                                        key: IncomeStability.VARIABLE,
-                                        label: t('pages.settings.panels.money_style.variable'),
-                                    },
-                                    {
-                                        key: IncomeStability.NONE,
-                                        label: t('pages.settings.panels.money_style.none'),
-                                    },
-                                ] as const
-                            ).map(option => {
-                                const on =
-                                    (settingsQuery.data?.money?.incomeStability ??
-                                        IncomeStability.STABLE) === option.key;
-                                return (
-                                    <button
-                                        key={option.key}
-                                        type="button"
-                                        disabled={!live || !householdId}
-                                        onClick={() => saveIncomeStability.mutate(option.key)}
-                                        className={cn(
-                                            'rounded-full px-3.5 py-1.5 font-mono text-[10px] font-medium tracking-[0.12em] uppercase transition-colors',
-                                            on
-                                                ? 'bg-accent text-on-accent'
-                                                : 'text-fg-muted hover:text-fg'
-                                        )}>
-                                        {option.label}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </SettingsRow>
-                </SettingsInkCard>
-
-                <SettingsInkCard
-                    eyebrow={t('pages.settings.panels.password.eyebrow')}
-                    blurb={t('pages.settings.panels.password.blurb')}>
-                    <Form {...passwordForm}>
-                        <form
-                            className="grid gap-3 py-2.5"
-                            onSubmit={passwordForm.handleSubmit(values =>
-                                savePassword.mutate(values)
-                            )}>
-                            <FormField
-                                control={passwordForm.control}
-                                name="currentPassword"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <Field
-                                            label={t('pages.settings.panels.password.current')}
-                                            htmlFor="cur-pw">
-                                            <FormControl>
-                                                <Password
-                                                    id="cur-pw"
-                                                    {...field}
-                                                    placeholder={t('ui.form.fields.password_mask')}
-                                                    showPasswordLabel={t('ui.form.show_password')}
-                                                    hidePasswordLabel={t('ui.form.hide_password')}
-                                                    autoComplete="current-password"
-                                                />
-                                            </FormControl>
-                                        </Field>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={passwordForm.control}
-                                name="newPassword"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <Field
-                                            label={t('pages.settings.panels.password.next')}
-                                            htmlFor="new-pw"
-                                            hint={t('pages.settings.panels.password.hint')}>
-                                            <FormControl>
-                                                <Password
-                                                    id="new-pw"
-                                                    {...field}
-                                                    placeholder={t('ui.form.fields.password_mask')}
-                                                    showPasswordLabel={t('ui.form.show_password')}
-                                                    hidePasswordLabel={t('ui.form.hide_password')}
-                                                    autoComplete="new-password"
-                                                />
-                                            </FormControl>
-                                        </Field>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <div className="flex justify-end">
-                                <Button
-                                    type="submit"
-                                    variant="secondary"
-                                    disabled={savePassword.isPending}>
-                                    {savePassword.isPending
-                                        ? t('pages.settings.working')
-                                        : t('pages.settings.panels.password.change')}
-                                </Button>
-                            </div>
-                        </form>
-                    </Form>
-                </SettingsInkCard>
-
-                <SettingsInkCard
-                    eyebrow={t('pages.settings.panels.household.eyebrow')}
-                    blurb={`${memberLimitLabel(activePlan, t)}. ${t('pages.settings.panels.household.blurb_suffix')}`}>
-                    <div className="grid gap-3 py-2.5">
-                        {live && (membersQuery.data?.length ?? 0) > 0 ? (
-                            <ul className="divide-y divide-line rounded-lg border border-line">
-                                {(membersQuery.data ?? []).map(member => (
-                                    <li
-                                        key={member.id}
-                                        className="flex items-center justify-between gap-3 px-3 py-2.5">
-                                        <div className="min-w-0">
-                                            <p className="truncate text-sm font-medium text-fg">
-                                                {member.displayName}
-                                            </p>
-                                            <p className="truncate text-xs text-fg-muted">
-                                                {member.email}
-                                            </p>
-                                        </div>
-                                        <Badge>{member.role}</Badge>
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <StubNotice
-                                prefix={t('ui.statusPage.scaffold')}
-                                what={t('pages.settings.panels.household.members_stub')}
-                            />
-                        )}
-                        {!invitesAllowed ? (
-                            <p className="text-sm text-fg-muted">
-                                {inviteCopy.line}{' '}
-                                <span className="font-medium text-fg">{inviteCopy.cta}</span>
-                            </p>
-                        ) : !seatOpen ? (
-                            <p className="text-sm text-fg-muted">
-                                {t('pages.settings.panels.household.seat_limit', {
-                                    limit: memberLimitLabel(activePlan, t),
-                                })}
-                            </p>
-                        ) : (
-                            <Form {...inviteForm}>
-                                <form
-                                    className="grid gap-3"
-                                    onSubmit={inviteForm.handleSubmit(values =>
-                                        invite.mutate(values)
+            <SettingsInkCard
+                eyebrow={t('pages.settings.panels.money_style.eyebrow')}
+                blurb={t('pages.settings.panels.money_style.blurb')}>
+                <SettingsRow>
+                    <SettingsRowLabel
+                        title={t('pages.settings.rows.spending_style.title')}
+                        sub={t('pages.settings.rows.spending_style.sub')}
+                    />
+                    <div className="flex flex-wrap justify-end gap-1.5">
+                        {(
+                            [
+                                {
+                                    key: SpendingStyle.SPENDER,
+                                    label: t('pages.settings.panels.money_style.spender'),
+                                    sub: t('pages.settings.panels.money_style.spender_sub'),
+                                },
+                                {
+                                    key: SpendingStyle.SAVER,
+                                    label: t('pages.settings.panels.money_style.saver'),
+                                    sub: t('pages.settings.panels.money_style.saver_sub'),
+                                },
+                                {
+                                    key: SpendingStyle.BALANCED,
+                                    label: t('pages.settings.panels.money_style.balanced'),
+                                    sub: t('pages.settings.panels.money_style.balanced_sub'),
+                                },
+                                {
+                                    key: SpendingStyle.UNKNOWN,
+                                    label: t('pages.settings.panels.money_style.not_sure'),
+                                    sub: t('pages.settings.panels.money_style.not_sure_sub'),
+                                },
+                            ] as const
+                        ).map(option => {
+                            const on =
+                                (accountSettingsQuery.data?.spendingStyle ??
+                                    SpendingStyle.UNKNOWN) === option.key;
+                            return (
+                                <button
+                                    key={option.key}
+                                    type="button"
+                                    onClick={() => {
+                                        if (live) saveSpendingStyle.mutate(option.key);
+                                    }}
+                                    className={cn(
+                                        'grid min-w-[4.5rem] gap-0.5 rounded-[10px] border px-3 py-2 text-left transition-colors',
+                                        on
+                                            ? 'border-accent bg-accent-soft'
+                                            : 'border-line hover:border-accent/50'
                                     )}>
-                                    <FormField
-                                        control={inviteForm.control}
-                                        name="email"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <Field
-                                                    label={t(
-                                                        'pages.settings.panels.household.invite_email'
-                                                    )}
-                                                    htmlFor="invite-email">
-                                                    <FormControl>
-                                                        <Email
-                                                            id="invite-email"
-                                                            {...field}
-                                                            placeholder={t(
-                                                                'pages.settings.panels.household.invite_placeholder'
-                                                            )}
-                                                            disabled={!live}
-                                                        />
-                                                    </FormControl>
-                                                </Field>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <div className="flex justify-end">
-                                        <Button
-                                            type="submit"
-                                            variant="secondary"
-                                            disabled={!live || invite.isPending}>
-                                            {invite.isPending
-                                                ? t('pages.settings.working')
-                                                : t('pages.settings.invite')}
-                                        </Button>
-                                    </div>
-                                </form>
-                            </Form>
-                        )}
-                    </div>
-                </SettingsInkCard>
-
-                <SettingsInkCard
-                    eyebrow={t('pages.settings.panels.display.eyebrow')}
-                    blurb={t('pages.settings.panels.display.blurb')}>
-                    <SettingsRow>
-                        <SettingsRowLabel
-                            title={t('pages.settings.rows.appearance.title')}
-                            sub={t('pages.settings.rows.appearance.sub')}
-                        />
-                        <div className="flex gap-1 rounded-full border border-line bg-raised p-0.5">
-                            {(
-                                [
-                                    {
-                                        value: Theme.SYSTEM,
-                                        label: t('pages.settings.panels.display.system'),
-                                    },
-                                    {
-                                        value: Theme.LIGHT,
-                                        label: t('pages.settings.panels.display.light'),
-                                    },
-                                    {
-                                        value: Theme.DARK,
-                                        label: t('pages.settings.panels.display.dark'),
-                                    },
-                                ] as const
-                            ).map(option => {
-                                const on = activeTheme === option.value;
-                                return (
-                                    <button
-                                        key={option.value}
-                                        type="button"
-                                        disabled={!live || saveTheme.isPending}
-                                        onClick={() => saveTheme.mutate(option.value)}
+                                    <span
                                         className={cn(
-                                            'rounded-full px-3.5 py-1.5 font-mono text-[10px] font-medium tracking-[0.12em] uppercase transition-colors',
-                                            on
-                                                ? 'bg-accent text-on-accent'
-                                                : 'text-fg-muted hover:text-fg'
+                                            'text-xs font-medium',
+                                            on ? 'text-accent' : 'text-fg'
                                         )}>
                                         {option.label}
-                                    </button>
-                                );
-                            })}
+                                    </span>
+                                    <span className="font-mono text-[9px] text-fg-muted">
+                                        {option.sub}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </SettingsRow>
+                <SettingsRow last>
+                    <SettingsRowLabel
+                        title={t('pages.settings.rows.income_stability.title')}
+                        sub={t('pages.settings.rows.income_stability.sub')}
+                    />
+                    <div className="flex flex-wrap gap-1 rounded-full border border-line bg-raised p-0.5">
+                        {(
+                            [
+                                {
+                                    key: IncomeStability.STABLE,
+                                    label: t('pages.settings.panels.money_style.stable'),
+                                },
+                                {
+                                    key: IncomeStability.VARIABLE,
+                                    label: t('pages.settings.panels.money_style.variable'),
+                                },
+                                {
+                                    key: IncomeStability.NONE,
+                                    label: t('pages.settings.panels.money_style.none'),
+                                },
+                            ] as const
+                        ).map(option => {
+                            const on =
+                                (settingsQuery.data?.money?.incomeStability ??
+                                    IncomeStability.STABLE) === option.key;
+                            return (
+                                <button
+                                    key={option.key}
+                                    type="button"
+                                    disabled={!live || !householdId}
+                                    onClick={() => saveIncomeStability.mutate(option.key)}
+                                    className={cn(
+                                        'rounded-full px-3.5 py-1.5 font-mono text-[10px] font-medium tracking-[0.12em] uppercase transition-colors',
+                                        on
+                                            ? 'bg-accent text-on-accent'
+                                            : 'text-fg-muted hover:text-fg'
+                                    )}>
+                                    {option.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </SettingsRow>
+            </SettingsInkCard>
+
+            <SettingsInkCard
+                eyebrow={t('pages.settings.panels.password.eyebrow')}
+                blurb={t('pages.settings.panels.password.blurb')}>
+                <Form {...passwordForm}>
+                    <form
+                        className="grid gap-3 py-2.5"
+                        onSubmit={passwordForm.handleSubmit(values => savePassword.mutate(values))}>
+                        <FormField
+                            control={passwordForm.control}
+                            name="currentPassword"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <Field
+                                        label={t('pages.settings.panels.password.current')}
+                                        htmlFor="cur-pw">
+                                        <FormControl>
+                                            <Password
+                                                id="cur-pw"
+                                                {...field}
+                                                placeholder={t('ui.form.fields.password_mask')}
+                                                showPasswordLabel={t('ui.form.show_password')}
+                                                hidePasswordLabel={t('ui.form.hide_password')}
+                                                autoComplete="current-password"
+                                            />
+                                        </FormControl>
+                                    </Field>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={passwordForm.control}
+                            name="newPassword"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <Field
+                                        label={t('pages.settings.panels.password.next')}
+                                        htmlFor="new-pw"
+                                        hint={t('pages.settings.panels.password.hint')}>
+                                        <FormControl>
+                                            <Password
+                                                id="new-pw"
+                                                {...field}
+                                                placeholder={t('ui.form.fields.password_mask')}
+                                                showPasswordLabel={t('ui.form.show_password')}
+                                                hidePasswordLabel={t('ui.form.hide_password')}
+                                                autoComplete="new-password"
+                                            />
+                                        </FormControl>
+                                    </Field>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <div className="flex justify-end">
+                            <Button
+                                type="submit"
+                                variant="secondary"
+                                disabled={savePassword.isPending}>
+                                {savePassword.isPending
+                                    ? t('pages.settings.working')
+                                    : t('pages.settings.panels.password.change')}
+                            </Button>
                         </div>
-                    </SettingsRow>
-                    <SettingsRow last>
-                        <Form {...periodForm}>
+                    </form>
+                </Form>
+            </SettingsInkCard>
+
+            <SettingsInkCard
+                eyebrow={t('pages.settings.panels.household.eyebrow')}
+                blurb={`${memberLimitLabel(activePlan, t)}. ${t('pages.settings.panels.household.blurb_suffix')}`}>
+                <div className="grid gap-3 py-2.5">
+                    {live && (membersQuery.data?.length ?? 0) > 0 ? (
+                        <ul className="divide-y divide-line rounded-lg border border-line">
+                            {(membersQuery.data ?? []).map(member => (
+                                <li
+                                    key={member.id}
+                                    className="flex items-center justify-between gap-3 px-3 py-2.5">
+                                    <div className="min-w-0">
+                                        <p className="truncate text-sm font-medium text-fg">
+                                            {member.displayName}
+                                        </p>
+                                        <p className="truncate text-xs text-fg-muted">
+                                            {member.email}
+                                        </p>
+                                    </div>
+                                    <Badge>{member.role}</Badge>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <StubNotice
+                            prefix={t('ui.statusPage.scaffold')}
+                            what={t('pages.settings.panels.household.members_stub')}
+                        />
+                    )}
+                    {!invitesAllowed ? (
+                        <p className="text-sm text-fg-muted">
+                            {inviteCopy.line}{' '}
+                            <span className="font-medium text-fg">{inviteCopy.cta}</span>
+                        </p>
+                    ) : !seatOpen ? (
+                        <p className="text-sm text-fg-muted">
+                            {t('pages.settings.panels.household.seat_limit', {
+                                limit: memberLimitLabel(activePlan, t),
+                            })}
+                        </p>
+                    ) : (
+                        <Form {...inviteForm}>
                             <form
-                                className="grid w-full gap-3 sm:grid-cols-[1fr_auto] sm:items-end"
-                                onSubmit={periodForm.handleSubmit(values =>
-                                    savePeriod.mutate(values)
-                                )}>
+                                className="grid gap-3"
+                                onSubmit={inviteForm.handleSubmit(values => invite.mutate(values))}>
                                 <FormField
-                                    control={periodForm.control}
-                                    name="periodStartDay"
+                                    control={inviteForm.control}
+                                    name="email"
                                     render={({ field }) => (
                                         <FormItem>
                                             <Field
                                                 label={t(
-                                                    'pages.settings.panels.display.period_day'
+                                                    'pages.settings.panels.household.invite_email'
                                                 )}
-                                                htmlFor="period-day"
-                                                hint={t(
-                                                    'pages.settings.panels.display.period_day_hint'
-                                                )}>
+                                                htmlFor="invite-email">
                                                 <FormControl>
-                                                    <Input
-                                                        id="period-day"
-                                                        type="number"
-                                                        min={1}
-                                                        max={28}
-                                                        className="w-28"
-                                                        disabled={!live}
+                                                    <Email
+                                                        id="invite-email"
                                                         {...field}
-                                                        value={field.value}
-                                                        onChange={event =>
-                                                            field.onChange(
-                                                                Math.min(
-                                                                    28,
-                                                                    Math.max(
-                                                                        1,
-                                                                        Number(
-                                                                            event.target.value
-                                                                        ) || 1
-                                                                    )
-                                                                )
-                                                            )
-                                                        }
+                                                        placeholder={t(
+                                                            'pages.settings.panels.household.invite_placeholder'
+                                                        )}
+                                                        disabled={!live}
                                                     />
                                                 </FormControl>
                                             </Field>
@@ -958,55 +845,158 @@ export function AccountSettings() {
                                         </FormItem>
                                     )}
                                 />
-                                <Button
-                                    type="submit"
-                                    variant="secondary"
-                                    disabled={!live || savePeriod.isPending}>
-                                    {savePeriod.isPending
-                                        ? t('pages.settings.working')
-                                        : t('pages.settings.save')}
-                                </Button>
+                                <div className="flex justify-end">
+                                    <Button
+                                        type="submit"
+                                        variant="secondary"
+                                        disabled={!live || invite.isPending}>
+                                        {invite.isPending
+                                            ? t('pages.settings.working')
+                                            : t('pages.settings.invite')}
+                                    </Button>
+                                </div>
                             </form>
                         </Form>
-                    </SettingsRow>
-                </SettingsInkCard>
+                    )}
+                </div>
+            </SettingsInkCard>
 
-                <SettingsInkCard
-                    eyebrow={t('pages.settings.panels.coach.eyebrow')}
-                    blurb={t('pages.settings.panels.coach.blurb')}>
-                    <Toggle
-                        checked={helpersEnabled}
-                        label={t('pages.settings.panels.coach.toggle')}
-                        hint={
-                            helpersEnabled
-                                ? t('pages.settings.panels.coach.hint_on')
-                                : t('pages.settings.panels.coach.hint_off')
-                        }
-                        onCheckedChange={setHelpersEnabled}
+            <SettingsInkCard
+                eyebrow={t('pages.settings.panels.display.eyebrow')}
+                blurb={t('pages.settings.panels.display.blurb')}>
+                <SettingsRow>
+                    <SettingsRowLabel
+                        title={t('pages.settings.rows.appearance.title')}
+                        sub={t('pages.settings.rows.appearance.sub')}
                     />
-                </SettingsInkCard>
+                    <div className="flex gap-1 rounded-full border border-line bg-raised p-0.5">
+                        {(
+                            [
+                                {
+                                    value: Theme.SYSTEM,
+                                    label: t('pages.settings.panels.display.system'),
+                                },
+                                {
+                                    value: Theme.LIGHT,
+                                    label: t('pages.settings.panels.display.light'),
+                                },
+                                {
+                                    value: Theme.DARK,
+                                    label: t('pages.settings.panels.display.dark'),
+                                },
+                            ] as const
+                        ).map(option => {
+                            const on = activeTheme === option.value;
+                            return (
+                                <button
+                                    key={option.value}
+                                    type="button"
+                                    disabled={!live || saveTheme.isPending}
+                                    onClick={() => saveTheme.mutate(option.value)}
+                                    className={cn(
+                                        'rounded-full px-3.5 py-1.5 font-mono text-[10px] font-medium tracking-[0.12em] uppercase transition-colors',
+                                        on
+                                            ? 'bg-accent text-on-accent'
+                                            : 'text-fg-muted hover:text-fg'
+                                    )}>
+                                    {option.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </SettingsRow>
+                <SettingsRow last>
+                    <Form {...periodForm}>
+                        <form
+                            className="grid w-full gap-3 sm:grid-cols-[1fr_auto] sm:items-end"
+                            onSubmit={periodForm.handleSubmit(values => savePeriod.mutate(values))}>
+                            <FormField
+                                control={periodForm.control}
+                                name="periodStartDay"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <Field
+                                            label={t('pages.settings.panels.display.period_day')}
+                                            htmlFor="period-day"
+                                            hint={t(
+                                                'pages.settings.panels.display.period_day_hint'
+                                            )}>
+                                            <FormControl>
+                                                <Input
+                                                    id="period-day"
+                                                    type="number"
+                                                    min={1}
+                                                    max={28}
+                                                    className="w-28"
+                                                    disabled={!live}
+                                                    {...field}
+                                                    value={field.value}
+                                                    onChange={event =>
+                                                        field.onChange(
+                                                            Math.min(
+                                                                28,
+                                                                Math.max(
+                                                                    1,
+                                                                    Number(event.target.value) || 1
+                                                                )
+                                                            )
+                                                        )
+                                                    }
+                                                />
+                                            </FormControl>
+                                        </Field>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <Button
+                                type="submit"
+                                variant="secondary"
+                                disabled={!live || savePeriod.isPending}>
+                                {savePeriod.isPending
+                                    ? t('pages.settings.working')
+                                    : t('pages.settings.save')}
+                            </Button>
+                        </form>
+                    </Form>
+                </SettingsRow>
+            </SettingsInkCard>
 
-                <SettingsInkCard
-                    eyebrow={t('features.tour.chrome.settings.eyebrow')}
-                    blurb={t('features.tour.chrome.settings.blurb')}>
-                    <SettingsRow last>
-                        <SettingsRowLabel
-                            title={t('features.tour.chrome.settings.row_title')}
-                            sub={t('features.tour.chrome.settings.row_sub')}
-                        />
-                        <Button type="button" variant="secondary" onClick={restartFullTour}>
-                            {t('features.tour.chrome.settings.restart')}
-                        </Button>
-                    </SettingsRow>
-                </SettingsInkCard>
-
-                <DangerZone
-                    title={t('pages.settings.account.delete_account')}
-                    body={t('pages.settings.delete.body')}
-                    action={t('pages.settings.account.delete_account')}
-                    onAction={() => showToast(t('pages.settings.toasts.delete_coming'), 'info')}
+            <SettingsInkCard
+                eyebrow={t('pages.settings.panels.coach.eyebrow')}
+                blurb={t('pages.settings.panels.coach.blurb')}>
+                <Toggle
+                    checked={helpersEnabled}
+                    label={t('pages.settings.panels.coach.toggle')}
+                    hint={
+                        helpersEnabled
+                            ? t('pages.settings.panels.coach.hint_on')
+                            : t('pages.settings.panels.coach.hint_off')
+                    }
+                    onCheckedChange={setHelpersEnabled}
                 />
-            </SettingsPanel>
-        </Form>
+            </SettingsInkCard>
+
+            <SettingsInkCard
+                eyebrow={t('features.tour.chrome.settings.eyebrow')}
+                blurb={t('features.tour.chrome.settings.blurb')}>
+                <SettingsRow last>
+                    <SettingsRowLabel
+                        title={t('features.tour.chrome.settings.row_title')}
+                        sub={t('features.tour.chrome.settings.row_sub')}
+                    />
+                    <Button type="button" variant="secondary" onClick={restartFullTour}>
+                        {t('features.tour.chrome.settings.restart')}
+                    </Button>
+                </SettingsRow>
+            </SettingsInkCard>
+
+            <DangerZone
+                title={t('pages.settings.account.delete_account')}
+                body={t('pages.settings.delete.body')}
+                action={t('pages.settings.account.delete_account')}
+                onAction={() => showToast(t('pages.settings.toasts.delete_coming'), 'info')}
+            />
+        </SettingsPanel>
     );
 }

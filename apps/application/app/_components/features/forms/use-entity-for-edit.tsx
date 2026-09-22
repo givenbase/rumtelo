@@ -13,6 +13,37 @@ type EntityForEditResult<TRow, TValues> =
     | { status: 'missing'; node: ReactNode }
     | { status: 'ready'; row: TRow; values: TValues };
 
+function editGate<TRow, TValues>(options: {
+    t: (key: string) => string;
+    loading: boolean;
+    row: TRow | null | undefined;
+    mapRow: (row: TRow) => TValues;
+    loadingKey?: string;
+    notFoundKey?: string;
+}): EntityForEditResult<TRow, TValues> {
+    if (options.loading && !options.row) {
+        return {
+            status: 'loading',
+            node: (
+                <Typography as="p" size="sm" color="muted">
+                    {options.t(options.loadingKey ?? 'loading')}
+                </Typography>
+            ),
+        };
+    }
+    if (!options.row) {
+        return {
+            status: 'missing',
+            node: (
+                <Typography as="p" size="sm" color="muted">
+                    {options.t(options.notFoundKey ?? 'not_found')}
+                </Typography>
+            ),
+        };
+    }
+    return { status: 'ready', row: options.row, values: options.mapRow(options.row) };
+}
+
 /**
  * Shared create/update loader: list query → find by id → map to form defaults.
  */
@@ -30,21 +61,51 @@ export function useEntityForEdit<TRow extends { id: string }, TValues>(options: 
     const query = useLiveQuery(options.listOptions, [], live);
     const row = (query.data ?? []).find(item => item.id === options.id);
 
-    if (live && query.isLoading && !row) {
-        return {
-            status: 'loading',
-            node: (
-                <Typography as="p" size="sm" color="muted">
-                    {t(options.loadingKey ?? 'loading')}
-                </Typography>
-            ),
-        };
-    }
-    if (!row) {
-        return {
-            status: 'missing',
-            node: <p className="text-sm text-fg-muted">{t(options.notFoundKey ?? 'not_found')}</p>,
-        };
-    }
-    return { status: 'ready', row, values: options.mapRow(row) };
+    return editGate({
+        t,
+        loading: live && query.isLoading,
+        row,
+        mapRow: options.mapRow,
+        loadingKey: options.loadingKey,
+        notFoundKey: options.notFoundKey,
+    });
+}
+
+/**
+ * Shared edit loader for get-by-id queries (e.g. assets).
+ */
+export function useEntityGetForEdit<TRow, TValues>(options: {
+    getOptions: UseQueryOptions<TRow | null>;
+    mapRow: (row: TRow) => TValues;
+    loadingKey?: string;
+    notFoundKey?: string;
+    translationNamespace: string;
+}): EntityForEditResult<TRow, TValues> {
+    const t = useTranslations(options.translationNamespace);
+    const { householdId } = useAuth();
+    const live = isLiveData(householdId);
+    const query = useLiveQuery(options.getOptions, null, live);
+
+    return editGate({
+        t,
+        loading: live && query.isLoading,
+        row: query.data,
+        mapRow: options.mapRow,
+        loadingKey: options.loadingKey,
+        notFoundKey: options.notFoundKey,
+    });
+}
+
+/**
+ * Build ready/loading/missing from an already-resolved row (multi-query screens).
+ */
+export function resolveEntityForEdit<TRow, TValues>(options: {
+    t: (key: string) => string;
+    loading: boolean;
+    row: TRow | null | undefined;
+    mapRow: (row: TRow) => TValues;
+    loadingKey?: string;
+    notFoundKey?: string;
+}): EntityForEditResult<TRow, TValues> {
+    return editGate(options);
 }
