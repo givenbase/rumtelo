@@ -6,6 +6,12 @@ import { GIVING_CAUSE_CATALOG, GIVING_EVALUATOR_CATALOG, contract } from '@rumte
 import { ControllerSwagger } from '../../../../../../common/decorators/controller-swagger.decorators';
 import { AccountSettingsService } from '../../../../../auth/user/account/account-settings';
 import {
+    catalogLocaleFromContracts,
+    ENTITY_GIVING_CAUSE,
+    isCatalogSourceLocale,
+    TranslationService,
+} from '../../../../../backoffice/admin/translation';
+import {
     AudienceService,
     CategoryTemplateService,
     DebtPresetService,
@@ -33,7 +39,8 @@ export class MoneyCatalogsController {
         @Inject(MerchantPresetService) private readonly merchants: MerchantPresetService,
         @Inject(GivingOrganisationService)
         private readonly givingOrganisations: GivingOrganisationService,
-        @Inject(AccountSettingsService) private readonly accountSettings: AccountSettingsService
+        @Inject(AccountSettingsService) private readonly accountSettings: AccountSettingsService,
+        @Inject(TranslationService) private readonly translations: TranslationService
     ) {}
 
     @Implement(contract.money.catalogs.jarTemplates.list)
@@ -237,15 +244,27 @@ export class MoneyCatalogsController {
 
     @Implement(contract.money.catalogs.givingCauses.list)
     listGivingCauses() {
-        return implement(contract.money.catalogs.givingCauses.list).handler(() =>
-            GIVING_CAUSE_CATALOG.map((row, sortOrder) => ({
+        return implement(contract.money.catalogs.givingCauses.list).handler(async () => {
+            const { locale } = await this.accountSettings.get();
+            const catalogLocale = catalogLocaleFromContracts(locale);
+            const rows = GIVING_CAUSE_CATALOG.map((row, sortOrder) => ({
                 key: row.key,
                 name: row.name,
                 sortOrder,
                 icon: row.icon,
                 line: row.line,
-            }))
-        );
+            }));
+            if (isCatalogSourceLocale(catalogLocale)) return rows;
+
+            const fieldMap = await this.translations.fieldMapForType(
+                ENTITY_GIVING_CAUSE,
+                catalogLocale,
+                rows.map(row => row.key)
+            );
+            return this.translations.applyToMany(rows, fieldMap, ['name', 'line'], row =>
+                String(row.key)
+            );
+        });
     }
 
     @Implement(contract.money.catalogs.givingEvaluators.list)

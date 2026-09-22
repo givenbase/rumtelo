@@ -7,6 +7,7 @@ import {
     ENTITY_CATEGORY_TEMPLATE,
     ENTITY_DEBT_PRESET,
     ENTITY_FIXED_COST_PRESET,
+    ENTITY_GIVING_CAUSE,
     ENTITY_GOAL_PRESET,
     ENTITY_INCOME_SOURCE_PRESET,
     ENTITY_JAR_TEMPLATE,
@@ -14,6 +15,7 @@ import {
     Translation,
 } from '../../../../modules/backoffice/admin/translation';
 import { AUDIENCE_TRANSLATIONS } from '../../../../modules/backoffice/product/money/catalog/audience/seed/audience-translations';
+import { GIVING_CAUSE_TRANSLATIONS } from '../../../../modules/backoffice/product/money/catalog/giving-organisation/seed/giving-cause-translations';
 import { CATEGORY_TEMPLATE_TRANSLATIONS } from '../../../../modules/backoffice/product/money/template/category/seed/category-translations';
 import { JAR_TEMPLATE_TRANSLATIONS } from '../../../../modules/backoffice/product/money/template/jar/seed/jar-translations';
 import { DEBT_PRESET_TRANSLATIONS } from '../../../../modules/backoffice/product/money/preset/debt/seed/debt-translations';
@@ -55,6 +57,9 @@ export class CatalogTranslationSeeder extends Seeder {
                 TRANSACTION_IN_PRESET_TRANSLATIONS
             ).map(job => upsertFieldMap(em, job.entityType, job.locale, job.fields)),
             ...nameMaps(ENTITY_AUDIENCE, asObjectFields, AUDIENCE_TRANSLATIONS).map(job =>
+                upsertFieldMap(em, job.entityType, job.locale, job.fields)
+            ),
+            ...nameMaps(ENTITY_GIVING_CAUSE, asObjectFields, GIVING_CAUSE_TRANSLATIONS).map(job =>
                 upsertFieldMap(em, job.entityType, job.locale, job.fields)
             ),
         ]);
