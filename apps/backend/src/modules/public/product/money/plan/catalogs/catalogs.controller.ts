@@ -78,10 +78,12 @@ export class MoneyCatalogsController {
     listFixedCostPresets() {
         return implement(contract.money.catalogs.fixedCostPresets.list).handler(
             async ({ input }) => {
+                const { locale } = await this.accountSettings.get();
                 const rows = await this.fixedCosts.listActive({
                     jarKey: (input.jarKey as JarKey | null) ?? undefined,
                     categoryTemplateKey: input.categoryTemplateKey ?? undefined,
                     audienceKey: input.audienceKey ?? undefined,
+                    locale,
                 });
                 return rows.map(preset => ({
                     key: preset.key,
@@ -102,7 +104,8 @@ export class MoneyCatalogsController {
     @Implement(contract.money.catalogs.audiences.list)
     listAudiences() {
         return implement(contract.money.catalogs.audiences.list).handler(async () => {
-            const rows = await this.audiences.listActive();
+            const { locale } = await this.accountSettings.get();
+            const rows = await this.audiences.listActive(locale);
             return rows.map(row => ({
                 key: row.key,
                 name: row.name,
@@ -119,8 +122,10 @@ export class MoneyCatalogsController {
     @Implement(contract.money.catalogs.debtPresets.list)
     listDebtPresets() {
         return implement(contract.money.catalogs.debtPresets.list).handler(async ({ input }) => {
+            const { locale } = await this.accountSettings.get();
             const rows = await this.debts.listActive({
                 kind: (input.kind as DebtKind | null) ?? undefined,
+                locale,
             });
             return rows.map(preset => ({
                 key: preset.key,
@@ -137,8 +142,10 @@ export class MoneyCatalogsController {
     listIncomeSourcePresets() {
         return implement(contract.money.catalogs.incomeSourcePresets.list).handler(
             async ({ input }) => {
+                const { locale } = await this.accountSettings.get();
                 const rows = await this.incomes.listActive({
                     kind: (input.kind as IncomeKind | null) ?? undefined,
+                    locale,
                 });
                 return rows.map(preset => ({
                     key: preset.key,
@@ -155,7 +162,8 @@ export class MoneyCatalogsController {
     @Implement(contract.money.catalogs.transactionInPresets.list)
     listTransactionInPresets() {
         return implement(contract.money.catalogs.transactionInPresets.list).handler(async () => {
-            const rows = await this.transactionIns.listActive();
+            const { locale } = await this.accountSettings.get();
+            const rows = await this.transactionIns.listActive(locale);
             return rows.map(preset => ({
                 key: preset.key,
                 name: preset.name,
@@ -170,8 +178,10 @@ export class MoneyCatalogsController {
     @Implement(contract.money.catalogs.goalPresets.list)
     listGoalPresets() {
         return implement(contract.money.catalogs.goalPresets.list).handler(async ({ input }) => {
+            const { locale } = await this.accountSettings.get();
             const rows = await this.goals.listActive({
                 jarKey: (input.jarKey as JarKey | null) ?? undefined,
+                locale,
             });
             return rows.map(preset => ({
                 key: preset.key,

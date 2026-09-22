@@ -17,6 +17,12 @@ export type { CatalogLocale } from './catalog-locale';
 
 export const ENTITY_JAR_TEMPLATE = 'jar_template';
 export const ENTITY_CATEGORY_TEMPLATE = 'category_template';
+export const ENTITY_FIXED_COST_PRESET = 'fixed_cost_preset';
+export const ENTITY_GOAL_PRESET = 'goal_preset';
+export const ENTITY_DEBT_PRESET = 'debt_preset';
+export const ENTITY_INCOME_SOURCE_PRESET = 'income_source_preset';
+export const ENTITY_TRANSACTION_IN_PRESET = 'transaction_in_preset';
+export const ENTITY_AUDIENCE = 'audience';
 
 function asComparableString(value: unknown): string {
     if (value === null || value === undefined) return '';
