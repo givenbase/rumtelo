@@ -20,6 +20,8 @@ interface EmailLayoutProps {
     headerProps?: React.ComponentProps<typeof EmailHeader>;
     previewText?: string;
     title?: string;
+    /** Marketing site origin — wires header/footer logo links + legal URLs. */
+    websiteUrl?: string;
 }
 
 /**
@@ -32,8 +34,16 @@ const EmailLayout: React.FC<EmailLayoutProps> = ({
     headerProps,
     previewText,
     title,
+    websiteUrl,
 }) => {
     const theme = getTheme(darkMode);
+    const chrome = websiteUrl
+        ? {
+              websiteUrl,
+              privacyUrl: `${websiteUrl.replace(/\/$/, '')}/privacy`,
+              termsUrl: `${websiteUrl.replace(/\/$/, '')}/terms`,
+          }
+        : undefined;
 
     return (
         <Html>
@@ -58,9 +68,9 @@ const EmailLayout: React.FC<EmailLayoutProps> = ({
                         overflow: 'hidden',
                         padding: 0,
                     }}>
-                    <EmailHeader {...headerProps} darkMode={darkMode} />
+                    <EmailHeader {...chrome} {...headerProps} darkMode={darkMode} />
                     {children}
-                    <EmailFooter {...footerProps} darkMode={darkMode} />
+                    <EmailFooter {...chrome} {...footerProps} darkMode={darkMode} />
                 </Container>
             </Body>
         </Html>

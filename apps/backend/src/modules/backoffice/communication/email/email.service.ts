@@ -8,6 +8,7 @@ import type {
     PasswordResetEmailInput,
     SendEmailInput,
 } from './email.types';
+import { EMAIL_BRAND } from './utils/brand.constants';
 import { EmailTemplate, renderTemplate } from './utils/template-adapter';
 
 import { loadEnv } from '../../../../common/config/env.config';
@@ -22,6 +23,9 @@ import { loadEnv } from '../../../../common/config/env.config';
  *   memory  — log only (default; safe for local)
  *   resend  — Resend API when EMAIL_PROVIDER=resend + RESEND_API_KEY
  * EMAIL_LOG_ONLY=true forces memory behaviour even when provider is resend.
+ *
+ * Brand logos are data-URI inlined in the HTML (sharp 3× PNGs) so
+ * `/email-preview` and real clients render without remote fetches or CID.
  */
 @Injectable()
 export class EmailService {
@@ -30,12 +34,14 @@ export class EmailService {
     private readonly defaultFrom: string;
     private readonly resend: Resend | undefined;
     private readonly appOrigin: string;
+    private readonly webOrigin: string;
 
     constructor() {
         const env = loadEnv();
         this.provider = env.EMAIL_LOG_ONLY ? 'memory' : env.EMAIL_PROVIDER;
         this.defaultFrom = env.EMAIL_FROM;
         this.appOrigin = env.DOMAIN_APP.replace(/\/$/, '');
+        this.webOrigin = env.DOMAIN_WEB.replace(/\/$/, '');
 
         if (this.provider === 'resend') {
             if (!env.RESEND_API_KEY) {
@@ -90,7 +96,14 @@ export class EmailService {
         data: Record<string, unknown>,
         locale = 'en'
     ): Promise<boolean> {
-        const html = await renderTemplate(template, data, locale);
+        const html = await renderTemplate(
+            template,
+            {
+                ...data,
+                websiteUrl: this.webOrigin,
+            },
+            locale
+        );
         return this.send({ to, subject, html });
     }
 
@@ -146,5 +159,10 @@ export class EmailService {
     /** Accept URL for an invitation id (application route). */
     inviteUrl(invitationId: string): string {
         return `${this.appOrigin}/invite/${invitationId}`;
+    }
+
+    /** Marketing site origin used in email chrome links. */
+    get websiteUrl(): string {
+        return this.webOrigin || EMAIL_BRAND.websiteUrl;
     }
 }

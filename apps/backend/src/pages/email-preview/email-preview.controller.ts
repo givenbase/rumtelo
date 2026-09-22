@@ -9,9 +9,20 @@ import {
     EmailTemplate,
     renderTemplate,
 } from '../../modules/backoffice/communication/email/utils/template-adapter';
+import { escapeHtml, renderBrandPage } from '../shared/brand-shell';
 
-const TEMPLATES = [EmailTemplate.HOUSEHOLD_INVITE, EmailTemplate.ACCOUNT_VERIFICATION] as const;
+const TEMPLATES = [
+    EmailTemplate.HOUSEHOLD_INVITE,
+    EmailTemplate.ACCOUNT_VERIFICATION,
+    EmailTemplate.PASSWORD_RESET,
+] as const;
 type TemplateId = (typeof TEMPLATES)[number];
+
+const TEMPLATE_LABELS: Record<TemplateId, string> = {
+    [EmailTemplate.HOUSEHOLD_INVITE]: 'Household invite',
+    [EmailTemplate.ACCOUNT_VERIFICATION]: 'Account verification',
+    [EmailTemplate.PASSWORD_RESET]: 'Password reset',
+};
 
 /**
  * Dev/docs-only browser preview of outbound email HTML.
@@ -24,12 +35,24 @@ export class EmailPreviewController {
     @Get()
     list(@Res() reply: FastifyReply): void {
         if (!this.assertEnabled(reply)) return;
-        void reply.send({
-            templates: TEMPLATES.map(id => ({
-                id,
-                preview: `/email-preview/${id}`,
-            })),
+
+        const linksHtml = `<div class="links">${TEMPLATES.map(
+            id =>
+                `<a href="/email-preview/${escapeHtml(id)}">${escapeHtml(TEMPLATE_LABELS[id])}<span>${escapeHtml(id)}</span></a>`
+        ).join('')}</div>`;
+
+        const html = renderBrandPage({
+            title: 'Email preview',
+            eyebrow: 'Templates',
+            headline: 'Email preview',
+            message: 'Open a template to see the HTML we send via Resend.',
+            primaryHref: '/',
+            primaryLabel: 'API home',
+            bodyExtraHtml: linksHtml,
+            footerHtml: 'Dev / ENABLE_SWAGGER only · demo copy, not live mail.',
+            lang: 'en',
         });
+        void reply.type('text/html').send(html);
     }
 
     @Get(':template')
@@ -78,6 +101,16 @@ export class EmailPreviewController {
                         verificationUrl:
                             'https://app.rumtelo.local/api/auth/verify-email?token=demo',
                         expiresInHours: 48,
+                    },
+                    'en'
+                );
+            case EmailTemplate.PASSWORD_RESET:
+                return renderTemplate(
+                    EmailTemplate.PASSWORD_RESET,
+                    {
+                        firstName: 'Anna',
+                        resetUrl: 'https://rumtelo.local/reset-password?token=demo',
+                        expiresInHours: 1,
                     },
                     'en'
                 );

@@ -15,6 +15,7 @@ export interface AccountVerificationTemplateProps {
     firstName: string;
     locale?: string;
     verificationUrl: string;
+    websiteUrl?: string;
 }
 
 /**
@@ -27,6 +28,7 @@ export const AccountVerificationTemplate: React.FC<AccountVerificationTemplatePr
     expiresInHours = 48,
     darkMode = false,
     locale = 'en',
+    websiteUrl,
 }) => {
     const translate = createEmailTranslator(languageObject, locale);
     const styles = createEmailStyles(darkMode);
@@ -34,6 +36,7 @@ export const AccountVerificationTemplate: React.FC<AccountVerificationTemplatePr
     return (
         <EmailLayout
             darkMode={darkMode}
+            websiteUrl={websiteUrl}
             previewText={translate('email.auth.verification.header.preview_text')}
             title={translate('email.auth.verification.header.title')}>
             <Heading style={styles.heading}>
