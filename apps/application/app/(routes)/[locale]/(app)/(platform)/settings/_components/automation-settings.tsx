@@ -16,7 +16,7 @@ import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 import { SettingsInkCard, SettingsPanel, SettingsRowLabel } from './settings-chrome';
-import { AUTO_RULE_DEFAULTS, AUTO_RULE_KEYS } from './settings-shared';
+import { AUTO_RULE_DEFAULTS, AUTO_RULE_KEYS } from '../_utils/settings-shared';
 
 export function AutomationSettings() {
     const t = useTranslations();

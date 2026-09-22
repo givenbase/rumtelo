@@ -19,7 +19,7 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 import { SettingsInkCard, SettingsPanel, SettingsPill, SettingsRow } from './settings-chrome';
-import { JAR_COLOR, accountKindLabel } from './settings-shared';
+import { JAR_COLOR, accountKindLabel } from '../_utils/settings-shared';
 
 export function JarsSettings() {
     const t = useTranslations();

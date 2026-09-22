@@ -57,8 +57,8 @@ import {
     type LearnPiece,
     type LearnSkill,
     type LearnStatus,
-} from './learn-catalog';
-import { useLearnCatalogLabels } from './learn-labels';
+} from '../_utils/learn-catalog';
+import { useLearnCatalogLabels } from '../_utils/learn-labels';
 
 /** A taste of the shelf, not the whole library. One of each format, then a few more. */
 const RECOMMENDED_LIMIT = 6;

@@ -45,7 +45,7 @@ import { DayCheckIn } from './day-check-in';
 import { DayLogForm } from './day-log-form';
 import { TimeBandCard } from './time-band-card';
 import { TimeSources } from './time-sources';
-import { previewWeekSummary } from './week-fixture';
+import { previewWeekSummary } from '../_utils/week-fixture';
 import { WeekForecast } from './week-forecast';
 import { WeekSetupWizard } from './week-setup-wizard';
 

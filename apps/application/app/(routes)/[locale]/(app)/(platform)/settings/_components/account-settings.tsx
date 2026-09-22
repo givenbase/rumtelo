@@ -63,9 +63,9 @@ import {
     type PasswordFormValues,
     type PeriodFormValues,
     type ProfileFormValues,
-} from './settings-form-zod';
-import { CURRENCY_OPTIONS, initials } from './settings-shared';
-import { useSettingsMutation } from './use-settings-mutation';
+} from '../_utils/settings-form-zod';
+import { CURRENCY_OPTIONS, initials } from '../_utils/settings-shared';
+import { useSettingsMutation } from '../_utils/use-settings-mutation';
 
 export function AccountSettings() {
     const t = useTranslations();

@@ -14,7 +14,7 @@ import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 
-import type { DayMinutes } from './day-shape';
+import type { DayMinutes } from '../_utils/day-shape';
 import {
     DEFAULT_SHAPE,
     DEFAULT_WEEKDAYS,
@@ -24,7 +24,7 @@ import {
     overDay,
     shapeFromMinutes,
     weekdayShort,
-} from './day-shape';
+} from '../_utils/day-shape';
 import { ShapeEditor } from './shape-editor';
 
 type Step = 'weekdays' | 'workday' | 'dayOff';

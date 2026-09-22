@@ -14,4 +14,6 @@ Use before merge. Agents are thin; this is the shared bar.
 
 Soft review (settings/forms): flag `useState` named `*Draft` / `*Password` — prefer `useForm`.
 
+Route co-location: non-page files beside `page.tsx` / `layout.tsx` belong in `_components` or `_utils` — see `.cursor/rules/react-next-patterns.mdc`.
+
 See also: `.cursor/rules/react-next-patterns.mdc`, `CLAUDE.md`.

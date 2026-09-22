@@ -49,9 +49,17 @@ import {
     SettingsRow,
     SettingsRowLabel,
 } from './settings-chrome';
-import { createBankAccountFormSchema, type BankAccountFormValues } from './settings-form-zod';
-import { accountKindLabel, formatNlIbanStub, isIbanStub, nlIbanPrefix } from './settings-shared';
-import { useSettingsMutation } from './use-settings-mutation';
+import {
+    createBankAccountFormSchema,
+    type BankAccountFormValues,
+} from '../_utils/settings-form-zod';
+import {
+    accountKindLabel,
+    formatNlIbanStub,
+    isIbanStub,
+    nlIbanPrefix,
+} from '../_utils/settings-shared';
+import { useSettingsMutation } from '../_utils/use-settings-mutation';
 
 const EMPTY_BANK: BankAccountFormValues = {
     label: '',

@@ -25,8 +25,8 @@ import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 
-import { ABOUT_ORDER, aboutFields, asLearnSkill, type LearnSkill } from './learn-catalog';
-import { useLearnCatalogLabels } from './learn-labels';
+import { ABOUT_ORDER, aboutFields, asLearnSkill, type LearnSkill } from '../_utils/learn-catalog';
+import { useLearnCatalogLabels } from '../_utils/learn-labels';
 
 type AddLearningDialogProps = {
     open: boolean;

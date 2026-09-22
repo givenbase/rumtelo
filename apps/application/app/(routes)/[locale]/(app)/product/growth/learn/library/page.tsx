@@ -1,5 +1,5 @@
 import { getTranslations } from '@rumtelo/i18n';
-import { LearnPage } from '../learn-page';
+import { LearnPage } from '../_components/learn-page';
 
 export async function generateMetadata() {
     const t = await getTranslations('pages.meta');
