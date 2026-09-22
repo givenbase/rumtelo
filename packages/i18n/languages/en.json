@@ -4343,7 +4343,9 @@
                     "iban": "IBAN",
                     "no_iban": "No IBAN",
                     "iban_bank_mismatch": "IBAN bank code is {actual}, expected {expected} for {bank}",
-                    "iban_bank_mismatch_short": "This IBAN is {actual}, but {bank} uses {expected}."
+                    "iban_bank_mismatch_short": "This IBAN is {actual}, but {bank} uses {expected}.",
+                    "edit": "Edit",
+                    "edit_account": "Edit account"
                 },
                 "growth": {
                     "eyebrow": "Planning horizon",
@@ -4518,7 +4520,9 @@
                 "plan_kept_until": "{plan} kept until period end",
                 "csv_exported_one": "{count} transaction exported{periodSuffix}",
                 "csv_exported_other": "{count} transactions exported{periodSuffix}",
-                "csv_period_suffix": " for {period}"
+                "csv_period_suffix": " for {period}",
+                "account_updated": "Account updated",
+                "account_deleted": "Account deleted"
             }
         },
         "shell": {

@@ -47,6 +47,14 @@ export const transactionUpdate = oc
     .input(Transaction.partial().extend({ id: Id, householdId: HouseholdId }))
     .output(Transaction);
 
+export const accountUpdate = oc
+    .input(
+        Account.partial()
+            .omit({ connectionId: true, lastSyncedAt: true, balance: true })
+            .extend({ id: Id, householdId: HouseholdId })
+    )
+    .output(Account);
+
 export const transactionSort = oc.input(SortTransaction).output(Transaction);
 
 export const transactionBulkSort = oc
@@ -70,6 +78,8 @@ export const transactionRemove = oc
     .input(z.object({ householdId: HouseholdId, id: Id }))
     .output(ok);
 
+export const accountRemove = oc.input(z.object({ householdId: HouseholdId, id: Id })).output(ok);
+
 /** Nested contract object mounted at `contract.money.transactions`. */
 export const transactionContract = {
     list: transactionList,
@@ -86,4 +96,6 @@ export const transactionContract = {
 export const accountsContract = {
     list: accountList,
     create: accountCreate,
+    update: accountUpdate,
+    remove: accountRemove,
 };

@@ -34,4 +34,30 @@ export class BankAccountController {
     list() {
         return implement(contract.money.accounts.list).handler(() => this.accounts.list());
     }
+
+    // ====================================================================
+    // ? UPDATE Operations
+    // ====================================================================
+
+    /** Update a manual account label, IBAN, or kind. */
+    @RequireCapability(CAPABILITIES.moneyBank)
+    @Implement(contract.money.accounts.update)
+    update() {
+        return implement(contract.money.accounts.update).handler(({ input }) =>
+            this.accounts.update(input)
+        );
+    }
+
+    // ====================================================================
+    // ? DELETE Operations
+    // ====================================================================
+
+    /** Remove a manual account. */
+    @RequireCapability(CAPABILITIES.moneyBank)
+    @Implement(contract.money.accounts.remove)
+    remove() {
+        return implement(contract.money.accounts.remove).handler(({ input }) =>
+            this.accounts.remove(input.id)
+        );
+    }
 }

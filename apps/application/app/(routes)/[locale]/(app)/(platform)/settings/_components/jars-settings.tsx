@@ -5,11 +5,16 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 
-import { DEFAULT_JAR_SPLIT, SpendingStyle, type JarKey } from '@rumtelo/contracts';
+import {
+    DEFAULT_JAR_SPLIT,
+    SpendingStyle,
+    bankingCategoryTemplate,
+    type JarKey,
+} from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
-import { Badge, Button, Input, Meter, StubNotice } from '@rumtelo/ui';
-import { cn, formatPercent, sumMonthly } from '@rumtelo/utils';
+import { Badge, Button, Input, Meter, StubNotice, VendorMark } from '@rumtelo/ui';
+import { cn, formatIban, formatPercent, sumMonthly } from '@rumtelo/utils';
 
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { evaluateSplitCoach, pctByJarKey } from '@/app/_lib/split-coach';
@@ -17,8 +22,10 @@ import { isLiveData } from '@/app/_lib/preview';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 
 import { SettingsInkCard, SettingsPanel, SettingsPill, SettingsRow } from './settings-chrome';
+import { accountBankMark, bankingBanksOnly } from '../_utils/resolve-account-bank';
 import { JAR_COLOR, accountKindLabel } from '../_utils/settings-shared';
 
 export function JarsSettings() {
@@ -42,6 +49,26 @@ export function JarsSettings() {
         apiQuery.money.accounts.list.queryOptions({ input: { householdId: householdId! } }),
         [],
         live
+    );
+
+    const categoriesQuery = useCategoryTemplates(live);
+    const bankingCategoryKey = useMemo(
+        () => bankingCategoryTemplate(categoriesQuery.data ?? [])?.key ?? null,
+        [categoriesQuery.data]
+    );
+    const bankingMerchantsQuery = useLiveQuery(
+        apiQuery.money.catalogs.merchantPresets.list.queryOptions({
+            input: {
+                householdId: householdId!,
+                categoryTemplateKey: bankingCategoryKey,
+            },
+        }),
+        [],
+        live && Boolean(bankingCategoryKey)
+    );
+    const banks = useMemo(
+        () => bankingBanksOnly(bankingMerchantsQuery.data ?? []),
+        [bankingMerchantsQuery.data]
     );
 
     const jars = useMemo(() => jarsQuery.data ?? [], [jarsQuery.data]);
@@ -111,11 +138,9 @@ export function JarsSettings() {
         setDismissedTips({});
     }
 
-    function accountLabel(accountId: string | undefined) {
+    function seatAccount(accountId: string | undefined) {
         if (!accountId) return null;
-        const account = accounts.find(item => item.id === accountId);
-        if (!account) return null;
-        return `${account.name}${account.iban ? ` · ${account.iban.slice(-4)}` : ''}`;
+        return accounts.find(item => item.id === accountId) ?? null;
     }
 
     return (
@@ -137,7 +162,9 @@ export function JarsSettings() {
                 }>
                 {jars.map((jar, i) => {
                     const seatId = effectiveJarSeats[jar.id];
-                    const label = accountLabel(seatId);
+                    const account = seatAccount(seatId);
+                    const mark = account ? accountBankMark(account, banks) : null;
+                    const ibanLabel = account?.iban ? formatIban(account.iban) : null;
                     const isEditing = editingJarId === jar.id;
                     return (
                         <div
@@ -153,14 +180,25 @@ export function JarsSettings() {
                                     />
                                     <span className="grid min-w-0 gap-0.5">
                                         <span className="text-sm text-fg">{jar.name}</span>
-                                        <span
-                                            className={cn(
-                                                'font-mono text-[10px]',
-                                                label ? 'text-fg-secondary' : 'text-warning'
-                                            )}>
-                                            {label ??
-                                                t('pages.settings.panels.jars_placement.not_set')}
-                                        </span>
+                                        {account ? (
+                                            <span className="flex min-w-0 items-center gap-1.5">
+                                                {mark ? (
+                                                    <VendorMark
+                                                        name={mark.name}
+                                                        src={mark.src}
+                                                        size={16}
+                                                    />
+                                                ) : null}
+                                                <span className="min-w-0 truncate font-mono text-[10px] text-fg-secondary">
+                                                    {account.name}
+                                                    {ibanLabel ? ` · ${ibanLabel}` : ''}
+                                                </span>
+                                            </span>
+                                        ) : (
+                                            <span className="font-mono text-[10px] text-warning">
+                                                {t('pages.settings.panels.jars_placement.not_set')}
+                                            </span>
+                                        )}
                                     </span>
                                 </span>
                                 <Button
@@ -180,16 +218,20 @@ export function JarsSettings() {
                             </SettingsRow>
                             {isEditing ? (
                                 <div className="flex flex-wrap gap-2 pb-3 pl-5">
-                                    {accounts.map(account => {
-                                        const selected = seatId === account.id;
+                                    {accounts.map(option => {
+                                        const selected = seatId === option.id;
+                                        const optionMark = accountBankMark(option, banks);
+                                        const optionIban = option.iban
+                                            ? formatIban(option.iban)
+                                            : null;
                                         return (
                                             <button
-                                                key={account.id}
+                                                key={option.id}
                                                 type="button"
                                                 onClick={() => {
                                                     setJarSeats(prev => ({
                                                         ...prev,
-                                                        [jar.id]: account.id,
+                                                        [jar.id]: option.id,
                                                     }));
                                                     setEditingJarId(null);
                                                     showToast(
@@ -197,27 +239,34 @@ export function JarsSettings() {
                                                             'pages.settings.panels.jars_placement.seat_saved',
                                                             {
                                                                 jar: jar.name,
-                                                                account: account.name,
+                                                                account: option.name,
                                                             }
                                                         ),
                                                         'success'
                                                     );
                                                 }}
                                                 className={cn(
-                                                    'rounded-full border px-3 py-1.5 text-left text-xs transition-colors',
+                                                    'inline-flex items-center gap-2 rounded-xl border px-2.5 py-1.5 text-left text-xs transition-colors',
                                                     selected
                                                         ? 'border-accent bg-accent/10 text-fg'
                                                         : 'border-line text-fg-secondary hover:border-fg-faint hover:text-fg'
                                                 )}>
-                                                <span className="block font-medium text-fg">
-                                                    {account.name}
-                                                </span>
-                                                <span className="font-mono text-[10px] text-fg-muted">
-                                                    {accountKindLabel(account.kind, t) ??
-                                                        account.kind}
-                                                    {account.iban
-                                                        ? ` · ${account.iban.slice(-4)}`
-                                                        : ''}
+                                                {optionMark ? (
+                                                    <VendorMark
+                                                        name={optionMark.name}
+                                                        src={optionMark.src}
+                                                        size={18}
+                                                    />
+                                                ) : null}
+                                                <span className="grid min-w-0 gap-0.5">
+                                                    <span className="block font-medium text-fg">
+                                                        {option.name}
+                                                    </span>
+                                                    <span className="font-mono text-[10px] text-fg-muted">
+                                                        {accountKindLabel(option.kind, t) ??
+                                                            option.kind}
+                                                        {optionIban ? ` · ${optionIban}` : ''}
+                                                    </span>
                                                 </span>
                                             </button>
                                         );

@@ -4343,7 +4343,9 @@
                     "iban": "IBAN",
                     "no_iban": "Geen IBAN",
                     "iban_bank_mismatch": "De IBAN-bankcode is {actual}; verwacht werd {expected} voor {bank}",
-                    "iban_bank_mismatch_short": "Dit IBAN-nummer is {actual}, maar {bank} gebruikt {expected}."
+                    "iban_bank_mismatch_short": "Dit IBAN-nummer is {actual}, maar {bank} gebruikt {expected}.",
+                    "edit": "Wijzigen",
+                    "edit_account": "Account wijzigen"
                 },
                 "growth": {
                     "eyebrow": "Planhorizon",
@@ -4518,7 +4520,9 @@
                 "plan_kept_until": "{plan} wordt bewaard tot het einde van de periode",
                 "csv_exported_one": "{count} transactie geëxporteerd{periodSuffix}",
                 "csv_exported_other": "{count} geëxporteerde transacties{periodSuffix}",
-                "csv_period_suffix": " voor {period}"
+                "csv_period_suffix": " voor {period}",
+                "account_updated": "Account bijgewerkt",
+                "account_deleted": "Account verwijderd"
             }
         },
         "shell": {

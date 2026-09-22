@@ -47,6 +47,38 @@ export class BankAccountService {
         const rows = await this.repo.find();
         return rows.map(toDto);
     }
+
+    // ====================================================================
+    // ? UPDATE Operations
+    // ====================================================================
+
+    async update(input: { id: string; name?: string; iban?: string | null; kind?: string }) {
+        const account = await this.repo.findOneOrFail({ id: input.id });
+        if (input.name !== undefined) account.name = input.name.trim();
+        if (input.kind !== undefined) account.kind = input.kind as AccountKind;
+        if (input.iban !== undefined) {
+            const iban = normalizeOptionalIban(input.iban);
+            if (iban && iban !== account.iban) {
+                const clash = await this.repo.findOne({ iban });
+                if (clash && clash.id !== account.id) {
+                    throw apiConflict('iban_already_linked');
+                }
+            }
+            account.iban = iban;
+        }
+        await this.em.flush();
+        return toDto(account);
+    }
+
+    // ====================================================================
+    // ? DELETE Operations
+    // ====================================================================
+
+    async remove(id: string) {
+        const account = await this.repo.findOneOrFail({ id });
+        await this.em.remove(account).flush();
+        return { ok: true as const };
+    }
 }
 
 function normalizeOptionalIban(value: string | null | undefined): string | null {
