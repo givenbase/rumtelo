@@ -1,8 +1,10 @@
+'use client';
+
 import Link from 'next/link';
 
 import { RumteloLogo } from '@rumtelo/brand';
+import { useTranslations } from '@rumtelo/i18n';
 import { Typography } from '@rumtelo/ui';
-import { getTranslations } from '@rumtelo/i18n';
 
 import { TRUST_BADGE_KEYS } from '@/lib/landing-content';
 
@@ -50,8 +52,9 @@ const FOOT_COL_DEFS = [
     },
 ] as const;
 
-export async function LandingFooter() {
-    const t = await getTranslations();
+/** Client footer — landing page is a Client Component tree; use `useTranslations`. */
+export function LandingFooter() {
+    const t = useTranslations();
     const year = new Date().getFullYear();
 
     return (
