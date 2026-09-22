@@ -35,3 +35,4 @@ console.log(
 
 await runMigrations();
 console.log('better-auth migrations completed.');
+process.exit(0);
