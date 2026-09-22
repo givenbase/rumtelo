@@ -1,5 +1,4 @@
-import type { IntlLocale } from '@rumtelo/contracts';
-import { type GivingCause } from '@rumtelo/contracts';
+import { type IntlLocale, type GivingCause } from '@rumtelo/contracts';
 
 export type GivingCauseCopy = { name: string; line: string };
 

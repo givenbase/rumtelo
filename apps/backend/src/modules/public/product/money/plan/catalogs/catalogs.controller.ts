@@ -263,7 +263,7 @@ export class MoneyCatalogsController {
             );
             return this.translations.applyToMany(rows, fieldMap, ['name', 'line'], row =>
                 String(row.key)
-            ) as typeof rows;
+            );
         });
     }
 

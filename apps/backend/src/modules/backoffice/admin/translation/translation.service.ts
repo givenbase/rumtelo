@@ -1,5 +1,5 @@
 import { EntityManager } from '@mikro-orm/postgresql';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 
 import {
     catalogLocaleFromContracts,
@@ -41,6 +41,8 @@ function asComparableString(value: unknown): string {
  */
 @Injectable()
 export class TranslationService {
+    private readonly logger = new Logger(TranslationService.name);
+
     constructor(@Inject(EntityManager) private readonly em: EntityManager) {}
 
     /**
@@ -55,11 +57,22 @@ export class TranslationService {
         const catalogLocale = catalogLocaleFromContracts(locale);
         if (isCatalogSourceLocale(catalogLocale)) return out;
 
-        const rows = await this.em.find(Translation, {
-            entityType,
-            locale: catalogLocale,
-            ...(keys?.length ? { entityKey: { $in: keys } } : {}),
-        });
+        let rows: Translation[];
+        try {
+            rows = await this.em.find(Translation, {
+                entityType,
+                locale: catalogLocale,
+                ...(keys?.length ? { entityKey: { $in: keys } } : {}),
+            });
+        } catch (error) {
+            // Table missing / migration lag — serve EN catalog copy rather than 500.
+            this.logger.warn(
+                `Catalog translations unavailable for ${entityType}/${catalogLocale}: ${
+                    error instanceof Error ? error.message : String(error)
+                }`
+            );
+            return out;
+        }
 
         for (const row of rows) {
             let fields = out.get(row.entityKey);
