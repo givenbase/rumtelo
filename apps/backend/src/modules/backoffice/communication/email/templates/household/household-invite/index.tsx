@@ -16,6 +16,7 @@ export interface HouseholdInviteTemplateProps {
     inviterName?: string;
     locale?: string;
     role?: string;
+    websiteUrl?: string;
 }
 
 /**
@@ -28,6 +29,7 @@ export const HouseholdInviteTemplate: React.FC<HouseholdInviteTemplateProps> = (
     role = 'MEMBER',
     darkMode = false,
     locale = 'en',
+    websiteUrl,
 }) => {
     const translate = createEmailTranslator(languageObject, locale);
     const styles = createEmailStyles(darkMode);
@@ -37,6 +39,7 @@ export const HouseholdInviteTemplate: React.FC<HouseholdInviteTemplateProps> = (
     return (
         <EmailLayout
             darkMode={darkMode}
+            websiteUrl={websiteUrl}
             previewText={translate('email.household.invite.header.preview_text')}
             title={translate('email.household.invite.header.title')}>
             <Heading style={styles.heading}>

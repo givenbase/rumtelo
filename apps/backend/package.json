@@ -57,6 +57,7 @@
         "@orpc/zod": "^1.13.0",
         "@react-email/components": "^1.0.12",
         "@react-email/render": "^2.1.0",
+        "@rumtelo/brand": "workspace:*",
         "@rumtelo/contracts": "workspace:*",
         "@rumtelo/utils": "workspace:*",
         "@thallesp/nestjs-better-auth": "^2.4.0",

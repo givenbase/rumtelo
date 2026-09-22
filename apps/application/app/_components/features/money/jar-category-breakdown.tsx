@@ -122,6 +122,18 @@ export function JarCategoryBreakdown({
     const rows: Array<CategoryRow & { synthetic?: boolean }> = [...categories];
     const knownIds = new Set(categories.map(row => row.id));
 
+    function txMovement(txs: readonly Transaction[]) {
+        let spent = 0;
+        let received = 0;
+        for (const tx of txs) {
+            if (tx.amount < 0) spent += Math.abs(tx.amount);
+            else if (tx.amount > 0) received += tx.amount;
+        }
+        // Prefer OUT (spent). Income-only buckets (e.g. uncategorized Studio draw)
+        // still need a non-zero parent total.
+        return spent > 0 ? spent : received;
+    }
+
     function bucketTotals(bucketId: string) {
         const bucketFixed = allowFixedCosts ? (fixedByCategory.get(bucketId) ?? []) : [];
         const bucketTxs = txByCategory.get(bucketId) ?? [];
@@ -129,12 +141,7 @@ export function JarCategoryBreakdown({
             (sum, item) => sum + monthlyAmount(Math.abs(item.amount), item.cadence),
             0
         );
-        // Match jar category "actual": period OUT only (inflows nest under the row but don't count as spent).
-        const actual = bucketTxs.reduce(
-            (sum, tx) => (tx.amount < 0 ? sum + Math.abs(tx.amount) : sum),
-            0
-        );
-        return { budgeted, actual };
+        return { budgeted, actual: txMovement(bucketTxs) };
     }
 
     for (const [key, items] of fixedByCategory) {
@@ -172,6 +179,14 @@ export function JarCategoryBreakdown({
             left.name.localeCompare(right.name)
     );
 
+    // Hide empty template copies — only rows with planned/spent money or linked activity.
+    const visibleRows = rows.filter(row => {
+        if (row.budgeted !== 0 || row.actual !== 0) return true;
+        const hasFixed = allowFixedCosts && (fixedByCategory.get(row.id)?.length ?? 0) > 0;
+        const hasTx = (txByCategory.get(row.id)?.length ?? 0) > 0;
+        return hasFixed || hasTx;
+    });
+
     const settlementById = settlementsByFixedCostId(settlements);
     const claimedTxIds = allowFixedCosts
         ? claimLinkedFixedCostTxIds(transactions, settlements)
@@ -187,7 +202,7 @@ export function JarCategoryBreakdown({
         });
     }
 
-    if (rows.length === 0) {
+    if (visibleRows.length === 0) {
         return (
             <Typography as="p" size="sm" color="muted" className="px-5 py-4">
                 {tJars('no_categories')}
@@ -197,16 +212,15 @@ export function JarCategoryBreakdown({
 
     return (
         <ul className="grid">
-            {rows.map(category => {
+            {visibleRows.map(category => {
                 const open = openIds.has(category.id);
-                const { diff, over } = categoryVariance(category.budgeted, category.actual);
-                const icon = category.synthetic
-                    ? '◇'
-                    : categoryIcon(category.name, categoryTemplates, jarIcon);
                 const categoryFixed = allowFixedCosts
                     ? (fixedByCategory.get(category.id) ?? [])
                     : [];
                 const categoryTxs = txByCategory.get(category.id) ?? [];
+                const icon = category.synthetic
+                    ? '◇'
+                    : categoryIcon(category.name, categoryTemplates, jarIcon);
 
                 const fixedRows = categoryFixed.map(item => {
                     const monthly = monthlyAmount(item.amount, item.cadence);
@@ -223,6 +237,19 @@ export function JarCategoryBreakdown({
                 });
 
                 const leftoverTxs = categoryTxs.filter(tx => !claimedTxIds.has(tx.id));
+                // Roll up from nested activity so income-only rows (Studio BV etc.)
+                // aren't stuck at €0 when API "actual" is OUT-only.
+                const liveActual = txMovement(leftoverTxs);
+                const actual = liveActual > 0 ? liveActual : category.actual;
+                const budgeted = category.budgeted;
+                const onlyInflows =
+                    leftoverTxs.length > 0 &&
+                    leftoverTxs.every(tx => tx.amount >= 0) &&
+                    categoryFixed.length === 0;
+                const { diff, over } =
+                    onlyInflows && budgeted === 0
+                        ? { diff: actual, over: false }
+                        : categoryVariance(budgeted, actual);
                 const childCount = fixedRows.length + leftoverTxs.length;
                 const canExpand = childCount > 0;
 
@@ -248,19 +275,18 @@ export function JarCategoryBreakdown({
                                         {category.name}
                                     </span>
                                     <span className="mt-0.5 block font-mono text-[11px] text-fg-faint sm:hidden">
-                                        {tFixed('status_planned')} {formatMoney(category.budgeted)}{' '}
-                                        ·{' '}
+                                        {tFixed('status_planned')} {formatMoney(budgeted)} ·{' '}
                                         {tJars('mobile_spent', {
-                                            amount: formatMoney(category.actual),
+                                            amount: formatMoney(actual),
                                         })}
                                     </span>
                                 </span>
                                 <span className="hidden min-w-0 flex-1 items-center justify-end gap-6 sm:flex">
                                     <span className="w-20 text-right font-mono text-sm text-fg-muted tabular-nums">
-                                        {formatMoney(category.budgeted)}
+                                        {formatMoney(budgeted)}
                                     </span>
                                     <span className="w-20 text-right font-mono text-sm text-fg tabular-nums">
-                                        {formatMoney(category.actual)}
+                                        {formatMoney(actual)}
                                     </span>
                                     <span
                                         className={cn(

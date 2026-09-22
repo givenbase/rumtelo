@@ -10,6 +10,7 @@ import { PlanCatalogItem } from '../../backoffice/plan/plan.schema';
 import { accountContract } from './account/account.contract';
 import { billingContract } from './billing/billing.contract';
 import { coachContract } from './coach/coach.contract';
+import { contactContract } from './contact/contact.contract';
 import { householdContract } from './household/household.contract';
 
 /** Platform-level: account prefs, the household itself, and cross-product advisory. */
@@ -22,4 +23,5 @@ export const contract = {
     },
     billing: billingContract,
     coach: coachContract,
+    contact: contactContract,
 };

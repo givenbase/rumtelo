@@ -22,6 +22,7 @@ import {
     FormLabel,
     FormMessage,
     VendorMark,
+    EmptyState,
     Typography,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
@@ -440,7 +441,12 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
                     ) : null}
                 </div>
                 {detail.payments.length === 0 ? (
-                    <p className="px-5 py-6 text-sm text-fg-muted">{td('no_payments')}</p>
+                    <EmptyState
+                        variant="compact"
+                        className="border-0 bg-transparent"
+                        title={td('no_payments_title')}
+                        body={td('no_payments_body')}
+                    />
                 ) : (
                     detail.payments.map(payment => {
                         const paymentMark = partyMark(

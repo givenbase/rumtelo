@@ -38,16 +38,17 @@ const FOOT_COL_DEFS = [
     {
         headKey: 'legal' as const,
         links: [
-            { textKey: 'privacy' as const, href: '/privacy' },
-            { textKey: 'terms' as const, href: '/terms' },
-            { textKey: 'data_processing' as const, href: '/data-processing' },
+            { textKey: 'privacy' as const, href: '/legal/privacy' },
+            { textKey: 'terms' as const, href: '/legal/terms' },
+            { textKey: 'cookies' as const, href: '/legal/cookies' },
+            { textKey: 'legal_hub' as const, href: '/legal' },
         ],
     },
     {
         headKey: 'contact' as const,
         links: [
-            { textKey: 'support' as const, href: 'mailto:support@rumtelo.com' },
-            { textKey: 'press' as const, href: 'mailto:hello@rumtelo.com' },
+            { textKey: 'support' as const, href: '/support/contact' },
+            { textKey: 'press' as const, href: 'mailto:info@rumtelo.com' },
         ],
     },
 ] as const;

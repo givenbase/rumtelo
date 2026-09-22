@@ -89,13 +89,13 @@ export const LANDING_SECTIONS: LandingSection[] = [
         anchor: '#signup',
         label: 'Create account hand-off form',
         status: 'partial',
-        gap: 'Draft → /sign-up (Better Auth); terms/privacy linked',
+        gap: 'Draft → /sign-up (Better Auth); /legal/terms · privacy · cookies linked',
     },
     {
         id: 'footer',
         anchor: 'footer',
         label: 'Trust cards + links (tinted)',
         status: 'shell',
-        gap: 'Legal routes live at /privacy /terms /data-processing',
+        gap: 'Legal hub /legal · children under /legal/*',
     },
 ];

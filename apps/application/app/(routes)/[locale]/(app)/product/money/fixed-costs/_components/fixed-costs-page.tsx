@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { DEFAULT_JAR_SPLIT, jarCapabilitiesFor, JarKey } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Card, Typography } from '@rumtelo/ui';
+import { Card, EmptyState, Typography } from '@rumtelo/ui';
 import {
     cn,
     describePeriodTravel,
@@ -306,9 +306,14 @@ export function FixedCostsPageClient() {
 
                             <div className="grid">
                                 {groupedFixedCosts.length === 0 ? (
-                                    <p className="px-5 py-4 text-sm text-fg-muted">
-                                        {jarFilter ? t('empty_jar') : t('empty_all')}
-                                    </p>
+                                    <EmptyState
+                                        variant="compact"
+                                        className="border-0 bg-transparent"
+                                        title={
+                                            jarFilter ? t('empty_jar_title') : t('empty_all_title')
+                                        }
+                                        body={jarFilter ? t('empty_jar_body') : t('empty_all_body')}
+                                    />
                                 ) : (
                                     groupedFixedCosts.map(group => {
                                         const open =

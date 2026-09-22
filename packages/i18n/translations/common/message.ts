@@ -42,6 +42,10 @@ const message = {
             invitation_create_failed: 'Could not create invitation',
             jar_split_total: 'Jar split must total 100%, received {total}%',
             book_catalog_unavailable: 'The book catalog did not answer.',
+            contact_send_failed:
+                'Could not send your message. Please try again or email us directly.',
+            contact_message_rejected:
+                'Your message could not be sent. Remove extra links and try again, or email us directly.',
             not_authenticated: 'Not authenticated',
             no_household_selected: 'No household selected',
             not_household_member: 'Not a member of this household',

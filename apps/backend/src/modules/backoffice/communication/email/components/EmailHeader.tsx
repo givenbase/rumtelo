@@ -1,10 +1,11 @@
-import { Img, Link, Section, Text } from '@react-email/components';
+import { Img, Link, Section } from '@react-email/components';
 
 import * as React from 'react';
 
-import { emailBrand, emailFonts, emailLayout } from '../styles/email-tokens';
+import { emailBrand, emailLayout } from '../styles/email-tokens';
 import { getTheme } from '../styles/theme-styles';
-import { EMAIL_BRAND } from '../utils/brand.constants';
+import { EMAIL_BRAND, EMAIL_LOGO_SIZE } from '../utils/brand.constants';
+import { emailBrandDataUris } from '../utils/email-brand-images.util';
 
 interface EmailHeaderProps {
     darkMode?: boolean;
@@ -12,6 +13,7 @@ interface EmailHeaderProps {
     websiteUrl?: string;
 }
 
+/** Header chrome — full wordmark only; tagline lives in the footer. */
 const EmailHeader: React.FC<EmailHeaderProps> = ({
     websiteUrl = EMAIL_BRAND.websiteUrl,
     darkMode = false,
@@ -20,6 +22,8 @@ const EmailHeader: React.FC<EmailHeaderProps> = ({
     if (!showLogo) return null;
 
     const theme = getTheme(darkMode);
+    const { width, height } = EMAIL_LOGO_SIZE.wordmark;
+    const { wordmark } = emailBrandDataUris();
 
     return (
         <Section style={{ margin: 0, padding: 0 }}>
@@ -41,32 +45,18 @@ const EmailHeader: React.FC<EmailHeaderProps> = ({
                 }}>
                 <Link href={websiteUrl} style={{ textDecoration: 'none', display: 'inline-block' }}>
                     <Img
-                        src={`${websiteUrl.replace(/\/$/, '')}${
-                            darkMode
-                                ? EMAIL_BRAND.logoWordmarkOnDark
-                                : EMAIL_BRAND.logoWordmarkOnLight
-                        }`}
+                        src={wordmark}
                         alt={EMAIL_BRAND.name}
-                        width="192"
-                        height="32"
+                        width={width}
+                        height={height}
                         style={{
                             display: 'block',
-                            height: '32px',
+                            height: `${height}px`,
                             margin: '0 auto',
-                            width: '192px',
+                            width: `${width}px`,
                         }}
                     />
                 </Link>
-                <Text
-                    style={{
-                        color: darkMode ? '#5eead4' : emailBrand.inkMuted,
-                        fontFamily: emailFonts.sans,
-                        fontSize: '12px',
-                        lineHeight: '16px',
-                        margin: '12px 0 0',
-                    }}>
-                    {EMAIL_BRAND.tagline}
-                </Text>
             </Section>
         </Section>
     );

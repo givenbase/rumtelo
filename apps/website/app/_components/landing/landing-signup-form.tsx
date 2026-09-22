@@ -266,15 +266,21 @@ export function LandingSignupForm() {
                                 <span className="text-sm leading-relaxed text-fg-muted">
                                     {t('terms_before')}
                                     <Link
-                                        href="/terms"
+                                        href="/legal/terms"
                                         className="text-accent underline-offset-2 hover:underline">
                                         {t('terms_link')}
                                     </Link>
                                     {t('terms_mid')}
                                     <Link
-                                        href="/privacy"
+                                        href="/legal/privacy"
                                         className="text-accent underline-offset-2 hover:underline">
                                         {t('privacy_link')}
+                                    </Link>
+                                    {t('terms_after_before')}
+                                    <Link
+                                        href="/legal/cookies"
+                                        className="text-accent underline-offset-2 hover:underline">
+                                        {t('cookies_link')}
                                     </Link>
                                     {t('terms_after')}
                                 </span>

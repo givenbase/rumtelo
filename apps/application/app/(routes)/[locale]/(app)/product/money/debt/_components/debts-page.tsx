@@ -7,7 +7,7 @@ import type { Debt } from '@rumtelo/contracts';
 import { JarKey, PayoffStrategy } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { AccentCard, Card, Eyebrow, Typography } from '@rumtelo/ui';
+import { AccentCard, Card, EmptyState, Eyebrow, Typography } from '@rumtelo/ui';
 import { cn, describePeriodTravel, projectBalancesAfterMonths } from '@rumtelo/utils';
 
 import { CREATE_HREF } from '@/app/_lib/create-routes';
@@ -440,14 +440,16 @@ export function DebtsPageClient() {
                         </Typography>
                     ) : null}
 
-                    <Card className="p-0">
-                        <div className="grid gap-3 p-5">
-                            {visibleDebts.length === 0 ? (
-                                <Typography as="p" size="sm" color="muted">
-                                    {debtsLive.length === 0 ? t('empty_title') : t('empty_filter')}
-                                </Typography>
-                            ) : (
-                                visibleDebts.map(debt => {
+                    {visibleDebts.length === 0 ? (
+                        <EmptyState
+                            icon="↓"
+                            title={debtsLive.length === 0 ? t('empty_title') : t('empty_filter')}
+                            body={debtsLive.length === 0 ? t('empty_body') : t('empty_filter_body')}
+                        />
+                    ) : (
+                        <Card className="p-0">
+                            <div className="grid gap-3 p-5">
+                                {visibleDebts.map(debt => {
                                     const payoffRank = openOrdered.findIndex(
                                         entry => entry.id === debt.id
                                     );
@@ -478,10 +480,10 @@ export function DebtsPageClient() {
                                             }
                                         />
                                     );
-                                })
-                            )}
-                        </div>
-                    </Card>
+                                })}
+                            </div>
+                        </Card>
+                    )}
                 </div>
             )}
         </div>

@@ -22,7 +22,7 @@ import {
 } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Badge, Button, Card, Eyebrow, Section, Typography } from '@rumtelo/ui';
+import { Badge, Button, Card, EmptyState, Eyebrow, Section, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { isLiveData } from '@/app/_lib/preview';
@@ -441,23 +441,11 @@ export function WeekPageClient() {
                         ))}
                     </div>
                 ) : (
-                    <div className="grid gap-1 rounded-xl border border-dashed border-line p-5 text-sm text-fg-muted">
-                        {week > thisWeek ? (
-                            <>
-                                <span className="font-medium text-fg">
-                                    {t('empty_future_title')}
-                                </span>
-                                <span>{t('empty_future_body')}</span>
-                            </>
-                        ) : (
-                            <>
-                                <span className="font-medium text-fg">
-                                    {t('empty_current_title')}
-                                </span>
-                                <span>{t('empty_current_body')}</span>
-                            </>
-                        )}
-                    </div>
+                    <EmptyState
+                        variant="compact"
+                        title={week > thisWeek ? t('empty_future_title') : t('empty_current_title')}
+                        body={week > thisWeek ? t('empty_future_body') : t('empty_current_body')}
+                    />
                 )}
 
                 {/* ── Household split ── */}

@@ -5,6 +5,7 @@ import * as React from 'react';
 
 import AccountVerificationTemplate from '../templates/auth/account-verification';
 import PasswordResetTemplate from '../templates/auth/password-reset';
+import ContactFormTemplate from '../templates/forms/contact-form';
 import HouseholdInviteTemplate from '../templates/household/household-invite';
 
 const logger = new Logger('EmailTemplateAdapter');
@@ -14,6 +15,7 @@ export enum EmailTemplate {
     ACCOUNT_VERIFICATION = 'account-verification',
     PASSWORD_RESET = 'password-reset',
     HOUSEHOLD_INVITE = 'household-invite',
+    CONTACT_FORM = 'contact-form',
 }
 
 /**
@@ -46,6 +48,13 @@ export async function renderTemplate(
                 ...data,
                 locale,
             } as React.ComponentProps<typeof HouseholdInviteTemplate>);
+            break;
+
+        case EmailTemplate.CONTACT_FORM:
+            element = React.createElement(ContactFormTemplate, {
+                ...data,
+                locale,
+            } as React.ComponentProps<typeof ContactFormTemplate>);
             break;
 
         default: {

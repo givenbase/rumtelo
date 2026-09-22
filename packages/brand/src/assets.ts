@@ -4,16 +4,20 @@ export const BRAND_PUBLIC_BASE = '/brand' as const;
 export const BRAND_ASSETS = {
     /** App UI — colorful icon mark (theme-independent). */
     icon: `${BRAND_PUBLIC_BASE}/logo/icon.svg`,
-    /** Email / raster — colorful icon mark. */
+    /** Designer master raster (do not downsample by hand — use `pnpm email-assets`). */
     iconPng: `${BRAND_PUBLIC_BASE}/logo/icon.png`,
+    /** Email — Lanczos3 3× display PNG from master (`pnpm --filter @rumtelo/brand email-assets`). */
+    iconEmailPng: `${BRAND_PUBLIC_BASE}/logo/icon-email.png`,
     /** App UI — SVG lockup for light surfaces. */
     wordmarkOnLight: `${BRAND_PUBLIC_BASE}/logo/wordmark-on-light.svg`,
     /** App UI — SVG lockup for dark surfaces. */
     wordmarkOnDark: `${BRAND_PUBLIC_BASE}/logo/wordmark-on-dark.svg`,
-    /** Email / raster — PNG lockup for light surfaces. */
+    /** Designer master rasters. */
     wordmarkOnLightPng: `${BRAND_PUBLIC_BASE}/logo/wordmark-on-light.png`,
-    /** Email / raster — PNG lockup for dark surfaces. */
     wordmarkOnDarkPng: `${BRAND_PUBLIC_BASE}/logo/wordmark-on-dark.png`,
+    /** Email — Lanczos3 3× display PNGs from masters. */
+    wordmarkOnLightEmailPng: `${BRAND_PUBLIC_BASE}/logo/wordmark-on-light-email.png`,
+    wordmarkOnDarkEmailPng: `${BRAND_PUBLIC_BASE}/logo/wordmark-on-dark-email.png`,
 
     /** Browser tab — multi-size ICO. */
     favicon: `${BRAND_PUBLIC_BASE}/favicon/favicon.ico`,

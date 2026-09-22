@@ -15,6 +15,7 @@ export interface PasswordResetTemplateProps {
     firstName: string;
     locale?: string;
     resetUrl: string;
+    websiteUrl?: string;
 }
 
 /**
@@ -26,6 +27,7 @@ export const PasswordResetTemplate: React.FC<PasswordResetTemplateProps> = ({
     expiresInHours = 1,
     darkMode = false,
     locale = 'en',
+    websiteUrl,
 }) => {
     const translate = createEmailTranslator(languageObject, locale);
     const styles = createEmailStyles(darkMode);
@@ -33,6 +35,7 @@ export const PasswordResetTemplate: React.FC<PasswordResetTemplateProps> = ({
     return (
         <EmailLayout
             darkMode={darkMode}
+            websiteUrl={websiteUrl}
             previewText={translate('email.auth.password_reset.header.preview_text')}
             title={translate('email.auth.password_reset.header.title')}>
             <Heading style={styles.heading}>

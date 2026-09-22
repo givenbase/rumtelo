@@ -6,4 +6,5 @@ export * from '../account';
 export * from '../auth';
 export * from '../billing';
 export * from '../coach';
+export * from '../contact';
 export * from '../household';

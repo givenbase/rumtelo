@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Button, Eyebrow, Typography } from '@rumtelo/ui';
+import { Button, EmptyState, Eyebrow, Typography } from '@rumtelo/ui';
 import { toPeriodKey } from '@rumtelo/utils';
 
 import Link from 'next/link';
@@ -69,21 +69,25 @@ export function CoachPageClient() {
             </div>
 
             {messages.length === 0 ? (
-                <div className="grid gap-3 rounded-2xl border border-line bg-surface px-5 py-6">
-                    <Typography as="p" size="sm" color="muted">
-                        {t('empty_quiet')}
-                    </Typography>
-                    <Link
-                        href="/product/energy/week"
-                        className="text-sm font-medium text-accent hover:underline">
-                        {t('open_week')}
-                    </Link>
-                    <Link
-                        href="/product/money/week-check"
-                        className="text-sm font-medium text-accent hover:underline">
-                        {t('open_week_check')}
-                    </Link>
-                </div>
+                <EmptyState
+                    icon="◇"
+                    title={t('empty_title')}
+                    body={t('empty_quiet')}
+                    action={
+                        <div className="flex flex-col items-center gap-2">
+                            <Link
+                                href="/product/energy/week"
+                                className="text-sm font-medium text-accent hover:underline">
+                                {t('open_week')}
+                            </Link>
+                            <Link
+                                href="/product/money/week-check"
+                                className="text-sm font-medium text-accent hover:underline">
+                                {t('open_week_check')}
+                            </Link>
+                        </div>
+                    }
+                />
             ) : (
                 <ul className="grid gap-3">
                     {messages.map(message => {

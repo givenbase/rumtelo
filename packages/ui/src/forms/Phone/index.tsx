@@ -24,7 +24,7 @@ export type PhoneProps = {
 };
 
 /**
- * International phone field — stores E.164 (`+31614602535`).
+ * International phone field — stores E.164.
  * Prefer this over raw `<Input type="tel">` everywhere phones are collected.
  */
 export function Phone({ className, defaultCountry = 'NL', onChange, value, ...props }: PhoneProps) {

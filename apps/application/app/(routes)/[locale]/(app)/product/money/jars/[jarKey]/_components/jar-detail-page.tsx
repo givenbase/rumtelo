@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { GoalKind, GoalStatus, JarKey, jarCapabilitiesFor } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Button, Card, Typography } from '@rumtelo/ui';
+import { Button, Card, EmptyState, Typography } from '@rumtelo/ui';
 import {
     describePeriodTravel,
     endOfPeriodIso,
@@ -378,9 +378,20 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                 </div>
                 <Card className="p-0">
                     {leftoverPeriodTxs.length === 0 ? (
-                        <Typography as="p" size="sm" color="muted" className="px-5 py-4">
-                            {transactions.length === 0 ? t('no_tx_month') : t('all_nested')}
-                        </Typography>
+                        <EmptyState
+                            variant="compact"
+                            className="border-0 bg-transparent"
+                            title={
+                                transactions.length === 0
+                                    ? t('no_tx_month_title')
+                                    : t('all_nested_title')
+                            }
+                            body={
+                                transactions.length === 0
+                                    ? t('no_tx_month_body')
+                                    : t('all_nested_body')
+                            }
+                        />
                     ) : (
                         <ul className="grid">
                             {leftoverPeriodTxs.map(tx => {
