@@ -25,7 +25,7 @@ import { CoachStepCard } from './steps/coach-step-card';
 const EMPTY_MESSAGES: never[] = [];
 
 /**
- * Smart Coach walkthrough — one fillable card, insights secondary, quiet when caught up.
+ * Smart Coach walkthrough — one fillable move, insights secondary, quiet when caught up.
  */
 export function CoachPageClient() {
     const t = useTranslations('features.coach');
@@ -100,16 +100,16 @@ export function CoachPageClient() {
             : '';
 
     return (
-        <PageContent width="narrow" className="grid gap-8">
-            <div>
+        <PageContent width="narrow" className="grid gap-10">
+            <header className="grid gap-1.5">
                 <Eyebrow>{t('eyebrow')}</Eyebrow>
-                <Typography as="h1" className="mt-2">
-                    {t('page_title')}
-                </Typography>
-                <Typography as="p" size="sm" color="muted" className="mt-2 max-w-prose">
-                    {tSession('lead')}
-                </Typography>
-            </div>
+                <Typography as="h1">{t('page_title')}</Typography>
+                {quiet ? (
+                    <Typography as="p" size="sm" color="muted" className="mt-1 max-w-prose">
+                        {tSession('lead')}
+                    </Typography>
+                ) : null}
+            </header>
 
             {quiet ? (
                 <EmptyState
@@ -145,20 +145,20 @@ export function CoachPageClient() {
             ) : null}
 
             {messages.length > 0 ? (
-                <section className="grid gap-3">
-                    <Typography as="h2" size="lg">
-                        {tSession('insights_title')}
-                    </Typography>
-                    <Typography as="p" size="sm" color="muted">
-                        {tSession('insights_lead')}
-                    </Typography>
-                    <ul className="grid gap-3">
+                <section className="grid gap-4 border-t border-line pt-8">
+                    <div className="grid gap-1">
+                        <Typography as="h2" size="lg">
+                            {tSession('insights_title')}
+                        </Typography>
+                        <Typography as="p" size="sm" color="muted">
+                            {tSession('insights_lead')}
+                        </Typography>
+                    </div>
+                    <ul className="grid gap-0 divide-y divide-line">
                         {messages.map(message => {
                             const copy = resolveCoachMessage(message, t, tRoot);
                             return (
-                                <li
-                                    key={message.id}
-                                    className="grid gap-3 rounded-2xl border border-line bg-surface px-5 py-4">
+                                <li key={message.id} className="grid gap-2.5 py-4 first:pt-0">
                                     <div className="flex flex-wrap items-center justify-between gap-2">
                                         <Typography as="span" variant="eyebrow" color="primary">
                                             {coachKindDisplay(message.kind, tKind)}
@@ -173,7 +173,7 @@ export function CoachPageClient() {
                                             </Button>
                                         ) : null}
                                     </div>
-                                    <Typography as="h3" className="leading-snug">
+                                    <Typography as="p" className="leading-snug text-fg-secondary">
                                         {copy.text}
                                     </Typography>
                                     {message.ctaHref && copy.ctaLabel ? (

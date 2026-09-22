@@ -1,5 +1,6 @@
 'use client';
 
+import { MicIcon, Volume2Icon } from 'lucide-react';
 import { useRef, useState } from 'react';
 
 import type { CoachStepVoice } from '@rumtelo/contracts';
@@ -18,10 +19,6 @@ type Props = {
     className?: string;
 };
 
-/**
- * Web Speech session handle — typed against the DOM SpeechRecognition shape.
- * Construction goes through {@link createSpeechRecognition}; failures surface as toasts.
- */
 type SpeechRecognitionSession = {
     lang: string;
     interimResults: boolean;
@@ -57,8 +54,8 @@ function speakPrompt(prompt: string, bcp47: string): void {
 }
 
 /**
- * Voice I/O for a Coach step. Visibility comes from `CoachStep.voice` (session contract).
- * Engine failures toast — UI is not gated on browser capability sniffing.
+ * Compact voice utilities — secondary to the structured answer controls.
+ * Visibility from `CoachStep.voice`; failures toast.
  */
 export function CoachVoiceControls({ prompt, voice, onHeard, className }: Props) {
     const t = useTranslations('features.coach.session');
@@ -91,7 +88,7 @@ export function CoachVoiceControls({ prompt, voice, onHeard, className }: Props)
             recognition.lang = bcp47;
             recognition.interimResults = false;
             recognition.continuous = false;
-            // SpeechRecognition exposes result/error/end only via on* handlers (not addEventListener).
+            // SpeechRecognition exposes result/error/end only via on* handlers.
             recognition.onresult = event => {
                 const transcript = event.results[0]?.[0]?.transcript?.trim();
                 if (transcript) onHeard(transcript);
@@ -106,19 +103,25 @@ export function CoachVoiceControls({ prompt, voice, onHeard, className }: Props)
     };
 
     return (
-        <div className={cn('flex flex-wrap gap-2', className)}>
+        <div className={cn('flex flex-wrap items-center gap-2', className)}>
             {voice.speak ? (
-                <Button type="button" variant="ghost" size="sm" onClick={speak}>
+                <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={speak}
+                    iconLeft={<Volume2Icon className="size-3.5" aria-hidden />}>
                     {t('voice_read')}
                 </Button>
             ) : null}
             {voice.listen ? (
                 <Button
                     type="button"
-                    variant="ghost"
+                    variant={listening ? 'primary' : 'secondary'}
                     size="sm"
                     onClick={toggleListen}
-                    aria-pressed={listening}>
+                    aria-pressed={listening}
+                    iconLeft={<MicIcon className="size-3.5" aria-hidden />}>
                     {listening ? t('voice_listening') : t('voice_speak')}
                 </Button>
             ) : null}

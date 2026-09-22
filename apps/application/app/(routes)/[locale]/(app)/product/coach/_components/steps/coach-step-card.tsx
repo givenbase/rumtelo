@@ -13,8 +13,10 @@ import { cn } from '@rumtelo/utils';
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 
+import { localizeCoachStepHrefLabel, localizeCoachStepPrompt } from '../../_utils/step-prompt';
 import { typicalDayEntries } from '../../_utils/typical-day';
 import { CoachVoiceControls } from '../coach-voice-controls';
 
@@ -52,9 +54,12 @@ function CoachStepCardInner({ householdId, step, progressLabel, onAdvanced }: Pr
     const apiError = useApiError();
     const queryClient = useQueryClient();
     const { showToast } = useAppShell();
+    const { formatMoney } = useHouseholdCurrency();
     const [text, setText] = useState('');
     const [heard, setHeard] = useState('');
     const [pendingConfirm, setPendingConfirm] = useState<string | null>(null);
+    const prompt = localizeCoachStepPrompt(step, t, formatMoney);
+    const hrefLabel = localizeCoachStepHrefLabel(step, t);
 
     const fail = (error: unknown) => showToast(apiError(error), 'error');
 
@@ -256,24 +261,26 @@ function CoachStepCardInner({ householdId, step, progressLabel, onAdvanced }: Pr
     };
 
     return (
-        <section className="grid gap-4 rounded-2xl border border-accent/30 bg-surface px-5 py-5 shadow-md">
-            <div className="flex flex-wrap items-start justify-between gap-2">
+        <section className="grid gap-5 rounded-2xl border border-line bg-surface p-5 shadow-sm sm:gap-6 sm:p-6">
+            <header className="flex items-baseline justify-between gap-3">
                 <Typography as="span" variant="eyebrow" color="primary">
                     {t('card_eyebrow')}
                 </Typography>
-                <Typography as="span" size="sm" color="muted">
-                    {progressLabel}
-                </Typography>
-            </div>
+                {progressLabel ? (
+                    <span className="font-mono text-xs tracking-wide text-fg-muted tabular-nums">
+                        {progressLabel}
+                    </span>
+                ) : null}
+            </header>
 
-            <Typography as="h2" className="leading-snug">
-                {step.prompt}
+            <Typography
+                as="h2"
+                className="max-w-prose text-xl leading-snug font-semibold tracking-tight text-fg sm:text-[1.35rem]">
+                {prompt}
             </Typography>
 
-            <CoachVoiceControls prompt={step.prompt} voice={step.voice} onHeard={applyHeard} />
-
             {heard || pendingConfirm ? (
-                <div className="grid gap-2 rounded-xl border border-line bg-raised/40 px-3 py-2.5">
+                <div className="grid gap-2 rounded-xl bg-raised px-3.5 py-3">
                     {heard ? (
                         <Typography as="p" size="sm" color="muted">
                             {t('voice_heard', { text: heard })}
@@ -299,190 +306,195 @@ function CoachStepCardInner({ householdId, step, progressLabel, onAdvanced }: Pr
                 </div>
             ) : null}
 
-            {step.input === 'jar_pick' && step.payload.type === 'inbox_sort' ? (
-                <div className="flex flex-wrap gap-2">
-                    {step.payload.jars.map(jar => (
-                        <button
-                            key={jar.id}
-                            type="button"
-                            disabled={busy}
-                            onClick={() => sortInbox.mutate(jar.id)}
-                            className={cn(
-                                'rounded-full border border-line px-3.5 py-2 text-sm transition-colors hover:border-accent hover:bg-accent-soft',
-                                pendingConfirm === jar.id && 'border-accent bg-accent-soft'
-                            )}>
-                            {jar.name}
-                        </button>
-                    ))}
-                </div>
-            ) : null}
-
-            {step.input === 'paid_skip' ? (
-                <div className="flex flex-wrap gap-2">
-                    <Button type="button" disabled={busy} onClick={() => billAction.mutate('paid')}>
-                        {t('paid')}
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        disabled={busy}
-                        onClick={() => billAction.mutate('skip')}>
-                        {t('skip')}
-                    </Button>
-                </div>
-            ) : null}
-
-            {step.input === 'yes_typical' ? (
-                <div className="flex flex-wrap gap-2">
-                    <Button type="button" disabled={busy} onClick={() => timeTypical.mutate()}>
-                        {t('yes_typical')}
-                    </Button>
-                    {step.href ? (
-                        <Link
-                            href={step.href}
-                            className="inline-flex items-center text-sm font-medium text-accent hover:underline">
-                            {step.hrefLabel ?? t('adjust')}
-                        </Link>
-                    ) : null}
-                </div>
-            ) : null}
-
-            {step.input === 'gratitude_text' ? (
-                <form
-                    className="grid gap-3"
-                    onSubmit={event => {
-                        event.preventDefault();
-                        const line = text.trim();
-                        if (line) gratitude.mutate(line);
-                    }}>
-                    <input
-                        value={text}
-                        onChange={event => setText(event.target.value)}
-                        maxLength={280}
-                        placeholder={t('gratitude_placeholder')}
-                        className="w-full rounded-xl border border-line bg-raised px-3.5 py-2.5 text-sm outline-none focus:border-accent"
-                    />
-                    <Button type="submit" disabled={busy || !text.trim()}>
-                        {t('save')}
-                    </Button>
-                </form>
-            ) : null}
-
-            {step.input === 'score_chips' && step.payload.type === 'energy_score' ? (
-                <div className="grid gap-2">
-                    <Typography as="p" size="sm" color="muted">
-                        {metricHint(step.payload.metric, t)}
-                    </Typography>
+            <div className="grid gap-3">
+                {step.input === 'jar_pick' && step.payload.type === 'inbox_sort' ? (
                     <div className="flex flex-wrap gap-2">
-                        {SCORE_CHIPS.map(chip => (
+                        {step.payload.jars.map(jar => (
                             <button
-                                key={chip.value}
+                                key={jar.id}
                                 type="button"
                                 disabled={busy}
-                                onClick={() => score.mutate(chip.value)}
-                                className="rounded-full border border-line px-3.5 py-2 text-sm transition-colors hover:border-accent hover:bg-accent-soft">
-                                {t(chip.labelKey)}
+                                onClick={() => sortInbox.mutate(jar.id)}
+                                className={cn(
+                                    'rounded-xl border border-line px-4 py-2.5 text-sm font-medium transition-colors hover:border-accent hover:bg-accent-soft',
+                                    pendingConfirm === jar.id && 'border-accent bg-accent-soft'
+                                )}>
+                                {jar.name}
                             </button>
                         ))}
                     </div>
-                </div>
-            ) : null}
+                ) : null}
 
-            {step.input === 'week_check_look' ? (
-                <div className="flex flex-wrap gap-2">
-                    <Button
-                        type="button"
-                        disabled={busy}
-                        onClick={() => weekCheck.mutate({ stage: WeekCheckStage.REDIRECT })}>
-                        {t('look_continue')}
-                    </Button>
-                    {step.href ? (
-                        <Link
-                            href={step.href}
-                            className="inline-flex items-center text-sm font-medium text-accent hover:underline">
-                            {step.hrefLabel}
-                        </Link>
-                    ) : null}
-                </div>
-            ) : null}
+                {step.input === 'paid_skip' ? (
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Button
+                            type="button"
+                            disabled={busy}
+                            onClick={() => billAction.mutate('paid')}>
+                            {t('paid')}
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            disabled={busy}
+                            onClick={() => billAction.mutate('skip')}>
+                            {t('skip')}
+                        </Button>
+                    </div>
+                ) : null}
 
-            {step.input === 'week_check_redirect' && step.payload.type === 'week_check_redirect' ? (
-                <div className="grid gap-3">
-                    {step.payload.surplus > 0 ? (
+                {step.input === 'yes_typical' ? (
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Button type="button" disabled={busy} onClick={() => timeTypical.mutate()}>
+                            {t('yes_typical')}
+                        </Button>
+                        {step.href ? (
+                            <Button as={Link} href={step.href} variant="secondary">
+                                {hrefLabel}
+                            </Button>
+                        ) : null}
+                    </div>
+                ) : null}
+
+                {step.input === 'gratitude_text' ? (
+                    <form
+                        className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center"
+                        onSubmit={event => {
+                            event.preventDefault();
+                            const line = text.trim();
+                            if (line) gratitude.mutate(line);
+                        }}>
+                        <input
+                            value={text}
+                            onChange={event => setText(event.target.value)}
+                            maxLength={280}
+                            placeholder={t('gratitude_placeholder')}
+                            className="w-full rounded-xl border border-line bg-raised px-3.5 py-2.5 text-sm outline-none focus:border-accent"
+                        />
+                        <Button type="submit" disabled={busy || !text.trim()}>
+                            {t('save')}
+                        </Button>
+                    </form>
+                ) : null}
+
+                {step.input === 'score_chips' && step.payload.type === 'energy_score' ? (
+                    <div className="grid gap-2">
+                        <Typography as="p" size="sm" color="muted">
+                            {metricHint(step.payload.metric, t)}
+                        </Typography>
                         <div className="flex flex-wrap gap-2">
-                            {step.payload.jars.map(jar => (
+                            {SCORE_CHIPS.map(chip => (
                                 <button
-                                    key={jar.id}
+                                    key={chip.value}
                                     type="button"
                                     disabled={busy}
-                                    onClick={() =>
-                                        weekCheck.mutate({
-                                            stage: WeekCheckStage.INTEND,
-                                            allocations: [
-                                                {
-                                                    jarId: jar.id,
-                                                    amount:
-                                                        step.payload.type === 'week_check_redirect'
-                                                            ? step.payload.surplus
-                                                            : 0,
-                                                },
-                                            ],
-                                        })
-                                    }
-                                    className="rounded-full border border-line px-3.5 py-2 text-sm transition-colors hover:border-accent hover:bg-accent-soft">
-                                    {jar.name}
+                                    onClick={() => score.mutate(chip.value)}
+                                    className="rounded-xl border border-line px-4 py-2.5 text-sm font-medium transition-colors hover:border-accent hover:bg-accent-soft">
+                                    {t(chip.labelKey)}
                                 </button>
                             ))}
                         </div>
-                    ) : null}
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        disabled={busy}
-                        onClick={() => weekCheck.mutate({ stage: WeekCheckStage.INTEND })}>
-                        {t('redirect_skip')}
+                    </div>
+                ) : null}
+
+                {step.input === 'week_check_look' ? (
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Button
+                            type="button"
+                            disabled={busy}
+                            onClick={() => weekCheck.mutate({ stage: WeekCheckStage.REDIRECT })}>
+                            {t('look_continue')}
+                        </Button>
+                        {step.href ? (
+                            <Button as={Link} href={step.href} variant="secondary">
+                                {hrefLabel}
+                            </Button>
+                        ) : null}
+                    </div>
+                ) : null}
+
+                {step.input === 'week_check_redirect' &&
+                step.payload.type === 'week_check_redirect' ? (
+                    <div className="grid gap-3">
+                        {step.payload.surplus > 0 ? (
+                            <div className="flex flex-wrap gap-2">
+                                {step.payload.jars.map(jar => (
+                                    <button
+                                        key={jar.id}
+                                        type="button"
+                                        disabled={busy}
+                                        onClick={() =>
+                                            weekCheck.mutate({
+                                                stage: WeekCheckStage.INTEND,
+                                                allocations: [
+                                                    {
+                                                        jarId: jar.id,
+                                                        amount:
+                                                            step.payload.type ===
+                                                            'week_check_redirect'
+                                                                ? step.payload.surplus
+                                                                : 0,
+                                                    },
+                                                ],
+                                            })
+                                        }
+                                        className="rounded-xl border border-line px-4 py-2.5 text-sm font-medium transition-colors hover:border-accent hover:bg-accent-soft">
+                                        {jar.name}
+                                    </button>
+                                ))}
+                            </div>
+                        ) : null}
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            disabled={busy}
+                            onClick={() => weekCheck.mutate({ stage: WeekCheckStage.INTEND })}>
+                            {t('redirect_skip')}
+                        </Button>
+                    </div>
+                ) : null}
+
+                {step.input === 'week_check_intend' ? (
+                    <form
+                        className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center"
+                        onSubmit={event => {
+                            event.preventDefault();
+                            const intention = text.trim();
+                            if (!intention) return;
+                            weekCheck.mutate({ stage: WeekCheckStage.DONE, intention });
+                        }}>
+                        <input
+                            value={text}
+                            onChange={event => setText(event.target.value)}
+                            maxLength={280}
+                            placeholder={t('intend_placeholder')}
+                            className="w-full rounded-xl border border-line bg-raised px-3.5 py-2.5 text-sm outline-none focus:border-accent"
+                        />
+                        <Button type="submit" disabled={busy || !text.trim()}>
+                            {t('intend_save')}
+                        </Button>
+                    </form>
+                ) : null}
+
+                {step.input === 'link_only' && step.href ? (
+                    <Button as={Link} href={step.href}>
+                        {hrefLabel}
                     </Button>
-                </div>
-            ) : null}
+                ) : null}
+            </div>
 
-            {step.input === 'week_check_intend' ? (
-                <form
-                    className="grid gap-3"
-                    onSubmit={event => {
-                        event.preventDefault();
-                        const intention = text.trim();
-                        if (!intention) return;
-                        weekCheck.mutate({ stage: WeekCheckStage.DONE, intention });
-                    }}>
-                    <input
-                        value={text}
-                        onChange={event => setText(event.target.value)}
-                        maxLength={280}
-                        placeholder={t('intend_placeholder')}
-                        className="w-full rounded-xl border border-line bg-raised px-3.5 py-2.5 text-sm outline-none focus:border-accent"
-                    />
-                    <Button type="submit" disabled={busy || !text.trim()}>
-                        {t('intend_save')}
-                    </Button>
-                </form>
-            ) : null}
-
-            {step.input === 'link_only' && step.href ? (
-                <Link
-                    href={step.href}
-                    className="inline-flex w-fit items-center rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-on-accent">
-                    {step.hrefLabel ?? t('open')}
-                </Link>
-            ) : null}
-
-            {step.href &&
-            step.input !== 'link_only' &&
-            step.input !== 'yes_typical' &&
-            step.input !== 'week_check_look' ? (
-                <Link href={step.href} className="text-sm font-medium text-accent hover:underline">
-                    {step.hrefLabel ?? t('open')} →
-                </Link>
-            ) : null}
+            <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
+                <CoachVoiceControls prompt={prompt} voice={step.voice} onHeard={applyHeard} />
+                {step.href && step.input !== 'link_only' ? (
+                    <Link
+                        href={step.href}
+                        className="text-sm font-medium text-accent transition-colors hover:underline">
+                        {hrefLabel} →
+                    </Link>
+                ) : (
+                    <span />
+                )}
+            </footer>
         </section>
     );
 }
