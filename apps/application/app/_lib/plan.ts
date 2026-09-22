@@ -84,13 +84,6 @@ export function planPriceLabel(plan: PlanKey, t?: TranslateFn): string {
     return t?.('pages.settings.plan.price_per_month', { amount }) ?? `${amount} / month`;
 }
 
-/** @deprecated Prefer planPriceLabel(plan, t) for localized UI. */
-export const PLAN_PRICE: Record<PlanKey, string> = {
-    [PlanKey.BASIC]: formatPlanPrice(0),
-    [PlanKey.PLUS]: `${formatPlanPrice(toMinorUnits(9))} / month`,
-    [PlanKey.MAX]: `${formatPlanPrice(toMinorUnits(19))} / month`,
-};
-
 /** Fallback when household settings have not loaded yet. */
 export const DEFAULT_PLAN: PlanKey = PlanKey.BASIC;
 

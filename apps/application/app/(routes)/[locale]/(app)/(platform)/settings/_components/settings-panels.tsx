@@ -13,7 +13,8 @@ import {
     DEFAULT_JAR_SPLIT,
     HouseholdRole,
     IncomeStability,
-    Locale,
+    type Locale,
+    LOCALES,
     SpendingStyle,
     PayoffStrategy,
     Theme,
@@ -521,7 +522,7 @@ export function AccountSettings() {
                         sub={t('pages.settings.account.language_sub')}
                     />
                     <div className="flex gap-1 rounded-full border border-line bg-raised p-0.5">
-                        {([Locale.EN, Locale.NL] as const).map(code => {
+                        {LOCALES.map(code => {
                             const on = activeLang === code;
                             return (
                                 <button

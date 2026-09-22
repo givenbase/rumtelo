@@ -11,6 +11,7 @@ import { FixedCostPresetSeeder } from './product/money/FixedCostPresetSeeder';
 import { GivingOrganisationSeeder } from './product/money/GivingOrganisationSeeder';
 import { GoalPresetSeeder } from './product/money/GoalPresetSeeder';
 import { IncomeSourcePresetSeeder } from './product/money/IncomeSourcePresetSeeder';
+import { CatalogTranslationSeeder } from './product/money/CatalogTranslationSeeder';
 import { JarTemplateSeeder } from './product/money/JarTemplateSeeder';
 import { MarketSeeder } from './product/money/MarketSeeder';
 import { MerchantPresetSeeder } from './product/money/MerchantPresetSeeder';
@@ -36,6 +37,7 @@ export class DatabaseSeeder extends Seeder {
             // Lookups first — presets link to them by FK.
             JarTemplateSeeder,
             CategoryTemplateSeeder,
+            CatalogTranslationSeeder,
             AudienceSeeder,
             MarketSeeder,
             GivingOrganisationSeeder,

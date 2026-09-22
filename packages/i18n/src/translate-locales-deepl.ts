@@ -1,17 +1,22 @@
 /**
- * Translate identical EN→NL leaf strings in languages/nl.json via DeepL.
+ * Translate identical EN→{locale} leaf strings via DeepL for every non-English
+ * locale in `languages/*.json` (nl, es, fr, …).
  *
  * Only replaces values that still match English (post-`generate` fill).
- * Preserves `{placeholders}` with XML ignore tags.
+ * Preserves `{placeholders}` with opaque tokens.
  *
  * Requires DEEPL_API_KEY in packages/i18n/.env (or env).
- * Run: pnpm --filter @rumtelo/i18n translate:nl
+ * Run: pnpm --filter @rumtelo/i18n translate:locales
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import * as deepl from 'deepl-node';
+
+import { DEFAULT_INTL_LOCALE, type IntlLocale } from '@rumtelo/contracts';
+
+import { locales } from './next-intl';
 
 const packageRoot = join(fileURLToPath(import.meta.url), '../..');
 const languagesDir = join(packageRoot, 'languages');
@@ -71,7 +76,6 @@ function setAt(root: Record<string, Json>, path: string[], value: string) {
     current[path[path.length - 1]!] = value;
 }
 
-/** Swap ICU placeholders for opaque tokens DeepL won't touch. */
 function protectPlaceholders(text: string): { masked: string; keys: string[] } {
     const keys: string[] = [];
     const masked = text.replace(/\{([a-zA-Z0-9_]+)\}/g, (_match, key: string) => {
@@ -96,81 +100,16 @@ function placeholderSignature(text: string): string {
         .join(',');
 }
 
-/** Skip proper nouns / brand / jar short codes / already-Dutch-looking short tokens. */
 function shouldSkip(text: string, path: string[]): boolean {
     const trimmed = text.trim();
     if (!trimmed) return true;
     if (trimmed.length <= 1) return true;
-    // Jar short codes stay English (PLAY, NEC, …)
     if (path.at(-1) === 'short' && path.includes('jars')) return true;
-    // Pure numbers / currency / punctuation
     if (/^[\d€$£.,\s/%+\-–—·▸←→✦◇]+$/u.test(trimmed)) return true;
-    // Brand / plan product names alone
     if (/^(Rumtelo|Basic|Plus|Max|MasterClass|Masterclass)$/i.test(trimmed)) return true;
     return false;
 }
 
-async function main() {
-    loadEnvFile();
-    const authKey = process.env.DEEPL_API_KEY?.trim();
-    if (!authKey) {
-        console.error('Missing DEEPL_API_KEY (set in packages/i18n/.env or env)');
-        process.exit(1);
-    }
-
-    const enPath = join(languagesDir, 'en.json');
-    const nlPath = join(languagesDir, 'nl.json');
-    const en = JSON.parse(readFileSync(enPath, 'utf8')) as Json;
-    const nl = JSON.parse(readFileSync(nlPath, 'utf8')) as Record<string, Json>;
-
-    type Job = { path: string[]; text: string };
-    const jobs: Job[] = [];
-
-    walkStrings(en, [], (path, enText) => {
-        if (shouldSkip(enText, path)) return;
-        const nlValue = getAt(nl, path);
-        if (typeof nlValue !== 'string') return;
-        // Only translate still-identical EN fills
-        if (nlValue !== enText) return;
-        jobs.push({ path, text: enText });
-    });
-
-    console.log(`Found ${jobs.length} identical EN/NL leaves to translate`);
-    if (jobs.length === 0) return;
-
-    const client = new deepl.DeepLClient(authKey);
-    const batchSize = 40;
-    let done = 0;
-
-    for (let i = 0; i < jobs.length; i += batchSize) {
-        const batch = jobs.slice(i, i + batchSize);
-        const prepared = batch.map(job => protectPlaceholders(job.text));
-        const results = await client.translateText(
-            prepared.map(item => item.masked),
-            'en',
-            'nl',
-            { preserveFormatting: true }
-        );
-        const list = Array.isArray(results) ? results : [results];
-        for (let j = 0; j < batch.length; j++) {
-            const job = batch[j]!;
-            const translated = restorePlaceholders(list[j]!.text, prepared[j]!.keys);
-            if (placeholderSignature(job.text) !== placeholderSignature(translated)) {
-                console.warn(`Keeping EN (placeholder mismatch): ${job.path.join('.')}`);
-                continue;
-            }
-            setAt(nl, job.path, translated);
-        }
-        done += batch.length;
-        console.log(`Translated ${done}/${jobs.length}`);
-        // Persist after each batch so a mid-run failure keeps progress
-        writeJsonIfChanged(nlPath, nl);
-    }
-
-    console.log(`Done — ${jobs.length} leaf(s) considered`);
-}
-
-/** Write JSON only when serialized content differs (avoids dirty mtimes / git noise). */
 function writeJsonIfChanged(filePath: string, data: Json): boolean {
     const next = `${JSON.stringify(data, null, 4)}\n`;
     if (existsSync(filePath)) {
@@ -183,6 +122,88 @@ function writeJsonIfChanged(filePath: string, data: Json): boolean {
     writeFileSync(filePath, next, 'utf8');
     console.log(`Wrote ${filePath}`);
     return true;
+}
+
+async function translateLocale(
+    client: deepl.DeepLClient,
+    en: Json,
+    locale: IntlLocale
+): Promise<void> {
+    // DeepL target codes match our intl tags (nl / es / fr).
+    const target = locale as deepl.TargetLanguageCode;
+    const path = join(languagesDir, `${locale}.json`);
+    if (!existsSync(path)) {
+        console.warn(`Skip ${locale}: missing ${path} (run generate first)`);
+        return;
+    }
+    const tree = JSON.parse(readFileSync(path, 'utf8')) as Record<string, Json>;
+
+    type Job = { path: string[]; text: string };
+    const jobs: Job[] = [];
+
+    walkStrings(en, [], (leafPath, enText) => {
+        if (shouldSkip(enText, leafPath)) return;
+        const current = getAt(tree, leafPath);
+        if (typeof current !== 'string') return;
+        if (current !== enText) return;
+        jobs.push({ path: leafPath, text: enText });
+    });
+
+    console.log(`[${locale}] ${jobs.length} identical EN leaves to translate → ${target}`);
+    if (jobs.length === 0) return;
+
+    const batchSize = 40;
+    let done = 0;
+
+    for (let i = 0; i < jobs.length; i += batchSize) {
+        const batch = jobs.slice(i, i + batchSize);
+        const prepared = batch.map(job => protectPlaceholders(job.text));
+        const results = await client.translateText(
+            prepared.map(item => item.masked),
+            'en',
+            target,
+            { preserveFormatting: true }
+        );
+        const list = Array.isArray(results) ? results : [results];
+        for (let j = 0; j < batch.length; j++) {
+            const job = batch[j]!;
+            const translated = restorePlaceholders(list[j]!.text, prepared[j]!.keys);
+            if (placeholderSignature(job.text) !== placeholderSignature(translated)) {
+                console.warn(
+                    `[${locale}] Keeping EN (placeholder mismatch): ${job.path.join('.')}`
+                );
+                continue;
+            }
+            setAt(tree, job.path, translated);
+        }
+        done += batch.length;
+        console.log(`[${locale}] Translated ${done}/${jobs.length}`);
+        writeJsonIfChanged(path, tree);
+    }
+
+    console.log(`[${locale}] Done — ${jobs.length} leaf(s) considered`);
+}
+
+async function main() {
+    loadEnvFile();
+    const authKey = process.env.DEEPL_API_KEY?.trim();
+    if (!authKey) {
+        console.error('Missing DEEPL_API_KEY (set in packages/i18n/.env or env)');
+        process.exit(1);
+    }
+
+    const enPath = join(languagesDir, 'en.json');
+    if (!existsSync(enPath)) {
+        console.error(`Missing ${enPath} — run generate first`);
+        process.exit(1);
+    }
+    const en = JSON.parse(readFileSync(enPath, 'utf8')) as Json;
+    const client = new deepl.DeepLClient(authKey);
+
+    for (const locale of locales) {
+        if (locale === DEFAULT_INTL_LOCALE) continue;
+        await translateLocale(client, en, locale);
+    }
 }
 
 main().catch(error => {

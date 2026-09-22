@@ -3,18 +3,24 @@
 import { startTransition, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { LocalesEnum } from '@rumtelo/i18n';
-import en from '@rumtelo/i18n/languages/en.json';
-import nl from '@rumtelo/i18n/languages/nl.json';
+import {
+    DEFAULT_INTL_LOCALE,
+    INTL_LOCALES,
+    MESSAGE_CATALOGS,
+    type IntlLocale,
+} from '@rumtelo/i18n';
 import { createTranslator } from 'next-intl';
 import { StatusPage } from '@rumtelo/ui';
 
 import './globals.css';
 
-const MESSAGES = {
-    [LocalesEnum.English]: en,
-    [LocalesEnum.Dutch]: nl,
-} as const;
+function resolveLocale(): IntlLocale {
+    if (typeof document === 'undefined') return DEFAULT_INTL_LOCALE;
+    const lang = document.documentElement.lang;
+    return (INTL_LOCALES as readonly string[]).includes(lang)
+        ? (lang as IntlLocale)
+        : DEFAULT_INTL_LOCALE;
+}
 
 export default function GlobalError({
     error,
@@ -24,11 +30,11 @@ export default function GlobalError({
     reset: () => void;
 }) {
     const router = useRouter();
-    const locale =
-        typeof document !== 'undefined' && document.documentElement.lang === LocalesEnum.Dutch
-            ? LocalesEnum.Dutch
-            : LocalesEnum.English;
-    const t = useMemo(() => createTranslator({ locale, messages: MESSAGES[locale] }), [locale]);
+    const locale = resolveLocale();
+    const t = useMemo(
+        () => createTranslator({ locale, messages: MESSAGE_CATALOGS[locale] }),
+        [locale]
+    );
 
     useEffect(() => {
         console.error(error);

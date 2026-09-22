@@ -1,3 +1,4 @@
+export { MESSAGE_CATALOGS } from './message-catalogs';
 export * from './locale-metadata';
 export * from './locales';
 export * from './next-intl';
@@ -15,8 +16,3 @@ export {
     BRAND_TAGLINE,
     type BrandQuote,
 } from './brand';
-
-import { LocalesEnum } from './next-intl';
-
-/** Default UI locale — English first, Dutch second. */
-export const DEFAULT_LOCALE = LocalesEnum.English;

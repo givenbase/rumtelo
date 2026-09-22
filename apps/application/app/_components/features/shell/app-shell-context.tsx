@@ -12,8 +12,8 @@ import {
     type ReactNode,
 } from 'react';
 
-import { Locale, type PlanKey } from '@rumtelo/contracts';
-import { LocalesEnum, useLocale, usePathname, useRouter } from '@rumtelo/i18n';
+import { type Locale, LOCALES, type PlanKey } from '@rumtelo/contracts';
+import { fromIntlLocale, toIntlLocale, useLocale, usePathname, useRouter } from '@rumtelo/i18n';
 import { useQuery } from '@tanstack/react-query';
 
 import { DEFAULT_PLAN } from '@/app/_lib/plan';
@@ -70,8 +70,7 @@ export function AppShellProvider({ children }: { children: ReactNode }) {
     const [onboardingOpen, setOnboardingOpen] = useState(false);
     const [onboardingStep, setOnboardingStep] = useState(0);
     /** Mirror next-intl cookie/locale — derive, don't sync via effect. */
-    const locale: Locale =
-        intlLocale === LocalesEnum.Dutch || intlLocale === 'nl' ? Locale.NL : Locale.EN;
+    const locale: Locale = fromIntlLocale(intlLocale);
 
     const now = new Date();
     const [period, setPeriod] = useState<Period>({
@@ -136,7 +135,7 @@ export function AppShellProvider({ children }: { children: ReactNode }) {
 
     const setLocale = useCallback(
         (next: Locale) => {
-            const code = next === Locale.NL ? LocalesEnum.Dutch : LocalesEnum.English;
+            const code = toIntlLocale(next);
             if (intlLocale !== code) {
                 router.replace(pathname, { locale: code });
             }
@@ -145,7 +144,9 @@ export function AppShellProvider({ children }: { children: ReactNode }) {
     );
 
     const toggleLocale = useCallback(() => {
-        setLocale(locale === Locale.NL ? Locale.EN : Locale.NL);
+        const index = Math.max(0, LOCALES.indexOf(locale));
+        const next = LOCALES[(index + 1) % LOCALES.length]!;
+        setLocale(next);
     }, [locale, setLocale]);
 
     useEffect(() => {

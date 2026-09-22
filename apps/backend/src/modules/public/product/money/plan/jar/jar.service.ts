@@ -12,6 +12,16 @@ import {
 
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
+import { AccountSettingsService } from '../../../../../auth/user/account/account-settings';
+import {
+    catalogLocaleFromContracts,
+    ENTITY_CATEGORY_TEMPLATE,
+    ENTITY_JAR_TEMPLATE,
+    isCatalogSourceLocale,
+    TranslationService,
+} from '../../../../../backoffice/admin/translation';
+import { CATEGORY_TEMPLATE_SEED } from '../../../../../backoffice/product/money/template/category/seed/category.seed-data';
+import { JAR_TEMPLATE_SEED } from '../../../../../backoffice/product/money/template/jar/seed/jar.seed-data';
 import { Category } from './category.entity';
 import { Jar } from './jar.entity';
 
@@ -26,7 +36,11 @@ export class JarService {
     private readonly jars: HouseholdScopedRepository<Jar>;
     private readonly categories: HouseholdScopedRepository<Category>;
 
-    constructor(@Inject(EntityManager) private readonly em: EntityManager) {
+    constructor(
+        @Inject(EntityManager) private readonly em: EntityManager,
+        @Inject(TranslationService) private readonly translations: TranslationService,
+        @Inject(AccountSettingsService) private readonly accountSettings: AccountSettingsService
+    ) {
         this.jars = new HouseholdScopedRepository(em, Jar);
         this.categories = new HouseholdScopedRepository(em, Category);
     }
@@ -73,17 +87,31 @@ export class JarService {
 
     async list(): Promise<JarDto[]> {
         const rows = await this.jars.find({}, { orderBy: { sortOrder: 'ASC' } });
-        return rows.map(toJarDto);
+        return this.applyJarTranslations(rows.map(toJarDto));
     }
 
     async balances(period: string) {
         const jars = await this.jars.find({}, { orderBy: { sortOrder: 'ASC' } });
-        const spentByJar = await this.spentByJar(period);
-        const creditedByJar = await this.creditedByJar(period);
-        const spentByCategory = await this.spentByCategory(period);
-        const committedByJar = await this.committedOutByJar();
-        const committedByCategory = await this.committedOutByCategory();
-        const income = await this.monthlyNetIncome();
+        const [
+            jarDtos,
+            categoryNameByEnglish,
+            spentByJar,
+            creditedByJar,
+            spentByCategory,
+            committedByJar,
+            committedByCategory,
+            income,
+        ] = await Promise.all([
+            this.applyJarTranslations(jars.map(toJarDto)),
+            this.categoryNameOverlay(),
+            this.spentByJar(period),
+            this.creditedByJar(period),
+            this.spentByCategory(period),
+            this.committedOutByJar(),
+            this.committedOutByCategory(),
+            this.monthlyNetIncome(),
+        ]);
+        const jarById = new Map(jarDtos.map(jar => [jar.id, jar]));
         const allocations = new Map(
             allocateByPercentage(
                 income,
@@ -93,6 +121,7 @@ export class JarService {
 
         return Promise.all(
             jars.map(async jar => {
+                const base = jarById.get(jar.id) ?? toJarDto(jar);
                 const allocated = allocations.get(jar.id) ?? 0;
                 const spent = spentByJar.get(jar.id) ?? 0;
                 const credited = creditedByJar.get(jar.id) ?? 0;
@@ -100,7 +129,7 @@ export class JarService {
                 const coverage = jarCoverage({ allocated, spent, credited, committedOut });
                 const cats = await this.categories.find({ jar: jar.id });
                 return {
-                    ...toJarDto(jar),
+                    ...base,
                     period,
                     allocated,
                     spent,
@@ -115,7 +144,7 @@ export class JarService {
                         return {
                             id: category.id,
                             jarId: jar.id,
-                            name: category.name,
+                            name: categoryNameByEnglish.get(category.name) ?? category.name,
                             budgeted: categoryEnvelope(category.budgeted, fixed),
                             actual: spentByCategory.get(category.id) ?? 0,
                             isArchived: category.isArchived,
@@ -124,6 +153,46 @@ export class JarService {
                 };
             })
         );
+    }
+
+    /** Overlay catalog locale onto household jars when name/subtitle still match EN seed. */
+    private async applyJarTranslations(jars: JarDto[]): Promise<JarDto[]> {
+        if (!jars.length) return jars;
+        const { locale } = await this.accountSettings.get();
+        const catalogLocale = catalogLocaleFromContracts(locale);
+        if (isCatalogSourceLocale(catalogLocale)) return jars;
+
+        const fieldMap = await this.translations.fieldMapForType(
+            ENTITY_JAR_TEMPLATE,
+            catalogLocale,
+            jars.map(jar => jar.key)
+        );
+        const englishByKey = new Map(
+            JAR_TEMPLATE_SEED.map(row => [row.key, { name: row.name, subtitle: row.subtitle }])
+        );
+        return this.translations.applyToMany(
+            jars,
+            fieldMap,
+            ['name', 'subtitle'],
+            row => String(row.key),
+            {
+                englishOf: row => englishByKey.get(String(row.key) as never) ?? {},
+            }
+        );
+    }
+
+    /** EN category name → localized name for un-renamed household categories. */
+    private async categoryNameOverlay(): Promise<Map<string, string>> {
+        const { locale } = await this.accountSettings.get();
+        const catalogLocale = catalogLocaleFromContracts(locale);
+        if (isCatalogSourceLocale(catalogLocale)) return new Map();
+
+        const fieldMap = await this.translations.fieldMapForType(
+            ENTITY_CATEGORY_TEMPLATE,
+            catalogLocale
+        );
+        const englishNameByKey = new Map(CATEGORY_TEMPLATE_SEED.map(row => [row.key, row.name]));
+        return this.translations.nameByEnglish(fieldMap, englishNameByKey);
     }
 
     /** Active income normalised to a monthly figure. */

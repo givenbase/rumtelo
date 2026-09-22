@@ -3,9 +3,9 @@
  * other locale JSON files: fill missing keys from English and drop keys that
  * no longer exist in EN (does not call DeepL).
  *
- * Prefer adding English under translations/ first. For Dutch: run
- * `pnpm --filter @rumtelo/i18n translate:nl` after generate — it translates
- * leaves still identical to EN via DeepL and keeps existing NL overrides.
+ * Prefer adding English under translations/ first. For other locales: run
+ * `pnpm --filter @rumtelo/i18n translate:locales` after generate — it translates
+ * leaves still identical to EN via DeepL and keeps existing overrides.
  *
  * Run: pnpm --filter @rumtelo/i18n generate
  */
@@ -13,7 +13,8 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { basename, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { locales, LocalesEnum } from './next-intl';
+import { locales } from './next-intl';
+import { DEFAULT_INTL_LOCALE } from '@rumtelo/contracts';
 
 const packageRoot = join(fileURLToPath(import.meta.url), '../..');
 const translationsDir = join(packageRoot, 'translations');
@@ -103,11 +104,11 @@ async function main() {
     mkdirSync(languagesDir, { recursive: true });
 
     const english = (await loadTranslations()) as unknown as Json;
-    const enPath = join(languagesDir, `${LocalesEnum.English}.json`);
+    const enPath = join(languagesDir, `${DEFAULT_INTL_LOCALE}.json`);
     writeJsonIfChanged(enPath, english);
 
     for (const locale of locales) {
-        if (locale === LocalesEnum.English) continue;
+        if (locale === DEFAULT_INTL_LOCALE) continue;
         const path = join(languagesDir, `${locale}.json`);
         let current: Json = {};
         if (existsSync(path)) {

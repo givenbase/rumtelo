@@ -9,7 +9,7 @@ import { LOCALE_DISPLAY_NAMES, LOCALE_SHORT_LABELS } from './locale-metadata';
 import {
     activeLocales,
     isLocaleSwitcherVisible,
-    type Locale,
+    type IntlLocale,
     useLocale,
     usePathname,
     useRouter,
@@ -50,7 +50,7 @@ export function LocaleSwitcher({
     const router = useRouter();
     const pathname = usePathname();
     const t = useTranslations();
-    const activeLocale = useLocale() as Locale;
+    const activeLocale = useLocale() as IntlLocale;
     const [open, setOpen] = useState(false);
     const rootRef = useRef<HTMLDivElement>(null);
     const listId = useId();
@@ -88,7 +88,7 @@ export function LocaleSwitcher({
     const triggerLabel =
         ariaLabel ?? t('ui.theme.language_named', { name: LOCALE_DISPLAY_NAMES[current] });
 
-    function handleChange(code: Locale) {
+    function handleChange(code: IntlLocale) {
         if (code === activeLocale) {
             setOpen(false);
             return;

@@ -1,8 +1,7 @@
-import type { SVGProps } from 'react';
+import type { ComponentType, SVGProps } from 'react';
 
+import { fromIntlLocale, Locale, type IntlLocale } from '@rumtelo/contracts';
 import { cn } from '@rumtelo/utils';
-
-import { LocalesEnum, type Locale } from './next-intl';
 
 type FlagProps = SVGProps<SVGSVGElement>;
 
@@ -33,13 +32,36 @@ function FlagNl({ className, ...props }: FlagProps) {
     );
 }
 
-const FLAG_BY_LOCALE = {
-    [LocalesEnum.English]: FlagEn,
-    [LocalesEnum.Dutch]: FlagNl,
-} as const;
+function FlagEs({ className, ...props }: FlagProps) {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden className={className} {...props}>
+            <path fill="#AA151B" d="M0 0h24v6H0z" />
+            <path fill="#F1BF00" d="M0 6h24v12H0z" />
+            <path fill="#AA151B" d="M0 18h24v6H0z" />
+        </svg>
+    );
+}
 
-export function LocaleFlag({ locale, className }: { locale: Locale; className?: string }) {
-    const Flag = FLAG_BY_LOCALE[locale];
+function FlagFr({ className, ...props }: FlagProps) {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden className={className} {...props}>
+            <path fill="#002395" d="M0 0h8v24H0z" />
+            <path fill="#FFF" d="M8 0h8v24H8z" />
+            <path fill="#ED2939" d="M16 0h8v24h-8z" />
+        </svg>
+    );
+}
+
+/** Flag art keyed by contracts Locale — `satisfies` when {@link Locale} grows. */
+const FLAG_BY_LOCALE = {
+    [Locale.EN]: FlagEn,
+    [Locale.NL]: FlagNl,
+    [Locale.ES]: FlagEs,
+    [Locale.FR]: FlagFr,
+} as const satisfies Record<Locale, ComponentType<FlagProps>>;
+
+export function LocaleFlag({ locale, className }: { locale: IntlLocale; className?: string }) {
+    const Flag = FLAG_BY_LOCALE[fromIntlLocale(locale)];
     return (
         <span
             className={cn(
