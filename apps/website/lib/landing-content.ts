@@ -5,76 +5,9 @@
  * Feature claims and plan limits come from `@rumtelo/contracts`.
  */
 import { DEFAULT_JAR_SPLIT, JarKey, PlanKey } from '@rumtelo/contracts';
+import type { IconName } from '@rumtelo/ui';
 
-/* ─────────────────────────── icons ─────────────────────────── */
-
-export type IconName =
-    | 'home'
-    | 'trend'
-    | 'book'
-    | 'lock'
-    | 'sparkle'
-    | 'heart'
-    | 'wallet'
-    | 'shield'
-    | 'eye'
-    | 'db'
-    | 'moon'
-    | 'compass'
-    | 'inbox'
-    | 'clock'
-    | 'flag'
-    | 'users';
-
-export const ICON_PATHS: Record<IconName, string[]> = {
-    home: ['M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z', 'M9 22V12h6v10'],
-    trend: ['M22 7l-8.5 8.5-5-5L2 17', 'M16 7h6v6'],
-    book: [
-        'M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z',
-        'M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z',
-    ],
-    lock: [
-        'M7 11V7a5 5 0 0 1 10 0v4',
-        'M5 11h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2z',
-    ],
-    sparkle: [
-        'M12 3l-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z',
-    ],
-    heart: [
-        'M19 14c1.5-1.4 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.1 3 5.5l7 7z',
-    ],
-    wallet: [
-        'M21 12V7H5a2 2 0 0 1 0-4h14v4',
-        'M3 5v14a2 2 0 0 0 2 2h16v-5',
-        'M18 12a2 2 0 0 0 0 4h4v-4z',
-    ],
-    shield: [
-        'M20 13c0 5-3.5 7.5-7.7 8.9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z',
-    ],
-    eye: [
-        'M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z',
-        'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
-    ],
-    db: [
-        'M12 8c5 0 9-1.3 9-3s-4-3-9-3-9 1.3-9 3 4 3 9 3z',
-        'M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5',
-        'M3 12c0 1.7 4 3 9 3s9-1.3 9-3',
-    ],
-    moon: ['M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z'],
-    compass: ['M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z', 'M16.2 7.8l-2.1 6.3-6.3 2.1 2.1-6.3z'],
-    inbox: [
-        'M22 12h-6l-2 3h-4l-2-3H2',
-        'M5.5 5.1L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.7 4H7.3a2 2 0 0 0-1.8 1.1z',
-    ],
-    clock: ['M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z', 'M12 6v6l4 2'],
-    flag: ['M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z', 'M4 22v-7'],
-    users: [
-        'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2',
-        'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
-        'M23 21v-2a4 4 0 0 0-3-3.9',
-        'M16 3.1a4 4 0 0 1 0 7.8',
-    ],
-};
+export type { IconName };
 
 /* ─────────────────────────── hero ─────────────────────────── */
 
@@ -111,13 +44,13 @@ export const JARS: Jar[] = [
         key: 'ff',
         pct: DEFAULT_JAR_SPLIT[JarKey.FINANCIAL_FREEDOM],
         colorVar: 'var(--color-jar-ff)',
-        icon: 'trend',
+        icon: 'trending-up',
     },
     {
         key: 'edu',
         pct: DEFAULT_JAR_SPLIT[JarKey.EDUCATION],
         colorVar: 'var(--color-jar-edu)',
-        icon: 'book',
+        icon: 'book-open',
     },
     {
         key: 'lts',
@@ -129,7 +62,7 @@ export const JARS: Jar[] = [
         key: 'play',
         pct: DEFAULT_JAR_SPLIT[JarKey.PLAY],
         colorVar: 'var(--color-jar-play)',
-        icon: 'sparkle',
+        icon: 'sparkles',
     },
     {
         key: 'give',
@@ -177,7 +110,7 @@ export const PORTALS: Portal[] = [
     {
         key: 'soul',
         colorVar: 'var(--color-portal-soul)',
-        icon: 'sparkle',
+        icon: 'sparkles',
         media: PLACEHOLDER_MEDIA,
     },
 ];

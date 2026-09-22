@@ -8,7 +8,7 @@ import type { Goal, GoalProjection } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useTranslations, type TranslateFn } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Button, Card, Meter, Typography } from '@rumtelo/ui';
+import { Icon, Button, Card, Meter, Typography } from '@rumtelo/ui';
 import {
     earnGoalProgress,
     monthlyNetAsOf,
@@ -33,7 +33,6 @@ import { SaveGoalManifestActions } from '@/components/features/growth/save-goal-
 import { JarBadge, MetaChip, formatBookedDate } from '@/components/features/money/jar-badge';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
-import { EditIcon } from '@/components/features/ui/action-icons';
 import { useLocale } from 'next-intl';
 
 function kindEyebrow(kind: GoalKind, t: TranslateFn): string {
@@ -430,7 +429,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                         />
                     ) : null}
                     <Button as={Link} href={updateHref('goal', goal.id)} variant="secondary">
-                        <EditIcon />
+                        <Icon name="pencil" size="sm" />
                         {tAction('edit')}
                     </Button>
                 </div>

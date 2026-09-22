@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { Icon } from '../../display/Icon';
 import { useMemo, useState } from 'react';
 
 import { cn } from '@rumtelo/utils';
@@ -229,7 +229,7 @@ export function Calendar({ value, onSelect, min, max, className, locale, labels 
                     disabled={!canGoPrev}
                     onClick={() => setVisibleMonth(current => addMonths(current, -1))}
                     className="grid size-8 shrink-0 place-items-center rounded-full border border-line text-fg-muted transition-colors hover:border-accent-hover hover:text-accent disabled:pointer-events-none disabled:opacity-40">
-                    <ChevronLeftIcon className="size-4" />
+                    <Icon name="chevron-left" size="md" />
                 </button>
 
                 <div className="flex min-w-0 flex-1 items-center justify-center gap-1">
@@ -293,7 +293,7 @@ export function Calendar({ value, onSelect, min, max, className, locale, labels 
                     disabled={!canGoNext}
                     onClick={() => setVisibleMonth(current => addMonths(current, 1))}
                     className="grid size-8 shrink-0 place-items-center rounded-full border border-line text-fg-muted transition-colors hover:border-accent-hover hover:text-accent disabled:pointer-events-none disabled:opacity-40">
-                    <ChevronRightIcon className="size-4" />
+                    <Icon name="chevron-right" size="md" />
                 </button>
             </div>
 

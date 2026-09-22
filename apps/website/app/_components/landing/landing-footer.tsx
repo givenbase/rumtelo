@@ -4,18 +4,16 @@ import Link from 'next/link';
 
 import { RumteloLogo } from '@rumtelo/brand';
 import { useTranslations } from '@rumtelo/i18n';
-import { Typography } from '@rumtelo/ui';
+import { Icon, Typography, type IconName } from '@rumtelo/ui';
 
 import { TRUST_BADGE_KEYS } from '@/lib/landing-content';
 
-import { LandingIcon } from './landing-icon';
-
-const TRUST_KEYS = [
-    { key: 'readonly', icon: 'eye' as const },
-    { key: 'eu', icon: 'shield' as const },
-    { key: 'yours', icon: 'db' as const },
-    { key: 'coach', icon: 'compass' as const },
-] as const;
+const TRUST_KEYS: ReadonlyArray<{ key: string; icon: IconName }> = [
+    { key: 'readonly', icon: 'eye' },
+    { key: 'eu', icon: 'shield' },
+    { key: 'yours', icon: 'database' },
+    { key: 'coach', icon: 'compass' },
+];
 
 const FOOT_COL_DEFS = [
     {
@@ -65,7 +63,7 @@ export function LandingFooter() {
                     {TRUST_KEYS.map(card => (
                         <div key={card.key} className="flex min-w-0 items-start gap-3">
                             <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent">
-                                <LandingIcon name={card.icon} size={18} />
+                                <Icon name={card.icon} size="md" />
                             </span>
                             <span className="grid min-w-0 gap-0.5">
                                 <span className="text-sm font-semibold text-fg-strong">

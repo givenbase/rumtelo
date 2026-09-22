@@ -10,7 +10,6 @@ import { useFeatureHelpers } from '@/components/features/helpers';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { usePageTour } from '@/components/features/tour';
-import { EditIcon } from '@/components/features/ui/action-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
     type Currency,
@@ -26,6 +25,7 @@ import {
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import {
+    Icon,
     Badge,
     Button,
     DangerZone,
@@ -369,7 +369,7 @@ export function AccountSettings() {
                                 size="sm"
                                 className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
                                 onClick={beginEditProfile}>
-                                <EditIcon />
+                                <Icon name="pencil" size="sm" />
                                 {t('pages.settings.edit')}
                             </Button>
                         )}

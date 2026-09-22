@@ -442,7 +442,7 @@ export function DebtsPageClient() {
 
                     {visibleDebts.length === 0 ? (
                         <EmptyState
-                            icon="↓"
+                            icon="arrow-down"
                             title={debtsLive.length === 0 ? t('empty_title') : t('empty_filter')}
                             body={debtsLive.length === 0 ? t('empty_body') : t('empty_filter_body')}
                         />

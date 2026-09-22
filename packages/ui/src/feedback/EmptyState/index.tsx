@@ -6,6 +6,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@rumtelo/utils';
 
+import { Icon } from '../../display/Icon';
 import type EmptyStateProps from './types';
 
 const emptyVariants = cva(
@@ -43,7 +44,7 @@ EmptyHeader.displayName = 'EmptyHeader';
 const emptyMediaVariants = cva('flex shrink-0 items-center justify-center', {
     variants: {
         variant: {
-            icon: 'size-11 rounded-lg border border-line bg-raised text-2xl text-fg-muted',
+            icon: 'size-11 rounded-lg border border-line bg-raised text-fg-muted',
             illustration: 'h-48 w-48',
             image: 'h-32 w-32',
         },
@@ -108,7 +109,11 @@ export function EmptyState({
     return (
         <Empty variant={variant} className={className}>
             <EmptyHeader>
-                {icon ? <EmptyMedia>{icon}</EmptyMedia> : null}
+                {icon ? (
+                    <EmptyMedia>
+                        <Icon name={icon} size="lg" color="muted" />
+                    </EmptyMedia>
+                ) : null}
                 <EmptyTitle>{title}</EmptyTitle>
                 {body ? <EmptyDescription>{body}</EmptyDescription> : null}
             </EmptyHeader>

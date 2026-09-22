@@ -97,7 +97,7 @@ export function ContactForm() {
         return (
             <EmptyState
                 variant="compact"
-                icon="✓"
+                icon="check"
                 title={t('pages.support.contact.form.success_title')}
                 body={t('pages.support.contact.form.success_body')}
                 action={

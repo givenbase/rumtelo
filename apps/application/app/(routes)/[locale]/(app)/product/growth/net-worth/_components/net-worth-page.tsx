@@ -219,7 +219,7 @@ export function NetWorthPageClient() {
             </AccentCard>
 
             {holdings.length === 0 ? (
-                <EmptyState icon="↗" title={t('empty_title')} body={t('empty_body')} />
+                <EmptyState icon="trending-up" title={t('empty_title')} body={t('empty_body')} />
             ) : (
                 <>
                     <div className="flex flex-wrap items-center gap-2">
@@ -382,7 +382,7 @@ export function NetWorthPageClient() {
 
             <Section eyebrow={t('month_score_eyebrow')} title={t('month_score_title')}>
                 <EmptyState
-                    icon="◇"
+                    icon="diamond"
                     title={t('month_score_empty_title')}
                     body={t('month_score_empty_body')}
                 />

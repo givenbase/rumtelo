@@ -323,7 +323,7 @@ export function TransactionsPageClient() {
             {tab === 'INBOX' &&
                 (inbox.length === 0 ? (
                     <EmptyState
-                        icon="✓"
+                        icon="check"
                         title={t('inbox_empty_title')}
                         body={t('inbox_empty_body')}
                     />
@@ -578,13 +578,13 @@ export function TransactionsPageClient() {
             {tab === 'RULES' &&
                 (!live ? (
                     <EmptyState
-                        icon="◇"
+                        icon="diamond"
                         title={t('rules_sign_in_title')}
                         body={t('rules_sign_in_body')}
                     />
                 ) : rules.length === 0 ? (
                     <EmptyState
-                        icon="◇"
+                        icon="diamond"
                         title={t('rules_empty_title')}
                         body={t('rules_empty_body')}
                     />

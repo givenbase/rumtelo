@@ -113,7 +113,7 @@ export function CoachPageClient() {
 
             {quiet ? (
                 <EmptyState
-                    icon="◇"
+                    icon="diamond"
                     title={tSession('quiet_title')}
                     body={tSession('quiet_body')}
                     action={

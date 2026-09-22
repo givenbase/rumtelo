@@ -6,7 +6,7 @@ import Link from 'next/link';
 import type { AssetKind } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
-import { Button, Card, Typography } from '@rumtelo/ui';
+import { Icon, Button, Card, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { updateHref } from '@/app/_lib/create-routes';
@@ -14,7 +14,6 @@ import { isLiveData } from '@/app/_lib/preview';
 import { productPath } from '@/app/_lib/routes';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useAuth } from '@/components/features/shell/auth-provider';
-import { EditIcon } from '@/components/features/ui/action-icons';
 
 const EMPTY_KINDS: AssetKind[] = [];
 
@@ -115,7 +114,7 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                     </div>
                 </div>
                 <Button as={Link} href={updateHref('asset', asset.id)} variant="secondary">
-                    <EditIcon />
+                    <Icon name="pencil" size="sm" />
                     {tAction('edit')}
                 </Button>
             </div>

@@ -1,12 +1,11 @@
 'use client';
 
-import { MicIcon, Volume2Icon } from 'lucide-react';
 import { useRef, useState } from 'react';
 
 import type { CoachStepVoice } from '@rumtelo/contracts';
 import { COACH_SPEECH_BCP47, fromIntlLocale } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
-import { Button } from '@rumtelo/ui';
+import { Button, Icon } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { useAppShell } from '@/components/features/shell/app-shell-context';
@@ -110,7 +109,7 @@ export function CoachVoiceControls({ prompt, voice, onHeard, className }: Props)
                     variant="secondary"
                     size="sm"
                     onClick={speak}
-                    iconLeft={<Volume2Icon className="size-3.5" aria-hidden />}>
+                    iconLeft={<Icon name="volume-2" size="sm" />}>
                     {t('voice_read')}
                 </Button>
             ) : null}
@@ -121,7 +120,7 @@ export function CoachVoiceControls({ prompt, voice, onHeard, className }: Props)
                     size="sm"
                     onClick={toggleListen}
                     aria-pressed={listening}
-                    iconLeft={<MicIcon className="size-3.5" aria-hidden />}>
+                    iconLeft={<Icon name="mic" size="sm" />}>
                     {listening ? t('voice_listening') : t('voice_speak')}
                 </Button>
             ) : null}

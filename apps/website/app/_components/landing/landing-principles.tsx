@@ -1,11 +1,10 @@
 'use client';
 
-import { Typography } from '@rumtelo/ui';
+import { Icon, Typography } from '@rumtelo/ui';
 import { useTranslations } from '@rumtelo/i18n';
 
 import { PRINCIPLES } from '@/lib/landing-content';
 
-import { LandingIcon } from './landing-icon';
 import { Eyebrow } from './landing-primitives';
 
 const PRINCIPLE_KEYS = ['split', 'ten_minutes', 'energy', 'information'] as const;
@@ -37,7 +36,7 @@ export function LandingPrinciples() {
                                 className="grid content-start gap-3 rounded-2xl border border-bg/12 bg-bg/6 p-5 backdrop-blur-sm">
                                 <span className="flex items-center justify-between">
                                     <span className="grid size-9 place-items-center rounded-lg border border-bg/12 bg-bg/6 text-accent-hover">
-                                        <LandingIcon name={principle.icon} size={17} />
+                                        <Icon name={principle.icon} size="md" />
                                     </span>
                                     <span className="font-mono text-xs font-semibold tracking-widest text-bg/45">
                                         0{index + 1}

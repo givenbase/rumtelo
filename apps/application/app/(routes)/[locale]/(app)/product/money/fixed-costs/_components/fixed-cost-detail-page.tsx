@@ -11,6 +11,7 @@ import { FlowDirection } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import {
+    Icon,
     Button,
     Calendar,
     Card,
@@ -52,13 +53,6 @@ import {
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
-import {
-    EditIcon,
-    EndIcon,
-    PauseIcon,
-    ReactivateIcon,
-    ResumeIcon,
-} from '@/components/features/ui/action-icons';
 
 function statusLabel(
     status: ReturnType<typeof fixedCostStatus>,
@@ -318,7 +312,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                 variant="secondary"
                                 disabled={busy || !live}
                                 onClick={openPauseConfirm}>
-                                <PauseIcon />
+                                <Icon name="pause" size="sm" appearance="filled" />
                                 {t('pause_short')}
                             </Button>
                             <Button
@@ -326,7 +320,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                 variant="secondary"
                                 disabled={busy || !live}
                                 onClick={openEndConfirm}>
-                                <EndIcon />
+                                <Icon name="square" size="sm" appearance="filled" />
                                 {t('end_short')}
                             </Button>
                         </>
@@ -338,7 +332,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                 variant="secondary"
                                 disabled={busy || !live}
                                 onClick={() => lifecycleMutation.mutate({ isActive: true })}>
-                                <ResumeIcon />
+                                <Icon name="play" size="sm" appearance="filled" />
                                 {t('resume_short')}
                             </Button>
                             <Button
@@ -346,7 +340,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                 variant="secondary"
                                 disabled={busy || !live}
                                 onClick={openEndConfirm}>
-                                <EndIcon />
+                                <Icon name="square" size="sm" appearance="filled" />
                                 {t('end_short')}
                             </Button>
                         </>
@@ -359,12 +353,12 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                             onClick={() =>
                                 lifecycleMutation.mutate({ isActive: true, endsOn: null })
                             }>
-                            <ReactivateIcon />
+                            <Icon name="refresh-cw" size="sm" />
                             {t('reactivate_short')}
                         </Button>
                     ) : null}
                     <Button as={Link} href={updateHref('fixed', item.id)} variant="secondary">
-                        <EditIcon />
+                        <Icon name="pencil" size="sm" />
                         {tAction('edit')}
                     </Button>
                 </div>
@@ -391,7 +385,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                     {tAction('cancel')}
                                 </Button>
                                 <Button type="button" disabled={busy} onClick={confirmPause}>
-                                    <PauseIcon />
+                                    <Icon name="pause" size="sm" appearance="filled" />
                                     {busy ? t('pausing') : t('pause_bill')}
                                 </Button>
                             </DialogFooter>
@@ -468,7 +462,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                     {tAction('cancel')}
                                 </Button>
                                 <Button type="button" disabled={busy} onClick={confirmEnd}>
-                                    <EndIcon />
+                                    <Icon name="square" size="sm" appearance="filled" />
                                     {busy ? t('ending') : t('end_bill')}
                                 </Button>
                             </DialogFooter>

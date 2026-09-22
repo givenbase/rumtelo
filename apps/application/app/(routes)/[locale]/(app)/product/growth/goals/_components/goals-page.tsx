@@ -447,7 +447,7 @@ export function GoalsPageClient() {
 
             {shown.length === 0 ? (
                 <EmptyState
-                    icon="🎯"
+                    icon="target"
                     title={tab === 'REACHED' ? t('reached_empty_title') : t('empty_title')}
                     body={
                         tab === 'REACHED'

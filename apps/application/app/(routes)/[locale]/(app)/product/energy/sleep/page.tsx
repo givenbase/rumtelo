@@ -17,7 +17,7 @@ export default async function SleepPage() {
                 </Typography>
             </Section>
 
-            <EmptyState icon="🌙" title={t('empty_title')} body={t('empty_body')} />
+            <EmptyState icon="moon" title={t('empty_title')} body={t('empty_body')} />
         </div>
     );
 }

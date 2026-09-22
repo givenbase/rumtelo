@@ -1,8 +1,10 @@
 import type { ReactNode } from 'react';
 
+import type { IconName } from '../../display/Icon/types';
+
 interface EmptyStateProps {
-    /** Emoji string, Lucide node, or any media. */
-    icon?: ReactNode;
+    /** Lucide kebab or `custom/<id>` — rendered via shared Icon. */
+    icon?: IconName;
     title: string;
     /** Optional supporting line — omit for compact single-line empties. */
     body?: string;

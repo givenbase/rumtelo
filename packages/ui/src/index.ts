@@ -6,7 +6,7 @@
  * - cards      Card / AccentCard
  * - feedback   Badge, EmptyState, StatusPage, BrandLoader, toasts, notices
  * - layout     Section, Sheet, Dialog, Tabs
- * - display    Meter, StatTile, HeroNumber
+ * - display    Meter, StatTile, HeroNumber, Icon
  * - navigation DropdownMenu
  * - theme      ThemeProvider, ThemeToggle (tone: default | inverse), useTheme
  */
