@@ -78,6 +78,7 @@ const support = {
             name_placeholder: 'Your name',
             email: 'Email',
             email_placeholder: 'you@example.com',
+            phone: 'Phone',
             topic: 'Topic',
             message: 'Message',
             message_placeholder: 'How can we help?',

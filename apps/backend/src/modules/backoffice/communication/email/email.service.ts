@@ -167,6 +167,7 @@ export class EmailService {
                 email: input.email,
                 topic: input.topic,
                 message: input.message,
+                phone: input.phone,
                 websiteUrl: this.webOrigin,
             },
             locale

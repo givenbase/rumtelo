@@ -63,7 +63,7 @@ const form = {
         password_min: 'Password must be at least {count} characters',
         passwords_match: 'Passwords do not match',
         terms_required: 'Please agree to the terms.',
-        phone_e164: 'Enter a valid phone number with country code (e.g. +31614602535).',
+        phone_e164: 'Enter a valid phone number with country code.',
         valid_date: 'Enter a valid date',
         amount_required: 'Amount is required',
         valid_amount: 'Enter a valid amount',

@@ -122,6 +122,7 @@ export class EmailPreviewController {
                     {
                         name: 'Anna de Vries',
                         email: 'anna@example.com',
+                        phone: '+15555550100',
                         topic: 'Product support',
                         message:
                             'I have a question about my household jars and how Coach tips work.',

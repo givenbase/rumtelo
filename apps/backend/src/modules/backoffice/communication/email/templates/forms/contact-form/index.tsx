@@ -11,6 +11,7 @@ export interface ContactFormTemplateProps {
     locale?: string;
     message: string;
     name: string;
+    phone?: string;
     topic: string;
     websiteUrl?: string;
 }
@@ -19,6 +20,7 @@ export interface ContactFormTemplateProps {
 export const ContactFormTemplate: React.FC<ContactFormTemplateProps> = ({
     name,
     email,
+    phone,
     topic,
     message,
     darkMode = false,
@@ -41,6 +43,11 @@ export const ContactFormTemplate: React.FC<ContactFormTemplateProps> = ({
                 <Text style={styles.text}>
                     <strong>Email:</strong> {email}
                 </Text>
+                {phone ? (
+                    <Text style={styles.text}>
+                        <strong>Phone:</strong> {phone}
+                    </Text>
+                ) : null}
                 <Text style={styles.text}>
                     <strong>Topic:</strong> {topic}
                 </Text>

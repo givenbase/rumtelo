@@ -21,6 +21,7 @@ export const API_ERROR_MESSAGES = [
     'jar_split_total',
     'book_catalog_unavailable',
     'contact_send_failed',
+    'contact_message_rejected',
     'not_authenticated',
     'no_household_selected',
     'not_household_member',

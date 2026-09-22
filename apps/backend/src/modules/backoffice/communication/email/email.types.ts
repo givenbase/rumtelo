@@ -39,5 +39,7 @@ export type ContactFormEmailInput = {
     email: string;
     topic: string;
     message: string;
+    /** Optional E.164 phone from the submitter. */
+    phone?: string;
     locale?: string;
 };

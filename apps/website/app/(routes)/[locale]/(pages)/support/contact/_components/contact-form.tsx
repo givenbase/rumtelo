@@ -9,6 +9,7 @@ import { useTranslations } from '@rumtelo/i18n';
 import {
     Button,
     Email,
+    EmptyState,
     Form,
     FormControl,
     FormErrorBox,
@@ -17,6 +18,7 @@ import {
     FormLabel,
     FormMessage,
     Input,
+    Phone,
     Select,
     Textarea,
     bindFormSubmit,
@@ -57,8 +59,10 @@ export function ContactForm() {
         defaultValues: {
             name: '',
             email: '',
+            phone: '',
             topic: 'support',
             message: '',
+            website: '',
         },
         mode: 'onTouched',
         resolver: zodResolver(schema),
@@ -74,7 +78,14 @@ export function ContactForm() {
         try {
             await api.contact.submit(values);
             setSent(true);
-            form.reset({ name: '', email: '', topic: values.topic, message: '' });
+            form.reset({
+                name: '',
+                email: '',
+                phone: '',
+                topic: values.topic,
+                message: '',
+                website: '',
+            });
         } catch (error) {
             setApiError(error);
         }
@@ -84,33 +95,30 @@ export function ContactForm() {
 
     if (sent) {
         return (
-            <div className="grid gap-4 rounded-xl border border-line bg-chrome p-6">
-                <div className="grid gap-1.5">
-                    <p className="font-display text-lg font-semibold tracking-tight text-fg">
-                        {t('pages.support.contact.form.success_title')}
-                    </p>
-                    <p className="text-sm leading-relaxed text-fg-secondary">
-                        {t('pages.support.contact.form.success_body')}
-                    </p>
-                </div>
-                <Button
-                    type="button"
-                    variant="secondary"
-                    className="w-fit"
-                    onClick={() => {
-                        setSent(false);
-                        setApiError(null);
-                    }}>
-                    {t('pages.support.contact.form.send_another')}
-                </Button>
-            </div>
+            <EmptyState
+                variant="compact"
+                icon="✓"
+                title={t('pages.support.contact.form.success_title')}
+                body={t('pages.support.contact.form.success_body')}
+                action={
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={() => {
+                            setSent(false);
+                            setApiError(null);
+                        }}>
+                        {t('pages.support.contact.form.send_another')}
+                    </Button>
+                }
+            />
         );
     }
 
     return (
         <Form {...form}>
             <form
-                className="grid gap-4 rounded-xl border border-line bg-chrome p-6"
+                className="relative grid gap-4 rounded-xl border border-line bg-chrome p-6"
                 onSubmit={bindFormSubmit(form, onSubmit, onError)}
                 noValidate>
                 <FormErrorBox
@@ -125,10 +133,34 @@ export function ContactForm() {
                         root: t('ui.form.fields.api'),
                         name: t('pages.support.contact.form.name'),
                         email: t('pages.support.contact.form.email'),
+                        phone: t('pages.support.contact.form.phone'),
                         topic: t('pages.support.contact.form.topic'),
                         message: t('pages.support.contact.form.message'),
                     }}
                 />
+
+                {/* Honeypot — hidden from humans; bots that fill it are discarded server-side. */}
+                <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -left-[9999px] h-0 w-0 overflow-hidden opacity-0">
+                    <FormField
+                        control={form.control}
+                        name="website"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Website</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        {...field}
+                                        tabIndex={-1}
+                                        autoComplete="off"
+                                        disabled={busy}
+                                    />
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
+                </div>
 
                 <FormField
                     control={form.control}
@@ -161,6 +193,28 @@ export function ContactForm() {
                                     autoComplete="email"
                                     placeholder={t('pages.support.contact.form.email_placeholder')}
                                     disabled={busy}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel optional>{t('pages.support.contact.form.phone')}</FormLabel>
+                            <FormControl>
+                                <Phone
+                                    autoComplete="tel"
+                                    placeholder={t('ui.form.optional')}
+                                    disabled={busy}
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    onBlur={field.onBlur}
+                                    name={field.name}
                                 />
                             </FormControl>
                             <FormMessage />

@@ -18,8 +18,8 @@ export class ContactController {
     // ? CREATE Operations
     // ====================================================================
 
-    /** Anonymous contact form submit (rate-limited). */
-    @Throttle({ default: { limit: 5, ttl: 60_000 } })
+    /** Anonymous contact form submit — 3 / 15 min per IP (Redis-backed when available). */
+    @Throttle({ default: { limit: 3, ttl: 900_000 } })
     @Implement(contract.contact.submit)
     submit() {
         return implement(contract.contact.submit).handler(({ input }) =>

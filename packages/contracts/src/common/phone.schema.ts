@@ -1,13 +1,12 @@
 /**
- * Phone write contract — E.164 only (`+31614602535`).
+ * Phone write contract — E.164 only (e.g. country code + national number).
  * Pair with the `@rumtelo/ui` {@link Phone} field (stores E.164).
  */
 
 import parsePhoneNumberFromString from 'libphonenumber-js';
 import { z } from 'zod';
 
-export const PHONE_E164_MESSAGE =
-    'Enter a valid phone number with country code (e.g. +31614602535).';
+export const PHONE_E164_MESSAGE = 'Enter a valid phone number with country code.';
 
 /** Normalize to E.164, or null when missing/invalid. */
 export function normalizeToE164Phone(input: string): string | null {
