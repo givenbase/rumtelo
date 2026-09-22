@@ -259,35 +259,35 @@
             }
         },
         "statusPage": {
-            "loading": "Cargando",
-            "back_home": "De vuelta a casa",
-            "try_again": "Inténtalo de nuevo",
+            "loading": "Cargando…",
+            "back_home": "Ir al inicio",
+            "try_again": "Reintentar",
             "go_back": "Volver",
             "continue": "Continuar",
-            "scaffold": "Andamio.",
+            "scaffold": "Un momento…",
             "error": {
-                "title": "Ha surgido un problema",
-                "description": "Hemos tenido un problema inesperado al cargar esta página. Inténtalo de nuevo; si sigue ocurriendo, vuelve dentro de un momento."
+                "title": "Algo ha fallado",
+                "description": "No se pudo cargar esta página. Inténtalo de nuevo; si sigue pasando, vuelve en un momento."
             },
             "not_found": {
                 "title": "Esta página no existe",
-                "description": "Puede que se haya movido o que el enlace no sea correcto. Vuelve atrás y sigue donde lo dejaste."
+                "description": "Puede que el enlace esté mal o que la página se haya movido. Vuelve atrás y sigue donde lo dejaste."
             },
             "access_denied": {
                 "title": "No puedes abrir esto",
-                "description": "Tu cuenta no tiene acceso a esta sección de Rumtelo."
+                "description": "Tu cuenta no tiene acceso a esta parte de Rumtelo."
             },
             "unauthorized": {
                 "title": "Inicia sesión para continuar",
-                "description": "Tu sesión ha finalizado o no has iniciado sesión. Inicia sesión de nuevo para continuar donde lo dejaste."
+                "description": "Tu sesión ha caducado o no has iniciado sesión. Vuelve a entrar para seguir donde lo dejaste."
             },
             "maintenance": {
                 "title": "Rumtelo está temporalmente fuera de servicio",
-                "description": "Estamos realizando una breve actualización. Tus archivos JAR y tus datos están a salvo; vuelve a intentarlo dentro de unos minutos."
+                "description": "Estamos haciendo una actualización breve. Tus tarros y datos están a salvo — inténtalo en unos minutos."
             },
             "offline": {
-                "title": "Parece que no estás conectado",
-                "description": "Comprueba tu conexión y vuelve a intentarlo. Aquí nada funciona sin conexión a Internet."
+                "title": "Parece que estás sin conexión",
+                "description": "Comprueba tu conexión e inténtalo de nuevo. Aquí nada funciona sin red."
             }
         },
         "theme": {
@@ -1183,7 +1183,7 @@
                     "give_by": " · por {year}",
                     "save_pace": "◇ {monthly} al mes · {date}",
                     "date_open": "fecha de apertura",
-                    "jar_context": "Contexto del archivo JAR",
+                    "jar_context": "Contexto del tarro",
                     "available": "Disponible",
                     "fixed_out": "Se ha solucionado",
                     "headroom": "Altura libre",
@@ -1523,7 +1523,7 @@
                 "on_track": "{on} / {total} según lo previsto",
                 "move_between": "Pasar de un frasco a otro",
                 "add_transaction": "+ Añadir transacción",
-                "allocated": "{count} archivos JAR · {pct} % asignado",
+                "allocated": "{count} tarros · {pct} % asignado",
                 "tap_hint": "Toca un frasco para ver los gastos fijos, los gastos corrientes y lo que queda",
                 "summary_nothing": "Este mes no he planeado ni gastado nada",
                 "of_amount": "de {amount}",
@@ -1662,7 +1662,7 @@
                     "no_tx_month": "Este mes no se ha registrado ninguna transacción en este tarro.",
                     "all_nested": "Todos los pagos del periodo se incluyen en las categorías anteriores.",
                     "stacked_footnote": "Datos acumulados durante {months} meses. La actividad que se muestra a continuación corresponde al mes seleccionado.",
-                    "loading_jar": "Cargando el archivo JAR…",
+                    "loading_jar": "Cargando el tarro…",
                     "back_jars": "← Tarros",
                     "pct_of_net": "{pct} % de los ingresos netos",
                     "no_categories": "Aún no hay categorías.",
@@ -1800,7 +1800,7 @@
                 "inbox_empty_title": "Ya no queda nada por clasificar.",
                 "inbox_empty_body": "Cada pago tiene su hucha. Vuelve mañana o vincula una cuenta bancaria a continuación.",
                 "rules_sign_in_title": "Inicia sesión para gestionar las reglas.",
-                "rules_sign_in_body": "Las reglas clasifican automáticamente las transacciones de la bandeja de entrada en el archivo JAR correspondiente.",
+                "rules_sign_in_body": "Las reglas clasifican automáticamente las transacciones de la bandeja de entrada en el tarro correspondiente.",
                 "rules_empty_title": "Aún no hay normas.",
                 "rules_empty_body": "Selecciona «Siempre esto» en un mensaje de la bandeja de entrada para configurar una regla. Después, podrás gestionarlas aquí.",
                 "toast_sorted": "Clasificado y regla guardada",
@@ -1947,8 +1947,8 @@
                 "moving": "De mudanza…",
                 "submit": "Transferir dinero",
                 "cancel": "Cancelar",
-                "choose_source_first": "Elige primero un archivo JAR de origen.",
-                "source_blocked": "Elige otro archivo JAR de origen; este no permite realizar transferencias de dinero.",
+                "choose_source_first": "Elige primero un tarro de origen.",
+                "source_blocked": "Elige otro tarro de origen; este no permite realizar transferencias de dinero.",
                 "use_max": "Utiliza el máximo ({amount})",
                 "max_from": "Max, de {jar}: {amount}",
                 "choose_destination": "Elige dónde debe ir a parar el dinero.",
@@ -1983,7 +1983,7 @@
                 "know_vendor": "¿Conoces al proveedor?",
                 "use_as_vendor": "Utiliza «{name}» como proveedor",
                 "no_matches_enter": "No hay resultados: pulsa Intro para utilizar «{name}» como proveedor.",
-                "no_types_custom": "Aún no hay tipos para este archivo JAR; escribe un nombre personalizado en su lugar.",
+                "no_types_custom": "Aún no hay tipos para este tarro; escribe un nombre personalizado en su lugar.",
                 "no_match_use": "No se ha encontrado ninguna coincidencia: utiliza «{name}» como proveedor",
                 "custom_jar_hint": "Elige uno de los tarros que aparecen a continuación, o cámbialo y selecciona un tipo para que podamos clasificarlo.",
                 "vendors": "Proveedores",
@@ -2539,7 +2539,7 @@
             "offer": {
                 "eyebrow": "Visita rápida",
                 "title": "¿Quieres un tutorial sobre Rumtelo?",
-                "body": "Una breve visita guiada por el menú de navegación, los archivos JAR, los costes fijos y los ingresos. Puedes saltarte cualquier parte cuando quieras, o abrir la sección «Ayuda» más tarde para volver a ver una pantalla.",
+                "body": "Una breve visita guiada por el menú de navegación, los tarros, los costes fijos y los ingresos. Puedes saltarte cualquier parte cuando quieras, o abrir la sección «Ayuda» más tarde para volver a ver una pantalla.",
                 "accept": "Comienza la visita guiada",
                 "dismiss": "Ahora no"
             },
@@ -2803,7 +2803,7 @@
                 "money_allocated_month": "Dinero · Asignado este mes",
                 "income_span": "A lo largo de {months} meses · {jars} tarros",
                 "income_span_one_jar": "A lo largo de {months} meses · 1 tarro",
-                "income_month": "Repartidos en {jars} archivos JAR",
+                "income_month": "Repartidos en {jars} tarros",
                 "income_month_one_jar": "Distribuido en 1 tarro",
                 "see_income": "Ver ingresos ▸",
                 "six_jars": "✦ Las seis jarras",
@@ -3381,7 +3381,7 @@
                 },
                 "data": {
                     "question": "¿Dónde están mis datos?",
-                    "answer": "En servidores de la UE en Ámsterdam, cifrados en reposo. Puedes exportarlos o eliminarlos en cualquier momento. Si cancelas un plan de pago, todos los archivos JAR, transacciones y objetivos seguirán siendo legibles."
+                    "answer": "En servidores de la UE en Ámsterdam, cifrados en reposo. Puedes exportarlos o eliminarlos en cualquier momento. Si cancelas un plan de pago, todos los tarros, transacciones y objetivos seguirán siendo legibles."
                 },
                 "language": {
                     "question": "¿Neerlandés o inglés?",
@@ -4296,7 +4296,7 @@
                 "maintenance_title": "Fuera de línea por un rato",
                 "maintenance_body": "Estamos realizando una breve actualización. Inténtalo de nuevo dentro de unos minutos.",
                 "maintenance_api_down_title": "Rumtelo está temporalmente fuera de servicio",
-                "maintenance_api_down_body": "En este momento no podemos acceder a la API. Tus archivos JAR y tus datos están a salvo; inténtalo de nuevo dentro de un momento.",
+                "maintenance_api_down_body": "En este momento no podemos acceder a la API. Tus tarros y tus datos están a salvo; inténtalo de nuevo dentro de un momento.",
                 "maintenance_update_title": "Rumtelo se está preparando",
                 "maintenance_update_body": "Estamos terminando una pequeña actualización. Por ahora, solo el equipo de Rumtelo puede iniciar sesión.",
                 "locked_title": "Actualiza para abrir esto",
