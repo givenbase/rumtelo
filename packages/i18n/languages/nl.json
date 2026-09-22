@@ -317,21 +317,21 @@
                 "create_account": "Maak een account aan",
                 "or_divider": "of",
                 "demo": {
-                    "heading": "Demorekeningen",
+                    "heading": "Demo-accounts",
                     "passwords": "Wachtwoorden:"
                 }
             },
             "sign_up": {
-                "title": "Maak je account",
-                "subtitle": "Zes potten. Één rustig overzicht.",
+                "title": "Maak je account aan",
+                "subtitle": "Zes potjes. Eén rustig overzicht.",
                 "submit": "Account aanmaken",
                 "have_account": "Heb je al een account?",
-                "password_hint": "Ten minste {count} tekens",
-                "plan_intent": "Je hebt {plan} ({interval}) gekozen. Na de installatie sturen we je door naar Stripe om een betaalmethode toe te voegen en de upgrade te voltooien.",
+                "password_hint": "Minstens {count} tekens",
+                "plan_intent": "Je koos {plan} ({interval}). Na het aanmaken sturen we je naar Stripe om te betalen en de upgrade af te ronden.",
                 "plan_yearly": "jaarlijks",
                 "plan_monthly": "maandelijks",
                 "middle_name": "Tweede voornaam",
-                "birthday": "Verjaardag"
+                "birthday": "Geboortedatum"
             },
             "verify": {
                 "title": "Bijna klaar",
@@ -349,7 +349,7 @@
             "forgot_password": {
                 "title": "Wachtwoord vergeten",
                 "subtitle": "We sturen je per e-mail een link waarmee je een nieuw wachtwoord kunt kiezen.",
-                "submit": "Resetlink verzenden",
+                "submit": "Stuur resetlink",
                 "sent": "Als er voor dat e-mailadres een account is aangemaakt, wordt er zo meteen een link gestuurd waarmee je je wachtwoord kunt resetten.",
                 "back_to_sign_in": "Inloggen",
                 "back_to_sign_up": "Account aanmaken"
@@ -358,7 +358,7 @@
                 "title": "Kies een nieuw wachtwoord",
                 "subtitle": "Kies iets dat je nog nergens anders hebt gebruikt.",
                 "invalid": "Deze resetlink is ongeldig of is verlopen.",
-                "submit": "Wachtwoord bijwerken",
+                "submit": "Nieuw wachtwoord opslaan",
                 "success": "Het wachtwoord is bijgewerkt. Je kunt je er nu mee aanmelden.",
                 "continue": "Log in op de app",
                 "request_again": "Een nieuwe link aanvragen"
@@ -376,40 +376,40 @@
             }
         },
         "brand": {
-            "tagline": "Stop met gissen waar het bleef.",
+            "tagline": "Niet meer gissen waar het bleef.",
             "core": {
-                "one": "Stop met gissen waar het bleef.",
-                "two": "Geld gaat weg. Jij weet waarom.",
-                "three": "Geen mysterie-uitgaven meer."
+                "one": "Niet meer gissen waar het bleef.",
+                "two": "Geld gaat. Jij weet waarom.",
+                "three": "Geen mysterieuze uitgaven meer."
             },
             "auth_quotes_web": {
                 "money_picture": {
-                    "eyebrow": "Het geldbeeld",
-                    "headline": "Stop met gissen waar het bleef.",
-                    "support": "Geld gaat. Jij weet waarom. Geen mysterie-uitgaven meer."
+                    "eyebrow": "Je geldplaatje",
+                    "headline": "Niet meer gissen waar het bleef.",
+                    "support": "Geld gaat. Jij weet waarom. Geen mysterieuze uitgaven meer."
                 },
                 "how_it_works": {
                     "eyebrow": "Hoe het werkt",
                     "headline": "Eerst verdelen. Dan uitgeven.",
-                    "support": "Geld. Energie. Groei. Ziel. Één overzicht."
+                    "support": "Geld. Energie. Groei. Ziel. Eén overzicht."
                 },
                 "who_its_for": {
                     "eyebrow": "Voor wie",
-                    "headline": "Voor wie het goed doet — en klaar is.",
-                    "support": "Jaag niet op het getal. Kies de richting."
+                    "headline": "Voor wie het goed heeft — en er klaar voor is.",
+                    "support": "Jaag niet op het getal. Pak de richting."
                 },
                 "life_beyond": {
                     "eyebrow": "Het hele beeld",
-                    "headline": "Wijs het geld toe. Bescherm de energie. Houd het waarom.",
-                    "support": "Niet alleen geld. Waar je leven naartoe gaat."
+                    "headline": "Verdeel het geld. Bescherm je energie. Houd je waarom.",
+                    "support": "Niet alleen geld. Waar je leven heen gaat."
                 }
             },
             "auth_manifesto": {
-                "brand_lines_aria": "Merklijnen",
+                "brand_lines_aria": "Merkteksten",
                 "portals_eyebrow": "Vier portalen",
                 "portals_line": "Geld. Groei. Energie. Ziel — in balans.",
-                "jars_eyebrow": "Zes potten",
-                "jars_line": "Salaris gestort. Reeds toegewezen.",
+                "jars_eyebrow": "Zes potjes",
+                "jars_line": "Salaris binnen. Al verdeeld.",
                 "portals": {
                     "money": {
                         "name": "Geld",
@@ -430,7 +430,7 @@
                 },
                 "jars": {
                     "necessity": {
-                        "name": "Noodzaak",
+                        "name": "Noodzakelijk",
                         "short": "NEC"
                     },
                     "freedom": {
@@ -438,11 +438,11 @@
                         "short": "FF"
                     },
                     "education": {
-                        "name": "Onderwijs",
+                        "name": "Opleiding",
                         "short": "EDU"
                     },
                     "savings": {
-                        "name": "Besparingen",
+                        "name": "Sparen",
                         "short": "LTS"
                     },
                     "play": {
@@ -450,31 +450,31 @@
                         "short": "PLAY"
                     },
                     "give": {
-                        "name": "Geef",
+                        "name": "Geven",
                         "short": "GEEF"
                     }
                 }
             },
             "auth_quotes_app": {
                 "money_picture": {
-                    "eyebrow": "Jouw geld",
-                    "headline": "Weet waar het bleef. Weet waar het naartoe gaat.",
-                    "support": "Jouw geld, toegewezen. Niet geraden."
+                    "eyebrow": "Je geld",
+                    "headline": "Weet waar het bleef. En waar het heen gaat.",
+                    "support": "Je geld krijgt een plek. Geen giswerk."
                 },
                 "how_it_works": {
                     "eyebrow": "Vandaag",
-                    "headline": "Salaris binnen. Plaatje helder.",
-                    "support": "Wijs toe. Dan uitgeven. Zes potten beslissen."
+                    "headline": "Salaris binnen. Beeld helder.",
+                    "support": "Eerst verdelen. Dan uitgeven. Zes potjes beslissen."
                 },
                 "energy": {
-                    "eyebrow": "Jouw capaciteit",
+                    "eyebrow": "Je energie",
                     "headline": "Een moe hoofd geeft uit. Een uitgerust hoofd beslist.",
-                    "support": "Stop met gissen waar je op draait."
+                    "support": "Weet waar je energie naartoe gaat."
                 },
                 "why": {
                     "eyebrow": "Blijf doorgaan",
                     "headline": "Zie de uitgave. Zie de energie. Zie het waarom.",
-                    "support": "Heldere boeken. Rustig hoofd. Morgen weer."
+                    "support": "Heldere boeken. Rustig hoofd. Morgen weer verder."
                 }
             }
         },
@@ -497,7 +497,7 @@
             },
             "money-jars": {
                 "name": "Potten",
-                "description": "De zes potten — het kernmodel voor geld."
+                "description": "De zes potjes — het kernmodel voor geld."
             },
             "money-spending": {
                 "name": "Transacties",
@@ -682,10 +682,10 @@
                 }
             },
             "period_travel": {
-                "looking_back_one": "Terugblik op {stamp} ({relativeLabel}): er is in de loop van {horizon} maand ongeveer {money} door je potten gegaan.",
-                "looking_back_other": "Terugblik op {stamp} ({relativeLabel}): er is ongeveer {money} door je potten gegaan in de loop van {horizon} maanden.",
-                "looking_ahead_one": "Tegen {stamp}, als je je aan dit plan houdt, zal er in de loop van {horizon} maand ongeveer {money} door je potten zijn gegaan.",
-                "looking_ahead_other": "Tegen {stamp}, als je je aan dit plan houdt, zal er in de loop van {horizon} maanden ongeveer {money} door je potten zijn gegaan.",
+                "looking_back_one": "Terugblik op {stamp} ({relativeLabel}): er is in de loop van {horizon} maand ongeveer {money} door je potjes gegaan.",
+                "looking_back_other": "Terugblik op {stamp} ({relativeLabel}): er is ongeveer {money} door je potjes gegaan in de loop van {horizon} maanden.",
+                "looking_ahead_one": "Tegen {stamp}, als je je aan dit plan houdt, zal er in de loop van {horizon} maand ongeveer {money} door je potjes zijn gegaan.",
+                "looking_ahead_other": "Tegen {stamp}, als je je aan dit plan houdt, zal er in de loop van {horizon} maanden ongeveer {money} door je potjes zijn gegaan.",
                 "pace_needed": "{name} moet nog wat vaart maken — ongeveer {money} netto per maand om de deadline te halen.",
                 "past_note": "Het gespaarde levensdoel en de lopende schuld worden voor voorbije maanden niet teruggedraaid.",
                 "jar_highlight": "{name} {from} → {to}"
@@ -1206,7 +1206,7 @@
                     "advice_made_it_title": "Je hebt het gehaald",
                     "advice_made_it_body": "Zorg dat je het behaalde resultaat vasthoudt. Blijf de gewoonte aanhouden die je zo ver heeft gebracht — zelfs een kleiner maandelijks bedrag houdt de spier in vorm.",
                     "advice_earn_engine_title": "Inkomsten zijn de drijvende kracht",
-                    "advice_earn_engine_body": "Verhoog je netto-inkomen door je inkomsten te vergroten of door uitgaven te verminderen voordat het geld de potten bereikt. Het inkomensdoel is een minimum voor je levensstijl, geen wens.",
+                    "advice_earn_engine_body": "Verhoog je netto-inkomen door je inkomsten te vergroten of door uitgaven te verminderen voordat het geld de potjes bereikt. Het inkomensdoel is een minimum voor je levensstijl, geen wens.",
                     "advice_earn_short_title": "Nog steeds onder de ondergrens",
                     "advice_earn_short_body": "Bekijk je inkomen en controleer de bronnen. Een loonsverhoging of een verlaging van de vaste lasten op het juiste moment dicht de kloof vaak sneller dan je zou hopen.",
                     "advice_give_planned_title": "Geven is een geplande uitgave",
@@ -1518,7 +1518,7 @@
             },
             "jars": {
                 "eyebrow": "DE ZES POTTEN",
-                "title": "Elke munt krijgt een taak toegewezen voordat hij binnenkomt.",
+                "title": "Elke euro krijgt een taak vóór hij binnenkomt.",
                 "lead": "Zodra je inkomsten binnenkomen, wordt het bedrag direct verdeeld. Financiële vrijheid wordt nooit uitgegeven — alleen geïnvesteerd.",
                 "on_track": "{on} / {total} liggen op schema",
                 "move_between": "Van pot naar pot gaan",
@@ -2325,7 +2325,7 @@
                 "title": "Het verhaal achter de cijfers.",
                 "line": "Zonder dit is sturen niet meer dan een administratieve aangelegenheid.",
                 "fallback_coach_kind": "BEGIN KLEIN",
-                "fallback_coach_text": "Eén minuut stilte of één zin vol dankbaarheid — beide beschermen de potten.",
+                "fallback_coach_text": "Eén minuut stilte of één zin vol dankbaarheid — beide beschermen de potjes.",
                 "fallback_coach_cta": "Open stilte",
                 "cards": {
                     "stillness": {
@@ -2558,7 +2558,7 @@
                 "helpers_off": "Uit",
                 "settings": {
                     "eyebrow": "Rondleiding",
-                    "blurb": "Je kunt op elk moment nog eens de navigatie, de potten, de vaste kosten en de inkomsten doornemen.",
+                    "blurb": "Je kunt op elk moment nog eens de navigatie, de potjes, de vaste kosten en de inkomsten doornemen.",
                     "row_title": "Productrondleiding",
                     "row_sub": "Dezelfde stap-voor-stap-handleiding als na de installatie",
                     "restart": "Start de volledige rondleiding"
@@ -2610,7 +2610,7 @@
                         },
                         "simulator": {
                             "heading": "Wat een loonsverhoging betekent",
-                            "body": "Sleep de maandelijkse netto-opbrengst. De verdeling over de potten blijft behouden; het bedrag in elke pot verschuift mee. Kies een doel om de bijbehorende datum te zien. Dit is een prognose — het geld is nog niet overgemaakt."
+                            "body": "Sleep de maandelijkse netto-opbrengst. De verdeling over de potjes blijft behouden; het bedrag in elke pot verschuift mee. Kies een doel om de bijbehorende datum te zien. Dit is een prognose — het geld is nog niet overgemaakt."
                         },
                         "sources": {
                             "heading": "Inkomstenbronnen",
@@ -2649,7 +2649,7 @@
                         },
                         "jars_use": {
                             "heading": "Hoe potten hiervan gebruikmaken",
-                            "body": "Een vast bedrag aan OUT vermindert het beschikbare saldo in die pot. Zodra er geld binnenkomt, wordt het inkomen procentueel over de potten verdeeld — dit scherm geeft het plan weer, niet de boekhouding."
+                            "body": "Een vast bedrag aan OUT vermindert het beschikbare saldo in die pot. Zodra er geld binnenkomt, wordt het inkomen procentueel over de potjes verdeeld — dit scherm geeft het plan weer, niet de boekhouding."
                         }
                     },
                     "steps": {
@@ -2681,7 +2681,7 @@
                             "content": "Boek een transactie in of uit, of verplaats geld tussen potjes als dat in een bepaalde maand nodig is."
                         },
                         "list": {
-                            "title": "Je zes potten",
+                            "title": "Je zes potjes",
                             "content": "Elke rij staat voor een klus waar je geld mee verdient. Tik om de vaste kosten, uitgaven en het resterende bedrag te bekijken."
                         }
                     }
@@ -2726,7 +2726,7 @@
                     "sections": {
                         "what_for": {
                             "heading": "Waar dit voor dient",
-                            "body": "Het overzicht van het geld dat al is uitgegeven — Uitgegeven, Ontvangen (cadeaus, terugbetalingen en aanvullingen in de potten). Door dit hier bij te houden, blijft elke pot op orde."
+                            "body": "Het overzicht van het geld dat al is uitgegeven — Uitgegeven, Ontvangen (cadeaus, terugbetalingen en aanvullingen in de potjes). Door dit hier bij te houden, blijft elke pot op orde."
                         },
                         "how": {
                             "heading": "Hoe het werkt",
@@ -2769,7 +2769,7 @@
                 "4": "Kapitein",
                 "5": "Kompas",
                 "unlocks": {
-                    "six_jars": "Zes potten",
+                    "six_jars": "Zes potjes",
                     "inbox": "Inbox",
                     "week_check": "Wekelijkse controle",
                     "goals": "Doelstellingen",
@@ -2806,7 +2806,7 @@
                 "income_month": "Verspreid over {jars} potten",
                 "income_month_one_jar": "Verdeeld over 1 pot",
                 "see_income": "Zie inkomsten ▸",
-                "six_jars": "✦ De zes potten",
+                "six_jars": "✦ De zes potjes",
                 "see_all_jars": "Alles bekijken ▸"
             },
             "travel": {
@@ -2846,14 +2846,14 @@
                 "description": "Geld vloeit weg. Je zult ontdekken waarom. Rumtelo wijst elk bedrag meteen een doel toe zodra het binnenkomt, en breidt het beeld vervolgens uit naar je energie, groei en de reden daarachter — samen met een coach, in tien minuten per week. Ontwikkeld in Amsterdam. Gratis om mee te beginnen.",
                 "keywords": [
                     "geldoverzicht",
-                    "zes potten",
+                    "zes potjes",
                     "begroting opstellen",
                     "coach op het gebied van persoonlijke financiën",
                     "financiële vrijheid",
                     "wekelijkse controle",
                     "energie, slaap, geld",
-                    "geld overzicht",
-                    "potjes methode"
+                    "geldoverzicht",
+                    "potjesmethode"
                 ]
             },
             "header": {
@@ -2882,9 +2882,9 @@
             },
             "hero": {
                 "eyebrow": "GELD · GROEI · ENERGIE · ZIEL",
-                "headline": "Stop met gissen waar het bleef.",
-                "lead": "Geld gaat weg. Jij weet waarom. Rumtelo geeft elk bedrag meteen een taak — en verbredt daarna het beeld naar je energie, je groei en je waarom. Tien minuten per week. Informatie, nooit schaamte.",
-                "cta_primary": "Start gratis — geen kaart",
+                "headline": "Niet meer gissen waar het bleef.",
+                "lead": "Geld gaat. Jij weet waarom. Rumtelo geeft elk bedrag meteen een taak — en trekt daarna het beeld open naar je energie, je groei en je waarom. Tien minuten per week. Informatie, nooit schaamte.",
+                "cta_primary": "Start gratis — geen betaalkaart",
                 "cta_secondary": "Zo werkt het",
                 "open_dashboard": "Dashboard openen",
                 "manage_plan": "Abonnement beheren",
@@ -3019,7 +3019,7 @@
             },
             "portal_features": {
                 "money": {
-                    "f1": "Zes potten, jouw percentages",
+                    "f1": "Zes potjes, je percentages",
                     "f2": "Inbox — gesorteerd volgens regel of handmatig",
                     "f3": "Vaste kosten die je van tevoren kunt inschatten",
                     "f4": "Aflossingsplan met een einddatum",
@@ -3081,7 +3081,7 @@
                 "money_rows": {
                     "salary": {
                         "label": "Salaris",
-                        "jar": "Verdelen → zes potten"
+                        "jar": "Verdelen → zes potjes"
                     },
                     "groceries": {
                         "label": "Albert Heijn",
@@ -3158,7 +3158,7 @@
                     "millionaire_mind": {
                         "title": "De geheimen van de miljonairsmentaliteit",
                         "author": "T. Harv Eker",
-                        "line": "De verdeling over zes potten — elk bedrag wordt meteen ingezet zodra het binnenkomt."
+                        "line": "De verdeling over zes potjes — elk bedrag wordt meteen ingezet zodra het binnenkomt."
                     },
                     "psychology": {
                         "title": "De psychologie van geld",
@@ -3265,7 +3265,7 @@
                     "legal": "Juridisch",
                     "contact": "Contact",
                     "portals": "De portalen",
-                    "jars": "De potten",
+                    "jars": "De potjes",
                     "coach": "De coach",
                     "pricing": "Prijzen",
                     "why": "Waarom Rumtelo?",
@@ -3503,7 +3503,7 @@
                     },
                     "rights": {
                         "title": "Uw rechten",
-                        "body": "Je kunt je gegevens inzien, corrigeren, exporteren of verwijderen. Als je een betaald abonnement opzegt, blijven je potten, transacties en doelen toegankelijk, tenzij je ons vraagt om het account te verwijderen. Om je rechten uit te oefenen, stuur je een e-mail naar support@rumtelo.com."
+                        "body": "Je kunt je gegevens inzien, corrigeren, exporteren of verwijderen. Als je een betaald abonnement opzegt, blijven je potjes, transacties en doelen toegankelijk, tenzij je ons vraagt om het account te verwijderen. Om je rechten uit te oefenen, stuur je een e-mail naar support@rumtelo.com."
                     },
                     "retention": {
                         "title": "Behoud",
@@ -3614,7 +3614,7 @@
             "coming_soon_title": "Binnenkort beschikbaar",
             "coming_soon_body": "Binnenkort worden er nieuwe accounts geopend. Als je al toegang hebt, log dan in om verder te gaan.",
             "not_found_document": "Pagina niet gevonden · Rumtelo",
-            "app_description": "Houd de samenstelling in de gaten. Zes potten, een rustig wekelijks ritme, ruimte om te groeien."
+            "app_description": "Houd de samenstelling in de gaten. Zes potjes, een rustig wekelijks ritme, ruimte om te groeien."
         },
         "nav": {
             "groups": {
@@ -3660,10 +3660,10 @@
         },
         "onboarding": {
             "welcome": "Welkom bij Rumtelo",
-            "welcome_body": "Stop met gissen waar het gebleven is. Zes potten, één rustig overzicht.",
+            "welcome_body": "Stop met gissen waar het gebleven is. Zes potjes, één rustig overzicht.",
             "income": "Jouw inkomen",
             "income_body": "Kies de valuta voor dit huishouden en vul je netto maandinkomen in.",
-            "jars": "De zes potten",
+            "jars": "De zes potjes",
             "jars_body": "Je inkomen wordt meteen verdeeld — betaal eerst je toekomst.",
             "money_style": "Hoe je met geld omgaat",
             "money_style_body": "Alleen zachte labels — zodat tips bij je passen. Partners kunnen later anders kiezen.",
@@ -3870,7 +3870,7 @@
                 },
                 "money_style": {
                     "eyebrow": "Hoe je met geld omgaat",
-                    "blurb": "Persoonlijke stijl — partners kunnen hierin verschillen. Gebruik dit voor tips over de verdeling van de potten. De volgorde waarin schulden worden afgelost, vind je onder ‘Schuldinstellingen’ voor het hele bord.",
+                    "blurb": "Persoonlijke stijl — partners kunnen hierin verschillen. Gebruik dit voor tips over de verdeling van de potjes. De volgorde waarin schulden worden afgelost, vind je onder ‘Schuldinstellingen’ voor het hele bord.",
                     "spender": "Uitgever",
                     "spender_sub": "Vreugde staat voorop",
                     "saver": "Spaarder",
@@ -4020,7 +4020,7 @@
                     "rules": {
                         "split": {
                             "name": "Automatische verdeling van inkomsten",
-                            "desc": "Alles wat binnenkomt, gaat meteen in de potten: 55/10/10/10/10/5."
+                            "desc": "Alles wat binnenkomt, gaat meteen in de potjes: 55/10/10/10/10/5."
                         },
                         "guard": {
                             "name": "Potbeschermer",
@@ -4036,7 +4036,7 @@
                     "eyebrow": "Wat je gebruikt en betaalt",
                     "blurb": "Drie abonnementen: Basic, Plus en Max. Begin met Basic — niets wat je hebt ingevoerd, wordt ooit vergrendeld.",
                     "card_basic_tag": "Van {price}",
-                    "card_basic_line": "Solo-bord — de zes potten en de oefening die erachter schuilgaat. Je hebt geen bank nodig.",
+                    "card_basic_line": "Solo-bord — de zes potjes en de oefening die erachter schuilgaat. Je hebt geen bank nodig.",
                     "card_basic_feats": "{members} · Alleen solo · Spaarpotten · Leren · Coach",
                     "card_plus_tag": "Meest gekozen",
                     "card_plus_line": "Deel het bord met familie of vrienden — schulden, energieweken en doelen.",
@@ -4183,7 +4183,7 @@
                 "sign_out_sub": "Je blijft 30 dagen ingelogd",
                 "language": "Taal",
                 "language_sub": "Taal van de app",
-                "appearance": "Uiterlijk",
+                "appearance": "Weergave",
                 "appearance_sub": "Licht of donker",
                 "theme_light": "☀ Licht",
                 "theme_dark": "☾ Donker"
@@ -4233,7 +4233,7 @@
                 },
                 "income_create": {
                     "title": "Nieuwe inkomsten",
-                    "description": "Voeg een inkomstenbron toe waarmee je je potten kunt vullen."
+                    "description": "Voeg een inkomstenbron toe waarmee je je potjes kunt vullen."
                 },
                 "income_update": {
                     "title": "Inkomsten bewerken"
@@ -4347,7 +4347,7 @@
             },
             "closing_title": "Ga niet achter cijfers aan. Bepaal zelf de koers.",
             "closing_body": "Ontworpen voor mensen die het goed doen — en voor mensen die er klaar voor zijn. Zes potjes. Eén overzichtelijk geheel. Informatie, nooit een verwijt: een potje dat de lijn overschrijdt, is een signaal voor wat je vervolgens kunt doen, geen oordeel over wie je bent.",
-            "cta_jars": "Maak de potten open",
+            "cta_jars": "Maak de potjes open",
             "cta_week_check": "Wekelijkse controle",
             "routes": {
                 "home": "Eén blik, één vraag: heb ik deze maand de touwtjes in handen?",
@@ -4358,7 +4358,7 @@
                 "growth_goals": "Een doel zorgt ervoor dat het overschot van deze maand iets blijvends wordt. Met een datum en een potje is het een plan.",
                 "growth_net_worth": "Geld is iets van deze maand. Nettovermogen is iets van de komende jaren. Je bent rijk op de dag dat het je levensonderhoud dekt.",
                 "energy_week": "Je uren bepalen je capaciteit. Die worden bewust verdeeld, of door degene die het hardst om een deel vraagt.",
-                "energy_sleep": "Slaap is de vloer waarop de potten staan. Haal die weg en alle andere getallen vallen stilletjes naar beneden.",
+                "energy_sleep": "Slaap is de vloer waarop de potjes staan. Haal die weg en alle andere getallen vallen stilletjes naar beneden.",
                 "soul_stillness": "Een rustige geest gaat verstandig met geld om. Een onrustige geest geeft het uit en noemt dat een beslissing.",
                 "soul_gratitude": "Iemand die ziet wat hij al heeft, koopt minder om een leemte op te vullen.",
                 "soul_giving": "Een vast aandeel dat verdwijnt voordat je het in bezit kunt nemen, zorgt ervoor dat geld een hulpmiddel blijft en geen meester.",
