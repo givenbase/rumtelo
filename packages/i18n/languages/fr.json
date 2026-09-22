@@ -259,35 +259,35 @@
             }
         },
         "statusPage": {
-            "loading": "Chargement en cours",
-            "back_home": "De retour chez moi",
-            "try_again": "Réessayez",
+            "loading": "Chargement…",
+            "back_home": "Retour à l'accueil",
+            "try_again": "Réessayer",
             "go_back": "Retour",
             "continue": "Continuer",
-            "scaffold": "Échafaudage.",
+            "scaffold": "Un instant…",
             "error": {
                 "title": "Une erreur s'est produite",
-                "description": "Nous avons rencontré un problème inattendu lors du chargement de cette page. Veuillez réessayer. Si le problème persiste, veuillez revenir dans quelques instants."
+                "description": "Cette page n'a pas pu être chargée. Réessaie — si ça continue, reviens dans un moment."
             },
             "not_found": {
                 "title": "Cette page n'existe pas",
-                "description": "Il se peut que la page ait été déplacée ou que le lien ne soit plus valide. Revenez en arrière et reprenez là où vous vous étiez arrêté."
+                "description": "Le lien est peut-être incorrect, ou la page a déménagé. Reviens en arrière et reprends où tu en étais."
             },
             "access_denied": {
-                "title": "Vous ne pouvez pas ouvrir ce fichier.",
-                "description": "Votre compte ne dispose pas d'un accès à cette partie de Rumtelo."
+                "title": "Tu ne peux pas ouvrir ça",
+                "description": "Ton compte n'a pas accès à cette partie de Rumtelo."
             },
             "unauthorized": {
-                "title": "Connectez-vous pour continuer",
-                "description": "Votre session a expiré ou vous n'êtes pas connecté(e). Reconnectez-vous pour reprendre là où vous vous étiez arrêté(e)."
+                "title": "Connecte-toi pour continuer",
+                "description": "Ta session a expiré ou tu n'es pas connecté·e. Reconnecte-toi pour reprendre où tu en étais."
             },
             "maintenance": {
-                "title": "Rumtelo est temporairement indisponible",
-                "description": "Nous effectuons une brève mise à jour. Vos fichiers JAR et vos données sont en sécurité — veuillez réessayer dans quelques minutes."
+                "title": "Rumtelo est brièvement hors ligne",
+                "description": "Nous faisons une courte mise à jour. Tes pots et tes données sont en sécurité — réessaie dans quelques minutes."
             },
             "offline": {
-                "title": "Vous semblez être hors ligne",
-                "description": "Vérifiez votre connexion, puis réessayez. Rien ne fonctionne ici sans connexion Internet."
+                "title": "Tu sembles hors ligne",
+                "description": "Vérifie ta connexion, puis réessaie. Rien ne marche ici sans réseau."
             }
         },
         "theme": {
@@ -1183,7 +1183,7 @@
                     "give_by": " · par {year}",
                     "save_pace": "◇ {monthly} /mo · {date}",
                     "date_open": "date d'ouverture",
-                    "jar_context": "Contexte du fichier JAR",
+                    "jar_context": "Contexte du pot",
                     "available": "Disponible",
                     "fixed_out": "Corrigé",
                     "headroom": "Hauteur libre",
@@ -1662,7 +1662,7 @@
                     "no_tx_month": "Aucune transaction n'a été enregistrée dans ce « jar » ce mois-ci.",
                     "all_nested": "Tous les paiements périodiques sont regroupés sous les catégories ci-dessus.",
                     "stacked_footnote": "Cumul sur {months} mois. L'activité ci-dessous correspond toujours au mois sélectionné.",
-                    "loading_jar": "Chargement du fichier JAR…",
+                    "loading_jar": "Chargement du pot…",
                     "back_jars": "← Bocaux",
                     "pct_of_net": "{pct} % du montant net",
                     "no_categories": "Aucune catégorie pour l'instant.",
@@ -1800,7 +1800,7 @@
                 "inbox_empty_title": "Il n'y a plus rien à trier.",
                 "inbox_empty_body": "Chaque paiement correspond à une cagnotte. Revenez demain — ou associez un compte bancaire ci-dessous.",
                 "rules_sign_in_title": "Connectez-vous pour gérer les règles.",
-                "rules_sign_in_body": "Les règles classent automatiquement les transactions de la boîte de réception dans le bon fichier JAR.",
+                "rules_sign_in_body": "Les règles classent automatiquement les transactions de la boîte de réception dans le bon pot.",
                 "rules_empty_title": "Il n'y a pas encore de règles.",
                 "rules_empty_body": "Sélectionnez « Toujours cette option » sur un message de la boîte de réception pour définir une règle. Vous pourrez ensuite les gérer ici.",
                 "toast_sorted": "Tri effectué et règle enregistrée",
@@ -1903,7 +1903,7 @@
                 "add_note": "Ajouter une note",
                 "note_placeholder_in": "Facultatif — par exemple, de la part d'une tante",
                 "note_placeholder_out": "Facultatif — par exemple, le déjeuner des enfants",
-                "no_jars": "Pas de fichiers jar — procédez d'abord à l'installation complète",
+                "no_jars": "Pas de pots — procédez d'abord à l'installation complète",
                 "default_description": "Transaction",
                 "give_one_time_hint": "Don ponctuel — apparaît dans les transactions « Don » et « Sortie ». Pour un don récurrent, ajoutez plutôt un coût fixe."
             },
@@ -1947,8 +1947,8 @@
                 "moving": "Déménagement…",
                 "submit": "Transférer de l'argent",
                 "cancel": "Annuler",
-                "choose_source_first": "Commencez par choisir un fichier JAR source.",
-                "source_blocked": "Choisissez un autre fichier JAR source : celui-ci ne permet pas d'effectuer des virements.",
+                "choose_source_first": "Commencez par choisir un pot source.",
+                "source_blocked": "Choisissez un autre pot source : celui-ci ne permet pas d'effectuer des virements.",
                 "use_max": "Utiliser max ({amount})",
                 "max_from": "Max de {jar} : {amount}",
                 "choose_destination": "Choisissez où l'argent doit être versé.",
@@ -1983,7 +1983,7 @@
                 "know_vendor": "Vous connaissez ce fournisseur ?",
                 "use_as_vendor": "Utilisez « {name} » comme fournisseur",
                 "no_matches_enter": "Aucun résultat — appuyez sur Entrée pour utiliser « {name} » comme fournisseur.",
-                "no_types_custom": "Aucun type n'est encore défini pour ce fichier JAR — saisissez plutôt un nom personnalisé.",
+                "no_types_custom": "Aucun type n'est encore défini pour ce pot — saisissez plutôt un nom personnalisé.",
                 "no_match_use": "Aucune correspondance — utilisez « {name} » comme fournisseur",
                 "custom_jar_hint": "Choisissez un bocal parmi ceux ci-dessous — ou modifiez votre choix et sélectionnez un type afin que nous puissions le classer.",
                 "vendors": "Fournisseurs",
@@ -2067,7 +2067,7 @@
                 "name_free_placeholder": "Saisissez un nom personnalisé pour la facture…",
                 "name_edit_placeholder": "par exemple : loyer",
                 "amount_label": "Montant mensuel ({symbol})",
-                "no_jars": "Pas de fichiers jar — procédez d'abord à l'installation complète",
+                "no_jars": "Pas de pots — procédez d'abord à l'installation complète",
                 "category_auto": "Automatique à partir du nom / d'un préréglage",
                 "category_from_preset": "À partir du préréglage ({name})",
                 "paid_to": "Versé à (facultatif)",
@@ -2539,7 +2539,7 @@
             "offer": {
                 "eyebrow": "Visite rapide",
                 "title": "Vous souhaitez découvrir Rumtelo ?",
-                "body": "Une brève présentation guidée de la navigation, des fichiers JAR, des coûts fixes et des revenus. Vous pouvez passer à la suite à tout moment — ou ouvrir l'aide plus tard pour revoir un écran.",
+                "body": "Une brève présentation guidée de la navigation, des pots, des coûts fixes et des revenus. Vous pouvez passer à la suite à tout moment — ou ouvrir l'aide plus tard pour revoir un écran.",
                 "accept": "Commencer la visite",
                 "dismiss": "Pas maintenant"
             },
@@ -2803,7 +2803,7 @@
                 "money_allocated_month": "Argent · Alloué ce mois-ci",
                 "income_span": "Sur {months} mois · {jars} bocaux",
                 "income_span_one_jar": "Sur une période de {months} mois · 1 pot",
-                "income_month": "Répartis dans {jars} fichiers JAR",
+                "income_month": "Répartis dans {jars} pots",
                 "income_month_one_jar": "Réparti dans 1 bocal",
                 "see_income": "Voir les revenus ▸",
                 "six_jars": "✦ Les six bocaux",
@@ -3381,7 +3381,7 @@
                 },
                 "data": {
                     "question": "Où se trouvent mes données ?",
-                    "answer": "Hébergées sur des serveurs de l'UE à Amsterdam, les données sont chiffrées au repos. Vous pouvez les exporter ou les supprimer à tout moment. Si vous résiliez un abonnement payant, tous les fichiers JAR, toutes les transactions et tous les objectifs restent accessibles."
+                    "answer": "Hébergées sur des serveurs de l'UE à Amsterdam, les données sont chiffrées au repos. Vous pouvez les exporter ou les supprimer à tout moment. Si vous résiliez un abonnement payant, tous les pots, toutes les transactions et tous les objectifs restent accessibles."
                 },
                 "language": {
                     "question": "Néerlandais ou anglais ?",
@@ -4096,10 +4096,10 @@
                     "sheet_debts_cols": "nom · taux · solde",
                     "sheet_goals": "Objectifs",
                     "sheet_goals_rows": "cibles",
-                    "sheet_goals_cols": "nom · cible · fichier JAR",
+                    "sheet_goals_cols": "nom · cible · pot",
                     "sheet_rules": "Règles",
                     "sheet_rules_rows": "automatisation",
-                    "sheet_rules_cols": "correspondance · fichier JAR · priorité",
+                    "sheet_rules_cols": "correspondance · pot · priorité",
                     "download_excel": "Télécharger le fichier Excel (.xls)",
                     "download_json": "Télécharger le fichier JSON",
                     "download_csv": "Télécharger le fichier CSV",
@@ -4296,10 +4296,10 @@
                 "maintenance_title": "Brève interruption de connexion",
                 "maintenance_body": "Nous effectuons une brève mise à jour. Veuillez réessayer dans quelques minutes.",
                 "maintenance_api_down_title": "Rumtelo est temporairement indisponible",
-                "maintenance_api_down_body": "Nous ne parvenons pas à accéder à l'API pour le moment. Vos fichiers JAR et vos données sont en sécurité — veuillez réessayer dans quelques instants.",
+                "maintenance_api_down_body": "Nous ne parvenons pas à accéder à l'API pour le moment. Vos pots et vos données sont en sécurité — veuillez réessayer dans quelques instants.",
                 "maintenance_update_title": "Rumtelo se prépare",
                 "maintenance_update_body": "Nous sommes en train de finaliser une petite mise à jour. Pour l'instant, seule l'équipe Rumtelo peut se connecter.",
-                "locked_title": "Passez à la version supérieure pour ouvrir ce fichier",
+                "locked_title": "Passe à un plan supérieur pour ouvrir ceci",
                 "locked_body": "Cette partie de Rumtelo se trouve sur un niveau plus élevé.",
                 "locked_plan_title": "Disponible dans la formule {plan}",
                 "locked_plan_aria": "Mise à niveau du forfait requise",

@@ -5,7 +5,7 @@ const status = {
     try_again: 'Try again',
     go_back: 'Go back',
     continue: 'Continue',
-    scaffold: 'Scaffold.',
+    scaffold: 'Coming soon.',
     error: {
         title: 'Something went wrong',
         description:

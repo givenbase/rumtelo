@@ -41,7 +41,7 @@
             "error": {
                 "generic": "Er ging iets mis",
                 "invalid_value": "Ongeldige waarde",
-                "unexpected": "Er is een fout opgetreden. Probeer het nog eens.",
+                "unexpected": "Er ging iets mis. Probeer het opnieuw.",
                 "save_failed": "Opslaan mislukt",
                 "delete_failed": "Verwijderen mislukt",
                 "load_failed": "Laden mislukt",
@@ -162,7 +162,7 @@
                 "sign_in": "Inloggen",
                 "sign_up": "Account aanmaken",
                 "sign_out": "Uitloggen",
-                "try_again": "Probeer het nog eens",
+                "try_again": "Opnieuw proberen",
                 "dismiss": "Sluiten",
                 "resend": "Opnieuw verzenden"
             }
@@ -171,12 +171,12 @@
             "required": "Verplicht",
             "optional": "Optioneel",
             "incomplete_title": "Formulier onvolledig",
-            "incomplete_description": "Controleer de verplichte velden en probeer opnieuw.",
-            "incomplete_description_highlighted": "Vul de gemarkeerde velden in en probeer het nog eens.",
+            "incomplete_description": "Vul de verplichte velden in en probeer het opnieuw.",
+            "incomplete_description_highlighted": "Vul de gemarkeerde velden in en probeer het opnieuw.",
             "saving": "Opslaan…",
             "deleting": "Verwijderen…",
             "working": "Bezig…",
-            "loading": "Bezig met laden…",
+            "loading": "Laden…",
             "show_password": "Wachtwoord weergeven",
             "hide_password": "Wachtwoord verbergen",
             "pick_a_date": "Kies een datum",
@@ -259,40 +259,40 @@
             }
         },
         "statusPage": {
-            "loading": "Bezig met laden",
-            "back_home": "Weer thuis",
-            "try_again": "Probeer het nog eens",
+            "loading": "Laden…",
+            "back_home": "Naar home",
+            "try_again": "Opnieuw proberen",
             "go_back": "Terug",
             "continue": "Doorgaan",
-            "scaffold": "Bezig…",
+            "scaffold": "Even geduld…",
             "error": {
-                "title": "Er is iets misgegaan",
-                "description": "Er is een onverwacht probleem opgetreden bij het laden van deze pagina. Probeer het nog eens — als het probleem zich blijft voordoen, kom dan straks nog eens terug."
+                "title": "Er ging iets mis",
+                "description": "Deze pagina kon niet worden geladen. Probeer het opnieuw — blijft het misgaan, kom dan zo terug."
             },
             "not_found": {
                 "title": "Deze pagina bestaat niet",
-                "description": "Misschien is de pagina verplaatst, of is de link niet meer geldig. Ga terug en ga verder waar je was gebleven."
+                "description": "Misschien is de link verouderd of is de pagina verplaatst. Ga terug en ga verder waar je was."
             },
             "access_denied": {
                 "title": "Je kunt dit niet openen",
-                "description": "Je account heeft geen toegang tot dit gedeelte van Rumtelo."
+                "description": "Je account heeft geen toegang tot dit deel van Rumtelo."
             },
             "unauthorized": {
-                "title": "Log in om door te gaan",
-                "description": "Je sessie is beëindigd of je bent niet aangemeld. Meld je opnieuw aan om verder te gaan waar je was gebleven."
+                "title": "Log in om verder te gaan",
+                "description": "Je sessie is verlopen of je bent niet ingelogd. Log opnieuw in om verder te gaan waar je was."
             },
             "maintenance": {
-                "title": "Rumtelo is tijdelijk offline",
-                "description": "We voeren momenteel een korte update uit. Je potten en gegevens zijn veilig — probeer het over een paar minuten nog eens."
+                "title": "Rumtelo is even offline",
+                "description": "We doen een korte update. Je potten en gegevens blijven veilig — probeer het over een paar minuten opnieuw."
             },
             "offline": {
-                "title": "Je lijkt offline te zijn",
-                "description": "Controleer je verbinding en probeer het dan nog eens. Zonder internet werkt hier niets."
+                "title": "Je lijkt offline",
+                "description": "Check je verbinding en probeer het opnieuw. Zonder internet werkt hier niets."
             }
         },
         "theme": {
-            "switch_to_light": "Overschakelen naar de lichte modus",
-            "switch_to_dark": "Overschakelen naar de donkere modus",
+            "switch_to_light": "Lichte modus",
+            "switch_to_dark": "Donkere modus",
             "language": "Taal",
             "language_named": "Taal: {name}"
         }
@@ -1162,7 +1162,7 @@
                 "achieve_spend_blocked": "Uitgeven (volledige doelbedrag moet in de pot zitten)",
                 "cancel": "Annuleren",
                 "detail": {
-                    "loading": "Bezig met laden…",
+                    "loading": "Laden…",
                     "back": "← Doelen",
                     "not_found": "Doel niet gevonden.",
                     "kind_earn": "Verdien · maandelijks netto",
@@ -1270,7 +1270,7 @@
                 "month_score_empty_title": "Nog geen gegevens beschikbaar",
                 "month_score_empty_body": "Maandscore, niveaus en logboek volgen later. Bezittingen, potjes en schulden tellen al mee voor het nettovermogen.",
                 "detail": {
-                    "loading": "Bezig met laden…",
+                    "loading": "Laden…",
                     "not_found": "Bezit niet gevonden.",
                     "back": "← Nettovermogen"
                 }
@@ -1289,7 +1289,7 @@
                 "add_learning": "Leren toevoegen",
                 "add_learning_description": "Zoeken op titel. We slaan op waar het te vinden is, niet het boek zelf.",
                 "search": "Zoeken",
-                "catalog_error": "De catalogus gaf geen antwoord. Probeer het nog eens.",
+                "catalog_error": "De catalogus gaf geen antwoord. Probeer het opnieuw.",
                 "save_error": "Die titel kon niet worden opgeslagen.",
                 "add_button": "Toevoegen",
                 "nothing_found": "Er is niets met die naam.",
@@ -1421,7 +1421,7 @@
                 "mo_net": "/maand netto",
                 "subline_travel": "{amount}/maand · {months} maanden",
                 "subline_annual": "{amount}/jaar",
-                "loading": "Bezig met laden…",
+                "loading": "Laden…",
                 "not_found": "Inkomstenbron niet gevonden.",
                 "sources_heading": "✦ Inkomstenbronnen",
                 "empty_live": "Nog geen inkomstenbronnen — voeg er een toe om je potjes te vullen.",
@@ -1737,7 +1737,7 @@
                 "end_short": "Einde",
                 "reactivate_short": "Opnieuw activeren",
                 "detail": {
-                    "loading": "Bezig met laden…",
+                    "loading": "Laden…",
                     "not_found": "Vaste kosten niet gevonden.",
                     "back": "← Vaste kosten",
                     "money_in": "Geld binnen",
@@ -1824,7 +1824,7 @@
                     "other": "Overige"
                 },
                 "detail": {
-                    "loading": "Bezig met laden…",
+                    "loading": "Laden…",
                     "not_found": "Transactie niet gevonden.",
                     "back": "← Transacties",
                     "open_link": "Openen ›",
@@ -2195,7 +2195,7 @@
                 "show_payments_aria": "{name}-betalingen weergeven",
                 "hide_payments_aria": "{name}-betalingen verbergen",
                 "detail": {
-                    "loading": "Bezig met laden…",
+                    "loading": "Laden…",
                     "back": "← Schulden",
                     "not_found": "Schuld niet gevonden.",
                     "record_payment": "Betaling registreren",
@@ -3694,8 +3694,8 @@
             "back": "Terug",
             "next": "Volgende",
             "start": "Start",
-            "creating": "Bezig met laden…",
-            "setup_failed": "Installatie is mislukt — probeer het nog eens",
+            "creating": "Laden…",
+            "setup_failed": "Installatie is mislukt — probeer het opnieuw",
             "dialog_label": "Welkom bij Rumtelo",
             "household_created": "Huishouden aangemaakt",
             "continue": "Doorgaan",
