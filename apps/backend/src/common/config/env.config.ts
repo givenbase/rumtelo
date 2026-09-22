@@ -64,7 +64,7 @@ const EnvSchema = z.object({
     RESEND_API_KEY: z.string().optional(),
     /** When true, never call the provider — log only (even if provider is resend). */
     EMAIL_LOG_ONLY: boolish(false),
-    /** From address for outbound mail. */
+    /** From address for outbound mail (also receives contact-form submissions). */
     EMAIL_FROM: z.string().optional(),
 
     // ── Payments (optional — Checkout when STRIPE_SECRET_KEY is set) ──────

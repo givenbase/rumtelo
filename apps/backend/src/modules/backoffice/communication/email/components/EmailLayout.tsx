@@ -40,8 +40,9 @@ const EmailLayout: React.FC<EmailLayoutProps> = ({
     const chrome = websiteUrl
         ? {
               websiteUrl,
-              privacyUrl: `${websiteUrl.replace(/\/$/, '')}/privacy`,
-              termsUrl: `${websiteUrl.replace(/\/$/, '')}/terms`,
+              privacyUrl: `${websiteUrl.replace(/\/$/, '')}/legal/privacy`,
+              termsUrl: `${websiteUrl.replace(/\/$/, '')}/legal/terms`,
+              cookiesUrl: `${websiteUrl.replace(/\/$/, '')}/legal/cookies`,
           }
         : undefined;
 

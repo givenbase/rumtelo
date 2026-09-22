@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Resend } from 'resend';
 
 import type {
+    ContactFormEmailInput,
     EmailProvider,
     EmailVerificationEmailInput,
     HouseholdInviteEmailInput,
@@ -156,6 +157,29 @@ export class EmailService {
         );
     }
 
+    /** Marketing-site contact form → EMAIL_FROM inbox (reply-to = submitter). */
+    async sendContactFormEmail(input: ContactFormEmailInput): Promise<boolean> {
+        const locale = input.locale ?? 'en';
+        const html = await renderTemplate(
+            EmailTemplate.CONTACT_FORM,
+            {
+                name: input.name,
+                email: input.email,
+                topic: input.topic,
+                message: input.message,
+                websiteUrl: this.webOrigin,
+            },
+            locale
+        );
+
+        return this.send({
+            to: addressFromMailbox(this.defaultFrom),
+            subject: `Contact: ${input.topic} — ${input.name}`,
+            html,
+            replyTo: input.email,
+        });
+    }
+
     /** Accept URL for an invitation id (application route). */
     inviteUrl(invitationId: string): string {
         return `${this.appOrigin}/invite/${invitationId}`;
@@ -165,4 +189,10 @@ export class EmailService {
     get websiteUrl(): string {
         return this.webOrigin || EMAIL_BRAND.websiteUrl;
     }
+}
+
+/** `Rumtelo <info@rumtelo.app>` → `info@rumtelo.app` (Resend `to` wants a bare address). */
+function addressFromMailbox(mailbox: string): string {
+    const match = /<([^>]+)>/.exec(mailbox);
+    return (match?.[1] ?? mailbox).trim();
 }

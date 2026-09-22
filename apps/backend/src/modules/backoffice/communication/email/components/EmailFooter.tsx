@@ -13,6 +13,7 @@ interface EmailFooterProps {
     darkMode?: boolean;
     privacyUrl?: string;
     termsUrl?: string;
+    cookiesUrl?: string;
     websiteUrl?: string;
 }
 
@@ -21,8 +22,9 @@ const EmailFooter: React.FC<EmailFooterProps> = ({
     companyName = EMAIL_BRAND.name,
     currentYear = new Date().getFullYear(),
     darkMode = false,
-    privacyUrl = `${EMAIL_BRAND.websiteUrl}/privacy`,
-    termsUrl = `${EMAIL_BRAND.websiteUrl}/terms`,
+    privacyUrl = `${EMAIL_BRAND.websiteUrl}/legal/privacy`,
+    termsUrl = `${EMAIL_BRAND.websiteUrl}/legal/terms`,
+    cookiesUrl = `${EMAIL_BRAND.websiteUrl}/legal/cookies`,
     websiteUrl = EMAIL_BRAND.websiteUrl,
 }) => {
     const theme = getTheme(darkMode);
@@ -95,6 +97,10 @@ const EmailFooter: React.FC<EmailFooterProps> = ({
                 {' · '}
                 <Link href={termsUrl} style={linkStyle}>
                     Terms
+                </Link>
+                {' · '}
+                <Link href={cookiesUrl} style={linkStyle}>
+                    Cookies
                 </Link>
             </Text>
 

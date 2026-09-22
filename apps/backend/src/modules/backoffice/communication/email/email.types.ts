@@ -33,3 +33,11 @@ export type PasswordResetEmailInput = {
     expiresInHours?: number;
     locale?: string;
 };
+
+export type ContactFormEmailInput = {
+    name: string;
+    email: string;
+    topic: string;
+    message: string;
+    locale?: string;
+};
