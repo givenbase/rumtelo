@@ -12,6 +12,7 @@ export {
     ENTITY_INCOME_SOURCE_PRESET,
     ENTITY_TRANSACTION_IN_PRESET,
     ENTITY_AUDIENCE,
+    ENTITY_GIVING_CAUSE,
     type CatalogLocale,
 } from './translation.service';
 export { TranslationModule } from './translation.module';

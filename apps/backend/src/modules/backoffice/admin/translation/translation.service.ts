@@ -23,6 +23,7 @@ export const ENTITY_DEBT_PRESET = 'debt_preset';
 export const ENTITY_INCOME_SOURCE_PRESET = 'income_source_preset';
 export const ENTITY_TRANSACTION_IN_PRESET = 'transaction_in_preset';
 export const ENTITY_AUDIENCE = 'audience';
+export const ENTITY_GIVING_CAUSE = 'giving_cause';
 
 function asComparableString(value: unknown): string {
     if (value === null || value === undefined) return '';
