@@ -1,25 +1,18 @@
 'use client';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
-
-import { useLiveQuery } from '@rumtelo/hooks';
-import { useTranslations } from '@rumtelo/i18n';
-import { Typography } from '@rumtelo/ui';
-
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
-import { isLiveData } from '@/app/_lib/preview';
 import {
     FixedCostForm,
     type FixedCostFormValues,
     type GivePayeeMode,
 } from '@/components/features/forms/fixed-cost-form';
+import { useEntityForEdit } from '@/components/features/forms/use-entity-for-edit';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 export type FixedCostCreatePrefill = Partial<FixedCostFormValues> & {
     payeeMode?: GivePayeeMode;
-    /** GivingOrganisation catalog key (Coach path). */
     orgKey?: string;
-    /** MerchantPreset key when the gift was picked from a Coach chip. */
     merchantKey?: string;
 };
 
@@ -28,7 +21,6 @@ export function FixedCostCreatePage({
     defaultValues,
 }: {
     embedded?: boolean;
-    /** Cross-route prefill (jar, organisation, name, Give payee path) — e.g. Soul → Giving. */
     defaultValues?: FixedCostCreatePrefill;
 }) {
     const { payeeMode, orgKey, merchantKey, ...formDefaults } = defaultValues ?? {};
@@ -45,40 +37,30 @@ export function FixedCostCreatePage({
 }
 
 export function FixedCostUpdatePage({ id, embedded = false }: { id: string; embedded?: boolean }) {
-    const t = useTranslations('features.money.fixed.detail');
     const { householdId } = useAuth();
-    const live = isLiveData(householdId);
+    const loaded = useEntityForEdit({
+        translationNamespace: 'features.money.fixed.detail',
+        listOptions: apiQuery.money.fixedCosts.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        id,
+        mapRow: row => ({
+            name: row.name,
+            counterparty: row.counterparty ?? '',
+            amount: minorUnitsToAmountInput(Math.abs(row.amount)),
+            jarId: row.jarId,
+            dueDay: row.dueDay !== null ? String(row.dueDay) : '',
+        }),
+    });
 
-    const query = useLiveQuery(
-        apiQuery.money.fixedCosts.list.queryOptions({ input: { householdId: householdId! } }),
-        [] as never,
-        live
-    );
-    const row = (query.data ?? []).find(fixedCost => fixedCost.id === id);
-
-    if (live && query.isLoading && !row) {
-        return (
-            <Typography as="p" size="sm" color="muted">
-                {t('loading')}
-            </Typography>
-        );
-    }
-    if (!row) {
-        return <p className="text-sm text-fg-muted">{t('not_found')}</p>;
-    }
+    if (loaded.status !== 'ready') return loaded.node;
 
     return (
         <FixedCostForm
             mode="edit"
-            entityId={row.id}
+            entityId={loaded.row.id}
             embedded={embedded}
-            defaultValues={{
-                name: row.name,
-                counterparty: row.counterparty ?? '',
-                amount: minorUnitsToAmountInput(Math.abs(row.amount)),
-                jarId: row.jarId,
-                dueDay: row.dueDay !== null ? String(row.dueDay) : '',
-            }}
+            defaultValues={loaded.values}
         />
     );
 }

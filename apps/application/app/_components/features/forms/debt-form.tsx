@@ -36,7 +36,7 @@ import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 import { createDebtFormSchema, type DebtFormSchemaValues } from './form-zod';
-import { ChipSearch, matchesChipQuery } from './chip-search';
+import { CatalogChipPicker } from './catalog-chip-picker';
 import { ConfirmActionButton } from './confirm-action-button';
 import { FormInput } from './form-input';
 import { merchantsToNameOptions } from './merchant-name-options';
@@ -137,7 +137,6 @@ export function DebtForm({
             .map(key => byKey.get(key))
             .filter((merchant): merchant is MerchantPreset => Boolean(merchant));
     })();
-    const visibleLenders = lendersForType.filter(lender => matchesChipQuery(lenderQuery, lender));
 
     /** Suggested lenders + full merchant catalog (banks, BNPL, …) for typeahead. */
     const fromMerchants = merchantsToNameOptions(merchants);
@@ -368,72 +367,59 @@ export function DebtForm({
                                 {tDebt('who_heading')}
                             </p>
                             {lendersForType.length > 0 && !customLender ? (
-                                <div className="grid gap-2">
-                                    <ChipSearch
-                                        value={lenderQuery}
-                                        onChange={setLenderQuery}
-                                        placeholder={tDebt('lender_search')}
-                                        disabled={busy}
-                                    />
-                                    {lenderQuery.trim() && visibleLenders.length === 0 ? (
-                                        <p className="text-sm text-fg-muted">
-                                            {tForm('no_matches')}
-                                        </p>
-                                    ) : null}
-                                    <div className="flex flex-wrap gap-1.5">
-                                        {visibleLenders.map(lender => {
-                                            const selected =
-                                                selectedLenderName.toLowerCase() ===
-                                                lender.name.toLowerCase();
-                                            const mark = partyMark(
-                                                {
-                                                    key: lender.key,
-                                                    name: lender.name,
-                                                    logoDomain: lender.logoDomain,
-                                                    website: lender.website,
-                                                },
-                                                lenderChrome
-                                            );
-                                            return (
-                                                <button
-                                                    key={lender.key}
-                                                    type="button"
-                                                    disabled={busy}
-                                                    className={
-                                                        selected
-                                                            ? 'inline-flex items-center gap-2 rounded-xl border border-accent bg-accent/15 px-2.5 py-1.5 text-sm text-accent'
-                                                            : 'inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent'
-                                                    }
-                                                    onClick={() =>
-                                                        form.setValue('name', lender.name, {
-                                                            shouldValidate: true,
-                                                        })
-                                                    }>
-                                                    <VendorMark
-                                                        name={mark.name}
-                                                        src={mark.src}
-                                                        fallbackIcon={mark.fallbackIcon}
-                                                        tone={mark.tone}
-                                                        size={20}
-                                                    />
-                                                    {lender.name}
-                                                </button>
-                                            );
-                                        })}
-                                        <button
-                                            type="button"
-                                            disabled={busy}
-                                            className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
-                                            onClick={() => {
-                                                setCustomLender(true);
-                                                form.setValue('name', '', {
-                                                    shouldValidate: false,
-                                                });
-                                            }}>
-                                            {tForm('other')}
-                                        </button>
-                                    </div>
-                                </div>
+                                <CatalogChipPicker
+                                    query={lenderQuery}
+                                    onQueryChange={setLenderQuery}
+                                    items={lendersForType}
+                                    placeholder={tDebt('lender_search')}
+                                    noMatchesLabel={tForm('no_matches')}
+                                    disabled={busy}
+                                    otherLabel={tForm('other')}
+                                    onOther={() => {
+                                        setCustomLender(true);
+                                        form.setValue('name', '', {
+                                            shouldValidate: false,
+                                        });
+                                    }}
+                                    renderChip={lender => {
+                                        const selected =
+                                            selectedLenderName.toLowerCase() ===
+                                            lender.name.toLowerCase();
+                                        const mark = partyMark(
+                                            {
+                                                key: lender.key,
+                                                name: lender.name,
+                                                logoDomain: lender.logoDomain,
+                                                website: lender.website,
+                                            },
+                                            lenderChrome
+                                        );
+                                        return (
+                                            <button
+                                                type="button"
+                                                disabled={busy}
+                                                className={
+                                                    selected
+                                                        ? 'inline-flex items-center gap-2 rounded-xl border border-accent bg-accent/15 px-2.5 py-1.5 text-sm text-accent'
+                                                        : 'inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent'
+                                                }
+                                                onClick={() =>
+                                                    form.setValue('name', lender.name, {
+                                                        shouldValidate: true,
+                                                    })
+                                                }>
+                                                <VendorMark
+                                                    name={mark.name}
+                                                    src={mark.src}
+                                                    fallbackIcon={mark.fallbackIcon}
+                                                    tone={mark.tone}
+                                                    size={20}
+                                                />
+                                                {lender.name}
+                                            </button>
+                                        );
+                                    }}
+                                />
                             ) : null}
                             {showLenderInput ? (
                                 <FormField

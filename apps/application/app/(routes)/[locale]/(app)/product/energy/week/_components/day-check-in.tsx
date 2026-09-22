@@ -13,7 +13,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { formatDayLabel, shiftDay, todayIso } from '@/app/_lib/week-key';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 
-import type { DayMinutes } from './day-shape';
+import type { DayMinutes } from '../_utils/day-shape';
 import {
     dayKindName,
     describeShape,
@@ -21,7 +21,7 @@ import {
     overDay,
     shapeFromMinutes,
     templateForDay,
-} from './day-shape';
+} from '../_utils/day-shape';
 import { ShapeEditor } from './shape-editor';
 
 type Props = {

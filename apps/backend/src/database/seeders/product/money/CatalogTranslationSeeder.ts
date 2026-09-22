@@ -1,4 +1,5 @@
 import type { EntityManager } from '@mikro-orm/postgresql';
+import { FlushMode } from '@mikro-orm/postgresql';
 
 import { Seeder } from '@mikro-orm/seeder';
 
@@ -24,46 +25,73 @@ import { GOAL_PRESET_TRANSLATIONS } from '../../../../modules/backoffice/product
 import { INCOME_SOURCE_PRESET_TRANSLATIONS } from '../../../../modules/backoffice/product/money/preset/income/seed/income-translations';
 import { TRANSACTION_IN_PRESET_TRANSLATIONS } from '../../../../modules/backoffice/product/money/preset/transaction-in/seed/transaction-in-translations';
 
+type UpsertStats = { created: number; updated: number; skipped: number };
+
 /**
  * Upserts catalog translations for every locale in the seed maps.
- * Safe to re-run; English stays on the template/preset rows themselves.
+ * Safe to re-run: identical text is skipped (no dirty write / no flush churn).
+ * English stays on the template/preset rows themselves.
  */
 export class CatalogTranslationSeeder extends Seeder {
     async run(em: EntityManager): Promise<void> {
-        await Promise.all([
-            ...nameMaps(ENTITY_JAR_TEMPLATE, flattenJarCopy, JAR_TEMPLATE_TRANSLATIONS).map(job =>
-                upsertFieldMap(em, job.entityType, job.locale, job.fields)
-            ),
-            ...nameMaps(ENTITY_CATEGORY_TEMPLATE, asNameFields, CATEGORY_TEMPLATE_TRANSLATIONS).map(
-                job => upsertFieldMap(em, job.entityType, job.locale, job.fields)
-            ),
-            ...nameMaps(ENTITY_FIXED_COST_PRESET, asNameFields, FIXED_COST_PRESET_TRANSLATIONS).map(
-                job => upsertFieldMap(em, job.entityType, job.locale, job.fields)
-            ),
-            ...nameMaps(ENTITY_GOAL_PRESET, asNameFields, GOAL_PRESET_TRANSLATIONS).map(job =>
-                upsertFieldMap(em, job.entityType, job.locale, job.fields)
-            ),
-            ...nameMaps(ENTITY_DEBT_PRESET, asNameFields, DEBT_PRESET_TRANSLATIONS).map(job =>
-                upsertFieldMap(em, job.entityType, job.locale, job.fields)
-            ),
-            ...nameMaps(
-                ENTITY_INCOME_SOURCE_PRESET,
-                asNameFields,
-                INCOME_SOURCE_PRESET_TRANSLATIONS
-            ).map(job => upsertFieldMap(em, job.entityType, job.locale, job.fields)),
-            ...nameMaps(
-                ENTITY_TRANSACTION_IN_PRESET,
-                asObjectFields,
-                TRANSACTION_IN_PRESET_TRANSLATIONS
-            ).map(job => upsertFieldMap(em, job.entityType, job.locale, job.fields)),
-            ...nameMaps(ENTITY_AUDIENCE, asObjectFields, AUDIENCE_TRANSLATIONS).map(job =>
-                upsertFieldMap(em, job.entityType, job.locale, job.fields)
-            ),
-            ...nameMaps(ENTITY_GIVING_CAUSE, asObjectFields, GIVING_CAUSE_TRANSLATIONS).map(job =>
-                upsertFieldMap(em, job.entityType, job.locale, job.fields)
-            ),
-        ]);
-        await em.flush();
+        const totals: UpsertStats = { created: 0, updated: 0, skipped: 0 };
+        try {
+            // One transaction + COMMIT flush mode: finds must not auto-flush mid-upsert.
+            await em.transactional(
+                async tem => {
+                    const jobs = [
+                        ...nameMaps(ENTITY_JAR_TEMPLATE, flattenJarCopy, JAR_TEMPLATE_TRANSLATIONS),
+                        ...nameMaps(
+                            ENTITY_CATEGORY_TEMPLATE,
+                            asNameFields,
+                            CATEGORY_TEMPLATE_TRANSLATIONS
+                        ),
+                        ...nameMaps(
+                            ENTITY_FIXED_COST_PRESET,
+                            asNameFields,
+                            FIXED_COST_PRESET_TRANSLATIONS
+                        ),
+                        ...nameMaps(ENTITY_GOAL_PRESET, asNameFields, GOAL_PRESET_TRANSLATIONS),
+                        ...nameMaps(ENTITY_DEBT_PRESET, asNameFields, DEBT_PRESET_TRANSLATIONS),
+                        ...nameMaps(
+                            ENTITY_INCOME_SOURCE_PRESET,
+                            asNameFields,
+                            INCOME_SOURCE_PRESET_TRANSLATIONS
+                        ),
+                        ...nameMaps(
+                            ENTITY_TRANSACTION_IN_PRESET,
+                            asObjectFields,
+                            TRANSACTION_IN_PRESET_TRANSLATIONS
+                        ),
+                        ...nameMaps(ENTITY_AUDIENCE, asObjectFields, AUDIENCE_TRANSLATIONS),
+                        ...nameMaps(ENTITY_GIVING_CAUSE, asObjectFields, GIVING_CAUSE_TRANSLATIONS),
+                    ];
+                    // Sequential — EntityManager is not safe for concurrent find/create.
+                    for (const job of jobs) {
+                        const stats = await upsertFieldMap(
+                            tem,
+                            job.entityType,
+                            job.locale,
+                            job.fields
+                        );
+                        totals.created += stats.created;
+                        totals.updated += stats.updated;
+                        totals.skipped += stats.skipped;
+                    }
+                },
+                { flushMode: FlushMode.COMMIT }
+            );
+        } catch (error: unknown) {
+            const detail = formatSeedError(error);
+            console.error(`[CatalogTranslationSeeder] failed: ${detail}`);
+            throw error instanceof Error
+                ? error
+                : new Error(`CatalogTranslationSeeder failed: ${detail}`);
+        }
+
+        console.log(
+            `[CatalogTranslationSeeder] created=${totals.created} updated=${totals.updated} skipped=${totals.skipped}`
+        );
     }
 }
 
@@ -113,9 +141,10 @@ async function upsertFieldMap(
     entityType: string,
     locale: string,
     byKey: Record<string, Record<string, string>>
-): Promise<void> {
+): Promise<UpsertStats> {
+    const stats: UpsertStats = { created: 0, updated: 0, skipped: 0 };
     const keys = Object.keys(byKey);
-    if (keys.length === 0) return;
+    if (keys.length === 0) return stats;
 
     const existing = await em.find(Translation, {
         entityType,
@@ -130,7 +159,12 @@ async function upsertFieldMap(
         for (const [fieldName, text] of Object.entries(fields)) {
             const hit = byKeyField.get(`${entityKey}:${fieldName}`);
             if (hit) {
+                if (hit.text === text) {
+                    stats.skipped += 1;
+                    continue;
+                }
                 hit.text = text;
+                stats.updated += 1;
                 continue;
             }
             em.create(Translation, {
@@ -140,6 +174,19 @@ async function upsertFieldMap(
                 locale,
                 text,
             } as never);
+            stats.created += 1;
         }
+    }
+    return stats;
+}
+
+function formatSeedError(error: unknown): string {
+    if (error instanceof Error) {
+        return error.stack ?? error.message;
+    }
+    try {
+        return JSON.stringify(error);
+    } catch {
+        return String(error);
     }
 }

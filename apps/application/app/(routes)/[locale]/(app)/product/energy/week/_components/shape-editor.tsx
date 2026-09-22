@@ -8,8 +8,14 @@ import { cn } from '@rumtelo/utils';
 
 import { formatMinutes } from '@/app/_lib/time-meta';
 
-import type { DayMinutes, ShapeQuestion } from './day-shape';
-import { buildAnchors, buildFreeSplit, buildMore, freeAssigned, freeRemainder } from './day-shape';
+import type { DayMinutes, ShapeQuestion } from '../_utils/day-shape';
+import {
+    buildAnchors,
+    buildFreeSplit,
+    buildMore,
+    freeAssigned,
+    freeRemainder,
+} from '../_utils/day-shape';
 import { HourChips } from './hour-chips';
 
 type Props = {

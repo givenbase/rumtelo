@@ -26,7 +26,7 @@ import {
 } from '@/app/_lib/time-meta';
 import { formatDayLabel, shiftDay } from '@/app/_lib/week-key';
 
-import { dayKindName, finalizeDay, templateForDay, weekdayShort } from './day-shape';
+import { dayKindName, finalizeDay, templateForDay, weekdayShort } from '../_utils/day-shape';
 
 type Props = {
     templates: ReadonlyArray<TimeTemplate>;

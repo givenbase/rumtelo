@@ -16,7 +16,7 @@ import { appHomeUrl, appPlanSettingsUrl, appSignInUrl, webSignUpPath } from '@/l
 import { isRegistrationOpen } from '@/lib/maintenance';
 
 import { Cta, SectionHeading } from './landing-primitives';
-import { formatCatalogMajor, formatCatalogMajorExact } from './landing-money';
+import { formatCatalogMajor, formatCatalogMajorExact } from './_utils/landing-money';
 
 const PLAN_FEAT_KEYS = ['f1', 'f2', 'f3', 'f4', 'f5', 'f6'] as const;
 

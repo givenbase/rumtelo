@@ -12,7 +12,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { formatDayLabel, shiftDay, todayIso } from '@/app/_lib/week-key';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 
-import { finalizeDay, templateForDay, weekdayShort } from './day-shape';
+import { finalizeDay, templateForDay, weekdayShort } from '../_utils/day-shape';
 
 type Props = {
     householdId: string;

@@ -26,8 +26,47 @@ Prefer patterns Next.js and React docs endorse. Lint is a hint: keep rules that 
 - No-op effect cleanups for `consistent-return`
 - Pulling an entire page client for one interactive widget — extract a small client island
 
+## Form & draft state
+
+| Job | Pattern |
+|-----|---------|
+| **Any submit fields** | **`useForm` + `zodResolver` + `@rumtelo/ui` Form / `FormCreateEditShell`** — `reset(server)` on edit open; `reset()` on success/cancel |
+| Shared submit zod | One schema module (mirror money `form-zod`) — UI and resolver share it |
+| Instant toggle / mutate-on-pick | One `useState` or direct mutation — no fake form |
+| UI-only flags | Single `useState` (`signingOut`, dialog open, cooldown) |
+
+**Banned:** parallel `useState` per form field; Provider/Zustand holding submit field values.
+
+## Data ownership (use wisely)
+
+| Need | Prefer |
+|------|--------|
+| Submit fields | `useForm` only |
+| Server/API lists, search results, cache | TanStack + `apiQuery` (+ feature Provider to share in a route tree) |
+| React-tree scoped wiring (shelf, catalog) | React Context Provider |
+| App-wide non-server client UI | Provider first; **Zustand only** if distant trees need one store and Context is awkward — never form fields, never a second API cache beside TanStack |
+| Cross-route hand-off while form unmounts | Draft Provider / storage → hydrate into `useForm` |
+| In-memory filter over loaded options | Local string + `ChipSearch`, or RHF field if part of a form |
+
+**Banned:** `useMutation` + `setHits` for remote search; re-fetching the same `apiQuery` in every child instead of a layout-level provider; Zustand as default global store.
+
+## Route co-location
+
+Under `app/(routes)`, segment roots may only hold Next entry files (`page`, `layout`, `loading`, `error`, `not-found`, `template`, `default`, `route`) and real segments (`@slot`, dynamic folders). Everything else goes in a private folder:
+
+| Folder | Holds |
+|--------|--------|
+| `_components/` | UI, islands, feature Providers, hooks that return JSX, `*-page.tsx` shells |
+| `_utils/` | Pure TS: schemas, fixtures, catalogs, label mappers, non-UI hooks |
+
+Do **not** invent `_providers`, `_hooks`, `_schemas`, `_helpers`, `_i18n`, or `_locales` at feature routes. Providers live in `_components`; schemas/hooks without JSX live in `_utils`. App-wide provider stack stays `[locale]/providers.tsx` + `app/_components/features/shell`. Shared cross-feature code stays in `app/_components` / `app/_lib` / `app/_utils`.
+
+One tiny pure helper used by a single component may sit beside it in `_components`; prefer `_utils` once a second consumer appears or the file is clearly non-UI.
+
 ## PR self-check
 
 > Would I still write this if the lint rule did not exist?
 
 If no → simplify. If yes and it prevents a rerender, broken nav, or a11y gap → keep.
+
+> Are non-page files under a route segment in `_components` or `_utils` (not flat beside `page.tsx`)?

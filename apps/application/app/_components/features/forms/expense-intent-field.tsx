@@ -15,7 +15,8 @@ import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { partyMark } from '@/app/_lib/vendor-brands';
 
-import { ChipSearch, matchesChipQuery } from './chip-search';
+import { CatalogChipPicker } from './catalog-chip-picker';
+import { matchesChipQuery } from './chip-search';
 import { FormInput } from './form-input';
 
 /** Form selection state for the expense intent picker (not an API DTO). */
@@ -152,11 +153,6 @@ export function ExpenseIntentField({
                 return left.sortOrder - right.sortOrder;
             });
     }, [merchants, value.categoryKey]);
-
-    const visibleVendorChips = useMemo(
-        () => vendorsForCategory.filter(merchant => matchesChipQuery(vendorChipQuery, merchant)),
-        [vendorsForCategory, vendorChipQuery]
-    );
 
     const vendorTypeaheadHits = useMemo(() => {
         if (!customVendor) return [];
@@ -552,67 +548,16 @@ export function ExpenseIntentField({
                         {t('know_vendor')}
                     </p>
                     {vendorsForCategory.length > 0 ? (
-                        <div className="grid gap-2">
-                            <ChipSearch
-                                value={vendorChipQuery}
-                                onChange={setVendorChipQuery}
-                                placeholder={tForm('search_vendor')}
-                                disabled={disabled}
-                            />
-                            {vendorChipQuery.trim() && visibleVendorChips.length === 0 ? (
-                                <p className="text-sm text-fg-muted">{tForm('no_matches')}</p>
-                            ) : null}
-                            <div className="flex flex-wrap gap-1.5">
-                                {visibleVendorChips.map(merchant => {
-                                    const category = categories.find(
-                                        candidate => candidate.key === merchant.categoryTemplateKey
-                                    );
-                                    const mark = partyMark(
-                                        {
-                                            key: merchant.key,
-                                            name: merchant.name,
-                                            logoDomain: merchant.logoDomain,
-                                            website: merchant.website,
-                                        },
-                                        intentChrome({
-                                            icon: category?.icon ?? categoryIcon,
-                                            billName: category?.name ?? value.categoryName,
-                                            merchantJarKey: merchant.jarKey,
-                                        })
-                                    );
-                                    const badgeLabel = merchant.highlight
-                                        ? highlightLabel(merchant.highlight)
-                                        : null;
-                                    return (
-                                        <button
-                                            key={merchant.key}
-                                            type="button"
-                                            disabled={disabled}
-                                            className="inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent"
-                                            onClick={() => selectMerchant(merchant)}>
-                                            <VendorMark
-                                                name={mark.name}
-                                                src={mark.src}
-                                                fallbackIcon={mark.fallbackIcon}
-                                                tone={mark.tone}
-                                                size={20}
-                                            />
-                                            {merchant.name}
-                                            {badgeLabel ? (
-                                                <span className="text-[10px] tracking-wide text-fg-muted uppercase">
-                                                    {badgeLabel}
-                                                </span>
-                                            ) : null}
-                                        </button>
-                                    );
-                                })}
-                                <button
-                                    type="button"
-                                    disabled={disabled}
-                                    className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
-                                    onClick={() => setCustomVendor(true)}>
-                                    {tForm('other')}
-                                </button>
+                        <CatalogChipPicker
+                            query={vendorChipQuery}
+                            onQueryChange={setVendorChipQuery}
+                            items={vendorsForCategory}
+                            placeholder={tForm('search_vendor')}
+                            noMatchesLabel={tForm('no_matches')}
+                            disabled={disabled}
+                            otherLabel={tForm('other')}
+                            onOther={() => setCustomVendor(true)}
+                            trailing={
                                 <button
                                     type="button"
                                     disabled={disabled}
@@ -620,8 +565,50 @@ export function ExpenseIntentField({
                                     onClick={() => setSkippedVendor(true)}>
                                     {tForm('skip')}
                                 </button>
-                            </div>
-                        </div>
+                            }
+                            renderChip={merchant => {
+                                const category = categories.find(
+                                    candidate => candidate.key === merchant.categoryTemplateKey
+                                );
+                                const mark = partyMark(
+                                    {
+                                        key: merchant.key,
+                                        name: merchant.name,
+                                        logoDomain: merchant.logoDomain,
+                                        website: merchant.website,
+                                    },
+                                    intentChrome({
+                                        icon: category?.icon ?? categoryIcon,
+                                        billName: category?.name ?? value.categoryName,
+                                        merchantJarKey: merchant.jarKey,
+                                    })
+                                );
+                                const badgeLabel = merchant.highlight
+                                    ? highlightLabel(merchant.highlight)
+                                    : null;
+                                return (
+                                    <button
+                                        type="button"
+                                        disabled={disabled}
+                                        className="inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent"
+                                        onClick={() => selectMerchant(merchant)}>
+                                        <VendorMark
+                                            name={mark.name}
+                                            src={mark.src}
+                                            fallbackIcon={mark.fallbackIcon}
+                                            tone={mark.tone}
+                                            size={20}
+                                        />
+                                        {merchant.name}
+                                        {badgeLabel ? (
+                                            <span className="text-[10px] tracking-wide text-fg-muted uppercase">
+                                                {badgeLabel}
+                                            </span>
+                                        ) : null}
+                                    </button>
+                                );
+                            }}
+                        />
                     ) : (
                         <div className="flex flex-wrap gap-1.5">
                             <button

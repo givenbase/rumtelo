@@ -13,7 +13,7 @@ import { isRegistrationOpen } from '@/lib/maintenance';
 import { Typography } from '@rumtelo/ui';
 
 import { Cta, Eyebrow } from './landing-primitives';
-import { formatCatalogMajor } from './landing-money';
+import { formatCatalogMajor } from './_utils/landing-money';
 
 function ease(value: number) {
     const clamped = Math.min(1, Math.max(0, value));

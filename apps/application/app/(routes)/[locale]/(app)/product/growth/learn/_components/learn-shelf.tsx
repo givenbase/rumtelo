@@ -11,7 +11,7 @@ import { type LearnProgressStatus, type LearnShelf as LearnShelfDto } from '@rum
 import { useLiveQuery } from '@rumtelo/hooks';
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
 
-import { PIECES, SKILLS, type LearnSkill, type LearnStatus } from './learn-catalog';
+import { PIECES, SKILLS, type LearnSkill, type LearnStatus } from '../_utils/learn-catalog';
 
 type LearnShelfApi = {
     statusById: Record<string, LearnStatus>;

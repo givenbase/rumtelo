@@ -4,18 +4,12 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
 
-import {
-    SpendingStyle,
-    type LearnBookPreset,
-    type LearnBook,
-    type LearnWatchPreset,
-} from '@rumtelo/contracts';
-import { useLocale, useTranslations } from '@rumtelo/i18n';
+import { SpendingStyle } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import {
     Button,
     Card,
-    DatePicker,
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuLabel,
@@ -41,7 +35,9 @@ import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabi
 import { ListToolbar, ListToolbarTab } from '@/components/layout/list-toolbar';
 
 import { useLearnShelf } from './learn-shelf';
+import { useLearnCatalog } from './learn-catalog-provider';
 import { AddLearningDialog } from './add-learning-dialog';
+import { dueLine, FinishBy } from './learn-due';
 
 import {
     ABOUT_ORDER,
@@ -61,12 +57,9 @@ import {
     type LearnPiece,
     type LearnSkill,
     type LearnStatus,
-} from './learn-catalog';
-import { useLearnCatalogLabels } from './learn-labels';
+} from '../_utils/learn-catalog';
+import { useLearnCatalogLabels } from '../_utils/learn-labels';
 
-const EMPTY_BOOKS: LearnBookPreset[] = [];
-const EMPTY_WATCH: LearnWatchPreset[] = [];
-const EMPTY_BOOKS_ADDED: LearnBook[] = [];
 /** A taste of the shelf, not the whole library. One of each format, then a few more. */
 const RECOMMENDED_LIMIT = 6;
 /** Partner tags ride along on store links when set; the links work without them. */
@@ -266,76 +259,6 @@ function PieceSecondary({ piece }: { piece: LearnPiece }) {
 }
 
 const PICK: readonly LearnStatus[] = ['QUEUE', 'NOW', 'DONE'];
-
-function todayIso(): string {
-    return new Date().toISOString().slice(0, 10);
-}
-
-type LearnT = (key: string, values?: Record<string, string | number>) => string;
-
-/** "12 days left", "Due today", "3 days over". Whole days, local calendar. */
-export function dueLine(iso: string, t: LearnT): { text: string; over: boolean } {
-    const due = new Date(`${iso}T00:00:00`);
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    const days = Math.round((due.getTime() - now.getTime()) / 86_400_000);
-    if (days === 0) return { text: t('due_today'), over: false };
-    if (days === 1) return { text: t('due_tomorrow'), over: false };
-    if (days < 0) {
-        const over = -days;
-        return {
-            text: over === 1 ? t('due_over', { days: over }) : t('due_over_many', { days: over }),
-            over: true,
-        };
-    }
-    return { text: t('due_left', { days }), over: false };
-}
-
-/** The one thing we ask about progress: when do you want to be done? */
-function FinishBy({
-    value,
-    onChange,
-    className,
-}: {
-    value: string | undefined;
-    onChange: (iso: string) => void;
-    className?: string;
-}) {
-    const locale = useLocale();
-    const t = useTranslations();
-    const tForm = useTranslations('ui.form');
-    const tLearn = useTranslations('features.growth.learn');
-    const line = value ? dueLine(value, tLearn) : null;
-    return (
-        <div
-            className={cn(
-                'flex flex-wrap items-center gap-2 font-mono text-[10px] tracking-wide text-fg-muted uppercase',
-                className
-            )}>
-            <span>{tLearn('finish_by')}</span>
-            <DatePicker
-                value={value ?? null}
-                min={todayIso()}
-                onChange={onChange}
-                locale={locale}
-                placeholder={t('ui.form.pick_a_date')}
-                labels={{
-                    previousMonth: tForm('previous_month'),
-                    nextMonth: tForm('next_month'),
-                    month: tForm('month'),
-                    year: tForm('year'),
-                    today: tForm('today'),
-                    pickADay: tForm('pick_a_day'),
-                }}
-                closeLabel={t('ui.button.actions.close')}
-                className="w-40 font-sans text-xs tracking-normal normal-case"
-            />
-            {line ? (
-                <span className={line.over ? 'text-danger' : 'text-accent'}>{line.text}</span>
-            ) : null}
-        </div>
-    );
-}
 
 /**
  * Status and the finish date stay read-only until Edit is pressed.
@@ -626,42 +549,20 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
         setOrder,
     } = useLearnShelf();
 
-    const booksQuery = useLiveQuery(
-        apiQuery.growth.catalogs.bookPresets.list.queryOptions({
-            input: { householdId: householdId! },
-        }),
-        EMPTY_BOOKS,
-        live
-    );
-    const addedBooksQuery = useLiveQuery(
-        apiQuery.growth.learn.listBooks.queryOptions({
-            input: { householdId: householdId! },
-        }),
-        EMPTY_BOOKS_ADDED,
-        live
-    );
-    const watchQuery = useLiveQuery(
-        apiQuery.growth.catalogs.watchPresets.list.queryOptions({
-            input: { householdId: householdId! },
-        }),
-        EMPTY_WATCH,
-        live
-    );
+    const { books, watches, addedBooks: addedBookRows } = useLearnCatalog();
     const settingsQuery = useLiveQuery(apiQuery.account.settings.queryOptions(), null, live);
     const spendingStyle = settingsQuery.data?.spendingStyle ?? SpendingStyle.UNKNOWN;
 
     const suggestedIds = new Set<string>();
-    const bookPieces = (booksQuery.data ?? EMPTY_BOOKS).flatMap(book => {
+    const bookPieces = books.flatMap(book => {
         if (!bookVisible(book.minPlan, plan)) return [];
         if (bookSuggested(book.topic, book.spendingStyles, spendingStyle)) {
             suggestedIds.add(book.key);
         }
         return [bookToPiece(book, store, STORE_TAGS)];
     });
-    const addedBooks = (addedBooksQuery.data ?? EMPTY_BOOKS_ADDED).map(book =>
-        addedBookToPiece(book, store, STORE_TAGS)
-    );
-    const watchPieces = (watchQuery.data ?? EMPTY_WATCH).flatMap(watch => {
+    const addedBooks = addedBookRows.map(book => addedBookToPiece(book, store, STORE_TAGS));
+    const watchPieces = watches.flatMap(watch => {
         if (!bookVisible(watch.minPlan, plan)) return [];
         if (bookSuggested(watch.topic, watch.spendingStyles, spendingStyle)) {
             suggestedIds.add(watch.key);
@@ -1063,7 +964,7 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
                     onOpenChange={setAddOpen}
                     householdId={householdId}
                     initialQuery={addSeed}
-                    books={booksQuery.data ?? EMPTY_BOOKS}
+                    books={books}
                     onPick={(pieceKey, skill) => saveStatus(pieceKey, 'QUEUE', skill)}
                 />
             ) : null}

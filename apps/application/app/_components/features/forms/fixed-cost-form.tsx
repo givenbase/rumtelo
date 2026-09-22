@@ -45,7 +45,7 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 
 import { createFixedCostFormSchema, type FixedCostFormSchemaValues } from './form-zod';
-import { ChipSearch, matchesChipQuery } from './chip-search';
+import { CatalogChipPicker } from './catalog-chip-picker';
 import { ConfirmActionButton } from './confirm-action-button';
 import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
 import { FormInput } from './form-input';
@@ -329,11 +329,6 @@ export function FixedCostForm({
             )
             .slice(0, MAX_VENDOR_CHIPS);
     }, [merchants, activeCategoryTemplateKey, selectedBillPresetKey, fixedCostPresets]);
-
-    const visibleVendors = useMemo(
-        () => vendorsForCategory.filter(merchant => matchesChipQuery(vendorQuery, merchant)),
-        [vendorsForCategory, vendorQuery]
-    );
 
     const givingOrgNames = useMemo(() => givingOrgsQuery.data ?? [], [givingOrgsQuery.data]);
 
@@ -950,78 +945,65 @@ export function FixedCostForm({
                         ) : (
                             <>
                                 {!customPayee && vendorsForCategory.length > 0 ? (
-                                    <div className="grid gap-2">
-                                        <ChipSearch
-                                            value={vendorQuery}
-                                            onChange={setVendorQuery}
-                                            placeholder={tForm('search_vendor')}
-                                            disabled={busy}
-                                        />
-                                        {vendorQuery.trim() && visibleVendors.length === 0 ? (
-                                            <p className="text-sm text-fg-muted">
-                                                {tForm('no_matches')}
-                                            </p>
-                                        ) : null}
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {visibleVendors.map(merchant => {
-                                                const selected = nameMatches(
-                                                    counterparty,
-                                                    merchant.name
-                                                );
-                                                const mark = partyMark(
-                                                    {
-                                                        key: merchant.key,
-                                                        name: merchant.name,
-                                                        logoDomain: merchant.logoDomain,
-                                                        website: merchant.website,
-                                                    },
-                                                    vendorChrome
-                                                );
-                                                return (
-                                                    <button
-                                                        key={merchant.key}
-                                                        type="button"
-                                                        disabled={busy}
-                                                        className={
-                                                            selected
-                                                                ? 'inline-flex items-center gap-2 rounded-xl border border-accent bg-accent/15 px-2.5 py-1.5 text-sm text-accent'
-                                                                : 'inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent'
-                                                        }
-                                                        onClick={() => {
-                                                            form.setValue(
-                                                                'counterparty',
-                                                                merchant.name,
-                                                                {
-                                                                    shouldValidate: true,
-                                                                    shouldDirty: true,
-                                                                }
-                                                            );
-                                                        }}>
-                                                        <VendorMark
-                                                            name={mark.name}
-                                                            src={mark.src}
-                                                            fallbackIcon={mark.fallbackIcon}
-                                                            tone={mark.tone}
-                                                            size={20}
-                                                        />
-                                                        {merchant.name}
-                                                    </button>
-                                                );
-                                            })}
-                                            <button
-                                                type="button"
-                                                disabled={busy}
-                                                className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
-                                                onClick={() => {
-                                                    setCustomPayee(true);
-                                                    form.setValue('counterparty', '', {
-                                                        shouldValidate: false,
-                                                    });
-                                                }}>
-                                                {tForm('other')}
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <CatalogChipPicker
+                                        query={vendorQuery}
+                                        onQueryChange={setVendorQuery}
+                                        items={vendorsForCategory}
+                                        placeholder={tForm('search_vendor')}
+                                        noMatchesLabel={tForm('no_matches')}
+                                        disabled={busy}
+                                        otherLabel={tForm('other')}
+                                        onOther={() => {
+                                            setCustomPayee(true);
+                                            form.setValue('counterparty', '', {
+                                                shouldValidate: false,
+                                            });
+                                        }}
+                                        renderChip={merchant => {
+                                            const selected = nameMatches(
+                                                counterparty,
+                                                merchant.name
+                                            );
+                                            const mark = partyMark(
+                                                {
+                                                    key: merchant.key,
+                                                    name: merchant.name,
+                                                    logoDomain: merchant.logoDomain,
+                                                    website: merchant.website,
+                                                },
+                                                vendorChrome
+                                            );
+                                            return (
+                                                <button
+                                                    type="button"
+                                                    disabled={busy}
+                                                    className={
+                                                        selected
+                                                            ? 'inline-flex items-center gap-2 rounded-xl border border-accent bg-accent/15 px-2.5 py-1.5 text-sm text-accent'
+                                                            : 'inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent'
+                                                    }
+                                                    onClick={() => {
+                                                        form.setValue(
+                                                            'counterparty',
+                                                            merchant.name,
+                                                            {
+                                                                shouldValidate: true,
+                                                                shouldDirty: true,
+                                                            }
+                                                        );
+                                                    }}>
+                                                    <VendorMark
+                                                        name={mark.name}
+                                                        src={mark.src}
+                                                        fallbackIcon={mark.fallbackIcon}
+                                                        tone={mark.tone}
+                                                        size={20}
+                                                    />
+                                                    {merchant.name}
+                                                </button>
+                                            );
+                                        }}
+                                    />
                                 ) : null}
                                 {showPayeeInput ? (
                                     <FormControl>
