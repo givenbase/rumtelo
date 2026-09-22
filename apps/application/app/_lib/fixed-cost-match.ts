@@ -2,22 +2,19 @@ import type { FixedCost, FixedCostSettlement, Transaction } from '@rumtelo/contr
 import { FixedCostSettlementStatus, FlowDirection } from '@rumtelo/contracts';
 import {
     fixedCostLifecycle,
+    fixedCostPeriodStatus,
     isFixedCostCounting,
     monthlyAmount,
     type FixedCostLifecycle,
+    type FixedCostPeriodStatus,
 } from '@rumtelo/utils';
 
-export type FixedCostStatus = 'taken' | 'due' | 'upcoming' | 'skipped';
+export type FixedCostStatus = FixedCostPeriodStatus;
 export type { FixedCostLifecycle };
 export { fixedCostLifecycle, isFixedCostCounting };
 
 function normalize(value: string | null | undefined) {
     return value?.trim().toLowerCase() ?? '';
-}
-
-function periodParts(periodKey: string): { year: number; month: number } {
-    const [yearPart, monthPart] = periodKey.split('-');
-    return { year: Number(yearPart), month: Number(monthPart) };
 }
 
 /** Heuristic: period row likely settles this recurring bill (suggestion only). */
@@ -53,23 +50,7 @@ export function fixedCostStatus(
     period: { year: number; month: number } | string,
     today: Date = new Date()
 ): FixedCostStatus {
-    if (!isFixedCostCounting(item)) return 'upcoming';
-    if (settlement?.status === FixedCostSettlementStatus.PAID) return 'taken';
-    if (settlement?.status === FixedCostSettlementStatus.SKIPPED) return 'skipped';
-
-    const dueDay = item.dueDay;
-    if (dueDay === null || dueDay === undefined) return 'upcoming';
-
-    const parts = typeof period === 'string' ? periodParts(period) : period;
-    const periodIsCurrent =
-        today.getFullYear() === parts.year && today.getMonth() + 1 === parts.month;
-    const periodIsPast =
-        parts.year < today.getFullYear() ||
-        (parts.year === today.getFullYear() && parts.month < today.getMonth() + 1);
-
-    if (periodIsPast) return 'due';
-    if (!periodIsCurrent) return 'upcoming';
-    return today.getDate() >= dueDay ? 'due' : 'upcoming';
+    return fixedCostPeriodStatus(item, settlement, period, today);
 }
 
 export function lifecycleLabel(

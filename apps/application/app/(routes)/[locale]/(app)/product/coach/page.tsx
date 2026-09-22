@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+
 import { getTranslations } from '@rumtelo/i18n';
 
 import { CoachPageClient } from './_components/coach-page';
@@ -8,5 +10,9 @@ export async function generateMetadata() {
 }
 
 export default function CoachPage() {
-    return <CoachPageClient />;
+    return (
+        <Suspense fallback={null}>
+            <CoachPageClient />
+        </Suspense>
+    );
 }

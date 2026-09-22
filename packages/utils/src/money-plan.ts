@@ -130,6 +130,43 @@ export function isFixedCostCounting(item: { isActive?: boolean; endsOn?: string 
     return item.isActive !== false;
 }
 
+export type FixedCostPeriodStatus = 'taken' | 'due' | 'upcoming' | 'skipped';
+
+/**
+ * Period status from durable settlements. Heuristic matches are never Taken.
+ * Shared by the fixed-costs UI and the Coach session queue.
+ */
+export function fixedCostPeriodStatus(
+    item: { isActive?: boolean; dueDay?: number | null },
+    settlement: { status: string } | null | undefined,
+    period: { year: number; month: number } | string,
+    today: Date = new Date()
+): FixedCostPeriodStatus {
+    if (!isFixedCostCounting(item)) return 'upcoming';
+    if (settlement?.status === 'PAID') return 'taken';
+    if (settlement?.status === 'SKIPPED') return 'skipped';
+
+    const dueDay = item.dueDay;
+    if (dueDay === null || dueDay === undefined) return 'upcoming';
+
+    const parts =
+        typeof period === 'string'
+            ? (() => {
+                  const [yearPart, monthPart] = period.split('-');
+                  return { year: Number(yearPart), month: Number(monthPart) };
+              })()
+            : period;
+    const periodIsCurrent =
+        today.getFullYear() === parts.year && today.getMonth() + 1 === parts.month;
+    const periodIsPast =
+        parts.year < today.getFullYear() ||
+        (parts.year === today.getFullYear() && parts.month < today.getMonth() + 1);
+
+    if (periodIsPast) return 'due';
+    if (!periodIsCurrent) return 'upcoming';
+    return today.getDate() >= dueDay ? 'due' : 'upcoming';
+}
+
 /**
  * Sum monthly-normalised OUT fixed costs.
  * Pass already-filtered OUT items, or include direction/isActive for filtering.
