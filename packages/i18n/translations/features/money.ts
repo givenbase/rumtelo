@@ -609,7 +609,6 @@ const money = {
     },
     fixed_form: {
         save: 'Save fixed cost',
-        filter_all: 'All',
         name_placeholder: 'e.g. Netflix, rent',
         name_free_placeholder: 'Type a custom bill name…',
         name_edit_placeholder: 'e.g. rent',

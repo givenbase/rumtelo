@@ -175,6 +175,11 @@ const settings = {
             invite_email: 'Invite (email)',
             invite_placeholder: 'partner@example.com',
         },
+        household_profile: {
+            eyebrow: 'Household profile',
+            blurb: 'Pick what fits — bill suggestions across Money use this instead of asking every time.',
+            none_selected: 'Nothing picked yet — every bill type shows.',
+        },
         display: {
             eyebrow: 'Display',
             blurb: 'Theme and the day the budget month rolls over.',
@@ -413,6 +418,8 @@ const settings = {
         money_style_failed: 'Money style save failed',
         income_stability_saved: 'Income stability saved',
         income_stability_failed: 'Income stability save failed',
+        household_profile_saved: 'Household profile saved',
+        household_profile_failed: 'Household profile save failed',
         sign_out_failed: 'Sign out failed',
         split_saved: 'Split saved',
         split_failed: 'Split save failed',

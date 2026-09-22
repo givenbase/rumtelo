@@ -253,7 +253,6 @@
                 "pick_mode": "Hoe wil je kiezen?",
                 "clear_selection": "Selectie wissen",
                 "show_suggestions": "Suggesties weergeven",
-                "filter_bill_types": "Filter op soorten rekeningen",
                 "asset_type": "Soort activa",
                 "cause": "Oorzaak",
                 "independent_signals": "Onafhankelijke signalen",
@@ -1549,6 +1548,9 @@
                 "flow_hint": "Laat het leeg als het daar gewoon blijft staan.",
                 "name_placeholder": "Begin met typen, of kies er een uit",
                 "name_free_placeholder": "Typ de naam",
+                "which_car": "Welke auto?",
+                "search_brand": "Zoek op merk",
+                "more": "Meer",
                 "locked_pension": "Wordt geblokkeerd totdat je stopt met werken. Het telt mee in het totaal, maar niet als maandelijks inkomen.",
                 "locked_default": "Het telt mee in het totaal, maar niet als maandelijks inkomen."
             }
@@ -2140,7 +2142,6 @@
             },
             "fixed_form": {
                 "save": "Vaste kosten besparen",
-                "filter_all": "Alles",
                 "name_placeholder": "bijv. Netflix, huren",
                 "name_free_placeholder": "Typ een eigen naam voor de factuur in…",
                 "name_edit_placeholder": "bijv. huur",
@@ -4252,6 +4253,11 @@
                     "invite_email": "Uitnodigen (e-mail)",
                     "invite_placeholder": "partner@example.com"
                 },
+                "household_profile": {
+                    "eyebrow": "Huishoudprofiel",
+                    "blurb": "Kies wat het beste bij je past — gebruik de betalingsvoorstellen van Money in plaats van elke keer opnieuw te vragen.",
+                    "none_selected": "Er is nog niets geselecteerd — alle soorten rekeningen worden weergegeven."
+                },
                 "display": {
                     "eyebrow": "Weergave",
                     "blurb": "Thema en de dag waarop de begrotingsmaand afloopt.",
@@ -4480,6 +4486,8 @@
                 "money_style_failed": "Het opslaan van de betalingswijze is mislukt",
                 "income_stability_saved": "Inkomensstabiliteit behouden",
                 "income_stability_failed": "Het opslaan van de inkomensstabiliteit is mislukt",
+                "household_profile_saved": "Huishoudprofiel opgeslagen",
+                "household_profile_failed": "Het opslaan van het huishoudprofiel is mislukt",
                 "sign_out_failed": "Uitloggen is mislukt",
                 "split_saved": "Gesplitst en opgeslagen",
                 "split_failed": "Het opslaan in delen is mislukt",

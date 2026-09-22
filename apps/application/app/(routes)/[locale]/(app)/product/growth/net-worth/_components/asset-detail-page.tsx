@@ -3,12 +3,13 @@
 import { apiQuery } from '@/app/_lib/api-hooks';
 import Link from 'next/link';
 
-import type { AssetKind } from '@rumtelo/contracts';
+import type { AssetKind, MerchantPreset } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
-import { Icon, Button, Card, Typography } from '@rumtelo/ui';
+import { Icon, Button, Card, Typography, VendorMark } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
+import { carMarkForName } from '@/app/_lib/car-brands';
 import { updateHref } from '@/app/_lib/create-routes';
 import { isLiveData } from '@/app/_lib/preview';
 import { productPath } from '@/app/_lib/routes';
@@ -16,6 +17,7 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 const EMPTY_KINDS: AssetKind[] = [];
+const EMPTY_MERCHANTS: MerchantPreset[] = [];
 
 function statusLine(
     kindKey: string,
@@ -53,6 +55,13 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
         EMPTY_KINDS,
         live
     );
+    const merchantsQuery = useLiveQuery(
+        apiQuery.money.catalogs.merchantPresets.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        EMPTY_MERCHANTS,
+        live
+    );
 
     const asset = assetQuery.data;
     const boardHref = productPath('growth/net-worth');
@@ -78,6 +87,10 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
     }
 
     const kind = (kindsQuery.data ?? EMPTY_KINDS).find(row => row.key === asset.kindKey);
+    const brandMark =
+        asset.kindKey === 'VEHICLE'
+            ? carMarkForName(asset.name, merchantsQuery.data ?? EMPTY_MERCHANTS)
+            : null;
     const locked = kind ? !kind.canPay : false;
     const pays = !locked && asset.flow > 0;
     const income = locked
@@ -99,7 +112,17 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                         <span
                             className="grid size-10 shrink-0 place-items-center rounded-xl border border-line bg-sunken text-xl"
                             aria-hidden>
-                            {kind?.icon ?? '✦'}
+                            {brandMark ? (
+                                <VendorMark
+                                    name={brandMark.name}
+                                    src={brandMark.src}
+                                    fallbackIcon={brandMark.fallbackIcon ?? kind?.icon ?? '✦'}
+                                    tone={brandMark.tone}
+                                    size={28}
+                                />
+                            ) : (
+                                (kind?.icon ?? '✦')
+                            )}
                         </span>
                         <div>
                             <p className="font-mono text-[10px] tracking-widest text-fg-muted uppercase">

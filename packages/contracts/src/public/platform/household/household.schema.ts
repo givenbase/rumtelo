@@ -100,6 +100,12 @@ export const HouseholdSettings = z.object({
     weekCheck: HouseholdWeekCheckSettings,
     features: HouseholdFeatureSettings,
     answers: HouseholdAnswers,
+    /**
+     * Lifestyle tags (student, renter, homeowner, …) — `Audience.key` catalog
+     * rows. Drives bill-picker recommendations across the board; empty = no
+     * preference, everything shows.
+     */
+    audienceKeys: z.array(z.string()),
     /** When household board setup completed; null = incomplete. */
     onboardedAt: z.iso.datetime().nullable(),
 });
@@ -115,6 +121,8 @@ export const HouseholdSettingsPatch = z.object({
     weekCheck: HouseholdWeekCheckSettings.partial().optional(),
     features: HouseholdFeatureSettings.partial().optional(),
     answers: HouseholdAnswers.optional(),
+    /** Whole-array replace — the picker always sends the full selection. */
+    audienceKeys: z.array(z.string()).optional(),
 });
 
 /** Onboarding writes income + split + prefs in one transaction. */

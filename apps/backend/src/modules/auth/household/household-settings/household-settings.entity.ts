@@ -80,6 +80,14 @@ export class HouseholdSettings extends HouseholdEntity {
     answers: HouseholdAnswers = {};
 
     /**
+     * Lifestyle tags (student, renter, homeowner, …) — `Audience.key` catalog
+     * rows, set once in Settings. Drives bill-picker recommendations across
+     * the board instead of a per-form filter.
+     */
+    @Property({ type: 'json' })
+    audienceKeys: string[] = [];
+
+    /**
      * When board setup finished (`household.onboard`). Null = incomplete household.
      */
     @Property({ type: 'timestamptz', nullable: true })

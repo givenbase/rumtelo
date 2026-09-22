@@ -30,7 +30,6 @@ import {
     jarCapabilitiesFor,
     matchesAudience,
 } from '@rumtelo/contracts';
-import { cn } from '@rumtelo/utils';
 
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
@@ -117,8 +116,6 @@ export function FixedCostForm({
     );
     /** Bill-type preset key (VPN, INTERNET, …) — narrows Paid-to chips within Subscriptions. */
     const [selectedBillPresetKey, setSelectedBillPresetKey] = useState<string | null>(null);
-    /** Narrow bill-type suggestions by lifestyle audience from the catalog. */
-    const [audienceFilter, setAudienceFilter] = useState<string | null>(null);
     const [customPayee, setCustomPayee] = useState(false);
     const [vendorQuery, setVendorQuery] = useState('');
     /** Give only — null until the household picks a path (or prefill resolves one). */
@@ -191,6 +188,11 @@ export function FixedCostForm({
         [],
         live
     );
+    const householdSettingsQuery = useLiveQuery(
+        apiQuery.household.settings.queryOptions({ input: { householdId: householdId! } }),
+        null,
+        live
+    );
     const merchantsQuery = useLiveQuery(
         apiQuery.money.catalogs.merchantPresets.list.queryOptions({
             input: { householdId: householdId! },
@@ -234,14 +236,14 @@ export function FixedCostForm({
     const fixedCostPresets = useMemo(() => presetsQuery.data ?? [], [presetsQuery.data]);
     const audiences = useMemo(() => audiencesQuery.data ?? [], [audiencesQuery.data]);
 
-    /** Chip audiences from the catalog (baseline rows stay out of the chip row). */
-    const audienceChips = useMemo(
-        () => audiences.filter(audience => !audience.isBaseline),
-        [audiences]
-    );
     const baselineAudienceKeys = useMemo(
         () => audiences.filter(audience => audience.isBaseline).map(audience => audience.key),
         [audiences]
+    );
+    /** Household's lifestyle tags, set once in Settings — drives bill recommendations here. */
+    const householdAudienceKeys = useMemo(
+        () => householdSettingsQuery.data?.audienceKeys ?? [],
+        [householdSettingsQuery.data]
     );
 
     /** Bill-type presets + brand catalog — type Netflix, get Media + Play auto-filled. */
@@ -253,7 +255,7 @@ export function FixedCostForm({
         });
         const fromPresets: NamePresetOption[] = fixedCostPresets
             .filter(preset =>
-                matchesAudience(preset.audienceKeys, audienceFilter, baselineAudienceKeys)
+                matchesAudience(preset.audienceKeys, householdAudienceKeys, baselineAudienceKeys)
             )
             .map(preset => {
                 const category = categoryByKey.get(preset.categoryTemplateKey);
@@ -266,7 +268,7 @@ export function FixedCostForm({
             });
         // Brands first so “netflix” hits Netflix before “Streaming video”.
         return [...fromMerchants, ...fromPresets];
-    }, [merchants, fixedCostPresets, categoryByKey, audienceFilter, baselineAudienceKeys]);
+    }, [merchants, fixedCostPresets, categoryByKey, householdAudienceKeys, baselineAudienceKeys]);
 
     const fixedCostFormSchema = useMemo(() => createFixedCostFormSchema(tForm), [tForm]);
 
@@ -628,61 +630,6 @@ export function FixedCostForm({
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>{tForm('fields.name')}</FormLabel>
-                        {mode === 'create' ? (
-                            <div
-                                className="flex flex-wrap gap-1.5"
-                                role="group"
-                                aria-label={tForm('aria.filter_bill_types')}>
-                                <button
-                                    type="button"
-                                    aria-pressed={audienceFilter === null}
-                                    onClick={() => setAudienceFilter(null)}
-                                    className={cn(
-                                        'rounded-full border px-2.5 py-1 font-mono text-[11px] transition-colors',
-                                        audienceFilter === null
-                                            ? 'border-accent/40 bg-accent-soft text-accent'
-                                            : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
-                                    )}>
-                                    {tFixed('filter_all')}
-                                </button>
-                                {audienceChips.map(audience => {
-                                    const on = audienceFilter === audience.key;
-                                    return (
-                                        <button
-                                            key={audience.key}
-                                            type="button"
-                                            title={audience.description ?? undefined}
-                                            aria-pressed={on}
-                                            onClick={() =>
-                                                setAudienceFilter(previous =>
-                                                    previous === audience.key ? null : audience.key
-                                                )
-                                            }
-                                            className={cn(
-                                                'inline-flex items-center gap-1 rounded-full border px-2.5 py-1 font-mono text-[11px] transition-colors',
-                                                !on &&
-                                                    'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
-                                            )}
-                                            style={
-                                                on
-                                                    ? {
-                                                          borderColor:
-                                                              audience.accentColor ?? undefined,
-                                                          backgroundColor:
-                                                              audience.softColor ?? undefined,
-                                                          color: audience.accentColor ?? undefined,
-                                                      }
-                                                    : undefined
-                                            }>
-                                            {audience.icon ? (
-                                                <span aria-hidden>{audience.icon}</span>
-                                            ) : null}
-                                            {audience.name}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        ) : null}
                         <FormControl>
                             {mode === 'create' ? (
                                 <PresetNameField

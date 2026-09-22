@@ -253,7 +253,6 @@
                 "pick_mode": "Comment souhaitez-vous choisir ?",
                 "clear_selection": "Effacer la sélection",
                 "show_suggestions": "Afficher les suggestions",
-                "filter_bill_types": "Filtrer les types de factures",
                 "asset_type": "Type d'actif",
                 "cause": "Cause",
                 "independent_signals": "Signaux indépendants",
@@ -1549,6 +1548,9 @@
                 "flow_hint": "Laissez ce champ vide s'il ne sert qu'à ça.",
                 "name_placeholder": "Commencez à taper ou choisissez-en un",
                 "name_free_placeholder": "Saisissez le nom",
+                "which_car": "Quelle voiture ?",
+                "search_brand": "Rechercher une marque",
+                "more": "Plus",
                 "locked_pension": "Bloqué jusqu'à ce que vous cessiez de travailler. Ce montant est pris en compte dans le total, mais pas dans le revenu mensuel.",
                 "locked_default": "Ce montant est pris en compte dans le total, mais pas dans le revenu mensuel."
             }
@@ -2140,7 +2142,6 @@
             },
             "fixed_form": {
                 "save": "Réduire les coûts fixes",
-                "filter_all": "Tout",
                 "name_placeholder": "par exemple : Netflix, location",
                 "name_free_placeholder": "Saisissez un nom personnalisé pour la facture…",
                 "name_edit_placeholder": "par exemple : loyer",
@@ -4252,6 +4253,11 @@
                     "invite_email": "Inviter (par e-mail)",
                     "invite_placeholder": "partner@example.com"
                 },
+                "household_profile": {
+                    "eyebrow": "Profil du foyer",
+                    "blurb": "Choisissez ce qui vous convient le mieux : utilisez les suggestions de factures proposées par Money plutôt que de poser la question à chaque fois.",
+                    "none_selected": "Aucun choix n'a encore été effectué — tous les types de factures s'affichent."
+                },
                 "display": {
                     "eyebrow": "Affichage",
                     "blurb": "Thème et jour du changement de mois budgétaire.",
@@ -4480,6 +4486,8 @@
                 "money_style_failed": "Échec de l'enregistrement du style de paiement",
                 "income_stability_saved": "Stabilité des revenus préservée",
                 "income_stability_failed": "Échec de la sauvegarde de la stabilité des revenus",
+                "household_profile_saved": "Profil du foyer enregistré",
+                "household_profile_failed": "Échec de l'enregistrement du profil du foyer",
                 "sign_out_failed": "Échec de la déconnexion",
                 "split_saved": "Fractionnement enregistré",
                 "split_failed": "Échec de la sauvegarde fractionnée",

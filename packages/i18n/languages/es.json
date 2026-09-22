@@ -253,7 +253,6 @@
                 "pick_mode": "¿Cómo quieres elegir?",
                 "clear_selection": "Borrar selección",
                 "show_suggestions": "Mostrar sugerencias",
-                "filter_bill_types": "Filtrar tipos de facturas",
                 "asset_type": "Tipo de activo",
                 "cause": "Causa",
                 "independent_signals": "Señales independientes",
@@ -1549,6 +1548,9 @@
                 "flow_hint": "Déjalo en blanco si solo está ahí sin más.",
                 "name_placeholder": "Empieza a escribir o elige una opción",
                 "name_free_placeholder": "Escribe el nombre",
+                "which_car": "¿Qué coche?",
+                "search_brand": "Buscar marca",
+                "more": "Más",
                 "locked_pension": "Queda bloqueado hasta que dejes de trabajar. Se contabiliza en el total, pero no como ingresos mensuales.",
                 "locked_default": "Se tiene en cuenta en el total, pero no como ingresos mensuales."
             }
@@ -2140,7 +2142,6 @@
             },
             "fixed_form": {
                 "save": "Ahorrar en costes fijos",
-                "filter_all": "Todos",
                 "name_placeholder": "p. ej., Netflix, alquiler",
                 "name_free_placeholder": "Escribe un nombre personalizado para la factura…",
                 "name_edit_placeholder": "p. ej., alquiler",
@@ -4252,6 +4253,11 @@
                     "invite_email": "Invitar (correo electrónico)",
                     "invite_placeholder": "partner@example.com"
                 },
+                "household_profile": {
+                    "eyebrow": "Perfil del hogar",
+                    "blurb": "Elige lo que más te convenga: las sugerencias de facturación de Money te permiten utilizar esta opción en lugar de tener que preguntar cada vez.",
+                    "none_selected": "Aún no se ha seleccionado nada: se muestran todos los tipos de factura."
+                },
                 "display": {
                     "eyebrow": "Pantalla",
                     "blurb": "El tema y el día en que cambia el mes presupuestario.",
@@ -4480,6 +4486,8 @@
                 "money_style_failed": "Error al guardar el estilo de gestión del dinero",
                 "income_stability_saved": "Estabilidad de los ingresos garantizada",
                 "income_stability_failed": "Error al guardar la estabilidad de ingresos",
+                "household_profile_saved": "Perfil del hogar guardado",
+                "household_profile_failed": "No se ha podido guardar el perfil del hogar",
                 "sign_out_failed": "No se ha podido cerrar la sesión",
                 "split_saved": "División guardada",
                 "split_failed": "Error al dividir el archivo de guardado",

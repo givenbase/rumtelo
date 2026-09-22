@@ -7,16 +7,16 @@
 import { GivingCause, GivingEvaluator, GivingSignalTier, JarKey } from '../enums';
 
 /**
- * Picker filter: selected audience matches, or any baseline key (COMMON) is present.
- * Null filter = show everything.
+ * Picker filter: matches if any household audience key is present, or any
+ * baseline key (COMMON) is present. Empty filter = show everything.
  */
 export function matchesAudience(
     keys: readonly string[],
-    filter: string | null,
+    filters: readonly string[],
     baselineKeys: readonly string[] = ['COMMON']
 ): boolean {
-    if (!filter) return true;
-    if (keys.includes(filter)) return true;
+    if (filters.length === 0) return true;
+    if (filters.some(filter => keys.includes(filter))) return true;
     return baselineKeys.some(key => keys.includes(key));
 }
 

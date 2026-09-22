@@ -12,16 +12,23 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
+    VendorMark,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { AssetKind, AssetPreset } from '@rumtelo/contracts';
+import type { AssetKind, AssetPreset, MerchantPreset } from '@rumtelo/contracts';
 
 import { api } from '@/app/_lib/api';
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
+import {
+    CAR_BRAND_PREVIEW,
+    carBrandMark,
+    filterCarBrands,
+    findCarBrand,
+} from '@/app/_lib/car-brands';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { useTranslations } from '@rumtelo/i18n';
@@ -32,6 +39,8 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 
+import { CatalogChipPicker } from './catalog-chip-picker';
+import { matchesChipQuery } from './chip-search';
 import { createAssetFormSchema, type AssetFormSchemaValues } from './form-zod';
 import { FormInput } from './form-input';
 import { type NamePresetOption, PresetNameField } from './preset-name-field';
@@ -39,6 +48,7 @@ import { ConfirmActionButton } from './confirm-action-button';
 
 const EMPTY_KINDS: AssetKind[] = [];
 const EMPTY_PRESETS: AssetPreset[] = [];
+const EMPTY_MERCHANTS: MerchantPreset[] = [];
 
 type AssetFormValues = AssetFormSchemaValues;
 
@@ -81,6 +91,8 @@ export function AssetForm({
     const live = isLiveData(householdId);
     const queryClient = useQueryClient();
     const [presetKey, setPresetKey] = useState(defaultValues?.presetKey ?? null);
+    const [showAllCarBrands, setShowAllCarBrands] = useState(false);
+    const [carBrandQuery, setCarBrandQuery] = useState('');
 
     const kindsQuery = useLiveQuery(
         apiQuery.growth.catalogs.assetKinds.list.queryOptions({
@@ -96,8 +108,19 @@ export function AssetForm({
         EMPTY_PRESETS,
         live
     );
+    const merchantsQuery = useLiveQuery(
+        apiQuery.money.catalogs.merchantPresets.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        EMPTY_MERCHANTS,
+        live
+    );
     const kinds = kindsQuery.data ?? EMPTY_KINDS;
     const presets = presetsQuery.data ?? EMPTY_PRESETS;
+    const carBrands = useMemo(
+        () => filterCarBrands(merchantsQuery.data ?? EMPTY_MERCHANTS),
+        [merchantsQuery.data]
+    );
 
     const assetFormSchema = useMemo(() => createAssetFormSchema(tForm), [tForm]);
 
@@ -112,10 +135,27 @@ export function AssetForm({
     });
 
     const kindKey = useWatch({ control: form.control, name: 'kind' });
+    const name = useWatch({ control: form.control, name: 'name' });
     const picked = kinds.find(kind => kind.key === kindKey) ?? kinds[0];
+    const selectedCarBrand = useMemo(
+        () => (kindKey === 'VEHICLE' ? findCarBrand(name, carBrands) : null),
+        [kindKey, name, carBrands]
+    );
 
     const locked = kinds.find(kind => kind.key === lockedKind);
     const visibleKinds = locked ? [locked] : kinds;
+
+    const carBrandSearch = carBrandQuery.trim().length > 0;
+    const visibleCarBrands = useMemo(() => {
+        const matched = carBrandSearch
+            ? carBrands.filter(brand => matchesChipQuery(carBrandQuery, brand))
+            : carBrands;
+        const selectedPastPreview = matched
+            .slice(CAR_BRAND_PREVIEW)
+            .some(brand => brand.name.toLowerCase() === name.trim().toLowerCase());
+        if (carBrandSearch || showAllCarBrands || selectedPastPreview) return matched;
+        return matched.slice(0, CAR_BRAND_PREVIEW);
+    }, [carBrands, carBrandQuery, carBrandSearch, name, showAllCarBrands]);
 
     const suggestions: NamePresetOption[] = presets
         .filter(preset => !locked || preset.kindKey === locked.key)
@@ -148,6 +188,13 @@ export function AssetForm({
             form.setValue('name', '');
             setPresetKey(null);
         }
+        const brand = findCarBrand(current, carBrands);
+        if (brand && next !== 'VEHICLE') {
+            form.setValue('name', '');
+            setPresetKey(null);
+        }
+        setShowAllCarBrands(false);
+        setCarBrandQuery('');
         const nextKind = kinds.find(row => row.key === next);
         if (nextKind && !nextKind.canPay) form.setValue('flow', '');
     }
@@ -158,6 +205,12 @@ export function AssetForm({
         form.setValue('kind', preset.kindKey, { shouldValidate: true });
         setPresetKey(preset.key);
         if (!preset.canPay) form.setValue('flow', '');
+    }
+
+    function selectCarBrand(brand: MerchantPreset) {
+        form.setValue('name', brand.name, { shouldDirty: true, shouldValidate: true });
+        const carPreset = presets.find(row => row.key === 'CAR');
+        setPresetKey(carPreset?.key ?? null);
     }
 
     const saveMutation = useMutation({
@@ -232,6 +285,7 @@ export function AssetForm({
     }
 
     const busy = form.formState.isSubmitting || saveMutation.isPending || removeMutation.isPending;
+    const showCarBrands = kindKey === 'VEHICLE' && carBrands.length > 0;
 
     return (
         <FormCreateEditShell
@@ -274,6 +328,10 @@ export function AssetForm({
                                 aria-label={tForm('aria.asset_type')}>
                                 {visibleKinds.map(option => {
                                     const on = field.value === option.key;
+                                    const brandMark =
+                                        on && option.key === 'VEHICLE' && selectedCarBrand
+                                            ? carBrandMark(selectedCarBrand)
+                                            : null;
                                     return (
                                         <button
                                             key={option.key}
@@ -293,7 +351,17 @@ export function AssetForm({
                                                     'flex size-9 shrink-0 items-center justify-center rounded-lg text-lg',
                                                     on ? 'bg-accent/15' : 'bg-sunken'
                                                 )}>
-                                                {option.icon}
+                                                {brandMark ? (
+                                                    <VendorMark
+                                                        name={brandMark.name}
+                                                        src={brandMark.src}
+                                                        fallbackIcon={brandMark.fallbackIcon}
+                                                        tone={brandMark.tone}
+                                                        size={22}
+                                                    />
+                                                ) : (
+                                                    option.icon
+                                                )}
                                             </span>
                                             <span className="grid min-w-0 gap-0.5">
                                                 <span
@@ -341,6 +409,54 @@ export function AssetForm({
                     </FormItem>
                 )}
             />
+
+            {showCarBrands ? (
+                <div className="grid gap-2">
+                    <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
+                        {tAsset('which_car')}
+                    </p>
+                    <CatalogChipPicker
+                        query={carBrandQuery}
+                        onQueryChange={setCarBrandQuery}
+                        items={visibleCarBrands}
+                        placeholder={tAsset('search_brand')}
+                        noMatchesLabel={tForm('no_matches')}
+                        trailing={
+                            !carBrandSearch && visibleCarBrands.length < carBrands.length ? (
+                                <button
+                                    type="button"
+                                    className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
+                                    onClick={() => setShowAllCarBrands(true)}>
+                                    {tAsset('more')}
+                                </button>
+                            ) : null
+                        }
+                        renderChip={brand => {
+                            const selected = name.trim().toLowerCase() === brand.name.toLowerCase();
+                            const mark = carBrandMark(brand);
+                            return (
+                                <button
+                                    type="button"
+                                    className={
+                                        selected
+                                            ? 'inline-flex items-center gap-2 rounded-xl border border-accent bg-accent/15 px-2.5 py-1.5 text-sm text-accent'
+                                            : 'inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent'
+                                    }
+                                    onClick={() => selectCarBrand(brand)}>
+                                    <VendorMark
+                                        name={mark.name}
+                                        src={mark.src}
+                                        fallbackIcon={mark.fallbackIcon}
+                                        tone={mark.tone}
+                                        size={20}
+                                    />
+                                    {brand.name}
+                                </button>
+                            );
+                        }}
+                    />
+                </div>
+            ) : null}
 
             <FormField
                 control={form.control}

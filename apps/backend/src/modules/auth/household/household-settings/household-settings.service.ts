@@ -75,6 +75,7 @@ export class HouseholdSettingsService {
             weekCheck: { ...DEFAULT_WEEK_CHECK_SETTINGS },
             features: { ...DEFAULT_FEATURE_SETTINGS },
             answers: {},
+            audienceKeys: [],
             onboardedAt: new Date(),
         } as never);
         this.em.persist(
@@ -161,6 +162,9 @@ export class HouseholdSettingsService {
         if (patch.answers) {
             row.answers = { ...row.answers, ...patch.answers };
         }
+        if (patch.audienceKeys !== undefined) {
+            row.audienceKeys = patch.audienceKeys;
+        }
 
         await this.em.flush();
 
@@ -225,6 +229,7 @@ function toSettingsDto(row: HouseholdSettings, planKey: PlanKey): HouseholdSetti
         weekCheck: { ...DEFAULT_WEEK_CHECK_SETTINGS, ...row.weekCheck },
         features: { ...DEFAULT_FEATURE_SETTINGS, ...row.features },
         answers: row.answers ?? {},
+        audienceKeys: row.audienceKeys ?? [],
         onboardedAt: row.onboardedAt ? row.onboardedAt.toISOString() : null,
     };
 }

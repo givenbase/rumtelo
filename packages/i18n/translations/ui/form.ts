@@ -83,7 +83,6 @@ const form = {
         pick_mode: 'How do you want to pick?',
         clear_selection: 'Clear selection',
         show_suggestions: 'Show suggestions',
-        filter_bill_types: 'Filter bill types',
         asset_type: 'Asset type',
         cause: 'Cause',
         independent_signals: 'Independent signals',

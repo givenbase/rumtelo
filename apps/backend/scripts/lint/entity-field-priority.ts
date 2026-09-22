@@ -400,6 +400,7 @@ export const EXACT_FIELD_PRIORITY: Record<string, number> = {
     weekCheck: 8,
     features: 8,
     answers: 8,
+    audienceKeys: 8,
     tour: 8,
     capabilities: 8,
     guidePayload: 8,
@@ -461,7 +462,7 @@ export const SAME_PRIORITY_ORDER: readonly (readonly string[])[] = [
     ],
     ['score', 'maxScore', 'level'],
     ['isBankSyncEnabled', 'isCoachEnabled'],
-    ['money', 'weekCheck', 'features', 'answers'],
+    ['money', 'weekCheck', 'features', 'answers', 'audienceKeys'],
     ['periodStartDay', 'weekCheckReminderDay', 'weekCheckReminderAt'],
     ['isActive', 'isArchived'],
 ];

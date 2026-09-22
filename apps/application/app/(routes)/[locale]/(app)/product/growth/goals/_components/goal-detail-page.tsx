@@ -4,7 +4,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import Link from 'next/link';
 import { useMemo } from 'react';
 
-import type { Goal, GoalProjection } from '@rumtelo/contracts';
+import type { Goal, GoalProjection, MerchantPreset } from '@rumtelo/contracts';
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useTranslations, type TranslateFn } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
@@ -29,11 +29,14 @@ import { isLiveData } from '@/app/_lib/preview';
 import { productPath } from '@/app/_lib/routes';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
+import { GoalKindMark } from '@/components/features/growth/goal-kind-mark';
 import { SaveGoalManifestActions } from '@/components/features/growth/save-goal-manifest-actions';
 import { JarBadge, MetaChip, formatBookedDate } from '@/components/features/money/jar-badge';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useLocale } from 'next-intl';
+
+const EMPTY_MERCHANTS: MerchantPreset[] = [];
 
 function kindEyebrow(kind: GoalKind, t: TranslateFn): string {
     if (kind === GoalKind.EARN) return t('kind_earn');
@@ -45,13 +48,6 @@ function kindTint(kind: GoalKind): string {
     if (kind === GoalKind.EARN) return 'var(--color-accent)';
     if (kind === GoalKind.GIVE) return 'var(--color-jar-give)';
     return 'var(--color-jar-lts)';
-}
-
-function kindIcon(goal: Goal): string {
-    if (goal.icon?.trim()) return goal.icon.trim();
-    if (goal.kind === GoalKind.EARN) return '📈';
-    if (goal.kind === GoalKind.GIVE) return '💛';
-    return '🎯';
 }
 
 function formatMonthYear(iso: string | null | undefined, locale: string): string | null {
@@ -220,6 +216,13 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
     const incomeQuery = useLiveQuery(
         apiQuery.money.income.list.queryOptions({ input: { householdId: householdId! } }),
         [],
+        live
+    );
+    const merchantsQuery = useLiveQuery(
+        apiQuery.money.catalogs.merchantPresets.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        EMPTY_MERCHANTS,
         live
     );
 
@@ -406,7 +409,11 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                                 color: 'var(--color-on-accent)',
                             }}
                             aria-hidden>
-                            {kindIcon(goal)}
+                            <GoalKindMark
+                                goal={goal}
+                                merchants={merchantsQuery.data ?? EMPTY_MERCHANTS}
+                                size={28}
+                            />
                         </span>
                         <div>
                             <p className="font-mono text-[10px] tracking-widest text-fg-muted uppercase">
