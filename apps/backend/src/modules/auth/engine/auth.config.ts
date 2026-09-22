@@ -296,6 +296,14 @@ export function createAuth(env: Env) {
                  */
                 generateId: () => uuidv7(),
             },
+            /**
+             * Next auth proxy stamps a single-value `x-real-ip` (Railway XFF is
+             * multi-hop; BA only trusts one hop without `trustedProxies`).
+             * @see https://www.better-auth.com/docs/concepts/rate-limit#connecting-ip-address
+             */
+            ipAddress: {
+                ipAddressHeaders: ['x-real-ip', 'x-forwarded-for'],
+            },
             cookiePrefix: 'rumtelo',
             useSecureCookies: isSecureCookieEnv,
             ...(cookieDomain

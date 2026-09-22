@@ -98,6 +98,11 @@ export {
     proxyBetterAuthRequest,
     type BetterAuthProxyOptions,
 } from './better-auth-proxy';
+export {
+    applyTrustedClientIpHeaders,
+    isClientIp,
+    resolveClientIpFromHeaders,
+} from './better-auth-client-ip';
 export { rewriteBetterAuthSetCookie } from './better-auth-proxy-cookies';
 export {
     buildBetterAuthTrustedOrigins,

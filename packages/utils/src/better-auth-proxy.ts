@@ -1,3 +1,4 @@
+import { applyTrustedClientIpHeaders, resolveClientIpFromHeaders } from './better-auth-client-ip';
 import { rewriteBetterAuthSetCookie } from './better-auth-proxy-cookies';
 
 export type BetterAuthProxyOptions = {
@@ -18,7 +19,11 @@ function resolveBackendUrl(backendUrl?: string): string {
  * Proxy a Better Auth request from a Next.js app to the Nest backend API.
  * Preserves cookies and rewrites Set-Cookie for local dev vs production.
  *
+ * Collapses Railway multi-hop forwarded IPs to a single `x-real-ip` so Nest
+ * Better Auth rate limits can key per client (BA rejects multi-value XFF).
+ *
  * @see https://www.better-auth.com/docs/integrations/next
+ * @see https://www.better-auth.com/docs/concepts/rate-limit#connecting-ip-address
  */
 export async function proxyBetterAuthRequest(
     request: Request,
@@ -39,6 +44,11 @@ export async function proxyBetterAuthRequest(
     const cookieHeader = request.headers.get('cookie');
     if (cookieHeader) {
         requestHeaders.set('cookie', cookieHeader);
+    }
+
+    const clientIp = resolveClientIpFromHeaders(request.headers);
+    if (clientIp) {
+        applyTrustedClientIpHeaders(requestHeaders, clientIp);
     }
 
     let response: Response;
