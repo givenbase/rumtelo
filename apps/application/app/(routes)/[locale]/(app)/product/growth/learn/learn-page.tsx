@@ -4,12 +4,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
 
-import {
-    SpendingStyle,
-    type LearnBookPreset,
-    type LearnBook,
-    type LearnWatchPreset,
-} from '@rumtelo/contracts';
+import { SpendingStyle } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import {
@@ -41,6 +36,7 @@ import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabi
 import { ListToolbar, ListToolbarTab } from '@/components/layout/list-toolbar';
 
 import { useLearnShelf } from './learn-shelf';
+import { useLearnCatalog } from './learn-catalog-provider';
 import { AddLearningDialog } from './add-learning-dialog';
 
 import {
@@ -64,9 +60,6 @@ import {
 } from './learn-catalog';
 import { useLearnCatalogLabels } from './learn-labels';
 
-const EMPTY_BOOKS: LearnBookPreset[] = [];
-const EMPTY_WATCH: LearnWatchPreset[] = [];
-const EMPTY_BOOKS_ADDED: LearnBook[] = [];
 /** A taste of the shelf, not the whole library. One of each format, then a few more. */
 const RECOMMENDED_LIMIT = 6;
 /** Partner tags ride along on store links when set; the links work without them. */
@@ -626,42 +619,20 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
         setOrder,
     } = useLearnShelf();
 
-    const booksQuery = useLiveQuery(
-        apiQuery.growth.catalogs.bookPresets.list.queryOptions({
-            input: { householdId: householdId! },
-        }),
-        EMPTY_BOOKS,
-        live
-    );
-    const addedBooksQuery = useLiveQuery(
-        apiQuery.growth.learn.listBooks.queryOptions({
-            input: { householdId: householdId! },
-        }),
-        EMPTY_BOOKS_ADDED,
-        live
-    );
-    const watchQuery = useLiveQuery(
-        apiQuery.growth.catalogs.watchPresets.list.queryOptions({
-            input: { householdId: householdId! },
-        }),
-        EMPTY_WATCH,
-        live
-    );
+    const { books, watches, addedBooks: addedBookRows } = useLearnCatalog();
     const settingsQuery = useLiveQuery(apiQuery.account.settings.queryOptions(), null, live);
     const spendingStyle = settingsQuery.data?.spendingStyle ?? SpendingStyle.UNKNOWN;
 
     const suggestedIds = new Set<string>();
-    const bookPieces = (booksQuery.data ?? EMPTY_BOOKS).flatMap(book => {
+    const bookPieces = books.flatMap(book => {
         if (!bookVisible(book.minPlan, plan)) return [];
         if (bookSuggested(book.topic, book.spendingStyles, spendingStyle)) {
             suggestedIds.add(book.key);
         }
         return [bookToPiece(book, store, STORE_TAGS)];
     });
-    const addedBooks = (addedBooksQuery.data ?? EMPTY_BOOKS_ADDED).map(book =>
-        addedBookToPiece(book, store, STORE_TAGS)
-    );
-    const watchPieces = (watchQuery.data ?? EMPTY_WATCH).flatMap(watch => {
+    const addedBooks = addedBookRows.map(book => addedBookToPiece(book, store, STORE_TAGS));
+    const watchPieces = watches.flatMap(watch => {
         if (!bookVisible(watch.minPlan, plan)) return [];
         if (bookSuggested(watch.topic, watch.spendingStyles, spendingStyle)) {
             suggestedIds.add(watch.key);
@@ -1063,7 +1034,7 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
                     onOpenChange={setAddOpen}
                     householdId={householdId}
                     initialQuery={addSeed}
-                    books={booksQuery.data ?? EMPTY_BOOKS}
+                    books={books}
                     onPick={(pieceKey, skill) => saveStatus(pieceKey, 'QUEUE', skill)}
                 />
             ) : null}

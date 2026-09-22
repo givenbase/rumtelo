@@ -26,6 +26,30 @@ Prefer patterns Next.js and React docs endorse. Lint is a hint: keep rules that 
 - No-op effect cleanups for `consistent-return`
 - Pulling an entire page client for one interactive widget — extract a small client island
 
+## Form & draft state
+
+| Job | Pattern |
+|-----|---------|
+| **Any submit fields** | **`useForm` + `zodResolver` + `@rumtelo/ui` Form / `FormCreateEditShell`** — `reset(server)` on edit open; `reset()` on success/cancel |
+| Shared submit zod | One schema module (mirror money `form-zod`) — UI and resolver share it |
+| Instant toggle / mutate-on-pick | One `useState` or direct mutation — no fake form |
+| UI-only flags | Single `useState` (`signingOut`, dialog open, cooldown) |
+
+**Banned:** parallel `useState` per form field; Provider/Zustand holding submit field values.
+
+## Data ownership (use wisely)
+
+| Need | Prefer |
+|------|--------|
+| Submit fields | `useForm` only |
+| Server/API lists, search results, cache | TanStack + `apiQuery` (+ feature Provider to share in a route tree) |
+| React-tree scoped wiring (shelf, catalog) | React Context Provider |
+| App-wide non-server client UI | Provider first; **Zustand only** if distant trees need one store and Context is awkward — never form fields, never a second API cache beside TanStack |
+| Cross-route hand-off while form unmounts | Draft Provider / storage → hydrate into `useForm` |
+| In-memory filter over loaded options | Local string + `ChipSearch`, or RHF field if part of a form |
+
+**Banned:** `useMutation` + `setHits` for remote search; re-fetching the same `apiQuery` in every child instead of a layout-level provider; Zustand as default global store.
+
 ## PR self-check
 
 > Would I still write this if the lint rule did not exist?

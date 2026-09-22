@@ -198,6 +198,10 @@ in the wrong place.
 for exactly this reason: it needs a real FK to `Jar` and gets summed in
 aggregates.
 
+**Frontend state.** Submits → `useForm`; shared remote data → Provider + TanStack
+`apiQuery`; UI flags → `useState`. Full table + PR gates:
+`docs/engineering/pr-gates.md` and `.cursor/rules/react-next-patterns.mdc`.
+
 ---
 
 ## 7. What is real and what is not
