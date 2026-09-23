@@ -10171,17 +10171,6 @@
         },
         {
           "columnNames": [
-            "household_id"
-          ],
-          "composite": false,
-          "constraint": false,
-          "keyName": "money_bank_account_household_primary_unique",
-          "unique": true,
-          "primary": false,
-          "expression": "CREATE UNIQUE INDEX money_bank_account_household_primary_unique ON public.money_bank_account USING btree (household_id) WHERE (is_primary = true)"
-        },
-        {
-          "columnNames": [
             "id"
           ],
           "composite": false,
