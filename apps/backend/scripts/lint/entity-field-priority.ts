@@ -446,7 +446,7 @@ export const SAME_PRIORITY_ORDER: readonly (readonly string[])[] = [
     ['household', 'account'],
     ['key', 'name', 'slug'],
     ['period', 'week'],
-    ['matchValue', 'mcc', 'ibanBankCode'],
+    ['matchValue', 'mcc'],
     ['aliases', 'providerIds'],
     ['budgeted', 'actual', 'target', 'saved', 'monthlyContribution'],
     [

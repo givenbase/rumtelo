@@ -4,6 +4,8 @@
  */
 
 export type {
+    Audience,
+    Bank,
     CategoryTemplate,
     FixedCostPreset,
     DebtPreset,

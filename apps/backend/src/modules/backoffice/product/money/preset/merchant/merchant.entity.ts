@@ -18,19 +18,18 @@ import { Market } from '../../catalog/market/market.entity';
 import { CategoryTemplate } from '../../template/category/category.entity';
 import { JarTemplate } from '../../template/jar/jar.entity';
 
-import type { MerchantBanking } from './merchant-banking.entity';
 import type { MerchantBranding } from './merchant-branding.entity';
 import type { MerchantMatching } from './merchant-matching.entity';
 
 /**
  * Merchant Preset Entity
  *
- * Catalog identity + placement for expense / bank pickers.
- * Matching, branding, and optional banking live on 1:1 children.
+ * Catalog identity + placement for expense / bank-feed matching.
+ * Matching and branding live on 1:1 children. Institution IBAN codes
+ * live on the Bank catalog, not here.
  *
  * @see MerchantMatching — feed needles
  * @see MerchantBranding — logo / website
- * @see MerchantBanking — NL IBAN bank code (optional)
  * @see JarTemplate / CategoryTemplate — default placement for sorted spend
  * @see https://mikro-orm.io/docs/defining-entities
  */
@@ -81,8 +80,4 @@ export class MerchantPreset extends CatalogEntity {
     /** Logo / website (always present). */
     @OneToOne('MerchantBranding', { mappedBy: 'preset' })
     branding?: MerchantBranding;
-
-    /** NL IBAN bank code — only for banks that have one. */
-    @OneToOne('MerchantBanking', { mappedBy: 'preset' })
-    banking?: MerchantBanking | null;
 }

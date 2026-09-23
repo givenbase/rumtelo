@@ -41,6 +41,7 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 import { ConfirmActionButton } from '@/components/features/forms/confirm-action-button';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { useBankSyncOnVisit } from '@/app/_lib/use-bank-sync-on-visit';
 
 type Tab = 'INBOX' | 'OUT' | 'IN' | 'RULES';
 
@@ -84,6 +85,7 @@ export function TransactionsPageClient() {
     const [openJarIds, setOpenJarIds] = useState<Set<string>>(() => new Set());
     const live = isLiveData(householdId);
     const periodKey = toPeriodKey(period.year, period.month);
+    useBankSyncOnVisit();
 
     const inboxQuery = useLiveQuery(
         apiQuery.money.transactions.inbox.queryOptions({ input: { householdId: householdId! } }),

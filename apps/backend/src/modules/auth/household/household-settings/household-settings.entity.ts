@@ -1,4 +1,4 @@
-import { Collection, Entity, Enum, ManyToMany, Property, Unique } from '@mikro-orm/core';
+import { Collection, Entity, Enum, ManyToMany, ManyToOne, Property, Unique } from '@mikro-orm/core';
 import {
     Currency,
     HouseholdKind,
@@ -14,6 +14,7 @@ import { entityConfig } from '../../../../common/database/entity-config.util';
 import { HouseholdEntity } from '../../../../common/database/household.entity';
 import { NativeEnum } from '../../../../common/database/native-enum.util';
 import { Audience } from '../../../backoffice/product/money/catalog/audience/audience.entity';
+import { Bank } from '../../../backoffice/product/money/catalog/bank/bank.entity';
 
 export const DEFAULT_MONEY_SETTINGS: HouseholdMoneySettings = {
     periodStartDay: 1,
@@ -105,4 +106,11 @@ export class HouseholdSettings extends HouseholdEntity {
         pivotTable: 'backoffice.household_settings_audience',
     })
     audiences = new Collection<Audience>(this);
+
+    /**
+     * Primary catalog bank for the household. Catalog is pick-only —
+     * delete sets null; settings row stays.
+     */
+    @ManyToOne(() => Bank, { nullable: true, deleteRule: 'set null' })
+    mainBank: Bank | null = null;
 }

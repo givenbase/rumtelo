@@ -7,7 +7,7 @@
 import { z } from 'zod';
 
 import { Cadence, FlowDirection } from '../../../../common/common.enums';
-import { CatalogItemBase } from '../../../../common/common.schema';
+import { CatalogItemBase, Id } from '../../../../common/common.schema';
 import {
     DebtKind,
     GivingCause,
@@ -134,8 +134,6 @@ export const MerchantPreset = CatalogItemBase.extend({
     /** Favicon hostname — client builds logo URL; no client brand mirror. */
     logoDomain: z.string().min(1).max(120).nullable(),
     website: z.string().max(240).nullable(),
-    /** Dutch IBAN bank code (positions 5–8), e.g. INGB. Null when not applicable. */
-    ibanBankCode: z.string().length(4).nullable(),
     /** Editorial pin + chip label; null = normal. */
     highlight: z.enum(MerchantHighlight).nullable(),
     /** ISO markets where this merchant is listed (e.g. NL). */
@@ -143,6 +141,23 @@ export const MerchantPreset = CatalogItemBase.extend({
     matchPriority: z.int(),
     /** Aggregator merchant ids when Open Banking is wired. */
     providerIds: z.record(z.string(), z.string()),
+});
+
+/** Company bank pick-list for household account seats (not payment rails). */
+export const Bank = CatalogItemBase.extend({
+    id: Id,
+    description: z.string().max(280).nullable(),
+    /** ISO-2 markets this institution serves. */
+    countries: z.array(z.string().length(2)).min(1),
+    /** Dutch IBAN bank code (positions 5–8), e.g. INGB. Null when not applicable. */
+    ibanBankCode: z.string().length(4).nullable(),
+    logoDomain: z.string().min(1).max(120).nullable(),
+    website: z.string().max(240).nullable(),
+    /**
+     * Retail bank keys this issuer co-brands with / that typically settle the card
+     * (e.g. ICS → ING, ABN_AMRO). Empty for plain retail banks.
+     */
+    partnerBankKeys: z.array(z.string().min(1).max(64)),
 });
 
 /** One independent signal about an organisation — who says so, what, and where to check. */
@@ -191,6 +206,7 @@ export type GivingSignal = z.infer<typeof GivingSignal>;
 export type GivingOrganisation = z.infer<typeof GivingOrganisation>;
 export type CategoryTemplate = z.infer<typeof CategoryTemplate>;
 export type Audience = z.infer<typeof Audience>;
+export type Bank = z.infer<typeof Bank>;
 export type FixedCostPreset = z.infer<typeof FixedCostPreset>;
 export type DebtPreset = z.infer<typeof DebtPreset>;
 export type JarGuide = z.infer<typeof JarGuide>;

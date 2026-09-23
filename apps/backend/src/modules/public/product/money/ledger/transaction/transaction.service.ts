@@ -162,6 +162,67 @@ export class TransactionService {
         };
     }
 
+    /**
+     * AIS pull — same Inbox + dedupe shape as CSV, source BANK.
+     * `externalId` is folded into the hash so provider ids stay stable.
+     */
+    async importBankTransactions(
+        accountId: string,
+        rows: Array<{
+            externalId: string;
+            bookedOn: string;
+            amount: number;
+            description: string;
+            counterparty: string | null;
+        }>
+    ) {
+        const keys = rows.map(row =>
+            dedupeKey(accountId, row.bookedOn, row.amount, `${row.externalId}|${row.description}`)
+        );
+
+        const existing = keys.length
+            ? await this.transactions.find({ dedupeKey: { $in: keys } })
+            : [];
+        const seen = new Set(existing.map(transaction => transaction.dedupeKey));
+        const incoming: Array<{
+            externalId: string;
+            bookedOn: string;
+            amount: number;
+            description: string;
+            counterparty: string | null;
+            dedupeKey: string;
+        }> = [];
+
+        rows.forEach((row, index) => {
+            const key = keys[index]!;
+            if (seen.has(key)) return;
+            seen.add(key);
+            incoming.push({ ...row, dedupeKey: key });
+        });
+
+        const created = incoming.map(row =>
+            this.em.create(Transaction, {
+                household: currentHouseholdId(),
+                account: this.em.getReference(BankAccount, accountId),
+                amount: row.amount,
+                bookedOn: row.bookedOn,
+                description: row.description,
+                counterparty: row.counterparty,
+                status: TransactionStatus.INBOX,
+                source: TransactionSource.BANK,
+                dedupeKey: row.dedupeKey,
+            } as never)
+        );
+        const sorted = await this.rules.autoSort(created, { countHits: true });
+        await this.em.flush();
+
+        return {
+            imported: incoming.length,
+            skipped: rows.length - incoming.length,
+            sorted,
+        };
+    }
+
     // ====================================================================
     // ? READ Operations
     // ====================================================================

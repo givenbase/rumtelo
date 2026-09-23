@@ -36,6 +36,7 @@ import { AuthUser } from '../../../modules/auth/user/managed/user/auth-user.enti
 import { Account } from '../../../modules/auth/user/account/account.entity';
 import { AccountSettings } from '../../../modules/auth/user/account/account-settings/account-settings.entity';
 import { JarTemplate } from '../../../modules/backoffice/product/money/template/jar/jar.entity';
+import { Bank } from '../../../modules/backoffice/product/money/catalog/bank/bank.entity';
 import { HouseholdSettings } from '../../../modules/auth/household/household-settings/household-settings.entity';
 import { HouseholdBilling } from '../../../modules/auth/household/household-billing/household-billing.entity';
 import { EnergyLog } from '../../../modules/public/product/energy/log/energy-log.entity';
@@ -162,6 +163,8 @@ const DEMO_TX_CATEGORY: Array<{ includes: string; category: string }> = [
  * Money in this file is authored in **euros** (major units). Persist via
  * {@link toMinorUnits} — industry standard integer cents / minor units.
  */
+type DemoBanks = { primary: Bank; secondary: Bank };
+
 export class DemoHouseholdSeeder extends Seeder {
     async run(em: EntityManager): Promise<void> {
         const env = loadEnv();
@@ -319,6 +322,17 @@ export class DemoHouseholdSeeder extends Seeder {
             if (!settings.onboardedAt) settings.onboardedAt = new Date();
         }
 
+        const ingBank = await em.findOne(Bank, { key: 'ING', isActive: true });
+        const abnBank = await em.findOne(Bank, { key: 'ABN_AMRO', isActive: true });
+        if (!ingBank) {
+            throw new Error('DemoHouseholdSeeder: Bank catalog missing ING — run BankSeeder first');
+        }
+        settings.mainBank = ingBank;
+        const demoBanks: DemoBanks = {
+            primary: ingBank,
+            secondary: abnBank ?? ingBank,
+        };
+
         let billing = await em.findOne(HouseholdBilling, { household: householdId });
         if (!billing) {
             billing = em.create(HouseholdBilling, {
@@ -367,13 +381,20 @@ export class DemoHouseholdSeeder extends Seeder {
         if (incomeCount === 0) {
             switch (demo.persona) {
                 case 'basic':
-                    this.seedBasicBoard(em, householdId, rumteloAccount.id, jarMap, demo);
+                    this.seedBasicBoard(
+                        em,
+                        householdId,
+                        rumteloAccount.id,
+                        jarMap,
+                        demo,
+                        demoBanks
+                    );
                     break;
                 case 'plus':
-                    this.seedPlusBoard(em, householdId, rumteloAccount.id, jarMap, demo);
+                    this.seedPlusBoard(em, householdId, rumteloAccount.id, jarMap, demo, demoBanks);
                     break;
                 case 'max':
-                    this.seedMaxBoard(em, householdId, rumteloAccount.id, jarMap, demo);
+                    this.seedMaxBoard(em, householdId, rumteloAccount.id, jarMap, demo, demoBanks);
                     break;
             }
         }
@@ -405,7 +426,8 @@ export class DemoHouseholdSeeder extends Seeder {
         householdId: string,
         accountId: string,
         jars: JarMap,
-        demo: DemoAccount
+        demo: DemoAccount,
+        banks: DemoBanks
     ): void {
         this.createIncome(em, householdId, {
             name: 'Retail salary',
@@ -458,6 +480,7 @@ export class DemoHouseholdSeeder extends Seeder {
             name: 'Checking',
             kind: AccountKind.CHECKING,
             balance: 187.5,
+            bank: banks.primary,
         });
 
         for (const tx of [
@@ -567,7 +590,8 @@ export class DemoHouseholdSeeder extends Seeder {
         householdId: string,
         accountId: string,
         jars: JarMap,
-        demo: DemoAccount
+        demo: DemoAccount,
+        banks: DemoBanks
     ): void {
         this.createIncome(em, householdId, {
             name: 'Client retainers',
@@ -674,11 +698,13 @@ export class DemoHouseholdSeeder extends Seeder {
             name: 'Business checking',
             kind: AccountKind.CHECKING,
             balance: 942,
+            bank: banks.primary,
         });
         this.createBank(em, householdId, {
             name: 'Tax set-aside',
             kind: AccountKind.SAVINGS,
             balance: 2_100,
+            bank: banks.primary,
         });
 
         em.create(SortRule, {
@@ -1034,7 +1060,8 @@ export class DemoHouseholdSeeder extends Seeder {
         householdId: string,
         accountId: string,
         jars: JarMap,
-        demo: DemoAccount
+        demo: DemoAccount,
+        banks: DemoBanks
     ): void {
         this.createIncome(em, householdId, {
             name: 'Studio profit draw',
@@ -1198,16 +1225,19 @@ export class DemoHouseholdSeeder extends Seeder {
             name: 'Operating checking',
             kind: AccountKind.CHECKING,
             balance: 12_400,
+            bank: banks.primary,
         });
         this.createBank(em, householdId, {
             name: 'High-yield savings',
             kind: AccountKind.SAVINGS,
             balance: 36_500,
+            bank: banks.primary,
         });
         const brokerage = this.createBank(em, householdId, {
             name: 'Brokerage',
             kind: AccountKind.INVESTMENT,
             balance: 124_800,
+            bank: banks.secondary,
         });
 
         em.create(SortRule, {
@@ -1531,16 +1561,17 @@ export class DemoHouseholdSeeder extends Seeder {
     private createBank(
         em: EntityManager,
         householdId: string,
-        input: { name: string; kind: AccountKind; balance: number }
+        input: { name: string; kind: AccountKind; balance: number; bank: Bank }
     ): BankAccount {
-        const bank = em.create(BankAccount, {
+        const account = em.create(BankAccount, {
             household: householdId,
             name: input.name,
             kind: input.kind,
             balance: toMinorUnits(input.balance),
+            bank: input.bank,
         } as never);
-        em.persist(bank);
-        return bank;
+        em.persist(account);
+        return account;
     }
 
     private createTx(

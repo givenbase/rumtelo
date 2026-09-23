@@ -273,6 +273,7 @@ export function IncomeForm({
                                             preset => preset.key === opt.key
                                         );
                                         if (!full) return;
+                                        // OTHER keeps key in the field; kind/cadence become OTHER defaults.
                                         form.setValue('kind', full.kind);
                                         form.setValue('cadence', full.cadence);
                                     }}

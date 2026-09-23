@@ -12,4 +12,5 @@ export * from '../jar';
 export * from '../week-check';
 export * from '../rule';
 export * from '../transaction';
+export * from '../bank-sync';
 export * from '../month-score';

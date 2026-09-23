@@ -63,8 +63,8 @@ export function createBankAccountFormSchema(v: SettingsFormT) {
                 { message: v('pages.settings.panels.bank.iban') }
             ),
         kind: z.enum(AccountKind),
-        bankKey: z.string().max(40),
-        customBank: z.boolean(),
+        bankId: z.string().uuid(),
+        settlementAccountId: z.string().uuid().nullable().optional(),
     });
 }
 

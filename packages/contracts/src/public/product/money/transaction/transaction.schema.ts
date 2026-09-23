@@ -117,7 +117,20 @@ export const Account = z.object({
     iban: z.string().max(42).nullable(),
     kind: z.enum(AccountKind),
     balance: Money,
-    /** Null for manual accounts; set when linked through the bank-sync port. */
+    /**
+     * Catalog bank id (backoffice Bank) — always required.
+     * Manual vs Open Banking is `connectionId` (null = manual entry at this bank).
+     */
+    bankId: Id,
+    /**
+     * Checking/savings account that pays this seat’s bill (credit cards).
+     * Null until set. Connecting sync later does not change this link.
+     */
+    settlementAccountId: Id.nullable(),
+    /**
+     * Null = manual account at `bankId`; set when linked through bank sync.
+     * Connecting later upgrades this row — do not create a second account for the same IBAN.
+     */
     connectionId: Id.nullable(),
     lastSyncedAt: z.iso.datetime().nullable(),
 });

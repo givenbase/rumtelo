@@ -631,6 +631,8 @@ export function GoalForm({
                                         if (!full) return;
                                         setGoalPresetKey(full.key);
                                         selectedIcon.current = full.icon;
+                                        // OTHER = custom name; keep current jar (don't force LTS).
+                                        if (full.key === 'OTHER') return;
                                         const jar = jars.find(j => j.key === full.jarKey);
                                         if (jar) form.setValue('jarId', jar.id);
                                     }}

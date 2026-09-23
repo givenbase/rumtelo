@@ -106,6 +106,11 @@ export const HouseholdSettings = z.object({
      * preference, everything shows.
      */
     audienceKeys: z.array(z.string()),
+    /**
+     * Primary catalog bank for the household (`Bank.id`). Null = no main bank chosen.
+     * Soft link — catalog does not own household settings.
+     */
+    mainBankId: Id.nullable(),
     /** When household board setup completed; null = incomplete. */
     onboardedAt: z.iso.datetime().nullable(),
 });
@@ -123,6 +128,8 @@ export const HouseholdSettingsPatch = z.object({
     answers: HouseholdAnswers.optional(),
     /** Whole-array replace — the picker always sends the full selection. */
     audienceKeys: z.array(z.string()).optional(),
+    /** Primary catalog bank id; null clears. */
+    mainBankId: Id.nullable().optional(),
 });
 
 /** Onboarding writes income + split + prefs in one transaction. */

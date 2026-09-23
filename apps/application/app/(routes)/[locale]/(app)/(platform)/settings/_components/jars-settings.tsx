@@ -5,12 +5,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 
-import {
-    DEFAULT_JAR_SPLIT,
-    SpendingStyle,
-    bankingCategoryTemplate,
-    type JarKey,
-} from '@rumtelo/contracts';
+import { DEFAULT_JAR_SPLIT, SpendingStyle, type JarKey } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
 import { Badge, Button, Input, Meter, StubNotice, VendorMark } from '@rumtelo/ui';
@@ -22,10 +17,8 @@ import { isLiveData } from '@/app/_lib/preview';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
-import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
-
 import { SettingsInkCard, SettingsPanel, SettingsPill, SettingsRow } from './settings-chrome';
-import { accountBankMark, bankingBanksOnly } from '../_utils/resolve-account-bank';
+import { accountBankMark, countryFromCurrency } from '../_utils/resolve-account-bank';
 import { JAR_COLOR, accountKindLabel } from '../_utils/settings-shared';
 
 export function JarsSettings() {
@@ -51,25 +44,22 @@ export function JarsSettings() {
         live
     );
 
-    const categoriesQuery = useCategoryTemplates(live);
-    const bankingCategoryKey = useMemo(
-        () => bankingCategoryTemplate(categoriesQuery.data ?? [])?.key ?? null,
-        [categoriesQuery.data]
+    const settingsQuery = useLiveQuery(
+        apiQuery.household.settings.queryOptions({ input: { householdId: householdId! } }),
+        null,
+        live
     );
-    const bankingMerchantsQuery = useLiveQuery(
-        apiQuery.money.catalogs.merchantPresets.list.queryOptions({
+    const banksQuery = useLiveQuery(
+        apiQuery.money.catalogs.banks.list.queryOptions({
             input: {
                 householdId: householdId!,
-                categoryTemplateKey: bankingCategoryKey,
+                country: countryFromCurrency(settingsQuery.data?.currency),
             },
         }),
         [],
-        live && Boolean(bankingCategoryKey)
+        live
     );
-    const banks = useMemo(
-        () => bankingBanksOnly(bankingMerchantsQuery.data ?? []),
-        [bankingMerchantsQuery.data]
-    );
+    const banks = useMemo(() => banksQuery.data ?? [], [banksQuery.data]);
 
     const jars = useMemo(() => jarsQuery.data ?? [], [jarsQuery.data]);
     const accounts = useMemo(() => accountsQuery.data ?? [], [accountsQuery.data]);

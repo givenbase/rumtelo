@@ -13,6 +13,7 @@ import {
 } from '../../../../../backoffice/admin/translation';
 import {
     AudienceService,
+    BankService,
     CategoryTemplateService,
     DebtPresetService,
     FixedCostPresetService,
@@ -30,6 +31,7 @@ export class MoneyCatalogsController {
         @Inject(JarTemplateService) private readonly jars: JarTemplateService,
         @Inject(CategoryTemplateService) private readonly categories: CategoryTemplateService,
         @Inject(AudienceService) private readonly audiences: AudienceService,
+        @Inject(BankService) private readonly banks: BankService,
         @Inject(FixedCostPresetService) private readonly fixedCosts: FixedCostPresetService,
         @Inject(DebtPresetService) private readonly debts: DebtPresetService,
         @Inject(IncomeSourcePresetService) private readonly incomes: IncomeSourcePresetService,
@@ -122,6 +124,25 @@ export class MoneyCatalogsController {
                 icon: row.icon,
                 accentColor: row.accentColor,
                 softColor: row.softColor,
+            }));
+        });
+    }
+
+    @Implement(contract.money.catalogs.banks.list)
+    listBanks() {
+        return implement(contract.money.catalogs.banks.list).handler(async ({ input }) => {
+            const rows = await this.banks.listActive({ country: input.country ?? undefined });
+            return rows.map(row => ({
+                id: row.id,
+                key: row.key,
+                name: row.name,
+                sortOrder: row.sortOrder,
+                description: row.description,
+                countries: row.countries,
+                ibanBankCode: row.ibanBankCode,
+                logoDomain: row.logoDomain,
+                website: row.website,
+                partnerBankKeys: row.partnerBanks.getItems().map(partner => partner.key),
             }));
         });
     }
@@ -223,7 +244,6 @@ export class MoneyCatalogsController {
                     givingOrganisationKey: preset.givingOrganisation?.key ?? null,
                     logoDomain: preset.branding?.logoDomain ?? null,
                     website: preset.branding?.website ?? null,
-                    ibanBankCode: preset.banking?.ibanBankCode ?? null,
                     highlight: preset.highlight ?? null,
                     markets: preset.markets.getItems().map(market => market.key),
                     matchPriority: preset.matching?.matchPriority ?? 0,

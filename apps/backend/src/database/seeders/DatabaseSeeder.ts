@@ -5,6 +5,7 @@ import { Seeder } from '@mikro-orm/seeder';
 import { isLaunchProductsDeferred } from '../../common/config/launch-products.util';
 import { PlanSeeder } from './plan/PlanSeeder';
 import { AudienceSeeder } from './product/money/AudienceSeeder';
+import { BankSeeder } from './product/money/BankSeeder';
 import { CategoryTemplateSeeder } from './product/money/CategoryTemplateSeeder';
 import { DebtPresetSeeder } from './product/money/DebtPresetSeeder';
 import { FixedCostPresetSeeder } from './product/money/FixedCostPresetSeeder';
@@ -40,6 +41,7 @@ export class DatabaseSeeder extends Seeder {
             CatalogTranslationSeeder,
             AudienceSeeder,
             MarketSeeder,
+            BankSeeder,
             GivingOrganisationSeeder,
             MerchantPresetSeeder,
             // Presets that link to merchants.

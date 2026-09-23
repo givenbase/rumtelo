@@ -6,8 +6,6 @@ import { isIbanApiErrorMessage } from '@/app/_lib/api-user-message';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
-import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
-import { merchantsToNameOptions } from '@/components/features/forms/merchant-name-options';
 import {
     PresetNameField,
     type NamePresetOption,
@@ -15,7 +13,7 @@ import {
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AccountKind, bankingCategoryTemplate } from '@rumtelo/contracts';
+import { AccountKind, type Bank, type Account } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
 import {
@@ -39,8 +37,9 @@ import {
     nlIbanBankCode,
     normalizeIban,
 } from '@rumtelo/utils';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import {
     SettingsInkCard,
@@ -55,7 +54,8 @@ import {
 } from '../_utils/settings-form-zod';
 import {
     accountBankMark,
-    bankingBanksOnly,
+    composeAccountBankName,
+    countryFromCurrency,
     resolveAccountBank,
 } from '../_utils/resolve-account-bank';
 import {
@@ -66,14 +66,14 @@ import {
 } from '../_utils/settings-shared';
 import { useSettingsMutation } from '../_utils/use-settings-mutation';
 import { ConfirmActionButton } from '@/components/features/forms/confirm-action-button';
-import type { Account } from '@rumtelo/contracts';
+import { useBankSyncOnVisit } from '@/app/_lib/use-bank-sync-on-visit';
 
 const EMPTY_BANK: BankAccountFormValues = {
     label: '',
     iban: '',
     kind: AccountKind.CHECKING,
-    bankKey: '',
-    customBank: false,
+    bankId: '',
+    settlementAccountId: null,
 };
 
 export function BankSettings() {
@@ -82,16 +82,22 @@ export function BankSettings() {
     const { showToast } = useAppShell();
     const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const oauthHandled = useRef(false);
     const [adding, setAdding] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [ibanError, setIbanError] = useState<string | null>(null);
+    const [connectingAccountId, setConnectingAccountId] = useState<string | null>(null);
+    const [institutionId, setInstitutionId] = useState('');
 
     const form = useForm<BankAccountFormValues>({
         defaultValues: EMPTY_BANK,
         resolver: zodResolver(createBankAccountFormSchema(t)),
     });
-    const bankKey = useWatch({ control: form.control, name: 'bankKey' });
-    const customBank = useWatch({ control: form.control, name: 'customBank' });
+    useBankSyncOnVisit();
+    const bankId = useWatch({ control: form.control, name: 'bankId' });
+    const kind = useWatch({ control: form.control, name: 'kind' });
     const label = useWatch({ control: form.control, name: 'label' });
 
     const accountsQuery = useLiveQuery(
@@ -99,39 +105,54 @@ export function BankSettings() {
         [],
         live
     );
-    const categoriesQuery = useCategoryTemplates(live);
-    const bankingCategoryKey = useMemo(
-        () => bankingCategoryTemplate(categoriesQuery.data ?? [])?.key ?? null,
-        [categoriesQuery.data]
+    const settingsQuery = useLiveQuery(
+        apiQuery.household.settings.queryOptions({ input: { householdId: householdId! } }),
+        null,
+        live
     );
-    const bankingMerchantsQuery = useLiveQuery(
-        apiQuery.money.catalogs.merchantPresets.list.queryOptions({
-            input: {
-                householdId: householdId!,
-                categoryTemplateKey: bankingCategoryKey,
-            },
+    const bankCountry = countryFromCurrency(settingsQuery.data?.currency);
+    const banksQuery = useLiveQuery(
+        apiQuery.money.catalogs.banks.list.queryOptions({
+            input: { householdId: householdId!, country: bankCountry },
         }),
         [],
-        live && Boolean(bankingCategoryKey)
+        live
     );
-    const bankList = useMemo(
-        () => bankingBanksOnly(bankingMerchantsQuery.data ?? []),
-        [bankingMerchantsQuery.data]
+    const bankSyncStatus = useLiveQuery(
+        apiQuery.money.bankSync.status.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        { enabled: false, connectedAccountIds: [] },
+        live
     );
+    const syncEnabled = bankSyncStatus.data?.enabled;
+    const institutionsQuery = useLiveQuery(
+        apiQuery.money.bankSync.listInstitutions.queryOptions({
+            input: { householdId: householdId!, country: bankCountry },
+        }),
+        [],
+        live && syncEnabled
+    );
+    const bankList = useMemo(() => {
+        const rows = banksQuery.data ?? [];
+        const mainId = settingsQuery.data?.mainBankId ?? null;
+        if (!mainId) return rows;
+        const main = rows.find(bank => bank.id === mainId);
+        if (!main) return rows;
+        return [main, ...rows.filter(bank => bank.id !== mainId)];
+    }, [banksQuery.data, settingsQuery.data?.mainBankId]);
 
     const bankNameOptions = useMemo((): NamePresetOption[] => {
-        return [
-            ...merchantsToNameOptions(bankList, {
-                categoryTemplateKey: bankingCategoryKey ?? undefined,
-            }),
-            {
-                key: 'OTHER',
-                name: t('pages.settings.panels.bank.preset_other'),
-                group: t('pages.settings.panels.bank.preset_custom'),
-            },
-        ];
-    }, [bankList, bankingCategoryKey, t]);
+        return bankList.map(bank => ({
+            key: bank.key,
+            name: bank.name,
+            group: t('pages.settings.panels.bank.eyebrow'),
+            logoDomain: bank.logoDomain,
+            website: bank.website,
+        }));
+    }, [bankList, t]);
 
+    const bankById = useMemo(() => new Map(bankList.map(bank => [bank.id, bank])), [bankList]);
     const bankByKey = useMemo(() => new Map(bankList.map(bank => [bank.key, bank])), [bankList]);
 
     function resetForm() {
@@ -154,8 +175,8 @@ export function BankSettings() {
             label: account.name,
             iban: account.iban ? formatIban(account.iban) : '',
             kind: account.kind,
-            bankKey: bank?.key ?? '',
-            customBank: !bank,
+            bankId: bank?.id ?? account.bankId,
+            settlementAccountId: account.settlementAccountId,
         });
         setIbanError(null);
         setAdding(false);
@@ -166,21 +187,46 @@ export function BankSettings() {
         const bank = bankByKey.get(key);
         if (!bank) return;
         const currentLabel = form.getValues('label');
-        const previousBankName = bankByKey.get(form.getValues('bankKey'))?.name;
-        form.setValue('customBank', false);
-        form.setValue('bankKey', key);
-        form.setValue(
-            'label',
-            currentLabel.trim() && currentLabel.trim() !== previousBankName
-                ? currentLabel
-                : bank.name
-        );
+        // Always rewrite the stored name for the new bank (drop old "ING · …" prefix).
+        const nextName = composeAccountBankName(bank.name, currentLabel, bankList);
+        if (accountNameTaken(nextName, editingId)) {
+            showToast(t('common.message.error.api.account_name_taken'), 'error');
+            return;
+        }
+        form.setValue('bankId', bank.id, { shouldDirty: true });
+        form.setValue('label', nextName, {
+            shouldDirty: true,
+        });
         const code = bank.ibanBankCode?.toUpperCase() ?? null;
         if (code) {
             const prevIban = form.getValues('iban');
-            if (isIbanStub(prevIban)) form.setValue('iban', nlIbanPrefix(code));
+            if (isIbanStub(prevIban)) {
+                form.setValue('iban', nlIbanPrefix(code), { shouldDirty: true });
+            }
             setIbanError(null);
         }
+    }
+
+    /** Typing an exact catalog name selects that bank. */
+    function onBankNameChange(value: string) {
+        const needle = value.trim().toLowerCase();
+        const match = needle ? bankList.find(bank => bank.name.toLowerCase() === needle) : null;
+        if (match) {
+            form.setValue('bankId', match.id, { shouldDirty: true });
+            form.setValue('label', composeAccountBankName(match.name, value, bankList), {
+                shouldDirty: true,
+            });
+            const code = match.ibanBankCode?.toUpperCase() ?? null;
+            if (code) {
+                const prevIban = form.getValues('iban');
+                if (isIbanStub(prevIban)) {
+                    form.setValue('iban', nlIbanPrefix(code), { shouldDirty: true });
+                }
+                setIbanError(null);
+            }
+            return;
+        }
+        form.setValue('label', value, { shouldDirty: true });
     }
 
     function resolveIbanForSubmit(value: string): string | null {
@@ -189,7 +235,7 @@ export function BankSettings() {
         if (!isValidIban(trimmed)) {
             throw new Error('invalid_iban');
         }
-        const selected = bankKey ? bankByKey.get(bankKey) : null;
+        const selected = bankId ? bankById.get(bankId) : null;
         const expected = selected?.ibanBankCode?.toUpperCase() ?? null;
         if (expected) {
             const actual = nlIbanBankCode(trimmed);
@@ -206,7 +252,7 @@ export function BankSettings() {
         return normalizeIban(trimmed);
     }
 
-    const selectedBank = bankKey ? bankByKey.get(bankKey) : null;
+    const selectedBank = bankId ? (bankById.get(bankId) ?? null) : null;
     const selectedIbanCode = selectedBank?.ibanBankCode?.toUpperCase() ?? undefined;
     const ibanPlaceholder = selectedIbanCode
         ? formatNlIbanStub(selectedIbanCode)
@@ -216,14 +262,9 @@ export function BankSettings() {
         : t('pages.settings.panels.bank.iban_hint_optional');
 
     function buildAccountName(values: BankAccountFormValues): string {
-        const bank = values.bankKey ? bankByKey.get(values.bankKey) : null;
-        let accountName = values.label.trim();
-        if (!accountName && bank) accountName = bank.name;
-        if (bank && accountName && !accountName.toLowerCase().includes(bank.name.toLowerCase())) {
-            accountName = `${bank.name} · ${accountName}`;
-        }
-        if (!accountName) throw new Error(t('pages.settings.panels.bank.name_required'));
-        return accountName;
+        const bank = values.bankId ? (bankById.get(values.bankId) ?? null) : null;
+        if (!bank) throw new Error(t('common.message.error.api.bank_required'));
+        return composeAccountBankName(bank.name, values.label, bankList);
     }
 
     const createAccount = useSettingsMutation({
@@ -235,6 +276,8 @@ export function BankSettings() {
                 iban: resolveIbanForSubmit(values.iban),
                 kind: values.kind,
                 balance: 0,
+                bankId: values.bankId,
+                settlementAccountId: values.settlementAccountId ?? null,
             });
         },
         invalidateKeys: [apiQuery.money.accounts.list.key()],
@@ -257,6 +300,8 @@ export function BankSettings() {
                 name: buildAccountName(values),
                 iban: resolveIbanForSubmit(values.iban),
                 kind: values.kind,
+                bankId: values.bankId,
+                settlementAccountId: values.settlementAccountId ?? null,
             });
         },
         invalidateKeys: [apiQuery.money.accounts.list.key()],
@@ -280,19 +325,143 @@ export function BankSettings() {
         onSuccess: () => resetForm(),
     });
 
+    const setMainBank = useSettingsMutation({
+        mutationFn: async (nextBankId: string | null) => {
+            if (!householdId) throw new Error('No household');
+            return api.household.updateSettings({ householdId, mainBankId: nextBankId });
+        },
+        invalidateKeys: [apiQuery.household.settings.key()],
+        successMessage: t('pages.settings.toasts.main_bank_updated'),
+    });
+
+    const startLink = useSettingsMutation({
+        mutationFn: async (input: { bankAccountId: string; institutionId: string }) => {
+            if (!householdId) throw new Error('No household');
+            return api.money.bankSync.startLink({
+                householdId,
+                bankAccountId: input.bankAccountId,
+                institutionId: input.institutionId,
+            });
+        },
+        invalidateKeys: [],
+        onSuccess: result => {
+            window.location.assign(result.authUrl);
+        },
+    });
+
+    const completeLink = useSettingsMutation({
+        mutationFn: async (input: { code: string; state: string }) => {
+            if (!householdId) throw new Error('No household');
+            return api.money.bankSync.completeLink({
+                householdId,
+                code: input.code,
+                state: input.state,
+            });
+        },
+        invalidateKeys: [apiQuery.money.accounts.list.key(), apiQuery.money.bankSync.status.key()],
+    });
+
+    const syncNow = useSettingsMutation({
+        mutationFn: async (bankAccountId: string) => {
+            if (!householdId) throw new Error('No household');
+            return api.money.bankSync.syncNow({ householdId, bankAccountId });
+        },
+        invalidateKeys: [
+            apiQuery.money.accounts.list.key(),
+            apiQuery.money.transactions.inbox.key(),
+        ],
+    });
+
+    const disconnectBank = useSettingsMutation({
+        mutationFn: async (bankAccountId: string) => {
+            if (!householdId) throw new Error('No household');
+            return api.money.bankSync.disconnect({ householdId, bankAccountId });
+        },
+        invalidateKeys: [apiQuery.money.accounts.list.key(), apiQuery.money.bankSync.status.key()],
+        successMessage: t('pages.settings.toasts.bank_disconnected'),
+    });
+
+    const completeLinkAsync = completeLink.mutateAsync;
+    const syncNowAsync = syncNow.mutateAsync;
+
+    // Return from Enable Banking OAuth — exchange code, then first sync.
+    useEffect(() => {
+        if (!live || !householdId || oauthHandled.current) return;
+        const code = searchParams.get('code');
+        const state = searchParams.get('state');
+        if (!code || !state) return;
+        oauthHandled.current = true;
+
+        void (async () => {
+            try {
+                showToast(t('pages.settings.panels.bank.linked_toast'), 'info');
+                const linked = await completeLinkAsync({ code, state });
+                try {
+                    const synced = await syncNowAsync(linked.bankAccountId);
+                    showToast(
+                        t('pages.settings.panels.bank.synced_toast', {
+                            count: synced.imported,
+                        }),
+                        'success'
+                    );
+                } catch {
+                    showToast(t('pages.settings.panels.bank.sync_failed_toast'), 'error');
+                }
+            } catch {
+                showToast(t('common.message.error.api.bank_sync_failed'), 'error');
+            } finally {
+                router.replace('/settings/product/money/bank');
+            }
+        })();
+    }, [live, householdId, searchParams, completeLinkAsync, syncNowAsync, router, showToast, t]);
+
+    const mainBankId = settingsQuery.data?.mainBankId ?? null;
     const accounts = accountsQuery.data ?? [];
-    const kindLabel = (kind: string) => accountKindLabel(kind, t);
-    const formOpen = adding || Boolean(editingId);
+    const kindLabel = (accountKind: string) => accountKindLabel(accountKind, t);
     const saving = createAccount.isPending || updateAccount.isPending;
 
-    const canSubmit =
-        live &&
-        !saving &&
-        !ibanError &&
-        Boolean(label.trim() || (bankKey && bankByKey.get(bankKey)?.name)) &&
-        (customBank || Boolean(bankKey));
+    const partnerHint =
+        selectedBank && selectedBank.partnerBankKeys.length > 0
+            ? t('pages.settings.panels.bank.partners_hint', {
+                  banks: selectedBank.partnerBankKeys
+                      .map(key => bankByKey.get(key)?.name ?? key)
+                      .join(', '),
+              })
+            : null;
+
+    const settlementOptions = accounts.filter(
+        row =>
+            row.id !== editingId &&
+            (row.kind === AccountKind.CHECKING || row.kind === AccountKind.SAVINGS)
+    );
+
+    const canSubmit = live && !saving && !ibanError && Boolean(bankId && bankById.get(bankId));
+
+    function accountNameTaken(name: string, exceptId?: string | null): boolean {
+        const needle = name.trim().toLowerCase();
+        if (!needle) return false;
+        return accounts.some(
+            row => row.name.trim().toLowerCase() === needle && row.id !== exceptId
+        );
+    }
 
     function onSubmit(values: BankAccountFormValues) {
+        let name: string;
+        try {
+            name = buildAccountName(values);
+        } catch (error) {
+            showToast(
+                error instanceof Error
+                    ? error.message
+                    : t('pages.settings.panels.bank.name_required'),
+                'error'
+            );
+            return;
+        }
+        if (accountNameTaken(name, editingId)) {
+            showToast(t('common.message.error.api.account_name_taken'), 'error');
+            return;
+        }
         if (editingId) updateAccount.mutate(values);
         else createAccount.mutate(values);
     }
@@ -303,8 +472,17 @@ export function BankSettings() {
                 eyebrow={t('pages.settings.panels.bank.eyebrow')}
                 blurb={t('pages.settings.panels.bank.blurb')}
                 badge={
-                    <SettingsPill>{t('pages.settings.panels.bank.not_connected')}</SettingsPill>
+                    <SettingsPill>
+                        {syncEnabled
+                            ? t('pages.settings.panels.bank.connected')
+                            : t('pages.settings.panels.bank.not_connected')}
+                    </SettingsPill>
                 }>
+                {!syncEnabled ? (
+                    <p className="py-2.5 text-sm text-fg-muted">
+                        {t('pages.settings.panels.bank.connect_disabled_hint')}
+                    </p>
+                ) : null}
                 {bankList.length === 0 ? (
                     <p className="py-2.5 text-sm text-fg-muted">
                         {t('pages.settings.panels.bank.loading_banks')}
@@ -317,21 +495,29 @@ export function BankSettings() {
                             logoDomain: bank.logoDomain,
                             website: bank.website,
                         });
+                        const isMain = mainBankId === bank.id;
                         return (
-                            <SettingsRow key={bank.key} last={i === bankList.length - 1}>
+                            <SettingsRow key={bank.id} last={i === bankList.length - 1}>
                                 <div className="flex min-w-0 items-center gap-2.5">
                                     <VendorMark name={mark.name} src={mark.src} size={22} />
-                                    <SettingsRowLabel title={bank.name} />
+                                    <SettingsRowLabel
+                                        title={bank.name}
+                                        sub={
+                                            isMain
+                                                ? t('pages.settings.panels.bank.main_bank')
+                                                : undefined
+                                        }
+                                    />
                                 </div>
                                 <Button
                                     variant="secondary"
                                     size="sm"
                                     className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
-                                    disabled
-                                    onClick={() =>
-                                        showToast(t('pages.settings.toasts.bank_coming'), 'info')
-                                    }>
-                                    {t('pages.settings.panels.bank.connect')}
+                                    disabled={!live || setMainBank.isPending}
+                                    onClick={() => setMainBank.mutate(isMain ? null : bank.id)}>
+                                    {isMain
+                                        ? t('pages.settings.panels.bank.clear_main')
+                                        : t('pages.settings.panels.bank.set_main')}
                                 </Button>
                             </SettingsRow>
                         );
@@ -347,12 +533,42 @@ export function BankSettings() {
                         size="sm"
                         variant="secondary"
                         className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
-                        onClick={startAdd}
-                        disabled={formOpen && adding}>
-                        {t('pages.settings.panels.bank.add_account')}
+                        onClick={adding ? resetForm : startAdd}
+                        disabled={Boolean(editingId)}>
+                        {adding
+                            ? t('pages.settings.panels.jars_placement.close')
+                            : t('pages.settings.panels.bank.add_account')}
                     </Button>
                 }>
-                {accounts.length === 0 ? (
+                {adding ? (
+                    <AccountBankForm
+                        form={form}
+                        formKey="add"
+                        editing={false}
+                        live={live}
+                        canSubmit={canSubmit}
+                        saving={saving}
+                        bankList={bankList}
+                        bankNameOptions={bankNameOptions}
+                        bankById={bankById}
+                        bankId={bankId}
+                        selectedBank={selectedBank}
+                        selectedIbanCode={selectedIbanCode}
+                        ibanPlaceholder={ibanPlaceholder}
+                        ibanHint={ibanHint}
+                        partnerHint={partnerHint}
+                        kind={kind}
+                        settlementOptions={settlementOptions}
+                        ibanError={ibanError}
+                        setIbanError={setIbanError}
+                        kindLabel={kindLabel}
+                        pickBank={pickBank}
+                        onBankNameChange={onBankNameChange}
+                        onSubmit={onSubmit}
+                        onCancel={resetForm}
+                        t={t}
+                    />
+                ) : accounts.length === 0 ? (
                     <EmptyState
                         variant="compact"
                         className="border-0 bg-transparent"
@@ -361,11 +577,25 @@ export function BankSettings() {
                     />
                 ) : (
                     accounts.map((account, i) => {
-                        const mark = accountBankMark(account, bankList);
                         const isEditing = editingId === account.id;
                         if (editingId && !isEditing) return null;
+                        const mark = isEditing
+                            ? selectedBank
+                                ? vendorMarkSrc({
+                                      key: selectedBank.key,
+                                      name: selectedBank.name,
+                                      logoDomain: selectedBank.logoDomain,
+                                      website: selectedBank.website,
+                                  })
+                                : null
+                            : accountBankMark(account, bankList);
+                        const rowTitle = isEditing
+                            ? label.trim() || selectedBank?.name || account.name
+                            : account.name;
                         const isLastVisible =
-                            isEditing || (!editingId && i === accounts.length - 1 && !adding);
+                            isEditing || (!editingId && i === accounts.length - 1);
+                        const isLinked = Boolean(account.connectionId);
+                        const isConnecting = connectingAccountId === account.id;
                         return (
                             <div
                                 key={account.id}
@@ -382,23 +612,132 @@ export function BankSettings() {
                                             <VendorMark name={mark.name} src={mark.src} size={22} />
                                         ) : null}
                                         <SettingsRowLabel
-                                            title={account.name}
-                                            sub={`${account.iban ? formatIban(account.iban) : t('pages.settings.panels.bank.no_iban')} · ${formatMoney(account.balance)}`}
+                                            title={rowTitle}
+                                            sub={`${account.iban ? formatIban(account.iban) : t('pages.settings.panels.bank.no_iban')} · ${formatMoney(account.balance)}${
+                                                isLinked
+                                                    ? ` · ${t('pages.settings.panels.bank.connected')}`
+                                                    : ''
+                                            }`}
                                         />
                                     </button>
-                                    <Button
-                                        type="button"
-                                        variant="secondary"
-                                        size="sm"
-                                        className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
-                                        onClick={() =>
-                                            isEditing ? resetForm() : openEdit(account)
-                                        }>
-                                        {isEditing
-                                            ? t('pages.settings.panels.jars_placement.close')
-                                            : t('pages.settings.panels.bank.edit')}
-                                    </Button>
+                                    <div className="flex flex-wrap items-center justify-end gap-1.5">
+                                        {syncEnabled && !isEditing && isLinked ? (
+                                            <>
+                                                <Button
+                                                    type="button"
+                                                    variant="secondary"
+                                                    size="sm"
+                                                    className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
+                                                    disabled={!live || syncNow.isPending}
+                                                    onClick={() =>
+                                                        syncNow.mutate(account.id, {
+                                                            onSuccess: result => {
+                                                                showToast(
+                                                                    t(
+                                                                        'pages.settings.panels.bank.synced_toast',
+                                                                        { count: result.imported }
+                                                                    ),
+                                                                    'success'
+                                                                );
+                                                            },
+                                                        })
+                                                    }>
+                                                    {t('pages.settings.panels.bank.sync_now')}
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
+                                                    disabled={!live || disconnectBank.isPending}
+                                                    onClick={() =>
+                                                        disconnectBank.mutate(account.id)
+                                                    }>
+                                                    {t(
+                                                        'pages.settings.panels.bank.disconnect_bank'
+                                                    )}
+                                                </Button>
+                                            </>
+                                        ) : null}
+                                        {syncEnabled && !isEditing && !isLinked ? (
+                                            <Button
+                                                type="button"
+                                                variant="secondary"
+                                                size="sm"
+                                                className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
+                                                disabled={!live}
+                                                onClick={() => {
+                                                    setConnectingAccountId(account.id);
+                                                    setInstitutionId(
+                                                        institutionsQuery.data?.[0]?.id ?? ''
+                                                    );
+                                                }}>
+                                                {t('pages.settings.panels.bank.connect')}
+                                            </Button>
+                                        ) : null}
+                                        <Button
+                                            type="button"
+                                            variant="secondary"
+                                            size="sm"
+                                            className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
+                                            onClick={() =>
+                                                isEditing ? resetForm() : openEdit(account)
+                                            }>
+                                            {isEditing
+                                                ? t('pages.settings.panels.jars_placement.close')
+                                                : t('pages.settings.panels.bank.edit')}
+                                        </Button>
+                                    </div>
                                 </SettingsRow>
+                                {isConnecting && !isEditing ? (
+                                    <div className="grid gap-2 border-t border-line py-2.5">
+                                        <label
+                                            className="font-mono text-[10px] tracking-[0.14em] text-fg-faint uppercase"
+                                            htmlFor={`acc-aspsp-${account.id}`}>
+                                            {t('pages.settings.panels.bank.pick_institution')}
+                                        </label>
+                                        <Select
+                                            id={`acc-aspsp-${account.id}`}
+                                            value={institutionId}
+                                            onChange={event => setInstitutionId(event.target.value)}
+                                            disabled={!live || startLink.isPending}>
+                                            <option value="">
+                                                {t('pages.settings.panels.bank.pick_institution')}
+                                            </option>
+                                            {(institutionsQuery.data ?? []).map(row => (
+                                                <option key={row.id} value={row.id}>
+                                                    {row.name}
+                                                </option>
+                                            ))}
+                                        </Select>
+                                        <div className="flex flex-wrap justify-end gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                onClick={() => {
+                                                    setConnectingAccountId(null);
+                                                    setInstitutionId('');
+                                                }}>
+                                                {t('pages.settings.cancel')}
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                disabled={
+                                                    !live || !institutionId || startLink.isPending
+                                                }
+                                                onClick={() =>
+                                                    startLink.mutate({
+                                                        bankAccountId: account.id,
+                                                        institutionId,
+                                                    })
+                                                }>
+                                                {startLink.isPending
+                                                    ? t('pages.settings.panels.bank.linking')
+                                                    : t('pages.settings.panels.bank.connect')}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ) : null}
                                 {isEditing ? (
                                     <AccountBankForm
                                         form={form}
@@ -409,18 +748,20 @@ export function BankSettings() {
                                         saving={saving}
                                         bankList={bankList}
                                         bankNameOptions={bankNameOptions}
-                                        bankByKey={bankByKey}
-                                        bankKey={bankKey}
-                                        customBank={customBank}
-                                        label={label}
+                                        bankById={bankById}
+                                        bankId={bankId}
                                         selectedBank={selectedBank}
                                         selectedIbanCode={selectedIbanCode}
                                         ibanPlaceholder={ibanPlaceholder}
                                         ibanHint={ibanHint}
+                                        partnerHint={partnerHint}
+                                        kind={kind}
+                                        settlementOptions={settlementOptions}
                                         ibanError={ibanError}
                                         setIbanError={setIbanError}
                                         kindLabel={kindLabel}
                                         pickBank={pickBank}
+                                        onBankNameChange={onBankNameChange}
                                         onSubmit={onSubmit}
                                         onCancel={resetForm}
                                         onDelete={() => removeAccount.mutate()}
@@ -432,40 +773,12 @@ export function BankSettings() {
                         );
                     })
                 )}
-
-                {adding ? (
-                    <AccountBankForm
-                        form={form}
-                        formKey="add"
-                        editing={false}
-                        live={live}
-                        canSubmit={canSubmit}
-                        saving={saving}
-                        bankList={bankList}
-                        bankNameOptions={bankNameOptions}
-                        bankByKey={bankByKey}
-                        bankKey={bankKey}
-                        customBank={customBank}
-                        label={label}
-                        selectedBank={selectedBank}
-                        selectedIbanCode={selectedIbanCode}
-                        ibanPlaceholder={ibanPlaceholder}
-                        ibanHint={ibanHint}
-                        ibanError={ibanError}
-                        setIbanError={setIbanError}
-                        kindLabel={kindLabel}
-                        pickBank={pickBank}
-                        onSubmit={onSubmit}
-                        onCancel={resetForm}
-                        t={t}
-                    />
-                ) : null}
             </SettingsInkCard>
         </SettingsPanel>
     );
 }
 
-type BankPreset = ReturnType<typeof bankingBanksOnly>[number];
+type BankPreset = Bank;
 
 type AccountBankFormProps = {
     form: ReturnType<typeof useForm<BankAccountFormValues>>;
@@ -476,18 +789,20 @@ type AccountBankFormProps = {
     saving: boolean;
     bankList: BankPreset[];
     bankNameOptions: NamePresetOption[];
-    bankByKey: Map<string, BankPreset>;
-    bankKey: string;
-    customBank: boolean;
-    label: string;
+    bankById: Map<string, BankPreset>;
+    bankId: string;
     selectedBank: BankPreset | null | undefined;
     selectedIbanCode: string | undefined;
     ibanPlaceholder: string;
     ibanHint: string;
+    partnerHint: string | null;
+    kind: AccountKind;
+    settlementOptions: Account[];
     ibanError: string | null;
     setIbanError: (value: string | null) => void;
-    kindLabel: (kind: string) => string;
+    kindLabel: (accountKind: string) => string;
     pickBank: (key: string) => void;
+    onBankNameChange: (value: string) => void;
     onSubmit: (values: BankAccountFormValues) => void;
     onCancel: () => void;
     onDelete?: () => void;
@@ -504,18 +819,20 @@ function AccountBankForm({
     saving,
     bankList,
     bankNameOptions,
-    bankByKey,
-    bankKey,
-    customBank,
-    label,
+    bankById,
+    bankId,
     selectedBank,
     selectedIbanCode,
     ibanPlaceholder,
     ibanHint,
+    partnerHint,
+    kind,
+    settlementOptions,
     ibanError,
     setIbanError,
     kindLabel,
     pickBank,
+    onBankNameChange,
     onSubmit,
     onCancel,
     onDelete,
@@ -543,33 +860,19 @@ function AccountBankForm({
                     ) : (
                         <div className="grid gap-2">
                             <PresetNameField
-                                value={customBank ? label : (bankByKey.get(bankKey)?.name ?? '')}
-                                onChange={value => {
-                                    if (!customBank) {
-                                        form.setValue('customBank', true);
-                                        form.setValue('bankKey', '');
-                                    }
-                                    form.setValue('label', value);
-                                }}
+                                value={bankById.get(bankId)?.name ?? ''}
+                                onChange={onBankNameChange}
                                 options={bankNameOptions}
                                 placeholder={t('pages.settings.panels.bank.search_bank')}
                                 freeTextPlaceholder={t('pages.settings.panels.bank.type_bank_name')}
                                 lockPresets
-                                freeTextKeys={['OTHER']}
-                                initialLockedKey={customBank ? null : bankKey || undefined}
+                                initialLockedKey={bankById.get(bankId)?.key || undefined}
                                 disabled={!live}
                                 onClear={() => {
-                                    form.setValue('bankKey', '');
-                                    form.setValue('customBank', false);
+                                    form.setValue('bankId', '');
                                     form.setValue('label', '');
                                 }}
                                 onSelect={opt => {
-                                    if (opt.key === 'OTHER') {
-                                        form.setValue('customBank', true);
-                                        form.setValue('bankKey', '');
-                                        form.setValue('label', '');
-                                        return;
-                                    }
                                     pickBank(opt.key);
                                 }}
                             />
@@ -581,7 +884,7 @@ function AccountBankForm({
                                         logoDomain: bank.logoDomain,
                                         website: bank.website,
                                     });
-                                    const selected = !customBank && bankKey === bank.key;
+                                    const selected = bankId === bank.id;
                                     return (
                                         <button
                                             key={bank.key}
@@ -600,6 +903,9 @@ function AccountBankForm({
                                     );
                                 })}
                             </div>
+                            {partnerHint ? (
+                                <p className="text-xs text-fg-muted">{partnerHint}</p>
+                            ) : null}
                         </div>
                     )}
                 </div>
@@ -616,10 +922,10 @@ function AccountBankForm({
                                     <Input
                                         id={`acc-name-${formKey}`}
                                         placeholder={
-                                            bankKey
+                                            bankId
                                                 ? t('pages.settings.panels.bank.bank_checking', {
                                                       bank:
-                                                          bankByKey.get(bankKey)?.name ??
+                                                          bankById.get(bankId)?.name ??
                                                           t(
                                                               'pages.settings.panels.bank.bank_fallback'
                                                           ),
@@ -704,7 +1010,15 @@ function AccountBankForm({
                                     <Select
                                         id={`acc-kind-${formKey}`}
                                         value={field.value}
-                                        onChange={event => field.onChange(event.target.value)}
+                                        onChange={event => {
+                                            const next = event.target.value;
+                                            field.onChange(next);
+                                            if (next !== AccountKind.CREDIT) {
+                                                form.setValue('settlementAccountId', null, {
+                                                    shouldDirty: true,
+                                                });
+                                            }
+                                        }}
                                         disabled={!live}>
                                         <option value={AccountKind.CHECKING}>
                                             {kindLabel(AccountKind.CHECKING)}
@@ -727,6 +1041,41 @@ function AccountBankForm({
                         </FormItem>
                     )}
                 />
+                {kind === AccountKind.CREDIT ? (
+                    <FormField
+                        control={form.control}
+                        name="settlementAccountId"
+                        render={({ field }) => (
+                            <FormItem>
+                                <Field
+                                    label={t('pages.settings.panels.bank.pay_from')}
+                                    htmlFor={`acc-settle-${formKey}`}
+                                    hint={t('pages.settings.panels.bank.pay_from_hint')}>
+                                    <FormControl>
+                                        <Select
+                                            id={`acc-settle-${formKey}`}
+                                            value={field.value ?? ''}
+                                            onChange={event => {
+                                                const next = event.target.value;
+                                                field.onChange(next ? next : null);
+                                            }}
+                                            disabled={!live || settlementOptions.length === 0}>
+                                            <option value="">
+                                                {t('pages.settings.panels.bank.pay_from_none')}
+                                            </option>
+                                            {settlementOptions.map(row => (
+                                                <option key={row.id} value={row.id}>
+                                                    {row.name}
+                                                </option>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Field>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                ) : null}
                 <div className="flex flex-wrap items-center justify-end gap-2">
                     {editing && onDelete ? (
                         <ConfirmActionButton

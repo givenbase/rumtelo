@@ -718,6 +718,8 @@ export function ExpenseForm({
                                     onSelect={preset => {
                                         setInflowKey(preset.key);
                                         if (lockJar) return;
+                                        // OTHER_IN has no jar — keep the current one.
+                                        if (preset.key === 'OTHER_IN') return;
                                         const full = transactionInPresets.find(
                                             candidate => candidate.key === preset.key
                                         );

@@ -64,17 +64,51 @@ Imported rows: `source: CSV`, amounts in eurocents, SHA-256 dedupe key so re-imp
 - **Licence / path:** PSD2 AIS via Enable Banking; we do not talk to ING/Rabobank APIs ourselves.
 - **NL coverage (major):** ABN AMRO, ING, Rabobank have production AISP. Other Dutch ASPSPs (Volksbank brands, Triodos, etc.) — check [Enable Banking NL docs](https://enablebanking.com/docs/markets/nl/) and their ASPSP list.
 - **Consent:** typically expires ~**90 days**; UI must warn before expiry when sync ships.
-- **Code:** [`BankingPort`](../../apps/backend/src/banking/banking.port.ts); null adapter by default; [`EnableBankingAdapter`](../../apps/backend/src/banking/adapters/enable-banking.adapter.ts) throws until implemented (never silent `[]`).
+- **Code:** [`BankingPort`](../../apps/backend/src/banking/banking.port.ts) imports shared DTOs (`BankInstitution`, start-link result) from `@rumtelo/contracts`; provider-only shapes stay on the port. Null adapter by default; [`EnableBankingAdapter`](../../apps/backend/src/banking/adapters/enable-banking.adapter.ts) when `FEATURE_BANK_SYNC` is on.
+- **API:** `money.bankSync.*` (status, listInstitutions, startLink, completeLink, syncNow, syncStale, disconnect). Frontend never holds the PEM.
 
-Env (see `apps/backend/.env.example`):
+### When transactions refresh
+
+AIS does **not** push every booking. Rumtelo polls:
+
+| Trigger | Where | Behaviour |
+|---|---|---|
+| **Cron (every 6h)** | Nest `BankSyncScheduler` (`0 */6 * * *`) | Walks every seat with `connectionId`; skips if synced within **30 minutes**; runs each pull inside `householdStorage` |
+| **On visit** | Money hub, Transactions (Inbox), Bank settings | `useBankSyncOnVisit` → `bankSync.syncStale` once per mount; same 30‑minute freshness gate; silent if sync is off |
+| **Manual** | Bank settings **Sync now** | Always pulls that seat |
+| **After Connect** | OAuth return on bank settings | `completeLink` then immediate `syncNow` |
+
+Constants: [`bank-sync.constants.ts`](../../apps/backend/src/modules/public/product/money/ledger/bank-sync/bank-sync.constants.ts) (`BANK_SYNC_CRON`, `BANK_SYNC_STALE_MS`). New Inbox rows use `source: BANK` + dedupe keys (same idea as CSV).
+
+**Consent (~90 days):** when the bank session expires, pulls fail until the user Connects again. UI warning for expiry is still a follow-up.
+
+### Redirect URLs (Control Panel whitelist)
+
+Register **exact** origins+paths (no query string — Enable Banking appends `code` / `state`):
+
+```
+http://localhost:3000/settings/product/money/bank
+https://app.rumtelo.com/settings/product/money/bank
+```
+
+Browser returns to `DOMAIN_APP`; Nest exchanges the code via oRPC. Do **not** whitelist Nest/`DOMAIN_BACK`.
+
+### Env (see `apps/backend/.env.example`)
 
 ```bash
 FEATURE_BANK_SYNC=false
-ENABLE_BANKING_APP_ID=
-ENABLE_BANKING_PRIVATE_KEY=
+ENABLE_BANKING_APP_ID=          # UUID — same as .pem filename
+ENABLE_BANKING_PRIVATE_KEY=    # PEM contents (quoted; use \n for newlines)
 ```
 
-When `FEATURE_BANK_SYNC` is on, `ENABLE_BANKING_APP_ID` is required (validated in env config).
+When `FEATURE_BANK_SYNC` is on, **both** `ENABLE_BANKING_APP_ID` and `ENABLE_BANKING_PRIVATE_KEY` are required. Keep the flag false until credentials are set; the UI calls `bankSync.status` and only shows Connect when `enabled` is true.
+
+### Enable checklist
+
+1. Register Sandbox app at Enable Banking; paste the two redirect URLs above.
+2. Save App ID + PEM into local `.env` (never commit).
+3. Ship adapter + `bankSync` procedures; flip `FEATURE_BANK_SYNC=true` locally.
+4. Connect → return to settings → `connectionId` on the seat → Sync.
 
 ---
 
@@ -157,14 +191,14 @@ If we ever do "real jars", **bunq is the bank**, exactly as it is for Flow.
 | CSV parse | `…/ledger/transaction/csv/csv-parser.ts` |
 | Import API | `TransactionService.importCsv` → `money.transactions.importCsv` |
 | Contracts | `packages/contracts` — `ImportCsv` / `ImportPreview` |
-| Settings copy | Bank accounts settings mention CSV; connect UI still “coming soon” |
-| Plan capability | `moneyImport` — Upload bankafschriften (CSV); bank connect capability separate |
+| Settings copy | Bank settings Connect when `bankSync.status.enabled` |
+| Plan capability | `moneyImport` — CSV; live connect gated by `FEATURE_BANK_SYNC` (commercial later) |
 
 Flow:
 
 ```
 CSV file ──► parseStatementCsv ──► dedupe ──► Transaction (CSV, INBOX)
-Bank AIS ──► BankingPort.fetchTransactions ──► Transaction (BANK, INBOX)   [when implemented]
+Bank AIS ──► BankingPort.fetchTransactions ──► Transaction (BANK, INBOX)
                     └──► household sorts in Inbox
 ```
 
@@ -173,7 +207,8 @@ Bank AIS ──► BankingPort.fetchTransactions ──► Transaction (BANK, IN
 ## Product follow-ups (not done)
 
 - CSV **import wizard** UI: pick account → upload → confirm mapping/preview → commit
-- Implement **Enable Banking** adapter (institutions, link, fetch) + consent expiry UX
+- Consent-expiry warning UX (~90 days)
+- Optional denser cron / shorter stale window once volume is known
 - **Jar ↔ external account mapping** (route 1 above): link a bunq IBAN / Revolut currency account to a jar so balances mirror the bank
 - Send the two outreach mails in [outreach-pis.md](./outreach-pis.md); record answers (price, agent model yes/no) here
 - Optional later: MT940 / CAMT.053 parsers if customers need them beyond CSV
