@@ -2398,6 +2398,15 @@
                 "review_fixed": "Vaste kosten herzien",
                 "open_jar": "Open de pot met basisbenodigdheden",
                 "raise_income": "+ Het inkomen verhogen"
+            },
+            "household_profile": {
+                "filter_tip_title": "Rekeninglijst is afgestemd",
+                "filter_tip_body": "Sommige soorten rekeningen blijven verborgen op basis van je huishoudprofiel. Pas het aan in Instellingen, of toon alle soorten voor dit formulier.",
+                "show_all": "Alles tonen",
+                "use_filter": "Profiel filter gebruiken",
+                "open_settings": "Huishoudprofiel",
+                "showing_all": "Alle soorten rekeningen worden getoond voor dit formulier. Zet de profielfilter wanneer je wilt weer aan.",
+                "toast_added": "Toegevoegd aan huishoudprofiel: {profiles} — zodat Money passende rekeningen kan voorstellen."
             }
         },
         "soul": {
@@ -4327,6 +4336,8 @@
                     "iban_placeholder": "NL00 BANK 0000 0000 00",
                     "add": "Toevoegen",
                     "add_account": "+ Account toevoegen",
+                    "edit": "Wijzigen",
+                    "edit_account": "Account wijzigen",
                     "bank_fallback": "Bank",
                     "preset_other": "Overige",
                     "preset_custom": "Op maat",
@@ -4343,9 +4354,7 @@
                     "iban": "IBAN",
                     "no_iban": "Geen IBAN",
                     "iban_bank_mismatch": "De IBAN-bankcode is {actual}; verwacht werd {expected} voor {bank}",
-                    "iban_bank_mismatch_short": "Dit IBAN-nummer is {actual}, maar {bank} gebruikt {expected}.",
-                    "edit": "Wijzigen",
-                    "edit_account": "Account wijzigen"
+                    "iban_bank_mismatch_short": "Dit IBAN-nummer is {actual}, maar {bank} gebruikt {expected}."
                 },
                 "growth": {
                     "eyebrow": "Planhorizon",
@@ -4497,6 +4506,8 @@
                 "payoff_failed": "Het opslaan van de uitbetalingsmethode is mislukt",
                 "account_added": "Account toegevoegd",
                 "account_add_failed": "Het toevoegen van het account is mislukt",
+                "account_updated": "Account bijgewerkt",
+                "account_deleted": "Account verwijderd",
                 "bank_coming": "Bankconnect komt binnenkort beschikbaar",
                 "household_updated": "Huishouden bijgewerkt",
                 "household_failed": "Het opslaan van huishoudgegevens is mislukt",
@@ -4520,9 +4531,7 @@
                 "plan_kept_until": "{plan} wordt bewaard tot het einde van de periode",
                 "csv_exported_one": "{count} transactie geëxporteerd{periodSuffix}",
                 "csv_exported_other": "{count} geëxporteerde transacties{periodSuffix}",
-                "csv_period_suffix": " voor {period}",
-                "account_updated": "Account bijgewerkt",
-                "account_deleted": "Account verwijderd"
+                "csv_period_suffix": " voor {period}"
             }
         },
         "shell": {

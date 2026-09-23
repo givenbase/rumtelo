@@ -2398,6 +2398,15 @@
                 "review_fixed": "Review fixed costs",
                 "open_jar": "Open Necessities jar",
                 "raise_income": "+ Raise income"
+            },
+            "household_profile": {
+                "filter_tip_title": "Bill list is tailored",
+                "filter_tip_body": "Some bill types stay hidden based on your household profile. Change it in Settings, or show every type for this form.",
+                "show_all": "Show all",
+                "use_filter": "Use profile filter",
+                "open_settings": "Household profile",
+                "showing_all": "Showing every bill type for this form. Turn the profile filter back on anytime.",
+                "toast_added": "Added to household profile: {profiles} — so Money can suggest matching bills."
             }
         },
         "soul": {
@@ -4327,6 +4336,8 @@
                     "iban_placeholder": "NL00 BANK 0000 0000 00",
                     "add": "Add",
                     "add_account": "+ Add account",
+                    "edit": "Edit",
+                    "edit_account": "Edit account",
                     "bank_fallback": "Bank",
                     "preset_other": "Other",
                     "preset_custom": "Custom",
@@ -4343,9 +4354,7 @@
                     "iban": "IBAN",
                     "no_iban": "No IBAN",
                     "iban_bank_mismatch": "IBAN bank code is {actual}, expected {expected} for {bank}",
-                    "iban_bank_mismatch_short": "This IBAN is {actual}, but {bank} uses {expected}.",
-                    "edit": "Edit",
-                    "edit_account": "Edit account"
+                    "iban_bank_mismatch_short": "This IBAN is {actual}, but {bank} uses {expected}."
                 },
                 "growth": {
                     "eyebrow": "Planning horizon",
@@ -4497,6 +4506,8 @@
                 "payoff_failed": "Payoff method save failed",
                 "account_added": "Account added",
                 "account_add_failed": "Account add failed",
+                "account_updated": "Account updated",
+                "account_deleted": "Account deleted",
                 "bank_coming": "Bank connect coming soon",
                 "household_updated": "Household updated",
                 "household_failed": "Household save failed",
@@ -4520,9 +4531,7 @@
                 "plan_kept_until": "{plan} kept until period end",
                 "csv_exported_one": "{count} transaction exported{periodSuffix}",
                 "csv_exported_other": "{count} transactions exported{periodSuffix}",
-                "csv_period_suffix": " for {period}",
-                "account_updated": "Account updated",
-                "account_deleted": "Account deleted"
+                "csv_period_suffix": " for {period}"
             }
         },
         "shell": {

@@ -878,6 +878,19 @@ const money = {
         open_jar: 'Open Necessities jar',
         raise_income: '+ Raise income',
     },
+    /** Fixed-cost picker filter notice + smart Huishoudprofiel enable toasts. */
+    household_profile: {
+        filter_tip_title: 'Bill list is tailored',
+        filter_tip_body:
+            'Some bill types stay hidden based on your household profile. Change it in Settings, or show every type for this form.',
+        show_all: 'Show all',
+        use_filter: 'Use profile filter',
+        open_settings: 'Household profile',
+        showing_all:
+            'Showing every bill type for this form. Turn the profile filter back on anytime.',
+        toast_added:
+            'Added to household profile: {profiles} — so Money can suggest matching bills.',
+    },
 } as const;
 
 export default money;

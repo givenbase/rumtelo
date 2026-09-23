@@ -31,10 +31,12 @@ import {
 } from '@/app/_lib/car-brands';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
+import { audienceKeysFromAsset } from '@/app/_lib/household-audience-from-money';
 import { useTranslations } from '@rumtelo/i18n';
 
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { useMergeHouseholdAudiences } from '@/app/_lib/use-merge-household-audiences';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
@@ -89,6 +91,7 @@ export function AssetForm({
     const { symbol } = useHouseholdCurrency();
     const { householdId } = useAuth();
     const live = isLiveData(householdId);
+    const { mergeImplied } = useMergeHouseholdAudiences();
     const queryClient = useQueryClient();
     const [presetKey, setPresetKey] = useState(defaultValues?.presetKey ?? null);
     const [showAllCarBrands, setShowAllCarBrands] = useState(false);
@@ -238,10 +241,18 @@ export function AssetForm({
             }
             return api.growth.assets.create(payload);
         },
-        onSuccess: () => {
+        onSuccess: async (_data, values) => {
             void queryClient.invalidateQueries({ queryKey: apiQuery.growth.assets.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.growth.assets.get.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.growth.dashboard.get.key() });
+            if (mode === 'create') {
+                await mergeImplied(
+                    audienceKeysFromAsset({
+                        kindKey: values.kind,
+                        presetKey: presetKey === 'OTHER' ? null : presetKey,
+                    })
+                );
+            }
             showToast(
                 mode === 'edit'
                     ? t('common.message.success.updated', {

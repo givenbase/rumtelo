@@ -2398,6 +2398,15 @@
                 "review_fixed": "Revisar los costes fijos",
                 "open_jar": "Abre el tarro de «Necessities»",
                 "raise_income": "+ Aumentar los ingresos"
+            },
+            "household_profile": {
+                "filter_tip_title": "Bill list is tailored",
+                "filter_tip_body": "Some bill types stay hidden based on your household profile. Change it in Settings, or show every type for this form.",
+                "show_all": "Show all",
+                "use_filter": "Use profile filter",
+                "open_settings": "Household profile",
+                "showing_all": "Showing every bill type for this form. Turn the profile filter back on anytime.",
+                "toast_added": "Added to household profile: {profiles} — so Money can suggest matching bills."
             }
         },
         "soul": {
@@ -4327,6 +4336,8 @@
                     "iban_placeholder": "NL00 BANCO 0000 0000 00",
                     "add": "Añadir",
                     "add_account": "+ Añadir cuenta",
+                    "edit": "Editar",
+                    "edit_account": "Editar cuenta",
                     "bank_fallback": "Banco",
                     "preset_other": "Otros",
                     "preset_custom": "Personalizado",
@@ -4343,9 +4354,7 @@
                     "iban": "IBAN",
                     "no_iban": "Sin IBAN",
                     "iban_bank_mismatch": "El código bancario IBAN es {actual}; se esperaba {expected} para {bank}",
-                    "iban_bank_mismatch_short": "Este IBAN es {actual}, pero {bank} utiliza {expected}.",
-                    "edit": "Editar",
-                    "edit_account": "Editar cuenta"
+                    "iban_bank_mismatch_short": "Este IBAN es {actual}, pero {bank} utiliza {expected}."
                 },
                 "growth": {
                     "eyebrow": "Horizonte de planificación",
@@ -4497,6 +4506,8 @@
                 "payoff_failed": "Error al guardar el método de liquidación",
                 "account_added": "Cuenta añadida",
                 "account_add_failed": "No se ha podido añadir la cuenta",
+                "account_updated": "Cuenta actualizada",
+                "account_deleted": "Cuenta eliminada",
                 "bank_coming": "Próximamente: conexión con la banca",
                 "household_updated": "Datos sobre los hogares actualizados",
                 "household_failed": "Error al guardar los datos del hogar",
@@ -4520,9 +4531,7 @@
                 "plan_kept_until": "{plan} se mantiene hasta el final del período",
                 "csv_exported_one": "{count} transacción exportada{periodSuffix}",
                 "csv_exported_other": "{count} transacciones exportadas{periodSuffix}",
-                "csv_period_suffix": " para {period}",
-                "account_updated": "Cuenta actualizada",
-                "account_deleted": "Cuenta eliminada"
+                "csv_period_suffix": " para {period}"
             }
         },
         "shell": {

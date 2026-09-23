@@ -2398,6 +2398,15 @@
                 "review_fixed": "Examiner les coûts fixes",
                 "open_jar": "Ouvrir le pot « Necessities »",
                 "raise_income": "+ Augmenter les revenus"
+            },
+            "household_profile": {
+                "filter_tip_title": "Bill list is tailored",
+                "filter_tip_body": "Some bill types stay hidden based on your household profile. Change it in Settings, or show every type for this form.",
+                "show_all": "Show all",
+                "use_filter": "Use profile filter",
+                "open_settings": "Household profile",
+                "showing_all": "Showing every bill type for this form. Turn the profile filter back on anytime.",
+                "toast_added": "Added to household profile: {profiles} — so Money can suggest matching bills."
             }
         },
         "soul": {
@@ -4327,6 +4336,8 @@
                     "iban_placeholder": "NL00 BANQUE 0000 0000 00",
                     "add": "Ajouter",
                     "add_account": "+ Ajouter un compte",
+                    "edit": "Modifier",
+                    "edit_account": "Modifier le compte",
                     "bank_fallback": "Banque",
                     "preset_other": "Autres",
                     "preset_custom": "Personnalisé",
@@ -4343,9 +4354,7 @@
                     "iban": "IBAN",
                     "no_iban": "Pas d'IBAN",
                     "iban_bank_mismatch": "Le code bancaire IBAN est {actual}, alors qu'on s'attendait à {expected} pour {bank}",
-                    "iban_bank_mismatch_short": "Cet IBAN est {actual}, mais {bank} utilise {expected}.",
-                    "edit": "Modifier",
-                    "edit_account": "Modifier le compte"
+                    "iban_bank_mismatch_short": "Cet IBAN est {actual}, mais {bank} utilise {expected}."
                 },
                 "growth": {
                     "eyebrow": "Horizon de planification",
@@ -4497,6 +4506,8 @@
                 "payoff_failed": "Échec de l'enregistrement de la méthode de paiement",
                 "account_added": "Compte ajouté",
                 "account_add_failed": "Échec de l'ajout du compte",
+                "account_updated": "Compte mis à jour",
+                "account_deleted": "Compte supprimé",
                 "bank_coming": "Le service « Bank Connect » sera bientôt disponible",
                 "household_updated": "Mise à jour des données sur les ménages",
                 "household_failed": "Échec de l'enregistrement des données du ménage",
@@ -4520,9 +4531,7 @@
                 "plan_kept_until": "{plan} conservé jusqu'à la fin de la période",
                 "csv_exported_one": "{count} transaction exportée{periodSuffix}",
                 "csv_exported_other": "{count} transactions exportées{periodSuffix}",
-                "csv_period_suffix": " pour {period}",
-                "account_updated": "Compte mis à jour",
-                "account_deleted": "Compte supprimé"
+                "csv_period_suffix": " pour {period}"
             }
         },
         "shell": {

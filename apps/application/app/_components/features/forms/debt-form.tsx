@@ -29,9 +29,11 @@ import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { partyMark } from '@/app/_lib/vendor-brands';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
+import { audienceKeysFromDebt } from '@/app/_lib/household-audience-from-money';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
+import { useMergeHouseholdAudiences } from '@/app/_lib/use-merge-household-audiences';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
@@ -101,6 +103,7 @@ export function DebtForm({
     const apiError = useApiError();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
+    const { mergeImplied } = useMergeHouseholdAudiences();
     const [typeKey, setTypeKey] = useState<string | null>(null);
     const [typeQuery, setTypeQuery] = useState('');
     const [customLender, setCustomLender] = useState(false);
@@ -242,9 +245,18 @@ export function DebtForm({
                 ...schedule,
             });
         },
-        onSuccess: () => {
+        onSuccess: async () => {
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.key() });
+            if (mode === 'create' && typeKey && typeKey !== 'OTHER') {
+                const selected = debtTypes.find(option => option.key === typeKey);
+                await mergeImplied(
+                    audienceKeysFromDebt({
+                        presetKey: typeKey,
+                        kind: selected?.kind ?? form.getValues('kind'),
+                    })
+                );
+            }
             showToast(
                 mode === 'edit'
                     ? t('common.message.success.updated', {
