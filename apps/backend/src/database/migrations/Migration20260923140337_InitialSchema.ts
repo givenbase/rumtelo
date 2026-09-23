@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260922112448_InitialSchema extends Migration {
+export class Migration20260923140337_InitialSchema extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create schema if not exists "backoffice";`);
@@ -75,7 +75,10 @@ export class Migration20260922112448_InitialSchema extends Migration {
 
     this.addSql(`create table "auth"."verification" ("id" uuid not null, "identifier" text not null, "value" text not null, "expires_at" timestamptz not null, "created_at" timestamptz not null default CURRENT_TIMESTAMP, "updated_at" timestamptz not null default CURRENT_TIMESTAMP, constraint "verification_pkey" primary key ("id"));`);
 
-    this.addSql(`create table "money_bank_account" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "name" varchar(120) not null, "iban" varchar(34) null, "balance" bigint not null default 0, "connection_id" uuid null, "last_synced_at" timestamptz null, "kind" "public"."money_account_kind" not null default 'CHECKING', constraint "money_bank_account_pkey" primary key ("id"));`);
+    this.addSql(`create table "backoffice"."reference_money_bank" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "key" varchar(64) not null, "name" varchar(120) not null, "sort_order" int not null default 0, "is_active" boolean not null default true, "description" text null, "countries" jsonb not null, "iban_bank_code" varchar(4) null, "logo_domain" varchar(120) null, "website" varchar(240) null, constraint "reference_money_bank_pkey" primary key ("id"));`);
+    this.addSql(`alter table "backoffice"."reference_money_bank" add constraint "reference_money_bank_key_unique" unique ("key");`);
+
+    this.addSql(`create table "money_bank_account" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "name" varchar(120) not null, "iban" varchar(34) null, "balance" bigint not null default 0, "connection_id" varchar(120) null, "last_synced_at" timestamptz null, "kind" "public"."money_account_kind" not null default 'CHECKING', "bank_id" uuid not null, "settlement_account_id" uuid null, constraint "money_bank_account_pkey" primary key ("id"));`);
     this.addSql(`create index "money_bank_account_household_id_index" on "money_bank_account" ("household_id");`);
     this.addSql(`alter table "money_bank_account" add constraint "money_bank_account_household_id_iban_unique" unique ("household_id", "iban");`);
 
@@ -119,9 +122,11 @@ export class Migration20260922112448_InitialSchema extends Migration {
     this.addSql(`alter table "auth"."household_billing" add constraint "household_billing_stripe_subscription_id_unique" unique ("stripe_subscription_id");`);
     this.addSql(`alter table "auth"."household_billing" add constraint "household_billing_household_id_unique" unique ("household_id");`);
 
-    this.addSql(`create table "auth"."household_settings" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "why" text null, "money" jsonb not null, "week_check" jsonb not null, "features" jsonb not null, "answers" jsonb not null, "onboarded_at" timestamptz null, "kind" "public"."platform_household_kind" not null default 'SOLO', "currency" "public"."platform_currency" not null default 'EUR', constraint "household_settings_pkey" primary key ("id"));`);
+    this.addSql(`create table "auth"."household_settings" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "why" text null, "money" jsonb not null, "week_check" jsonb not null, "features" jsonb not null, "answers" jsonb not null, "onboarded_at" timestamptz null, "kind" "public"."platform_household_kind" not null default 'SOLO', "currency" "public"."platform_currency" not null default 'EUR', "main_bank_id" uuid null, constraint "household_settings_pkey" primary key ("id"));`);
     this.addSql(`create index "household_settings_household_id_index" on "auth"."household_settings" ("household_id");`);
     this.addSql(`alter table "auth"."household_settings" add constraint "household_settings_household_id_unique" unique ("household_id");`);
+
+    this.addSql(`create table "backoffice"."household_settings_audience" ("household_settings_id" uuid not null, "audience_id" uuid not null, constraint "household_settings_audience_pkey" primary key ("household_settings_id", "audience_id"));`);
 
     this.addSql(`create table "growth_income_lever" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "name" varchar(160) not null, "note" text null, "potential_monthly" bigint not null default 0, "is_done" boolean not null default false, constraint "growth_income_lever_pkey" primary key ("id"));`);
     this.addSql(`create index "growth_income_lever_household_id_index" on "growth_income_lever" ("household_id");`);
@@ -205,9 +210,6 @@ export class Migration20260922112448_InitialSchema extends Migration {
     this.addSql(`create table "backoffice"."reference_money_merchant_branding" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "logo_domain" varchar(120) null, "website" varchar(240) null, "preset_id" uuid not null, constraint "reference_money_merchant_branding_pkey" primary key ("id"));`);
     this.addSql(`alter table "backoffice"."reference_money_merchant_branding" add constraint "reference_money_merchant_branding_preset_id_unique" unique ("preset_id");`);
 
-    this.addSql(`create table "backoffice"."reference_money_merchant_banking" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "iban_bank_code" varchar(4) not null, "preset_id" uuid not null, constraint "reference_money_merchant_banking_pkey" primary key ("id"));`);
-    this.addSql(`alter table "backoffice"."reference_money_merchant_banking" add constraint "reference_money_merchant_banking_preset_id_unique" unique ("preset_id");`);
-
     this.addSql(`create table "backoffice"."reference_money_fixed_cost_preset_merchant" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "sort_order" int not null default 0, "preset_id" uuid not null, "merchant_id" uuid not null, constraint "reference_money_fixed_cost_preset_merchant_pkey" primary key ("id"));`);
     this.addSql(`create index "reference_money_fixed_cost_preset_merchant_merchant_id_index" on "backoffice"."reference_money_fixed_cost_preset_merchant" ("merchant_id");`);
     this.addSql(`alter table "backoffice"."reference_money_fixed_cost_preset_merchant" add constraint "reference_money_fixed_cost_preset_merchant_preset_93892_unique" unique ("preset_id", "merchant_id");`);
@@ -245,6 +247,8 @@ export class Migration20260922112448_InitialSchema extends Migration {
     this.addSql(`create table "backoffice"."plan_capability_grant" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "plan_id" uuid not null, "capability_id" uuid not null, constraint "plan_capability_grant_pkey" primary key ("id"));`);
     this.addSql(`create index "plan_capability_grant_capability_id_index" on "backoffice"."plan_capability_grant" ("capability_id");`);
     this.addSql(`alter table "backoffice"."plan_capability_grant" add constraint "plan_capability_grant_plan_id_capability_id_unique" unique ("plan_id", "capability_id");`);
+
+    this.addSql(`create table "backoffice"."reference_money_bank_partner" ("bank_1_id" uuid not null, "bank_2_id" uuid not null, constraint "reference_money_bank_partner_pkey" primary key ("bank_1_id", "bank_2_id"));`);
 
     this.addSql(`create table "backoffice"."reference_money_fixed_cost_preset_audience" ("fixed_cost_preset_id" uuid not null, "audience_id" uuid not null, constraint "reference_money_fixed_cost_preset_audience_pkey" primary key ("fixed_cost_preset_id", "audience_id"));`);
 
@@ -332,6 +336,8 @@ export class Migration20260922112448_InitialSchema extends Migration {
     this.addSql(`alter table "auth"."account_settings" add constraint "account_settings_account_id_foreign" foreign key ("account_id") references "auth"."account" ("id") on update cascade on delete cascade;`);
 
     this.addSql(`alter table "money_bank_account" add constraint "money_bank_account_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
+    this.addSql(`alter table "money_bank_account" add constraint "money_bank_account_bank_id_foreign" foreign key ("bank_id") references "backoffice"."reference_money_bank" ("id") on update cascade on delete restrict;`);
+    this.addSql(`alter table "money_bank_account" add constraint "money_bank_account_settlement_account_id_foreign" foreign key ("settlement_account_id") references "money_bank_account" ("id") on update cascade on delete set null;`);
 
     this.addSql(`alter table "platform_coach_message" add constraint "platform_coach_message_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
     this.addSql(`alter table "platform_coach_message" add constraint "platform_coach_message_account_id_foreign" foreign key ("account_id") references "auth"."account" ("id") on update cascade on delete cascade;`);
@@ -351,6 +357,10 @@ export class Migration20260922112448_InitialSchema extends Migration {
     this.addSql(`alter table "auth"."household_billing" add constraint "household_billing_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
 
     this.addSql(`alter table "auth"."household_settings" add constraint "household_settings_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
+    this.addSql(`alter table "auth"."household_settings" add constraint "household_settings_main_bank_id_foreign" foreign key ("main_bank_id") references "backoffice"."reference_money_bank" ("id") on update cascade on delete set null;`);
+
+    this.addSql(`alter table "backoffice"."household_settings_audience" add constraint "household_settings_audience_household_settings_id_foreign" foreign key ("household_settings_id") references "auth"."household_settings" ("id") on update cascade on delete cascade;`);
+    this.addSql(`alter table "backoffice"."household_settings_audience" add constraint "household_settings_audience_audience_id_foreign" foreign key ("audience_id") references "backoffice"."reference_money_audience" ("id") on update cascade on delete cascade;`);
 
     this.addSql(`alter table "growth_income_lever" add constraint "growth_income_lever_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
 
@@ -399,8 +409,6 @@ export class Migration20260922112448_InitialSchema extends Migration {
 
     this.addSql(`alter table "backoffice"."reference_money_merchant_branding" add constraint "reference_money_merchant_branding_preset_id_foreign" foreign key ("preset_id") references "backoffice"."reference_money_merchant_preset" ("id") on update cascade on delete cascade;`);
 
-    this.addSql(`alter table "backoffice"."reference_money_merchant_banking" add constraint "reference_money_merchant_banking_preset_id_foreign" foreign key ("preset_id") references "backoffice"."reference_money_merchant_preset" ("id") on update cascade on delete cascade;`);
-
     this.addSql(`alter table "backoffice"."reference_money_fixed_cost_preset_merchant" add constraint "reference_money_fixed_cost_preset_merchant_preset_id_foreign" foreign key ("preset_id") references "backoffice"."reference_money_fixed_cost_preset" ("id") on update cascade on delete cascade;`);
     this.addSql(`alter table "backoffice"."reference_money_fixed_cost_preset_merchant" add constraint "reference_money_fixed_cost_preset_merchant_merchant_id_foreign" foreign key ("merchant_id") references "backoffice"."reference_money_merchant_preset" ("id") on update cascade on delete cascade;`);
 
@@ -420,6 +428,9 @@ export class Migration20260922112448_InitialSchema extends Migration {
 
     this.addSql(`alter table "backoffice"."plan_capability_grant" add constraint "plan_capability_grant_plan_id_foreign" foreign key ("plan_id") references "backoffice"."plan" ("id") on update cascade on delete cascade;`);
     this.addSql(`alter table "backoffice"."plan_capability_grant" add constraint "plan_capability_grant_capability_id_foreign" foreign key ("capability_id") references "backoffice"."plan_capability" ("id") on update cascade on delete cascade;`);
+
+    this.addSql(`alter table "backoffice"."reference_money_bank_partner" add constraint "reference_money_bank_partner_bank_1_id_foreign" foreign key ("bank_1_id") references "backoffice"."reference_money_bank" ("id") on update cascade on delete cascade;`);
+    this.addSql(`alter table "backoffice"."reference_money_bank_partner" add constraint "reference_money_bank_partner_bank_2_id_foreign" foreign key ("bank_2_id") references "backoffice"."reference_money_bank" ("id") on update cascade on delete cascade;`);
 
     this.addSql(`alter table "backoffice"."reference_money_fixed_cost_preset_audience" add constraint "reference_money_fixed_cost_preset_audience_fixed_f3d56_foreign" foreign key ("fixed_cost_preset_id") references "backoffice"."reference_money_fixed_cost_preset" ("id") on update cascade on delete cascade;`);
     this.addSql(`alter table "backoffice"."reference_money_fixed_cost_preset_audience" add constraint "reference_money_fixed_cost_preset_audience_audience_id_foreign" foreign key ("audience_id") references "backoffice"."reference_money_audience" ("id") on update cascade on delete cascade;`);

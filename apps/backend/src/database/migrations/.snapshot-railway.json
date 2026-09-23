@@ -8164,6 +8164,22 @@
           ],
           "mappedType": "unknown",
           "nativeEnumName": "platform_currency"
+        },
+        "main_bank_id": {
+          "name": "main_bank_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
         }
       },
       "name": "household_settings",
@@ -8214,6 +8230,19 @@
           ],
           "updateRule": "cascade",
           "deleteRule": "cascade"
+        },
+        "household_settings_main_bank_id_foreign": {
+          "columnNames": [
+            "main_bank_id"
+          ],
+          "constraintName": "household_settings_main_bank_id_foreign",
+          "localTableName": "auth.household_settings",
+          "referencedTableName": "backoffice.reference_money_bank",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "set null"
         }
       },
       "nativeEnums": {
@@ -10043,19 +10072,19 @@
         },
         "connection_id": {
           "name": "connection_id",
-          "type": "uuid",
+          "type": "varchar(120)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "unique": false,
-          "length": null,
+          "length": 120,
           "precision": null,
           "scale": null,
           "default": null,
           "comment": null,
           "enumItems": [],
-          "mappedType": "uuid"
+          "mappedType": "string"
         },
         "last_synced_at": {
           "name": "last_synced_at",
@@ -10095,6 +10124,38 @@
           ],
           "mappedType": "unknown",
           "nativeEnumName": "money_account_kind"
+        },
+        "bank_id": {
+          "name": "bank_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "settlement_account_id": {
+          "name": "settlement_account_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
         }
       },
       "name": "money_bank_account",
@@ -10134,6 +10195,19 @@
       ],
       "checks": [],
       "foreignKeys": {
+        "money_bank_account_bank_id_foreign": {
+          "columnNames": [
+            "bank_id"
+          ],
+          "constraintName": "money_bank_account_bank_id_foreign",
+          "localTableName": "public.money_bank_account",
+          "referencedTableName": "backoffice.reference_money_bank",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "restrict"
+        },
         "money_bank_account_household_id_foreign": {
           "columnNames": [
             "household_id"
@@ -10146,6 +10220,19 @@
           ],
           "updateRule": "cascade",
           "deleteRule": "cascade"
+        },
+        "money_bank_account_settlement_account_id_foreign": {
+          "columnNames": [
+            "settlement_account_id"
+          ],
+          "constraintName": "money_bank_account_settlement_account_id_foreign",
+          "localTableName": "public.money_bank_account",
+          "referencedTableName": "public.money_bank_account",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "set null"
         }
       },
       "nativeEnums": {
@@ -27805,6 +27892,972 @@
           "enumItems": [],
           "mappedType": "boolean"
         },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "countries": {
+          "name": "countries",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "json"
+        },
+        "iban_bank_code": {
+          "name": "iban_bank_code",
+          "type": "varchar(4)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 4,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "logo_domain": {
+          "name": "logo_domain",
+          "type": "varchar(120)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 120,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "website": {
+          "name": "website",
+          "type": "varchar(240)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 240,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        }
+      },
+      "name": "reference_money_bank",
+      "schema": "backoffice",
+      "indexes": [
+        {
+          "columnNames": [
+            "key"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "reference_money_bank_key_unique",
+          "unique": true,
+          "primary": false
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "reference_money_bank_pkey",
+          "unique": true,
+          "primary": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {
+        "auth_locale": {
+          "name": "auth_locale",
+          "schema": "public",
+          "items": [
+            "EN",
+            "NL",
+            "ES",
+            "FR"
+          ]
+        },
+        "auth_theme": {
+          "name": "auth_theme",
+          "schema": "public",
+          "items": [
+            "LIGHT",
+            "DARK",
+            "SYSTEM"
+          ]
+        },
+        "backoffice_capability_kind": {
+          "name": "backoffice_capability_kind",
+          "schema": "public",
+          "items": [
+            "screen",
+            "action"
+          ]
+        },
+        "backoffice_plan_key": {
+          "name": "backoffice_plan_key",
+          "schema": "public",
+          "items": [
+            "BASIC",
+            "PLUS",
+            "MAX"
+          ]
+        },
+        "energy_metric": {
+          "name": "energy_metric",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "TRAIN",
+            "FOOD",
+            "MIND"
+          ]
+        },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
+        "growth_learn_progress_status": {
+          "name": "growth_learn_progress_status",
+          "schema": "public",
+          "items": [
+            "QUEUE",
+            "NOW",
+            "DONE"
+          ]
+        },
+        "growth_learn_watch_kind": {
+          "name": "growth_learn_watch_kind",
+          "schema": "public",
+          "items": [
+            "FILM",
+            "VIDEO",
+            "SERIES"
+          ]
+        },
+        "money_account_kind": {
+          "name": "money_account_kind",
+          "schema": "public",
+          "items": [
+            "CHECKING",
+            "SAVINGS",
+            "CREDIT",
+            "CASH",
+            "INVESTMENT"
+          ]
+        },
+        "money_cadence": {
+          "name": "money_cadence",
+          "schema": "public",
+          "items": [
+            "WEEKLY",
+            "MONTHLY",
+            "QUARTERLY",
+            "YEARLY",
+            "ONCE"
+          ]
+        },
+        "money_debt_kind": {
+          "name": "money_debt_kind",
+          "schema": "public",
+          "items": [
+            "CREDIT_CARD",
+            "LOAN",
+            "STUDENT",
+            "MORTGAGE",
+            "FAMILY",
+            "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
+          ]
+        },
+        "money_flow_direction": {
+          "name": "money_flow_direction",
+          "schema": "public",
+          "items": [
+            "IN",
+            "OUT"
+          ]
+        },
+        "money_giving_cause": {
+          "name": "money_giving_cause",
+          "schema": "public",
+          "items": [
+            "GLOBAL_HEALTH",
+            "POVERTY",
+            "EDUCATION",
+            "CLIMATE",
+            "ANIMALS",
+            "COMMUNITY",
+            "EMERGENCY",
+            "WATER"
+          ]
+        },
+        "money_goal_kind": {
+          "name": "money_goal_kind",
+          "schema": "public",
+          "items": [
+            "SAVE",
+            "EARN",
+            "GIVE"
+          ]
+        },
+        "money_goal_status": {
+          "name": "money_goal_status",
+          "schema": "public",
+          "items": [
+            "ACTIVE",
+            "REACHED",
+            "PAUSED",
+            "ARCHIVED"
+          ]
+        },
+        "money_income_kind": {
+          "name": "money_income_kind",
+          "schema": "public",
+          "items": [
+            "SALARY",
+            "FREELANCE",
+            "BENEFIT",
+            "RENTAL",
+            "DIVIDEND",
+            "OTHER"
+          ]
+        },
+        "money_jar_key": {
+          "name": "money_jar_key",
+          "schema": "public",
+          "items": [
+            "NECESSITIES",
+            "FINANCIAL_FREEDOM",
+            "EDUCATION",
+            "LONG_TERM_SAVINGS",
+            "PLAY",
+            "GIVE"
+          ]
+        },
+        "money_merchant_highlight": {
+          "name": "money_merchant_highlight",
+          "schema": "public",
+          "items": [
+            "FEATURED",
+            "NEW",
+            "POPULAR"
+          ]
+        },
+        "money_month_score_event_kind": {
+          "name": "money_month_score_event_kind",
+          "schema": "public",
+          "items": [
+            "JAR_HELD",
+            "JAR_OVERSPENT",
+            "INBOX_CLEARED",
+            "WEEK_CHECK_DONE",
+            "GOAL_REACHED",
+            "DEBT_CLEARED",
+            "INCOME_LOGGED",
+            "STREAK_KEPT"
+          ]
+        },
+        "money_rule_field": {
+          "name": "money_rule_field",
+          "schema": "public",
+          "items": [
+            "DESCRIPTION",
+            "COUNTERPARTY",
+            "AMOUNT"
+          ]
+        },
+        "money_rule_matcher": {
+          "name": "money_rule_matcher",
+          "schema": "public",
+          "items": [
+            "CONTAINS",
+            "EQUALS",
+            "STARTS_WITH",
+            "REGEX"
+          ]
+        },
+        "money_spending_style": {
+          "name": "money_spending_style",
+          "schema": "public",
+          "items": [
+            "SPENDER",
+            "SAVER",
+            "BALANCED",
+            "UNKNOWN"
+          ]
+        },
+        "money_transaction_source": {
+          "name": "money_transaction_source",
+          "schema": "public",
+          "items": [
+            "MANUAL",
+            "CSV",
+            "BANK",
+            "RECURRING"
+          ]
+        },
+        "money_transaction_status": {
+          "name": "money_transaction_status",
+          "schema": "public",
+          "items": [
+            "INBOX",
+            "SORTED",
+            "IGNORED"
+          ]
+        },
+        "money_week_check_stage": {
+          "name": "money_week_check_stage",
+          "schema": "public",
+          "items": [
+            "LOOK",
+            "REDIRECT",
+            "INTEND",
+            "DONE"
+          ]
+        },
+        "platform_coach_kind": {
+          "name": "platform_coach_kind",
+          "schema": "public",
+          "items": [
+            "NUDGE",
+            "WIN",
+            "WARNING",
+            "INSIGHT",
+            "WEEK_CHECK"
+          ]
+        },
+        "platform_currency": {
+          "name": "platform_currency",
+          "schema": "public",
+          "items": [
+            "EUR",
+            "USD",
+            "GBP"
+          ]
+        },
+        "platform_household_kind": {
+          "name": "platform_household_kind",
+          "schema": "public",
+          "items": [
+            "FAMILY",
+            "PARTNERS",
+            "FRIENDS",
+            "SOLO"
+          ]
+        }
+      },
+      "comment": null
+    },
+    {
+      "columns": {
+        "bank_1_id": {
+          "name": "bank_1_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "bank_2_id": {
+          "name": "bank_2_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        }
+      },
+      "name": "reference_money_bank_partner",
+      "schema": "backoffice",
+      "indexes": [
+        {
+          "columnNames": [
+            "bank_1_id",
+            "bank_2_id"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "reference_money_bank_partner_pkey",
+          "unique": true,
+          "primary": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "reference_money_bank_partner_bank_1_id_foreign": {
+          "columnNames": [
+            "bank_1_id"
+          ],
+          "constraintName": "reference_money_bank_partner_bank_1_id_foreign",
+          "localTableName": "backoffice.reference_money_bank_partner",
+          "referencedTableName": "backoffice.reference_money_bank",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        },
+        "reference_money_bank_partner_bank_2_id_foreign": {
+          "columnNames": [
+            "bank_2_id"
+          ],
+          "constraintName": "reference_money_bank_partner_bank_2_id_foreign",
+          "localTableName": "backoffice.reference_money_bank_partner",
+          "referencedTableName": "backoffice.reference_money_bank",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        }
+      },
+      "nativeEnums": {
+        "auth_locale": {
+          "name": "auth_locale",
+          "schema": "public",
+          "items": [
+            "EN",
+            "NL",
+            "ES",
+            "FR"
+          ]
+        },
+        "auth_theme": {
+          "name": "auth_theme",
+          "schema": "public",
+          "items": [
+            "LIGHT",
+            "DARK",
+            "SYSTEM"
+          ]
+        },
+        "backoffice_capability_kind": {
+          "name": "backoffice_capability_kind",
+          "schema": "public",
+          "items": [
+            "screen",
+            "action"
+          ]
+        },
+        "backoffice_plan_key": {
+          "name": "backoffice_plan_key",
+          "schema": "public",
+          "items": [
+            "BASIC",
+            "PLUS",
+            "MAX"
+          ]
+        },
+        "energy_metric": {
+          "name": "energy_metric",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "TRAIN",
+            "FOOD",
+            "MIND"
+          ]
+        },
+        "energy_time_category": {
+          "name": "energy_time_category",
+          "schema": "public",
+          "items": [
+            "SLEEP",
+            "PERSONAL_CARE",
+            "PAID_WORK",
+            "STUDY",
+            "HOUSEHOLD_CARE",
+            "FAMILY_CARE",
+            "VOLUNTEERING",
+            "SOCIAL",
+            "EXERCISE",
+            "HOBBIES",
+            "SCREEN",
+            "STILLNESS",
+            "TRAVEL",
+            "FREE_OTHER"
+          ]
+        },
+        "energy_time_day_kind": {
+          "name": "energy_time_day_kind",
+          "schema": "public",
+          "items": [
+            "WORKDAY",
+            "DAY_OFF"
+          ]
+        },
+        "growth_learn_progress_status": {
+          "name": "growth_learn_progress_status",
+          "schema": "public",
+          "items": [
+            "QUEUE",
+            "NOW",
+            "DONE"
+          ]
+        },
+        "growth_learn_watch_kind": {
+          "name": "growth_learn_watch_kind",
+          "schema": "public",
+          "items": [
+            "FILM",
+            "VIDEO",
+            "SERIES"
+          ]
+        },
+        "money_account_kind": {
+          "name": "money_account_kind",
+          "schema": "public",
+          "items": [
+            "CHECKING",
+            "SAVINGS",
+            "CREDIT",
+            "CASH",
+            "INVESTMENT"
+          ]
+        },
+        "money_cadence": {
+          "name": "money_cadence",
+          "schema": "public",
+          "items": [
+            "WEEKLY",
+            "MONTHLY",
+            "QUARTERLY",
+            "YEARLY",
+            "ONCE"
+          ]
+        },
+        "money_debt_kind": {
+          "name": "money_debt_kind",
+          "schema": "public",
+          "items": [
+            "CREDIT_CARD",
+            "LOAN",
+            "STUDENT",
+            "MORTGAGE",
+            "FAMILY",
+            "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
+          ]
+        },
+        "money_flow_direction": {
+          "name": "money_flow_direction",
+          "schema": "public",
+          "items": [
+            "IN",
+            "OUT"
+          ]
+        },
+        "money_giving_cause": {
+          "name": "money_giving_cause",
+          "schema": "public",
+          "items": [
+            "GLOBAL_HEALTH",
+            "POVERTY",
+            "EDUCATION",
+            "CLIMATE",
+            "ANIMALS",
+            "COMMUNITY",
+            "EMERGENCY",
+            "WATER"
+          ]
+        },
+        "money_goal_kind": {
+          "name": "money_goal_kind",
+          "schema": "public",
+          "items": [
+            "SAVE",
+            "EARN",
+            "GIVE"
+          ]
+        },
+        "money_goal_status": {
+          "name": "money_goal_status",
+          "schema": "public",
+          "items": [
+            "ACTIVE",
+            "REACHED",
+            "PAUSED",
+            "ARCHIVED"
+          ]
+        },
+        "money_income_kind": {
+          "name": "money_income_kind",
+          "schema": "public",
+          "items": [
+            "SALARY",
+            "FREELANCE",
+            "BENEFIT",
+            "RENTAL",
+            "DIVIDEND",
+            "OTHER"
+          ]
+        },
+        "money_jar_key": {
+          "name": "money_jar_key",
+          "schema": "public",
+          "items": [
+            "NECESSITIES",
+            "FINANCIAL_FREEDOM",
+            "EDUCATION",
+            "LONG_TERM_SAVINGS",
+            "PLAY",
+            "GIVE"
+          ]
+        },
+        "money_merchant_highlight": {
+          "name": "money_merchant_highlight",
+          "schema": "public",
+          "items": [
+            "FEATURED",
+            "NEW",
+            "POPULAR"
+          ]
+        },
+        "money_month_score_event_kind": {
+          "name": "money_month_score_event_kind",
+          "schema": "public",
+          "items": [
+            "JAR_HELD",
+            "JAR_OVERSPENT",
+            "INBOX_CLEARED",
+            "WEEK_CHECK_DONE",
+            "GOAL_REACHED",
+            "DEBT_CLEARED",
+            "INCOME_LOGGED",
+            "STREAK_KEPT"
+          ]
+        },
+        "money_rule_field": {
+          "name": "money_rule_field",
+          "schema": "public",
+          "items": [
+            "DESCRIPTION",
+            "COUNTERPARTY",
+            "AMOUNT"
+          ]
+        },
+        "money_rule_matcher": {
+          "name": "money_rule_matcher",
+          "schema": "public",
+          "items": [
+            "CONTAINS",
+            "EQUALS",
+            "STARTS_WITH",
+            "REGEX"
+          ]
+        },
+        "money_spending_style": {
+          "name": "money_spending_style",
+          "schema": "public",
+          "items": [
+            "SPENDER",
+            "SAVER",
+            "BALANCED",
+            "UNKNOWN"
+          ]
+        },
+        "money_transaction_source": {
+          "name": "money_transaction_source",
+          "schema": "public",
+          "items": [
+            "MANUAL",
+            "CSV",
+            "BANK",
+            "RECURRING"
+          ]
+        },
+        "money_transaction_status": {
+          "name": "money_transaction_status",
+          "schema": "public",
+          "items": [
+            "INBOX",
+            "SORTED",
+            "IGNORED"
+          ]
+        },
+        "money_week_check_stage": {
+          "name": "money_week_check_stage",
+          "schema": "public",
+          "items": [
+            "LOOK",
+            "REDIRECT",
+            "INTEND",
+            "DONE"
+          ]
+        },
+        "platform_coach_kind": {
+          "name": "platform_coach_kind",
+          "schema": "public",
+          "items": [
+            "NUDGE",
+            "WIN",
+            "WARNING",
+            "INSIGHT",
+            "WEEK_CHECK"
+          ]
+        },
+        "platform_currency": {
+          "name": "platform_currency",
+          "schema": "public",
+          "items": [
+            "EUR",
+            "USD",
+            "GBP"
+          ]
+        },
+        "platform_household_kind": {
+          "name": "platform_household_kind",
+          "schema": "public",
+          "items": [
+            "FAMILY",
+            "PARTNERS",
+            "FRIENDS",
+            "SOLO"
+          ]
+        }
+      },
+      "comment": null
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "key": {
+          "name": "key",
+          "type": "varchar(64)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": 64,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(120)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 120,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "sort_order": {
+          "name": "sort_order",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": "0",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "bool",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "true",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
         "icon": {
           "name": "icon",
           "type": "varchar(8)",
@@ -33146,462 +34199,6 @@
       ],
       "checks": [],
       "foreignKeys": {},
-      "nativeEnums": {
-        "auth_locale": {
-          "name": "auth_locale",
-          "schema": "public",
-          "items": [
-            "EN",
-            "NL",
-            "ES",
-            "FR"
-          ]
-        },
-        "auth_theme": {
-          "name": "auth_theme",
-          "schema": "public",
-          "items": [
-            "LIGHT",
-            "DARK",
-            "SYSTEM"
-          ]
-        },
-        "backoffice_capability_kind": {
-          "name": "backoffice_capability_kind",
-          "schema": "public",
-          "items": [
-            "screen",
-            "action"
-          ]
-        },
-        "backoffice_plan_key": {
-          "name": "backoffice_plan_key",
-          "schema": "public",
-          "items": [
-            "BASIC",
-            "PLUS",
-            "MAX"
-          ]
-        },
-        "energy_metric": {
-          "name": "energy_metric",
-          "schema": "public",
-          "items": [
-            "SLEEP",
-            "TRAIN",
-            "FOOD",
-            "MIND"
-          ]
-        },
-        "energy_time_category": {
-          "name": "energy_time_category",
-          "schema": "public",
-          "items": [
-            "SLEEP",
-            "PERSONAL_CARE",
-            "PAID_WORK",
-            "STUDY",
-            "HOUSEHOLD_CARE",
-            "FAMILY_CARE",
-            "VOLUNTEERING",
-            "SOCIAL",
-            "EXERCISE",
-            "HOBBIES",
-            "SCREEN",
-            "STILLNESS",
-            "TRAVEL",
-            "FREE_OTHER"
-          ]
-        },
-        "energy_time_day_kind": {
-          "name": "energy_time_day_kind",
-          "schema": "public",
-          "items": [
-            "WORKDAY",
-            "DAY_OFF"
-          ]
-        },
-        "growth_learn_progress_status": {
-          "name": "growth_learn_progress_status",
-          "schema": "public",
-          "items": [
-            "QUEUE",
-            "NOW",
-            "DONE"
-          ]
-        },
-        "growth_learn_watch_kind": {
-          "name": "growth_learn_watch_kind",
-          "schema": "public",
-          "items": [
-            "FILM",
-            "VIDEO",
-            "SERIES"
-          ]
-        },
-        "money_account_kind": {
-          "name": "money_account_kind",
-          "schema": "public",
-          "items": [
-            "CHECKING",
-            "SAVINGS",
-            "CREDIT",
-            "CASH",
-            "INVESTMENT"
-          ]
-        },
-        "money_cadence": {
-          "name": "money_cadence",
-          "schema": "public",
-          "items": [
-            "WEEKLY",
-            "MONTHLY",
-            "QUARTERLY",
-            "YEARLY",
-            "ONCE"
-          ]
-        },
-        "money_debt_kind": {
-          "name": "money_debt_kind",
-          "schema": "public",
-          "items": [
-            "CREDIT_CARD",
-            "LOAN",
-            "STUDENT",
-            "MORTGAGE",
-            "FAMILY",
-            "OTHER"
-          ]
-        },
-        "money_debt_schedule_kind": {
-          "name": "money_debt_schedule_kind",
-          "schema": "public",
-          "items": [
-            "OPEN",
-            "TERM",
-            "DEADLINE"
-          ]
-        },
-        "money_fixed_cost_settlement_source": {
-          "name": "money_fixed_cost_settlement_source",
-          "schema": "public",
-          "items": [
-            "MATCHED",
-            "MARK_PAID",
-            "SKIP",
-            "LINKED"
-          ]
-        },
-        "money_fixed_cost_settlement_status": {
-          "name": "money_fixed_cost_settlement_status",
-          "schema": "public",
-          "items": [
-            "PAID",
-            "SKIPPED"
-          ]
-        },
-        "money_flow_direction": {
-          "name": "money_flow_direction",
-          "schema": "public",
-          "items": [
-            "IN",
-            "OUT"
-          ]
-        },
-        "money_giving_cause": {
-          "name": "money_giving_cause",
-          "schema": "public",
-          "items": [
-            "GLOBAL_HEALTH",
-            "POVERTY",
-            "EDUCATION",
-            "CLIMATE",
-            "ANIMALS",
-            "COMMUNITY",
-            "EMERGENCY",
-            "WATER"
-          ]
-        },
-        "money_goal_kind": {
-          "name": "money_goal_kind",
-          "schema": "public",
-          "items": [
-            "SAVE",
-            "EARN",
-            "GIVE"
-          ]
-        },
-        "money_goal_status": {
-          "name": "money_goal_status",
-          "schema": "public",
-          "items": [
-            "ACTIVE",
-            "REACHED",
-            "PAUSED",
-            "ARCHIVED"
-          ]
-        },
-        "money_income_kind": {
-          "name": "money_income_kind",
-          "schema": "public",
-          "items": [
-            "SALARY",
-            "FREELANCE",
-            "BENEFIT",
-            "RENTAL",
-            "DIVIDEND",
-            "OTHER"
-          ]
-        },
-        "money_jar_key": {
-          "name": "money_jar_key",
-          "schema": "public",
-          "items": [
-            "NECESSITIES",
-            "FINANCIAL_FREEDOM",
-            "EDUCATION",
-            "LONG_TERM_SAVINGS",
-            "PLAY",
-            "GIVE"
-          ]
-        },
-        "money_merchant_highlight": {
-          "name": "money_merchant_highlight",
-          "schema": "public",
-          "items": [
-            "FEATURED",
-            "NEW",
-            "POPULAR"
-          ]
-        },
-        "money_month_score_event_kind": {
-          "name": "money_month_score_event_kind",
-          "schema": "public",
-          "items": [
-            "JAR_HELD",
-            "JAR_OVERSPENT",
-            "INBOX_CLEARED",
-            "WEEK_CHECK_DONE",
-            "GOAL_REACHED",
-            "DEBT_CLEARED",
-            "INCOME_LOGGED",
-            "STREAK_KEPT"
-          ]
-        },
-        "money_rule_field": {
-          "name": "money_rule_field",
-          "schema": "public",
-          "items": [
-            "DESCRIPTION",
-            "COUNTERPARTY",
-            "AMOUNT"
-          ]
-        },
-        "money_rule_matcher": {
-          "name": "money_rule_matcher",
-          "schema": "public",
-          "items": [
-            "CONTAINS",
-            "EQUALS",
-            "STARTS_WITH",
-            "REGEX"
-          ]
-        },
-        "money_spending_style": {
-          "name": "money_spending_style",
-          "schema": "public",
-          "items": [
-            "SPENDER",
-            "SAVER",
-            "BALANCED",
-            "UNKNOWN"
-          ]
-        },
-        "money_transaction_source": {
-          "name": "money_transaction_source",
-          "schema": "public",
-          "items": [
-            "MANUAL",
-            "CSV",
-            "BANK",
-            "RECURRING"
-          ]
-        },
-        "money_transaction_status": {
-          "name": "money_transaction_status",
-          "schema": "public",
-          "items": [
-            "INBOX",
-            "SORTED",
-            "IGNORED"
-          ]
-        },
-        "money_week_check_stage": {
-          "name": "money_week_check_stage",
-          "schema": "public",
-          "items": [
-            "LOOK",
-            "REDIRECT",
-            "INTEND",
-            "DONE"
-          ]
-        },
-        "platform_coach_kind": {
-          "name": "platform_coach_kind",
-          "schema": "public",
-          "items": [
-            "NUDGE",
-            "WIN",
-            "WARNING",
-            "INSIGHT",
-            "WEEK_CHECK"
-          ]
-        },
-        "platform_currency": {
-          "name": "platform_currency",
-          "schema": "public",
-          "items": [
-            "EUR",
-            "USD",
-            "GBP"
-          ]
-        },
-        "platform_household_kind": {
-          "name": "platform_household_kind",
-          "schema": "public",
-          "items": [
-            "FAMILY",
-            "PARTNERS",
-            "FRIENDS",
-            "SOLO"
-          ]
-        }
-      },
-      "comment": null
-    },
-    {
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": true,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamptz(6)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": 6,
-          "precision": null,
-          "scale": null,
-          "default": "now()",
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamptz(6)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": 6,
-          "precision": null,
-          "scale": null,
-          "default": "now()",
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "datetime"
-        },
-        "iban_bank_code": {
-          "name": "iban_bank_code",
-          "type": "varchar(4)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": 4,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "string"
-        },
-        "preset_id": {
-          "name": "preset_id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": true,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        }
-      },
-      "name": "reference_money_merchant_banking",
-      "schema": "backoffice",
-      "indexes": [
-        {
-          "columnNames": [
-            "id"
-          ],
-          "composite": false,
-          "constraint": false,
-          "keyName": "reference_money_merchant_banking_pkey",
-          "unique": true,
-          "primary": true
-        },
-        {
-          "columnNames": [
-            "preset_id"
-          ],
-          "composite": false,
-          "constraint": true,
-          "keyName": "reference_money_merchant_banking_preset_id_unique",
-          "unique": true,
-          "primary": false
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {
-        "reference_money_merchant_banking_preset_id_foreign": {
-          "columnNames": [
-            "preset_id"
-          ],
-          "constraintName": "reference_money_merchant_banking_preset_id_foreign",
-          "localTableName": "backoffice.reference_money_merchant_banking",
-          "referencedTableName": "backoffice.reference_money_merchant_preset",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "updateRule": "cascade",
-          "deleteRule": "cascade"
-        }
-      },
       "nativeEnums": {
         "auth_locale": {
           "name": "auth_locale",
