@@ -22,6 +22,7 @@ export const API_ERROR_MESSAGES = [
     'invalid_iban',
     'bank_sync_disabled',
     'bank_sync_failed',
+    'bank_sync_redirect_not_allowed',
     'bank_sync_account_required',
     'plan_downgrade_max_only',
     'demo_no_plan_change',

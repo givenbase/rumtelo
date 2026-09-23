@@ -39,6 +39,7 @@ const meta = {
     settings_jars: 'Jars — Settings',
     settings_debt: 'Debt — Settings',
     settings_bank: 'Bank — Settings',
+    banking_callback: 'Connecting bank…',
     settings_automation: 'Automation settings',
     settings_goals: 'Goals — Settings',
     settings_week: 'Week — Settings',

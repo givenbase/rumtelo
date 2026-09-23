@@ -35,6 +35,11 @@ export class EnableBankingAdapter implements BankingPort {
         const env = loadEnv();
         this.appId = env.ENABLE_BANKING_APP_ID ?? '';
         this.privateKeyPem = normalizePem(env.ENABLE_BANKING_PRIVATE_KEY ?? '');
+        if (this.isEnabled() && !this.privateKeyPem.includes('END')) {
+            this.logger.error(
+                'ENABLE_BANKING_PRIVATE_KEY looks truncated (no END line). Put the full PEM on one .env line with \\n escapes.'
+            );
+        }
     }
 
     isEnabled(): boolean {

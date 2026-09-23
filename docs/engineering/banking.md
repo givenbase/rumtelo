@@ -87,11 +87,11 @@ Constants: [`bank-sync.constants.ts`](../../apps/backend/src/modules/public/prod
 Register **exact** origins+paths (no query string — Enable Banking appends `code` / `state`):
 
 ```
-http://localhost:3000/settings/product/money/bank
-https://app.rumtelo.com/settings/product/money/bank
+http://localhost:3000/banking/callback
+https://app.rumtelo.com/banking/callback
 ```
 
-Browser returns to `DOMAIN_APP`; Nest exchanges the code via oRPC. Do **not** whitelist Nest/`DOMAIN_BACK`.
+Browser returns to `DOMAIN_APP` + `/banking/callback`; the app exchanges the code, syncs once, then redirects to Bank settings. Do **not** whitelist Nest/`DOMAIN_BACK`.
 
 ### Env (see `apps/backend/.env.example`)
 
@@ -114,7 +114,7 @@ Bank settings splits hard on `account.connectionId`:
 1. Register Sandbox app at Enable Banking; paste the two redirect URLs above.
 2. Save App ID + PEM into local `.env` (never commit).
 3. Ship adapter + `bankSync` procedures; flip `FEATURE_BANK_SYNC=true` locally.
-4. Connect → return to settings → `connectionId` on the seat → Sync.
+4. Connect → return to `/banking/callback` → sync → Bank settings.
 
 ---
 

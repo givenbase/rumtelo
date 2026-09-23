@@ -43,6 +43,8 @@ const message = {
             invalid_iban: 'Invalid IBAN — check the number and try again.',
             bank_sync_disabled: 'Bank connect is not enabled on this server.',
             bank_sync_failed: 'Could not connect to the bank. Try again.',
+            bank_sync_redirect_not_allowed:
+                'Bank connect redirect URL is not allowed. Add it in the Enable Banking Control Panel.',
             bank_sync_account_required: 'Add a manual account before connecting a bank.',
             primary_account_required: 'Keep at least one primary account.',
             plan_downgrade_max_only: 'Only Max can schedule a downgrade to Plus',

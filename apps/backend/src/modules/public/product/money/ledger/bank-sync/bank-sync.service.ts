@@ -1,6 +1,7 @@
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
+import { BANK_SYNC_OAUTH_CALLBACK_PATH } from '@rumtelo/contracts/money';
 import { normalizeIban } from '@rumtelo/utils';
 
 import {
@@ -39,7 +40,7 @@ export class BankSyncService {
         this.requireEnabled();
         const account = await this.accounts.findOneOrFail({ id: input.bankAccountId });
         await this.assertBankLinkCapacity(account);
-        const redirectUrl = `${loadEnv().DOMAIN_APP.replace(/\/$/, '')}/settings/product/money/bank`;
+        const redirectUrl = `${loadEnv().DOMAIN_APP.replace(/\/$/, '')}${BANK_SYNC_OAUTH_CALLBACK_PATH}`;
         try {
             const { authUrl } = await this.banking.startLink({
                 institutionId: input.institutionId,
@@ -48,7 +49,11 @@ export class BankSyncService {
             });
             return { authUrl };
         } catch (error) {
-            this.logger.error(`startLink failed (redirectUrl=${redirectUrl}): ${String(error)}`);
+            const detail = String(error);
+            this.logger.error(`startLink failed (redirectUrl=${redirectUrl}): ${detail}`);
+            if (/REDIRECT_URI_NOT_ALLOWED|Redirect URI not allowed/i.test(detail)) {
+                throw apiBadRequest('bank_sync_redirect_not_allowed');
+            }
             throw apiBadRequest('bank_sync_failed');
         }
     }

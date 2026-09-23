@@ -22,8 +22,7 @@ import {
     normalizeIban,
 } from '@rumtelo/utils';
 import { useQueryClient } from '@tanstack/react-query';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import { accountNameTaken, EMPTY_BANK } from '../_utils/bank-settings';
@@ -55,10 +54,7 @@ export function BankSettings() {
     const { formatMoney } = useHouseholdCurrency();
     const { withinLimit } = usePlanCapabilities();
     const live = isLiveData(householdId);
-    const router = useRouter();
-    const searchParams = useSearchParams();
     const queryClient = useQueryClient();
-    const oauthHandled = useRef(false);
     const [adding, setAdding] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [ibanError, setIbanError] = useState<string | null>(null);
@@ -335,18 +331,6 @@ export function BankSettings() {
         },
     });
 
-    const completeLink = useSettingsMutation({
-        mutationFn: async (input: { code: string; state: string }) => {
-            if (!householdId) throw new Error('No household');
-            return api.money.bankSync.completeLink({
-                householdId,
-                code: input.code,
-                state: input.state,
-            });
-        },
-        invalidateKeys: [apiQuery.money.accounts.list.key(), apiQuery.money.bankSync.status.key()],
-    });
-
     const syncNow = useSettingsMutation({
         mutationFn: async (bankAccountId: string) => {
             if (!householdId) throw new Error('No household');
@@ -366,31 +350,6 @@ export function BankSettings() {
         invalidateKeys: [apiQuery.money.accounts.list.key(), apiQuery.money.bankSync.status.key()],
         successMessage: t('pages.settings.toasts.bank_disconnected'),
     });
-
-    const completeLinkAsync = completeLink.mutateAsync;
-    const syncNowAsync = syncNow.mutateAsync;
-
-    useEffect(() => {
-        if (!live || !householdId || oauthHandled.current) return;
-        const code = searchParams.get('code');
-        const state = searchParams.get('state');
-        if (!code || !state) return;
-        oauthHandled.current = true;
-        void (async () => {
-            try {
-                const linked = await completeLinkAsync({ code, state });
-                const result = await syncNowAsync(linked.bankAccountId);
-                showToast(
-                    t('pages.settings.panels.bank.synced_toast', { count: result.imported }),
-                    'success'
-                );
-            } catch (error) {
-                showToast(extractErrorMessage(error), 'error');
-            } finally {
-                router.replace('/settings/product/money/bank');
-            }
-        })();
-    }, [live, householdId, searchParams, completeLinkAsync, syncNowAsync, showToast, t, router]);
 
     const kindLabel = (accountKind: string) => accountKindLabel(accountKind, t);
     const saving = createAccount.isPending || updateAccount.isPending;
