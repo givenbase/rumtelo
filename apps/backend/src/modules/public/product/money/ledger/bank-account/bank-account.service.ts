@@ -30,6 +30,7 @@ export class BankAccountService {
         balance: number;
         bankId: string;
         settlementAccountId?: string | null;
+        isPrimary?: boolean;
     }) {
         const name = input.name.trim();
         await this.assertNameAvailable(name);
@@ -43,6 +44,9 @@ export class BankAccountService {
             input.kind === AccountKind.CREDIT
                 ? await this.resolveSettlement(input.settlementAccountId)
                 : null;
+        const existing = await this.repo.find();
+        const makePrimary = input.isPrimary === true || existing.length === 0;
+        if (makePrimary) await this.clearPrimaries();
         const account = this.em.create(BankAccount, {
             household: currentHouseholdId(),
             name,
@@ -51,6 +55,7 @@ export class BankAccountService {
             settlementAccount,
             kind: input.kind as AccountKind,
             balance: input.balance,
+            isPrimary: makePrimary,
         } as never);
         await this.em.persist(account).flush();
         return toDto(account);
@@ -77,6 +82,7 @@ export class BankAccountService {
         kind?: string;
         bankId?: string;
         settlementAccountId?: string | null;
+        isPrimary?: boolean;
     }) {
         const account = await this.repo.findOneOrFail({ id: input.id });
         await this.em.populate(account, ['bank', 'settlementAccount']);
@@ -106,6 +112,19 @@ export class BankAccountService {
             }
             account.iban = iban;
         }
+        if (input.isPrimary === true) {
+            await this.clearPrimaries(account.id);
+            account.isPrimary = true;
+        } else if (input.isPrimary === false && account.isPrimary) {
+            // Keep exactly one primary when possible — refuse clearing the only primary.
+            const others = (await this.repo.find()).filter(row => row.id !== account.id);
+            if (others.length === 0) {
+                throw apiBadRequest('primary_account_required');
+            }
+            account.isPrimary = false;
+            const next = pickNextPrimary(others);
+            if (next) next.isPrimary = true;
+        }
         await this.em.flush();
         return toDto(account);
     }
@@ -116,7 +135,15 @@ export class BankAccountService {
 
     async remove(id: string) {
         const account = await this.repo.findOneOrFail({ id });
+        const wasPrimary = account.isPrimary;
         await this.em.remove(account).flush();
+        if (wasPrimary) {
+            const next = pickNextPrimary(await this.repo.find());
+            if (next) {
+                next.isPrimary = true;
+                await this.em.flush();
+            }
+        }
         return { ok: true as const };
     }
 
@@ -127,6 +154,14 @@ export class BankAccountService {
             row => row.name.trim().toLowerCase() === needle && row.id !== exceptId
         );
         if (clash) throw apiConflict('account_name_taken');
+    }
+
+    private async clearPrimaries(exceptId?: string) {
+        const rows = await this.repo.find({ isPrimary: true });
+        for (const row of rows) {
+            if (exceptId && row.id === exceptId) continue;
+            row.isPrimary = false;
+        }
     }
 
     private async requireBank(bankId: string): Promise<Bank> {
@@ -155,6 +190,16 @@ export class BankAccountService {
     }
 }
 
+/** Prefer checking seats, then oldest — used when clearing or deleting the primary. */
+function pickNextPrimary(rows: BankAccount[]): BankAccount | undefined {
+    return [...rows].sort(
+        (left, right) =>
+            (left.kind === AccountKind.CHECKING ? 0 : 1) -
+                (right.kind === AccountKind.CHECKING ? 0 : 1) ||
+            left.createdAt.getTime() - right.createdAt.getTime()
+    )[0];
+}
+
 function normalizeOptionalIban(value: string | null | undefined): string | null {
     if (value === null || value === undefined || !value.trim()) return null;
     if (!isValidIban(value)) {
@@ -175,5 +220,6 @@ export function toDto(account: BankAccount) {
         settlementAccountId: account.settlementAccount?.id ?? null,
         connectionId: account.connectionId,
         lastSyncedAt: account.lastSyncedAt?.toISOString() ?? null,
+        isPrimary: account.isPrimary,
     };
 }

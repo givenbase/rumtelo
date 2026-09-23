@@ -19,10 +19,9 @@ import {
 import { ConfigService } from '@nestjs/config';
 
 import type { Env } from '../../../../common/config/env.config';
-import { apiBadRequest, apiForbidden } from '../../../../common/errors/api-user-error';
+import { apiForbidden } from '../../../../common/errors/api-user-error';
 import { isDemoHouseholdSlug } from '@rumtelo/contracts/platform';
 import { Audience } from '../../../backoffice/product/money/catalog/audience/audience.entity';
-import { Bank } from '../../../backoffice/product/money/catalog/bank/bank.entity';
 import { AuthHousehold } from '../managed/household/auth-household.entity';
 import { AuthMember } from '../managed/member/auth-member.entity';
 import { HouseholdBilling } from '../household-billing/household-billing.entity';
@@ -97,7 +96,7 @@ export class HouseholdSettingsService {
         let row: HouseholdSettings | null = await this.em.findOne(
             HouseholdSettings,
             { household: householdId },
-            { populate: ['audiences', 'mainBank'] }
+            { populate: ['audiences'] }
         );
         if (!row) {
             row = this.em.create(HouseholdSettings, { household: householdId } as never);
@@ -119,7 +118,7 @@ export class HouseholdSettingsService {
         let row: HouseholdSettings | null = await this.em.findOne(
             HouseholdSettings,
             { household: householdId },
-            { populate: ['audiences', 'mainBank'] }
+            { populate: ['audiences'] }
         );
         if (!row) {
             row = this.em.create(HouseholdSettings, { household: householdId } as never);
@@ -177,18 +176,6 @@ export class HouseholdSettingsService {
                     ? await this.em.find(Audience, { key: { $in: patch.audienceKeys } })
                     : [];
             row.audiences.set(audiences);
-        }
-        if (patch.mainBankId !== undefined) {
-            if (patch.mainBankId === null || !patch.mainBankId.trim()) {
-                row.mainBank = null;
-            } else {
-                const bank = await this.em.findOne(Bank, {
-                    id: patch.mainBankId.trim(),
-                    isActive: true,
-                });
-                if (!bank) throw apiBadRequest('bank_not_found');
-                row.mainBank = bank;
-            }
         }
 
         await this.em.flush();
@@ -255,7 +242,6 @@ function toSettingsDto(row: HouseholdSettings, planKey: PlanKey): HouseholdSetti
         features: { ...DEFAULT_FEATURE_SETTINGS, ...row.features },
         answers: row.answers ?? {},
         audienceKeys: row.audiences.getItems().map(audience => audience.key),
-        mainBankId: row.mainBank?.id ?? null,
         onboardedAt: row.onboardedAt ? row.onboardedAt.toISOString() : null,
     };
 }

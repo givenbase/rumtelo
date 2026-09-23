@@ -15,6 +15,7 @@ export const API_ERROR_MESSAGES = [
     'bill_link_inflow',
     'iban_already_linked',
     'account_name_taken',
+    'primary_account_required',
     'bank_not_found',
     'bank_required',
     'settlement_account_invalid',

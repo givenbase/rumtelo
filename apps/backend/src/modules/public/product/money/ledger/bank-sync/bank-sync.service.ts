@@ -8,6 +8,7 @@ import {
     type BankingPort,
     encodeConnectionId,
 } from '../../../../../../banking/banking.port';
+import { PlanAccessService } from '../../../../../../common/capability';
 import { loadEnv } from '../../../../../../common/config/env.config';
 import { apiBadRequest, apiUnavailable } from '../../../../../../common/errors/api-user-error';
 import { householdStorage } from '../../../../../../common/household/household.context';
@@ -24,7 +25,8 @@ export class BankSyncService {
     constructor(
         @Inject(EntityManager) private readonly em: EntityManager,
         @Inject(BANKING_PORT) private readonly banking: BankingPort,
-        @Inject(TransactionService) private readonly transactions: TransactionService
+        @Inject(TransactionService) private readonly transactions: TransactionService,
+        @Inject(PlanAccessService) private readonly planAccess: PlanAccessService
     ) {
         this.accounts = new HouseholdScopedRepository(em, BankAccount);
     }
@@ -36,18 +38,25 @@ export class BankSyncService {
     async startLink(input: { bankAccountId: string; institutionId: string }) {
         this.requireEnabled();
         const account = await this.accounts.findOneOrFail({ id: input.bankAccountId });
+        await this.assertBankLinkCapacity(account);
         const redirectUrl = `${loadEnv().DOMAIN_APP.replace(/\/$/, '')}/settings/product/money/bank`;
-        const { authUrl } = await this.banking.startLink({
-            institutionId: input.institutionId,
-            redirectUrl,
-            state: account.id,
-        });
-        return { authUrl };
+        try {
+            const { authUrl } = await this.banking.startLink({
+                institutionId: input.institutionId,
+                redirectUrl,
+                state: account.id,
+            });
+            return { authUrl };
+        } catch (error) {
+            this.logger.error(`startLink failed (redirectUrl=${redirectUrl}): ${String(error)}`);
+            throw apiBadRequest('bank_sync_failed');
+        }
     }
 
     async completeLink(input: { code: string; state: string }) {
         this.requireEnabled();
         const account = await this.accounts.findOneOrFail({ id: input.state });
+        await this.assertBankLinkCapacity(account);
         let link;
         try {
             link = await this.banking.completeLink({ code: input.code, state: input.state });
@@ -203,6 +212,13 @@ export class BankSyncService {
 
     private requireEnabled() {
         if (!this.banking.isEnabled()) throw apiUnavailable('bank_sync_disabled');
+    }
+
+    /** New live links consume a plan seat; re-consent on an already-linked seat does not. */
+    private async assertBankLinkCapacity(account: BankAccount) {
+        if (account.connectionId) return;
+        const occupied = await this.accounts.count({ connectionId: { $ne: null } });
+        await this.planAccess.assertWithinLimit('maxBankLinks', occupied);
     }
 }
 

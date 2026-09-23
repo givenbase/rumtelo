@@ -234,6 +234,12 @@ export function diffPlans(from: PlanKey, to: PlanKey, t?: TranslateFn): PlanChan
         fromLimits.maxGoals,
         toLimits.maxGoals
     );
+    pushLimit(
+        t?.('pages.settings.plan.limit_bank_links') ?? 'Bank links',
+        t?.('pages.settings.plan.unit_bank_links') ?? 'linked accounts',
+        fromLimits.maxBankLinks,
+        toLimits.maxBankLinks
+    );
 
     const fromKinds = new Set(capabilitiesFor(from).householdKinds);
     const toKinds = new Set(capabilitiesFor(to).householdKinds);

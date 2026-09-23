@@ -327,7 +327,6 @@ export class DemoHouseholdSeeder extends Seeder {
         if (!ingBank) {
             throw new Error('DemoHouseholdSeeder: Bank catalog missing ING — run BankSeeder first');
         }
-        settings.mainBank = ingBank;
         const demoBanks: DemoBanks = {
             primary: ingBank,
             secondary: abnBank ?? ingBank,
@@ -1226,6 +1225,7 @@ export class DemoHouseholdSeeder extends Seeder {
             kind: AccountKind.CHECKING,
             balance: 12_400,
             bank: banks.primary,
+            isPrimary: true,
         });
         this.createBank(em, householdId, {
             name: 'High-yield savings',
@@ -1561,7 +1561,13 @@ export class DemoHouseholdSeeder extends Seeder {
     private createBank(
         em: EntityManager,
         householdId: string,
-        input: { name: string; kind: AccountKind; balance: number; bank: Bank }
+        input: {
+            name: string;
+            kind: AccountKind;
+            balance: number;
+            bank: Bank;
+            isPrimary?: boolean;
+        }
     ): BankAccount {
         const account = em.create(BankAccount, {
             household: householdId,
@@ -1569,6 +1575,7 @@ export class DemoHouseholdSeeder extends Seeder {
             kind: input.kind,
             balance: toMinorUnits(input.balance),
             bank: input.bank,
+            isPrimary: input.isPrimary ?? false,
         } as never);
         em.persist(account);
         return account;

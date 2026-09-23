@@ -101,8 +101,14 @@ ENABLE_BANKING_APP_ID=          # UUID — same as .pem filename
 ENABLE_BANKING_PRIVATE_KEY=    # PEM contents (quoted; use \n for newlines)
 ```
 
-When `FEATURE_BANK_SYNC` is on, **both** `ENABLE_BANKING_APP_ID` and `ENABLE_BANKING_PRIVATE_KEY` are required. Keep the flag false until credentials are set; the UI calls `bankSync.status` and only shows Connect when `enabled` is true.
+When `FEATURE_BANK_SYNC` is on, **both** `ENABLE_BANKING_APP_ID` and `ENABLE_BANKING_PRIVATE_KEY` are required. Keep the flag false until credentials are set; the UI calls `bankSync.status` and only shows the Connect wizard when `enabled` is true.
 
+### Settings UX (Open Banking vs manual)
+
+Bank settings splits hard on `account.connectionId`:
+
+- **Open Banking** — only linked seats, grouped by catalog bank (accordion). Actions: Sync now, Disconnect, **Connect a bank** wizard (institution → seat → `startLink`). Badge is **N linked / None linked**, never “feature flag on”.
+- **Manual accounts** — seats with no `connectionId`. Primary seat (`BankAccount.isPrimary`) is the default for CSV labels. No Connect on manual rows in v1.
 ### Enable checklist
 
 1. Register Sandbox app at Enable Banking; paste the two redirect URLs above.
@@ -191,8 +197,8 @@ If we ever do "real jars", **bunq is the bank**, exactly as it is for Flow.
 | CSV parse | `…/ledger/transaction/csv/csv-parser.ts` |
 | Import API | `TransactionService.importCsv` → `money.transactions.importCsv` |
 | Contracts | `packages/contracts` — `ImportCsv` / `ImportPreview` |
-| Settings copy | Bank settings Connect when `bankSync.status.enabled` |
-| Plan capability | `moneyImport` — CSV; live connect gated by `FEATURE_BANK_SYNC` (commercial later) |
+| Settings UX | Open Banking vs Manual accounts. Primary = `BankAccount.isPrimary` (one per household). Live link seats: Basic 0 / Plus 2 / Max 6 (`maxBankLinks`; paid extras later) |
+| Plan capability | `moneyBank` + `maxBankLinks` for AIS; `moneyImport` for CSV; live connect also gated by `FEATURE_BANK_SYNC` |
 
 Flow:
 

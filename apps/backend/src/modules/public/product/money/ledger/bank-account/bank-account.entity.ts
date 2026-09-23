@@ -68,4 +68,11 @@ export class BankAccount extends HouseholdEntity {
      */
     @ManyToOne(() => BankAccount, { nullable: true, deleteRule: 'set null' })
     settlementAccount: BankAccount | null = null;
+
+    /**
+     * Default seat for CSV labels / household defaults. At most one per household
+     * (partial unique index + service clears others when set).
+     */
+    @Property({ default: false })
+    isPrimary = false;
 }

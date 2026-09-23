@@ -343,6 +343,7 @@ export const PLAN_LIMITS: Record<PlanKey, PlanLimits> = {
         maxAssets: null,
         maxIncomeStreams: null,
         maxLearnEntries: null,
+        maxBankLinks: 0,
     },
     [PlanKey.PLUS]: {
         maxMembers: 5,
@@ -350,6 +351,7 @@ export const PLAN_LIMITS: Record<PlanKey, PlanLimits> = {
         maxAssets: null,
         maxIncomeStreams: null,
         maxLearnEntries: null,
+        maxBankLinks: 2,
     },
     [PlanKey.MAX]: {
         maxMembers: null,
@@ -357,6 +359,7 @@ export const PLAN_LIMITS: Record<PlanKey, PlanLimits> = {
         maxAssets: null,
         maxIncomeStreams: null,
         maxLearnEntries: null,
+        maxBankLinks: 6,
     },
 };
 

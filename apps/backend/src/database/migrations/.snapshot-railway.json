@@ -8164,22 +8164,6 @@
           ],
           "mappedType": "unknown",
           "nativeEnumName": "platform_currency"
-        },
-        "main_bank_id": {
-          "name": "main_bank_id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "uuid"
         }
       },
       "name": "household_settings",
@@ -8230,19 +8214,6 @@
           ],
           "updateRule": "cascade",
           "deleteRule": "cascade"
-        },
-        "household_settings_main_bank_id_foreign": {
-          "columnNames": [
-            "main_bank_id"
-          ],
-          "constraintName": "household_settings_main_bank_id_foreign",
-          "localTableName": "auth.household_settings",
-          "referencedTableName": "backoffice.reference_money_bank",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "updateRule": "cascade",
-          "deleteRule": "set null"
         }
       },
       "nativeEnums": {
@@ -10156,6 +10127,22 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "uuid"
+        },
+        "is_primary": {
+          "name": "is_primary",
+          "type": "bool",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "false",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "boolean"
         }
       },
       "name": "money_bank_account",
@@ -10181,6 +10168,17 @@
           "keyName": "money_bank_account_household_id_index",
           "unique": false,
           "primary": false
+        },
+        {
+          "columnNames": [
+            "household_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "money_bank_account_household_primary_unique",
+          "unique": true,
+          "primary": false,
+          "expression": "CREATE UNIQUE INDEX money_bank_account_household_primary_unique ON public.money_bank_account USING btree (household_id) WHERE (is_primary = true)"
         },
         {
           "columnNames": [

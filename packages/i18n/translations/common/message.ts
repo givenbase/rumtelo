@@ -44,6 +44,7 @@ const message = {
             bank_sync_disabled: 'Bank connect is not enabled on this server.',
             bank_sync_failed: 'Could not connect to the bank. Try again.',
             bank_sync_account_required: 'Add a manual account before connecting a bank.',
+            primary_account_required: 'Keep at least one primary account.',
             plan_downgrade_max_only: 'Only Max can schedule a downgrade to Plus',
             demo_no_plan_change: 'Demo households cannot change plans',
             invitation_create_failed: 'Could not create invitation',

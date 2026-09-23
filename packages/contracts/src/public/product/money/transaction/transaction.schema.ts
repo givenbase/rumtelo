@@ -133,6 +133,10 @@ export const Account = z.object({
      */
     connectionId: Id.nullable(),
     lastSyncedAt: z.iso.datetime().nullable(),
+    /**
+     * Household default seat (CSV labels / defaults). At most one true per household.
+     */
+    isPrimary: z.boolean().default(false),
 });
 
 // ====================================================================

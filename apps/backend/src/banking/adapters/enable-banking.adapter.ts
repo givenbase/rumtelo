@@ -70,8 +70,11 @@ export class EnableBankingAdapter implements BankingPort {
         state: string;
     }): Promise<{ authUrl: string }> {
         const { country, name } = decodeInstitutionId(input.institutionId);
-        const validUntil = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString();
-        const data = await this.request<{ url: string }>('POST', '/auth', {
+        // EB examples use second precision (no ms); some ASPSPs reject otherwise.
+        const validUntil = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
+            .toISOString()
+            .replace(/\.\d{3}Z$/, 'Z');
+        const data = await this.request<{ url?: string }>('POST', '/auth', {
             access: { valid_until: validUntil },
             aspsp: { name, country },
             state: input.state,
@@ -238,7 +241,10 @@ export class EnableBankingAdapter implements BankingPort {
         }
         if (!response.ok) {
             this.logger.error(`Enable Banking ${method} ${path} → ${response.status}: ${text}`);
-            throw new Error(`Enable Banking ${method} ${path} failed (${response.status})`);
+            const detail = enableBankingErrorDetail(json, text);
+            throw new Error(
+                `Enable Banking ${method} ${path} failed (${response.status})${detail ? `: ${detail}` : ''}`
+            );
         }
         return json as T;
     }
@@ -277,4 +283,21 @@ function normalizePem(value: string): string {
     if (!trimmed) return '';
     if (trimmed.includes('-----BEGIN') && trimmed.includes('\n')) return trimmed;
     return trimmed.replace(/\\n/g, '\n');
+}
+
+function enableBankingErrorDetail(json: unknown, text: string): string {
+    if (json && typeof json === 'object') {
+        const row = json as Record<string, unknown>;
+        const code = typeof row.error === 'string' ? row.error : null;
+        const message =
+            typeof row.message === 'string'
+                ? row.message
+                : typeof row.error_description === 'string'
+                  ? row.error_description
+                  : null;
+        if (code && message) return `${code} — ${message}`;
+        if (code) return code;
+        if (message) return message;
+    }
+    return text.slice(0, 280);
 }
