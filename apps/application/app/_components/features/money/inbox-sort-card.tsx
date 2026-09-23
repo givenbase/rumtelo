@@ -47,6 +47,7 @@ export function InboxSortCard({
     debts = [],
     suggestedFixedCost,
     suggestedJarId,
+    suggestionConfidence = 'low',
     logoDomain,
     onConfirm,
     detailHref,
@@ -59,6 +60,8 @@ export function InboxSortCard({
     /** Suggested recurring bill to link (heuristic). */
     suggestedFixedCost?: InboxFixedCostOption | null;
     suggestedJarId?: string;
+    /** Only `high` shows “vrij zeker” — rule / merchant / payee memory. */
+    suggestionConfidence?: 'high' | 'low';
     /** From merchant catalog match when known. */
     logoDomain?: string | null;
     onConfirm?: (
@@ -107,10 +110,7 @@ export function InboxSortCard({
             categoryTemplates: categoryTemplatesQuery.data ?? [],
         })
     );
-    const confident =
-        Boolean(suggestedJarId) ||
-        suggestJarKey(transaction.amount) === 'NECESSITIES' ||
-        Math.abs(transaction.amount) < 2_000;
+    const confident = suggestionConfidence === 'high';
     const canApplyDebt = transaction.amount < 0 && debts.length > 0 && !linkFixedCost;
     const canLinkFixed = Boolean(suggestedFixedCost) && !debtId;
 

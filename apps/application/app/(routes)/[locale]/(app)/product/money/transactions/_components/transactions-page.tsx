@@ -27,7 +27,7 @@ import {
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { createTxHref, txDetailHref } from '@/app/_lib/create-routes';
 import { suggestFixedCostForTx } from '@/app/_lib/fixed-cost-match';
-import { matchMerchantJarKey } from '@/app/_lib/merchant-match';
+import { buildPayeeJarMemory, suggestInboxJar } from '@/app/_lib/inbox-suggest';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
@@ -66,11 +66,8 @@ const EMPTY_RULES: Rule[] = [];
 const EMPTY_MERCHANTS: MerchantPreset[] = [];
 const EMPTY_TRANSACTION_PAGE = { items: EMPTY_TRANSACTIONS, nextCursor: null };
 
-function fallbackJarKey(amount: number): JarKey {
-    if (amount > 0) return JarKey.NECESSITIES;
-    if (Math.abs(amount) < 2_000) return JarKey.PLAY;
-    return JarKey.NECESSITIES;
-}
+/** Soft “Juist” payee memory uses priority 900 on the backend — hide those from Rules UI. */
+const EXPLICIT_RULE_PRIORITY_MAX = 500;
 
 export function TransactionsPageClient() {
     const t = useTranslations('features.money.transactions');
@@ -151,6 +148,7 @@ export function TransactionsPageClient() {
     const spendableJars = jars.filter(jar => jarCapabilitiesFor(jar.key).canSpend);
     const jarById = new Map(jars.map(jar => [jar.id, jar]));
     const rules = rulesQuery.data ?? EMPTY_RULES;
+    const managedRules = rules.filter(rule => rule.priority < EXPLICIT_RULE_PRIORITY_MAX);
     const merchants = merchantsQuery.data ?? EMPTY_MERCHANTS;
     const categoryTemplates = categoryTemplatesQuery.data ?? [];
     const all = (listQuery.data?.items ?? [])
@@ -193,8 +191,9 @@ export function TransactionsPageClient() {
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.key() });
+            // Juist also upserts soft payee memory into rules.
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.rules.list.key() });
             if (vars.createRule) {
-                void queryClient.invalidateQueries({ queryKey: apiQuery.money.rules.list.key() });
                 showToast(t('toast_sorted'), 'success');
             } else {
                 showToast(
@@ -256,9 +255,16 @@ export function TransactionsPageClient() {
         return match?.id ?? jars[0]?.id ?? fallbackKey;
     }
 
-    function suggestJarKeyFor(transaction: Transaction): JarKey {
-        const text = `${transaction.counterparty ?? ''} ${transaction.description}`;
-        return matchMerchantJarKey(text, merchants) ?? fallbackJarKey(transaction.amount);
+    const payeeMemory = buildPayeeJarMemory(all);
+
+    function suggestionFor(transaction: Transaction) {
+        return suggestInboxJar({
+            transaction,
+            jars,
+            merchants,
+            rules,
+            payeeMemory,
+        });
     }
 
     return (
@@ -279,7 +285,7 @@ export function TransactionsPageClient() {
                 createLabel={tab === 'IN' ? t('add_in') : t('add_out')}
                 createHref={createTxHref({ direction: tab === 'IN' ? 'in' : 'out' })}
                 secondary={
-                    live && (tab === 'INBOX' || tab === 'RULES') && rules.length > 0 ? (
+                    live && (tab === 'INBOX' || tab === 'RULES') && managedRules.length > 0 ? (
                         <Button
                             variant="secondary"
                             size="sm"
@@ -313,9 +319,9 @@ export function TransactionsPageClient() {
                                 {inbox.length}
                             </span>
                         )}
-                        {id === 'RULES' && rules.length > 0 && (
+                        {id === 'RULES' && managedRules.length > 0 && (
                             <span className="rounded-full bg-accent/15 px-2 py-0.5 font-mono text-xs text-accent">
-                                {rules.length}
+                                {managedRules.length}
                             </span>
                         )}
                     </button>
@@ -332,7 +338,10 @@ export function TransactionsPageClient() {
                 ) : (
                     <div className="grid gap-3">
                         {inbox.map(transaction => {
-                            const suggestedKey = suggestJarKeyFor(transaction);
+                            const suggestion = suggestionFor(transaction);
+                            const suggestedJarId =
+                                suggestion.jarId ??
+                                resolveJarId(suggestion.jarKey ?? JarKey.NECESSITIES);
                             const title =
                                 transaction.counterparty?.trim() || transaction.description;
                             const catalog = findCatalogMerchantFromFeed(title, merchants);
@@ -348,7 +357,8 @@ export function TransactionsPageClient() {
                                     jars={transaction.amount < 0 ? spendableJars : jars}
                                     debts={debts}
                                     suggestedFixedCost={suggestedFixed}
-                                    suggestedJarId={resolveJarId(suggestedKey)}
+                                    suggestedJarId={suggestedJarId}
+                                    suggestionConfidence={suggestion.confidence}
                                     logoDomain={catalog?.logoDomain}
                                     onConfirm={
                                         live
@@ -437,7 +447,10 @@ export function TransactionsPageClient() {
                                 const feedText = `${transaction.counterparty ?? ''} ${transaction.description}`;
                                 const merchant = findCatalogMerchantFromFeed(feedText, merchants);
                                 const jarKey =
-                                    jar?.key ?? merchant?.jarKey ?? suggestJarKeyFor(transaction);
+                                    jar?.key ??
+                                    merchant?.jarKey ??
+                                    suggestionFor(transaction).jarKey ??
+                                    JarKey.NECESSITIES;
                                 const mark = partyMark(
                                     merchant ?? { name: title },
                                     catalogMarkChrome({
@@ -584,7 +597,7 @@ export function TransactionsPageClient() {
                         title={t('rules_sign_in_title')}
                         body={t('rules_sign_in_body')}
                     />
-                ) : rules.length === 0 ? (
+                ) : managedRules.length === 0 ? (
                     <EmptyState
                         icon="diamond"
                         title={t('rules_empty_title')}
@@ -597,7 +610,7 @@ export function TransactionsPageClient() {
                         </Typography>
                         <Card className="overflow-hidden p-0">
                             <div className="grid gap-px">
-                                {rules.map(rule => {
+                                {managedRules.map(rule => {
                                     const jar = jarById.get(rule.jarId);
                                     return (
                                         <div

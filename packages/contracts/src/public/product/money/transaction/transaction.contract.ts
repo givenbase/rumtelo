@@ -26,7 +26,17 @@ const ok = z.object({ ok: z.literal(true) });
 export const transactionCreate = oc.input(CreateTransaction).output(Transaction);
 
 export const accountCreate = oc
-    .input(Account.omit({ id: true, connectionId: true, lastSyncedAt: true }))
+    .input(
+        Account.omit({
+            id: true,
+            connectionId: true,
+            lastSyncedAt: true,
+            isPrimary: true,
+        }).extend({
+            /** Optional — server forces primary when this is the first seat. */
+            isPrimary: z.boolean().optional(),
+        })
+    )
     .output(Account);
 
 // ====================================================================

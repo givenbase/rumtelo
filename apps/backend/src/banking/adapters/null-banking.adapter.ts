@@ -32,6 +32,10 @@ export class NullBankingAdapter implements BankingPort {
         return null;
     }
 
+    async fetchBalance() {
+        return null;
+    }
+
     async fetchTransactions() {
         return [];
     }

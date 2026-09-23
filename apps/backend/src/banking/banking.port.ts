@@ -61,7 +61,21 @@ export interface BankingPort {
     /** Exchange the OAuth `code` for a session + authorised accounts. */
     completeLink(input: { code: string; state: string }): Promise<BankLinkResult>;
     getConnection(connectionId: string): Promise<BankConnection | null>;
-    fetchTransactions(connectionId: string, since: string): Promise<BankTransaction[]>;
+    /**
+     * Current AIS balance in minor units, or `null` when the ASPSP returns none.
+     * Prefer interim/closing available over booked when several types exist.
+     */
+    fetchBalance(connectionId: string): Promise<number | null>;
+    /**
+     * Pull AIS transactions.
+     * `strategy: 'longest'` — first sync / catch-up (Enable Banking FAQ).
+     * `strategy: 'default'` — incremental recent updates.
+     */
+    fetchTransactions(
+        connectionId: string,
+        since: string,
+        options?: { strategy?: 'default' | 'longest' }
+    ): Promise<BankTransaction[]>;
     /** Best-effort revoke; adapters may no-op if the provider has no delete. */
     disconnect(connectionId: string): Promise<void>;
 }

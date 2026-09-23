@@ -3,6 +3,7 @@ import { createPrivateKey, createSign } from 'node:crypto';
 
 import type { BankInstitution } from '@rumtelo/contracts';
 
+import { currentAuthHeaders } from '../../common/household/household.context';
 import { loadEnv } from '../../common/config/env.config';
 import {
     type BankingPort,
@@ -15,6 +16,12 @@ import {
 } from '../banking.port';
 
 const API_BASE = 'https://api.enablebanking.com';
+
+/** Cap pagination so a runaway continuation_key cannot loop forever. */
+const MAX_TRANSACTION_PAGES = 50;
+
+/** Prefer spendable/available saldo, then booked. */
+const BALANCE_TYPE_PRIORITY = ['ITAV', 'CLAV', 'CLBD', 'ITBD', 'FWAV', 'XPCD'] as const;
 
 /**
  * Enable Banking AIS adapter.
@@ -80,7 +87,13 @@ export class EnableBankingAdapter implements BankingPort {
             .toISOString()
             .replace(/\.\d{3}Z$/, 'Z');
         const data = await this.request<{ url?: string }>('POST', '/auth', {
-            access: { valid_until: validUntil },
+            access: {
+                // Explicit AIS scopes — omitting these can yield an empty session
+                // (account list only) on some ASPSPs.
+                balances: true,
+                transactions: true,
+                valid_until: validUntil,
+            },
             aspsp: { name, country },
             state: input.state,
             redirect_url: input.redirectUrl,
@@ -159,60 +172,104 @@ export class EnableBankingAdapter implements BankingPort {
         }
     }
 
-    async fetchTransactions(connectionId: string, since: string): Promise<BankTransaction[]> {
+    async fetchBalance(connectionId: string): Promise<number | null> {
+        const { accountUid } = decodeConnectionId(connectionId);
+        const data = await this.request<{
+            balances?: Array<{
+                balance_amount?: { amount?: string; currency?: string };
+                balance_type?: string;
+            }>;
+        }>('GET', `/accounts/${encodeURIComponent(accountUid)}/balances`);
+
+        const balances = data.balances ?? [];
+        if (balances.length === 0) return null;
+
+        const preferred =
+            BALANCE_TYPE_PRIORITY.map(type =>
+                balances.find(row => (row.balance_type ?? '').toUpperCase() === type)
+            ).find(Boolean) ?? balances[0];
+
+        const raw = preferred?.balance_amount?.amount;
+        if (raw === undefined || raw === null) return null;
+        const cents = Math.round(Number.parseFloat(raw) * 100);
+        return Number.isFinite(cents) ? cents : null;
+    }
+
+    async fetchTransactions(
+        connectionId: string,
+        since: string,
+        options?: { strategy?: 'default' | 'longest' }
+    ): Promise<BankTransaction[]> {
         const { accountUid } = decodeConnectionId(connectionId);
         const dateFrom = since.slice(0, 10);
-        const data = await this.request<{
-            transactions?: Array<{
-                entry_reference?: string;
-                transaction_id?: string;
-                booking_date?: string;
-                value_date?: string;
-                transaction_amount?: { amount?: string; currency?: string };
-                remittance_information?: string[] | string | null;
-                creditor_name?: string | null;
-                debtor_name?: string | null;
-                credit_debit_indicator?: string;
-            }>;
-            continuation_key?: string | null;
-        }>(
-            'GET',
-            `/accounts/${encodeURIComponent(accountUid)}/transactions?date_from=${encodeURIComponent(dateFrom)}`
-        );
-
+        const strategy = options?.strategy ?? 'default';
         const rows: BankTransaction[] = [];
-        for (const tx of data.transactions ?? []) {
-            const bookedOn = (tx.booking_date ?? tx.value_date ?? '').slice(0, 10);
-            if (!bookedOn) continue;
-            const rawAmount = tx.transaction_amount?.amount;
-            if (rawAmount === undefined || rawAmount === null) continue;
-            let cents = Math.round(Number.parseFloat(rawAmount) * 100);
-            if (!Number.isFinite(cents)) continue;
-            if (tx.credit_debit_indicator === 'DBIT' && cents > 0) cents = -cents;
-            if (tx.credit_debit_indicator === 'CRDT' && cents < 0) cents = Math.abs(cents);
+        let continuationKey: string | null = null;
+        let rawCount = 0;
+        let skipped = 0;
 
-            const remittance = Array.isArray(tx.remittance_information)
-                ? tx.remittance_information.join(' ')
-                : (tx.remittance_information ?? '');
-            const description = remittance.trim() || 'Bank transaction';
-            const counterparty =
-                cents < 0
-                    ? (tx.creditor_name ?? null)
-                    : (tx.debtor_name ?? tx.creditor_name ?? null);
-            const externalId =
-                tx.entry_reference ??
-                tx.transaction_id ??
-                `${bookedOn}:${cents}:${description.slice(0, 40)}`;
+        // Keep query params identical across continuation pages (EB FAQ).
+        const baseQuery = new URLSearchParams({
+            date_from: dateFrom,
+            strategy,
+        });
 
-            rows.push({
-                externalId,
-                bookedOn,
-                amount: cents,
-                description,
-                counterparty,
-            });
+        for (let page = 0; page < MAX_TRANSACTION_PAGES; page += 1) {
+            const query = new URLSearchParams(baseQuery);
+            if (continuationKey) query.set('continuation_key', continuationKey);
+
+            const data = await this.request<{
+                transactions?: Array<Record<string, unknown>>;
+                continuation_key?: string | null;
+            }>(
+                'GET',
+                `/accounts/${encodeURIComponent(accountUid)}/transactions?${query.toString()}`
+            );
+
+            const pageRows = data.transactions ?? [];
+            rawCount += pageRows.length;
+            for (const tx of pageRows) {
+                const mapped = mapTransaction(tx);
+                if (mapped) rows.push(mapped);
+                else skipped += 1;
+            }
+
+            // Empty page + continuation_key still means “keep going” (EB FAQ).
+            continuationKey = data.continuation_key?.trim() || null;
+            if (!continuationKey) break;
+        }
+
+        if (continuationKey) {
+            this.logger.warn(
+                `fetchTransactions hit ${MAX_TRANSACTION_PAGES}-page cap for account ${accountUid}; more pages remain`
+            );
+        }
+        this.logger.log(
+            `fetchTransactions account=${accountUid} strategy=${strategy} date_from=${dateFrom} raw=${rawCount} imported=${rows.length} skipped=${skipped}`
+        );
+        if (rawCount === 0) {
+            const { sessionId } = decodeConnectionId(connectionId);
+            await this.logEmptyTransactionPull(sessionId, accountUid);
         }
         return rows;
+    }
+
+    /** Diagnose empty AIS pulls — session status / access scopes (EB Control Panel). */
+    private async logEmptyTransactionPull(sessionId: string, accountUid: string): Promise<void> {
+        try {
+            const session = await this.request<{
+                status?: string;
+                access?: Record<string, unknown>;
+                accounts?: Array<{ uid?: string; name?: string | null; iban?: string | null }>;
+                aspsp?: { name?: string; country?: string };
+            }>('GET', `/sessions/${encodeURIComponent(sessionId)}`);
+            const access = session.access ?? {};
+            this.logger.warn(
+                `empty tx pull session=${sessionId} account=${accountUid} status=${session.status ?? '?'} aspsp=${session.aspsp?.name ?? '?'} access=${JSON.stringify(access)} accounts=${(session.accounts ?? []).length}`
+            );
+        } catch (error) {
+            this.logger.warn(`empty tx pull: could not load session ${sessionId}: ${String(error)}`);
+        }
     }
 
     async disconnect(connectionId: string): Promise<void> {
@@ -232,6 +289,7 @@ export class EnableBankingAdapter implements BankingPort {
                 Authorization: `Bearer ${jwt}`,
                 Accept: 'application/json',
                 ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+                ...psuHeadersFromRequest(),
             },
             body: body !== undefined ? JSON.stringify(body) : undefined,
         });
@@ -305,4 +363,84 @@ function enableBankingErrorDetail(json: unknown, text: string): string {
         if (message) return message;
     }
     return text.slice(0, 280);
+}
+
+/**
+ * Forward PSU headers when an end-user triggered the call (EB FAQ).
+ * ASPSPs often require at least IP + User-Agent for AIS transaction pulls.
+ */
+function psuHeadersFromRequest(): Record<string, string> {
+    const headers = currentAuthHeaders();
+    const forwarded = headers.get('x-forwarded-for');
+    const ip =
+        forwarded?.split(',')[0]?.trim() ||
+        headers.get('x-real-ip')?.trim() ||
+        headers.get('cf-connecting-ip')?.trim() ||
+        '';
+    const userAgent = headers.get('user-agent')?.trim() || '';
+    const out: Record<string, string> = {};
+    if (ip) out['Psu-Ip-Address'] = ip;
+    if (userAgent) out['Psu-User-Agent'] = userAgent;
+    return out;
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+    return value && typeof value === 'object' ? (value as Record<string, unknown>) : null;
+}
+
+function stringField(row: Record<string, unknown>, key: string): string | null {
+    const value = row[key];
+    return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+function nestedName(row: Record<string, unknown>, key: string): string | null {
+    const nested = asRecord(row[key]);
+    if (!nested) return null;
+    return stringField(nested, 'name');
+}
+
+function mapTransaction(tx: Record<string, unknown>): BankTransaction | null {
+    const bookedOn = (
+        stringField(tx, 'booking_date') ??
+        stringField(tx, 'value_date') ??
+        stringField(tx, 'transaction_date') ??
+        ''
+    ).slice(0, 10);
+    if (!bookedOn) return null;
+
+    const amountObj = asRecord(tx.transaction_amount);
+    const rawAmount = amountObj && typeof amountObj.amount === 'string' ? amountObj.amount : null;
+    if (rawAmount === null) return null;
+    let cents = Math.round(Number.parseFloat(rawAmount) * 100);
+    if (!Number.isFinite(cents)) return null;
+
+    const indicator = stringField(tx, 'credit_debit_indicator');
+    if (indicator === 'DBIT' && cents > 0) cents = -cents;
+    if (indicator === 'CRDT' && cents < 0) cents = Math.abs(cents);
+
+    const remittanceRaw = tx.remittance_information;
+    const remittance = Array.isArray(remittanceRaw)
+        ? remittanceRaw.filter(part => typeof part === 'string').join(' ')
+        : typeof remittanceRaw === 'string'
+          ? remittanceRaw
+          : '';
+    const description = remittance.trim() || 'Bank transaction';
+
+    const creditorName = stringField(tx, 'creditor_name') ?? nestedName(tx, 'creditor');
+    const debtorName = stringField(tx, 'debtor_name') ?? nestedName(tx, 'debtor');
+    const counterparty =
+        cents < 0 ? (creditorName ?? null) : (debtorName ?? creditorName ?? null);
+
+    const externalId =
+        stringField(tx, 'entry_reference') ??
+        stringField(tx, 'transaction_id') ??
+        `${bookedOn}:${cents}:${description.slice(0, 40)}`;
+
+    return {
+        externalId,
+        bookedOn,
+        amount: cents,
+        description,
+        counterparty,
+    };
 }

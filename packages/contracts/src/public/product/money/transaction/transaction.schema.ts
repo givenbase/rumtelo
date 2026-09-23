@@ -128,15 +128,16 @@ export const Account = z.object({
      */
     settlementAccountId: Id.nullable(),
     /**
-     * Null = manual account at `bankId`; set when linked through bank sync.
+     * Null = manual account at `bankId`; set when linked through bank sync
+     * (`sessionId::accountUid` for Enable Banking — not a UUID).
      * Connecting later upgrades this row — do not create a second account for the same IBAN.
      */
-    connectionId: Id.nullable(),
+    connectionId: z.string().min(1).max(120).nullable(),
     lastSyncedAt: z.iso.datetime().nullable(),
     /**
      * Household default seat (CSV labels / defaults). At most one true per household.
      */
-    isPrimary: z.boolean().default(false),
+    isPrimary: z.boolean(),
 });
 
 // ====================================================================

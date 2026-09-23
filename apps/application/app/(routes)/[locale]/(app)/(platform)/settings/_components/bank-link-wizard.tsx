@@ -7,17 +7,34 @@ import {
 } from '@/components/features/forms/preset-name-field';
 import { type Account, type Bank } from '@rumtelo/contracts';
 import type { BankInstitution } from '@rumtelo/contracts/money';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from '@rumtelo/i18n';
-import { Button, Field, Input, VendorMark } from '@rumtelo/ui';
+import {
+    Button,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormMessage,
+    Field,
+    Input,
+    VendorMark,
+} from '@rumtelo/ui';
 import { cn, formatIban } from '@rumtelo/utils';
 import { useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { accountBankMark } from '../_utils/resolve-account-bank';
 import {
+    accountNameTaken,
     isMockInstitution,
     matchCatalogToInstitution,
     sortInstitutions,
 } from '../_utils/bank-settings';
+import {
+    createBankWizardSeatFormSchema,
+    type BankWizardSeatFormValues,
+} from '../_utils/settings-form-zod';
 import { SettingsRowLabel } from './settings-chrome';
 
 export type BankLinkWizardAuthoriseInput = {
@@ -28,6 +45,8 @@ export type BankLinkWizardAuthoriseInput = {
     catalogBankId: string;
 };
 
+export type BankLinkWizardAuthoriseResult = 'ok' | 'name_taken' | 'failed';
+
 export type BankLinkWizardProps = {
     live: boolean;
     onClose: () => void;
@@ -37,10 +56,14 @@ export type BankLinkWizardProps = {
     bankNameOptions: NamePresetOption[];
     bankById: Map<string, Bank>;
     bankByKey: Map<string, Bank>;
+    /** All household seats — used to keep new labels unique. */
+    accounts: Account[];
     manualAccounts: Account[];
     primaryBankId: string | null;
     formatMoney: (amount: number) => string;
-    onAuthorise: (input: BankLinkWizardAuthoriseInput) => void | Promise<void>;
+    onAuthorise: (
+        input: BankLinkWizardAuthoriseInput
+    ) => BankLinkWizardAuthoriseResult | Promise<BankLinkWizardAuthoriseResult>;
 };
 
 export function BankLinkWizard({
@@ -52,6 +75,7 @@ export function BankLinkWizard({
     bankNameOptions,
     bankById,
     bankByKey,
+    accounts,
     manualAccounts,
     primaryBankId,
     formatMoney,
@@ -64,8 +88,14 @@ export function BankLinkWizard({
         manualAccounts.length > 0 ? 'existing' : 'new'
     );
     const [wizardSeatId, setWizardSeatId] = useState('');
-    const [wizardNewLabel, setWizardNewLabel] = useState('');
-    const [wizardCatalogBankId, setWizardCatalogBankId] = useState('');
+
+    const seatForm = useForm<BankWizardSeatFormValues>({
+        defaultValues: { label: '', bankId: '' },
+        resolver: zodResolver(createBankWizardSeatFormSchema(t)),
+        mode: 'onSubmit',
+    });
+    const wizardNewLabel = useWatch({ control: seatForm.control, name: 'label' }) ?? '';
+    const wizardCatalogBankId = useWatch({ control: seatForm.control, name: 'bankId' }) ?? '';
 
     const institutions = sortInstitutions(institutionsRaw);
     const sandboxInstitutionList = institutions.some(row => isMockInstitution(row.name));
@@ -94,7 +124,46 @@ export function BankLinkWizard({
         wizardSeatMode === 'existing'
             ? (wizardMatchingSeats.find(row => row.id === wizardSeatId) ?? null)
             : null;
-    const wizardSeatMark = wizardSeat ? accountBankMark(wizardSeat, bankList) : null;
+    const wizardSeatCatalog =
+        wizardSeatMode === 'existing'
+            ? null
+            : (bankById.get(
+                  wizardCatalogBankId ||
+                      wizardInstitutionCatalog?.id ||
+                      primaryBankId ||
+                      bankList[0]?.id ||
+                      ''
+              ) ?? null);
+    const wizardSeatMark =
+        wizardSeat != null
+            ? accountBankMark(wizardSeat, bankList)
+            : wizardSeatCatalog
+              ? vendorMarkSrc({
+                    key: wizardSeatCatalog.key,
+                    name: wizardSeatCatalog.name,
+                    logoDomain: wizardSeatCatalog.logoDomain,
+                    website: wizardSeatCatalog.website,
+                })
+              : null;
+    const wizardSeatTitle =
+        wizardSeatMode === 'existing' && wizardSeat
+            ? wizardSeat.name
+            : wizardNewLabel.trim() ||
+              (wizardSeatCatalog
+                  ? t('pages.settings.panels.bank.wizard_authorise_seat_new', {
+                        bank: wizardSeatCatalog.name,
+                    })
+                  : t('pages.settings.panels.bank.wizard_seat_new'));
+    const wizardSeatSub =
+        wizardSeatMode === 'existing' && wizardSeat
+            ? `${wizardSeat.iban ? formatIban(wizardSeat.iban) : t('pages.settings.panels.bank.no_iban')} · ${formatMoney(wizardSeat.balance)}`
+            : wizardSeatCatalog?.name;
+    const showAspspCatalogMismatch =
+        Boolean(wizardInstitution) &&
+        Boolean(wizardSeatCatalog) &&
+        Boolean(wizardInstitutionCatalog) &&
+        wizardSeatCatalog!.id !== wizardInstitutionCatalog!.id &&
+        !isMockInstitution(wizardInstitution!.name);
     const canWizardSeatNext =
         wizardSeatMode === 'existing'
             ? Boolean(wizardSeatId && wizardSeat)
@@ -105,6 +174,58 @@ export function BankLinkWizard({
                   bankList[0]?.id
               );
     const wizardBusy = busy;
+
+    function defaultLabelForBank(bankId: string): string {
+        const catalog = bankById.get(bankId);
+        return t('pages.settings.panels.bank.bank_checking', {
+            bank: catalog?.name ?? t('pages.settings.panels.bank.bank_fallback'),
+        });
+    }
+
+    function applyCatalogBank(bankId: string, fillEmptyLabel = true) {
+        seatForm.setValue('bankId', bankId, { shouldDirty: true, shouldValidate: true });
+        seatForm.clearErrors('bankId');
+        if (fillEmptyLabel && !seatForm.getValues('label').trim()) {
+            seatForm.setValue('label', defaultLabelForBank(bankId), { shouldDirty: true });
+        }
+    }
+
+    /** Validates new-seat form + unique name; keeps the user on step 2 when invalid. */
+    async function ensureNewSeatFormReady(): Promise<boolean> {
+        if (wizardSeatMode !== 'new') {
+            seatForm.clearErrors();
+            return true;
+        }
+        const bankId =
+            seatForm.getValues('bankId') ||
+            wizardInstitutionCatalog?.id ||
+            primaryBankId ||
+            bankList[0]?.id ||
+            '';
+        if (bankId && !seatForm.getValues('bankId')) {
+            applyCatalogBank(bankId, true);
+        }
+        const ok = await seatForm.trigger();
+        if (!ok) {
+            setWizardSeatMode('new');
+            setWizardStep(2);
+            return false;
+        }
+        const label =
+            seatForm.getValues('label').trim() || defaultLabelForBank(seatForm.getValues('bankId'));
+        if (accountNameTaken(accounts, label)) {
+            seatForm.setError('label', {
+                message: t('pages.settings.panels.bank.account_name_taken'),
+            });
+            setWizardSeatMode('new');
+            setWizardStep(2);
+            return false;
+        }
+        if (!seatForm.getValues('label').trim()) {
+            seatForm.setValue('label', label, { shouldDirty: true });
+        }
+        return true;
+    }
 
     return (
         <div className="grid gap-3 border-t border-line py-3">
@@ -153,14 +274,8 @@ export function BankLinkWizard({
                                         disabled={!live || wizardBusy}
                                         onClick={() => {
                                             setWizardInstitutionId(row.id);
-                                            setWizardCatalogBankId(catalog?.id ?? '');
-                                            if (catalog && !wizardNewLabel.trim()) {
-                                                setWizardNewLabel(
-                                                    t('pages.settings.panels.bank.bank_checking', {
-                                                        bank: catalog.name,
-                                                    })
-                                                );
-                                            }
+                                            if (catalog) applyCatalogBank(catalog.id, true);
+                                            else seatForm.setValue('bankId', '');
                                         }}
                                         className={cn(
                                             'flex w-full items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition-colors',
@@ -208,14 +323,7 @@ export function BankLinkWizard({
                                     ? matchCatalogToInstitution(wizardInstitution.name, bankList)
                                     : null;
                                 if (catalog) {
-                                    setWizardCatalogBankId(catalog.id);
-                                    if (!wizardNewLabel.trim()) {
-                                        setWizardNewLabel(
-                                            t('pages.settings.panels.bank.bank_checking', {
-                                                bank: catalog.name,
-                                            })
-                                        );
-                                    }
+                                    applyCatalogBank(catalog.id, true);
                                 }
                                 const matching =
                                     wizardInstitution && isMockInstitution(wizardInstitution.name)
@@ -249,7 +357,10 @@ export function BankLinkWizard({
                             variant={wizardSeatMode === 'existing' ? 'primary' : 'secondary'}
                             className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
                             disabled={wizardMatchingSeats.length === 0}
-                            onClick={() => setWizardSeatMode('existing')}>
+                            onClick={() => {
+                                setWizardSeatMode('existing');
+                                seatForm.clearErrors();
+                            }}>
                             {t('pages.settings.panels.bank.wizard_seat_existing')}
                         </Button>
                         <Button
@@ -260,7 +371,7 @@ export function BankLinkWizard({
                             onClick={() => {
                                 setWizardSeatMode('new');
                                 if (wizardInstitutionCatalog) {
-                                    setWizardCatalogBankId(wizardInstitutionCatalog.id);
+                                    applyCatalogBank(wizardInstitutionCatalog.id, true);
                                 }
                             }}>
                             {t('pages.settings.panels.bank.wizard_seat_new')}
@@ -336,149 +447,154 @@ export function BankLinkWizard({
                             )}
                         </div>
                     ) : (
-                        <div className="grid gap-3">
-                            {wizardInstitutionCatalog || wizardInstitutionMark ? (
-                                <div className="flex items-center gap-2.5 rounded-xl border border-line px-3 py-2.5">
-                                    {wizardInstitutionMark ? (
-                                        <VendorMark
-                                            name={wizardInstitutionMark.name}
-                                            src={wizardInstitutionMark.src}
-                                            size={22}
-                                        />
-                                    ) : null}
-                                    <SettingsRowLabel
-                                        title={
-                                            wizardInstitutionCatalog?.name ??
-                                            wizardInstitution?.name ??
-                                            t('pages.settings.panels.bank.bank_fallback')
-                                        }
-                                        sub={t('pages.settings.panels.bank.wizard_catalog_bank')}
-                                    />
-                                </div>
-                            ) : null}
-                            <Field label={t('pages.settings.panels.bank.wizard_new_label')}>
-                                <Input
-                                    value={wizardNewLabel}
-                                    onChange={event => setWizardNewLabel(event.target.value)}
-                                    disabled={!live || wizardBusy}
-                                />
-                            </Field>
-                            {!wizardInstitutionCatalog ? (
-                                <div className="grid gap-2">
-                                    <p className="font-mono text-[10px] tracking-[0.14em] text-fg-faint uppercase">
-                                        {t('pages.settings.panels.bank.wizard_catalog_bank')}
-                                    </p>
-                                    {bankList.length === 0 ? (
-                                        <p className="text-sm text-fg-muted">
-                                            {t('pages.settings.panels.bank.loading_banks')}
-                                        </p>
-                                    ) : (
-                                        <>
-                                            <PresetNameField
-                                                value={
-                                                    bankById.get(
-                                                        wizardCatalogBankId || primaryBankId || ''
-                                                    )?.name ?? ''
-                                                }
-                                                onChange={name => {
-                                                    const match = bankList.find(
-                                                        bank =>
-                                                            bank.name.toLowerCase() ===
-                                                            name.trim().toLowerCase()
-                                                    );
-                                                    if (match) {
-                                                        setWizardCatalogBankId(match.id);
-                                                        if (!wizardNewLabel.trim()) {
-                                                            setWizardNewLabel(
-                                                                t(
-                                                                    'pages.settings.panels.bank.bank_checking',
-                                                                    {
-                                                                        bank: match.name,
-                                                                    }
-                                                                )
-                                                            );
-                                                        }
-                                                    }
-                                                }}
-                                                options={bankNameOptions}
-                                                placeholder={t(
-                                                    'pages.settings.panels.bank.search_bank'
-                                                )}
-                                                freeTextPlaceholder={t(
-                                                    'pages.settings.panels.bank.type_bank_name'
-                                                )}
-                                                lockPresets
-                                                initialLockedKey={
-                                                    bankById.get(
-                                                        wizardCatalogBankId || primaryBankId || ''
-                                                    )?.key || undefined
-                                                }
-                                                disabled={!live || wizardBusy}
-                                                onClear={() => setWizardCatalogBankId('')}
-                                                onSelect={opt => {
-                                                    const bank = bankByKey.get(opt.key);
-                                                    if (!bank) return;
-                                                    setWizardCatalogBankId(bank.id);
-                                                    if (!wizardNewLabel.trim()) {
-                                                        setWizardNewLabel(
-                                                            t(
-                                                                'pages.settings.panels.bank.bank_checking',
-                                                                { bank: bank.name }
-                                                            )
-                                                        );
-                                                    }
-                                                }}
+                        <Form {...seatForm}>
+                            <div className="grid gap-3">
+                                {wizardInstitutionCatalog || wizardInstitutionMark ? (
+                                    <div className="flex items-center gap-2.5 rounded-xl border border-line px-3 py-2.5">
+                                        {wizardInstitutionMark ? (
+                                            <VendorMark
+                                                name={wizardInstitutionMark.name}
+                                                src={wizardInstitutionMark.src}
+                                                size={22}
                                             />
-                                            <div className="flex flex-wrap gap-2">
-                                                {bankList.slice(0, 8).map(bank => {
-                                                    const mark = vendorMarkSrc({
-                                                        key: bank.key,
-                                                        name: bank.name,
-                                                        logoDomain: bank.logoDomain,
-                                                        website: bank.website,
-                                                    });
-                                                    const selectedId =
-                                                        wizardCatalogBankId || primaryBankId || '';
-                                                    const selected = selectedId === bank.id;
-                                                    return (
-                                                        <button
-                                                            key={bank.key}
-                                                            type="button"
-                                                            disabled={!live || wizardBusy}
-                                                            onClick={() => {
-                                                                setWizardCatalogBankId(bank.id);
-                                                                if (!wizardNewLabel.trim()) {
-                                                                    setWizardNewLabel(
-                                                                        t(
-                                                                            'pages.settings.panels.bank.bank_checking',
-                                                                            {
-                                                                                bank: bank.name,
-                                                                            }
-                                                                        )
-                                                                    );
-                                                                }
-                                                            }}
-                                                            className={cn(
-                                                                'inline-flex items-center gap-2 rounded-full border px-2.5 py-1.5 text-xs transition-colors',
-                                                                selected
-                                                                    ? 'border-accent bg-accent/10 text-fg'
-                                                                    : 'border-line text-fg-secondary hover:border-fg-faint hover:text-fg'
-                                                            )}>
-                                                            <VendorMark
-                                                                name={mark.name}
-                                                                src={mark.src}
-                                                                size={18}
-                                                            />
-                                                            {bank.name}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        </>
+                                        ) : null}
+                                        <SettingsRowLabel
+                                            title={
+                                                wizardInstitutionCatalog?.name ??
+                                                wizardInstitution?.name ??
+                                                t('pages.settings.panels.bank.bank_fallback')
+                                            }
+                                            sub={t('pages.settings.panels.bank.wizard_catalog_bank')}
+                                        />
+                                    </div>
+                                ) : null}
+                                <FormField
+                                    control={seatForm.control}
+                                    name="label"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <Field
+                                                label={t(
+                                                    'pages.settings.panels.bank.wizard_new_label'
+                                                )}
+                                                htmlFor="wizard-new-label">
+                                                <FormControl>
+                                                    <Input
+                                                        {...field}
+                                                        id="wizard-new-label"
+                                                        disabled={!live || wizardBusy}
+                                                    />
+                                                </FormControl>
+                                            </Field>
+                                            <FormMessage />
+                                        </FormItem>
                                     )}
-                                </div>
-                            ) : null}
-                        </div>
+                                />
+                                {!wizardInstitutionCatalog ? (
+                                    <div className="grid gap-2">
+                                        <p className="font-mono text-[10px] tracking-[0.14em] text-fg-faint uppercase">
+                                            {t('pages.settings.panels.bank.wizard_catalog_bank')}
+                                        </p>
+                                        {bankList.length === 0 ? (
+                                            <p className="text-sm text-fg-muted">
+                                                {t('pages.settings.panels.bank.loading_banks')}
+                                            </p>
+                                        ) : (
+                                            <>
+                                                <PresetNameField
+                                                    value={
+                                                        bankById.get(
+                                                            wizardCatalogBankId ||
+                                                                primaryBankId ||
+                                                                ''
+                                                        )?.name ?? ''
+                                                    }
+                                                    onChange={name => {
+                                                        const match = bankList.find(
+                                                            bank =>
+                                                                bank.name.toLowerCase() ===
+                                                                name.trim().toLowerCase()
+                                                        );
+                                                        if (match) applyCatalogBank(match.id, true);
+                                                    }}
+                                                    options={bankNameOptions}
+                                                    placeholder={t(
+                                                        'pages.settings.panels.bank.search_bank'
+                                                    )}
+                                                    freeTextPlaceholder={t(
+                                                        'pages.settings.panels.bank.type_bank_name'
+                                                    )}
+                                                    lockPresets
+                                                    initialLockedKey={
+                                                        bankById.get(
+                                                            wizardCatalogBankId ||
+                                                                primaryBankId ||
+                                                                ''
+                                                        )?.key || undefined
+                                                    }
+                                                    disabled={!live || wizardBusy}
+                                                    onClear={() => {
+                                                        seatForm.setValue('bankId', '');
+                                                        seatForm.clearErrors('bankId');
+                                                    }}
+                                                    onSelect={opt => {
+                                                        const bank = bankByKey.get(opt.key);
+                                                        if (!bank) return;
+                                                        applyCatalogBank(bank.id, true);
+                                                    }}
+                                                />
+                                                <div className="flex flex-wrap gap-2">
+                                                    {bankList.slice(0, 8).map(bank => {
+                                                        const mark = vendorMarkSrc({
+                                                            key: bank.key,
+                                                            name: bank.name,
+                                                            logoDomain: bank.logoDomain,
+                                                            website: bank.website,
+                                                        });
+                                                        const selectedId =
+                                                            wizardCatalogBankId ||
+                                                            primaryBankId ||
+                                                            '';
+                                                        const selected = selectedId === bank.id;
+                                                        return (
+                                                            <button
+                                                                key={bank.key}
+                                                                type="button"
+                                                                disabled={!live || wizardBusy}
+                                                                onClick={() =>
+                                                                    applyCatalogBank(bank.id, true)
+                                                                }
+                                                                className={cn(
+                                                                    'inline-flex items-center gap-2 rounded-full border px-2.5 py-1.5 text-xs transition-colors',
+                                                                    selected
+                                                                        ? 'border-accent bg-accent/10 text-fg'
+                                                                        : 'border-line text-fg-secondary hover:border-fg-faint hover:text-fg'
+                                                                )}>
+                                                                <VendorMark
+                                                                    name={mark.name}
+                                                                    src={mark.src}
+                                                                    size={18}
+                                                                />
+                                                                {bank.name}
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                                <FormField
+                                                    control={seatForm.control}
+                                                    name="bankId"
+                                                    render={() => (
+                                                        <FormItem>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </>
+                                        )}
+                                    </div>
+                                ) : null}
+                            </div>
+                        </Form>
                     )}
                     <div className="flex flex-wrap justify-end gap-2">
                         <Button type="button" variant="ghost" onClick={() => setWizardStep(1)}>
@@ -487,7 +603,12 @@ export function BankLinkWizard({
                         <Button
                             type="button"
                             disabled={!live || !canWizardSeatNext}
-                            onClick={() => setWizardStep(3)}>
+                            onClick={() => {
+                                void (async () => {
+                                    if (!(await ensureNewSeatFormReady())) return;
+                                    setWizardStep(3);
+                                })();
+                            }}>
                             {t('pages.settings.panels.bank.connect')}
                         </Button>
                     </div>
@@ -496,67 +617,87 @@ export function BankLinkWizard({
 
             {wizardStep === 3 ? (
                 <div className="grid gap-3">
-                    <p className="text-sm text-fg-muted">
-                        {t('pages.settings.panels.bank.wizard_authorise_hint')}
-                    </p>
-                    <div className="grid gap-2 rounded-xl border border-line px-3 py-3">
-                        <p className="font-mono text-[10px] tracking-[0.14em] text-fg-faint uppercase">
-                            {t('pages.settings.panels.bank.wizard_authorise_bank')}
+                    <div className="grid gap-2">
+                        <p className="text-sm text-fg-muted">
+                            {t('pages.settings.panels.bank.wizard_authorise_hint')}
                         </p>
-                        {wizardInstitution && wizardInstitutionMark ? (
-                            <div className="flex items-center gap-2.5">
-                                <VendorMark
-                                    name={wizardInstitutionMark.name}
-                                    src={wizardInstitutionMark.src}
-                                    size={28}
-                                />
-                                <SettingsRowLabel
-                                    title={wizardInstitution.name}
-                                    sub={
-                                        isMockInstitution(wizardInstitution.name)
-                                            ? t('pages.settings.panels.bank.wizard_sandbox_badge')
-                                            : undefined
-                                    }
-                                />
-                            </div>
-                        ) : (
-                            <p className="text-sm text-fg-muted">
-                                {t('pages.settings.panels.bank.pick_institution')}
+                        <ul className="grid gap-1.5 text-sm text-fg-secondary">
+                            <li className="flex gap-2">
+                                <span className="text-fg-faint" aria-hidden>
+                                    ·
+                                </span>
+                                <span>{t('pages.settings.panels.bank.wizard_authorise_what_1')}</span>
+                            </li>
+                            <li className="flex gap-2">
+                                <span className="text-fg-faint" aria-hidden>
+                                    ·
+                                </span>
+                                <span>{t('pages.settings.panels.bank.wizard_authorise_what_2')}</span>
+                            </li>
+                            <li className="flex gap-2">
+                                <span className="text-fg-faint" aria-hidden>
+                                    ·
+                                </span>
+                                <span>{t('pages.settings.panels.bank.wizard_authorise_what_3')}</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div className="grid gap-3 rounded-xl border border-line px-3 py-3">
+                        <div className="grid gap-2">
+                            <p className="font-mono text-[10px] tracking-[0.14em] text-fg-faint uppercase">
+                                {t('pages.settings.panels.bank.wizard_authorise_bank')}
                             </p>
-                        )}
-                        <p className="mt-2 font-mono text-[10px] tracking-[0.14em] text-fg-faint uppercase">
-                            {t('pages.settings.panels.bank.wizard_authorise_seat')}
-                        </p>
-                        {wizardSeatMode === 'existing' && wizardSeat ? (
+                            {wizardInstitution && wizardInstitutionMark ? (
+                                <div className="flex items-center gap-2.5">
+                                    <VendorMark
+                                        name={wizardInstitutionMark.name}
+                                        src={wizardInstitutionMark.src}
+                                        size={28}
+                                    />
+                                    <SettingsRowLabel
+                                        title={wizardInstitution.name}
+                                        sub={
+                                            isMockInstitution(wizardInstitution.name)
+                                                ? t(
+                                                      'pages.settings.panels.bank.wizard_sandbox_badge'
+                                                  )
+                                                : undefined
+                                        }
+                                    />
+                                </div>
+                            ) : (
+                                <p className="text-sm text-fg-muted">
+                                    {t('pages.settings.panels.bank.pick_institution')}
+                                </p>
+                            )}
+                        </div>
+                        <div className="border-t border-line" />
+                        <div className="grid gap-2">
+                            <p className="font-mono text-[10px] tracking-[0.14em] text-fg-faint uppercase">
+                                {t('pages.settings.panels.bank.wizard_authorise_seat')}
+                            </p>
                             <div className="flex items-center gap-2.5">
                                 {wizardSeatMark ? (
                                     <VendorMark
                                         name={wizardSeatMark.name}
                                         src={wizardSeatMark.src}
-                                        size={22}
+                                        size={28}
                                     />
                                 ) : null}
                                 <SettingsRowLabel
-                                    title={wizardSeat.name}
-                                    sub={`${wizardSeat.iban ? formatIban(wizardSeat.iban) : t('pages.settings.panels.bank.no_iban')} · ${formatMoney(wizardSeat.balance)}`}
+                                    title={wizardSeatTitle}
+                                    sub={wizardSeatSub}
                                 />
                             </div>
-                        ) : (
-                            <SettingsRowLabel
-                                title={
-                                    wizardNewLabel.trim() ||
-                                    t('pages.settings.panels.bank.wizard_seat_new')
-                                }
-                                sub={
-                                    bankById.get(
-                                        wizardCatalogBankId ||
-                                            primaryBankId ||
-                                            bankList[0]?.id ||
-                                            ''
-                                    )?.name
-                                }
-                            />
-                        )}
+                            {showAspspCatalogMismatch ? (
+                                <p className="text-xs text-fg-muted">
+                                    {t('pages.settings.panels.bank.wizard_authorise_mismatch', {
+                                        aspsp: wizardInstitution!.name,
+                                        catalog: wizardSeatCatalog!.name,
+                                    })}
+                                </p>
+                            ) : null}
+                        </div>
                     </div>
                     <div className="flex flex-wrap justify-end gap-2">
                         <Button
@@ -569,15 +710,28 @@ export function BankLinkWizard({
                         <Button
                             type="button"
                             disabled={!live || wizardBusy}
-                            onClick={() =>
-                                void onAuthorise({
-                                    institutionId: wizardInstitutionId,
-                                    seatMode: wizardSeatMode,
-                                    seatId: wizardSeatId,
-                                    newLabel: wizardNewLabel,
-                                    catalogBankId: wizardCatalogBankId,
-                                })
-                            }>
+                            onClick={() => {
+                                void (async () => {
+                                    if (!(await ensureNewSeatFormReady())) return;
+                                    const values = seatForm.getValues();
+                                    const result = await onAuthorise({
+                                        institutionId: wizardInstitutionId,
+                                        seatMode: wizardSeatMode,
+                                        seatId: wizardSeatId,
+                                        newLabel: values.label,
+                                        catalogBankId: values.bankId,
+                                    });
+                                    if (result === 'name_taken') {
+                                        seatForm.setError('label', {
+                                            message: t(
+                                                'pages.settings.panels.bank.account_name_taken'
+                                            ),
+                                        });
+                                        setWizardSeatMode('new');
+                                        setWizardStep(2);
+                                    }
+                                })();
+                            }}>
                             {wizardBusy
                                 ? t('pages.settings.panels.bank.linking')
                                 : t('pages.settings.panels.bank.wizard_authorise')}

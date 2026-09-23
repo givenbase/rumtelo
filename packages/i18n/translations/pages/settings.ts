@@ -257,9 +257,15 @@ const settings = {
                 'No {bank} accounts yet. Create one below — it will be labelled for that bank.',
             wizard_authorise: 'Continue to bank',
             wizard_authorise_hint:
-                'You’ll leave Rumtelo briefly to approve read-only access at the bank, then return here.',
-            wizard_authorise_bank: 'Bank to authorise',
-            wizard_authorise_seat: 'Account to link',
+                'Next you leave Rumtelo briefly, sign in at the bank, and approve read-only access. We never move money. When you return, transactions sync into your Inbox.',
+            wizard_authorise_what_1: 'Read-only: balances and transactions only.',
+            wizard_authorise_what_2: 'You can disconnect this link any time in Settings.',
+            wizard_authorise_what_3: 'After approval we sync once, then return you here.',
+            wizard_authorise_bank: 'Bank that must approve',
+            wizard_authorise_seat: 'Rumtelo account to link',
+            wizard_authorise_seat_new: 'New account · {bank}',
+            wizard_authorise_mismatch:
+                'The bank you authorise ({aspsp}) can differ from the Rumtelo label bank ({catalog}). That is fine for testing; in daily use they usually match.',
             wizard_cancel: 'Cancel',
             group_accounts: '{count} accounts',
             not_connected: 'Not connected',

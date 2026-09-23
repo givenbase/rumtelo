@@ -65,7 +65,8 @@ export class BankSyncService {
         let link;
         try {
             link = await this.banking.completeLink({ code: input.code, state: input.state });
-        } catch {
+        } catch (error) {
+            this.logger.error(`completeLink failed account=${account.id}: ${String(error)}`);
             throw apiBadRequest('bank_sync_failed');
         }
 
@@ -74,6 +75,9 @@ export class BankSyncService {
 
         account.connectionId = encodeConnectionId(link.sessionId, matched.uid);
         account.lastSyncedAt = null;
+        if (!account.iban && matched.iban) {
+            account.iban = normalizeIban(matched.iban);
+        }
         await this.em.flush();
 
         return {
@@ -196,22 +200,48 @@ export class BankSyncService {
     private async pullAccount(account: BankAccount) {
         if (!account.connectionId) throw apiBadRequest('bank_sync_failed');
 
-        const since =
-            account.lastSyncedAt?.toISOString().slice(0, 10) ??
-            new Date(Date.now() - BANK_SYNC_INITIAL_LOOKBACK_DAYS * 24 * 60 * 60 * 1000)
-                .toISOString()
-                .slice(0, 10);
+        const lookbackSince = new Date(
+            Date.now() - BANK_SYNC_INITIAL_LOOKBACK_DAYS * 24 * 60 * 60 * 1000
+        )
+            .toISOString()
+            .slice(0, 10);
+        const firstPull = !account.lastSyncedAt;
+        const since = firstPull
+            ? lookbackSince
+            : (account.lastSyncedAt!.toISOString().slice(0, 10) ?? lookbackSince);
+
+        try {
+            const balance = await this.banking.fetchBalance(account.connectionId);
+            if (balance !== null) account.balance = balance;
+        } catch (error) {
+            this.logger.warn(`fetchBalance failed account=${account.id}: ${String(error)}`);
+        }
 
         let rows;
         try {
-            rows = await this.banking.fetchTransactions(account.connectionId, since);
-        } catch {
+            // EB FAQ: longest on first/catch-up; default for incremental.
+            rows = await this.banking.fetchTransactions(account.connectionId, since, {
+                strategy: firstPull ? 'longest' : 'default',
+            });
+            // Incremental empty → one longest catch-up (period quirks / empty+continuation).
+            if (!firstPull && rows.length === 0) {
+                rows = await this.banking.fetchTransactions(account.connectionId, lookbackSince, {
+                    strategy: 'longest',
+                });
+            }
+        } catch (error) {
+            this.logger.error(`fetchTransactions failed account=${account.id}: ${String(error)}`);
             throw apiBadRequest('bank_sync_failed');
         }
 
         const result = await this.transactions.importBankTransactions(account.id, rows);
         account.lastSyncedAt = new Date();
         await this.em.flush();
+        if (result.imported === 0 && rows.length === 0) {
+            this.logger.warn(
+                `sync imported 0 account=${account.id} — if consent predates balances/transactions scopes, reconnect the bank`
+            );
+        }
         return result;
     }
 

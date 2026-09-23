@@ -1,6 +1,6 @@
 # Bank data — CSV import, Enable Banking, and moving money
 
-How Rumtelo gets bank transactions into the Inbox. **CSV is always-on. Live PSD2 sync is Enable Banking**, behind a feature flag, not implemented end-to-end yet. **Moving money (PIS) is not on the near roadmap** — see [Moving money](#moving-money--pis-licences-bunq-vs-revolut) for why and for the three routes.
+How Rumtelo gets bank transactions into the Inbox. **CSV is always-on. Live PSD2 sync is Enable Banking** (AIS balances + transactions), behind a feature flag. **Moving money (PIS) is not on the near roadmap** — see [Moving money](#moving-money--pis-licences-bunq-vs-revolut) for why and for the three routes.
 
 ---
 
@@ -80,7 +80,9 @@ AIS does **not** push every booking. Rumtelo polls:
 
 Constants: [`bank-sync.constants.ts`](../../apps/backend/src/modules/public/product/money/ledger/bank-sync/bank-sync.constants.ts) (`BANK_SYNC_CRON`, `BANK_SYNC_STALE_MS`). New Inbox rows use `source: BANK` + dedupe keys (same idea as CSV).
 
-**Consent (~90 days):** when the bank session expires, pulls fail until the user Connects again. UI warning for expiry is still a follow-up.
+Each pull also refreshes `BankAccount.balance` from AIS (`GET …/balances`, preferring interim/closing available). Consent requests `balances` + `transactions` explicitly. Transaction pages follow `continuation_key` (capped).
+
+**Consent (~90 days):** when the bank session expires, pulls fail until the user Connects again. UI warning for expiry is still a follow-up. Seats authorised **before** balances/transactions scopes were requested need a fresh Connect to pick up saldo.
 
 ### Redirect URLs (Control Panel whitelist)
 
@@ -115,6 +117,13 @@ Bank settings splits hard on `account.connectionId`:
 2. Save App ID + PEM into local `.env` (never commit).
 3. Ship adapter + `bankSync` procedures; flip `FEATURE_BANK_SYNC=true` locally.
 4. Connect → return to `/banking/callback` → sync → Bank settings.
+
+### Mock ASPSP (sandbox balances + txs)
+
+Live ASPSPs in sandbox often return **empty** transaction lists. For local AIS testing, import fixture data into Enable Banking’s **Mock ASPSP** (Control Panel → Mock ASPSP → Import), then Connect **Mock ASPSP** from Rumtelo.
+
+- Fixture: [`fixtures/enable-banking-mock-nl.json`](./fixtures/enable-banking-mock-nl.json) — 3 EUR accounts (checking / savings / credit) named after the demo plan personas (`Jamie Lee Rivera` / `Avery Chen` / `Morgan Ellis Blake`), NL-style remittance names aligned with Inbox merchant needles. Format matches [EB sample JSON](https://enablebanking.com/sample-data/DK-Danske_Bank-synthetic-1.json).
+- This is **not** `DemoHouseholdSeeder` / DB seed data — that path fills Rumtelo’s ledger directly; Mock ASPSP fills Enable Banking so our sync adapter pulls rows like a real bank.
 
 ---
 
@@ -204,7 +213,8 @@ Flow:
 
 ```
 CSV file ──► parseStatementCsv ──► dedupe ──► Transaction (CSV, INBOX)
-Bank AIS ──► BankingPort.fetchTransactions ──► Transaction (BANK, INBOX)
+Bank AIS ──► BankingPort.fetchBalance ──► BankAccount.balance
+         └──► BankingPort.fetchTransactions ──► Transaction (BANK, INBOX)
                     └──► household sorts in Inbox
 ```
 

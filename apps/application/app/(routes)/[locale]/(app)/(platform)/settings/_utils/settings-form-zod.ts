@@ -63,9 +63,19 @@ export function createBankAccountFormSchema(v: SettingsFormT) {
                 { message: v('pages.settings.panels.bank.iban') }
             ),
         kind: z.enum(AccountKind),
-        bankId: z.string().uuid(),
-        settlementAccountId: z.string().uuid().nullable().optional(),
+        bankId: z.uuid(),
+        settlementAccountId: z.uuid().nullable().optional(),
     });
 }
 
 export type BankAccountFormValues = z.infer<ReturnType<typeof createBankAccountFormSchema>>;
+
+/** New Open Banking seat fields (wizard step 2 — create mode). */
+export function createBankWizardSeatFormSchema(v: SettingsFormT) {
+    return z.object({
+        label: z.string().max(80),
+        bankId: z.uuid(v('pages.settings.panels.bank.bank_required')),
+    });
+}
+
+export type BankWizardSeatFormValues = z.infer<ReturnType<typeof createBankWizardSeatFormSchema>>;

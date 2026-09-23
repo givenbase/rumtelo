@@ -285,40 +285,36 @@ export class TransactionService {
         entity.status = TransactionStatus.SORTED;
         entity.appliedMerchantKey = null;
 
-        if (createRule) {
-            const counterparty = entity.counterparty?.trim() ?? '';
-            const description = entity.description.trim();
-            const merchant = await this.merchants.matchFeed({
-                text: `${counterparty} ${description}`,
-            });
-            const needle = merchant?.matching?.matchValue.trim() ?? '';
-            let field: 'COUNTERPARTY' | 'DESCRIPTION' = counterparty
-                ? 'COUNTERPARTY'
-                : 'DESCRIPTION';
-            let matchValue = counterparty || description;
-            // Prefer the catalog needle when it is specific enough to be a rule.
-            // Short brands (NS, ING) stay on the raw counterparty — a CONTAINS rule
-            // of two letters would swallow unrelated descriptions.
-            if (needle.length >= 4) {
-                if (containsWord(description, needle)) {
-                    field = 'DESCRIPTION';
-                    matchValue = needle;
-                } else if (containsWord(counterparty, needle)) {
-                    field = 'COUNTERPARTY';
-                    matchValue = needle;
-                }
+        const counterparty = entity.counterparty?.trim() ?? '';
+        const description = entity.description.trim();
+        const merchant = await this.merchants.matchFeed({
+            text: `${counterparty} ${description}`,
+        });
+        const needle = merchant?.matching?.matchValue.trim() ?? '';
+        let field: 'COUNTERPARTY' | 'DESCRIPTION' = counterparty ? 'COUNTERPARTY' : 'DESCRIPTION';
+        let matchValue = counterparty || description;
+        // Prefer the catalog needle when it is specific enough to be a rule.
+        // Short brands (NS, ING) stay on the raw counterparty — a CONTAINS rule
+        // of two letters would swallow unrelated descriptions.
+        if (needle.length >= 4) {
+            if (containsWord(description, needle)) {
+                field = 'DESCRIPTION';
+                matchValue = needle;
+            } else if (containsWord(counterparty, needle)) {
+                field = 'COUNTERPARTY';
+                matchValue = needle;
             }
-            const rule = await this.rules.create({
-                field,
-                matcher: 'CONTAINS',
-                matchValue,
-                jarId,
-                categoryId: categoryId ?? null,
-                priority: 100,
-                isActive: true,
-            });
-            entity.appliedRule = rule.id;
         }
+
+        // Always learn the payee (Juist = soft memory, Altijd dit = explicit rule).
+        const hint = await this.rules.upsertPayeeHint({
+            field,
+            matchValue,
+            jarId,
+            categoryId: categoryId ?? null,
+            explicit: createRule,
+        });
+        if (hint) entity.appliedRule = hint.id;
 
         if (debtId !== undefined) {
             if (entity.fixedCost && debtId) {

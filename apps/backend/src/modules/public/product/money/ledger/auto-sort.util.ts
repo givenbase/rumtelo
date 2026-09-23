@@ -37,10 +37,13 @@ export type AutoSortContext = {
     categoryByJarAndName: Map<string, Map<string, Category>>;
 };
 
+/** Soft payee-memory rules created by Inbox “Juist” — after explicit “Altijd dit” rules. */
+export const PAYEE_MEMORY_RULE_PRIORITY = 900;
+
 /**
  * Place inbox rows: household rules first (priority order, first match wins),
- * then the merchant catalog. A merchant whose jar cannot take an outflow
- * (Financial Freedom) is skipped — the row stays in the inbox.
+ * then the merchant catalog (outflows only). A merchant whose jar cannot take an
+ * outflow (Financial Freedom) is skipped — the row stays in the inbox.
  *
  * Mutates the rows. Increments `rule.hitCount` only when `countHits` is set,
  * so a dry-run preview does not teach the rules they fired.
@@ -68,6 +71,9 @@ export function autoSortRows(
             continue;
         }
 
+        // Merchant catalog is expense-oriented — don't auto-place inflows.
+        if (row.amount >= 0) continue;
+
         const merchant = matchMerchant(context.merchants, {
             text: `${row.counterparty ?? ''} ${row.description}`,
         });
@@ -75,7 +81,7 @@ export function autoSortRows(
         const jarKey = merchant.jarTemplate.key;
         const jar = context.jarsByKey.get(jarKey);
         if (!jar) continue;
-        if (row.amount < 0 && !jarCapabilitiesFor(jarKey).canSpend) continue;
+        if (!jarCapabilitiesFor(jarKey).canSpend) continue;
 
         const categoryName = merchant.categoryTemplate.name.trim().toLowerCase();
         row.jar = jar;

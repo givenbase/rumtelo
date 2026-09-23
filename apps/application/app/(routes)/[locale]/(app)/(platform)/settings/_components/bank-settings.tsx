@@ -42,10 +42,17 @@ import {
     nlIbanPrefix,
 } from '../_utils/settings-shared';
 import { useSettingsMutation } from '../_utils/use-settings-mutation';
-import { BankLinkWizard, type BankLinkWizardAuthoriseInput } from './bank-link-wizard';
+import { BankLinkWizard, type BankLinkWizardAuthoriseInput, type BankLinkWizardAuthoriseResult } from './bank-link-wizard';
 import { BankLinkedAccounts } from './bank-linked-accounts';
 import { BankManualAccounts } from './bank-manual-accounts';
 import { SettingsInkCard, SettingsPanel, SettingsPill } from './settings-chrome';
+
+function isAccountNameTakenError(message: string): boolean {
+    return (
+        message === 'account_name_taken' ||
+        /account_name_taken|already exists|bestaat al een/i.test(message)
+    );
+}
 
 export function BankSettings() {
     const t = useTranslations();
@@ -171,9 +178,12 @@ export function BankSettings() {
         const currentLabel = form.getValues('label');
         const nextName = composeAccountBankName(bank.name, currentLabel, bankList);
         if (accountNameTaken(accounts, nextName, editingId)) {
-            showToast(t('common.message.error.api.account_name_taken'), 'error');
+            form.setError('label', {
+                message: t('pages.settings.panels.bank.account_name_taken'),
+            });
             return;
         }
+        form.clearErrors('label');
         form.setValue('bankId', bank.id, { shouldDirty: true });
         form.setValue('label', nextName, { shouldDirty: true });
         const code = bank.ibanBankCode?.toUpperCase() ?? null;
@@ -261,8 +271,15 @@ export function BankSettings() {
         invalidateKeys: [apiQuery.money.accounts.list.key()],
         successMessage: t('pages.settings.toasts.account_added'),
         onSuccess: () => resetForm(),
+        silenceErrorToast: error => isAccountNameTakenError(extractErrorMessage(error)),
         onError: error => {
             const raw = extractErrorMessage(error);
+            if (isAccountNameTakenError(raw)) {
+                form.setError('label', {
+                    message: t('pages.settings.panels.bank.account_name_taken'),
+                });
+                return;
+            }
             if (isIbanApiErrorMessage(raw) || /iban/i.test(raw)) {
                 setIbanError(raw);
             }
@@ -285,8 +302,15 @@ export function BankSettings() {
         invalidateKeys: [apiQuery.money.accounts.list.key()],
         successMessage: t('pages.settings.toasts.account_updated'),
         onSuccess: () => resetForm(),
+        silenceErrorToast: error => isAccountNameTakenError(extractErrorMessage(error)),
         onError: error => {
             const raw = extractErrorMessage(error);
+            if (isAccountNameTakenError(raw)) {
+                form.setError('label', {
+                    message: t('pages.settings.panels.bank.account_name_taken'),
+                });
+                return;
+            }
             if (isIbanApiErrorMessage(raw) || /iban/i.test(raw)) {
                 setIbanError(raw);
             }
@@ -384,22 +408,27 @@ export function BankSettings() {
             return;
         }
         if (accountNameTaken(accounts, name, editingId)) {
-            showToast(t('common.message.error.api.account_name_taken'), 'error');
+            form.setError('label', {
+                message: t('pages.settings.panels.bank.account_name_taken'),
+            });
             return;
         }
+        form.clearErrors('label');
         if (editingId) updateAccount.mutate(values);
         else createAccount.mutate(values);
     }
 
-    async function runWizardAuthorise(input: BankLinkWizardAuthoriseInput) {
-        if (!householdId || !input.institutionId) return;
+    async function runWizardAuthorise(
+        input: BankLinkWizardAuthoriseInput
+    ): Promise<BankLinkWizardAuthoriseResult> {
+        if (!householdId || !input.institutionId) return 'failed';
         try {
             let bankAccountId = input.seatId;
             if (input.seatMode === 'new') {
                 const catalogId = input.catalogBankId || primaryBankId || bankList[0]?.id;
                 if (!catalogId) {
                     showToast(t('common.message.error.api.bank_required'), 'error');
-                    return;
+                    return 'failed';
                 }
                 const bank = bankById.get(catalogId);
                 const seatLabel =
@@ -408,8 +437,7 @@ export function BankSettings() {
                         bank: bank?.name ?? t('pages.settings.panels.bank.bank_fallback'),
                     });
                 if (accountNameTaken(accounts, seatLabel)) {
-                    showToast(t('common.message.error.api.account_name_taken'), 'error');
-                    return;
+                    return 'name_taken';
                 }
                 const created = await api.money.accounts.create({
                     householdId,
@@ -427,11 +455,17 @@ export function BankSettings() {
             }
             if (!bankAccountId) {
                 showToast(t('common.message.error.api.bank_sync_account_required'), 'error');
-                return;
+                return 'failed';
             }
             startLink.mutate({ bankAccountId, institutionId: input.institutionId });
+            return 'ok';
         } catch (error) {
-            showToast(extractErrorMessage(error), 'error');
+            const raw = extractErrorMessage(error);
+            if (isAccountNameTakenError(raw)) {
+                return 'name_taken';
+            }
+            showToast(raw, 'error');
+            return 'failed';
         }
     }
 
@@ -487,6 +521,7 @@ export function BankSettings() {
                         bankNameOptions={bankNameOptions}
                         bankById={bankById}
                         bankByKey={bankByKey}
+                        accounts={accounts}
                         manualAccounts={manualAccounts}
                         primaryBankId={primaryBankId}
                         formatMoney={formatMoney}
