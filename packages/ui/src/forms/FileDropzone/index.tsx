@@ -21,6 +21,8 @@ export type FileDropzoneProps = {
     replaceLabel?: string;
     /** Clear selected file. */
     clearLabel?: string;
+    /** `compact` = tighter padding for Settings cards. */
+    density?: 'default' | 'compact';
     className?: string;
     onFile: (file: File | null) => void;
 };
@@ -38,6 +40,7 @@ export function FileDropzone({
     fileName = null,
     replaceLabel,
     clearLabel,
+    density = 'default',
     className,
     onFile,
 }: FileDropzoneProps) {
@@ -111,18 +114,21 @@ export function FileDropzone({
                 onDragOver={onDragOver}
                 onDrop={onDrop}
                 className={cn(
-                    'flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed px-4 py-8 text-center transition-colors',
+                    'flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed px-4 text-center transition-colors',
+                    density === 'compact' ? 'py-5' : 'py-7',
                     dragging
                         ? 'border-accent bg-accent-soft/50 text-fg'
                         : hasFile
                           ? 'border-line bg-raised text-fg'
-                          : 'border-line bg-surface-raised/40 text-fg-secondary hover:border-fg-faint hover:bg-raised',
+                          : 'bg-surface-raised/40 border-line text-fg-secondary hover:border-fg-faint hover:bg-raised',
                     disabled && 'cursor-not-allowed opacity-50'
                 )}>
                 <span
                     className={cn(
                         'flex size-10 items-center justify-center rounded-full border',
-                        dragging ? 'border-accent bg-accent/15 text-accent' : 'border-line text-fg-muted'
+                        dragging
+                            ? 'border-accent bg-accent/15 text-accent'
+                            : 'border-line text-fg-muted'
                     )}
                     aria-hidden>
                     <Icon name={hasFile ? 'file-text' : 'upload'} size="md" />

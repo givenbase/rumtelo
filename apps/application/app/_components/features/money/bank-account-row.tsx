@@ -19,7 +19,7 @@ export type BankAccountRowProps = {
     sub?: string;
     /** Override logo (e.g. while editing bank in Settings). */
     mark?: PartyMark | null;
-    markSize?: 18 | 22 | 28;
+    markSize?: 18 | 22 | 28 | 32;
     selected?: boolean;
     disabled?: boolean;
     className?: string;

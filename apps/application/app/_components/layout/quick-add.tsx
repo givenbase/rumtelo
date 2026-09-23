@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Typography } from '@rumtelo/ui';
+import { Icon, Typography, type IconName } from '@rumtelo/ui';
 import { useTranslations } from '@rumtelo/i18n';
 import { cn } from '@rumtelo/utils';
 
@@ -21,24 +21,51 @@ import {
     usePlanCapabilities,
 } from '@/components/features/shell/use-plan-capabilities';
 
-const QUICK_ITEMS: { labelKey: string; kind: CreateKind; search: string }[] = [
-    { labelKey: 'pages.shell.quick_add.transaction', kind: 'tx', search: 'transaction expense' },
+const QUICK_ITEMS: {
+    labelKey: string;
+    kind: CreateKind;
+    search: string;
+    icon: IconName;
+}[] = [
+    {
+        labelKey: 'pages.shell.quick_add.transaction',
+        kind: 'tx',
+        search: 'transaction expense',
+        icon: 'receipt',
+    },
     {
         labelKey: 'pages.shell.quick_add.import_statement',
         kind: 'importStatement',
         search: 'import statement bank camt mt940 csv afschrift',
+        icon: 'upload',
     },
     {
         labelKey: 'pages.shell.quick_add.fixed_cost',
         kind: 'fixed',
         search: 'fixed cost bill rent huur',
+        icon: 'calendar-clock',
     },
-    { labelKey: 'pages.shell.quick_add.debt', kind: 'debt', search: 'debt' },
-    { labelKey: 'pages.shell.quick_add.goal', kind: 'goal', search: 'goal' },
-    { labelKey: 'pages.shell.quick_add.income', kind: 'income', search: 'income' },
-    { labelKey: 'pages.shell.quick_add.training', kind: 'session', search: 'training sport' },
-    { labelKey: 'pages.shell.quick_add.asset', kind: 'asset', search: 'asset' },
-    { labelKey: 'pages.shell.quick_add.move_money', kind: 'move', search: 'move jar' },
+    { labelKey: 'pages.shell.quick_add.debt', kind: 'debt', search: 'debt', icon: 'credit-card' },
+    { labelKey: 'pages.shell.quick_add.goal', kind: 'goal', search: 'goal', icon: 'target' },
+    {
+        labelKey: 'pages.shell.quick_add.income',
+        kind: 'income',
+        search: 'income',
+        icon: 'wallet',
+    },
+    {
+        labelKey: 'pages.shell.quick_add.training',
+        kind: 'session',
+        search: 'training sport',
+        icon: 'dumbbell',
+    },
+    { labelKey: 'pages.shell.quick_add.asset', kind: 'asset', search: 'asset', icon: 'landmark' },
+    {
+        labelKey: 'pages.shell.quick_add.move_money',
+        kind: 'move',
+        search: 'move jar',
+        icon: 'arrow-left-right',
+    },
 ];
 
 type PaletteMode = 'ask' | 'add';
@@ -230,17 +257,29 @@ export function QuickAddFab() {
                                         key={item.kind}
                                         href={CREATE_HREF[item.kind]}
                                         onClick={() => setQuickOpen(false)}
-                                        className={
-                                            locked
-                                                ? 'rounded-lg px-3 py-2.5 text-left text-sm text-fg-muted opacity-55 transition-colors hover:bg-raised'
-                                                : 'rounded-lg px-3 py-2.5 text-left text-sm text-fg transition-colors hover:bg-raised'
-                                        }>
-                                        {locked && (
-                                            <span aria-hidden className="mr-1 text-xs">
-                                                🔒
-                                            </span>
-                                        )}
-                                        {t(item.labelKey)}
+                                        className={cn(
+                                            'flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm transition-colors hover:bg-raised',
+                                            locked ? 'text-fg-muted opacity-55' : 'text-fg'
+                                        )}>
+                                        <span
+                                            className={cn(
+                                                'grid size-8 shrink-0 place-items-center rounded-lg border border-line bg-raised',
+                                                !locked && 'text-accent'
+                                            )}
+                                            aria-hidden>
+                                            <Icon name={item.icon} size="sm" />
+                                        </span>
+                                        <span className="min-w-0 flex-1 truncate">
+                                            {t(item.labelKey)}
+                                        </span>
+                                        {locked ? (
+                                            <Icon
+                                                name="lock"
+                                                size="sm"
+                                                className="shrink-0 text-fg-faint"
+                                                aria-hidden
+                                            />
+                                        ) : null}
                                     </Link>
                                 );
                             })}

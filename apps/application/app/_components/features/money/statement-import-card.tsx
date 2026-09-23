@@ -12,10 +12,7 @@ import { BankAccountRow } from '@/components/features/money/bank-account-row';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
-import {
-    embeddedFormSurfaceClass,
-    formFieldStackClass,
-} from '@/components/layout/form-create-edit-shell';
+import { embeddedFormSurfaceClass } from '@/components/layout/form-create-edit-shell';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
 import { Button, FileDropzone } from '@rumtelo/ui';
@@ -38,8 +35,8 @@ function readPreferred(): PreferredFormat {
 
 export type StatementImportCardProps = {
     /**
-     * `full` = prefer tip + upload (Settings / import route).
-     * `compact` = upload fields only (rare embeds).
+     * `full` = prefer tip + upload (import route / modal).
+     * `compact` = account + dropzone only (Settings already has eyebrow/blurb).
      */
     variant?: 'full' | 'compact';
     /** When true (modal/page), use sticky footer like other create forms. */
@@ -155,14 +152,14 @@ export function StatementImportCard({
     const canSubmit = live && Boolean(selectedId) && Boolean(fileContent) && !busy;
 
     const fields = (
-        <fieldset className={cn('min-w-0 border-0 p-0', formFieldStackClass)}>
+        <div className="grid gap-5">
             {variant === 'full' ? (
-                <div className="grid gap-2">
+                <section className="grid gap-2">
                     <p className="text-xs font-semibold tracking-wide text-fg-muted uppercase">
                         {t('prefer_eyebrow')}
                     </p>
-                    <p className="text-sm text-fg-secondary">{t('prefer_hint')}</p>
-                    <div className="flex flex-wrap gap-1.5">
+                    <p className="text-sm leading-snug text-fg-secondary">{t('prefer_hint')}</p>
+                    <div className="flex flex-wrap gap-1.5 pt-0.5">
                         {(
                             [
                                 ['camt053', t('format_camt')],
@@ -184,13 +181,11 @@ export function StatementImportCard({
                             </button>
                         ))}
                     </div>
-                    <p className="text-xs text-fg-muted">{t('after_import')}</p>
-                </div>
-            ) : (
-                <p className="text-sm text-fg-secondary">{t('hint')}</p>
-            )}
+                    <p className="text-xs leading-snug text-fg-muted">{t('after_import')}</p>
+                </section>
+            ) : null}
 
-            <div className="grid gap-1.5">
+            <section className="grid gap-2">
                 <span className="text-xs font-semibold tracking-wide text-fg-muted uppercase">
                     {t('account')}
                 </span>
@@ -199,12 +194,13 @@ export function StatementImportCard({
                         {t('no_accounts')}
                     </p>
                 ) : (
-                    <div role="radiogroup" aria-label={t('account')} className="grid gap-1.5">
+                    <div role="radiogroup" aria-label={t('account')} className="grid gap-2">
                         {accounts.map(account => (
                             <BankAccountRow
                                 key={account.id}
                                 account={account}
                                 banks={banks}
+                                markSize={28}
                                 selected={account.id === selectedId}
                                 disabled={!live || busy}
                                 onSelect={() => setAccountId(account.id)}
@@ -212,15 +208,16 @@ export function StatementImportCard({
                         ))}
                     </div>
                 )}
-            </div>
+            </section>
 
-            <div className="grid gap-1.5">
+            <section className="grid gap-2">
                 <span className="text-xs font-semibold tracking-wide text-fg-muted uppercase">
                     {t('upload_eyebrow')}
                 </span>
                 <FileDropzone
                     accept={ACCEPT}
                     disabled={!live || !selectedId || busy}
+                    density={embedded ? 'default' : 'compact'}
                     idleLabel={t('drop_idle')}
                     activeLabel={t('drop_active')}
                     hint={t('drop_hint')}
@@ -229,8 +226,8 @@ export function StatementImportCard({
                     clearLabel={t('clear_file')}
                     onFile={file => void onPickedFile(file)}
                 />
-            </div>
-        </fieldset>
+            </section>
+        </div>
     );
 
     const submit = (
@@ -249,8 +246,8 @@ export function StatementImportCard({
                 )}
                 method="post"
                 onSubmit={onSubmit}>
-                <div className="min-w-0 flex-1 space-y-4">{fields}</div>
-                <div className="sticky bottom-0 z-10 -mx-5 mt-6 -mb-5 border-t border-line bg-surface px-5 py-4 shadow-[0_-4px_12px_-4px_rgb(0_0_0_/0.08)]">
+                <div className="min-w-0 flex-1">{fields}</div>
+                <div className="sticky bottom-0 z-10 -mx-5 mt-5 -mb-5 border-t border-line bg-surface px-5 py-4 shadow-[0_-4px_12px_-4px_rgb(0_0_0_/0.08)]">
                     {submit}
                 </div>
             </form>
@@ -259,11 +256,15 @@ export function StatementImportCard({
 
     return (
         <form
-            className={cn('relative flex flex-col gap-6', embeddedFormSurfaceClass, className)}
+            className={cn(
+                'relative flex flex-col gap-4 py-3.5',
+                embeddedFormSurfaceClass,
+                className
+            )}
             method="post"
             onSubmit={onSubmit}>
-            <div className="min-w-0 flex-1 space-y-4">{fields}</div>
-            <div>{submit}</div>
+            {fields}
+            <div className="pt-1 pb-0.5">{submit}</div>
         </form>
     );
 }

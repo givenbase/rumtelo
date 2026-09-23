@@ -203,65 +203,77 @@ export function BankLinkedAccounts({
                                                   }`}
                                                   onSelect={() => onOpenEdit(account)}
                                                   trailing={
-                                              <div className="flex flex-wrap items-center justify-end gap-1.5">
-                                                  {!isEditing && !account.isPrimary ? (
-                                                      <Button
-                                                          type="button"
-                                                          variant="secondary"
-                                                          size="sm"
-                                                          className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
-                                                          disabled={!live || setPrimaryPending}
-                                                          onClick={() => onSetPrimary(account.id)}>
-                                                          {t(
-                                                              'pages.settings.panels.bank.set_primary'
-                                                          )}
-                                                      </Button>
-                                                  ) : null}
-                                                  {!isEditing ? (
-                                                      <>
+                                                      <div className="flex flex-wrap items-center justify-end gap-1.5">
+                                                          {!isEditing && !account.isPrimary ? (
+                                                              <Button
+                                                                  type="button"
+                                                                  variant="secondary"
+                                                                  size="sm"
+                                                                  className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
+                                                                  disabled={
+                                                                      !live || setPrimaryPending
+                                                                  }
+                                                                  onClick={() =>
+                                                                      onSetPrimary(account.id)
+                                                                  }>
+                                                                  {t(
+                                                                      'pages.settings.panels.bank.set_primary'
+                                                                  )}
+                                                              </Button>
+                                                          ) : null}
+                                                          {!isEditing ? (
+                                                              <>
+                                                                  <Button
+                                                                      type="button"
+                                                                      variant="secondary"
+                                                                      size="sm"
+                                                                      className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
+                                                                      disabled={
+                                                                          !live || syncPending
+                                                                      }
+                                                                      onClick={() =>
+                                                                          onSync(account.id)
+                                                                      }>
+                                                                      {t(
+                                                                          'pages.settings.panels.bank.sync_now'
+                                                                      )}
+                                                                  </Button>
+                                                                  <Button
+                                                                      type="button"
+                                                                      variant="ghost"
+                                                                      size="sm"
+                                                                      className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
+                                                                      disabled={
+                                                                          !live || disconnectPending
+                                                                      }
+                                                                      onClick={() =>
+                                                                          onDisconnect(account.id)
+                                                                      }>
+                                                                      {t(
+                                                                          'pages.settings.panels.bank.disconnect_bank'
+                                                                      )}
+                                                                  </Button>
+                                                              </>
+                                                          ) : null}
                                                           <Button
                                                               type="button"
                                                               variant="secondary"
                                                               size="sm"
                                                               className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
-                                                              disabled={!live || syncPending}
-                                                              onClick={() => onSync(account.id)}>
-                                                              {t(
-                                                                  'pages.settings.panels.bank.sync_now'
-                                                              )}
-                                                          </Button>
-                                                          <Button
-                                                              type="button"
-                                                              variant="ghost"
-                                                              size="sm"
-                                                              className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
-                                                              disabled={!live || disconnectPending}
                                                               onClick={() =>
-                                                                  onDisconnect(account.id)
+                                                                  isEditing
+                                                                      ? onReset()
+                                                                      : onOpenEdit(account)
                                                               }>
-                                                              {t(
-                                                                  'pages.settings.panels.bank.disconnect_bank'
-                                                              )}
+                                                              {isEditing
+                                                                  ? t(
+                                                                        'pages.settings.panels.jars_placement.close'
+                                                                    )
+                                                                  : t(
+                                                                        'pages.settings.panels.bank.edit'
+                                                                    )}
                                                           </Button>
-                                                      </>
-                                                  ) : null}
-                                                  <Button
-                                                      type="button"
-                                                      variant="secondary"
-                                                      size="sm"
-                                                      className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
-                                                      onClick={() =>
-                                                          isEditing
-                                                              ? onReset()
-                                                              : onOpenEdit(account)
-                                                      }>
-                                                      {isEditing
-                                                          ? t(
-                                                                'pages.settings.panels.jars_placement.close'
-                                                            )
-                                                          : t('pages.settings.panels.bank.edit')}
-                                                  </Button>
-                                              </div>
+                                                      </div>
                                                   }
                                               />
                                           </SettingsRow>

@@ -161,31 +161,33 @@ export function BankManualAccounts({
                                     }`}
                                     onSelect={() => onOpenEdit(account)}
                                     trailing={
-                                <div className="flex flex-wrap items-center justify-end gap-1.5">
-                                    {!isEditing && !account.isPrimary ? (
-                                        <Button
-                                            type="button"
-                                            variant="secondary"
-                                            size="sm"
-                                            className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
-                                            disabled={!live || setPrimaryPending}
-                                            onClick={() => onSetPrimary(account.id)}>
-                                            {t('pages.settings.panels.bank.set_primary')}
-                                        </Button>
-                                    ) : null}
-                                    <Button
-                                        type="button"
-                                        variant="secondary"
-                                        size="sm"
-                                        className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
-                                        onClick={() =>
-                                            isEditing ? onReset() : onOpenEdit(account)
-                                        }>
-                                        {isEditing
-                                            ? t('pages.settings.panels.jars_placement.close')
-                                            : t('pages.settings.panels.bank.edit')}
-                                    </Button>
-                                </div>
+                                        <div className="flex flex-wrap items-center justify-end gap-1.5">
+                                            {!isEditing && !account.isPrimary ? (
+                                                <Button
+                                                    type="button"
+                                                    variant="secondary"
+                                                    size="sm"
+                                                    className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
+                                                    disabled={!live || setPrimaryPending}
+                                                    onClick={() => onSetPrimary(account.id)}>
+                                                    {t('pages.settings.panels.bank.set_primary')}
+                                                </Button>
+                                            ) : null}
+                                            <Button
+                                                type="button"
+                                                variant="secondary"
+                                                size="sm"
+                                                className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
+                                                onClick={() =>
+                                                    isEditing ? onReset() : onOpenEdit(account)
+                                                }>
+                                                {isEditing
+                                                    ? t(
+                                                          'pages.settings.panels.jars_placement.close'
+                                                      )
+                                                    : t('pages.settings.panels.bank.edit')}
+                                            </Button>
+                                        </div>
                                     }
                                 />
                             </SettingsRow>

@@ -574,7 +574,7 @@ export function BankSettings() {
                 <SettingsInkCard
                     eyebrow={t('pages.settings.panels.bank.import_eyebrow')}
                     blurb={t('pages.settings.panels.bank.import_blurb')}>
-                    <StatementImportCard embedded={false} variant="full" />
+                    <StatementImportCard embedded={false} variant="compact" />
                 </SettingsInkCard>
             ) : null}
 
