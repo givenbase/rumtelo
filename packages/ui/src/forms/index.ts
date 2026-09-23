@@ -10,6 +10,7 @@ export * from './Label';
 export * from './Toggle';
 export * from './Calendar';
 export * from './DatePicker';
+export * from './FileDropzone';
 
 export {
     useFormField,

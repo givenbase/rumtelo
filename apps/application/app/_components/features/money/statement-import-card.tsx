@@ -5,7 +5,10 @@ import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { CAPABILITIES } from '@/app/_lib/plan';
 import { isLiveData } from '@/app/_lib/preview';
+import { countryFromCurrency } from '@/app/_lib/resolve-account-bank';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { BankAccountRow } from '@/components/features/money/bank-account-row';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
@@ -15,10 +18,10 @@ import {
 } from '@/components/layout/form-create-edit-shell';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
-import { Button, Select } from '@rumtelo/ui';
+import { Button, FileDropzone } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRef, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 
 const ACCEPT = '.xml,.sta,.mt940,.csv,text/csv,text/xml,application/xml';
 
@@ -47,7 +50,7 @@ export type StatementImportCardProps = {
 
 /**
  * Statement upload — CAMT.053 preferred, MT940 / CSV accepted.
- * Layout mirrors FormCreateEditShell so Settings / Toevoegen / create-tx feel the same.
+ * Account picker reuses BankAccountRow (same mark + bank chrome as Settings).
  */
 export function StatementImportCard({
     variant = 'full',
@@ -60,10 +63,10 @@ export function StatementImportCard({
     const { showToast } = useAppShell();
     const apiError = useApiError();
     const { hasCapability } = usePlanCapabilities();
+    const { currency } = useHouseholdCurrency();
     const live = isLiveData(householdId);
     const queryClient = useQueryClient();
     const dismiss = useFormDismiss(onSuccess);
-    const fileRef = useRef<HTMLInputElement>(null);
     const [accountId, setAccountId] = useState('');
     const [fileName, setFileName] = useState<string | null>(null);
     const [fileContent, setFileContent] = useState<string | null>(null);
@@ -74,7 +77,15 @@ export function StatementImportCard({
         [],
         live && Boolean(householdId)
     );
+    const banksQuery = useLiveQuery(
+        apiQuery.money.catalogs.banks.list.queryOptions({
+            input: { householdId: householdId!, country: countryFromCurrency(currency) },
+        }),
+        [],
+        live && Boolean(householdId)
+    );
     const accounts = accountsQuery.data ?? [];
+    const banks = banksQuery.data ?? [];
     const selectedId =
         accountId || accounts.find(row => row.isPrimary)?.id || accounts[0]?.id || '';
 
@@ -105,8 +116,6 @@ export function StatementImportCard({
             );
             setFileName(null);
             setFileContent(null);
-            if (fileRef.current) fileRef.current.value = '';
-            // Modal/page: leave like other create forms. Settings (embedded=false): stay put.
             if (embedded || onSuccess) dismiss();
         },
         onError: (error: unknown) => showToast(apiError(error), 'error'),
@@ -119,9 +128,12 @@ export function StatementImportCard({
         window.localStorage.setItem(PREFERRED_KEY, next);
     }
 
-    async function onFileChange(fileList: FileList | null) {
-        const file = fileList?.[0];
-        if (!file) return;
+    async function onPickedFile(file: File | null) {
+        if (!file) {
+            setFileName(null);
+            setFileContent(null);
+            return;
+        }
         setFileName(file.name);
         const content = await file.text();
         if (!content.trim()) {
@@ -163,7 +175,7 @@ export function StatementImportCard({
                                 type="button"
                                 onClick={() => setPreferredFormat(key)}
                                 className={cn(
-                                    'rounded-full border px-2.5 py-1 font-mono text-[10px] tracking-[0.1em] uppercase transition-colors',
+                                    'rounded-full border px-2.5 py-1 font-mono text-[10px] tracking-widest uppercase transition-colors',
                                     preferred === key
                                         ? 'border-accent bg-accent/10 text-fg'
                                         : 'border-line text-fg-muted hover:border-fg-faint hover:text-fg'
@@ -178,49 +190,45 @@ export function StatementImportCard({
                 <p className="text-sm text-fg-secondary">{t('hint')}</p>
             )}
 
-            <label className="grid gap-1.5">
+            <div className="grid gap-1.5">
                 <span className="text-xs font-semibold tracking-wide text-fg-muted uppercase">
                     {t('account')}
                 </span>
-                <Select
-                    value={selectedId}
-                    disabled={!live || accounts.length === 0 || busy}
-                    onChange={event => setAccountId(event.target.value)}>
-                    {accounts.length === 0 ? (
-                        <option value="">{t('no_accounts')}</option>
-                    ) : (
-                        accounts.map(account => (
-                            <option key={account.id} value={account.id}>
-                                {account.name}
-                            </option>
-                        ))
-                    )}
-                </Select>
-            </label>
+                {accounts.length === 0 ? (
+                    <p className="rounded-xl border border-dashed border-line px-3 py-3 text-sm text-fg-muted">
+                        {t('no_accounts')}
+                    </p>
+                ) : (
+                    <div role="radiogroup" aria-label={t('account')} className="grid gap-1.5">
+                        {accounts.map(account => (
+                            <BankAccountRow
+                                key={account.id}
+                                account={account}
+                                banks={banks}
+                                selected={account.id === selectedId}
+                                disabled={!live || busy}
+                                onSelect={() => setAccountId(account.id)}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
 
             <div className="grid gap-1.5">
                 <span className="text-xs font-semibold tracking-wide text-fg-muted uppercase">
                     {t('upload_eyebrow')}
                 </span>
-                <input
-                    ref={fileRef}
-                    type="file"
+                <FileDropzone
                     accept={ACCEPT}
-                    className="sr-only"
                     disabled={!live || !selectedId || busy}
-                    onChange={event => void onFileChange(event.target.files)}
+                    idleLabel={t('drop_idle')}
+                    activeLabel={t('drop_active')}
+                    hint={t('drop_hint')}
+                    fileName={fileName}
+                    replaceLabel={t('rechoose')}
+                    clearLabel={t('clear_file')}
+                    onFile={file => void onPickedFile(file)}
                 />
-                <Button
-                    type="button"
-                    variant="secondary"
-                    className="w-full justify-center rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
-                    disabled={!live || !selectedId || busy}
-                    onClick={() => fileRef.current?.click()}>
-                    {fileName ? t('rechoose') : t('choose_file')}
-                </Button>
-                {fileName ? (
-                    <p className="truncate font-mono text-[11px] text-fg-muted">{fileName}</p>
-                ) : null}
             </div>
         </fieldset>
     );

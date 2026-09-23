@@ -11,6 +11,7 @@ import type { UseFormReturn } from 'react-hook-form';
 
 import type { BankAccountFormValues } from '../_utils/settings-form-zod';
 import { accountBankMark } from '../_utils/resolve-account-bank';
+import { BankAccountRow } from '@/components/features/money/bank-account-row';
 import { BankAccountForm } from './bank-account-form';
 import { SettingsRow, SettingsRowLabel } from './settings-chrome';
 
@@ -189,26 +190,19 @@ export function BankLinkedAccounts({
                                                   'mb-1 rounded-xl border border-accent/40 bg-accent-soft/50 px-3'
                                           )}>
                                           <SettingsRow last={isLastVisible && !isEditing}>
-                                              <button
-                                                  type="button"
-                                                  className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
-                                                  onClick={() => onOpenEdit(account)}>
-                                                  {seatMark ? (
-                                                      <VendorMark
-                                                          name={seatMark.name}
-                                                          src={seatMark.src}
-                                                          size={22}
-                                                      />
-                                                  ) : null}
-                                                  <SettingsRowLabel
-                                                      title={rowTitle}
-                                                      sub={`${account.iban ? formatIban(account.iban) : t('pages.settings.panels.bank.no_iban')} · ${formatMoney(account.balance)}${
-                                                          account.isPrimary
-                                                              ? ` · ${t('pages.settings.panels.bank.primary')}`
-                                                              : ''
-                                                      }`}
-                                                  />
-                                              </button>
+                                              <BankAccountRow
+                                                  account={account}
+                                                  banks={bankList}
+                                                  title={rowTitle}
+                                                  mark={seatMark}
+                                                  className="min-w-0 flex-1"
+                                                  sub={`${account.iban ? formatIban(account.iban) : t('pages.settings.panels.bank.no_iban')} · ${formatMoney(account.balance)}${
+                                                      account.isPrimary
+                                                          ? ` · ${t('pages.settings.panels.bank.primary')}`
+                                                          : ''
+                                                  }`}
+                                                  onSelect={() => onOpenEdit(account)}
+                                                  trailing={
                                               <div className="flex flex-wrap items-center justify-end gap-1.5">
                                                   {!isEditing && !account.isPrimary ? (
                                                       <Button
@@ -268,6 +262,8 @@ export function BankLinkedAccounts({
                                                           : t('pages.settings.panels.bank.edit')}
                                                   </Button>
                                               </div>
+                                                  }
+                                              />
                                           </SettingsRow>
                                           {isEditing ? (
                                               <BankAccountForm

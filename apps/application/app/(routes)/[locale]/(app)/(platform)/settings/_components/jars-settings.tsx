@@ -17,6 +17,7 @@ import { isLiveData } from '@/app/_lib/preview';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { BankAccountRow } from '@/components/features/money/bank-account-row';
 import { SettingsInkCard, SettingsPanel, SettingsPill, SettingsRow } from './settings-chrome';
 import { accountBankMark, countryFromCurrency } from '../_utils/resolve-account-bank';
 import { JAR_COLOR, accountKindLabel } from '../_utils/settings-shared';
@@ -207,60 +208,39 @@ export function JarsSettings() {
                                 </Button>
                             </SettingsRow>
                             {isEditing ? (
-                                <div className="flex flex-wrap gap-2 pb-3 pl-5">
-                                    {accounts.map(option => {
-                                        const selected = seatId === option.id;
-                                        const optionMark = accountBankMark(option, banks);
-                                        const optionIban = option.iban
-                                            ? formatIban(option.iban)
-                                            : null;
-                                        return (
-                                            <button
-                                                key={option.id}
-                                                type="button"
-                                                onClick={() => {
-                                                    setJarSeats(prev => ({
-                                                        ...prev,
-                                                        [jar.id]: option.id,
-                                                    }));
-                                                    setEditingJarId(null);
-                                                    showToast(
-                                                        t(
-                                                            'pages.settings.panels.jars_placement.seat_saved',
-                                                            {
-                                                                jar: jar.name,
-                                                                account: option.name,
-                                                            }
-                                                        ),
-                                                        'success'
-                                                    );
-                                                }}
-                                                className={cn(
-                                                    'inline-flex items-center gap-2 rounded-xl border px-2.5 py-1.5 text-left text-xs transition-colors',
-                                                    selected
-                                                        ? 'border-accent bg-accent/10 text-fg'
-                                                        : 'border-line text-fg-secondary hover:border-fg-faint hover:text-fg'
-                                                )}>
-                                                {optionMark ? (
-                                                    <VendorMark
-                                                        name={optionMark.name}
-                                                        src={optionMark.src}
-                                                        size={18}
-                                                    />
-                                                ) : null}
-                                                <span className="grid min-w-0 gap-0.5">
-                                                    <span className="block font-medium text-fg">
-                                                        {option.name}
-                                                    </span>
-                                                    <span className="font-mono text-[10px] text-fg-muted">
-                                                        {accountKindLabel(option.kind, t) ??
-                                                            option.kind}
-                                                        {optionIban ? ` · ${optionIban}` : ''}
-                                                    </span>
-                                                </span>
-                                            </button>
-                                        );
-                                    })}
+                                <div
+                                    role="radiogroup"
+                                    className="grid gap-1.5 pb-3 pl-5"
+                                    aria-label={t('pages.settings.panels.jars_placement.change')}>
+                                    {accounts.map(option => (
+                                        <BankAccountRow
+                                            key={option.id}
+                                            account={option}
+                                            banks={banks}
+                                            markSize={18}
+                                            selected={seatId === option.id}
+                                            sub={`${accountKindLabel(option.kind, t) ?? option.kind}${
+                                                option.iban ? ` · ${formatIban(option.iban)}` : ''
+                                            }`}
+                                            onSelect={() => {
+                                                setJarSeats(prev => ({
+                                                    ...prev,
+                                                    [jar.id]: option.id,
+                                                }));
+                                                setEditingJarId(null);
+                                                showToast(
+                                                    t(
+                                                        'pages.settings.panels.jars_placement.seat_saved',
+                                                        {
+                                                            jar: jar.name,
+                                                            account: option.name,
+                                                        }
+                                                    ),
+                                                    'success'
+                                                );
+                                            }}
+                                        />
+                                    ))}
                                 </div>
                             ) : null}
                         </div>
