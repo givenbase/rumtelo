@@ -51,6 +51,8 @@ import {
 import { BankLinkedAccounts } from './bank-linked-accounts';
 import { BankManualAccounts } from './bank-manual-accounts';
 import { SettingsInkCard, SettingsPanel, SettingsPill } from './settings-chrome';
+import { StatementImportCard } from '@/components/features/money/statement-import-card';
+import { CAPABILITIES } from '@/app/_lib/plan';
 
 function isAccountNameTakenError(message: string): boolean {
     return (
@@ -64,7 +66,7 @@ export function BankSettings() {
     const { householdId } = useAuth();
     const { showToast } = useAppShell();
     const { formatMoney } = useHouseholdCurrency();
-    const { withinLimit } = usePlanCapabilities();
+    const { withinLimit, hasCapability } = usePlanCapabilities();
     const live = isLiveData(householdId);
     const queryClient = useQueryClient();
     const [adding, setAdding] = useState(false);
@@ -567,6 +569,14 @@ export function BankSettings() {
                     />
                 ) : null}
             </SettingsInkCard>
+
+            {hasCapability(CAPABILITIES.moneyImport) ? (
+                <SettingsInkCard
+                    eyebrow={t('pages.settings.panels.bank.import_eyebrow')}
+                    blurb={t('pages.settings.panels.bank.import_blurb')}>
+                    <StatementImportCard embedded={false} variant="full" />
+                </SettingsInkCard>
+            ) : null}
 
             <SettingsInkCard
                 eyebrow={t('pages.settings.panels.bank.manual_eyebrow')}

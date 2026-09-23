@@ -4,12 +4,9 @@
  * export different headers) and none of it is transaction business logic.
  */
 
-export interface ParsedRow {
-    bookedOn: string;
-    amount: number;
-    description: string;
-    counterparty: string | null;
-}
+import type { ParsedRow } from '../statement/parsed-row';
+
+export type { ParsedRow } from '../statement/parsed-row';
 
 /** Header aliases across the major Dutch exports. */
 const COLUMNS = {

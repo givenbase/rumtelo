@@ -15,7 +15,8 @@ import {
 } from '../../plan/fixed-cost/fixed-cost-link.util';
 import { BankAccount } from '../bank-account/bank-account.entity';
 import { SortRuleService } from '../sort-rule/sort-rule.service';
-import { parseStatementCsv } from './csv/csv-parser';
+import { parseStatement } from './statement/parse-statement';
+import type { StatementFormat } from './statement/parsed-row';
 import { jarCapabilitiesFor, TransactionSource, TransactionStatus } from '@rumtelo/contracts';
 
 import { Transaction } from './transaction.entity';
@@ -91,11 +92,16 @@ export class TransactionService {
     }
 
     /**
-     * CSV is the always-on import path; bank sync is the optional one. Import is
-     * idempotent via dedupeKey, so re-uploading the same statement is safe.
+     * Statement file import (CSV / MT940 / CAMT.053). Idempotent via dedupeKey.
+     * Prefer CAMT.053 when the bank offers it; format sniff is automatic.
      */
-    async importCsv(accountId: string, content: string, dryRun: boolean) {
-        const parsed = parseStatementCsv(content);
+    async importCsv(
+        accountId: string,
+        content: string,
+        dryRun: boolean,
+        format: StatementFormat | 'auto' = 'auto'
+    ) {
+        const { rows: parsed } = parseStatement(content, format);
         const keys = parsed.map(row =>
             dedupeKey(accountId, row.bookedOn, row.amount, row.description)
         );
@@ -158,7 +164,7 @@ export class TransactionService {
             duplicates: parsed.length - freshCount,
             willImport: freshCount,
             sorted,
-            sample: [],
+            sample: incoming.slice(0, 5).map(row => row.description),
         };
     }
 

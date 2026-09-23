@@ -1,6 +1,6 @@
 # Bank data — CSV import, Enable Banking, and moving money
 
-How Rumtelo gets bank transactions into the Inbox. **CSV is always-on. Live PSD2 sync is Enable Banking** (AIS balances + transactions), behind a feature flag. **Moving money (PIS) is not on the near roadmap** — see [Moving money](#moving-money--pis-licences-bunq-vs-revolut) for why and for the three routes.
+How Rumtelo gets bank transactions into the Inbox. **Statement file import (CAMT.053 / MT940 / CSV) is always-on** behind `moneyImport`. **Live PSD2 sync is Enable Banking** (AIS balances + transactions), behind a feature flag. **Moving money (PIS) is not on the near roadmap** — see [Moving money](#moving-money--pis-licences-bunq-vs-revolut) for why and for the three routes.
 
 ---
 
@@ -48,14 +48,25 @@ Chosen aggregator: **Enable Banking** (already stubbed). Port allows swap to Tin
 
 | Format | Status |
 |---|---|
-| **CSV** | Supported on the backend (`importCsv`). NL/EN header aliases. |
-| MT940 / CAMT.053 / OFX / QIF / PDF | **Not** parsed. Banks often offer these on download screens; we do not ingest them yet. |
+| **CAMT.053** (ISO 20022 XML) | Supported — prefer this when the bank offers it |
+| **MT940** (SWIFT `.sta` / `.mt940`) | Supported — legacy fallback while banks still default to it |
+| **CSV** | Supported (`importCsv`). NL/EN header aliases |
+| OFX / QIF / PDF | **Not** parsed |
+
+Prefer **CAMT.053** in product copy. NL support is broad (Rabobank often defaults to it; ABN, ING, Volksbank, Triodos, Knab also offer it). MT940 remains available on many portals during the ISO 20022 transition.
+
+Samples for local testing:
+
+- [`fixtures/statement-sample-nl.camt053.xml`](./fixtures/statement-sample-nl.camt053.xml)
+- [`fixtures/statement-sample-nl.mt940.sta`](./fixtures/statement-sample-nl.mt940.sta)
+
+Detection is automatic (`format: auto` on `money.transactions.importCsv`).
 
 ### CSV mapping
 
-Server-side header aliases only (date/datum, amount/bedrag, description/omschrijving, counterparty/tegenrekening, …) in [`csv-parser.ts`](../../apps/backend/src/modules/public/product/money/ledger/transaction/csv/csv-parser.ts). No upload UI or manual column-map wizard in the app yet; `dryRun` preview exists on the contract but is not wired in the UI (`sample` is empty).
+Server-side header aliases only (date/datum, amount/bedrag, description/omschrijving, counterparty/tegenrekening, …) in [`csv-parser.ts`](../../apps/backend/src/modules/public/product/money/ledger/transaction/csv/csv-parser.ts). CAMT/MT940 parsers live under [`statement/`](../../apps/backend/src/modules/public/product/money/ledger/transaction/statement/). Statement upload UI is on Transactions (capability `moneyImport`); full column-map wizard still roadmap.
 
-Imported rows: `source: CSV`, amounts in eurocents, SHA-256 dedupe key so re-importing the same statement skips duplicates.
+Imported rows: `source: CSV` (file import vs AIS `BANK`), amounts in eurocents, SHA-256 dedupe key so re-importing the same statement skips duplicates.
 
 ---
 
@@ -209,12 +220,12 @@ If we ever do "real jars", **bunq is the bank**, exactly as it is for Flow.
 | Import API | `TransactionService.importCsv` → `money.transactions.importCsv` |
 | Contracts | `packages/contracts` — `ImportCsv` / `ImportPreview` |
 | Settings UX | Open Banking vs Manual accounts. Primary = `BankAccount.isPrimary` (one per household). Live link seats: Basic 0 / Plus 2 / Max 6 (`maxBankLinks`; paid extras later) |
-| Plan capability | `moneyBank` + `maxBankLinks` for AIS; `moneyImport` for CSV; live connect also gated by `FEATURE_BANK_SYNC` |
+| Plan capability | `moneyBank` + `maxBankLinks` for AIS; `moneyImport` for statement files (CAMT/MT940/CSV); live connect also gated by `FEATURE_BANK_SYNC` |
 
 Flow:
 
 ```
-CSV file ──► parseStatementCsv ──► dedupe ──► Transaction (CSV, INBOX)
+CSV / MT940 / CAMT.053 ──► parseStatement ──► dedupe ──► Transaction (CSV, INBOX)
 Bank AIS ──► BankingPort.fetchBalance ──► BankAccount.balance
          └──► BankingPort.fetchTransactions ──► Transaction (BANK, INBOX)
                     └──► household sorts in Inbox
@@ -224,12 +235,12 @@ Bank AIS ──► BankingPort.fetchBalance ──► BankAccount.balance
 
 ## Product follow-ups (not done)
 
-- CSV **import wizard** UI: pick account → upload → confirm mapping/preview → commit
+- Richer statement import wizard (preview/mapping) — minimal account+file upload ships on Transactions
 - Consent-expiry warning UX (~90 days)
 - Optional denser cron / shorter stale window once volume is known
 - **Jar ↔ external account mapping** (route 1 above): link a bunq IBAN / Revolut currency account to a jar so balances mirror the bank
 - Send the two outreach mails in [outreach-pis.md](./outreach-pis.md); record answers (price, agent model yes/no) here
-- Optional later: MT940 / CAMT.053 parsers if customers need them beyond CSV
+- Optional later: OFX / QIF / PDF parsers
 
 ---
 

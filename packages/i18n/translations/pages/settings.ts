@@ -292,6 +292,9 @@ const settings = {
             manual_eyebrow: 'Manual accounts',
             manual_blurb:
                 'CSV import and seats without live sync. These are separate from Open Banking links above.',
+            import_eyebrow: 'Statement file import',
+            import_blurb:
+                'Prefer CAMT.053 from your bank. MT940 or CSV work too. After import, sort the Inbox and link matching vaste kosten.',
             account_label: 'Account label',
             account_label_hint:
                 'Shown in jars and CSV — e.g. Operating checking, or Creditcard · t.n.v. Avery Chen.',

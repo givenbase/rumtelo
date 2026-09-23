@@ -24,6 +24,11 @@ import {
 const QUICK_ITEMS: { labelKey: string; kind: CreateKind; search: string }[] = [
     { labelKey: 'pages.shell.quick_add.transaction', kind: 'tx', search: 'transaction expense' },
     {
+        labelKey: 'pages.shell.quick_add.import_statement',
+        kind: 'importStatement',
+        search: 'import statement bank camt mt940 csv afschrift',
+    },
+    {
         labelKey: 'pages.shell.quick_add.fixed_cost',
         kind: 'fixed',
         search: 'fixed cost bill rent huur',

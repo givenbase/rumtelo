@@ -25,7 +25,7 @@ import {
 } from '@rumtelo/contracts';
 
 import { useApiError } from '@/app/_lib/api-error-messages';
-import { createTxHref, txDetailHref } from '@/app/_lib/create-routes';
+import { CREATE_HREF, createTxHref, txDetailHref } from '@/app/_lib/create-routes';
 import { suggestFixedCostForTx } from '@/app/_lib/fixed-cost-match';
 import { buildPayeeJarMemory, suggestInboxJar } from '@/app/_lib/inbox-suggest';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
@@ -42,6 +42,7 @@ import { ListToolbar } from '@/components/layout/list-toolbar';
 import { ConfirmActionButton } from '@/components/features/forms/confirm-action-button';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useBankSyncOnVisit } from '@/app/_lib/use-bank-sync-on-visit';
+import Link from 'next/link';
 
 type Tab = 'INBOX' | 'OUT' | 'IN' | 'RULES';
 
@@ -327,6 +328,17 @@ export function TransactionsPageClient() {
                     </button>
                 ))}
             </ListToolbar>
+
+            {tab === 'INBOX' ? (
+                <p className="mb-3 text-sm text-fg-muted">
+                    {t('import_hint_lead')}{' '}
+                    <Link
+                        href={CREATE_HREF.importStatement}
+                        className="font-medium text-accent hover:underline">
+                        {t('import_hint_link')}
+                    </Link>
+                </p>
+            ) : null}
 
             {tab === 'INBOX' &&
                 (inbox.length === 0 ? (

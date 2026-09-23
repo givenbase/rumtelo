@@ -24,12 +24,17 @@ export class TransactionController {
         );
     }
 
-    /** Bulk-import transactions from a bank statement CSV. */
+    /** Bulk-import transactions from a bank statement (CSV / MT940 / CAMT.053). */
     @RequireCapability(CAPABILITIES.moneyImport)
     @Implement(contract.money.transactions.importCsv)
     importCsv() {
         return implement(contract.money.transactions.importCsv).handler(({ input }) =>
-            this.transactions.importCsv(input.accountId, input.content, input.dryRun)
+            this.transactions.importCsv(
+                input.accountId,
+                input.content,
+                input.dryRun,
+                input.format ?? 'auto'
+            )
         );
     }
 

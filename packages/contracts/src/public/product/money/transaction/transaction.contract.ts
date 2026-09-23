@@ -1,6 +1,6 @@
 /**
  * Transaction Contract
- * oRPC procedures for transactions (CRUD, sort, bulk-sort, CSV import) and accounts.
+ * oRPC procedures for transactions (CRUD, sort, bulk-sort, statement file import) and accounts.
  */
 
 import { oc } from '@orpc/contract';

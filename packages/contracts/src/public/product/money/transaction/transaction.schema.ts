@@ -141,15 +141,18 @@ export const Account = z.object({
 });
 
 // ====================================================================
-// CSV Import
+// Statement file import (CSV / MT940 / CAMT.053)
 // ====================================================================
+
+export const StatementImportFormat = z.enum(['auto', 'csv', 'mt940', 'camt053']);
 
 export const ImportCsv = z.object({
     householdId: HouseholdId,
     accountId: Id,
-    /** Raw CSV text. Parsing/mapping happens server-side so the format lives in one place. */
+    /** Raw statement text (CSV, MT940, or CAMT.053 XML). Format is sniffed when `format` is auto. */
     content: z.string().min(1),
     dryRun: z.boolean().default(true),
+    format: StatementImportFormat.default('auto'),
 });
 
 export const ImportPreview = z.object({
@@ -176,3 +179,4 @@ export type Account = z.infer<typeof Account>;
 export type ImportCsv = z.infer<typeof ImportCsv>;
 export type ImportPreview = z.infer<typeof ImportPreview>;
 export type ImportCsvResult = z.infer<typeof ImportCsvResult>;
+export type StatementImportFormat = z.infer<typeof StatementImportFormat>;
