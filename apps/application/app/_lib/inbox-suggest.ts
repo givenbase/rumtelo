@@ -130,7 +130,10 @@ export function suggestInboxJar(input: {
         return { jarId: jar.id, jarKey: jar.key, confidence: 'high' };
     }
 
-    function fromJarKey(jarKey: JarKey | null, confidence: InboxSuggestConfidence): InboxSuggestion {
+    function fromJarKey(
+        jarKey: JarKey | null,
+        confidence: InboxSuggestConfidence
+    ): InboxSuggestion {
         if (!jarKey) return { jarId: null, jarKey: null, confidence };
         const jar = jarByKey.get(jarKey);
         return {

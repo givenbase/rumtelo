@@ -135,7 +135,7 @@ export function BankLinkWizard({
                       ''
               ) ?? null);
     const wizardSeatMark =
-        wizardSeat != null
+        wizardSeat !== null
             ? accountBankMark(wizardSeat, bankList)
             : wizardSeatCatalog
               ? vendorMarkSrc({
@@ -464,7 +464,9 @@ export function BankLinkWizard({
                                                 wizardInstitution?.name ??
                                                 t('pages.settings.panels.bank.bank_fallback')
                                             }
-                                            sub={t('pages.settings.panels.bank.wizard_catalog_bank')}
+                                            sub={t(
+                                                'pages.settings.panels.bank.wizard_catalog_bank'
+                                            )}
                                         />
                                     </div>
                                 ) : null}
@@ -626,19 +628,25 @@ export function BankLinkWizard({
                                 <span className="text-fg-faint" aria-hidden>
                                     ·
                                 </span>
-                                <span>{t('pages.settings.panels.bank.wizard_authorise_what_1')}</span>
+                                <span>
+                                    {t('pages.settings.panels.bank.wizard_authorise_what_1')}
+                                </span>
                             </li>
                             <li className="flex gap-2">
                                 <span className="text-fg-faint" aria-hidden>
                                     ·
                                 </span>
-                                <span>{t('pages.settings.panels.bank.wizard_authorise_what_2')}</span>
+                                <span>
+                                    {t('pages.settings.panels.bank.wizard_authorise_what_2')}
+                                </span>
                             </li>
                             <li className="flex gap-2">
                                 <span className="text-fg-faint" aria-hidden>
                                     ·
                                 </span>
-                                <span>{t('pages.settings.panels.bank.wizard_authorise_what_3')}</span>
+                                <span>
+                                    {t('pages.settings.panels.bank.wizard_authorise_what_3')}
+                                </span>
                             </li>
                         </ul>
                     </div>
@@ -684,10 +692,7 @@ export function BankLinkWizard({
                                         size={28}
                                     />
                                 ) : null}
-                                <SettingsRowLabel
-                                    title={wizardSeatTitle}
-                                    sub={wizardSeatSub}
-                                />
+                                <SettingsRowLabel title={wizardSeatTitle} sub={wizardSeatSub} />
                             </div>
                             {showAspspCatalogMismatch ? (
                                 <p className="text-xs text-fg-muted">

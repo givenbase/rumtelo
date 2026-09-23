@@ -293,12 +293,14 @@ const settings = {
             manual_blurb:
                 'CSV import and seats without live sync. These are separate from Open Banking links above.',
             account_label: 'Account label',
-            account_label_hint: 'Shown in jar seats and CSV import — e.g. Operating checking.',
+            account_label_hint:
+                'Shown in jars and CSV — e.g. Operating checking, or Creditcard · t.n.v. Avery Chen.',
             type: 'Type',
             search_bank: 'Search bank — e.g. ING, Bunq',
             type_bank_name: 'Type a bank name…',
             iban_hint_optional: 'Optional — validated when filled (ISO IBAN check).',
             iban_hint_prefix: 'Starts with NL00 {code} — paste the rest from your statement.',
+            iban_locked_hint: 'IBAN comes from the bank link — disconnect to change it.',
             iban_placeholder: 'NL00 BANK 0000 0000 00',
             add: 'Add',
             add_account: '+ Add account',

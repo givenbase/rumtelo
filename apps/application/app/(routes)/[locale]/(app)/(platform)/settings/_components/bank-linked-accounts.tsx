@@ -1,27 +1,55 @@
 'use client';
 
 import { vendorMarkSrc } from '@/app/_lib/vendor-brands';
-import { type Account, type Bank } from '@rumtelo/contracts';
+import { type NamePresetOption } from '@/components/features/forms/preset-name-field';
+import { type AccountKind, type Account, type Bank } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import { Button, EmptyState, VendorMark } from '@rumtelo/ui';
-import { formatIban } from '@rumtelo/utils';
+import { cn, formatIban } from '@rumtelo/utils';
 import { useState } from 'react';
+import type { UseFormReturn } from 'react-hook-form';
 
+import type { BankAccountFormValues } from '../_utils/settings-form-zod';
+import { accountBankMark } from '../_utils/resolve-account-bank';
+import { BankAccountForm } from './bank-account-form';
 import { SettingsRow, SettingsRowLabel } from './settings-chrome';
 
 export type BankLinkedAccountsProps = {
     live: boolean;
     linkedByBankId: Map<string, Account[]>;
     linkedCount: number;
+    bankList: Bank[];
+    bankNameOptions: NamePresetOption[];
     bankById: Map<string, Bank>;
+    form: UseFormReturn<BankAccountFormValues>;
+    bankId: string;
+    kind: AccountKind;
+    label: string;
+    selectedBank: Bank | null | undefined;
+    selectedIbanCode: string | undefined;
+    ibanPlaceholder: string;
+    ibanHint: string;
+    partnerHint: string | null;
+    settlementOptions: Account[];
+    ibanError: string | null;
+    setIbanError: (value: string | null) => void;
+    kindLabel: (accountKind: string) => string;
+    editingId: string | null;
+    canSubmit: boolean;
+    saving: boolean;
     formatMoney: (amount: number) => string;
     syncEnabled: boolean;
     wizardOpen: boolean;
     canConnect: boolean;
     onOpenWizard: () => void;
+    onReset: () => void;
+    onOpenEdit: (account: Account) => void;
     onSetPrimary: (id: string) => void;
     onSync: (id: string) => void;
     onDisconnect: (id: string) => void;
+    onSubmit: (values: BankAccountFormValues) => void;
+    pickBank: (key: string) => void;
+    onBankNameChange: (value: string) => void;
     setPrimaryPending: boolean;
     syncPending: boolean;
     disconnectPending: boolean;
@@ -31,15 +59,38 @@ export function BankLinkedAccounts({
     live,
     linkedByBankId,
     linkedCount,
+    bankList,
+    bankNameOptions,
     bankById,
+    form,
+    bankId,
+    kind,
+    label,
+    selectedBank,
+    selectedIbanCode,
+    ibanPlaceholder,
+    ibanHint,
+    partnerHint,
+    settlementOptions,
+    ibanError,
+    setIbanError,
+    kindLabel,
+    editingId,
+    canSubmit,
+    saving,
     formatMoney,
     syncEnabled,
     wizardOpen,
     canConnect,
     onOpenWizard,
+    onReset,
+    onOpenEdit,
     onSetPrimary,
     onSync,
     onDisconnect,
+    onSubmit,
+    pickBank,
+    onBankNameChange,
     setPrimaryPending,
     syncPending,
     disconnectPending,
@@ -63,6 +114,10 @@ export function BankLinkedAccounts({
     }
 
     function isBankGroupOpen(bankIdKey: string) {
+        if (editingId) {
+            const seats = linkedByBankId.get(bankIdKey) ?? [];
+            if (seats.some(row => row.id === editingId)) return true;
+        }
         return openBankGroups.size === 0 || openBankGroups.has(bankIdKey);
     }
 
@@ -75,6 +130,7 @@ export function BankLinkedAccounts({
             ) : null}
 
             {linkedBankEntries.map(([groupBankId, seats], groupIndex) => {
+                if (editingId && !seats.some(row => row.id === editingId)) return null;
                 const bank = bankById.get(groupBankId);
                 const mark = bank
                     ? vendorMarkSrc({
@@ -106,51 +162,145 @@ export function BankLinkedAccounts({
                             </span>
                         </button>
                         {open
-                            ? seats.map((account, seatIndex) => (
-                                  <SettingsRow
-                                      key={account.id}
-                                      last={isLastGroup && seatIndex === seats.length - 1}>
-                                      <SettingsRowLabel
-                                          title={account.name}
-                                          sub={`${account.iban ? formatIban(account.iban) : t('pages.settings.panels.bank.no_iban')} · ${formatMoney(account.balance)}${
-                                              account.isPrimary
-                                                  ? ` · ${t('pages.settings.panels.bank.primary')}`
-                                                  : ''
-                                          }`}
-                                      />
-                                      <div className="flex flex-wrap items-center justify-end gap-1.5">
-                                          {!account.isPrimary ? (
-                                              <Button
+                            ? seats.map((account, seatIndex) => {
+                                  const isEditing = editingId === account.id;
+                                  if (editingId && !isEditing) return null;
+                                  const seatMark = isEditing
+                                      ? selectedBank
+                                          ? vendorMarkSrc({
+                                                key: selectedBank.key,
+                                                name: selectedBank.name,
+                                                logoDomain: selectedBank.logoDomain,
+                                                website: selectedBank.website,
+                                            })
+                                          : null
+                                      : accountBankMark(account, bankList);
+                                  const rowTitle = isEditing
+                                      ? label.trim() || selectedBank?.name || account.name
+                                      : account.name;
+                                  const isLastVisible =
+                                      isEditing ||
+                                      (!editingId && isLastGroup && seatIndex === seats.length - 1);
+                                  return (
+                                      <div
+                                          key={account.id}
+                                          className={cn(
+                                              isEditing &&
+                                                  'mb-1 rounded-xl border border-accent/40 bg-accent-soft/50 px-3'
+                                          )}>
+                                          <SettingsRow last={isLastVisible && !isEditing}>
+                                              <button
                                                   type="button"
-                                                  variant="secondary"
-                                                  size="sm"
-                                                  className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
-                                                  disabled={!live || setPrimaryPending}
-                                                  onClick={() => onSetPrimary(account.id)}>
-                                                  {t('pages.settings.panels.bank.set_primary')}
-                                              </Button>
+                                                  className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
+                                                  onClick={() => onOpenEdit(account)}>
+                                                  {seatMark ? (
+                                                      <VendorMark
+                                                          name={seatMark.name}
+                                                          src={seatMark.src}
+                                                          size={22}
+                                                      />
+                                                  ) : null}
+                                                  <SettingsRowLabel
+                                                      title={rowTitle}
+                                                      sub={`${account.iban ? formatIban(account.iban) : t('pages.settings.panels.bank.no_iban')} · ${formatMoney(account.balance)}${
+                                                          account.isPrimary
+                                                              ? ` · ${t('pages.settings.panels.bank.primary')}`
+                                                              : ''
+                                                      }`}
+                                                  />
+                                              </button>
+                                              <div className="flex flex-wrap items-center justify-end gap-1.5">
+                                                  {!isEditing && !account.isPrimary ? (
+                                                      <Button
+                                                          type="button"
+                                                          variant="secondary"
+                                                          size="sm"
+                                                          className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
+                                                          disabled={!live || setPrimaryPending}
+                                                          onClick={() => onSetPrimary(account.id)}>
+                                                          {t(
+                                                              'pages.settings.panels.bank.set_primary'
+                                                          )}
+                                                      </Button>
+                                                  ) : null}
+                                                  {!isEditing ? (
+                                                      <>
+                                                          <Button
+                                                              type="button"
+                                                              variant="secondary"
+                                                              size="sm"
+                                                              className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
+                                                              disabled={!live || syncPending}
+                                                              onClick={() => onSync(account.id)}>
+                                                              {t(
+                                                                  'pages.settings.panels.bank.sync_now'
+                                                              )}
+                                                          </Button>
+                                                          <Button
+                                                              type="button"
+                                                              variant="ghost"
+                                                              size="sm"
+                                                              className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
+                                                              disabled={!live || disconnectPending}
+                                                              onClick={() =>
+                                                                  onDisconnect(account.id)
+                                                              }>
+                                                              {t(
+                                                                  'pages.settings.panels.bank.disconnect_bank'
+                                                              )}
+                                                          </Button>
+                                                      </>
+                                                  ) : null}
+                                                  <Button
+                                                      type="button"
+                                                      variant="secondary"
+                                                      size="sm"
+                                                      className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
+                                                      onClick={() =>
+                                                          isEditing
+                                                              ? onReset()
+                                                              : onOpenEdit(account)
+                                                      }>
+                                                      {isEditing
+                                                          ? t(
+                                                                'pages.settings.panels.jars_placement.close'
+                                                            )
+                                                          : t('pages.settings.panels.bank.edit')}
+                                                  </Button>
+                                              </div>
+                                          </SettingsRow>
+                                          {isEditing ? (
+                                              <BankAccountForm
+                                                  form={form}
+                                                  formKey={editingId}
+                                                  editing
+                                                  live={live}
+                                                  canSubmit={canSubmit}
+                                                  saving={saving}
+                                                  bankList={bankList}
+                                                  bankNameOptions={bankNameOptions}
+                                                  bankById={bankById}
+                                                  bankId={bankId}
+                                                  selectedBank={selectedBank}
+                                                  selectedIbanCode={selectedIbanCode}
+                                                  ibanPlaceholder={ibanPlaceholder}
+                                                  ibanHint={ibanHint}
+                                                  partnerHint={partnerHint}
+                                                  kind={kind}
+                                                  settlementOptions={settlementOptions}
+                                                  ibanError={ibanError}
+                                                  setIbanError={setIbanError}
+                                                  kindLabel={kindLabel}
+                                                  pickBank={pickBank}
+                                                  onBankNameChange={onBankNameChange}
+                                                  onSubmit={onSubmit}
+                                                  onCancel={onReset}
+                                                  ibanLocked
+                                              />
                                           ) : null}
-                                          <Button
-                                              type="button"
-                                              variant="secondary"
-                                              size="sm"
-                                              className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
-                                              disabled={!live || syncPending}
-                                              onClick={() => onSync(account.id)}>
-                                              {t('pages.settings.panels.bank.sync_now')}
-                                          </Button>
-                                          <Button
-                                              type="button"
-                                              variant="ghost"
-                                              size="sm"
-                                              className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
-                                              disabled={!live || disconnectPending}
-                                              onClick={() => onDisconnect(account.id)}>
-                                              {t('pages.settings.panels.bank.disconnect_bank')}
-                                          </Button>
                                       </div>
-                                  </SettingsRow>
-                              ))
+                                  );
+                              })
                             : null}
                     </div>
                 );
@@ -171,7 +321,7 @@ export function BankLinkedAccounts({
                         type="button"
                         size="sm"
                         className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
-                        disabled={!live || !canConnect}
+                        disabled={!live || !canConnect || Boolean(editingId)}
                         onClick={onOpenWizard}>
                         {t('pages.settings.panels.bank.connect_bank')}
                     </Button>

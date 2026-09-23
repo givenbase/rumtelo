@@ -4390,6 +4390,7 @@
                     "type_bank_name": "Saisissez le nom d'une banque…",
                     "iban_hint_optional": "Facultatif — validé s'il est renseigné (vérification ISO IBAN).",
                     "iban_hint_prefix": "Commence par NL00 {code} — copiez-collez la suite à partir de votre relevé.",
+                    "iban_locked_hint": "L'IBAN vient de la connexion bancaire — déconnectez pour le modifier.",
                     "iban_placeholder": "NL00 BANQUE 0000 0000 00",
                     "add": "Ajouter",
                     "add_account": "+ Ajouter un compte",

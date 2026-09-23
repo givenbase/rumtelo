@@ -7,6 +7,7 @@ import { currentAuthHeaders } from '../../common/household/household.context';
 import { loadEnv } from '../../common/config/env.config';
 import {
     type BankingPort,
+    type BankAccountRef,
     type BankConnection,
     type BankLinkResult,
     type BankTransaction,
@@ -110,6 +111,8 @@ export class EnableBankingAdapter implements BankingPort {
                 uid: string;
                 iban?: string | null;
                 name?: string | null;
+                details?: string | null;
+                product?: string | null;
                 account_id?: { iban?: string | null };
                 identification?: string | null;
             }>;
@@ -124,6 +127,8 @@ export class EnableBankingAdapter implements BankingPort {
             uid: account.uid,
             iban: account.iban ?? account.account_id?.iban ?? account.identification ?? null,
             name: account.name ?? null,
+            details: account.details ?? null,
+            product: account.product ?? null,
         }));
 
         const institutionName = session.aspsp?.name ?? 'Bank';
@@ -193,6 +198,30 @@ export class EnableBankingAdapter implements BankingPort {
         if (raw === undefined || raw === null) return null;
         const cents = Math.round(Number.parseFloat(raw) * 100);
         return Number.isFinite(cents) ? cents : null;
+    }
+
+    async fetchAccountMeta(connectionId: string): Promise<BankAccountRef | null> {
+        const { accountUid } = decodeConnectionId(connectionId);
+        try {
+            const data = await this.request<{
+                uid?: string;
+                name?: string | null;
+                details?: string | null;
+                product?: string | null;
+                account_id?: { iban?: string | null };
+                iban?: string | null;
+            }>('GET', `/accounts/${encodeURIComponent(accountUid)}/details`);
+            return {
+                uid: data.uid ?? accountUid,
+                iban: data.iban ?? data.account_id?.iban ?? null,
+                name: data.name ?? null,
+                details: data.details ?? null,
+                product: data.product ?? null,
+            };
+        } catch (error) {
+            this.logger.warn(`fetchAccountMeta failed: ${String(error)}`);
+            return null;
+        }
     }
 
     async fetchTransactions(
@@ -268,7 +297,9 @@ export class EnableBankingAdapter implements BankingPort {
                 `empty tx pull session=${sessionId} account=${accountUid} status=${session.status ?? '?'} aspsp=${session.aspsp?.name ?? '?'} access=${JSON.stringify(access)} accounts=${(session.accounts ?? []).length}`
             );
         } catch (error) {
-            this.logger.warn(`empty tx pull: could not load session ${sessionId}: ${String(error)}`);
+            this.logger.warn(
+                `empty tx pull: could not load session ${sessionId}: ${String(error)}`
+            );
         }
     }
 
@@ -428,8 +459,7 @@ function mapTransaction(tx: Record<string, unknown>): BankTransaction | null {
 
     const creditorName = stringField(tx, 'creditor_name') ?? nestedName(tx, 'creditor');
     const debtorName = stringField(tx, 'debtor_name') ?? nestedName(tx, 'debtor');
-    const counterparty =
-        cents < 0 ? (creditorName ?? null) : (debtorName ?? creditorName ?? null);
+    const counterparty = cents < 0 ? (creditorName ?? null) : (debtorName ?? creditorName ?? null);
 
     const externalId =
         stringField(tx, 'entry_reference') ??

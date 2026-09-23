@@ -25,7 +25,12 @@ export interface BankConnection {
 export interface BankAccountRef {
     uid: string;
     iban: string | null;
+    /** Account holder name from the ASPSP (`AccountResource.name`). */
     name: string | null;
+    /** PSU/ASPSP description — often the product nickname (`details`). */
+    details: string | null;
+    /** Bank product name when distinct from `details`. */
+    product: string | null;
 }
 
 /** Adapter result before we map onto a household BankAccount.connectionId. */
@@ -66,6 +71,11 @@ export interface BankingPort {
      * Prefer interim/closing available over booked when several types exist.
      */
     fetchBalance(connectionId: string): Promise<number | null>;
+    /**
+     * Live AIS account meta (holder / product / IBAN) for the linked seat.
+     * Used to keep Rumtelo labels in sync with what the bank returns.
+     */
+    fetchAccountMeta(connectionId: string): Promise<BankAccountRef | null>;
     /**
      * Pull AIS transactions.
      * `strategy: 'longest'` — first sync / catch-up (Enable Banking FAQ).

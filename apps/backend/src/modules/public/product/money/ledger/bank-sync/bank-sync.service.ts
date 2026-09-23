@@ -78,6 +78,7 @@ export class BankSyncService {
         if (!account.iban && matched.iban) {
             account.iban = normalizeIban(matched.iban);
         }
+        await this.applyBankProvidedName(account, matched);
         await this.em.flush();
 
         return {
@@ -217,6 +218,16 @@ export class BankSyncService {
             this.logger.warn(`fetchBalance failed account=${account.id}: ${String(error)}`);
         }
 
+        try {
+            const meta = await this.banking.fetchAccountMeta(account.connectionId);
+            if (meta) {
+                if (!account.iban && meta.iban) account.iban = normalizeIban(meta.iban);
+                await this.applyBankProvidedName(account, meta);
+            }
+        } catch (error) {
+            this.logger.warn(`fetchAccountMeta failed account=${account.id}: ${String(error)}`);
+        }
+
         let rows;
         try {
             // EB FAQ: longest on first/catch-up; default for incremental.
@@ -255,6 +266,23 @@ export class BankSyncService {
         const occupied = await this.accounts.count({ connectionId: { $ne: null } });
         await this.planAccess.assertWithinLimit('maxBankLinks', occupied);
     }
+
+    /**
+     * Prefer ASPSP product/details + holder over the handmatig seat label so
+     * Open Banking shows what Enable Banking returned (e.g. Betaalrekening · Jamie Lee Rivera).
+     */
+    private async applyBankProvidedName(
+        account: BankAccount,
+        ref: { uid: string; name: string | null; details: string | null; product: string | null }
+    ) {
+        const label = labelFromBankAccount(ref);
+        if (!label) return;
+        const needle = label.toLowerCase();
+        const clash = (await this.accounts.find()).find(
+            row => row.id !== account.id && row.name.trim().toLowerCase() === needle
+        );
+        account.name = clash ? `${label} · ${ref.uid.slice(0, 8)}` : label;
+    }
 }
 
 function isStale(lastSyncedAt: Date | null, maxAgeMs: number): boolean {
@@ -263,7 +291,13 @@ function isStale(lastSyncedAt: Date | null, maxAgeMs: number): boolean {
 }
 
 function pickAccount(
-    accounts: Array<{ uid: string; iban: string | null; name: string | null }>,
+    accounts: Array<{
+        uid: string;
+        iban: string | null;
+        name: string | null;
+        details: string | null;
+        product: string | null;
+    }>,
     seatIban: string | null
 ) {
     if (accounts.length === 0) return null;
@@ -271,4 +305,18 @@ function pickAccount(
     const needle = normalizeIban(seatIban);
     const hit = accounts.find(row => row.iban && normalizeIban(row.iban) === needle);
     return hit ?? accounts[0]!;
+}
+
+/** `details|product · holder` — matches Mock ASPSP / AIS AccountResource fields. */
+function labelFromBankAccount(ref: {
+    name: string | null;
+    details: string | null;
+    product: string | null;
+}): string | null {
+    const holder = ref.name?.trim() || '';
+    const product = (ref.details?.trim() || ref.product?.trim() || '').trim();
+    if (product && holder && product.toLowerCase() !== holder.toLowerCase()) {
+        return `${product} · ${holder}`;
+    }
+    return product || holder || null;
 }

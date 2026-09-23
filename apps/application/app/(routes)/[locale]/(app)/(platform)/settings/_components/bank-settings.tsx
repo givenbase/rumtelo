@@ -30,6 +30,7 @@ import {
     composeAccountBankName,
     countryFromCurrency,
     resolveAccountBank,
+    stripBankPrefixFromLabel,
 } from '../_utils/resolve-account-bank';
 import {
     createBankAccountFormSchema,
@@ -42,7 +43,11 @@ import {
     nlIbanPrefix,
 } from '../_utils/settings-shared';
 import { useSettingsMutation } from '../_utils/use-settings-mutation';
-import { BankLinkWizard, type BankLinkWizardAuthoriseInput, type BankLinkWizardAuthoriseResult } from './bank-link-wizard';
+import {
+    BankLinkWizard,
+    type BankLinkWizardAuthoriseInput,
+    type BankLinkWizardAuthoriseResult,
+} from './bank-link-wizard';
 import { BankLinkedAccounts } from './bank-linked-accounts';
 import { BankManualAccounts } from './bank-manual-accounts';
 import { SettingsInkCard, SettingsPanel, SettingsPill } from './settings-chrome';
@@ -161,7 +166,7 @@ export function BankSettings() {
     function openEdit(account: Account) {
         const bank = resolveAccountBank(account, bankList);
         form.reset({
-            label: account.name,
+            label: stripBankPrefixFromLabel(account.name, bankList),
             iban: account.iban ? formatIban(account.iban) : '',
             kind: account.kind,
             bankId: bank?.id ?? account.bankId,
@@ -169,6 +174,7 @@ export function BankSettings() {
         });
         setIbanError(null);
         setAdding(false);
+        setWizardOpen(false);
         setEditingId(account.id);
     }
 
@@ -289,11 +295,13 @@ export function BankSettings() {
     const updateAccount = useSettingsMutation({
         mutationFn: async (values: BankAccountFormValues) => {
             if (!householdId || !editingId) throw new Error('No household');
+            const linked = accounts.find(row => row.id === editingId)?.connectionId;
             return api.money.accounts.update({
                 householdId,
                 id: editingId,
                 name: buildAccountName(values),
-                iban: resolveIbanForSubmit(values.iban),
+                // Provider IBAN stays on the seat while linked — only refresh name/bank/kind.
+                ...(linked ? {} : { iban: resolveIbanForSubmit(values.iban) }),
                 kind: values.kind,
                 bankId: values.bankId,
                 settlementAccountId: values.settlementAccountId ?? null,
@@ -487,12 +495,39 @@ export function BankSettings() {
                     live={live}
                     linkedByBankId={linkedByBankId}
                     linkedCount={linkedAccounts.length}
+                    bankList={bankList}
+                    bankNameOptions={bankNameOptions}
                     bankById={bankById}
+                    form={form}
+                    bankId={bankId}
+                    kind={kind}
+                    label={label}
+                    selectedBank={selectedBank}
+                    selectedIbanCode={selectedIbanCode}
+                    ibanPlaceholder={ibanPlaceholder}
+                    ibanHint={ibanHint}
+                    partnerHint={partnerHint}
+                    settlementOptions={settlementOptions}
+                    ibanError={ibanError}
+                    setIbanError={setIbanError}
+                    kindLabel={kindLabel}
+                    editingId={
+                        editingId && linkedAccounts.some(row => row.id === editingId)
+                            ? editingId
+                            : null
+                    }
+                    canSubmit={canSubmit}
+                    saving={saving}
                     formatMoney={formatMoney}
                     syncEnabled={syncEnabled}
                     wizardOpen={wizardOpen}
                     canConnect={canConnect}
-                    onOpenWizard={() => setWizardOpen(true)}
+                    onOpenWizard={() => {
+                        resetForm();
+                        setWizardOpen(true);
+                    }}
+                    onReset={resetForm}
+                    onOpenEdit={openEdit}
                     onSetPrimary={id => setPrimaryAccount.mutate(id)}
                     onSync={id =>
                         syncNow.mutate(id, {
@@ -507,6 +542,9 @@ export function BankSettings() {
                         })
                     }
                     onDisconnect={id => disconnectBank.mutate(id)}
+                    onSubmit={onSubmit}
+                    pickBank={pickBank}
+                    onBankNameChange={onBankNameChange}
                     setPrimaryPending={setPrimaryAccount.isPending}
                     syncPending={syncNow.isPending}
                     disconnectPending={disconnectBank.isPending}
@@ -565,7 +603,11 @@ export function BankSettings() {
                     setIbanError={setIbanError}
                     kindLabel={kindLabel}
                     adding={adding}
-                    editingId={editingId}
+                    editingId={
+                        editingId && manualAccounts.some(row => row.id === editingId)
+                            ? editingId
+                            : null
+                    }
                     canSubmit={canSubmit}
                     saving={saving}
                     setPrimaryPending={setPrimaryAccount.isPending}

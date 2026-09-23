@@ -4390,6 +4390,7 @@
                     "type_bank_name": "Escribe el nombre de un banco…",
                     "iban_hint_optional": "Opcional: se valida al rellenarlo (comprobación ISO IBAN).",
                     "iban_hint_prefix": "Empieza por NL00 {code} — pega el resto de tu extracto.",
+                    "iban_locked_hint": "El IBAN viene del enlace bancario — desconecta para cambiarlo.",
                     "iban_placeholder": "NL00 BANCO 0000 0000 00",
                     "add": "Añadir",
                     "add_account": "+ Añadir cuenta",

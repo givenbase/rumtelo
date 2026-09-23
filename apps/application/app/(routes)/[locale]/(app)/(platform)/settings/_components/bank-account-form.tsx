@@ -53,6 +53,8 @@ export type BankAccountFormProps = {
     onCancel: () => void;
     onDelete?: () => void;
     deletePending?: boolean;
+    /** Linked Open Banking seats keep the provider IBAN read-only. */
+    ibanLocked?: boolean;
 };
 
 export function BankAccountForm({
@@ -82,6 +84,7 @@ export function BankAccountForm({
     onCancel,
     onDelete,
     deletePending,
+    ibanLocked = false,
 }: BankAccountFormProps) {
     const t = useTranslations();
     return (
@@ -194,19 +197,25 @@ export function BankAccountForm({
                             <Field
                                 label={t('pages.settings.panels.bank.iban')}
                                 htmlFor={`acc-iban-${formKey}`}
-                                hint={ibanError ?? ibanHint}>
+                                hint={
+                                    ibanLocked
+                                        ? t('pages.settings.panels.bank.iban_locked_hint')
+                                        : (ibanError ?? ibanHint)
+                                }>
                                 <FormControl>
                                     <Input
                                         id={`acc-iban-${formKey}`}
                                         placeholder={ibanPlaceholder}
                                         aria-invalid={Boolean(ibanError)}
-                                        disabled={!live}
+                                        disabled={!live || ibanLocked}
                                         {...field}
                                         onChange={event => {
+                                            if (ibanLocked) return;
                                             field.onChange(event);
                                             if (ibanError) setIbanError(null);
                                         }}
                                         onBlur={() => {
+                                            if (ibanLocked) return;
                                             field.onBlur();
                                             const trimmed = field.value.trim();
                                             if (!trimmed || isIbanStub(trimmed)) return;

@@ -1,1714 +1,1618 @@
 {
-  "accounts": [
-    {
-      "info": {
-        "credit_limit": null,
-        "all_account_ids": [
-          {
-            "scheme_name": "IBAN",
-            "identification": "NL91ABNA0417164300",
-            "issuer": null
-          },
-          {
-            "scheme_name": "BBAN",
-            "identification": "ABNA0417164300",
-            "issuer": null
-          }
-        ],
-        "account_servicer": null,
-        "currency": "EUR",
-        "psu_status": "Account Holder",
-        "linked_account": null,
-        "cash_account_type": "CACC",
-        "usage": "PRIV",
-        "identification_hash": "701502320c05f830e08c212f53ec9c540c1a45ce59b1",
-        "product": "Betaalrekening",
-        "name": "Jamie Lee Rivera",
-        "details": "Betaalrekening",
-        "resource_id": "4ce095a7-ed2f-51d3-a3fb-31f4f5193e9a",
-        "account_id": {
-          "iban": "NL91ABNA0417164300",
-          "other": null
+    "accounts": [
+        {
+            "info": {
+                "credit_limit": null,
+                "all_account_ids": [
+                    {
+                        "scheme_name": "IBAN",
+                        "identification": "NL91ABNA0417164300",
+                        "issuer": null
+                    },
+                    {
+                        "scheme_name": "BBAN",
+                        "identification": "ABNA0417164300",
+                        "issuer": null
+                    }
+                ],
+                "account_servicer": null,
+                "currency": "EUR",
+                "psu_status": "Account Holder",
+                "linked_account": null,
+                "cash_account_type": "CACC",
+                "usage": "PRIV",
+                "identification_hash": "701502320c05f830e08c212f53ec9c540c1a45ce59b1",
+                "product": "Betaalrekening",
+                "name": "Jamie Lee Rivera",
+                "details": "Betaalrekening",
+                "resource_id": "4ce095a7-ed2f-51d3-a3fb-31f4f5193e9a",
+                "account_id": {
+                    "iban": "NL91ABNA0417164300",
+                    "other": null
+                }
+            },
+            "balances": [
+                {
+                    "name": "Interim available",
+                    "balance_amount": {
+                        "amount": "2847.65",
+                        "currency": "EUR"
+                    },
+                    "balance_type": "ITAV",
+                    "reference_date": "2026-09-23",
+                    "last_change_date_time": null,
+                    "last_committed_transaction": null
+                },
+                {
+                    "name": "Closing booked",
+                    "balance_amount": {
+                        "amount": "2847.65",
+                        "currency": "EUR"
+                    },
+                    "balance_type": "CLBD",
+                    "reference_date": "2026-09-23",
+                    "last_change_date_time": null,
+                    "last_committed_transaction": null
+                }
+            ],
+            "transactions": [
+                {
+                    "entry_reference": "EC2BEF84B2",
+                    "merchant_category_code": "5411",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "18.90"
+                    },
+                    "creditor": {
+                        "name": "SPAR CITY",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-23",
+                    "value_date": "2026-09-23",
+                    "transaction_date": "2026-09-23",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["SPAR CITY 4821 UTRECHT"]
+                },
+                {
+                    "entry_reference": "FE04CA3137",
+                    "merchant_category_code": "5812",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "64.00"
+                    },
+                    "creditor": {
+                        "name": "CAFE DE JAREN",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-23",
+                    "value_date": "2026-09-23",
+                    "transaction_date": "2026-09-23",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["PIN 19:41 AMSTERDAM"]
+                },
+                {
+                    "entry_reference": "00B783DCCE",
+                    "merchant_category_code": "5411",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "42.50"
+                    },
+                    "creditor": {
+                        "name": "ALBERT HEIJN 1582",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-22",
+                    "value_date": "2026-09-22",
+                    "transaction_date": "2026-09-22",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["AH 1582 AMSTERDAM BEURS"]
+                },
+                {
+                    "entry_reference": "E3C2A156B3",
+                    "merchant_category_code": "4121",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "21.50"
+                    },
+                    "creditor": {
+                        "name": "UBER *TRIP",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-22",
+                    "value_date": "2026-09-22",
+                    "transaction_date": "2026-09-22",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["UBER *TRIP HELP.UBER.COM"]
+                },
+                {
+                    "entry_reference": "0E80694889",
+                    "merchant_category_code": "5814",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "14.50"
+                    },
+                    "creditor": {
+                        "name": "STARBUCKS",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-21",
+                    "value_date": "2026-09-21",
+                    "transaction_date": "2026-09-21",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["STARBUCKS CC 2918 AMS"]
+                },
+                {
+                    "entry_reference": "26F6AE1C4E",
+                    "merchant_category_code": "5812",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "48.00"
+                    },
+                    "creditor": {
+                        "name": "DELIVEROO",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-21",
+                    "value_date": "2026-09-21",
+                    "transaction_date": "2026-09-21",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["DELIVEROO.NL 882194"]
+                },
+                {
+                    "entry_reference": "3DC4407840",
+                    "merchant_category_code": "5734",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "89.00"
+                    },
+                    "creditor": {
+                        "name": "ADOBE SYSTEMS",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-20",
+                    "value_date": "2026-09-20",
+                    "transaction_date": "2026-09-20",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["ADOBE *CREATIVE CLOUD"]
+                },
+                {
+                    "entry_reference": "6EB3A485C7",
+                    "merchant_category_code": "4814",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "35.00"
+                    },
+                    "creditor": {
+                        "name": "ODIDO",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-20",
+                    "value_date": "2026-09-20",
+                    "transaction_date": "2026-09-20",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["Factuur mobiel sept"]
+                },
+                {
+                    "entry_reference": "114B025CD3",
+                    "merchant_category_code": "5411",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "420.00"
+                    },
+                    "creditor": {
+                        "name": "JUMBO SUPERMARKT",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-19",
+                    "value_date": "2026-09-19",
+                    "transaction_date": "2026-09-19",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["JUMBO 3120 UTRECHT LUNETTE"]
+                },
+                {
+                    "entry_reference": "C9D4D3C881",
+                    "merchant_category_code": "4111",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "22.00"
+                    },
+                    "creditor": {
+                        "name": "GVB Amsterdam",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-18",
+                    "value_date": "2026-09-18",
+                    "transaction_date": "2026-09-18",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["OV-chipkaart opwaarderen"]
+                },
+                {
+                    "entry_reference": "0569DB9108",
+                    "merchant_category_code": "5912",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "68.00"
+                    },
+                    "creditor": {
+                        "name": "ETOS BV",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-18",
+                    "value_date": "2026-09-18",
+                    "transaction_date": "2026-09-18",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["ETOS 2214 ROTTERDAM"]
+                },
+                {
+                    "entry_reference": "B9F96A8D83",
+                    "merchant_category_code": "4111",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "12.80"
+                    },
+                    "creditor": {
+                        "name": "NS Groep",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-17",
+                    "value_date": "2026-09-17",
+                    "transaction_date": "2026-09-17",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["NS GROEP REISPRODUCT"]
+                },
+                {
+                    "entry_reference": "5653990818",
+                    "merchant_category_code": "5541",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "55.00"
+                    },
+                    "creditor": {
+                        "name": "SHELL NL",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-16",
+                    "value_date": "2026-09-16",
+                    "transaction_date": "2026-09-16",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["SHELL STATION A2 BREUKELEN"]
+                },
+                {
+                    "entry_reference": "B3291B05D6",
+                    "merchant_category_code": "5942",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "125.00"
+                    },
+                    "creditor": {
+                        "name": "BOL.COM",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-15",
+                    "value_date": "2026-09-15",
+                    "transaction_date": "2026-09-15",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["BOL.COM BOEKEN 8821"]
+                },
+                {
+                    "entry_reference": "2CD6931FAD",
+                    "merchant_category_code": "4899",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "9.99"
+                    },
+                    "creditor": {
+                        "name": "SPOTIFY",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-14",
+                    "value_date": "2026-09-14",
+                    "transaction_date": "2026-09-14",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["SPOTIFY P0AAB1C2D3"]
+                },
+                {
+                    "entry_reference": "CAA3304141",
+                    "merchant_category_code": "4899",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "17.99"
+                    },
+                    "creditor": {
+                        "name": "NETFLIX",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-13",
+                    "value_date": "2026-09-13",
+                    "transaction_date": "2026-09-13",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["NETFLIX.COM 314159"]
+                },
+                {
+                    "entry_reference": "71478715F8",
+                    "merchant_category_code": "5812",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "79.00"
+                    },
+                    "creditor": {
+                        "name": "THUISBEZORGD",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-12",
+                    "value_date": "2026-09-12",
+                    "transaction_date": "2026-09-12",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["THUISBEZORGD.NL 9912"]
+                },
+                {
+                    "entry_reference": "7DB39E4198",
+                    "merchant_category_code": null,
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "1850.00"
+                    },
+                    "creditor": null,
+                    "creditor_account": null,
+                    "debtor": {
+                        "name": "RETAIL GROUP NL BV",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "CreditTransfer"
+                    },
+                    "credit_debit_indicator": "CRDT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-11",
+                    "value_date": "2026-09-11",
+                    "transaction_date": "2026-09-11",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["Salaris september"]
+                },
+                {
+                    "entry_reference": "18894A9B27",
+                    "merchant_category_code": null,
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "950.00"
+                    },
+                    "creditor": {
+                        "name": "WONINGSTICHTING ROCHDALE",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-10",
+                    "value_date": "2026-09-10",
+                    "transaction_date": "2026-09-10",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["Huur oktober \u2014 nr 14"]
+                },
+                {
+                    "entry_reference": "4F5D17CCA6",
+                    "merchant_category_code": null,
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "155.00"
+                    },
+                    "creditor": {
+                        "name": "ZILVEREN KRUIS",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-09",
+                    "value_date": "2026-09-09",
+                    "transaction_date": "2026-09-09",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["Zorgpremie oktober"]
+                },
+                {
+                    "entry_reference": "30239BBFCE",
+                    "merchant_category_code": "5411",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "33.40"
+                    },
+                    "creditor": {
+                        "name": "LIDL NL",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-08",
+                    "value_date": "2026-09-08",
+                    "transaction_date": "2026-09-08",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["LIDL 1182 AMSTERDAM NOORD"]
+                },
+                {
+                    "entry_reference": "CB9083E1D1",
+                    "merchant_category_code": null,
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "450.00"
+                    },
+                    "creditor": null,
+                    "creditor_account": null,
+                    "debtor": {
+                        "name": "BAKKERIJ DE GUNST BV",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "CreditTransfer"
+                    },
+                    "credit_debit_indicator": "CRDT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-07",
+                    "value_date": "2026-09-07",
+                    "transaction_date": "2026-09-07",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["Factuur logo pakket"]
+                },
+                {
+                    "entry_reference": "94ED62C7AA",
+                    "merchant_category_code": "5912",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "28.50"
+                    },
+                    "creditor": {
+                        "name": "KRUIDVAT",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-05",
+                    "value_date": "2026-09-05",
+                    "transaction_date": "2026-09-05",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["KRUIDVAT 4411 UTRECHT"]
+                },
+                {
+                    "entry_reference": "3EE85F68EC",
+                    "merchant_category_code": null,
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "120.00"
+                    },
+                    "creditor": {
+                        "name": "DE LAGE LANDEN FINANCE",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-03",
+                    "value_date": "2026-09-03",
+                    "transaction_date": "2026-09-03",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["Lening aflossing sept"]
+                },
+                {
+                    "entry_reference": "6BC8CCC932",
+                    "merchant_category_code": "4111",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "8.50"
+                    },
+                    "creditor": {
+                        "name": "RET Rotterdam",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-01",
+                    "value_date": "2026-09-01",
+                    "transaction_date": "2026-09-01",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["RET OV CHECK-IN"]
+                },
+                {
+                    "entry_reference": "06C02EB6C2",
+                    "merchant_category_code": "5411",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "62.00"
+                    },
+                    "creditor": {
+                        "name": "PLUS supermarket",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-08-30",
+                    "value_date": "2026-08-30",
+                    "transaction_date": "2026-08-30",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["PLUS SUPERMARKT 09 UTRECHT"]
+                },
+                {
+                    "entry_reference": "3C1721C949",
+                    "merchant_category_code": "8398",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "250.00"
+                    },
+                    "creditor": {
+                        "name": "GiveDirectly",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-08-28",
+                    "value_date": "2026-08-28",
+                    "transaction_date": "2026-08-28",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["Periodieke donatie"]
+                },
+                {
+                    "entry_reference": "7F3083405C",
+                    "merchant_category_code": "5411",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "41.20"
+                    },
+                    "creditor": {
+                        "name": "AH TO GO",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-08-26",
+                    "value_date": "2026-08-26",
+                    "transaction_date": "2026-08-26",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["AH TO GO CS UTRECHT"]
+                },
+                {
+                    "entry_reference": "63B7040E9B",
+                    "merchant_category_code": null,
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "1850.00"
+                    },
+                    "creditor": null,
+                    "creditor_account": null,
+                    "debtor": {
+                        "name": "RETAIL GROUP NL BV",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "CreditTransfer"
+                    },
+                    "credit_debit_indicator": "CRDT",
+                    "status": "BOOK",
+                    "booking_date": "2026-08-24",
+                    "value_date": "2026-08-24",
+                    "transaction_date": "2026-08-24",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["Salaris augustus"]
+                },
+                {
+                    "entry_reference": "CE9CAD33D3",
+                    "merchant_category_code": null,
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "950.00"
+                    },
+                    "creditor": {
+                        "name": "WONINGSTICHTING ROCHDALE",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-08-22",
+                    "value_date": "2026-08-22",
+                    "transaction_date": "2026-08-22",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["Huur september \u2014 nr 14"]
+                },
+                {
+                    "entry_reference": "A3C918441F",
+                    "merchant_category_code": "5815",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "19.95"
+                    },
+                    "creditor": {
+                        "name": "APPLE.COM/BILL",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-08-19",
+                    "value_date": "2026-08-19",
+                    "transaction_date": "2026-08-19",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["APPLE.COM/BILL"]
+                },
+                {
+                    "entry_reference": "22016C029B",
+                    "merchant_category_code": "5411",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "76.30"
+                    },
+                    "creditor": {
+                        "name": "DIRK VAN DEN BROEK",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-08-14",
+                    "value_date": "2026-08-14",
+                    "transaction_date": "2026-08-14",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["DIRK VAN DEN BROEK AMS"]
+                },
+                {
+                    "entry_reference": "272E3CC25E",
+                    "merchant_category_code": "8398",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "400.00"
+                    },
+                    "creditor": {
+                        "name": "GIRO555",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-08-09",
+                    "value_date": "2026-08-09",
+                    "transaction_date": "2026-08-09",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["Noodhulpacitie SHO"]
+                },
+                {
+                    "entry_reference": "D62817659D",
+                    "merchant_category_code": "4899",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "15.00"
+                    },
+                    "creditor": {
+                        "name": "GOOGLE *",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-08-04",
+                    "value_date": "2026-08-04",
+                    "transaction_date": "2026-08-04",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["GOOGLE *YouTubePremium"]
+                },
+                {
+                    "entry_reference": "7203CE437E",
+                    "merchant_category_code": "4899",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "88.00"
+                    },
+                    "creditor": {
+                        "name": "ZIGGO BV",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-07-30",
+                    "value_date": "2026-07-30",
+                    "transaction_date": "2026-07-30",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["ZIGGO BV INTERNET"]
+                },
+                {
+                    "entry_reference": "F832D3E9D8",
+                    "merchant_category_code": null,
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "1850.00"
+                    },
+                    "creditor": null,
+                    "creditor_account": null,
+                    "debtor": {
+                        "name": "RETAIL GROUP NL BV",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "CreditTransfer"
+                    },
+                    "credit_debit_indicator": "CRDT",
+                    "status": "BOOK",
+                    "booking_date": "2026-07-25",
+                    "value_date": "2026-07-25",
+                    "transaction_date": "2026-07-25",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["Salaris juli"]
+                }
+            ]
+        },
+        {
+            "info": {
+                "credit_limit": null,
+                "all_account_ids": [
+                    {
+                        "scheme_name": "IBAN",
+                        "identification": "NL86INGB0002445588",
+                        "issuer": null
+                    },
+                    {
+                        "scheme_name": "BBAN",
+                        "identification": "INGB0002445588",
+                        "issuer": null
+                    }
+                ],
+                "account_servicer": null,
+                "currency": "EUR",
+                "psu_status": "Account Holder",
+                "linked_account": null,
+                "cash_account_type": "CACC",
+                "usage": "PRIV",
+                "identification_hash": "fb2c144dc43eadc838313d743086408f0660db136031",
+                "product": "Betaalrekening",
+                "name": "Avery Chen",
+                "details": "Spaarrekening",
+                "resource_id": "c77974b2-c88a-576b-8d0a-b62454722e48",
+                "account_id": {
+                    "iban": "NL86INGB0002445588",
+                    "other": null
+                }
+            },
+            "balances": [
+                {
+                    "name": "Interim available",
+                    "balance_amount": {
+                        "amount": "6520.00",
+                        "currency": "EUR"
+                    },
+                    "balance_type": "ITAV",
+                    "reference_date": "2026-09-23",
+                    "last_change_date_time": null,
+                    "last_committed_transaction": null
+                },
+                {
+                    "name": "Closing booked",
+                    "balance_amount": {
+                        "amount": "6520.00",
+                        "currency": "EUR"
+                    },
+                    "balance_type": "CLBD",
+                    "reference_date": "2026-09-23",
+                    "last_change_date_time": null,
+                    "last_committed_transaction": null
+                }
+            ],
+            "transactions": [
+                {
+                    "entry_reference": "D30002EA51",
+                    "merchant_category_code": null,
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "200.00"
+                    },
+                    "creditor": null,
+                    "creditor_account": null,
+                    "debtor": {
+                        "name": "VAN EIGEN REKENING",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "CreditTransfer"
+                    },
+                    "credit_debit_indicator": "CRDT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-21",
+                    "value_date": "2026-09-21",
+                    "transaction_date": "2026-09-21",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["Overboeking spaardoel"]
+                },
+                {
+                    "entry_reference": "682D3350E8",
+                    "merchant_category_code": null,
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "50.00"
+                    },
+                    "creditor": {
+                        "name": "NAAR EIGEN REKENING",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-18",
+                    "value_date": "2026-09-18",
+                    "transaction_date": "2026-09-18",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["Opname naar betaalrekening"]
+                },
+                {
+                    "entry_reference": "3FDADF1962",
+                    "merchant_category_code": null,
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "200.00"
+                    },
+                    "creditor": null,
+                    "creditor_account": null,
+                    "debtor": {
+                        "name": "VAN EIGEN REKENING",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "CreditTransfer"
+                    },
+                    "credit_debit_indicator": "CRDT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-11",
+                    "value_date": "2026-09-11",
+                    "transaction_date": "2026-09-11",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["Overboeking spaardoel"]
+                },
+                {
+                    "entry_reference": "7A5842399E",
+                    "merchant_category_code": null,
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "200.00"
+                    },
+                    "creditor": null,
+                    "creditor_account": null,
+                    "debtor": {
+                        "name": "VAN EIGEN REKENING",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "CreditTransfer"
+                    },
+                    "credit_debit_indicator": "CRDT",
+                    "status": "BOOK",
+                    "booking_date": "2026-08-22",
+                    "value_date": "2026-08-22",
+                    "transaction_date": "2026-08-22",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["Overboeking spaardoel"]
+                },
+                {
+                    "entry_reference": "F4C2BEC694",
+                    "merchant_category_code": null,
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "12.34"
+                    },
+                    "creditor": null,
+                    "creditor_account": null,
+                    "debtor": {
+                        "name": "BUNQ BV",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "CreditTransfer"
+                    },
+                    "credit_debit_indicator": "CRDT",
+                    "status": "BOOK",
+                    "booking_date": "2026-08-14",
+                    "value_date": "2026-08-14",
+                    "transaction_date": "2026-08-14",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["Rente Q2"]
+                }
+            ]
+        },
+        {
+            "info": {
+                "credit_limit": null,
+                "all_account_ids": [
+                    {
+                        "scheme_name": "IBAN",
+                        "identification": "NL39RABO0300065264",
+                        "issuer": null
+                    },
+                    {
+                        "scheme_name": "BBAN",
+                        "identification": "RABO0300065264",
+                        "issuer": null
+                    }
+                ],
+                "account_servicer": null,
+                "currency": "EUR",
+                "psu_status": "Account Holder",
+                "linked_account": null,
+                "cash_account_type": "CACC",
+                "usage": "PRIV",
+                "identification_hash": "e29259ae1e72c9385f6e6db745a3e8a1ec0519eb383f",
+                "product": "Betaalrekening",
+                "name": "Morgan Ellis Blake",
+                "details": "Creditcard",
+                "resource_id": "723f8043-ab25-503f-aeef-c21f2b7d66c1",
+                "account_id": {
+                    "iban": "NL39RABO0300065264",
+                    "other": null
+                }
+            },
+            "balances": [
+                {
+                    "name": "Interim available",
+                    "balance_amount": {
+                        "amount": "-412.50",
+                        "currency": "EUR"
+                    },
+                    "balance_type": "ITAV",
+                    "reference_date": "2026-09-23",
+                    "last_change_date_time": null,
+                    "last_committed_transaction": null
+                },
+                {
+                    "name": "Closing booked",
+                    "balance_amount": {
+                        "amount": "-412.50",
+                        "currency": "EUR"
+                    },
+                    "balance_type": "CLBD",
+                    "reference_date": "2026-09-23",
+                    "last_change_date_time": null,
+                    "last_committed_transaction": null
+                }
+            ],
+            "transactions": [
+                {
+                    "entry_reference": "6EACF42443",
+                    "merchant_category_code": "5734",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "89.00"
+                    },
+                    "creditor": {
+                        "name": "ADOBE SYSTEMS",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-22",
+                    "value_date": "2026-09-22",
+                    "transaction_date": "2026-09-22",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["ADOBE *CREATIVE CLOUD"]
+                },
+                {
+                    "entry_reference": "F14AD037D9",
+                    "merchant_category_code": "5812",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "184.00"
+                    },
+                    "creditor": {
+                        "name": "RESTAURANT RIJKS",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-20",
+                    "value_date": "2026-09-20",
+                    "transaction_date": "2026-09-20",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["PIN 21:08 AMSTERDAM CENTRUM"]
+                },
+                {
+                    "entry_reference": "21866DAEFB",
+                    "merchant_category_code": "7011",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "450.00"
+                    },
+                    "creditor": {
+                        "name": "AIRBNB",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-17",
+                    "value_date": "2026-09-17",
+                    "transaction_date": "2026-09-17",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["AIRBNB * HM8XK2 AMS"]
+                },
+                {
+                    "entry_reference": "5C7A73F3A1",
+                    "merchant_category_code": "4111",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "62.00"
+                    },
+                    "creditor": {
+                        "name": "NS Groep",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-13",
+                    "value_date": "2026-09-13",
+                    "transaction_date": "2026-09-13",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["NS INTERNATIONAAL"]
+                },
+                {
+                    "entry_reference": "EB06A15536",
+                    "merchant_category_code": null,
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "180.00"
+                    },
+                    "creditor": null,
+                    "creditor_account": null,
+                    "debtor": {
+                        "name": "ICS CREDITCARD",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "CreditTransfer"
+                    },
+                    "credit_debit_indicator": "CRDT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-09",
+                    "value_date": "2026-09-09",
+                    "transaction_date": "2026-09-09",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["Creditcard minimumbetaling"]
+                },
+                {
+                    "entry_reference": "7156157034",
+                    "merchant_category_code": "5942",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "29.99"
+                    },
+                    "creditor": {
+                        "name": "AMAZON.NL",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-09-03",
+                    "value_date": "2026-09-03",
+                    "transaction_date": "2026-09-03",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["AMAZON.NL MARKETPLACE"]
+                },
+                {
+                    "entry_reference": "CEFF421A25",
+                    "merchant_category_code": "5541",
+                    "transaction_amount": {
+                        "currency": "EUR",
+                        "amount": "55.00"
+                    },
+                    "creditor": {
+                        "name": "SHELL NL",
+                        "postal_address": null,
+                        "organisation_id": null,
+                        "private_id": null
+                    },
+                    "creditor_account": null,
+                    "debtor": null,
+                    "debtor_account": null,
+                    "bank_transaction_code": {
+                        "description": null,
+                        "code": "Payments",
+                        "sub_code": "DebitTransfer"
+                    },
+                    "credit_debit_indicator": "DBIT",
+                    "status": "BOOK",
+                    "booking_date": "2026-08-29",
+                    "value_date": "2026-08-29",
+                    "transaction_date": "2026-08-29",
+                    "balance_after_transaction": null,
+                    "reference_number": null,
+                    "remittance_information": ["SHELL STATION A12"]
+                }
+            ]
         }
-      },
-      "balances": [
-        {
-          "name": "Interim available",
-          "balance_amount": {
-            "amount": "2847.65",
-            "currency": "EUR"
-          },
-          "balance_type": "ITAV",
-          "reference_date": "2026-09-23",
-          "last_change_date_time": null,
-          "last_committed_transaction": null
-        },
-        {
-          "name": "Closing booked",
-          "balance_amount": {
-            "amount": "2847.65",
-            "currency": "EUR"
-          },
-          "balance_type": "CLBD",
-          "reference_date": "2026-09-23",
-          "last_change_date_time": null,
-          "last_committed_transaction": null
-        }
-      ],
-      "transactions": [
-        {
-          "entry_reference": "EC2BEF84B2",
-          "merchant_category_code": "5411",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "18.90"
-          },
-          "creditor": {
-            "name": "SPAR CITY",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-23",
-          "value_date": "2026-09-23",
-          "transaction_date": "2026-09-23",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "SPAR CITY 4821 UTRECHT"
-          ]
-        },
-        {
-          "entry_reference": "FE04CA3137",
-          "merchant_category_code": "5812",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "64.00"
-          },
-          "creditor": {
-            "name": "CAFE DE JAREN",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-23",
-          "value_date": "2026-09-23",
-          "transaction_date": "2026-09-23",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "PIN 19:41 AMSTERDAM"
-          ]
-        },
-        {
-          "entry_reference": "00B783DCCE",
-          "merchant_category_code": "5411",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "42.50"
-          },
-          "creditor": {
-            "name": "ALBERT HEIJN 1582",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-22",
-          "value_date": "2026-09-22",
-          "transaction_date": "2026-09-22",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "AH 1582 AMSTERDAM BEURS"
-          ]
-        },
-        {
-          "entry_reference": "E3C2A156B3",
-          "merchant_category_code": "4121",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "21.50"
-          },
-          "creditor": {
-            "name": "UBER *TRIP",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-22",
-          "value_date": "2026-09-22",
-          "transaction_date": "2026-09-22",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "UBER *TRIP HELP.UBER.COM"
-          ]
-        },
-        {
-          "entry_reference": "0E80694889",
-          "merchant_category_code": "5814",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "14.50"
-          },
-          "creditor": {
-            "name": "STARBUCKS",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-21",
-          "value_date": "2026-09-21",
-          "transaction_date": "2026-09-21",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "STARBUCKS CC 2918 AMS"
-          ]
-        },
-        {
-          "entry_reference": "26F6AE1C4E",
-          "merchant_category_code": "5812",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "48.00"
-          },
-          "creditor": {
-            "name": "DELIVEROO",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-21",
-          "value_date": "2026-09-21",
-          "transaction_date": "2026-09-21",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "DELIVEROO.NL 882194"
-          ]
-        },
-        {
-          "entry_reference": "3DC4407840",
-          "merchant_category_code": "5734",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "89.00"
-          },
-          "creditor": {
-            "name": "ADOBE SYSTEMS",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-20",
-          "value_date": "2026-09-20",
-          "transaction_date": "2026-09-20",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "ADOBE *CREATIVE CLOUD"
-          ]
-        },
-        {
-          "entry_reference": "6EB3A485C7",
-          "merchant_category_code": "4814",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "35.00"
-          },
-          "creditor": {
-            "name": "ODIDO",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-20",
-          "value_date": "2026-09-20",
-          "transaction_date": "2026-09-20",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "Factuur mobiel sept"
-          ]
-        },
-        {
-          "entry_reference": "114B025CD3",
-          "merchant_category_code": "5411",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "420.00"
-          },
-          "creditor": {
-            "name": "JUMBO SUPERMARKT",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-19",
-          "value_date": "2026-09-19",
-          "transaction_date": "2026-09-19",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "JUMBO 3120 UTRECHT LUNETTE"
-          ]
-        },
-        {
-          "entry_reference": "C9D4D3C881",
-          "merchant_category_code": "4111",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "22.00"
-          },
-          "creditor": {
-            "name": "GVB Amsterdam",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-18",
-          "value_date": "2026-09-18",
-          "transaction_date": "2026-09-18",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "OV-chipkaart opwaarderen"
-          ]
-        },
-        {
-          "entry_reference": "0569DB9108",
-          "merchant_category_code": "5912",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "68.00"
-          },
-          "creditor": {
-            "name": "ETOS BV",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-18",
-          "value_date": "2026-09-18",
-          "transaction_date": "2026-09-18",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "ETOS 2214 ROTTERDAM"
-          ]
-        },
-        {
-          "entry_reference": "B9F96A8D83",
-          "merchant_category_code": "4111",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "12.80"
-          },
-          "creditor": {
-            "name": "NS Groep",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-17",
-          "value_date": "2026-09-17",
-          "transaction_date": "2026-09-17",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "NS GROEP REISPRODUCT"
-          ]
-        },
-        {
-          "entry_reference": "5653990818",
-          "merchant_category_code": "5541",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "55.00"
-          },
-          "creditor": {
-            "name": "SHELL NL",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-16",
-          "value_date": "2026-09-16",
-          "transaction_date": "2026-09-16",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "SHELL STATION A2 BREUKELEN"
-          ]
-        },
-        {
-          "entry_reference": "B3291B05D6",
-          "merchant_category_code": "5942",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "125.00"
-          },
-          "creditor": {
-            "name": "BOL.COM",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-15",
-          "value_date": "2026-09-15",
-          "transaction_date": "2026-09-15",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "BOL.COM BOEKEN 8821"
-          ]
-        },
-        {
-          "entry_reference": "2CD6931FAD",
-          "merchant_category_code": "4899",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "9.99"
-          },
-          "creditor": {
-            "name": "SPOTIFY",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-14",
-          "value_date": "2026-09-14",
-          "transaction_date": "2026-09-14",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "SPOTIFY P0AAB1C2D3"
-          ]
-        },
-        {
-          "entry_reference": "CAA3304141",
-          "merchant_category_code": "4899",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "17.99"
-          },
-          "creditor": {
-            "name": "NETFLIX",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-13",
-          "value_date": "2026-09-13",
-          "transaction_date": "2026-09-13",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "NETFLIX.COM 314159"
-          ]
-        },
-        {
-          "entry_reference": "71478715F8",
-          "merchant_category_code": "5812",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "79.00"
-          },
-          "creditor": {
-            "name": "THUISBEZORGD",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-12",
-          "value_date": "2026-09-12",
-          "transaction_date": "2026-09-12",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "THUISBEZORGD.NL 9912"
-          ]
-        },
-        {
-          "entry_reference": "7DB39E4198",
-          "merchant_category_code": null,
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "1850.00"
-          },
-          "creditor": null,
-          "creditor_account": null,
-          "debtor": {
-            "name": "RETAIL GROUP NL BV",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "CreditTransfer"
-          },
-          "credit_debit_indicator": "CRDT",
-          "status": "BOOK",
-          "booking_date": "2026-09-11",
-          "value_date": "2026-09-11",
-          "transaction_date": "2026-09-11",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "Salaris september"
-          ]
-        },
-        {
-          "entry_reference": "18894A9B27",
-          "merchant_category_code": null,
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "950.00"
-          },
-          "creditor": {
-            "name": "WONINGSTICHTING ROCHDALE",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-10",
-          "value_date": "2026-09-10",
-          "transaction_date": "2026-09-10",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "Huur oktober \u2014 nr 14"
-          ]
-        },
-        {
-          "entry_reference": "4F5D17CCA6",
-          "merchant_category_code": null,
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "155.00"
-          },
-          "creditor": {
-            "name": "ZILVEREN KRUIS",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-09",
-          "value_date": "2026-09-09",
-          "transaction_date": "2026-09-09",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "Zorgpremie oktober"
-          ]
-        },
-        {
-          "entry_reference": "30239BBFCE",
-          "merchant_category_code": "5411",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "33.40"
-          },
-          "creditor": {
-            "name": "LIDL NL",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-08",
-          "value_date": "2026-09-08",
-          "transaction_date": "2026-09-08",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "LIDL 1182 AMSTERDAM NOORD"
-          ]
-        },
-        {
-          "entry_reference": "CB9083E1D1",
-          "merchant_category_code": null,
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "450.00"
-          },
-          "creditor": null,
-          "creditor_account": null,
-          "debtor": {
-            "name": "BAKKERIJ DE GUNST BV",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "CreditTransfer"
-          },
-          "credit_debit_indicator": "CRDT",
-          "status": "BOOK",
-          "booking_date": "2026-09-07",
-          "value_date": "2026-09-07",
-          "transaction_date": "2026-09-07",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "Factuur logo pakket"
-          ]
-        },
-        {
-          "entry_reference": "94ED62C7AA",
-          "merchant_category_code": "5912",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "28.50"
-          },
-          "creditor": {
-            "name": "KRUIDVAT",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-05",
-          "value_date": "2026-09-05",
-          "transaction_date": "2026-09-05",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "KRUIDVAT 4411 UTRECHT"
-          ]
-        },
-        {
-          "entry_reference": "3EE85F68EC",
-          "merchant_category_code": null,
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "120.00"
-          },
-          "creditor": {
-            "name": "DE LAGE LANDEN FINANCE",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-03",
-          "value_date": "2026-09-03",
-          "transaction_date": "2026-09-03",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "Lening aflossing sept"
-          ]
-        },
-        {
-          "entry_reference": "6BC8CCC932",
-          "merchant_category_code": "4111",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "8.50"
-          },
-          "creditor": {
-            "name": "RET Rotterdam",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-01",
-          "value_date": "2026-09-01",
-          "transaction_date": "2026-09-01",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "RET OV CHECK-IN"
-          ]
-        },
-        {
-          "entry_reference": "06C02EB6C2",
-          "merchant_category_code": "5411",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "62.00"
-          },
-          "creditor": {
-            "name": "PLUS supermarket",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-08-30",
-          "value_date": "2026-08-30",
-          "transaction_date": "2026-08-30",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "PLUS SUPERMARKT 09 UTRECHT"
-          ]
-        },
-        {
-          "entry_reference": "3C1721C949",
-          "merchant_category_code": "8398",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "250.00"
-          },
-          "creditor": {
-            "name": "GiveDirectly",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-08-28",
-          "value_date": "2026-08-28",
-          "transaction_date": "2026-08-28",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "Periodieke donatie"
-          ]
-        },
-        {
-          "entry_reference": "7F3083405C",
-          "merchant_category_code": "5411",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "41.20"
-          },
-          "creditor": {
-            "name": "AH TO GO",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-08-26",
-          "value_date": "2026-08-26",
-          "transaction_date": "2026-08-26",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "AH TO GO CS UTRECHT"
-          ]
-        },
-        {
-          "entry_reference": "63B7040E9B",
-          "merchant_category_code": null,
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "1850.00"
-          },
-          "creditor": null,
-          "creditor_account": null,
-          "debtor": {
-            "name": "RETAIL GROUP NL BV",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "CreditTransfer"
-          },
-          "credit_debit_indicator": "CRDT",
-          "status": "BOOK",
-          "booking_date": "2026-08-24",
-          "value_date": "2026-08-24",
-          "transaction_date": "2026-08-24",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "Salaris augustus"
-          ]
-        },
-        {
-          "entry_reference": "CE9CAD33D3",
-          "merchant_category_code": null,
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "950.00"
-          },
-          "creditor": {
-            "name": "WONINGSTICHTING ROCHDALE",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-08-22",
-          "value_date": "2026-08-22",
-          "transaction_date": "2026-08-22",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "Huur september \u2014 nr 14"
-          ]
-        },
-        {
-          "entry_reference": "A3C918441F",
-          "merchant_category_code": "5815",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "19.95"
-          },
-          "creditor": {
-            "name": "APPLE.COM/BILL",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-08-19",
-          "value_date": "2026-08-19",
-          "transaction_date": "2026-08-19",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "APPLE.COM/BILL"
-          ]
-        },
-        {
-          "entry_reference": "22016C029B",
-          "merchant_category_code": "5411",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "76.30"
-          },
-          "creditor": {
-            "name": "DIRK VAN DEN BROEK",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-08-14",
-          "value_date": "2026-08-14",
-          "transaction_date": "2026-08-14",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "DIRK VAN DEN BROEK AMS"
-          ]
-        },
-        {
-          "entry_reference": "272E3CC25E",
-          "merchant_category_code": "8398",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "400.00"
-          },
-          "creditor": {
-            "name": "GIRO555",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-08-09",
-          "value_date": "2026-08-09",
-          "transaction_date": "2026-08-09",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "Noodhulpacitie SHO"
-          ]
-        },
-        {
-          "entry_reference": "D62817659D",
-          "merchant_category_code": "4899",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "15.00"
-          },
-          "creditor": {
-            "name": "GOOGLE *",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-08-04",
-          "value_date": "2026-08-04",
-          "transaction_date": "2026-08-04",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "GOOGLE *YouTubePremium"
-          ]
-        },
-        {
-          "entry_reference": "7203CE437E",
-          "merchant_category_code": "4899",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "88.00"
-          },
-          "creditor": {
-            "name": "ZIGGO BV",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-07-30",
-          "value_date": "2026-07-30",
-          "transaction_date": "2026-07-30",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "ZIGGO BV INTERNET"
-          ]
-        },
-        {
-          "entry_reference": "F832D3E9D8",
-          "merchant_category_code": null,
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "1850.00"
-          },
-          "creditor": null,
-          "creditor_account": null,
-          "debtor": {
-            "name": "RETAIL GROUP NL BV",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "CreditTransfer"
-          },
-          "credit_debit_indicator": "CRDT",
-          "status": "BOOK",
-          "booking_date": "2026-07-25",
-          "value_date": "2026-07-25",
-          "transaction_date": "2026-07-25",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "Salaris juli"
-          ]
-        }
-      ]
-    },
-    {
-      "info": {
-        "credit_limit": null,
-        "all_account_ids": [
-          {
-            "scheme_name": "IBAN",
-            "identification": "NL86INGB0002445588",
-            "issuer": null
-          },
-          {
-            "scheme_name": "BBAN",
-            "identification": "INGB0002445588",
-            "issuer": null
-          }
-        ],
-        "account_servicer": null,
-        "currency": "EUR",
-        "psu_status": "Account Holder",
-        "linked_account": null,
-        "cash_account_type": "CACC",
-        "usage": "PRIV",
-        "identification_hash": "fb2c144dc43eadc838313d743086408f0660db136031",
-        "product": "Betaalrekening",
-        "name": "Avery Chen",
-        "details": "Spaarrekening",
-        "resource_id": "c77974b2-c88a-576b-8d0a-b62454722e48",
-        "account_id": {
-          "iban": "NL86INGB0002445588",
-          "other": null
-        }
-      },
-      "balances": [
-        {
-          "name": "Interim available",
-          "balance_amount": {
-            "amount": "6520.00",
-            "currency": "EUR"
-          },
-          "balance_type": "ITAV",
-          "reference_date": "2026-09-23",
-          "last_change_date_time": null,
-          "last_committed_transaction": null
-        },
-        {
-          "name": "Closing booked",
-          "balance_amount": {
-            "amount": "6520.00",
-            "currency": "EUR"
-          },
-          "balance_type": "CLBD",
-          "reference_date": "2026-09-23",
-          "last_change_date_time": null,
-          "last_committed_transaction": null
-        }
-      ],
-      "transactions": [
-        {
-          "entry_reference": "D30002EA51",
-          "merchant_category_code": null,
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "200.00"
-          },
-          "creditor": null,
-          "creditor_account": null,
-          "debtor": {
-            "name": "VAN EIGEN REKENING",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "CreditTransfer"
-          },
-          "credit_debit_indicator": "CRDT",
-          "status": "BOOK",
-          "booking_date": "2026-09-21",
-          "value_date": "2026-09-21",
-          "transaction_date": "2026-09-21",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "Overboeking spaardoel"
-          ]
-        },
-        {
-          "entry_reference": "682D3350E8",
-          "merchant_category_code": null,
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "50.00"
-          },
-          "creditor": {
-            "name": "NAAR EIGEN REKENING",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-18",
-          "value_date": "2026-09-18",
-          "transaction_date": "2026-09-18",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "Opname naar betaalrekening"
-          ]
-        },
-        {
-          "entry_reference": "3FDADF1962",
-          "merchant_category_code": null,
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "200.00"
-          },
-          "creditor": null,
-          "creditor_account": null,
-          "debtor": {
-            "name": "VAN EIGEN REKENING",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "CreditTransfer"
-          },
-          "credit_debit_indicator": "CRDT",
-          "status": "BOOK",
-          "booking_date": "2026-09-11",
-          "value_date": "2026-09-11",
-          "transaction_date": "2026-09-11",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "Overboeking spaardoel"
-          ]
-        },
-        {
-          "entry_reference": "7A5842399E",
-          "merchant_category_code": null,
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "200.00"
-          },
-          "creditor": null,
-          "creditor_account": null,
-          "debtor": {
-            "name": "VAN EIGEN REKENING",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "CreditTransfer"
-          },
-          "credit_debit_indicator": "CRDT",
-          "status": "BOOK",
-          "booking_date": "2026-08-22",
-          "value_date": "2026-08-22",
-          "transaction_date": "2026-08-22",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "Overboeking spaardoel"
-          ]
-        },
-        {
-          "entry_reference": "F4C2BEC694",
-          "merchant_category_code": null,
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "12.34"
-          },
-          "creditor": null,
-          "creditor_account": null,
-          "debtor": {
-            "name": "BUNQ BV",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "CreditTransfer"
-          },
-          "credit_debit_indicator": "CRDT",
-          "status": "BOOK",
-          "booking_date": "2026-08-14",
-          "value_date": "2026-08-14",
-          "transaction_date": "2026-08-14",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "Rente Q2"
-          ]
-        }
-      ]
-    },
-    {
-      "info": {
-        "credit_limit": null,
-        "all_account_ids": [
-          {
-            "scheme_name": "IBAN",
-            "identification": "NL39RABO0300065264",
-            "issuer": null
-          },
-          {
-            "scheme_name": "BBAN",
-            "identification": "RABO0300065264",
-            "issuer": null
-          }
-        ],
-        "account_servicer": null,
-        "currency": "EUR",
-        "psu_status": "Account Holder",
-        "linked_account": null,
-        "cash_account_type": "CACC",
-        "usage": "PRIV",
-        "identification_hash": "e29259ae1e72c9385f6e6db745a3e8a1ec0519eb383f",
-        "product": "Betaalrekening",
-        "name": "Morgan Ellis Blake",
-        "details": "Creditcard",
-        "resource_id": "723f8043-ab25-503f-aeef-c21f2b7d66c1",
-        "account_id": {
-          "iban": "NL39RABO0300065264",
-          "other": null
-        }
-      },
-      "balances": [
-        {
-          "name": "Interim available",
-          "balance_amount": {
-            "amount": "-412.50",
-            "currency": "EUR"
-          },
-          "balance_type": "ITAV",
-          "reference_date": "2026-09-23",
-          "last_change_date_time": null,
-          "last_committed_transaction": null
-        },
-        {
-          "name": "Closing booked",
-          "balance_amount": {
-            "amount": "-412.50",
-            "currency": "EUR"
-          },
-          "balance_type": "CLBD",
-          "reference_date": "2026-09-23",
-          "last_change_date_time": null,
-          "last_committed_transaction": null
-        }
-      ],
-      "transactions": [
-        {
-          "entry_reference": "6EACF42443",
-          "merchant_category_code": "5734",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "89.00"
-          },
-          "creditor": {
-            "name": "ADOBE SYSTEMS",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-22",
-          "value_date": "2026-09-22",
-          "transaction_date": "2026-09-22",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "ADOBE *CREATIVE CLOUD"
-          ]
-        },
-        {
-          "entry_reference": "F14AD037D9",
-          "merchant_category_code": "5812",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "184.00"
-          },
-          "creditor": {
-            "name": "RESTAURANT RIJKS",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-20",
-          "value_date": "2026-09-20",
-          "transaction_date": "2026-09-20",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "PIN 21:08 AMSTERDAM CENTRUM"
-          ]
-        },
-        {
-          "entry_reference": "21866DAEFB",
-          "merchant_category_code": "7011",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "450.00"
-          },
-          "creditor": {
-            "name": "AIRBNB",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-17",
-          "value_date": "2026-09-17",
-          "transaction_date": "2026-09-17",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "AIRBNB * HM8XK2 AMS"
-          ]
-        },
-        {
-          "entry_reference": "5C7A73F3A1",
-          "merchant_category_code": "4111",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "62.00"
-          },
-          "creditor": {
-            "name": "NS Groep",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-13",
-          "value_date": "2026-09-13",
-          "transaction_date": "2026-09-13",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "NS INTERNATIONAAL"
-          ]
-        },
-        {
-          "entry_reference": "EB06A15536",
-          "merchant_category_code": null,
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "180.00"
-          },
-          "creditor": null,
-          "creditor_account": null,
-          "debtor": {
-            "name": "ICS CREDITCARD",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "CreditTransfer"
-          },
-          "credit_debit_indicator": "CRDT",
-          "status": "BOOK",
-          "booking_date": "2026-09-09",
-          "value_date": "2026-09-09",
-          "transaction_date": "2026-09-09",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "Creditcard minimumbetaling"
-          ]
-        },
-        {
-          "entry_reference": "7156157034",
-          "merchant_category_code": "5942",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "29.99"
-          },
-          "creditor": {
-            "name": "AMAZON.NL",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-09-03",
-          "value_date": "2026-09-03",
-          "transaction_date": "2026-09-03",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "AMAZON.NL MARKETPLACE"
-          ]
-        },
-        {
-          "entry_reference": "CEFF421A25",
-          "merchant_category_code": "5541",
-          "transaction_amount": {
-            "currency": "EUR",
-            "amount": "55.00"
-          },
-          "creditor": {
-            "name": "SHELL NL",
-            "postal_address": null,
-            "organisation_id": null,
-            "private_id": null
-          },
-          "creditor_account": null,
-          "debtor": null,
-          "debtor_account": null,
-          "bank_transaction_code": {
-            "description": null,
-            "code": "Payments",
-            "sub_code": "DebitTransfer"
-          },
-          "credit_debit_indicator": "DBIT",
-          "status": "BOOK",
-          "booking_date": "2026-08-29",
-          "value_date": "2026-08-29",
-          "transaction_date": "2026-08-29",
-          "balance_after_transaction": null,
-          "reference_number": null,
-          "remittance_information": [
-            "SHELL STATION A12"
-          ]
-        }
-      ]
-    }
-  ]
+    ]
 }

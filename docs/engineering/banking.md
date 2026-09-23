@@ -78,6 +78,8 @@ AIS does **not** push every booking. Rumtelo polls:
 | **Manual** | Bank settings **Sync now** | Always pulls that seat |
 | **After Connect** | OAuth return on bank settings | `completeLink` then immediate `syncNow` |
 
+On `completeLink` / each sync, Rumtelo applies the ASPSP account label from Enable Banking (`details`/`product` + holder `name`, e.g. `Betaalrekening · Jamie Lee Rivera`) onto the seat — handmatig nicknames do not win while the account stays linked.
+
 Constants: [`bank-sync.constants.ts`](../../apps/backend/src/modules/public/product/money/ledger/bank-sync/bank-sync.constants.ts) (`BANK_SYNC_CRON`, `BANK_SYNC_STALE_MS`). New Inbox rows use `source: BANK` + dedupe keys (same idea as CSV).
 
 Each pull also refreshes `BankAccount.balance` from AIS (`GET …/balances`, preferring interim/closing available). Consent requests `balances` + `transactions` explicitly. Transaction pages follow `continuation_key` (capped).
