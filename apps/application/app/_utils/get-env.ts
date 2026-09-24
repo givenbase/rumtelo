@@ -35,7 +35,7 @@ export const env = createEnv({
         NEXT_PUBLIC_APP_ENV: z.enum(['development', 'staging', 'production']).optional(),
         /**
          * Scheduled maintenance — product locked to `@rumtelo.com` emails.
-         * Alias: `MAINTENANCE` is accepted as a fallback at build/runtime.
+         * Application-only; backend uses `MAINTENANCE` separately (see `/health`).
          */
         NEXT_PUBLIC_MAINTENANCE: z.enum(['true', 'false']).optional(),
 
@@ -59,7 +59,7 @@ export const env = createEnv({
         NEXT_PUBLIC_PREVIEW_MODE: process.env.NEXT_PUBLIC_PREVIEW_MODE,
         NEXT_PUBLIC_PREVIEW_PLAN: process.env.NEXT_PUBLIC_PREVIEW_PLAN,
         NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV,
-        NEXT_PUBLIC_MAINTENANCE: process.env.NEXT_PUBLIC_MAINTENANCE ?? process.env.MAINTENANCE,
+        NEXT_PUBLIC_MAINTENANCE: process.env.NEXT_PUBLIC_MAINTENANCE,
         NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
         NEXT_PUBLIC_BOL_PARTNER_ID: process.env.NEXT_PUBLIC_BOL_PARTNER_ID,
         NEXT_PUBLIC_AMAZON_TAG: process.env.NEXT_PUBLIC_AMAZON_TAG,

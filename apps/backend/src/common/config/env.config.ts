@@ -78,8 +78,8 @@ const EnvSchema = z.object({
     BILLING_PREVIEW_BYPASS: boolish(false),
 
     /**
-     * Scheduled maintenance flag — mirrored by Next `NEXT_PUBLIC_MAINTENANCE`.
-     * Exposed on `/health` so monitors and the app can agree.
+     * Backend scheduled-maintenance flag — exposed on `/health`.
+     * Next apps use `NEXT_PUBLIC_MAINTENANCE` separately (not an alias).
      */
     MAINTENANCE: boolish(false),
 
