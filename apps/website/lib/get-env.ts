@@ -23,11 +23,6 @@ export const env = createEnv({
          * Website-only; backend uses `MAINTENANCE` separately.
          */
         NEXT_PUBLIC_MAINTENANCE: z.enum(['true', 'false']).optional(),
-        /**
-         * Railway environment name at build (`staging` | `production`).
-         * Prefer `NEXT_PUBLIC_RAILWAY_ENVIRONMENT_NAME=${{RAILWAY_ENVIRONMENT_NAME}}` on Railway.
-         */
-        NEXT_PUBLIC_RAILWAY_ENVIRONMENT_NAME: z.string().min(1).optional(),
     },
 
     emptyStringAsUndefined: true,
@@ -38,16 +33,13 @@ export const env = createEnv({
         NEXT_PUBLIC_DOMAIN_WEB: process.env.NEXT_PUBLIC_DOMAIN_WEB,
         NEXT_PUBLIC_DOMAIN_BACK: process.env.NEXT_PUBLIC_DOMAIN_BACK,
         NEXT_PUBLIC_MAINTENANCE: process.env.NEXT_PUBLIC_MAINTENANCE,
-        NEXT_PUBLIC_RAILWAY_ENVIRONMENT_NAME:
-            process.env.NEXT_PUBLIC_RAILWAY_ENVIRONMENT_NAME ??
-            process.env.RAILWAY_ENVIRONMENT_NAME,
         NODE_ENV: process.env.NODE_ENV,
         SKIP_ENV_VALIDATION: process.env.SKIP_ENV_VALIDATION,
     },
 
     server: {
         DOMAIN_BACK: portalOrigin('http://localhost:3002'),
-        NODE_ENV: z.enum(['development', 'test', 'production']).default('development').optional(),
+        NODE_ENV: z.enum(['development', 'test', 'staging', 'production']).default('development').optional(),
         SKIP_ENV_VALIDATION: z.string().optional(),
     },
 

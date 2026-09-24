@@ -7,6 +7,7 @@ import { BRAND_ASSETS, BRAND_METADATA_ICONS } from '@rumtelo/brand';
 import { getTranslations } from '@rumtelo/i18n';
 
 import { Providers } from './providers';
+import { StagingBanner } from '@/components/layout/staging-banner';
 
 import '../../globals.css';
 
@@ -75,6 +76,7 @@ export default async function LocaleLayout({ children }: LocaleLayoutProps) {
             <body
                 className={`${display.variable} ${sans.variable} ${mono.variable} bg-bg font-sans text-fg antialiased`}>
                 <NextIntlClientProvider locale={locale} messages={messages}>
+                    <StagingBanner />
                     <Providers>{children}</Providers>
                 </NextIntlClientProvider>
             </body>

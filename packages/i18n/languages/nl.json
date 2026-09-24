@@ -3043,9 +3043,9 @@
                 "manage_plan": "Upgraden, downgraden of beheren",
                 "plan_named": "{plan}-plan",
                 "sign_out_sub": "Deze browsersessie afsluiten",
-                "staging_banner_badge": "Staging",
+                "staging_banner_badge": "Enscenering",
                 "staging_banner": "Staging — not live production. Data here may be reset.",
-                "staging_banner_aria": "Staging environment notice"
+                "staging_banner_aria": "Mededeling over de testomgeving"
             },
             "hero": {
                 "eyebrow": "GELD · GROEI · ENERGIE · ZIEL",
@@ -4822,9 +4822,9 @@
                 "upgrade_cta": "Upgrade naar {plan}",
                 "back_to_dashboard": "Terug naar het dashboard",
                 "back_to_website": "Terug naar de website",
-                "staging_banner_badge": "Staging",
+                "staging_banner_badge": "Enscenering",
                 "staging_banner": "Staging — not live production. Data here may be reset.",
-                "staging_banner_aria": "Staging environment notice"
+                "staging_banner_aria": "Mededeling over de testomgeving"
             }
         },
         "support": {

@@ -34,13 +34,6 @@ export const env = createEnv({
          */
         NEXT_PUBLIC_MAINTENANCE: z.enum(['true', 'false']).optional(),
 
-        /**
-         * Railway environment name at build time (`staging` | `production`).
-         * Set on Railway as `NEXT_PUBLIC_RAILWAY_ENVIRONMENT_NAME=${{RAILWAY_ENVIRONMENT_NAME}}`
-         * or leave unset and rely on `dev-*` hostnames.
-         */
-        NEXT_PUBLIC_RAILWAY_ENVIRONMENT_NAME: z.string().min(1).optional(),
-
         NEXT_PUBLIC_SENTRY_DSN: z.url().optional(),
 
         /** bol.com partner site id — Learn book links carry it when set. */
@@ -61,9 +54,6 @@ export const env = createEnv({
         NEXT_PUBLIC_PREVIEW_MODE: process.env.NEXT_PUBLIC_PREVIEW_MODE,
         NEXT_PUBLIC_PREVIEW_PLAN: process.env.NEXT_PUBLIC_PREVIEW_PLAN,
         NEXT_PUBLIC_MAINTENANCE: process.env.NEXT_PUBLIC_MAINTENANCE,
-        NEXT_PUBLIC_RAILWAY_ENVIRONMENT_NAME:
-            process.env.NEXT_PUBLIC_RAILWAY_ENVIRONMENT_NAME ??
-            process.env.RAILWAY_ENVIRONMENT_NAME,
         NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
         NEXT_PUBLIC_BOL_PARTNER_ID: process.env.NEXT_PUBLIC_BOL_PARTNER_ID,
         NEXT_PUBLIC_AMAZON_TAG: process.env.NEXT_PUBLIC_AMAZON_TAG,
@@ -80,7 +70,7 @@ export const env = createEnv({
          */
         DOMAIN_BACK: portalOrigin('http://localhost:3002'),
 
-        NODE_ENV: z.enum(['development', 'test', 'production']).default('development').optional(),
+        NODE_ENV: z.enum(['development', 'test', 'staging', 'production']).default('development').optional(),
         SKIP_ENV_VALIDATION: z.string().optional(),
         PORT: z.coerce.number().default(3000).optional(),
     },

@@ -1,8 +1,7 @@
 name: Resolve deploy environment
 description: |
-    Maps GitHub Environments (staging | production) to which secrets/vars to inject.
-    Deployed runs use NODE_ENV=production (Next builds require it; launch deferral
-    follows NODE_ENV — Energy/Soul off in production). Local uses development .env.
+    Maps GitHub Environments (staging | production) to which secrets/vars to inject
+    and NODE_ENV for deployed runs. Staging → NODE_ENV=staging; production → production.
 
 inputs:
     deploy_environment:
@@ -15,7 +14,7 @@ outputs:
         description: GitHub Environments name (staging | production)
         value: ${{ steps.resolve.outputs.github_environment }}
     node_env:
-        description: Backend NODE_ENV for deployed runs (production)
+        description: NODE_ENV for the target (staging | production)
         value: ${{ steps.resolve.outputs.node_env }}
     is_production:
         description: 'true when GitHub environment is production'
@@ -44,9 +43,7 @@ runs:
                   IS_PROD="true"
                   ;;
                 staging)
-                  # Next + Nest deploy builds use production; staging vs prod is
-                  # which GitHub Environment secrets you inject.
-                  NODE_ENV="production"
+                  NODE_ENV="staging"
                   IS_PROD="false"
                   ;;
                 *)
@@ -63,6 +60,6 @@ runs:
 
               echo "::group::Resolved deploy environment"
               echo "GitHub environment:  $GITHUB_ENV  (Settings → Environments)"
-              echo "Backend NODE_ENV:    $NODE_ENV"
+              echo "NODE_ENV:            $NODE_ENV"
               echo "Branch:              $REF"
               echo "::endgroup::"
