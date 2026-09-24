@@ -39,6 +39,8 @@ const message = {
             account_name_taken: 'An account with this name already exists.',
             bank_not_found: 'That bank is not in the catalog.',
             bank_required: 'Choose a bank for this account.',
+            statement_bank_mismatch:
+                'This statement does not match the selected bank account. Choose the matching account.',
             settlement_account_invalid: 'Choose a valid account to pay this bill from.',
             invalid_iban: 'Invalid IBAN — check the number and try again.',
             bank_sync_disabled: 'Bank connect is not enabled on this server.',

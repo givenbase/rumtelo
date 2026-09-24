@@ -33,7 +33,8 @@ export class TransactionController {
                 input.accountId,
                 input.content,
                 input.dryRun,
-                input.format ?? 'auto'
+                input.format ?? 'auto',
+                input.fileName
             )
         );
     }

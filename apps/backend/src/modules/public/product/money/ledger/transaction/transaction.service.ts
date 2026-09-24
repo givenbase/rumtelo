@@ -3,6 +3,7 @@ import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 
 import { containsWord } from '@rumtelo/utils';
+import { apiBadRequest } from '../../../../../../common/errors/api-user-error';
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { MerchantPresetService } from '../../../../../backoffice/product/money/preset/merchant/merchant.service';
@@ -15,7 +16,7 @@ import {
 } from '../../plan/fixed-cost/fixed-cost-link.util';
 import { BankAccount } from '../bank-account/bank-account.entity';
 import { SortRuleService } from '../sort-rule/sort-rule.service';
-import { parseStatement } from './statement/parse-statement';
+import { csvDialectMismatchesBank, parseStatement } from './statement/parse-statement';
 import type { StatementFormat } from './statement/parsed-row';
 import { jarCapabilitiesFor, TransactionSource, TransactionStatus } from '@rumtelo/contracts';
 
@@ -99,9 +100,26 @@ export class TransactionService {
         accountId: string,
         content: string,
         dryRun: boolean,
-        format: StatementFormat | 'auto' = 'auto'
+        format: StatementFormat | 'auto' = 'auto',
+        fileName?: string | null
     ) {
-        const { rows: parsed } = parseStatement(content, format);
+        const account = await this.em.findOne(
+            BankAccount,
+            { id: accountId },
+            { populate: ['bank'] }
+        );
+        if (!account) throw apiBadRequest('bank_not_found');
+
+        const {
+            rows: parsed,
+            format: resolvedFormat,
+            csvDialect,
+        } = parseStatement(content, format, fileName);
+        const accountMismatch = csvDialectMismatchesBank(csvDialect, account.bank.key);
+        if (accountMismatch && !dryRun) {
+            throw apiBadRequest('statement_bank_mismatch');
+        }
+
         const keys = parsed.map(row =>
             dedupeKey(accountId, row.bookedOn, row.amount, row.description)
         );
@@ -127,7 +145,8 @@ export class TransactionService {
         });
 
         let sorted = 0;
-        if (dryRun) {
+        if (dryRun || accountMismatch) {
+            // Dry-run (or blocked mismatch): count rule hits without writing.
             sorted = await this.rules.autoSort(
                 incoming.map(row => ({
                     amount: row.amount,
@@ -162,9 +181,12 @@ export class TransactionService {
         return {
             detected: parsed.length,
             duplicates: parsed.length - freshCount,
-            willImport: freshCount,
-            sorted,
-            sample: incoming.slice(0, 5).map(row => row.description),
+            willImport: accountMismatch ? 0 : freshCount,
+            sorted: accountMismatch ? 0 : sorted,
+            sample: incoming.slice(0, 5).map(row => row.counterparty?.trim() || row.description),
+            format: resolvedFormat,
+            csvDialect,
+            accountMismatch,
         };
     }
 

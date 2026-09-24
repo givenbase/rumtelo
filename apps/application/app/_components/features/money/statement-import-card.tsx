@@ -14,51 +14,53 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
 import { embeddedFormSurfaceClass } from '@/components/layout/form-create-edit-shell';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { StatementImportPreferredFormat } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
-import { Button, FileDropzone, Form } from '@rumtelo/ui';
-import { cn, isEnumValue } from '@rumtelo/utils';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Button, FileDropzone, Form, Icon } from '@rumtelo/ui';
+import { cn } from '@rumtelo/utils';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 
 const ACCEPT = '.xml,.sta,.mt940,.csv,text/csv,text/xml,application/xml';
 
-const PREFERRED_KEY = 'rumtelo.statementImportPreferred';
-
-const LEGACY_PREFERRED: Record<string, StatementImportPreferredFormat> = {
-    camt053: StatementImportPreferredFormat.CAMT053,
-    mt940: StatementImportPreferredFormat.MT940,
-    csv: StatementImportPreferredFormat.CSV,
-};
-
-function readPreferred(): StatementImportPreferredFormat {
-    if (typeof window === 'undefined') return StatementImportPreferredFormat.CAMT053;
-    const raw = window.localStorage.getItem(PREFERRED_KEY);
-    if (!raw) return StatementImportPreferredFormat.CAMT053;
-    if (isEnumValue(StatementImportPreferredFormat, raw)) return raw;
-    return LEGACY_PREFERRED[raw] ?? StatementImportPreferredFormat.CAMT053;
-}
-
 const statementImportSchema = z.object({
     accountId: z.string(),
     fileName: z.string().nullable(),
     fileContent: z.string().nullable(),
-    preferred: z.enum(StatementImportPreferredFormat),
 });
 
 type StatementImportValues = z.infer<typeof statementImportSchema>;
 
-const FORMAT_OPTIONS = [
-    { value: StatementImportPreferredFormat.CAMT053, labelKey: 'format_camt' as const },
-    { value: StatementImportPreferredFormat.MT940, labelKey: 'format_mt940' as const },
-    { value: StatementImportPreferredFormat.CSV, labelKey: 'format_csv' as const },
-];
+/** Catalog bank.key → CSV dialects — labels for mismatch copy only. */
+type DialectLabelKey =
+    | 'dialect_ing'
+    | 'dialect_rabobank'
+    | 'dialect_revolut'
+    | 'dialect_bunq'
+    | 'dialect_knab'
+    | 'dialect_asn';
+
+const DIALECT_LABEL: Record<string, DialectLabelKey> = {
+    'nl.ing': 'dialect_ing',
+    'nl.rabobank': 'dialect_rabobank',
+    'nl.revolut': 'dialect_revolut',
+    'nl.bunq': 'dialect_bunq',
+    'nl.knab': 'dialect_knab',
+    'nl.asn': 'dialect_asn',
+};
+
+type FormatLabelKey = 'format_camt' | 'format_mt940' | 'format_csv';
+
+const FORMAT_LABEL: Record<string, FormatLabelKey> = {
+    camt053: 'format_camt',
+    mt940: 'format_mt940',
+    csv: 'format_csv',
+};
 
 export type StatementImportCardProps = {
     /**
-     * `full` = prefer tip + upload (import route / modal).
+     * `full` = supported-formats tip + upload (import route / modal).
      * `compact` = account + dropzone only (Settings already has eyebrow/blurb).
      */
     variant?: 'full' | 'compact';
@@ -69,7 +71,7 @@ export type StatementImportCardProps = {
 };
 
 /**
- * Statement upload — CAMT.053 preferred, MT940 / CSV accepted.
+ * Statement upload — format sniffed automatically (CAMT.053 / MT940 / CSV).
  * Account picker reuses BankAccountRow (same mark + bank chrome as Settings).
  */
 export function StatementImportCard({
@@ -94,16 +96,12 @@ export function StatementImportCard({
             accountId: '',
             fileName: null,
             fileContent: null,
-            preferred: readPreferred(),
         },
     });
 
     const accountId = useWatch({ control: form.control, name: 'accountId' }) ?? '';
     const fileName = useWatch({ control: form.control, name: 'fileName' }) ?? null;
     const fileContent = useWatch({ control: form.control, name: 'fileContent' }) ?? null;
-    const preferred =
-        useWatch({ control: form.control, name: 'preferred' }) ??
-        StatementImportPreferredFormat.CAMT053;
 
     const accountsQuery = useLiveQuery(
         apiQuery.money.accounts.list.queryOptions({ input: { householdId: householdId! } }),
@@ -121,14 +119,44 @@ export function StatementImportCard({
     const banks = banksQuery.data ?? [];
     const selectedId =
         accountId || accounts.find(row => row.isPrimary)?.id || accounts[0]?.id || '';
+    const selectedAccount = accounts.find(row => row.id === selectedId);
+    const selectedBank = banks.find(row => row.id === selectedAccount?.bankId);
+    const selectedBankKey = selectedBank?.key ?? null;
+    const previewEnabled = live && Boolean(householdId && selectedId && fileContent);
+    const previewQuery = useQuery({
+        queryKey: [
+            'money',
+            'statement-import-preview',
+            householdId,
+            selectedId,
+            fileName,
+            fileContent?.length ?? 0,
+        ],
+        queryFn: () =>
+            api.money.transactions.importCsv({
+                householdId: householdId!,
+                accountId: selectedId,
+                content: fileContent!,
+                fileName: fileName ?? undefined,
+                dryRun: true,
+                format: 'auto',
+            }),
+        enabled: previewEnabled,
+        staleTime: Infinity,
+        retry: false,
+    });
+    const preview = previewQuery.data;
 
     const importMutation = useMutation({
-        mutationFn: async (content: string) => {
-            if (!householdId || !selectedId) throw new Error('No account');
+        mutationFn: async (values: StatementImportValues) => {
+            const account = values.accountId || selectedId;
+            const content = values.fileContent;
+            if (!householdId || !account || !content) throw new Error('No account');
             return api.money.transactions.importCsv({
                 householdId,
-                accountId: selectedId,
+                accountId: account,
                 content,
+                fileName: values.fileName ?? undefined,
                 dryRun: false,
                 format: 'auto',
             });
@@ -140,6 +168,14 @@ export function StatementImportCard({
                 }),
                 queryClient.invalidateQueries({ queryKey: apiQuery.money.transactions.list.key() }),
             ]);
+            if (result.detected === 0) {
+                showToast(t('toast_none_detected'), 'error');
+                return;
+            }
+            if (result.willImport === 0) {
+                showToast(t('toast_all_duplicates', { count: result.duplicates }), 'error');
+                return;
+            }
             showToast(
                 t('toast_imported', {
                     count: result.willImport,
@@ -155,11 +191,6 @@ export function StatementImportCard({
     });
 
     if (!hasCapability(CAPABILITIES.moneyImport)) return null;
-
-    function setPreferredFormat(next: StatementImportPreferredFormat) {
-        form.setValue('preferred', next);
-        window.localStorage.setItem(PREFERRED_KEY, next);
-    }
 
     async function onPickedFile(file: File | null) {
         if (!file) {
@@ -181,38 +212,91 @@ export function StatementImportCard({
     function onSubmit(values: StatementImportValues) {
         const content = values.fileContent;
         const account = values.accountId || selectedId;
-        if (!account || !content) return;
-        if (!values.accountId && account) form.setValue('accountId', account);
-        importMutation.mutate(content);
+        if (!account) {
+            showToast(t('no_accounts'), 'error');
+            return;
+        }
+        if (!content) {
+            showToast(t('empty_file'), 'error');
+            return;
+        }
+        if (!values.accountId) form.setValue('accountId', account);
+        importMutation.mutate({ ...values, accountId: account, fileContent: content });
     }
 
     const busy = importMutation.isPending;
-    const canSubmit = live && Boolean(selectedId) && Boolean(fileContent) && !busy;
+    const accountMismatch = Boolean(preview?.accountMismatch);
+    const previewBlocks =
+        Boolean(preview) &&
+        (preview!.detected === 0 || preview!.willImport === 0 || accountMismatch);
+    const canSubmit =
+        live &&
+        Boolean(selectedId) &&
+        Boolean(fileContent) &&
+        !busy &&
+        !previewQuery.isFetching &&
+        !previewBlocks;
+
+    const detectedFormatLabel = (() => {
+        const key = preview?.format ? FORMAT_LABEL[preview.format] : null;
+        return key ? t(key) : null;
+    })();
+
+    const dialectMismatch = (() => {
+        if (!accountMismatch) return null;
+        const dialect = preview?.csvDialect;
+        const fileLabelKey = dialect ? DIALECT_LABEL[dialect] : null;
+        return {
+            fileBank: fileLabelKey ? t(fileLabelKey) : t('format_csv'),
+            accountBank: selectedBank?.name ?? selectedBankKey ?? '—',
+        };
+    })();
+
+    const previewMessage = (() => {
+        if (!fileContent) return null;
+        if (previewQuery.isFetching) return t('preview_checking');
+        if (previewQuery.isError) return null;
+        if (!preview) return null;
+        if (accountMismatch) return null;
+        if (preview.detected === 0) return t('preview_none');
+        if (preview.willImport === 0)
+            return t('toast_all_duplicates', { count: preview.duplicates });
+        if (preview.duplicates > 0) {
+            return t('preview_with_duplicates', {
+                count: preview.willImport,
+                duplicates: preview.duplicates,
+                format: detectedFormatLabel ?? t('format_csv'),
+            });
+        }
+        return t('preview_ready', {
+            count: preview.willImport,
+            format: detectedFormatLabel ?? t('format_csv'),
+        });
+    })();
+
+    const previewTone =
+        !preview || preview.willImport === 0
+            ? 'text-fg-muted'
+            : preview.duplicates > 0
+              ? 'text-fg-secondary'
+              : 'text-fg';
+
+    const sampleLine =
+        preview && preview.sample.length > 0 && !accountMismatch
+            ? t('preview_samples', { samples: preview.sample.slice(0, 3).join(' · ') })
+            : null;
 
     const fields = (
         <div className="grid gap-5">
             {variant === 'full' ? (
                 <section className="grid gap-2">
                     <p className="text-xs font-semibold tracking-wide text-fg-muted uppercase">
-                        {t('prefer_eyebrow')}
+                        {t('formats_eyebrow')}
                     </p>
-                    <p className="text-sm leading-snug text-fg-secondary">{t('prefer_hint')}</p>
-                    <div className="flex flex-wrap gap-1.5 pt-0.5">
-                        {FORMAT_OPTIONS.map(option => (
-                            <button
-                                key={option.value}
-                                type="button"
-                                onClick={() => setPreferredFormat(option.value)}
-                                className={cn(
-                                    'rounded-full border px-2.5 py-1 font-mono text-[10px] tracking-widest uppercase transition-colors',
-                                    preferred === option.value
-                                        ? 'border-accent bg-accent/10 text-fg'
-                                        : 'border-line text-fg-muted hover:border-fg-faint hover:text-fg'
-                                )}>
-                                {t(option.labelKey)}
-                            </button>
-                        ))}
-                    </div>
+                    <p className="text-sm leading-snug text-fg-secondary">{t('formats_hint')}</p>
+                    <p className="font-mono text-[10px] tracking-widest text-fg-muted uppercase">
+                        {t('drop_hint')}
+                    </p>
                     <p className="text-xs leading-snug text-fg-muted">{t('after_import')}</p>
                 </section>
             ) : null}
@@ -258,6 +342,36 @@ export function StatementImportCard({
                     clearLabel={t('clear_file')}
                     onFile={file => void onPickedFile(file)}
                 />
+                {accountMismatch && dialectMismatch ? (
+                    <div
+                        className="grid gap-2 rounded-xl border border-warning/40 bg-warning/10 px-3.5 py-3"
+                        role="alert"
+                        aria-live="assertive">
+                        <div className="flex items-center gap-2">
+                            <Icon
+                                name="triangle-alert"
+                                className="size-4 shrink-0 text-warning"
+                                aria-hidden
+                            />
+                            <p className="font-mono text-[10px] font-bold tracking-[0.14em] text-warning uppercase">
+                                {t('mismatch_eyebrow')}
+                            </p>
+                        </div>
+                        <p className="text-sm leading-snug text-fg">
+                            {t('dialect_mismatch', dialectMismatch)}
+                        </p>
+                    </div>
+                ) : previewMessage ? (
+                    <p
+                        className={cn('text-sm leading-snug', previewTone)}
+                        role="status"
+                        aria-live="polite">
+                        {previewMessage}
+                    </p>
+                ) : null}
+                {sampleLine && preview && preview.willImport > 0 ? (
+                    <p className="text-xs leading-snug text-fg-muted">{sampleLine}</p>
+                ) : null}
             </section>
         </div>
     );

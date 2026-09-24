@@ -151,6 +151,8 @@ export const ImportCsv = z.object({
     accountId: Id,
     /** Raw statement text (CSV, MT940, or CAMT.053 XML). Format is sniffed when `format` is auto. */
     content: z.string().min(1),
+    /** Original filename — helps dialect sniff when headers are ambiguous. */
+    fileName: z.string().max(240).nullish(),
     dryRun: z.boolean().default(true),
     format: StatementImportFormat.default('auto'),
 });
@@ -162,6 +164,20 @@ export const ImportPreview = z.object({
     /** Of the rows that land, how many a rule or the merchant catalog sorts immediately. */
     sorted: z.int(),
     sample: z.array(z.string()),
+    /** Sniffed file family. */
+    format: z.enum(['csv', 'mt940', 'camt053']),
+    /**
+     * Optional CSV dialect fingerprint when headers/filename match a known export
+     * (e.g. `nl.ing`, `nl.revolut`). Open string — not an enum — so other
+     * markets can add dialects without a contract churn. Null = CAMT/MT940
+     * or CSV without a known fingerprint.
+     */
+    csvDialect: z.string().min(1).max(64).nullable(),
+    /**
+     * True when `csvDialect` is known and does not belong on the selected
+     * account’s catalog bank — client must block import.
+     */
+    accountMismatch: z.boolean(),
 });
 
 export const ImportCsvResult = z.object({

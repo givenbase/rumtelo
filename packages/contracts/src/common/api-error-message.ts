@@ -18,6 +18,7 @@ export const API_ERROR_MESSAGES = [
     'primary_account_required',
     'bank_not_found',
     'bank_required',
+    'statement_bank_mismatch',
     'settlement_account_invalid',
     'invalid_iban',
     'bank_sync_disabled',

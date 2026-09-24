@@ -165,13 +165,6 @@ export enum FixedCostSettlementSource {
     LINKED = 'LINKED',
 }
 
-/** Preferred statement file format for household import (local preference). */
-export enum StatementImportPreferredFormat {
-    CAMT053 = 'CAMT053',
-    MT940 = 'MT940',
-    CSV = 'CSV',
-}
-
 export enum RuleField {
     DESCRIPTION = 'DESCRIPTION',
     COUNTERPARTY = 'COUNTERPARTY',

@@ -341,10 +341,10 @@ const money = {
         import_hint_link: 'Import statement',
         statement_import: {
             eyebrow: 'Import statement',
-            hint: 'Prefer CAMT.053 (ISO 20022 XML) from your bank. MT940 or CSV also work — we detect the format.',
-            prefer_eyebrow: 'Preferred download',
-            prefer_hint:
-                'Ask your bank for CAMT.053 when you can — richer than MT940. Remembers your tip here only.',
+            hint: 'Upload a CAMT.053, MT940, or CSV download from your bank — we detect the format.',
+            formats_eyebrow: 'Supported files',
+            formats_hint:
+                'Ask your bank for CAMT.053 when you can (richest). MT940 and CSV also work. We detect the type automatically.',
             format_camt: 'CAMT.053',
             format_mt940: 'MT940',
             format_csv: 'CSV',
@@ -362,7 +362,27 @@ const money = {
             submit: 'Import statement',
             working: 'Importing…',
             empty_file: 'That file was empty.',
+            preview_checking: 'Checking file…',
+            preview_ready: 'Detected {format} · {count} ready to import',
+            preview_with_duplicates:
+                'Detected {format} · {count} new · {duplicates} already imported',
+            preview_none:
+                'File not supported or empty — use a bank CAMT.053, MT940, or CSV with date and amount columns.',
+            preview_samples: 'e.g. {samples}',
+            dialect_mismatch:
+                'This file looks like a {fileBank} statement, but you selected a {accountBank} account. Switch to the matching account to import.',
+            mismatch_eyebrow: 'Wrong account',
+            dialect_ing: 'ING',
+            dialect_rabobank: 'Rabobank',
+            dialect_revolut: 'Revolut',
+            dialect_bunq: 'bunq',
+            dialect_knab: 'Knab',
+            dialect_asn: 'ASN / SNS',
             toast_imported: 'Imported {count} · skipped {skipped} duplicates',
+            toast_none_detected:
+                'No transactions found in that file. Check it is a bank CSV (with date and amount columns), MT940, or CAMT.053.',
+            toast_all_duplicates: 'All {count} rows were already imported — nothing new.',
+            toast_bank_mismatch: 'Wrong account for this file — import blocked.',
         },
         rules_sign_in_title: 'Sign in to manage rules.',
         rules_sign_in_body: 'Rules automatically sort inbox transactions into the right jar.',
