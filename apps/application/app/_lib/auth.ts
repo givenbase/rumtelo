@@ -16,8 +16,18 @@ import { env } from '@/app/_utils/get-env';
 /** Align client poll with Nest `session.cookieCache.maxAge` (5 minutes). */
 const BETTER_AUTH_SESSION_REFETCH_INTERVAL_SEC = 5 * 60;
 
+/**
+ * Same-origin `/api/auth` (matches oRPC in `api.ts`). Browser must not call
+ * DOMAIN_WEB — that is a cross-origin fetch and CORS-blocks sign-in.
+ */
+function getAuthBaseURL(): string {
+    const origin =
+        typeof window !== 'undefined' ? window.location.origin : env.NEXT_PUBLIC_DOMAIN_APP;
+    return origin.replace(/\/$/, '');
+}
+
 const client = createAuthClient({
-    baseURL: env.NEXT_PUBLIC_DOMAIN_APP,
+    baseURL: getAuthBaseURL(),
     plugins: [organizationClient()],
     sessionOptions: {
         refetchInterval: BETTER_AUTH_SESSION_REFETCH_INTERVAL_SEC,
