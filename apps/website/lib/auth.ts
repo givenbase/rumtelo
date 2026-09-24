@@ -13,8 +13,15 @@ import { env } from '@/lib/get-env';
 /** Align client poll with Nest `session.cookieCache.maxAge` (5 minutes). */
 const BETTER_AUTH_SESSION_REFETCH_INTERVAL_SEC = 5 * 60;
 
+/** Same-origin `/api/auth` proxy — do not point the browser at another portal. */
+function getAuthBaseURL(): string {
+    const origin =
+        typeof window !== 'undefined' ? window.location.origin : env.NEXT_PUBLIC_DOMAIN_WEB;
+    return origin.replace(/\/$/, '');
+}
+
 const client = createAuthClient({
-    baseURL: env.NEXT_PUBLIC_DOMAIN_WEB,
+    baseURL: getAuthBaseURL(),
     plugins: [organizationClient()],
     sessionOptions: {
         refetchInterval: BETTER_AUTH_SESSION_REFETCH_INTERVAL_SEC,
