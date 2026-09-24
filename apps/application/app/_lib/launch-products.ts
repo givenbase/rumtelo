@@ -1,6 +1,6 @@
 /**
- * Launch product surface for the app (Money + Growth in production).
- * Mirrors backend seed / capability deferral via NEXT_PUBLIC_APP_ENV.
+ * Launch product surface for the app (Money + Growth when NODE_ENV=production).
+ * Mirrors backend seed / capability deferral.
  */
 import {
     isCapabilityDeferredAtLaunch,
@@ -9,13 +9,8 @@ import {
     type CapabilityKey,
 } from '@rumtelo/contracts';
 
-import { env } from '@/app/_utils/get-env';
-
 function launchEnvOpts() {
-    return {
-        appEnv: env.NEXT_PUBLIC_APP_ENV,
-        nodeEnv: process.env.NODE_ENV,
-    };
+    return { nodeEnv: process.env.NODE_ENV };
 }
 
 /** True when Energy/Soul should be hidden and ungranted. */

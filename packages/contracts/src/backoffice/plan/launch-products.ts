@@ -1,9 +1,9 @@
 /**
- * Launch surface — which product portals ship in production vs staging.
+ * Launch surface — which product portals ship in production vs local/staging.
  *
- * Production launch: Money + Growth (plus Home / Platform).
- * Energy + Soul stay in the catalog and staging/dev for QA, but are deferred
- * in production until ready.
+ * Production (`NODE_ENV=production`): Money + Growth (plus Home / Platform).
+ * Energy + Soul stay in the catalog for non-production (`development` /
+ * `staging` / `test`) but are deferred when `NODE_ENV=production`.
  *
  * Runtime still uses PLAN_ACCESS for plan gating; this layer is an env-scoped
  * soft-disable on top (nav, seed isActive/grants, capability checks).
@@ -27,20 +27,9 @@ export function isCapabilityDeferredAtLaunch(key: CapabilityKey): boolean {
 
 /**
  * Whether Energy/Soul (and their capabilities) should be inactive.
- *
- * Prefer explicit `appEnv` (deployed staging keeps `NODE_ENV=production`).
- * When unset, `nodeEnv === 'production'` restricts — matches `db:seed:prod`
- * vs `db:seed:stag` (`NODE_ENV=staging`).
+ * Driven only by `NODE_ENV` — defer when `production`.
  */
-export function shouldDeferLaunchProducts(opts: {
-    appEnv?: string | null;
-    nodeEnv?: string | null;
-}): boolean {
-    const appEnv = opts.appEnv?.trim().toLowerCase();
-    if (appEnv === 'production') return true;
-    if (appEnv === 'staging' || appEnv === 'development' || appEnv === 'test') {
-        return false;
-    }
+export function shouldDeferLaunchProducts(opts: { nodeEnv?: string | null }): boolean {
     const nodeEnv = opts.nodeEnv?.trim().toLowerCase() ?? 'development';
     return nodeEnv === 'production';
 }
@@ -51,7 +40,7 @@ export function shouldDeferLaunchProducts(opts: {
  */
 export function isProductEnabledAtLaunch(
     product: string,
-    opts: { appEnv?: string | null; nodeEnv?: string | null }
+    opts: { nodeEnv?: string | null }
 ): boolean {
     if (!shouldDeferLaunchProducts(opts)) return true;
     if (
