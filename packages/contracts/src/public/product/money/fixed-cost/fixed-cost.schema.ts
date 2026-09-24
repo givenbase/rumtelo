@@ -15,7 +15,7 @@ import {
     PeriodKey,
 } from '../../../../common/common.schema';
 import { Cadence, FlowDirection } from '../../../../common/common.enums';
-import { FixedCostSettlementSource, FixedCostSettlementStatus } from '../enums';
+import { FixedCostSettlementSource, FixedCostSettlementStatus, JarKey } from '../enums';
 
 export const FixedCost = z.object({
     id: Id,
@@ -45,7 +45,7 @@ export const FixedCost = z.object({
 
 export const FixedCostsByJar = z.object({
     jarId: Id,
-    jarKey: z.string(),
+    jarKey: z.enum(JarKey),
     jarName: z.string(),
     total: Money,
     items: z.array(FixedCost),

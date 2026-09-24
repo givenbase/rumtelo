@@ -308,6 +308,7 @@ export function NetWorthPageClient() {
                                             <Link
                                                 key={holding.id}
                                                 href={assetDetailHref(holding.id)}
+                                                aria-label={holding.name}
                                                 className={cn(
                                                     'grid cursor-pointer gap-0 overflow-hidden rounded-xl border bg-raised text-left transition-colors hover:border-accent-hover',
                                                     pays

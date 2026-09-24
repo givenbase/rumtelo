@@ -4,7 +4,7 @@ import { api } from '@/app/_lib/api';
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { useLiveQuery } from '@rumtelo/hooks';
@@ -90,24 +90,27 @@ export function IncomeForm({
         [],
         live
     );
-    const incomeKindGroup = (kind: IncomeKind): string => {
-        switch (kind) {
-            case IncomeKind.SALARY:
-                return tIncome('kind_group_employment');
-            case IncomeKind.FREELANCE:
-                return tIncome('kind_group_freelance');
-            case IncomeKind.BENEFIT:
-                return tIncome('kind_group_benefits');
-            case IncomeKind.RENTAL:
-                return tIncome('kind_group_rental');
-            case IncomeKind.DIVIDEND:
-                return tIncome('kind_group_investments');
-            case IncomeKind.OTHER:
-                return tIncome('kind_group_other');
-            default:
-                return kind;
-        }
-    };
+    const incomeKindGroup = useCallback(
+        (kind: IncomeKind): string => {
+            switch (kind) {
+                case IncomeKind.SALARY:
+                    return tIncome('kind_group_employment');
+                case IncomeKind.FREELANCE:
+                    return tIncome('kind_group_freelance');
+                case IncomeKind.BENEFIT:
+                    return tIncome('kind_group_benefits');
+                case IncomeKind.RENTAL:
+                    return tIncome('kind_group_rental');
+                case IncomeKind.DIVIDEND:
+                    return tIncome('kind_group_investments');
+                case IncomeKind.OTHER:
+                    return tIncome('kind_group_other');
+                default:
+                    return kind;
+            }
+        },
+        [tIncome]
+    );
 
     const presetOptions = useMemo(
         () =>
@@ -119,7 +122,7 @@ export function IncomeForm({
                         icon: preset.icon ?? INCOME_KIND_ICON[preset.kind] ?? null,
                     }) satisfies IncomeSourcePreset & { group: string; icon: string | null }
             ),
-        [presetsQuery.data, tIncome]
+        [presetsQuery.data, incomeKindGroup]
     );
 
     const incomeFormSchema = useMemo(() => createIncomeFormSchema(tForm), [tForm]);

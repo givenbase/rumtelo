@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 
 import { useLiveQuery } from '@rumtelo/hooks';
-import type { JarGuide, JarTemplate } from '@rumtelo/contracts';
+import type { JarGuide, JarKey, JarTemplate } from '@rumtelo/contracts';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { jarChrome } from '@/app/_lib/jar-meta';
@@ -19,8 +19,8 @@ export type JarCatalogEntry = JarTemplate & {
 /** Active jar templates from the company catalog, with client chrome tokens. */
 export function useJarCatalog(): {
     jars: JarCatalogEntry[];
-    byKey: Map<string, JarCatalogEntry>;
-    guideFor: (key: string) => JarGuide | null;
+    byKey: Map<JarKey, JarCatalogEntry>;
+    guideFor: (key: JarKey) => JarGuide | null;
     ready: boolean;
 } {
     const { householdId } = useAuth();
@@ -50,7 +50,7 @@ export function useJarCatalog(): {
     return {
         jars,
         byKey,
-        guideFor: (key: string) => byKey.get(key)?.guide ?? null,
+        guideFor: key => byKey.get(key)?.guide ?? null,
         ready: Boolean(query.data),
     };
 }

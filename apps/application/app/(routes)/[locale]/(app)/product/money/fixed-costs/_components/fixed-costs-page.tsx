@@ -3,7 +3,14 @@
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useState } from 'react';
 
-import { DEFAULT_JAR_SPLIT, jarCapabilitiesFor, JarKey } from '@rumtelo/contracts';
+import {
+    DEFAULT_JAR_SPLIT,
+    jarCapabilitiesFor,
+    JarKey,
+    FlowDirection,
+    Cadence,
+    FixedCostPeriodStatus,
+} from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Card, EmptyState, Typography } from '@rumtelo/ui';
@@ -50,13 +57,13 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 type Tab = 'ERUIT' | 'ERIN';
 
 function statusChip(status: FixedCostStatus, t: (key: string) => string) {
-    if (status === 'taken') {
+    if (status === FixedCostPeriodStatus.TAKEN) {
         return <MetaChip className="border-success/30 text-success">{t('status_taken')}</MetaChip>;
     }
-    if (status === 'due') {
+    if (status === FixedCostPeriodStatus.DUE) {
         return <MetaChip className="border-danger/30 text-danger">{t('status_due')}</MetaChip>;
     }
-    if (status === 'skipped') {
+    if (status === FixedCostPeriodStatus.SKIPPED) {
         return <MetaChip className="border-line text-fg-muted">{t('status_skipped')}</MetaChip>;
     }
     return <MetaChip>{t('status_planned')}</MetaChip>;
@@ -76,7 +83,7 @@ export function FixedCostsPageClient() {
     const { formatMoney } = useHouseholdCurrency();
     const appLocale = useLocale();
     const [tab, setTab] = useState<Tab>('ERUIT');
-    const [jarFilter, setJarFilter] = useState<string | null>(null);
+    const [jarFilter, setJarFilter] = useState<JarKey | null>(null);
     const [openJarKeys, setOpenJarKeys] = useState<Set<string>>(() => new Set());
     const live = isLiveData(householdId);
     const periodKey = toPeriodKey(period.year, period.month);
@@ -133,7 +140,7 @@ export function FixedCostsPageClient() {
     const splitJars =
         catalogJars.length > 0
             ? catalogJars
-            : (Object.values(JarKey) as JarKey[]).map(key => ({
+            : Object.values(JarKey).map(key => ({
                   key,
                   name: key,
                   color: jarChrome(key).color,
@@ -145,7 +152,7 @@ export function FixedCostsPageClient() {
         live && byJarQuery.data?.length
             ? byJarQuery.data.flatMap(group =>
                   group.items
-                      .filter(item => item.direction === 'OUT')
+                      .filter(item => item.direction === FlowDirection.OUT)
                       .map(item => ({
                           ...item,
                           monthly: monthlyAmount(Math.abs(item.amount), item.cadence),
@@ -213,7 +220,7 @@ export function FixedCostsPageClient() {
         });
 
     const necessitiesFixedMonthly = fixedCosts
-        .filter(item => item.jarKey === 'NECESSITIES')
+        .filter(item => item.jarKey === JarKey.NECESSITIES)
         .reduce((total, item) => total + item.monthly, 0);
     const necessitiesPressure = evaluateNecessitiesPressure({
         netMonthlyCents: NET,
@@ -466,7 +473,7 @@ export function FixedCostsPageClient() {
                                 {splitJars
                                     .filter(
                                         j =>
-                                            jarCapabilitiesFor(j.key as JarKey).allowsFixedCosts &&
+                                            jarCapabilitiesFor(j.key).allowsFixedCosts &&
                                             fixedCosts.some(fixedCost => fixedCost.jarKey === j.key)
                                     )
                                     .map(j => {
@@ -609,7 +616,7 @@ export function FixedCostsPageClient() {
                                                 <MetaChip>
                                                     {cadenceLabel(source.cadence, tChips)}
                                                 </MetaChip>
-                                                {source.cadence !== 'MONTHLY' ? (
+                                                {source.cadence !== Cadence.MONTHLY ? (
                                                     <MetaChip>
                                                         {tChips('amount_per_month', {
                                                             amount: formatMoney(source.monthly),

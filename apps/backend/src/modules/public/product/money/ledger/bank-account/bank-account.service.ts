@@ -26,7 +26,7 @@ export class BankAccountService {
     async create(input: {
         name: string;
         iban?: string | null;
-        kind: string;
+        kind: AccountKind;
         balance: number;
         bankId: string;
         settlementAccountId?: string | null;
@@ -53,7 +53,7 @@ export class BankAccountService {
             iban,
             bank,
             settlementAccount,
-            kind: input.kind as AccountKind,
+            kind: input.kind,
             balance: input.balance,
             isPrimary: makePrimary,
         } as never);
@@ -79,7 +79,7 @@ export class BankAccountService {
         id: string;
         name?: string;
         iban?: string | null;
-        kind?: string;
+        kind?: AccountKind;
         bankId?: string;
         settlementAccountId?: string | null;
         isPrimary?: boolean;
@@ -92,7 +92,7 @@ export class BankAccountService {
             account.name = name;
         }
         if (input.kind !== undefined) {
-            account.kind = input.kind as AccountKind;
+            account.kind = input.kind;
             if (account.kind !== AccountKind.CREDIT) account.settlementAccount = null;
         }
         if (input.bankId !== undefined) account.bank = await this.requireBank(input.bankId);

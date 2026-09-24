@@ -38,7 +38,7 @@ export class LeverPresetSeeder extends Seeder {
 
         for (const [sortOrder, row] of LEVER_PRESET_SEED.entries()) {
             const minWealthStage = requireStage(row.minWealthStageKey);
-            const postures = row.postureKeys.map(requirePosture);
+            const postureList = row.postureKeys.map(requirePosture);
             const existing = existingByKey.get(row.key);
             if (existing) {
                 existing.name = row.name;
@@ -61,7 +61,7 @@ export class LeverPresetSeeder extends Seeder {
                     sortOrder,
                     isActive: true,
                 } as never);
-            preset.postures.set(postures);
+            preset.postures.set(postureList);
         }
         await em.flush();
     }

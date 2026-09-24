@@ -78,8 +78,12 @@ export class FixedCostPresetSeeder extends Seeder {
             syncOrderedMerchantLinks(
                 preset.merchantLinks,
                 merchantKeys.map(merchantByKey),
-                (merchant, sortOrder) =>
-                    em.create(FixedCostPresetMerchant, { preset, merchant, sortOrder } as never)
+                (merchant, merchantSortOrder) =>
+                    em.create(FixedCostPresetMerchant, {
+                        preset,
+                        merchant,
+                        sortOrder: merchantSortOrder,
+                    } as never)
             );
         }
         await em.flush();

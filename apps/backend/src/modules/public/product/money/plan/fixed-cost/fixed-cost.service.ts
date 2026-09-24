@@ -8,6 +8,7 @@ import {
     FixedCostSettlementSource,
     FixedCostSettlementStatus,
     FlowDirection,
+    type JarKey,
     jarCapabilitiesFor,
 } from '@rumtelo/contracts';
 import { isFixedCostCounting, sumMonthlyFixedOut } from '@rumtelo/utils';
@@ -218,7 +219,7 @@ export class FixedCostService {
         await this.em.populate(rows, ['jar']);
         const groups = new Map<
             string,
-            { jarKey: string; jarName: string; items: ReturnType<typeof toDto>[] }
+            { jarKey: JarKey; jarName: string; items: ReturnType<typeof toDto>[] }
         >();
         for (const row of rows) {
             const jarId = row.jar.id;

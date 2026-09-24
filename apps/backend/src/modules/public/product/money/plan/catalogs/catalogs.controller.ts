@@ -281,9 +281,7 @@ export class MoneyCatalogsController {
                 catalogLocale,
                 rows.map(row => row.key)
             );
-            return this.translations.applyToMany(rows, fieldMap, ['name', 'line'], row =>
-                String(row.key)
-            );
+            return this.translations.applyToMany(rows, fieldMap, ['name', 'line'], row => row.key);
         });
     }
 

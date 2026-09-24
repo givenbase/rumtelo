@@ -55,13 +55,22 @@ export function nativeEnumType(domain: EnumDomain, name: string): string {
 
 const RESERVED_KEYS = new Set(['domain', 'defaultValue', 'nullable', 'name', 'length']);
 
+function isStringEnumRecord(value: unknown): value is Record<string, string> {
+    if (typeof value !== 'object' || value === null) return false;
+    for (const entry of Object.values(value)) {
+        if (typeof entry !== 'string') return false;
+    }
+    return true;
+}
+
 /**
  * Extracts the enum reference and its PascalCase key name from the options object.
  * The enum must be the only non-reserved PascalCase key, e.g. `{ DebtKind, domain: 'money' }`.
  */
-function resolveEnumEntry<T extends Record<string, string>>(
-    obj: Record<string, unknown>
-): { enumNamePascalCase: string; enumRef: T } {
+function resolveEnumEntry(obj: Record<string, unknown>): {
+    enumNamePascalCase: string;
+    enumRef: Record<string, string>;
+} {
     const key = Object.keys(obj).find(k => !RESERVED_KEYS.has(k) && /^[A-Z][a-zA-Z0-9]*$/.test(k));
     if (!key) {
         throw new Error(
@@ -69,10 +78,10 @@ function resolveEnumEntry<T extends Record<string, string>>(
         );
     }
     const ref = obj[key];
-    if (typeof ref !== 'object' || ref === null) {
+    if (!isStringEnumRecord(ref)) {
         throw new Error(`NativeEnum: value for "${key}" must be the enum object itself`);
     }
-    return { enumRef: ref as T, enumNamePascalCase: key };
+    return { enumRef: ref, enumNamePascalCase: key };
 }
 
 /**
@@ -111,13 +120,14 @@ export function NativeEnum<T extends Record<string, string>>(options: {
     [enumKey: string]: boolean | number | string | T | T[keyof T] | undefined;
 }): {
     default?: T[keyof T];
-    items: () => T;
+    /** Runtime enum object discovered from the shorthand key. */
+    items: () => Record<string, string>;
     length?: number;
     nativeEnumName: string;
     nullable?: boolean;
 } {
     const { domain, name: nameOverride, defaultValue, nullable, length, ...rest } = options;
-    const { enumRef, enumNamePascalCase } = resolveEnumEntry<T>(rest);
+    const { enumRef, enumNamePascalCase } = resolveEnumEntry(rest);
 
     let suffix: string;
 

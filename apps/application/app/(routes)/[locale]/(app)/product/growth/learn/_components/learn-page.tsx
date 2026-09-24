@@ -168,6 +168,8 @@ function MediaCover({ piece, className }: { piece: LearnPiece; className?: strin
                 className
             )}>
             {show ? (
+                // Decorative cover — remote URLs / onError sizing; next/image not a fit here.
+                // oxlint-disable-next-line next/no-img-element
                 <img
                     src={src!}
                     alt=""

@@ -5,8 +5,13 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useLocale } from 'next-intl';
 
-import type { Goal, MerchantPreset } from '@rumtelo/contracts';
-import { GoalKind, GoalStatus } from '@rumtelo/contracts';
+import {
+    type Goal,
+    type MerchantPreset,
+    GoalKind,
+    GoalStatus,
+    type JarKey,
+} from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations, type TranslateFn } from '@rumtelo/i18n';
 import { AccentCard, Card, EmptyState, Meter, Typography } from '@rumtelo/ui';
@@ -194,7 +199,7 @@ export function GoalsPageClient() {
     const { period } = useAppShell();
     const [tab, setTab] = useState<Tab>('ON_TRACK');
     const [kindFilter, setKindFilter] = useState<KindFilter>('ALL');
-    const [jarFilter, setJarFilter] = useState<string | null>(null);
+    const [jarFilter, setJarFilter] = useState<JarKey | null>(null);
     const [openKindKeys, setOpenKindKeys] = useState<Set<string>>(() => new Set());
     const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
@@ -232,7 +237,7 @@ export function GoalsPageClient() {
     );
 
     const jarById = useMemo(() => {
-        const map = new Map<string, { id: string; key: string; name: string }>();
+        const map = new Map<string, { id: string; key: JarKey; name: string }>();
         for (const jar of jarsQuery.data ?? []) {
             map.set(jar.id, { id: jar.id, key: jar.key, name: jar.name });
         }
@@ -295,7 +300,7 @@ export function GoalsPageClient() {
     const kindsPresent = KIND_ORDER.filter(kind => tabGoals.some(goal => goal.kind === kind));
 
     const saveJarKeys = (() => {
-        const keys = new Set<string>();
+        const keys = new Set<JarKey>();
         for (const goal of tabGoals) {
             if (goal.kind !== GoalKind.SAVE || !goal.jarId) continue;
             const jar = jarById.get(goal.jarId);

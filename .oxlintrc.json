@@ -117,7 +117,8 @@
                 "**/scripts/**",
                 "**/*.config.{js,mjs,cjs,ts,mts}",
                 "**/mikro-orm.config.ts",
-                "**/generate-languages.ts"
+                "**/generate-languages.ts",
+                "**/translate-locales-deepl.ts"
             ],
             "rules": {
                 "no-console": "off",

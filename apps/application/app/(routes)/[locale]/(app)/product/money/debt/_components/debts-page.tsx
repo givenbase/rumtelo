@@ -69,26 +69,30 @@ export function DebtsPageClient() {
         { key: 'balance-low', label: t('sort_balance_low') },
         { key: 'minimum', label: t('sort_minimum') },
     ];
-    const strategyOptions = [
-        {
-            key: PayoffStrategy.AVALANCHE,
-            name: t('strategy_avalanche'),
-            promise: t('strategy_avalanche_promise'),
-            rule: t('strategy_avalanche_rule'),
-        },
-        {
-            key: PayoffStrategy.SNOWBALL,
-            name: t('strategy_snowball'),
-            promise: t('strategy_snowball_promise'),
-            rule: t('strategy_snowball_rule'),
-        },
-        {
-            key: PayoffStrategy.MINIMAL,
-            name: t('strategy_minimal'),
-            promise: t('strategy_minimal_promise'),
-            rule: t('strategy_minimal_rule'),
-        },
-    ] as const;
+    const strategyOptions = useMemo(
+        () =>
+            [
+                {
+                    key: PayoffStrategy.AVALANCHE,
+                    name: t('strategy_avalanche'),
+                    promise: t('strategy_avalanche_promise'),
+                    rule: t('strategy_avalanche_rule'),
+                },
+                {
+                    key: PayoffStrategy.SNOWBALL,
+                    name: t('strategy_snowball'),
+                    promise: t('strategy_snowball_promise'),
+                    rule: t('strategy_snowball_rule'),
+                },
+                {
+                    key: PayoffStrategy.MINIMAL,
+                    name: t('strategy_minimal'),
+                    promise: t('strategy_minimal_promise'),
+                    rule: t('strategy_minimal_rule'),
+                },
+            ] as const,
+        [t]
+    );
     const { householdId } = useAuth();
     const { period } = useAppShell();
     const { formatMoney } = useHouseholdCurrency();

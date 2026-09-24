@@ -20,7 +20,7 @@ import {
     Select,
     VendorMark,
 } from '@rumtelo/ui';
-import { cn, formatIban, isValidIban, nlIbanBankCode } from '@rumtelo/utils';
+import { cn, formatIban, isEnumValue, isValidIban, nlIbanBankCode } from '@rumtelo/utils';
 import type { UseFormReturn } from 'react-hook-form';
 
 import type { BankAccountFormValues } from '../_utils/settings-form-zod';
@@ -265,9 +265,10 @@ export function BankAccountForm({
                                         id={`acc-kind-${formKey}`}
                                         value={field.value}
                                         onChange={event => {
-                                            const next = event.target.value;
-                                            field.onChange(next);
-                                            if (next !== AccountKind.CREDIT) {
+                                            const { value } = event.target;
+                                            if (!isEnumValue(AccountKind, value)) return;
+                                            field.onChange(value);
+                                            if (value !== AccountKind.CREDIT) {
                                                 form.setValue('settlementAccountId', null, {
                                                     shouldDirty: true,
                                                 });

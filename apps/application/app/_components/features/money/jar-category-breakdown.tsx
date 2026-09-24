@@ -11,6 +11,7 @@ import type {
     MerchantPreset,
     Transaction,
 } from '@rumtelo/contracts';
+import { FixedCostPeriodStatus } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Typography } from '@rumtelo/ui';
 import { cn, categoryVariance, monthlyAmount } from '@rumtelo/utils';
@@ -36,15 +37,15 @@ function statusChip(
     plannedLabel: string,
     tFixed: ReturnType<typeof useTranslations<'features.money.fixed'>>
 ) {
-    if (status === 'taken') {
+    if (status === FixedCostPeriodStatus.TAKEN) {
         return (
             <MetaChip className="border-success/30 text-success">{tFixed('status_taken')}</MetaChip>
         );
     }
-    if (status === 'due') {
+    if (status === FixedCostPeriodStatus.DUE) {
         return <MetaChip className="border-danger/30 text-danger">{tFixed('status_due')}</MetaChip>;
     }
-    if (status === 'skipped') {
+    if (status === FixedCostPeriodStatus.SKIPPED) {
         return (
             <MetaChip className="border-line text-fg-muted">{tFixed('status_skipped')}</MetaChip>
         );

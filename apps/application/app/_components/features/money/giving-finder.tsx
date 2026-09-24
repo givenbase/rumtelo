@@ -4,7 +4,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMemo, useState } from 'react';
 
 import type { GivingCause, GivingOrganisation } from '@rumtelo/contracts';
-import { JarKey } from '@rumtelo/contracts';
+import { JarKey, GivingSignalTier } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
 import { VendorMark } from '@rumtelo/ui';
@@ -299,7 +299,7 @@ function GivingOrganisationCard({
             <ul className="flex flex-wrap gap-1.5" aria-label={tForm('aria.independent_signals')}>
                 {organisation.signals.map(signal => {
                     const evaluator = givingEvaluatorMeta(signal.evaluator);
-                    const tier = signalTiers[evaluator?.tier ?? 'governance'];
+                    const tier = signalTiers[evaluator?.tier ?? GivingSignalTier.GOVERNANCE];
                     const text = `${evaluator?.name ?? signal.evaluator} · ${signal.label}${
                         signal.year ? ` (${signal.year})` : ''
                     }`;
@@ -309,7 +309,7 @@ function GivingOrganisationCard({
                                 'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-mono text-[10px]',
                                 tier.className
                             )}>
-                            {evaluator?.tier === 'impact' ? '✓' : '·'} {text}
+                            {evaluator?.tier === GivingSignalTier.IMPACT ? '✓' : '·'} {text}
                         </span>
                     );
                     return (

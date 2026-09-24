@@ -13,25 +13,48 @@ import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
 import { embeddedFormSurfaceClass } from '@/components/layout/form-create-edit-shell';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { StatementImportPreferredFormat } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
-import { Button, FileDropzone } from '@rumtelo/ui';
-import { cn } from '@rumtelo/utils';
+import { Button, FileDropzone, Form } from '@rumtelo/ui';
+import { cn, isEnumValue } from '@rumtelo/utils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState, type FormEvent } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import { z } from 'zod';
 
 const ACCEPT = '.xml,.sta,.mt940,.csv,text/csv,text/xml,application/xml';
 
 const PREFERRED_KEY = 'rumtelo.statementImportPreferred';
 
-type PreferredFormat = 'camt053' | 'mt940' | 'csv';
+const LEGACY_PREFERRED: Record<string, StatementImportPreferredFormat> = {
+    camt053: StatementImportPreferredFormat.CAMT053,
+    mt940: StatementImportPreferredFormat.MT940,
+    csv: StatementImportPreferredFormat.CSV,
+};
 
-function readPreferred(): PreferredFormat {
-    if (typeof window === 'undefined') return 'camt053';
+function readPreferred(): StatementImportPreferredFormat {
+    if (typeof window === 'undefined') return StatementImportPreferredFormat.CAMT053;
     const raw = window.localStorage.getItem(PREFERRED_KEY);
-    if (raw === 'mt940' || raw === 'csv' || raw === 'camt053') return raw;
-    return 'camt053';
+    if (!raw) return StatementImportPreferredFormat.CAMT053;
+    if (isEnumValue(StatementImportPreferredFormat, raw)) return raw;
+    return LEGACY_PREFERRED[raw] ?? StatementImportPreferredFormat.CAMT053;
 }
+
+const statementImportSchema = z.object({
+    accountId: z.string(),
+    fileName: z.string().nullable(),
+    fileContent: z.string().nullable(),
+    preferred: z.enum(StatementImportPreferredFormat),
+});
+
+type StatementImportValues = z.infer<typeof statementImportSchema>;
+
+const FORMAT_OPTIONS = [
+    { value: StatementImportPreferredFormat.CAMT053, labelKey: 'format_camt' as const },
+    { value: StatementImportPreferredFormat.MT940, labelKey: 'format_mt940' as const },
+    { value: StatementImportPreferredFormat.CSV, labelKey: 'format_csv' as const },
+];
 
 export type StatementImportCardProps = {
     /**
@@ -64,10 +87,23 @@ export function StatementImportCard({
     const live = isLiveData(householdId);
     const queryClient = useQueryClient();
     const dismiss = useFormDismiss(onSuccess);
-    const [accountId, setAccountId] = useState('');
-    const [fileName, setFileName] = useState<string | null>(null);
-    const [fileContent, setFileContent] = useState<string | null>(null);
-    const [preferred, setPreferred] = useState<PreferredFormat>(() => readPreferred());
+
+    const form = useForm<StatementImportValues>({
+        resolver: zodResolver(statementImportSchema),
+        defaultValues: {
+            accountId: '',
+            fileName: null,
+            fileContent: null,
+            preferred: readPreferred(),
+        },
+    });
+
+    const accountId = useWatch({ control: form.control, name: 'accountId' }) ?? '';
+    const fileName = useWatch({ control: form.control, name: 'fileName' }) ?? null;
+    const fileContent = useWatch({ control: form.control, name: 'fileContent' }) ?? null;
+    const preferred =
+        useWatch({ control: form.control, name: 'preferred' }) ??
+        StatementImportPreferredFormat.CAMT053;
 
     const accountsQuery = useLiveQuery(
         apiQuery.money.accounts.list.queryOptions({ input: { householdId: householdId! } }),
@@ -111,8 +147,8 @@ export function StatementImportCard({
                 }),
                 'success'
             );
-            setFileName(null);
-            setFileContent(null);
+            form.setValue('fileName', null);
+            form.setValue('fileContent', null);
             if (embedded || onSuccess) dismiss();
         },
         onError: (error: unknown) => showToast(apiError(error), 'error'),
@@ -120,32 +156,34 @@ export function StatementImportCard({
 
     if (!hasCapability(CAPABILITIES.moneyImport)) return null;
 
-    function setPreferredFormat(next: PreferredFormat) {
-        setPreferred(next);
+    function setPreferredFormat(next: StatementImportPreferredFormat) {
+        form.setValue('preferred', next);
         window.localStorage.setItem(PREFERRED_KEY, next);
     }
 
     async function onPickedFile(file: File | null) {
         if (!file) {
-            setFileName(null);
-            setFileContent(null);
+            form.setValue('fileName', null);
+            form.setValue('fileContent', null);
             return;
         }
-        setFileName(file.name);
+        form.setValue('fileName', file.name);
         const content = await file.text();
         if (!content.trim()) {
-            setFileContent(null);
-            setFileName(null);
+            form.setValue('fileName', null);
+            form.setValue('fileContent', null);
             showToast(t('empty_file'), 'error');
             return;
         }
-        setFileContent(content);
+        form.setValue('fileContent', content);
     }
 
-    function onSubmit(event: FormEvent) {
-        event.preventDefault();
-        if (!selectedId || !fileContent) return;
-        importMutation.mutate(fileContent);
+    function onSubmit(values: StatementImportValues) {
+        const content = values.fileContent;
+        const account = values.accountId || selectedId;
+        if (!account || !content) return;
+        if (!values.accountId && account) form.setValue('accountId', account);
+        importMutation.mutate(content);
     }
 
     const busy = importMutation.isPending;
@@ -160,24 +198,18 @@ export function StatementImportCard({
                     </p>
                     <p className="text-sm leading-snug text-fg-secondary">{t('prefer_hint')}</p>
                     <div className="flex flex-wrap gap-1.5 pt-0.5">
-                        {(
-                            [
-                                ['camt053', t('format_camt')],
-                                ['mt940', t('format_mt940')],
-                                ['csv', t('format_csv')],
-                            ] as const
-                        ).map(([key, label]) => (
+                        {FORMAT_OPTIONS.map(option => (
                             <button
-                                key={key}
+                                key={option.value}
                                 type="button"
-                                onClick={() => setPreferredFormat(key)}
+                                onClick={() => setPreferredFormat(option.value)}
                                 className={cn(
                                     'rounded-full border px-2.5 py-1 font-mono text-[10px] tracking-widest uppercase transition-colors',
-                                    preferred === key
+                                    preferred === option.value
                                         ? 'border-accent bg-accent/10 text-fg'
                                         : 'border-line text-fg-muted hover:border-fg-faint hover:text-fg'
                                 )}>
-                                {label}
+                                {t(option.labelKey)}
                             </button>
                         ))}
                     </div>
@@ -203,7 +235,7 @@ export function StatementImportCard({
                                 markSize={28}
                                 selected={account.id === selectedId}
                                 disabled={!live || busy}
-                                onSelect={() => setAccountId(account.id)}
+                                onSelect={() => form.setValue('accountId', account.id)}
                             />
                         ))}
                     </div>
@@ -238,33 +270,37 @@ export function StatementImportCard({
 
     if (embedded) {
         return (
-            <form
-                className={cn(
-                    'relative flex min-h-full flex-col',
-                    embeddedFormSurfaceClass,
-                    className
-                )}
-                method="post"
-                onSubmit={onSubmit}>
-                <div className="min-w-0 flex-1">{fields}</div>
-                <div className="sticky bottom-0 z-10 -mx-5 mt-5 -mb-5 border-t border-line bg-surface px-5 py-4 shadow-[0_-4px_12px_-4px_rgb(0_0_0_/0.08)]">
-                    {submit}
-                </div>
-            </form>
+            <Form {...form}>
+                <form
+                    className={cn(
+                        'relative flex min-h-full flex-col',
+                        embeddedFormSurfaceClass,
+                        className
+                    )}
+                    method="post"
+                    onSubmit={form.handleSubmit(onSubmit)}>
+                    <div className="min-w-0 flex-1">{fields}</div>
+                    <div className="sticky bottom-0 z-10 -mx-5 mt-5 -mb-5 border-t border-line bg-surface px-5 py-4 shadow-[0_-4px_12px_-4px_rgb(0_0_0_/0.08)]">
+                        {submit}
+                    </div>
+                </form>
+            </Form>
         );
     }
 
     return (
-        <form
-            className={cn(
-                'relative flex flex-col gap-4 py-3.5',
-                embeddedFormSurfaceClass,
-                className
-            )}
-            method="post"
-            onSubmit={onSubmit}>
-            {fields}
-            <div className="pt-1 pb-0.5">{submit}</div>
-        </form>
+        <Form {...form}>
+            <form
+                className={cn(
+                    'relative flex flex-col gap-4 py-3.5',
+                    embeddedFormSurfaceClass,
+                    className
+                )}
+                method="post"
+                onSubmit={form.handleSubmit(onSubmit)}>
+                {fields}
+                <div className="pt-1 pb-0.5">{submit}</div>
+            </form>
+        </Form>
     );
 }

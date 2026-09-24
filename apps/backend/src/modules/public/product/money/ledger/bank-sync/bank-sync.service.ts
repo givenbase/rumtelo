@@ -136,6 +136,7 @@ export class BankSyncService {
         let synced = 0;
         for (const account of stale) {
             try {
+                // oxlint-disable-next-line no-await-in-loop -- pull accounts sequentially to keep provider rate limits
                 const result = await this.pullAccount(account);
                 imported += result.imported;
                 synced += 1;
@@ -163,6 +164,7 @@ export class BankSyncService {
         this.logger.log(`Bank sync cron: ${due.length}/${linked.length} seats due`);
 
         for (const account of due) {
+            // oxlint-disable-next-line no-await-in-loop -- household context must wrap each account sync sequentially
             await householdStorage.run(
                 {
                     userId: 'system:bank-sync',

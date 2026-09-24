@@ -1,4 +1,6 @@
 export { cn } from './cn';
+export { isEnumValue, parseEnum } from './enum';
+
 export {
     extractErrorMessage,
     getOrpcValidationIssues,
@@ -46,8 +48,6 @@ export {
     fixedCostLifecycle,
     isFixedCostCounting,
     fixedCostPeriodStatus,
-    type FixedCostLifecycle,
-    type FixedCostPeriodStatus,
     monthlyNetAsOf,
     incomeDelta,
     earnGoalProgress,

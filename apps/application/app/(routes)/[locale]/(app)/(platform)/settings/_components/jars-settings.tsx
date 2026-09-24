@@ -3,24 +3,30 @@
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 
-import { DEFAULT_JAR_SPLIT, SpendingStyle, type JarKey } from '@rumtelo/contracts';
+import { DEFAULT_JAR_SPLIT, SpendingStyle } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
 import { Badge, Button, Input, Meter, StubNotice, VendorMark } from '@rumtelo/ui';
 import { cn, formatIban, formatPercent, sumMonthly } from '@rumtelo/utils';
 
 import { useApiError } from '@/app/_lib/api-error-messages';
-import { evaluateSplitCoach, pctByJarKey } from '@/app/_lib/split-coach';
 import { isLiveData } from '@/app/_lib/preview';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
-import { useAuth } from '@/components/features/shell/auth-provider';
+import { evaluateSplitCoach, pctByJarKey } from '@/app/_lib/split-coach';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { BankAccountRow } from '@/components/features/money/bank-account-row';
-import { SettingsInkCard, SettingsPanel, SettingsPill, SettingsRow } from './settings-chrome';
+import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useAuth } from '@/components/features/shell/auth-provider';
 import { accountBankMark, countryFromCurrency } from '../_utils/resolve-account-bank';
 import { JAR_COLOR, accountKindLabel } from '../_utils/settings-shared';
+import { SettingsInkCard, SettingsPanel, SettingsPill, SettingsRow } from './settings-chrome';
+
+type JarsSettingsValues = {
+    pct: Record<string, number>;
+    jarSeats: Record<string, string>;
+};
 
 export function JarsSettings() {
     const t = useTranslations();
@@ -68,17 +74,26 @@ export function JarsSettings() {
         () => Object.fromEntries(jars.map(j => [j.id, j.percentage])),
         [jars]
     );
-    const [pctDraft, setPctDraft] = useState<Record<string, number> | null>(null);
+
+    const form = useForm<JarsSettingsValues>({
+        defaultValues: { pct: {}, jarSeats: {} },
+    });
+    const pct = useWatch({ control: form.control, name: 'pct' }) ?? {};
+    const jarSeats = useWatch({ control: form.control, name: 'jarSeats' }) ?? {};
+
+    useEffect(() => {
+        if (jars.length === 0) return;
+        if (form.formState.isDirty) return;
+        form.reset({ pct: serverPct, jarSeats: form.getValues('jarSeats') });
+    }, [form, jars.length, serverPct]);
+
     const [dismissedTips, setDismissedTips] = useState<Record<string, true>>({});
-    /** Jar → account seat until the mapping API lands. */
-    const [jarSeats, setJarSeats] = useState<Record<string, string>>({});
     const [editingJarId, setEditingJarId] = useState<string | null>(null);
-    const pct = pctDraft ?? serverPct;
 
     const total = Object.values(pct).reduce((running, value) => running + value, 0);
     const balanced = Math.abs(total - 100) < 0.01;
 
-    const effectiveJarSeats = useMemo(() => {
+    const effectiveJarSeats = (() => {
         if (accounts.length === 0) return jarSeats;
         const fallbackId = accounts[0]!.id;
         const next: Record<string, string> = { ...jarSeats };
@@ -88,13 +103,13 @@ export function JarsSettings() {
             next[jar.id] = fallbackId;
         }
         return next;
-    }, [accounts, jars, jarSeats]);
+    })();
 
-    const coachTips = useMemo(() => {
+    const coachTips = (() => {
         const spendingStyle = accountSettingsQuery.data?.spendingStyle ?? SpendingStyle.UNKNOWN;
         const tips = evaluateSplitCoach(pctByJarKey(jars, pct), spendingStyle);
         return tips.filter(tip => !dismissedTips[tip.id]);
-    }, [jars, pct, dismissedTips, accountSettingsQuery.data?.spendingStyle]);
+    })();
 
     const incomeQuery = useLiveQuery(
         apiQuery.money.income.list.queryOptions({ input: { householdId: householdId! } }),
@@ -112,7 +127,7 @@ export function JarsSettings() {
             });
         },
         onSuccess: () => {
-            setPctDraft(null);
+            form.reset({ pct: form.getValues('pct'), jarSeats: form.getValues('jarSeats') });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
             showToast(t('pages.settings.toasts.split_saved'), 'success');
@@ -123,9 +138,9 @@ export function JarsSettings() {
     function resetDefaults() {
         const next: Record<string, number> = {};
         for (const jar of jars) {
-            next[jar.id] = DEFAULT_JAR_SPLIT[jar.key as JarKey] ?? jar.percentage;
+            next[jar.id] = DEFAULT_JAR_SPLIT[jar.key] ?? jar.percentage;
         }
-        setPctDraft(next);
+        form.setValue('pct', next, { shouldDirty: true });
         setDismissedTips({});
     }
 
@@ -223,10 +238,14 @@ export function JarsSettings() {
                                                 option.iban ? ` · ${formatIban(option.iban)}` : ''
                                             }`}
                                             onSelect={() => {
-                                                setJarSeats(prev => ({
-                                                    ...prev,
-                                                    [jar.id]: option.id,
-                                                }));
+                                                form.setValue(
+                                                    'jarSeats',
+                                                    {
+                                                        ...form.getValues('jarSeats'),
+                                                        [jar.id]: option.id,
+                                                    },
+                                                    { shouldDirty: true }
+                                                );
                                                 setEditingJarId(null);
                                                 showToast(
                                                     t(
@@ -285,10 +304,14 @@ export function JarsSettings() {
                                         step={0.5}
                                         value={value}
                                         onChange={event =>
-                                            setPctDraft(prev => ({
-                                                ...(prev ?? serverPct),
-                                                [jar.id]: Number(event.target.value) || 0,
-                                            }))
+                                            form.setValue(
+                                                'pct',
+                                                {
+                                                    ...pct,
+                                                    [jar.id]: Number(event.target.value) || 0,
+                                                },
+                                                { shouldDirty: true }
+                                            )
                                         }
                                         className="h-8 w-16 text-sm"
                                     />

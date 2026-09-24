@@ -13,12 +13,16 @@ export const JAR_CHROME: Record<JarKey, { color: string; text: string }> = {
     [JarKey.GIVE]: { color: 'bg-jar-give', text: 'text-jar-give' },
 };
 
+const JAR_KEYS = new Set<string>(Object.values(JarKey));
+
+function isJarKey(value: string): value is JarKey {
+    return JAR_KEYS.has(value);
+}
+
 export function jarChrome(key: string | null | undefined): {
     color: string;
     text: string;
 } {
-    if (key && Object.prototype.hasOwnProperty.call(JAR_CHROME, key)) {
-        return JAR_CHROME[key as JarKey];
-    }
+    if (key && isJarKey(key)) return JAR_CHROME[key];
     return JAR_CHROME[JarKey.NECESSITIES];
 }

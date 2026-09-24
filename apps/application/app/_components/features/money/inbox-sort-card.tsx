@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 
 import type { Debt, FixedCost, Jar, Transaction } from '@rumtelo/contracts';
 import { JarKey } from '@rumtelo/contracts';
@@ -10,20 +11,25 @@ import { Button, VendorMark } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
-import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
-
 import { jarChrome } from '@/app/_lib/jar-meta';
-import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
+import { isLiveData } from '@/app/_lib/preview';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { partyMark } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { formatBookedDate } from '@/components/features/money/jar-badge';
-import { isLiveData } from '@/app/_lib/preview';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 type InboxJarOption = Pick<Jar, 'id' | 'key' | 'name' | 'subtitle'>;
 type InboxDebtOption = Pick<Debt, 'id' | 'name'>;
 type InboxFixedCostOption = Pick<FixedCost, 'id' | 'name' | 'counterparty'>;
+
+type InboxSortValues = {
+    jarId: string;
+    debtId: string | null;
+    linkFixedCost: boolean;
+};
 
 function suggestJarKey(amount: number): JarKey {
     if (amount > 0) return JarKey.NECESSITIES;
@@ -83,17 +89,19 @@ export function InboxSortCard({
     const { householdId } = useAuth();
     const { byKey: catalogByKey } = useJarCatalog();
     const categoryTemplatesQuery = useCategoryTemplates(isLiveData(householdId));
-    const [pickedJarId, setPickedJarId] = useState<string | null>(null);
-    const [debtId, setDebtId] = useState<string | null>(null);
-    const [linkFixedCost, setLinkFixedCost] = useState(Boolean(suggestedFixedCost));
+    const form = useForm<InboxSortValues>({
+        defaultValues: {
+            jarId: resolveInitialJarId(jars, suggestedJarId, transaction.amount),
+            debtId: null,
+            linkFixedCost: Boolean(suggestedFixedCost),
+        },
+    });
+    const jarId = useWatch({ control: form.control, name: 'jarId' }) ?? '';
+    const debtId = useWatch({ control: form.control, name: 'debtId' }) ?? null;
+    const linkFixedCost = useWatch({ control: form.control, name: 'linkFixedCost' }) ?? false;
     const [picking, setPicking] = useState(false);
     const [done, setDone] = useState(false);
     const [pending, setPending] = useState<'sort' | 'rule' | null>(null);
-
-    const jarId = useMemo(() => {
-        if (pickedJarId && jars.some(j => j.id === pickedJarId)) return pickedJarId;
-        return resolveInitialJarId(jars, suggestedJarId, transaction.amount);
-    }, [pickedJarId, jars, suggestedJarId, transaction.amount]);
 
     const selected = jars.find(j => j.id === jarId) ?? jars[0];
     const suggestedKey = selected?.key ?? suggestJarKey(transaction.amount);
@@ -117,7 +125,8 @@ export function InboxSortCard({
     if (done) return null;
 
     async function confirm(createRule = false) {
-        if (!jarId) return;
+        const values = form.getValues();
+        if (!values.jarId) return;
         if (!onConfirm) {
             setDone(true);
             return;
@@ -126,10 +135,10 @@ export function InboxSortCard({
         try {
             await onConfirm(
                 transaction.id,
-                jarId,
+                values.jarId,
                 createRule,
-                canApplyDebt ? debtId : null,
-                canLinkFixed && linkFixedCost ? suggestedFixedCost!.id : null
+                canApplyDebt ? values.debtId : null,
+                canLinkFixed && values.linkFixedCost ? suggestedFixedCost!.id : null
             );
             setDone(true);
         } finally {
@@ -211,7 +220,7 @@ export function InboxSortCard({
                                     key={jar.id}
                                     type="button"
                                     onClick={() => {
-                                        setPickedJarId(jar.id);
+                                        form.setValue('jarId', jar.id);
                                         setPicking(false);
                                     }}
                                     className={cn(
@@ -247,8 +256,8 @@ export function InboxSortCard({
                                 suggestedFixedCost.counterparty?.trim() || suggestedFixedCost.name,
                         })}
                         onChange={event => {
-                            setLinkFixedCost(event.target.checked);
-                            if (event.target.checked) setDebtId(null);
+                            form.setValue('linkFixedCost', event.target.checked);
+                            if (event.target.checked) form.setValue('debtId', null);
                         }}
                     />
                     <label htmlFor="inbox-link-fixed-cost" className="min-w-0 cursor-pointer">
@@ -274,8 +283,8 @@ export function InboxSortCard({
                         value={debtId ?? ''}
                         onChange={event => {
                             const next = event.target.value || null;
-                            setDebtId(next);
-                            if (next) setLinkFixedCost(false);
+                            form.setValue('debtId', next);
+                            if (next) form.setValue('linkFixedCost', false);
                         }}
                         className="h-10 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg outline-none focus:border-accent">
                         <option value="">{tExpense('dont_link')}</option>

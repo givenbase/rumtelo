@@ -139,12 +139,37 @@ export enum FixedCostSettlementStatus {
     SKIPPED = 'SKIPPED',
 }
 
+/**
+ * Derived UI status for a fixed cost in a budget period
+ * (settlement + due-day heuristics — not a DB column).
+ */
+export enum FixedCostPeriodStatus {
+    TAKEN = 'TAKEN',
+    DUE = 'DUE',
+    UPCOMING = 'UPCOMING',
+    SKIPPED = 'SKIPPED',
+}
+
+/** Lifecycle derived from isActive + endsOn — not a separate status column. */
+export enum FixedCostLifecycle {
+    ACTIVE = 'ACTIVE',
+    PAUSED = 'PAUSED',
+    ENDED = 'ENDED',
+}
+
 /** How the period settlement was recorded. */
 export enum FixedCostSettlementSource {
     MATCHED = 'MATCHED',
     MARK_PAID = 'MARK_PAID',
     SKIP = 'SKIP',
     LINKED = 'LINKED',
+}
+
+/** Preferred statement file format for household import (local preference). */
+export enum StatementImportPreferredFormat {
+    CAMT053 = 'CAMT053',
+    MT940 = 'MT940',
+    CSV = 'CSV',
 }
 
 export enum RuleField {

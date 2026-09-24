@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 
 import type { JarBalance } from '@rumtelo/contracts';
-import { WeekCheckStage } from '@rumtelo/contracts';
+import { WeekCheckStage, JarKey } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import { Button, Eyebrow, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
@@ -198,7 +198,7 @@ export function WeekCheckWizard({
                         {surplus > 0 ? (
                             <div className="grid gap-2">
                                 {jars
-                                    .filter(j => j.key !== 'NECESSITIES')
+                                    .filter(j => j.key !== JarKey.NECESSITIES)
                                     .map(jar => (
                                         <div
                                             key={jar.id}

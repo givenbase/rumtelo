@@ -65,25 +65,26 @@ export function givingCauseCopy(
 ): { name: string; line: string; icon: string } {
     const meta = resolveGivingCauseMeta(key);
     if (!meta) return { name: key, line: '', icon: '💛' };
-    const base = `features.soul.giving.causes.${key}`;
+    const nameKey = `features.soul.giving.causes.${key}.name`;
+    const lineKey = `features.soul.giving.causes.${key}.line`;
     return {
-        name: t.has(`${base}.name` as never) ? t(`${base}.name` as never) : meta.name,
-        line: t.has(`${base}.line` as never) ? t(`${base}.line` as never) : meta.line,
+        name: t.has(nameKey) ? t(nameKey) : meta.name,
+        line: t.has(lineKey) ? t(lineKey) : meta.line,
         icon: meta.icon,
     };
 }
 
 /** Why giving is in a money app — keyed via Soul → Giving copy. */
 export function whyGiveCopy(t: TranslateFn) {
-    const g = (key: string) => t(`features.soul.giving.${key}` as never);
+    const giveKey = (key: string) => t(`features.soul.giving.${key}`);
     return {
-        headline: g('headline'),
-        body: [g('lead'), g('coach_tip_1'), g('coach_tip_2')] as const,
+        headline: giveKey('headline'),
+        body: [giveKey('lead'), giveKey('coach_tip_1'), giveKey('coach_tip_2')] as const,
         checks: [
-            { title: g('check_1_title'), body: g('check_1_body') },
-            { title: g('check_2_title'), body: g('check_2_body') },
-            { title: g('check_3_title'), body: g('check_3_body') },
-            { title: g('check_4_title'), body: g('check_4_body') },
+            { title: giveKey('check_1_title'), body: giveKey('check_1_body') },
+            { title: giveKey('check_2_title'), body: giveKey('check_2_body') },
+            { title: giveKey('check_3_title'), body: giveKey('check_3_body') },
+            { title: giveKey('check_4_title'), body: giveKey('check_4_body') },
         ] as const,
     };
 }

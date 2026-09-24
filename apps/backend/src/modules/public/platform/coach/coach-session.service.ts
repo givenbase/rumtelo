@@ -5,6 +5,7 @@ import {
     CoachKind,
     coachStepVoice,
     EnergyMetric,
+    FixedCostPeriodStatus,
     TimeDayKind,
     TransactionStatus,
     WeekCheckStage,
@@ -160,7 +161,7 @@ export class CoachSessionService {
                 settlement ? { status: settlement.status } : null,
                 period
             );
-            if (status !== 'due') continue;
+            if (status !== FixedCostPeriodStatus.DUE) continue;
 
             this.enqueue(steps, {
                 id: `money.due_bill:${cost.id}:${period}`,

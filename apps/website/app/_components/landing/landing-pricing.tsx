@@ -26,8 +26,8 @@ function planFeatureLines(
 ): string[] {
     const slug = planSlug(key);
     const limits = PLAN_LIMITS[key];
-    return PLAN_FEAT_KEYS.map(f =>
-        tPlans(`${slug}.${f}`, {
+    return PLAN_FEAT_KEYS.map(feat =>
+        tPlans(`${slug}.${feat}`, {
             maxGoals: limits.maxGoals ?? 0,
             maxMembers: limits.maxMembers ?? 0,
         })

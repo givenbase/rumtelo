@@ -14,6 +14,7 @@ import {
     HouseholdKind,
     IncomeKind,
     IncomeStability,
+    JarKey,
     LearnProgressStatus,
     Locale,
     PayoffStrategy,
@@ -1792,14 +1793,14 @@ export class DemoHouseholdSeeder extends Seeder {
 }
 
 function toJarMap(jars: Jar[]): JarMap {
-    const byKey = (key: string) => jars.find(j => j.key === key) ?? jars[0]!;
+    const byKey = (key: JarKey) => jars.find(j => j.key === key) ?? jars[0]!;
     return {
-        necessities: byKey('NECESSITIES'),
-        ff: byKey('FINANCIAL_FREEDOM'),
-        education: byKey('EDUCATION'),
-        lts: byKey('LONG_TERM_SAVINGS'),
-        play: byKey('PLAY'),
-        give: byKey('GIVE'),
+        necessities: byKey(JarKey.NECESSITIES),
+        ff: byKey(JarKey.FINANCIAL_FREEDOM),
+        education: byKey(JarKey.EDUCATION),
+        lts: byKey(JarKey.LONG_TERM_SAVINGS),
+        play: byKey(JarKey.PLAY),
+        give: byKey(JarKey.GIVE),
         all: jars,
     };
 }

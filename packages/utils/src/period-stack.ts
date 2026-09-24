@@ -9,7 +9,7 @@
  * on top of live `saved` (do not double-count the current month’s saved).
  */
 
-import { GoalKind, GoalStatus, PayoffStrategy } from '@rumtelo/contracts';
+import { GoalKind, GoalStatus, type JarKey, PayoffStrategy } from '@rumtelo/contracts';
 
 import { allocateByPercentage } from './money-plan';
 import {
@@ -148,10 +148,10 @@ export function incomeNeededForTarget(input: IncomeNeededInput): IncomeNeededRes
 export type GoalAtHorizonInput = {
     id: string;
     name: string;
-    jarKey?: string | null;
+    jarKey?: JarKey | null;
     jarId?: string | null;
-    kind: string;
-    status: string;
+    kind: GoalKind;
+    status: GoalStatus;
     saved: number;
     target: number;
     monthlyContribution: number;
@@ -166,7 +166,7 @@ export type GoalAtHorizonInput = {
 export type GoalAtPeriod = {
     goalId: string;
     name: string;
-    jarKey: string | null;
+    jarKey: JarKey | null;
     saved: number;
     target: number;
     projectedSaved: number;
@@ -195,11 +195,7 @@ export function projectGoalsAtHorizon(input: {
     const { goals, monthsDelta, direction } = input;
 
     return goals.map(goal => {
-        const open =
-            goal.status === GoalStatus.ACTIVE ||
-            goal.status === GoalStatus.REACHED ||
-            goal.status === 'ACTIVE' ||
-            goal.status === 'REACHED';
+        const open = goal.status === GoalStatus.ACTIVE || goal.status === GoalStatus.REACHED;
 
         if (direction === 'past') {
             const fulfilledAlready =
@@ -247,7 +243,7 @@ export function projectGoalsAtHorizon(input: {
         // Looking ahead — future deposits only (monthsDelta), on top of live saved.
         const futureMonths = Math.max(0, monthsDelta);
         let projectedSaved = goal.saved;
-        if (goal.kind === GoalKind.EARN || goal.kind === 'EARN') {
+        if (goal.kind === GoalKind.EARN) {
             // EARN is a monthly net target, not a running balance — keep live saved/progress.
             projectedSaved = goal.saved;
         } else {
@@ -269,10 +265,7 @@ export function projectGoalsAtHorizon(input: {
         if (
             goal.targetOn &&
             remaining > 0 &&
-            (goal.kind === GoalKind.SAVE ||
-                goal.kind === GoalKind.GIVE ||
-                goal.kind === 'SAVE' ||
-                goal.kind === 'GIVE')
+            (goal.kind === GoalKind.SAVE || goal.kind === GoalKind.GIVE)
         ) {
             const targetYm = parsePeriodKey(goal.targetOn.slice(0, 7));
             const monthsToTarget = monthsBetween(currentYearMonth(), targetYm);

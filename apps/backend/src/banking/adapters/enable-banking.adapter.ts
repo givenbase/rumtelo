@@ -247,6 +247,7 @@ export class EnableBankingAdapter implements BankingPort {
             const query = new URLSearchParams(baseQuery);
             if (continuationKey) query.set('continuation_key', continuationKey);
 
+            // oxlint-disable-next-line no-await-in-loop -- paginate Enable Banking pages in order
             const data = await this.request<{
                 transactions?: Array<Record<string, unknown>>;
                 continuation_key?: string | null;

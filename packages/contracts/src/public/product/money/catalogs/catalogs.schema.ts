@@ -89,6 +89,7 @@ export const JarGuide = z.object({
 });
 
 export const JarTemplate = CatalogItemBase.extend({
+    key: z.enum(JarKey),
     subtitle: z.string().max(160).nullable(),
     icon: z.string().max(8).nullable(),
     /** Default share of net income (0–100). */

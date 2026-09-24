@@ -1,17 +1,19 @@
 import type { FixedCost, FixedCostSettlement, Transaction } from '@rumtelo/contracts';
-import { FixedCostSettlementStatus, FlowDirection } from '@rumtelo/contracts';
+import {
+    FixedCostLifecycle,
+    FixedCostPeriodStatus,
+    FixedCostSettlementStatus,
+    FlowDirection,
+} from '@rumtelo/contracts';
 import {
     fixedCostLifecycle,
     fixedCostPeriodStatus,
     isFixedCostCounting,
     monthlyAmount,
-    type FixedCostLifecycle,
-    type FixedCostPeriodStatus,
 } from '@rumtelo/utils';
 
 export type FixedCostStatus = FixedCostPeriodStatus;
-export type { FixedCostLifecycle };
-export { fixedCostLifecycle, isFixedCostCounting };
+export { FixedCostLifecycle, FixedCostPeriodStatus, fixedCostLifecycle, isFixedCostCounting };
 
 function normalize(value: string | null | undefined) {
     return value?.trim().toLowerCase() ?? '';
@@ -57,8 +59,8 @@ export function lifecycleLabel(
     lifecycle: FixedCostLifecycle,
     labels: { active: string; paused: string; ended: string }
 ): string {
-    if (lifecycle === 'paused') return labels.paused;
-    if (lifecycle === 'ended') return labels.ended;
+    if (lifecycle === FixedCostLifecycle.PAUSED) return labels.paused;
+    if (lifecycle === FixedCostLifecycle.ENDED) return labels.ended;
     return labels.active;
 }
 

@@ -18,24 +18,29 @@ type Props = {
     className?: string;
 };
 
+type SpeechRecognitionResultEvent = {
+    results: ArrayLike<ArrayLike<{ transcript: string }>>;
+};
+
 type SpeechRecognitionSession = {
     lang: string;
     interimResults: boolean;
     continuous: boolean;
-    onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
-    onerror: (() => void) | null;
-    onend: (() => void) | null;
     start: () => void;
     stop: () => void;
+    addEventListener(type: 'result', listener: (event: SpeechRecognitionResultEvent) => void): void;
+    addEventListener(type: 'error' | 'end', listener: () => void): void;
 };
 
+function isSpeechRecognitionCtor(value: unknown): value is new () => SpeechRecognitionSession {
+    return typeof value === 'function';
+}
+
 function createSpeechRecognition(): SpeechRecognitionSession {
-    const scope = globalThis as typeof globalThis & {
-        SpeechRecognition?: new () => SpeechRecognitionSession;
-        webkitSpeechRecognition?: new () => SpeechRecognitionSession;
-    };
-    const Ctor = scope.SpeechRecognition ?? scope.webkitSpeechRecognition;
-    if (!Ctor) {
+    const Ctor =
+        Reflect.get(globalThis, 'SpeechRecognition') ??
+        Reflect.get(globalThis, 'webkitSpeechRecognition');
+    if (!isSpeechRecognitionCtor(Ctor)) {
         throw new Error('SPEECH_RECOGNITION_UNAVAILABLE');
     }
     return new Ctor();
@@ -87,13 +92,12 @@ export function CoachVoiceControls({ prompt, voice, onHeard, className }: Props)
             recognition.lang = bcp47;
             recognition.interimResults = false;
             recognition.continuous = false;
-            // SpeechRecognition exposes result/error/end only via on* handlers.
-            recognition.onresult = event => {
+            recognition.addEventListener('result', event => {
                 const transcript = event.results[0]?.[0]?.transcript?.trim();
                 if (transcript) onHeard(transcript);
-            };
-            recognition.onerror = () => setListening(false);
-            recognition.onend = () => setListening(false);
+            });
+            recognition.addEventListener('error', () => setListening(false));
+            recognition.addEventListener('end', () => setListening(false));
             recognition.start();
             setListening(true);
         } catch {

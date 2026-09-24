@@ -64,7 +64,7 @@ export class DebtService {
             kind: input.kind as DebtKind,
             balance: input.balance,
             originalBalance: input.originalBalance ?? input.balance,
-            interestRate: Number(input.interestRate).toFixed(2),
+            interestRate: input.interestRate.toFixed(2),
             minimumPayment: input.minimumPayment ?? 0,
             extraPayment: input.extraPayment ?? 0,
             dueDay: input.dueDay ?? null,
@@ -224,7 +224,7 @@ export class DebtService {
         if (patch.balance !== undefined) entity.balance = patch.balance;
         if (patch.originalBalance !== undefined) entity.originalBalance = patch.originalBalance;
         if (patch.interestRate !== undefined) {
-            entity.interestRate = Number(patch.interestRate).toFixed(2);
+            entity.interestRate = patch.interestRate.toFixed(2);
         }
         if (patch.minimumPayment !== undefined) entity.minimumPayment = patch.minimumPayment;
         if (patch.extraPayment !== undefined) entity.extraPayment = patch.extraPayment;

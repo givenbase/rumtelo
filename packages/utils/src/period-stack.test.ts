@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { PayoffStrategy } from '@rumtelo/contracts';
+import { GoalKind, GoalStatus, PayoffStrategy } from '@rumtelo/contracts';
 
 import { allocateByPercentage } from './money-plan';
 import { projectBalancesAfterMonths, simulatePayoff } from './debt-payoff-math';
@@ -50,8 +50,8 @@ describe('period-stack', () => {
                 {
                     id: 'g1',
                     name: 'Emergency',
-                    kind: 'SAVE',
-                    status: 'ACTIVE',
+                    kind: GoalKind.SAVE,
+                    status: GoalStatus.ACTIVE,
                     saved: 100_000,
                     target: 200_000,
                     monthlyContribution: 50_000,
