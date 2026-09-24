@@ -14,10 +14,9 @@ const isProd = process.env.NODE_ENV === 'production';
 /**
  * Production launch defers Energy/Soul concept schemas — exclude those entities
  * so Nest / `db:gen` do not touch MVP tables that will be redesigned later.
- * Staging / local keep the full entity graph for QA.
+ * Non-production (`development` / `staging` / `test`) keep the full entity graph.
  */
 const deferLaunchProducts = shouldDeferLaunchProducts({
-    appEnv: process.env.APP_ENV,
     nodeEnv: process.env.NODE_ENV,
 });
 
