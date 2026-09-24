@@ -2,7 +2,7 @@ import { EntityManager } from '@mikro-orm/postgresql';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 
-import { containsWord } from '@rumtelo/utils';
+import { containsWord, endOfPeriodIso } from '@rumtelo/utils';
 import { apiBadRequest } from '../../../../../../common/errors/api-user-error';
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
@@ -267,12 +267,31 @@ export class TransactionService {
         status?: string | null;
         jarId?: string | null;
         debtId?: string | null;
+        period?: string | null;
+        search?: string | null;
         limit: number;
     }) {
         const where: Record<string, unknown> = {};
         if (filter.status) where.status = filter.status;
         if (filter.jarId) where.jar = filter.jarId;
         if (filter.debtId) where.debt = filter.debtId;
+
+        if (filter.period) {
+            where.bookedOn = {
+                $gte: `${filter.period}-01`,
+                $lte: endOfPeriodIso(filter.period),
+            };
+        }
+
+        const needle = filter.search?.trim();
+        if (needle) {
+            const pattern = `%${needle.replace(/[%_\\]/g, '\\$&')}%`;
+            where.$or = [
+                { description: { $ilike: pattern } },
+                { counterparty: { $ilike: pattern } },
+                { note: { $ilike: pattern } },
+            ];
+        }
 
         const rows = await this.transactions.find(where, {
             orderBy: { bookedOn: 'DESC' },

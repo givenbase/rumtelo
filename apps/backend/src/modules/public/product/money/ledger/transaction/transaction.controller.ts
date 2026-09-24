@@ -59,6 +59,8 @@ export class TransactionController {
                 status: input.status,
                 jarId: input.jarId,
                 debtId: input.debtId,
+                period: input.period,
+                search: input.search,
                 limit: input.limit,
             })
         );

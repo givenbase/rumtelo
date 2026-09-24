@@ -3,11 +3,11 @@
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useDeferredValue, useMemo, useState } from 'react';
 
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
-import { Button, Card, EmptyState, Typography } from '@rumtelo/ui';
+import { Button, Card, EmptyState, Slider, Typography } from '@rumtelo/ui';
 import { cn, toPeriodKey } from '@rumtelo/utils';
 
 import {
@@ -38,6 +38,7 @@ import { JarBadge, MetaChip, formatBookedDate } from '@/components/features/mone
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { ListControls, ListControlsChip } from '@/components/layout/list-controls';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 import { ConfirmActionButton } from '@/components/features/forms/confirm-action-button';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -45,6 +46,39 @@ import { useBankSyncOnVisit } from '@/app/_lib/use-bank-sync-on-visit';
 import Link from 'next/link';
 
 type Tab = 'INBOX' | 'OUT' | 'IN' | 'RULES';
+type LedgerSort = 'date-new' | 'date-old' | 'amount-high' | 'amount-low';
+
+/** Dual-thumb amount range in minor units — €25 steps up to €500. */
+const AMOUNT_STEP = 2_500;
+const AMOUNT_MAX = 50_000;
+const AMOUNT_RANGE_DEFAULT: [number, number] = [0, AMOUNT_MAX];
+
+function matchesAmountRange(absAmount: number, range: readonly [number, number]): boolean {
+    const [min, max] = range;
+    if (min === 0 && max === AMOUNT_MAX) return true;
+    if (max >= AMOUNT_MAX) return absAmount >= min;
+    return absAmount >= min && absAmount <= max;
+}
+
+function isLedgerSort(value: string): value is LedgerSort {
+    return (
+        value === 'date-new' ||
+        value === 'date-old' ||
+        value === 'amount-high' ||
+        value === 'amount-low'
+    );
+}
+
+function sortLedger(items: Transaction[], sort: LedgerSort): Transaction[] {
+    const next = items.slice();
+    next.sort((left, right) => {
+        if (sort === 'date-old') return left.bookedOn.localeCompare(right.bookedOn);
+        if (sort === 'amount-high') return Math.abs(right.amount) - Math.abs(left.amount);
+        if (sort === 'amount-low') return Math.abs(left.amount) - Math.abs(right.amount);
+        return right.bookedOn.localeCompare(left.bookedOn);
+    });
+    return next;
+}
 
 const MATCHER_KEY: Record<RuleMatcher, string> = {
     [RuleMatcher.CONTAINS]: 'matcher_contains',
@@ -81,6 +115,11 @@ export function TransactionsPageClient() {
     const [tab, setTab] = useState<Tab>('INBOX');
     const [ledgerLayout, setLedgerLayout] = useState<'list' | 'jar'>('list');
     const [openJarIds, setOpenJarIds] = useState<Set<string>>(() => new Set());
+    const [search, setSearch] = useState('');
+    const [jarFilter, setJarFilter] = useState('all');
+    const [amountRange, setAmountRange] = useState<[number, number]>(AMOUNT_RANGE_DEFAULT);
+    const [ledgerSort, setLedgerSort] = useState<LedgerSort>('date-new');
+    const deferredSearch = useDeferredValue(search.trim());
     const live = isLiveData(householdId);
     const periodKey = toPeriodKey(period.year, period.month);
     useBankSyncOnVisit();
@@ -93,7 +132,13 @@ export function TransactionsPageClient() {
 
     const listQuery = useLiveQuery(
         apiQuery.money.transactions.list.queryOptions({
-            input: { householdId: householdId!, limit: 50 },
+            input: {
+                householdId: householdId!,
+                limit: 100,
+                period: periodKey,
+                search: deferredSearch || undefined,
+                jarId: jarFilter === 'all' ? undefined : jarFilter,
+            },
         }),
         EMPTY_TRANSACTION_PAGE,
         live
@@ -155,8 +200,62 @@ export function TransactionsPageClient() {
     const all = (listQuery.data?.items ?? [])
         .slice()
         .sort((left, right) => right.bookedOn.localeCompare(left.bookedOn));
-    const outItems = all.filter(transaction => transaction.amount < 0);
-    const inItems = all.filter(transaction => transaction.amount > 0);
+
+    const inboxVisible = useMemo(() => {
+        if (!deferredSearch) return inbox;
+        const needle = deferredSearch.toLowerCase();
+        return inbox.filter(transaction => {
+            const hay =
+                `${transaction.counterparty ?? ''} ${transaction.description} ${transaction.note ?? ''}`.toLowerCase();
+            return hay.includes(needle);
+        });
+    }, [inbox, deferredSearch]);
+
+    const outItems = useMemo(() => {
+        const filtered = all.filter(
+            transaction =>
+                transaction.amount < 0 &&
+                matchesAmountRange(Math.abs(transaction.amount), amountRange)
+        );
+        return sortLedger(filtered, ledgerSort);
+    }, [all, amountRange, ledgerSort]);
+
+    const inItems = useMemo(() => {
+        const filtered = all.filter(
+            transaction =>
+                transaction.amount > 0 &&
+                matchesAmountRange(Math.abs(transaction.amount), amountRange)
+        );
+        return sortLedger(filtered, ledgerSort);
+    }, [all, amountRange, ledgerSort]);
+
+    const jarFilterOptions = useMemo(
+        () => [
+            { key: 'all', label: t('filter_all') },
+            ...jars.map(jar => ({ key: jar.id, label: jar.name })),
+        ],
+        [jars, t]
+    );
+
+    const amountFilterActive =
+        amountRange[0] !== AMOUNT_RANGE_DEFAULT[0] || amountRange[1] !== AMOUNT_RANGE_DEFAULT[1];
+
+    const amountMinLabel = formatMoney(amountRange[0]);
+    const amountMaxLabel =
+        amountRange[1] >= AMOUNT_MAX
+            ? t('amount_over', { amount: formatMoney(AMOUNT_MAX) })
+            : formatMoney(amountRange[1]);
+
+    const ledgerSortOptions = useMemo(
+        () =>
+            [
+                { key: 'date-new' as const, label: t('sort_date_new') },
+                { key: 'date-old' as const, label: t('sort_date_old') },
+                { key: 'amount-high' as const, label: t('sort_amount_high') },
+                { key: 'amount-low' as const, label: t('sort_amount_low') },
+            ] as const,
+        [t]
+    );
 
     const sortMutation = useMutation({
         mutationFn: async ({
@@ -330,14 +429,24 @@ export function TransactionsPageClient() {
             </ListToolbar>
 
             {tab === 'INBOX' ? (
-                <p className="mb-3 text-sm text-fg-muted">
-                    {t('import_hint_lead')}{' '}
-                    <Link
-                        href={CREATE_HREF.importStatement}
-                        className="font-medium text-accent hover:underline">
-                        {t('import_hint_link')}
-                    </Link>
-                </p>
+                <div className="mb-3 grid gap-2.5">
+                    <p className="text-sm text-fg-muted">
+                        {t('import_hint_lead')}{' '}
+                        <Link
+                            href={CREATE_HREF.importStatement}
+                            className="font-medium text-accent hover:underline">
+                            {t('import_hint_link')}
+                        </Link>
+                    </p>
+                    <ListControls
+                        search={{
+                            value: search,
+                            onChange: setSearch,
+                            placeholder: t('search_placeholder'),
+                            ariaLabel: t('search_aria'),
+                        }}
+                    />
+                </div>
             ) : null}
 
             {tab === 'INBOX' &&
@@ -347,9 +456,15 @@ export function TransactionsPageClient() {
                         title={t('inbox_empty_title')}
                         body={t('inbox_empty_body')}
                     />
+                ) : inboxVisible.length === 0 ? (
+                    <EmptyState
+                        variant="compact"
+                        title={t('empty_search_title')}
+                        body={t('empty_search_body')}
+                    />
                 ) : (
                     <div className="grid gap-3">
-                        {inbox.map(transaction => {
+                        {inboxVisible.map(transaction => {
                             const suggestion = suggestionFor(transaction);
                             const suggestedJarId =
                                 suggestion.jarId ??
@@ -400,51 +515,106 @@ export function TransactionsPageClient() {
 
             {tab === 'OUT' || tab === 'IN' ? (
                 <div className="grid gap-3">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                        <Typography as="p" size="sm" color="muted">
-                            {tab === 'OUT' ? t('out_lead') : t('in_lead')}
-                        </Typography>
-                        <div
-                            className="flex gap-1"
-                            role="group"
-                            aria-label={t('ledger_layout_aria')}>
-                            {(
-                                [
-                                    { key: 'list' as const, label: t('layout_list') },
-                                    { key: 'jar' as const, label: t('layout_by_jar') },
-                                ] as const
-                            ).map(option => (
-                                <button
-                                    key={option.key}
-                                    type="button"
-                                    aria-pressed={ledgerLayout === option.key}
-                                    onClick={() => setLedgerLayout(option.key)}
-                                    className={cn(
-                                        'rounded-full border px-3 py-1 font-mono text-[10px] font-medium tracking-widest uppercase transition-colors',
-                                        ledgerLayout === option.key
-                                            ? 'border-accent/40 bg-accent-soft text-accent'
-                                            : 'border-line text-fg-muted hover:text-accent'
-                                    )}>
-                                    {option.label}
-                                </button>
-                            ))}
+                    <ListControls
+                        title={
+                            <Typography as="p" size="sm" color="muted" className="leading-snug">
+                                {tab === 'OUT' ? t('out_lead') : t('in_lead')}
+                            </Typography>
+                        }
+                        search={{
+                            value: search,
+                            onChange: setSearch,
+                            placeholder: t('search_placeholder'),
+                            ariaLabel: t('search_aria'),
+                        }}
+                        sort={{
+                            value: ledgerSort,
+                            options: ledgerSortOptions,
+                            onChange: next => {
+                                if (isLedgerSort(next)) setLedgerSort(next);
+                            },
+                            label: t('sort_label'),
+                            ariaLabel: t('sort_aria'),
+                        }}
+                        filters={{
+                            value: jarFilter,
+                            options: jarFilterOptions,
+                            onChange: setJarFilter,
+                            ariaLabel: t('filter_jar_aria'),
+                        }}
+                        end={
+                            <div
+                                className="flex items-center gap-1.5"
+                                role="group"
+                                aria-label={t('ledger_layout_aria')}>
+                                {(
+                                    [
+                                        { key: 'list' as const, label: t('layout_list') },
+                                        { key: 'jar' as const, label: t('layout_by_jar') },
+                                    ] as const
+                                ).map(option => (
+                                    <ListControlsChip
+                                        key={option.key}
+                                        active={ledgerLayout === option.key}
+                                        onClick={() => setLedgerLayout(option.key)}>
+                                        {option.label}
+                                    </ListControlsChip>
+                                ))}
+                            </div>
+                        }>
+                        <div className="grid max-w-md gap-2" aria-label={t('filter_amount_aria')}>
+                            <span className="font-mono text-[10px] tracking-widest text-fg-muted uppercase">
+                                {t('filter_amount_label')}
+                            </span>
+                            <Slider
+                                min={0}
+                                max={AMOUNT_MAX}
+                                step={AMOUNT_STEP}
+                                minStepsBetweenThumbs={1}
+                                value={amountRange}
+                                onValueChange={next => {
+                                    const low = next[0] ?? 0;
+                                    const high = next[1] ?? AMOUNT_MAX;
+                                    setAmountRange([low, high]);
+                                }}
+                                aria-label={t('filter_amount_aria')}
+                                className="w-full"
+                            />
+                            <div className="flex items-center justify-between gap-3">
+                                <span className="font-mono text-[10px] tracking-wide text-fg tabular-nums">
+                                    {amountMinLabel}
+                                </span>
+                                <span className="font-mono text-[10px] tracking-wide text-fg tabular-nums">
+                                    {amountMaxLabel}
+                                </span>
+                            </div>
                         </div>
-                    </div>
+                    </ListControls>
                     <Card className="overflow-hidden p-0">
                         {(() => {
                             const items = tab === 'OUT' ? outItems : inItems;
                             if (items.length === 0) {
+                                const filtering =
+                                    deferredSearch.length > 0 ||
+                                    jarFilter !== 'all' ||
+                                    amountFilterActive;
                                 return (
                                     <EmptyState
                                         variant="compact"
                                         className="border-0 bg-transparent"
                                         title={
-                                            tab === 'OUT'
-                                                ? t('empty_out_title')
-                                                : t('empty_in_title')
+                                            filtering
+                                                ? t('empty_search_title')
+                                                : tab === 'OUT'
+                                                  ? t('empty_out_title')
+                                                  : t('empty_in_title')
                                         }
                                         body={
-                                            tab === 'OUT' ? t('empty_out_body') : t('empty_in_body')
+                                            filtering
+                                                ? t('empty_search_body')
+                                                : tab === 'OUT'
+                                                  ? t('empty_out_body')
+                                                  : t('empty_in_body')
                                         }
                                     />
                                 );
