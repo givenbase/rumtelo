@@ -25,6 +25,8 @@
                 "NEXT_PUBLIC_DOMAIN_WEB",
                 "NEXT_PUBLIC_DOMAIN_BACK",
                 "NEXT_PUBLIC_MAINTENANCE",
+                "NEXT_PUBLIC_RAILWAY_ENVIRONMENT_NAME",
+                "RAILWAY_ENVIRONMENT_NAME",
                 "MAINTENANCE",
                 "FEATURE_BANK_SYNC",
                 "ENABLE_BANKING_APP_ID",

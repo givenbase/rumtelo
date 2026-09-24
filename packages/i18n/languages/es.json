@@ -3042,7 +3042,10 @@
                 "continue_in_app": "Continuar en la aplicación",
                 "manage_plan": "Actualizar, bajar de categoría o gestionar",
                 "plan_named": "Plan {plan}",
-                "sign_out_sub": "Cerrar esta sesión del navegador"
+                "sign_out_sub": "Cerrar esta sesión del navegador",
+                "staging_banner_badge": "Staging",
+                "staging_banner": "Staging — not live production. Data here may be reset.",
+                "staging_banner_aria": "Staging environment notice"
             },
             "hero": {
                 "eyebrow": "DINERO · CRECIMIENTO · ENERGÍA · ALMA",
@@ -4818,7 +4821,10 @@
                 "locked_plan_aria": "Es necesario actualizar el plan",
                 "upgrade_cta": "Actualizar a {plan}",
                 "back_to_dashboard": "Volver al panel de control",
-                "back_to_website": "Volver a la página web"
+                "back_to_website": "Volver a la página web",
+                "staging_banner_badge": "Staging",
+                "staging_banner": "Staging — not live production. Data here may be reset.",
+                "staging_banner_aria": "Staging environment notice"
             }
         },
         "support": {

@@ -3042,7 +3042,10 @@
                 "continue_in_app": "Continue in the app",
                 "manage_plan": "Upgrade, downgrade or manage",
                 "plan_named": "{plan} plan",
-                "sign_out_sub": "Leave this browser session"
+                "sign_out_sub": "Leave this browser session",
+                "staging_banner_badge": "Staging",
+                "staging_banner": "Not live production — data here may be reset.",
+                "staging_banner_aria": "Staging environment notice"
             },
             "hero": {
                 "eyebrow": "MONEY · GROWTH · ENERGY · SOUL",
@@ -4818,7 +4821,10 @@
                 "locked_plan_aria": "Plan upgrade required",
                 "upgrade_cta": "Upgrade to {plan}",
                 "back_to_dashboard": "Back to dashboard",
-                "back_to_website": "Back to website"
+                "back_to_website": "Back to website",
+                "staging_banner_badge": "Staging",
+                "staging_banner": "Not live production — data here may be reset.",
+                "staging_banner_aria": "Staging environment notice"
             }
         },
         "support": {

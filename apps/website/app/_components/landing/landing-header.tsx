@@ -81,7 +81,7 @@ export function LandingHeader() {
     const planLabel = planKey ? tPlans(`${planSlug(planKey)}.name`) : null;
 
     return (
-        <header className="sticky top-0 z-20 border-b border-line bg-chrome/95 backdrop-blur-md">
+        <header className="sticky top-[var(--staging-banner-h,0px)] z-20 border-b border-line bg-chrome/95 backdrop-blur-md">
             <div className="mx-auto flex w-full max-w-6xl min-w-0 items-center gap-3 px-4 py-3 sm:gap-4 lg:px-6">
                 <Link href="/" className="min-w-0 shrink" onClick={close}>
                     <RumteloLogo

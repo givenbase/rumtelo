@@ -11,6 +11,7 @@ import { AccountThemeProvider } from '@/components/features/shell/account-theme-
 import { AppShellProvider } from '@/components/features/shell/app-shell-context';
 import { AuthProvider, useAuth } from '@/components/features/shell/auth-provider';
 import { PlanIntentProvider } from '@/components/features/shell/plan-intent-provider';
+import { StagingBanner } from '@/components/layout/staging-banner';
 
 /** Keeps OpenAPILink headers in sync without remounting the oRPC client. */
 function HouseholdHeaderSync({ children }: { children: ReactNode }) {
@@ -45,6 +46,7 @@ export function Providers({ children }: { children: ReactNode }) {
 
     return (
         <ThemeProvider>
+            <StagingBanner />
             <QueryClientProvider client={queryClient}>
                 {/*
                   Auth must sit above the Suspense that catches useSearchParams

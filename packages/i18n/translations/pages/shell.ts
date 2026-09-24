@@ -162,6 +162,9 @@ const shell = {
         upgrade_cta: 'Upgrade to {plan}',
         back_to_dashboard: 'Back to dashboard',
         back_to_website: 'Back to website',
+        staging_banner_badge: 'Staging',
+        staging_banner: 'Not live production — data here may be reset.',
+        staging_banner_aria: 'Staging environment notice',
     },
 } as const;
 

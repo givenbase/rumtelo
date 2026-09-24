@@ -39,6 +39,9 @@ const landing = {
         manage_plan: 'Upgrade, downgrade or manage',
         plan_named: '{plan} plan',
         sign_out_sub: 'Leave this browser session',
+        staging_banner_badge: 'Staging',
+        staging_banner: 'Not live production — data here may be reset.',
+        staging_banner_aria: 'Staging environment notice',
     },
     hero: {
         eyebrow: 'MONEY · GROWTH · ENERGY · SOUL',

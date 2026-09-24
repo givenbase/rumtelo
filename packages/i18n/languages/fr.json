@@ -3042,7 +3042,10 @@
                 "continue_in_app": "Continuer dans l'application",
                 "manage_plan": "Passer à un forfait supérieur, revenir à un forfait inférieur ou gérer son forfait",
                 "plan_named": "Formule {plan}",
-                "sign_out_sub": "Quitter cette session de navigation"
+                "sign_out_sub": "Quitter cette session de navigation",
+                "staging_banner_badge": "Staging",
+                "staging_banner": "Staging — not live production. Data here may be reset.",
+                "staging_banner_aria": "Staging environment notice"
             },
             "hero": {
                 "eyebrow": "ARGENT · CROISSANCE · ÉNERGIE · ÂME",
@@ -4818,7 +4821,10 @@
                 "locked_plan_aria": "Mise à niveau du forfait requise",
                 "upgrade_cta": "Passer à la version {plan}",
                 "back_to_dashboard": "Retour au tableau de bord",
-                "back_to_website": "Retour au site web"
+                "back_to_website": "Retour au site web",
+                "staging_banner_badge": "Staging",
+                "staging_banner": "Staging — not live production. Data here may be reset.",
+                "staging_banner_aria": "Staging environment notice"
             }
         },
         "support": {

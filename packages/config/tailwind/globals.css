@@ -59,6 +59,11 @@
         line-height: 1.55;
     }
 
+    /* Staging banner (fixed) — keep chrome + content below it */
+    html[data-staging-banner='true'] body {
+        padding-top: var(--staging-banner-h, 2.5rem);
+    }
+
     button:not(:disabled),
     [role='button']:not(:disabled) {
         cursor: pointer;
