@@ -1,5 +1,5 @@
 import { UniqueConstraintViolationException } from '@mikro-orm/core';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException } from '@nestjs/common';
 import { ORPCError } from '@orpc/server';
 import { APIError } from 'better-auth/api';
 
@@ -204,15 +204,15 @@ export function mapToOrpcClientError(error: unknown): unknown {
         }
 
         const code =
-            status === HttpStatus.UNAUTHORIZED
+            status === 401
                 ? 'UNAUTHORIZED'
-                : status === HttpStatus.FORBIDDEN
+                : status === 403
                   ? 'FORBIDDEN'
-                  : status === HttpStatus.NOT_FOUND
+                  : status === 404
                     ? 'NOT_FOUND'
-                    : status === HttpStatus.CONFLICT
+                    : status === 409
                       ? 'CONFLICT'
-                      : status === HttpStatus.TOO_MANY_REQUESTS
+                      : status === 429
                         ? 'TOO_MANY_REQUESTS'
                         : status >= 500
                           ? 'INTERNAL_SERVER_ERROR'

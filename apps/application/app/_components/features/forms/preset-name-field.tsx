@@ -31,9 +31,8 @@ type PresetNameFieldProps = {
     onChange: (name: string) => void;
     onSelect?: (preset: NamePresetOption) => void;
     /**
-     * Fired when the locked preset is cleared (×) or the name is wiped.
-     * Use to reset dependent fields (category, vendor, jar hints).
-     * Not fired when picking Other (empty name while typing a custom one).
+     * Fired when the locked preset is cleared (×) or a non-custom name is wiped.
+     * Not fired while typing a custom name under a freeTextKeys lock (e.g. OTHER).
      */
     onClear?: () => void;
     options: NamePresetOption[];
@@ -43,8 +42,8 @@ type PresetNameFieldProps = {
     disabled?: boolean;
     id?: string;
     /**
-     * Lock the name after picking a preset (chip). Manual typing only after
-     * a key in `freeTextKeys` (e.g. Other).
+     * Lock the name after picking a preset (chip). Keys in `freeTextKeys`
+     * (e.g. OTHER) stay selected by key but the display name is free to type.
      */
     lockPresets?: boolean;
     freeTextKeys?: readonly string[];
@@ -80,19 +79,18 @@ function findOptionByQuery(options: NamePresetOption[], query: string) {
 function resolveLockedPreset(
     lockPresets: boolean,
     initialLockedKey: string | null | undefined,
-    freeTextKeys: readonly string[],
     options: NamePresetOption[]
 ): NamePresetOption | null {
-    if (!lockPresets || !initialLockedKey || freeTextKeys.includes(initialLockedKey)) {
-        return null;
-    }
+    if (!lockPresets || !initialLockedKey) return null;
+    // Free-text keys (OTHER) hydrate as a custom lock — name stays editable.
     return options.find(option => option.key === initialLockedKey) ?? null;
 }
 
 /**
- * Name input with a suggestion dropdown (design: New debt modal).
+ * Name input with a suggestion dropdown.
  * Default: free typing; list filters as you type; picking fills the name.
- * With lockPresets: catalog picks lock; only freeTextKeys (Other) unlock typing.
+ * With lockPresets: catalog picks lock to a chip. freeTextKeys (Other) lock the
+ * key but keep an editable name — identity stays OTHER while the label is custom.
  */
 export function PresetNameField({
     value,
@@ -113,22 +111,23 @@ export function PresetNameField({
     const resolvedFreeTextPlaceholder = freeTextPlaceholder ?? tForm('type_custom_name');
     const [open, setOpen] = useState(false);
     const [locked, setLocked] = useState<NamePresetOption | null>(() =>
-        resolveLockedPreset(lockPresets, initialLockedKey, freeTextKeys, options)
+        resolveLockedPreset(lockPresets, initialLockedKey, options)
     );
     const [hydratedLockKey, setHydratedLockKey] = useState(initialLockedKey);
-    const [awaitingCustom, setAwaitingCustom] = useState(false);
     const [filterQuery, setFilterQuery] = useState('');
     const rootRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const listboxId = `${id ?? 'preset-name'}-listbox`;
 
     const freeKeySet = useMemo(() => new Set(freeTextKeys), [freeTextKeys]);
-    const searchOnly = lockPresets && !awaitingCustom && !locked;
+    const isCustomLock = Boolean(locked && freeKeySet.has(locked.key));
+    /** Search the catalog until a preset is locked (including Other). */
+    const searchOnly = lockPresets && !locked;
 
     // Sync lock when edit hydrate key arrives (adjust during render — no effect).
     if (initialLockedKey !== hydratedLockKey) {
         setHydratedLockKey(initialLockedKey);
-        setLocked(resolveLockedPreset(lockPresets, initialLockedKey, freeTextKeys, options));
+        setLocked(resolveLockedPreset(lockPresets, initialLockedKey, options));
     }
 
     const query = (searchOnly ? filterQuery : value).trim();
@@ -139,14 +138,14 @@ export function PresetNameField({
     }, [options, query, locked]);
 
     const filtered = useMemo(() => {
-        if (lockPresets && locked) return options;
+        if (lockPresets && locked && !isCustomLock) return options;
         const matched = options.filter(option => matchesQuery(option, query));
         // Merchant catalog is large — only surface brands once the user types.
         if (!query) {
             return matched.filter(option => !option.key.startsWith('merchant:'));
         }
         return matched;
-    }, [options, query, lockPresets, locked]);
+    }, [options, query, lockPresets, locked, isCustomLock]);
 
     const grouped = useMemo(() => {
         const map = new Map<string, NamePresetOption[]>();
@@ -169,39 +168,34 @@ export function PresetNameField({
 
     function clearLock() {
         setLocked(null);
-        setAwaitingCustom(false);
         setFilterQuery('');
         onChange('');
         onClear?.();
         setOpen(true);
-        requestAnimationFrame(() => inputRef.current?.focus());
+        requestAnimationFrame(() => inputRef.current?.focus({ preventScroll: true }));
     }
 
     function pickOption(opt: NamePresetOption) {
         onSelect?.(opt);
         setFilterQuery('');
+        setOpen(false);
         if (lockPresets && freeKeySet.has(opt.key)) {
-            setLocked(null);
-            setAwaitingCustom(true);
+            // Keep key (e.g. OTHER); name is free — clear for the user to fill in.
+            setLocked(opt);
             onChange('');
-            setOpen(false);
-            requestAnimationFrame(() => inputRef.current?.focus());
             return;
         }
         if (lockPresets) {
             setLocked(opt);
-            setAwaitingCustom(false);
             onChange(opt.name);
-            setOpen(false);
             return;
         }
         onChange(opt.name);
-        setOpen(false);
     }
 
-    const showLockedChip = Boolean(lockPresets && locked);
+    const showLockedChip = Boolean(lockPresets && locked && !isCustomLock);
     const inputValue = searchOnly ? filterQuery : value;
-    const inputPlaceholder = awaitingCustom ? resolvedFreeTextPlaceholder : resolvedPlaceholder;
+    const inputPlaceholder = isCustomLock ? resolvedFreeTextPlaceholder : resolvedPlaceholder;
     const emptyHint = lockPresets ? tForm('no_matches_other') : tForm('no_matches_keep_typing');
 
     return (
@@ -262,19 +256,46 @@ export function PresetNameField({
                                     onChange('');
                                     onClear?.();
                                 }
-                            } else {
-                                const wasFilled = Boolean(value.trim());
-                                onChange(next);
-                                setLocked(null);
-                                if (!next.trim()) {
-                                    setAwaitingCustom(false);
-                                    if (wasFilled) onClear?.();
-                                }
+                                setOpen(true);
+                                return;
                             }
+                            if (isCustomLock) {
+                                // OTHER (etc.) stays selected — only the label changes.
+                                onChange(next);
+                                setOpen(false);
+                                return;
+                            }
+                            const wasFilled = Boolean(value.trim());
+                            onChange(next);
+                            setLocked(null);
+                            if (!next.trim()) {
+                                if (wasFilled) onClear?.();
+                                setOpen(false);
+                            } else {
+                                setOpen(true);
+                            }
+                        }}
+                        onFocus={() => {
+                            // Custom Other: keep catalog closed until ··· — user is naming.
+                            if (isCustomLock) return;
                             setOpen(true);
                         }}
-                        onFocus={() => setOpen(true)}
                     />
+                    {isCustomLock && locked ? (
+                        <span className="pointer-events-none absolute top-1/2 right-20 -translate-y-1/2 text-[10px] tracking-wide text-fg-faint uppercase">
+                            {locked.name}
+                        </span>
+                    ) : null}
+                    {isCustomLock ? (
+                        <button
+                            type="button"
+                            disabled={disabled}
+                            aria-label={tForm('aria.clear_selection')}
+                            className="absolute top-1/2 right-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-fg-muted hover:bg-fg/5 hover:text-fg disabled:opacity-40"
+                            onClick={clearLock}>
+                            <span aria-hidden>×</span>
+                        </button>
+                    ) : null}
                     <button
                         type="button"
                         disabled={disabled || options.length === 0}

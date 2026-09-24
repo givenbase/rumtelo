@@ -7,6 +7,7 @@
  */
 
 import { accountsContract, transactionContract } from './transaction/transaction.contract';
+import { bankSyncContract } from './bank-sync/bank-sync.contract';
 import { catalogsContract } from './catalogs/catalogs.contract';
 import { dashboardContract } from './dashboard/dashboard.contract';
 import { debtContract } from './debt/debt.contract';
@@ -24,6 +25,7 @@ export const contract = {
     fixedCosts: fixedCostContract,
     accounts: accountsContract,
     transactions: transactionContract,
+    bankSync: bankSyncContract,
     rules: ruleContract,
     goals: goalContract,
     debts: debtContract,

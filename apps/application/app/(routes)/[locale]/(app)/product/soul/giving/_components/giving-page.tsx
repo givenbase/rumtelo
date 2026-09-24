@@ -7,7 +7,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import type { FixedCost, Goal } from '@rumtelo/contracts';
-import { GoalKind, GoalStatus, JarKey, TransactionStatus } from '@rumtelo/contracts';
+import { GoalKind, GoalStatus, JarKey, TransactionStatus, FlowDirection } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card, EmptyState, Meter, Section, Typography } from '@rumtelo/ui';
@@ -154,7 +154,7 @@ export function GivingPageClient() {
     const giveFixed = useMemo((): GiveFixedRow[] => {
         const group = (fixedQuery.data ?? []).find(row => row.jarKey === JarKey.GIVE);
         return (group?.items ?? [])
-            .filter(item => isFixedCostCounting(item) && item.direction === 'OUT')
+            .filter(item => isFixedCostCounting(item) && item.direction === FlowDirection.OUT)
             .map(item => ({
                 id: item.id,
                 name: item.name,

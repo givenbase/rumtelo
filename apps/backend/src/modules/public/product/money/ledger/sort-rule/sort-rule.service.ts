@@ -11,11 +11,15 @@ import { type RuleField, type RuleMatcher, TransactionStatus } from '@rumtelo/co
 import {
     autoSortRows,
     categoryIndex,
+    PAYEE_MEMORY_RULE_PRIORITY,
     type AutoSortContext,
     type AutoSortRow,
 } from '../auto-sort.util';
 import { Transaction } from '../transaction/transaction.entity';
 import { SortRule } from './sort-rule.entity';
+
+/** Explicit “Altijd dit” / managed rules — ahead of soft payee memory. */
+const EXPLICIT_RULE_PRIORITY = 100;
 
 @Injectable()
 export class SortRuleService {
@@ -47,12 +51,60 @@ export class SortRuleService {
             matchValue: input.matchValue.trim(),
             jar: this.em.getReference(Jar, input.jarId),
             category: input.categoryId ? this.em.getReference(Category, input.categoryId) : null,
-            priority: input.priority ?? 100,
+            priority: input.priority ?? EXPLICIT_RULE_PRIORITY,
             isActive: input.isActive ?? true,
             hitCount: 0,
         } as never);
         await this.em.persist(entity).flush();
         return toDto(entity);
+    }
+
+    /**
+     * Upsert a CONTAINS rule for a payee needle.
+     * - `explicit` (Altijd dit): priority 100
+     * - soft memory (Juist): priority 900, never demotes an existing explicit rule
+     */
+    async upsertPayeeHint(input: {
+        field: 'COUNTERPARTY' | 'DESCRIPTION';
+        matchValue: string;
+        jarId: string;
+        categoryId?: string | null;
+        explicit: boolean;
+    }) {
+        const matchValue = input.matchValue.trim();
+        if (matchValue.length < 2) return null;
+
+        const siblings = await this.repo.find({
+            field: input.field as RuleField,
+            matcher: 'CONTAINS' as RuleMatcher,
+            isActive: true,
+        });
+        const existing = siblings.find(
+            row => row.matchValue.trim().toLowerCase() === matchValue.toLowerCase()
+        );
+
+        if (existing) {
+            await this.em.populate(existing, ['jar', 'category']);
+            existing.jar = this.em.getReference(Jar, input.jarId);
+            existing.category = input.categoryId
+                ? this.em.getReference(Category, input.categoryId)
+                : null;
+            if (input.explicit && existing.priority > EXPLICIT_RULE_PRIORITY) {
+                existing.priority = EXPLICIT_RULE_PRIORITY;
+            }
+            await this.em.flush();
+            return toDto(existing);
+        }
+
+        return this.create({
+            field: input.field,
+            matcher: 'CONTAINS',
+            matchValue,
+            jarId: input.jarId,
+            categoryId: input.categoryId ?? null,
+            priority: input.explicit ? EXPLICIT_RULE_PRIORITY : PAYEE_MEMORY_RULE_PRIORITY,
+            isActive: true,
+        });
     }
 
     // ====================================================================

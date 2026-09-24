@@ -22,7 +22,7 @@ export default async function TrainingPage() {
 
             <ListToolbar createLabel={t('add_session')} createHref={CREATE_HREF.session} />
 
-            <EmptyState icon="💪" title={t('empty_title')} body={t('empty_body')} />
+            <EmptyState icon="dumbbell" title={t('empty_title')} body={t('empty_body')} />
         </div>
     );
 }

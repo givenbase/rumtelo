@@ -3,7 +3,13 @@
 import { apiQuery } from '@/app/_lib/api-hooks';
 import Link from 'next/link';
 
-import { GoalKind, GoalStatus, JarKey, jarCapabilitiesFor } from '@rumtelo/contracts';
+import {
+    GoalKind,
+    GoalStatus,
+    JarKey,
+    jarCapabilitiesFor,
+    FlowDirection,
+} from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, Card, EmptyState, Typography } from '@rumtelo/ui';
@@ -124,9 +130,11 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
         live
     );
 
+    // group.jarKey is schema string; jarKey is JarKey (string enum) — same runtime values.
+    // oxlint-disable-next-line typescript/no-unsafe-enum-comparison
     const fixedGroup = (byJarQuery.data ?? []).find(group => group.jarKey === jarKey);
     const fixedOut = (fixedGroup?.items ?? []).filter(
-        item => item.direction === 'OUT' && isFixedCostCounting(item)
+        item => item.direction === FlowDirection.OUT && isFixedCostCounting(item)
     );
 
     const transactions = [...(txQuery.data?.items ?? [])].sort((left, right) =>

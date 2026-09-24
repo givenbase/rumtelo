@@ -10,6 +10,8 @@ type SettingsMutationOptions<TData, TVariables> = {
     successMessage?: string | ((data: TData, variables: TVariables) => string);
     onSuccess?: (data: TData, variables: TVariables) => void | Promise<void>;
     onError?: (error: unknown, variables: TVariables) => void;
+    /** When true, skip the default error toast (caller shows field errors instead). */
+    silenceErrorToast?: (error: unknown, variables: TVariables) => boolean;
 };
 
 /**
@@ -21,7 +23,8 @@ export function useSettingsMutation<TData, TVariables = void>(
     const { showToast } = useAppShell();
     const apiError = useApiError();
     const queryClient = useQueryClient();
-    const { mutationFn, invalidateKeys, successMessage, onSuccess, onError } = options;
+    const { mutationFn, invalidateKeys, successMessage, onSuccess, onError, silenceErrorToast } =
+        options;
 
     return useMutation({
         mutationFn,
@@ -43,7 +46,9 @@ export function useSettingsMutation<TData, TVariables = void>(
             await onSuccess?.(data, variables);
         },
         onError: (error, variables) => {
-            showToast(apiError(error), 'error');
+            if (!silenceErrorToast?.(error, variables)) {
+                showToast(apiError(error), 'error');
+            }
             onError?.(error, variables);
         },
     });

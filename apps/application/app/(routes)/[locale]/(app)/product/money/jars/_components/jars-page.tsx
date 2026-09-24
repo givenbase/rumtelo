@@ -1,4 +1,5 @@
 'use client';
+import { JarKey } from '@rumtelo/contracts';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 
@@ -53,7 +54,7 @@ export function JarsPageClient() {
     const stacked = dashboardQuery.data?.travel?.mode === 'stacked';
     const totalPct = jars.reduce((total, j) => total + j.percentage, 0);
     const onTarget = jars.filter(j => !j.overspent).length;
-    const necJar = jars.find(jar => jar.key === 'NECESSITIES');
+    const necJar = jars.find(jar => jar.key === JarKey.NECESSITIES);
     const necessitiesPressure = necJar ? necessitiesPressureFromJar(necJar) : null;
 
     return (

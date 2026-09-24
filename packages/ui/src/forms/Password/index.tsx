@@ -3,8 +3,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-import { EyeIcon, EyeOffIcon } from 'lucide-react';
-
+import { Icon } from '../../display/Icon';
 import { Input, type InputProps } from '../Input';
 
 export type PasswordProps = Omit<InputProps, 'type' | 'endAction'> & {
@@ -58,9 +57,9 @@ const Password = React.forwardRef<HTMLInputElement, PasswordProps>(
                             disabled={disabled}
                             onClick={() => setVisible(previous => !previous)}>
                             {visible ? (
-                                <EyeOffIcon className="size-4" aria-hidden />
+                                <Icon name="eye-off" size="md" />
                             ) : (
-                                <EyeIcon className="size-4" aria-hidden />
+                                <Icon name="eye" size="md" />
                             )}
                         </button>
                     ) : undefined

@@ -408,7 +408,7 @@ export function HomeDashboardClient() {
                 )}>
                 <PortalWidget
                     tint="var(--color-jar-lts)"
-                    icon="↗"
+                    icon="trending-up"
                     title={t('pages.nav.pills.growth')}
                     href="/product/growth"
                     stats={[
@@ -444,7 +444,7 @@ export function HomeDashboardClient() {
                 {isProductEnabled('soul') && (
                     <PortalWidget
                         tint="var(--color-portal-soul)"
-                        icon="✦"
+                        icon="sparkles"
                         title={t('pages.nav.pills.soul')}
                         href="/product/soul"
                         stats={[

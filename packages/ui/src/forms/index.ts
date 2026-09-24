@@ -8,8 +8,10 @@ export * from './Textarea';
 export * from './Field';
 export * from './Label';
 export * from './Toggle';
+export * from './Slider';
 export * from './Calendar';
 export * from './DatePicker';
+export * from './FileDropzone';
 
 export {
     useFormField,

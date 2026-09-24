@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { PayoffStrategy, type JarKey } from '@rumtelo/contracts';
+import { GoalStatus, JarKey, PayoffStrategy } from '@rumtelo/contracts';
 import {
     endOfPeriodIso,
     jarCoverage,
@@ -124,13 +124,13 @@ export class DashboardService {
                             other.id !== goal.id &&
                             other.jarId &&
                             other.jarId === goal.jarId &&
-                            other.status === 'ACTIVE'
+                            other.status === GoalStatus.ACTIVE
                     )
                     .reduce((total, other) => total + other.monthlyContribution, 0);
                 return {
                     id: goal.id,
                     name: goal.name,
-                    jarKey: (jar?.key as string | undefined) ?? null,
+                    jarKey: jar?.key ?? null,
                     jarId: goal.jarId,
                     kind: goal.kind,
                     status: goal.status,
@@ -148,7 +148,7 @@ export class DashboardService {
         const goalsAtPeriod = projectedGoals.map(goal => ({
             goalId: goal.goalId,
             name: goal.name,
-            jarKey: (goal.jarKey as JarKey | null) ?? null,
+            jarKey: goal.jarKey,
             saved: goal.saved,
             target: goal.target,
             projectedSaved: goal.projectedSaved,
@@ -158,9 +158,7 @@ export class DashboardService {
         }));
 
         const strategy =
-            (settings.money?.payoffStrategy as PayoffStrategy | undefined) ??
-            debtPlan.strategy ??
-            PayoffStrategy.AVALANCHE;
+            settings.money?.payoffStrategy ?? debtPlan.strategy ?? PayoffStrategy.AVALANCHE;
         const extraMonthly = debtList.reduce((total, debt) => total + (debt.extraPayment ?? 0), 0);
         const debtsAtPeriod = projectDebtsAtHorizon({
             debts: debtList.map(debt => ({
@@ -178,7 +176,7 @@ export class DashboardService {
 
         // Keep avgLeftOver / playLeft monthly (baseline), not stacked.
         const avgLeftOver = sum(baselineJars.map(jar => jar.available));
-        const playLeft = baselineJars.find(jar => jar.key === 'PLAY')?.available ?? 0;
+        const playLeft = baselineJars.find(jar => jar.key === JarKey.PLAY)?.available ?? 0;
 
         return {
             period,

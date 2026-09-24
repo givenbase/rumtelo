@@ -1,6 +1,6 @@
 'use client';
 
-import { CalendarIcon } from 'lucide-react';
+import { Icon } from '../../display/Icon';
 import { useEffect, useId, useRef, useState } from 'react';
 
 import { cn } from '@rumtelo/utils';
@@ -91,7 +91,7 @@ export function DatePicker({
                 <span className="truncate">
                     {value ? formatDisplayDate(value, locale) : placeholder}
                 </span>
-                <CalendarIcon className="size-4 shrink-0 text-fg-muted" aria-hidden />
+                <Icon name="calendar" size="md" color="muted" className="shrink-0" />
             </button>
 
             {open ? (

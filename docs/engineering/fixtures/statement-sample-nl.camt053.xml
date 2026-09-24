@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.08">
+  <BkToCstmrStmt>
+    <GrpHdr>
+      <MsgId>RUMTELO-SAMPLE-CAMT-NL</MsgId>
+      <CreDtTm>2026-09-23T12:00:00+02:00</CreDtTm>
+    </GrpHdr>
+    <Stmt>
+      <Id>STMT-NL-2026-09</Id>
+      <Acct>
+        <Id>
+          <IBAN>NL91ABNA0417164300</IBAN>
+        </Id>
+        <Ccy>EUR</Ccy>
+        <Nm>Jamie Lee Rivera</Nm>
+      </Acct>
+      <Ntry>
+        <Amt Ccy="EUR">42.50</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Status>BOOK</Status>
+        <BookgDt><Dt>2026-09-22</Dt></BookgDt>
+        <ValDt><Dt>2026-09-22</Dt></ValDt>
+        <NtryDtls>
+          <TxDtls>
+            <RltdPties>
+              <Cdtr><Nm>ALBERT HEIJN 1582</Nm></Cdtr>
+            </RltdPties>
+            <RmtInf><Ustrd>AH 1582 AMSTERDAM BEURS</Ustrd></RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="EUR">1850.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Status>BOOK</Status>
+        <BookgDt><Dt>2026-09-11</Dt></BookgDt>
+        <ValDt><Dt>2026-09-11</Dt></ValDt>
+        <NtryDtls>
+          <TxDtls>
+            <RltdPties>
+              <Dbtr><Nm>RETAIL GROUP NL BV</Nm></Dbtr>
+            </RltdPties>
+            <RmtInf><Ustrd>Salaris september</Ustrd></RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="EUR">950.00</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Status>BOOK</Status>
+        <BookgDt><Dt>2026-09-10</Dt></BookgDt>
+        <ValDt><Dt>2026-09-10</Dt></ValDt>
+        <NtryDtls>
+          <TxDtls>
+            <RltdPties>
+              <Cdtr><Nm>WONINGSTICHTING ROCHDALE</Nm></Cdtr>
+            </RltdPties>
+            <RmtInf><Ustrd>Huur oktober — nr 14</Ustrd></RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="EUR">9.99</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Status>BOOK</Status>
+        <BookgDt><Dt>2026-09-14</Dt></BookgDt>
+        <ValDt><Dt>2026-09-14</Dt></ValDt>
+        <NtryDtls>
+          <TxDtls>
+            <RltdPties>
+              <Cdtr><Nm>SPOTIFY</Nm></Cdtr>
+            </RltdPties>
+            <RmtInf><Ustrd>SPOTIFY P0AAB1C2D3</Ustrd></RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="EUR">125.00</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Status>BOOK</Status>
+        <BookgDt><Dt>2026-09-15</Dt></BookgDt>
+        <ValDt><Dt>2026-09-15</Dt></ValDt>
+        <NtryDtls>
+          <TxDtls>
+            <RltdPties>
+              <Cdtr><Nm>BOL.COM</Nm></Cdtr>
+            </RltdPties>
+            <RmtInf><Ustrd>BOL.COM BOEKEN 8821</Ustrd></RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+    </Stmt>
+  </BkToCstmrStmt>
+</Document>

@@ -6,11 +6,15 @@ import { Implement, implement } from '@orpc/nest';
 import { ControllerSwagger } from '../../../../common/decorators/controller-swagger.decorators';
 import { currentPeriod } from '../../../../common/utils/period.util';
 import { CoachService } from './coach.service';
+import { CoachSessionService } from './coach-session.service';
 
 /** Transport only. Handler order is always CRUD. */
 @ControllerSwagger('coach', 'public')
 export class CoachController {
-    constructor(@Inject(CoachService) private readonly coach: CoachService) {}
+    constructor(
+        @Inject(CoachService) private readonly coach: CoachService,
+        @Inject(CoachSessionService) private readonly sessions: CoachSessionService
+    ) {}
 
     // ====================================================================
     // ? READ Operations
@@ -22,6 +26,12 @@ export class CoachController {
         return implement(contract.coach.feed).handler(({ input }) =>
             this.coach.feed(input.period ?? currentPeriod())
         );
+    }
+
+    /** Smart fill queue — missing money / energy / soul answers for this visit. */
+    @Implement(contract.coach.session)
+    session() {
+        return implement(contract.coach.session).handler(() => this.sessions.session());
     }
 
     // ====================================================================

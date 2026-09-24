@@ -12,6 +12,7 @@ import { DebtKind, DebtScheduleKind, JarKey } from '@rumtelo/contracts';
 import { useLocale, useTranslations, type TranslateFn } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import {
+    Icon,
     Badge,
     Button,
     Card,
@@ -48,7 +49,6 @@ import { MetaChip, formatBookedDate, formatDueDay } from '@/components/features/
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
-import { EditIcon } from '@/components/features/ui/action-icons';
 
 type PaymentFormValues = {
     amount: string;
@@ -263,7 +263,7 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
                         {td('record_payment')}
                     </Button>
                     <Button as={Link} href={updateHref('debt', debt.id)} variant="secondary">
-                        <EditIcon />
+                        <Icon name="pencil" size="sm" />
                         {tAction('edit')}
                     </Button>
                 </div>

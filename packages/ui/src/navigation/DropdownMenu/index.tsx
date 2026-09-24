@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckIcon, ChevronRightIcon, CircleIcon } from 'lucide-react';
+import { Icon } from '../../display/Icon';
 import * as React from 'react';
 
 import { cn } from '@rumtelo/utils';
@@ -87,7 +87,7 @@ function DropdownMenuCheckboxItem({
             {...props}>
             <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
                 <DropdownMenuPrimitive.ItemIndicator>
-                    <CheckIcon className="size-4" />
+                    <Icon name="check" size="md" />
                 </DropdownMenuPrimitive.ItemIndicator>
             </span>
             {children}
@@ -116,7 +116,7 @@ function DropdownMenuRadioItem({
             {...props}>
             <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
                 <DropdownMenuPrimitive.ItemIndicator>
-                    <CircleIcon className="size-2 fill-current" />
+                    <Icon name="circle" size="sm" appearance="filled" className="size-2" />
                 </DropdownMenuPrimitive.ItemIndicator>
             </span>
             {children}
@@ -186,7 +186,7 @@ function DropdownMenuSubTrigger({
             )}
             {...props}>
             {children}
-            <ChevronRightIcon className="ml-auto size-4" />
+            <Icon name="chevron-right" size="md" className="ml-auto" />
         </DropdownMenuPrimitive.SubTrigger>
     );
 }

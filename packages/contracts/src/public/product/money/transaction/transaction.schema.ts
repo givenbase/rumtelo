@@ -117,21 +117,44 @@ export const Account = z.object({
     iban: z.string().max(42).nullable(),
     kind: z.enum(AccountKind),
     balance: Money,
-    /** Null for manual accounts; set when linked through the bank-sync port. */
-    connectionId: Id.nullable(),
+    /**
+     * Catalog bank id (backoffice Bank) — always required.
+     * Manual vs Open Banking is `connectionId` (null = manual entry at this bank).
+     */
+    bankId: Id,
+    /**
+     * Checking/savings account that pays this seat’s bill (credit cards).
+     * Null until set. Connecting sync later does not change this link.
+     */
+    settlementAccountId: Id.nullable(),
+    /**
+     * Null = manual account at `bankId`; set when linked through bank sync
+     * (`sessionId::accountUid` for Enable Banking — not a UUID).
+     * Connecting later upgrades this row — do not create a second account for the same IBAN.
+     */
+    connectionId: z.string().min(1).max(120).nullable(),
     lastSyncedAt: z.iso.datetime().nullable(),
+    /**
+     * Household default seat (CSV labels / defaults). At most one true per household.
+     */
+    isPrimary: z.boolean(),
 });
 
 // ====================================================================
-// CSV Import
+// Statement file import (CSV / MT940 / CAMT.053)
 // ====================================================================
+
+export const StatementImportFormat = z.enum(['auto', 'csv', 'mt940', 'camt053']);
 
 export const ImportCsv = z.object({
     householdId: HouseholdId,
     accountId: Id,
-    /** Raw CSV text. Parsing/mapping happens server-side so the format lives in one place. */
+    /** Raw statement text (CSV, MT940, or CAMT.053 XML). Format is sniffed when `format` is auto. */
     content: z.string().min(1),
+    /** Original filename — helps dialect sniff when headers are ambiguous. */
+    fileName: z.string().max(240).nullish(),
     dryRun: z.boolean().default(true),
+    format: StatementImportFormat.default('auto'),
 });
 
 export const ImportPreview = z.object({
@@ -141,6 +164,20 @@ export const ImportPreview = z.object({
     /** Of the rows that land, how many a rule or the merchant catalog sorts immediately. */
     sorted: z.int(),
     sample: z.array(z.string()),
+    /** Sniffed file family. */
+    format: z.enum(['csv', 'mt940', 'camt053']),
+    /**
+     * Optional CSV dialect fingerprint when headers/filename match a known export
+     * (e.g. `nl.ing`, `nl.revolut`). Open string — not an enum — so other
+     * markets can add dialects without a contract churn. Null = CAMT/MT940
+     * or CSV without a known fingerprint.
+     */
+    csvDialect: z.string().min(1).max(64).nullable(),
+    /**
+     * True when `csvDialect` is known and does not belong on the selected
+     * account’s catalog bank — client must block import.
+     */
+    accountMismatch: z.boolean(),
 });
 
 export const ImportCsvResult = z.object({
@@ -158,3 +195,4 @@ export type Account = z.infer<typeof Account>;
 export type ImportCsv = z.infer<typeof ImportCsv>;
 export type ImportPreview = z.infer<typeof ImportPreview>;
 export type ImportCsvResult = z.infer<typeof ImportCsvResult>;
+export type StatementImportFormat = z.infer<typeof StatementImportFormat>;

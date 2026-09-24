@@ -51,7 +51,7 @@ Browser ──HTTPS──► Application (public) ── /api/auth   ├─► B
 | `DATABASE_REDIS_URL` | Backend | `${{Redis.REDIS_URL}}` (`redis://` / `rediss://`) — Better Auth rate limits + session cache, Nest HTTP Throttler, sign-up stash; Nest health probe |
 | `DOMAIN_BACK` | Backend + Application + Website (server) | `http://${{Backend.RAILWAY_PRIVATE_DOMAIN}}:${{Backend.PORT}}` — see note below |
 | `DOMAIN_BACK_PUBLIC` | Backend | `https://${{Backend.RAILWAY_PUBLIC_DOMAIN}}` |
-| `DOMAIN_APP` / `DOMAIN_WEB` | Backend | Public HTTPS — no www (`https://app.rumtelo.com`, `https://rumtelo.com`) |
+| `DOMAIN_APP` / `DOMAIN_WEB` | Backend | Public HTTPS brand hosts — no www. Prod: `https://app.rumtelo.com`, `https://rumtelo.com`. Staging: `https://dev-app.rumtelo.com`, `https://dev.rumtelo.com` (not `*.up.railway.app` — shared auth cookies need one root domain) |
 | `NEXT_PUBLIC_DOMAIN_APP` | Application + Website (build) | Same as `DOMAIN_APP` |
 | `NEXT_PUBLIC_DOMAIN_WEB` | Application + Website (build) | Same as `DOMAIN_WEB` (`https://rumtelo.com`) |
 | `NEXT_PUBLIC_DOMAIN_BACK` | Application + Website (build) | Backend **public** HTTPS (optional; not used by proxies) |

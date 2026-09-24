@@ -14,6 +14,7 @@ import {
     HouseholdKind,
     IncomeKind,
     IncomeStability,
+    JarKey,
     LearnProgressStatus,
     Locale,
     PayoffStrategy,
@@ -36,6 +37,7 @@ import { AuthUser } from '../../../modules/auth/user/managed/user/auth-user.enti
 import { Account } from '../../../modules/auth/user/account/account.entity';
 import { AccountSettings } from '../../../modules/auth/user/account/account-settings/account-settings.entity';
 import { JarTemplate } from '../../../modules/backoffice/product/money/template/jar/jar.entity';
+import { Bank } from '../../../modules/backoffice/product/money/catalog/bank/bank.entity';
 import { HouseholdSettings } from '../../../modules/auth/household/household-settings/household-settings.entity';
 import { HouseholdBilling } from '../../../modules/auth/household/household-billing/household-billing.entity';
 import { EnergyLog } from '../../../modules/public/product/energy/log/energy-log.entity';
@@ -162,6 +164,8 @@ const DEMO_TX_CATEGORY: Array<{ includes: string; category: string }> = [
  * Money in this file is authored in **euros** (major units). Persist via
  * {@link toMinorUnits} — industry standard integer cents / minor units.
  */
+type DemoBanks = { primary: Bank; secondary: Bank };
+
 export class DemoHouseholdSeeder extends Seeder {
     async run(em: EntityManager): Promise<void> {
         const env = loadEnv();
@@ -319,6 +323,16 @@ export class DemoHouseholdSeeder extends Seeder {
             if (!settings.onboardedAt) settings.onboardedAt = new Date();
         }
 
+        const ingBank = await em.findOne(Bank, { key: 'ING', isActive: true });
+        const abnBank = await em.findOne(Bank, { key: 'ABN_AMRO', isActive: true });
+        if (!ingBank) {
+            throw new Error('DemoHouseholdSeeder: Bank catalog missing ING — run BankSeeder first');
+        }
+        const demoBanks: DemoBanks = {
+            primary: ingBank,
+            secondary: abnBank ?? ingBank,
+        };
+
         let billing = await em.findOne(HouseholdBilling, { household: householdId });
         if (!billing) {
             billing = em.create(HouseholdBilling, {
@@ -367,13 +381,20 @@ export class DemoHouseholdSeeder extends Seeder {
         if (incomeCount === 0) {
             switch (demo.persona) {
                 case 'basic':
-                    this.seedBasicBoard(em, householdId, rumteloAccount.id, jarMap, demo);
+                    this.seedBasicBoard(
+                        em,
+                        householdId,
+                        rumteloAccount.id,
+                        jarMap,
+                        demo,
+                        demoBanks
+                    );
                     break;
                 case 'plus':
-                    this.seedPlusBoard(em, householdId, rumteloAccount.id, jarMap, demo);
+                    this.seedPlusBoard(em, householdId, rumteloAccount.id, jarMap, demo, demoBanks);
                     break;
                 case 'max':
-                    this.seedMaxBoard(em, householdId, rumteloAccount.id, jarMap, demo);
+                    this.seedMaxBoard(em, householdId, rumteloAccount.id, jarMap, demo, demoBanks);
                     break;
             }
         }
@@ -405,7 +426,8 @@ export class DemoHouseholdSeeder extends Seeder {
         householdId: string,
         accountId: string,
         jars: JarMap,
-        demo: DemoAccount
+        demo: DemoAccount,
+        banks: DemoBanks
     ): void {
         this.createIncome(em, householdId, {
             name: 'Retail salary',
@@ -458,53 +480,55 @@ export class DemoHouseholdSeeder extends Seeder {
             name: 'Checking',
             kind: AccountKind.CHECKING,
             balance: 187.5,
+            bank: banks.primary,
         });
 
+        // Bank-feed style copy (AIS-like): creditor name + remittance — not English “Milk/Salary” labels.
         for (const tx of [
             {
                 daysAgo: 0,
                 amount: -18.9,
-                description: 'Corner store',
-                counterparty: 'Spar',
+                description: 'SPAR CITY 4821 UTRECHT',
+                counterparty: 'SPAR CITY',
                 status: TransactionStatus.INBOX,
             },
             {
                 daysAgo: 1,
                 amount: -42.5,
-                description: 'Groceries',
-                counterparty: 'Supermarket',
+                description: 'AH 1582 AMSTERDAM BEURS',
+                counterparty: 'ALBERT HEIJN 1582',
                 jar: jars.necessities,
                 status: TransactionStatus.SORTED,
             },
             {
                 daysAgo: 3,
                 amount: -950,
-                description: 'Rent',
-                counterparty: 'Landlord',
+                description: 'Huur oktober — nr 14',
+                counterparty: 'WONINGSTICHTING ROCHDALE',
                 jar: jars.necessities,
                 status: TransactionStatus.SORTED,
             },
             {
                 daysAgo: 5,
                 amount: -22,
-                description: 'Bus top-up',
-                counterparty: 'Transit',
+                description: 'OV-chipkaart opwaarderen',
+                counterparty: 'GVB Amsterdam',
                 jar: jars.necessities,
                 status: TransactionStatus.SORTED,
             },
             {
                 daysAgo: 7,
                 amount: -14.5,
-                description: 'Coffee',
-                counterparty: 'Cafe',
+                description: 'STARBUCKS CC 2918 AMS',
+                counterparty: 'STARBUCKS',
                 jar: jars.play,
                 status: TransactionStatus.SORTED,
             },
             {
                 daysAgo: 12,
                 amount: 1_850,
-                description: 'Salary',
-                counterparty: 'Employer',
+                description: 'Salaris september',
+                counterparty: 'RETAIL GROUP NL BV',
                 jar: jars.necessities,
                 status: TransactionStatus.SORTED,
                 source: TransactionSource.BANK,
@@ -512,16 +536,16 @@ export class DemoHouseholdSeeder extends Seeder {
             {
                 daysAgo: 14,
                 amount: -35,
-                description: 'Phone bill',
-                counterparty: 'Mobile Co',
+                description: 'Factuur mobiel sept',
+                counterparty: 'ODIDO',
                 jar: jars.necessities,
                 status: TransactionStatus.SORTED,
             },
             {
                 daysAgo: 18,
                 amount: -68,
-                description: 'Pharmacy',
-                counterparty: 'Pharmacy',
+                description: 'ETOS 2214 ROTTERDAM',
+                counterparty: 'ETOS BV',
                 jar: jars.necessities,
                 status: TransactionStatus.SORTED,
             },
@@ -567,7 +591,8 @@ export class DemoHouseholdSeeder extends Seeder {
         householdId: string,
         accountId: string,
         jars: JarMap,
-        demo: DemoAccount
+        demo: DemoAccount,
+        banks: DemoBanks
     ): void {
         this.createIncome(em, householdId, {
             name: 'Client retainers',
@@ -674,18 +699,20 @@ export class DemoHouseholdSeeder extends Seeder {
             name: 'Business checking',
             kind: AccountKind.CHECKING,
             balance: 942,
+            bank: banks.primary,
         });
         this.createBank(em, householdId, {
             name: 'Tax set-aside',
             kind: AccountKind.SAVINGS,
             balance: 2_100,
+            bank: banks.primary,
         });
 
         em.create(SortRule, {
             household: householdId,
             field: RuleField.COUNTERPARTY,
             matcher: RuleMatcher.CONTAINS,
-            matchValue: 'Adobe',
+            matchValue: 'ADOBE',
             jar: jars.necessities,
             priority: 10,
             hitCount: 4,
@@ -693,9 +720,9 @@ export class DemoHouseholdSeeder extends Seeder {
         } as never);
         em.create(SortRule, {
             household: householdId,
-            field: RuleField.DESCRIPTION,
+            field: RuleField.COUNTERPARTY,
             matcher: RuleMatcher.CONTAINS,
-            matchValue: 'Uber',
+            matchValue: 'UBER',
             jar: jars.play,
             priority: 20,
             hitCount: 11,
@@ -706,15 +733,15 @@ export class DemoHouseholdSeeder extends Seeder {
             {
                 daysAgo: 0,
                 amount: -64,
-                description: 'Client dinner',
-                counterparty: 'Bistro',
+                description: 'PIN 19:41 AMSTERDAM',
+                counterparty: 'CAFE DE JAREN',
                 status: TransactionStatus.INBOX,
             },
             {
                 daysAgo: 0,
                 amount: -21.5,
-                description: 'Uber to pitch',
-                counterparty: 'Uber',
+                description: 'UBER *TRIP HELP.UBER.COM',
+                counterparty: 'UBER *TRIP',
                 jar: jars.play,
                 status: TransactionStatus.SORTED,
                 source: TransactionSource.BANK,
@@ -722,8 +749,8 @@ export class DemoHouseholdSeeder extends Seeder {
             {
                 daysAgo: 1,
                 amount: 950,
-                description: 'Invoice #184 — Acme',
-                counterparty: 'Acme BV',
+                description: 'Factuur 184 — diensten sept',
+                counterparty: 'ACME DESIGN BV',
                 jar: jars.necessities,
                 status: TransactionStatus.SORTED,
                 source: TransactionSource.BANK,
@@ -731,16 +758,16 @@ export class DemoHouseholdSeeder extends Seeder {
             {
                 daysAgo: 2,
                 amount: -180,
-                description: 'Credit card minimum',
-                counterparty: 'Visa',
+                description: 'Creditcard minimumbetaling',
+                counterparty: 'ICS CREDITCARD',
                 jar: jars.necessities,
                 status: TransactionStatus.SORTED,
             },
             {
                 daysAgo: 3,
                 amount: -89,
-                description: 'Adobe Creative Cloud',
-                counterparty: 'Adobe',
+                description: 'ADOBE *CREATIVE CLOUD',
+                counterparty: 'ADOBE SYSTEMS',
                 jar: jars.necessities,
                 status: TransactionStatus.SORTED,
                 source: TransactionSource.RECURRING,
@@ -748,24 +775,24 @@ export class DemoHouseholdSeeder extends Seeder {
             {
                 daysAgo: 4,
                 amount: -420,
-                description: 'Weekly groceries',
-                counterparty: 'Supermarket',
+                description: 'JUMBO 3120 UTRECHT LUNETTE',
+                counterparty: 'JUMBO SUPERMARKT',
                 jar: jars.necessities,
                 status: TransactionStatus.SORTED,
             },
             {
                 daysAgo: 5,
                 amount: -1_250,
-                description: 'Rent',
-                counterparty: 'Landlord',
+                description: 'Huur oktober — unit 3B',
+                counterparty: 'V.V.E. DE GRAVENHOF',
                 jar: jars.necessities,
                 status: TransactionStatus.SORTED,
             },
             {
                 daysAgo: 7,
                 amount: 1_400,
-                description: 'Invoice #183 — Nova',
-                counterparty: 'Nova Studio',
+                description: 'Factuur 183 — branding pack',
+                counterparty: 'NOVA STUDIO BV',
                 jar: jars.necessities,
                 status: TransactionStatus.SORTED,
                 source: TransactionSource.BANK,
@@ -773,8 +800,8 @@ export class DemoHouseholdSeeder extends Seeder {
             {
                 daysAgo: 9,
                 amount: -380,
-                description: 'Car lease',
-                counterparty: 'LeaseCo',
+                description: 'Autolease termijn sept',
+                counterparty: 'ALPHERA FINANCIAL SERVICES',
                 jar: jars.necessities,
                 status: TransactionStatus.SORTED,
                 source: TransactionSource.RECURRING,
@@ -782,32 +809,32 @@ export class DemoHouseholdSeeder extends Seeder {
             {
                 daysAgo: 11,
                 amount: -220,
-                description: 'Coworking',
-                counterparty: 'WeWork',
+                description: 'Coworking lidmaatschap',
+                counterparty: 'SPACES REGULIERSBREESTRAAT',
                 jar: jars.necessities,
                 status: TransactionStatus.SORTED,
             },
             {
                 daysAgo: 14,
                 amount: -48,
-                description: 'Takeout after late delivery',
-                counterparty: 'Deliveroo',
+                description: 'DELIVEROO.NL 882194',
+                counterparty: 'DELIVEROO',
                 jar: jars.play,
                 status: TransactionStatus.SORTED,
             },
             {
                 daysAgo: 16,
                 amount: 450,
-                description: 'Rush gig — logo pack',
-                counterparty: 'Local Shop',
+                description: 'Factuur logo pakket',
+                counterparty: 'BAKKERIJ DE GUNST BV',
                 jar: jars.necessities,
                 status: TransactionStatus.SORTED,
             },
             {
                 daysAgo: 20,
                 amount: -120,
-                description: 'Laptop loan payment',
-                counterparty: 'FinCo',
+                description: 'Lening aflossing sept',
+                counterparty: 'DE LAGE LANDEN FINANCE',
                 jar: jars.necessities,
                 status: TransactionStatus.SORTED,
             },
@@ -1034,7 +1061,8 @@ export class DemoHouseholdSeeder extends Seeder {
         householdId: string,
         accountId: string,
         jars: JarMap,
-        demo: DemoAccount
+        demo: DemoAccount,
+        banks: DemoBanks
     ): void {
         this.createIncome(em, householdId, {
             name: 'Studio profit draw',
@@ -1198,23 +1226,27 @@ export class DemoHouseholdSeeder extends Seeder {
             name: 'Operating checking',
             kind: AccountKind.CHECKING,
             balance: 12_400,
+            bank: banks.primary,
+            isPrimary: true,
         });
         this.createBank(em, householdId, {
             name: 'High-yield savings',
             kind: AccountKind.SAVINGS,
             balance: 36_500,
+            bank: banks.primary,
         });
         const brokerage = this.createBank(em, householdId, {
             name: 'Brokerage',
             kind: AccountKind.INVESTMENT,
             balance: 124_800,
+            bank: banks.secondary,
         });
 
         em.create(SortRule, {
             household: householdId,
             field: RuleField.COUNTERPARTY,
             matcher: RuleMatcher.CONTAINS,
-            matchValue: 'Vanguard',
+            matchValue: 'DEGIRO',
             jar: jars.ff,
             priority: 5,
             hitCount: 22,
@@ -1224,7 +1256,7 @@ export class DemoHouseholdSeeder extends Seeder {
             household: householdId,
             field: RuleField.DESCRIPTION,
             matcher: RuleMatcher.CONTAINS,
-            matchValue: 'Dividend',
+            matchValue: 'DIVIDEND',
             jar: jars.ff,
             priority: 5,
             hitCount: 18,
@@ -1234,7 +1266,7 @@ export class DemoHouseholdSeeder extends Seeder {
             household: householdId,
             field: RuleField.COUNTERPARTY,
             matcher: RuleMatcher.CONTAINS,
-            matchValue: 'Whole Foods',
+            matchValue: 'ALBERT HEIJN',
             jar: jars.necessities,
             priority: 30,
             hitCount: 9,
@@ -1245,8 +1277,8 @@ export class DemoHouseholdSeeder extends Seeder {
             {
                 daysAgo: 0,
                 amount: 325,
-                description: 'Dividend — VT',
-                counterparty: 'Vanguard',
+                description: 'DIVIDEND VT ISIN US9229087690',
+                counterparty: 'DEGIRO',
                 jar: jars.ff,
                 status: TransactionStatus.SORTED,
                 source: TransactionSource.BANK,
@@ -1255,15 +1287,15 @@ export class DemoHouseholdSeeder extends Seeder {
             {
                 daysAgo: 0,
                 amount: -184,
-                description: 'Date night',
-                counterparty: 'Restaurant',
+                description: 'PIN 21:08 AMSTERDAM CENTRUM',
+                counterparty: 'RESTAURANT RIJKS',
                 status: TransactionStatus.INBOX,
             },
             {
                 daysAgo: 1,
                 amount: -1_200,
-                description: 'Brokerage transfer → VT',
-                counterparty: 'Vanguard',
+                description: 'Overboeking beleggingsrekening',
+                counterparty: 'DEGIRO',
                 jar: jars.ff,
                 status: TransactionStatus.SORTED,
                 source: TransactionSource.BANK,
@@ -1271,8 +1303,8 @@ export class DemoHouseholdSeeder extends Seeder {
             {
                 daysAgo: 2,
                 amount: 1_400,
-                description: 'Rental income',
-                counterparty: 'Tenant',
+                description: 'Huurinkomsten okt — unit A',
+                counterparty: 'HUURDER J. DE VRIES',
                 jar: jars.ff,
                 status: TransactionStatus.SORTED,
                 source: TransactionSource.BANK,
@@ -1280,8 +1312,8 @@ export class DemoHouseholdSeeder extends Seeder {
             {
                 daysAgo: 3,
                 amount: -1_850,
-                description: 'Mortgage + extra principal',
-                counterparty: 'Bank NL',
+                description: 'Hypotheek + extra aflossing',
+                counterparty: 'ING BANK HYPOTEKEN',
                 jar: jars.necessities,
                 status: TransactionStatus.SORTED,
                 source: TransactionSource.RECURRING,
@@ -1289,8 +1321,8 @@ export class DemoHouseholdSeeder extends Seeder {
             {
                 daysAgo: 4,
                 amount: 5_200,
-                description: 'Studio profit draw',
-                counterparty: 'Studio BV',
+                description: 'Winstuitkering Q3',
+                counterparty: 'STUDIO NOORD BV',
                 jar: jars.necessities,
                 status: TransactionStatus.SORTED,
                 source: TransactionSource.BANK,
@@ -1298,7 +1330,7 @@ export class DemoHouseholdSeeder extends Seeder {
             {
                 daysAgo: 5,
                 amount: -250,
-                description: 'Monthly give',
+                description: 'Periodieke donatie',
                 counterparty: DEMO_GIVE_COUNTERPARTY,
                 jar: jars.give,
                 status: TransactionStatus.SORTED,
@@ -1307,7 +1339,7 @@ export class DemoHouseholdSeeder extends Seeder {
             {
                 daysAgo: 35,
                 amount: -250,
-                description: 'Monthly give',
+                description: 'Periodieke donatie',
                 counterparty: DEMO_GIVE_COUNTERPARTY,
                 jar: jars.give,
                 status: TransactionStatus.SORTED,
@@ -1316,7 +1348,7 @@ export class DemoHouseholdSeeder extends Seeder {
             {
                 daysAgo: 66,
                 amount: -250,
-                description: 'Monthly give',
+                description: 'Periodieke donatie',
                 counterparty: DEMO_GIVE_COUNTERPARTY,
                 jar: jars.give,
                 status: TransactionStatus.SORTED,
@@ -1325,7 +1357,7 @@ export class DemoHouseholdSeeder extends Seeder {
             {
                 daysAgo: 96,
                 amount: -250,
-                description: 'Monthly give',
+                description: 'Periodieke donatie',
                 counterparty: DEMO_GIVE_COUNTERPARTY,
                 jar: jars.give,
                 status: TransactionStatus.SORTED,
@@ -1334,16 +1366,16 @@ export class DemoHouseholdSeeder extends Seeder {
             {
                 daysAgo: 48,
                 amount: -400,
-                description: 'Emergency appeal',
-                counterparty: 'Giro555',
+                description: 'Noodhulpacitie SHO',
+                counterparty: 'GIRO555',
                 jar: jars.give,
                 status: TransactionStatus.SORTED,
             },
             {
                 daysAgo: 6,
                 amount: -79,
-                description: 'Masterclass membership',
-                counterparty: 'LearnCo',
+                description: 'MASTERCLASS LIDMAATSCHAP',
+                counterparty: 'COURSERA.ORG',
                 jar: jars.education,
                 status: TransactionStatus.SORTED,
                 source: TransactionSource.RECURRING,
@@ -1351,24 +1383,24 @@ export class DemoHouseholdSeeder extends Seeder {
             {
                 daysAgo: 8,
                 amount: -620,
-                description: 'Groceries + household',
-                counterparty: 'Whole Foods',
+                description: 'AH 2041 AMSTERDAM OUD-ZUID',
+                counterparty: 'ALBERT HEIJN 2041',
                 jar: jars.necessities,
                 status: TransactionStatus.SORTED,
             },
             {
                 daysAgo: 10,
                 amount: -450,
-                description: 'Weekend trip',
-                counterparty: 'Airbnb',
+                description: 'AIRBNB * HM8XK2 AMS',
+                counterparty: 'AIRBNB',
                 jar: jars.play,
                 status: TransactionStatus.SORTED,
             },
             {
                 daysAgo: 12,
                 amount: 280,
-                description: 'Dividend — VXUS',
-                counterparty: 'Vanguard',
+                description: 'DIVIDEND VXUS ISIN US9219097683',
+                counterparty: 'DEGIRO',
                 jar: jars.ff,
                 status: TransactionStatus.SORTED,
                 source: TransactionSource.BANK,
@@ -1377,30 +1409,31 @@ export class DemoHouseholdSeeder extends Seeder {
             {
                 daysAgo: 15,
                 amount: -1_000,
-                description: 'Business credit line extra',
-                counterparty: 'BizBank',
+                description: 'Zakelijk krediet extra aflossing',
+                counterparty: 'KNAB ZAKELIJK',
                 jar: jars.ff,
                 status: TransactionStatus.SORTED,
             },
             {
                 daysAgo: 18,
                 amount: -125,
-                description: 'Books + course materials',
-                counterparty: 'Bookstore',
+                description: 'BOL.COM BOEKEN 8821',
+                counterparty: 'BOL.COM',
                 jar: jars.education,
                 status: TransactionStatus.SORTED,
             },
             {
                 daysAgo: 22,
                 amount: 950,
-                description: 'Quarterly dividend sweep',
-                counterparty: 'Broker',
+                description: 'DIVIDEND UITKERING Q3',
+                counterparty: 'DEGIRO',
                 jar: jars.ff,
                 status: TransactionStatus.SORTED,
                 source: TransactionSource.BANK,
+                account: brokerage,
             },
         ] as const) {
-            this.createTx(em, householdId, tx.account ?? checking, tx);
+            this.createTx(em, householdId, checking, tx);
         }
 
         this.seedEnergyDays(em, householdId, accountId, [
@@ -1531,16 +1564,24 @@ export class DemoHouseholdSeeder extends Seeder {
     private createBank(
         em: EntityManager,
         householdId: string,
-        input: { name: string; kind: AccountKind; balance: number }
+        input: {
+            name: string;
+            kind: AccountKind;
+            balance: number;
+            bank: Bank;
+            isPrimary?: boolean;
+        }
     ): BankAccount {
-        const bank = em.create(BankAccount, {
+        const account = em.create(BankAccount, {
             household: householdId,
             name: input.name,
             kind: input.kind,
             balance: toMinorUnits(input.balance),
+            bank: input.bank,
+            isPrimary: input.isPrimary ?? false,
         } as never);
-        em.persist(bank);
-        return bank;
+        em.persist(account);
+        return account;
     }
 
     private createTx(
@@ -1752,14 +1793,14 @@ export class DemoHouseholdSeeder extends Seeder {
 }
 
 function toJarMap(jars: Jar[]): JarMap {
-    const byKey = (key: string) => jars.find(j => j.key === key) ?? jars[0]!;
+    const byKey = (key: JarKey) => jars.find(j => j.key === key) ?? jars[0]!;
     return {
-        necessities: byKey('NECESSITIES'),
-        ff: byKey('FINANCIAL_FREEDOM'),
-        education: byKey('EDUCATION'),
-        lts: byKey('LONG_TERM_SAVINGS'),
-        play: byKey('PLAY'),
-        give: byKey('GIVE'),
+        necessities: byKey(JarKey.NECESSITIES),
+        ff: byKey(JarKey.FINANCIAL_FREEDOM),
+        education: byKey(JarKey.EDUCATION),
+        lts: byKey(JarKey.LONG_TERM_SAVINGS),
+        play: byKey(JarKey.PLAY),
+        give: byKey(JarKey.GIVE),
         all: jars,
     };
 }

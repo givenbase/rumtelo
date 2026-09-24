@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { CalendarIcon } from 'lucide-react';
+import { Icon } from '../../display/Icon';
 
 import { cn } from '@rumtelo/utils';
 
@@ -68,7 +68,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                     className="inline-flex size-8 items-center justify-center rounded-md text-fg-muted transition-colors hover:text-fg disabled:opacity-50"
                     disabled={props.disabled}
                     onClick={openNativePicker}>
-                    <CalendarIcon className="size-4" aria-hidden />
+                    <Icon name="calendar" size="md" />
                 </button>
             ) : null);
 

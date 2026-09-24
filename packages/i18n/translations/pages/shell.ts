@@ -37,9 +37,17 @@ const shell = {
         title: 'Add',
         fab_label: 'Quick add',
         close: 'Close',
-        open_aria: 'Quick add',
-        close_aria: 'Close quick add',
+        open_aria: 'Ask or add',
+        close_aria: 'Close palette',
+        mode_ask: 'Ask',
+        mode_add: 'Add',
+        ask_placeholder: 'Ask Coach or search…',
+        add_placeholder: 'Filter what to add…',
+        next_step: 'Next with Coach',
+        open_coach: 'Open Coach',
+        no_matches: 'Nothing matched.',
         transaction: 'Transaction',
+        import_statement: 'Bank statement',
         fixed_cost: 'Fixed cost',
         debt: 'Debt',
         goal: 'Goal',
@@ -52,6 +60,11 @@ const shell = {
         tx_create: {
             title: 'New transaction',
             description: 'Out for spend, In for gifts, refunds, and jar top-ups.',
+        },
+        tx_import: {
+            title: 'Import bank statement',
+            description:
+                'Prefer CAMT.053 from your bank. Rows land in the Inbox — sort them and link vaste kosten when they match.',
         },
         tx_update: {
             title: 'Edit transaction',

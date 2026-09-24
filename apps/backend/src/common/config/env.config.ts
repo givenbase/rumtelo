@@ -150,6 +150,9 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     if (data.FEATURE_BANK_SYNC && !data.ENABLE_BANKING_APP_ID) {
         throw new Error('FEATURE_BANK_SYNC is on but ENABLE_BANKING_APP_ID is missing');
     }
+    if (data.FEATURE_BANK_SYNC && !data.ENABLE_BANKING_PRIVATE_KEY) {
+        throw new Error('FEATURE_BANK_SYNC is on but ENABLE_BANKING_PRIVATE_KEY is missing');
+    }
     if (data.DATABASE_SYNC) {
         throw new Error(
             'DATABASE_SYNC must stay false — Rumtelo applies schema via migrations only'

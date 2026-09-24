@@ -21,6 +21,11 @@ export const FORM_ROUTE = {
         descriptionKey: 'pages.shell.forms.tx_create.description',
         closeHref: productPath('money/transactions'),
     },
+    txImport: {
+        titleKey: 'pages.shell.forms.tx_import.title',
+        descriptionKey: 'pages.shell.forms.tx_import.description',
+        closeHref: productPath('money/transactions'),
+    },
     txUpdate: {
         titleKey: 'pages.shell.forms.tx_update.title',
         descriptionKey: 'pages.shell.forms.tx_update.description',

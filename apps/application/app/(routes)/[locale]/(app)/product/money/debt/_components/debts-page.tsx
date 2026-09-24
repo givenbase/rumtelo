@@ -25,6 +25,7 @@ import { isLiveData } from '@/app/_lib/preview';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { ListControls } from '@/components/layout/list-controls';
 import { ListToolbar, ListToolbarTab } from '@/components/layout/list-toolbar';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { DebtListRow } from './debt-list-row';
@@ -69,26 +70,30 @@ export function DebtsPageClient() {
         { key: 'balance-low', label: t('sort_balance_low') },
         { key: 'minimum', label: t('sort_minimum') },
     ];
-    const strategyOptions = [
-        {
-            key: PayoffStrategy.AVALANCHE,
-            name: t('strategy_avalanche'),
-            promise: t('strategy_avalanche_promise'),
-            rule: t('strategy_avalanche_rule'),
-        },
-        {
-            key: PayoffStrategy.SNOWBALL,
-            name: t('strategy_snowball'),
-            promise: t('strategy_snowball_promise'),
-            rule: t('strategy_snowball_rule'),
-        },
-        {
-            key: PayoffStrategy.MINIMAL,
-            name: t('strategy_minimal'),
-            promise: t('strategy_minimal_promise'),
-            rule: t('strategy_minimal_rule'),
-        },
-    ] as const;
+    const strategyOptions = useMemo(
+        () =>
+            [
+                {
+                    key: PayoffStrategy.AVALANCHE,
+                    name: t('strategy_avalanche'),
+                    promise: t('strategy_avalanche_promise'),
+                    rule: t('strategy_avalanche_rule'),
+                },
+                {
+                    key: PayoffStrategy.SNOWBALL,
+                    name: t('strategy_snowball'),
+                    promise: t('strategy_snowball_promise'),
+                    rule: t('strategy_snowball_rule'),
+                },
+                {
+                    key: PayoffStrategy.MINIMAL,
+                    name: t('strategy_minimal'),
+                    promise: t('strategy_minimal_promise'),
+                    rule: t('strategy_minimal_rule'),
+                },
+            ] as const,
+        [t]
+    );
     const { householdId } = useAuth();
     const { period } = useAppShell();
     const { formatMoney } = useHouseholdCurrency();
@@ -387,62 +392,32 @@ export function DebtsPageClient() {
                     formatMoney={formatMoney}
                 />
             ) : (
-                <div className="grid gap-3">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                        <Typography as="span" variant="eyebrow" color="primary">
-                            {listTitle}
-                        </Typography>
-                        <label className="flex items-center gap-2 text-xs text-fg-muted">
-                            <span className="font-mono text-[10px] tracking-widest uppercase">
-                                {t('sort_label')}
-                            </span>
-                            <select
-                                value={sort}
-                                onChange={event => {
-                                    const next = event.target.value;
-                                    if (isDebtSort(next)) setSort(next);
-                                }}
-                                aria-label={t('sort_aria')}
-                                className="rounded-lg border border-line bg-raised px-2.5 py-1.5 font-mono text-[10px] tracking-wide text-fg uppercase outline-none focus:border-accent">
-                                {debtSorts.map(option => (
-                                    <option key={option.key} value={option.key}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </label>
-                    </div>
-
-                    <div
-                        className="flex flex-wrap gap-1.5"
-                        role="group"
-                        aria-label={t('filter_aria')}>
-                        {debtFilters.map(option => (
-                            <button
-                                key={option.key}
-                                type="button"
-                                aria-pressed={filter === option.key}
-                                onClick={() => setFilter(option.key)}
-                                className={cn(
-                                    'rounded-full border px-3 py-1.5 font-mono text-[10px] font-medium tracking-widest uppercase transition-all duration-200',
-                                    filter === option.key
-                                        ? 'border-accent/40 bg-accent-soft text-accent'
-                                        : 'border-line text-fg-muted hover:border-accent-hover hover:text-accent'
-                                )}>
-                                {option.label}
-                            </button>
-                        ))}
-                    </div>
-
-                    {showPayoffRanks && focusDebt && hasExtra ? (
-                        <Typography as="p" size="xs" color="muted">
-                            {t('payoff_hint')}
-                        </Typography>
-                    ) : null}
+                <div className="grid gap-4">
+                    <ListControls
+                        title={listTitle}
+                        sort={{
+                            value: sort,
+                            options: debtSorts,
+                            onChange: next => {
+                                if (isDebtSort(next)) setSort(next);
+                            },
+                            label: t('sort_label'),
+                            ariaLabel: t('sort_aria'),
+                        }}
+                        filters={{
+                            value: filter,
+                            options: debtFilters,
+                            onChange: setFilter,
+                            ariaLabel: t('filter_aria'),
+                        }}
+                        hint={
+                            showPayoffRanks && focusDebt && hasExtra ? t('payoff_hint') : undefined
+                        }
+                    />
 
                     {visibleDebts.length === 0 ? (
                         <EmptyState
-                            icon="↓"
+                            icon="arrow-down"
                             title={debtsLive.length === 0 ? t('empty_title') : t('empty_filter')}
                             body={debtsLive.length === 0 ? t('empty_body') : t('empty_filter_body')}
                         />

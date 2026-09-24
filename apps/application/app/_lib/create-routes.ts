@@ -3,6 +3,7 @@ import { productPath } from './routes';
 /** Canonical create/update paths for money + growth entities. */
 export const CREATE_HREF = {
     tx: productPath('money/transactions/create'),
+    importStatement: productPath('money/transactions/import'),
     fixed: productPath('money/fixed-costs/create'),
     debt: productPath('money/debt/create'),
     income: productPath('growth/income/create'),
@@ -102,7 +103,10 @@ export function createMoveHref(opts?: { fromJarId?: string; returnTo?: string })
     return qs ? `${CREATE_HREF.move}?${qs}` : CREATE_HREF.move;
 }
 
-export function updateHref(kind: Exclude<CreateKind, 'session' | 'move'>, id: string) {
+export function updateHref(
+    kind: Exclude<CreateKind, 'session' | 'move' | 'importStatement'>,
+    id: string
+) {
     switch (kind) {
         case 'tx':
             return productPath(`money/transactions/update/${id}`);

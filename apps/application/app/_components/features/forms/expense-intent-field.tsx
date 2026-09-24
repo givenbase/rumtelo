@@ -2,12 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import type {
-    CategoryTemplate,
-    JarKey,
-    MerchantHighlight,
-    MerchantPreset,
-} from '@rumtelo/contracts';
+import type { CategoryTemplate, JarKey, MerchantPreset } from '@rumtelo/contracts';
+import { MerchantHighlight } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import { Typography, VendorMark } from '@rumtelo/ui';
 
@@ -78,8 +74,8 @@ export function ExpenseIntentField({
     const t = useTranslations('features.money.expense_intent');
     const tForm = useTranslations('ui.form');
     const highlightLabel = (highlight: MerchantHighlight) => {
-        if (highlight === 'FEATURED') return t('highlight_featured');
-        if (highlight === 'NEW') return t('highlight_new');
+        if (highlight === MerchantHighlight.FEATURED) return t('highlight_featured');
+        if (highlight === MerchantHighlight.NEW) return t('highlight_new');
         return t('highlight_popular');
     };
     const pickModes: ReadonlyArray<{ id: ExpensePickMode; label: string }> = [

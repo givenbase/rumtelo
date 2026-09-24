@@ -258,18 +258,22 @@ function useRemoteShelf(live: boolean, householdId: string | null): LearnShelfAp
                     ),
                 });
                 void (async () => {
-                    for (const row of ordered) {
-                        const existing = current.progress.find(item => item.pieceKey === row.id);
-                        if (!existing) continue;
-                        await save.mutateAsync({
-                            householdId,
-                            pieceKey: row.id,
-                            status: existing.status,
-                            skill: row.skill,
-                            dueOn: existing.dueOn,
-                            rank: rankOf.get(row.id)!,
-                        });
-                    }
+                    await Promise.all(
+                        ordered.map(async row => {
+                            const existing = current.progress.find(
+                                item => item.pieceKey === row.id
+                            );
+                            if (!existing) return;
+                            await save.mutateAsync({
+                                householdId,
+                                pieceKey: row.id,
+                                status: existing.status,
+                                skill: row.skill,
+                                dueOn: existing.dueOn,
+                                rank: rankOf.get(row.id)!,
+                            });
+                        })
+                    );
                 })();
             },
             focusSkill(skill) {

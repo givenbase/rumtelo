@@ -12,4 +12,5 @@ export type {
     ImportCsv,
     ImportPreview,
     ImportCsvResult,
+    StatementImportFormat,
 } from './transaction.schema';

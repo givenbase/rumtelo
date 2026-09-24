@@ -24,7 +24,7 @@ export function normalizeTourProgress(
     return {
         offer: tour.offer ?? DEFAULT_ACCOUNT_TOUR_PROGRESS.offer,
         tours: tour.tours ?? {},
-        seriesActive: Boolean(tour.seriesActive),
+        seriesActive: tour.seriesActive ?? false,
         seriesIndex: Math.max(0, Math.floor(tour.seriesIndex ?? 0)),
     };
 }

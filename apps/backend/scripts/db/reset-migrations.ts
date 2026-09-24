@@ -21,7 +21,7 @@
  */
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, unlinkSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, resolve as resolvePath } from 'node:path';
 import { createInterface } from 'node:readline';
 import { fileURLToPath } from 'node:url';
 
@@ -31,8 +31,8 @@ import { databaseNameFromUrl, maskDatabaseUrl } from './confirm-destructive';
 
 const CONFIRM_PHRASE = 'RESET ALL ENVS';
 
-const backendRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const monorepoRoot = resolve(backendRoot, '../..');
+const backendRoot = resolvePath(dirname(fileURLToPath(import.meta.url)), '../..');
+const monorepoRoot = resolvePath(backendRoot, '../..');
 const migrationsDir = join(backendRoot, 'src/database/migrations');
 
 const wantSeed = !process.argv.includes('--no-seed');

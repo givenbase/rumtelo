@@ -489,6 +489,9 @@ const growth = {
         flow_hint: 'Leave empty if it only sits there.',
         name_placeholder: 'Start typing, or pick one',
         name_free_placeholder: 'Type the name',
+        which_car: 'Which car?',
+        search_brand: 'Search brand',
+        more: 'More',
         locked_pension:
             'Locked until you stop working. It counts in the total, not as monthly income.',
         locked_default: 'It counts in the total, not as monthly income.',

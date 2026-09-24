@@ -2,7 +2,8 @@ import { EntityManager } from '@mikro-orm/postgresql';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 
-import { containsWord } from '@rumtelo/utils';
+import { containsWord, endOfPeriodIso } from '@rumtelo/utils';
+import { apiBadRequest } from '../../../../../../common/errors/api-user-error';
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { MerchantPresetService } from '../../../../../backoffice/product/money/preset/merchant/merchant.service';
@@ -15,7 +16,8 @@ import {
 } from '../../plan/fixed-cost/fixed-cost-link.util';
 import { BankAccount } from '../bank-account/bank-account.entity';
 import { SortRuleService } from '../sort-rule/sort-rule.service';
-import { parseStatementCsv } from './csv/csv-parser';
+import { csvDialectMismatchesBank, parseStatement } from './statement/parse-statement';
+import type { StatementFormat } from './statement/parsed-row';
 import { jarCapabilitiesFor, TransactionSource, TransactionStatus } from '@rumtelo/contracts';
 
 import { Transaction } from './transaction.entity';
@@ -91,11 +93,33 @@ export class TransactionService {
     }
 
     /**
-     * CSV is the always-on import path; bank sync is the optional one. Import is
-     * idempotent via dedupeKey, so re-uploading the same statement is safe.
+     * Statement file import (CSV / MT940 / CAMT.053). Idempotent via dedupeKey.
+     * Prefer CAMT.053 when the bank offers it; format sniff is automatic.
      */
-    async importCsv(accountId: string, content: string, dryRun: boolean) {
-        const parsed = parseStatementCsv(content);
+    async importCsv(
+        accountId: string,
+        content: string,
+        dryRun: boolean,
+        format: StatementFormat | 'auto' = 'auto',
+        fileName?: string | null
+    ) {
+        const account = await this.em.findOne(
+            BankAccount,
+            { id: accountId },
+            { populate: ['bank'] }
+        );
+        if (!account) throw apiBadRequest('bank_not_found');
+
+        const {
+            rows: parsed,
+            format: resolvedFormat,
+            csvDialect,
+        } = parseStatement(content, format, fileName);
+        const accountMismatch = csvDialectMismatchesBank(csvDialect, account.bank.key);
+        if (accountMismatch && !dryRun) {
+            throw apiBadRequest('statement_bank_mismatch');
+        }
+
         const keys = parsed.map(row =>
             dedupeKey(accountId, row.bookedOn, row.amount, row.description)
         );
@@ -121,7 +145,8 @@ export class TransactionService {
         });
 
         let sorted = 0;
-        if (dryRun) {
+        if (dryRun || accountMismatch) {
+            // Dry-run (or blocked mismatch): count rule hits without writing.
             sorted = await this.rules.autoSort(
                 incoming.map(row => ({
                     amount: row.amount,
@@ -156,9 +181,73 @@ export class TransactionService {
         return {
             detected: parsed.length,
             duplicates: parsed.length - freshCount,
-            willImport: freshCount,
+            willImport: accountMismatch ? 0 : freshCount,
+            sorted: accountMismatch ? 0 : sorted,
+            sample: incoming.slice(0, 5).map(row => row.counterparty?.trim() || row.description),
+            format: resolvedFormat,
+            csvDialect,
+            accountMismatch,
+        };
+    }
+
+    /**
+     * AIS pull — same Inbox + dedupe shape as CSV, source BANK.
+     * `externalId` is folded into the hash so provider ids stay stable.
+     */
+    async importBankTransactions(
+        accountId: string,
+        rows: Array<{
+            externalId: string;
+            bookedOn: string;
+            amount: number;
+            description: string;
+            counterparty: string | null;
+        }>
+    ) {
+        const keys = rows.map(row =>
+            dedupeKey(accountId, row.bookedOn, row.amount, `${row.externalId}|${row.description}`)
+        );
+
+        const existing = keys.length
+            ? await this.transactions.find({ dedupeKey: { $in: keys } })
+            : [];
+        const seen = new Set(existing.map(transaction => transaction.dedupeKey));
+        const incoming: Array<{
+            externalId: string;
+            bookedOn: string;
+            amount: number;
+            description: string;
+            counterparty: string | null;
+            dedupeKey: string;
+        }> = [];
+
+        rows.forEach((row, index) => {
+            const key = keys[index]!;
+            if (seen.has(key)) return;
+            seen.add(key);
+            incoming.push({ ...row, dedupeKey: key });
+        });
+
+        const created = incoming.map(row =>
+            this.em.create(Transaction, {
+                household: currentHouseholdId(),
+                account: this.em.getReference(BankAccount, accountId),
+                amount: row.amount,
+                bookedOn: row.bookedOn,
+                description: row.description,
+                counterparty: row.counterparty,
+                status: TransactionStatus.INBOX,
+                source: TransactionSource.BANK,
+                dedupeKey: row.dedupeKey,
+            } as never)
+        );
+        const sorted = await this.rules.autoSort(created, { countHits: true });
+        await this.em.flush();
+
+        return {
+            imported: incoming.length,
+            skipped: rows.length - incoming.length,
             sorted,
-            sample: [],
         };
     }
 
@@ -178,12 +267,31 @@ export class TransactionService {
         status?: string | null;
         jarId?: string | null;
         debtId?: string | null;
+        period?: string | null;
+        search?: string | null;
         limit: number;
     }) {
         const where: Record<string, unknown> = {};
         if (filter.status) where.status = filter.status;
         if (filter.jarId) where.jar = filter.jarId;
         if (filter.debtId) where.debt = filter.debtId;
+
+        if (filter.period) {
+            where.bookedOn = {
+                $gte: `${filter.period}-01`,
+                $lte: endOfPeriodIso(filter.period),
+            };
+        }
+
+        const needle = filter.search?.trim();
+        if (needle) {
+            const pattern = `%${needle.replace(/[%_\\]/g, '\\$&')}%`;
+            where.$or = [
+                { description: { $ilike: pattern } },
+                { counterparty: { $ilike: pattern } },
+                { note: { $ilike: pattern } },
+            ];
+        }
 
         const rows = await this.transactions.find(where, {
             orderBy: { bookedOn: 'DESC' },
@@ -224,40 +332,36 @@ export class TransactionService {
         entity.status = TransactionStatus.SORTED;
         entity.appliedMerchantKey = null;
 
-        if (createRule) {
-            const counterparty = entity.counterparty?.trim() ?? '';
-            const description = entity.description.trim();
-            const merchant = await this.merchants.matchFeed({
-                text: `${counterparty} ${description}`,
-            });
-            const needle = merchant?.matching?.matchValue.trim() ?? '';
-            let field: 'COUNTERPARTY' | 'DESCRIPTION' = counterparty
-                ? 'COUNTERPARTY'
-                : 'DESCRIPTION';
-            let matchValue = counterparty || description;
-            // Prefer the catalog needle when it is specific enough to be a rule.
-            // Short brands (NS, ING) stay on the raw counterparty — a CONTAINS rule
-            // of two letters would swallow unrelated descriptions.
-            if (needle.length >= 4) {
-                if (containsWord(description, needle)) {
-                    field = 'DESCRIPTION';
-                    matchValue = needle;
-                } else if (containsWord(counterparty, needle)) {
-                    field = 'COUNTERPARTY';
-                    matchValue = needle;
-                }
+        const counterparty = entity.counterparty?.trim() ?? '';
+        const description = entity.description.trim();
+        const merchant = await this.merchants.matchFeed({
+            text: `${counterparty} ${description}`,
+        });
+        const needle = merchant?.matching?.matchValue.trim() ?? '';
+        let field: 'COUNTERPARTY' | 'DESCRIPTION' = counterparty ? 'COUNTERPARTY' : 'DESCRIPTION';
+        let matchValue = counterparty || description;
+        // Prefer the catalog needle when it is specific enough to be a rule.
+        // Short brands (NS, ING) stay on the raw counterparty — a CONTAINS rule
+        // of two letters would swallow unrelated descriptions.
+        if (needle.length >= 4) {
+            if (containsWord(description, needle)) {
+                field = 'DESCRIPTION';
+                matchValue = needle;
+            } else if (containsWord(counterparty, needle)) {
+                field = 'COUNTERPARTY';
+                matchValue = needle;
             }
-            const rule = await this.rules.create({
-                field,
-                matcher: 'CONTAINS',
-                matchValue,
-                jarId,
-                categoryId: categoryId ?? null,
-                priority: 100,
-                isActive: true,
-            });
-            entity.appliedRule = rule.id;
         }
+
+        // Always learn the payee (Juist = soft memory, Altijd dit = explicit rule).
+        const hint = await this.rules.upsertPayeeHint({
+            field,
+            matchValue,
+            jarId,
+            categoryId: categoryId ?? null,
+            explicit: createRule,
+        });
+        if (hint) entity.appliedRule = hint.id;
 
         if (debtId !== undefined) {
             if (entity.fixedCost && debtId) {

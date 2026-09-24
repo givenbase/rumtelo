@@ -42,7 +42,6 @@ export class MerchantPresetService {
                     'markets',
                     'matching',
                     'branding',
-                    'banking',
                 ],
             }
         );

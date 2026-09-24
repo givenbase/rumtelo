@@ -2,7 +2,6 @@ import type { EntityManager } from '@mikro-orm/postgresql';
 
 import { Seeder } from '@mikro-orm/seeder';
 
-import { MerchantBanking } from '../../../../modules/backoffice/product/money/preset/merchant/merchant-banking.entity';
 import { MerchantBranding } from '../../../../modules/backoffice/product/money/preset/merchant/merchant-branding.entity';
 import { MerchantMatching } from '../../../../modules/backoffice/product/money/preset/merchant/merchant-matching.entity';
 import { MerchantPreset } from '../../../../modules/backoffice/product/money/preset/merchant/merchant.entity';
@@ -32,7 +31,7 @@ export class MerchantPresetSeeder extends Seeder {
         const existingRows = await em.find(
             MerchantPreset,
             {},
-            { populate: ['matching', 'branding', 'banking', 'markets'] }
+            { populate: ['matching', 'branding', 'markets'] }
         );
         const existingByKey = new Map(existingRows.map(row => [row.key, row]));
 
@@ -49,7 +48,6 @@ export class MerchantPresetSeeder extends Seeder {
             const providerIds = { ...row.providerIds };
             const logoDomain = row.logoDomain;
             const website = row.website ?? null;
-            const ibanBankCode = row.ibanBankCode?.trim().toUpperCase() || null;
 
             const existing = existingByKey.get(row.key);
             if (existing) {
@@ -82,20 +80,6 @@ export class MerchantPresetSeeder extends Seeder {
                     existing.branding = branding;
                     em.persist(branding);
                 }
-
-                if (ibanBankCode) {
-                    const banking =
-                        existing.banking ??
-                        em.create(MerchantBanking, { preset: existing } as never);
-                    banking.ibanBankCode = ibanBankCode;
-                    if (!existing.banking) {
-                        existing.banking = banking;
-                        em.persist(banking);
-                    }
-                } else if (existing.banking) {
-                    em.remove(existing.banking);
-                    existing.banking = null;
-                }
                 continue;
             }
 
@@ -125,10 +109,6 @@ export class MerchantPresetSeeder extends Seeder {
                 logoDomain,
                 website,
             } as never);
-
-            if (ibanBankCode) {
-                preset.banking = em.create(MerchantBanking, { preset, ibanBankCode } as never);
-            }
         }
 
         for (const row of existingRows) {

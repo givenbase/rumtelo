@@ -5,8 +5,13 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useLocale } from 'next-intl';
 
-import type { Goal } from '@rumtelo/contracts';
-import { GoalKind, GoalStatus } from '@rumtelo/contracts';
+import {
+    type Goal,
+    type MerchantPreset,
+    GoalKind,
+    GoalStatus,
+    type JarKey,
+} from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations, type TranslateFn } from '@rumtelo/i18n';
 import { AccentCard, Card, EmptyState, Meter, Typography } from '@rumtelo/ui';
@@ -29,6 +34,7 @@ import { jarChrome } from '@/app/_lib/jar-meta';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
+import { GoalKindMark } from '@/components/features/growth/goal-kind-mark';
 import { JarBadge } from '@/components/features/money/jar-badge';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -36,6 +42,8 @@ import { ListToolbar } from '@/components/layout/list-toolbar';
 
 type Tab = 'ON_TRACK' | 'REACHED';
 type KindFilter = 'ALL' | GoalKind;
+
+const EMPTY_MERCHANTS: MerchantPreset[] = [];
 
 /** Few goals → featured cards; more → grouped compact list. */
 const FEATURED_MAX = 2;
@@ -90,13 +98,6 @@ function kindTint(kind: GoalKind): string {
     if (kind === GoalKind.EARN) return 'var(--color-accent)';
     if (kind === GoalKind.GIVE) return 'var(--color-jar-give)';
     return 'var(--color-jar-lts)';
-}
-
-function kindIcon(goal: Goal): string {
-    if (goal.icon?.trim()) return goal.icon.trim();
-    if (goal.kind === GoalKind.EARN) return '📈';
-    if (goal.kind === GoalKind.GIVE) return '💛';
-    return '🎯';
 }
 
 type GoalProgress = {
@@ -198,7 +199,7 @@ export function GoalsPageClient() {
     const { period } = useAppShell();
     const [tab, setTab] = useState<Tab>('ON_TRACK');
     const [kindFilter, setKindFilter] = useState<KindFilter>('ALL');
-    const [jarFilter, setJarFilter] = useState<string | null>(null);
+    const [jarFilter, setJarFilter] = useState<JarKey | null>(null);
     const [openKindKeys, setOpenKindKeys] = useState<Set<string>>(() => new Set());
     const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
@@ -221,6 +222,14 @@ export function GoalsPageClient() {
         [],
         live
     );
+    const merchantsQuery = useLiveQuery(
+        apiQuery.money.catalogs.merchantPresets.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        EMPTY_MERCHANTS,
+        live
+    );
+    const merchants = merchantsQuery.data ?? EMPTY_MERCHANTS;
 
     const currentNet = useMemo(
         () => monthlyNetAsOf(incomeQuery.data ?? [], todayIso()),
@@ -228,7 +237,7 @@ export function GoalsPageClient() {
     );
 
     const jarById = useMemo(() => {
-        const map = new Map<string, { id: string; key: string; name: string }>();
+        const map = new Map<string, { id: string; key: JarKey; name: string }>();
         for (const jar of jarsQuery.data ?? []) {
             map.set(jar.id, { id: jar.id, key: jar.key, name: jar.name });
         }
@@ -291,7 +300,7 @@ export function GoalsPageClient() {
     const kindsPresent = KIND_ORDER.filter(kind => tabGoals.some(goal => goal.kind === kind));
 
     const saveJarKeys = (() => {
-        const keys = new Set<string>();
+        const keys = new Set<JarKey>();
         for (const goal of tabGoals) {
             if (goal.kind !== GoalKind.SAVE || !goal.jarId) continue;
             const jar = jarById.get(goal.jarId);
@@ -447,7 +456,7 @@ export function GoalsPageClient() {
 
             {shown.length === 0 ? (
                 <EmptyState
-                    icon="🎯"
+                    icon="target"
                     title={tab === 'REACHED' ? t('reached_empty_title') : t('empty_title')}
                     body={
                         tab === 'REACHED'
@@ -487,7 +496,12 @@ export function GoalsPageClient() {
                                     className="h-full transition-colors hover:border-accent-hover">
                                     <div className="flex flex-wrap items-center gap-2">
                                         <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-raised px-2.5 py-1 font-mono text-[10px] tracking-widest text-fg-secondary uppercase">
-                                            {kindIcon(goal)} {kindEyebrow(goal.kind, tDetail)}
+                                            <GoalKindMark
+                                                goal={goal}
+                                                merchants={merchants}
+                                                size={16}
+                                            />{' '}
+                                            {kindEyebrow(goal.kind, tDetail)}
                                         </span>
                                         {focus ? (
                                             <span className="inline-flex items-center rounded-full border border-accent/40 bg-accent-soft px-2.5 py-1 font-mono text-[10px] tracking-widest text-accent uppercase">
@@ -608,40 +622,49 @@ export function GoalsPageClient() {
                                                         href={goalDetailHref(goal.id)}
                                                         className="grid w-full gap-2.5 px-5 py-3.5 text-left hover:bg-raised">
                                                         <div className="flex items-start justify-between gap-3">
-                                                            <div className="min-w-0">
-                                                                <p className="truncate text-sm font-medium text-fg">
-                                                                    <span aria-hidden>
-                                                                        {kindIcon(goal)}{' '}
-                                                                    </span>
-                                                                    {goal.name}
-                                                                    {focus ? (
-                                                                        <span className="ml-2 font-mono text-[10px] tracking-wide text-accent uppercase">
-                                                                            {t('focus')}
-                                                                        </span>
-                                                                    ) : rank !== null &&
-                                                                      rank > 1 ? (
-                                                                        <span className="ml-2 font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                                                            #{rank}
-                                                                        </span>
-                                                                    ) : null}
-                                                                    {projection?.fulfilledByPeriod &&
-                                                                    reachedLabel ? (
-                                                                        <span className="ml-2 font-mono text-[10px] tracking-wide text-success uppercase">
-                                                                            {t('reached_badge', {
-                                                                                when: reachedLabel,
-                                                                            })}
-                                                                        </span>
-                                                                    ) : null}
-                                                                </p>
-                                                                {goal.why?.trim() ? (
-                                                                    <p className="mt-0.5 truncate text-xs text-fg-muted italic">
-                                                                        {goal.why.trim()}
+                                                            <div className="flex min-w-0 items-start gap-3">
+                                                                <span className="mt-0.5 inline-flex shrink-0">
+                                                                    <GoalKindMark
+                                                                        goal={goal}
+                                                                        merchants={merchants}
+                                                                        size={22}
+                                                                    />
+                                                                </span>
+                                                                <div className="min-w-0">
+                                                                    <p className="truncate text-sm font-medium text-fg">
+                                                                        {goal.name}
+                                                                        {focus ? (
+                                                                            <span className="ml-2 font-mono text-[10px] tracking-wide text-accent uppercase">
+                                                                                {t('focus')}
+                                                                            </span>
+                                                                        ) : rank !== null &&
+                                                                          rank > 1 ? (
+                                                                            <span className="ml-2 font-mono text-[10px] tracking-wide text-fg-faint uppercase">
+                                                                                #{rank}
+                                                                            </span>
+                                                                        ) : null}
+                                                                        {projection?.fulfilledByPeriod &&
+                                                                        reachedLabel ? (
+                                                                            <span className="ml-2 font-mono text-[10px] tracking-wide text-success uppercase">
+                                                                                {t(
+                                                                                    'reached_badge',
+                                                                                    {
+                                                                                        when: reachedLabel,
+                                                                                    }
+                                                                                )}
+                                                                            </span>
+                                                                        ) : null}
                                                                     </p>
-                                                                ) : (
-                                                                    <p className="mt-0.5 truncate font-mono text-[11px] text-fg-faint">
-                                                                        {stats.subline}
-                                                                    </p>
-                                                                )}
+                                                                    {goal.why?.trim() ? (
+                                                                        <p className="mt-0.5 truncate text-xs text-fg-muted italic">
+                                                                            {goal.why.trim()}
+                                                                        </p>
+                                                                    ) : (
+                                                                        <p className="mt-0.5 truncate font-mono text-[11px] text-fg-faint">
+                                                                            {stats.subline}
+                                                                        </p>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                             <div className="shrink-0 text-right">
                                                                 <p className="font-mono text-sm text-accent">

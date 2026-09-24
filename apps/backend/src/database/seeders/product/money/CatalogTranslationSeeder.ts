@@ -68,6 +68,7 @@ export class CatalogTranslationSeeder extends Seeder {
                     ];
                     // Sequential — EntityManager is not safe for concurrent find/create.
                     for (const job of jobs) {
+                        // oxlint-disable-next-line no-await-in-loop -- upsert translations per locale sequentially
                         const stats = await upsertFieldMap(
                             tem,
                             job.entityType,

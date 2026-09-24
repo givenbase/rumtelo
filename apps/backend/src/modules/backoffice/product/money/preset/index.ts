@@ -8,7 +8,6 @@ export {
 export { GoalPreset, GoalPresetModule, GoalPresetService } from './goal';
 export { IncomeSourcePreset, IncomeSourcePresetModule, IncomeSourcePresetService } from './income';
 export {
-    MerchantBanking,
     MerchantBranding,
     MerchantMatching,
     MerchantPreset,

@@ -1,11 +1,10 @@
 'use client';
 
-import { Typography } from '@rumtelo/ui';
+import { Icon, Typography } from '@rumtelo/ui';
 import { useTranslations } from '@rumtelo/i18n';
 
 import { JARS } from '@/lib/landing-content';
 
-import { LandingIcon } from './landing-icon';
 import { CARD, SectionHeading } from './landing-primitives';
 
 /** Tinted band — sits between the plain Portals and Coach sections. */
@@ -56,7 +55,11 @@ export function LandingJars() {
                             className={`${CARD} grid min-w-0 content-start gap-2.5 p-5`}>
                             <span className="flex flex-wrap items-center gap-3">
                                 <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-line bg-raised">
-                                    <LandingIcon name={jar.icon} size={20} color={jar.colorVar} />
+                                    <Icon
+                                        name={jar.icon}
+                                        size="lg"
+                                        style={{ color: jar.colorVar }}
+                                    />
                                 </span>
                                 <Typography as="h3" size="lg">
                                     {t(`jars.${jar.key}.name`)}

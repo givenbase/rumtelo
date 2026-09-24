@@ -11,21 +11,19 @@ import { useAuthFormSchemas } from '@/app/_lib/auth-form-schemas';
 import { useOptionalPlanIntent } from '@/app/_components/plan-intent-provider';
 import { useOptionalSignUpDraft } from '@/app/_components/sign-up-draft-provider';
 import { useMarketingSession } from '@/app/_components/marketing-session-provider';
-import type { IconName } from '@/lib/landing-content';
 import { isRegistrationOpen } from '@/lib/maintenance';
 import { planSlug } from '@/lib/landing-plans';
 import { appHomeUrl, appPlanSettingsUrl, appSignInUrl, webSignUpPath } from '@/lib/portal-urls';
 import { planIntentQuery } from '@rumtelo/utils';
 import { useTranslations } from '@rumtelo/i18n';
+import { Email, Icon, type IconName } from '@rumtelo/ui';
 
-import { LandingIcon } from './landing-icon';
 import { Cta, SectionHeading } from './landing-primitives';
-import { Email } from '@rumtelo/ui';
 
 const ASSURANCE_ITEMS: ReadonlyArray<{ key: 'bank' | 'eu' | 'export' | 'free'; icon: IconName }> = [
     { key: 'bank', icon: 'eye' },
     { key: 'eu', icon: 'shield' },
-    { key: 'export', icon: 'db' },
+    { key: 'export', icon: 'database' },
     { key: 'free', icon: 'shield' },
 ];
 
@@ -184,7 +182,7 @@ export function LandingSignupForm() {
                                     key={assurance.key}
                                     className="flex min-w-0 items-start gap-2.5">
                                     <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent">
-                                        <LandingIcon name={assurance.icon} size={17} />
+                                        <Icon name={assurance.icon} size="md" />
                                     </span>
                                     <span className="pt-1 text-sm leading-relaxed text-fg-secondary">
                                         {tLanding(`assurances.${assurance.key}`)}

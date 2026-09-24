@@ -145,8 +145,8 @@ function parseHoursToken(token: string | undefined): number | null {
     if (!token) return null;
     const hours = token.match(/(\d+)h/);
     const minutes = token.match(/(\d+)m/);
-    const h = hours ? Number(hours[1]) : 0;
-    const m = minutes ? Number(minutes[1]) : 0;
+    const hourCount = hours ? Number(hours[1]) : 0;
+    const minuteCount = minutes ? Number(minutes[1]) : 0;
     if (!hours && !minutes) return null;
-    return h * 60 + m;
+    return hourCount * 60 + minuteCount;
 }

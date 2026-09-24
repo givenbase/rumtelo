@@ -8,6 +8,7 @@ import { SpendingStyle } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import {
+    Icon,
     Button,
     Card,
     DropdownMenu,
@@ -30,7 +31,6 @@ import { env } from '@/app/_utils/get-env';
 import { CoachMark, useHelpersEnabled } from '@/components/features/helpers';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
-import { EditIcon } from '@/components/features/ui/action-icons';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
 import { ListToolbar, ListToolbarTab } from '@/components/layout/list-toolbar';
 
@@ -168,6 +168,8 @@ function MediaCover({ piece, className }: { piece: LearnPiece; className?: strin
                 className
             )}>
             {show ? (
+                // Decorative cover — remote URLs / onError sizing; next/image not a fit here.
+                // oxlint-disable-next-line next/no-img-element
                 <img
                     src={src!}
                     alt=""
@@ -294,7 +296,7 @@ function PieceAdjust({
             size="sm"
             aria-expanded={open}
             onClick={() => setOpen(current => !current)}>
-            <EditIcon />
+            <Icon name="pencil" size="sm" />
             {open ? tLearn('edit_done') : tLearn('edit')}
         </Button>
     );
@@ -447,18 +449,7 @@ function Tint({ pip }: { pip?: string }) {
 }
 
 function Chevron() {
-    return (
-        <svg aria-hidden viewBox="0 0 16 16" className="size-4 shrink-0 text-fg-muted">
-            <path
-                d="M4 6.5 8 10.5 12 6.5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            />
-        </svg>
-    );
+    return <Icon name="chevron-down" size="md" color="muted" />;
 }
 
 function FilterLane({
@@ -819,7 +810,7 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
 
             {shown.length === 0 && (browsing || tab === 'DONE') ? (
                 <EmptyState
-                    icon="✦"
+                    icon="sparkles"
                     title={
                         tab === 'DONE'
                             ? tLearn('done_empty_title')
@@ -993,7 +984,7 @@ function ReadingList({
     if (pieces.length === 0) {
         return (
             <EmptyState
-                icon="✦"
+                icon="sparkles"
                 title={tLearn('reading_empty_title')}
                 body={tLearn('reading_empty_body')}
             />

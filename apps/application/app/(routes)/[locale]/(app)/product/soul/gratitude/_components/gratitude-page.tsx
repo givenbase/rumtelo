@@ -107,7 +107,7 @@ export function GratitudePageClient() {
 
             {/* ── Entries list ── */}
             {empty ? (
-                <EmptyState icon="✦" title={t('empty_title')} body={t('empty_body')} />
+                <EmptyState icon="sparkles" title={t('empty_title')} body={t('empty_body')} />
             ) : (
                 <div className="grid gap-2.5">
                     {entries.map(entry => (

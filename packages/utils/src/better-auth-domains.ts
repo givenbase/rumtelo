@@ -1,9 +1,10 @@
 /**
  * Shared domain helpers for Better Auth trustedOrigins, CORS, and cross-subdomain cookies.
- * Derive trusted origins / cookie domains for better-auth.
+ * Derive trusted origins / cookie domains from configured DOMAIN_* env URLs
+ * (same pattern as galighticus-platform).
  */
 
-/** e.g. `https://app.rumtelo.com` → `rumtelo.com` */
+/** e.g. `https://app.example.com` → `example.com` */
 export function extractRootDomainFromUrl(url: string): string | null {
     try {
         const hostname = new URL(url).hostname;
@@ -22,20 +23,25 @@ export function extractRootDomainFromUrl(url: string): string | null {
 
 /**
  * Shared cookie domain for production/staging subdomains — e.g. `.rumtelo.com`
- * so `rumtelo.com` and `app.rumtelo.com` share the session (no www).
+ * so `rumtelo.com` / `dev.rumtelo.com` and `app.rumtelo.com` / `dev-app.rumtelo.com`
+ * share the session. Values come only from DOMAIN_WEB / DOMAIN_APP (and siblings).
  */
 export function resolveCrossSubdomainCookieDomain(
     ...domainUrls: (string | undefined)[]
 ): string | undefined {
     for (const domainUrl of domainUrls) {
         if (!domainUrl) continue;
-        const root = extractRootDomainFromUrl(domainUrl);
-        if (root) return `.${root}`;
+        try {
+            const root = extractRootDomainFromUrl(domainUrl);
+            if (root) return `.${root}`;
+        } catch {
+            continue;
+        }
     }
     return undefined;
 }
 
-/** Exact origin (`https://app.rumtelo.com`) — Better Auth does not support `*.domain` wildcards. */
+/** Exact origin (`https://app.example.com`) — Better Auth does not support `*.domain` wildcards. */
 export function normalizeOrigin(url: string): string {
     return new URL(url).origin;
 }

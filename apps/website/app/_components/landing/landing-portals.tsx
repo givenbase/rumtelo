@@ -2,14 +2,13 @@
 
 import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
 
-import { Typography } from '@rumtelo/ui';
+import { Icon, Typography } from '@rumtelo/ui';
 import { useTranslations } from '@rumtelo/i18n';
 
 import { PORTALS } from '@/lib/landing-content';
 import { webSignUpPath, appSignInUrl } from '@/lib/portal-urls';
 import { isRegistrationOpen } from '@/lib/maintenance';
 
-import { LandingIcon } from './landing-icon';
 import { LandingPortalScreen } from './landing-portal-screen';
 import { Cta, SectionHeading } from './landing-primitives';
 
@@ -163,7 +162,11 @@ export function LandingPortals() {
                             <span
                                 className="grid size-11 shrink-0 place-items-center rounded-xl border border-line bg-raised"
                                 style={{ borderColor: portal.colorVar }}>
-                                <LandingIcon name={portal.icon} size={21} color={portal.colorVar} />
+                                <Icon
+                                    name={portal.icon}
+                                    size="lg"
+                                    style={{ color: portal.colorVar }}
+                                />
                             </span>
                             <Typography
                                 as="span"

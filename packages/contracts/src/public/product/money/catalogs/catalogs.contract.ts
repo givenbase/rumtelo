@@ -10,6 +10,7 @@ import { HouseholdScoped } from '../../../../common/common.schema';
 import { DebtKind, GivingCause, IncomeKind, JarKey } from '../enums';
 import {
     Audience,
+    Bank,
     CategoryTemplate,
     DebtPreset,
     FixedCostPreset,
@@ -46,6 +47,16 @@ export const catalogsContract = {
     },
     audiences: {
         list: oc.input(HouseholdScoped).output(z.array(Audience)),
+    },
+    banks: {
+        list: oc
+            .input(
+                HouseholdScoped.extend({
+                    /** ISO-2 country filter; omit for all active banks. */
+                    country: z.string().length(2).nullish(),
+                })
+            )
+            .output(z.array(Bank)),
     },
     debtPresets: {
         list: oc

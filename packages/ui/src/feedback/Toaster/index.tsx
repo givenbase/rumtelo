@@ -1,14 +1,10 @@
 'use client';
 
-import {
-    CircleCheckIcon,
-    InfoIcon,
-    Loader2Icon,
-    OctagonXIcon,
-    TriangleAlertIcon,
-} from 'lucide-react';
+import type { CSSProperties } from 'react';
 import { useTheme } from 'next-themes';
 import { Toaster as Sonner, type ToasterProps } from 'sonner';
+
+import { Icon } from '../../display/Icon';
 
 const Toaster = ({ ...props }: ToasterProps) => {
     const { resolvedTheme } = useTheme();
@@ -18,11 +14,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
             theme={(resolvedTheme as ToasterProps['theme']) ?? 'system'}
             className="toaster group"
             icons={{
-                success: <CircleCheckIcon className="size-4" />,
-                info: <InfoIcon className="size-4" />,
-                warning: <TriangleAlertIcon className="size-4" />,
-                error: <OctagonXIcon className="size-4" />,
-                loading: <Loader2Icon className="size-4 animate-spin" />,
+                success: <Icon name="circle-check" size="md" />,
+                info: <Icon name="info" size="md" />,
+                warning: <Icon name="triangle-alert" size="md" />,
+                error: <Icon name="octagon-x" size="md" />,
+                loading: <Icon name="loader-2" size="md" className="animate-spin" />,
             }}
             style={
                 {
@@ -30,7 +26,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
                     '--normal-text': 'var(--popover-foreground)',
                     '--normal-border': 'var(--border)',
                     '--border-radius': 'var(--radius)',
-                } as React.CSSProperties
+                } as CSSProperties
             }
             {...props}
         />

@@ -23,6 +23,7 @@ import { formRoute, moveCreateMeta } from '@/app/_lib/form-route-meta';
 import { MoveMoneyForm } from '@/components/features/forms/move-money-form';
 import { AssetForm } from '@/components/features/forms/asset-form';
 import { SheetStubForm } from '@/components/features/forms/sheet-stub-form';
+import { StatementImportCard } from '@/components/features/money/statement-import-card';
 import { RouteModalShell } from '@/components/layout/route-modal-shell';
 
 type ShellProps = {
@@ -57,6 +58,15 @@ export function TxUpdateModalShell({ closeHref, id }: ShellProps & { id: string 
     return (
         <RouteModalShell closeHref={closeHref} meta={meta}>
             <ExpenseUpdatePage id={id} embedded />
+        </RouteModalShell>
+    );
+}
+
+export function TxImportModalShell({ closeHref }: ShellProps) {
+    const meta = formRoute('txImport');
+    return (
+        <RouteModalShell closeHref={closeHref} meta={meta}>
+            <StatementImportCard embedded variant="full" />
         </RouteModalShell>
     );
 }

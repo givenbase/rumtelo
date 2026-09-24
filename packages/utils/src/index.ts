@@ -1,4 +1,6 @@
 export { cn } from './cn';
+export { isEnumValue, parseEnum } from './enum';
+
 export {
     extractErrorMessage,
     getOrpcValidationIssues,
@@ -45,7 +47,7 @@ export {
     fixedOutNetSummary,
     fixedCostLifecycle,
     isFixedCostCounting,
-    type FixedCostLifecycle,
+    fixedCostPeriodStatus,
     monthlyNetAsOf,
     incomeDelta,
     earnGoalProgress,
@@ -96,6 +98,11 @@ export {
     proxyBetterAuthRequest,
     type BetterAuthProxyOptions,
 } from './better-auth-proxy';
+export {
+    applyTrustedClientIpHeaders,
+    isClientIp,
+    resolveClientIpFromHeaders,
+} from './better-auth-client-ip';
 export { rewriteBetterAuthSetCookie } from './better-auth-proxy-cookies';
 export {
     buildBetterAuthTrustedOrigins,

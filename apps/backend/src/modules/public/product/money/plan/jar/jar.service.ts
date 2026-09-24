@@ -170,15 +170,9 @@ export class JarService {
         const englishByKey = new Map(
             JAR_TEMPLATE_SEED.map(row => [row.key, { name: row.name, subtitle: row.subtitle }])
         );
-        return this.translations.applyToMany(
-            jars,
-            fieldMap,
-            ['name', 'subtitle'],
-            row => String(row.key),
-            {
-                englishOf: row => englishByKey.get(String(row.key) as never) ?? {},
-            }
-        );
+        return this.translations.applyToMany(jars, fieldMap, ['name', 'subtitle'], row => row.key, {
+            englishOf: row => englishByKey.get(row.key) ?? {},
+        });
     }
 
     /** EN category name → localized name for un-renamed household categories. */

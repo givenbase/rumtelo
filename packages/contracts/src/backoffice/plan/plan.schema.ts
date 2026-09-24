@@ -21,6 +21,8 @@ export const PlanLimits = z.object({
     maxAssets: z.number().int().positive().nullable(),
     maxIncomeStreams: z.number().int().positive().nullable(),
     maxLearnEntries: z.number().int().positive().nullable(),
+    /** Live Open Banking linked seats. 0 = none (Basic). null = unlimited. */
+    maxBankLinks: z.number().int().min(0).nullable(),
 });
 
 export const PlanCapabilities = z.object({
@@ -34,6 +36,8 @@ export const PlanCapabilities = z.object({
     maxIncomeStreams: z.number().int().positive().nullable(),
     /** Learn entries ceiling. null = unlimited. */
     maxLearnEntries: z.number().int().positive().nullable(),
+    /** Live AIS linked seats ceiling. 0 = none. null = unlimited. */
+    maxBankLinks: z.number().int().min(0).nullable(),
     /** Household shapes this tier may use. Basic = solo only. */
     householdKinds: z.array(z.enum(HouseholdKind)).min(1),
     /** Flat capability keys granted on this tier (derived from PLAN_ACCESS). */

@@ -2,7 +2,9 @@
 
 import { api } from '@/app/_lib/api';
 import { useEffect, useMemo, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
     Currency,
     DEFAULT_JAR_SPLIT,
@@ -13,12 +15,13 @@ import {
 } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Button, Field, Input, Typography } from '@rumtelo/ui';
-import { cn, formatMoney, currencySymbol } from '@rumtelo/utils';
+import { cn, currencySymbol, formatMoney } from '@rumtelo/utils';
+import { z } from 'zod';
 
 import { useApiError } from '@/app/_lib/api-error-messages';
+import { writeHelpersEnabled } from '@/app/_lib/feature-helpers';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
-import { writeHelpersEnabled } from '@/app/_lib/feature-helpers';
 import { usePageTour } from '@/components/features/tour';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -48,6 +51,17 @@ const JAR_NAME_KEYS: Record<
     [JarKey.PLAY]: 'features.brand.auth_manifesto.jars.play.name',
     [JarKey.GIVE]: 'features.brand.auth_manifesto.jars.give.name',
 };
+
+const onboardingSchema = z.object({
+    householdName: z.string().min(1).max(120),
+    currency: z.enum(Currency),
+    monthlyIncome: z.string().min(1),
+    why: z.string().max(500),
+    spendingStyle: z.enum(SpendingStyle),
+    incomeStability: z.enum(IncomeStability),
+});
+
+type OnboardingValues = z.infer<typeof onboardingSchema>;
 
 export function OnboardingOverlay() {
     const t = useTranslations('pages.onboarding');
@@ -85,19 +99,31 @@ export function OnboardingOverlay() {
     }, [session, householdId, isPending, openOnboarding, closeOnboarding]);
 
     const defaultHouseholdName = t('household_default');
-    const [householdNameDraft, setHouseholdNameDraft] = useState<string | null>(null);
-    const householdName = householdNameDraft ?? defaultHouseholdName;
-    const [currency, setCurrency] = useState<Currency>(Currency.EUR);
-    const [monthlyIncome, setMonthlyIncome] = useState('4300');
-    const [why, setWhy] = useState('');
-    const [spendingStyle, setSpendingStyle] = useState(SpendingStyle.UNKNOWN);
-    const [incomeStability, setIncomeStability] = useState(IncomeStability.STABLE);
+    const form = useForm<OnboardingValues>({
+        resolver: zodResolver(onboardingSchema),
+        defaultValues: {
+            householdName: defaultHouseholdName,
+            currency: Currency.EUR,
+            monthlyIncome: '4300',
+            why: '',
+            spendingStyle: SpendingStyle.UNKNOWN,
+            incomeStability: IncomeStability.STABLE,
+        },
+    });
+
+    const householdName = useWatch({ control: form.control, name: 'householdName' });
+    const currency = useWatch({ control: form.control, name: 'currency' });
+    const monthlyIncome = useWatch({ control: form.control, name: 'monthlyIncome' });
+    const why = useWatch({ control: form.control, name: 'why' });
+    const spendingStyle = useWatch({ control: form.control, name: 'spendingStyle' });
+    const incomeStability = useWatch({ control: form.control, name: 'incomeStability' });
+
     const [pending, setPending] = useState(false);
     const { jars: catalogJars } = useJarCatalog();
     const displayJars =
         catalogJars.length > 0
             ? catalogJars
-            : (Object.values(JarKey) as JarKey[]).map(key => ({
+            : Object.values(JarKey).map(key => ({
                   key,
                   name: tRoot(JAR_NAME_KEYS[key]),
                   icon: '◇',
@@ -112,20 +138,20 @@ export function OnboardingOverlay() {
     const step = steps[onboardingStep] ?? steps[0]!;
     const isLast = onboardingStep >= steps.length - 1;
 
-    async function finish() {
+    async function finish(values: OnboardingValues) {
         setPending(true);
         try {
-            const minorUnits = Math.round(parseFloat(monthlyIncome.replace(',', '.')) * 100);
+            const minorUnits = Math.round(parseFloat(values.monthlyIncome.replace(',', '.')) * 100);
             const split = displayJars.map(jar => ({ key: jar.key, percentage: jar.pct }));
             const household = await api.household.onboard({
-                householdName,
-                currency,
+                householdName: values.householdName,
+                currency: values.currency,
                 locale: Locale.NL,
-                spendingStyle,
-                incomeStability,
+                spendingStyle: values.spendingStyle,
+                incomeStability: values.incomeStability,
                 monthlyNetIncome: Number.isFinite(minorUnits) ? minorUnits : 0,
                 split,
-                why: why.trim() || null,
+                why: values.why.trim() || null,
             });
             await setActiveHousehold(household.id);
             await refreshSession();
@@ -180,7 +206,7 @@ export function OnboardingOverlay() {
                                             key={option.code}
                                             type="button"
                                             aria-pressed={on}
-                                            onClick={() => setCurrency(option.code)}
+                                            onClick={() => form.setValue('currency', option.code)}
                                             className={cn(
                                                 'grid gap-0.5 rounded-[10px] border px-3 py-2 text-left transition-colors',
                                                 on
@@ -214,14 +240,18 @@ export function OnboardingOverlay() {
                                 id="income"
                                 inputMode="decimal"
                                 value={monthlyIncome}
-                                onChange={event => setMonthlyIncome(event.target.value)}
+                                onChange={event =>
+                                    form.setValue('monthlyIncome', event.target.value)
+                                }
                             />
                         </Field>
                         <Field label={t('household_name')} htmlFor="hh-name">
                             <Input
                                 id="hh-name"
                                 value={householdName}
-                                onChange={event => setHouseholdNameDraft(event.target.value)}
+                                onChange={event =>
+                                    form.setValue('householdName', event.target.value)
+                                }
                             />
                         </Field>
                     </div>
@@ -272,7 +302,7 @@ export function OnboardingOverlay() {
                                     <button
                                         key={option.key}
                                         type="button"
-                                        onClick={() => setSpendingStyle(option.key)}
+                                        onClick={() => form.setValue('spendingStyle', option.key)}
                                         className={cn(
                                             'rounded-full border px-3 py-1.5 text-xs transition-colors',
                                             spendingStyle === option.key
@@ -308,7 +338,7 @@ export function OnboardingOverlay() {
                                     <button
                                         key={option.key}
                                         type="button"
-                                        onClick={() => setIncomeStability(option.key)}
+                                        onClick={() => form.setValue('incomeStability', option.key)}
                                         className={cn(
                                             'rounded-full border px-3 py-1.5 text-xs transition-colors',
                                             incomeStability === option.key
@@ -329,7 +359,7 @@ export function OnboardingOverlay() {
                             <Input
                                 id="why"
                                 value={why}
-                                onChange={event => setWhy(event.target.value)}
+                                onChange={event => form.setValue('why', event.target.value)}
                                 placeholder={t('why_placeholder')}
                             />
                         </Field>
@@ -358,7 +388,10 @@ export function OnboardingOverlay() {
                             </Button>
                         )}
                         {isLast ? (
-                            <Button size="sm" disabled={pending} onClick={() => void finish()}>
+                            <Button
+                                size="sm"
+                                disabled={pending}
+                                onClick={() => void form.handleSubmit(finish)()}>
                                 {pending ? t('creating') : t('start')}
                             </Button>
                         ) : (

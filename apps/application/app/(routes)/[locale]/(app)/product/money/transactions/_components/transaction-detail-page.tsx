@@ -8,7 +8,7 @@ import type { Transaction } from '@rumtelo/contracts';
 import { TransactionSource, TransactionStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
-import { Button, Card, Typography, VendorMark } from '@rumtelo/ui';
+import { Icon, Button, Card, Typography, VendorMark } from '@rumtelo/ui';
 import { isFixedCostCounting, toPeriodKey } from '@rumtelo/utils';
 
 import {
@@ -32,7 +32,6 @@ import { JarBadge, MetaChip, formatBookedDate } from '@/components/features/mone
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
-import { EditIcon } from '@/components/features/ui/action-icons';
 
 const EMPTY_TRANSACTIONS: Transaction[] = [];
 const EMPTY_PAGE = { items: EMPTY_TRANSACTIONS, nextCursor: null };
@@ -448,7 +447,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                     </div>
                 </div>
                 <Button as={Link} href={updateHref('tx', tx.id)} variant="secondary">
-                    <EditIcon />
+                    <Icon name="pencil" size="sm" />
                     {tAction('edit')}
                 </Button>
             </div>

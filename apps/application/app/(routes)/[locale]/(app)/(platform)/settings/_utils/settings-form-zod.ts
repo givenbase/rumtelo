@@ -5,9 +5,9 @@ import { z } from 'zod';
 /** Scoped `useTranslations` for settings validation messages. */
 export type SettingsFormT = (key: string) => string;
 
-export function createProfileFormSchema(v: SettingsFormT) {
+export function createProfileFormSchema(msg: SettingsFormT) {
     return z.object({
-        displayName: z.string().trim().min(1, v('pages.settings.account.display_name')).max(120),
+        displayName: z.string().trim().min(1, msg('pages.settings.account.display_name')).max(120),
         firstName: z.string().max(80),
         middleName: z.string().max(80),
         lastName: z.string().max(80),
@@ -18,18 +18,18 @@ export function createProfileFormSchema(v: SettingsFormT) {
 
 export type ProfileFormValues = z.infer<ReturnType<typeof createProfileFormSchema>>;
 
-export function createPasswordFormSchema(v: SettingsFormT) {
+export function createPasswordFormSchema(msg: SettingsFormT) {
     return z.object({
-        currentPassword: z.string().min(1, v('pages.settings.account.current_password')),
-        newPassword: z.string().min(8, v('pages.settings.account.new_password')),
+        currentPassword: z.string().min(1, msg('pages.settings.account.current_password')),
+        newPassword: z.string().min(8, msg('pages.settings.account.new_password')),
     });
 }
 
 export type PasswordFormValues = z.infer<ReturnType<typeof createPasswordFormSchema>>;
 
-export function createInviteFormSchema(v: SettingsFormT) {
+export function createInviteFormSchema(msg: SettingsFormT) {
     return z.object({
-        email: z.string().trim().email(v('pages.settings.account.invite_email')),
+        email: z.string().trim().email(msg('pages.settings.account.invite_email')),
     });
 }
 
@@ -43,7 +43,7 @@ export function createPeriodFormSchema(_v: SettingsFormT) {
 
 export type PeriodFormValues = z.infer<ReturnType<typeof createPeriodFormSchema>>;
 
-export function createBankAccountFormSchema(v: SettingsFormT) {
+export function createBankAccountFormSchema(msg: SettingsFormT) {
     return z.object({
         label: z.string().max(80),
         iban: z
@@ -60,12 +60,22 @@ export function createBankAccountFormSchema(v: SettingsFormT) {
                     }
                     return isValidIban(normalizeIban(trimmed));
                 },
-                { message: v('pages.settings.panels.bank.iban') }
+                { message: msg('pages.settings.panels.bank.iban') }
             ),
         kind: z.enum(AccountKind),
-        bankKey: z.string().max(40),
-        customBank: z.boolean(),
+        bankId: z.uuid(),
+        settlementAccountId: z.uuid().nullable().optional(),
     });
 }
 
 export type BankAccountFormValues = z.infer<ReturnType<typeof createBankAccountFormSchema>>;
+
+/** New Open Banking seat fields (wizard step 2 — create mode). */
+export function createBankWizardSeatFormSchema(msg: SettingsFormT) {
+    return z.object({
+        label: z.string().max(80),
+        bankId: z.uuid(msg('pages.settings.panels.bank.bank_required')),
+    });
+}
+
+export type BankWizardSeatFormValues = z.infer<ReturnType<typeof createBankWizardSeatFormSchema>>;

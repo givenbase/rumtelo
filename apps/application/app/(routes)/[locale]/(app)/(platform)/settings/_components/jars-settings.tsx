@@ -3,23 +3,30 @@
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 
-import { DEFAULT_JAR_SPLIT, SpendingStyle, type JarKey } from '@rumtelo/contracts';
+import { DEFAULT_JAR_SPLIT, SpendingStyle } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
-import { Badge, Button, Input, Meter, StubNotice } from '@rumtelo/ui';
-import { cn, formatPercent, sumMonthly } from '@rumtelo/utils';
+import { Badge, Button, Input, Meter, StubNotice, VendorMark } from '@rumtelo/ui';
+import { cn, formatIban, formatPercent, sumMonthly } from '@rumtelo/utils';
 
 import { useApiError } from '@/app/_lib/api-error-messages';
-import { evaluateSplitCoach, pctByJarKey } from '@/app/_lib/split-coach';
 import { isLiveData } from '@/app/_lib/preview';
+import { evaluateSplitCoach, pctByJarKey } from '@/app/_lib/split-coach';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { BankAccountRow } from '@/components/features/money/bank-account-row';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
-import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
-
-import { SettingsInkCard, SettingsPanel, SettingsPill, SettingsRow } from './settings-chrome';
+import { accountBankMark, countryFromCurrency } from '../_utils/resolve-account-bank';
 import { JAR_COLOR, accountKindLabel } from '../_utils/settings-shared';
+import { SettingsInkCard, SettingsPanel, SettingsPill, SettingsRow } from './settings-chrome';
+
+type JarsSettingsValues = {
+    pct: Record<string, number>;
+    jarSeats: Record<string, string>;
+};
 
 export function JarsSettings() {
     const t = useTranslations();
@@ -44,23 +51,49 @@ export function JarsSettings() {
         live
     );
 
+    const settingsQuery = useLiveQuery(
+        apiQuery.household.settings.queryOptions({ input: { householdId: householdId! } }),
+        null,
+        live
+    );
+    const banksQuery = useLiveQuery(
+        apiQuery.money.catalogs.banks.list.queryOptions({
+            input: {
+                householdId: householdId!,
+                country: countryFromCurrency(settingsQuery.data?.currency),
+            },
+        }),
+        [],
+        live
+    );
+    const banks = useMemo(() => banksQuery.data ?? [], [banksQuery.data]);
+
     const jars = useMemo(() => jarsQuery.data ?? [], [jarsQuery.data]);
     const accounts = useMemo(() => accountsQuery.data ?? [], [accountsQuery.data]);
     const serverPct = useMemo(
         () => Object.fromEntries(jars.map(j => [j.id, j.percentage])),
         [jars]
     );
-    const [pctDraft, setPctDraft] = useState<Record<string, number> | null>(null);
+
+    const form = useForm<JarsSettingsValues>({
+        defaultValues: { pct: {}, jarSeats: {} },
+    });
+    const pct = useWatch({ control: form.control, name: 'pct' }) ?? {};
+    const jarSeats = useWatch({ control: form.control, name: 'jarSeats' }) ?? {};
+
+    useEffect(() => {
+        if (jars.length === 0) return;
+        if (form.formState.isDirty) return;
+        form.reset({ pct: serverPct, jarSeats: form.getValues('jarSeats') });
+    }, [form, jars.length, serverPct]);
+
     const [dismissedTips, setDismissedTips] = useState<Record<string, true>>({});
-    /** Jar → account seat until the mapping API lands. */
-    const [jarSeats, setJarSeats] = useState<Record<string, string>>({});
     const [editingJarId, setEditingJarId] = useState<string | null>(null);
-    const pct = pctDraft ?? serverPct;
 
     const total = Object.values(pct).reduce((running, value) => running + value, 0);
     const balanced = Math.abs(total - 100) < 0.01;
 
-    const effectiveJarSeats = useMemo(() => {
+    const effectiveJarSeats = (() => {
         if (accounts.length === 0) return jarSeats;
         const fallbackId = accounts[0]!.id;
         const next: Record<string, string> = { ...jarSeats };
@@ -70,13 +103,13 @@ export function JarsSettings() {
             next[jar.id] = fallbackId;
         }
         return next;
-    }, [accounts, jars, jarSeats]);
+    })();
 
-    const coachTips = useMemo(() => {
+    const coachTips = (() => {
         const spendingStyle = accountSettingsQuery.data?.spendingStyle ?? SpendingStyle.UNKNOWN;
         const tips = evaluateSplitCoach(pctByJarKey(jars, pct), spendingStyle);
         return tips.filter(tip => !dismissedTips[tip.id]);
-    }, [jars, pct, dismissedTips, accountSettingsQuery.data?.spendingStyle]);
+    })();
 
     const incomeQuery = useLiveQuery(
         apiQuery.money.income.list.queryOptions({ input: { householdId: householdId! } }),
@@ -94,7 +127,7 @@ export function JarsSettings() {
             });
         },
         onSuccess: () => {
-            setPctDraft(null);
+            form.reset({ pct: form.getValues('pct'), jarSeats: form.getValues('jarSeats') });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
             showToast(t('pages.settings.toasts.split_saved'), 'success');
@@ -105,17 +138,15 @@ export function JarsSettings() {
     function resetDefaults() {
         const next: Record<string, number> = {};
         for (const jar of jars) {
-            next[jar.id] = DEFAULT_JAR_SPLIT[jar.key as JarKey] ?? jar.percentage;
+            next[jar.id] = DEFAULT_JAR_SPLIT[jar.key] ?? jar.percentage;
         }
-        setPctDraft(next);
+        form.setValue('pct', next, { shouldDirty: true });
         setDismissedTips({});
     }
 
-    function accountLabel(accountId: string | undefined) {
+    function seatAccount(accountId: string | undefined) {
         if (!accountId) return null;
-        const account = accounts.find(item => item.id === accountId);
-        if (!account) return null;
-        return `${account.name}${account.iban ? ` · ${account.iban.slice(-4)}` : ''}`;
+        return accounts.find(item => item.id === accountId) ?? null;
     }
 
     return (
@@ -137,7 +168,9 @@ export function JarsSettings() {
                 }>
                 {jars.map((jar, i) => {
                     const seatId = effectiveJarSeats[jar.id];
-                    const label = accountLabel(seatId);
+                    const account = seatAccount(seatId);
+                    const mark = account ? accountBankMark(account, banks) : null;
+                    const ibanLabel = account?.iban ? formatIban(account.iban) : null;
                     const isEditing = editingJarId === jar.id;
                     return (
                         <div
@@ -153,14 +186,25 @@ export function JarsSettings() {
                                     />
                                     <span className="grid min-w-0 gap-0.5">
                                         <span className="text-sm text-fg">{jar.name}</span>
-                                        <span
-                                            className={cn(
-                                                'font-mono text-[10px]',
-                                                label ? 'text-fg-secondary' : 'text-warning'
-                                            )}>
-                                            {label ??
-                                                t('pages.settings.panels.jars_placement.not_set')}
-                                        </span>
+                                        {account ? (
+                                            <span className="flex min-w-0 items-center gap-1.5">
+                                                {mark ? (
+                                                    <VendorMark
+                                                        name={mark.name}
+                                                        src={mark.src}
+                                                        size={16}
+                                                    />
+                                                ) : null}
+                                                <span className="min-w-0 truncate font-mono text-[10px] text-fg-secondary">
+                                                    {account.name}
+                                                    {ibanLabel ? ` · ${ibanLabel}` : ''}
+                                                </span>
+                                            </span>
+                                        ) : (
+                                            <span className="font-mono text-[10px] text-warning">
+                                                {t('pages.settings.panels.jars_placement.not_set')}
+                                            </span>
+                                        )}
                                     </span>
                                 </span>
                                 <Button
@@ -179,49 +223,43 @@ export function JarsSettings() {
                                 </Button>
                             </SettingsRow>
                             {isEditing ? (
-                                <div className="flex flex-wrap gap-2 pb-3 pl-5">
-                                    {accounts.map(account => {
-                                        const selected = seatId === account.id;
-                                        return (
-                                            <button
-                                                key={account.id}
-                                                type="button"
-                                                onClick={() => {
-                                                    setJarSeats(prev => ({
-                                                        ...prev,
-                                                        [jar.id]: account.id,
-                                                    }));
-                                                    setEditingJarId(null);
-                                                    showToast(
-                                                        t(
-                                                            'pages.settings.panels.jars_placement.seat_saved',
-                                                            {
-                                                                jar: jar.name,
-                                                                account: account.name,
-                                                            }
-                                                        ),
-                                                        'success'
-                                                    );
-                                                }}
-                                                className={cn(
-                                                    'rounded-full border px-3 py-1.5 text-left text-xs transition-colors',
-                                                    selected
-                                                        ? 'border-accent bg-accent/10 text-fg'
-                                                        : 'border-line text-fg-secondary hover:border-fg-faint hover:text-fg'
-                                                )}>
-                                                <span className="block font-medium text-fg">
-                                                    {account.name}
-                                                </span>
-                                                <span className="font-mono text-[10px] text-fg-muted">
-                                                    {accountKindLabel(account.kind, t) ??
-                                                        account.kind}
-                                                    {account.iban
-                                                        ? ` · ${account.iban.slice(-4)}`
-                                                        : ''}
-                                                </span>
-                                            </button>
-                                        );
-                                    })}
+                                <div
+                                    role="radiogroup"
+                                    className="grid gap-1.5 pb-3 pl-5"
+                                    aria-label={t('pages.settings.panels.jars_placement.change')}>
+                                    {accounts.map(option => (
+                                        <BankAccountRow
+                                            key={option.id}
+                                            account={option}
+                                            banks={banks}
+                                            markSize={18}
+                                            selected={seatId === option.id}
+                                            sub={`${accountKindLabel(option.kind, t) ?? option.kind}${
+                                                option.iban ? ` · ${formatIban(option.iban)}` : ''
+                                            }`}
+                                            onSelect={() => {
+                                                form.setValue(
+                                                    'jarSeats',
+                                                    {
+                                                        ...form.getValues('jarSeats'),
+                                                        [jar.id]: option.id,
+                                                    },
+                                                    { shouldDirty: true }
+                                                );
+                                                setEditingJarId(null);
+                                                showToast(
+                                                    t(
+                                                        'pages.settings.panels.jars_placement.seat_saved',
+                                                        {
+                                                            jar: jar.name,
+                                                            account: option.name,
+                                                        }
+                                                    ),
+                                                    'success'
+                                                );
+                                            }}
+                                        />
+                                    ))}
                                 </div>
                             ) : null}
                         </div>
@@ -266,10 +304,14 @@ export function JarsSettings() {
                                         step={0.5}
                                         value={value}
                                         onChange={event =>
-                                            setPctDraft(prev => ({
-                                                ...(prev ?? serverPct),
-                                                [jar.id]: Number(event.target.value) || 0,
-                                            }))
+                                            form.setValue(
+                                                'pct',
+                                                {
+                                                    ...pct,
+                                                    [jar.id]: Number(event.target.value) || 0,
+                                                },
+                                                { shouldDirty: true }
+                                            )
                                         }
                                         className="h-8 w-16 text-sm"
                                     />

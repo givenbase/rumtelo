@@ -46,7 +46,7 @@ export async function confirmDestructiveDrop(options: {
         return false;
     }
 
-    const nodeEnv = String(process.env.NODE_ENV ?? 'development');
+    const nodeEnv = process.env.NODE_ENV ?? 'development';
     const dbName = databaseNameFromUrl(options.databaseUrl);
     const host = new URL(options.databaseUrl).host;
     const isProdLike = nodeEnv === 'production' || nodeEnv === 'staging';

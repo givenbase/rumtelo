@@ -7,10 +7,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useState } from 'react';
 
-import { FlowDirection } from '@rumtelo/contracts';
+import { FixedCostLifecycle, FixedCostPeriodStatus, FlowDirection } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import {
+    Icon,
     Button,
     Calendar,
     Card,
@@ -52,21 +53,14 @@ import {
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
-import {
-    EditIcon,
-    EndIcon,
-    PauseIcon,
-    ReactivateIcon,
-    ResumeIcon,
-} from '@/components/features/ui/action-icons';
 
 function statusLabel(
     status: ReturnType<typeof fixedCostStatus>,
     t: ReturnType<typeof useTranslations<'features.money.fixed'>>
 ) {
-    if (status === 'taken') return t('detail_status_taken');
-    if (status === 'due') return t('detail_status_due');
-    if (status === 'skipped') return t('detail_status_skipped');
+    if (status === FixedCostPeriodStatus.TAKEN) return t('detail_status_taken');
+    if (status === FixedCostPeriodStatus.DUE) return t('detail_status_due');
+    if (status === FixedCostPeriodStatus.SKIPPED) return t('detail_status_skipped');
     return t('detail_status_planned');
 }
 
@@ -258,7 +252,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
         : undefined;
     const status = fixedCostStatus(item, settlement, period);
     const lifecycle = fixedCostLifecycle(item);
-    const canSettle = lifecycle === 'active' && isFixedCostCounting(item);
+    const canSettle = lifecycle === FixedCostLifecycle.ACTIVE && isFixedCostCounting(item);
     const settleBusy = settleMutation.isPending;
     const company = item.counterparty?.trim() || item.name;
     const subtitle =
@@ -311,14 +305,14 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                     </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                    {lifecycle === 'active' ? (
+                    {lifecycle === FixedCostLifecycle.ACTIVE ? (
                         <>
                             <Button
                                 type="button"
                                 variant="secondary"
                                 disabled={busy || !live}
                                 onClick={openPauseConfirm}>
-                                <PauseIcon />
+                                <Icon name="pause" size="sm" appearance="filled" />
                                 {t('pause_short')}
                             </Button>
                             <Button
@@ -326,19 +320,19 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                 variant="secondary"
                                 disabled={busy || !live}
                                 onClick={openEndConfirm}>
-                                <EndIcon />
+                                <Icon name="square" size="sm" appearance="filled" />
                                 {t('end_short')}
                             </Button>
                         </>
                     ) : null}
-                    {lifecycle === 'paused' ? (
+                    {lifecycle === FixedCostLifecycle.PAUSED ? (
                         <>
                             <Button
                                 type="button"
                                 variant="secondary"
                                 disabled={busy || !live}
                                 onClick={() => lifecycleMutation.mutate({ isActive: true })}>
-                                <ResumeIcon />
+                                <Icon name="play" size="sm" appearance="filled" />
                                 {t('resume_short')}
                             </Button>
                             <Button
@@ -346,12 +340,12 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                 variant="secondary"
                                 disabled={busy || !live}
                                 onClick={openEndConfirm}>
-                                <EndIcon />
+                                <Icon name="square" size="sm" appearance="filled" />
                                 {t('end_short')}
                             </Button>
                         </>
                     ) : null}
-                    {lifecycle === 'ended' ? (
+                    {lifecycle === FixedCostLifecycle.ENDED ? (
                         <Button
                             type="button"
                             variant="secondary"
@@ -359,12 +353,12 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                             onClick={() =>
                                 lifecycleMutation.mutate({ isActive: true, endsOn: null })
                             }>
-                            <ReactivateIcon />
+                            <Icon name="refresh-cw" size="sm" />
                             {t('reactivate_short')}
                         </Button>
                     ) : null}
                     <Button as={Link} href={updateHref('fixed', item.id)} variant="secondary">
-                        <EditIcon />
+                        <Icon name="pencil" size="sm" />
                         {tAction('edit')}
                     </Button>
                 </div>
@@ -391,7 +385,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                     {tAction('cancel')}
                                 </Button>
                                 <Button type="button" disabled={busy} onClick={confirmPause}>
-                                    <PauseIcon />
+                                    <Icon name="pause" size="sm" appearance="filled" />
                                     {busy ? t('pausing') : t('pause_bill')}
                                 </Button>
                             </DialogFooter>
@@ -468,7 +462,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                     {tAction('cancel')}
                                 </Button>
                                 <Button type="button" disabled={busy} onClick={confirmEnd}>
-                                    <EndIcon />
+                                    <Icon name="square" size="sm" appearance="filled" />
                                     {busy ? t('ending') : t('end_bill')}
                                 </Button>
                             </DialogFooter>
@@ -490,9 +484,9 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                     <div className="flex flex-wrap gap-1.5">
                         <MetaChip
                             className={
-                                lifecycle === 'active'
+                                lifecycle === FixedCostLifecycle.ACTIVE
                                     ? 'border-success/30 text-success'
-                                    : lifecycle === 'paused'
+                                    : lifecycle === FixedCostLifecycle.PAUSED
                                       ? 'border-line text-fg-muted'
                                       : 'border-fg-faint/40 text-fg-faint'
                             }>
@@ -502,14 +496,14 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                 ended: t('lifecycle_ended'),
                             })}
                         </MetaChip>
-                        {lifecycle === 'active' ? (
+                        {lifecycle === FixedCostLifecycle.ACTIVE ? (
                             <MetaChip
                                 className={
-                                    status === 'taken'
+                                    status === FixedCostPeriodStatus.TAKEN
                                         ? 'border-success/30 text-success'
-                                        : status === 'due'
+                                        : status === FixedCostPeriodStatus.DUE
                                           ? 'border-danger/30 text-danger'
-                                          : status === 'skipped'
+                                          : status === FixedCostPeriodStatus.SKIPPED
                                             ? 'border-line text-fg-muted'
                                             : undefined
                                 }>
@@ -597,7 +591,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                 </dl>
             </Card>
 
-            {lifecycle === 'active' ? (
+            {lifecycle === FixedCostLifecycle.ACTIVE ? (
                 <section className="grid gap-3">
                     <Typography as="h2" variant="eyebrow" color="primary">
                         {t('detail.period_heading')}
@@ -633,7 +627,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                 }
                                 href={txDetailHref(linkedTx.id)}
                             />
-                        ) : status === 'taken' ? (
+                        ) : status === FixedCostPeriodStatus.TAKEN ? (
                             <Typography as="p" size="sm" color="muted" className="px-5 py-4">
                                 {t('detail.marked_paid')}
                                 {settlement?.paidAt
@@ -644,7 +638,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                     : ''}
                                 . {t('detail.no_linked_tx')}
                             </Typography>
-                        ) : status === 'skipped' ? (
+                        ) : status === FixedCostPeriodStatus.SKIPPED ? (
                             <Typography as="p" size="sm" color="muted" className="px-5 py-4">
                                 {t('detail.skipped_period')}
                             </Typography>
@@ -655,7 +649,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                         )}
                         {canSettle ? (
                             <div className="flex flex-wrap gap-2 border-t border-line px-5 py-3">
-                                {status !== 'taken' ? (
+                                {status !== FixedCostPeriodStatus.TAKEN ? (
                                     <Button
                                         type="button"
                                         disabled={settleBusy || !live}
@@ -663,7 +657,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                         {t('detail.mark_paid')}
                                     </Button>
                                 ) : null}
-                                {status !== 'skipped' ? (
+                                {status !== FixedCostPeriodStatus.SKIPPED ? (
                                     <Button
                                         type="button"
                                         variant="secondary"

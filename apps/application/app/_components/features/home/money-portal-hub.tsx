@@ -15,6 +15,7 @@ import { PortalHub, type PortalHubProps } from '@/components/features/home/porta
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { useBankSyncOnVisit } from '@/app/_lib/use-bank-sync-on-visit';
 
 function formatDebtFree(on: string | null, locale: string): string {
     if (!on) return '—';
@@ -38,6 +39,8 @@ export function MoneyPortalHubClient() {
     const { formatMoney } = useHouseholdCurrency();
     const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);
+
+    useBankSyncOnVisit();
 
     const query = useLiveQuery(
         apiQuery.money.dashboard.get.queryOptions({

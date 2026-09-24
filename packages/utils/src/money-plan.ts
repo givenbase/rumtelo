@@ -1,4 +1,10 @@
-import { CADENCE_TO_MONTHLY, type Cadence } from '@rumtelo/contracts';
+import {
+    CADENCE_TO_MONTHLY,
+    FixedCostLifecycle,
+    FixedCostPeriodStatus,
+    FixedCostSettlementStatus,
+    type Cadence,
+} from '@rumtelo/contracts';
 
 /** Convert a cadence amount to a monthly-equivalent (integer minor units). */
 export function monthlyAmount(amount: number, cadence: Cadence | string): number {
@@ -105,12 +111,10 @@ type FixedOutLike = {
 
 /**
  * Lifecycle derived from stored flags — no separate status column.
- * - active: isActive true (optional future endsOn is still a plan date)
- * - paused: isActive false, and endsOn is missing or still in the future
- * - ended: isActive false and endsOn is today or earlier
+ * - ACTIVE: isActive true (optional future endsOn is still a plan date)
+ * - PAUSED: isActive false, and endsOn is missing or still in the future
+ * - ENDED: isActive false and endsOn is today or earlier
  */
-export type FixedCostLifecycle = 'active' | 'paused' | 'ended';
-
 export function fixedCostLifecycle(
     item: {
         isActive?: boolean;
@@ -119,15 +123,52 @@ export function fixedCostLifecycle(
     asOf: string = new Date().toISOString().slice(0, 10)
 ): FixedCostLifecycle {
     if (item.isActive === false) {
-        if (item.endsOn && item.endsOn <= asOf) return 'ended';
-        return 'paused';
+        if (item.endsOn && item.endsOn <= asOf) return FixedCostLifecycle.ENDED;
+        return FixedCostLifecycle.PAUSED;
     }
-    return 'active';
+    return FixedCostLifecycle.ACTIVE;
 }
 
 /** True when the bill should count toward jar pressure / monthly out. */
 export function isFixedCostCounting(item: { isActive?: boolean; endsOn?: string | null }): boolean {
     return item.isActive !== false;
+}
+
+/**
+ * Period status from durable settlements. Heuristic matches are never Taken.
+ * Shared by the fixed-costs UI and the Coach session queue.
+ */
+export function fixedCostPeriodStatus(
+    item: { isActive?: boolean; dueDay?: number | null },
+    settlement: { status: string } | null | undefined,
+    period: { year: number; month: number } | string,
+    today: Date = new Date()
+): FixedCostPeriodStatus {
+    if (!isFixedCostCounting(item)) return FixedCostPeriodStatus.UPCOMING;
+    if (settlement?.status === FixedCostSettlementStatus.PAID) return FixedCostPeriodStatus.TAKEN;
+    if (settlement?.status === FixedCostSettlementStatus.SKIPPED) {
+        return FixedCostPeriodStatus.SKIPPED;
+    }
+
+    const dueDay = item.dueDay;
+    if (dueDay === null || dueDay === undefined) return FixedCostPeriodStatus.UPCOMING;
+
+    const parts =
+        typeof period === 'string'
+            ? (() => {
+                  const [yearPart, monthPart] = period.split('-');
+                  return { year: Number(yearPart), month: Number(monthPart) };
+              })()
+            : period;
+    const periodIsCurrent =
+        today.getFullYear() === parts.year && today.getMonth() + 1 === parts.month;
+    const periodIsPast =
+        parts.year < today.getFullYear() ||
+        (parts.year === today.getFullYear() && parts.month < today.getMonth() + 1);
+
+    if (periodIsPast) return FixedCostPeriodStatus.DUE;
+    if (!periodIsCurrent) return FixedCostPeriodStatus.UPCOMING;
+    return today.getDate() >= dueDay ? FixedCostPeriodStatus.DUE : FixedCostPeriodStatus.UPCOMING;
 }
 
 /**

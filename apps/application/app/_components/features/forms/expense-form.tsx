@@ -32,6 +32,8 @@ import { GivingFinder } from '@/components/features/money/giving-finder';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
+import { CREATE_HREF } from '@/app/_lib/create-routes';
+import Link from 'next/link';
 import { ConfirmActionButton } from './confirm-action-button';
 import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
 import { ExpenseIntentField, type ExpenseIntentSelection } from './expense-intent-field';
@@ -718,6 +720,8 @@ export function ExpenseForm({
                                     onSelect={preset => {
                                         setInflowKey(preset.key);
                                         if (lockJar) return;
+                                        // OTHER_IN has no jar — keep the current one.
+                                        if (preset.key === 'OTHER_IN') return;
                                         const full = transactionInPresets.find(
                                             candidate => candidate.key === preset.key
                                         );
@@ -919,6 +923,16 @@ export function ExpenseForm({
                     {tExpense('add_note')}
                 </button>
             )}
+            {mode === 'create' ? (
+                <p className="mt-2 text-sm text-fg-muted">
+                    {tExpense('import_instead_lead')}{' '}
+                    <Link
+                        href={CREATE_HREF.importStatement}
+                        className="font-medium text-accent hover:underline">
+                        {tExpense('import_instead_link')}
+                    </Link>
+                </p>
+            ) : null}
         </FormCreateEditShell>
     );
 }

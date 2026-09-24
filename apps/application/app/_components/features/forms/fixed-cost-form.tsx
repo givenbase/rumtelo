@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { api } from '@/app/_lib/api';
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
@@ -30,16 +31,19 @@ import {
     jarCapabilitiesFor,
     matchesAudience,
 } from '@rumtelo/contracts';
-import { cn } from '@rumtelo/utils';
 
+import { audienceKeysFromFixedCostPreset } from '@/app/_lib/household-audience-from-money';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
+import { SETTINGS_HREF } from '@/app/_lib/settings-tabs';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
+import { useMergeHouseholdAudiences } from '@/app/_lib/use-merge-household-audiences';
 import { partyMark } from '@/app/_lib/vendor-brands';
 import { GivingFinder } from '@/components/features/money/giving-finder';
+import { CoachTipCard } from '@/components/features/helpers';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
@@ -98,6 +102,7 @@ export function FixedCostForm({
 }: FixedCostFormProps) {
     const t = useTranslations();
     const tFixed = useTranslations('features.money.fixed_form');
+    const tProfile = useTranslations('features.money.household_profile');
     const tForm = useTranslations('ui.form');
     const tBtn = useTranslations('ui.button.actions');
     const givePayeeModes: ReadonlyArray<{ id: GivePayeeMode; label: string }> = [
@@ -111,16 +116,17 @@ export function FixedCostForm({
     const apiError = useApiError();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
+    const { mergeImplied } = useMergeHouseholdAudiences();
     /** Preset category template key — resolved to a household category on save. */
     const [pendingCategoryTemplateKey, setPendingCategoryTemplateKey] = useState<string | null>(
         null
     );
     /** Bill-type preset key (VPN, INTERNET, …) — narrows Paid-to chips within Subscriptions. */
     const [selectedBillPresetKey, setSelectedBillPresetKey] = useState<string | null>(null);
-    /** Narrow bill-type suggestions by lifestyle audience from the catalog. */
-    const [audienceFilter, setAudienceFilter] = useState<string | null>(null);
     const [customPayee, setCustomPayee] = useState(false);
     const [vendorQuery, setVendorQuery] = useState('');
+    /** Create-only: bypass Huishoudprofiel filter for this form session. */
+    const [showAllPresets, setShowAllPresets] = useState(false);
     /** Give only — null until the household picks a path (or prefill resolves one). */
     const [givePayeeMode, setGivePayeeMode] = useState<GivePayeeMode | null>(
         defaultGivePayeeMode ?? null
@@ -191,6 +197,11 @@ export function FixedCostForm({
         [],
         live
     );
+    const householdSettingsQuery = useLiveQuery(
+        apiQuery.household.settings.queryOptions({ input: { householdId: householdId! } }),
+        null,
+        live
+    );
     const merchantsQuery = useLiveQuery(
         apiQuery.money.catalogs.merchantPresets.list.queryOptions({
             input: { householdId: householdId! },
@@ -234,14 +245,14 @@ export function FixedCostForm({
     const fixedCostPresets = useMemo(() => presetsQuery.data ?? [], [presetsQuery.data]);
     const audiences = useMemo(() => audiencesQuery.data ?? [], [audiencesQuery.data]);
 
-    /** Chip audiences from the catalog (baseline rows stay out of the chip row). */
-    const audienceChips = useMemo(
-        () => audiences.filter(audience => !audience.isBaseline),
-        [audiences]
-    );
     const baselineAudienceKeys = useMemo(
         () => audiences.filter(audience => audience.isBaseline).map(audience => audience.key),
         [audiences]
+    );
+    /** Household's lifestyle tags, set once in Settings — drives bill recommendations here. */
+    const householdAudienceKeys = useMemo(
+        () => householdSettingsQuery.data?.audienceKeys ?? [],
+        [householdSettingsQuery.data]
     );
 
     /** Bill-type presets + brand catalog — type Netflix, get Media + Play auto-filled. */
@@ -252,8 +263,14 @@ export function FixedCostForm({
             excludeGivingLinked: true,
         });
         const fromPresets: NamePresetOption[] = fixedCostPresets
-            .filter(preset =>
-                matchesAudience(preset.audienceKeys, audienceFilter, baselineAudienceKeys)
+            .filter(
+                preset =>
+                    showAllPresets ||
+                    matchesAudience(
+                        preset.audienceKeys,
+                        householdAudienceKeys,
+                        baselineAudienceKeys
+                    )
             )
             .map(preset => {
                 const category = categoryByKey.get(preset.categoryTemplateKey);
@@ -266,7 +283,14 @@ export function FixedCostForm({
             });
         // Brands first so “netflix” hits Netflix before “Streaming video”.
         return [...fromMerchants, ...fromPresets];
-    }, [merchants, fixedCostPresets, categoryByKey, audienceFilter, baselineAudienceKeys]);
+    }, [
+        merchants,
+        fixedCostPresets,
+        categoryByKey,
+        householdAudienceKeys,
+        baselineAudienceKeys,
+        showAllPresets,
+    ]);
 
     const fixedCostFormSchema = useMemo(() => createFixedCostFormSchema(tForm), [tForm]);
 
@@ -508,10 +532,14 @@ export function FixedCostForm({
                 note: null,
             });
         },
-        onSuccess: () => {
+        onSuccess: async () => {
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.byJar.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
+            if (mode === 'create' && selectedBillPresetKey && selectedBillPresetKey !== 'OTHER') {
+                const preset = fixedCostPresets.find(row => row.key === selectedBillPresetKey);
+                await mergeImplied(audienceKeysFromFixedCostPreset(preset?.audienceKeys));
+            }
             showToast(
                 mode === 'edit'
                     ? t('common.message.entity.fixed_updated')
@@ -628,61 +656,6 @@ export function FixedCostForm({
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>{tForm('fields.name')}</FormLabel>
-                        {mode === 'create' ? (
-                            <div
-                                className="flex flex-wrap gap-1.5"
-                                role="group"
-                                aria-label={tForm('aria.filter_bill_types')}>
-                                <button
-                                    type="button"
-                                    aria-pressed={audienceFilter === null}
-                                    onClick={() => setAudienceFilter(null)}
-                                    className={cn(
-                                        'rounded-full border px-2.5 py-1 font-mono text-[11px] transition-colors',
-                                        audienceFilter === null
-                                            ? 'border-accent/40 bg-accent-soft text-accent'
-                                            : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
-                                    )}>
-                                    {tFixed('filter_all')}
-                                </button>
-                                {audienceChips.map(audience => {
-                                    const on = audienceFilter === audience.key;
-                                    return (
-                                        <button
-                                            key={audience.key}
-                                            type="button"
-                                            title={audience.description ?? undefined}
-                                            aria-pressed={on}
-                                            onClick={() =>
-                                                setAudienceFilter(previous =>
-                                                    previous === audience.key ? null : audience.key
-                                                )
-                                            }
-                                            className={cn(
-                                                'inline-flex items-center gap-1 rounded-full border px-2.5 py-1 font-mono text-[11px] transition-colors',
-                                                !on &&
-                                                    'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
-                                            )}
-                                            style={
-                                                on
-                                                    ? {
-                                                          borderColor:
-                                                              audience.accentColor ?? undefined,
-                                                          backgroundColor:
-                                                              audience.softColor ?? undefined,
-                                                          color: audience.accentColor ?? undefined,
-                                                      }
-                                                    : undefined
-                                            }>
-                                            {audience.icon ? (
-                                                <span aria-hidden>{audience.icon}</span>
-                                            ) : null}
-                                            {audience.name}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        ) : null}
                         <FormControl>
                             {mode === 'create' ? (
                                 <PresetNameField
@@ -705,6 +678,12 @@ export function FixedCostForm({
                                         setGiveModeHydrated(false);
                                     }}
                                     onSelect={opt => {
+                                        // Keep OTHER as the selected key; only skip jar/category apply.
+                                        if (opt.key === 'OTHER') {
+                                            setSelectedBillPresetKey('OTHER');
+                                            return;
+                                        }
+
                                         if (isMerchantOptionKey(opt.key)) {
                                             const merchantKey = merchantKeyFromOptionKey(opt.key);
                                             const merchant = merchants.find(
@@ -780,6 +759,43 @@ export function FixedCostForm({
                     </FormItem>
                 )}
             />
+
+            {mode === 'create' && householdAudienceKeys.length > 0 ? (
+                showAllPresets ? (
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-fg-muted">
+                        <p className="min-w-0 flex-1 text-pretty">{tProfile('showing_all')}</p>
+                        <Button
+                            type="button"
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => setShowAllPresets(false)}>
+                            {tProfile('use_filter')}
+                        </Button>
+                    </div>
+                ) : (
+                    <CoachTipCard
+                        title={tProfile('filter_tip_title')}
+                        actions={
+                            <>
+                                <Button
+                                    type="button"
+                                    size="sm"
+                                    onClick={() => setShowAllPresets(true)}>
+                                    {tProfile('show_all')}
+                                </Button>
+                                <Button
+                                    as={Link}
+                                    href={SETTINGS_HREF.account}
+                                    size="sm"
+                                    variant="secondary">
+                                    {tProfile('open_settings')}
+                                </Button>
+                            </>
+                        }>
+                        {tProfile('filter_tip_body')}
+                    </CoachTipCard>
+                )
+            ) : null}
 
             <FormField
                 control={form.control}

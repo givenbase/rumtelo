@@ -10,7 +10,6 @@ import { useFeatureHelpers } from '@/components/features/helpers';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { usePageTour } from '@/components/features/tour';
-import { EditIcon } from '@/components/features/ui/action-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
     type Currency,
@@ -26,6 +25,7 @@ import {
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import {
+    Icon,
     Badge,
     Button,
     DangerZone,
@@ -44,7 +44,7 @@ import {
 } from '@rumtelo/ui';
 import { cn, DEFAULT_CURRENCY, formatMoney as formatMoneyExplicit } from '@rumtelo/utils';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import {
@@ -121,6 +121,17 @@ export function AccountSettings() {
         apiQuery.household.current.queryOptions({ input: { householdId: householdId! } }),
         null,
         live
+    );
+    const audiencesQuery = useLiveQuery(
+        apiQuery.money.catalogs.audiences.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [],
+        live
+    );
+    const audienceChips = useMemo(
+        () => (audiencesQuery.data ?? []).filter(audience => !audience.isBaseline),
+        [audiencesQuery.data]
     );
 
     const activePlan = settingsQuery.data?.planKey ?? plan;
@@ -240,6 +251,24 @@ export function AccountSettings() {
         invalidateKeys: [apiQuery.household.settings.key()],
         successMessage: t('pages.settings.toasts.income_stability_saved'),
     });
+
+    const saveAudienceKeys = useSettingsMutation({
+        mutationFn: async (next: string[]) => {
+            if (!householdId) throw new Error('No household');
+            return api.household.updateSettings({ householdId, audienceKeys: next });
+        },
+        invalidateKeys: [apiQuery.household.settings.key()],
+        successMessage: t('pages.settings.toasts.household_profile_saved'),
+    });
+
+    function toggleAudienceKey(key: string) {
+        if (!live) return;
+        const current = settingsQuery.data?.audienceKeys ?? [];
+        const next = current.includes(key)
+            ? current.filter(existing => existing !== key)
+            : [...current, key];
+        saveAudienceKeys.mutate(next);
+    }
 
     function pickLocale(next: Locale) {
         if (live) saveLocale.mutate(next);
@@ -369,7 +398,7 @@ export function AccountSettings() {
                                 size="sm"
                                 className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
                                 onClick={beginEditProfile}>
-                                <EditIcon />
+                                <Icon name="pencil" size="sm" />
                                 {t('pages.settings.edit')}
                             </Button>
                         )}
@@ -859,6 +888,50 @@ export function AccountSettings() {
                         </Form>
                     )}
                 </div>
+            </SettingsInkCard>
+
+            <SettingsInkCard
+                eyebrow={t('pages.settings.panels.household_profile.eyebrow')}
+                blurb={t('pages.settings.panels.household_profile.blurb')}>
+                <div
+                    className="flex flex-wrap gap-1.5 py-2.5"
+                    role="group"
+                    aria-label={t('pages.settings.panels.household_profile.eyebrow')}>
+                    {audienceChips.map(audience => {
+                        const on = (settingsQuery.data?.audienceKeys ?? []).includes(audience.key);
+                        return (
+                            <button
+                                key={audience.key}
+                                type="button"
+                                title={audience.description ?? undefined}
+                                aria-pressed={on}
+                                disabled={!live || saveAudienceKeys.isPending}
+                                onClick={() => toggleAudienceKey(audience.key)}
+                                className={cn(
+                                    'inline-flex items-center gap-1 rounded-full border px-2.5 py-1.5 text-xs font-medium transition-colors disabled:opacity-60',
+                                    !on &&
+                                        'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                )}
+                                style={
+                                    on
+                                        ? {
+                                              borderColor: audience.accentColor ?? undefined,
+                                              backgroundColor: audience.softColor ?? undefined,
+                                              color: audience.accentColor ?? undefined,
+                                          }
+                                        : undefined
+                                }>
+                                {audience.icon ? <span aria-hidden>{audience.icon}</span> : null}
+                                {audience.name}
+                            </button>
+                        );
+                    })}
+                </div>
+                {(settingsQuery.data?.audienceKeys ?? []).length === 0 ? (
+                    <p className="pb-1 text-xs text-fg-muted">
+                        {t('pages.settings.panels.household_profile.none_selected')}
+                    </p>
+                ) : null}
             </SettingsInkCard>
 
             <SettingsInkCard

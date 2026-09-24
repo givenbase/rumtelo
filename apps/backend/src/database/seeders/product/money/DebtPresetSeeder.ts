@@ -46,8 +46,12 @@ export class DebtPresetSeeder extends Seeder {
             syncOrderedMerchantLinks(
                 preset.merchantLinks,
                 row.merchantKeys.map(merchantByKey),
-                (merchant, sortOrder) =>
-                    em.create(DebtPresetMerchant, { preset, merchant, sortOrder } as never)
+                (merchant, merchantSortOrder) =>
+                    em.create(DebtPresetMerchant, {
+                        preset,
+                        merchant,
+                        sortOrder: merchantSortOrder,
+                    } as never)
             );
         }
         for (const row of existingRows) {

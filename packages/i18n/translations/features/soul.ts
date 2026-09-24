@@ -44,6 +44,8 @@ const soul = {
         mark_done: 'Mark as done',
         done_today: '✓ Done today',
         minutes_suffix: '{minutes} min',
+        toast_logged: 'Stillness logged as mind score',
+        mind_note: '{minutes} min stillness',
         why_title: '✦ Why this is in a money app',
         mind_tie:
             'A restless mind does not steer money — it spends it and calls that a decision. Stillness ' +

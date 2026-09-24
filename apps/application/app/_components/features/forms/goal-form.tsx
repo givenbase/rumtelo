@@ -33,9 +33,9 @@ import { GIVING_CAUSE_CATALOG, givingCauseCopy, givingCauseMeta } from '@/app/_l
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { CAR_BRAND_PREVIEW, carBrandMark, filterCarBrands } from '@/app/_lib/car-brands';
 import { soulPath } from '@/app/_lib/routes';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
-import { partyMark } from '@/app/_lib/vendor-brands';
 import { CoachTipCard } from '@/components/features/helpers';
 import { GivingFinder } from '@/components/features/money/giving-finder';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
@@ -77,12 +77,6 @@ const GOAL_KIND_OPTIONS: ReadonlyArray<{
         lineKey: 'kind_give_line',
     },
 ];
-
-/** Lease companies share the auto-finance MCC; they are not a car you save for. */
-const NOT_A_CAR_BRAND = new Set(['LEASEPLAN', 'ALPHERA']);
-
-/** First chip row on Car fund. The rest sit behind More — same dashed chip as other pickers. */
-const CAR_BRAND_PREVIEW = 12;
 
 const GIVE_TARGET_MODES: ReadonlyArray<{ id: GiveTargetMode; labelKey: string }> = [
     { id: 'manual', labelKey: 'give_mode_manual' },
@@ -173,11 +167,7 @@ export function GoalForm({
         live && mode === 'create'
     );
     const carBrands = useMemo(
-        () =>
-            (merchantsQuery.data ?? [])
-                .filter(merchant => merchant.mcc === '7512' && !NOT_A_CAR_BRAND.has(merchant.key))
-                .slice()
-                .sort((left, right) => left.sortOrder - right.sortOrder),
+        () => filterCarBrands(merchantsQuery.data ?? []),
         [merchantsQuery.data]
     );
     const selectedIcon = useRef<string | null>(null);
@@ -641,6 +631,8 @@ export function GoalForm({
                                         if (!full) return;
                                         setGoalPresetKey(full.key);
                                         selectedIcon.current = full.icon;
+                                        // OTHER = custom name; keep current jar (don't force LTS).
+                                        if (full.key === 'OTHER') return;
                                         const jar = jars.find(j => j.key === full.jarKey);
                                         if (jar) form.setValue('jarId', jar.id);
                                     }}
@@ -697,14 +689,7 @@ export function GoalForm({
                         }
                         renderChip={brand => {
                             const selected = name.trim().toLowerCase() === brand.name.toLowerCase();
-                            const mark = partyMark(
-                                {
-                                    key: brand.key,
-                                    name: brand.name,
-                                    logoDomain: brand.logoDomain,
-                                },
-                                { fallbackIcon: '🚗', tone: null }
-                            );
+                            const mark = carBrandMark(brand);
                             return (
                                 <button
                                     type="button"

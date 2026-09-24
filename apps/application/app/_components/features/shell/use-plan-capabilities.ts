@@ -70,4 +70,5 @@ export const CREATE_KIND_CAPABILITY: Partial<Record<string, string>> = {
     goal: CAPABILITIES.growthGoals,
     income: CAPABILITIES.growthIncome,
     asset: CAPABILITIES.growthNetWorth,
+    importStatement: CAPABILITIES.moneyImport,
 };
