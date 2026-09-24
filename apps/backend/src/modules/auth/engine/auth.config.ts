@@ -44,7 +44,8 @@ function authUserFirstName(user: { name?: string | null; email: string }): strin
  *
  * Acquisition / recovery emails (verify, reset) land on DOMAIN_WEB; product
  * sessions bind on DOMAIN_APP via `/api/auth` proxies. Production/staging use
- * cross-subdomain cookies on `.rumtelo.com` (no www).
+ * cross-subdomain cookies from DOMAIN_WEB / DOMAIN_APP (e.g. `.rumtelo.com`
+ * when those env URLs are `*.rumtelo.com` — same as galighticus).
  *
  * IDs: Better Auth mints uuidv7 via `advanced.database.generateId` (same as BaseEntity).
  * Columns stay Postgres `uuid`. Personal profile lives on Rumtelo `auth.account`, not BA.
@@ -282,7 +283,8 @@ export function createAuth(env: Env) {
         ],
 
         /**
-         * Cross-subdomain SSO (`rumtelo.com` + `app.rumtelo.com`, no www).
+         * Cross-subdomain SSO from env DOMAIN_WEB + DOMAIN_APP
+         * (`resolveCrossSubdomainCookieDomain` → e.g. `.rumtelo.com`).
          * Better Auth only applies Domain via `advanced.crossSubDomainCookies` —
          * a top-level `cookie.domain` is ignored (host-only → re-login per app).
          * @see https://www.better-auth.com/docs/concepts/cookies#cross-subdomain-cookies
@@ -310,7 +312,7 @@ export function createAuth(env: Env) {
                 ? {
                       crossSubDomainCookies: {
                           enabled: true,
-                          // Root domain without leading dot — e.g. `rumtelo.com`
+                          // Root from DOMAIN_* env, no leading dot (Better Auth)
                           domain: cookieDomain.replace(/^\./, ''),
                       },
                   }
