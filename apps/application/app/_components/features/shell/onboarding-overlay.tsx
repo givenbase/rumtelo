@@ -14,7 +14,7 @@ import {
     SpendingStyle,
 } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
-import { Button, Field, Icon, Input, Typography } from '@rumtelo/ui';
+import { Button, celebrateFireworks, Field, Icon, Input, Typography } from '@rumtelo/ui';
 import { cn, currencySymbol, formatMoney } from '@rumtelo/utils';
 import { z } from 'zod';
 
@@ -168,6 +168,10 @@ export function OnboardingOverlay() {
                 split,
                 why: values.why.trim() || null,
             });
+
+            // Celebrate before activating household — otherwise the overlay unmounts instantly.
+            await celebrateFireworks({ durationMs: 1800, zIndex: 80 });
+
             await setActiveHousehold(household.id);
             await refreshSession();
             writeHelpersEnabled(true);
@@ -192,7 +196,7 @@ export function OnboardingOverlay() {
                 role="dialog"
                 aria-modal="true"
                 aria-label={t('dialog_label')}
-                className="fixed top-1/2 left-1/2 z-71 max-h-[min(90vh,44rem)] w-full max-w-md -translate-1/2 animate-rise overflow-y-auto rounded-2xl border border-line-strong bg-surface p-6 shadow-xl">
+                className="fixed top-1/2 left-1/2 z-71 max-h-[90dvh] w-full max-w-md -translate-1/2 animate-rise overflow-y-auto rounded-2xl border border-line-strong bg-surface p-6 shadow-xl">
                 <div className="mb-5 flex items-center justify-between">
                     <p className="font-mono text-xs font-semibold tracking-widest text-accent uppercase">
                         {t('step_of', { current: onboardingStep + 1, total: steps.length })}

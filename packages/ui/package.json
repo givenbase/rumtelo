@@ -28,6 +28,7 @@
         "@radix-ui/react-tabs": "^1.1.13",
         "@rumtelo/config": "workspace:*",
         "@rumtelo/utils": "workspace:*",
+        "canvas-confetti": "^1.9.4",
         "class-variance-authority": "^0.7.1",
         "lucide-react": "^0.511.0",
         "next-themes": "^0.4.6",
@@ -41,6 +42,7 @@
     },
     "devDependencies": {
         "@rumtelo/typescript-config": "workspace:*",
+        "@types/canvas-confetti": "^1.9.0",
         "@types/node": "26.3.0",
         "@types/react": "19.2.18",
         "@types/react-dom": "19.2.5",
