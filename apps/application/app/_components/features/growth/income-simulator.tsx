@@ -5,12 +5,13 @@ import { useLocale } from 'next-intl';
 import { useState } from 'react';
 
 import type { Goal, JarBalance } from '@rumtelo/contracts';
-import { GoalKind, GoalStatus } from '@rumtelo/contracts';
+import { CoachFeatureId, GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import { Card, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { CREATE_HREF, createGoalHref, goalDetailHref } from '@/app/_lib/create-routes';
+import { isCoachFeatureEnabled } from '@/app/_lib/coach-readiness';
 import { evaluateGoalPace } from '@/app/_lib/goal-pace';
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
 import { jarChrome } from '@/app/_lib/jar-meta';
@@ -100,7 +101,9 @@ export function IncomeSimulator({
 }: IncomeSimulatorProps) {
     const t = useTranslations('features.growth.income_simulator');
     const locale = useLocale();
-    const coachGuidesEnabled = useHelpersEnabled();
+    const helpersEnabled = useHelpersEnabled();
+    const coachGuidesEnabled =
+        helpersEnabled && isCoachFeatureEnabled(CoachFeatureId.INCOME_SIMULATOR);
     const { formatMoney } = useHouseholdCurrency();
 
     /** User override only — `null` means "follow the target (or current income)". */

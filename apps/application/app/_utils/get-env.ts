@@ -70,7 +70,10 @@ export const env = createEnv({
          */
         DOMAIN_BACK: portalOrigin('http://localhost:3002'),
 
-        NODE_ENV: z.enum(['development', 'test', 'staging', 'production']).default('development').optional(),
+        NODE_ENV: z
+            .enum(['development', 'test', 'staging', 'production'])
+            .default('development')
+            .optional(),
         SKIP_ENV_VALIDATION: z.string().optional(),
         PORT: z.coerce.number().default(3000).optional(),
     },
