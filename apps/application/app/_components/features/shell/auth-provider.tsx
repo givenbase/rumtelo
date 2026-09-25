@@ -7,6 +7,7 @@ import {
     useEffect,
     useMemo,
     useRef,
+    useState,
     type ReactNode,
 } from 'react';
 
@@ -28,6 +29,12 @@ interface AuthCtx {
     /** Active household id (opaque AuthId). Null until onboarded / activated. */
     householdId: string | null;
     isPending: boolean;
+    /**
+     * False until the first-login household activation attempt finishes
+     * (list orgs → set active, or confirm none). Lets boot wait without
+     * deadlocking new users who have no household yet.
+     */
+    householdReady: boolean;
     isAuthenticated: boolean;
     refreshSession: () => Promise<void>;
     /** Sets BA active organization (= Rumtelo household) and refreshes session. */
@@ -55,11 +62,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data, isPending, refetch } = useSession();
     const session = toSession(data);
     const activating = useRef(false);
+    /** User id whose org-activation attempt has finished (including "none"). */
+    const [activatedForUserId, setActivatedForUserId] = useState<string | null>(null);
 
     const householdId = activeHouseholdId(session);
     const userId = sessionUserId(session);
     const user = session?.user ?? null;
     const isAuthenticated = Boolean(userId);
+
+    const householdReady = useMemo(() => {
+        if (isPending) return false;
+        if (!userId) return true;
+        if (householdId) return true;
+        return activatedForUserId === userId;
+    }, [isPending, userId, householdId, activatedForUserId]);
 
     const refetchRef = useRef(refetch);
     useEffect(() => {
@@ -79,9 +95,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
 
     // First login / demo: activate the only household if session has none.
+    // After the attempt (including empty list), mark this user activated so
+    // AppBootGate can open onboarding instead of spinning forever.
     useEffect(() => {
-        if (isPending || !session?.user || householdId || activating.current) return;
+        if (isPending || !userId || householdId) return;
+        if (activatedForUserId === userId || activating.current) return;
         activating.current = true;
+        const targetUserId = userId;
         void (async () => {
             try {
                 const orgs = await listOrganizations();
@@ -92,9 +112,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 }
             } finally {
                 activating.current = false;
+                setActivatedForUserId(targetUserId);
             }
         })();
-    }, [isPending, session?.user, householdId]);
+    }, [isPending, userId, householdId, activatedForUserId]);
 
     const value = useMemo(
         () => ({
@@ -103,6 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             userId,
             householdId,
             isPending,
+            householdReady,
             isAuthenticated,
             refreshSession,
             setActiveHousehold,
@@ -113,6 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             userId,
             householdId,
             isPending,
+            householdReady,
             isAuthenticated,
             refreshSession,
             setActiveHousehold,

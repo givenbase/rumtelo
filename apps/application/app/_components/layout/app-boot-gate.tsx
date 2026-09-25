@@ -11,6 +11,7 @@ import { AppShell } from '@/components/layout/shell';
 /**
  * Holds the product shell until auth + household plan are known,
  * so Plus/Max routes never flash the 🔒 upgrade wall as Basic.
+ * New users (session, no household) pass through so onboarding can mount.
  */
 export function AppBootGate({ children, modal }: { children: ReactNode; modal: ReactNode }) {
     const t = useTranslations();

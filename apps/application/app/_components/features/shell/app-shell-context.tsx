@@ -58,7 +58,7 @@ interface AppShellCtx {
 const AppShellContext = createContext<AppShellCtx | null>(null);
 
 export function AppShellProvider({ children }: { children: ReactNode }) {
-    const { householdId, isPending: authPending, isAuthenticated } = useAuth();
+    const { householdId, isPending: authPending, householdReady } = useAuth();
     const intlLocale = useLocale();
     const router = useRouter();
     const pathname = usePathname();
@@ -100,13 +100,16 @@ export function AppShellProvider({ children }: { children: ReactNode }) {
     /**
      * Auth / household / settings still settling → plan is not authoritative.
      * Using DEFAULT_PLAN (Basic) here would flash LockedGate on Plus/Max routes.
+     *
+     * Authenticated users with no household are ready once the org-activation
+     * lookup finishes — otherwise AppBootGate spins forever and onboarding
+     * (which creates the household) never mounts.
      */
     const planReady = useMemo(() => {
-        if (authPending) return false;
-        if (isAuthenticated && !householdId) return false;
+        if (authPending || !householdReady) return false;
         if (!householdId) return true;
         return settingsQuery.isFetched || settingsQuery.isError;
-    }, [authPending, isAuthenticated, householdId, settingsQuery.isFetched, settingsQuery.isError]);
+    }, [authPending, householdReady, householdId, settingsQuery.isFetched, settingsQuery.isError]);
 
     const showToast = useCallback((message: string, type: Toast['type'] = 'info') => {
         if (toastTimer.current) clearTimeout(toastTimer.current);
