@@ -4,7 +4,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMemo, useState } from 'react';
 
 import type { GivingCause, GivingOrganisation } from '@rumtelo/contracts';
-import { JarKey, GivingSignalTier } from '@rumtelo/contracts';
+import { CoachFeatureId, JarKey, GivingSignalTier } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
 import { VendorMark } from '@rumtelo/ui';
@@ -21,6 +21,7 @@ import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { partyMark } from '@/app/_lib/vendor-brands';
+import { CoachFeatureGate } from '@/components/features/helpers/coach-feature-gate';
 import { CoachMark } from '@/components/features/helpers/helper-mark';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
@@ -116,118 +117,124 @@ export function GivingFinder({
     const activeCause = cause ? givingCauseCopy(tRoot, cause) : null;
 
     return (
-        <div
-            data-coach-guide="giving-finder"
-            className={cn(
-                'grid gap-3 rounded-2xl border border-accent/20 bg-surface p-4 ring-1 ring-accent/10',
-                className
-            )}>
-            <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex flex-wrap items-center gap-2">
-                    <CoachMark size="sm" />
-                    <p className="font-mono text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
-                        {t('title')}
-                    </p>
-                </div>
-                {!defaultOpen ? (
-                    <button
-                        type="button"
-                        onClick={() => setOpen(previous => !previous)}
-                        aria-expanded={open}
-                        className="font-mono text-xs font-medium tracking-wide text-fg-muted uppercase hover:text-accent">
-                        {open ? t('hide') : t('help_choose')}
-                    </button>
-                ) : null}
-            </div>
-
-            {!open ? (
-                <p className="text-sm leading-relaxed text-fg-secondary">{t('collapsed_lead')}</p>
-            ) : (
-                <>
-                    <p className="text-sm leading-relaxed text-fg-secondary">
-                        {t('expanded_lead')}
-                    </p>
-                    <ul
-                        className="flex flex-wrap gap-x-4 gap-y-1"
-                        aria-label={tForm('aria.read_badges')}>
-                        {GIVING_SIGNAL_TIER_ORDER.map(key => (
-                            <li
-                                key={key}
-                                className="flex items-center gap-1.5 font-mono text-[10px] text-fg-faint"
-                                title={signalTiers[key].line}>
-                                <span
-                                    className={cn(
-                                        'inline-block size-2 rounded-full border',
-                                        signalTiers[key].className
-                                    )}
-                                    aria-hidden
-                                />
-                                {signalTiers[key].label}
-                            </li>
-                        ))}
-                    </ul>
-
-                    <div
-                        className="flex flex-wrap gap-2"
-                        role="group"
-                        aria-label={tForm('aria.cause')}>
-                        {causesWithRows.map(meta => {
-                            const on = cause === meta.key;
-                            return (
-                                <button
-                                    key={meta.key}
-                                    type="button"
-                                    aria-pressed={on}
-                                    onClick={() =>
-                                        setCause(previous =>
-                                            previous === meta.key ? null : meta.key
-                                        )
-                                    }
-                                    className={cn(
-                                        'flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
-                                        on
-                                            ? 'border-accent/40 bg-accent-soft text-accent'
-                                            : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
-                                    )}>
-                                    <span aria-hidden>{meta.icon}</span>
-                                    {givingCauseCopy(tRoot, meta.key).name}
-                                </button>
-                            );
-                        })}
+        <CoachFeatureGate feature={CoachFeatureId.GIVING_FINDER}>
+            <div
+                data-coach-guide="giving-finder"
+                className={cn(
+                    'grid gap-3 rounded-2xl border border-accent/20 bg-surface p-4 ring-1 ring-accent/10',
+                    className
+                )}>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <CoachMark size="sm" />
+                        <p className="font-mono text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
+                            {t('title')}
+                        </p>
                     </div>
-
-                    {activeCause ? (
-                        <p className="text-xs leading-relaxed text-fg-muted">{activeCause.line}</p>
+                    {!defaultOpen ? (
+                        <button
+                            type="button"
+                            onClick={() => setOpen(previous => !previous)}
+                            aria-expanded={open}
+                            className="font-mono text-xs font-medium tracking-wide text-fg-muted uppercase hover:text-accent">
+                            {open ? t('hide') : t('help_choose')}
+                        </button>
                     ) : null}
+                </div>
 
-                    {!live ? (
-                        <p className="text-sm text-fg-muted">{t('sign_in')}</p>
-                    ) : query.isLoading ? (
-                        <p className="text-sm text-fg-muted">{t('loading')}</p>
-                    ) : causesWithRows.length === 0 ? (
-                        <p className="text-sm text-fg-muted">{t('empty_list')}</p>
-                    ) : cause && shown.length === 0 ? (
-                        <p className="text-sm text-fg-muted">{t('empty_cause')}</p>
-                    ) : (
-                        <ul className="grid gap-2">
-                            {shown.map(organisation => (
-                                <li key={organisation.key}>
-                                    <GivingOrganisationCard
-                                        organisation={organisation}
-                                        selected={
-                                            selectedOrg?.key === organisation.key ||
-                                            selectedName?.trim().toLowerCase() ===
-                                                organisation.name.toLowerCase()
-                                        }
-                                        onPick={() => onPick(organisation)}
+                {!open ? (
+                    <p className="text-sm leading-relaxed text-fg-secondary">
+                        {t('collapsed_lead')}
+                    </p>
+                ) : (
+                    <>
+                        <p className="text-sm leading-relaxed text-fg-secondary">
+                            {t('expanded_lead')}
+                        </p>
+                        <ul
+                            className="flex flex-wrap gap-x-4 gap-y-1"
+                            aria-label={tForm('aria.read_badges')}>
+                            {GIVING_SIGNAL_TIER_ORDER.map(key => (
+                                <li
+                                    key={key}
+                                    className="flex items-center gap-1.5 font-mono text-[10px] text-fg-faint"
+                                    title={signalTiers[key].line}>
+                                    <span
+                                        className={cn(
+                                            'inline-block size-2 rounded-full border',
+                                            signalTiers[key].className
+                                        )}
+                                        aria-hidden
                                     />
+                                    {signalTiers[key].label}
                                 </li>
                             ))}
                         </ul>
-                    )}
-                </>
-            )}
-        </div>
+
+                        <div
+                            className="flex flex-wrap gap-2"
+                            role="group"
+                            aria-label={tForm('aria.cause')}>
+                            {causesWithRows.map(meta => {
+                                const on = cause === meta.key;
+                                return (
+                                    <button
+                                        key={meta.key}
+                                        type="button"
+                                        aria-pressed={on}
+                                        onClick={() =>
+                                            setCause(previous =>
+                                                previous === meta.key ? null : meta.key
+                                            )
+                                        }
+                                        className={cn(
+                                            'flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
+                                            on
+                                                ? 'border-accent/40 bg-accent-soft text-accent'
+                                                : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                        )}>
+                                        <span aria-hidden>{meta.icon}</span>
+                                        {givingCauseCopy(tRoot, meta.key).name}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {activeCause ? (
+                            <p className="text-xs leading-relaxed text-fg-muted">
+                                {activeCause.line}
+                            </p>
+                        ) : null}
+
+                        {!live ? (
+                            <p className="text-sm text-fg-muted">{t('sign_in')}</p>
+                        ) : query.isLoading ? (
+                            <p className="text-sm text-fg-muted">{t('loading')}</p>
+                        ) : causesWithRows.length === 0 ? (
+                            <p className="text-sm text-fg-muted">{t('empty_list')}</p>
+                        ) : cause && shown.length === 0 ? (
+                            <p className="text-sm text-fg-muted">{t('empty_cause')}</p>
+                        ) : (
+                            <ul className="grid gap-2">
+                                {shown.map(organisation => (
+                                    <li key={organisation.key}>
+                                        <GivingOrganisationCard
+                                            organisation={organisation}
+                                            selected={
+                                                selectedOrg?.key === organisation.key ||
+                                                selectedName?.trim().toLowerCase() ===
+                                                    organisation.name.toLowerCase()
+                                            }
+                                            onPick={() => onPick(organisation)}
+                                        />
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </>
+                )}
+            </div>
+        </CoachFeatureGate>
     );
 }
 

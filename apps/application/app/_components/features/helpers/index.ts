@@ -15,6 +15,7 @@ export {
     useHelpersEnabled as useCoachGuidesEnabled,
 } from './provider';
 export { HelperGate, HelperGate as CoachGuideGate } from './helper-gate';
+export { CoachFeatureGate } from './coach-feature-gate';
 export { CoachMark } from './helper-mark';
 export { CoachGuideSurface } from './helper-surface';
 export { CoachTipCard } from './coach-tip-card';

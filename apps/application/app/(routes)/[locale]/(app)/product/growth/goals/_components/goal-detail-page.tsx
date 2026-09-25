@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useMemo } from 'react';
 
 import type { Goal, GoalProjection, MerchantPreset } from '@rumtelo/contracts';
-import { GoalKind, GoalStatus } from '@rumtelo/contracts';
+import { CoachFeatureId, GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useTranslations, type TranslateFn } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Icon, Button, Card, Meter, Typography } from '@rumtelo/ui';
@@ -31,6 +31,7 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { GoalKindMark } from '@/components/features/growth/goal-kind-mark';
 import { SaveGoalManifestActions } from '@/components/features/growth/save-goal-manifest-actions';
+import { CoachFeatureGate } from '@/components/features/helpers';
 import { JarBadge, MetaChip, formatBookedDate } from '@/components/features/money/jar-badge';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
@@ -627,19 +628,23 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                 </Card>
             ) : null}
 
-            <section className="grid gap-3">
-                <Typography as="h2" variant="eyebrow" color="primary">
-                    {td('how_to_get_there')}
-                </Typography>
-                <div className="grid gap-3">
-                    {advice.map(tip => (
-                        <Card key={tip.title} className="grid gap-1.5 p-5">
-                            <p className="text-sm font-medium text-fg">{tip.title}</p>
-                            <p className="text-sm leading-relaxed text-fg-secondary">{tip.body}</p>
-                        </Card>
-                    ))}
-                </div>
-            </section>
+            <CoachFeatureGate feature={CoachFeatureId.GOAL_ADVICE}>
+                <section className="grid gap-3">
+                    <Typography as="h2" variant="eyebrow" color="primary">
+                        {td('how_to_get_there')}
+                    </Typography>
+                    <div className="grid gap-3">
+                        {advice.map(tip => (
+                            <Card key={tip.title} className="grid gap-1.5 p-5">
+                                <p className="text-sm font-medium text-fg">{tip.title}</p>
+                                <p className="text-sm leading-relaxed text-fg-secondary">
+                                    {tip.body}
+                                </p>
+                            </Card>
+                        ))}
+                    </div>
+                </section>
+            </CoachFeatureGate>
 
             {related.length > 0 ? (
                 <section className="grid gap-3">

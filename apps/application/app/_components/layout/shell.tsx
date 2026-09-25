@@ -161,7 +161,9 @@ function AppShellInner({ children }: { children: ReactNode }) {
     return (
         <div className="min-h-dvh bg-bg bg-(image:--gradient-page) bg-top bg-no-repeat">
             {/* ── HEADER ──────────────────────────────────────────────────── */}
-            <header className="sticky top-0 z-40 bg-chrome backdrop-blur-md">
+            <header
+                data-app-chrome-header
+                className="sticky top-[var(--staging-banner-h,0px)] z-40 bg-chrome backdrop-blur-md">
                 <div className="relative mx-auto flex h-16 max-w-7xl items-center px-4">
                     {/* Wordmark */}
                     <Link

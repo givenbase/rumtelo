@@ -4,5 +4,6 @@ export * from './EmptyState';
 export * from './DangerZone';
 export * from './StatusPage';
 export * from './BrandLoader';
+export * from './StagingEnvironmentBanner';
 export { Toaster } from './Toaster';
 export { toast } from 'sonner';

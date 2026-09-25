@@ -4,3 +4,4 @@
 export * from './coach.schema';
 export * from './coach.session.schema';
 export * from './coach.contract';
+export * from './coach-readiness';

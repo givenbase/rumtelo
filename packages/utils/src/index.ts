@@ -130,3 +130,4 @@ export {
 export { accountThemeFromCss, cssThemeFromAccount, type CssTheme } from './theme';
 export { formatIban, isValidIban, nlIbanBankCode, normalizeIban } from './iban';
 export { containsWord } from './text-match';
+export { shouldShowStagingBanner } from './staging-banner';

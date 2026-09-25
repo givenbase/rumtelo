@@ -4,8 +4,10 @@ import type { OnModuleInit } from '@nestjs/common';
 import {
     bandStatus,
     CAPABILITIES,
+    CoachFeatureId,
     DISCRETIONARY_BAND,
     hasCapability,
+    isCoachFeatureEnabledAtLaunch,
     TIME_COACH_KEY_PREFIX,
     TIME_REFERENCE,
     TimeBandStatus,
@@ -76,6 +78,13 @@ export class TimeCoachService implements OnModuleInit {
     /** Evaluate the current person's week and upsert the inbox. */
     async refresh(): Promise<void> {
         if (isLaunchProductsDeferred()) return;
+        if (
+            !isCoachFeatureEnabledAtLaunch(CoachFeatureId.TIME_COACH, {
+                nodeEnv: process.env.NODE_ENV,
+            })
+        ) {
+            return;
+        }
         const planKey = await this.planAccess.planKeyForCurrentHousehold();
         if (!hasCapability(CAPABILITIES.energyWeek, planKey)) return;
 

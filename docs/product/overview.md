@@ -46,4 +46,5 @@ See [research/money-awareness.md](../research/money-awareness.md).
 
 - [Audience](./audience.md)
 - [Principles](./principles.md)
+- [Coach readiness](./coach-readiness.md) — which Coach/helper surfaces ship vs staging-only
 - [Brand positioning](../brand/positioning.md)

@@ -1,3 +1,4 @@
+import { RequestContext } from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
@@ -150,6 +151,8 @@ export class BankSyncService {
     /**
      * Cron entry — walks every linked seat across households. Each pull runs
      * inside {@link householdStorage} so scoped repos stay honest.
+     * Cron has no Nest request ALS — wrap in {@link RequestContext} so `this.em`
+     * resolves to a fork (decorators alone can be dropped by the Nest compile).
      */
     async syncAllLinkedForCron() {
         if (!this.banking.isEnabled()) {
@@ -157,31 +160,33 @@ export class BankSyncService {
             return;
         }
 
-        const linked = await this.em.find(BankAccount, {
-            connectionId: { $ne: null },
-        });
-        const due = linked.filter(row => isStale(row.lastSyncedAt, BANK_SYNC_STALE_MS));
-        this.logger.log(`Bank sync cron: ${due.length}/${linked.length} seats due`);
+        return RequestContext.create(this.em, async () => {
+            const linked = await this.em.find(BankAccount, {
+                connectionId: { $ne: null },
+            });
+            const due = linked.filter(row => isStale(row.lastSyncedAt, BANK_SYNC_STALE_MS));
+            this.logger.log(`Bank sync cron: ${due.length}/${linked.length} seats due`);
 
-        for (const account of due) {
-            // oxlint-disable-next-line no-await-in-loop -- household context must wrap each account sync sequentially
-            await householdStorage.run(
-                {
-                    userId: 'system:bank-sync',
-                    householdId: account.household,
-                    role: 'OWNER',
-                },
-                async () => {
-                    try {
-                        await this.pullAccount(account);
-                    } catch (error) {
-                        this.logger.warn(
-                            `cron sync failed household=${account.household} account=${account.id}: ${String(error)}`
-                        );
+            for (const account of due) {
+                // oxlint-disable-next-line no-await-in-loop -- household context must wrap each account sync sequentially
+                await householdStorage.run(
+                    {
+                        userId: 'system:bank-sync',
+                        householdId: account.household,
+                        role: 'OWNER',
+                    },
+                    async () => {
+                        try {
+                            await this.pullAccount(account);
+                        } catch (error) {
+                            this.logger.warn(
+                                `cron sync failed household=${account.household} account=${account.id}: ${String(error)}`
+                            );
+                        }
                     }
-                }
-            );
-        }
+                );
+            }
+        });
     }
 
     // ====================================================================

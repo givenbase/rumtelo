@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
 
-import { SpendingStyle } from '@rumtelo/contracts';
+import { CoachFeatureId, SpendingStyle } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import {
@@ -25,6 +25,7 @@ import {
 import { cn } from '@rumtelo/utils';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
+import { isCoachFeatureEnabled } from '@/app/_lib/coach-readiness';
 import { isLiveData } from '@/app/_lib/preview';
 import { PlanKey } from '@/app/_lib/plan';
 import { env } from '@/app/_utils/get-env';
@@ -1098,7 +1099,9 @@ function PieceGroups({
 }) {
     const tLearn = useTranslations('features.growth.learn');
     const labels = useLearnCatalogLabels();
-    const coach = useHelpersEnabled();
+    const helpersEnabled = useHelpersEnabled();
+    const coach =
+        recommended && helpersEnabled && isCoachFeatureEnabled(CoachFeatureId.LEARN_RECOMMENDED);
     const groups = recommended
         ? []
         : FORMAT_ORDER.map(format => ({

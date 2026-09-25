@@ -77,7 +77,8 @@ export function OnboardingOverlay() {
         [t]
     );
 
-    const { session, householdId, isPending, setActiveHousehold, refreshSession } = useAuth();
+    const { session, householdId, isPending, householdReady, setActiveHousehold, refreshSession } =
+        useAuth();
     const {
         onboardingOpen,
         onboardingStep,
@@ -90,13 +91,13 @@ export function OnboardingOverlay() {
     const planIntent = useOptionalPlanIntent();
 
     useEffect(() => {
-        if (isPending) return;
+        if (isPending || !householdReady) return;
         if (householdId) {
             closeOnboarding();
             return;
         }
         if (session) openOnboarding();
-    }, [session, householdId, isPending, openOnboarding, closeOnboarding]);
+    }, [session, householdId, isPending, householdReady, openOnboarding, closeOnboarding]);
 
     const defaultHouseholdName = t('household_default');
     const form = useForm<OnboardingValues>({
