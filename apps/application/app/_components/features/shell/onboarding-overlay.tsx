@@ -14,13 +14,14 @@ import {
     SpendingStyle,
 } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
-import { Button, Field, Input, Typography } from '@rumtelo/ui';
+import { Button, Field, Icon, Input, Typography } from '@rumtelo/ui';
 import { cn, currencySymbol, formatMoney } from '@rumtelo/utils';
 import { z } from 'zod';
 
 import { useApiError } from '@/app/_lib/api-error-messages';
+import { webOrigin } from '@/app/_lib/auth';
 import { writeHelpersEnabled } from '@/app/_lib/feature-helpers';
-import { jarChrome } from '@/app/_lib/jar-meta';
+import { jarChrome, jarIcon } from '@/app/_lib/jar-meta';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { usePageTour } from '@/components/features/tour';
 import { useAppShell } from '@/components/features/shell/app-shell-context';
@@ -66,6 +67,7 @@ type OnboardingValues = z.infer<typeof onboardingSchema>;
 export function OnboardingOverlay() {
     const t = useTranslations('pages.onboarding');
     const tRoot = useTranslations();
+    const tJars = useTranslations('features.money.jars');
     const apiError = useApiError();
     const appLocale = useLocale();
     const steps = useMemo(
@@ -120,17 +122,29 @@ export function OnboardingOverlay() {
     const incomeStability = useWatch({ control: form.control, name: 'incomeStability' });
 
     const [pending, setPending] = useState(false);
-    const { jars: catalogJars } = useJarCatalog();
-    const displayJars =
-        catalogJars.length > 0
-            ? catalogJars
-            : Object.values(JarKey).map(key => ({
-                  key,
-                  name: tRoot(JAR_NAME_KEYS[key]),
-                  icon: '◇',
-                  pct: DEFAULT_JAR_SPLIT[key],
-                  text: jarChrome(key).text,
-              }));
+    const [expandedJar, setExpandedJar] = useState<JarKey | null>(null);
+    const { jars: catalogJars, byKey: catalogByKey } = useJarCatalog();
+    const displayJars = useMemo(() => {
+        const catalogOrder = catalogJars.length > 0 ? catalogJars.map(jar => jar.key) : null;
+        const keys = catalogOrder ?? Object.values(JarKey);
+        return keys.map(key => {
+            const catalog = catalogByKey.get(key);
+            return {
+                key,
+                name: catalog?.name ?? tRoot(JAR_NAME_KEYS[key]),
+                icon: jarIcon(key, catalog?.icon),
+                pct: catalog?.pct ?? DEFAULT_JAR_SPLIT[key],
+                subtitle: tJars.has(`guides.${key}.subtitle`)
+                    ? tJars(`guides.${key}.subtitle`)
+                    : (catalog?.subtitle ?? ''),
+                note: tJars.has(`guides.${key}.note`)
+                    ? tJars(`guides.${key}.note`)
+                    : (catalog?.guide?.note ?? ''),
+                text: jarChrome(key).text,
+            };
+        });
+    }, [catalogByKey, catalogJars, tJars, tRoot]);
+    const jarsLearnMoreHref = `${webOrigin()}/${appLocale}#jars`;
 
     if (!session) return null;
     if (householdId) return null;
@@ -178,7 +192,7 @@ export function OnboardingOverlay() {
                 role="dialog"
                 aria-modal="true"
                 aria-label={t('dialog_label')}
-                className="fixed top-1/2 left-1/2 z-71 w-full max-w-md -translate-1/2 animate-rise rounded-2xl border border-line-strong bg-surface p-6 shadow-xl">
+                className="fixed top-1/2 left-1/2 z-71 max-h-[min(90vh,44rem)] w-full max-w-md -translate-1/2 animate-rise overflow-y-auto rounded-2xl border border-line-strong bg-surface p-6 shadow-xl">
                 <div className="mb-5 flex items-center justify-between">
                     <p className="font-mono text-xs font-semibold tracking-widest text-accent uppercase">
                         {t('step_of', { current: onboardingStep + 1, total: steps.length })}
@@ -192,8 +206,8 @@ export function OnboardingOverlay() {
 
                 {onboardingStep === 1 && (
                     <div className="mt-4 grid gap-3">
-                        <div>
-                            <p className="mb-2 font-mono text-[10px] tracking-[0.12em] text-fg-muted uppercase">
+                        <div className="grid gap-1.5">
+                            <p className="font-mono text-[10px] tracking-[0.12em] text-fg-muted uppercase">
                                 {t('currency')}
                             </p>
                             <div
@@ -231,11 +245,15 @@ export function OnboardingOverlay() {
                                     );
                                 })}
                             </div>
+                            <Typography as="p" variant="caption">
+                                {t('currency_hint')}
+                            </Typography>
                         </div>
                         <Field
                             label={t('net_income_label', {
                                 symbol: currencySymbol(currency),
                             })}
+                            hint={t('net_income_hint')}
                             htmlFor="income">
                             <Input
                                 id="income"
@@ -246,7 +264,10 @@ export function OnboardingOverlay() {
                                 }
                             />
                         </Field>
-                        <Field label={t('household_name')} htmlFor="hh-name">
+                        <Field
+                            label={t('household_name')}
+                            hint={t('household_name_hint')}
+                            htmlFor="hh-name">
                             <Input
                                 id="hh-name"
                                 value={householdName}
@@ -259,24 +280,75 @@ export function OnboardingOverlay() {
                 )}
 
                 {onboardingStep === 2 && (
-                    <ul className="mt-4 grid gap-2">
-                        {displayJars.map(jar => (
-                            <li
-                                key={jar.key}
-                                className="flex items-center justify-between rounded-xl border border-line bg-raised px-3 py-2">
-                                <span className="text-sm text-fg">
-                                    {jar.icon} {jar.name}
-                                </span>
-                                <span className="font-mono text-xs text-fg-muted">{jar.pct}%</span>
-                            </li>
-                        ))}
-                    </ul>
+                    <div className="mt-4 grid gap-3">
+                        <Typography as="p" variant="caption">
+                            {t('jars_tap_hint')}
+                        </Typography>
+                        <ul className="grid gap-2">
+                            {displayJars.map(jar => {
+                                const open = expandedJar === jar.key;
+                                return (
+                                    <li
+                                        key={jar.key}
+                                        className="rounded-xl border border-line bg-raised">
+                                        <button
+                                            type="button"
+                                            aria-expanded={open}
+                                            onClick={() => setExpandedJar(open ? null : jar.key)}
+                                            className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-card">
+                                            <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-line bg-card text-base">
+                                                {jar.icon}
+                                            </span>
+                                            <span className="grid min-w-0 flex-1 gap-0.5">
+                                                <span className="flex items-baseline gap-2">
+                                                    <span className="truncate text-sm font-medium text-fg">
+                                                        {jar.name}
+                                                    </span>
+                                                    <span className="font-mono text-xs text-fg-muted tabular-nums">
+                                                        {jar.pct}%
+                                                    </span>
+                                                </span>
+                                                {jar.subtitle ? (
+                                                    <span className="truncate font-mono text-[10px] tracking-wide text-fg-faint uppercase">
+                                                        {jar.subtitle}
+                                                    </span>
+                                                ) : null}
+                                            </span>
+                                            <Icon
+                                                name="chevron-down"
+                                                size="sm"
+                                                color="muted"
+                                                className={cn(
+                                                    'shrink-0 transition-transform',
+                                                    open && 'rotate-180'
+                                                )}
+                                            />
+                                        </button>
+                                        {open && jar.note ? (
+                                            <div className="border-t border-line px-3 py-2.5">
+                                                <Typography as="p" size="sm" color="muted">
+                                                    {jar.note}
+                                                </Typography>
+                                            </div>
+                                        ) : null}
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                        <a
+                            href={jarsLearnMoreHref}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-accent underline-offset-2 hover:underline">
+                            {t('jars_read_more')}
+                        </a>
+                    </div>
                 )}
 
                 {onboardingStep === 3 && (
                     <div className="mt-4 grid gap-4">
-                        <div>
-                            <p className="mb-2 font-mono text-[10px] tracking-[0.12em] text-fg-muted uppercase">
+                        <div className="grid gap-1.5">
+                            <p className="font-mono text-[10px] tracking-[0.12em] text-fg-muted uppercase">
                                 {t('spending_style_label')}
                             </p>
                             <div className="flex flex-wrap gap-1.5">
@@ -314,9 +386,12 @@ export function OnboardingOverlay() {
                                     </button>
                                 ))}
                             </div>
+                            <Typography as="p" variant="caption">
+                                {t('spending_style_hint')}
+                            </Typography>
                         </div>
-                        <div>
-                            <p className="mb-2 font-mono text-[10px] tracking-[0.12em] text-fg-muted uppercase">
+                        <div className="grid gap-1.5">
+                            <p className="font-mono text-[10px] tracking-[0.12em] text-fg-muted uppercase">
                                 {t('income_stability_label')}
                             </p>
                             <div className="flex gap-1.5">
@@ -350,13 +425,21 @@ export function OnboardingOverlay() {
                                     </button>
                                 ))}
                             </div>
+                            <Typography as="p" variant="caption">
+                                {t('income_stability_hint')}
+                            </Typography>
                         </div>
                     </div>
                 )}
 
                 {onboardingStep === 4 && (
-                    <div className="mt-4">
-                        <Field label={t('why_label')} htmlFor="why">
+                    <div className="mt-4 grid gap-4">
+                        <blockquote className="rounded-xl border border-accent/25 bg-accent-soft/40 px-3.5 py-3">
+                            <Typography as="p" size="sm" weight="medium" className="text-accent">
+                                {t('why_quote')}
+                            </Typography>
+                        </blockquote>
+                        <Field label={t('why_label')} hint={t('why_hint')} htmlFor="why">
                             <Input
                                 id="why"
                                 value={why}

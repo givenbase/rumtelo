@@ -906,7 +906,7 @@ const money = {
             change_settings: 'Change method in Settings',
             explain_only: 'This page only explains — it does not switch it for you.',
             no_extra_hint:
-                'Avalanche and Snowball look identical in the € totals below because Extra /mo is none. Those two methods only choose where leftover money goes — try a small Extra /mo above to see them split. The cards still differ in which debt they would attack first.',
+                'Avalanche and Snowball look identical in the totals below because Extra /mo is none. Those two methods only choose where leftover money goes — try a small Extra /mo above to see them split. The cards still differ in which debt they would attack first.',
             when_avalanche: 'Pick this if you want to pay the least interest over time.',
             when_snowball: 'Pick this if knocking out a small debt first helps you stick with it.',
             when_minimal: 'Pick this only if you truly cannot put anything extra toward debt.',
@@ -916,9 +916,9 @@ const money = {
             outcome_costs_more: 'Costs about {amount} more in interest',
             outcome_slowest: 'Slowest option',
             outcome_same_snowball_saves:
-                'Same € as Snowball today · saves about {amount} vs minimums only',
-            outcome_same_different_debt: 'Same € as Avalanche today · different first debt',
-            outcome_same_avalanche: 'Same € as Snowball today · different first debt',
+                'Same amount as Snowball today · saves about {amount} vs minimums only',
+            outcome_same_different_debt: 'Same amount as Avalanche today · different first debt',
+            outcome_same_avalanche: 'Same amount as Snowball today · different first debt',
             outcome_saves: 'Saves about {amount} vs minimums only',
             outcome_cheapest_soonest: 'Cheapest and soonest for you',
             outcome_least_interest: 'Pays the least interest',
