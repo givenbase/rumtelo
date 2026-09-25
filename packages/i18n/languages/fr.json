@@ -4097,19 +4097,37 @@
         "onboarding": {
             "welcome": "Bienvenue chez Rumtelo",
             "welcome_body": "Rumtelo vous aide à visualiser où va votre argent, en toute sérénité. Nous répartissons vos revenus dans six « tirelires » pour que vous sachiez toujours quelle part est destinée aux factures, à l'épargne et à vos dépenses courantes. Pas besoin d'être diplômé en finance.",
+            "welcome_points": {
+                "jars": "Six bocaux qui ont une utilité",
+                "overview": "Une vue d'ensemble sereine",
+                "coach": "Des conseils sans complexe"
+            },
             "income": "Vos revenus",
             "income_body": "Nous vous demandons quelques informations de base afin que Rumtelo puisse configurer votre foyer. Une estimation suffit : vous pourrez modifier ces informations ultérieurement.",
             "jars": "Les six bocaux",
-            "jars_body": "Vos revenus sont répartis dans six bocaux, chacun correspondant à une utilisation précise : chaque somme sait ainsi d’emblée où elle doit aller. Appuyez sur un bocal pour voir à quoi il sert. La répartition de départ (55 / 10 / 10 / 10 / 10 / 5) s'inspire d'une habitude financière qui a fait ses preuves : payer ses factures, puis se rémunérer, puis se faire plaisir et faire des dons. Vous pouvez modifier ces pourcentages ultérieurement.",
+            "jars_body": "Chaque pot a une fonction bien précise. La répartition de départ est la suivante : 55 / 10 / 10 / 10 / 10 / 5 — payer les factures, puis subvenir à vos besoins, puis vous faire plaisir et faire des dons. Vous pourrez modifier ces pourcentages par la suite.",
             "jars_tap_hint": "Appuyez sur un bocal pour découvrir pourquoi il existe.",
             "jars_read_more": "En savoir plus sur la méthode des six bocaux",
             "money_style": "Votre rapport à l'argent",
             "money_style_body": "Il n'y a pas de bonne réponse. Seules les étiquettes souples sont disponibles, pour que les embouts s'adaptent à vous. Les membres d'un même foyer peuvent faire des choix différents par la suite.",
             "coach": "Le coach reste à vos côtés",
             "coach_body": "De petits conseils s'affichent à l'écran (signalés par ✦ « The Coach ») pendant que vous apprenez — ils sont utiles et ne vous font jamais sentir coupable. Ouvrez « The Coach » à tout moment pour connaître les prochaines étapes. Vous pouvez désactiver ces conseils ultérieurement dans Réglages → Compte.",
-            "why": "Votre motivation",
-            "why_body": "Décrivez la vie que vous choisissez — en une seule petite phrase. Affichez-la sur votre tableau de bord : ainsi, lorsque l’argent se fait rare, vous pourrez revoir cette image. Une raison claire à agir l’emporte sur n’importe quel obstacle : vous ne vous contentez pas de jongler avec des chiffres, vous préservez votre vision.",
-            "why_quote": "Ne vous focalisez pas sur les chiffres. Prenez les rênes.",
+            "coach_points": {
+                "tips": "Des conseils à l'écran tout au long de votre apprentissage",
+                "open": "Accédez à The Coach à tout moment",
+                "settings": "Désactivez les pourboires dans les Paramètres"
+            },
+            "why": "Ton rêve",
+            "why_body": "En une phrase : pourquoi voulez-vous Rumtelo — ou quel rêve cherchez-vous à réaliser ? Nous l'affichons sur votre tableau de bord pour vous rappeler brièvement ce vers quoi vous tendez.",
+            "why_tip": "Écrivez un rêve ou une motivation — pas un chiffre. Restez simple.",
+            "why_label": "Ton rêve ou ta raison",
+            "why_hint": "Affiché sur votre tableau de bord à titre de rappel. Vous pouvez le modifier ultérieurement.",
+            "why_placeholder": "Par exemple : une maison au soleil, près de la mer et avec des fruits frais",
+            "why_examples": {
+                "house": "Une maison au soleil",
+                "calm": "Plus de sérénité face à l'argent",
+                "free": "La liberté de choisir ma voie"
+            },
             "currency": "Devise",
             "currency_hint": "Les quantités et les bocaux sont exprimés dans cette devise pour ce foyer.",
             "net_income_label": "Revenu mensuel net ({symbol})",
@@ -4132,9 +4150,6 @@
                 "variable": "Variable",
                 "none": "Aucun"
             },
-            "why_label": "Quel est votre objectif ?",
-            "why_hint": "Affiché sur votre tableau de bord comme votre message personnel : veillez à ce qu’il soit court, percutant et à votre image.",
-            "why_placeholder": "Par exemple : une maison au soleil, près de la mer et avec des fruits frais",
             "step_of": "Étape {current} sur {total}",
             "back": "Retour",
             "next": "Suivant",

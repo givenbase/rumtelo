@@ -2,12 +2,17 @@ const onboarding = {
     welcome: 'Welcome to Rumtelo',
     welcome_body:
         'Rumtelo helps you see where your money goes — calmly. We split income into six jars so you always know what is for bills, saving, and living. No finance degree needed.',
+    welcome_points: {
+        jars: 'Six jars with a job',
+        overview: 'One calm overview',
+        coach: 'Tips without shame',
+    },
     income: 'Your income',
     income_body:
         'We ask a few basics so Rumtelo can set up your household. Approximate is fine — you can change this later.',
     jars: 'The six jars',
     jars_body:
-        'Your income is split into six jars, each with one job — so every amount already knows where it belongs. Tap a jar to see what it is for. The starting split (55 / 10 / 10 / 10 / 10 / 5) comes from a proven money habit: pay bills, then yourself, then joy and giving. You can change the percentages later.',
+        'Each jar has one job. The starting split is 55 / 10 / 10 / 10 / 10 / 5 — pay bills, then yourself, then joy and giving. Change percentages later.',
     jars_tap_hint: 'Tap a jar to learn why it exists.',
     jars_read_more: 'Read more about the six jars method',
     money_style: 'How you handle money',
@@ -16,10 +21,23 @@ const onboarding = {
     coach: 'The Coach stays with you',
     coach_body:
         'Short tips on screen (marked ✦ The Coach) stay on while you learn — helpful, never shaming. Open The Coach anytime for next steps. Turn tips off later in Settings → Account.',
-    why: 'Your why',
+    coach_points: {
+        tips: 'On-screen tips while you learn',
+        open: 'Open The Coach anytime',
+        settings: 'Turn tips off in Settings',
+    },
+    why: 'Your dream',
     why_body:
-        'Write the life you are choosing — in one short line. It lives on your dashboard so when money feels tight, you see that picture again. A clear why is bigger than any obstacle: you are not only sorting numbers — you are protecting the vision.',
-    why_quote: 'Don’t chase the number. Own the direction.',
+        'In one short sentence: why do you want Rumtelo — or what dream are you working toward? We put it on your dashboard as a small reminder of what you are working for.',
+    why_tip: 'Write a dream or a reason — not a number. Keep it simple.',
+    why_label: 'Your dream or reason',
+    why_hint: 'Shown on your dashboard as a reminder. You can change it later.',
+    why_placeholder: 'e.g. A house in the sun, sea & fresh fruit',
+    why_examples: {
+        house: 'A house in the sun',
+        calm: 'More calm around money',
+        free: 'Freedom to choose my path',
+    },
     currency: 'Currency',
     currency_hint: 'Amounts and jars use this currency for this household.',
     net_income_label: 'Net monthly income ({symbol})',
@@ -44,10 +62,6 @@ const onboarding = {
         variable: 'Variable',
         none: 'None',
     },
-    why_label: 'What are you building toward?',
-    why_hint:
-        'Shown on your dashboard as your personal check-in — keep it short, vivid, and yours.',
-    why_placeholder: 'e.g. A house in the sun, sea & fresh fruit',
     step_of: 'Step {current} of {total}',
     back: 'Back',
     next: 'Next',

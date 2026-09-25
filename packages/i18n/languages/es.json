@@ -4097,19 +4097,37 @@
         "onboarding": {
             "welcome": "Bienvenidos a Rumtelo",
             "welcome_body": "Rumtelo te ayuda a ver adónde va tu dinero, sin agobios. Dividimos los ingresos en seis «tarros» para que siempre sepas qué parte se destina a los gastos fijos, al ahorro y a los gastos corrientes. No hace falta tener un título en finanzas.",
+            "welcome_points": {
+                "jars": "Seis tarros con una función",
+                "overview": "Una visión general serena",
+                "coach": "Consejos sin complejos"
+            },
             "income": "Tus ingresos",
             "income_body": "Te pedimos algunos datos básicos para que Rumtelo pueda configurar tu hogar. No hace falta que sean exactos; puedes modificarlos más adelante.",
             "jars": "Las seis jarras",
-            "jars_body": "Tus ingresos se reparten en seis frascos, cada uno destinado a un fin concreto, de modo que cada cantidad ya sabe dónde debe ir. Toca un frasco para ver para qué sirve. La distribución inicial (55 / 10 / 10 / 10 / 10 / 5) se basa en un hábito financiero de eficacia probada: pagar las facturas, luego a ti mismo, y después dedicar una parte al disfrute y a la generosidad. Puedes modificar los porcentajes más adelante.",
+            "jars_body": "Cada tarro tiene una función. La distribución inicial es 55 / 10 / 10 / 10 / 10 / 5: pagar las facturas, luego tus propios gastos, y después el disfrute y la generosidad. Más adelante puedes modificar los porcentajes.",
             "jars_tap_hint": "Toca un tarro para saber por qué existe.",
             "jars_read_more": "Más información sobre el método de los seis frascos",
             "money_style": "Cómo gestionas el dinero",
             "money_style_body": "No hay respuestas correctas. Solo etiquetas flexibles, para que los consejos se adapten a ti. Las personas que conviven en el mismo hogar pueden optar por algo diferente más adelante.",
             "coach": "El entrenador te acompaña",
             "coach_body": "Los consejos breves que aparecen en pantalla (marcados con ✦ «The Coach») permanecen visibles mientras aprendes; son útiles y nunca te hacen sentir mal. Abre «The Coach» en cualquier momento para ver los siguientes pasos. Más adelante, puedes desactivar los consejos en Ajustes → Cuenta.",
-            "why": "Tu «por qué»",
-            "why_body": "Escribe la vida que estás eligiendo, en una sola frase breve. Quedará en tu panel de control para que, cuando el dinero escasee, puedas volver a ver esa imagen. Un «por qué» claro es más importante que cualquier obstáculo: no solo estás gestionando cifras, sino que estás protegiendo tu visión.",
-            "why_quote": "No te obsesiones con las cifras. Asume el control de la dirección.",
+            "coach_points": {
+                "tips": "Consejos en pantalla mientras aprendes",
+                "open": "Accede a The Coach cuando quieras",
+                "settings": "Desactiva las sugerencias en «Ajustes»"
+            },
+            "why": "Tu sueño",
+            "why_body": "En una frase breve: ¿por qué quieres Rumtelo, o qué sueño estás persiguiendo? Lo ponemos en tu panel de control como un pequeño recordatorio de aquello por lo que estás trabajando.",
+            "why_tip": "Escribe un sueño o un motivo, no un número. Que sea sencillo.",
+            "why_label": "Tu sueño o tu motivo",
+            "why_hint": "Aparece en tu panel de control como recordatorio. Puedes cambiarlo más adelante.",
+            "why_placeholder": "Por ejemplo: Una casa con sol, mar y fruta fresca",
+            "why_examples": {
+                "house": "Una casa al sol",
+                "calm": "Más tranquilidad en lo que respecta al dinero",
+                "free": "Libertad para elegir mi camino"
+            },
             "currency": "Moneda",
             "currency_hint": "Las cantidades y los tarros se expresan en esta moneda para este hogar.",
             "net_income_label": "Ingresos netos mensuales ({symbol})",
@@ -4132,9 +4150,6 @@
                 "variable": "Variable",
                 "none": "Ninguno"
             },
-            "why_label": "¿Hacia qué objetivo te estás esforzando?",
-            "why_hint": "Aparecerá en tu panel de control como tu «check-in» personal: que sea breve, llamativo y personal.",
-            "why_placeholder": "Por ejemplo: una casa con sol, mar y fruta fresca",
             "step_of": "Paso {current} de {total}",
             "back": "Atrás",
             "next": "Siguiente",

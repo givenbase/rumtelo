@@ -4097,19 +4097,37 @@
         "onboarding": {
             "welcome": "Welkom bij Rumtelo",
             "welcome_body": "Rumtelo helpt je rustig te zien waar je geld naartoe gaat. We verdelen je inkomen over zes potjes, zodat je altijd weet wat er is voor rekeningen, sparen en leven. Geen financiële opleiding nodig.",
+            "welcome_points": {
+                "jars": "Zes potjes met een taak",
+                "overview": "Eén rustig overzicht",
+                "coach": "Tips zonder schaamte"
+            },
             "income": "Jouw inkomen",
             "income_body": "We vragen een paar basisgegevens om je huishouden in te richten. Een schatting is genoeg — je kunt dit later altijd aanpassen.",
             "jars": "De zes potjes",
-            "jars_body": "Je inkomen wordt verdeeld over zes potjes, elk met één taak — zodat elk bedrag al weet waar het hoort. Tik op een potje om te zien waar het voor is. De startverdeling (55 / 10 / 10 / 10 / 10 / 5) komt uit een beproefde geldgewoonte: eerst rekeningen, dan jezelf, dan plezier en geven. De percentages kun je later aanpassen.",
+            "jars_body": "Elk potje heeft één taak. De startverdeling is 55 / 10 / 10 / 10 / 10 / 5 — eerst rekeningen, dan jezelf, dan plezier en geven. Percentages kun je later wijzigen.",
             "jars_tap_hint": "Tik op een potje om te zien waarom het bestaat.",
             "jars_read_more": "Lees meer over de zes-potjesmethode",
             "money_style": "Hoe je met geld omgaat",
             "money_style_body": "Er zijn geen foute antwoorden. Alleen zachte labels, zodat tips bij jou passen. Partners in hetzelfde huishouden kunnen later iets anders kiezen.",
             "coach": "De Coach blijft bij je",
             "coach_body": "Korte tips op het scherm (✦ De Coach) blijven aan terwijl je leert — behulpzaam, nooit beschamend. Open De Coach wanneer je wilt voor volgende stappen. Zet tips later uit via Instellingen → Account.",
-            "why": "Jouw waarom",
-            "why_body": "Schrijf het leven dat je kiest — in één korte zin. Die staat op je dashboard, zodat je dat beeld weer ziet als geld krap voelt. Een helder waarom is groter dan elk obstakel: je sorteert niet alleen cijfers — je beschermt die visie.",
-            "why_quote": "Jaag het getal niet na. Kies de richting.",
+            "coach_points": {
+                "tips": "Tips op het scherm terwijl je leert",
+                "open": "Open De Coach wanneer je wilt",
+                "settings": "Zet tips uit in Instellingen"
+            },
+            "why": "Jouw droom",
+            "why_body": "In één korte zin: waarom wil je Rumtelo gebruiken — of welke droom werk je naartoe? Die zin komt op je dashboard als een kleine herinnering waar je het voor doet.",
+            "why_tip": "Schrijf een droom of een reden — geen getal. Houd het simpel.",
+            "why_label": "Jouw droom of reden",
+            "why_hint": "Staat op je dashboard als herinnering. Je kunt het later wijzigen.",
+            "why_placeholder": "bijv. Huis in de zon, zee & vers fruit",
+            "why_examples": {
+                "house": "Een huis in de zon",
+                "calm": "Meer rust rondom geld",
+                "free": "Vrijheid om mijn eigen pad te kiezen"
+            },
             "currency": "Valuta",
             "currency_hint": "Bedragen en potjes gebruiken deze valuta voor dit huishouden.",
             "net_income_label": "Netto maandelijks inkomen ({symbol})",
@@ -4132,9 +4150,6 @@
                 "variable": "Variabele",
                 "none": "Geen"
             },
-            "why_label": "Waar bouw je naartoe?",
-            "why_hint": "Staat op je dashboard als persoonlijke check-in — kort, levendig, en van jou.",
-            "why_placeholder": "bijv. Huis in de zon, zee & vers fruit",
             "step_of": "Stap {current} van {total}",
             "back": "Terug",
             "next": "Volgende",
