@@ -11,21 +11,22 @@ import { StagingBanner } from '@/app/_components/staging-banner';
 
 import '../../globals.css';
 
-/** Brand book: Tungsten (display) → Archivo Narrow web substitute; Archivo body. */
+/**
+ * Brand book via `next/font/google` (build-time download + self-host).
+ * Variable Archivo faces when Google provides them — Next’s recommended path.
+ */
 const display = Archivo_Narrow({
-    subsets: ['latin'],
-    weight: ['500', '600', '700'],
+    subsets: ['latin', 'latin-ext'],
     variable: '--font-archivo-narrow',
     display: 'swap',
 });
 const sans = Archivo({
-    subsets: ['latin'],
-    weight: ['400', '500', '600', '700'],
+    subsets: ['latin', 'latin-ext'],
     variable: '--font-archivo',
     display: 'swap',
 });
 const mono = IBM_Plex_Mono({
-    subsets: ['latin'],
+    subsets: ['latin', 'latin-ext'],
     weight: ['400', '500', '600'],
     variable: '--font-plex-mono',
     display: 'swap',

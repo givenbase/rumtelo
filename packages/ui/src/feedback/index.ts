@@ -5,5 +5,6 @@ export * from './DangerZone';
 export * from './StatusPage';
 export * from './BrandLoader';
 export * from './StagingEnvironmentBanner';
+export * from './Celebrate';
 export { Toaster } from './Toaster';
 export { toast } from 'sonner';

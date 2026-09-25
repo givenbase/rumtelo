@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260923202205_InitialSchema extends Migration {
+export class Migration20260925121237_InitialSchema extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create schema if not exists "backoffice";`);
