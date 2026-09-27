@@ -3001,13 +3001,31 @@
                 "surplus": "Il reste {amount} de cette période",
                 "overspent": "Un ou plusieurs postes de budget ont dépassé leur plafond."
             },
+            "household": {
+                "eyebrow": "Votre foyer",
+                "blurb": "Les membres de ce forum, ainsi que tous les entraîneurs de « Practice » qui ont demandé à suivre la discussion.",
+                "open_settings": "Manage in settings",
+                "open_practice": "Gérer les entraîneurs",
+                "members_label": "Personnes",
+                "members_hint": "Membres ayant accès à ce forum",
+                "practice_label": "Entraînement",
+                "practice_hint": "Entraîneurs externes — consentement mutuel",
+                "practice_none": "Aucun entraîneur associé",
+                "practice_pending": "{count, plural, one {# invite pending} other {# invites pending}}",
+                "practice_active": "{name}",
+                "attention_eyebrow": "Il faut que tu donnes ton accord",
+                "attention_blurb": "Un cabinet vous a demandé l'autorisation de consulter ou de gérer ce forum. N'acceptez cette demande que si vous connaissez ce cabinet."
+            },
             "coach": {
                 "inbox_one": "{count} transaction en attente d'un jar.",
                 "inbox_many": "{count} transactions en attente d'un jar.",
                 "all_sorted": "Tout est réglé — place à l’intention.",
                 "sort_inbox": "Trier la boîte de réception",
                 "week_check": "Bilan hebdomadaire",
-                "see_jars": "Voir les bocaux"
+                "see_jars": "Voir les bocaux",
+                "practice_pending_one": "Une invitation à participer à un exercice vous attend — acceptez-la dans les paramètres si vous souhaitez l'ajouter à votre tableau.",
+                "practice_pending_many": "{count} Des invitations à s'entraîner vous attendent : acceptez-les dans les paramètres si vous souhaitez les voir apparaître sur votre tableau.",
+                "practice_pending_cta": "Invitation à donner un avis"
             },
             "hero": {
                 "money_accumulated": "Argent · Amassé grâce à {period}",
@@ -4083,6 +4101,8 @@
             "why": "Pourquoi",
             "sign_in": "Se connecter",
             "settings_account": "Compte — Paramètres",
+            "settings_household": "Ménage — Paramètres",
+            "settings_practice": "Entraîneurs d'entraînement — Paramètres",
             "settings_export": "Exporter — Paramètres",
             "settings_import": "Importation — Paramètres",
             "settings_jars": "Jars — Paramètres",
@@ -4485,6 +4505,14 @@
                 "account": {
                     "label": "Compte",
                     "sub": "Profil, connexion, langue"
+                },
+                "household": {
+                    "label": "Ménage",
+                    "sub": "Membres et invités"
+                },
+                "practice": {
+                    "label": "Entraîneurs d'entraînement",
+                    "sub": "Accepter ou supprimer le lien avec les entraîneurs"
                 },
                 "plan": {
                     "label": "Plan",

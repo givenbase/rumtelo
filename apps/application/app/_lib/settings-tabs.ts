@@ -7,6 +7,8 @@ import { isProductEnabled } from './launch-products';
 
 export type SettingsTab =
     | 'account'
+    | 'household'
+    | 'practice'
     | 'plan'
     | 'export'
     | 'import'
@@ -38,6 +40,8 @@ export type SettingsNavSection = {
 /** Absolute href for each settings tab. */
 export const SETTINGS_HREF: Record<SettingsTab, string> = {
     account: '/settings',
+    household: '/settings/general/household',
+    practice: '/settings/general/practice',
     plan: '/settings/general/plan',
     export: '/settings/data/export',
     import: '/settings/data/import',
@@ -60,6 +64,16 @@ const ALL_SETTINGS_SECTIONS: SettingsNavSection[] = [
                 key: 'account',
                 labelKey: 'pages.settings.tabs.account.label',
                 subKey: 'pages.settings.tabs.account.sub',
+            },
+            {
+                key: 'household',
+                labelKey: 'pages.settings.tabs.household.label',
+                subKey: 'pages.settings.tabs.household.sub',
+            },
+            {
+                key: 'practice',
+                labelKey: 'pages.settings.tabs.practice.label',
+                subKey: 'pages.settings.tabs.practice.sub',
             },
             {
                 key: 'plan',

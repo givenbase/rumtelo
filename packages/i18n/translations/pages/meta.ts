@@ -35,6 +35,8 @@ const meta = {
     why: 'Why',
     sign_in: 'Sign in',
     settings_account: 'Account — Settings',
+    settings_household: 'Household — Settings',
+    settings_practice: 'Practice coaches — Settings',
     settings_export: 'Export — Settings',
     settings_import: 'Import — Settings',
     settings_jars: 'Jars — Settings',

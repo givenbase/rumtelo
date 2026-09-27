@@ -8,7 +8,12 @@ import { useEffect, useMemo } from 'react';
 
 import { useSearchParams } from 'next/navigation';
 
-import { CoachKind, type MonthScore } from '@rumtelo/contracts';
+import {
+    CoachKind,
+    HouseholdRole,
+    PracticeClientLinkStatus,
+    type MonthScore,
+} from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Eyebrow, Typography } from '@rumtelo/ui';
@@ -24,11 +29,13 @@ import { formatPeriodTravelLabels } from '@/app/_lib/period-travel-i18n';
 import { isProductEnabled } from '@/app/_lib/launch-products';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
+import { settingsHref } from '@/app/_lib/settings-tabs';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { CoachVerdict } from '@/components/features/home/coach-verdict';
 import { HeroKluis } from '@/components/features/home/hero-kluis';
+import { HouseholdPeopleCard } from '@/components/features/home/household-people-card';
 import { PortalWidget } from '@/components/features/home/portal-widget';
 import { MonthScoreLog } from '@/components/features/home/month-score-log';
 import { JarDrilldownTable } from '@/components/features/money/jar-drilldown-table';
@@ -44,7 +51,7 @@ export function HomeDashboardClient() {
     const tShell = useTranslations('pages.shell');
     const locale = useLocale();
     const queryClient = useQueryClient();
-    const { householdId } = useAuth();
+    const { householdId, session } = useAuth();
     const { period, showToast, openOnboarding } = useHouseholdShell();
     const { canMutate } = useBoardWriteAccess();
     const apiError = useApiError();
@@ -183,6 +190,25 @@ export function HomeDashboardClient() {
         live
     );
 
+    const membersQuery = useLiveQuery(
+        apiQuery.household.members.queryOptions({ input: { householdId: householdId! } }),
+        [],
+        live
+    );
+    const myMember = (membersQuery.data ?? []).find(m => m.userId === session?.user?.id);
+    const canManagePractice =
+        myMember?.role === HouseholdRole.OWNER || myMember?.role === HouseholdRole.ADMIN;
+    const practiceLinksQuery = useLiveQuery(
+        apiQuery.household.practiceLinks.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [],
+        live && canManagePractice
+    );
+    const pendingPracticeCount = (practiceLinksQuery.data ?? []).filter(
+        link => link.status === PracticeClientLinkStatus.INVITED
+    ).length;
+
     const closeMonthScoreMutation = useMutation({
         mutationFn: async () => {
             if (!householdId) throw new Error('No household');
@@ -248,30 +274,51 @@ export function HomeDashboardClient() {
               tDashboard,
           })
         : null;
-    const coach: readonly CoachVerdictMessage[] =
-        live && liveData?.coach?.length
-            ? liveData.coach
-            : [
-                  {
-                      id: 'fallback',
+    const coach: readonly CoachVerdictMessage[] = (() => {
+        const practiceNudge: CoachVerdictMessage | null =
+            live && canManagePractice && pendingPracticeCount > 0
+                ? {
+                      id: 'practice-pending',
                       key: null,
                       kind: CoachKind.NUDGE,
-                      text: dashboard.inboxCount
-                          ? t(
-                                dashboard.inboxCount === 1
-                                    ? 'pages.dashboard.coach.inbox_one'
-                                    : 'pages.dashboard.coach.inbox_many',
-                                { count: dashboard.inboxCount }
-                            )
-                          : t('pages.dashboard.coach.all_sorted'),
-                      ctaLabel: dashboard.inboxCount
-                          ? t('pages.dashboard.coach.sort_inbox')
-                          : t('pages.dashboard.coach.week_check'),
-                      ctaHref: dashboard.inboxCount
-                          ? '/product/money/transactions'
-                          : '/product/money/week-check',
-                  },
-              ];
+                      text:
+                          pendingPracticeCount === 1
+                              ? tDashboard('coach.practice_pending_one')
+                              : tDashboard('coach.practice_pending_many', {
+                                    count: pendingPracticeCount,
+                                }),
+                      ctaLabel: tDashboard('coach.practice_pending_cta'),
+                      ctaHref: settingsHref('practice'),
+                  }
+                : null;
+
+        const moneyCoach: readonly CoachVerdictMessage[] =
+            live && liveData?.coach?.length
+                ? liveData.coach
+                : [
+                      {
+                          id: 'fallback',
+                          key: null,
+                          kind: CoachKind.NUDGE,
+                          text: dashboard.inboxCount
+                              ? t(
+                                    dashboard.inboxCount === 1
+                                        ? 'pages.dashboard.coach.inbox_one'
+                                        : 'pages.dashboard.coach.inbox_many',
+                                    { count: dashboard.inboxCount }
+                                )
+                              : t('pages.dashboard.coach.all_sorted'),
+                          ctaLabel: dashboard.inboxCount
+                              ? t('pages.dashboard.coach.sort_inbox')
+                              : t('pages.dashboard.coach.week_check'),
+                          ctaHref: dashboard.inboxCount
+                              ? '/product/money/transactions'
+                              : '/product/money/week-check',
+                      },
+                  ];
+
+        return practiceNudge ? [practiceNudge, ...moneyCoach] : moneyCoach;
+    })();
 
     const horizon = travelMeta.monthsHorizon;
     const baselineTotal = dashboard.baselineAllocatedTotal;
@@ -348,6 +395,8 @@ export function HomeDashboardClient() {
             </div>
 
             <CoachVerdict messages={coach} recap={fallbackRecap} />
+
+            <HouseholdPeopleCard />
 
             <MonthScoreLog
                 score={monthScore.score}

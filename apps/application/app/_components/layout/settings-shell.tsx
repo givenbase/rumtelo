@@ -147,16 +147,21 @@ export function SettingsShell({ children }: { children: ReactNode }) {
     );
 }
 
-/** Hide Plan when role cannot see billing (MEMBER / VIEWER). */
+/** Hide Plan when role cannot see billing; hide Practice coaches for non-managers. */
 function filterSettingsSections(
     sections: SettingsNavSection[],
     role: HouseholdRole
 ): SettingsNavSection[] {
     const canSeeBilling = roleCanSee(role, HouseholdPermissionSection.HOUSEHOLD_BILLING);
+    const canManagePractice = role === HouseholdRole.OWNER || role === HouseholdRole.ADMIN;
     return sections
         .map(section => ({
             ...section,
-            items: section.items.filter(item => (item.key === 'plan' ? canSeeBilling : true)),
+            items: section.items.filter(item => {
+                if (item.key === 'plan') return canSeeBilling;
+                if (item.key === 'practice') return canManagePractice;
+                return true;
+            }),
         }))
         .filter(section => section.items.length > 0);
 }

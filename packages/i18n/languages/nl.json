@@ -3001,13 +3001,31 @@
                 "surplus": "{amount} heeft deze periode verlaten",
                 "overspent": "Er is te veel uitgegeven aan een of meer potten"
             },
+            "household": {
+                "eyebrow": "Uw huishouden",
+                "blurb": "De mensen op dit forum, en alle Practice-coaches die hebben gevraagd om mee te kijken.",
+                "open_settings": "Manage in settings",
+                "open_practice": "Coaches beheren",
+                "members_label": "Mensen",
+                "members_hint": "Leden met toegang tot dit forum",
+                "practice_label": "Oefening",
+                "practice_hint": "Externe coaches — wederzijdse toestemming",
+                "practice_none": "Geen coach gekoppeld",
+                "practice_pending": "{count, plural, one {# invite pending} other {# invites pending}}",
+                "practice_active": "{name}",
+                "attention_eyebrow": "Moet door jou worden goedgekeurd",
+                "attention_blurb": "Een praktijk heeft gevraagd om dit prikbord te mogen bekijken of beheren. Accepteer dit verzoek alleen als je deze praktijk kent."
+            },
             "coach": {
                 "inbox_one": "{count}-transactie wacht op een pot.",
                 "inbox_many": "{count} transacties die wachten op een pot.",
                 "all_sorted": "Alles geregeld — tijd om intenties te formuleren.",
                 "sort_inbox": "Inbox sorteren",
                 "week_check": "Wekelijkse controle",
-                "see_jars": "Zie potten"
+                "see_jars": "Zie potten",
+                "practice_pending_one": "Er staat een uitnodiging voor een oefening op je wachten — accepteer deze in de instellingen als je ze op je bord wilt hebben.",
+                "practice_pending_many": "{count} Er staan uitnodigingen voor oefeningen klaar — accepteer ze in de instellingen als je ze op je bord wilt hebben.",
+                "practice_pending_cta": "Uitnodiging voor een recensie"
             },
             "hero": {
                 "money_accumulated": "Geld · Opgebouwd via {period}",
@@ -4083,6 +4101,8 @@
             "why": "Waarom",
             "sign_in": "Inloggen",
             "settings_account": "Account — Instellingen",
+            "settings_household": "Huishouden — Instellingen",
+            "settings_practice": "Trainingscoaches — Instellingen",
             "settings_export": "Exporteren — Instellingen",
             "settings_import": "Importeren — Instellingen",
             "settings_jars": "Potten — Instellingen",
@@ -4485,6 +4505,14 @@
                 "account": {
                     "label": "Account",
                     "sub": "Profiel, inloggen, taal"
+                },
+                "household": {
+                    "label": "Huishouden",
+                    "sub": "Leden en genodigden"
+                },
+                "practice": {
+                    "label": "Trainers",
+                    "sub": "Coaches accepteren of ontkoppelen"
                 },
                 "plan": {
                     "label": "Plan",

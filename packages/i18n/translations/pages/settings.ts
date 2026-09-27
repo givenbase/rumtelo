@@ -14,6 +14,8 @@ const settings = {
     },
     tabs: {
         account: { label: 'Account', sub: 'Profile, sign-in, language' },
+        household: { label: 'Household', sub: 'Members and invites' },
+        practice: { label: 'Practice coaches', sub: 'Accept or unlink coaches' },
         plan: { label: 'Plan', sub: 'What you use and pay' },
         jars: { label: 'Jars', sub: 'Split, accounts, coach' },
         debt: { label: 'Debt', sub: 'Payoff method' },
@@ -590,7 +592,7 @@ const settings = {
         rejected: 'Practice invite declined',
         unlinked: 'Practice unlinked',
         invite_redeemed:
-            'Practice invitation linked — accept it under Practice coaches when you are ready.',
+            'Practice invitation linked — open Settings → Practice coaches to accept when you are ready.',
     },
 } as const;
 

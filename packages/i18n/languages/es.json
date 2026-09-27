@@ -3001,13 +3001,31 @@
                 "surplus": "Quedan {amount} de este periodo",
                 "overspent": "Se ha superado el presupuesto de una o varias partidas"
             },
+            "household": {
+                "eyebrow": "Tu hogar",
+                "blurb": "Los usuarios de este foro y cualquier entrenador de Practice que haya pedido echar un vistazo.",
+                "open_settings": "Manage in settings",
+                "open_practice": "Gestionar entrenadores",
+                "members_label": "Gente",
+                "members_hint": "Miembros con acceso a este foro",
+                "practice_label": "Práctica",
+                "practice_hint": "Entrenadores externos: consentimiento doble",
+                "practice_none": "No hay ningún entrenador asociado",
+                "practice_pending": "{count, plural, one {# invite pending} other {# invites pending}}",
+                "practice_active": "{name}",
+                "attention_eyebrow": "Necesita tu aprobación",
+                "attention_blurb": "Una consulta ha solicitado ver o gestionar este foro. Acepta solo si los conoces."
+            },
             "coach": {
                 "inbox_one": "{count} transacción a la espera de un tarro.",
                 "inbox_many": "{count} transacciones a la espera de un tarro.",
                 "all_sorted": "Ya está todo listo: es hora de fijarse un objetivo.",
                 "sort_inbox": "Ordenar la bandeja de entrada",
                 "week_check": "Resumen semanal",
-                "see_jars": "Ver tarros"
+                "see_jars": "Ver tarros",
+                "practice_pending_one": "Hay una invitación para «Practice» pendiente: acéptala en la configuración si quieres que aparezca en tu tablero.",
+                "practice_pending_many": "{count} Hay invitaciones de entrenamiento esperándote: acéptalas en la configuración si quieres que aparezcan en tu tablero.",
+                "practice_pending_cta": "Invitación para dejar una reseña"
             },
             "hero": {
                 "money_accumulated": "Dinero · Acumulado a través de {period}",
@@ -4083,6 +4101,8 @@
             "why": "¿Por qué?",
             "sign_in": "Iniciar sesión",
             "settings_account": "Cuenta — Ajustes",
+            "settings_household": "Hogar — Configuración",
+            "settings_practice": "Entrenadores de entrenamiento — Ajustes",
             "settings_export": "Exportar — Configuración",
             "settings_import": "Importar — Configuración",
             "settings_jars": "Jars — Configuración",
@@ -4485,6 +4505,14 @@
                 "account": {
                     "label": "Cuenta",
                     "sub": "Perfil, inicio de sesión, idioma"
+                },
+                "household": {
+                    "label": "Hogar",
+                    "sub": "Miembros e invitados"
+                },
+                "practice": {
+                    "label": "Entrenadores de entrenamiento",
+                    "sub": "Aceptar o desvincular a los entrenadores"
                 },
                 "plan": {
                     "label": "Plan",
