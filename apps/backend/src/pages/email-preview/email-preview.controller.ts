@@ -1,10 +1,14 @@
-import { Controller, Get, NotFoundException, Param, Res } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param, Query, Res } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
 import { type FastifyReply } from 'fastify';
 
 import { loadEnv } from '../../common/config/env.config';
 import { isSwaggerEnabled } from '../../common/config/setup-swagger.config';
+import {
+    listMemoryEmails,
+    practiceInviteTokenFromHtml,
+} from '../../modules/backoffice/communication/email/utils/memory-outbox';
 import {
     EmailTemplate,
     renderTemplate,
@@ -57,6 +61,23 @@ export class EmailPreviewController {
             lang: 'en',
         });
         void reply.type('text/html').send(html);
+    }
+
+    /**
+     * JSON outbox of memory-provider sends (local/dev).
+     * Playwright uses this to read Practice invite tokens without Resend.
+     */
+    @Get('outbox')
+    outbox(@Query('to') to: string | undefined, @Res() reply: FastifyReply): void {
+        if (!this.assertEnabled(reply)) return;
+
+        const rows = listMemoryEmails(to ? { to } : undefined).map(row => ({
+            to: row.to,
+            subject: row.subject,
+            at: row.at,
+            practiceInviteToken: practiceInviteTokenFromHtml(row.html),
+        }));
+        void reply.type('application/json').send({ count: rows.length, emails: rows });
     }
 
     @Get(':template')

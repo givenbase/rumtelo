@@ -14,6 +14,7 @@ export function ToastPill() {
             key={toast.id}
             role="status"
             aria-live="polite"
+            data-testid="toast"
             className={cn(
                 'fixed bottom-24 left-1/2 z-60 max-w-[calc(100vw-2rem)] -translate-x-1/2 animate-rise rounded-full border px-5 py-2.5 text-center text-sm font-medium text-balance shadow-lg',
                 toast.type === 'success' && 'border-success/30 bg-success/10 text-success',

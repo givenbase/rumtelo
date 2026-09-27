@@ -20,5 +20,6 @@ function createPersonaTest(persona: DemoPersona) {
 export const basicTest = createPersonaTest('basic');
 export const plusTest = createPersonaTest('plus');
 export const maxTest = createPersonaTest('max');
+export const practiceTest = createPersonaTest('practice');
 
 export { expect };

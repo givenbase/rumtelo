@@ -14,13 +14,14 @@ function readUrl(name: string, fallback: string): string {
     return (process.env[name] ?? fallback).replace(/\/$/, '');
 }
 
-export type DemoPersona = 'basic' | 'plus' | 'max';
+export type DemoPersona = 'basic' | 'plus' | 'max' | 'practice';
 
 /** Keep in sync with `@rumtelo/contracts/platform` `demoPassword`. */
 const DEMO_PASSWORDS: Record<DemoPersona, string> = {
     basic: 'teloBasic1!',
     plus: 'teloPlus1!',
     max: 'teloMax1!',
+    practice: 'teloPractice1!',
 };
 
 export const e2eEnv = {
@@ -38,6 +39,10 @@ export const e2eEnv = {
         max: {
             email: process.env.E2E_MAX_EMAIL ?? 'max@rumtelo.com',
             password: process.env.E2E_MAX_PASSWORD ?? DEMO_PASSWORDS.max,
+        },
+        practice: {
+            email: process.env.E2E_PRACTICE_EMAIL ?? 'practice@rumtelo.com',
+            password: process.env.E2E_PRACTICE_PASSWORD ?? DEMO_PASSWORDS.practice,
         },
     },
 } as const;

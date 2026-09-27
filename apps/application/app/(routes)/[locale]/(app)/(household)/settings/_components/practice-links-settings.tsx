@@ -113,6 +113,7 @@ export function PracticeLinksSettings() {
                                         <>
                                             <Button
                                                 size="sm"
+                                                data-testid="practice-link-accept"
                                                 disabled={!live || accept.isPending}
                                                 onClick={() => accept.mutate(link.id)}>
                                                 {t('pages.settings.practice_links.accept')}

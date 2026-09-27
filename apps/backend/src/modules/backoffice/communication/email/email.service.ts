@@ -11,6 +11,7 @@ import type {
     SendEmailInput,
 } from './email.types';
 import { EMAIL_BRAND } from './utils/brand.constants';
+import { pushMemoryEmail } from './utils/memory-outbox';
 import { EmailTemplate, renderTemplate } from './utils/template-adapter';
 
 import { loadEnv } from '../../../../common/config/env.config';
@@ -63,6 +64,7 @@ export class EmailService {
         const from = input.from ?? this.defaultFrom;
 
         if (this.provider === 'memory' || !this.resend) {
+            pushMemoryEmail({ to, subject: input.subject, html: input.html });
             this.logger.log({
                 event: 'email.memory',
                 to,

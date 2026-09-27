@@ -48,7 +48,10 @@ export function PracticeClientsPage() {
                 title={t('pages.practice.clients.title')}
                 blurb={t('pages.practice.clients.blurb')}
                 action={
-                    <Button size="sm" onClick={() => setAddOpen(true)}>
+                    <Button
+                        size="sm"
+                        data-testid="practice-add-client"
+                        onClick={() => setAddOpen(true)}>
                         <Icon name="plus" size="sm" />
                         {t('pages.practice.clients.add_title')}
                     </Button>

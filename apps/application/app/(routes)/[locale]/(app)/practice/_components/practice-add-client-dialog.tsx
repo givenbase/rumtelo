@@ -124,6 +124,7 @@ export function PracticeAddClientDialog({
                                         <FormControl>
                                             <Email
                                                 id="add-client-email"
+                                                data-testid="practice-add-client-email"
                                                 {...field}
                                                 placeholder={t(
                                                     'pages.practice.clients.email_placeholder'
@@ -230,7 +231,10 @@ export function PracticeAddClientDialog({
                                 onClick={() => onOpenChange(false)}>
                                 {t('ui.button.actions.cancel')}
                             </Button>
-                            <Button type="submit" disabled={addClient.isPending}>
+                            <Button
+                                type="submit"
+                                data-testid="practice-add-client-submit"
+                                disabled={addClient.isPending}>
                                 {addClient.isPending ? '…' : t('pages.practice.clients.submit')}
                             </Button>
                         </DialogFooter>

@@ -18,6 +18,8 @@ import {
 } from '@/app/_lib/practice-preview';
 import { practicePath } from '@/app/_lib/routes';
 
+import { ToastPill } from '@/components/layout/toast';
+
 import { PracticeAccountMenu } from './practice-account-menu';
 import { PracticeContextProvider, usePractice } from './practice-context';
 
@@ -152,6 +154,7 @@ function PracticeShellInner({ children }: { children: ReactNode }) {
             <main className="flex-1">
                 <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-10">{children}</div>
             </main>
+            <ToastPill />
         </div>
     );
 }
