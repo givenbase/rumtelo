@@ -49,7 +49,7 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 
 import { createFixedCostFormSchema, type FixedCostFormSchemaValues } from './form-zod';
-import { CatalogChipPicker } from './catalog-chip-picker';
+import { CATALOG_CHIP_IDLE_LIMIT, CatalogChipPicker } from './catalog-chip-picker';
 import { ConfirmActionButton } from './confirm-action-button';
 import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
 import { FormInput } from './form-input';
@@ -60,9 +60,6 @@ import {
     merchantsToNameOptions,
 } from './merchant-name-options';
 import { PresetNameField, type NamePresetOption } from './preset-name-field';
-
-/** Cap suggested vendor chips so the form stays scannable. */
-const MAX_VENDOR_CHIPS = 16;
 
 export type GivePayeeMode = 'known' | 'coach' | 'manual';
 
@@ -345,13 +342,11 @@ export function FixedCostForm({
                 .filter((merchant): merchant is MerchantPreset => Boolean(merchant));
         }
         if (!activeCategoryTemplateKey) return [] as MerchantPreset[];
-        return merchants
-            .filter(
-                merchant =>
-                    merchant.categoryTemplateKey === activeCategoryTemplateKey &&
-                    !merchant.givingOrganisationKey
-            )
-            .slice(0, MAX_VENDOR_CHIPS);
+        return merchants.filter(
+            merchant =>
+                merchant.categoryTemplateKey === activeCategoryTemplateKey &&
+                !merchant.givingOrganisationKey
+        );
     }, [merchants, activeCategoryTemplateKey, selectedBillPresetKey, fixedCostPresets]);
 
     const givingOrgNames = useMemo(() => givingOrgsQuery.data ?? [], [givingOrgsQuery.data]);
@@ -968,6 +963,12 @@ export function FixedCostForm({
                                         placeholder={tForm('search_vendor')}
                                         noMatchesLabel={tForm('no_matches')}
                                         disabled={busy}
+                                        idleLimit={CATALOG_CHIP_IDLE_LIMIT}
+                                        selectedKey={
+                                            vendorsForCategory.find(merchant =>
+                                                nameMatches(counterparty, merchant.name)
+                                            )?.key ?? null
+                                        }
                                         otherLabel={tForm('other')}
                                         onOther={() => {
                                             setCustomPayee(true);

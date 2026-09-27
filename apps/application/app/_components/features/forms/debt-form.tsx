@@ -38,7 +38,7 @@ import { useHouseholdShell } from '@/components/features/shell/household-shell-c
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 import { createDebtFormSchema, type DebtFormSchemaValues } from './form-zod';
-import { CatalogChipPicker } from './catalog-chip-picker';
+import { CATALOG_CHIP_IDLE_LIMIT, CatalogChipPicker } from './catalog-chip-picker';
 import { ConfirmActionButton } from './confirm-action-button';
 import { FormInput } from './form-input';
 import { merchantsToNameOptions } from './merchant-name-options';
@@ -386,6 +386,14 @@ export function DebtForm({
                                     placeholder={tDebt('lender_search')}
                                     noMatchesLabel={tForm('no_matches')}
                                     disabled={busy}
+                                    idleLimit={CATALOG_CHIP_IDLE_LIMIT}
+                                    selectedKey={
+                                        lendersForType.find(
+                                            lender =>
+                                                selectedLenderName.toLowerCase() ===
+                                                lender.name.toLowerCase()
+                                        )?.key ?? null
+                                    }
                                     otherLabel={tForm('other')}
                                     onOther={() => {
                                         setCustomLender(true);
