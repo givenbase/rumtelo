@@ -29,13 +29,11 @@ import {
 import { CREATE_HREF, goalDetailHref } from '@/app/_lib/create-routes';
 import { formatPeriodTravelLabels } from '@/app/_lib/period-travel-i18n';
 import { isFocusSaveGoal, saveGoalRank } from '@/app/_lib/goal-focus';
-import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
-import { jarChrome } from '@/app/_lib/jar-meta';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { GoalKindMark } from '@/components/features/growth/goal-kind-mark';
-import { JarBadge } from '@/components/features/money/jar-badge';
+import { JarBadge, JarMark } from '@/components/features/money/jar-badge';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar } from '@/components/layout/list-toolbar';
@@ -440,12 +438,7 @@ export function GoalsPageClient() {
                                               ? 'border-accent/50 bg-accent-soft text-accent'
                                               : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
                                       )}>
-                                      <span
-                                          className="size-1.75 rounded-sm"
-                                          style={{
-                                              background: bgClassToCssVar(jarChrome(key).color),
-                                          }}
-                                      />
+                                      <JarMark jarKey={key} icon={catalog?.icon} />
                                       {name}
                                   </button>
                               );
@@ -518,7 +511,11 @@ export function GoalsPageClient() {
                                             </span>
                                         ) : null}
                                         {jar && goal.kind === GoalKind.SAVE ? (
-                                            <JarBadge jarKey={jar.key} name={jar.name} />
+                                            <JarBadge
+                                                jarKey={jar.key}
+                                                name={jar.name}
+                                                icon={jarByKey.get(jar.key)?.icon}
+                                            />
                                         ) : null}
                                     </div>
 
@@ -698,6 +695,9 @@ export function GoalsPageClient() {
                                                                 <JarBadge
                                                                     jarKey={jar.key}
                                                                     name={jar.name}
+                                                                    icon={
+                                                                        jarByKey.get(jar.key)?.icon
+                                                                    }
                                                                     className="hidden sm:inline-flex"
                                                                 />
                                                             ) : null}

@@ -8,6 +8,8 @@ import { cn } from '@rumtelo/utils';
 export type ListControlOption<T extends string = string> = {
     key: T;
     label: string;
+    /** Optional leading mark (e.g. jar icon + color). */
+    leading?: ReactNode;
 };
 
 type ListControlsSort<T extends string> = {
@@ -95,7 +97,12 @@ function FilterChips<T extends string>({ filters }: { filters: ListControlsFilte
                     type="button"
                     aria-pressed={filters.value === option.key}
                     onClick={() => filters.onChange(option.key)}
-                    className={cn(CHIP, filters.value === option.key ? CHIP_ACTIVE : CHIP_IDLE)}>
+                    className={cn(
+                        CHIP,
+                        'gap-1.5',
+                        filters.value === option.key ? CHIP_ACTIVE : CHIP_IDLE
+                    )}>
+                    {option.leading}
                     {option.label}
                 </button>
             ))}

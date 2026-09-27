@@ -16,6 +16,7 @@ import { evaluateGoalPace } from '@/app/_lib/goal-pace';
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { CoachMark, useHelpersEnabled } from '@/components/features/helpers';
+import { JarMark } from '@/components/features/money/jar-badge';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 type SimulatorJar = Pick<JarBalance, 'id' | 'key' | 'name' | 'percentage' | 'committedOut'>;
@@ -340,8 +341,9 @@ export function IncomeSimulator({
                                 key={j.id}
                                 className="rounded-xl border border-line bg-raised p-3.5">
                                 <div
-                                    className="font-mono text-xs font-medium tracking-wide uppercase"
+                                    className="flex items-center gap-1.5 font-mono text-xs font-medium tracking-wide uppercase"
                                     style={{ color: bgClassToCssVar(color) }}>
+                                    <JarMark jarKey={j.key} />
                                     {j.name}
                                 </div>
                                 <div className="mt-2 font-mono text-lg text-fg">

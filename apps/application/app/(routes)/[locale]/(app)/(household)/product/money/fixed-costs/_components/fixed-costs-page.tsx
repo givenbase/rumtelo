@@ -31,7 +31,7 @@ import { api } from '@/app/_lib/api';
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { CREATE_HREF, fixedDetailHref, updateHref } from '@/app/_lib/create-routes';
-import { bgClassToCssVar, cadenceLabel } from '@/app/_lib/jar-chrome';
+import { cadenceLabel } from '@/app/_lib/jar-chrome';
 import {
     fixedCostLifecycle,
     fixedCostStatus,
@@ -56,6 +56,7 @@ import { ConfirmActionButton } from '@/components/features/forms/confirm-action-
 import { CoachTipCard } from '@/components/features/helpers';
 import {
     JarBadge,
+    JarMark,
     MetaChip,
     formatBookedDate,
     formatDueDay,
@@ -201,6 +202,7 @@ export function FixedCostsPageClient() {
             : Object.values(JarKey).map(key => ({
                   key,
                   name: key,
+                  icon: null as string | null,
                   color: jarChrome(key).color,
                   pct: DEFAULT_JAR_SPLIT[key],
               }));
@@ -484,6 +486,7 @@ export function FixedCostsPageClient() {
                                                     <JarBadge
                                                         jarKey={group.jar.key}
                                                         name={group.jar.name}
+                                                        icon={group.jar.icon}
                                                     />
                                                     <span className="flex items-center gap-2">
                                                         <span className="font-mono text-[11px] text-fg-faint">
@@ -646,10 +649,7 @@ export function FixedCostsPageClient() {
                                                         ? 'border-accent/50 bg-accent-soft text-accent'
                                                         : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
                                                 )}>
-                                                <span
-                                                    className="size-1.75 rounded-sm"
-                                                    style={{ background: bgClassToCssVar(j.color) }}
-                                                />
+                                                <JarMark jarKey={j.key} icon={j.icon} />
                                                 {j.name}
                                             </button>
                                         );
@@ -720,6 +720,9 @@ export function FixedCostsPageClient() {
                                                                     jar =>
                                                                         jar.key === fixedCost.jarKey
                                                                 )?.name ?? fixedCost.jarKey
+                                                            }
+                                                            icon={
+                                                                jarByKey.get(fixedCost.jarKey)?.icon
                                                             }
                                                         />
                                                     </>
@@ -802,11 +805,8 @@ export function FixedCostsPageClient() {
                                 {splitJars.map(j => (
                                     <span
                                         key={j.key}
-                                        className="flex items-center gap-1.5 rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary">
-                                        <span
-                                            className="size-1.75 rounded-sm"
-                                            style={{ background: bgClassToCssVar(j.color) }}
-                                        />
+                                        className="flex items-center gap-1.5 rounded-full border border-line-strong bg-surface px-3 py-1.5 font-mono text-xs text-fg-secondary">
+                                        <JarMark jarKey={j.key} icon={j.icon} />
                                         {j.name}
                                         <span className="text-fg-faint">{j.pct}%</span>
                                     </span>

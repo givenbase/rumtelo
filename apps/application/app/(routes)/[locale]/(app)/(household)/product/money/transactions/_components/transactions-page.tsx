@@ -35,7 +35,12 @@ import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { partyMark, findCatalogMerchantFromFeed } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { InboxSortCard } from '@/components/features/money/inbox-sort-card';
-import { JarBadge, MetaChip, formatBookedDate } from '@/components/features/money/jar-badge';
+import {
+    JarBadge,
+    JarMark,
+    MetaChip,
+    formatBookedDate,
+} from '@/components/features/money/jar-badge';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -235,7 +240,11 @@ export function TransactionsPageClient() {
     const jarFilterOptions = useMemo(
         () => [
             { key: 'all', label: t('filter_all') },
-            ...jars.map(jar => ({ key: jar.id, label: jar.name })),
+            ...jars.map(jar => ({
+                key: jar.id,
+                label: jar.name,
+                leading: <JarMark jarKey={jar.key} icon={jar.icon} />,
+            })),
         ],
         [jars, t]
     );
@@ -714,7 +723,11 @@ export function TransactionsPageClient() {
                                                 {transaction.status === TransactionStatus.INBOX ? (
                                                     <MetaChip>{t('inbox_chip')}</MetaChip>
                                                 ) : (
-                                                    <JarBadge jarKey={jar?.key} name={jar?.name} />
+                                                    <JarBadge
+                                                        jarKey={jar?.key}
+                                                        name={jar?.name}
+                                                        icon={jar?.icon}
+                                                    />
                                                 )}
                                             </>
                                         }
@@ -780,6 +793,7 @@ export function TransactionsPageClient() {
                                                     <JarBadge
                                                         jarKey={group.jar?.key}
                                                         name={label}
+                                                        icon={group.jar?.icon}
                                                     />
                                                     <span className="flex items-center gap-2">
                                                         <span className="font-mono text-[11px] text-fg-faint">

@@ -550,11 +550,12 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                             <JarBadge
                                 jarKey={jar.key}
                                 name={jar.name}
+                                icon={jar.icon}
                                 className="border-0 bg-transparent p-0"
                             />
                         </Link>
                     ) : jar ? (
-                        <JarBadge jarKey={jar.key} name={jar.name} />
+                        <JarBadge jarKey={jar.key} name={jar.name} icon={jar.icon} />
                     ) : null}
                 </div>
             </Card>

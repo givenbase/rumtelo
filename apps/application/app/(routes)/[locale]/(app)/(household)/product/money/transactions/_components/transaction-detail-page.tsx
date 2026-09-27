@@ -496,6 +496,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                             <JarBadge
                                 jarKey={jar.key}
                                 name={jar.name}
+                                icon={jar.icon}
                                 className="border-0 bg-transparent p-0"
                             />
                         </Link>
@@ -514,6 +515,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                             <JarBadge
                                 jarKey={jar.key}
                                 name={jar.name}
+                                icon={jar.icon}
                                 className="border-0 bg-transparent p-0"
                             />
                         </span>
@@ -654,6 +656,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                                                         <JarBadge
                                                             jarKey={rowJar.key}
                                                             name={rowJar.name}
+                                                            icon={rowJar.icon}
                                                         />
                                                     ) : null}
                                                 </>

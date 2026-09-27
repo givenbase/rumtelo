@@ -551,11 +551,12 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                                 <JarBadge
                                     jarKey={jar.key}
                                     name={jar.name}
+                                    icon={jar.icon}
                                     className="border-0 bg-transparent p-0"
                                 />
                             </Link>
                         ) : (
-                            <JarBadge jarKey={jar.key} name={jar.name} />
+                            <JarBadge jarKey={jar.key} name={jar.name} icon={jar.icon} />
                         )}
                     </div>
                     <dl className="grid gap-3 text-sm sm:grid-cols-3">
