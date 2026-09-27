@@ -36,6 +36,13 @@ export class PracticeController {
         );
     }
 
+    @Implement(contract.practice.redeemClientInvite)
+    redeemClientInvite() {
+        return implement(contract.practice.redeemClientInvite).handler(({ input }) =>
+            this.practice.redeemClientInvite(input)
+        );
+    }
+
     // ====================================================================
     // ? READ Operations
     // ====================================================================

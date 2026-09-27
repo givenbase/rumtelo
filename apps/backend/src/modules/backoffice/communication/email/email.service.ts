@@ -7,6 +7,7 @@ import type {
     EmailVerificationEmailInput,
     HouseholdInviteEmailInput,
     PasswordResetEmailInput,
+    PracticeClientInviteEmailInput,
     SendEmailInput,
 } from './email.types';
 import { EMAIL_BRAND } from './utils/brand.constants';
@@ -123,6 +124,47 @@ export class EmailService {
             },
             locale
         );
+    }
+
+    /** Practice client invite — new signup, continue onboarding, or accept in settings. */
+    async sendPracticeClientInvite(input: PracticeClientInviteEmailInput): Promise<boolean> {
+        const locale = input.locale ?? 'en';
+        return this.sendTemplatedEmail(
+            input.to,
+            locale === 'nl' ? 'Practice-uitnodiging — Rumtelo' : 'Practice invitation — Rumtelo',
+            EmailTemplate.PRACTICE_CLIENT_INVITE,
+            {
+                practiceName: input.practiceName,
+                inviteUrl: input.inviteUrl,
+                inviterName: input.inviterName,
+                access: input.access,
+                variant: input.variant,
+            },
+            locale
+        );
+    }
+
+    /** App settings (account) — practice dual-consent accept card. */
+    practiceClientAcceptUrl(): string {
+        return `${this.appOrigin}/settings`;
+    }
+
+    /** Marketing signup with practice invite token (brand-new account). */
+    practiceClientSignupUrl(token: string, email: string): string {
+        const params = new URLSearchParams({
+            practiceInvite: token,
+            email,
+        });
+        return `${this.webOrigin}/sign-up?${params.toString()}`;
+    }
+
+    /** App sign-in + finish onboarding for users who already have an account. */
+    practiceClientContinueUrl(token: string, email: string): string {
+        const params = new URLSearchParams({
+            practiceInvite: token,
+            email,
+        });
+        return `${this.appOrigin}/sign-in?${params.toString()}`;
     }
 
     /** Account email verification — Better Auth `emailVerification.sendVerificationEmail`. */

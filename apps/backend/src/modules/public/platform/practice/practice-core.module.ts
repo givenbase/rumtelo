@@ -5,6 +5,7 @@ import { isLaunchProductsDeferred } from '../../../../common/config/launch-produ
 import { AccountModule } from '../../../auth/user/account/account.module';
 import { HouseholdBillingModule } from '../../../auth/household/household-billing/household-billing.module';
 import { HouseholdSettingsModule } from '../../../auth/household/household-settings/household-settings.module';
+import { EmailModule } from '../../../backoffice/communication/email';
 import { EnergyDashboardModule } from '../../product/energy/dashboard/dashboard.module';
 import { GrowthDashboardModule } from '../../product/growth/dashboard/dashboard.module';
 import { DashboardModule } from '../../product/money/dashboard/dashboard.module';
@@ -13,6 +14,7 @@ import { BillingModule } from '../billing/billing.module';
 import { Address } from '../address/address.entity';
 import { PracticeAddress } from './practice-address/practice-address.entity';
 import { PracticeBilling } from './practice-billing/practice-billing.entity';
+import { PracticeClientInvite } from './practice-client-invite/practice-client-invite.entity';
 import { PracticeClientLink } from './practice-client-link/practice-client-link.entity';
 import { PracticeClientLinkFlag } from './practice-client-link-flag/practice-client-link-flag.entity';
 import { PracticeMember } from './practice-member/practice-member.entity';
@@ -29,6 +31,7 @@ const launchDeferred = isLaunchProductsDeferred();
     imports: [
         AccountModule,
         BillingModule,
+        EmailModule,
         HouseholdBillingModule,
         HouseholdSettingsModule,
         DashboardModule,
@@ -41,6 +44,7 @@ const launchDeferred = isLaunchProductsDeferred();
             PracticeMember,
             PracticeClientLink,
             PracticeClientLinkFlag,
+            PracticeClientInvite,
             PracticeBilling,
         ]),
     ],

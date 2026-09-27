@@ -16,6 +16,8 @@ export type {
     PracticeCreateInput,
     PracticeUpdateInput,
     PracticeAddClientInput,
+    PracticeAddClientResult,
+    PracticeRedeemClientInviteInput,
     HouseholdPracticeLinkInput,
     PracticeInviteMemberInput,
 } from './practice.schema';

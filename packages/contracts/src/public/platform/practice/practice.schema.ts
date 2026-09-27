@@ -201,14 +201,38 @@ export const PracticeUpdateInput = z.object({
 
 export const PracticeAddClientInput = z.object({
     practiceId: Id,
-    /** Existing household to link, or invite path later. */
+    /** Existing household to link (skips email lookup). */
     householdId: HouseholdId.optional(),
     email: z.email().optional(),
     /**
      * Both VIEW and MANAGE start INVITED. ACTIVE + MANAGE sponsorship only after
      * household OWNER/ADMIN accept (`household.practiceLinks.accept`).
      */
-    access: z.enum(PracticeClientAccess).default(PracticeClientAccess.MANAGE),
+    access: z.enum(PracticeClientAccess).default(PracticeClientAccess.VIEW),
+});
+
+/**
+ * addClient outcome:
+ * - `link_pending` — household exists; dual-consent INVITED link + email to accept
+ * - `email_invite` — no user / no household; email token for signup or finish setup
+ *
+ * `reason` explains email_invite (for coach-facing copy):
+ * - `no_user` — “No user found with that email”
+ * - `no_household` — “Household not found”
+ */
+export const PracticeAddClientResult = z.object({
+    outcome: z.enum(['link_pending', 'email_invite']),
+    reason: z.enum(['no_user', 'no_household']).nullable(),
+    email: z.email().nullable(),
+    access: z.enum(PracticeClientAccess),
+    link: PracticeClientLink.nullable(),
+    expiresAt: IsoDateTime.nullable(),
+});
+
+/** Redeem an email invite token after the client has a household. */
+export const PracticeRedeemClientInviteInput = z.object({
+    token: z.string().min(8).max(80),
+    householdId: HouseholdId,
 });
 
 export const HouseholdPracticeLinkInput = z.object({
@@ -238,5 +262,7 @@ export type PracticeBillingStatus = z.infer<typeof PracticeBillingStatus>;
 export type PracticeCreateInput = z.infer<typeof PracticeCreateInput>;
 export type PracticeUpdateInput = z.infer<typeof PracticeUpdateInput>;
 export type PracticeAddClientInput = z.infer<typeof PracticeAddClientInput>;
+export type PracticeAddClientResult = z.infer<typeof PracticeAddClientResult>;
+export type PracticeRedeemClientInviteInput = z.infer<typeof PracticeRedeemClientInviteInput>;
 export type HouseholdPracticeLinkInput = z.infer<typeof HouseholdPracticeLinkInput>;
 export type PracticeInviteMemberInput = z.infer<typeof PracticeInviteMemberInput>;

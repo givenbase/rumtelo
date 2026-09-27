@@ -131,6 +131,20 @@ export {
     writePlanIntent,
     type PendingPlanIntent,
 } from './plan-intent';
+export {
+    PRACTICE_INVITE_COOKIE,
+    PRACTICE_INVITE_STORAGE_KEY,
+    PRACTICE_INVITE_CHANGE_EVENT,
+    clearPracticeInvite,
+    getPracticeInviteServerSnapshot,
+    getPracticeInviteSnapshot,
+    parsePracticeInviteToken,
+    practiceInviteFromSearchParams,
+    practiceInviteQuery,
+    readPracticeInviteFromDocument,
+    subscribePracticeInvite,
+    writePracticeInvite,
+} from './practice-invite-intent';
 export { accountThemeFromCss, cssThemeFromAccount, type CssTheme } from './theme';
 export { formatIban, isValidIban, nlIbanBankCode, normalizeIban } from './iban';
 export { containsWord } from './text-match';

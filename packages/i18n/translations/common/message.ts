@@ -80,6 +80,10 @@ const message = {
                 'Only household owners or admins can manage Practice contracts',
             practice_slug_taken: 'That practice URL is already taken',
             practice_invite_user_not_found: 'No user found with that email',
+            practice_client_invite_not_found: 'Practice invitation not found or already used',
+            practice_client_invite_expired: 'This Practice invitation has expired',
+            practice_client_invite_email_mismatch:
+                'Sign in with the email address that received this invitation',
             household_not_found: 'Household not found',
             household_create_failed: 'Could not create household',
             household_context_required: 'Household context required for capability check',

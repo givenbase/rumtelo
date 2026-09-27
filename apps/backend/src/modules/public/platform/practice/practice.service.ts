@@ -9,6 +9,7 @@ import {
     PracticeAddressKind,
     PracticeClientAccess,
     PracticeClientControlFlag,
+    PracticeClientInviteStatus,
     PracticeClientLinkStatus,
     PracticeRole,
     PracticeSubscriptionStatus,
@@ -16,6 +17,7 @@ import {
     type AddressInput,
     type HouseholdPracticeLink as HouseholdPracticeLinkDto,
     type PracticeAddClientInput,
+    type PracticeAddClientResult,
     type PracticeBillingStatus,
     type PracticeClientLink as PracticeClientLinkDto,
     type PracticeClientPortalSnapshot,
@@ -24,8 +26,10 @@ import {
     type PracticeInviteMemberInput,
     type Practice as PracticeDto,
     type PracticeMember as PracticeMemberDto,
+    type PracticeRedeemClientInviteInput,
     type PracticeUpdateInput,
 } from '@rumtelo/contracts';
+import { v7 as uuidv7 } from 'uuid';
 
 import { apiBadRequest, apiForbidden, apiNotFound } from '../../../../common/errors/api-user-error';
 import { currentUserId, householdStorage } from '../../../../common/household/household.context';
@@ -38,6 +42,7 @@ import { AuthMember } from '../../../auth/household/managed/member/auth-member.e
 import { AuthUser } from '../../../auth/user/managed/user/auth-user.entity';
 import { Account } from '../../../auth/user/account/account.entity';
 import { AccountService } from '../../../auth/user/account/account.service';
+import { EmailService } from '../../../backoffice/communication/email';
 import { EnergyDashboardService } from '../../product/energy/dashboard/dashboard.service';
 import { GrowthDashboardService } from '../../product/growth/dashboard/dashboard.service';
 import { DashboardService } from '../../product/money/dashboard/dashboard.service';
@@ -46,10 +51,13 @@ import { Address } from '../address/address.entity';
 import { BillingService } from '../billing/billing.service';
 import { PracticeAddress } from './practice-address/practice-address.entity';
 import { PracticeBilling } from './practice-billing/practice-billing.entity';
+import { PracticeClientInvite } from './practice-client-invite/practice-client-invite.entity';
 import { PracticeClientLink } from './practice-client-link/practice-client-link.entity';
 import { PracticeClientLinkFlag } from './practice-client-link-flag/practice-client-link-flag.entity';
 import { PracticeMember } from './practice-member/practice-member.entity';
 import { Practice } from './practice/practice.entity';
+
+const CLIENT_INVITE_TTL_MS = 14 * 24 * 60 * 60 * 1000;
 
 /** Managed (= coached) households are Practice-sponsored at Plus (or keep Max). */
 const SPONSORED_MANAGE_PLAN = PlanKey.PLUS;
@@ -62,6 +70,7 @@ export class PracticeService {
         @Inject(EntityManager) private readonly em: EntityManager,
         @Inject(AccountService) private readonly accounts: AccountService,
         @Inject(BillingService) private readonly billingService: BillingService,
+        @Inject(EmailService) private readonly email: EmailService,
         @Inject(HouseholdBillingService)
         private readonly householdBilling: HouseholdBillingService,
         @Inject(HouseholdSettingsService)
@@ -186,51 +195,129 @@ export class PracticeService {
         return this.toMemberDto(member);
     }
 
-    async addClient(input: PracticeAddClientInput): Promise<PracticeClientLinkDto> {
-        const { account } = await this.assertPracticeRole(input.practiceId, [
+    async addClient(input: PracticeAddClientInput): Promise<PracticeAddClientResult> {
+        const { account, practice } = await this.assertPracticeRole(input.practiceId, [
             PracticeRole.OWNER,
             PracticeRole.ADMIN,
             PracticeRole.COACH,
         ]);
+        const access = input.access ?? PracticeClientAccess.VIEW;
+        const practiceName = practice.displayName?.trim() || practice.legalName;
+        const inviterName =
+            [account.firstName, account.lastName].filter(Boolean).join(' ').trim() || undefined;
 
-        const householdId = await this.resolveClientHouseholdId(input);
-        const access = input.access ?? PracticeClientAccess.MANAGE;
-        const existing = await this.em.findOne(PracticeClientLink, {
-            practice: input.practiceId,
-            household: householdId,
-        });
-
-        if (existing) {
-            // Idempotent: already ACTIVE with same access — leave dual-consent alone.
-            if (
-                existing.status === PracticeClientLinkStatus.ACTIVE &&
-                existing.access === access &&
-                existing.householdAcceptedAt
-            ) {
-                return this.toClientLinkDto(existing);
-            }
-            // Re-offer (access change or re-invite after revoke): INVITED until household accepts.
-            await this.applyPracticeInvite(existing, access, account.id);
-            await this.refreshBillableCounts(input.practiceId);
-            await this.em.flush();
-            void this.syncPracticeStripe(input.practiceId);
-            return this.toClientLinkDto(existing);
+        // Explicit household id — existing household path.
+        if (input.householdId) {
+            return this.offerLinkToHousehold({
+                practiceId: input.practiceId,
+                householdId: input.householdId,
+                access,
+                addedByAccountId: account.id,
+                practiceName,
+                inviterName,
+                notifyEmail: null,
+            });
         }
 
-        const link = this.em.create(PracticeClientLink, {
-            practice: input.practiceId,
-            household: householdId,
-            status: PracticeClientLinkStatus.INVITED,
+        if (!input.email) throw apiBadRequest('practice_invite_user_not_found');
+        const email = input.email.trim().toLowerCase();
+        const user = await this.em.findOne(AuthUser, { email });
+
+        // No Rumtelo account yet → email invite to sign up.
+        if (!user) {
+            return this.offerEmailInvite({
+                practiceId: input.practiceId,
+                email,
+                access,
+                addedByAccountId: account.id,
+                practiceName,
+                inviterName,
+                reason: 'no_user',
+            });
+        }
+
+        const membership = await this.em.findOne(
+            AuthMember,
+            { user: user.id },
+            { orderBy: { createdAt: 'ASC' } }
+        );
+
+        // Account exists but no household → email invite to finish setup.
+        if (!membership) {
+            return this.offerEmailInvite({
+                practiceId: input.practiceId,
+                email,
+                access,
+                addedByAccountId: account.id,
+                practiceName,
+                inviterName,
+                reason: 'no_household',
+            });
+        }
+
+        const householdId =
+            typeof membership.household === 'string'
+                ? membership.household
+                : membership.household.id;
+
+        return this.offerLinkToHousehold({
+            practiceId: input.practiceId,
+            householdId,
             access,
-            addedByAccount: account.id,
-            activatedAt: null,
-            householdAcceptedAt: null,
-        } as never);
-        this.em.persist(link);
-        await this.refreshBillableCounts(input.practiceId);
+            addedByAccountId: account.id,
+            practiceName,
+            inviterName,
+            notifyEmail: email,
+        });
+    }
+
+    /**
+     * After signup + onboard: redeem email invite → INVITED PracticeClientLink
+     * (household still accepts dual-consent in settings).
+     */
+    async redeemClientInvite(
+        input: PracticeRedeemClientInviteInput
+    ): Promise<PracticeClientLinkDto> {
+        const { account, user } = await this.accounts.ensureCurrentAccount();
+        if (!user.email) throw apiForbidden('practice_client_invite_email_mismatch');
+
+        const invite = await this.em.findOne(PracticeClientInvite, {
+            token: input.token.trim(),
+            status: PracticeClientInviteStatus.PENDING,
+        });
+        if (!invite) throw apiNotFound('practice_client_invite_not_found');
+        if (invite.expiresAt.getTime() < Date.now()) {
+            invite.status = PracticeClientInviteStatus.REVOKED;
+            await this.em.flush();
+            throw apiBadRequest('practice_client_invite_expired');
+        }
+        if (invite.email.trim().toLowerCase() !== user.email.trim().toLowerCase()) {
+            throw apiForbidden('practice_client_invite_email_mismatch');
+        }
+
+        const membership = await this.em.findOne(AuthMember, {
+            user: user.id,
+            household: input.householdId,
+        });
+        if (!membership) throw apiForbidden('practice_household_forbidden');
+
+        const result = await this.offerLinkToHousehold({
+            practiceId: invite.practice,
+            householdId: input.householdId,
+            access: invite.access,
+            addedByAccountId: invite.addedByAccount ?? account.id,
+            practiceName: '',
+            inviterName: undefined,
+            notifyEmail: null,
+            skipEmail: true,
+        });
+
+        if (!result.link) throw apiNotFound('practice_client_link_not_found');
+
+        invite.status = PracticeClientInviteStatus.ACCEPTED;
+        invite.acceptedLinkId = result.link.id;
         await this.em.flush();
-        void this.syncPracticeStripe(input.practiceId);
-        return this.toClientLinkDto(link);
+        return result.link;
     }
 
     // ====================================================================
@@ -520,24 +607,145 @@ export class PracticeService {
         return { account, member, practice };
     }
 
-    private async resolveClientHouseholdId(input: PracticeAddClientInput): Promise<string> {
-        if (input.householdId) {
-            const hh = await this.em.findOne(AuthHousehold, { id: input.householdId });
-            if (!hh) throw apiNotFound('household_not_found');
-            return hh.id;
+    /**
+     * Household already on Rumtelo → INVITED dual-consent link (+ optional email).
+     */
+    private async offerLinkToHousehold(input: {
+        practiceId: string;
+        householdId: string;
+        access: PracticeClientAccess;
+        addedByAccountId: string;
+        practiceName: string;
+        inviterName?: string;
+        notifyEmail: string | null;
+        skipEmail?: boolean;
+    }): Promise<PracticeAddClientResult> {
+        const hh = await this.em.findOne(AuthHousehold, { id: input.householdId });
+        if (!hh) throw apiNotFound('household_not_found');
+
+        const existing = await this.em.findOne(PracticeClientLink, {
+            practice: input.practiceId,
+            household: input.householdId,
+        });
+
+        let link: PracticeClientLink;
+        let alreadyActive = false;
+        if (existing) {
+            if (
+                existing.status === PracticeClientLinkStatus.ACTIVE &&
+                existing.access === input.access &&
+                existing.householdAcceptedAt
+            ) {
+                link = existing;
+                alreadyActive = true;
+            } else {
+                await this.applyPracticeInvite(existing, input.access, input.addedByAccountId);
+                link = existing;
+            }
+        } else {
+            link = this.em.create(PracticeClientLink, {
+                practice: input.practiceId,
+                household: input.householdId,
+                status: PracticeClientLinkStatus.INVITED,
+                access: input.access,
+                addedByAccount: input.addedByAccountId,
+                activatedAt: null,
+                householdAcceptedAt: null,
+            } as never);
+            this.em.persist(link);
         }
-        if (!input.email) throw apiBadRequest('practice_invite_user_not_found');
-        const user = await this.em.findOne(AuthUser, { email: input.email.trim().toLowerCase() });
-        if (!user) throw apiNotFound('practice_invite_user_not_found');
-        const membership = await this.em.findOne(
-            AuthMember,
-            { user: user.id },
-            { orderBy: { createdAt: 'ASC' } }
-        );
-        if (!membership) throw apiNotFound('household_not_found');
-        return typeof membership.household === 'string'
-            ? membership.household
-            : membership.household.id;
+
+        if (!alreadyActive) {
+            await this.refreshBillableCounts(input.practiceId);
+            await this.em.flush();
+            void this.syncPracticeStripe(input.practiceId);
+        }
+
+        const dto = await this.toClientLinkDto(link);
+
+        if (!alreadyActive && !input.skipEmail && input.notifyEmail) {
+            const practiceName =
+                input.practiceName ||
+                (await this.em.findOne(Practice, { id: input.practiceId }))?.displayName ||
+                'Practice';
+            void this.email.sendPracticeClientInvite({
+                to: input.notifyEmail,
+                practiceName,
+                inviteUrl: this.email.practiceClientAcceptUrl(),
+                inviterName: input.inviterName,
+                access: input.access,
+                variant: 'existing_household',
+            });
+        }
+
+        return {
+            outcome: 'link_pending',
+            reason: null,
+            email: input.notifyEmail,
+            access: input.access,
+            link: dto,
+            expiresAt: null,
+        };
+    }
+
+    /**
+     * No user / no household → upsert email token invite + signup/continue email.
+     */
+    private async offerEmailInvite(input: {
+        practiceId: string;
+        email: string;
+        access: PracticeClientAccess;
+        addedByAccountId: string;
+        practiceName: string;
+        inviterName?: string;
+        reason: 'no_user' | 'no_household';
+    }): Promise<PracticeAddClientResult> {
+        const pending = await this.em.find(PracticeClientInvite, {
+            practice: input.practiceId,
+            email: input.email,
+            status: PracticeClientInviteStatus.PENDING,
+        });
+        for (const row of pending) {
+            row.status = PracticeClientInviteStatus.REVOKED;
+        }
+
+        const token = uuidv7();
+        const expiresAt = new Date(Date.now() + CLIENT_INVITE_TTL_MS);
+        const invite = this.em.create(PracticeClientInvite, {
+            practice: input.practiceId,
+            email: input.email,
+            token,
+            access: input.access,
+            status: PracticeClientInviteStatus.PENDING,
+            expiresAt,
+            addedByAccount: input.addedByAccountId,
+            acceptedLinkId: null,
+        } as never);
+        this.em.persist(invite);
+        await this.em.flush();
+
+        const inviteUrl =
+            input.reason === 'no_household'
+                ? this.email.practiceClientContinueUrl(token, input.email)
+                : this.email.practiceClientSignupUrl(token, input.email);
+
+        void this.email.sendPracticeClientInvite({
+            to: input.email,
+            practiceName: input.practiceName,
+            inviteUrl,
+            inviterName: input.inviterName,
+            access: input.access,
+            variant: 'new_or_continue',
+        });
+
+        return {
+            outcome: 'email_invite',
+            reason: input.reason,
+            email: input.email,
+            access: input.access,
+            link: null,
+            expiresAt: expiresAt.toISOString(),
+        };
     }
 
     private async loadBillingAddress(practiceId: string): Promise<Address | null> {

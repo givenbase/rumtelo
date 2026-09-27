@@ -29,6 +29,7 @@ import { useHouseholdShell } from '@/components/features/shell/household-shell-c
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { OnboardingOverlay } from '@/components/features/shell/onboarding-overlay';
 import { PendingPlanCheckout } from '@/components/features/shell/pending-plan-checkout';
+import { PendingPracticeInviteRedeem } from '@/components/features/shell/pending-practice-invite-redeem';
 import { CapabilityGate } from '@/components/features/shell/capability-gate';
 import { BoardMutateRouteGuard } from '@/components/features/shell/board-mutate-route-guard';
 import { usePracticePreview } from '@/components/features/shell/practice-preview';
@@ -659,6 +660,7 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
             <ToastPill />
             {capabilities.showOnboarding ? <OnboardingOverlay /> : null}
             {capabilities.showPlanCheckout ? <PendingPlanCheckout /> : null}
+            <PendingPracticeInviteRedeem />
         </div>
     );
 }

@@ -18,6 +18,17 @@ export type HouseholdInviteEmailInput = {
     locale?: string;
 };
 
+export type PracticeClientInviteEmailInput = {
+    to: string;
+    practiceName: string;
+    inviteUrl: string;
+    inviterName?: string;
+    access: 'VIEW' | 'MANAGE';
+    /** new_or_continue = signup/onboard; existing_household = accept in settings */
+    variant: 'new_or_continue' | 'existing_household';
+    locale?: string;
+};
+
 export type EmailVerificationEmailInput = {
     to: string;
     firstName: string;

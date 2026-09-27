@@ -10,6 +10,7 @@ import { Id } from '../../../common/common.schema';
 import {
     Practice,
     PracticeAddClientInput,
+    PracticeAddClientResult,
     PracticeBillingStatus,
     PracticeClientLink,
     PracticeClientPortalSnapshot,
@@ -17,6 +18,7 @@ import {
     PracticeDetail,
     PracticeInviteMemberInput,
     PracticeMember,
+    PracticeRedeemClientInviteInput,
     PracticeUpdateInput,
 } from './practice.schema';
 
@@ -28,7 +30,12 @@ export const practiceCreate = oc.input(PracticeCreateInput).output(PracticeDetai
 
 export const practiceInviteMember = oc.input(PracticeInviteMemberInput).output(PracticeMember);
 
-export const practiceAddClient = oc.input(PracticeAddClientInput).output(PracticeClientLink);
+export const practiceAddClient = oc.input(PracticeAddClientInput).output(PracticeAddClientResult);
+
+/** After signup/onboarding — turn email invite token into an INVITED client link. */
+export const practiceRedeemClientInvite = oc
+    .input(PracticeRedeemClientInviteInput)
+    .output(PracticeClientLink);
 
 // ====================================================================
 // ? READ Operations
@@ -74,6 +81,7 @@ export const practiceContract = {
     inviteMember: practiceInviteMember,
     members: practiceMembers,
     addClient: practiceAddClient,
+    redeemClientInvite: practiceRedeemClientInvite,
     clients: practiceClients,
     clientPortalSnapshot: practiceClientPortalSnapshot,
     revokeClient: practiceRevokeClient,

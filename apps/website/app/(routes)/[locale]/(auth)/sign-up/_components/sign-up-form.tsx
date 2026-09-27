@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import {
     Button,
@@ -28,7 +28,7 @@ import { useTranslations } from '@rumtelo/i18n';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { planIntentQuery, type PendingPlanIntent } from '@rumtelo/utils';
+import { planIntentQuery, practiceInviteQuery, type PendingPlanIntent } from '@rumtelo/utils';
 
 import { useAuthFormSchemas } from '@/app/_lib/auth-form-schemas';
 import { useApiErrorFallbacks, useApiErrorMessage } from '@/app/_lib/api-error-messages';
@@ -36,12 +36,19 @@ import { signUp } from '@/lib/auth';
 import { planSlug } from '@/lib/landing-plans';
 import { appSignInUrl } from '@/lib/portal-urls';
 import { useOptionalPlanIntent } from '@/app/_components/plan-intent-provider';
+import { useOptionalPracticeInvite } from '@/app/_components/practice-invite-provider';
 import { useOptionalSignUpDraft } from '@/app/_components/sign-up-draft-provider';
 
-function verifyCallbackUrl(intent: PendingPlanIntent | null): string {
+function verifyCallbackUrl(
+    intent: PendingPlanIntent | null,
+    practiceInviteToken: string | null
+): string {
     const params = new URLSearchParams({ status: 'confirmed' });
     const planQuery = planIntentQuery(intent);
     for (const [key, value] of Object.entries(planQuery)) {
+        params.set(key, value);
+    }
+    for (const [key, value] of Object.entries(practiceInviteQuery(practiceInviteToken))) {
         params.set(key, value);
     }
     return `/verify?${params.toString()}`;
@@ -54,19 +61,23 @@ export function SignUpForm() {
     const errorMessages = useApiErrorFallbacks();
     const formatApiMessage = useApiErrorMessage();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const planIntent = useOptionalPlanIntent();
+    const practiceInvite = useOptionalPracticeInvite();
     const signUpDraft = useOptionalSignUpDraft();
     const [apiError, setApiError] = useState<unknown>(null);
 
     const intent = planIntent?.intent ?? null;
+    const practiceInviteToken = practiceInvite?.token ?? null;
     const draft = signUpDraft?.draft ?? null;
+    const emailFromInvite = searchParams.get('email')?.trim() ?? '';
 
     const form = useForm<SignUpFormSchema>({
         defaultValues: {
             firstName: draft?.firstName ?? '',
             middleName: '',
             lastName: draft?.lastName ?? '',
-            email: draft?.email ?? '',
+            email: draft?.email || emailFromInvite || '',
             password: '',
             phone: '',
             dateOfBirth: '',
@@ -76,16 +87,16 @@ export function SignUpForm() {
     });
 
     useEffect(() => {
-        if (!draft) return;
+        if (!draft && !emailFromInvite) return;
         const current = form.getValues();
         if (current.firstName || current.lastName || current.email) return;
         form.reset({
             ...current,
-            firstName: draft.firstName,
-            lastName: draft.lastName,
-            email: draft.email,
+            firstName: draft?.firstName ?? '',
+            lastName: draft?.lastName ?? '',
+            email: draft?.email || emailFromInvite || '',
         });
-    }, [draft, form]);
+    }, [draft, emailFromInvite, form]);
 
     const onError = createFormInvalidHandler(undefined, {
         title: t('ui.form.incomplete_title'),
@@ -107,7 +118,7 @@ export function SignUpForm() {
             name,
             email: values.email,
             password: values.password,
-            callbackURL: verifyCallbackUrl(intent),
+            callbackURL: verifyCallbackUrl(intent, practiceInviteToken),
             firstName: values.firstName,
             middleName: values.middleName || undefined,
             lastName: values.lastName,
@@ -134,7 +145,10 @@ export function SignUpForm() {
             return;
         }
 
-        const verifyParams = new URLSearchParams(planIntentQuery(intent));
+        const verifyParams = new URLSearchParams({
+            ...planIntentQuery(intent),
+            ...practiceInviteQuery(practiceInviteToken),
+        });
         verifyParams.set('email', values.email);
         router.push(`/verify?${verifyParams.toString()}`);
         router.refresh();

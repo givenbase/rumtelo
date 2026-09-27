@@ -549,6 +549,8 @@ const settings = {
         accepted: 'Practice access accepted',
         rejected: 'Practice invite declined',
         unlinked: 'Practice unlinked',
+        invite_redeemed:
+            'Practice invitation linked — accept it under Practice coaches when you are ready.',
     },
 } as const;
 

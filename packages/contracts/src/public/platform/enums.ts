@@ -86,6 +86,13 @@ export enum PracticeClientLinkStatus {
     REVOKED = 'REVOKED',
 }
 
+/** Email invite before a household exists (new signup or unfinished onboarding). */
+export enum PracticeClientInviteStatus {
+    PENDING = 'PENDING',
+    ACCEPTED = 'ACCEPTED',
+    REVOKED = 'REVOKED',
+}
+
 /**
  * Access granted to the Practice on a linked household (scope of the middle contract).
  *

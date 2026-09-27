@@ -62,6 +62,7 @@ export function SignInForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const redirectParam = searchParams.get('redirectTo');
+    const emailFromInvite = searchParams.get('email')?.trim() ?? '';
     const [apiError, setApiError] = useState<unknown>(null);
     const [verification, setVerification] = useState<{
         email: string;
@@ -71,7 +72,7 @@ export function SignInForm() {
     const [cooldown, setCooldown] = useState(0);
 
     const form = useForm<SignInValues>({
-        defaultValues: { email: '', password: '' },
+        defaultValues: { email: emailFromInvite, password: '' },
         mode: 'onTouched',
         resolver: zodResolver(signInSchema),
     });

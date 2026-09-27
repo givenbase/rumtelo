@@ -13,6 +13,7 @@ import { escapeHtml, renderBrandPage } from '../shared/brand-shell';
 
 const TEMPLATES = [
     EmailTemplate.HOUSEHOLD_INVITE,
+    EmailTemplate.PRACTICE_CLIENT_INVITE,
     EmailTemplate.ACCOUNT_VERIFICATION,
     EmailTemplate.PASSWORD_RESET,
     EmailTemplate.CONTACT_FORM,
@@ -21,6 +22,7 @@ type TemplateId = (typeof TEMPLATES)[number];
 
 const TEMPLATE_LABELS: Record<TemplateId, string> = {
     [EmailTemplate.HOUSEHOLD_INVITE]: 'Household invite',
+    [EmailTemplate.PRACTICE_CLIENT_INVITE]: 'Practice invitation',
     [EmailTemplate.ACCOUNT_VERIFICATION]: 'Account verification',
     [EmailTemplate.PASSWORD_RESET]: 'Password reset',
     [EmailTemplate.CONTACT_FORM]: 'Contact form',
@@ -94,6 +96,19 @@ export class EmailPreviewController {
                         role: 'MEMBER',
                     },
                     'nl'
+                );
+            case EmailTemplate.PRACTICE_CLIENT_INVITE:
+                return renderTemplate(
+                    EmailTemplate.PRACTICE_CLIENT_INVITE,
+                    {
+                        practiceName: 'Studio Noord',
+                        inviteUrl:
+                            'https://rumtelo.local/sign-up?practiceInvite=demo-token&email=client%40example.com',
+                        inviterName: 'Anna',
+                        access: 'VIEW',
+                        variant: 'new_or_continue',
+                    },
+                    'en'
                 );
             case EmailTemplate.ACCOUNT_VERIFICATION:
                 return renderTemplate(

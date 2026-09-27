@@ -20,6 +20,8 @@ import {
     FormField,
     FormItem,
     FormMessage,
+    Icon,
+    type IconName,
 } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
@@ -29,6 +31,29 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { createAddClientSchema, type AddClientValues } from '../_utils/practice-form-zod';
 import { usePractice } from './practice-context';
 import { usePracticeMutation } from './use-practice-mutation';
+
+const ACCESS_OPTIONS: {
+    key: PracticeClientAccess;
+    icon: IconName;
+    titleKey: string;
+    bodyKey: string;
+    badgeKey: string;
+}[] = [
+    {
+        key: PracticeClientAccess.VIEW,
+        icon: 'eye',
+        titleKey: 'pages.practice.clients.access_view_title',
+        bodyKey: 'pages.practice.clients.access_view_body',
+        badgeKey: 'pages.practice.clients.access_view_badge',
+    },
+    {
+        key: PracticeClientAccess.MANAGE,
+        icon: 'shield',
+        titleKey: 'pages.practice.clients.access_manage_title',
+        bodyKey: 'pages.practice.clients.access_manage_body',
+        badgeKey: 'pages.practice.clients.access_manage_badge',
+    },
+];
 
 export function PracticeAddClientDialog({
     open,
@@ -41,7 +66,7 @@ export function PracticeAddClientDialog({
     const { activePractice } = usePractice();
     const addClientSchema = createAddClientSchema(t);
     const form = useForm<AddClientValues>({
-        defaultValues: { email: '', householdId: '', access: PracticeClientAccess.MANAGE },
+        defaultValues: { email: '', householdId: '', access: PracticeClientAccess.VIEW },
         resolver: zodResolver(addClientSchema),
     });
 
@@ -56,7 +81,15 @@ export function PracticeAddClientDialog({
             });
         },
         invalidateKeys: [apiQuery.practice.clients.key(), apiQuery.practice.billingStatus.key()],
-        successMessage: t('pages.practice.clients.invited'),
+        successMessage: data => {
+            if (data.outcome === 'email_invite' && data.reason === 'no_user') {
+                return t('pages.practice.clients.invited_no_user');
+            }
+            if (data.outcome === 'email_invite' && data.reason === 'no_household') {
+                return t('pages.practice.clients.invited_no_household');
+            }
+            return t('pages.practice.clients.invited');
+        },
         onSuccess: () => {
             form.reset();
             onOpenChange(false);
@@ -70,14 +103,14 @@ export function PracticeAddClientDialog({
                 if (!next) form.reset();
                 onOpenChange(next);
             }}>
-            <DialogContent className="sm:max-w-md" closeLabel={t('ui.button.actions.close')}>
+            <DialogContent className="sm:max-w-lg" closeLabel={t('ui.button.actions.close')}>
                 <DialogHeader>
                     <DialogTitle>{t('pages.practice.clients.add_title')}</DialogTitle>
-                    <DialogDescription>{t('pages.practice.clients.blurb')}</DialogDescription>
+                    <DialogDescription>{t('pages.practice.clients.add_lead')}</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                     <form
-                        className="grid gap-4"
+                        className="grid gap-5"
                         onSubmit={form.handleSubmit(values => addClient.mutate(values))}>
                         <FormField
                             control={form.control}
@@ -86,7 +119,8 @@ export function PracticeAddClientDialog({
                                 <FormItem>
                                     <Field
                                         label={t('pages.practice.clients.email_label')}
-                                        htmlFor="add-client-email">
+                                        htmlFor="add-client-email"
+                                        hint={t('pages.practice.clients.email_hint')}>
                                         <FormControl>
                                             <Email
                                                 id="add-client-email"
@@ -101,42 +135,85 @@ export function PracticeAddClientDialog({
                                 </FormItem>
                             )}
                         />
+
                         <FormField
                             control={form.control}
                             name="access"
                             render={({ field }) => (
                                 <FormItem>
-                                    <Field label={t('pages.practice.clients.access_label')}>
-                                        <div className="flex gap-1.5">
-                                            {(
-                                                [
-                                                    {
-                                                        key: PracticeClientAccess.VIEW,
-                                                        label: t(
-                                                            'pages.practice.clients.access_view'
-                                                        ),
-                                                    },
-                                                    {
-                                                        key: PracticeClientAccess.MANAGE,
-                                                        label: t(
-                                                            'pages.practice.clients.access_manage'
-                                                        ),
-                                                    },
-                                                ] as const
-                                            ).map(opt => {
+                                    <Field
+                                        label={t('pages.practice.clients.access_label')}
+                                        hint={t('pages.practice.clients.access_hint')}>
+                                        <div
+                                            role="radiogroup"
+                                            aria-label={t('pages.practice.clients.access_label')}
+                                            className="grid gap-2">
+                                            {ACCESS_OPTIONS.map(opt => {
                                                 const selected = field.value === opt.key;
                                                 return (
                                                     <button
                                                         key={opt.key}
                                                         type="button"
+                                                        role="radio"
+                                                        aria-checked={selected}
                                                         onClick={() => field.onChange(opt.key)}
                                                         className={cn(
-                                                            'flex-1 rounded-[10px] border px-3 py-2 text-left text-xs font-medium transition-colors',
+                                                            'flex w-full items-start gap-3 rounded-xl border px-3.5 py-3 text-left transition-colors',
                                                             selected
-                                                                ? 'border-accent bg-accent-soft text-accent'
-                                                                : 'border-line text-fg hover:border-accent/50'
+                                                                ? 'border-accent bg-accent-soft/60 ring-1 ring-accent/30'
+                                                                : 'border-line bg-surface hover:border-accent/40 hover:bg-raised/50'
                                                         )}>
-                                                        {opt.label}
+                                                        <span
+                                                            aria-hidden
+                                                            className={cn(
+                                                                'mt-0.5 grid size-9 shrink-0 place-items-center rounded-lg',
+                                                                selected
+                                                                    ? 'bg-accent text-on-accent'
+                                                                    : 'bg-raised text-fg-secondary'
+                                                            )}>
+                                                            <Icon name={opt.icon} size="sm" />
+                                                        </span>
+                                                        <span className="min-w-0 flex-1">
+                                                            <span className="flex flex-wrap items-center gap-2">
+                                                                <span
+                                                                    className={cn(
+                                                                        'text-sm font-semibold',
+                                                                        selected
+                                                                            ? 'text-accent'
+                                                                            : 'text-fg'
+                                                                    )}>
+                                                                    {t(opt.titleKey)}
+                                                                </span>
+                                                                <span
+                                                                    className={cn(
+                                                                        'rounded-full px-2 py-0.5 font-mono text-[10px] font-medium tracking-wide uppercase',
+                                                                        selected
+                                                                            ? 'bg-accent/15 text-accent'
+                                                                            : 'bg-raised text-fg-muted'
+                                                                    )}>
+                                                                    {t(opt.badgeKey)}
+                                                                </span>
+                                                            </span>
+                                                            <span className="mt-0.5 block text-xs leading-snug text-fg-muted">
+                                                                {t(opt.bodyKey)}
+                                                            </span>
+                                                        </span>
+                                                        <span
+                                                            aria-hidden
+                                                            className={cn(
+                                                                'mt-1 grid size-4 shrink-0 place-items-center rounded-full border',
+                                                                selected
+                                                                    ? 'border-accent bg-accent'
+                                                                    : 'border-line-strong bg-surface'
+                                                            )}>
+                                                            {selected ? (
+                                                                <Icon
+                                                                    name="check"
+                                                                    size="sm"
+                                                                    className="text-on-accent"
+                                                                />
+                                                            ) : null}
+                                                        </span>
                                                     </button>
                                                 );
                                             })}
@@ -145,6 +222,7 @@ export function PracticeAddClientDialog({
                                 </FormItem>
                             )}
                         />
+
                         <DialogFooter>
                             <Button
                                 type="button"
