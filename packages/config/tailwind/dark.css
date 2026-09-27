@@ -9,8 +9,8 @@
             --color-surface: #222b3b;
             --color-raised: #2c384c;
             --color-sunken: #343f52;
-            --color-line: rgb(255 255 255 / 0.1);
-            --color-line-strong: rgb(255 255 255 / 0.2);
+            --color-line: rgb(255 255 255 / 0.14);
+            --color-line-strong: rgb(255 255 255 / 0.36);
             --color-fg: #f2f5f9;
             --color-fg-strong: #dce3ed;
             --color-fg-secondary: #a7b2c3;
@@ -51,8 +51,8 @@
         --color-surface: #222b3b;
         --color-raised: #2c384c;
         --color-sunken: #343f52;
-        --color-line: rgb(255 255 255 / 0.1);
-        --color-line-strong: rgb(255 255 255 / 0.2);
+        --color-line: rgb(255 255 255 / 0.14);
+        --color-line-strong: rgb(255 255 255 / 0.36);
         --color-fg: #f2f5f9;
         --color-fg-strong: #dce3ed;
         --color-fg-secondary: #a7b2c3;

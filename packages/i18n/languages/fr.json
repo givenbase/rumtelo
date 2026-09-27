@@ -1899,6 +1899,7 @@
                 "filter_jar_aria": "Filtrer par bocal",
                 "filter_amount_aria": "Trier par montant",
                 "filter_amount_label": "Montant",
+                "filter_amount_clear": "Effacer",
                 "amount_range": "{min}–{max}",
                 "amount_over": "{amount}+",
                 "sort_label": "Trier",

@@ -120,6 +120,7 @@ export function TransactionsPageClient() {
     const [search, setSearch] = useState('');
     const [jarFilter, setJarFilter] = useState('all');
     const [amountRange, setAmountRange] = useState<[number, number]>(AMOUNT_RANGE_DEFAULT);
+    const [amountFilterOpen, setAmountFilterOpen] = useState(false);
     const [ledgerSort, setLedgerSort] = useState<LedgerSort>('date-new');
     const deferredSearch = useDeferredValue(search.trim());
     const live = isLiveData(householdId);
@@ -411,12 +412,13 @@ export function TransactionsPageClient() {
                     <button
                         key={id}
                         type="button"
+                        aria-pressed={tab === id}
                         onClick={() => setTab(id)}
                         className={cn(
                             'flex items-center gap-2 rounded-full border px-4 py-2 font-mono text-xs font-medium tracking-wide uppercase transition-all duration-200',
                             tab === id
-                                ? 'border-accent/40 bg-accent-soft text-accent'
-                                : 'border-line text-fg-muted hover:border-line-strong hover:text-fg'
+                                ? 'border-accent/50 bg-accent-soft text-accent'
+                                : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
                         )}>
                         {label}
                         {id === 'INBOX' && inbox.length > 0 && (
@@ -567,35 +569,63 @@ export function TransactionsPageClient() {
                                         {option.label}
                                     </ListControlsChip>
                                 ))}
+                                <ListControlsChip
+                                    active={amountFilterOpen || amountFilterActive}
+                                    onClick={() => setAmountFilterOpen(open => !open)}>
+                                    {t('filter_amount_label')}
+                                    {amountFilterActive ? (
+                                        <span className="ml-1.5 inline-flex size-4 items-center justify-center rounded-full bg-accent/20 font-mono text-[9px] text-accent">
+                                            1
+                                        </span>
+                                    ) : null}
+                                </ListControlsChip>
                             </div>
                         }>
-                        <div className="grid max-w-md gap-2" aria-label={t('filter_amount_aria')}>
-                            <span className="font-mono text-[10px] tracking-widest text-fg-muted uppercase">
-                                {t('filter_amount_label')}
-                            </span>
-                            <Slider
-                                min={0}
-                                max={AMOUNT_MAX}
-                                step={AMOUNT_STEP}
-                                minStepsBetweenThumbs={1}
-                                value={amountRange}
-                                onValueChange={next => {
-                                    const low = next[0] ?? 0;
-                                    const high = next[1] ?? AMOUNT_MAX;
-                                    setAmountRange([low, high]);
-                                }}
-                                aria-label={t('filter_amount_aria')}
-                                className="w-full"
-                            />
-                            <div className="flex items-center justify-between gap-3">
-                                <span className="font-mono text-[10px] tracking-wide text-fg tabular-nums">
-                                    {amountMinLabel}
-                                </span>
-                                <span className="font-mono text-[10px] tracking-wide text-fg tabular-nums">
-                                    {amountMaxLabel}
-                                </span>
+                        {amountFilterOpen ? (
+                            <div
+                                className="grid max-w-md gap-2 rounded-xl border border-line-strong bg-surface px-3.5 py-3 shadow-sm"
+                                role="group"
+                                aria-label={t('filter_amount_aria')}>
+                                <div className="flex items-center justify-between gap-2">
+                                    <span className="font-mono text-[10px] tracking-widest text-fg-muted uppercase">
+                                        {t('filter_amount_label')}
+                                    </span>
+                                    {amountFilterActive ? (
+                                        <button
+                                            type="button"
+                                            className="font-mono text-[10px] tracking-wide text-accent uppercase hover:underline"
+                                            onClick={() => {
+                                                setAmountRange(AMOUNT_RANGE_DEFAULT);
+                                                setAmountFilterOpen(false);
+                                            }}>
+                                            {t('filter_amount_clear')}
+                                        </button>
+                                    ) : null}
+                                </div>
+                                <Slider
+                                    min={0}
+                                    max={AMOUNT_MAX}
+                                    step={AMOUNT_STEP}
+                                    minStepsBetweenThumbs={1}
+                                    value={amountRange}
+                                    onValueChange={next => {
+                                        const low = next[0] ?? 0;
+                                        const high = next[1] ?? AMOUNT_MAX;
+                                        setAmountRange([low, high]);
+                                    }}
+                                    aria-label={t('filter_amount_aria')}
+                                    className="w-full"
+                                />
+                                <div className="flex items-center justify-between gap-3">
+                                    <span className="font-mono text-[10px] tracking-wide text-fg tabular-nums">
+                                        {amountMinLabel}
+                                    </span>
+                                    <span className="font-mono text-[10px] tracking-wide text-fg tabular-nums">
+                                        {amountMaxLabel}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
+                        ) : null}
                     </ListControls>
                     <Card className="overflow-hidden p-0">
                         {(() => {

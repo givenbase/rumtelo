@@ -395,8 +395,8 @@ export function FixedCostsPageClient() {
                             className={cn(
                                 'flex items-center gap-2.5 rounded-full border px-4 py-2 font-mono text-xs font-medium tracking-wide uppercase transition-all duration-200',
                                 tab === tabKey
-                                    ? 'border-accent/40 bg-accent-soft text-accent'
-                                    : 'border-line text-fg-muted hover:border-line-strong hover:text-fg'
+                                    ? 'border-accent/50 bg-accent-soft text-accent'
+                                    : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
                             )}>
                             {tabKey === 'ERUIT' ? t('tab_out') : t('tab_in')}
                             <span
@@ -643,8 +643,8 @@ export function FixedCostsPageClient() {
                                                 className={cn(
                                                     'flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
                                                     on
-                                                        ? 'border-accent/40 bg-accent-soft text-accent'
-                                                        : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                                        ? 'border-accent/50 bg-accent-soft text-accent'
+                                                        : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
                                                 )}>
                                                 <span
                                                     className="size-1.75 rounded-sm"

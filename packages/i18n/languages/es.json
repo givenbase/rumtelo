@@ -1899,6 +1899,7 @@
                 "filter_jar_aria": "Filtrar por tarro",
                 "filter_amount_aria": "Filtrar por importe",
                 "filter_amount_label": "Importe",
+                "filter_amount_clear": "Borrar",
                 "amount_range": "{min}–{max}",
                 "amount_over": "{amount}+",
                 "sort_label": "Ordenar",

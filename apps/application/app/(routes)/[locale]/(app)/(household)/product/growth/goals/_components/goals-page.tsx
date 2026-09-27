@@ -374,8 +374,8 @@ export function GoalsPageClient() {
                             className={cn(
                                 'flex items-baseline gap-2 rounded-full border px-4 py-2.5 font-mono text-xs font-medium tracking-wide uppercase transition-all duration-200',
                                 tab === tabKey
-                                    ? 'border-accent/40 bg-accent-soft text-accent'
-                                    : 'border-line text-fg-muted hover:border-line-strong hover:text-fg'
+                                    ? 'border-accent/50 bg-accent-soft text-accent'
+                                    : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
                             )}>
                             {tabKey === 'ON_TRACK' ? t('tab_on_track') : t('tab_reached')}
                             <span className="opacity-70">{count}</span>
@@ -408,8 +408,8 @@ export function GoalsPageClient() {
                                       className={cn(
                                           'rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
                                           on
-                                              ? 'border-accent/40 bg-accent-soft text-accent'
-                                              : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                              ? 'border-accent/50 bg-accent-soft text-accent'
+                                              : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
                                       )}>
                                       {label}
                                       <span className="ml-1.5 opacity-60">{count}</span>
@@ -437,8 +437,8 @@ export function GoalsPageClient() {
                                       className={cn(
                                           'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
                                           on
-                                              ? 'border-accent/40 bg-accent-soft text-accent'
-                                              : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                              ? 'border-accent/50 bg-accent-soft text-accent'
+                                              : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
                                       )}>
                                       <span
                                           className="size-1.75 rounded-sm"

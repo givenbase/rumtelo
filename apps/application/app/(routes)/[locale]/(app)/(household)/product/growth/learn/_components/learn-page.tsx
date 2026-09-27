@@ -19,7 +19,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
     EmptyState,
-    Input,
     Typography,
 } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
@@ -33,6 +32,7 @@ import { CoachMark, useHelpersEnabled } from '@/components/features/helpers';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
+import { ListSearchField } from '@/components/layout/list-controls';
 import { ListToolbar, ListToolbarTab } from '@/components/layout/list-toolbar';
 
 import { useLearnShelf } from './learn-shelf';
@@ -348,8 +348,8 @@ function StatusPick({
                         className={cn(
                             'rounded-full border px-2.5 py-1 font-mono text-[10px] tracking-wide uppercase',
                             on
-                                ? 'border-accent/40 bg-accent-soft text-accent'
-                                : 'border-line text-fg-muted hover:border-line-strong hover:text-fg'
+                                ? 'border-accent/50 bg-accent-soft text-accent'
+                                : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
                         )}>
                         {labels.pickLabel(format, key)}
                     </button>
@@ -707,12 +707,11 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
             {browsing ? (
                 <div className="grid overflow-hidden rounded-2xl border border-line bg-surface">
                     <div className="flex flex-wrap items-center gap-3 border-b border-line px-4 py-3.5">
-                        <Input
-                            type="search"
+                        <ListSearchField
                             value={search}
-                            onChange={event => setSearch(event.target.value)}
+                            onChange={setSearch}
                             placeholder={tLearn('search_placeholder')}
-                            aria-label={tLearn('search_aria')}
+                            ariaLabel={tLearn('search_aria')}
                             className="min-w-0 flex-1 basis-64"
                         />
                         <span className="font-mono text-xs text-fg-muted">

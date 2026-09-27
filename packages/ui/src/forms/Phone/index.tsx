@@ -36,7 +36,7 @@ export function Phone({ className, defaultCountry = 'NL', onChange, value, ...pr
                 '[&_.PhoneInputInput]:min-w-0 [&_.PhoneInputInput]:flex-1',
                 '[&_.PhoneInputInput]:border-none [&_.PhoneInputInput]:bg-transparent',
                 '[&_.PhoneInputInput]:p-0 [&_.PhoneInputInput]:text-sm [&_.PhoneInputInput]:text-fg',
-                '[&_.PhoneInputInput]:outline-none [&_.PhoneInputInput]:placeholder:text-fg-faint',
+                '[&_.PhoneInputInput]:outline-none [&_.PhoneInputInput]:placeholder:text-fg-muted',
                 '[&_.PhoneInputCountrySelect]:bg-transparent [&_.PhoneInputCountrySelectArrow]:opacity-50',
                 className
             )}

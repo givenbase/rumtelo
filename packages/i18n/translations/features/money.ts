@@ -330,6 +330,7 @@ const money = {
         filter_jar_aria: 'Filter by jar',
         filter_amount_aria: 'Filter by amount',
         filter_amount_label: 'Amount',
+        filter_amount_clear: 'Clear',
         amount_range: '{min}–{max}',
         amount_over: '{amount}+',
         sort_label: 'Sort',
