@@ -13,7 +13,7 @@ import type {
 } from '@rumtelo/contracts';
 
 import { api } from '@/app/_lib/api';
-import { downloadTextFile, toCsv } from '@/app/_lib/download';
+import { downloadTextFile, downloadZip, toCsv } from '@/app/_lib/download';
 import { fromMinorUnits } from '@rumtelo/utils';
 
 const PAGE_LIMIT = 200;
@@ -106,18 +106,20 @@ function jarKeyMap(jars: Jar[]): Map<string, string> {
     return new Map(jars.map(jar => [jar.id, jar.key]));
 }
 
-/** Portable CSV for Sheets / other apps — major units, common headers. */
+/** Portable CSV for Sheets / other apps — major units, common headers + jarKey for restore. */
 export function portableTransactionRows(
     transactions: Transaction[],
     jars: Jar[]
 ): Record<string, unknown>[] {
     const names = jarNameMap(jars);
+    const keys = jarKeyMap(jars);
     return transactions.map(transaction => ({
         date: transaction.bookedOn,
         amount: fromMinorUnits(transaction.amount).toFixed(2),
         description: transaction.description,
         payee: transaction.counterparty ?? '',
         jar: transaction.jarId ? (names.get(transaction.jarId) ?? '') : '',
+        jarKey: transaction.jarId ? (keys.get(transaction.jarId) ?? '') : '',
         note: transaction.note ?? '',
     }));
 }
@@ -148,6 +150,7 @@ export function transactionExportRows(
 
 export function buildExportSheets(bundle: HouseholdExportBundle): ExportSheet[] {
     const names = jarNameMap(bundle.jars);
+    const keys = jarKeyMap(bundle.jars);
     const sheets: ExportSheet[] = [
         {
             name: 'Jars',
@@ -180,6 +183,7 @@ export function buildExportSheets(bundle: HouseholdExportBundle): ExportSheet[] 
                 cadence: cost.cadence,
                 direction: cost.direction,
                 jar: names.get(cost.jarId) ?? cost.jarId,
+                jarKey: keys.get(cost.jarId) ?? '',
                 debtId: cost.debtId ?? '',
                 isActive: cost.isActive,
                 counterparty: cost.counterparty ?? '',
@@ -215,6 +219,7 @@ export function buildExportSheets(bundle: HouseholdExportBundle): ExportSheet[] 
                 targetCents: goal.target,
                 savedCents: goal.saved,
                 jar: goal.jarId ? (names.get(goal.jarId) ?? goal.jarId) : '',
+                jarKey: goal.jarId ? (keys.get(goal.jarId) ?? '') : '',
                 status: goal.status,
                 targetOn: goal.targetOn ?? '',
             })),
@@ -228,6 +233,7 @@ export function buildExportSheets(bundle: HouseholdExportBundle): ExportSheet[] 
             matcher: rule.matcher,
             matchValue: rule.matchValue,
             jar: names.get(rule.jarId) ?? rule.jarId,
+            jarKey: keys.get(rule.jarId) ?? '',
             categoryId: rule.categoryId ?? '',
             priority: rule.priority,
             isActive: rule.isActive,
@@ -237,57 +243,12 @@ export function buildExportSheets(bundle: HouseholdExportBundle): ExportSheet[] 
     return sheets;
 }
 
-function xmlEscape(value: string): string {
-    return value
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;');
-}
-
-function excelCell(value: unknown): string {
-    if (typeof value === 'number' && Number.isFinite(value)) {
-        return `<Cell><Data ss:Type="Number">${value}</Data></Cell>`;
-    }
-    if (typeof value === 'boolean') {
-        return `<Cell><Data ss:Type="Boolean">${value ? 1 : 0}</Data></Cell>`;
-    }
-    const text =
-        value === null || value === undefined
-            ? ''
-            : typeof value === 'string' || typeof value === 'bigint'
-              ? String(value)
-              : JSON.stringify(value);
-    return `<Cell><Data ss:Type="String">${xmlEscape(text)}</Data></Cell>`;
-}
-
-function sanitizeSheetName(name: string): string {
-    const cleaned = name.replaceAll(/[:\\/?*[\]]/g, ' ').trim() || 'Sheet';
-    return cleaned.slice(0, 31);
-}
-
-/** SpreadsheetML workbook Excel opens as a multi-sheet .xls. */
-export function toSpreadsheetXml(sheets: ExportSheet[]): string {
-    const worksheets = sheets
-        .map(sheet => {
-            const headers = sheet.rows[0] ? Object.keys(sheet.rows[0]) : [];
-            const headerRow =
-                headers.length > 0
-                    ? `<Row>${headers.map(header => excelCell(header)).join('')}</Row>`
-                    : '';
-            const body = sheet.rows
-                .map(row => `<Row>${headers.map(header => excelCell(row[header])).join('')}</Row>`)
-                .join('');
-            return `<Worksheet ss:Name="${xmlEscape(sanitizeSheetName(sheet.name))}"><Table>${headerRow}${body}</Table></Worksheet>`;
-        })
-        .join('');
-
-    return `<?xml version="1.0" encoding="UTF-8"?>
-<?mso-application progid="Excel.Sheet"?>
-<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
- xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
-${worksheets}
-</Workbook>`;
+function csvFileName(sheetName: string): string {
+    const slug = sheetName
+        .toLowerCase()
+        .replaceAll(/[^a-z0-9]+/g, '-')
+        .replaceAll(/^-|-$/g, '');
+    return `${slug || 'sheet'}.csv`;
 }
 
 export function downloadHouseholdJson(bundle: HouseholdExportBundle, stamp: string) {
@@ -304,18 +265,28 @@ export function downloadHouseholdJson(bundle: HouseholdExportBundle, stamp: stri
     );
 }
 
+/** Single portable transactions CSV (Sheets / banks / other apps). */
 export function downloadHouseholdCsv(transactions: Transaction[], jars: Jar[], stamp: string) {
     downloadTextFile(
         `rumtelo-transactions-${stamp}.csv`,
-        toCsv(portableTransactionRows(transactions, jars)),
+        toCsv(portableTransactionRows(transactions, jars), [
+            'date',
+            'amount',
+            'description',
+            'payee',
+            'jar',
+            'jarKey',
+            'note',
+        ]),
         'text/csv;charset=utf-8'
     );
 }
 
-export function downloadHouseholdExcel(bundle: HouseholdExportBundle, stamp: string) {
-    downloadTextFile(
-        `rumtelo-export-${stamp}.xls`,
-        toSpreadsheetXml(buildExportSheets(bundle)),
-        'application/vnd.ms-excel;charset=utf-8'
-    );
+/** One real CSV per subject in a zip — not SpreadsheetML / fake .xls. */
+export function downloadHouseholdCsvZip(bundle: HouseholdExportBundle, stamp: string) {
+    const entries = buildExportSheets(bundle).map(sheet => ({
+        name: csvFileName(sheet.name),
+        content: toCsv(sheet.rows),
+    }));
+    downloadZip(`rumtelo-export-${stamp}.zip`, entries);
 }

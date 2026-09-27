@@ -2,11 +2,16 @@
 
 import { useRef, useState } from 'react';
 
-import { ArchiveRestorePayload, type ArchiveRestoreResult } from '@rumtelo/contracts';
+import type { ArchiveRestorePayload, ArchiveRestoreResult } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import { Button, StubNotice } from '@rumtelo/ui';
 
 import { api } from '@/app/_lib/api';
+import {
+    archivePayloadFromFile,
+    type ArchiveImportFound,
+    type ArchiveImportSource,
+} from '@/app/_lib/archive-from-csv-zip';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -35,6 +40,65 @@ function sectionLine(
     return `${label}: ${parts.join(' · ')}`;
 }
 
+function foundParts(t: ReturnType<typeof useTranslations>, found: ArchiveImportFound): string[] {
+    const parts: string[] = [];
+    const push = (count: number, one: string, other: string) => {
+        if (count <= 0) return;
+        parts.push(
+            t(count === 1 ? one : other, {
+                count: String(count),
+            })
+        );
+    };
+    push(
+        found.jars,
+        'pages.settings.panels.import.found_jars_one',
+        'pages.settings.panels.import.found_jars_other'
+    );
+    push(
+        found.income,
+        'pages.settings.panels.import.found_income_one',
+        'pages.settings.panels.import.found_income_other'
+    );
+    push(
+        found.fixedCosts,
+        'pages.settings.panels.import.found_fixed_one',
+        'pages.settings.panels.import.found_fixed_other'
+    );
+    push(
+        found.debts,
+        'pages.settings.panels.import.found_debts_one',
+        'pages.settings.panels.import.found_debts_other'
+    );
+    push(
+        found.goals,
+        'pages.settings.panels.import.found_goals_one',
+        'pages.settings.panels.import.found_goals_other'
+    );
+    push(
+        found.rules,
+        'pages.settings.panels.import.found_rules_one',
+        'pages.settings.panels.import.found_rules_other'
+    );
+    push(
+        found.transactions,
+        'pages.settings.panels.import.found_tx_one',
+        'pages.settings.panels.import.found_tx_other'
+    );
+    return parts;
+}
+
+function sourceLabel(t: ReturnType<typeof useTranslations>, source: ArchiveImportSource): string {
+    switch (source) {
+        case 'json':
+            return t('pages.settings.panels.import.source_json');
+        case 'csv-zip':
+            return t('pages.settings.panels.import.source_csv_zip');
+        case 'csv':
+            return t('pages.settings.panels.import.source_csv');
+    }
+}
+
 export function ImportSettings() {
     const t = useTranslations();
     const { householdId } = useAuth();
@@ -45,11 +109,17 @@ export function ImportSettings() {
     const [busy, setBusy] = useState<Busy>(null);
     const [payload, setPayload] = useState<ArchiveRestorePayload | null>(null);
     const [fileName, setFileName] = useState<string | null>(null);
+    const [source, setSource] = useState<ArchiveImportSource | null>(null);
+    const [found, setFound] = useState<ArchiveImportFound | null>(null);
+    const [sheets, setSheets] = useState<string[]>([]);
     const [preview, setPreview] = useState<ArchiveRestoreResult | null>(null);
 
     function clear() {
         setPayload(null);
         setFileName(null);
+        setSource(null);
+        setFound(null);
+        setSheets([]);
         setPreview(null);
         if (fileInputRef.current) fileInputRef.current.value = '';
     }
@@ -57,16 +127,27 @@ export function ImportSettings() {
     async function onFile(file: File | null) {
         if (!file) return;
         try {
-            const text = await file.text();
-            const parsed = ArchiveRestorePayload.safeParse(JSON.parse(text));
-            if (!parsed.success) {
+            const next = await archivePayloadFromFile(file);
+            const total =
+                next.found.jars +
+                next.found.income +
+                next.found.fixedCosts +
+                next.found.debts +
+                next.found.goals +
+                next.found.rules +
+                next.found.transactions;
+            if (total === 0) {
                 clear();
-                showToast(t('pages.settings.toasts.import_invalid'), 'error');
+                showToast(t('pages.settings.toasts.import_empty'), 'error');
                 return;
             }
-            setPayload(parsed.data);
+            setPayload(next.payload);
             setFileName(file.name);
+            setSource(next.source);
+            setFound(next.found);
+            setSheets(next.sheets);
             setPreview(null);
+            showToast(t('pages.settings.toasts.import_detected'), 'success');
         } catch {
             clear();
             showToast(t('pages.settings.toasts.import_invalid'), 'error');
@@ -100,6 +181,7 @@ export function ImportSettings() {
     }
 
     const canAct = live && planReady && busy === null && payload !== null;
+    const detected = found ? foundParts(t, found) : [];
 
     return (
         <SettingsPanel>
@@ -110,7 +192,7 @@ export function ImportSettings() {
                     <input
                         ref={fileInputRef}
                         type="file"
-                        accept="application/json,.json"
+                        accept="application/json,.json,application/zip,.zip,text/csv,.csv"
                         className="sr-only"
                         onChange={event => {
                             void onFile(event.target.files?.[0] ?? null);
@@ -138,6 +220,26 @@ export function ImportSettings() {
                     <p className="font-mono text-[10.5px] leading-relaxed text-pretty text-fg-muted">
                         {t('pages.settings.panels.import.format_note')}
                     </p>
+                    {found && source ? (
+                        <div className="grid gap-1 rounded-[13px] border border-line bg-raised p-3.5">
+                            <p className="text-[13px] font-semibold text-fg">
+                                {t('pages.settings.panels.import.found_title')}
+                            </p>
+                            <p className="font-mono text-[10px] text-fg-muted">
+                                {sourceLabel(t, source)}
+                                {sheets.length > 0
+                                    ? ` · ${t('pages.settings.panels.import.found_sheets', {
+                                          sheets: sheets.join(', '),
+                                      })}`
+                                    : ''}
+                            </p>
+                            <p className="font-mono text-[10px] text-fg-muted">
+                                {detected.length > 0
+                                    ? detected.join(' · ')
+                                    : t('pages.settings.panels.import.found_none')}
+                            </p>
+                        </div>
+                    ) : null}
                     {!live ? (
                         <StubNotice
                             prefix={t('ui.statusPage.scaffold')}

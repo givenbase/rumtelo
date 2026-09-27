@@ -8,7 +8,7 @@ import { cn, toPeriodKey } from '@rumtelo/utils';
 
 import {
     downloadHouseholdCsv,
-    downloadHouseholdExcel,
+    downloadHouseholdCsvZip,
     downloadHouseholdJson,
     fetchHouseholdExportBundle,
     fetchTransactionsForExport,
@@ -23,7 +23,7 @@ import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabi
 
 import { SettingsInkCard, SettingsPanel } from './settings-chrome';
 
-type Busy = 'csv' | 'json' | 'excel' | null;
+type Busy = 'csv' | 'json' | 'zip' | null;
 
 function stampToday() {
     return new Date().toISOString().slice(0, 10);
@@ -136,16 +136,16 @@ export function ExportSettings() {
         }
     }
 
-    async function exportExcel() {
+    async function exportCsvZip() {
         if (!householdId) return;
-        setBusy('excel');
+        setBusy('zip');
         try {
             const data = await ensureBundle();
             if (!data) return;
-            downloadHouseholdExcel(data, stampToday());
-            showToast(t('pages.settings.toasts.excel_ok'), 'success');
+            downloadHouseholdCsvZip(data, stampToday());
+            showToast(t('pages.settings.toasts.csv_zip_ok'), 'success');
         } catch {
-            showToast(t('pages.settings.toasts.excel_failed'), 'error');
+            showToast(t('pages.settings.toasts.csv_failed'), 'error');
         } finally {
             setBusy(null);
         }
@@ -314,13 +314,13 @@ export function ExportSettings() {
                             className="min-w-0 flex-1 rounded-full font-mono text-[10.5px] tracking-[0.13em] uppercase sm:min-w-[190px]"
                             disabled={!canDownload}
                             onClick={() => {
-                                if (scope === 'all') void exportExcel();
+                                if (scope === 'all') void exportCsvZip();
                                 else void exportCsv(scope === 'month');
                             }}>
-                            {busy === 'excel' || (busy === 'csv' && scope !== 'all')
+                            {busy === 'zip' || (busy === 'csv' && scope !== 'all')
                                 ? t('pages.settings.working')
                                 : scope === 'all'
-                                  ? t('pages.settings.panels.export.download_excel')
+                                  ? t('pages.settings.panels.export.download_csv_zip')
                                   : t('pages.settings.panels.export.download_csv')}
                         </Button>
                         <Button
