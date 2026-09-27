@@ -14,6 +14,7 @@ import {
 
 import { type Locale, LOCALES, type PlanKey } from '@rumtelo/contracts';
 import { fromIntlLocale, toIntlLocale, useLocale, usePathname, useRouter } from '@rumtelo/i18n';
+import { isYearMonthBefore, periodTravelBounds } from '@rumtelo/utils';
 import { useQuery } from '@tanstack/react-query';
 
 import { DEFAULT_PLAN } from '@/app/_lib/plan';
@@ -49,6 +50,8 @@ interface HouseholdShellCtx {
     setPlan: (plan: PlanKey) => void;
     period: Period;
     setPeriod: (period: Period) => void;
+    /** Household creation time — drives period-travel floor (created month − 1). */
+    householdCreatedAt: string | null;
     locale: Locale;
     toggleLocale: () => void;
     /** Switch UI + next-intl locale to a specific value. */
@@ -110,6 +113,14 @@ export function HouseholdShellProvider({ children }: { children: ReactNode }) {
         if (!householdId) return true;
         return settingsQuery.isFetched || settingsQuery.isError;
     }, [authPending, householdReady, householdId, settingsQuery.isFetched, settingsQuery.isError]);
+
+    const householdCreatedAt = settingsQuery.data?.createdAt ?? null;
+    if (householdCreatedAt) {
+        const { floor } = periodTravelBounds(householdCreatedAt);
+        if (isYearMonthBefore(period, floor)) {
+            setPeriod(floor);
+        }
+    }
 
     const showToast = useCallback((message: string, type: Toast['type'] = 'info') => {
         if (toastTimer.current) clearTimeout(toastTimer.current);
@@ -185,6 +196,7 @@ export function HouseholdShellProvider({ children }: { children: ReactNode }) {
             setPlan,
             period,
             setPeriod,
+            householdCreatedAt,
             locale,
             toggleLocale,
             setLocale,
@@ -206,6 +218,7 @@ export function HouseholdShellProvider({ children }: { children: ReactNode }) {
             setPlan,
             period,
             setPeriod,
+            householdCreatedAt,
             locale,
             toggleLocale,
             setLocale,

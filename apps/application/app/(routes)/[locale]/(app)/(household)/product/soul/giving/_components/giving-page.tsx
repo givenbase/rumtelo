@@ -28,6 +28,7 @@ import {
 } from '@/app/_lib/create-routes';
 import { cadenceLabel } from '@/app/_lib/jar-chrome';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
+import { listFixedCostsForPeriodView } from '@/app/_lib/period-plan-list';
 import { isLiveData } from '@/app/_lib/preview';
 import { productPath } from '@/app/_lib/routes';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
@@ -61,6 +62,7 @@ type GivePledge = Pick<
 
 type GiveFixedRow = Pick<FixedCost, 'id' | 'name' | 'counterparty' | 'cadence' | 'dueDay'> & {
     monthly: number;
+    applies: boolean;
 };
 
 function yearStartIso(): string {
@@ -86,6 +88,7 @@ const GIVING_CHECKS = ['1', '2', '3', '4'] as const;
 export function GivingPageClient() {
     const t = useTranslations('features.soul.giving');
     const tChips = useTranslations('features.money.chips');
+    const tFixed = useTranslations('features.money.fixed');
     const locale = useLocale();
     const { householdId } = useAuth();
     const { period } = useHouseholdShell();
@@ -153,18 +156,28 @@ export function GivingPageClient() {
     );
     const giveFixed = useMemo((): GiveFixedRow[] => {
         const group = (fixedQuery.data ?? []).find(row => row.jarKey === JarKey.GIVE);
-        return (group?.items ?? [])
-            .filter(item => isFixedCostCounting(item) && item.direction === FlowDirection.OUT)
-            .map(item => ({
-                id: item.id,
-                name: item.name,
-                counterparty: item.counterparty,
-                cadence: item.cadence,
-                dueDay: item.dueDay,
-                monthly: monthlyAmount(Math.abs(item.amount), item.cadence),
-            }));
-    }, [fixedQuery.data]);
-    const monthlyPlanned = giveFixed.reduce((total, item) => total + item.monthly, 0);
+        const asOf = endOfPeriodIso(periodKey);
+        const { applying, list } = listFixedCostsForPeriodView(
+            (group?.items ?? []).filter(
+                item => isFixedCostCounting(item) && item.direction === FlowDirection.OUT
+            ),
+            asOf,
+            travel.direction
+        );
+        const applyingIds = new Set(applying.map(item => item.id));
+        return list.map(item => ({
+            id: item.id,
+            name: item.name,
+            counterparty: item.counterparty,
+            cadence: item.cadence,
+            dueDay: item.dueDay,
+            monthly: monthlyAmount(Math.abs(item.amount), item.cadence),
+            applies: applyingIds.has(item.id),
+        }));
+    }, [fixedQuery.data, periodKey, travel.direction]);
+    const monthlyPlanned = giveFixed
+        .filter(item => item.applies)
+        .reduce((total, item) => total + item.monthly, 0);
     const merchantsQuery = useLiveQuery(
         apiQuery.money.catalogs.merchantPresets.list.queryOptions({
             input: { householdId: householdId! },
@@ -387,8 +400,12 @@ export function GivingPageClient() {
                                         amount={tChips('amount_per_month', {
                                             amount: formatMoney(item.monthly),
                                         })}
+                                        amountClassName={item.applies ? undefined : 'text-fg-muted'}
                                         badges={
                                             <>
+                                                {item.applies ? null : (
+                                                    <MetaChip>{tFixed('status_planned')}</MetaChip>
+                                                )}
                                                 {due ? <MetaChip>{due}</MetaChip> : null}
                                                 <MetaChip>
                                                     {cadenceLabel(item.cadence, tChips)}

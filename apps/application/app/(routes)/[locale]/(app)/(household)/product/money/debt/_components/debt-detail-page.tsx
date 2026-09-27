@@ -33,16 +33,14 @@ import { z } from 'zod';
 import { fixedDetailHref, txDetailHref, updateHref } from '@/app/_lib/create-routes';
 import { cadencePeriodUnit, scheduleHint } from '@/app/_lib/debt-schedule';
 import { cadenceLabel } from '@/app/_lib/jar-chrome';
-import {
-    minorUnitsToAmountInput,
-    parseAmountToMinorUnits,
-    todayIsoDate,
-} from '@/app/_lib/money-input';
+import { minorUnitsToAmountInput, parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
 import { productPath } from '@/app/_lib/routes';
+import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
+import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
 import { findCatalogVendor, partyMark } from '@/app/_lib/vendor-brands';
 import { FormInput } from '@/components/features/forms/form-input';
 import { MetaChip, formatBookedDate, formatDueDay } from '@/components/features/money/jar-badge';
@@ -88,8 +86,10 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
     const tAction = useTranslations('common.action');
     const tChips = useTranslations('features.money.chips');
     const appLocale = useLocale();
-    const { showToast } = useHouseholdShell();
+    const { showToast, period } = useHouseholdShell();
+    const { canMutate } = useBoardWriteAccess();
     const apiError = useApiError();
+    const periodDefaultDate = viewedPeriodDefaultIso(period);
 
     const paymentSchema = useMemo(
         () =>
@@ -136,7 +136,7 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
     const paymentForm = useForm<PaymentFormValues>({
         defaultValues: {
             amount: '',
-            bookedOn: todayIsoDate(),
+            bookedOn: periodDefaultDate,
             note: '',
         },
         resolver: zodResolver(paymentSchema),
@@ -165,7 +165,7 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
                 amount: debt
                     ? minorUnitsToAmountInput(debt.minimumPayment + debt.extraPayment)
                     : '',
-                bookedOn: todayIsoDate(),
+                bookedOn: periodDefaultDate,
                 note: '',
             });
         },
@@ -221,10 +221,10 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
     const defaultPay = debt.minimumPayment + debt.extraPayment;
 
     function openPay() {
-        if (!debt) return;
+        if (!debt || !canMutate) return;
         paymentForm.reset({
             amount: minorUnitsToAmountInput(defaultPay > 0 ? defaultPay : debt.minimumPayment),
-            bookedOn: todayIsoDate(),
+            bookedOn: periodDefaultDate,
             note: '',
         });
         setPaying(true);
@@ -258,15 +258,17 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
                         </div>
                     </div>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                    <Button type="button" onClick={openPay}>
-                        {td('record_payment')}
-                    </Button>
-                    <Button as={Link} href={updateHref('debt', debt.id)} variant="secondary">
-                        <Icon name="pencil" size="sm" />
-                        {tAction('edit')}
-                    </Button>
-                </div>
+                {canMutate ? (
+                    <div className="flex flex-wrap gap-2">
+                        <Button type="button" onClick={openPay}>
+                            {td('record_payment')}
+                        </Button>
+                        <Button as={Link} href={updateHref('debt', debt.id)} variant="secondary">
+                            <Icon name="pencil" size="sm" />
+                            {tAction('edit')}
+                        </Button>
+                    </div>
+                ) : null}
             </div>
 
             <Card className="grid gap-4 p-5">

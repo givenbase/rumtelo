@@ -31,8 +31,13 @@ export { toPeriodKey, currentWeekKey } from './period-key';
 export {
     currentYearMonth,
     describePeriodTravel,
+    isYearMonthAfter,
+    isYearMonthBefore,
     monthsBetween,
+    periodTravelBounds,
+    shiftYearMonth,
     type PeriodTravel,
+    type PeriodTravelBounds,
     type YearMonth,
 } from './period-offset';
 export {

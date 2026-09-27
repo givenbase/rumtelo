@@ -297,6 +297,8 @@ export function SignInForm() {
                                 <FormLabel>{t('ui.form.fields.email')}</FormLabel>
                                 <FormControl>
                                     <Email
+                                        id="email"
+                                        data-testid="sign-in-email"
                                         placeholder={t('ui.form.fields.email_placeholder')}
                                         disabled={busy}
                                         {...field}
@@ -315,6 +317,8 @@ export function SignInForm() {
                                 <FormLabel>{t('ui.form.fields.password')}</FormLabel>
                                 <FormControl>
                                     <Password
+                                        id="password"
+                                        data-testid="sign-in-password"
                                         autoComplete="current-password"
                                         placeholder={t('ui.form.fields.password_mask')}
                                         disabled={busy}

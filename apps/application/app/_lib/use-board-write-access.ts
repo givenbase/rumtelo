@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Board write access — Practice preview + household VIEWER.
+ * Board write access — Practice preview + household VIEWER + closed / future period.
  * When false, hide create/edit chrome and block mutate routes.
  */
 
@@ -10,6 +10,7 @@ import { usePathname } from 'next/navigation';
 
 import { HouseholdRole } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
+import { describePeriodTravel, toPeriodKey } from '@rumtelo/utils';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import {
@@ -18,6 +19,7 @@ import {
     roleCan,
 } from '@/app/_lib/role-permissions';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { usePracticePreview } from '@/components/features/shell/practice-preview';
 
 function sectionFromPath(pathname: string): HouseholdPermissionSection {
@@ -40,17 +42,25 @@ export type BoardWriteAccess = {
     showCreateFlows: boolean;
     /** True while Practice is previewing a client board. */
     practicePreview: boolean;
+    /** Viewed shell period is closed — board is frozen for that month. */
+    periodClosed: boolean;
+    /** Looking ahead — projection only; no creates or settles. */
+    periodLookingAhead: boolean;
     role: HouseholdRole;
 };
 
 /**
  * Single gate for mutation chrome on the household board.
  * Practice preview uses its own caps; otherwise household role CRUD applies.
+ * Closed months and future travel freeze create/update chrome for the viewed period.
  */
 export function useBoardWriteAccess(): BoardWriteAccess {
     const pathname = usePathname() ?? '/';
     const { householdId, userId } = useAuth();
+    const { period } = useHouseholdShell();
     const { capabilities } = usePracticePreview();
+    const periodKey = toPeriodKey(period.year, period.month);
+    const periodLookingAhead = describePeriodTravel(period).direction === 'future';
 
     const membersQuery = useLiveQuery(
         apiQuery.household.members.queryOptions({
@@ -58,6 +68,14 @@ export function useBoardWriteAccess(): BoardWriteAccess {
         }),
         [],
         Boolean(householdId) && !capabilities.active
+    );
+
+    const monthScoreQuery = useLiveQuery(
+        apiQuery.money.monthScore.current.queryOptions({
+            input: { householdId: householdId!, period: periodKey },
+        }),
+        { isClosed: false } as never,
+        Boolean(householdId)
     );
 
     const role = useMemo(() => {
@@ -72,13 +90,17 @@ export function useBoardWriteAccess(): BoardWriteAccess {
         return HouseholdRole.VIEWER;
     }, [capabilities.active, membersQuery.data, membersQuery.isPending, userId]);
     const section = sectionFromPath(pathname);
+    const periodClosed = monthScoreQuery.data?.isClosed;
+    const periodFrozen = periodClosed || periodLookingAhead;
 
     return useMemo(() => {
         if (capabilities.active) {
             return {
-                canMutate: capabilities.canMutate,
-                showCreateFlows: capabilities.showCreateFlows,
+                canMutate: capabilities.canMutate && !periodFrozen,
+                showCreateFlows: capabilities.showCreateFlows && !periodFrozen,
                 practicePreview: true,
+                periodClosed,
+                periodLookingAhead,
                 role,
             };
         }
@@ -88,10 +110,21 @@ export function useBoardWriteAccess(): BoardWriteAccess {
         const canDelete = roleCan(role, section, HouseholdPermissionAction.DELETE);
 
         return {
-            canMutate: canCreate || canUpdate || canDelete,
-            showCreateFlows: canCreate,
+            canMutate: (canCreate || canUpdate || canDelete) && !periodFrozen,
+            showCreateFlows: canCreate && !periodFrozen,
             practicePreview: false,
+            periodClosed,
+            periodLookingAhead,
             role,
         };
-    }, [capabilities.active, capabilities.canMutate, capabilities.showCreateFlows, role, section]);
+    }, [
+        capabilities.active,
+        capabilities.canMutate,
+        capabilities.showCreateFlows,
+        periodClosed,
+        periodFrozen,
+        periodLookingAhead,
+        role,
+        section,
+    ]);
 }

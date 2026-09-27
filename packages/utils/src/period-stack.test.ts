@@ -13,7 +13,7 @@ import {
     projectGoalsAtHorizon,
     stackPlannedAllocations,
 } from './period-stack';
-import { describePeriodTravel } from './period-offset';
+import { describePeriodTravel, periodTravelBounds } from './period-offset';
 
 describe('period-stack', () => {
     it('horizonMonths is |Δ| + 1', () => {
@@ -139,5 +139,20 @@ describe('period-stack', () => {
         // Goals / debt deltas belong on the travel strip, not in Coach copy.
         assert.doesNotMatch(text, /Emergency/);
         assert.doesNotMatch(text, /still owe/i);
+    });
+});
+
+describe('periodTravelBounds', () => {
+    it('floors at created month − 1 and horizons at live + 12', () => {
+        const now = new Date(2026, 8, 15); // Sep 2026
+        const bounds = periodTravelBounds(new Date(2026, 8, 10), now);
+        assert.deepEqual(bounds.floor, { year: 2026, month: 8 });
+        assert.deepEqual(bounds.horizon, { year: 2027, month: 9 });
+    });
+
+    it('never floors after the live month', () => {
+        const now = new Date(2026, 2, 1); // Mar 2026
+        const bounds = periodTravelBounds(new Date(2026, 5, 1), now);
+        assert.deepEqual(bounds.floor, { year: 2026, month: 3 });
     });
 });

@@ -106,6 +106,8 @@ export const HouseholdSettings = z.object({
      * preference, everything shows.
      */
     audienceKeys: z.array(z.string()),
+    /** When the Better Auth household (organization) was created. */
+    createdAt: z.iso.datetime(),
     /** When household board setup completed; null = incomplete. */
     onboardedAt: z.iso.datetime().nullable(),
 });

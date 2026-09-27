@@ -14,7 +14,15 @@ import type {
 import { FixedCostPeriodStatus } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Typography } from '@rumtelo/ui';
-import { cn, categoryVariance, monthlyAmount } from '@rumtelo/utils';
+import {
+    cn,
+    categoryVariance,
+    describePeriodTravel,
+    endOfPeriodIso,
+    fixedCostAppliesAsOf,
+    monthlyAmount,
+    toPeriodKey,
+} from '@rumtelo/utils';
 
 import { cadenceLabel } from '@/app/_lib/jar-chrome';
 import {
@@ -25,6 +33,7 @@ import {
 } from '@/app/_lib/fixed-cost-match';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { fixedDetailHref, txDetailHref } from '@/app/_lib/create-routes';
+import { listFixedCostsForPeriodView } from '@/app/_lib/period-plan-list';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
 import { MetaChip, formatBookedDate, formatDueDay } from '@/components/features/money/jar-badge';
@@ -102,10 +111,18 @@ export function JarCategoryBreakdown({
     const tChips = useTranslations('features.money.chips');
     const [openIds, setOpenIds] = useState<Set<string>>(() => new Set());
     const today = new Date();
+    const asOf = endOfPeriodIso(toPeriodKey(period.year, period.month));
+    const travel = describePeriodTravel(period);
+    const { applying: applyingFixed, list: viewFixed } = listFixedCostsForPeriodView(
+        fixedCosts,
+        asOf,
+        travel.direction
+    );
+    const applyingIds = new Set(applyingFixed.map(item => item.id));
 
     const uncategorizedKey = 'uncategorized';
     const fixedByCategory = new Map<string, FixedCost[]>();
-    for (const item of fixedCosts) {
+    for (const item of viewFixed) {
         const key = item.categoryId ?? uncategorizedKey;
         const list = fixedByCategory.get(key) ?? [];
         list.push(item);
@@ -138,10 +155,9 @@ export function JarCategoryBreakdown({
     function bucketTotals(bucketId: string) {
         const bucketFixed = allowFixedCosts ? (fixedByCategory.get(bucketId) ?? []) : [];
         const bucketTxs = txByCategory.get(bucketId) ?? [];
-        const budgeted = bucketFixed.reduce(
-            (sum, item) => sum + monthlyAmount(Math.abs(item.amount), item.cadence),
-            0
-        );
+        const budgeted = bucketFixed
+            .filter(item => applyingIds.has(item.id))
+            .reduce((sum, item) => sum + monthlyAmount(Math.abs(item.amount), item.cadence), 0);
         return { budgeted, actual: txMovement(bucketTxs) };
     }
 
@@ -229,11 +245,15 @@ export function JarCategoryBreakdown({
                     const match = settlement?.transactionId
                         ? txById.get(settlement.transactionId)
                         : undefined;
+                    const applies = fixedCostAppliesAsOf(item, asOf);
                     return {
                         item,
                         monthly,
                         match,
-                        status: fixedCostStatus(item, settlement, period, today),
+                        applies,
+                        status: applies
+                            ? fixedCostStatus(item, settlement, period, today)
+                            : FixedCostPeriodStatus.UPCOMING,
                     };
                 });
 
@@ -329,77 +349,85 @@ export function JarCategoryBreakdown({
                                     </Typography>
                                 ) : (
                                     <ul className="grid">
-                                        {fixedRows.map(({ item, monthly, match, status }) => {
-                                            const company = item.counterparty?.trim() || item.name;
-                                            const subtitle =
-                                                item.counterparty?.trim() &&
-                                                item.counterparty.trim() !== item.name.trim()
-                                                    ? item.name
-                                                    : null;
-                                            const due = formatDueDay(item.dueDay, tChips);
-                                            return (
-                                                <li key={`fc-${item.id}`}>
-                                                    <MoneyPartyRow
-                                                        title={company}
-                                                        subtitle={subtitle}
-                                                        mark={partyMark(
-                                                            findPartyVendor(
-                                                                company,
-                                                                merchants,
-                                                                givingOrgs
-                                                            ),
-                                                            catalogMarkChrome({
-                                                                billName: item.name,
-                                                                jarKey,
-                                                                jarByKey,
-                                                                categoryTemplates,
-                                                            })
-                                                        )}
-                                                        amount={formatMoney(-Math.abs(monthly))}
-                                                        badges={
-                                                            <>
-                                                                {statusChip(
-                                                                    status,
-                                                                    tFixed('status_planned'),
-                                                                    tFixed
-                                                                )}
-                                                                {due ? (
-                                                                    <MetaChip>{due}</MetaChip>
-                                                                ) : null}
-                                                                <MetaChip>
-                                                                    {cadenceLabel(
-                                                                        item.cadence,
-                                                                        tChips
+                                        {fixedRows.map(
+                                            ({ item, monthly, match, status, applies }) => {
+                                                const company =
+                                                    item.counterparty?.trim() || item.name;
+                                                const subtitle =
+                                                    item.counterparty?.trim() &&
+                                                    item.counterparty.trim() !== item.name.trim()
+                                                        ? item.name
+                                                        : null;
+                                                const due = formatDueDay(item.dueDay, tChips);
+                                                return (
+                                                    <li key={`fc-${item.id}`}>
+                                                        <MoneyPartyRow
+                                                            title={company}
+                                                            subtitle={subtitle}
+                                                            mark={partyMark(
+                                                                findPartyVendor(
+                                                                    company,
+                                                                    merchants,
+                                                                    givingOrgs
+                                                                ),
+                                                                catalogMarkChrome({
+                                                                    billName: item.name,
+                                                                    jarKey,
+                                                                    jarByKey,
+                                                                    categoryTemplates,
+                                                                })
+                                                            )}
+                                                            amount={formatMoney(-Math.abs(monthly))}
+                                                            amountClassName={
+                                                                applies
+                                                                    ? undefined
+                                                                    : 'text-fg-muted'
+                                                            }
+                                                            badges={
+                                                                <>
+                                                                    {statusChip(
+                                                                        status,
+                                                                        tFixed('status_planned'),
+                                                                        tFixed
                                                                     )}
-                                                                </MetaChip>
-                                                                {match ? (
+                                                                    {due ? (
+                                                                        <MetaChip>{due}</MetaChip>
+                                                                    ) : null}
                                                                     <MetaChip>
-                                                                        {formatBookedDate(
-                                                                            match.bookedOn,
-                                                                            appLocale
+                                                                        {cadenceLabel(
+                                                                            item.cadence,
+                                                                            tChips
                                                                         )}
                                                                     </MetaChip>
-                                                                ) : null}
-                                                                {Math.abs(monthly) !==
-                                                                Math.abs(item.amount) ? (
-                                                                    <MetaChip>
-                                                                        {tChips(
-                                                                            'amount_per_month',
-                                                                            {
-                                                                                amount: formatMoney(
-                                                                                    monthly
-                                                                                ),
-                                                                            }
-                                                                        )}
-                                                                    </MetaChip>
-                                                                ) : null}
-                                                            </>
-                                                        }
-                                                        href={fixedDetailHref(item.id)}
-                                                    />
-                                                </li>
-                                            );
-                                        })}
+                                                                    {match ? (
+                                                                        <MetaChip>
+                                                                            {formatBookedDate(
+                                                                                match.bookedOn,
+                                                                                appLocale
+                                                                            )}
+                                                                        </MetaChip>
+                                                                    ) : null}
+                                                                    {Math.abs(monthly) !==
+                                                                    Math.abs(item.amount) ? (
+                                                                        <MetaChip>
+                                                                            {tChips(
+                                                                                'amount_per_month',
+                                                                                {
+                                                                                    amount: formatMoney(
+                                                                                        monthly
+                                                                                    ),
+                                                                                }
+                                                                            )}
+                                                                        </MetaChip>
+                                                                    ) : null}
+                                                                </>
+                                                            }
+                                                            href={fixedDetailHref(item.id)}
+                                                        />
+                                                    </li>
+                                                );
+                                            }
+                                        )}
                                         {leftoverTxs.map(tx => {
                                             const title = tx.counterparty?.trim() || tx.description;
                                             const subtitle =

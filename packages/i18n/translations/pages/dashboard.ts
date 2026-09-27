@@ -4,10 +4,35 @@ const dashboard = {
         label: 'Score',
         days_left_one: '1 day left',
         days_left_other: '{count} days left',
+        /** Persistent badge when this period’s score is locked. */
+        closed_badge: 'Closed',
+        closed_hint:
+            'This month is closed — the score stays as it was, and nothing can be added or changed for this period.',
+        /** Why close matters — shown while the period is still open. */
+        close_explain:
+            'Closing locks this score and freezes the month. Clear the inbox and bills first so the log stays honest.',
+        /** Compact period-travel note (lives here instead of a Coach slide). */
+        travel_past_one: '{stamp} · about {money} through jars over {horizon} month',
+        travel_past_other: '{stamp} · about {money} through jars over {horizon} months',
+        travel_ahead_one: 'By {stamp} · about {money} through jars over {horizon} month',
+        travel_ahead_other: 'By {stamp} · about {money} through jars over {horizon} months',
+        travel_jar: '{name} {from} → {to}',
     },
     close_month: 'Close month',
+    /** Second click on ConfirmActionButton / coach close CTA. */
+    close_month_confirm: 'Are you sure? Close this month',
+    /** Shown above Close when inbox / bills still open. */
+    close_blocked_title: 'Finish these before closing this month',
+    close_blocked_inbox_one: '1 unsorted transaction in the inbox',
+    close_blocked_inbox_other: '{count} unsorted transactions in the inbox',
+    close_blocked_bills_one: '1 bill still unpaid or unskipped{names}',
+    close_blocked_bills_other: '{count} bills still unpaid or unskipped{names}',
+    close_blocked_bill_names: ' ({list})',
+    close_blocked_open_bills: 'Open bills ▸',
     closing: 'Closing…',
     month_closed: 'Month closed',
+    /** Toast after close — recap is the surplus/overspent line. */
+    month_closed_toast: 'Month closed · {recap}',
     close_failed: 'Could not close month',
     levels: {
         '1': 'Beginner',

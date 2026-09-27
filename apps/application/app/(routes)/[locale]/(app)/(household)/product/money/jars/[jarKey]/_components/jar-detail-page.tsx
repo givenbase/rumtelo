@@ -27,6 +27,7 @@ import { activeSaveGoalsOnJar, focusSaveGoal } from '@/app/_lib/goal-focus';
 import { resolveJarSubtitle } from '@/app/_lib/jar-copy';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
+import { listFixedCostsForPeriodView } from '@/app/_lib/period-plan-list';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { isLiveData } from '@/app/_lib/preview';
@@ -133,8 +134,14 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
     // group.jarKey is schema string; jarKey is JarKey (string enum) — same runtime values.
     // oxlint-disable-next-line typescript/no-unsafe-enum-comparison
     const fixedGroup = (byJarQuery.data ?? []).find(group => group.jarKey === jarKey);
-    const fixedOut = (fixedGroup?.items ?? []).filter(
-        item => item.direction === FlowDirection.OUT && isFixedCostCounting(item)
+    const travel = describePeriodTravel(period);
+    const asOf = endOfPeriodIso(periodKey);
+    const { list: fixedOut } = listFixedCostsForPeriodView(
+        (fixedGroup?.items ?? []).filter(
+            item => item.direction === FlowDirection.OUT && isFixedCostCounting(item)
+        ),
+        asOf,
+        travel.direction
     );
 
     const transactions = [...(txQuery.data?.items ?? [])].sort((left, right) =>
@@ -174,7 +181,6 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
         if (goal.kind === GoalKind.SAVE) return true;
         return jar.key === JarKey.GIVE && goal.kind === GoalKind.GIVE;
     });
-    const travel = describePeriodTravel(period);
     const projectionById = new Map(
         travel.direction === 'current'
             ? []

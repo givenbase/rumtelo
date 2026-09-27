@@ -10,7 +10,6 @@ import { AccentCard, Button, Card, EmptyState, Eyebrow, Typography } from '@rumt
 import {
     incomeAmountAsOf,
     incomeDelta,
-    incomeSourceApplies,
     monthlyNetAsOf,
     describePeriodTravel,
     endOfPeriodIso,
@@ -21,6 +20,7 @@ import {
 import { useTranslations } from '@rumtelo/i18n';
 
 import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
+import { listIncomeForPeriodView } from '@/app/_lib/period-plan-list';
 import { isLiveData } from '@/app/_lib/preview';
 import { IncomeSimulator } from '@/components/features/growth/income-simulator';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -42,6 +42,7 @@ function dayBefore(iso: string): string {
 
 export function IncomePageClient() {
     const t = useTranslations('features.growth.income');
+    const tFixed = useTranslations('features.money.fixed');
     const { householdId } = useAuth();
     const { period } = useHouseholdShell();
     const { formatMoney } = useHouseholdCurrency();
@@ -72,8 +73,13 @@ export function IncomePageClient() {
     );
 
     const allSources = incomeQuery.data ?? [];
-    const asOf = traveling ? endOfPeriodIso(periodKey) : todayIso();
-    const sources = allSources.filter(source => incomeSourceApplies(source, asOf));
+    const asOf = endOfPeriodIso(periodKey);
+    const { applying: applyingSources, list: sources } = listIncomeForPeriodView(
+        allSources,
+        asOf,
+        travel.direction
+    );
+    const applyingIds = new Set(applyingSources.map(source => source.id));
     const monthlyNet = monthlyNetAsOf(allSources, asOf);
     const spanNet = traveling ? monthlyNet * horizon : monthlyNet;
     const jars = jarsQuery.data ?? [];
@@ -252,7 +258,10 @@ export function IncomePageClient() {
                     ) : (
                         <div className="grid gap-px">
                             {sources.map(source => {
-                                const amountAsOf = incomeAmountAsOf(source, asOf) ?? source.amount;
+                                const applies = applyingIds.has(source.id);
+                                const amountAsOf = applies
+                                    ? (incomeAmountAsOf(source, asOf) ?? source.amount)
+                                    : source.amount;
                                 return (
                                     <Link
                                         key={source.id}
@@ -261,10 +270,15 @@ export function IncomePageClient() {
                                         <div>
                                             <div className="text-sm text-fg">{source.name}</div>
                                             <div className="mt-0.5 font-mono text-xs tracking-normal text-fg-faint">
-                                                {source.kind}
+                                                {applies ? source.kind : tFixed('status_planned')}
                                             </div>
                                         </div>
-                                        <span className="font-mono text-sm text-success">
+                                        <span
+                                            className={
+                                                applies
+                                                    ? 'font-mono text-sm text-success'
+                                                    : 'font-mono text-sm text-fg-muted'
+                                            }>
                                             {formatMoney(amountAsOf)}
                                         </span>
                                     </Link>

@@ -34,6 +34,7 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { useMergeHouseholdAudiences } from '@/app/_lib/use-merge-household-audiences';
+import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
@@ -99,7 +100,8 @@ export function DebtForm({
         { id: Cadence.QUARTERLY, label: tDebt('cadence_quarterly') },
         { id: Cadence.YEARLY, label: tDebt('cadence_yearly') },
     ];
-    const { showToast } = useHouseholdShell();
+    const { showToast, period } = useHouseholdShell();
+    const periodDefaultDate = viewedPeriodDefaultIso(period);
     const apiError = useApiError();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
@@ -154,7 +156,7 @@ export function DebtForm({
             minimumPayment: defaultValues?.minimumPayment ?? '',
             extraPayment: defaultValues?.extraPayment ?? '',
             dueDay: defaultValues?.dueDay ?? '',
-            startedOn: defaultValues?.startedOn ?? '',
+            startedOn: defaultValues?.startedOn ?? periodDefaultDate,
             scheduleKind: defaultValues?.scheduleKind ?? DebtScheduleKind.OPEN,
             paymentCadence: defaultValues?.paymentCadence ?? Cadence.MONTHLY,
             termPayments: defaultValues?.termPayments ?? '',

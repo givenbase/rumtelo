@@ -656,7 +656,7 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
             </nav>
 
             {/* ── OVERLAYS ─────────────────────────────────────────────────── */}
-            {capabilities.showQuickAdd ? <QuickAddFab /> : null}
+            {capabilities.showQuickAdd && canMutate ? <QuickAddFab /> : null}
             <ToastPill />
             {capabilities.showOnboarding ? <OnboardingOverlay /> : null}
             {capabilities.showPlanCheckout ? <PendingPlanCheckout /> : null}

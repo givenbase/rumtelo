@@ -19,6 +19,7 @@ import { Debt } from '../../targets/debt/debt.entity';
 import { Category } from '../jar/category.entity';
 import { Jar } from '../jar/jar.entity';
 import { JarService } from '../jar/jar.service';
+import { assertPeriodOpen } from '../../month-score/period-lock.util';
 import { applyFixedCostLinkChange } from './fixed-cost-link.util';
 import { FixedCost } from './fixed-cost.entity';
 import { FixedCostSettlement } from './fixed-cost-settlement.entity';
@@ -92,6 +93,7 @@ export class FixedCostService {
         if (!isFixedCostCounting(fixedCost)) {
             throw apiBadRequest('bill_paused_no_settlement');
         }
+        await assertPeriodOpen(this.em, input.period);
 
         if (input.transactionId) {
             const transaction = await this.em.findOneOrFail(Transaction, {
@@ -167,6 +169,7 @@ export class FixedCostService {
         if (!isFixedCostCounting(fixedCost)) {
             throw apiBadRequest('bill_paused_no_settlement');
         }
+        await assertPeriodOpen(this.em, input.period);
 
         let settlement = await this.settlements.findOne({
             fixedCost: input.fixedCostId,
@@ -325,6 +328,7 @@ export class FixedCostService {
     async unlinkSettlement(id: string) {
         const settlement = await this.settlements.findOneOrFail({ id });
         await this.em.populate(settlement, ['transaction', 'fixedCost']);
+        await assertPeriodOpen(this.em, settlement.period);
         if (settlement.transaction) {
             settlement.transaction.fixedCost = null;
             settlement.transaction = null;

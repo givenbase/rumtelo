@@ -26,7 +26,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
-import { parseAmountToMinorUnits, todayIsoDate } from '@/app/_lib/money-input';
+import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
+import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
@@ -397,7 +398,7 @@ export function MoveMoneyForm({
             if (values.fromJarId === values.toJarId) {
                 throw new Error(tForm('validation.different_jars'));
             }
-            const date = todayIsoDate();
+            const date = viewedPeriodDefaultIso(period);
             const note = values.note.trim();
             const fromName = source.name;
             const toName = jars.find(j => j.id === values.toJarId)?.name ?? tTx('jar_fallback');

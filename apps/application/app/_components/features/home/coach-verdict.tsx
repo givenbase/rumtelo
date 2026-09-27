@@ -134,7 +134,7 @@ export function CoachVerdict({
                         </button>
                     </span>
 
-                    <span className="ml-auto flex items-center gap-2">
+                    <span className="ml-auto flex flex-wrap items-center justify-end gap-2">
                         <button
                             type="button"
                             className="rounded-full border border-line-strong px-4 py-2.5 font-mono text-xs font-medium tracking-wide text-fg-secondary uppercase transition-colors hover:border-accent-hover hover:text-accent"

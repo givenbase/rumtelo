@@ -15,7 +15,11 @@ import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { coachKindDisplay } from '@/app/_lib/coach-kind-label';
 import { resolveCoachMessage } from '@/app/_lib/coach-message-copy';
+import { monthScoreRecapHeadline } from '@/app/_lib/month-score-copy';
 import { isLiveData } from '@/app/_lib/preview';
+import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
+import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { MonthScoreLog } from '@/components/features/home/month-score-log';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { PageContent } from '@/components/layout/page-content';
@@ -26,17 +30,21 @@ const EMPTY_MESSAGES: never[] = [];
 
 /**
  * Smart Coach walkthrough — one fillable move, insights secondary, quiet when caught up.
+ * Quiet state offers month close (same gate as home Month score).
  */
 export function CoachPageClient() {
     const t = useTranslations('features.coach');
     const tSession = useTranslations('features.coach.session');
     const tKind = useTranslations('features.coach.verdict');
+    const tDashboard = useTranslations('pages.dashboard');
     const tRoot = useTranslations();
     const queryClient = useQueryClient();
     const searchParams = useSearchParams();
     const stepParam = searchParams.get('step');
     const { householdId } = useAuth();
     const { period, showToast } = useHouseholdShell();
+    const { canMutate } = useBoardWriteAccess();
+    const { formatMoney } = useHouseholdCurrency();
     const apiError = useApiError();
     const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);
@@ -64,6 +72,24 @@ export function CoachPageClient() {
         live
     );
 
+    const monthScoreQuery = useLiveQuery(
+        apiQuery.money.monthScore.current.queryOptions({
+            input: { householdId: householdId!, period: periodKey },
+        }),
+        {
+            householdId: householdId ?? '',
+            period: periodKey,
+            score: 0,
+            maxScore: 100,
+            daysLeft: 0,
+            isClosed: false,
+            level: 1,
+            events: [],
+            closeBlockers: { inboxCount: 0, dueBillCount: 0, dueBillNames: [] },
+        },
+        live
+    );
+
     const dismiss = useMutation({
         mutationFn: async (id: string) => {
             if (householdId) {
@@ -76,8 +102,30 @@ export function CoachPageClient() {
         onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
+    const closeMonth = useMutation({
+        mutationFn: async () => {
+            if (!householdId) throw new Error('No household');
+            return api.money.monthScore.close({ householdId, period: periodKey });
+        },
+        onSuccess: recap => {
+            void queryClient.invalidateQueries({
+                queryKey: apiQuery.money.monthScore.current.key(),
+            });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
+            const recapLine = monthScoreRecapHeadline(
+                tDashboard,
+                recap.headlineKey,
+                formatMoney,
+                recap.leftOver
+            );
+            showToast(tDashboard('month_closed_toast', { recap: recapLine }), 'success');
+        },
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
+    });
+
     const session = sessionQuery.data;
     const messages = feedQuery.data ?? EMPTY_MESSAGES;
+    const monthScore = monthScoreQuery.data;
 
     const activeStep = useMemo(() => {
         const steps = session?.steps ?? [];
@@ -98,6 +146,10 @@ export function CoachPageClient() {
                   total: Math.min(totalAvailable, 3),
               })
             : '';
+
+    const showCloseStrip = quiet && live && monthScore;
+    const canCloseMonth =
+        showCloseStrip && canMutate && monthScore !== undefined && !monthScore.isClosed;
 
     return (
         <PageContent width="narrow" className="grid gap-10">
@@ -141,6 +193,20 @@ export function CoachPageClient() {
                             queryKey: apiQuery.coach.session.key(),
                         });
                     }}
+                />
+            ) : null}
+
+            {showCloseStrip && monthScore ? (
+                <MonthScoreLog
+                    compact
+                    score={monthScore.score}
+                    daysLeft={monthScore.daysLeft}
+                    level={monthScore.level}
+                    isClosed={monthScore.isClosed}
+                    closeBlockers={monthScore.closeBlockers}
+                    canCloseMonth={canCloseMonth}
+                    closeMonthPending={closeMonth.isPending}
+                    onCloseMonth={() => closeMonth.mutate()}
                 />
             ) : null}
 

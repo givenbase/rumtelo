@@ -19,7 +19,7 @@ import type { CoachVerdictMessage, CoachRecapItem } from '@/components/features/
 import { resolveJarSubtitle } from '@/app/_lib/jar-copy';
 import { monthScoreRecapHeadline } from '@/app/_lib/month-score-copy';
 import { jarChrome } from '@/app/_lib/jar-meta';
-import { buildPeriodTravelCoachText } from '@/app/_lib/period-travel-coach-copy';
+import { buildPeriodTravelScoreNote } from '@/app/_lib/period-travel-score-note';
 import { formatPeriodTravelLabels } from '@/app/_lib/period-travel-i18n';
 import { isProductEnabled } from '@/app/_lib/launch-products';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
@@ -33,12 +33,12 @@ import { PortalWidget } from '@/components/features/home/portal-widget';
 import { MonthScoreLog } from '@/components/features/home/month-score-log';
 import { JarDrilldownTable } from '@/components/features/money/jar-drilldown-table';
 import type { JarDrilldownItem } from '@/components/features/money/jar-drilldown-parts';
+import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 export function HomeDashboardClient() {
     const t = useTranslations();
-    const tCoach = useTranslations('features.coach');
     const tDashboard = useTranslations('pages.dashboard');
     const tJars = useTranslations('features.money.jars');
     const tShell = useTranslations('pages.shell');
@@ -46,6 +46,7 @@ export function HomeDashboardClient() {
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { period, showToast, openOnboarding } = useHouseholdShell();
+    const { canMutate } = useBoardWriteAccess();
     const apiError = useApiError();
     const { formatMoney } = useHouseholdCurrency();
     const searchParams = useSearchParams();
@@ -138,6 +139,7 @@ export function HomeDashboardClient() {
         isClosed: false,
         level: 1,
         events: [],
+        closeBlockers: { inboxCount: 0, dueBillCount: 0, dueBillNames: [] },
     };
 
     const { byKey: catalogByKey } = useJarCatalog();
@@ -188,10 +190,13 @@ export function HomeDashboardClient() {
         },
         onSuccess: recap => {
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
-            showToast(
-                monthScoreRecapHeadline(tDashboard, recap.headlineKey, formatMoney, recap.leftOver),
-                'success'
+            const recapLine = monthScoreRecapHeadline(
+                tDashboard,
+                recap.headlineKey,
+                formatMoney,
+                recap.leftOver
             );
+            showToast(tDashboard('month_closed_toast', { recap: recapLine }), 'success');
         },
         onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
@@ -227,61 +232,46 @@ export function HomeDashboardClient() {
     const travel = describePeriodTravel(period);
     const travelLabels = formatPeriodTravelLabels(travel, tShell);
     const goalsAtPeriod = liveData?.goalsAtPeriod ?? [];
-    const periodTravelCoachText = stacked
-        ? buildPeriodTravelCoachText({
+    const periodScoreNote = stacked
+        ? buildPeriodTravelScoreNote({
               period: periodKey,
               locale,
               travel,
               monthsHorizon: travelMeta.monthsHorizon,
               stackedTotal: dashboard.allocatedTotal ?? 0,
               formatMoney,
-              goalsAtPeriod,
               jarHighlights: (liveData?.jars ?? []).slice(0, 2).map(jar => ({
                   name: jar.name,
                   from: baselineById.get(jar.id) ?? jar.allocated,
                   to: jar.allocated,
               })),
-              tCoach,
-              tShell,
+              tDashboard,
           })
         : null;
-    const travelCoach: CoachVerdictMessage | null = periodTravelCoachText
-        ? {
-              id: 'period-travel',
-              key: null,
-              kind: CoachKind.WIN,
-              text: periodTravelCoachText,
-              ctaLabel: t('pages.dashboard.coach.see_jars'),
-              ctaHref: '/product/money/jars',
-          }
-        : null;
-    const coach: readonly CoachVerdictMessage[] = (() => {
-        const feed =
-            live && liveData?.coach?.length
-                ? liveData.coach
-                : [
-                      {
-                          id: 'fallback',
-                          key: null,
-                          kind: CoachKind.NUDGE,
-                          text: dashboard.inboxCount
-                              ? t(
-                                    dashboard.inboxCount === 1
-                                        ? 'pages.dashboard.coach.inbox_one'
-                                        : 'pages.dashboard.coach.inbox_many',
-                                    { count: dashboard.inboxCount }
-                                )
-                              : t('pages.dashboard.coach.all_sorted'),
-                          ctaLabel: dashboard.inboxCount
-                              ? t('pages.dashboard.coach.sort_inbox')
-                              : t('pages.dashboard.coach.week_check'),
-                          ctaHref: dashboard.inboxCount
-                              ? '/product/money/transactions'
-                              : '/product/money/week-check',
-                      },
-                  ];
-        return travelCoach ? [travelCoach, ...feed] : feed;
-    })();
+    const coach: readonly CoachVerdictMessage[] =
+        live && liveData?.coach?.length
+            ? liveData.coach
+            : [
+                  {
+                      id: 'fallback',
+                      key: null,
+                      kind: CoachKind.NUDGE,
+                      text: dashboard.inboxCount
+                          ? t(
+                                dashboard.inboxCount === 1
+                                    ? 'pages.dashboard.coach.inbox_one'
+                                    : 'pages.dashboard.coach.inbox_many',
+                                { count: dashboard.inboxCount }
+                            )
+                          : t('pages.dashboard.coach.all_sorted'),
+                      ctaLabel: dashboard.inboxCount
+                          ? t('pages.dashboard.coach.sort_inbox')
+                          : t('pages.dashboard.coach.week_check'),
+                      ctaHref: dashboard.inboxCount
+                          ? '/product/money/transactions'
+                          : '/product/money/week-check',
+                  },
+              ];
 
     const horizon = travelMeta.monthsHorizon;
     const baselineTotal = dashboard.baselineAllocatedTotal;
@@ -358,6 +348,24 @@ export function HomeDashboardClient() {
             </div>
 
             <CoachVerdict messages={coach} recap={fallbackRecap} />
+
+            <MonthScoreLog
+                score={monthScore.score}
+                daysLeft={monthScore.daysLeft}
+                level={monthScore.level}
+                events={monthScore.events}
+                isClosed={liveData?.monthScore?.isClosed}
+                closeBlockers={monthScore.closeBlockers}
+                periodNote={periodScoreNote}
+                canCloseMonth={
+                    live &&
+                    canMutate &&
+                    liveData?.monthScore !== undefined &&
+                    !liveData.monthScore.isClosed
+                }
+                closeMonthPending={closeMonthScoreMutation.isPending}
+                onCloseMonth={() => closeMonthScoreMutation.mutate()}
+            />
 
             <HeroKluis
                 eyebrow={heroEyebrow}
@@ -461,27 +469,6 @@ export function HomeDashboardClient() {
                     />
                 )}
             </div>
-
-            <MonthScoreLog
-                score={monthScore.score}
-                daysLeft={monthScore.daysLeft}
-                level={monthScore.level}
-                events={monthScore.events}
-            />
-
-            {live && liveData?.monthScore && !liveData.monthScore.isClosed && (
-                <div className="flex justify-end">
-                    <button
-                        type="button"
-                        onClick={() => closeMonthScoreMutation.mutate()}
-                        disabled={closeMonthScoreMutation.isPending}
-                        className="rounded-full border border-line-strong px-5 py-2.5 font-mono text-xs font-medium tracking-wide text-fg-muted uppercase transition-colors hover:border-accent-hover hover:text-accent disabled:opacity-50">
-                        {closeMonthScoreMutation.isPending
-                            ? t('pages.dashboard.closing')
-                            : t('pages.dashboard.close_month')}
-                    </button>
-                </div>
-            )}
         </div>
     );
 }

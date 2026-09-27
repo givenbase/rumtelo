@@ -226,6 +226,11 @@ const money = {
         status_due: 'Due',
         status_skipped: 'Skipped',
         status_planned: 'Planned',
+        /** List-row quick settle (short). */
+        mark_paid_short: 'Paid',
+        mark_all_due: 'Mark all due paid',
+        mark_all_due_confirm: 'Mark {count} bills paid?',
+        toast_paid_all: 'Marked {count} bills paid',
         detail_status_taken: 'Paid this period',
         detail_status_due: 'Still due',
         detail_status_skipped: 'Skipped this period',

@@ -31,6 +31,7 @@ import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
+import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
 import { CoachTipCard } from '@/components/features/helpers';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -81,7 +82,8 @@ export function IncomeForm({
     const tIncome = useTranslations('features.money.income_form');
     const tForm = useTranslations('ui.form');
     const tBtn = useTranslations('ui.button.actions');
-    const { showToast } = useHouseholdShell();
+    const { showToast, period } = useHouseholdShell();
+    const periodDefaultDate = viewedPeriodDefaultIso(period);
     const apiError = useApiError();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
@@ -178,9 +180,9 @@ export function IncomeForm({
             amount: defaultValues?.amount ?? '',
             kind: defaultValues?.kind ?? IncomeKind.SALARY,
             cadence: defaultValues?.cadence ?? Cadence.MONTHLY,
-            startedOn: defaultValues?.startedOn ?? todayIso(),
+            startedOn: defaultValues?.startedOn ?? periodDefaultDate,
             endsOn: defaultValues?.endsOn ?? '',
-            amountEffectiveFrom: defaultValues?.amountEffectiveFrom ?? todayIso(),
+            amountEffectiveFrom: defaultValues?.amountEffectiveFrom ?? periodDefaultDate,
         },
         resolver: zodResolver(incomeFormSchema),
     });
@@ -221,10 +223,13 @@ export function IncomeForm({
                     amount: cents,
                     startedOn,
                     endsOn,
-                    amountEffectiveFrom: values.amountEffectiveFrom?.slice(0, 10) || todayIso(),
+                    amountEffectiveFrom:
+                        values.amountEffectiveFrom?.slice(0, 10) || periodDefaultDate,
                 });
             }
-            const startedOn = values.startedOn?.trim() ? values.startedOn.slice(0, 10) : todayIso();
+            const startedOn = values.startedOn?.trim()
+                ? values.startedOn.slice(0, 10)
+                : periodDefaultDate;
             return api.money.income.create({
                 householdId,
                 name,
@@ -549,15 +554,15 @@ export function IncomeForm({
                         {tIncome('amount_history')}
                     </Typography>
                     <ul className="grid gap-1.5">
-                        {periods.map(period => (
+                        {periods.map(amountPeriod => (
                             <li
-                                key={period.id}
+                                key={amountPeriod.id}
                                 className="flex items-baseline justify-between gap-3 text-sm">
                                 <span className="font-mono text-xs text-fg-muted">
-                                    {period.effectiveOn}
+                                    {amountPeriod.effectiveOn}
                                 </span>
                                 <span className="font-mono text-fg">
-                                    {formatMoney(period.amount)}
+                                    {formatMoney(amountPeriod.amount)}
                                 </span>
                             </li>
                         ))}

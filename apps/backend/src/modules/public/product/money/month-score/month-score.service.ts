@@ -1,15 +1,17 @@
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable } from '@nestjs/common';
 
+import type { MonthScoreUnlockKey } from '@rumtelo/contracts';
+
+import { apiBadRequest } from '../../../../../common/errors/api-user-error';
 import { HouseholdScopedRepository } from '../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../common/household/household.context';
 import { sum } from '../../../../../common/utils/money.util';
 import { daysInPeriod } from '../../../../../common/utils/period.util';
 import { JarService } from '../plan/jar/jar.service';
+import { closeBlockersReady, collectCloseBlockers } from './close-blockers.util';
 import { MonthScore } from './month-score.entity';
 import { MonthScoreEvent } from './month-score-event.entity';
-
-import type { MonthScoreUnlockKey } from '@rumtelo/contracts';
 
 /** Level thresholds are cumulative score. Display labels and unlock copy live in client i18n. */
 export const LEVELS: {
@@ -51,6 +53,8 @@ export class MonthScoreService {
             : [];
         const score = monthScore?.score ?? 0;
         const level = levelFor(score);
+        const isClosed = monthScore?.isClosed ?? false;
+        const closeBlockers = isClosed ? null : await collectCloseBlockers(this.em, period);
 
         return {
             householdId: currentHouseholdId(),
@@ -58,7 +62,7 @@ export class MonthScoreService {
             score,
             maxScore: monthScore?.maxScore ?? 100,
             daysLeft: Math.max(0, daysInPeriod(period) - new Date().getUTCDate()),
-            isClosed: monthScore?.isClosed ?? false,
+            isClosed,
             level: level.index,
             events: events.map(event => ({
                 id: event.id,
@@ -69,6 +73,7 @@ export class MonthScoreService {
                 text: event.text,
                 points: event.points,
             })),
+            closeBlockers,
         };
     }
 
@@ -90,6 +95,14 @@ export class MonthScoreService {
         let monthScore = await this.scores.findOne({ period });
         if (monthScore?.isClosed) {
             return this.buildRecap(period, monthScore);
+        }
+
+        const blockers = await collectCloseBlockers(this.em, period);
+        if (!closeBlockersReady(blockers)) {
+            throw apiBadRequest('month_close_incomplete', {
+                inbox: blockers.inboxCount,
+                bills: blockers.dueBillCount,
+            });
         }
 
         const recap = await this.buildRecap(period, monthScore);

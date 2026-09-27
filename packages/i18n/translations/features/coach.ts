@@ -13,7 +13,7 @@ const coach = {
         lead: 'One next move at a time. Answer here — leave only when the work is heavy.',
         quiet_title: "You're caught up for now",
         quiet_body:
-            'Nothing urgent is waiting. Open insights below when they appear, or check My week.',
+            'Nothing urgent is waiting. Close the month when you are ready, or check My week.',
         progress: '{done} of ~{total}',
         card_eyebrow: 'Next',
         answer_label: 'Your answer',

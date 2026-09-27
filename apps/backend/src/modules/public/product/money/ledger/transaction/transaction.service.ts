@@ -13,7 +13,13 @@ import { applyDebtLinkChange } from '../../targets/debt/debt-link.util';
 import {
     applyFixedCostLinkChange,
     clearFixedCostLinkOnTransaction,
+    periodFromBookedOn,
 } from '../../plan/fixed-cost/fixed-cost-link.util';
+import {
+    assertBookedOnPeriodOpen,
+    assertPeriodOpen,
+    isPeriodClosed,
+} from '../../month-score/period-lock.util';
 import { BankAccount } from '../bank-account/bank-account.entity';
 import { SortRuleService } from '../sort-rule/sort-rule.service';
 import { csvDialectMismatchesBank, parseStatement } from './statement/parse-statement';
@@ -59,6 +65,7 @@ export class TransactionService {
         if (input.jarId) {
             await assertJarAllowsOutflow(this.em, input.jarId, input.amount);
         }
+        await assertBookedOnPeriodOpen(this.em, input.bookedOn);
         const entity = this.em.create(Transaction, {
             household: currentHouseholdId(),
             account: input.accountId ? this.em.getReference(BankAccount, input.accountId) : null,
@@ -144,6 +151,13 @@ export class TransactionService {
             incoming.push({ ...row, dedupeKey: key });
         });
 
+        if (!dryRun && !accountMismatch && incoming.length) {
+            await assertOpenPeriodsForBookedOns(
+                this.em,
+                incoming.map(row => row.bookedOn)
+            );
+        }
+
         let sorted = 0;
         if (dryRun || accountMismatch) {
             // Dry-run (or blocked mismatch): count rule hits without writing.
@@ -228,7 +242,21 @@ export class TransactionService {
             incoming.push({ ...row, dedupeKey: key });
         });
 
-        const created = incoming.map(row =>
+        // Bank sync: skip rows booked in closed months (do not rewrite locked history).
+        const uniquePeriods = [...new Set(incoming.map(row => periodFromBookedOn(row.bookedOn)))];
+        const closedFlags = await Promise.all(
+            uniquePeriods.map(
+                async period => [period, await isPeriodClosed(this.em, period)] as const
+            )
+        );
+        const closedPeriods = new Set(
+            closedFlags.filter(([, closed]) => closed).map(([period]) => period)
+        );
+        const openIncoming = incoming.filter(
+            row => !closedPeriods.has(periodFromBookedOn(row.bookedOn))
+        );
+
+        const created = openIncoming.map(row =>
             this.em.create(Transaction, {
                 household: currentHouseholdId(),
                 account: this.em.getReference(BankAccount, accountId),
@@ -245,8 +273,8 @@ export class TransactionService {
         await this.em.flush();
 
         return {
-            imported: incoming.length,
-            skipped: rows.length - incoming.length,
+            imported: openIncoming.length,
+            skipped: rows.length - openIncoming.length,
             sorted,
         };
     }
@@ -326,6 +354,7 @@ export class TransactionService {
         }
         const entity = await this.transactions.findOneOrFail({ id: transactionId });
         await this.em.populate(entity, ['debt', 'fixedCost']);
+        await assertBookedOnPeriodOpen(this.em, entity.bookedOn);
         await assertJarAllowsOutflow(this.em, jarId, entity.amount);
         entity.jar = this.em.getReference(Jar, jarId);
         entity.category = categoryId ? this.em.getReference(Category, categoryId) : null;
@@ -383,6 +412,10 @@ export class TransactionService {
 
     async bulkSort(ids: string[], jarId: string, categoryId?: string | null) {
         const rows = await this.transactions.find({ id: { $in: ids } });
+        await assertOpenPeriodsForBookedOns(
+            this.em,
+            rows.map(row => row.bookedOn)
+        );
         if (rows.some(row => row.amount < 0)) {
             await assertJarAllowsOutflow(this.em, jarId, -1);
         }
@@ -409,6 +442,7 @@ export class TransactionService {
     ) {
         const entity = await this.transactions.findOneOrFail({ id });
         await this.em.populate(entity, ['debt', 'fixedCost']);
+        await assertBookedOnPeriodOpen(this.em, entity.bookedOn);
         const { categoryId, inflowKey, debtId, fixedCostId, ...fields } = patch;
 
         if (debtId && fixedCostId) {
@@ -452,6 +486,7 @@ export class TransactionService {
     async remove(id: string) {
         const entity = await this.transactions.findOneOrFail({ id });
         await this.em.populate(entity, ['debt', 'fixedCost']);
+        await assertBookedOnPeriodOpen(this.em, entity.bookedOn);
         if (entity.debt) {
             await applyDebtLinkChange(this.em, entity, null);
         }
@@ -470,6 +505,11 @@ async function assertJarAllowsOutflow(em: EntityManager, jarId: string, amount: 
             'Day-to-day spend cannot land on Financial Freedom. Move money or invest instead.'
         );
     }
+}
+
+async function assertOpenPeriodsForBookedOns(em: EntityManager, bookedOns: string[]) {
+    const periods = [...new Set(bookedOns.map(periodFromBookedOn))];
+    await Promise.all(periods.map(period => assertPeriodOpen(em, period)));
 }
 
 export function toDto(transaction: Transaction) {

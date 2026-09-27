@@ -103,7 +103,8 @@ export class HouseholdSettingsService {
             await this.em.persist(row).flush();
         }
         const planKey = await this.billing.getPlanKey(householdId);
-        return toSettingsDto(row, planKey);
+        const createdAt = await this.resolveHouseholdCreatedAt(householdId, row.onboardedAt);
+        return toSettingsDto(row, planKey, createdAt);
     }
 
     // ====================================================================
@@ -211,7 +212,22 @@ export class HouseholdSettingsService {
         }
 
         const planKey = await this.billing.getPlanKey(householdId);
-        return toSettingsDto(row, planKey);
+        const createdAt = await this.resolveHouseholdCreatedAt(householdId, row.onboardedAt);
+        return toSettingsDto(row, planKey, createdAt);
+    }
+
+    /**
+     * Period-travel floor uses household creation. Prefer AuthHousehold.createdAt;
+     * fall back to onboardedAt, then now.
+     */
+    private async resolveHouseholdCreatedAt(
+        householdId: string,
+        onboardedAt: Date | null
+    ): Promise<string> {
+        const household = await this.em.findOne(AuthHousehold, { id: householdId });
+        if (household?.createdAt) return household.createdAt.toISOString();
+        if (onboardedAt) return onboardedAt.toISOString();
+        return new Date().toISOString();
     }
 
     /**
@@ -256,7 +272,11 @@ export class HouseholdSettingsService {
     }
 }
 
-function toSettingsDto(row: HouseholdSettings, planKey: PlanKey): HouseholdSettingsDto {
+function toSettingsDto(
+    row: HouseholdSettings,
+    planKey: PlanKey,
+    createdAt: string
+): HouseholdSettingsDto {
     return {
         householdId: row.household,
         why: row.why,
@@ -268,6 +288,7 @@ function toSettingsDto(row: HouseholdSettings, planKey: PlanKey): HouseholdSetti
         features: { ...DEFAULT_FEATURE_SETTINGS, ...row.features },
         answers: row.answers ?? {},
         audienceKeys: row.audiences.getItems().map(audience => audience.key),
+        createdAt,
         onboardedAt: row.onboardedAt ? row.onboardedAt.toISOString() : null,
     };
 }

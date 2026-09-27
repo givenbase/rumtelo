@@ -34,6 +34,7 @@ import {
 
 import { audienceKeysFromFixedCostPreset } from '@/app/_lib/household-audience-from-money';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
+import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
 import { SETTINGS_HREF } from '@/app/_lib/settings-tabs';
@@ -109,7 +110,8 @@ export function FixedCostForm({
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { symbol } = useHouseholdCurrency();
-    const { showToast } = useHouseholdShell();
+    const { showToast, period } = useHouseholdShell();
+    const periodDefaultDate = viewedPeriodDefaultIso(period);
     const apiError = useApiError();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
@@ -299,7 +301,7 @@ export function FixedCostForm({
             jarId: defaultValues?.jarId ?? '',
             categoryId: defaultValues?.categoryId ?? null,
             dueDay: defaultValues?.dueDay ?? '',
-            startedOn: defaultValues?.startedOn ?? new Date().toISOString().slice(0, 10),
+            startedOn: defaultValues?.startedOn ?? periodDefaultDate,
             endsOn: defaultValues?.endsOn ?? '',
         },
         resolver: zodResolver(fixedCostFormSchema),
@@ -518,7 +520,7 @@ export function FixedCostForm({
             }
             const startedOn = values.startedOn?.trim()
                 ? values.startedOn.slice(0, 10)
-                : new Date().toISOString().slice(0, 10);
+                : periodDefaultDate;
             return api.money.fixedCosts.create({
                 householdId,
                 jarId: values.jarId,

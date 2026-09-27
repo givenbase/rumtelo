@@ -15,6 +15,7 @@ import {
     subscribeHelpersEnabled,
     writeHelpersEnabled,
 } from '@/app/_lib/feature-helpers';
+import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { usePracticePreview } from '@/components/features/shell/practice-preview';
 
 type FeatureHelpersContextValue = {
@@ -37,7 +38,9 @@ export function useHelpersEnabled(): boolean {
         getHelpersServerSnapshot
     );
     const { capabilities } = usePracticePreview();
-    return preferred && capabilities.showHelpers;
+    const { periodClosed } = useBoardWriteAccess();
+    // Closed months are a finished record — no coach nudges or helper chrome.
+    return preferred && capabilities.showHelpers && !periodClosed;
 }
 
 /**

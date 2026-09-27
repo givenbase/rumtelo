@@ -1,6 +1,6 @@
 'use client';
 
-import { apiQuery } from '@/app/_lib/api-hooks';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import {
@@ -21,13 +21,15 @@ import {
     fixedCostAppliesAsOf,
     horizonMonths,
     incomeAmountAsOf,
-    incomeSourceApplies,
     monthlyAmount,
     monthlyNetAsOf,
     sumMonthlyFixedOut,
     toPeriodKey,
 } from '@rumtelo/utils';
 
+import { api } from '@/app/_lib/api';
+import { useApiError } from '@/app/_lib/api-error-messages';
+import { apiQuery } from '@/app/_lib/api-hooks';
 import { CREATE_HREF, fixedDetailHref, updateHref } from '@/app/_lib/create-routes';
 import { bgClassToCssVar, cadenceLabel } from '@/app/_lib/jar-chrome';
 import {
@@ -40,10 +42,17 @@ import {
 import { evaluateNecessitiesPressure } from '@/app/_lib/necessities-pressure';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
+import {
+    isScheduledLater,
+    listFixedCostsForPeriodView,
+    listIncomeForPeriodView,
+} from '@/app/_lib/period-plan-list';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { isLiveData } from '@/app/_lib/preview';
+import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
+import { ConfirmActionButton } from '@/components/features/forms/confirm-action-button';
 import { CoachTipCard } from '@/components/features/helpers';
 import {
     JarBadge,
@@ -60,17 +69,59 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 type Tab = 'ERUIT' | 'ERIN';
 
-function statusChip(status: FixedCostStatus, t: (key: string) => string) {
+const META_CHIP =
+    'inline-flex items-center rounded-full border bg-raised px-2 py-0.5 font-mono text-[10px] font-medium tracking-wide uppercase';
+
+/** Right-rail status: Due is the mark-paid control; other states stay read-only. */
+function statusControl(
+    status: FixedCostStatus,
+    t: (key: string) => string,
+    opts?: {
+        canMarkPaid?: boolean;
+        pending?: boolean;
+        onMarkPaid?: () => void;
+    }
+) {
     if (status === FixedCostPeriodStatus.TAKEN) {
-        return <MetaChip className="border-success/30 text-success">{t('status_taken')}</MetaChip>;
+        return (
+            <span className={cn(META_CHIP, 'border-success/30 bg-success/5 text-success')}>
+                {t('status_taken')}
+            </span>
+        );
     }
     if (status === FixedCostPeriodStatus.DUE) {
-        return <MetaChip className="border-danger/30 text-danger">{t('status_due')}</MetaChip>;
+        if (opts?.canMarkPaid && opts.onMarkPaid) {
+            return (
+                <button
+                    type="button"
+                    data-mutate
+                    disabled={opts.pending}
+                    title={t('mark_paid_short')}
+                    aria-label={t('mark_paid_short')}
+                    onClick={() => opts.onMarkPaid?.()}
+                    className={cn(
+                        META_CHIP,
+                        'cursor-pointer border-danger/40 bg-danger/5 text-danger transition-colors',
+                        'hover:border-danger hover:bg-danger/15 active:scale-[0.98] disabled:opacity-50'
+                    )}>
+                    {t('status_due')}
+                </button>
+            );
+        }
+        return (
+            <span className={cn(META_CHIP, 'border-danger/30 bg-danger/5 text-danger')}>
+                {t('status_due')}
+            </span>
+        );
     }
     if (status === FixedCostPeriodStatus.SKIPPED) {
-        return <MetaChip className="border-line text-fg-muted">{t('status_skipped')}</MetaChip>;
+        return (
+            <span className={cn(META_CHIP, 'border-line text-fg-muted')}>
+                {t('status_skipped')}
+            </span>
+        );
     }
-    return <MetaChip>{t('status_planned')}</MetaChip>;
+    return <span className={cn(META_CHIP, 'text-fg-muted')}>{t('status_planned')}</span>;
 }
 
 /**
@@ -83,8 +134,11 @@ export function FixedCostsPageClient() {
     const t = useTranslations('features.money.fixed');
     const tChips = useTranslations('features.money.chips');
     const { householdId } = useAuth();
-    const { period } = useHouseholdShell();
+    const { period, showToast } = useHouseholdShell();
+    const { canMutate } = useBoardWriteAccess();
     const { formatMoney } = useHouseholdCurrency();
+    const apiError = useApiError();
+    const queryClient = useQueryClient();
     const appLocale = useLocale();
     const [tab, setTab] = useState<Tab>('ERUIT');
     const [jarFilter, setJarFilter] = useState<JarKey | null>(null);
@@ -166,35 +220,48 @@ export function FixedCostsPageClient() {
               )
             : [];
     const asOf = endOfPeriodIso(periodKey);
-    const fixedCosts = allFixedOut.filter(item => fixedCostAppliesAsOf(item, asOf));
-    const inactiveFixedCosts = allFixedOut.filter(item => !fixedCostAppliesAsOf(item, asOf));
+    const { applying: applyingFixedCosts, list: fixedCosts } = listFixedCostsForPeriodView(
+        allFixedOut,
+        asOf,
+        travel.direction
+    );
+    const inactiveFixedCosts = allFixedOut.filter(
+        item => !fixedCostAppliesAsOf(item, asOf) && !isScheduledLater(item, asOf)
+    );
 
     const periodTransactions = periodTxQuery.data?.items ?? [];
     const settlementById = settlementsByFixedCostId(settlementsQuery.data ?? []);
     const txById = new Map(periodTransactions.map(tx => [tx.id, tx]));
 
     const allIncome = incomeQuery.data ?? [];
+    const { applying: applyingIncome, list: incomeForView } = listIncomeForPeriodView(
+        allIncome,
+        asOf,
+        travel.direction
+    );
     const incomeSources =
-        live && allIncome.length
-            ? allIncome
-                  .filter(source => incomeSourceApplies(source, asOf))
-                  .map(source => {
-                      const amount = incomeAmountAsOf(source, asOf) ?? source.amount;
-                      return {
-                          id: source.id,
-                          label: source.name,
-                          amount,
-                          monthly: monthlyAmount(amount, source.cadence),
-                          cadence: source.cadence,
-                          kind: source.kind,
-                          dueDay: source.expectedDay,
-                      };
-                  })
+        live && incomeForView.length
+            ? incomeForView.map(source => {
+                  const applies = applyingIncome.some(row => row.id === source.id);
+                  const amount = applies
+                      ? (incomeAmountAsOf(source, asOf) ?? source.amount)
+                      : source.amount;
+                  return {
+                      id: source.id,
+                      label: source.name,
+                      amount,
+                      monthly: monthlyAmount(amount, source.cadence),
+                      cadence: source.cadence,
+                      kind: source.kind,
+                      dueDay: source.expectedDay,
+                      applies,
+                  };
+              })
             : [];
 
     const NET = monthlyNetAsOf(allIncome, asOf);
     const outTotal = sumMonthlyFixedOut(
-        fixedCosts.map(item => ({
+        applyingFixedCosts.map(item => ({
             amount: item.amount,
             cadence: item.cadence,
             direction: 'OUT' as const,
@@ -217,6 +284,9 @@ export function FixedCostsPageClient() {
                 .filter(item => item.jarKey === jar.key)
                 .slice()
                 .sort((left, right) => {
+                    const leftApplies = fixedCostAppliesAsOf(left, asOf) ? 0 : 1;
+                    const rightApplies = fixedCostAppliesAsOf(right, asOf) ? 0 : 1;
+                    if (leftApplies !== rightApplies) return leftApplies - rightApplies;
                     const leftDay = left.dueDay ?? 99;
                     const rightDay = right.dueDay ?? 99;
                     if (leftDay !== rightDay) return leftDay - rightDay;
@@ -224,17 +294,53 @@ export function FixedCostsPageClient() {
                         right.counterparty ?? right.name
                     );
                 });
-            const monthly = items.reduce((total, item) => total + item.monthly, 0);
+            const monthly = items
+                .filter(item => fixedCostAppliesAsOf(item, asOf))
+                .reduce((total, item) => total + item.monthly, 0);
             return { jar, items, monthly };
         });
 
-    const necessitiesFixedMonthly = fixedCosts
+    const necessitiesFixedMonthly = applyingFixedCosts
         .filter(item => item.jarKey === JarKey.NECESSITIES)
         .reduce((total, item) => total + item.monthly, 0);
     const necessitiesPressure = evaluateNecessitiesPressure({
         netMonthlyCents: NET,
         fixedOutMonthlyCents: outTotal,
         necessitiesFixedMonthlyCents: necessitiesFixedMonthly,
+    });
+
+    const dueIds = applyingFixedCosts
+        .filter(
+            item =>
+                fixedCostStatus(item, settlementById.get(item.id), periodKey) ===
+                FixedCostPeriodStatus.DUE
+        )
+        .map(item => item.id);
+
+    const markPaidMutation = useMutation({
+        mutationFn: async (ids: string[]) => {
+            if (!householdId) throw new Error('No household');
+            await Promise.all(
+                ids.map(fixedCostId =>
+                    api.money.fixedCosts.markPaid({
+                        householdId,
+                        fixedCostId,
+                        period: periodKey,
+                    })
+                )
+            );
+            return ids.length;
+        },
+        onSuccess: count => {
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.key() });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
+            void queryClient.invalidateQueries({
+                queryKey: apiQuery.money.monthScore.current.key(),
+            });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
+            showToast(count === 1 ? t('toast_paid') : t('toast_paid_all', { count }), 'success');
+        },
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     return (
@@ -311,13 +417,28 @@ export function FixedCostsPageClient() {
                 <div data-tour="fixed-list" className="grid gap-5">
                     <div className="grid items-start gap-5 sm:grid-cols-2">
                         <Card className="p-0">
-                            <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
+                            <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-3.5">
                                 <Typography as="span" variant="eyebrow" color="primary">
                                     ✦ {t('every_month_out')}
                                 </Typography>
-                                <span className="font-mono text-sm text-fg-secondary">
-                                    {formatMoney(outTotal)}
-                                </span>
+                                <div className="flex shrink-0 items-center gap-2.5">
+                                    {dueIds.length > 0 ? (
+                                        <ConfirmActionButton
+                                            size="sm"
+                                            variant="secondary"
+                                            label={t('mark_all_due')}
+                                            confirmLabel={t('mark_all_due_confirm', {
+                                                count: dueIds.length,
+                                            })}
+                                            pending={markPaidMutation.isPending}
+                                            disabled={!live || !canMutate}
+                                            onConfirm={() => markPaidMutation.mutate(dueIds)}
+                                        />
+                                    ) : null}
+                                    <span className="font-mono text-sm text-fg-secondary">
+                                        {formatMoney(outTotal)}
+                                    </span>
+                                </div>
                             </div>
 
                             <div className="grid">
@@ -395,11 +516,17 @@ export function FixedCostsPageClient() {
                                                           const settlement = settlementById.get(
                                                               fixedCost.id
                                                           );
-                                                          const status = fixedCostStatus(
+                                                          const applies = fixedCostAppliesAsOf(
                                                               fixedCost,
-                                                              settlement,
-                                                              period
+                                                              asOf
                                                           );
+                                                          const status = applies
+                                                              ? fixedCostStatus(
+                                                                    fixedCost,
+                                                                    settlement,
+                                                                    period
+                                                                )
+                                                              : FixedCostPeriodStatus.UPCOMING;
                                                           const linkedTx = settlement?.transactionId
                                                               ? txById.get(settlement.transactionId)
                                                               : undefined;
@@ -424,9 +551,13 @@ export function FixedCostsPageClient() {
                                                                   amount={formatMoney(
                                                                       -Math.abs(fixedCost.monthly)
                                                                   )}
+                                                                  amountClassName={
+                                                                      applies
+                                                                          ? undefined
+                                                                          : 'text-fg-muted'
+                                                                  }
                                                                   badges={
                                                                       <>
-                                                                          {statusChip(status, t)}
                                                                           {due ? (
                                                                               <MetaChip>
                                                                                   {due}
@@ -468,6 +599,18 @@ export function FixedCostsPageClient() {
                                                                   href={fixedDetailHref(
                                                                       fixedCost.id
                                                                   )}
+                                                                  status={statusControl(status, t, {
+                                                                      canMarkPaid:
+                                                                          canMutate &&
+                                                                          live &&
+                                                                          applies,
+                                                                      pending:
+                                                                          markPaidMutation.isPending,
+                                                                      onMarkPaid: () =>
+                                                                          markPaidMutation.mutate([
+                                                                              fixedCost.id,
+                                                                          ]),
+                                                                  })}
                                                               />
                                                           );
                                                       })
@@ -519,7 +662,7 @@ export function FixedCostsPageClient() {
                         </CoachTipCard>
                     </div>
 
-                    {inactiveFixedCosts.length > 0 ? (
+                    {travel.direction === 'current' && inactiveFixedCosts.length > 0 ? (
                         <Card className="p-0">
                             <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
                                 <Typography as="span" variant="eyebrow" color="muted">
@@ -618,7 +761,9 @@ export function FixedCostsPageClient() {
                                             })
                                         )}
                                         amount={formatMoney(source.monthly)}
-                                        amountClassName="text-success"
+                                        amountClassName={
+                                            source.applies ? 'text-success' : 'text-fg-muted'
+                                        }
                                         badges={
                                             <>
                                                 {due ? <MetaChip>{due}</MetaChip> : null}
@@ -638,6 +783,11 @@ export function FixedCostsPageClient() {
                                             source.id
                                                 ? updateHref('income', source.id)
                                                 : CREATE_HREF.income
+                                        }
+                                        status={
+                                            source.applies
+                                                ? null
+                                                : statusControl(FixedCostPeriodStatus.UPCOMING, t)
                                         }
                                     />
                                 );
