@@ -8,7 +8,9 @@ import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { AccentCard, Button, Card, EmptyState, Eyebrow, Typography } from '@rumtelo/ui';
 import {
+    incomeAmountAsOf,
     incomeDelta,
+    incomeSourceApplies,
     monthlyNetAsOf,
     describePeriodTravel,
     endOfPeriodIso,
@@ -70,10 +72,9 @@ export function IncomePageClient() {
     );
 
     const allSources = incomeQuery.data ?? [];
-    const sources = allSources.filter(source => source.isActive);
-    const netNow = monthlyNetAsOf(sources, todayIso());
-    const netAsOf = monthlyNetAsOf(sources, endOfPeriodIso(periodKey));
-    const monthlyNet = travel.direction === 'past' ? netAsOf : netNow;
+    const asOf = traveling ? endOfPeriodIso(periodKey) : todayIso();
+    const sources = allSources.filter(source => incomeSourceApplies(source, asOf));
+    const monthlyNet = monthlyNetAsOf(allSources, asOf);
     const spanNet = traveling ? monthlyNet * horizon : monthlyNet;
     const jars = jarsQuery.data ?? [];
 
@@ -107,16 +108,16 @@ export function IncomePageClient() {
 
     const gap = target - monthlyNet;
 
-    const newestEffective = sources
+    const newestEffective = allSources
         .flatMap(source => source.periods ?? [])
         .map(amountPeriod => amountPeriod.effectiveOn.slice(0, 10))
         .sort()
         .at(-1);
     const delta =
-        newestEffective !== undefined
+        newestEffective !== undefined && !traveling
             ? incomeDelta(
-                  monthlyNetAsOf(sources, dayBefore(newestEffective)),
-                  monthlyNetAsOf(sources, todayIso())
+                  monthlyNetAsOf(allSources, dayBefore(newestEffective)),
+                  monthlyNetAsOf(allSources, todayIso())
               )
             : null;
 
@@ -250,22 +251,25 @@ export function IncomePageClient() {
                         />
                     ) : (
                         <div className="grid gap-px">
-                            {sources.map(source => (
-                                <Link
-                                    key={source.id}
-                                    href={updateHref('income', source.id)}
-                                    className="flex w-full items-center justify-between gap-3 border-b border-line px-4 py-2.5 text-left last:border-b-0 hover:bg-raised sm:px-5 sm:py-3">
-                                    <div>
-                                        <div className="text-sm text-fg">{source.name}</div>
-                                        <div className="mt-0.5 font-mono text-xs tracking-normal text-fg-faint">
-                                            {source.kind}
+                            {sources.map(source => {
+                                const amountAsOf = incomeAmountAsOf(source, asOf) ?? source.amount;
+                                return (
+                                    <Link
+                                        key={source.id}
+                                        href={updateHref('income', source.id)}
+                                        className="flex w-full items-center justify-between gap-3 border-b border-line px-4 py-2.5 text-left last:border-b-0 hover:bg-raised sm:px-5 sm:py-3">
+                                        <div>
+                                            <div className="text-sm text-fg">{source.name}</div>
+                                            <div className="mt-0.5 font-mono text-xs tracking-normal text-fg-faint">
+                                                {source.kind}
+                                            </div>
                                         </div>
-                                    </div>
-                                    <span className="font-mono text-sm text-success">
-                                        {formatMoney(source.amount)}
-                                    </span>
-                                </Link>
-                            ))}
+                                        <span className="font-mono text-sm text-success">
+                                            {formatMoney(amountAsOf)}
+                                        </span>
+                                    </Link>
+                                );
+                            })}
                         </div>
                     )}
                 </Card>

@@ -23,6 +23,8 @@ export function IncomeUpdatePage({ id, embedded = false }: { id: string; embedde
             amount: minorUnitsToAmountInput(row.amount),
             kind: row.kind,
             cadence: row.cadence,
+            startedOn: row.startedOn ?? '',
+            endsOn: row.endsOn ?? '',
         }),
     });
 

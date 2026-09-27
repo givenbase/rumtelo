@@ -33,6 +33,8 @@ const message = {
             goal_no_jar_spend: 'Goal has no jar to spend from',
             payment_amount_positive: 'Payment amount must be positive',
             bill_paused_no_settlement: 'Paused or ended bills cannot take new settlements.',
+            income_kind_cadence_locked:
+                'Type and frequency cannot change on an existing income. End it and create a new one.',
             bill_link_outflow: 'Link an outflow to settle an outgoing bill.',
             bill_link_inflow: 'Link an inflow to settle a recurring credit.',
             iban_already_linked: 'This IBAN is already linked to an account.',

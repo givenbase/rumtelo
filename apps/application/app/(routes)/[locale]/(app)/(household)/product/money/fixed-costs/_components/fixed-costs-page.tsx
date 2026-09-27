@@ -17,9 +17,14 @@ import { Card, EmptyState, Typography } from '@rumtelo/ui';
 import {
     cn,
     describePeriodTravel,
-    fixedOutNetSummary,
+    endOfPeriodIso,
+    fixedCostAppliesAsOf,
     horizonMonths,
+    incomeAmountAsOf,
+    incomeSourceApplies,
     monthlyAmount,
+    monthlyNetAsOf,
+    sumMonthlyFixedOut,
     toPeriodKey,
 } from '@rumtelo/utils';
 
@@ -28,7 +33,6 @@ import { bgClassToCssVar, cadenceLabel } from '@/app/_lib/jar-chrome';
 import {
     fixedCostLifecycle,
     fixedCostStatus,
-    isFixedCostCounting,
     lifecycleLabel,
     settlementsByFixedCostId,
     type FixedCostStatus,
@@ -161,42 +165,47 @@ export function FixedCostsPageClient() {
                       }))
               )
             : [];
-    const fixedCosts = allFixedOut.filter(isFixedCostCounting);
-    const inactiveFixedCosts = allFixedOut.filter(item => !isFixedCostCounting(item));
+    const asOf = endOfPeriodIso(periodKey);
+    const fixedCosts = allFixedOut.filter(item => fixedCostAppliesAsOf(item, asOf));
+    const inactiveFixedCosts = allFixedOut.filter(item => !fixedCostAppliesAsOf(item, asOf));
 
     const periodTransactions = periodTxQuery.data?.items ?? [];
     const settlementById = settlementsByFixedCostId(settlementsQuery.data ?? []);
     const txById = new Map(periodTransactions.map(tx => [tx.id, tx]));
 
+    const allIncome = incomeQuery.data ?? [];
     const incomeSources =
-        live && incomeQuery.data?.length
-            ? incomeQuery.data
-                  .filter(source => source.isActive)
-                  .map(source => ({
-                      id: source.id,
-                      label: source.name,
-                      amount: source.amount,
-                      monthly: monthlyAmount(source.amount, source.cadence),
-                      cadence: source.cadence,
-                      kind: source.kind,
-                      dueDay: source.expectedDay,
-                  }))
+        live && allIncome.length
+            ? allIncome
+                  .filter(source => incomeSourceApplies(source, asOf))
+                  .map(source => {
+                      const amount = incomeAmountAsOf(source, asOf) ?? source.amount;
+                      return {
+                          id: source.id,
+                          label: source.name,
+                          amount,
+                          monthly: monthlyAmount(amount, source.cadence),
+                          cadence: source.cadence,
+                          kind: source.kind,
+                          dueDay: source.expectedDay,
+                      };
+                  })
             : [];
 
-    const {
-        net: NET,
-        outTotal,
-        leftover,
-        commitmentRatio,
-    } = fixedOutNetSummary(
-        incomeSources.map(source => ({ amount: source.amount, cadence: source.cadence })),
+    const NET = monthlyNetAsOf(allIncome, asOf);
+    const outTotal = sumMonthlyFixedOut(
         fixedCosts.map(item => ({
             amount: item.amount,
             cadence: item.cadence,
             direction: 'OUT' as const,
+            isActive: item.isActive,
+            startedOn: item.startedOn,
+            endsOn: item.endsOn,
         })),
-        { activeOnly: false }
+        { asOf, activeOnly: false }
     );
+    const leftover = NET - outTotal;
+    const commitmentRatio = NET > 0 ? Math.round((outTotal / NET) * 100) : 0;
     const visibleFixedCosts = jarFilter
         ? fixedCosts.filter(fixedCost => fixedCost.jarKey === jarFilter)
         : fixedCosts;

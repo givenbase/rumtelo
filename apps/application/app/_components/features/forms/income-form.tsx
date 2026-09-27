@@ -1,11 +1,12 @@
 'use client';
 
+import Link from 'next/link';
 import { api } from '@/app/_lib/api';
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { useLiveQuery } from '@rumtelo/hooks';
 import {
@@ -25,10 +26,12 @@ import { Cadence, IncomeKind } from '@rumtelo/contracts';
 
 import { useTranslations } from '@rumtelo/i18n';
 
+import { CREATE_HREF } from '@/app/_lib/create-routes';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
+import { CoachTipCard } from '@/components/features/helpers';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
@@ -112,6 +115,48 @@ export function IncomeForm({
         [tIncome]
     );
 
+    const kindLabel = useCallback(
+        (kind: IncomeKind): string => {
+            switch (kind) {
+                case IncomeKind.SALARY:
+                    return tIncome('kind_salary');
+                case IncomeKind.FREELANCE:
+                    return tIncome('kind_freelance');
+                case IncomeKind.BENEFIT:
+                    return tIncome('kind_benefit');
+                case IncomeKind.RENTAL:
+                    return tIncome('kind_rental');
+                case IncomeKind.DIVIDEND:
+                    return tIncome('kind_dividend');
+                case IncomeKind.OTHER:
+                    return tIncome('kind_other');
+                default:
+                    return kind;
+            }
+        },
+        [tIncome]
+    );
+
+    const cadenceLabel = useCallback(
+        (cadence: Cadence): string => {
+            switch (cadence) {
+                case Cadence.WEEKLY:
+                    return tIncome('cadence_weekly');
+                case Cadence.MONTHLY:
+                    return tIncome('cadence_monthly');
+                case Cadence.QUARTERLY:
+                    return tIncome('cadence_quarterly');
+                case Cadence.YEARLY:
+                    return tIncome('cadence_yearly');
+                case Cadence.ONCE:
+                    return tIncome('cadence_once');
+                default:
+                    return cadence;
+            }
+        },
+        [tIncome]
+    );
+
     const presetOptions = useMemo(
         () =>
             (presetsQuery.data ?? []).map(
@@ -133,6 +178,8 @@ export function IncomeForm({
             amount: defaultValues?.amount ?? '',
             kind: defaultValues?.kind ?? IncomeKind.SALARY,
             cadence: defaultValues?.cadence ?? Cadence.MONTHLY,
+            startedOn: defaultValues?.startedOn ?? todayIso(),
+            endsOn: defaultValues?.endsOn ?? '',
             amountEffectiveFrom: defaultValues?.amountEffectiveFrom ?? todayIso(),
         },
         resolver: zodResolver(incomeFormSchema),
@@ -148,23 +195,36 @@ export function IncomeForm({
         }
     );
 
+    const invalidateIncome = () => {
+        void queryClient.invalidateQueries({ queryKey: apiQuery.money.income.list.key() });
+        void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
+        void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
+        void queryClient.invalidateQueries({ queryKey: apiQuery.money.goals.list.key() });
+        void queryClient.invalidateQueries({
+            queryKey: apiQuery.money.goals.projections.key(),
+        });
+    };
+
     const saveMutation = useMutation({
         mutationFn: async (values: IncomeFormValues) => {
             if (!householdId) throw new Error('No household');
             const cents = parseAmountToMinorUnits(values.amount);
             if (cents === null || cents <= 0) throw new Error('Invalid amount');
             const name = values.name.trim();
+            const endsOn = values.endsOn?.trim() ? values.endsOn.slice(0, 10) : null;
             if (mode === 'edit' && entityId) {
+                const startedOn = values.startedOn?.trim() ? values.startedOn.slice(0, 10) : null;
                 return api.money.income.update({
                     id: entityId,
                     householdId,
                     name,
                     amount: cents,
-                    kind: values.kind,
-                    cadence: values.cadence,
+                    startedOn,
+                    endsOn,
                     amountEffectiveFrom: values.amountEffectiveFrom?.slice(0, 10) || todayIso(),
                 });
             }
+            const startedOn = values.startedOn?.trim() ? values.startedOn.slice(0, 10) : todayIso();
             return api.money.income.create({
                 householdId,
                 name,
@@ -173,17 +233,12 @@ export function IncomeForm({
                 cadence: values.cadence,
                 expectedDay: null,
                 isActive: true,
-                startedOn: null,
+                startedOn,
+                endsOn,
             });
         },
         onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: apiQuery.money.income.list.key() });
-            void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
-            void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
-            void queryClient.invalidateQueries({ queryKey: apiQuery.money.goals.list.key() });
-            void queryClient.invalidateQueries({
-                queryKey: apiQuery.money.goals.projections.key(),
-            });
+            invalidateIncome();
             showToast(
                 mode === 'edit'
                     ? t('common.message.success.updated', {
@@ -197,16 +252,31 @@ export function IncomeForm({
         onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
+    const endMutation = useMutation({
+        mutationFn: async () => {
+            if (!householdId || !entityId) throw new Error('No household');
+            return api.money.income.update({
+                id: entityId,
+                householdId,
+                isActive: false,
+                endsOn: todayIso(),
+            });
+        },
+        onSuccess: () => {
+            invalidateIncome();
+            showToast(tIncome('toast_ended'), 'success');
+            dismiss();
+        },
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
+    });
+
     const removeMutation = useMutation({
         mutationFn: async () => {
             if (!householdId || !entityId) throw new Error('No household');
             return api.money.income.remove({ householdId, id: entityId });
         },
         onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: apiQuery.money.income.list.key() });
-            void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
-            void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
-            void queryClient.invalidateQueries({ queryKey: apiQuery.money.goals.list.key() });
+            invalidateIncome();
             showToast(t('common.message.entity.income_deleted'), 'success');
             dismiss();
         },
@@ -221,7 +291,14 @@ export function IncomeForm({
         await saveMutation.mutateAsync(values);
     }
 
-    const busy = form.formState.isSubmitting || saveMutation.isPending || removeMutation.isPending;
+    const busy =
+        form.formState.isSubmitting ||
+        saveMutation.isPending ||
+        removeMutation.isPending ||
+        endMutation.isPending;
+
+    const lockedKind = useWatch({ control: form.control, name: 'kind' });
+    const lockedCadence = useWatch({ control: form.control, name: 'cadence' });
 
     return (
         <FormCreateEditShell
@@ -239,18 +316,41 @@ export function IncomeForm({
                               : tIncome('save')}
                     </Button>
                     {mode === 'edit' && entityId ? (
-                        <ConfirmActionButton
-                            variant="ghost"
-                            className="w-full text-danger hover:bg-danger/10 hover:text-danger"
-                            disabled={busy}
-                            pending={removeMutation.isPending}
-                            label={tBtn('delete')}
-                            confirmLabel={tForm('confirm_delete')}
-                            onConfirm={() => void removeMutation.mutateAsync()}
-                        />
+                        <>
+                            <ConfirmActionButton
+                                variant="ghost"
+                                className="w-full"
+                                disabled={busy}
+                                pending={endMutation.isPending}
+                                label={tIncome('end_income')}
+                                confirmLabel={tIncome('confirm_end')}
+                                onConfirm={() => void endMutation.mutateAsync()}
+                            />
+                            <ConfirmActionButton
+                                variant="ghost"
+                                className="w-full text-danger hover:bg-danger/10 hover:text-danger"
+                                disabled={busy}
+                                pending={removeMutation.isPending}
+                                label={tBtn('delete')}
+                                confirmLabel={tForm('confirm_delete')}
+                                onConfirm={() => void removeMutation.mutateAsync()}
+                            />
+                        </>
                     ) : null}
                 </div>
             }>
+            {mode === 'edit' ? (
+                <CoachTipCard
+                    title={tIncome('raise_tip_title')}
+                    meta={
+                        <Link href={CREATE_HREF.income} className="hover:text-accent">
+                            {tIncome('raise_tip_link')}
+                        </Link>
+                    }>
+                    {tIncome('raise_tip_body')}
+                </CoachTipCard>
+            ) : null}
+
             <FormField
                 control={form.control}
                 name="name"
@@ -276,7 +376,6 @@ export function IncomeForm({
                                             preset => preset.key === opt.key
                                         );
                                         if (!full) return;
-                                        // OTHER keeps key in the field; kind/cadence become OTHER defaults.
                                         form.setValue('kind', full.kind);
                                         form.setValue('cadence', full.cadence);
                                     }}
@@ -334,24 +433,16 @@ export function IncomeForm({
 
             <FormField
                 control={form.control}
-                name="cadence"
+                name="startedOn"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>{tIncome('how_often')}</FormLabel>
+                        <FormLabel>{tIncome('start_date')}</FormLabel>
                         <FormControl>
-                            <select
-                                className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
-                                {...field}>
-                                <option value={Cadence.WEEKLY}>{tIncome('cadence_weekly')}</option>
-                                <option value={Cadence.MONTHLY}>
-                                    {tIncome('cadence_monthly')}
-                                </option>
-                                <option value={Cadence.QUARTERLY}>
-                                    {tIncome('cadence_quarterly')}
-                                </option>
-                                <option value={Cadence.YEARLY}>{tIncome('cadence_yearly')}</option>
-                                <option value={Cadence.ONCE}>{tIncome('cadence_once')}</option>
-                            </select>
+                            <FormInput
+                                type="date"
+                                pickerAriaLabel={tForm('aria.open_date_picker')}
+                                {...field}
+                            />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -360,26 +451,97 @@ export function IncomeForm({
 
             <FormField
                 control={form.control}
-                name="kind"
+                name="endsOn"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>{tIncome('type')}</FormLabel>
+                        <FormLabel>{tIncome('end_date')}</FormLabel>
                         <FormControl>
-                            <select
-                                className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
-                                {...field}>
-                                <option value="SALARY">{tIncome('kind_salary')}</option>
-                                <option value="FREELANCE">{tIncome('kind_freelance')}</option>
-                                <option value="BENEFIT">{tIncome('kind_benefit')}</option>
-                                <option value="RENTAL">{tIncome('kind_rental')}</option>
-                                <option value="DIVIDEND">{tIncome('kind_dividend')}</option>
-                                <option value="OTHER">{tIncome('kind_other')}</option>
-                            </select>
+                            <FormInput
+                                type="date"
+                                pickerAriaLabel={tForm('aria.open_date_picker')}
+                                {...field}
+                            />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
                 )}
             />
+
+            {mode === 'create' ? (
+                <>
+                    <FormField
+                        control={form.control}
+                        name="cadence"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>{tIncome('how_often')}</FormLabel>
+                                <FormControl>
+                                    <select
+                                        className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
+                                        {...field}>
+                                        <option value={Cadence.WEEKLY}>
+                                            {tIncome('cadence_weekly')}
+                                        </option>
+                                        <option value={Cadence.MONTHLY}>
+                                            {tIncome('cadence_monthly')}
+                                        </option>
+                                        <option value={Cadence.QUARTERLY}>
+                                            {tIncome('cadence_quarterly')}
+                                        </option>
+                                        <option value={Cadence.YEARLY}>
+                                            {tIncome('cadence_yearly')}
+                                        </option>
+                                        <option value={Cadence.ONCE}>
+                                            {tIncome('cadence_once')}
+                                        </option>
+                                    </select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="kind"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>{tIncome('type')}</FormLabel>
+                                <FormControl>
+                                    <select
+                                        className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
+                                        {...field}>
+                                        <option value="SALARY">{tIncome('kind_salary')}</option>
+                                        <option value="FREELANCE">
+                                            {tIncome('kind_freelance')}
+                                        </option>
+                                        <option value="BENEFIT">{tIncome('kind_benefit')}</option>
+                                        <option value="RENTAL">{tIncome('kind_rental')}</option>
+                                        <option value="DIVIDEND">{tIncome('kind_dividend')}</option>
+                                        <option value="OTHER">{tIncome('kind_other')}</option>
+                                    </select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </>
+            ) : (
+                <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="grid gap-1">
+                        <Typography as="p" variant="eyebrow" color="muted">
+                            {tIncome('how_often')}
+                        </Typography>
+                        <p className="text-sm text-fg">{cadenceLabel(lockedCadence)}</p>
+                    </div>
+                    <div className="grid gap-1">
+                        <Typography as="p" variant="eyebrow" color="muted">
+                            {tIncome('type')}
+                        </Typography>
+                        <p className="text-sm text-fg">{kindLabel(lockedKind)}</p>
+                    </div>
+                </div>
+            )}
 
             {mode === 'edit' && periods.length > 0 ? (
                 <div className="grid gap-2 border-t border-line pt-4">

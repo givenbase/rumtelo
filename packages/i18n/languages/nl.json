@@ -59,6 +59,7 @@
                     "goal_no_jar_spend": "Het doel heeft geen pot om uit te geven",
                     "payment_amount_positive": "Het betalingsbedrag moet positief zijn",
                     "bill_paused_no_settlement": "Gepauzeerde of beëindigde vaste lasten kunnen geen nieuwe afrekeningen krijgen.",
+                    "income_kind_cadence_locked": "Type en frequentie kun je niet wijzigen op bestaande inkomsten. Beëindig ze en maak nieuwe aan.",
                     "bill_link_outflow": "Koppel een uitgave om een uitgaande vaste last af te rekenen.",
                     "bill_link_inflow": "Koppel een ontvangst om een terugkerend tegoed te verrekenen.",
                     "iban_already_linked": "Dit IBAN-nummer is al aan een rekening gekoppeld.",
@@ -2076,6 +2077,14 @@
                 "amount": "Bedrag ({symbol})",
                 "amount_new": "Nieuw bedrag ({symbol})",
                 "amount_history": "Overzicht van bedragen",
+                "start_date": "Startdatum",
+                "end_date": "Einddatum (optioneel)",
+                "raise_tip_title": "Loonsverhoging of nieuwe baan?",
+                "raise_tip_body": "Beëindig deze inkomsten en voeg nieuwe toe met het nieuwe bedrag en de startdatum. Zo blijft de geschiedenis kloppen als je door de maanden bladert.",
+                "raise_tip_link": "Nieuwe inkomsten toevoegen →",
+                "end_income": "Inkomsten beëindigen",
+                "confirm_end": "Klik opnieuw om te beëindigen",
+                "toast_ended": "Inkomsten beëindigd",
                 "name_placeholder": "bijv. salaris",
                 "free_text_placeholder": "Vertel eens waar het vandaan komt…",
                 "kind_salary": "Salaris",
@@ -2238,7 +2247,9 @@
                 "give_placeholder": "bijv. Giro555, je kerk, KWF",
                 "payee_name": "Naam van de begunstigde",
                 "payee_placeholder": "bijv. verhuurder, verzekeraar",
-                "due_day": "Vervaldag (dag van de maand)"
+                "due_day": "Vervaldag (dag van de maand)",
+                "start_date": "Startdatum",
+                "end_date": "Einddatum (optioneel)"
             },
             "debt": {
                 "eyebrow": "SCHULD",
@@ -2778,11 +2789,11 @@
                     "sections": {
                         "what_for": {
                             "heading": "Waar deze pagina voor dient",
-                            "body": "Houd elke inkomstenbron bij en bekijk het maandelijkse netto-inkomen van het huishouden. Als je een bedrag aanpast, blijft de geschiedenis behouden — loonsverhogingen en -verlagingen worden aan specifieke periodes gekoppeld, zodat je kunt zien hoe het netto-inkomen in de loop van de tijd is veranderd."
+                            "body": "Houd elke inkomstenbron bij met een start- (en optionele eind)datum, en zie het maandelijkse netto-inkomen van het huishouden voor de maand die je bekijkt. Ga terug naar vóór de start en de bron verdwijnt; beëindig hem wanneer hij stopt."
                         },
                         "now_target_gap": {
                             "heading": "Nu: Doel, Tekort",
-                            "body": "Dit is je huidige maandelijkse netto-inkomen (alle actieve bronnen). Het streefbedrag is gebaseerd op je hoogste actieve ‘Verdien’-doel (het maandelijkse netto-inkomen dat je wilt behalen). Als je nog geen ‘Verdien’-doel hebt, wordt er een voorbeeldstreefbedrag weergegeven. Het verschil geeft aan met hoeveel je netto-inkomen nog moet stijgen."
+                            "body": "Nu is je maandelijkse netto voor de bekeken periode (bronnen die dan gelden). Het streefbedrag komt van je hoogste actieve Verdien-doel. Heb je nog geen Verdien-doel, dan zie je een voorbeelddoel. Het tekort is hoeveel netto er nog bij moet."
                         },
                         "simulator": {
                             "heading": "Wat een loonsverhoging betekent",
@@ -2790,17 +2801,17 @@
                         },
                         "sources": {
                             "heading": "Inkomstenbronnen",
-                            "body": "Voer hier je salaris, freelance-inkomsten, secundaire arbeidsvoorwaarden en neveninkomsten in. Tik op een rij om het bedrag (met ingangsdatum), de frequentie of het type aan te passen."
+                            "body": "Voer hier salaris, freelance, uitkeringen en neveninkomsten in. Bij een loonsverhoging of nieuwe baan: beëindig de oude bron en maak een nieuwe aan — type en frequentie blijven vergrendeld bij bewerken."
                         },
                         "earning_methods": {
                             "heading": "Manieren om geld te verdienen (De Coach)",
-                            "body": "Kostenbesparingen hebben een ondergrens; inkomsten verhogen niet. Typische manieren: ruil tijd of vaardigheden in (freelancewerk, salarisverhoging), bouw een klein systeem op (productgebaseerd aanbod) of vergroot later je inkomsten uit vermogen. Kies één methode, stel een inkomsten doel in voor het gewenste nettobedrag, en zorg vervolgens voor een inkomstenbron zodra het geld binnenkomt — de prognose voor het tekort en het spaarpotje wordt automatisch bijgewerkt."
+                            "body": "Kostenbesparingen hebben een ondergrens; inkomsten verhogen niet. Typische manieren: ruil tijd of vaardigheden in (freelancewerk, salarisverhoging), bouw een klein systeem op, of vergroot later inkomsten uit vermogen. Kies één methode, stel een Verdien-doel in, en beëindig de oude bron en voeg het nieuwe bedrag toe zodra het geld binnenkomt."
                         }
                     },
                     "steps": {
                         "summary": {
                             "title": "Nu · Doel · Tekort",
-                            "content": "Je huidige maandelijkse netto-inkomen, het Verdien-doel en hoeveel er nog nodig is om het tekort weg te werken."
+                            "content": "Je maandelijkse netto voor deze periode, het Verdien-doel en hoeveel er nog nodig is om het tekort weg te werken."
                         },
                         "simulator": {
                             "title": "Wat een loonsverhoging inhoudt",
@@ -2808,7 +2819,7 @@
                         },
                         "sources": {
                             "title": "Inkomstenbronnen",
-                            "content": "Je inkomstenbronnen. Tik op een rij om het bedrag aan te passen (met ingangsdatum) of voeg een nieuwe toe via + Inkomsten toevoegen."
+                            "content": "Je inkomstenbronnen voor deze periode. Bij een loonsverhoging: beëindig de oude en voeg nieuwe toe met + Inkomsten toevoegen en de nieuwe startdatum."
                         }
                     }
                 },

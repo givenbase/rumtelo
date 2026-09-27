@@ -48,6 +48,10 @@ export class FixedCost extends HouseholdEntity {
     @Property({ type: 'smallint', nullable: true })
     dueDay: number | null = null;
 
+    /** First day this bill applies; null = unknown. */
+    @Property({ type: 'date', nullable: true })
+    startedOn: string | null = null;
+
     /** Last charge date for fixed-term contracts; null = open-ended. */
     @Property({ type: 'date', nullable: true })
     endsOn: string | null = null;

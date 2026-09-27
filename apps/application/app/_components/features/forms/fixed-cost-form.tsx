@@ -299,6 +299,8 @@ export function FixedCostForm({
             jarId: defaultValues?.jarId ?? '',
             categoryId: defaultValues?.categoryId ?? null,
             dueDay: defaultValues?.dueDay ?? '',
+            startedOn: defaultValues?.startedOn ?? new Date().toISOString().slice(0, 10),
+            endsOn: defaultValues?.endsOn ?? '',
         },
         resolver: zodResolver(fixedCostFormSchema),
     });
@@ -498,7 +500,9 @@ export function FixedCostForm({
             }
             setPendingCategoryTemplateKey(null);
 
+            const endsOn = values.endsOn?.trim() ? values.endsOn.slice(0, 10) : null;
             if (mode === 'edit' && entityId) {
+                const startedOn = values.startedOn?.trim() ? values.startedOn.slice(0, 10) : null;
                 return api.money.fixedCosts.update({
                     id: entityId,
                     householdId,
@@ -508,8 +512,13 @@ export function FixedCostForm({
                     jarId: values.jarId,
                     categoryId,
                     dueDay,
+                    startedOn,
+                    endsOn,
                 });
             }
+            const startedOn = values.startedOn?.trim()
+                ? values.startedOn.slice(0, 10)
+                : new Date().toISOString().slice(0, 10);
             return api.money.fixedCosts.create({
                 householdId,
                 jarId: values.jarId,
@@ -523,7 +532,8 @@ export function FixedCostForm({
                 dueDay,
                 direction: FlowDirection.OUT,
                 isActive: true,
-                endsOn: null,
+                startedOn,
+                endsOn,
                 note: null,
             });
         },
@@ -1053,6 +1063,42 @@ export function FixedCostForm({
                         <FormLabel>{tFixed('due_day')}</FormLabel>
                         <FormControl>
                             <FormInput type="number" min={1} max={31} placeholder="1" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="startedOn"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>{tFixed('start_date')}</FormLabel>
+                        <FormControl>
+                            <FormInput
+                                type="date"
+                                pickerAriaLabel={tForm('aria.open_date_picker')}
+                                {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="endsOn"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>{tFixed('end_date')}</FormLabel>
+                        <FormControl>
+                            <FormInput
+                                type="date"
+                                pickerAriaLabel={tForm('aria.open_date_picker')}
+                                {...field}
+                            />
                         </FormControl>
                         <FormMessage />
                     </FormItem>

@@ -321,6 +321,7 @@ export class HouseholdService {
                 amount: input.monthlyNetIncome,
                 isActive: true,
                 startedOn,
+                endsOn: null,
             } as never);
             this.em.create(IncomeAmountPeriod, {
                 household: org.id,

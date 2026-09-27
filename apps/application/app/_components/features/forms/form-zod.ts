@@ -56,6 +56,8 @@ export function createIncomeFormSchema(msg: FormT) {
         amount: positiveMoneyInput(msg),
         kind: z.enum(IncomeKind),
         cadence: z.enum(Cadence),
+        startedOn: z.string().optional(),
+        endsOn: z.string().optional(),
         amountEffectiveFrom: z.string().optional(),
     });
 }
@@ -70,6 +72,8 @@ export function createFixedCostFormSchema(msg: FormT) {
         jarId: z.string().min(1, msg('validation.choose_jar')),
         categoryId: z.string().nullable().optional(),
         dueDay: z.string().optional(),
+        startedOn: z.string().optional(),
+        endsOn: z.string().optional(),
     });
 }
 

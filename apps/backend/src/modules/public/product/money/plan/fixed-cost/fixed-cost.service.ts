@@ -51,6 +51,7 @@ export class FixedCostService {
         dueDay?: number | null;
         direction?: 'IN' | 'OUT';
         isActive?: boolean;
+        startedOn?: string | null;
         endsOn?: string | null;
         note?: string | null;
     }) {
@@ -67,6 +68,7 @@ export class FixedCostService {
             dueDay: input.dueDay ?? null,
             direction: (input.direction as FlowDirection) ?? FlowDirection.OUT,
             isActive: input.isActive ?? true,
+            startedOn: input.startedOn ?? null,
             endsOn: input.endsOn ?? null,
             note: input.note ?? null,
         } as never);
@@ -238,8 +240,10 @@ export class FixedCostService {
             jarId,
             jarKey: group.jarKey,
             jarName: group.jarName,
-            /** Monthly-normalised active OUT only — matches jar committedOut. */
-            total: sumMonthlyFixedOut(group.items, { activeOnly: true }),
+            /** Monthly-normalised OUT as-of today — matches jar committedOut. */
+            total: sumMonthlyFixedOut(group.items, {
+                asOf: new Date().toISOString().slice(0, 10),
+            }),
             items: group.items,
         }));
     }
@@ -272,6 +276,7 @@ export class FixedCostService {
             dueDay: number | null;
             direction: 'IN' | 'OUT';
             isActive: boolean;
+            startedOn: string | null;
             endsOn: string | null;
             note: string | null;
         }>
@@ -296,6 +301,7 @@ export class FixedCostService {
         if (patch.dueDay !== undefined) entity.dueDay = patch.dueDay;
         if (patch.direction !== undefined) entity.direction = patch.direction as FlowDirection;
         if (patch.isActive !== undefined) entity.isActive = patch.isActive;
+        if (patch.startedOn !== undefined) entity.startedOn = patch.startedOn;
         if (patch.endsOn !== undefined) entity.endsOn = patch.endsOn;
         if (patch.note !== undefined) entity.note = patch.note;
         await this.em.flush();
@@ -351,6 +357,7 @@ export function toDto(fixedCost: FixedCost) {
         dueDay: fixedCost.dueDay,
         direction: fixedCost.direction,
         isActive: fixedCost.isActive,
+        startedOn: fixedCost.startedOn,
         endsOn: fixedCost.endsOn,
         note: fixedCost.note,
     };

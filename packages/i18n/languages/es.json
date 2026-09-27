@@ -59,6 +59,7 @@
                     "goal_no_jar_spend": "Goal no dispone de fondos para gastar",
                     "payment_amount_positive": "El importe del pago debe ser positivo",
                     "bill_paused_no_settlement": "Las facturas en suspenso o cerradas no pueden aceptar nuevas liquidaciones.",
+                    "income_kind_cadence_locked": "El tipo y la frecuencia no se pueden modificar en una renta ya existente. Cierra esa renta y crea una nueva.",
                     "bill_link_outflow": "Vincula un gasto para liquidar una factura pendiente.",
                     "bill_link_inflow": "Vincula un ingreso para liquidar un abono periódico.",
                     "iban_already_linked": "Este IBAN ya está vinculado a una cuenta.",
@@ -2076,6 +2077,14 @@
                 "amount": "Importe ({symbol})",
                 "amount_new": "Nuevo importe ({symbol})",
                 "amount_history": "Historial de importes",
+                "start_date": "Start date",
+                "end_date": "End date (optional)",
+                "raise_tip_title": "Got a raise or new job?",
+                "raise_tip_body": "End this income and add a new one with the new amount and start date. That keeps history honest when you travel months.",
+                "raise_tip_link": "Add new income →",
+                "end_income": "End income",
+                "confirm_end": "Click again to end",
+                "toast_ended": "Income ended",
                 "name_placeholder": "p. ej., el sueldo",
                 "free_text_placeholder": "Explica de dónde viene…",
                 "kind_salary": "Salario",
@@ -2238,7 +2247,9 @@
                 "give_placeholder": "p. ej., Giro555, tu iglesia, KWF",
                 "payee_name": "Nombre del beneficiario",
                 "payee_placeholder": "p. ej., el arrendador, la aseguradora",
-                "due_day": "Fecha de vencimiento (día del mes)"
+                "due_day": "Fecha de vencimiento (día del mes)",
+                "start_date": "Start date",
+                "end_date": "End date (optional)"
             },
             "debt": {
                 "eyebrow": "DEUDA",

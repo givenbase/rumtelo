@@ -333,6 +333,7 @@ export class DebtService {
                 dueDay: debt.dueDay,
                 direction: FlowDirection.OUT,
                 isActive: !debt.closedOn,
+                startedOn: debt.startedOn,
                 endsOn: debt.closedOn ?? debt.maturityOn,
                 note: null,
             } as never);
@@ -445,6 +446,7 @@ function toLinkedFixedCostDto(fixedCost: FixedCost) {
         dueDay: fixedCost.dueDay,
         direction: fixedCost.direction,
         isActive: fixedCost.isActive,
+        startedOn: fixedCost.startedOn,
         endsOn: fixedCost.endsOn,
         note: fixedCost.note,
     };

@@ -29,6 +29,8 @@ export const IncomeSource = z.object({
     expectedDay: z.int().min(1).max(31).nullable(),
     isActive: z.boolean().default(true),
     startedOn: IsoDate.nullable(),
+    /** Last day this source applies; null = open-ended. */
+    endsOn: IsoDate.nullable(),
     /** Newest first. */
     periods: z.array(IncomeAmountPeriod).default([]),
 });

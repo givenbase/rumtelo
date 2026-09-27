@@ -50,6 +50,8 @@ export function FixedCostUpdatePage({ id, embedded = false }: { id: string; embe
             amount: minorUnitsToAmountInput(Math.abs(row.amount)),
             jarId: row.jarId,
             dueDay: row.dueDay !== null ? String(row.dueDay) : '',
+            startedOn: row.startedOn ?? '',
+            endsOn: row.endsOn ?? '',
         }),
     });
 

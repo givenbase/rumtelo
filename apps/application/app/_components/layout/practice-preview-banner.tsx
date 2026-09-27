@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation';
 
-import { RumteloLogo } from '@rumtelo/brand';
 import { useTranslations } from '@rumtelo/i18n';
 import { Icon } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
@@ -11,8 +10,8 @@ import { practicePath } from '@/app/_lib/routes';
 import { usePracticePreview } from '@/components/features/shell/practice-preview';
 
 /**
- * Full-bleed brand strip while a Practice coach previews a client board.
- * Mounted inside the sticky chrome stack so it cannot scroll away.
+ * Accent strip while a Practice coach previews a client board.
+ * No wordmark — the shell header already brands the page.
  */
 export function PracticePreviewBanner() {
     const t = useTranslations('pages.shell');
@@ -38,10 +37,6 @@ export function PracticePreviewBanner() {
             )}>
             <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-2.5">
                 <div className="flex min-w-0 items-center gap-3">
-                    <RumteloLogo
-                        variant="wordmarkOnDark"
-                        className="hidden h-5 w-auto max-w-[7.5rem] shrink-0 opacity-95 sm:block"
-                    />
                     <span
                         aria-hidden
                         className="grid size-9 shrink-0 place-items-center rounded-full bg-white text-accent shadow-sm">

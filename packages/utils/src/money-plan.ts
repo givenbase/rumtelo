@@ -105,9 +105,35 @@ type FixedOutLike = {
     cadence: Cadence | string;
     direction?: string;
     isActive?: boolean;
+    startedOn?: string | null;
     /** When set with isActive false → ended; future endsOn on an active bill is still counting. */
     endsOn?: string | null;
 };
+
+/**
+ * Shared date-range + pause rule for income and fixed costs.
+ * - Before startedOn → false
+ * - After endsOn → false
+ * - Paused (inactive, no endsOn) → false
+ * - Ended but asOf still in [startedOn, endsOn] → true (past travel)
+ */
+export function planItemAppliesAsOf(
+    item: {
+        isActive?: boolean;
+        startedOn?: string | null;
+        endsOn?: string | null;
+    },
+    asOfDate: string,
+    startedOnFallback?: string | null
+): boolean {
+    const asOf = asOfDate.slice(0, 10);
+    const start = (item.startedOn ?? startedOnFallback ?? null)?.slice(0, 10) ?? null;
+    const end = item.endsOn?.slice(0, 10) ?? null;
+    if (start && asOf < start) return false;
+    if (end && asOf > end) return false;
+    if (item.isActive === false && !end) return false;
+    return true;
+}
 
 /**
  * Lifecycle derived from stored flags — no separate status column.
@@ -129,9 +155,21 @@ export function fixedCostLifecycle(
     return FixedCostLifecycle.ACTIVE;
 }
 
-/** True when the bill should count toward jar pressure / monthly out. */
+/** True when the bill should count toward jar pressure / monthly out (today, not as-of). */
 export function isFixedCostCounting(item: { isActive?: boolean; endsOn?: string | null }): boolean {
     return item.isActive !== false;
+}
+
+/** Whether a fixed cost applies in the viewed period (start/end + pause). */
+export function fixedCostAppliesAsOf(
+    item: {
+        isActive?: boolean;
+        startedOn?: string | null;
+        endsOn?: string | null;
+    },
+    asOfDate: string
+): boolean {
+    return planItemAppliesAsOf(item, asOfDate);
 }
 
 /**
@@ -174,15 +212,21 @@ export function fixedCostPeriodStatus(
 /**
  * Sum monthly-normalised OUT fixed costs.
  * Pass already-filtered OUT items, or include direction/isActive for filtering.
+ * When `asOf` is set, uses start/end range (and re-includes ended-in-range rows).
  */
 export function sumMonthlyFixedOut(
     items: readonly FixedOutLike[],
-    opts?: { activeOnly?: boolean }
+    opts?: { activeOnly?: boolean; asOf?: string }
 ): number {
     const activeOnly = opts?.activeOnly ?? true;
+    const asOf = opts?.asOf?.slice(0, 10);
     return items.reduce((total, item) => {
         if (item.direction !== undefined && item.direction !== 'OUT') return total;
-        if (activeOnly && !isFixedCostCounting(item)) return total;
+        if (asOf) {
+            if (!fixedCostAppliesAsOf(item, asOf)) return total;
+        } else if (activeOnly && !isFixedCostCounting(item)) {
+            return total;
+        }
         return total + monthlyAmount(Math.abs(item.amount), item.cadence);
     }, 0);
 }
@@ -231,22 +275,46 @@ export type IncomeSourceForNet = {
     amount: number;
     cadence: Cadence | string;
     isActive?: boolean;
+    startedOn?: string | null;
+    endsOn?: string | null;
     periods?: readonly IncomePeriodLike[];
 };
 
+function oldestPeriodEffectiveOn(periods: readonly IncomePeriodLike[] | undefined): string | null {
+    if (!periods?.length) return null;
+    return (
+        [...periods]
+            .map(period => period.effectiveOn.slice(0, 10))
+            .sort()
+            .at(0) ?? null
+    );
+}
+
+/** Whether an income source applies on asOf (start/end + pause; ended-in-range still counts). */
+export function incomeSourceApplies(source: IncomeSourceForNet, asOfDate: string): boolean {
+    return planItemAppliesAsOf(source, asOfDate, oldestPeriodEffectiveOn(source.periods));
+}
+
+/** Amount (minor units, per cadence) for a source on asOf — null when it does not apply. */
+export function incomeAmountAsOf(source: IncomeSourceForNet, asOfDate: string): number | null {
+    const asOf = asOfDate.slice(0, 10);
+    if (!incomeSourceApplies(source, asOf)) return null;
+    const periods = source.periods ?? [];
+    const applicable = periods
+        .filter(period => period.effectiveOn.slice(0, 10) <= asOf)
+        .sort((left, right) => right.effectiveOn.localeCompare(left.effectiveOn));
+    return applicable[0]?.amount ?? source.amount;
+}
+
 /**
  * Household monthly net as of a date.
- * Per active source: period with max effectiveOn <= asOf, else cached amount.
+ * Per applicable source: period with max effectiveOn <= asOf, else cached amount.
  */
 export function monthlyNetAsOf(sources: readonly IncomeSourceForNet[], asOfDate: string): number {
     const asOf = asOfDate.slice(0, 10);
     return sources.reduce((total, source) => {
-        if (source.isActive === false) return total;
-        const periods = source.periods ?? [];
-        const applicable = periods
-            .filter(period => period.effectiveOn.slice(0, 10) <= asOf)
-            .sort((left, right) => right.effectiveOn.localeCompare(left.effectiveOn));
-        const amount = applicable[0]?.amount ?? source.amount;
+        const amount = incomeAmountAsOf(source, asOf);
+        if (amount === null) return total;
         return total + monthlyAmount(amount, source.cadence);
     }, 0);
 }

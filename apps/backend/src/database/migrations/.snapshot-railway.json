@@ -14057,6 +14057,22 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "uuid"
+        },
+        "started_on": {
+          "name": "started_on",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 0,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "date"
         }
       },
       "name": "money_fixed_cost",
@@ -16804,6 +16820,22 @@
           ],
           "mappedType": "unknown",
           "nativeEnumName": "money_cadence"
+        },
+        "ends_on": {
+          "name": "ends_on",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 0,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "date"
         }
       },
       "name": "money_income_source",

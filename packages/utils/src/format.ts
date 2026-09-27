@@ -33,11 +33,14 @@ export function formatMoney(
     minorUnits: number,
     { currency, locale = 'en-IE', signed = false }: FormatMoneyOptions
 ): string {
+    // Whole major units stay compact (€168). Non-zero cents keep two decimals so
+    // e.g. €167.99 vs €168.00 is not rounded into a fake “equal but −€1 available”.
+    const wholeMajor = minorUnits % 100 === 0;
     const formatted = new Intl.NumberFormat(locale, {
         style: 'currency',
         currency,
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
+        minimumFractionDigits: wholeMajor ? 0 : 2,
+        maximumFractionDigits: wholeMajor ? 0 : 2,
     }).format(fromMinorUnits(minorUnits));
     return signed && minorUnits > 0 ? `+${formatted}` : formatted;
 }

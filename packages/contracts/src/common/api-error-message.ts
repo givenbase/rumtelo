@@ -11,6 +11,7 @@ export const API_ERROR_MESSAGES = [
     'goal_no_jar_spend',
     'payment_amount_positive',
     'bill_paused_no_settlement',
+    'income_kind_cadence_locked',
     'bill_link_outflow',
     'bill_link_inflow',
     'iban_already_linked',

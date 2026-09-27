@@ -27,6 +27,7 @@ export class IncomeController {
                 expectedDay: input.expectedDay,
                 isActive: input.isActive,
                 startedOn: input.startedOn,
+                endsOn: input.endsOn,
             })
         );
     }
