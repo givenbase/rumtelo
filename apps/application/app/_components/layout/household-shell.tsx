@@ -30,7 +30,9 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 import { OnboardingOverlay } from '@/components/features/shell/onboarding-overlay';
 import { PendingPlanCheckout } from '@/components/features/shell/pending-plan-checkout';
 import { CapabilityGate } from '@/components/features/shell/capability-gate';
+import { BoardMutateRouteGuard } from '@/components/features/shell/board-mutate-route-guard';
 import { usePracticePreview } from '@/components/features/shell/practice-preview';
+import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
 import { PageHelpButton, PageTourProvider } from '@/components/features/tour';
 import { FeatureHelpersProvider, WhyCaption } from '@/components/features/helpers';
@@ -160,6 +162,7 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
     const { isCapabilityLocked, accessForPath } = usePlanCapabilities();
     const { session } = useAuth();
     const { capabilities } = usePracticePreview();
+    const { canMutate } = useBoardWriteAccess();
 
     const isDark = resolvedTheme === 'dark';
     const planName = planLabel(plan, t);
@@ -222,6 +225,7 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                 capabilities.active && 'ring-4 ring-accent/35 ring-inset'
             )}
             data-practice-preview={capabilities.active ? 'true' : undefined}
+            data-board-readonly={!canMutate ? 'true' : undefined}
             data-practice-readonly={
                 capabilities.active && !capabilities.canMutate ? 'true' : undefined
             }>
@@ -614,7 +618,9 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                     <WhyCaption pathname={pathname} locked={access.locked} />
                 ) : null}
                 <main className="min-w-0">
-                    <CapabilityGate>{children}</CapabilityGate>
+                    <CapabilityGate>
+                        <BoardMutateRouteGuard>{children}</BoardMutateRouteGuard>
+                    </CapabilityGate>
                 </main>
             </div>
 

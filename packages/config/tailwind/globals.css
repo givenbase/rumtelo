@@ -68,4 +68,16 @@
     [role='button']:not(:disabled) {
         cursor: pointer;
     }
+
+    /*
+     * Board read-only (Practice preview + household VIEWER):
+     * hide create/update/import entry points and anything marked data-mutate.
+     */
+    [data-board-readonly] a[href*='/create'],
+    [data-board-readonly] a[href*='/update'],
+    [data-board-readonly] a[href*='/import'],
+    [data-board-readonly] a[href*='/move/create'],
+    [data-board-readonly] [data-mutate] {
+        display: none !important;
+    }
 }

@@ -446,7 +446,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                         </div>
                     </div>
                 </div>
-                <Button as={Link} href={updateHref('tx', tx.id)} variant="secondary">
+                <Button as={Link} href={updateHref('tx', tx.id)} variant="secondary" data-mutate>
                     <Icon name="pencil" size="sm" />
                     {tAction('edit')}
                 </Button>

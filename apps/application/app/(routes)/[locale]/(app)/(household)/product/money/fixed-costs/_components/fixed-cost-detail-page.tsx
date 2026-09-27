@@ -304,7 +304,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                         </div>
                     </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2" data-mutate>
                     {lifecycle === FixedCostLifecycle.ACTIVE ? (
                         <>
                             <Button
@@ -357,7 +357,11 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                             {t('reactivate_short')}
                         </Button>
                     ) : null}
-                    <Button as={Link} href={updateHref('fixed', item.id)} variant="secondary">
+                    <Button
+                        as={Link}
+                        href={updateHref('fixed', item.id)}
+                        variant="secondary"
+                        data-mutate>
                         <Icon name="pencil" size="sm" />
                         {tAction('edit')}
                     </Button>
@@ -648,7 +652,9 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                             </Typography>
                         )}
                         {canSettle ? (
-                            <div className="flex flex-wrap gap-2 border-t border-line px-5 py-3">
+                            <div
+                                className="flex flex-wrap gap-2 border-t border-line px-5 py-3"
+                                data-mutate>
                                 {status !== FixedCostPeriodStatus.TAKEN ? (
                                     <Button
                                         type="button"

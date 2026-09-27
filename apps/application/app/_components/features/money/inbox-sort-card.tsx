@@ -20,6 +20,7 @@ import { partyMark } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { formatBookedDate } from '@/components/features/money/jar-badge';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 
 type InboxJarOption = Pick<Jar, 'id' | 'key' | 'name' | 'subtitle'>;
 type InboxDebtOption = Pick<Debt, 'id' | 'name'>;
@@ -87,6 +88,7 @@ export function InboxSortCard({
     const tSort = useTranslations('features.money.transactions.inbox_sort');
     const tExpense = useTranslations('features.money.expense_form');
     const { householdId } = useAuth();
+    const { canMutate } = useBoardWriteAccess();
     const { byKey: catalogByKey } = useJarCatalog();
     const categoryTemplatesQuery = useCategoryTemplates(isLiveData(householdId));
     const form = useForm<InboxSortValues>({
@@ -123,6 +125,49 @@ export function InboxSortCard({
     const canLinkFixed = Boolean(suggestedFixedCost) && !debtId;
 
     if (done) return null;
+
+    // Read-only board — show the feed row, no sort / rule / jar pickers.
+    if (!canMutate) {
+        return (
+            <div className="grid animate-rise gap-4 rounded-2xl border border-line bg-surface p-5 shadow-md">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div className="flex min-w-0 items-start gap-3">
+                        <VendorMark
+                            name={mark.name}
+                            src={mark.src}
+                            fallbackIcon={mark.fallbackIcon}
+                            tone={mark.tone}
+                            size={28}
+                            className="mt-0.5"
+                        />
+                        <div className="min-w-0">
+                            <p className="text-base font-semibold text-fg">{title}</p>
+                            <p className="mt-1 font-mono text-xs tracking-normal text-fg-muted">
+                                {[
+                                    transaction.note?.trim() || null,
+                                    !transaction.note?.trim() &&
+                                    transaction.counterparty?.trim() &&
+                                    transaction.description !== transaction.counterparty.trim()
+                                        ? transaction.description
+                                        : null,
+                                    formatBookedDate(transaction.bookedOn, appLocale),
+                                ]
+                                    .filter(Boolean)
+                                    .join(' · ')}
+                            </p>
+                        </div>
+                    </div>
+                    <span
+                        className={cn(
+                            'shrink-0 font-mono text-lg',
+                            transaction.amount < 0 ? 'text-fg' : 'text-success'
+                        )}>
+                        {formatMoney(transaction.amount, { signed: true })}
+                    </span>
+                </div>
+            </div>
+        );
+    }
 
     async function confirm(createRule = false) {
         const values = form.getValues();
