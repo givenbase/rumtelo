@@ -35,6 +35,23 @@ function sectionFromPath(pathname: string): HouseholdPermissionSection {
     return HouseholdPermissionSection.HOME;
 }
 
+/**
+ * Soft-nav / FAB create rights follow product portals — not org settings CRUD.
+ * MEMBER has READ_ONLY on HOUSEHOLD_SETTINGS; using that for `showCreateFlows`
+ * made `/settings/data/import` look like a blocked create route after members
+ * loaded (OWNER fail-open → MEMBER), while Export (no `/import` segment) stayed.
+ */
+function createFlowSection(section: HouseholdPermissionSection): HouseholdPermissionSection {
+    switch (section) {
+        case HouseholdPermissionSection.HOUSEHOLD_SETTINGS:
+        case HouseholdPermissionSection.HOUSEHOLD_MEMBERS:
+        case HouseholdPermissionSection.HOUSEHOLD_BILLING:
+            return HouseholdPermissionSection.MONEY;
+        default:
+            return section;
+    }
+}
+
 export type BoardWriteAccess = {
     /** Any board write (create / update / delete / settle / sort). */
     canMutate: boolean;
@@ -108,10 +125,15 @@ export function useBoardWriteAccess(): BoardWriteAccess {
         const canCreate = roleCan(role, section, HouseholdPermissionAction.CREATE);
         const canUpdate = roleCan(role, section, HouseholdPermissionAction.UPDATE);
         const canDelete = roleCan(role, section, HouseholdPermissionAction.DELETE);
+        const canBoardCreate = roleCan(
+            role,
+            createFlowSection(section),
+            HouseholdPermissionAction.CREATE
+        );
 
         return {
             canMutate: (canCreate || canUpdate || canDelete) && !periodFrozen,
-            showCreateFlows: canCreate && !periodFrozen,
+            showCreateFlows: canBoardCreate && !periodFrozen,
             practicePreview: false,
             periodClosed,
             periodLookingAhead,

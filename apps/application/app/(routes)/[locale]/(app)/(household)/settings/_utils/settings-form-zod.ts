@@ -20,8 +20,8 @@ export type ProfileFormValues = z.infer<ReturnType<typeof createProfileFormSchem
 
 export function createPasswordFormSchema(msg: SettingsFormT) {
     return z.object({
-        currentPassword: z.string().min(1, msg('pages.settings.account.current_password')),
-        newPassword: z.string().min(8, msg('pages.settings.account.new_password')),
+        currentPassword: z.string().min(1, msg('pages.settings.panels.password.current')),
+        newPassword: z.string().min(8, msg('pages.settings.panels.password.next')),
     });
 }
 
@@ -29,7 +29,7 @@ export type PasswordFormValues = z.infer<ReturnType<typeof createPasswordFormSch
 
 export function createInviteFormSchema(msg: SettingsFormT) {
     return z.object({
-        email: z.string().trim().email(msg('pages.settings.account.invite_email')),
+        email: z.email(msg('pages.settings.panels.household.invite_email')),
         role: z.enum([HouseholdRole.ADMIN, HouseholdRole.MEMBER, HouseholdRole.VIEWER]),
     });
 }

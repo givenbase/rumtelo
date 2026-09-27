@@ -1,62 +1,112 @@
 'use client';
 
-import { api } from '@/app/_lib/api';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useTranslations } from '@rumtelo/i18n';
 import { Button, StubNotice } from '@rumtelo/ui';
 import { cn, toPeriodKey } from '@rumtelo/utils';
 
-import { downloadTextFile, toCsv } from '@/app/_lib/download';
+import {
+    downloadHouseholdCsv,
+    downloadHouseholdExcel,
+    downloadHouseholdJson,
+    fetchHouseholdExportBundle,
+    fetchTransactionsForExport,
+    type HouseholdExportAccess,
+    type HouseholdExportBundle,
+} from '@/app/_lib/household-export';
+import { CAPABILITIES } from '@/app/_lib/plan';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
 
 import { SettingsInkCard, SettingsPanel } from './settings-chrome';
+
+type Busy = 'csv' | 'json' | 'excel' | null;
+
+function stampToday() {
+    return new Date().toISOString().slice(0, 10);
+}
 
 export function ExportSettings() {
     const t = useTranslations();
     const { householdId } = useAuth();
     const { showToast, period } = useHouseholdShell();
+    const { hasCapability, planReady } = usePlanCapabilities();
     const live = isLiveData(householdId);
-    const [busy, setBusy] = useState<'csv' | 'json' | null>(null);
+    const [busy, setBusy] = useState<Busy>(null);
     const [scope, setScope] = useState<'all' | 'tx' | 'month'>('all');
+
+    const periodKey = toPeriodKey(period.year, period.month);
+    const includeDebts = hasCapability(CAPABILITIES.moneyDebt);
+    const includeGoals = hasCapability(CAPABILITIES.growthGoals);
+    const exportAccess: HouseholdExportAccess = { includeDebts, includeGoals };
+    const previewKey =
+        live && householdId && planReady
+            ? `${householdId}:${includeDebts ? 1 : 0}:${includeGoals ? 1 : 0}`
+            : null;
+
+    const [preview, setPreview] = useState<{
+        key: string;
+        bundle: HouseholdExportBundle | null;
+        failed: boolean;
+    } | null>(null);
+
+    // Derive from gate + last fetch — do not sync-clear in an effect.
+    const bundle = preview && previewKey && preview.key === previewKey ? preview.bundle : null;
+    const previewFailed =
+        preview && previewKey && preview.key === previewKey ? preview.failed : false;
+
+    useEffect(() => {
+        if (!previewKey || !householdId) return;
+        let cancelled = false;
+        void (async () => {
+            try {
+                const next = await fetchHouseholdExportBundle(householdId, {
+                    includeDebts,
+                    includeGoals,
+                });
+                if (!cancelled) {
+                    setPreview({ key: previewKey, bundle: next, failed: false });
+                }
+            } catch {
+                if (!cancelled) {
+                    setPreview({ key: previewKey, bundle: null, failed: true });
+                }
+            }
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, [previewKey, householdId, includeDebts, includeGoals]);
+
+    async function ensureBundle(): Promise<HouseholdExportBundle | null> {
+        if (!householdId || !planReady || !previewKey) return null;
+        if (bundle) return bundle;
+        const next = await fetchHouseholdExportBundle(householdId, exportAccess);
+        setPreview({ key: previewKey, bundle: next, failed: false });
+        return next;
+    }
 
     async function exportCsv(periodOnly: boolean) {
         if (!householdId) return;
         setBusy('csv');
         try {
-            const periodKey = toPeriodKey(period.year, period.month);
-            const { items } = await api.money.transactions.list({
-                householdId,
-                limit: 200,
-                ...(periodOnly ? { period: periodKey } : {}),
-            });
-            const jars = await api.money.jars.list({ householdId });
-            const jarName = new Map(jars.map(j => [j.id, j.name]));
-            const rows = items.map(transaction => ({
-                id: transaction.id,
-                bookedOn: transaction.bookedOn,
-                description: transaction.description,
-                counterparty: transaction.counterparty ?? '',
-                amountCents: transaction.amount,
-                status: transaction.status,
-                jar: transaction.jarId ? (jarName.get(transaction.jarId) ?? transaction.jarId) : '',
-                categoryId: transaction.categoryId ?? '',
-            }));
-            const stamp = periodOnly ? periodKey : new Date().toISOString().slice(0, 10);
-            downloadTextFile(
-                `rumtelo-transactions-${stamp}.csv`,
-                toCsv(rows),
-                'text/csv;charset=utf-8'
-            );
+            const data = await ensureBundle();
+            if (!data) return;
+            const transactions = periodOnly
+                ? await fetchTransactionsForExport(householdId, periodKey)
+                : data.transactions;
+            const stamp = periodOnly ? periodKey : stampToday();
+            downloadHouseholdCsv(transactions, data.jars, stamp);
             showToast(
                 t(
-                    rows.length === 1
+                    transactions.length === 1
                         ? 'pages.settings.toasts.csv_exported_one'
                         : 'pages.settings.toasts.csv_exported_other',
                     {
-                        count: String(rows.length),
+                        count: String(transactions.length),
                         periodSuffix: periodOnly
                             ? t('pages.settings.toasts.csv_period_suffix', { period: periodKey })
                             : '',
@@ -75,34 +125,9 @@ export function ExportSettings() {
         if (!householdId) return;
         setBusy('json');
         try {
-            const [jars, income, fixedCosts, debts, goals, rules, transactions] = await Promise.all(
-                [
-                    api.money.jars.list({ householdId }),
-                    api.money.income.list({ householdId }),
-                    api.money.fixedCosts.list({ householdId }),
-                    api.money.debts.list({ householdId }),
-                    api.money.goals.list({ householdId }),
-                    api.money.rules.list({ householdId }),
-                    api.money.transactions.list({ householdId, limit: 200 }),
-                ]
-            );
-            const payload = {
-                exportedAt: new Date().toISOString(),
-                householdId,
-                jars,
-                income,
-                fixedCosts,
-                debts,
-                goals,
-                rules,
-                transactions: transactions.items,
-            };
-            const stamp = new Date().toISOString().slice(0, 10);
-            downloadTextFile(
-                `rumtelo-export-${stamp}.json`,
-                JSON.stringify(payload, null, 2),
-                'application/json'
-            );
+            const data = await ensureBundle();
+            if (!data) return;
+            downloadHouseholdJson(data, stampToday());
             showToast(t('pages.settings.toasts.export_ok'), 'success');
         } catch {
             showToast(t('pages.settings.toasts.json_failed'), 'error');
@@ -111,51 +136,73 @@ export function ExportSettings() {
         }
     }
 
-    const periodKey = toPeriodKey(period.year, period.month);
+    async function exportExcel() {
+        if (!householdId) return;
+        setBusy('excel');
+        try {
+            const data = await ensureBundle();
+            if (!data) return;
+            downloadHouseholdExcel(data, stampToday());
+            showToast(t('pages.settings.toasts.excel_ok'), 'success');
+        } catch {
+            showToast(t('pages.settings.toasts.excel_failed'), 'error');
+        } finally {
+            setBusy(null);
+        }
+    }
+
+    const monthTxCount = bundle
+        ? bundle.transactions.filter(tx => tx.bookedOn.startsWith(periodKey)).length
+        : null;
 
     const sheets = [
         {
             name: t('pages.settings.panels.export.sheet_jars'),
-            rows: t('pages.settings.panels.export.sheet_jars_rows'),
+            count: bundle?.jars.length ?? null,
             cols: t('pages.settings.panels.export.sheet_jars_cols'),
             fullOnly: true,
         },
         {
             name: t('pages.settings.panels.export.sheet_income'),
-            rows: t('pages.settings.panels.export.sheet_income_rows'),
+            count: bundle?.income.length ?? null,
             cols: t('pages.settings.panels.export.sheet_income_cols'),
             fullOnly: true,
         },
         {
             name: t('pages.settings.panels.export.sheet_fixed'),
-            rows: t('pages.settings.panels.export.sheet_fixed_rows'),
+            count: bundle?.fixedCosts.length ?? null,
             cols: t('pages.settings.panels.export.sheet_fixed_cols'),
             fullOnly: true,
         },
         {
             name: t('pages.settings.panels.export.sheet_transactions'),
-            rows:
-                scope === 'month'
-                    ? t('pages.settings.panels.export.sheet_transactions_rows_month')
-                    : t('pages.settings.panels.export.sheet_transactions_rows_ledger'),
+            count: scope === 'month' ? monthTxCount : (bundle?.transactions.length ?? null),
             cols: t('pages.settings.panels.export.sheet_transactions_cols'),
             fullOnly: false,
         },
-        {
-            name: t('pages.settings.panels.export.sheet_debts'),
-            rows: t('pages.settings.panels.export.sheet_debts_rows'),
-            cols: t('pages.settings.panels.export.sheet_debts_cols'),
-            fullOnly: true,
-        },
-        {
-            name: t('pages.settings.panels.export.sheet_goals'),
-            rows: t('pages.settings.panels.export.sheet_goals_rows'),
-            cols: t('pages.settings.panels.export.sheet_goals_cols'),
-            fullOnly: true,
-        },
+        ...(includeDebts
+            ? [
+                  {
+                      name: t('pages.settings.panels.export.sheet_debts'),
+                      count: bundle?.debts.length ?? null,
+                      cols: t('pages.settings.panels.export.sheet_debts_cols'),
+                      fullOnly: true,
+                  },
+              ]
+            : []),
+        ...(includeGoals
+            ? [
+                  {
+                      name: t('pages.settings.panels.export.sheet_goals'),
+                      count: bundle?.goals.length ?? null,
+                      cols: t('pages.settings.panels.export.sheet_goals_cols'),
+                      fullOnly: true,
+                  },
+              ]
+            : []),
         {
             name: t('pages.settings.panels.export.sheet_rules'),
-            rows: t('pages.settings.panels.export.sheet_rules_rows'),
+            count: bundle?.rules.length ?? null,
             cols: t('pages.settings.panels.export.sheet_rules_cols'),
             fullOnly: true,
         },
@@ -180,6 +227,8 @@ export function ExportSettings() {
     ];
 
     const visibleSheets = sheets.filter(sheet => scope === 'all' || !sheet.fullOnly);
+    const loadingPreview = live && planReady && !bundle && !previewFailed;
+    const canDownload = live && planReady && busy === null;
 
     return (
         <SettingsPanel>
@@ -240,7 +289,16 @@ export function ExportSettings() {
                                     {sh.name}
                                 </span>
                                 <span className="shrink-0 font-mono text-[10px] text-accent">
-                                    {sh.rows}
+                                    {loadingPreview
+                                        ? t('pages.settings.panels.export.sheet_rows_loading')
+                                        : sh.count === null
+                                          ? t('pages.settings.panels.export.sheet_rows_unknown')
+                                          : t(
+                                                sh.count === 1
+                                                    ? 'pages.settings.panels.export.sheet_rows_one'
+                                                    : 'pages.settings.panels.export.sheet_rows_other',
+                                                { count: String(sh.count) }
+                                            )}
                                 </span>
                                 <span className="min-w-0 font-mono text-[10px] leading-snug text-fg-muted">
                                     {sh.cols}
@@ -254,25 +312,27 @@ export function ExportSettings() {
                     <div className="flex flex-wrap gap-2.5">
                         <Button
                             className="min-w-0 flex-1 rounded-full font-mono text-[10.5px] tracking-[0.13em] uppercase sm:min-w-[190px]"
-                            disabled={!live || busy !== null}
+                            disabled={!canDownload}
                             onClick={() => {
-                                showToast(t('pages.settings.panels.export.excel_coming'), 'info');
+                                if (scope === 'all') void exportExcel();
+                                else void exportCsv(scope === 'month');
                             }}>
-                            {t('pages.settings.panels.export.download_excel')}
+                            {busy === 'excel' || (busy === 'csv' && scope !== 'all')
+                                ? t('pages.settings.working')
+                                : scope === 'all'
+                                  ? t('pages.settings.panels.export.download_excel')
+                                  : t('pages.settings.panels.export.download_csv')}
                         </Button>
                         <Button
                             variant="secondary"
                             className="min-w-0 flex-1 rounded-full font-mono text-[10.5px] tracking-[0.13em] uppercase sm:min-w-[190px]"
-                            disabled={!live || busy !== null}
+                            disabled={!canDownload}
                             onClick={() => {
-                                if (scope === 'all') void exportJson();
-                                else void exportCsv(scope === 'month');
+                                void exportJson();
                             }}>
-                            {busy
+                            {busy === 'json'
                                 ? t('pages.settings.working')
-                                : scope === 'all'
-                                  ? t('pages.settings.panels.export.download_json')
-                                  : t('pages.settings.panels.export.download_csv')}
+                                : t('pages.settings.panels.export.download_json')}
                         </Button>
                     </div>
                     <p className="font-mono text-[10.5px] leading-relaxed text-pretty text-fg-muted">

@@ -7,6 +7,7 @@
  */
 
 import { accountsContract, transactionContract } from './transaction/transaction.contract';
+import { archiveContract } from './archive/archive.contract';
 import { bankSyncContract } from './bank-sync/bank-sync.contract';
 import { catalogsContract } from './catalogs/catalogs.contract';
 import { dashboardContract } from './dashboard/dashboard.contract';
@@ -34,4 +35,6 @@ export const contract = {
     dashboard: dashboardContract,
     /** Backoffice company catalogs — read-only suggestions for create forms. */
     catalogs: catalogsContract,
+    /** Rumtelo JSON archive restore (settings export → another household). */
+    archive: archiveContract,
 };

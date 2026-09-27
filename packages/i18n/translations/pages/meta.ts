@@ -36,6 +36,7 @@ const meta = {
     sign_in: 'Sign in',
     settings_account: 'Account — Settings',
     settings_export: 'Export — Settings',
+    settings_import: 'Import — Settings',
     settings_jars: 'Jars — Settings',
     settings_debt: 'Debt — Settings',
     settings_bank: 'Bank — Settings',

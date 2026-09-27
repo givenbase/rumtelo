@@ -104,13 +104,13 @@ export class BillingService {
             periodEndsAt: toIsoOrNull(snap.periodEndsAt),
             periodStartedAt: toIsoOrNull(snap.periodStartedAt),
             // DB rows may still have NULL before the column default applied.
-            willCancelAtPeriodEnd: snap.willCancelAtPeriodEnd,
+            willCancelAtPeriodEnd: Boolean(snap.willCancelAtPeriodEnd),
             scheduledPlanKey: snap.scheduledPlanKey ?? null,
             hasStripeCustomer: Boolean(snap.stripeCustomerId),
             hasActiveSubscription: Boolean(snap.stripeSubscriptionId),
             seatAddons: {
-                extraContributor: snap.extraContributorSeats,
-                extraViewer: snap.extraViewerSeats,
+                extraContributor: snap.extraContributorSeats ?? 0,
+                extraViewer: snap.extraViewerSeats ?? 0,
             },
             prices: await this.loadPriceCatalog(),
             seatAddonCatalog: {

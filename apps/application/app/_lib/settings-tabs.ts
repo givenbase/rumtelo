@@ -9,6 +9,7 @@ export type SettingsTab =
     | 'account'
     | 'plan'
     | 'export'
+    | 'import'
     | 'jars'
     | 'debt'
     | 'bank'
@@ -39,6 +40,7 @@ export const SETTINGS_HREF: Record<SettingsTab, string> = {
     account: '/settings',
     plan: '/settings/general/plan',
     export: '/settings/data/export',
+    import: '/settings/data/import',
     jars: '/settings/product/money/jars',
     debt: '/settings/product/money/debt',
     bank: '/settings/product/money/bank',
@@ -141,6 +143,11 @@ const ALL_SETTINGS_SECTIONS: SettingsNavSection[] = [
                 labelKey: 'pages.settings.tabs.export.label',
                 subKey: 'pages.settings.tabs.export.sub',
             },
+            {
+                key: 'import',
+                labelKey: 'pages.settings.tabs.import.label',
+                subKey: 'pages.settings.tabs.import.sub',
+            },
         ],
     },
 ];
@@ -162,11 +169,16 @@ export function isSettingsTab(value: string | undefined | null): value is Settin
     return Boolean(value && TAB_KEYS.has(value));
 }
 
-/** Active section from pathname (supports nested `/settings/product/…`). */
+/** Active section from pathname (supports nested `/settings/product/…` + locale prefix). */
 export function settingsTabFromPathname(pathname: string): SettingsTab {
     const normalized = pathname.replace(/\/$/, '') || '/settings';
-    if (normalized === '/settings') return DEFAULT_TAB;
-    return HREF_TO_TAB.get(normalized) ?? DEFAULT_TAB;
+    if (normalized === '/settings' || normalized.endsWith('/settings')) return DEFAULT_TAB;
+    const exact = HREF_TO_TAB.get(normalized);
+    if (exact) return exact;
+    const bySuffix = [...HREF_TO_TAB.entries()]
+        .sort((left, right) => right[0].length - left[0].length)
+        .find(([href]) => href !== '/settings' && normalized.endsWith(href));
+    return bySuffix?.[1] ?? DEFAULT_TAB;
 }
 
 /** Map portal nav group → default settings section for that product. */

@@ -8,4 +8,5 @@ export { SoulSettings } from './soul-settings';
 export { AutomationSettings } from './automation-settings';
 export { PlanSettings } from './plan-settings';
 export { ExportSettings } from './export-settings';
+export { ImportSettings } from './import-settings';
 export { PracticeLinksSettings } from './practice-links-settings';

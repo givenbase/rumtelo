@@ -114,7 +114,7 @@ export function SettingsShell({ children }: { children: ReactNode }) {
             <div className="flex flex-col gap-5 md:flex-row md:items-start md:gap-6">
                 <nav
                     aria-label={t('pages.shell.settings')}
-                    className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 md:hidden">
+                    className="-mx-1 flex flex-wrap gap-1.5 px-1 pb-1 md:hidden">
                     {sections
                         .flatMap(section => section.items)
                         .map(tab => (
