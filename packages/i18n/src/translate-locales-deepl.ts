@@ -130,6 +130,8 @@ function shouldSkip(text: string, path: string[]): boolean {
     if (path.at(-1) === 'short' && path.includes('jars')) return true;
     if (/^[\d€$£.,\s/%+\-–—·▸←→✦◇]+$/u.test(trimmed)) return true;
     if (/^(Rumtelo|Basic|Plus|Max|MasterClass|Masterclass)$/i.test(trimmed)) return true;
+    // DeepL mangles ICU (`{count, plural, one {…} other {…}}`) into broken locale copy.
+    if (/\{[a-zA-Z0-9_]+,\s*(plural|select)\b/.test(trimmed)) return true;
     return false;
 }
 
