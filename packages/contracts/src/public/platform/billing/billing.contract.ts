@@ -1,14 +1,14 @@
 /**
  * Billing Contracts
- * Stripe checkout, portal, plan changes, status.
+ * Stripe checkout, portal, plan changes, status, seat add-on stubs.
  */
 
 import { oc } from '@orpc/contract';
 import { z } from 'zod';
 
 import { HouseholdId, HouseholdScoped } from '../../../common/common.schema';
-import { PlanKey } from '../../../enums';
-import { BillingInterval, HouseholdBillingStatus } from './billing.schema';
+import { PlanKey, SeatAddonKind } from '../../../enums';
+import { BillingInterval, HouseholdBillingStatus, SeatAddonQuantities } from './billing.schema';
 
 // ====================================================================
 // ? CREATE Operations
@@ -62,10 +62,26 @@ export const billingSchedulePlanChange = oc
     )
     .output(HouseholdBillingStatus);
 
+/**
+ * Purchase / change seat add-on quantities (€2.50 / seat).
+ * Stub — Stripe qty wiring not live; handlers throw NOT_IMPLEMENTED.
+ */
+export const billingUpdateSeatAddons = oc
+    .input(
+        z.object({
+            householdId: HouseholdId,
+            extras: SeatAddonQuantities,
+            /** Optional: which kind the UI focused (telemetry / future proration). */
+            focusKind: z.enum(SeatAddonKind).optional(),
+        })
+    )
+    .output(HouseholdBillingStatus);
+
 /** Nested contract object mounted at `contract.billing`. */
 export const billingContract = {
     status: billingStatus,
     createCheckoutSession: billingCreateCheckoutSession,
     schedulePlanChange: billingSchedulePlanChange,
     createPortalSession: billingCreatePortalSession,
+    updateSeatAddons: billingUpdateSeatAddons,
 };

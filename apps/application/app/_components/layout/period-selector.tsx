@@ -5,10 +5,21 @@ import { useLocale } from 'next-intl';
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@rumtelo/ui';
 import { useTranslations } from '@rumtelo/i18n';
-import { cn, describePeriodTravel } from '@rumtelo/utils';
+import {
+    cn,
+    currentYearMonth,
+    describePeriodTravel,
+    isYearMonthAfter,
+    isYearMonthBefore,
+    periodTravelBounds,
+    shiftYearMonth,
+} from '@rumtelo/utils';
 
 import { formatPeriodTravelLabels } from '@/app/_lib/period-travel-i18n';
-import { useAppShell, type Period } from '@/components/features/shell/app-shell-context';
+import {
+    useHouseholdShell,
+    type Period,
+} from '@/components/features/shell/household-shell-context';
 
 function monthShort(period: Period, locale: string): string {
     return new Intl.DateTimeFormat(locale, { month: 'short' }).format(
@@ -31,28 +42,9 @@ function decode(value: string): Period {
     const year = Number(ys);
     const month = Number(ms);
     if (!Number.isFinite(year) || !Number.isFinite(month) || month < 1 || month > 12) {
-        const now = new Date();
-        return { year: now.getFullYear(), month: now.getMonth() + 1 };
+        return currentYearMonth();
     }
     return { year, month };
-}
-
-function nowPeriod(): Period {
-    const now = new Date();
-    return { year: now.getFullYear(), month: now.getMonth() + 1 };
-}
-
-function shiftPeriod(period: Period, deltaMonths: number): Period {
-    const date = new Date(period.year, period.month - 1 + deltaMonths, 1);
-    return { year: date.getFullYear(), month: date.getMonth() + 1 };
-}
-
-function isAfter(left: Period, right: Period): boolean {
-    return left.year > right.year || (left.year === right.year && left.month > right.month);
-}
-
-function isBefore(left: Period, right: Period): boolean {
-    return left.year < right.year || (left.year === right.year && left.month < right.month);
 }
 
 function labelShort(period: Period, locale: string): string {
@@ -66,17 +58,16 @@ function labelShort(period: Period, locale: string): string {
 export function PeriodSelector() {
     const t = useTranslations('pages.shell');
     const locale = useLocale();
-    const { period, setPeriod } = useAppShell();
+    const { period, setPeriod, householdCreatedAt } = useHouseholdShell();
     const [open, setOpen] = useState(false);
     const [viewYear, setViewYear] = useState(period.year);
 
-    const current = nowPeriod();
-    const horizon = shiftPeriod(current, 12);
-    const floor = shiftPeriod(current, -8 * 12);
+    const current = currentYearMonth();
+    const { floor, horizon } = periodTravelBounds(householdCreatedAt);
     const value = encode(period);
     const thisMonth = encode(current);
-    const lastMonth = encode(shiftPeriod(current, -1));
-    const nextMonth = encode(shiftPeriod(current, 1));
+    const lastMonth = encode(shiftYearMonth(current, -1));
+    const nextMonth = encode(shiftYearMonth(current, 1));
     const travel = describePeriodTravel(period);
     const labels = formatPeriodTravelLabels(travel, t);
 
@@ -86,7 +77,7 @@ export function PeriodSelector() {
     }
 
     function commit(next: Period) {
-        if (isBefore(next, floor) || isAfter(next, horizon)) return;
+        if (isYearMonthBefore(next, floor) || isYearMonthAfter(next, horizon)) return;
         setPeriod(next);
         setOpen(false);
     }
@@ -201,6 +192,10 @@ export function PeriodSelector() {
                         ] as const
                     ).map((option, index) => {
                         const selected = value === option.key;
+                        const optionPeriod = decode(option.key);
+                        const disabled =
+                            isYearMonthBefore(optionPeriod, floor) ||
+                            isYearMonthAfter(optionPeriod, horizon);
                         return (
                             <span key={option.key} className="inline-flex items-center gap-1">
                                 {index > 0 ? (
@@ -212,12 +207,15 @@ export function PeriodSelector() {
                                     type="button"
                                     role="option"
                                     aria-selected={selected}
+                                    disabled={disabled}
                                     onClick={() => commitKey(option.key)}
                                     className={cn(
                                         'px-1.5 py-1 text-xs tracking-tight transition-colors',
                                         selected
                                             ? 'font-semibold text-accent'
-                                            : 'text-fg-muted hover:text-fg'
+                                            : disabled
+                                              ? 'cursor-not-allowed text-fg-faint opacity-40'
+                                              : 'text-fg-muted hover:text-fg'
                                     )}>
                                     {t(option.labelKey)}
                                 </button>
@@ -260,7 +258,8 @@ export function PeriodSelector() {
                             const key = encode(next);
                             const selected = value === key;
                             const isCurrent = thisMonth === key;
-                            const disabled = isBefore(next, floor) || isAfter(next, horizon);
+                            const disabled =
+                                isYearMonthBefore(next, floor) || isYearMonthAfter(next, horizon);
                             const label = monthShort(next, locale);
                             return (
                                 <button

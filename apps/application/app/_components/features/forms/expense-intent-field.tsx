@@ -11,7 +11,7 @@ import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { partyMark } from '@/app/_lib/vendor-brands';
 
-import { CatalogChipPicker } from './catalog-chip-picker';
+import { CATALOG_CHIP_IDLE_LIMIT, CatalogChipPicker } from './catalog-chip-picker';
 import { matchesChipQuery } from './chip-search';
 import { FormInput } from './form-input';
 
@@ -551,6 +551,14 @@ export function ExpenseIntentField({
                             placeholder={tForm('search_vendor')}
                             noMatchesLabel={tForm('no_matches')}
                             disabled={disabled}
+                            idleLimit={CATALOG_CHIP_IDLE_LIMIT}
+                            selectedKey={
+                                vendorsForCategory.find(
+                                    merchant =>
+                                        merchant.name.toLowerCase() ===
+                                        (value.vendor ?? '').toLowerCase()
+                                )?.key ?? null
+                            }
                             otherLabel={tForm('other')}
                             onOther={() => setCustomVendor(true)}
                             trailing={

@@ -45,4 +45,15 @@ export class BillingController {
             this.billing.createPortalSession(input.householdId)
         );
     }
+
+    @Implement(contract.billing.updateSeatAddons)
+    updateSeatAddons() {
+        return implement(contract.billing.updateSeatAddons).handler(({ input }) =>
+            this.billing.updateSeatAddons({
+                householdId: input.householdId,
+                extras: input.extras,
+                focusKind: input.focusKind,
+            })
+        );
+    }
 }

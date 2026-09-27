@@ -9,7 +9,7 @@ import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { missingAudienceKeys } from '@/app/_lib/household-audience-from-money';
 import { isLiveData } from '@/app/_lib/preview';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 /**
@@ -19,7 +19,7 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 export function useMergeHouseholdAudiences() {
     const { householdId } = useAuth();
     const queryClient = useQueryClient();
-    const { showToast } = useAppShell();
+    const { showToast } = useHouseholdShell();
     const t = useTranslations('features.money.household_profile');
     const live = isLiveData(householdId);
 

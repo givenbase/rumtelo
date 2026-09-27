@@ -14,7 +14,7 @@ export const PAGE_CONTENT_WIDTH = {
     default: 'max-w-4xl',
     /** Wide dashboards with side panels (~1152px) */
     wide: 'max-w-6xl',
-    /** Full shell width (1240px cap lives on AppShell) */
+    /** Full shell width (1240px cap lives on HouseholdShell) */
     full: 'max-w-none',
 } as const;
 

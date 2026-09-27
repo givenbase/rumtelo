@@ -1,3 +1,17 @@
+/**
+ * Household roles for the organization plugin.
+ *
+ * Better-auth roles (keep 1:1 with {@link HouseholdRole} in contracts):
+ * - **owner** — creator of the household / company (100% control)
+ * - **admin** — high trust (~80%); org/member/invite mutations, not the creator
+ * - **member** — limited write; day-to-day board work, no org admin
+ * - **viewer** — look-along only; no organization / member / invitation mutations
+ *
+ * Relationship labels ("Partner", "Kid") are UI copy from household kind — never roles.
+ *
+ * Seat add-ons (`SeatAddonKind`) are billing inventory, not roles: a CONTRIBUTOR
+ * seat may be filled by admin or member; a VIEWER seat only by viewer.
+ */
 import { createAccessControl } from 'better-auth/plugins/access';
 import {
     adminAc,
@@ -6,16 +20,6 @@ import {
     ownerAc,
 } from 'better-auth/plugins/organization/access';
 
-/**
- * Household roles for the organization plugin.
- *
- * Better Auth's defaults stop at owner/admin/member. VIEWER needs to be a real
- * role — someone a household invites to look at the board without the power to
- * change members or invitations — so we define it here instead of silently
- * downgrading it to member at invite time. App roles map 1:1: OWNER / MEMBER /
- * VIEWER; relationship labels ("Partner", "Kid") are UI copy from the
- * household's kind, never role values.
- */
 export const householdAccessControl = createAccessControl(defaultStatements);
 
 export const householdRoles = {

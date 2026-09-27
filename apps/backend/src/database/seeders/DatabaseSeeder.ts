@@ -25,6 +25,7 @@ import { AssetKindSeeder } from './product/growth/AssetKindSeeder';
 import { AssetPresetSeeder } from './product/growth/AssetPresetSeeder';
 import { WealthStageSeeder } from './product/growth/WealthStageSeeder';
 import { DemoHouseholdSeeder } from './demo/DemoHouseholdSeeder';
+import { DemoPracticeSeeder } from './demo/DemoPracticeSeeder';
 
 /**
  * Root seeder — backoffice product catalogs first, then plans, then demo data.
@@ -58,7 +59,7 @@ export class DatabaseSeeder extends Seeder {
             BookPresetSeeder,
             WatchPresetSeeder,
             PlanSeeder,
-            ...(isLaunchProductsDeferred() ? [] : [DemoHouseholdSeeder]),
+            ...(isLaunchProductsDeferred() ? [] : [DemoHouseholdSeeder, DemoPracticeSeeder]),
         ];
         return this.call(em, seeders);
     }

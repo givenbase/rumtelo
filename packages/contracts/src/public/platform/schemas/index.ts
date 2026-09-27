@@ -8,3 +8,4 @@ export * from '../billing';
 export * from '../coach';
 export * from '../contact';
 export * from '../household';
+export * from '../practice';

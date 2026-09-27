@@ -26,8 +26,8 @@
     --color-surface: #ffffff;
     --color-raised: #e8ecf2;
     --color-sunken: #d5dbe5;
-    --color-line: rgb(26 32 45 / 0.12);
-    --color-line-strong: rgb(26 32 45 / 0.22);
+    --color-line: rgb(26 32 45 / 0.14);
+    --color-line-strong: rgb(26 32 45 / 0.36);
 
     /* Foreground — brand navy #1A202D */
     --color-fg: #1a202d;

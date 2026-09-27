@@ -4,7 +4,7 @@ export interface HouseholdContext {
     userId: string;
     /** Null only during household.onboard (user authenticated, org not yet created). */
     householdId: string | null;
-    role: 'OWNER' | 'MEMBER' | 'VIEWER';
+    role: 'OWNER' | 'ADMIN' | 'MEMBER' | 'VIEWER';
 }
 
 /**

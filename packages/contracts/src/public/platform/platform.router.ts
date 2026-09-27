@@ -12,6 +12,7 @@ import { billingContract } from './billing/billing.contract';
 import { coachContract } from './coach/coach.contract';
 import { contactContract } from './contact/contact.contract';
 import { householdContract } from './household/household.contract';
+import { practiceContract } from './practice/practice.contract';
 
 /** Platform-level: account prefs, the household itself, and cross-product advisory. */
 export const contract = {
@@ -24,4 +25,6 @@ export const contract = {
     billing: billingContract,
     coach: coachContract,
     contact: contactContract,
+    /** B2B Practice control plane. */
+    practice: practiceContract,
 };

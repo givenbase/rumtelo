@@ -35,11 +35,19 @@ import {
     webSignUpUrl,
     webVerifyUrl,
 } from '@/app/_lib/auth';
-import { DEMO_ACCOUNTS } from '@rumtelo/contracts/platform';
+import { DEMO_SIGN_IN_ACCOUNTS } from '@rumtelo/contracts/platform';
 
 function safeRedirectPath(value: string | null): string {
     if (value && value.startsWith('/') && !value.startsWith('//')) return value;
     return '/';
+}
+
+function postSignInPath(email: string, redirectParam: string | null): string {
+    if (redirectParam !== null) return safeRedirectPath(redirectParam);
+    const demo = DEMO_SIGN_IN_ACCOUNTS.find(
+        account => account.email.toLowerCase() === email.trim().toLowerCase()
+    );
+    return demo?.homePath ?? '/';
 }
 
 const isDev = process.env.NODE_ENV !== 'production';
@@ -53,7 +61,8 @@ export function SignInForm() {
     const formatApiMessage = useApiErrorMessage();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const redirectTo = safeRedirectPath(searchParams.get('redirectTo'));
+    const redirectParam = searchParams.get('redirectTo');
+    const emailFromInvite = searchParams.get('email')?.trim() ?? '';
     const [apiError, setApiError] = useState<unknown>(null);
     const [verification, setVerification] = useState<{
         email: string;
@@ -63,7 +72,7 @@ export function SignInForm() {
     const [cooldown, setCooldown] = useState(0);
 
     const form = useForm<SignInValues>({
-        defaultValues: { email: '', password: '' },
+        defaultValues: { email: emailFromInvite, password: '' },
         mode: 'onTouched',
         resolver: zodResolver(signInSchema),
     });
@@ -83,10 +92,12 @@ export function SignInForm() {
         setApiError(null);
         setVerification(null);
 
+        const destination = postSignInPath(values.email, redirectParam);
+
         const result = await signIn.email({
             email: values.email,
             password: values.password,
-            callbackURL: redirectTo,
+            callbackURL: destination,
         });
 
         if (result.error) {
@@ -114,7 +125,7 @@ export function SignInForm() {
             return;
         }
 
-        router.push(redirectTo);
+        router.push(destination);
         router.refresh();
     }
 
@@ -214,9 +225,9 @@ export function SignInForm() {
                         {t('features.auth.sign_in.demo.heading')}
                     </p>
                     <div className="flex flex-wrap gap-2">
-                        {DEMO_ACCOUNTS.map(account => (
+                        {DEMO_SIGN_IN_ACCOUNTS.map(account => (
                             <Button
-                                key={account.persona}
+                                key={account.key}
                                 type="button"
                                 variant="secondary"
                                 size="sm"
@@ -239,8 +250,8 @@ export function SignInForm() {
                     </div>
                     <Typography as="p" variant="caption" color="muted">
                         {t('features.auth.sign_in.demo.passwords')}{' '}
-                        {DEMO_ACCOUNTS.map((account, index) => (
-                            <span key={account.persona}>
+                        {DEMO_SIGN_IN_ACCOUNTS.map((account, index) => (
+                            <span key={account.key}>
                                 {index > 0 ? ' / ' : null}
                                 <code className="text-fg">{account.password}</code>
                             </span>
@@ -286,6 +297,8 @@ export function SignInForm() {
                                 <FormLabel>{t('ui.form.fields.email')}</FormLabel>
                                 <FormControl>
                                     <Email
+                                        id="email"
+                                        data-testid="sign-in-email"
                                         placeholder={t('ui.form.fields.email_placeholder')}
                                         disabled={busy}
                                         {...field}
@@ -304,6 +317,8 @@ export function SignInForm() {
                                 <FormLabel>{t('ui.form.fields.password')}</FormLabel>
                                 <FormControl>
                                     <Password
+                                        id="password"
+                                        data-testid="sign-in-password"
                                         autoComplete="current-password"
                                         placeholder={t('ui.form.fields.password_mask')}
                                         disabled={busy}

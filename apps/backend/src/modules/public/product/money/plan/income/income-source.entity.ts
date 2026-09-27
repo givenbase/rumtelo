@@ -39,6 +39,10 @@ export class IncomeSource extends HouseholdEntity {
     @Property({ type: 'date', nullable: true })
     startedOn: string | null = null;
 
+    /** Last day this source applies; null = open-ended. */
+    @Property({ type: 'date', nullable: true })
+    endsOn: string | null = null;
+
     // ? ENUMS
     /** Salary / benefit / freelance / … */
     @Enum(NativeEnum({ IncomeKind, domain: 'money', defaultValue: IncomeKind.SALARY }))

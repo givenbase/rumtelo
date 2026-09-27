@@ -67,7 +67,7 @@ export const INSURANCE_MERCHANTS: readonly MerchantSeed[] = [
         key: 'ZILVEREN_KRUIS',
         name: 'Zilveren Kruis',
         matchValue: 'Zilveren Kruis',
-        aliases: ['Zilveren Kruis', 'ZILVEREN KRUIS', 'ZK Achmea'],
+        aliases: ['Zilveren Kruis', 'ZILVEREN KRUIS', 'Zilverenkruis', 'ZK Achmea', 'ZK'],
         mcc: '6300',
         jarKey: necessities,
         categoryTemplateKey: 'INSURANCE',

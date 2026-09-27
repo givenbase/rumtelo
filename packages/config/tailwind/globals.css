@@ -68,4 +68,9 @@
     [role='button']:not(:disabled) {
         cursor: pointer;
     }
+
+    /* Opt-in: mark mutate controls with data-mutate; shell sets data-board-readonly. */
+    [data-board-readonly] [data-mutate] {
+        display: none !important;
+    }
 }

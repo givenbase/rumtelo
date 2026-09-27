@@ -103,7 +103,8 @@ export class HouseholdSettingsService {
             await this.em.persist(row).flush();
         }
         const planKey = await this.billing.getPlanKey(householdId);
-        return toSettingsDto(row, planKey);
+        const createdAt = await this.resolveHouseholdCreatedAt(householdId, row.onboardedAt);
+        return toSettingsDto(row, planKey, createdAt);
     }
 
     // ====================================================================
@@ -143,13 +144,39 @@ export class HouseholdSettingsService {
             // Stripe is billing source of truth — skip seat/kind fit on cancel/sync
             // so multi-member households can downgrade to Basic without blocking the webhook.
             if (!opts?.allowStripeBillingSync) {
-                const memberCount = await this.em.count(AuthMember, { household: householdId });
-                if (!householdFitsPlan(patch.planKey, { memberCount, kind: nextKind })) {
+                const memberships = await this.em.find(AuthMember, { household: householdId });
+                let writableCount = 0;
+                let viewerCount = 0;
+                for (const member of memberships) {
+                    const role = member.role.toLowerCase();
+                    if (role === 'viewer') viewerCount += 1;
+                    else writableCount += 1;
+                }
+                const memberCount = memberships.length;
+                const snap = await this.billing.getSnapshot(householdId);
+                if (
+                    !householdFitsPlan(patch.planKey, {
+                        memberCount,
+                        writableCount,
+                        viewerCount,
+                        kind: nextKind,
+                        extras: {
+                            extraContributor: snap.extraContributorSeats,
+                            extraViewer: snap.extraViewerSeats,
+                        },
+                    })
+                ) {
                     const caps = capabilitiesFor(patch.planKey);
                     throw new BadRequestException(
                         caps.maxMembers !== null && memberCount > caps.maxMembers
                             ? `Cannot switch to ${patch.planKey}: household has ${memberCount} members (max ${caps.maxMembers})`
-                            : `Cannot switch to ${patch.planKey}: household kind ${nextKind} is not allowed`
+                            : caps.maxWritableMembers !== null &&
+                                writableCount > caps.maxWritableMembers
+                              ? `Cannot switch to ${patch.planKey}: household has ${writableCount} writable members (max ${caps.maxWritableMembers})`
+                              : caps.maxViewerMembers !== null &&
+                                  viewerCount > caps.maxViewerMembers
+                                ? `Cannot switch to ${patch.planKey}: household has ${viewerCount} viewers (max ${caps.maxViewerMembers})`
+                                : `Cannot switch to ${patch.planKey}: household kind ${nextKind} is not allowed`
                     );
                 }
             }
@@ -185,7 +212,22 @@ export class HouseholdSettingsService {
         }
 
         const planKey = await this.billing.getPlanKey(householdId);
-        return toSettingsDto(row, planKey);
+        const createdAt = await this.resolveHouseholdCreatedAt(householdId, row.onboardedAt);
+        return toSettingsDto(row, planKey, createdAt);
+    }
+
+    /**
+     * Period-travel floor uses household creation. Prefer AuthHousehold.createdAt;
+     * fall back to onboardedAt, then now.
+     */
+    private async resolveHouseholdCreatedAt(
+        householdId: string,
+        onboardedAt: Date | null
+    ): Promise<string> {
+        const household = await this.em.findOne(AuthHousehold, { id: householdId });
+        if (household?.createdAt) return household.createdAt.toISOString();
+        if (onboardedAt) return onboardedAt.toISOString();
+        return new Date().toISOString();
     }
 
     /**
@@ -230,7 +272,11 @@ export class HouseholdSettingsService {
     }
 }
 
-function toSettingsDto(row: HouseholdSettings, planKey: PlanKey): HouseholdSettingsDto {
+function toSettingsDto(
+    row: HouseholdSettings,
+    planKey: PlanKey,
+    createdAt: string
+): HouseholdSettingsDto {
     return {
         householdId: row.household,
         why: row.why,
@@ -242,6 +288,7 @@ function toSettingsDto(row: HouseholdSettings, planKey: PlanKey): HouseholdSetti
         features: { ...DEFAULT_FEATURE_SETTINGS, ...row.features },
         answers: row.answers ?? {},
         audienceKeys: row.audiences.getItems().map(audience => audience.key),
+        createdAt,
         onboardedAt: row.onboardedAt ? row.onboardedAt.toISOString() : null,
     };
 }

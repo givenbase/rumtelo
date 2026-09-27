@@ -4,6 +4,7 @@
  */
 
 import type { MerchantPreset } from '@rumtelo/contracts';
+import { containsWord } from '@rumtelo/utils';
 
 export type VendorBrand = {
     name: string;
@@ -106,6 +107,16 @@ export function findCatalogVendor(
     return hit ? toResolveInput(hit) : null;
 }
 
+/** Lowercase + strip spaces/punct so "Zilverenkruis" ≈ "Zilveren Kruis". */
+function compactPartyName(value: string): string {
+    return value
+        .trim()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/\p{M}/gu, '')
+        .replace(/[^a-z0-9]+/g, '');
+}
+
 /** Exact name / alias match — full merchant row. */
 export function findCatalogMerchant(
     name: string,
@@ -113,10 +124,15 @@ export function findCatalogMerchant(
 ): MerchantPreset | null {
     const needle = name.trim().toLowerCase();
     if (!needle) return null;
+    const compactNeedle = compactPartyName(needle);
     return (
         merchants.find(merchant => {
-            if (merchant.name.toLowerCase() === needle) return true;
-            return merchant.aliases.some(alias => alias.trim().toLowerCase() === needle);
+            const labels = [merchant.name, ...merchant.aliases];
+            return labels.some(label => {
+                const normalized = label.trim().toLowerCase();
+                if (normalized === needle) return true;
+                return Boolean(compactNeedle) && compactPartyName(label) === compactNeedle;
+            });
         }) ?? null
     );
 }
@@ -148,7 +164,7 @@ export function findCatalogMerchantFromFeed(
             .map(alias => alias.trim().toLowerCase())
             .filter(Boolean);
         for (const needle of needles) {
-            if (!haystack.includes(needle)) continue;
+            if (!containsWord(haystack, needle)) continue;
             if (!best || needle.length > best.length) {
                 best = { merchant, length: needle.length };
             }

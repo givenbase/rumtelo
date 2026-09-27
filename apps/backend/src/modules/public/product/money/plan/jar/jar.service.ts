@@ -5,9 +5,10 @@ import { type Jar as ContractJar, type Cadence, jarCapabilitiesFor } from '@rumt
 import {
     allocateByPercentage,
     categoryEnvelope,
+    fixedCostAppliesAsOf,
     jarCoverage,
     monthlyAmount,
-    sumMonthly,
+    monthlyNetAsOf,
 } from '@rumtelo/utils';
 
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
@@ -189,15 +190,32 @@ export class JarService {
         return this.translations.nameByEnglish(fieldMap, englishNameByKey);
     }
 
-    /** Active income normalised to a monthly figure. */
+    /** Income normalised to a monthly figure as of today (start/end aware). */
     async monthlyNetIncome(): Promise<number> {
-        const rows = await this.em
-            .getConnection()
-            .execute<{ amount: string; cadence: Cadence }[]>(
-                `SELECT amount::text, cadence FROM money_income_source WHERE household_id = ? AND is_active = true`,
-                [currentHouseholdId()]
-            );
-        return sumMonthly(rows.map(row => ({ amount: Number(row.amount), cadence: row.cadence })));
+        const today = new Date().toISOString().slice(0, 10);
+        const rows = await this.em.getConnection().execute<
+            {
+                amount: string;
+                cadence: Cadence;
+                is_active: boolean;
+                started_on: string | null;
+                ends_on: string | null;
+            }[]
+        >(
+            `SELECT amount::text, cadence, is_active, started_on, ends_on
+             FROM money_income_source WHERE household_id = ?`,
+            [currentHouseholdId()]
+        );
+        return monthlyNetAsOf(
+            rows.map(row => ({
+                amount: Number(row.amount),
+                cadence: row.cadence,
+                isActive: row.is_active,
+                startedOn: row.started_on,
+                endsOn: row.ends_on,
+            })),
+            today
+        );
     }
 
     /**
@@ -455,39 +473,79 @@ export class JarService {
         );
     }
 
-    /** Active fixed OUT per jar, monthly-normalised. */
+    /** Fixed OUT per jar, monthly-normalised, as-of today (start/end aware). */
     private async committedOutByJar(): Promise<Map<string, number>> {
-        const rows = await this.em
-            .getConnection()
-            .execute<{ jar_id: string; amount: string; cadence: Cadence }[]>(
-                `SELECT jar_id, amount::text, cadence
+        const today = new Date().toISOString().slice(0, 10);
+        const rows = await this.em.getConnection().execute<
+            {
+                jar_id: string;
+                amount: string;
+                cadence: Cadence;
+                is_active: boolean;
+                started_on: string | null;
+                ends_on: string | null;
+            }[]
+        >(
+            `SELECT jar_id, amount::text, cadence, is_active, started_on, ends_on
              FROM money_fixed_cost
-            WHERE household_id = ? AND is_active = true AND direction = 'OUT'`,
-                [currentHouseholdId()]
-            );
+            WHERE household_id = ? AND direction = 'OUT'`,
+            [currentHouseholdId()]
+        );
         const map = new Map<string, number>();
         for (const row of rows) {
             if (!row.jar_id) continue;
+            if (
+                !fixedCostAppliesAsOf(
+                    {
+                        isActive: row.is_active,
+                        startedOn: row.started_on,
+                        endsOn: row.ends_on,
+                    },
+                    today
+                )
+            ) {
+                continue;
+            }
             const monthly = monthlyAmount(Number(row.amount), row.cadence);
             map.set(row.jar_id, (map.get(row.jar_id) ?? 0) + monthly);
         }
         return map;
     }
 
-    /** Active fixed OUT per category, monthly-normalised (uncategorised rows omitted). */
+    /** Fixed OUT per category, monthly-normalised (uncategorised rows omitted), as-of today. */
     private async committedOutByCategory(): Promise<Map<string, number>> {
-        const rows = await this.em
-            .getConnection()
-            .execute<{ category_id: string; amount: string; cadence: Cadence }[]>(
-                `SELECT category_id, amount::text, cadence
+        const today = new Date().toISOString().slice(0, 10);
+        const rows = await this.em.getConnection().execute<
+            {
+                category_id: string;
+                amount: string;
+                cadence: Cadence;
+                is_active: boolean;
+                started_on: string | null;
+                ends_on: string | null;
+            }[]
+        >(
+            `SELECT category_id, amount::text, cadence, is_active, started_on, ends_on
              FROM money_fixed_cost
-            WHERE household_id = ? AND is_active = true AND direction = 'OUT'
+            WHERE household_id = ? AND direction = 'OUT'
               AND category_id IS NOT NULL`,
-                [currentHouseholdId()]
-            );
+            [currentHouseholdId()]
+        );
         const map = new Map<string, number>();
         for (const row of rows) {
             if (!row.category_id) continue;
+            if (
+                !fixedCostAppliesAsOf(
+                    {
+                        isActive: row.is_active,
+                        startedOn: row.started_on,
+                        endsOn: row.ends_on,
+                    },
+                    today
+                )
+            ) {
+                continue;
+            }
             const monthly = monthlyAmount(Number(row.amount), row.cadence);
             map.set(row.category_id, (map.get(row.category_id) ?? 0) + monthly);
         }

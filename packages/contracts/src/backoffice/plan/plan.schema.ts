@@ -16,7 +16,15 @@ import { CapabilityKind, PlanKey } from './enums';
 
 /** Named capacity ceilings — null = unlimited. */
 export const PlanLimits = z.object({
+    /** Total household seats (owner included). null = unlimited. */
     maxMembers: z.number().int().positive().nullable(),
+    /**
+     * Writable seats: OWNER + ADMIN + MEMBER (not viewer).
+     * null = unlimited. Distinct from {@link SeatAddonKind} / BA role strings.
+     */
+    maxWritableMembers: z.number().int().positive().nullable(),
+    /** Viewer / look-along seats. null = unlimited. */
+    maxViewerMembers: z.number().int().min(0).nullable(),
     maxGoals: z.number().int().positive().nullable(),
     maxAssets: z.number().int().positive().nullable(),
     maxIncomeStreams: z.number().int().positive().nullable(),
@@ -28,6 +36,10 @@ export const PlanLimits = z.object({
 export const PlanCapabilities = z.object({
     /** Ceiling on household members (owner included). null = unlimited. */
     maxMembers: z.number().int().positive().nullable(),
+    /** Writable seats (OWNER + ADMIN + MEMBER). null = unlimited. */
+    maxWritableMembers: z.number().int().positive().nullable(),
+    /** Viewer / look-along seats. null = unlimited. */
+    maxViewerMembers: z.number().int().min(0).nullable(),
     /** Goals create ceiling. null = unlimited. */
     maxGoals: z.number().int().positive().nullable(),
     /** Net-worth assets ceiling. null = unlimited. */
@@ -44,6 +56,22 @@ export const PlanCapabilities = z.object({
     capabilityKeys: z.array(z.enum(CAPABILITY_KEYS)),
     /** Whether invites are allowed (mirrors platform-invite). */
     canInvite: z.boolean(),
+});
+
+/**
+ * Purchased seat add-ons beyond the plan’s included matrix.
+ * `extraContributor` / `extraViewer` are inventory counts — not roles.
+ */
+export const SeatExtras = z.object({
+    extraContributor: z.number().int().nonnegative().default(0),
+    extraViewer: z.number().int().nonnegative().default(0),
+});
+
+/** Effective caps after included plan limits + purchased extras. */
+export const EffectiveSeatCaps = z.object({
+    maxMembers: z.number().int().positive().nullable(),
+    maxWritable: z.number().int().positive().nullable(),
+    maxViewer: z.number().int().min(0).nullable(),
 });
 
 // ====================================================================
@@ -83,6 +111,8 @@ export const PlanCapabilityGrant = z.object({
 export type PlanLimits = z.infer<typeof PlanLimits>;
 export type PlanLimitKey = keyof PlanLimits;
 export type PlanCapabilities = z.infer<typeof PlanCapabilities>;
+export type SeatExtras = z.infer<typeof SeatExtras>;
+export type EffectiveSeatCaps = z.infer<typeof EffectiveSeatCaps>;
 export type CapabilityDefinition = z.infer<typeof CapabilityDefinition>;
 export type PlanCatalogItem = z.infer<typeof PlanCatalogItem>;
 export type PlanCapabilityGrant = z.infer<typeof PlanCapabilityGrant>;

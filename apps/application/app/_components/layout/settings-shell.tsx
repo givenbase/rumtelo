@@ -1,21 +1,29 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { useMemo } from 'react';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { HouseholdPermissionSection, HouseholdRole } from '@rumtelo/contracts';
 import { Typography } from '@rumtelo/ui';
 import { useTranslations } from '@rumtelo/i18n';
 import { cn } from '@rumtelo/utils';
 
+import { useAuth } from '@/components/features/shell/auth-provider';
+import { isLiveData } from '@/app/_lib/preview';
+import { roleCanSee } from '@/app/_lib/role-permissions';
+import { apiQuery } from '@/app/_lib/api-hooks';
 import {
     SETTINGS_SECTIONS,
     settingsHref,
     settingsTabFromPathname,
     type SettingsNavItem,
+    type SettingsNavSection,
 } from '@/app/_lib/settings-tabs';
 import { PageContent } from '@/components/layout/page-content';
+import { useLiveQuery } from '@rumtelo/hooks';
 
 function NavLink({
     tab,
@@ -75,6 +83,16 @@ export function SettingsShell({ children }: { children: ReactNode }) {
     const t = useTranslations();
     const pathname = usePathname();
     const activeTab = settingsTabFromPathname(pathname);
+    const { householdId, user } = useAuth();
+    const live = isLiveData(householdId);
+    const membersQuery = useLiveQuery(
+        apiQuery.household.members.queryOptions({ input: { householdId: householdId! } }),
+        [],
+        live
+    );
+    const myRole =
+        membersQuery.data?.find(m => m.userId === user?.id)?.role ?? HouseholdRole.VIEWER;
+    const sections = useMemo(() => filterSettingsSections(SETTINGS_SECTIONS, myRole), [myRole]);
 
     return (
         <PageContent width="wide" className="animate-rise">
@@ -94,20 +112,20 @@ export function SettingsShell({ children }: { children: ReactNode }) {
             </header>
 
             <div className="flex flex-col gap-5 md:flex-row md:items-start md:gap-6">
-                {/* Mobile: one horizontal chip row */}
                 <nav
                     aria-label={t('pages.shell.settings')}
-                    className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 md:hidden">
-                    {SETTINGS_SECTIONS.flatMap(section => section.items).map(tab => (
-                        <NavLink key={tab.key} tab={tab} active={tab.key === activeTab} />
-                    ))}
+                    className="-mx-1 flex flex-wrap gap-1.5 px-1 pb-1 md:hidden">
+                    {sections
+                        .flatMap(section => section.items)
+                        .map(tab => (
+                            <NavLink key={tab.key} tab={tab} active={tab.key === activeTab} />
+                        ))}
                 </nav>
 
-                {/* Desktop: compact grouped rail */}
                 <nav
                     aria-label={t('pages.shell.settings')}
                     className="hidden shrink-0 content-start gap-3 md:grid md:w-40">
-                    {SETTINGS_SECTIONS.map(section => (
+                    {sections.map(section => (
                         <div key={section.titleKey} className="grid gap-px">
                             <p className="px-2.5 pb-1 font-mono text-[9px] font-semibold tracking-[0.16em] text-fg-faint uppercase">
                                 {t(section.titleKey)}
@@ -127,4 +145,23 @@ export function SettingsShell({ children }: { children: ReactNode }) {
             </div>
         </PageContent>
     );
+}
+
+/** Hide Plan when role cannot see billing; hide Practice coaches for non-managers. */
+function filterSettingsSections(
+    sections: SettingsNavSection[],
+    role: HouseholdRole
+): SettingsNavSection[] {
+    const canSeeBilling = roleCanSee(role, HouseholdPermissionSection.HOUSEHOLD_BILLING);
+    const canManagePractice = role === HouseholdRole.OWNER || role === HouseholdRole.ADMIN;
+    return sections
+        .map(section => ({
+            ...section,
+            items: section.items.filter(item => {
+                if (item.key === 'plan') return canSeeBilling;
+                if (item.key === 'practice') return canManagePractice;
+                return true;
+            }),
+        }))
+        .filter(section => section.items.length > 0);
 }

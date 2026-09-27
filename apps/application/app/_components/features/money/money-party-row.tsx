@@ -20,6 +20,11 @@ type MoneyPartyRowProps = {
     amount: string;
     amountClassName?: string;
     badges?: ReactNode;
+    /**
+     * Right-rail control next to the amount (e.g. Due → mark paid).
+     * Outside the row link so it does not navigate.
+     */
+    status?: ReactNode;
     /** Prefer for pure navigation — enables prefetch + open-in-new-tab. */
     href?: string;
     /** Use only when navigation is conditional or follows another action. */
@@ -27,7 +32,7 @@ type MoneyPartyRowProps = {
 };
 
 /**
- * Shared ledger / bill row: company logo, name, jar + pay-day chips, amount.
+ * Shared ledger / bill row: company logo, name, meta chips, amount + optional status.
  */
 export function MoneyPartyRow({
     title,
@@ -36,13 +41,14 @@ export function MoneyPartyRow({
     amount,
     amountClassName,
     badges,
+    status,
     href,
     onClick,
 }: MoneyPartyRowProps) {
-    const className =
-        'flex w-full cursor-pointer items-center gap-3 border-b border-line px-5 py-3.5 text-left last:border-b-0 hover:bg-raised';
+    const mainClass =
+        'flex min-w-0 flex-1 cursor-pointer items-center gap-3 px-5 py-3.5 text-left hover:bg-raised';
 
-    const body = (
+    const main = (
         <>
             <VendorMark
                 name={mark.name}
@@ -63,27 +69,32 @@ export function MoneyPartyRow({
                     <div className="mt-1.5 flex flex-wrap items-center gap-1.5">{badges}</div>
                 ) : null}
             </div>
-            <span
-                className={cn(
-                    'shrink-0 font-mono text-sm whitespace-nowrap text-fg',
-                    amountClassName
-                )}>
-                {amount}
-            </span>
         </>
     );
 
-    if (href) {
-        return (
-            <Link href={href} aria-label={title} className={className}>
-                {body}
-            </Link>
-        );
-    }
-
     return (
-        <button type="button" aria-label={title} onClick={onClick} className={className}>
-            {body}
-        </button>
+        <div className="flex w-full items-center border-b border-line last:border-b-0">
+            {href ? (
+                <Link href={href} aria-label={title} className={mainClass}>
+                    {main}
+                </Link>
+            ) : (
+                <button type="button" aria-label={title} onClick={onClick} className={mainClass}>
+                    {main}
+                </button>
+            )}
+            <div className="flex shrink-0 items-center gap-2.5 py-3.5 pr-5">
+                <span
+                    className={cn(
+                        'min-w-[4.5rem] text-right font-mono text-sm whitespace-nowrap text-fg tabular-nums',
+                        amountClassName
+                    )}>
+                    {amount}
+                </span>
+                {status !== undefined ? (
+                    <div className="flex w-[7.25rem] shrink-0 justify-end">{status}</div>
+                ) : null}
+            </div>
+        </div>
     );
 }

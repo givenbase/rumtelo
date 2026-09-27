@@ -8,6 +8,7 @@ import {
     useMemo,
     useRef,
     useState,
+    useSyncExternalStore,
     type ReactNode,
 } from 'react';
 
@@ -19,6 +20,13 @@ import {
     useSession,
     type Session,
 } from '@/app/_lib/auth';
+import {
+    getPracticePreviewSnapshot,
+    hydratePracticePreview,
+    subscribePracticePreview,
+} from '@/app/_lib/practice-preview';
+
+hydratePracticePreview();
 
 interface AuthCtx {
     session: Session | null | undefined;
@@ -26,8 +34,13 @@ interface AuthCtx {
     user: Session['user'] | null;
     /** Better Auth `user.id` (opaque AuthId). */
     userId: string | null;
-    /** Active household id (opaque AuthId). Null until onboarded / activated. */
+    /**
+     * Effective household for product queries.
+     * Practice coach preview overrides BA active org without switching it.
+     */
     householdId: string | null;
+    /** True while viewing a client board via Practice (read-only). */
+    isPracticePreview: boolean;
     isPending: boolean;
     /**
      * False until the first-login household activation attempt finishes
@@ -64,8 +77,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const activating = useRef(false);
     /** User id whose org-activation attempt has finished (including "none"). */
     const [activatedForUserId, setActivatedForUserId] = useState<string | null>(null);
+    const preview = useSyncExternalStore(
+        subscribePracticePreview,
+        getPracticePreviewSnapshot,
+        () => null
+    );
 
-    const householdId = activeHouseholdId(session);
+    const sessionHouseholdId = activeHouseholdId(session);
+    const householdId = preview?.householdId ?? sessionHouseholdId;
+    const isPracticePreview = Boolean(preview);
     const userId = sessionUserId(session);
     const user = session?.user ?? null;
     const isAuthenticated = Boolean(userId);
@@ -95,10 +115,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
 
     // First login / demo: activate the only household if session has none.
-    // After the attempt (including empty list), mark this user activated so
-    // AppBootGate can open onboarding instead of spinning forever.
+    // Skip while practice preview is active — do not steal the coach into their own board.
     useEffect(() => {
-        if (isPending || !userId || householdId) return;
+        if (isPending || !userId || householdId || isPracticePreview) return;
         if (activatedForUserId === userId || activating.current) return;
         activating.current = true;
         const targetUserId = userId;
@@ -115,7 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 setActivatedForUserId(targetUserId);
             }
         })();
-    }, [isPending, userId, householdId, activatedForUserId]);
+    }, [isPending, userId, householdId, activatedForUserId, isPracticePreview]);
 
     const value = useMemo(
         () => ({
@@ -123,6 +142,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             user,
             userId,
             householdId,
+            isPracticePreview,
             isPending,
             householdReady,
             isAuthenticated,
@@ -134,6 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             user,
             userId,
             householdId,
+            isPracticePreview,
             isPending,
             householdReady,
             isAuthenticated,
@@ -151,12 +172,12 @@ export function useAuth(): AuthCtx {
     return ctx;
 }
 
-/** Active household AuthId, or null if none selected. */
+/** Effective household AuthId (preview or BA active org), or null. */
 export function useHouseholdId(): string | null {
     return useAuth().householdId;
 }
 
-/** Active household AuthId — throws if missing (call after onboarding). */
+/** Effective household AuthId — throws if missing (call after onboarding). */
 export function useRequireHouseholdId(): string {
     const id = useHouseholdId();
     if (!id) throw new Error('No active household — complete onboarding first');

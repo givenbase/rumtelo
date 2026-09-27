@@ -7,6 +7,8 @@ export type {
     PlanLimits,
     PlanLimitKey,
     PlanCapabilities,
+    SeatExtras,
+    EffectiveSeatCaps,
     CapabilityDefinition,
     PlanCatalogItem,
     PlanCapabilityGrant,

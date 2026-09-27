@@ -19,7 +19,7 @@ import { useTranslations } from '@rumtelo/i18n';
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useApiError } from '@/app/_lib/api-error-messages';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 import { buildFullTourChapters, pathWithoutLocale } from './content';
@@ -105,7 +105,7 @@ export function PageTourProvider({ children }: { children: ReactNode }) {
     const { userId } = useAuth();
     const queryClient = useQueryClient();
     const t = useTranslations('features.tour');
-    const { showToast } = useAppShell();
+    const { showToast } = useHouseholdShell();
     const apiError = useApiError();
     const fullTourChapters = useMemo(() => buildFullTourChapters(t), [t]);
     const joyrideLocale = useMemo(

@@ -23,6 +23,10 @@ export type HouseholdBillingSnapshot = {
     scheduledPlanKey: PlanKey | null;
     stripeSubscriptionId: string | null;
     stripeCustomerId: string | null;
+    /** Purchased extra contributor seats beyond the plan matrix. */
+    extraContributorSeats: number;
+    /** Purchased extra viewer seats beyond the plan matrix. */
+    extraViewerSeats: number;
 };
 
 /**
@@ -63,6 +67,8 @@ export class HouseholdBillingService {
             scheduledPlanKey: row.scheduledPlanKey ?? null,
             stripeSubscriptionId: row.stripeSubscriptionId,
             stripeCustomerId: row.stripeCustomerId,
+            extraContributorSeats: row.extraContributorSeats,
+            extraViewerSeats: row.extraViewerSeats,
         };
     }
 

@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { cn, describePeriodTravel } from '@rumtelo/utils';
 
 import { formatPeriodTravelLabels } from '@/app/_lib/period-travel-i18n';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 
 function formatPeriodStamp(year: number, month: number, locale: string): string {
     return new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric' }).format(
@@ -19,7 +19,7 @@ function formatPeriodStamp(year: number, month: number, locale: string): string 
 export function PeriodTravelBanner() {
     const t = useTranslations('pages.shell');
     const locale = useLocale();
-    const { period, setPeriod } = useAppShell();
+    const { period, setPeriod } = useHouseholdShell();
     const travel = describePeriodTravel(period);
     const labels = formatPeriodTravelLabels(travel, t);
 

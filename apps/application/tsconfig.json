@@ -11,8 +11,9 @@
             "@/*": ["./*"],
             "@/app/*": ["./app/*"],
             "@/components/*": ["./app/_components/*"],
-            "@/product/*": ["./app/(routes)/[locale]/(app)/product/*"],
-            "@/platform/*": ["./app/(routes)/[locale]/(app)/(platform)/*"]
+            "@/product/*": ["./app/(routes)/[locale]/(app)/(household)/product/*"],
+            "@/household/*": ["./app/(routes)/[locale]/(app)/(household)/*"],
+            "@/practice/*": ["./app/(routes)/[locale]/(app)/practice/*"]
         }
     },
     "include": ["**/*.ts", "**/*.tsx", "next-env.d.ts", "next.config.js", ".next/types/**/*.ts"],

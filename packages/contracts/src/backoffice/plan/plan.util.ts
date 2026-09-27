@@ -3,7 +3,7 @@
  * Capability catalog, plan access tree, grant lists, and helper functions.
  */
 
-import { HouseholdKind } from '../../enums';
+import { HouseholdKind, HouseholdRole } from '../../enums';
 import {
     CAPABILITIES,
     CAPABILITY_PRODUCTS,
@@ -12,9 +12,10 @@ import {
     productOfCapability,
     type CapabilityKey,
 } from './capabilities';
-import { CapabilityKind, PlanKey } from './enums';
+import { CapabilityKind, PlanKey, SeatAddonKind } from './enums';
 import type {
     CapabilityDefinition,
+    EffectiveSeatCaps,
     PlanCapabilities,
     PlanCapabilityGrant,
     PlanLimitKey,
@@ -213,7 +214,7 @@ export const CAPABILITY_CATALOG: Record<CapabilityKey, CapabilityDefinition> = {
         key: CAPABILITIES.platformInvite,
         kind: CapabilityKind.ACTION,
         name: 'Invite',
-        description: 'Invite a partner, family, or friend to the household.',
+        description: 'Invite a partner, family, friend, or coach (viewer) to the household.',
         sortOrder: 50,
     },
 };
@@ -256,7 +257,7 @@ const BASIC_ACCESS: ProductFeatureMap = {
         CAPABILITIES.soulGiving,
         CAPABILITIES.soulIntent,
     ],
-    [CapabilityProduct.PLATFORM]: [],
+    [CapabilityProduct.PLATFORM]: [CAPABILITIES.platformInvite],
 };
 
 const PLUS_EXTRA: ProductFeatureMap = {
@@ -273,7 +274,7 @@ const PLUS_EXTRA: ProductFeatureMap = {
         CAPABILITIES.energyFood,
     ],
     [CapabilityProduct.SOUL]: [],
-    [CapabilityProduct.PLATFORM]: [CAPABILITIES.platformInvite],
+    [CapabilityProduct.PLATFORM]: [],
 };
 
 const MAX_EXTRA: ProductFeatureMap = {
@@ -335,10 +336,12 @@ const ALL_KINDS = [
     HouseholdKind.FRIENDS,
 ] as const;
 
-/** Capacity ceilings per plan — Basic never uses null (unlimited). */
+/** Capacity ceilings per plan — Basic never uses null (unlimited) for seats. */
 export const PLAN_LIMITS: Record<PlanKey, PlanLimits> = {
     [PlanKey.BASIC]: {
-        maxMembers: 1,
+        maxMembers: 2,
+        maxWritableMembers: 1,
+        maxViewerMembers: 1,
         maxGoals: 1,
         maxAssets: null,
         maxIncomeStreams: null,
@@ -346,7 +349,9 @@ export const PLAN_LIMITS: Record<PlanKey, PlanLimits> = {
         maxBankLinks: 0,
     },
     [PlanKey.PLUS]: {
-        maxMembers: 5,
+        maxMembers: 3,
+        maxWritableMembers: 2,
+        maxViewerMembers: 2,
         maxGoals: 5,
         maxAssets: null,
         maxIncomeStreams: null,
@@ -354,7 +359,9 @@ export const PLAN_LIMITS: Record<PlanKey, PlanLimits> = {
         maxBankLinks: 2,
     },
     [PlanKey.MAX]: {
-        maxMembers: null,
+        maxMembers: 5,
+        maxWritableMembers: 4,
+        maxViewerMembers: 1,
         maxGoals: null,
         maxAssets: null,
         maxIncomeStreams: null,
@@ -362,6 +369,59 @@ export const PLAN_LIMITS: Record<PlanKey, PlanLimits> = {
         maxBankLinks: 6,
     },
 };
+
+/** Absolute BA / product ceiling for members + pending invites (included + add-ons). */
+export const MEMBERSHIP_HARD_LIMIT = 20;
+
+/** €2.50 / seat / month in eurocents — consumer add-ons and Practice staff seats. */
+export const SEAT_ADDON_UNIT_CENTS = 250;
+
+/** Catalog stub for purchasable household seat add-ons (Stripe qty wiring later). */
+export const SEAT_ADDON_CATALOG = {
+    [SeatAddonKind.CONTRIBUTOR]: {
+        kind: SeatAddonKind.CONTRIBUTOR,
+        lookupKey: 'rumtelo_addon_contributor_seat_monthly',
+        unitAmountCents: SEAT_ADDON_UNIT_CENTS,
+        currency: 'eur' as const,
+    },
+    [SeatAddonKind.VIEWER]: {
+        kind: SeatAddonKind.VIEWER,
+        lookupKey: 'rumtelo_addon_viewer_seat_monthly',
+        unitAmountCents: SEAT_ADDON_UNIT_CENTS,
+        currency: 'eur' as const,
+    },
+} as const;
+
+/**
+ * Practice B2B pricing (eurocents / month).
+ * Base covers the org; staff + client seats meter every added account.
+ * Client seat sits above Plus retail so MANAGE sponsorship still has margin.
+ * VIEW links are not metered (free Basic look-along).
+ */
+export const PRACTICE_BASE_UNIT_CENTS = 4900;
+export const PRACTICE_STAFF_SEAT_UNIT_CENTS = SEAT_ADDON_UNIT_CENTS;
+export const PRACTICE_CLIENT_SEAT_UNIT_CENTS = 1400;
+
+export const PRACTICE_PRICING_CATALOG = {
+    base: {
+        kind: 'base' as const,
+        lookupKey: 'rumtelo_practice_base_monthly',
+        unitAmountCents: PRACTICE_BASE_UNIT_CENTS,
+        currency: 'eur' as const,
+    },
+    staffSeat: {
+        kind: 'staff_seat' as const,
+        lookupKey: 'rumtelo_practice_seat_monthly',
+        unitAmountCents: PRACTICE_STAFF_SEAT_UNIT_CENTS,
+        currency: 'eur' as const,
+    },
+    clientSeat: {
+        kind: 'client_seat' as const,
+        lookupKey: 'rumtelo_practice_client_monthly',
+        unitAmountCents: PRACTICE_CLIENT_SEAT_UNIT_CENTS,
+        currency: 'eur' as const,
+    },
+} as const;
 
 function buildPlanCapabilities(
     plan: PlanKey,
@@ -473,27 +533,111 @@ export function canInviteOnPlan(plan: PlanKey): boolean {
 }
 
 /**
- * Whether another member seat is available.
- * `occupiedSeats` = current members + pending invites (owner counts as 1).
+ * OWNER / ADMIN / MEMBER occupy writable seats; VIEWER occupies viewer seats.
+ * Distinct from {@link SeatAddonKind} (billing inventory).
  */
-export function canAddHouseholdMember(plan: PlanKey, occupiedSeats: number): boolean {
-    const caps = capabilitiesFor(plan);
-    if (!caps.canInvite) return false;
-    return withinLimit(plan, 'maxMembers', occupiedSeats);
+export function isWritableHouseholdRole(role: HouseholdRole): boolean {
+    return (
+        role === HouseholdRole.OWNER ||
+        role === HouseholdRole.ADMIN ||
+        role === HouseholdRole.MEMBER
+    );
+}
+
+function addSeatCap(base: number | null, extra: number): number | null {
+    if (base === null) return null;
+    return base + Math.max(0, extra);
+}
+
+/**
+ * Effective seat ceilings = plan-included matrix + purchased add-ons,
+ * capped by {@link MEMBERSHIP_HARD_LIMIT}.
+ */
+export function effectiveSeatCaps(
+    plan: PlanKey,
+    extras: { extraContributor?: number; extraViewer?: number } = {}
+): EffectiveSeatCaps {
+    const limits = PLAN_LIMITS[plan];
+    const extraContributor = Math.max(0, extras.extraContributor ?? 0);
+    const extraViewer = Math.max(0, extras.extraViewer ?? 0);
+    let maxMembers = addSeatCap(limits.maxMembers, extraContributor + extraViewer);
+    if (maxMembers !== null) {
+        maxMembers = Math.min(maxMembers, MEMBERSHIP_HARD_LIMIT);
+    } else {
+        maxMembers = MEMBERSHIP_HARD_LIMIT;
+    }
+    return {
+        maxMembers,
+        maxWritable: addSeatCap(limits.maxWritableMembers, extraContributor),
+        maxViewer: addSeatCap(limits.maxViewerMembers, extraViewer),
+    };
+}
+
+export type CanAddHouseholdMemberOpts = {
+    /** Current members + pending invites (owner counts as 1). */
+    occupiedSeats: number;
+    /** Current writable roles (OWNER+ADMIN+MEMBER) + pending for those roles. */
+    writableCount: number;
+    /** Current VIEWER members + pending viewer invites. */
+    viewerCount: number;
+    /** Role being invited (OWNER cannot be invited). */
+    role: HouseholdRole;
+    extras?: { extraContributor?: number; extraViewer?: number };
+};
+
+/**
+ * Whether another member seat is available for the given role under effective caps.
+ */
+export function canAddHouseholdMember(plan: PlanKey, opts: CanAddHouseholdMemberOpts): boolean {
+    if (!canInviteOnPlan(plan)) return false;
+    if (opts.role === HouseholdRole.OWNER) return false;
+
+    const caps = effectiveSeatCaps(plan, opts.extras);
+    if (caps.maxMembers !== null && opts.occupiedSeats >= caps.maxMembers) return false;
+
+    if (isWritableHouseholdRole(opts.role)) {
+        return caps.maxWritable === null || opts.writableCount < caps.maxWritable;
+    }
+    return caps.maxViewer === null || opts.viewerCount < caps.maxViewer;
+}
+
+/** Roles the plan may invite at all (ignores current occupancy). Owner is never inviteable. */
+export function planAllowsInviteRole(
+    plan: PlanKey,
+    role: HouseholdRole,
+    extras: { extraContributor?: number; extraViewer?: number } = {}
+): boolean {
+    if (role === HouseholdRole.OWNER) return false;
+    if (!canInviteOnPlan(plan)) return false;
+    const caps = effectiveSeatCaps(plan, extras);
+    if (isWritableHouseholdRole(role)) {
+        // Need room beyond the founding owner for admin/member invites.
+        return caps.maxWritable === null || caps.maxWritable > 1;
+    }
+    return caps.maxViewer === null || caps.maxViewer > 0;
 }
 
 export function canUseHouseholdKind(plan: PlanKey, kind: HouseholdKind): boolean {
     return capabilitiesFor(plan).householdKinds.includes(kind);
 }
 
-/** True when the household already fits under the target plan's caps. */
+/** True when the household already fits under the target plan's effective caps. */
 export function householdFitsPlan(
     plan: PlanKey,
-    opts: { memberCount: number; kind: HouseholdKind }
+    opts: {
+        memberCount: number;
+        writableCount: number;
+        viewerCount: number;
+        kind: HouseholdKind;
+        extras?: { extraContributor?: number; extraViewer?: number };
+    }
 ): boolean {
-    const caps = capabilitiesFor(plan);
-    if (!caps.householdKinds.includes(opts.kind)) return false;
+    const capsPlan = capabilitiesFor(plan);
+    if (!capsPlan.householdKinds.includes(opts.kind)) return false;
+    const caps = effectiveSeatCaps(plan, opts.extras);
     if (caps.maxMembers !== null && opts.memberCount > caps.maxMembers) return false;
+    if (caps.maxWritable !== null && opts.writableCount > caps.maxWritable) return false;
+    if (caps.maxViewer !== null && opts.viewerCount > caps.maxViewer) return false;
     return true;
 }
 

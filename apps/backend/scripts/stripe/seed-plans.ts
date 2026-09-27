@@ -1,5 +1,6 @@
 /**
  * Create Rumtelo Plus / Max Stripe Products + recurring Prices (idempotent).
+ * Also seeds household seat add-ons and Practice B2B prices (base + staff + client).
  *
  * Seeds Stripe plans with stable lookup_keys
  * so test and live accounts share the same code paths after seeding each one.
@@ -20,9 +21,14 @@ import { loadEnvFiles } from '../../src/common/config/load-env';
 import {
     STRIPE_PLAN_CATALOG,
     STRIPE_PLAN_LOOKUP_KEYS,
+    STRIPE_PRACTICE_BASE_CATALOG,
+    STRIPE_PRACTICE_CLIENT_CATALOG,
+    STRIPE_PRACTICE_SEAT_CATALOG,
+    STRIPE_SEAT_ADDON_CATALOG,
     type BillingInterval,
     type PaidPlanKey,
 } from '../../src/modules/public/platform/billing/config/stripe-plans.config';
+import { SeatAddonKind } from '@rumtelo/contracts';
 
 const loadedEnvPath = loadEnvFiles();
 
@@ -102,6 +108,73 @@ async function ensurePrice(
     return price;
 }
 
+/**
+ * Idempotent: create or skip a recurring per-unit-amount price with a stable lookup_key.
+ * Used for seat add-ons and practice staff seats (all monthly, no yearly variant).
+ */
+async function ensureAddonPrice(
+    stripe: Stripe,
+    opts: {
+        name: string;
+        description: string;
+        currency: string;
+        monthCents: number;
+        lookupKey: string;
+        metaKind: string;
+        metaType: string;
+    }
+): Promise<Stripe.Price> {
+    const existing = await stripe.prices.list({
+        lookup_keys: [opts.lookupKey],
+        limit: 1,
+        active: true,
+    });
+
+    if (existing.data.length > 0) {
+        const price = existing.data[0];
+        console.log(`  ⏭  ${opts.lookupKey} → ${price.id} (exists)`);
+        return price;
+    }
+
+    // Ensure a product for this add-on exists.
+    const products = await stripe.products.search({
+        query: `metadata['addon_kind']:'${opts.metaKind}' AND metadata['product_type']:'${opts.metaType}'`,
+        limit: 1,
+    });
+
+    let productId: string;
+    if (products.data.length > 0) {
+        productId = products.data[0].id;
+    } else {
+        const product = await stripe.products.create({
+            name: opts.name,
+            description: opts.description,
+            metadata: {
+                addon_kind: opts.metaKind,
+                product_type: opts.metaType,
+                category: 'rumtelo',
+            },
+        });
+        productId = product.id;
+    }
+
+    const price = await stripe.prices.create({
+        product: productId,
+        unit_amount: Math.round(opts.monthCents),
+        currency: opts.currency,
+        recurring: { interval: 'month' },
+        lookup_key: opts.lookupKey,
+        nickname: opts.name,
+        metadata: {
+            addon_kind: opts.metaKind,
+            billing_interval: 'month',
+        },
+    });
+
+    console.log(`  ✓  ${opts.lookupKey} → ${price.id} (€${(opts.monthCents / 100).toFixed(2)}/mo)`);
+    return price;
+}
+
 function hasFlag(flag: string): boolean {
     return process.argv.includes(flag);
 }
@@ -166,6 +239,7 @@ async function main() {
 
     const envLines: string[] = [];
 
+    // ── Household plans (Plus / Max) ──────────────────────────────────
     for (const planKey of PLAN_KEYS) {
         console.log(`\n📦 ${STRIPE_PLAN_CATALOG[planKey].name}`);
         const product = await ensureProduct(stripe, planKey);
@@ -180,12 +254,68 @@ async function main() {
         }
     }
 
+    // ── Household seat add-ons ────────────────────────────────────────
+    console.log('\n🪑 Household seat add-ons');
+    for (const kind of [SeatAddonKind.CONTRIBUTOR, SeatAddonKind.VIEWER]) {
+        const catalog = STRIPE_SEAT_ADDON_CATALOG[kind];
+        const price = await ensureAddonPrice(stripe, {
+            name: catalog.name,
+            description: catalog.description,
+            currency: catalog.currency,
+            monthCents: catalog.month * 100,
+            lookupKey: catalog.lookupKey,
+            metaKind: kind,
+            metaType: 'household_seat_addon',
+        });
+        envLines.push(`STRIPE_PRICE_ID_ADDON_${kind.toUpperCase()}=${price.id}`);
+    }
+
+    // ── Practice B2B (base + staff + client) ──────────────────────────
+    console.log('\n🏢 Practice pricing');
+    for (const catalog of [
+        {
+            ...STRIPE_PRACTICE_BASE_CATALOG,
+            metaKind: 'practice_base',
+            metaType: 'practice_base_subscription',
+            envName: 'STRIPE_PRICE_ID_PRACTICE_BASE',
+        },
+        {
+            ...STRIPE_PRACTICE_SEAT_CATALOG,
+            metaKind: 'practice_seat',
+            metaType: 'practice_seat_meter',
+            envName: 'STRIPE_PRICE_ID_PRACTICE_SEAT',
+        },
+        {
+            ...STRIPE_PRACTICE_CLIENT_CATALOG,
+            metaKind: 'practice_client',
+            metaType: 'practice_client_meter',
+            envName: 'STRIPE_PRICE_ID_PRACTICE_CLIENT',
+        },
+    ]) {
+        const price = await ensureAddonPrice(stripe, {
+            name: catalog.name,
+            description: catalog.description,
+            currency: catalog.currency,
+            monthCents: catalog.month * 100,
+            lookupKey: catalog.lookupKey,
+            metaKind: catalog.metaKind,
+            metaType: catalog.metaType,
+        });
+        envLines.push(`${catalog.envName}=${price.id}`);
+    }
+
     console.log('\n✅ Catalog ready. Lookup keys (same in staging + prod after each seed):');
     for (const planKey of PLAN_KEYS) {
         for (const interval of INTERVALS) {
             console.log(`   ${STRIPE_PLAN_LOOKUP_KEYS[planKey][interval]}`);
         }
     }
+    for (const kind of [SeatAddonKind.CONTRIBUTOR, SeatAddonKind.VIEWER]) {
+        console.log(`   ${STRIPE_SEAT_ADDON_CATALOG[kind].lookupKey}`);
+    }
+    console.log(`   ${STRIPE_PRACTICE_BASE_CATALOG.lookupKey}`);
+    console.log(`   ${STRIPE_PRACTICE_SEAT_CATALOG.lookupKey}`);
+    console.log(`   ${STRIPE_PRACTICE_CLIENT_CATALOG.lookupKey}`);
 
     console.log('\n📋 Price IDs (optional reference / Dashboard):');
     for (const line of envLines) console.log(`   ${line}`);

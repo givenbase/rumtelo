@@ -8,6 +8,7 @@
         "test": "playwright test",
         "test:smoke": "playwright test --grep @smoke",
         "test:plan": "playwright test --grep @plan",
+        "test:practice": "playwright test --grep @practice",
         "test:ui": "playwright test --ui",
         "test:headed": "playwright test --headed",
         "report": "playwright show-report",

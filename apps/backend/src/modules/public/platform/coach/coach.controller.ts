@@ -31,7 +31,9 @@ export class CoachController {
     /** Smart fill queue — missing money / energy / soul answers for this visit. */
     @Implement(contract.coach.session)
     session() {
-        return implement(contract.coach.session).handler(() => this.sessions.session());
+        return implement(contract.coach.session).handler(({ input }) =>
+            this.sessions.session(input.period)
+        );
     }
 
     // ====================================================================

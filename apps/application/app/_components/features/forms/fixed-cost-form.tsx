@@ -34,6 +34,7 @@ import {
 
 import { audienceKeysFromFixedCostPreset } from '@/app/_lib/household-audience-from-money';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
+import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
 import { SETTINGS_HREF } from '@/app/_lib/settings-tabs';
@@ -44,12 +45,12 @@ import { useMergeHouseholdAudiences } from '@/app/_lib/use-merge-household-audie
 import { partyMark } from '@/app/_lib/vendor-brands';
 import { GivingFinder } from '@/components/features/money/giving-finder';
 import { CoachTipCard } from '@/components/features/helpers';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 
 import { createFixedCostFormSchema, type FixedCostFormSchemaValues } from './form-zod';
-import { CatalogChipPicker } from './catalog-chip-picker';
+import { CATALOG_CHIP_IDLE_LIMIT, CatalogChipPicker } from './catalog-chip-picker';
 import { ConfirmActionButton } from './confirm-action-button';
 import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
 import { FormInput } from './form-input';
@@ -60,9 +61,6 @@ import {
     merchantsToNameOptions,
 } from './merchant-name-options';
 import { PresetNameField, type NamePresetOption } from './preset-name-field';
-
-/** Cap suggested vendor chips so the form stays scannable. */
-const MAX_VENDOR_CHIPS = 16;
 
 export type GivePayeeMode = 'known' | 'coach' | 'manual';
 
@@ -112,7 +110,8 @@ export function FixedCostForm({
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { symbol } = useHouseholdCurrency();
-    const { showToast } = useAppShell();
+    const { showToast, period } = useHouseholdShell();
+    const periodDefaultDate = viewedPeriodDefaultIso(period);
     const apiError = useApiError();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
@@ -302,6 +301,8 @@ export function FixedCostForm({
             jarId: defaultValues?.jarId ?? '',
             categoryId: defaultValues?.categoryId ?? null,
             dueDay: defaultValues?.dueDay ?? '',
+            startedOn: defaultValues?.startedOn ?? periodDefaultDate,
+            endsOn: defaultValues?.endsOn ?? '',
         },
         resolver: zodResolver(fixedCostFormSchema),
     });
@@ -345,13 +346,11 @@ export function FixedCostForm({
                 .filter((merchant): merchant is MerchantPreset => Boolean(merchant));
         }
         if (!activeCategoryTemplateKey) return [] as MerchantPreset[];
-        return merchants
-            .filter(
-                merchant =>
-                    merchant.categoryTemplateKey === activeCategoryTemplateKey &&
-                    !merchant.givingOrganisationKey
-            )
-            .slice(0, MAX_VENDOR_CHIPS);
+        return merchants.filter(
+            merchant =>
+                merchant.categoryTemplateKey === activeCategoryTemplateKey &&
+                !merchant.givingOrganisationKey
+        );
     }, [merchants, activeCategoryTemplateKey, selectedBillPresetKey, fixedCostPresets]);
 
     const givingOrgNames = useMemo(() => givingOrgsQuery.data ?? [], [givingOrgsQuery.data]);
@@ -503,7 +502,9 @@ export function FixedCostForm({
             }
             setPendingCategoryTemplateKey(null);
 
+            const endsOn = values.endsOn?.trim() ? values.endsOn.slice(0, 10) : null;
             if (mode === 'edit' && entityId) {
+                const startedOn = values.startedOn?.trim() ? values.startedOn.slice(0, 10) : null;
                 return api.money.fixedCosts.update({
                     id: entityId,
                     householdId,
@@ -513,8 +514,13 @@ export function FixedCostForm({
                     jarId: values.jarId,
                     categoryId,
                     dueDay,
+                    startedOn,
+                    endsOn,
                 });
             }
+            const startedOn = values.startedOn?.trim()
+                ? values.startedOn.slice(0, 10)
+                : periodDefaultDate;
             return api.money.fixedCosts.create({
                 householdId,
                 jarId: values.jarId,
@@ -528,7 +534,8 @@ export function FixedCostForm({
                 dueDay,
                 direction: FlowDirection.OUT,
                 isActive: true,
-                endsOn: null,
+                startedOn,
+                endsOn,
                 note: null,
             });
         },
@@ -968,6 +975,12 @@ export function FixedCostForm({
                                         placeholder={tForm('search_vendor')}
                                         noMatchesLabel={tForm('no_matches')}
                                         disabled={busy}
+                                        idleLimit={CATALOG_CHIP_IDLE_LIMIT}
+                                        selectedKey={
+                                            vendorsForCategory.find(merchant =>
+                                                nameMatches(counterparty, merchant.name)
+                                            )?.key ?? null
+                                        }
                                         otherLabel={tForm('other')}
                                         onOther={() => {
                                             setCustomPayee(true);
@@ -1052,6 +1065,42 @@ export function FixedCostForm({
                         <FormLabel>{tFixed('due_day')}</FormLabel>
                         <FormControl>
                             <FormInput type="number" min={1} max={31} placeholder="1" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="startedOn"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>{tFixed('start_date')}</FormLabel>
+                        <FormControl>
+                            <FormInput
+                                type="date"
+                                pickerAriaLabel={tForm('aria.open_date_picker')}
+                                {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="endsOn"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>{tFixed('end_date')}</FormLabel>
+                        <FormControl>
+                            <FormInput
+                                type="date"
+                                pickerAriaLabel={tForm('aria.open_date_picker')}
+                                {...field}
+                            />
                         </FormControl>
                         <FormMessage />
                     </FormItem>

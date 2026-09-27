@@ -30,6 +30,7 @@ export function ConfirmActionButton({
     return (
         <Button
             type="button"
+            data-mutate
             disabled={disabled}
             onBlur={() => setArmed(false)}
             onClick={() => {

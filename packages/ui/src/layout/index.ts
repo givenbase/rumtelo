@@ -28,3 +28,14 @@ export {
 export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants } from './Tabs';
 
 export { Separator } from './Separator';
+
+export {
+    Table,
+    TableHeader,
+    TableBody,
+    TableFooter,
+    TableHead,
+    TableRow,
+    TableCell,
+    TableCaption,
+} from './Table';

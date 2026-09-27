@@ -19,7 +19,9 @@ export const coachFeed = oc
     .output(z.array(CoachMessage));
 
 /** Smart fill queue — what is missing this week / period, one question at a time. */
-export const coachSession = oc.input(HouseholdScoped).output(CoachSession);
+export const coachSession = oc
+    .input(HouseholdScoped.extend({ period: PeriodKey.nullish() }))
+    .output(CoachSession);
 
 // ====================================================================
 // ? UPDATE Operations

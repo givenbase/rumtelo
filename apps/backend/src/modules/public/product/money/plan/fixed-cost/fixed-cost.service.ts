@@ -19,6 +19,7 @@ import { Debt } from '../../targets/debt/debt.entity';
 import { Category } from '../jar/category.entity';
 import { Jar } from '../jar/jar.entity';
 import { JarService } from '../jar/jar.service';
+import { assertPeriodOpen } from '../../month-score/period-lock.util';
 import { applyFixedCostLinkChange } from './fixed-cost-link.util';
 import { FixedCost } from './fixed-cost.entity';
 import { FixedCostSettlement } from './fixed-cost-settlement.entity';
@@ -51,6 +52,7 @@ export class FixedCostService {
         dueDay?: number | null;
         direction?: 'IN' | 'OUT';
         isActive?: boolean;
+        startedOn?: string | null;
         endsOn?: string | null;
         note?: string | null;
     }) {
@@ -67,6 +69,7 @@ export class FixedCostService {
             dueDay: input.dueDay ?? null,
             direction: (input.direction as FlowDirection) ?? FlowDirection.OUT,
             isActive: input.isActive ?? true,
+            startedOn: input.startedOn ?? null,
             endsOn: input.endsOn ?? null,
             note: input.note ?? null,
         } as never);
@@ -90,6 +93,7 @@ export class FixedCostService {
         if (!isFixedCostCounting(fixedCost)) {
             throw apiBadRequest('bill_paused_no_settlement');
         }
+        await assertPeriodOpen(this.em, input.period);
 
         if (input.transactionId) {
             const transaction = await this.em.findOneOrFail(Transaction, {
@@ -165,6 +169,7 @@ export class FixedCostService {
         if (!isFixedCostCounting(fixedCost)) {
             throw apiBadRequest('bill_paused_no_settlement');
         }
+        await assertPeriodOpen(this.em, input.period);
 
         let settlement = await this.settlements.findOne({
             fixedCost: input.fixedCostId,
@@ -238,8 +243,10 @@ export class FixedCostService {
             jarId,
             jarKey: group.jarKey,
             jarName: group.jarName,
-            /** Monthly-normalised active OUT only — matches jar committedOut. */
-            total: sumMonthlyFixedOut(group.items, { activeOnly: true }),
+            /** Monthly-normalised OUT as-of today — matches jar committedOut. */
+            total: sumMonthlyFixedOut(group.items, {
+                asOf: new Date().toISOString().slice(0, 10),
+            }),
             items: group.items,
         }));
     }
@@ -272,6 +279,7 @@ export class FixedCostService {
             dueDay: number | null;
             direction: 'IN' | 'OUT';
             isActive: boolean;
+            startedOn: string | null;
             endsOn: string | null;
             note: string | null;
         }>
@@ -296,6 +304,7 @@ export class FixedCostService {
         if (patch.dueDay !== undefined) entity.dueDay = patch.dueDay;
         if (patch.direction !== undefined) entity.direction = patch.direction as FlowDirection;
         if (patch.isActive !== undefined) entity.isActive = patch.isActive;
+        if (patch.startedOn !== undefined) entity.startedOn = patch.startedOn;
         if (patch.endsOn !== undefined) entity.endsOn = patch.endsOn;
         if (patch.note !== undefined) entity.note = patch.note;
         await this.em.flush();
@@ -319,6 +328,7 @@ export class FixedCostService {
     async unlinkSettlement(id: string) {
         const settlement = await this.settlements.findOneOrFail({ id });
         await this.em.populate(settlement, ['transaction', 'fixedCost']);
+        await assertPeriodOpen(this.em, settlement.period);
         if (settlement.transaction) {
             settlement.transaction.fixedCost = null;
             settlement.transaction = null;
@@ -351,6 +361,7 @@ export function toDto(fixedCost: FixedCost) {
         dueDay: fixedCost.dueDay,
         direction: fixedCost.direction,
         isActive: fixedCost.isActive,
+        startedOn: fixedCost.startedOn,
         endsOn: fixedCost.endsOn,
         note: fixedCost.note,
     };

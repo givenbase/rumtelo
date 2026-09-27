@@ -4,10 +4,35 @@ const dashboard = {
         label: 'Score',
         days_left_one: '1 day left',
         days_left_other: '{count} days left',
+        /** Persistent badge when this period’s score is locked. */
+        closed_badge: 'Closed',
+        closed_hint:
+            'This month is closed — the score stays as it was, and nothing can be added or changed for this period.',
+        /** Why close matters — shown while the period is still open. */
+        close_explain:
+            'Closing locks this score and freezes the month. Clear the inbox and bills first so the log stays honest.',
+        /** Compact period-travel note (lives here instead of a Coach slide). */
+        travel_past_one: '{stamp} · about {money} through jars over {horizon} month',
+        travel_past_other: '{stamp} · about {money} through jars over {horizon} months',
+        travel_ahead_one: 'By {stamp} · about {money} through jars over {horizon} month',
+        travel_ahead_other: 'By {stamp} · about {money} through jars over {horizon} months',
+        travel_jar: '{name} {from} → {to}',
     },
     close_month: 'Close month',
+    /** Second click on ConfirmActionButton / coach close CTA. */
+    close_month_confirm: 'Are you sure? Close this month',
+    /** Shown above Close when inbox / bills still open. */
+    close_blocked_title: 'Finish these before closing this month',
+    close_blocked_inbox_one: '1 unsorted transaction in the inbox',
+    close_blocked_inbox_other: '{count} unsorted transactions in the inbox',
+    close_blocked_bills_one: '1 bill still unpaid or unskipped{names}',
+    close_blocked_bills_other: '{count} bills still unpaid or unskipped{names}',
+    close_blocked_bill_names: ' ({list})',
+    close_blocked_open_bills: 'Open bills ▸',
     closing: 'Closing…',
     month_closed: 'Month closed',
+    /** Toast after close — recap is the surplus/overspent line. */
+    month_closed_toast: 'Month closed · {recap}',
     close_failed: 'Could not close month',
     levels: {
         '1': 'Beginner',
@@ -34,6 +59,22 @@ const dashboard = {
         surplus: '{amount} left this period',
         overspent: 'One or more jars are overspent',
     },
+    household: {
+        eyebrow: 'Your household',
+        blurb: 'People on this board, and any Practice coach who asked to look along.',
+        open_settings: 'Manage people',
+        open_practice: 'Manage coaches',
+        members_label: 'People',
+        members_hint: 'Members with access to this board',
+        practice_label: 'Practice',
+        practice_hint: 'External coaches — dual consent',
+        practice_none: 'No coach linked',
+        practice_pending: '{count, plural, one {# invite pending} other {# invites pending}}',
+        practice_active: '{count, plural, one {Linked · {name}} other {# Practices linked}}',
+        attention_eyebrow: 'Needs your OK',
+        attention_blurb:
+            'A Practice asked to view or manage this board. Accept only if you know them.',
+    },
     coach: {
         inbox_one: '{count} transaction waiting for a jar.',
         inbox_many: '{count} transactions waiting for a jar.',
@@ -41,6 +82,11 @@ const dashboard = {
         sort_inbox: 'Sort inbox',
         week_check: 'Week check',
         see_jars: 'See jars',
+        practice_pending_one:
+            'A Practice invitation is waiting — accept in settings if you want them on your board.',
+        practice_pending_many:
+            '{count} Practice invitations are waiting — accept in settings if you want them on your board.',
+        practice_pending_cta: 'Review invite',
     },
     hero: {
         money_accumulated: 'Money · Accumulated through {period}',

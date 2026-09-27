@@ -10,6 +10,7 @@ import { cn } from '@rumtelo/utils';
 
 import { capabilityKeyForPathname } from '@/app/_lib/capability-access';
 import { coachKindDisplay } from '@/app/_lib/coach-kind-label';
+import { useHelpersEnabled } from '@/components/features/helpers';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
 
 interface HubCard {
@@ -45,6 +46,7 @@ export function PortalHub({ tint, icon, eyebrow, title, line, coach, cards }: Po
     const t = useTranslations('features.coach');
     const tKind = useTranslations('features.coach.verdict');
     const { isCapabilityLocked } = usePlanCapabilities();
+    const showCoach = useHelpersEnabled();
     const coachLocked = isCapabilityLocked(capabilityKeyForPathname(coach.href));
 
     return (
@@ -64,36 +66,38 @@ export function PortalHub({ tint, icon, eyebrow, title, line, coach, cards }: Po
                 </Typography>
             </div>
 
-            <div
-                className="flex flex-wrap items-center gap-4 rounded-2xl border border-l-4 border-line bg-surface p-4 shadow-md sm:p-5"
-                style={{ borderLeftColor: tint }}>
-                <div className="grid min-w-0 flex-1 gap-1.5">
-                    <span className="flex items-center gap-2">
-                        <span
-                            className="size-1.75 rounded-full"
-                            style={{ background: coach.dot }}
-                        />
-                        <Typography as="span" variant="eyebrow" color="primary">
-                            {t('page_title')}
-                        </Typography>
-                        <span
-                            className="font-mono text-xs font-medium tracking-widest uppercase"
-                            style={{ color: coach.dot }}>
-                            · {coachKindDisplay(coach.kind, tKind)}
+            {showCoach ? (
+                <div
+                    className="flex flex-wrap items-center gap-4 rounded-2xl border border-l-4 border-line bg-surface p-4 shadow-md sm:p-5"
+                    style={{ borderLeftColor: tint }}>
+                    <div className="grid min-w-0 flex-1 gap-1.5">
+                        <span className="flex items-center gap-2">
+                            <span
+                                className="size-1.75 rounded-full"
+                                style={{ background: coach.dot }}
+                            />
+                            <Typography as="span" variant="eyebrow" color="primary">
+                                {t('page_title')}
+                            </Typography>
+                            <span
+                                className="font-mono text-xs font-medium tracking-widest uppercase"
+                                style={{ color: coach.dot }}>
+                                · {coachKindDisplay(coach.kind, tKind)}
+                            </span>
                         </span>
-                    </span>
-                    <Typography
-                        as="p"
-                        weight="medium"
-                        size="default"
-                        className="leading-snug text-pretty lg:text-lg">
-                        {coach.text}
-                    </Typography>
+                        <Typography
+                            as="p"
+                            weight="medium"
+                            size="default"
+                            className="leading-snug text-pretty lg:text-lg">
+                            {coach.text}
+                        </Typography>
+                    </div>
+                    <Button as={Link} href={coach.href} size="sm">
+                        {coachLocked ? t('helpers.locked_cta', { cta: coach.cta }) : coach.cta}
+                    </Button>
                 </div>
-                <Button as={Link} href={coach.href} size="sm">
-                    {coachLocked ? t('helpers.locked_cta', { cta: coach.cta }) : coach.cta}
-                </Button>
-            </div>
+            ) : null}
 
             <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
                 {cards.map(card => {

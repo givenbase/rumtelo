@@ -15,6 +15,8 @@ import {
     subscribeHelpersEnabled,
     writeHelpersEnabled,
 } from '@/app/_lib/feature-helpers';
+import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
+import { usePracticePreview } from '@/components/features/shell/practice-preview';
 
 type FeatureHelpersContextValue = {
     /** Inline helpers visible (why-lines, jar guides, …). */
@@ -25,13 +27,20 @@ type FeatureHelpersContextValue = {
 
 const FeatureHelpersContext = createContext<FeatureHelpersContextValue | null>(null);
 
-/** Live preference — use in gates and toggles (no provider required for read). */
+/**
+ * Live preference — false while Practice is previewing a client board
+ * (helpers are for household members, not coaches).
+ */
 export function useHelpersEnabled(): boolean {
-    return useSyncExternalStore(
+    const preferred = useSyncExternalStore(
         subscribeHelpersEnabled,
         readHelpersEnabled,
         getHelpersServerSnapshot
     );
+    const { capabilities } = usePracticePreview();
+    const { periodClosed, periodLookingAhead } = useBoardWriteAccess();
+    // Closed / future months are a finished or projected record — no coach nudges or helper chrome.
+    return preferred && capabilities.showHelpers && !periodClosed && !periodLookingAhead;
 }
 
 /**

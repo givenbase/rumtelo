@@ -15,3 +15,4 @@ export * from './coach';
 export * from './contact';
 export * from './demo';
 export * from './household';
+export * from './practice';

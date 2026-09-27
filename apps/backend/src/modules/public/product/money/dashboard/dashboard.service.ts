@@ -80,9 +80,10 @@ export class DashboardService {
         const stackedMode = meta.mode === 'stacked';
 
         let jars = baselineJars;
-        if (meta.travel.direction === 'future') {
-            jars = scaleJarsForHorizon(baselineJars, horizon, period, { zeroLedger: true });
-        } else if (meta.travel.direction === 'past') {
+        // Looking ahead/back: plan fields scale by horizon; ledger (spent + TOEGEVOEGD/
+        // credited Ins) sums by booked_on across current↔selected. Do not zeroLedger on
+        // future — that hid real In credits while allocated still stacked.
+        if (meta.travel.direction === 'future' || meta.travel.direction === 'past') {
             const [range, spentByCategory] = await Promise.all([
                 this.jars.spentCreditedByJarBetween(period, currentKey),
                 this.jars.spentByCategoryBetween(period, currentKey),

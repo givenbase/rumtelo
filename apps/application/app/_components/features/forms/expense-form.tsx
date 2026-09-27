@@ -24,12 +24,13 @@ import { JarKey, defaultGiveCategoryTemplate, jarCapabilitiesFor } from '@rumtel
 
 import { useTranslations } from '@rumtelo/i18n';
 
-import { parseAmountToMinorUnits, todayIsoDate } from '@/app/_lib/money-input';
+import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
+import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { GivingFinder } from '@/components/features/money/giving-finder';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 import { CREATE_HREF } from '@/app/_lib/create-routes';
@@ -209,10 +210,11 @@ export function ExpenseForm({
         { id: 'known', label: tFixed('give_known') },
         { id: 'coach', label: tFixed('give_coach') },
     ];
-    const { showToast } = useAppShell();
+    const { showToast, period } = useHouseholdShell();
     const apiError = useApiError();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
+    const periodDefaultDate = viewedPeriodDefaultIso(period);
     const propDirection: 'out' | 'in' = directionProp === 'in' ? 'in' : 'out';
     const [direction, setDirection] = useState<'out' | 'in'>(propDirection);
     const [seenDirectionProp, setSeenDirectionProp] = useState(propDirection);
@@ -486,7 +488,7 @@ export function ExpenseForm({
                 householdId,
                 description,
                 amount: signedAmount,
-                bookedOn: todayIsoDate(),
+                bookedOn: periodDefaultDate,
                 jarId: values.jarId,
                 accountId: null,
                 categoryId,

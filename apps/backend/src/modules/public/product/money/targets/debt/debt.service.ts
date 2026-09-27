@@ -23,6 +23,7 @@ import { FixedCost } from '../../plan/fixed-cost/fixed-cost.entity';
 import { Category } from '../../plan/jar/category.entity';
 import { Jar } from '../../plan/jar/jar.entity';
 
+import { assertBookedOnPeriodOpen } from '../../month-score/period-lock.util';
 import { applyDebtBalanceDelta, syncLinkedFixedCostLifecycle } from './debt-link.util';
 import { Debt } from './debt.entity';
 
@@ -96,6 +97,8 @@ export class DebtService {
         if (input.amount <= 0) {
             throw apiBadRequest('payment_amount_positive');
         }
+
+        await assertBookedOnPeriodOpen(this.em, input.bookedOn);
 
         const debt = await this.repo.findOneOrFail({ id: input.debtId });
         const { jar, category } = await resolveDebtPaymentTargets(this.em);
@@ -333,6 +336,7 @@ export class DebtService {
                 dueDay: debt.dueDay,
                 direction: FlowDirection.OUT,
                 isActive: !debt.closedOn,
+                startedOn: debt.startedOn,
                 endsOn: debt.closedOn ?? debt.maturityOn,
                 note: null,
             } as never);
@@ -445,6 +449,7 @@ function toLinkedFixedCostDto(fixedCost: FixedCost) {
         dueDay: fixedCost.dueDay,
         direction: fixedCost.direction,
         isActive: fixedCost.isActive,
+        startedOn: fixedCost.startedOn,
         endsOn: fixedCost.endsOn,
         note: fixedCost.note,
     };

@@ -8,7 +8,13 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EntityManager } from '@mikro-orm/postgresql';
-import { PlanKey, PLAN_RANK } from '@rumtelo/contracts';
+import {
+    PlanKey,
+    PLAN_RANK,
+    PracticeSubscriptionStatus,
+    SEAT_ADDON_UNIT_CENTS,
+    SeatAddonKind,
+} from '@rumtelo/contracts';
 import Stripe from 'stripe';
 
 import type { Env } from '../../../../common/config/env.config';
@@ -17,18 +23,33 @@ import { isDemoHouseholdSlug } from '@rumtelo/contracts/platform';
 import { AuthHousehold } from '../../../auth/household/managed/household/auth-household.entity';
 import { HouseholdBillingService } from '../../../auth/household/household-billing/household-billing.service';
 import { AccountService } from '../../../auth/user/account/account.service';
+import { PracticeBilling } from '../practice/practice-billing/practice-billing.entity';
 import {
     stripeLookupKey,
+    STRIPE_PRACTICE_BASE_LOOKUP_KEY,
+    STRIPE_PRACTICE_CLIENT_LOOKUP_KEY,
+    STRIPE_PRACTICE_SEAT_LOOKUP_KEY,
+    STRIPE_SEAT_ADDON_LOOKUP_KEYS,
     type BillingInterval,
     type PaidPlanKey,
 } from './config/stripe-plans.config';
 import {
     customerIdFromStripe,
     isActiveSubscriptionStatus,
+    mapPracticeSubscriptionStatus,
     periodFieldsFromSubscription,
     planKeyFromSubscription,
     subscriptionIdFromCheckout,
 } from './stripe-subscription.util';
+
+/** Address data used when creating a Stripe customer for a Practice. */
+export type PracticeAddressData = {
+    line1: string;
+    line2: string | null;
+    city: string;
+    postalCode: string;
+    country: string;
+};
 
 /**
  * Stripe Checkout for Plus / Max + webhook sync of planKey.
@@ -36,6 +57,9 @@ import {
  * Prices resolve via stable lookup keys (seed with `pnpm stripe:seed-plans`).
  * Without STRIPE_SECRET_KEY, paid upgrades are blocked (stay on Basic) unless
  * BILLING_PREVIEW_BYPASS is explicitly true for local/preview.
+ *
+ * Also handles Practice B2B metering: `syncPracticeSubscription` keeps
+ * base + staff seats + client seats in sync on the practice Stripe subscription.
  */
 @Injectable()
 export class BillingService {
@@ -67,6 +91,10 @@ export class BillingService {
         return this.config.get('BILLING_PREVIEW_BYPASS', { infer: true });
     }
 
+    // ====================================================================
+    // ? READ Operations
+    // ====================================================================
+
     async status(householdId: string) {
         const snap = await this.billing.getSnapshot(householdId);
         return {
@@ -76,70 +104,47 @@ export class BillingService {
             periodEndsAt: toIsoOrNull(snap.periodEndsAt),
             periodStartedAt: toIsoOrNull(snap.periodStartedAt),
             // DB rows may still have NULL before the column default applied.
-            willCancelAtPeriodEnd: snap.willCancelAtPeriodEnd,
+            willCancelAtPeriodEnd: Boolean(snap.willCancelAtPeriodEnd),
             scheduledPlanKey: snap.scheduledPlanKey ?? null,
             hasStripeCustomer: Boolean(snap.stripeCustomerId),
             hasActiveSubscription: Boolean(snap.stripeSubscriptionId),
+            seatAddons: {
+                extraContributor: snap.extraContributorSeats ?? 0,
+                extraViewer: snap.extraViewerSeats ?? 0,
+            },
             prices: await this.loadPriceCatalog(),
+            seatAddonCatalog: {
+                unitAmountCents: SEAT_ADDON_UNIT_CENTS,
+                currency: 'eur' as const,
+                kinds: [SeatAddonKind.CONTRIBUTOR, SeatAddonKind.VIEWER],
+            },
         };
     }
 
+    // ====================================================================
+    // ? UPDATE Operations
+    // ====================================================================
+
     /**
-     * Resolve lookup keys → amount / currency / label from Stripe.
-     * Returns null when the secret key is unset.
+     * Purchase / change seat add-on quantities.
+     * Persists extras on HouseholdBilling and, when Stripe is live + a
+     * subscription exists, upserts the contributor / viewer price items.
      */
-    private async loadPriceCatalog() {
-        if (!this.stripe) return null;
+    async updateSeatAddons(input: {
+        householdId: string;
+        extras: { extraContributor: number; extraViewer: number };
+        focusKind?: SeatAddonKind;
+    }): Promise<Awaited<ReturnType<BillingService['status']>>> {
+        const row = await this.billing.ensure(input.householdId);
+        row.extraContributorSeats = input.extras.extraContributor;
+        row.extraViewerSeats = input.extras.extraViewer;
+        await this.em.flush();
 
-        const slots: { plan: PaidPlanKey; interval: BillingInterval }[] = [
-            { plan: PlanKey.PLUS, interval: 'month' },
-            { plan: PlanKey.PLUS, interval: 'year' },
-            { plan: PlanKey.MAX, interval: 'month' },
-            { plan: PlanKey.MAX, interval: 'year' },
-        ];
+        if (this.stripe && row.stripeSubscriptionId && !this.isPreviewBypass()) {
+            await this.syncSeatAddonItems(row.stripeSubscriptionId, input.extras);
+        }
 
-        const resolved = await Promise.all(
-            slots.map(async ({ plan, interval }) => {
-                const priceId = await this.priceIdFor(plan, interval);
-                if (!priceId) return { plan, interval, display: null };
-                try {
-                    const price = await this.stripe!.prices.retrieve(priceId, {
-                        expand: ['product'],
-                    });
-                    const product = price.product;
-                    const productName =
-                        typeof product === 'object' &&
-                        product &&
-                        !('deleted' in product && product.deleted)
-                            ? product.name
-                            : null;
-                    return {
-                        plan,
-                        interval,
-                        display: {
-                            priceId: price.id,
-                            amountCents: price.unit_amount ?? 0,
-                            currency: price.currency,
-                            label: price.nickname ?? productName ?? null,
-                        },
-                    };
-                } catch (err) {
-                    this.logger.warn(
-                        `Failed to retrieve Stripe price ${priceId}: ${err instanceof Error ? err.message : String(err)}`
-                    );
-                    return { plan, interval, display: null };
-                }
-            })
-        );
-
-        const pick = (plan: PaidPlanKey, interval: BillingInterval) =>
-            resolved.find(entry => entry.plan === plan && entry.interval === interval)?.display ??
-            null;
-
-        return {
-            PLUS: { month: pick(PlanKey.PLUS, 'month'), year: pick(PlanKey.PLUS, 'year') },
-            MAX: { month: pick(PlanKey.MAX, 'month'), year: pick(PlanKey.MAX, 'year') },
-        };
+        return this.status(input.householdId);
     }
 
     /**
@@ -220,11 +225,13 @@ export class BillingService {
                 householdId: input.householdId,
                 planKey: input.planKey,
                 accountId: account.id,
+                entityType: 'household',
             },
             subscription_data: {
                 metadata: {
                     householdId: input.householdId,
                     planKey: input.planKey,
+                    entityType: 'household',
                 },
             },
         });
@@ -307,6 +314,241 @@ export class BillingService {
         return { url: session.url };
     }
 
+    // ====================================================================
+    // ? Practice B2B seat metering
+    // ====================================================================
+
+    /**
+     * Sync Practice Stripe subscription: base (qty 1) + staff seats + client seats.
+     * Creates customer + subscription on first call when Stripe is configured.
+     *
+     * No-op when Stripe is not configured or preview bypass is active so
+     * local/staging environments work without seeded prices.
+     */
+    async syncPracticeSubscription(input: {
+        practiceId: string;
+        seatCount: number;
+        clientCount: number;
+        /** Practice display name — used for Stripe customer `name`. */
+        name: string;
+        /** Practice billing email. */
+        email: string;
+        /** Practice billing address (may be null if not yet set). */
+        address: PracticeAddressData | null;
+    }): Promise<void> {
+        if (!this.stripe || this.isPreviewBypass()) return;
+
+        const billing = await this.findOrCreatePracticeBilling(input.practiceId);
+        const staffCount = Math.max(0, input.seatCount);
+        const clientCount = Math.max(0, input.clientCount);
+
+        // Ensure a Stripe customer exists for this practice.
+        if (!billing.stripeCustomerId) {
+            const customer = await this.stripe.customers.create({
+                email: input.email,
+                name: input.name,
+                address: input.address
+                    ? {
+                          line1: input.address.line1,
+                          line2: input.address.line2 ?? undefined,
+                          city: input.address.city,
+                          postal_code: input.address.postalCode,
+                          country: input.address.country,
+                      }
+                    : undefined,
+                metadata: {
+                    practiceId: input.practiceId,
+                    entityType: 'practice',
+                },
+            });
+            billing.stripeCustomerId = customer.id;
+            await this.em.flush();
+            this.logger.log(
+                `Stripe customer ${customer.id} created for practice ${input.practiceId}`
+            );
+        }
+
+        const [basePriceId, staffPriceId, clientPriceId] = await Promise.all([
+            this.priceIdForLookupKey(STRIPE_PRACTICE_BASE_LOOKUP_KEY),
+            this.priceIdForLookupKey(STRIPE_PRACTICE_SEAT_LOOKUP_KEY),
+            this.priceIdForLookupKey(STRIPE_PRACTICE_CLIENT_LOOKUP_KEY),
+        ]);
+        if (!basePriceId || !staffPriceId || !clientPriceId) {
+            this.logger.warn(
+                `Missing Practice Stripe prices (base/staff/client) — run pnpm stripe:seed-plans`
+            );
+            return;
+        }
+
+        if (!billing.stripeSubscriptionId) {
+            const items: Stripe.SubscriptionCreateParams.Item[] = [
+                { price: basePriceId, quantity: 1 },
+            ];
+            if (staffCount > 0) items.push({ price: staffPriceId, quantity: staffCount });
+            if (clientCount > 0) items.push({ price: clientPriceId, quantity: clientCount });
+
+            const sub = await this.stripe.subscriptions.create({
+                customer: billing.stripeCustomerId,
+                items,
+                metadata: {
+                    practiceId: input.practiceId,
+                    entityType: 'practice',
+                },
+            });
+            billing.stripeSubscriptionId = sub.id;
+            billing.billableSeatCount = staffCount;
+            billing.billableClientCount = clientCount;
+            billing.status = mapPracticeSubscriptionStatus(sub.status);
+            const periodItem = sub.items.data[0];
+            billing.periodStartedAt = periodItem?.current_period_start
+                ? new Date(periodItem.current_period_start * 1000)
+                : null;
+            billing.periodEndsAt = periodItem?.current_period_end
+                ? new Date(periodItem.current_period_end * 1000)
+                : null;
+            await this.em.flush();
+            this.logger.log(
+                `Practice subscription ${sub.id} created (base + ${staffCount} staff + ${clientCount} clients)`
+            );
+            return;
+        }
+
+        const sub = await this.stripe.subscriptions.retrieve(billing.stripeSubscriptionId, {
+            expand: ['items.data.price'],
+        });
+        await this.syncPracticeSubscriptionItems(sub, {
+            basePriceId,
+            staffPriceId,
+            clientPriceId,
+            staffCount,
+            clientCount,
+        });
+
+        billing.billableSeatCount = staffCount;
+        billing.billableClientCount = clientCount;
+        await this.em.flush();
+    }
+
+    /**
+     * Align subscription line items with desired staff/client quantities.
+     * Base stays qty 1; meter lines are added / updated / deleted as needed.
+     */
+    private async syncPracticeSubscriptionItems(
+        sub: Stripe.Subscription,
+        opts: {
+            basePriceId: string;
+            staffPriceId: string;
+            clientPriceId: string;
+            staffCount: number;
+            clientCount: number;
+        }
+    ): Promise<void> {
+        if (!this.stripe) return;
+
+        const findItem = (lookupKey: string, priceId: string) =>
+            sub.items.data.find(item => {
+                if (typeof item.price === 'string') return item.price === priceId;
+                return item.price.lookup_key === lookupKey || item.price.id === priceId;
+            });
+
+        const updates: Stripe.SubscriptionUpdateParams.Item[] = [];
+
+        const baseItem = findItem(STRIPE_PRACTICE_BASE_LOOKUP_KEY, opts.basePriceId);
+        if (baseItem) {
+            if (baseItem.quantity !== 1) {
+                updates.push({ id: baseItem.id, quantity: 1 });
+            }
+        } else {
+            updates.push({ price: opts.basePriceId, quantity: 1 });
+        }
+
+        const staffItem = findItem(STRIPE_PRACTICE_SEAT_LOOKUP_KEY, opts.staffPriceId);
+        if (opts.staffCount > 0) {
+            if (staffItem) {
+                if (staffItem.quantity !== opts.staffCount) {
+                    updates.push({ id: staffItem.id, quantity: opts.staffCount });
+                }
+            } else {
+                updates.push({ price: opts.staffPriceId, quantity: opts.staffCount });
+            }
+        } else if (staffItem) {
+            updates.push({ id: staffItem.id, deleted: true });
+        }
+
+        const clientItem = findItem(STRIPE_PRACTICE_CLIENT_LOOKUP_KEY, opts.clientPriceId);
+        if (opts.clientCount > 0) {
+            if (clientItem) {
+                if (clientItem.quantity !== opts.clientCount) {
+                    updates.push({ id: clientItem.id, quantity: opts.clientCount });
+                }
+            } else {
+                updates.push({ price: opts.clientPriceId, quantity: opts.clientCount });
+            }
+        } else if (clientItem) {
+            updates.push({ id: clientItem.id, deleted: true });
+        }
+
+        if (updates.length === 0) return;
+
+        await this.stripe.subscriptions.update(sub.id, {
+            items: updates,
+            proration_behavior: 'create_prorations',
+        });
+        this.logger.log(
+            `Practice subscription ${sub.id} synced (staff=${opts.staffCount}, clients=${opts.clientCount})`
+        );
+    }
+
+    // ====================================================================
+    // ? Stripe Webhook
+    // ====================================================================
+
+    async handleWebhookEvent(rawBody: Buffer, signature: string): Promise<void> {
+        if (!this.stripe) {
+            this.logger.warn('Stripe webhook received but STRIPE_SECRET_KEY is unset');
+            return;
+        }
+
+        const secret = this.config.get('STRIPE_WEBHOOK_SIGNING_SECRET', { infer: true });
+        if (!secret) {
+            throw new ServiceUnavailableException('STRIPE_WEBHOOK_SIGNING_SECRET is unset');
+        }
+
+        const event = this.stripe.webhooks.constructEvent(rawBody, signature, secret);
+
+        switch (event.type) {
+            case 'checkout.session.completed':
+                await this.onCheckoutCompleted(event.data.object);
+                break;
+            case 'customer.subscription.updated': {
+                const sub = event.data.object;
+                if (sub.metadata?.entityType === 'practice') {
+                    await this.onPracticeSubscriptionUpdated(sub);
+                } else {
+                    // Portal cancel / plan switches / renewals land here.
+                    await this.onSubscriptionUpdated(sub);
+                }
+                break;
+            }
+            case 'customer.subscription.deleted': {
+                const sub = event.data.object;
+                if (sub.metadata?.entityType === 'practice') {
+                    await this.onPracticeSubscriptionDeleted(sub);
+                } else {
+                    // Portal cancel at period end (or immediate) — drop to Basic.
+                    await this.onSubscriptionDeleted(sub);
+                }
+                break;
+            }
+            default:
+                this.logger.debug(`Ignoring Stripe event ${event.type}`);
+        }
+    }
+
+    // ====================================================================
+    // ? Private — Household helpers
+    // ====================================================================
+
     /** Seeded demo households keep their plan fixed for product walkthroughs. */
     private async assertNotDemoHousehold(householdId: string): Promise<void> {
         const household = await this.em.findOne(AuthHousehold, { id: householdId });
@@ -333,6 +575,7 @@ export class BillingService {
             metadata: {
                 householdId,
                 accountId: account.id,
+                entityType: 'household',
             },
         });
 
@@ -383,6 +626,7 @@ export class BillingService {
                 ...subscription.metadata,
                 householdId: input.householdId,
                 planKey: input.planKey,
+                entityType: 'household',
             },
             expand: ['items.data.price'],
         });
@@ -497,6 +741,7 @@ export class BillingService {
                     metadata: {
                         householdId,
                         planKey: toPlan,
+                        entityType: 'household',
                     },
                 },
             ],
@@ -532,36 +777,6 @@ export class BillingService {
             this.logger.warn(
                 `Could not release schedule ${scheduleId}: ${err instanceof Error ? err.message : String(err)}`
             );
-        }
-    }
-
-    async handleWebhookEvent(rawBody: Buffer, signature: string): Promise<void> {
-        if (!this.stripe) {
-            this.logger.warn('Stripe webhook received but STRIPE_SECRET_KEY is unset');
-            return;
-        }
-
-        const secret = this.config.get('STRIPE_WEBHOOK_SIGNING_SECRET', { infer: true });
-        if (!secret) {
-            throw new ServiceUnavailableException('STRIPE_WEBHOOK_SIGNING_SECRET is unset');
-        }
-
-        const event = this.stripe.webhooks.constructEvent(rawBody, signature, secret);
-
-        switch (event.type) {
-            case 'checkout.session.completed':
-                await this.onCheckoutCompleted(event.data.object);
-                break;
-            case 'customer.subscription.updated':
-                // Portal cancel / plan switches / renewals land here.
-                await this.onSubscriptionUpdated(event.data.object);
-                break;
-            case 'customer.subscription.deleted':
-                // Portal cancel at period end (or immediate) — drop to Basic.
-                await this.onSubscriptionDeleted(event.data.object);
-                break;
-            default:
-                this.logger.debug(`Ignoring Stripe event ${event.type}`);
         }
     }
 
@@ -680,20 +895,191 @@ export class BillingService {
         this.logger.log(`Plan BASIC applied for household ${householdId} via subscription.deleted`);
     }
 
-    private async resolveHouseholdId(subscription: Stripe.Subscription): Promise<string | null> {
-        const fromMeta = subscription.metadata?.householdId?.trim();
-        if (fromMeta) return fromMeta;
-        return this.billing.findHouseholdIdByStripeSubscriptionId(subscription.id);
+    // ====================================================================
+    // ? Private — Practice webhook handlers
+    // ====================================================================
+
+    private async onPracticeSubscriptionUpdated(subscription: Stripe.Subscription): Promise<void> {
+        const practiceId = await this.resolvePracticeId(subscription);
+        if (!practiceId) {
+            this.logger.warn(
+                `subscription.updated (practice) ${subscription.id} — no practiceId in metadata or DB`
+            );
+            return;
+        }
+
+        const billing = await this.findOrCreatePracticeBilling(practiceId);
+        billing.stripeSubscriptionId = subscription.id;
+        billing.stripeCustomerId = customerIdFromStripe(subscription.customer);
+
+        let staffQty = billing.billableSeatCount;
+        let clientQty = billing.billableClientCount;
+        let periodStart: Date | null = null;
+        let periodEnd: Date | null = null;
+
+        for (const item of subscription.items.data) {
+            const lookup = typeof item.price === 'string' ? null : (item.price.lookup_key ?? null);
+            if (lookup === STRIPE_PRACTICE_SEAT_LOOKUP_KEY) {
+                staffQty = item.quantity ?? 0;
+            } else if (lookup === STRIPE_PRACTICE_CLIENT_LOOKUP_KEY) {
+                clientQty = item.quantity ?? 0;
+            }
+            if (!periodStart && item.current_period_start) {
+                periodStart = new Date(item.current_period_start * 1000);
+            }
+            if (!periodEnd && item.current_period_end) {
+                periodEnd = new Date(item.current_period_end * 1000);
+            }
+        }
+
+        billing.billableSeatCount = staffQty;
+        billing.billableClientCount = clientQty;
+        billing.periodStartedAt = periodStart;
+        billing.periodEndsAt = periodEnd;
+        billing.status = mapPracticeSubscriptionStatus(subscription.status);
+        await this.em.flush();
+        this.logger.log(
+            `Practice ${practiceId} billing synced via subscription.updated (${staffQty} staff, ${clientQty} clients)`
+        );
     }
 
-    /** Resolve `price_…` via Stripe lookup key. */
-    private async priceIdFor(
-        planKey: PaidPlanKey,
-        interval: BillingInterval
-    ): Promise<string | undefined> {
+    private async onPracticeSubscriptionDeleted(subscription: Stripe.Subscription): Promise<void> {
+        const practiceId = await this.resolvePracticeId(subscription);
+        if (!practiceId) {
+            this.logger.warn(
+                `subscription.deleted (practice) ${subscription.id} — no practiceId in metadata or DB`
+            );
+            return;
+        }
+
+        const billing = await this.findOrCreatePracticeBilling(practiceId);
+        billing.stripeSubscriptionId = null;
+        billing.periodStartedAt = null;
+        billing.periodEndsAt = null;
+        billing.status = PracticeSubscriptionStatus.NONE;
+        await this.em.flush();
+        this.logger.log(`Practice ${practiceId} subscription cleared via subscription.deleted`);
+    }
+
+    // ====================================================================
+    // ? Private — Stripe catalog helpers
+    // ====================================================================
+
+    /**
+     * Resolve lookup keys → amount / currency / label from Stripe.
+     * Returns null when the secret key is unset.
+     */
+    private async loadPriceCatalog() {
+        if (!this.stripe) return null;
+
+        const slots: { plan: PaidPlanKey; interval: BillingInterval }[] = [
+            { plan: PlanKey.PLUS, interval: 'month' },
+            { plan: PlanKey.PLUS, interval: 'year' },
+            { plan: PlanKey.MAX, interval: 'month' },
+            { plan: PlanKey.MAX, interval: 'year' },
+        ];
+
+        const resolved = await Promise.all(
+            slots.map(async ({ plan, interval }) => {
+                const priceId = await this.priceIdFor(plan, interval);
+                if (!priceId) return { plan, interval, display: null };
+                try {
+                    const price = await this.stripe!.prices.retrieve(priceId, {
+                        expand: ['product'],
+                    });
+                    const product = price.product;
+                    const productName =
+                        typeof product === 'object' &&
+                        product &&
+                        !('deleted' in product && product.deleted)
+                            ? product.name
+                            : null;
+                    return {
+                        plan,
+                        interval,
+                        display: {
+                            priceId: price.id,
+                            amountCents: price.unit_amount ?? 0,
+                            currency: price.currency,
+                            label: price.nickname ?? productName ?? null,
+                        },
+                    };
+                } catch (err) {
+                    this.logger.warn(
+                        `Failed to retrieve Stripe price ${priceId}: ${err instanceof Error ? err.message : String(err)}`
+                    );
+                    return { plan, interval, display: null };
+                }
+            })
+        );
+
+        const pick = (plan: PaidPlanKey, interval: BillingInterval) =>
+            resolved.find(entry => entry.plan === plan && entry.interval === interval)?.display ??
+            null;
+
+        return {
+            PLUS: { month: pick(PlanKey.PLUS, 'month'), year: pick(PlanKey.PLUS, 'year') },
+            MAX: { month: pick(PlanKey.MAX, 'month'), year: pick(PlanKey.MAX, 'year') },
+        };
+    }
+
+    /**
+     * Upsert contributor / viewer add-on items on an existing household subscription.
+     * Items with qty = 0 are deleted; new non-zero items are added.
+     */
+    private async syncSeatAddonItems(
+        subscriptionId: string,
+        extras: { extraContributor: number; extraViewer: number }
+    ): Promise<void> {
+        if (!this.stripe) return;
+
+        const subscription = await this.stripe.subscriptions.retrieve(subscriptionId, {
+            expand: ['items.data.price'],
+        });
+        const existingItems = subscription.items.data;
+        const updates: Stripe.SubscriptionUpdateParams.Item[] = [];
+
+        const addonKinds: Array<[SeatAddonKind, number]> = [
+            [SeatAddonKind.CONTRIBUTOR, extras.extraContributor],
+            [SeatAddonKind.VIEWER, extras.extraViewer],
+        ];
+
+        for (const [kind, qty] of addonKinds) {
+            const lookupKey = STRIPE_SEAT_ADDON_LOOKUP_KEYS[kind];
+            const priceId = await this.priceIdForLookupKey(lookupKey);
+            if (!priceId) {
+                this.logger.warn(
+                    `No active Stripe price for seat add-on ${lookupKey} — run pnpm stripe:seed-plans`
+                );
+                continue;
+            }
+            const existingItem = existingItems.find(
+                item => typeof item.price !== 'string' && item.price.lookup_key === lookupKey
+            );
+            if (existingItem) {
+                if (qty === 0) {
+                    updates.push({ id: existingItem.id, deleted: true });
+                } else if (existingItem.quantity !== qty) {
+                    updates.push({ id: existingItem.id, quantity: qty });
+                }
+            } else if (qty > 0) {
+                updates.push({ price: priceId, quantity: qty });
+            }
+        }
+
+        if (updates.length > 0) {
+            await this.stripe.subscriptions.update(subscriptionId, {
+                items: updates,
+                proration_behavior: 'create_prorations',
+            });
+            this.logger.log(`Seat add-on items synced on household subscription ${subscriptionId}`);
+        }
+    }
+
+    /** Resolve `price_…` via Stripe lookup key. Results are process-cached. */
+    private async priceIdForLookupKey(lookupKey: string): Promise<string | undefined> {
         if (!this.stripe) return undefined;
 
-        const lookupKey = stripeLookupKey(planKey, interval);
         const cached = this.priceIdCache.get(lookupKey);
         if (cached) return cached;
 
@@ -711,6 +1097,47 @@ export class BillingService {
         }
         this.priceIdCache.set(lookupKey, priceId);
         return priceId;
+    }
+
+    /** Resolve `price_…` for a plan+interval pair via stable lookup key. */
+    private async priceIdFor(
+        planKey: PaidPlanKey,
+        interval: BillingInterval
+    ): Promise<string | undefined> {
+        return this.priceIdForLookupKey(stripeLookupKey(planKey, interval));
+    }
+
+    // ====================================================================
+    // ? Private — household / practice resolution helpers
+    // ====================================================================
+
+    private async resolveHouseholdId(subscription: Stripe.Subscription): Promise<string | null> {
+        const fromMeta = subscription.metadata?.householdId?.trim();
+        if (fromMeta) return fromMeta;
+        return this.billing.findHouseholdIdByStripeSubscriptionId(subscription.id);
+    }
+
+    private async resolvePracticeId(subscription: Stripe.Subscription): Promise<string | null> {
+        const fromMeta = subscription.metadata?.practiceId?.trim();
+        if (fromMeta) return fromMeta;
+        const billing = await this.em.findOne(PracticeBilling, {
+            stripeSubscriptionId: subscription.id,
+        });
+        return billing?.practice ?? null;
+    }
+
+    /** Find or lazily create a PracticeBilling row for a practice. */
+    private async findOrCreatePracticeBilling(practiceId: string): Promise<PracticeBilling> {
+        let billing = await this.em.findOne(PracticeBilling, { practice: practiceId });
+        if (!billing) {
+            billing = this.em.create(PracticeBilling, {
+                practice: practiceId,
+                billableSeatCount: 0,
+                billableClientCount: 0,
+            } as never);
+            await this.em.persist(billing).flush();
+        }
+        return billing;
     }
 }
 

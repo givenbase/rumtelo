@@ -33,6 +33,12 @@ const message = {
             goal_no_jar_spend: 'Goal has no jar to spend from',
             payment_amount_positive: 'Payment amount must be positive',
             bill_paused_no_settlement: 'Paused or ended bills cannot take new settlements.',
+            income_kind_cadence_locked:
+                'Type and frequency cannot change on an existing income. End it and create a new one.',
+            period_closed:
+                'This month is closed — you cannot add or change anything for that period.',
+            month_close_incomplete:
+                'Finish open work before closing this month ({inbox} unsorted in inbox, {bills} bills unpaid or unskipped).',
             bill_link_outflow: 'Link an outflow to settle an outgoing bill.',
             bill_link_inflow: 'Link an inflow to settle a recurring credit.',
             iban_already_linked: 'This IBAN is already linked to an account.',
@@ -64,6 +70,24 @@ const message = {
             plan_missing_capability: 'This plan does not include that feature',
             plan_limit_reached: 'Plan limit reached',
             capability_unavailable: 'This feature is not available yet',
+            feature_not_implemented: 'This feature is not available yet',
+            viewer_read_only: 'Viewers can look along but cannot change household data',
+            role_permission_denied: 'Your role cannot do that in this household',
+            practice_not_found: 'Practice not found',
+            practice_not_member: 'You are not a member of this practice',
+            practice_forbidden: 'You cannot do that in this practice',
+            practice_client_link_not_found: 'Client link not found',
+            practice_client_link_not_active:
+                'This Practice link is not active yet — wait for household accept',
+            practice_client_link_not_invited: 'This Practice invite is not pending',
+            practice_household_forbidden:
+                'Only household owners or admins can manage Practice contracts',
+            practice_slug_taken: 'That practice URL is already taken',
+            practice_invite_user_not_found: 'No user found with that email',
+            practice_client_invite_not_found: 'Practice invitation not found or already used',
+            practice_client_invite_expired: 'This Practice invitation has expired',
+            practice_client_invite_email_mismatch:
+                'Sign in with the email address that received this invitation',
             household_not_found: 'Household not found',
             household_create_failed: 'Could not create household',
             household_context_required: 'Household context required for capability check',

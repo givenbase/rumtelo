@@ -6,7 +6,7 @@ import { useTranslations } from '@rumtelo/i18n';
 import { BrandLoader } from '@rumtelo/ui';
 
 import { PlanKey } from '@/app/_lib/plan';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { LockedGate } from '@/components/features/shell/locked-gate';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
 
@@ -22,7 +22,7 @@ export function RequireCapability({
     children: ReactNode;
 }) {
     const t = useTranslations('ui.statusPage');
-    const { planReady } = useAppShell();
+    const { planReady } = useHouseholdShell();
     const { isCapabilityLocked, requiredPlanFor } = usePlanCapabilities();
 
     if (!planReady) {

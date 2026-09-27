@@ -25,6 +25,14 @@ export const MonthScoreEvent = z.object({
     points: z.int(),
 });
 
+/** Open work that blocks closing this period (inbox + unpaid/unskipped bills). */
+export const MonthCloseBlockers = z.object({
+    inboxCount: z.int().nonnegative(),
+    dueBillCount: z.int().nonnegative(),
+    /** Up to a few bill names for warning copy. */
+    dueBillNames: z.array(z.string()),
+});
+
 export const MonthScore = z.object({
     householdId: HouseholdId,
     period: PeriodKey,
@@ -35,6 +43,11 @@ export const MonthScore = z.object({
     /** Level index (1–5). Display label comes from client i18n. */
     level: z.int().min(1),
     events: z.array(MonthScoreEvent),
+    /**
+     * Null when the period is already closed.
+     * When open: inbox + due bills that must be cleared before close.
+     */
+    closeBlockers: MonthCloseBlockers.nullable(),
 });
 
 /** Stable unlock keys — client maps to `pages.dashboard.levels.unlocks.*`. */
@@ -74,6 +87,7 @@ export const PeriodRecap = z.object({
 
 // Inferred types (same-module merge for consumers)
 export type MonthScoreEvent = z.infer<typeof MonthScoreEvent>;
+export type MonthCloseBlockers = z.infer<typeof MonthCloseBlockers>;
 export type MonthScore = z.infer<typeof MonthScore>;
 export type Level = z.infer<typeof Level>;
 export type PeriodRecap = z.infer<typeof PeriodRecap>;

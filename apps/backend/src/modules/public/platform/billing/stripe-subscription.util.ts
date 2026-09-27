@@ -1,6 +1,6 @@
 import type Stripe from 'stripe';
 
-import { PlanKey } from '@rumtelo/contracts';
+import { PlanKey, PracticeSubscriptionStatus } from '@rumtelo/contracts';
 
 import { planKeyFromStripeLookupKey, type PaidPlanKey } from './config/stripe-plans.config';
 
@@ -9,6 +9,30 @@ const ACTIVE_SUB_STATUSES = new Set<Stripe.Subscription.Status>(['active', 'tria
 
 export function isActiveSubscriptionStatus(status: Stripe.Subscription.Status): boolean {
     return ACTIVE_SUB_STATUSES.has(status);
+}
+
+/** Map Stripe subscription.status → PracticeSubscriptionStatus for UI / gates. */
+export function mapPracticeSubscriptionStatus(
+    status: Stripe.Subscription.Status | null | undefined
+): PracticeSubscriptionStatus {
+    switch (status) {
+        case 'trialing':
+            return PracticeSubscriptionStatus.TRIALING;
+        case 'active':
+            return PracticeSubscriptionStatus.ACTIVE;
+        case 'past_due':
+            return PracticeSubscriptionStatus.PAST_DUE;
+        case 'unpaid':
+            return PracticeSubscriptionStatus.UNPAID;
+        case 'canceled':
+            return PracticeSubscriptionStatus.CANCELED;
+        case 'incomplete':
+        case 'incomplete_expired':
+        case 'paused':
+            return PracticeSubscriptionStatus.INCOMPLETE;
+        default:
+            return PracticeSubscriptionStatus.NONE;
+    }
 }
 
 export function customerIdFromStripe(

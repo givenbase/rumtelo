@@ -26,11 +26,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
-import { parseAmountToMinorUnits, todayIsoDate } from '@/app/_lib/money-input';
+import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
+import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 
@@ -290,7 +291,7 @@ export function MoveMoneyForm({
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { symbol, formatMoney } = useHouseholdCurrency();
-    const { showToast, period } = useAppShell();
+    const { showToast, period } = useHouseholdShell();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
     const fromLocked = Boolean(defaultFromJarId);
@@ -397,7 +398,7 @@ export function MoveMoneyForm({
             if (values.fromJarId === values.toJarId) {
                 throw new Error(tForm('validation.different_jars'));
             }
-            const date = todayIsoDate();
+            const date = viewedPeriodDefaultIso(period);
             const note = values.note.trim();
             const fromName = source.name;
             const toName = jars.find(j => j.id === values.toJarId)?.name ?? tTx('jar_fallback');

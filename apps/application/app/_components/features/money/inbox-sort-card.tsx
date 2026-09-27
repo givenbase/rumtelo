@@ -10,18 +10,17 @@ import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Button, VendorMark } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
-import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
-import { jarChrome } from '@/app/_lib/jar-meta';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { partyMark } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
-import { formatBookedDate } from '@/components/features/money/jar-badge';
+import { formatBookedDate, JarMark } from '@/components/features/money/jar-badge';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 
-type InboxJarOption = Pick<Jar, 'id' | 'key' | 'name' | 'subtitle'>;
+type InboxJarOption = Pick<Jar, 'id' | 'key' | 'name' | 'subtitle' | 'icon'>;
 type InboxDebtOption = Pick<Debt, 'id' | 'name'>;
 type InboxFixedCostOption = Pick<FixedCost, 'id' | 'name' | 'counterparty'>;
 
@@ -87,6 +86,7 @@ export function InboxSortCard({
     const tSort = useTranslations('features.money.transactions.inbox_sort');
     const tExpense = useTranslations('features.money.expense_form');
     const { householdId } = useAuth();
+    const { canMutate } = useBoardWriteAccess();
     const { byKey: catalogByKey } = useJarCatalog();
     const categoryTemplatesQuery = useCategoryTemplates(isLiveData(householdId));
     const form = useForm<InboxSortValues>({
@@ -123,6 +123,49 @@ export function InboxSortCard({
     const canLinkFixed = Boolean(suggestedFixedCost) && !debtId;
 
     if (done) return null;
+
+    // Read-only board — show the feed row, no sort / rule / jar pickers.
+    if (!canMutate) {
+        return (
+            <div className="grid animate-rise gap-4 rounded-2xl border border-line bg-surface p-5 shadow-md">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div className="flex min-w-0 items-start gap-3">
+                        <VendorMark
+                            name={mark.name}
+                            src={mark.src}
+                            fallbackIcon={mark.fallbackIcon}
+                            tone={mark.tone}
+                            size={28}
+                            className="mt-0.5"
+                        />
+                        <div className="min-w-0">
+                            <p className="text-base font-semibold text-fg">{title}</p>
+                            <p className="mt-1 font-mono text-xs tracking-normal text-fg-muted">
+                                {[
+                                    transaction.note?.trim() || null,
+                                    !transaction.note?.trim() &&
+                                    transaction.counterparty?.trim() &&
+                                    transaction.description !== transaction.counterparty.trim()
+                                        ? transaction.description
+                                        : null,
+                                    formatBookedDate(transaction.bookedOn, appLocale),
+                                ]
+                                    .filter(Boolean)
+                                    .join(' · ')}
+                            </p>
+                        </div>
+                    </div>
+                    <span
+                        className={cn(
+                            'shrink-0 font-mono text-lg',
+                            transaction.amount < 0 ? 'text-fg' : 'text-success'
+                        )}>
+                        {formatMoney(transaction.amount, { signed: true })}
+                    </span>
+                </div>
+            </div>
+        );
+    }
 
     async function confirm(createRule = false) {
         const values = form.getValues();
@@ -192,10 +235,7 @@ export function InboxSortCard({
                     <span className="font-mono text-xs tracking-widest text-fg-muted uppercase">
                         {tTx('detail.looks_like')}
                     </span>
-                    <span
-                        className="size-2 shrink-0 rounded-sm"
-                        style={{ background: bgClassToCssVar(jarChrome(suggestedKey).color) }}
-                    />
+                    <JarMark jarKey={suggestedKey} icon={selected?.icon ?? catalog?.icon} />
                     <span className="text-sm text-fg">
                         {selected?.name ?? catalog?.name ?? tTx('jar_fallback')}
                     </span>
@@ -226,15 +266,10 @@ export function InboxSortCard({
                                     className={cn(
                                         'inline-flex items-center gap-2 rounded-full border px-3 py-1.5 font-mono text-xs tracking-widest uppercase transition-colors',
                                         active
-                                            ? 'border-accent/40 bg-accent-soft text-accent'
-                                            : 'border-line text-fg-muted hover:border-line-strong hover:text-fg'
+                                            ? 'border-accent/50 bg-accent-soft text-accent'
+                                            : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
                                     )}>
-                                    <span
-                                        className="size-1.5 rounded-sm"
-                                        style={{
-                                            background: bgClassToCssVar(jarChrome(jar.key).color),
-                                        }}
-                                    />
+                                    <JarMark jarKey={jar.key} icon={jar.icon} />
                                     {jar.name}
                                 </button>
                             );

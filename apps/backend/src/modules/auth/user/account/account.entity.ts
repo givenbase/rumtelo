@@ -13,7 +13,7 @@ import { AuthUser } from '../managed/user/auth-user.entity';
  *
  * Better Auth owns login identity only (`auth.user`: email, password/OAuth,
  * display `name`, image, verification, 2FA). Everything personal for the product
- * lives here: legal names, phone, date of birth, and (later) address facts.
+ * lives here: legal names, phone, date of birth; addresses via account-address.
  *
  *   user/managed/*            auth machinery (library-owned tables)
  *   auth.account              personal information for the application

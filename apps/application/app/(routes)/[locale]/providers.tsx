@@ -8,9 +8,10 @@ import { ThemeProvider, BrandLoader } from '@rumtelo/ui';
 
 import { setClientHouseholdId } from '@/app/_lib/household-api-context';
 import { AccountThemeProvider } from '@/components/features/shell/account-theme-sync';
-import { AppShellProvider } from '@/components/features/shell/app-shell-context';
+import { HouseholdShellProvider } from '@/components/features/shell/household-shell-context';
 import { AuthProvider, useAuth } from '@/components/features/shell/auth-provider';
 import { PlanIntentProvider } from '@/components/features/shell/plan-intent-provider';
+import { PracticeInviteProvider } from '@/components/features/shell/practice-invite-provider';
 
 /** Keeps OpenAPILink headers in sync without remounting the oRPC client. */
 function HouseholdHeaderSync({ children }: { children: ReactNode }) {
@@ -55,11 +56,13 @@ export function Providers({ children }: { children: ReactNode }) {
                 <AuthProvider>
                     <Suspense fallback={<ProvidersFallback />}>
                         <PlanIntentProvider>
-                            <HouseholdHeaderSync>
-                                <AccountThemeProvider>
-                                    <AppShellProvider>{children}</AppShellProvider>
-                                </AccountThemeProvider>
-                            </HouseholdHeaderSync>
+                            <PracticeInviteProvider>
+                                <HouseholdHeaderSync>
+                                    <AccountThemeProvider>
+                                        <HouseholdShellProvider>{children}</HouseholdShellProvider>
+                                    </AccountThemeProvider>
+                                </HouseholdHeaderSync>
+                            </PracticeInviteProvider>
                         </PlanIntentProvider>
                     </Suspense>
                 </AuthProvider>

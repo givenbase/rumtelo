@@ -18,7 +18,7 @@ export const baseStyles: EmailBaseStyles = {
         fontSize: '24px',
         fontWeight: 600,
         textAlign: 'left',
-        margin: '0 0 16px',
+        margin: '24px 0 16px',
         padding: `0 ${emailLayout.contentInset}`,
         fontFamily: emailFonts.display,
         letterSpacing: '-0.02em',

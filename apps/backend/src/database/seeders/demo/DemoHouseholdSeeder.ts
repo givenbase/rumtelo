@@ -1558,6 +1558,8 @@ export class DemoHouseholdSeeder extends Seeder {
             jar,
             cadence: Cadence.MONTHLY,
             direction: FlowDirection.OUT,
+            startedOn: monthsAgo(6),
+            endsOn: null,
         } as never);
     }
 

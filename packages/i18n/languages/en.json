@@ -59,6 +59,9 @@
                     "goal_no_jar_spend": "Goal has no jar to spend from",
                     "payment_amount_positive": "Payment amount must be positive",
                     "bill_paused_no_settlement": "Paused or ended bills cannot take new settlements.",
+                    "income_kind_cadence_locked": "Type and frequency cannot change on an existing income. End it and create a new one.",
+                    "period_closed": "This month is closed — you cannot add or change anything for that period.",
+                    "month_close_incomplete": "Finish open work before closing this month ({inbox} unsorted in inbox, {bills} bills unpaid or unskipped).",
                     "bill_link_outflow": "Link an outflow to settle an outgoing bill.",
                     "bill_link_inflow": "Link an inflow to settle a recurring credit.",
                     "iban_already_linked": "This IBAN is already linked to an account.",
@@ -86,6 +89,21 @@
                     "plan_missing_capability": "This plan does not include that feature",
                     "plan_limit_reached": "Plan limit reached",
                     "capability_unavailable": "This feature is not available yet",
+                    "feature_not_implemented": "This feature is not available yet",
+                    "viewer_read_only": "Viewers can look along but cannot change household data",
+                    "role_permission_denied": "Your role cannot do that in this household",
+                    "practice_not_found": "Practice not found",
+                    "practice_not_member": "You are not a member of this practice",
+                    "practice_forbidden": "You cannot do that in this practice",
+                    "practice_client_link_not_found": "Client link not found",
+                    "practice_client_link_not_active": "This Practice link is not active yet — wait for household accept",
+                    "practice_client_link_not_invited": "This Practice invite is not pending",
+                    "practice_household_forbidden": "Only household owners or admins can manage Practice contracts",
+                    "practice_slug_taken": "That practice URL is already taken",
+                    "practice_invite_user_not_found": "No user found with that email",
+                    "practice_client_invite_not_found": "Practice invitation not found or already used",
+                    "practice_client_invite_expired": "This Practice invitation has expired",
+                    "practice_client_invite_email_mismatch": "Sign in with the email address that received this invitation",
                     "household_not_found": "Household not found",
                     "household_create_failed": "Could not create household",
                     "household_context_required": "Household context required for capability check",
@@ -597,7 +615,7 @@
             },
             "platform-invite": {
                 "name": "Invite",
-                "description": "Invite a partner, family, or friend to the household."
+                "description": "Invite a partner, family, friend, or coach (viewer) to the household."
             }
         },
         "coach": {
@@ -612,7 +630,7 @@
             "session": {
                 "lead": "One next move at a time. Answer here — leave only when the work is heavy.",
                 "quiet_title": "You're caught up for now",
-                "quiet_body": "Nothing urgent is waiting. Open insights below when they appear, or check My week.",
+                "quiet_body": "Nothing urgent is waiting. Close the month when you are ready, or check My week.",
                 "progress": "{done} of ~{total}",
                 "card_eyebrow": "Next",
                 "answer_label": "Your answer",
@@ -1778,11 +1796,15 @@
                 "empty_all_body": "Add a recurring cost to see it on this list.",
                 "paused_ended": "Paused & ended",
                 "how_split": "How this is split",
-                "status_taken": "Taken",
-                "status_due": "Still due",
+                "status_taken": "Paid",
+                "status_due": "Due",
                 "status_skipped": "Skipped",
                 "status_planned": "Planned",
-                "detail_status_taken": "Taken this period",
+                "mark_paid_short": "Paid",
+                "mark_all_due": "Mark all due paid",
+                "mark_all_due_confirm": "Mark {count} bills paid?",
+                "toast_paid_all": "Marked {count} bills paid",
+                "detail_status_taken": "Paid this period",
                 "detail_status_due": "Still due",
                 "detail_status_skipped": "Skipped this period",
                 "detail_status_planned": "Planned",
@@ -1877,6 +1899,7 @@
                 "filter_jar_aria": "Filter by jar",
                 "filter_amount_aria": "Filter by amount",
                 "filter_amount_label": "Amount",
+                "filter_amount_clear": "Clear",
                 "amount_range": "{min}–{max}",
                 "amount_over": "{amount}+",
                 "sort_label": "Sort",
@@ -2064,6 +2087,14 @@
                 "amount": "Amount ({symbol})",
                 "amount_new": "New amount ({symbol})",
                 "amount_history": "Amount history",
+                "start_date": "Start date",
+                "end_date": "End date (optional)",
+                "raise_tip_title": "Got a raise or new job?",
+                "raise_tip_body": "End this income and add a new one with the new amount and start date. That keeps history honest when you travel months.",
+                "raise_tip_link": "Add new income →",
+                "end_income": "End income",
+                "confirm_end": "Click again to end",
+                "toast_ended": "Income ended",
                 "name_placeholder": "e.g. salary",
                 "free_text_placeholder": "Describe where it came from…",
                 "kind_salary": "Salary",
@@ -2226,7 +2257,9 @@
                 "give_placeholder": "e.g. Giro555, your church, KWF",
                 "payee_name": "Payee name",
                 "payee_placeholder": "e.g. landlord, insurer",
-                "due_day": "Due day (day of month)"
+                "due_day": "Due day (day of month)",
+                "start_date": "Start date",
+                "end_date": "End date (optional)"
             },
             "debt": {
                 "eyebrow": "DEBT",
@@ -2432,7 +2465,7 @@
                     "you_use": "You use {strategy} today.",
                     "change_settings": "Change method in Settings",
                     "explain_only": "This page only explains — it does not switch it for you.",
-                    "no_extra_hint": "Avalanche and Snowball look identical in the € totals below because Extra /mo is none. Those two methods only choose where leftover money goes — try a small Extra /mo above to see them split. The cards still differ in which debt they would attack first.",
+                    "no_extra_hint": "Avalanche and Snowball look identical in the totals below because Extra /mo is none. Those two methods only choose where leftover money goes — try a small Extra /mo above to see them split. The cards still differ in which debt they would attack first.",
                     "when_avalanche": "Pick this if you want to pay the least interest over time.",
                     "when_snowball": "Pick this if knocking out a small debt first helps you stick with it.",
                     "when_minimal": "Pick this only if you truly cannot put anything extra toward debt.",
@@ -2441,9 +2474,9 @@
                     "how_minimal": "Each debt only gets its minimum. Nothing leftover, nothing moved over.",
                     "outcome_costs_more": "Costs about {amount} more in interest",
                     "outcome_slowest": "Slowest option",
-                    "outcome_same_snowball_saves": "Same € as Snowball today · saves about {amount} vs minimums only",
-                    "outcome_same_different_debt": "Same € as Avalanche today · different first debt",
-                    "outcome_same_avalanche": "Same € as Snowball today · different first debt",
+                    "outcome_same_snowball_saves": "Same amount as Snowball today · saves about {amount} vs minimums only",
+                    "outcome_same_different_debt": "Same amount as Avalanche today · different first debt",
+                    "outcome_same_avalanche": "Same amount as Snowball today · different first debt",
                     "outcome_saves": "Saves about {amount} vs minimums only",
                     "outcome_cheapest_soonest": "Cheapest and soonest for you",
                     "outcome_least_interest": "Pays the least interest",
@@ -2766,11 +2799,11 @@
                     "sections": {
                         "what_for": {
                             "heading": "What this page is for",
-                            "body": "Track every income source and see household monthly net. Editing an amount keeps history — raises and cuts become dated periods, so you can see how net moved over time."
+                            "body": "Track every income source with a start (and optional end) date, and see household monthly net for the month you are viewing. Travel back before a source started and it disappears; end it when it stops."
                         },
                         "now_target_gap": {
                             "heading": "Now, Target, Gap",
-                            "body": "Now is your current monthly net (all active sources). Target comes from your highest active Earn goal (monthly net you want). If you have no Earn goal yet, a demo target is shown. Gap is how much net still needs to rise."
+                            "body": "Now is your monthly net for the viewed period (sources that apply then). Target comes from your highest active Earn goal (monthly net you want). If you have no Earn goal yet, a demo target is shown. Gap is how much net still needs to rise."
                         },
                         "simulator": {
                             "heading": "What a raise does",
@@ -2778,17 +2811,17 @@
                         },
                         "sources": {
                             "heading": "Income sources",
-                            "body": "Add salary, freelance, benefits, and side income here. Tap a row to change amount (with an effective date), cadence, or type."
+                            "body": "Add salary, freelance, benefits, and side income here. For a raise or new job, end the old source and create a new one — type and frequency stay locked on edit."
                         },
                         "earning_methods": {
                             "heading": "Earning methods (The Coach)",
-                            "body": "Cutting costs has a floor; raising income does not. Typical levers: trade time or skill (freelance, raise), build a small system (productized offer), or grow asset income later. Pick one method, set an Earn goal for the net you want, then raise a source when the money lands — the gap and jar projection update with you."
+                            "body": "Cutting costs has a floor; raising income does not. Typical levers: trade time or skill (freelance, raise), build a small system (productized offer), or grow asset income later. Pick one method, set an Earn goal for the net you want, then end the old source and add the new amount when the money lands."
                         }
                     },
                     "steps": {
                         "summary": {
                             "title": "Now · Target · Gap",
-                            "content": "Your monthly net today, the Earn-goal target, and how much is left to close the gap."
+                            "content": "Your monthly net for this period, the Earn-goal target, and how much is left to close the gap."
                         },
                         "simulator": {
                             "title": "What a raise does",
@@ -2796,7 +2829,7 @@
                         },
                         "sources": {
                             "title": "Income sources",
-                            "content": "Your pay streams. Tap a row to change amount (with an effective date) or add another with + Add income."
+                            "content": "Your pay streams for this period. For a raise, end the old one and + Add income with the new start date."
                         }
                     }
                 },
@@ -2920,11 +2953,28 @@
                 "eyebrow": "✦ Month score",
                 "label": "Score",
                 "days_left_one": "1 day left",
-                "days_left_other": "{count} days left"
+                "days_left_other": "{count} days left",
+                "closed_badge": "Closed",
+                "closed_hint": "This month is closed — the score stays as it was, and nothing can be added or changed for this period.",
+                "close_explain": "Closing locks this score and freezes the month. Clear the inbox and bills first so the log stays honest.",
+                "travel_past_one": "{stamp} · about {money} through jars over {horizon} month",
+                "travel_past_other": "{stamp} · about {money} through jars over {horizon} months",
+                "travel_ahead_one": "By {stamp} · about {money} through jars over {horizon} month",
+                "travel_ahead_other": "By {stamp} · about {money} through jars over {horizon} months",
+                "travel_jar": "{name} {from} → {to}"
             },
             "close_month": "Close month",
+            "close_month_confirm": "Are you sure? Close this month",
+            "close_blocked_title": "Finish these before closing this month",
+            "close_blocked_inbox_one": "1 unsorted transaction in the inbox",
+            "close_blocked_inbox_other": "{count} unsorted transactions in the inbox",
+            "close_blocked_bills_one": "1 bill still unpaid or unskipped{names}",
+            "close_blocked_bills_other": "{count} bills still unpaid or unskipped{names}",
+            "close_blocked_bill_names": " ({list})",
+            "close_blocked_open_bills": "Open bills ▸",
             "closing": "Closing…",
             "month_closed": "Month closed",
+            "month_closed_toast": "Month closed · {recap}",
             "close_failed": "Could not close month",
             "levels": {
                 "1": "Beginner",
@@ -2951,13 +3001,31 @@
                 "surplus": "{amount} left this period",
                 "overspent": "One or more jars are overspent"
             },
+            "household": {
+                "eyebrow": "Your household",
+                "blurb": "People on this board, and any Practice coach who asked to look along.",
+                "open_settings": "Manage people",
+                "open_practice": "Manage coaches",
+                "members_label": "People",
+                "members_hint": "Members with access to this board",
+                "practice_label": "Practice",
+                "practice_hint": "External coaches — dual consent",
+                "practice_none": "No coach linked",
+                "practice_pending": "{count, plural, one {# invite pending} other {# invites pending}}",
+                "practice_active": "{count, plural, one {Linked · {name}} other {# Practices linked}}",
+                "attention_eyebrow": "Needs your OK",
+                "attention_blurb": "A Practice asked to view or manage this board. Accept only if you know them."
+            },
             "coach": {
                 "inbox_one": "{count} transaction waiting for a jar.",
                 "inbox_many": "{count} transactions waiting for a jar.",
                 "all_sorted": "All sorted — time for intention.",
                 "sort_inbox": "Sort inbox",
                 "week_check": "Week check",
-                "see_jars": "See jars"
+                "see_jars": "See jars",
+                "practice_pending_one": "A Practice invitation is waiting — accept in settings if you want them on your board.",
+                "practice_pending_many": "{count} Practice invitations are waiting — accept in settings if you want them on your board.",
+                "practice_pending_cta": "Review invite"
             },
             "hero": {
                 "money_accumulated": "Money · Accumulated through {period}",
@@ -3497,7 +3565,7 @@
                     "f3": "ENERGY · sleep",
                     "f4": "SOUL · stillness, gratitude, one intention a week",
                     "f5": "The Coach, the week check, the month score",
-                    "f6": "Solo household"
+                    "f6": "1 full + 1 viewer seat (invite a coach)"
                 },
                 "plus": {
                     "name": "Plus",
@@ -3507,7 +3575,7 @@
                     "f2": "MONEY · debt plan with interest and a freedom date",
                     "f3": "MONEY · bank statement import — live sync coming",
                     "f4": "ENERGY · your 168 hours, training, food",
-                    "f5": "Invite up to {maxMembers} — partner, family, friends",
+                    "f5": "Up to {maxMembers} seats — full and viewer mix",
                     "f6": "Up to {maxGoals} goals"
                 },
                 "max": {
@@ -3518,7 +3586,7 @@
                     "f2": "GROWTH · net worth, returns and your freedom number",
                     "f3": "GROWTH · Learn courses on Masterclass, not Udemy",
                     "f4": "SOUL · the seven centres",
-                    "f5": "Unlimited goals and members",
+                    "f5": "Up to {maxMembers} seats (more full access)",
                     "f6": "Devices — watch, scale, ring (coming)"
                 }
             },
@@ -3546,7 +3614,7 @@
                 },
                 "partner": {
                     "question": "Can I use it with a partner or my family?",
-                    "answer": "Yes — on Plus (up to {maxMembers} people) and Max (unlimited). A household shares the jars. Spending style stays personal, because partners differ."
+                    "answer": "Yes — Basic includes one viewer seat (coach or look-along). Plus and Max add more full and viewer seats. A household shares the jars. Spending style stays personal, because partners differ. Need more people? Add seats for €2.50 each."
                 },
                 "data": {
                     "question": "Where is my data?",
@@ -4033,7 +4101,12 @@
             "why": "Why",
             "sign_in": "Sign in",
             "settings_account": "Account — Settings",
+            "settings_household": "Household — Settings",
+            "settings_preferences": "Preferences — Settings",
+            "settings_security": "Security — Settings",
+            "settings_practice": "Practice coaches — Settings",
             "settings_export": "Export — Settings",
+            "settings_import": "Import — Settings",
             "settings_jars": "Jars — Settings",
             "settings_debt": "Debt — Settings",
             "settings_bank": "Bank — Settings",
@@ -4096,22 +4169,47 @@
         },
         "onboarding": {
             "welcome": "Welcome to Rumtelo",
-            "welcome_body": "Stop wondering where it went. Six jars, one calm overview.",
+            "welcome_body": "Rumtelo helps you see where your money goes — calmly. We split income into six jars so you always know what is for bills, saving, and living. No finance degree needed.",
+            "welcome_points": {
+                "jars": "Six jars with a job",
+                "overview": "One calm overview",
+                "coach": "Tips without shame"
+            },
             "income": "Your income",
-            "income_body": "Pick the currency for this household, then your net monthly income.",
+            "income_body": "We ask a few basics so Rumtelo can set up your household. Approximate is fine — you can change this later.",
             "jars": "The six jars",
-            "jars_body": "Your income is split immediately — pay your future first.",
+            "jars_body": "Each jar has one job. The starting split is 55 / 10 / 10 / 10 / 10 / 5 — pay bills, then yourself, then joy and giving. Change percentages later.",
+            "jars_tap_hint": "Tap a jar to learn why it exists.",
+            "jars_read_more": "Read more about the six jars method",
             "money_style": "How you handle money",
-            "money_style_body": "Soft labels only — so tips fit you. Partners can choose differently later.",
+            "money_style_body": "There are no right answers. Soft labels only, so tips fit you. Partners in the same household can choose differently later.",
             "coach": "The Coach stays with you",
-            "coach_body": "On-screen tips (marked ✦ The Coach) stay on while you learn — tips without shame. Open The Coach anytime for next moves. Turn tips off later in Settings → Account.",
-            "why": "Your why",
-            "why_body": "One sentence on your dashboard. The check when money gets tight.",
+            "coach_body": "Short tips on screen (marked ✦ The Coach) stay on while you learn — helpful, never shaming. Open The Coach anytime for next steps. Turn tips off later in Settings → Account.",
+            "coach_points": {
+                "tips": "On-screen tips while you learn",
+                "open": "Open The Coach anytime",
+                "settings": "Turn tips off in Settings"
+            },
+            "why": "Your dream",
+            "why_body": "In one short sentence: why do you want Rumtelo — or what dream are you working toward? We put it on your dashboard as a small reminder of what you are working for.",
+            "why_tip": "Write a dream or a reason — not a number. Keep it simple.",
+            "why_label": "Your dream or reason",
+            "why_hint": "Shown on your dashboard as a reminder. You can change it later.",
+            "why_placeholder": "e.g. A house in the sun, sea & fresh fruit",
+            "why_examples": {
+                "house": "A house in the sun",
+                "calm": "More calm around money",
+                "free": "Freedom to choose my path"
+            },
             "currency": "Currency",
+            "currency_hint": "Amounts and jars use this currency for this household.",
             "net_income_label": "Net monthly income ({symbol})",
+            "net_income_hint": "What usually lands after tax — roughly is enough. We use it to fill your jars.",
             "household_name": "Household name",
+            "household_name_hint": "A name for your shared money space — e.g. your family name. You can rename it anytime.",
             "household_default": "My household",
             "spending_style_label": "I tend to…",
+            "spending_style_hint": "Helps The Coach suggest tips that match how you spend.",
             "spending_styles": {
                 "spender": "Spender",
                 "saver": "Saver",
@@ -4119,13 +4217,12 @@
                 "unknown": "Not sure"
             },
             "income_stability_label": "Income month to month",
+            "income_stability_hint": "Stable or varying income changes how careful we are with tips.",
             "income_stability": {
                 "stable": "Stable",
                 "variable": "Variable",
                 "none": "None"
             },
-            "why_label": "Why are you here?",
-            "why_placeholder": "e.g. Stop guessing where the money went",
             "step_of": "Step {current} of {total}",
             "back": "Back",
             "next": "Next",
@@ -4137,6 +4234,261 @@
             "continue": "Continue",
             "finish": "Open Rumtelo",
             "skip": "Skip for now"
+        },
+        "practice": {
+            "chrome": {
+                "title": "Your Practice.",
+                "lead": "Manage clients, staff, and billing in one place."
+            },
+            "nav": {
+                "overview": "Overview",
+                "clients": "Clients",
+                "staff": "Staff",
+                "billing": "Billing",
+                "settings": "Settings",
+                "practice_label": "Rumtelo Practice",
+                "practice_label_short": "Practice"
+            },
+            "switcher": {
+                "open_practice": "Open Practice",
+                "go_to_practice": "Go to Practice"
+            },
+            "menu": {
+                "settings": "Practice settings",
+                "settings_sub": "Billing and company profile"
+            },
+            "overview": {
+                "title": "Overview",
+                "blurb": "How many clients you coach, and what needs your attention.",
+                "clients_count": "{count} clients",
+                "clients_label": "Active clients",
+                "managed_label": "Managed",
+                "invited_label": "Invited",
+                "view_only_label": "View only",
+                "billable_seats_label": "Billable staff seats",
+                "monthly_cost_label": "Monthly cost (est.)",
+                "monthly_cost_sub": "Base + {staff} staff + {clients} managed",
+                "insight_people": "People coached",
+                "insight_people_hint": "Members across active client households",
+                "insight_pending": "Pending invites",
+                "insight_pending_hint": "Waiting for the household to accept",
+                "insight_staff": "Billable staff",
+                "insight_staff_hint": "Seats on your Practice subscription",
+                "insight_cost": "Est. monthly",
+                "insight_cost_hint": "Base + staff seats + managed clients",
+                "attention_eyebrow": "Needs attention",
+                "attention_blurb": "Invites still waiting — follow up or open the client.",
+                "attention_pending": "Invitation pending",
+                "attention_view_all": "All clients",
+                "open_client": "Open",
+                "health_managed": "Sponsored — full coaching access",
+                "health_view": "View only — invitation accepted",
+                "health_pending": "Invitation pending",
+                "empty_prefix": "Empty roster",
+                "no_practice_title": "No practice yet",
+                "no_practice_body": "Create a practice to start managing clients and staff.",
+                "create_cta": "Create a Practice"
+            },
+            "clients": {
+                "title": "Clients",
+                "blurb": "Households linked to your practice. Invite by email.",
+                "add_title": "Add a client",
+                "add_lead": "Invite by email. New accounts get a signup link; existing households accept in settings before you can open their board.",
+                "email_label": "Client email",
+                "email_placeholder": "client@example.com",
+                "email_hint": "We email them either way — create an account, finish setup, or accept in settings.",
+                "household_id_label": "Household ID",
+                "access_label": "Access level",
+                "access_hint": "Choose what you may do after they accept. They always confirm first.",
+                "access_view_title": "View",
+                "access_view_body": "Look along on their board — read-only. No sponsorship fee.",
+                "access_view_badge": "Free",
+                "access_manage_title": "Manage",
+                "access_manage_body": "Coach with full tools. After they accept, you sponsor Plus for them.",
+                "access_manage_badge": "Sponsored",
+                "access_view": "View — send invitation (free)",
+                "access_manage": "Manage — invite to sponsor Plus (after they accept)",
+                "access_view_short": "View",
+                "access_manage_short": "Manage",
+                "col_household": "Household",
+                "col_owner": "Owner",
+                "col_members": "Members",
+                "col_status": "Status",
+                "col_access": "Access",
+                "status_invited": "Invited",
+                "status_active": "Active",
+                "status_revoked": "Revoked",
+                "revoke": "Revoke",
+                "submit": "Send invitation",
+                "added": "Invitation sent — waiting for household accept",
+                "invited": "Invitation sent — waiting for household accept",
+                "invited_no_user": "No user found with that email — invitation sent to create an account",
+                "invited_no_household": "Household not found — invitation sent to continue their setup",
+                "revoked": "Client access revoked",
+                "empty": "No clients yet. Add your first client to get started.",
+                "added_by": "Added by you",
+                "link_since": "Since {date}",
+                "linked_label": "Linked",
+                "members_count": "{count, plural, one {# member} other {# members}}",
+                "members_meta_label": "Members",
+                "owner_label": "Owner {name}",
+                "owner_meta_label": "Owner",
+                "owner_unknown": "Owner unknown",
+                "open": "View progress",
+                "not_found_title": "Client not found",
+                "not_found_body": "This link is missing or no longer on your practice.",
+                "back_to_roster": "Back to clients",
+                "detail_title": "Client progress",
+                "detail_blurb": "Status for this household and a snapshot of their portals.",
+                "household_label": "Household",
+                "access_eyebrow": "Access",
+                "progress_eyebrow": "Portal snapshot",
+                "progress_blurb": "Live money, growth, energy, and soul metrics for this household.",
+                "progress_pending": "Waiting for the household to accept the invitation.",
+                "progress_view_only": "View access — invite accepted. Upgrade to Manage for coaching tools.",
+                "portal_money": "Money",
+                "portal_growth": "Growth",
+                "portal_energy": "Energy",
+                "portal_soul": "Soul",
+                "portal_placeholder": "—",
+                "portal_coming": "Available after the household accepts the invite",
+                "portal_money_hint": "Spent this month",
+                "portal_growth_hint": "Income this month",
+                "portal_energy_hint": "Training sessions this week",
+                "portal_soul_hint": "Stillness streak (days)",
+                "portal_energy_value": "{count, plural, one {# session} other {# sessions}}",
+                "portal_soul_value": "{count, plural, one {# day} other {# days}}",
+                "open_board": "Open household board",
+                "open_board_hint": "Preview the client’s Rumtelo board as Practice. Read-only — you are not a household member.",
+                "open_board_blocked": "The household must accept the invitation before you can open their board."
+            },
+            "staff": {
+                "title": "Staff",
+                "blurb": "Coaches and admins on your practice. Each billable staff seat costs {staffPrice} / month on top of the Practice base.",
+                "invite_title": "Invite a staff member",
+                "email_label": "Email",
+                "email_placeholder": "coach@yourpractice.com",
+                "role_label": "Role",
+                "role_owner": "Owner",
+                "role_admin": "Admin",
+                "role_coach": "Coach",
+                "billable_label": "Billable seat",
+                "billable_hint": "Counts toward your monthly staff seat cost ({staffPrice})",
+                "submit": "Send invite",
+                "invited": "Invitation sent",
+                "empty": "No staff yet.",
+                "joined": "Joined",
+                "seat_count": "{count, plural, one {# seat} other {# seats}}",
+                "col_name": "Name",
+                "col_email": "Email",
+                "col_role": "Role",
+                "col_seat": "Seat",
+                "seat_billable": "Billable",
+                "seat_free": "Included"
+            },
+            "billing": {
+                "title": "Billing",
+                "blurb": "{basePrice} base + {staffPrice} per staff seat + {clientPrice} per managed client (view-only is free).",
+                "usage_eyebrow": "Usage",
+                "subscription_eyebrow": "Subscription",
+                "status_label": "Status",
+                "status_none": "No subscription",
+                "status_trialing": "Trialing",
+                "status_active": "Active — paid",
+                "status_past_due": "Past due — payment failed",
+                "status_unpaid": "Unpaid — access at risk",
+                "status_canceled": "Canceled",
+                "status_incomplete": "Incomplete checkout",
+                "practice_started_label": "Practice started",
+                "period_start_label": "Current period started",
+                "next_renewal_label": "Next renewal",
+                "next_renewal_hint": "When the next invoice is due",
+                "overdue_hint": "Payment is overdue — update the card in Stripe to restore a healthy status.",
+                "base_label": "Practice base",
+                "base_hint": "Monthly org subscription",
+                "staff_label": "Staff seats",
+                "clients_label": "Managed clients",
+                "seats_label": "Billable seats",
+                "unit_cost_label": "Unit cost",
+                "unit_cost_value": "{amount} / seat / month",
+                "period_label": "Current period",
+                "period_value": "{start} – {end}",
+                "no_subscription": "No active subscription yet. Complete checkout to start billing.",
+                "stripe_customer_label": "Stripe customer",
+                "stripe_subscription_label": "Subscription ID",
+                "total_label": "Monthly total (est.)"
+            },
+            "settings": {
+                "title": "Practice Settings",
+                "blurb": "Company profile, billing address, and subscription in one place.",
+                "chrome": {
+                    "title": "Everything you set for this Practice.",
+                    "lead": "Billing, company profile, and the details clients see on invoices."
+                },
+                "sections": {
+                    "practice": "Practice"
+                },
+                "tabs": {
+                    "billing": {
+                        "label": "Billing",
+                        "sub": "Subscription, seats, and estimated invoice"
+                    },
+                    "company": {
+                        "label": "Company",
+                        "sub": "Legal name, contact, and billing address"
+                    }
+                },
+                "identity_eyebrow": "Company",
+                "billing_section_blurb": "Subscription status, seats, and estimated monthly invoice.",
+                "legal_name": "Legal / company name",
+                "display_name": "Display name",
+                "display_name_hint": "Shown in the header and to clients (defaults to legal name)",
+                "billing_email": "Billing email",
+                "registration_number": "Registration number",
+                "vat_number": "VAT number",
+                "phone": "Phone",
+                "website": "Website",
+                "billing_address_eyebrow": "Billing Address",
+                "address_line1": "Street & number",
+                "address_line2": "Floor, suite, etc.",
+                "address_postal": "Postal code",
+                "address_city": "City",
+                "address_country": "Country",
+                "save": "Save changes",
+                "saved": "Practice updated",
+                "optional": "Optional"
+            },
+            "create": {
+                "title": "Create a Practice",
+                "lead": "Register your coaching or advisory practice to manage clients and staff.",
+                "step_identity": "Identity",
+                "step_address": "Address",
+                "step_terms": "Terms",
+                "legal_name": "Legal / company name",
+                "display_name": "Display name",
+                "display_name_hint": "Optional — shown to clients",
+                "billing_email": "Billing email",
+                "registration_number": "Company registration number",
+                "registration_hint": "Optional",
+                "vat_number": "VAT number",
+                "vat_hint": "Optional",
+                "phone": "Phone",
+                "phone_hint": "Optional",
+                "website": "Website",
+                "website_hint": "Optional",
+                "billing_address_title": "Billing address",
+                "address_line1": "Street & number",
+                "address_line2": "Floor, suite, etc.",
+                "address_line2_hint": "Optional",
+                "address_postal": "Postal code",
+                "address_city": "City",
+                "accept_terms": "I accept the terms of service",
+                "accept_terms_hint": "Required to create your practice",
+                "submit": "Create Practice",
+                "created": "Practice created",
+                "already_have": "Already have a practice?",
+                "go_to_practice": "Go to dashboard"
+            }
         },
         "settings": {
             "chrome": {
@@ -4154,7 +4506,23 @@
             "tabs": {
                 "account": {
                     "label": "Account",
-                    "sub": "Profile, sign-in, language"
+                    "sub": "Profile and sign-out"
+                },
+                "household": {
+                    "label": "Household",
+                    "sub": "Members, money style, profile"
+                },
+                "preferences": {
+                    "label": "Preferences",
+                    "sub": "Language, currency, display, coach"
+                },
+                "security": {
+                    "label": "Security",
+                    "sub": "Password and sign-in"
+                },
+                "practice": {
+                    "label": "Practice coaches",
+                    "sub": "Accept or unlink coaches"
                 },
                 "plan": {
                     "label": "Plan",
@@ -4190,7 +4558,11 @@
                 },
                 "export": {
                     "label": "Export",
-                    "sub": "Excel or CSV"
+                    "sub": "Excel, CSV, JSON"
+                },
+                "import": {
+                    "label": "Import",
+                    "sub": "Restore a Rumtelo file"
                 }
             },
             "account": {
@@ -4238,12 +4610,17 @@
                 "members_unlimited": "Unlimited members",
                 "members_solo": "1 member (solo)",
                 "members_up_to": "Up to {max} members",
+                "members_matrix": "Up to {max} — {full} writable, {viewers} viewer",
                 "price_free": "Free",
                 "price_per_month": "{amount} / month",
                 "limit_members": "Members",
+                "limit_full_members": "Writable seats",
+                "limit_viewer_members": "Viewer seats",
                 "limit_goals": "Goals",
                 "limit_bank_links": "Bank links",
                 "unit_members": "members",
+                "unit_full_members": "writable seats",
+                "unit_viewer_members": "viewer seats",
                 "unit_goals": "goals",
                 "unit_bank_links": "linked accounts",
                 "kind_note_basic": "Household type limited to Solo — partners / family / friends need Plus or Max.",
@@ -4281,7 +4658,9 @@
                 "add_payment_for": "Add payment for {plan}",
                 "upgrade_overlay_eyebrow": "Finish your upgrade",
                 "upgrade_overlay_body": "You chose {plan} ({interval}) on the website. Account setup is done — next is Stripe Checkout to activate the plan. You can skip and stay on Basic, then upgrade anytime in Settings → Plan.",
-                "stay_on_basic": "Stay on Basic"
+                "stay_on_basic": "Stay on Basic",
+                "add_seat_cta": "Add a seat (€2.50 / month)",
+                "add_seat_stub": "Extra seats are coming soon — you can still use the seats included in your plan."
             },
             "saved": "Settings saved",
             "save_failed": "Could not save settings",
@@ -4333,9 +4712,14 @@
                     "eyebrow": "Household",
                     "blurb_suffix": "Members share jars, rules, and transaction history.",
                     "members_stub": "Members appear here once you have a household.",
-                    "seat_limit": "Seat limit reached ({limit}). Upgrade to Max for unlimited members.",
+                    "seat_limit": "Seat limit reached ({limit}). Add a seat (€2.50) or upgrade your plan for more room.",
                     "invite_email": "Invite (email)",
-                    "invite_placeholder": "partner@example.com"
+                    "invite_placeholder": "partner@example.com",
+                    "invite_role": "Role",
+                    "invite_role_admin": "Admin (high access)",
+                    "invite_role_member": "Member (day-to-day)",
+                    "invite_role_viewer": "Viewer (look along)",
+                    "invite_viewer_hint": "Basic includes one viewer seat for a coach or social worker."
                 },
                 "household_profile": {
                     "eyebrow": "Household profile",
@@ -4566,44 +4950,75 @@
                     "stub_billing": "Upgrades charge now. Downgrades keep your current plan until the paid period ends. Manage card & invoices via Stripe Portal."
                 },
                 "export": {
-                    "eyebrow": "Everything to Excel or CSV",
-                    "blurb": "One file with a tab per subject — jars, income, fixed costs, transactions, debts, what you own, goals. Handy for your accountant, an administrator, or your own archive.",
+                    "eyebrow": "Everything to CSV or JSON",
+                    "blurb": "Plain CSV for spreadsheets and other apps — or JSON to restore later in Rumtelo. Handy for your accountant, an administrator, or your own archive.",
                     "what_goes_in": "What goes in",
-                    "tabs_heading": "Tabs in the file",
+                    "tabs_heading": "Sheets in the zip",
                     "this_month": "This month only",
                     "scope_everything": "Everything",
-                    "scope_everything_desc": "Every sheet in one JSON file",
+                    "scope_everything_desc": "One CSV per subject in a zip, or full JSON",
                     "scope_tx": "Transactions only",
-                    "scope_tx_desc": "All transactions as CSV",
+                    "scope_tx_desc": "All transactions as one CSV",
                     "scope_month_desc": "Transactions for {period}",
                     "sheet_jars": "Jars",
-                    "sheet_jars_rows": "6 rows",
                     "sheet_jars_cols": "key · name · % · allocated",
                     "sheet_income": "Income",
-                    "sheet_income_rows": "sources",
                     "sheet_income_cols": "label · amount · kind",
                     "sheet_fixed": "Fixed costs",
-                    "sheet_fixed_rows": "recurring",
                     "sheet_fixed_cols": "name · amount · jar",
                     "sheet_transactions": "Transactions",
-                    "sheet_transactions_rows_month": "this month",
-                    "sheet_transactions_rows_ledger": "ledger",
-                    "sheet_transactions_cols": "date · desc · amount · jar",
+                    "sheet_transactions_cols": "date · amount · description · payee",
                     "sheet_debts": "Debts",
-                    "sheet_debts_rows": "balances",
                     "sheet_debts_cols": "name · rate · balance",
                     "sheet_goals": "Goals",
-                    "sheet_goals_rows": "targets",
                     "sheet_goals_cols": "name · target · jar",
                     "sheet_rules": "Rules",
-                    "sheet_rules_rows": "automation",
                     "sheet_rules_cols": "match · jar · priority",
-                    "download_excel": "Download Excel (.xls)",
+                    "sheet_rows_one": "{count} row",
+                    "sheet_rows_other": "{count} rows",
+                    "sheet_rows_loading": "…",
+                    "sheet_rows_unknown": "—",
+                    "download_csv_zip": "Download CSV (.zip)",
                     "download_json": "Download JSON",
                     "download_csv": "Download CSV",
-                    "excel_coming": "Excel multi-sheet export coming soon — use CSV or JSON for now.",
-                    "format_note": "Excel with a real tab per subject is coming. JSON is the full archive; CSV is transactions only — pick this month when you want the current period.",
+                    "format_note": "Everything downloads a zip with one real CSV file per subject (jars, income, transactions, …). Transactions-only and this month are a single CSV with portable columns (date, amount, description, payee, jar, note). JSON is the full Rumtelo archive — use Import to restore it later.",
                     "sign_in_stub": "Sign in to download exports."
+                },
+                "import": {
+                    "eyebrow": "Restore a Rumtelo file",
+                    "blurb": "Choose a JSON archive, a CSV zip, or a single CSV sheet from Export. Jars remap by key; duplicates are skipped. Debts and goals follow your plan.",
+                    "choose": "Choose JSON, CSV, or zip",
+                    "preview": "Preview import",
+                    "confirm": "Import into this household",
+                    "clear": "Clear",
+                    "result_title": "Import preview",
+                    "found_title": "Detected in this file",
+                    "found_sheets": "Sheets: {sheets}",
+                    "found_none": "No importable rows",
+                    "found_jars_one": "{count} jar",
+                    "found_jars_other": "{count} jars",
+                    "found_income_one": "{count} income",
+                    "found_income_other": "{count} income",
+                    "found_fixed_one": "{count} fixed cost",
+                    "found_fixed_other": "{count} fixed costs",
+                    "found_debts_one": "{count} debt",
+                    "found_debts_other": "{count} debts",
+                    "found_goals_one": "{count} goal",
+                    "found_goals_other": "{count} goals",
+                    "found_rules_one": "{count} rule",
+                    "found_rules_other": "{count} rules",
+                    "found_tx_one": "{count} transaction",
+                    "found_tx_other": "{count} transactions",
+                    "source_json": "Rumtelo JSON archive",
+                    "source_csv_zip": "CSV zip export",
+                    "source_csv": "Single CSV sheet",
+                    "will": "{count} will import",
+                    "skipped": "{count} skipped",
+                    "skipped_plan": "{count} skipped (plan)",
+                    "split_ok": "Jar split will be applied",
+                    "split_skip": "Jar split unchanged",
+                    "format_note": "Accepts Rumtelo JSON, the CSV zip from Export, or one sheet (jars.csv, transactions.csv, …). We detect the sheet from the file name or columns. Bank statement CSVs still go under Bank.",
+                    "sign_in_stub": "Sign in to import data."
                 },
                 "sign_out_sub": "You stay signed in for 30 days on this device"
             },
@@ -4649,7 +5064,14 @@
                 "stripe_unconfigured": "Paid plans are unavailable until Stripe billing is configured",
                 "csv_failed": "CSV export failed",
                 "export_ok": "Full export downloaded",
+                "csv_zip_ok": "CSV zip downloaded",
                 "json_failed": "JSON export failed",
+                "import_preview_ok": "Import preview ready",
+                "import_ok": "Archive imported",
+                "import_failed": "Import failed",
+                "import_detected": "File recognised — review what we found, then preview",
+                "import_empty": "That file had no importable Rumtelo rows",
+                "import_invalid": "That file is not a valid Rumtelo JSON, CSV, or CSV zip export",
                 "chf_coming": "CHF support is coming soon",
                 "delete_coming": "Account deletion coming soon — export your data first.",
                 "stripe_overlay_failed": "Could not start Stripe checkout — try Settings → Plan",
@@ -4661,6 +5083,24 @@
                 "csv_exported_one": "{count} transaction exported{periodSuffix}",
                 "csv_exported_other": "{count} transactions exported{periodSuffix}",
                 "csv_period_suffix": " for {period}"
+            },
+            "practice_links": {
+                "eyebrow": "Practice coaches",
+                "blurb": "External Practice firms that asked to view or manage this household. Accepting is dual consent — they are not household members.",
+                "empty": "No Practice invites or links yet.",
+                "pending_sub": "Invited for {access} access — accept to share your board.",
+                "active_sub": "Active {access} contract.",
+                "access_view": "view",
+                "access_manage": "manage",
+                "status_invited": "Pending",
+                "status_active": "Active",
+                "accept": "Accept",
+                "reject": "Decline",
+                "unlink": "Unlink",
+                "accepted": "Practice access accepted",
+                "rejected": "Practice invite declined",
+                "unlinked": "Practice unlinked",
+                "invite_redeemed": "Practice invitation linked — open Settings → Practice coaches to accept when you are ready."
             }
         },
         "shell": {
@@ -4800,6 +5240,14 @@
                 "days_ahead_one": "≈ 1 day ahead",
                 "days_ahead_other": "≈ {count} days ahead"
             },
+            "practice_preview": {
+                "eyebrow": "Client household — Practice preview",
+                "headline": "You are viewing {name}",
+                "sub": "Read-only. This is a client board, not your own account. Changes are blocked.",
+                "viewing": "Viewing",
+                "read_only": "Read-only as Practice",
+                "back": "Back to Practice"
+            },
             "aria": {
                 "switch_product": "Switch product",
                 "close_product_menu": "Close product menu",
@@ -4818,8 +5266,13 @@
                 "locked_title": "Upgrade to open this",
                 "locked_body": "This part of Rumtelo is on a higher plan.",
                 "locked_plan_title": "Available in the {plan} plan",
+                "locked_plan_title_practice": "This client needs {plan}",
+                "locked_plan_body_practice": "Their household plan does not include this. If you manage them, upgrade from Practice billing.",
                 "locked_plan_aria": "Plan upgrade required",
+                "locked_plan_aria_practice": "Client plan upgrade required",
                 "upgrade_cta": "Upgrade to {plan}",
+                "upgrade_cta_practice": "Open Practice billing",
+                "back_to_practice": "Back to Practice clients",
                 "back_to_dashboard": "Back to dashboard",
                 "back_to_website": "Back to website",
                 "staging_banner_badge": "Staging",

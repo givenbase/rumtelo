@@ -12,8 +12,9 @@ import { StagingBanner } from '@/components/layout/staging-banner';
 import '../../globals.css';
 
 /**
- * Brand book fonts: Archivo Narrow (Tungsten web stand-in) for display,
- * Archivo for body, IBM Plex Mono for figures. next/font self-hosts them.
+ * Brand book fonts via `next/font/google` (Next downloads + self-hosts at build).
+ * Variable faces where Google offers them — fewer gstatic fetches, Next’s recommended path.
+ * latin-ext covers NL diacritics.
  *
  * No `generateStaticParams` here: Next 16.3 fails SSG on `@modal/(...)` intercept
  * routes under `[locale]` ("Could not resolve param value for segment: locale").
@@ -22,19 +23,17 @@ import '../../globals.css';
  * Locale comes from next-intl `requestLocale` via `i18n/request.ts` (not `setRequestLocale`).
  */
 const display = Archivo_Narrow({
-    subsets: ['latin'],
-    weight: ['500', '600', '700'],
+    subsets: ['latin', 'latin-ext'],
     variable: '--font-archivo-narrow',
     display: 'swap',
 });
 const sans = Archivo({
-    subsets: ['latin'],
-    weight: ['400', '500', '600', '700'],
+    subsets: ['latin', 'latin-ext'],
     variable: '--font-archivo',
     display: 'swap',
 });
 const mono = IBM_Plex_Mono({
-    subsets: ['latin'],
+    subsets: ['latin', 'latin-ext'],
     weight: ['400', '500', '600'],
     variable: '--font-plex-mono',
     display: 'swap',

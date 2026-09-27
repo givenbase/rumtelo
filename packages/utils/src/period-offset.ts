@@ -17,9 +17,53 @@ export function currentYearMonth(now = new Date()): YearMonth {
     return { year: now.getFullYear(), month: now.getMonth() + 1 };
 }
 
+/** Shift a calendar month by `deltaMonths` (negative = past). */
+export function shiftYearMonth(period: YearMonth, deltaMonths: number): YearMonth {
+    const date = new Date(period.year, period.month - 1 + deltaMonths, 1);
+    return { year: date.getFullYear(), month: date.getMonth() + 1 };
+}
+
 /** Months from `from` to `to`: positive if `to` is after `from`. */
 export function monthsBetween(from: YearMonth, to: YearMonth): number {
     return (to.year - from.year) * 12 + (to.month - from.month);
+}
+
+export function isYearMonthBefore(left: YearMonth, right: YearMonth): boolean {
+    return left.year < right.year || (left.year === right.year && left.month < right.month);
+}
+
+export function isYearMonthAfter(left: YearMonth, right: YearMonth): boolean {
+    return left.year > right.year || (left.year === right.year && left.month > right.month);
+}
+
+export type PeriodTravelBounds = {
+    floor: YearMonth;
+    horizon: YearMonth;
+};
+
+/**
+ * Period picker range: floor = household created month − 1 (never after live),
+ * horizon = live + 12 months.
+ */
+export function periodTravelBounds(
+    createdAt: Date | string | null | undefined,
+    now = new Date()
+): PeriodTravelBounds {
+    const live = currentYearMonth(now);
+    const horizon = shiftYearMonth(live, 12);
+    const created =
+        createdAt instanceof Date
+            ? createdAt
+            : typeof createdAt === 'string' && createdAt
+              ? new Date(createdAt)
+              : null;
+    const createdMonth =
+        created && !Number.isNaN(created.getTime())
+            ? { year: created.getFullYear(), month: created.getMonth() + 1 }
+            : live;
+    let floor = shiftYearMonth(createdMonth, -1);
+    if (isYearMonthAfter(floor, live)) floor = live;
+    return { floor, horizon };
 }
 
 function formatSpan(absMonths: number, suffix: 'ago' | 'ahead'): string {

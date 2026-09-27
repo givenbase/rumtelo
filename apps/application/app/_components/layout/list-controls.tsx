@@ -2,12 +2,14 @@
 
 import type { ReactNode } from 'react';
 
-import { Typography } from '@rumtelo/ui';
+import { Icon, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 export type ListControlOption<T extends string = string> = {
     key: T;
     label: string;
+    /** Optional leading mark (e.g. jar icon + color). */
+    leading?: ReactNode;
 };
 
 type ListControlsSort<T extends string> = {
@@ -32,18 +34,56 @@ type ListControlsSearch = {
     ariaLabel?: string;
 };
 
-const SHELL =
-    'h-7 rounded-full border border-line bg-raised outline-none transition-colors focus:border-accent';
-
-const SORT_SELECT = cn(SHELL, 'px-3 font-mono text-[10px] tracking-wide text-fg uppercase');
-
-const SEARCH_INPUT = cn(
-    SHELL,
-    'min-w-0 flex-1 rounded-lg px-3 text-sm tracking-normal text-fg normal-case placeholder:text-fg-muted sm:max-w-sm'
-);
+/** Interactive chrome — line-strong so fields read as controls (WCAG 1.4.11). */
+const FOCUS_RING =
+    'outline-none transition-colors focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent/35';
 
 const CHIP =
-    'inline-flex h-7 items-center rounded-full border px-3 font-mono text-[10px] font-medium leading-none tracking-widest uppercase transition-all duration-200';
+    'inline-flex h-8 items-center rounded-full border px-3 font-mono text-[11px] font-medium leading-none tracking-wide uppercase transition-colors duration-200';
+
+const CHIP_IDLE =
+    'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent';
+const CHIP_ACTIVE = 'border-accent/50 bg-accent-soft text-accent';
+
+/**
+ * Primary list search — surface field, strong border, leading icon.
+ * Prefer this over a bare Input when the job is “find in a list”.
+ */
+export function ListSearchField({
+    value,
+    onChange,
+    placeholder,
+    ariaLabel,
+    className,
+}: {
+    value: string;
+    onChange: (value: string) => void;
+    placeholder: string;
+    ariaLabel?: string;
+    className?: string;
+}) {
+    return (
+        <div className={cn('relative min-w-0', className)}>
+            <Icon
+                name="search"
+                size="sm"
+                className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-fg-muted"
+            />
+            <input
+                type="search"
+                value={value}
+                onChange={event => onChange(event.target.value)}
+                placeholder={placeholder}
+                aria-label={ariaLabel ?? placeholder}
+                className={cn(
+                    'h-11 w-full min-w-0 rounded-xl border border-line-strong bg-surface py-2.5 pr-3.5 pl-10 text-sm text-fg shadow-sm',
+                    'placeholder:text-fg-muted',
+                    FOCUS_RING
+                )}
+            />
+        </div>
+    );
+}
 
 function FilterChips<T extends string>({ filters }: { filters: ListControlsFilters<T> }) {
     return (
@@ -59,10 +99,10 @@ function FilterChips<T extends string>({ filters }: { filters: ListControlsFilte
                     onClick={() => filters.onChange(option.key)}
                     className={cn(
                         CHIP,
-                        filters.value === option.key
-                            ? 'border-accent/40 bg-accent-soft text-accent'
-                            : 'border-line text-fg-muted hover:border-accent-hover hover:text-accent'
+                        'gap-1.5',
+                        filters.value === option.key ? CHIP_ACTIVE : CHIP_IDLE
                     )}>
+                    {option.leading}
                     {option.label}
                 </button>
             ))}
@@ -72,7 +112,7 @@ function FilterChips<T extends string>({ filters }: { filters: ListControlsFilte
 
 function SortControl<T extends string>({ sort }: { sort: ListControlsSort<T> }) {
     return (
-        <label className="flex h-7 items-center gap-2.5 text-xs text-fg-muted">
+        <label className="flex h-8 items-center gap-2 text-xs text-fg-muted">
             <span className="font-mono text-[10px] leading-none tracking-widest uppercase">
                 {sort.label}
             </span>
@@ -80,7 +120,10 @@ function SortControl<T extends string>({ sort }: { sort: ListControlsSort<T> }) 
                 value={sort.value}
                 onChange={event => sort.onChange(event.target.value as T)}
                 aria-label={sort.ariaLabel}
-                className={SORT_SELECT}>
+                className={cn(
+                    'h-8 rounded-full border border-line-strong bg-surface px-3 font-mono text-[11px] tracking-wide text-fg uppercase',
+                    FOCUS_RING
+                )}>
                 {sort.options.map(option => (
                     <option key={option.key} value={option.key}>
                         {option.label}
@@ -94,8 +137,8 @@ function SortControl<T extends string>({ sort }: { sort: ListControlsSort<T> }) 
 /**
  * Shared list chrome under ListToolbar.
  *
- * - Debts-style (filters + sort, no search): chips and sort share one baseline.
- * - Search pages: search + sort/end on one row; filter chips on the next.
+ * Search is the primary control (surface + strong border + icon).
+ * Chips / sort / end stay secondary on the next tools row.
  */
 export function ListControls<TSort extends string = string, TFilter extends string = string>({
     title,
@@ -124,7 +167,7 @@ export function ListControls<TSort extends string = string, TFilter extends stri
     const hasEnd = Boolean(end);
     /** Few chips + sort only — keep them on one row (debts pattern). */
     const inlineFiltersWithSort = hasFilters && hasSort && !hasSearch && !hasEnd;
-    const hasToolsRow = hasSearch || hasEnd || (hasSort && !inlineFiltersWithSort);
+    const hasSecondaryTools = hasEnd || (hasSort && !inlineFiltersWithSort);
 
     return (
         <div className={cn('grid gap-3', className)}>
@@ -147,29 +190,36 @@ export function ListControls<TSort extends string = string, TFilter extends stri
                 </div>
             ) : null}
 
-            {hasToolsRow ? (
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-2.5">
-                    {search ? (
-                        <input
-                            type="search"
-                            value={search.value}
-                            onChange={event => search.onChange(event.target.value)}
-                            placeholder={search.placeholder}
-                            aria-label={search.ariaLabel ?? search.placeholder}
-                            className={SEARCH_INPUT}
-                        />
-                    ) : (
-                        <div className="min-w-0 flex-1" />
-                    )}
-                    <div className="ml-auto flex shrink-0 flex-wrap items-center justify-end gap-2.5">
-                        {sort && !inlineFiltersWithSort ? <SortControl sort={sort} /> : null}
-                        {end}
-                    </div>
-                </div>
+            {hasSearch && search ? (
+                <ListSearchField
+                    value={search.value}
+                    onChange={search.onChange}
+                    placeholder={search.placeholder}
+                    ariaLabel={search.ariaLabel}
+                />
             ) : null}
 
             {hasFilters && filters && !inlineFiltersWithSort ? (
-                <FilterChips filters={filters} />
+                <div
+                    className={cn(
+                        'flex flex-wrap items-center gap-x-3 gap-y-2.5',
+                        hasSecondaryTools && 'justify-between'
+                    )}>
+                    <FilterChips filters={filters} />
+                    {hasSecondaryTools ? (
+                        <div className="flex shrink-0 flex-wrap items-center gap-2.5">
+                            {sort && !inlineFiltersWithSort ? <SortControl sort={sort} /> : null}
+                            {end}
+                        </div>
+                    ) : null}
+                </div>
+            ) : null}
+
+            {!hasFilters && hasSecondaryTools ? (
+                <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-2">
+                    {sort && !inlineFiltersWithSort ? <SortControl sort={sort} /> : null}
+                    {end}
+                </div>
             ) : null}
 
             {hint !== undefined && hint !== null ? (
@@ -206,13 +256,7 @@ export function ListControlsChip({
             type="button"
             aria-pressed={active}
             onClick={onClick}
-            className={cn(
-                CHIP,
-                active
-                    ? 'border-accent/40 bg-accent-soft text-accent'
-                    : 'border-line text-fg-muted hover:border-accent-hover hover:text-accent',
-                className
-            )}>
+            className={cn(CHIP, active ? CHIP_ACTIVE : CHIP_IDLE, className)}>
             {children}
         </button>
     );

@@ -17,13 +17,13 @@ import {
 } from '@/app/_lib/plan';
 import { isCapabilityEnabledAtLaunch, isProductEnabled } from '@/app/_lib/launch-products';
 import { capabilityAccessForPath, capabilityKeyForPathname } from '@/app/_lib/capability-access';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 
 /**
  * Plan capability checks — plan → product → feature.
  */
 export function usePlanCapabilities() {
-    const { plan, planReady } = useAppShell();
+    const { plan, planReady } = useHouseholdShell();
     const caps = capabilitiesFor(plan);
 
     return useMemo(

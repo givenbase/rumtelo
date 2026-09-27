@@ -9,7 +9,7 @@ import { countryFromCurrency } from '@/app/_lib/resolve-account-bank';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { BankAccountRow } from '@/components/features/money/bank-account-row';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
 import { embeddedFormSurfaceClass } from '@/components/layout/form-create-edit-shell';
@@ -82,7 +82,7 @@ export function StatementImportCard({
 }: StatementImportCardProps) {
     const t = useTranslations('features.money.transactions.statement_import');
     const { householdId } = useAuth();
-    const { showToast } = useAppShell();
+    const { showToast } = useHouseholdShell();
     const apiError = useApiError();
     const { hasCapability } = usePlanCapabilities();
     const { currency } = useHouseholdCurrency();

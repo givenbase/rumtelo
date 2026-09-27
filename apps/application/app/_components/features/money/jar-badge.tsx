@@ -2,34 +2,47 @@ import type { ReactNode } from 'react';
 
 import { cn } from '@rumtelo/utils';
 
-import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
-import { jarChrome } from '@/app/_lib/jar-meta';
+import { jarIcon } from '@/app/_lib/jar-meta';
+
+type JarMarkProps = {
+    jarKey?: string | null;
+    /** Catalog / household icon; falls back to jar seed emoji. */
+    icon?: string | null;
+    className?: string;
+};
+
+/**
+ * Jar identity on flat chrome — icon only.
+ * Tiny color dots are too close (esp. Freedom vs Education teal) and double the noise next to emoji.
+ * Use full jar color on larger surfaces (cards, meters), not in filter chips.
+ */
+export function JarMark({ jarKey, icon, className }: JarMarkProps) {
+    return (
+        <span className={cn('text-[13px] leading-none', className)} aria-hidden>
+            {jarIcon(jarKey, icon)}
+        </span>
+    );
+}
 
 type JarBadgeProps = {
     jarKey?: string | null;
     name?: string | null;
+    icon?: string | null;
     className?: string;
 };
 
-/** Colored jar pill — used on lists so the destination is scannable, not flat text. */
-export function JarBadge({ jarKey, name, className }: JarBadgeProps) {
+/** Jar pill — icon + name (color lives on jar cards / accents, not as a micro-dot). */
+export function JarBadge({ jarKey, name, icon, className }: JarBadgeProps) {
     const label = name?.trim();
     if (!label) return null;
-    const chrome = jarChrome(jarKey);
 
     return (
         <span
             className={cn(
-                'inline-flex items-center gap-1.5 rounded-full border border-line bg-raised px-2 py-0.5 font-mono text-[10px] font-medium tracking-wide text-fg-secondary uppercase',
+                'inline-flex items-center gap-1.5 rounded-full border border-line-strong bg-surface px-2 py-0.5 font-mono text-[10px] font-medium tracking-wide text-fg-secondary uppercase',
                 className
             )}>
-            <span
-                className="size-1.75 shrink-0 rounded-sm"
-                style={{
-                    background: jarKey ? bgClassToCssVar(chrome.color) : 'var(--color-fg-faint)',
-                }}
-                aria-hidden
-            />
+            <JarMark jarKey={jarKey} icon={icon} />
             {label}
         </span>
     );
