@@ -13,8 +13,10 @@ const settings = {
         data: 'Data',
     },
     tabs: {
-        account: { label: 'Account', sub: 'Profile, sign-in, language' },
-        household: { label: 'Household', sub: 'Members and invites' },
+        account: { label: 'Account', sub: 'Profile and sign-out' },
+        household: { label: 'Household', sub: 'Members, money style, profile' },
+        preferences: { label: 'Preferences', sub: 'Language, currency, display, coach' },
+        security: { label: 'Security', sub: 'Password and sign-in' },
         practice: { label: 'Practice coaches', sub: 'Accept or unlink coaches' },
         plan: { label: 'Plan', sub: 'What you use and pay' },
         jars: { label: 'Jars', sub: 'Split, accounts, coach' },

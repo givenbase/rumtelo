@@ -4102,6 +4102,8 @@
             "sign_in": "Sign in",
             "settings_account": "Account — Settings",
             "settings_household": "Household — Settings",
+            "settings_preferences": "Preferences — Settings",
+            "settings_security": "Security — Settings",
             "settings_practice": "Practice coaches — Settings",
             "settings_export": "Export — Settings",
             "settings_import": "Import — Settings",
@@ -4504,11 +4506,19 @@
             "tabs": {
                 "account": {
                     "label": "Account",
-                    "sub": "Profile, sign-in, language"
+                    "sub": "Profile and sign-out"
                 },
                 "household": {
                     "label": "Household",
-                    "sub": "Members and invites"
+                    "sub": "Members, money style, profile"
+                },
+                "preferences": {
+                    "label": "Preferences",
+                    "sub": "Language, currency, display, coach"
+                },
+                "security": {
+                    "label": "Security",
+                    "sub": "Password and sign-in"
                 },
                 "practice": {
                     "label": "Practice coaches",

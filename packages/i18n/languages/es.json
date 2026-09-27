@@ -4102,6 +4102,8 @@
             "sign_in": "Iniciar sesión",
             "settings_account": "Cuenta — Ajustes",
             "settings_household": "Hogar — Configuración",
+            "settings_preferences": "Preferencias — Configuración",
+            "settings_security": "Seguridad — Configuración",
             "settings_practice": "Entrenadores de entrenamiento — Ajustes",
             "settings_export": "Exportar — Configuración",
             "settings_import": "Importar — Configuración",
@@ -4504,11 +4506,19 @@
             "tabs": {
                 "account": {
                     "label": "Cuenta",
-                    "sub": "Perfil, inicio de sesión, idioma"
+                    "sub": "Perfil y cerrar sesión"
                 },
                 "household": {
                     "label": "Hogar",
-                    "sub": "Miembros e invitados"
+                    "sub": "Miembros, gestión del dinero, perfil"
+                },
+                "preferences": {
+                    "label": "Preferencias",
+                    "sub": "Idioma, moneda, pantalla, coach"
+                },
+                "security": {
+                    "label": "Seguridad",
+                    "sub": "Contraseña e inicio de sesión"
                 },
                 "practice": {
                     "label": "Entrenadores de entrenamiento",

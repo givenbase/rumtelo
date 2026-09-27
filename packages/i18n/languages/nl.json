@@ -4102,6 +4102,8 @@
             "sign_in": "Inloggen",
             "settings_account": "Account — Instellingen",
             "settings_household": "Huishouden — Instellingen",
+            "settings_preferences": "Voorkeuren — Instellingen",
+            "settings_security": "Beveiliging — Instellingen",
             "settings_practice": "Trainingscoaches — Instellingen",
             "settings_export": "Exporteren — Instellingen",
             "settings_import": "Importeren — Instellingen",
@@ -4504,11 +4506,19 @@
             "tabs": {
                 "account": {
                     "label": "Account",
-                    "sub": "Profiel, inloggen, taal"
+                    "sub": "Profiel en uitloggen"
                 },
                 "household": {
                     "label": "Huishouden",
-                    "sub": "Leden en genodigden"
+                    "sub": "Leden, geldbeheer, profiel"
+                },
+                "preferences": {
+                    "label": "Voorkeuren",
+                    "sub": "Taal, valuta, weergave, coach"
+                },
+                "security": {
+                    "label": "Beveiliging",
+                    "sub": "Wachtwoord en aanmelden"
                 },
                 "practice": {
                     "label": "Trainers",

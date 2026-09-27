@@ -4102,6 +4102,8 @@
             "sign_in": "Se connecter",
             "settings_account": "Compte — Paramètres",
             "settings_household": "Ménage — Paramètres",
+            "settings_preferences": "Préférences — Paramètres",
+            "settings_security": "Sécurité — Paramètres",
             "settings_practice": "Entraîneurs d'entraînement — Paramètres",
             "settings_export": "Exporter — Paramètres",
             "settings_import": "Importation — Paramètres",
@@ -4504,11 +4506,19 @@
             "tabs": {
                 "account": {
                     "label": "Compte",
-                    "sub": "Profil, connexion, langue"
+                    "sub": "Profil et déconnexion"
                 },
                 "household": {
                     "label": "Ménage",
-                    "sub": "Membres et invités"
+                    "sub": "Membres, gestion de l'argent, profil"
+                },
+                "preferences": {
+                    "label": "Préférences",
+                    "sub": "Langue, devise, affichage, coach"
+                },
+                "security": {
+                    "label": "Sécurité",
+                    "sub": "Mot de passe et connexion"
                 },
                 "practice": {
                     "label": "Entraîneurs d'entraînement",

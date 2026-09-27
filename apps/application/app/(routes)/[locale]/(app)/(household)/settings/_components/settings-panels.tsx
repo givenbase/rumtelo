@@ -10,4 +10,6 @@ export { PlanSettings } from './plan-settings';
 export { ExportSettings } from './export-settings';
 export { ImportSettings } from './import-settings';
 export { PracticeLinksSettings } from './practice-links-settings';
-export { HouseholdMembersSettings } from './household-members-settings';
+export { HouseholdSettings } from './household-members-settings';
+export { PreferencesSettings } from './preferences-settings';
+export { SecuritySettings } from './security-settings';

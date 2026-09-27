@@ -1,6 +1,6 @@
 import { getTranslations } from '@rumtelo/i18n';
 
-import { HouseholdMembersSettings } from '../../_components/settings-panels';
+import { HouseholdSettings } from '../../_components/settings-panels';
 
 export async function generateMetadata() {
     const t = await getTranslations('pages.meta');
@@ -8,5 +8,5 @@ export async function generateMetadata() {
 }
 
 export default function HouseholdSettingsPage() {
-    return <HouseholdMembersSettings />;
+    return <HouseholdSettings />;
 }
