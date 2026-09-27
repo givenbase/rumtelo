@@ -12,7 +12,9 @@ import {
     canAddHouseholdMember,
     canInviteOnPlan,
     canUseHouseholdKind,
-    capabilitiesFor,
+    effectiveSeatCaps,
+    isWritableHouseholdRole,
+    planAllowsInviteRole,
 } from '@rumtelo/contracts';
 
 import { EntityManager } from '@mikro-orm/postgresql';
@@ -31,6 +33,7 @@ import { IncomeSource } from '../../public/product/money/plan/income/income-sour
 import { Jar } from '../../public/product/money/plan/jar/jar.entity';
 import { AccountSettingsService } from '../user/account/account-settings/account-settings.service';
 import { AccountService } from '../user/account/account.service';
+import { HouseholdBillingService } from './household-billing/household-billing.service';
 import { HouseholdSettingsService } from './household-settings/household-settings.service';
 import { AuthHousehold } from './managed/household/auth-household.entity';
 import { AuthInvitation } from './managed/invitation/auth-invitation.entity';
@@ -53,6 +56,7 @@ export class HouseholdService {
         @Inject(AccountSettingsService) private readonly accountSettings: AccountSettingsService,
         @Inject(HouseholdSettingsService)
         private readonly householdSettings: HouseholdSettingsService,
+        @Inject(HouseholdBillingService) private readonly householdBilling: HouseholdBillingService,
         @Inject(JarTemplateService) private readonly jarTemplates: JarTemplateService,
         @Inject(EmailService) private readonly email: EmailService
     ) {}
@@ -70,18 +74,36 @@ export class HouseholdService {
         const settings = await this.householdSettings.get(householdId);
         const planKey = settings.planKey;
         if (!canInviteOnPlan(planKey)) {
+            throw new BadRequestException('Invites are not available on this plan');
+        }
+
+        const snap = await this.householdBilling.getSnapshot(householdId);
+        const extras = {
+            extraContributor: snap.extraContributorSeats,
+            extraViewer: snap.extraViewerSeats,
+        };
+        if (!planAllowsInviteRole(planKey, role, extras)) {
             throw new BadRequestException(
-                'Basic is solo-only — upgrade to Plus to invite household members'
+                role === HouseholdRole.VIEWER
+                    ? 'This plan does not allow that invite role'
+                    : 'This plan has no contributor seat left to invite — add a seat or invite as viewer'
             );
         }
 
-        const occupied = await this.occupiedSeats(householdId);
-        if (!canAddHouseholdMember(planKey, occupied)) {
-            const max = capabilitiesFor(planKey).maxMembers;
+        const seats = await this.seatOccupation(householdId);
+        if (
+            !canAddHouseholdMember(planKey, {
+                occupiedSeats: seats.occupied,
+                writableCount: seats.writableCount,
+                viewerCount: seats.viewerCount,
+                role,
+                extras,
+            })
+        ) {
+            const caps = effectiveSeatCaps(planKey, extras);
             throw new BadRequestException(
-                max === null
-                    ? 'Cannot invite another member right now'
-                    : `This plan allows up to ${max} household members (including you)`
+                `This plan allows up to ${caps.maxMembers} household members ` +
+                    `(${caps.maxWritable} writable / ${caps.maxViewer} viewer, including you)`
             );
         }
 
@@ -89,7 +111,7 @@ export class HouseholdService {
         const result = await this.authService.api.createInvitation({
             body: {
                 email,
-                role: role.toLowerCase() as 'owner' | 'member' | 'viewer',
+                role: role.toLowerCase() as 'owner' | 'admin' | 'member' | 'viewer',
                 organizationId: householdId,
             },
             headers,
@@ -171,14 +193,35 @@ export class HouseholdService {
     // Private helpers
     // ====================================================================
 
-    /** Members + pending invites occupy seats against plan.maxMembers. */
-    private async occupiedSeats(householdId: string): Promise<number> {
-        const members = await this.em.count(AuthMember, { household: householdId });
-        const pending = await this.em.count(AuthInvitation, {
+    /** Members + pending invites by role bucket against effective seat caps. */
+    private async seatOccupation(householdId: string): Promise<{
+        occupied: number;
+        writableCount: number;
+        viewerCount: number;
+    }> {
+        const memberships = await this.em.find(AuthMember, { household: householdId });
+        const pending = await this.em.find(AuthInvitation, {
             household: householdId,
             status: 'pending',
         });
-        return members + pending;
+
+        let writableCount = 0;
+        let viewerCount = 0;
+        for (const member of memberships) {
+            if (isWritableHouseholdRole(mapRole(member.role))) writableCount += 1;
+            else viewerCount += 1;
+        }
+        for (const invite of pending) {
+            const role = mapRole(invite.role ?? 'member');
+            if (isWritableHouseholdRole(role)) writableCount += 1;
+            else viewerCount += 1;
+        }
+
+        return {
+            occupied: memberships.length + pending.length,
+            writableCount,
+            viewerCount,
+        };
     }
 
     /**
@@ -315,8 +358,9 @@ function slugify(name: string) {
 function mapRole(raw: string): HouseholdRole {
     switch (raw.toLowerCase()) {
         case 'owner':
-        case 'admin':
             return HouseholdRole.OWNER;
+        case 'admin':
+            return HouseholdRole.ADMIN;
         case 'member':
             return HouseholdRole.MEMBER;
         case 'viewer':

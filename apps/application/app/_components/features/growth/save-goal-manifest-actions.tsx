@@ -19,7 +19,7 @@ import { useApiError } from '@/app/_lib/api-error-messages';
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { isFocusSaveGoal, saveGoalRank } from '@/app/_lib/goal-focus';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 
 type Props = {
     goal: Goal;
@@ -43,7 +43,7 @@ export function SaveGoalManifestActions({
     const tUi = useTranslations();
     const apiError = useApiError();
     const queryClient = useQueryClient();
-    const { showToast } = useAppShell();
+    const { showToast } = useHouseholdShell();
     const [achieveOpen, setAchieveOpen] = useState(false);
 
     const isSaveActive =

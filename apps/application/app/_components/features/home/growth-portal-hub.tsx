@@ -18,7 +18,7 @@ import { pickPortalCoach } from '@/app/_lib/portal-coach';
 import { isLiveData } from '@/app/_lib/preview';
 import { growthPortalShell } from '@/app/_lib/portal-hubs';
 import { PortalHub, type PortalHubProps } from '@/components/features/home/portal-hub';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
@@ -28,7 +28,7 @@ export function GrowthPortalHubClient() {
     const tc = useTranslations('features.growth.hub.cards');
     const shell = growthPortalShell(t);
     const { householdId } = useAuth();
-    const { period } = useAppShell();
+    const { period } = useHouseholdShell();
     const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
     const travel = describePeriodTravel(period);

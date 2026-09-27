@@ -2,10 +2,10 @@
 
 import { cn } from '@rumtelo/utils';
 
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 
 export function ToastPill() {
-    const { toast } = useAppShell();
+    const { toast } = useHouseholdShell();
 
     if (!toast) return null;
 

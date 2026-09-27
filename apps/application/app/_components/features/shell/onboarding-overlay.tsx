@@ -13,6 +13,7 @@ import {
     Locale,
     SpendingStyle,
 } from '@rumtelo/contracts';
+import { useLiveQuery } from '@rumtelo/hooks';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import {
     Badge,
@@ -28,15 +29,15 @@ import { cn, currencySymbol, formatMoney } from '@rumtelo/utils';
 import { z } from 'zod';
 
 import { useApiError } from '@/app/_lib/api-error-messages';
+import { apiQuery } from '@/app/_lib/api-hooks';
 import { webOrigin } from '@/app/_lib/auth';
 import { writeHelpersEnabled } from '@/app/_lib/feature-helpers';
 import { jarChrome, jarIcon } from '@/app/_lib/jar-meta';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { usePageTour } from '@/components/features/tour';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useOptionalPlanIntent } from '@/components/features/shell/plan-intent-provider';
-
 const ONBOARDING_CURRENCIES = [
     { code: Currency.EUR },
     { code: Currency.USD },
@@ -164,9 +165,18 @@ export function OnboardingOverlay() {
         setOnboardingStep,
         showToast,
         openOnboarding,
-    } = useAppShell();
+    } = useHouseholdShell();
     const { requestTourOffer } = usePageTour();
     const planIntent = useOptionalPlanIntent();
+
+    // Practice-only accounts never create a personal household — AppBootGate
+    // sends them to `/practice`. Do not flash household onboarding first.
+    const practiceListQuery = useLiveQuery(
+        apiQuery.practice.list.queryOptions(),
+        [],
+        Boolean(session)
+    );
+    const hasPractice = (practiceListQuery.data?.length ?? 0) > 0;
 
     useEffect(() => {
         if (isPending || !householdReady) return;
@@ -174,9 +184,21 @@ export function OnboardingOverlay() {
             closeOnboarding();
             return;
         }
-        if (session) openOnboarding();
-    }, [session, householdId, isPending, householdReady, openOnboarding, closeOnboarding]);
-
+        if (hasPractice) {
+            closeOnboarding();
+            return;
+        }
+        if (session && practiceListQuery.isFetched) openOnboarding();
+    }, [
+        session,
+        householdId,
+        isPending,
+        householdReady,
+        hasPractice,
+        practiceListQuery.isFetched,
+        openOnboarding,
+        closeOnboarding,
+    ]);
     const defaultHouseholdName = t('household_default');
     const form = useForm<OnboardingValues>({
         resolver: zodResolver(onboardingSchema),

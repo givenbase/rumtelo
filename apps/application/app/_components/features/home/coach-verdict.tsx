@@ -11,6 +11,7 @@ import { cn } from '@rumtelo/utils';
 
 import { coachKindDisplay } from '@/app/_lib/coach-kind-label';
 import { resolveCoachMessage } from '@/app/_lib/coach-message-copy';
+import { useHelpersEnabled } from '@/components/features/helpers';
 
 /** Display fields for the rotating coach card (full DTO may omit CTA when informational). */
 export type CoachVerdictMessage = Pick<
@@ -54,9 +55,10 @@ export function CoachVerdict({
     const t = useTranslations('features.coach.verdict');
     const tCoach = useTranslations('features.coach');
     const tRoot = useTranslations();
+    const helpersEnabled = useHelpersEnabled();
     const [index, setIndex] = useState(0);
     const msg = messages[index] ?? messages[0];
-    if (!msg) return null;
+    if (!helpersEnabled || !msg) return null;
     const copy = resolveCoachMessage(msg, tCoach, tRoot);
     const meta = {
         label: coachKindDisplay(msg.kind, t),

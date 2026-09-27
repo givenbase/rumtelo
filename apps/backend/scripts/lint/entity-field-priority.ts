@@ -309,6 +309,8 @@ export const EXACT_FIELD_PRIORITY: Record<string, number> = {
     firstName: 2,
     lastName: 2,
     middleName: 2,
+    legalName: 2,
+    displayName: 2,
     label: 2,
 
     slug: 3,
@@ -325,6 +327,8 @@ export const EXACT_FIELD_PRIORITY: Record<string, number> = {
 
     body: 5,
     content: 5,
+    line1: 5,
+    line2: 5,
 
     role: 6,
     type: 6,
@@ -332,6 +336,7 @@ export const EXACT_FIELD_PRIORITY: Record<string, number> = {
     fieldName: 6,
     entityType: 6,
     email: 6,
+    billingEmail: 6,
     phone: 6,
     iban: 6,
     counterparty: 6,
@@ -391,6 +396,12 @@ export const EXACT_FIELD_PRIORITY: Record<string, number> = {
     inflowKey: 7,
     appliedMerchantKey: 7,
     givingOrganisationKey: 7,
+    registrationNumber: 7,
+    vatNumber: 7,
+    extraContributorSeats: 7,
+    extraViewerSeats: 7,
+    billableSeatCount: 7,
+    billableClientCount: 7,
 
     // 8 — config / json
     metadata: 8,
@@ -445,6 +456,12 @@ export const SAME_PRIORITY_ORDER: readonly (readonly string[])[] = [
     ['entityId', 'entityType', 'fieldName'],
     ['household', 'account'],
     ['key', 'name', 'slug'],
+    ['legalName', 'displayName', 'slug'],
+    ['line1', 'line2', 'postalCode', 'city', 'country'],
+    ['billingEmail', 'phone'],
+    ['registrationNumber', 'vatNumber'],
+    ['extraContributorSeats', 'extraViewerSeats'],
+    ['billableSeatCount', 'billableClientCount'],
     ['period', 'week'],
     ['matchValue', 'mcc'],
     ['aliases', 'providerIds'],

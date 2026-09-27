@@ -34,7 +34,7 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { useMergeHouseholdAudiences } from '@/app/_lib/use-merge-household-audiences';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 import { createDebtFormSchema, type DebtFormSchemaValues } from './form-zod';
@@ -99,7 +99,7 @@ export function DebtForm({
         { id: Cadence.QUARTERLY, label: tDebt('cadence_quarterly') },
         { id: Cadence.YEARLY, label: tDebt('cadence_yearly') },
     ];
-    const { showToast } = useAppShell();
+    const { showToast } = useHouseholdShell();
     const apiError = useApiError();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);

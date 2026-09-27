@@ -233,7 +233,7 @@ export function createAuth(env: Env) {
                 allowUserToCreateOrganization: true,
                 organizationLimit: 5,
                 creatorRole: 'owner',
-                membershipLimit: 10,
+                membershipLimit: 20,
                 schema: {
                     organization: {
                         // DB table `auth.household` — SDK still uses organization.*

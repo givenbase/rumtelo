@@ -11,7 +11,7 @@ import { api } from '@/app/_lib/api';
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { planLabel } from '@/app/_lib/plan';
 import { useAuth } from '@/components/features/shell/auth-provider';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useOptionalPlanIntent } from '@/components/features/shell/plan-intent-provider';
 
 /**
@@ -21,7 +21,7 @@ import { useOptionalPlanIntent } from '@/components/features/shell/plan-intent-p
 export function UpgradeCheckoutOverlay({ open, onSkip }: { open: boolean; onSkip: () => void }) {
     const t = useTranslations();
     const { householdId } = useAuth();
-    const { showToast } = useAppShell();
+    const { showToast } = useHouseholdShell();
     const apiError = useApiError();
     const planIntent = useOptionalPlanIntent();
     const intent = planIntent?.intent ?? null;

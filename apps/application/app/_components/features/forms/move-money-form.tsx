@@ -30,7 +30,7 @@ import { parseAmountToMinorUnits, todayIsoDate } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 
@@ -290,7 +290,7 @@ export function MoveMoneyForm({
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { symbol, formatMoney } = useHouseholdCurrency();
-    const { showToast, period } = useAppShell();
+    const { showToast, period } = useHouseholdShell();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
     const fromLocked = Boolean(defaultFromJarId);

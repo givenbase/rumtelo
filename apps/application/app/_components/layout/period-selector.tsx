@@ -8,7 +8,10 @@ import { useTranslations } from '@rumtelo/i18n';
 import { cn, describePeriodTravel } from '@rumtelo/utils';
 
 import { formatPeriodTravelLabels } from '@/app/_lib/period-travel-i18n';
-import { useAppShell, type Period } from '@/components/features/shell/app-shell-context';
+import {
+    useHouseholdShell,
+    type Period,
+} from '@/components/features/shell/household-shell-context';
 
 function monthShort(period: Period, locale: string): string {
     return new Intl.DateTimeFormat(locale, { month: 'short' }).format(
@@ -66,7 +69,7 @@ function labelShort(period: Period, locale: string): string {
 export function PeriodSelector() {
     const t = useTranslations('pages.shell');
     const locale = useLocale();
-    const { period, setPeriod } = useAppShell();
+    const { period, setPeriod } = useHouseholdShell();
     const [open, setOpen] = useState(false);
     const [viewYear, setViewYear] = useState(period.year);
 

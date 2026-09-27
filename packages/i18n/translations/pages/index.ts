@@ -4,6 +4,7 @@ export { default as legal } from './legal';
 export { default as meta } from './meta';
 export { default as nav } from './nav';
 export { default as onboarding } from './onboarding';
+export { default as practice } from './practice';
 export { default as settings } from './settings';
 export { default as shell } from './shell';
 export { default as support } from './support';

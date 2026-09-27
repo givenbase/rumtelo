@@ -13,4 +13,4 @@ export {
 } from '@rumtelo/contracts';
 
 /** Re-export shell locale toggle — use inside authenticated layout only. */
-export { useAppShell as useLocaleContext } from '@/components/features/shell/app-shell-context';
+export { useHouseholdShell as useLocaleContext } from '@/components/features/shell/household-shell-context';

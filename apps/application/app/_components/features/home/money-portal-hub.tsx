@@ -13,7 +13,7 @@ import { isLiveData } from '@/app/_lib/preview';
 import { moneyPortalShell } from '@/app/_lib/portal-hubs';
 import { PortalHub, type PortalHubProps } from '@/components/features/home/portal-hub';
 import { useAuth } from '@/components/features/shell/auth-provider';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useBankSyncOnVisit } from '@/app/_lib/use-bank-sync-on-visit';
 
@@ -35,7 +35,7 @@ export function MoneyPortalHubClient() {
     const locale = useLocale();
     const shell = moneyPortalShell(t);
     const { householdId } = useAuth();
-    const { period } = useAppShell();
+    const { period } = useHouseholdShell();
     const { formatMoney } = useHouseholdCurrency();
     const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);

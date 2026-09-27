@@ -15,6 +15,7 @@ import { apiForbidden } from '../errors/api-user-error';
 import { toAuthHeaders } from './auth-headers.util';
 import { authHeadersStorage, householdStorage, type HouseholdContext } from './household.context';
 import { MembershipService } from './membership.service';
+import { practiceStorage, type PracticeContext } from './practice.context';
 
 type Req = FastifyRequest & {
     user?: { id: string } | null;
@@ -40,10 +41,12 @@ export class HouseholdScopeInterceptor implements NestInterceptor {
 
         return new Observable(subscriber => {
             void this.resolve(req)
-                .then(({ ctx, headers }) => {
+                .then(({ ctx, headers, practiceCtx }) => {
                     householdStorage.run(ctx, () => {
                         authHeadersStorage.run(headers, () => {
-                            next.handle().subscribe(subscriber);
+                            practiceStorage.run(practiceCtx, () => {
+                                next.handle().subscribe(subscriber);
+                            });
                         });
                     });
                 })
@@ -51,7 +54,9 @@ export class HouseholdScopeInterceptor implements NestInterceptor {
         });
     }
 
-    private async resolve(req: Req): Promise<{ ctx: HouseholdContext; headers: Headers }> {
+    private async resolve(
+        req: Req
+    ): Promise<{ ctx: HouseholdContext; headers: Headers; practiceCtx: PracticeContext }> {
         if (!this.authService?.api) {
             throw apiForbidden('auth_not_ready');
         }
@@ -69,20 +74,66 @@ export class HouseholdScopeInterceptor implements NestInterceptor {
 
         const pathname = (req.url ?? '').split('?')[0] ?? '';
         const isOnboard = pathname.endsWith('/household/onboard');
+        const isPractice = pathname.includes('/practice');
 
         const householdId = resolveHouseholdId(req);
         const headers = toAuthHeaders(req);
+        const practiceCtx = resolvePracticeContext(req);
+
+        // Practice control plane is authz'd via PracticeMember — not household membership.
+        // Soft-attach a household when the user is a member (client drill-down later);
+        // never 403 practice routes for a missing / foreign household.
+        if (isPractice) {
+            if (householdId) {
+                const role = await this.membership.roleFor(userId, householdId);
+                if (role) {
+                    return {
+                        ctx: { userId, householdId, role },
+                        headers,
+                        practiceCtx,
+                    };
+                }
+            }
+            return {
+                ctx: { userId, householdId: null, role: 'OWNER' },
+                headers,
+                practiceCtx,
+            };
+        }
 
         if (!householdId && isOnboard) {
-            return { ctx: { userId, householdId: null, role: 'OWNER' }, headers };
+            return {
+                ctx: { userId, householdId: null, role: 'OWNER' },
+                headers,
+                practiceCtx,
+            };
         }
 
         if (!householdId) throw apiForbidden('no_household_selected');
 
         const role = await this.membership.roleFor(userId, householdId);
-        if (!role) throw apiForbidden('not_household_member');
+        if (role) {
+            return { ctx: { userId, householdId, role }, headers, practiceCtx };
+        }
 
-        return { ctx: { userId, householdId, role }, headers };
+        // Practice coach preview: not a household member, but linked via PracticeClientLink.
+        const practiceId = practiceCtx.practiceId;
+        if (practiceId) {
+            const previewRole = await this.membership.practicePreviewRoleFor(
+                userId,
+                practiceId,
+                householdId
+            );
+            if (previewRole) {
+                return {
+                    ctx: { userId, householdId, role: previewRole },
+                    headers,
+                    practiceCtx,
+                };
+            }
+        }
+
+        throw apiForbidden('not_household_member');
     }
 }
 
@@ -113,4 +164,11 @@ function resolveHouseholdId(req: Req): string | null {
     const activeOrg = (req.session?.session as { activeOrganizationId?: string | null } | undefined)
         ?.activeOrganizationId;
     return activeOrg ?? null;
+}
+
+/** Optional `x-practice-id` — role is resolved in PracticeService when needed. */
+function resolvePracticeContext(req: Req): PracticeContext {
+    const header = req.headers['x-practice-id'];
+    const practiceId = typeof header === 'string' && header.length > 0 ? header : null;
+    return { practiceId, role: null };
 }

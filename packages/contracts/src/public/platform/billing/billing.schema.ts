@@ -5,7 +5,7 @@
 
 import { z } from 'zod';
 
-import { PlanKey } from '../../../enums';
+import { PlanKey, SeatAddonKind } from '../../../enums';
 
 /** Stripe / marketing billing cadence for paid plans. */
 export const BillingInterval = z.enum(['month', 'year']);
@@ -32,6 +32,13 @@ const IsoDateTime = z.preprocess((value: unknown) => {
     return value;
 }, z.iso.datetime());
 
+/** Purchased seat add-on quantities (0 until Stripe add-on qty is live). */
+export const SeatAddonQuantities = z.object({
+    /** Extra contributor seats (assignable as admin or member). */
+    extraContributor: z.number().int().nonnegative(),
+    extraViewer: z.number().int().nonnegative(),
+});
+
 /** Household commercial snapshot for plan UI (period-end cancel / downgrade). */
 export const HouseholdBillingStatus = z.object({
     stripeEnabled: z.boolean(),
@@ -52,6 +59,11 @@ export const HouseholdBillingStatus = z.object({
     /** Active Stripe subscription id is stored (paid tier). */
     hasActiveSubscription: z.boolean(),
     /**
+     * Purchased seat add-ons beyond the plan matrix.
+     * Always present; quantities are `0` until Stripe add-on wiring ships.
+     */
+    seatAddons: SeatAddonQuantities,
+    /**
      * Live Stripe catalog for Plus/Max (month + year). Null when Stripe is unset.
      * Always include this key (use `null`, never omit).
      */
@@ -67,10 +79,19 @@ export const HouseholdBillingStatus = z.object({
             }),
         })
         .nullable(),
+    /**
+     * Stub catalog for seat add-ons (€2.50 / seat). Stripe price ids null until seeded.
+     */
+    seatAddonCatalog: z.object({
+        unitAmountCents: z.number().int().nonnegative(),
+        currency: z.literal('eur'),
+        kinds: z.array(z.enum(SeatAddonKind)),
+    }),
 });
 
 // Inferred types (same-module merge for consumers)
 export type BillingInterval = z.infer<typeof BillingInterval>;
 export type PendingPlanIntent = z.infer<typeof PendingPlanIntent>;
 export type BillingPriceDisplay = z.infer<typeof BillingPriceDisplay>;
+export type SeatAddonQuantities = z.infer<typeof SeatAddonQuantities>;
 export type HouseholdBillingStatus = z.infer<typeof HouseholdBillingStatus>;

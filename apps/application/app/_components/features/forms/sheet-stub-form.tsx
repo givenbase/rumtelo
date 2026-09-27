@@ -19,7 +19,7 @@ import { useMemo } from 'react';
 
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 
 import { createStubFormSchema, type StubFormSchemaValues } from './form-zod';
@@ -49,7 +49,7 @@ export function SheetStubForm({
 }: SheetStubFormProps) {
     const tStub = useTranslations('features.energy.stub_form');
     const tUiForm = useTranslations('ui.form');
-    const { showToast } = useAppShell();
+    const { showToast } = useHouseholdShell();
     const dismiss = useFormDismiss(onSuccess);
     const { symbol } = useHouseholdCurrency();
     const submitLabel = kind === 'session' ? tStub('save_training') : tStub('save_asset');

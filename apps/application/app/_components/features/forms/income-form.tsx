@@ -29,7 +29,7 @@ import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 import { ConfirmActionButton } from './confirm-action-button';
@@ -78,7 +78,7 @@ export function IncomeForm({
     const tIncome = useTranslations('features.money.income_form');
     const tForm = useTranslations('ui.form');
     const tBtn = useTranslations('ui.button.actions');
-    const { showToast } = useAppShell();
+    const { showToast } = useHouseholdShell();
     const apiError = useApiError();
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);

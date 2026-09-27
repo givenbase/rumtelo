@@ -468,7 +468,7 @@ const landing = {
             f3: 'ENERGY · sleep',
             f4: 'SOUL · stillness, gratitude, one intention a week',
             f5: 'The Coach, the week check, the month score',
-            f6: 'Solo household',
+            f6: '1 full + 1 viewer seat (invite a coach)',
         },
         plus: {
             name: 'Plus',
@@ -478,7 +478,7 @@ const landing = {
             f2: 'MONEY · debt plan with interest and a freedom date',
             f3: 'MONEY · bank statement import — live sync coming',
             f4: 'ENERGY · your 168 hours, training, food',
-            f5: 'Invite up to {maxMembers} — partner, family, friends',
+            f5: 'Up to {maxMembers} seats — full and viewer mix',
             f6: 'Up to {maxGoals} goals',
         },
         max: {
@@ -489,7 +489,7 @@ const landing = {
             f2: 'GROWTH · net worth, returns and your freedom number',
             f3: 'GROWTH · Learn courses on Masterclass, not Udemy',
             f4: 'SOUL · the seven centres',
-            f5: 'Unlimited goals and members',
+            f5: 'Up to {maxMembers} seats (more full access)',
             f6: 'Devices — watch, scale, ring (coming)',
         },
     },
@@ -517,7 +517,7 @@ const landing = {
         },
         partner: {
             question: 'Can I use it with a partner or my family?',
-            answer: 'Yes — on Plus (up to {maxMembers} people) and Max (unlimited). A household shares the jars. Spending style stays personal, because partners differ.',
+            answer: 'Yes — Basic includes one viewer seat (coach or look-along). Plus and Max add more full and viewer seats. A household shares the jars. Spending style stays personal, because partners differ. Need more people? Add seats for €2.50 each.',
         },
         data: {
             question: 'Where is my data?',

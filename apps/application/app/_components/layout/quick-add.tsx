@@ -14,7 +14,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { NAV_GROUPS } from '@/app/_lib/nav';
 import { isLiveData } from '@/app/_lib/preview';
 import { productPath } from '@/app/_lib/routes';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import {
     CREATE_KIND_CAPABILITY,
@@ -74,7 +74,7 @@ export function QuickAddFab() {
     const t = useTranslations();
     const tQuick = useTranslations('pages.shell.quick_add');
     const router = useRouter();
-    const { quickOpen, toggleQuick, setQuickOpen } = useAppShell();
+    const { quickOpen, toggleQuick, setQuickOpen } = useHouseholdShell();
     const { isCapabilityLocked } = usePlanCapabilities();
     const { householdId } = useAuth();
     const live = isLiveData(householdId);

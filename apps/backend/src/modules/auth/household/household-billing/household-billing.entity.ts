@@ -41,6 +41,14 @@ export class HouseholdBilling extends HouseholdEntity {
     @Property({ type: 'varchar', length: 255, nullable: true })
     stripeSubscriptionId: string | null = null;
 
+    /** Purchased extra contributor seats beyond the plan matrix. */
+    @Property({ type: 'int', default: 0 })
+    extraContributorSeats = 0;
+
+    /** Purchased extra viewer seats beyond the plan matrix. */
+    @Property({ type: 'int', default: 0 })
+    extraViewerSeats = 0;
+
     /** Stripe `cancel_at_period_end` — cancelled, but access runs until {@link periodEndsAt}. */
     @Property({ type: 'boolean', default: false })
     willCancelAtPeriodEnd = false;

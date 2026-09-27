@@ -143,13 +143,39 @@ export class HouseholdSettingsService {
             // Stripe is billing source of truth — skip seat/kind fit on cancel/sync
             // so multi-member households can downgrade to Basic without blocking the webhook.
             if (!opts?.allowStripeBillingSync) {
-                const memberCount = await this.em.count(AuthMember, { household: householdId });
-                if (!householdFitsPlan(patch.planKey, { memberCount, kind: nextKind })) {
+                const memberships = await this.em.find(AuthMember, { household: householdId });
+                let writableCount = 0;
+                let viewerCount = 0;
+                for (const member of memberships) {
+                    const role = member.role.toLowerCase();
+                    if (role === 'viewer') viewerCount += 1;
+                    else writableCount += 1;
+                }
+                const memberCount = memberships.length;
+                const snap = await this.billing.getSnapshot(householdId);
+                if (
+                    !householdFitsPlan(patch.planKey, {
+                        memberCount,
+                        writableCount,
+                        viewerCount,
+                        kind: nextKind,
+                        extras: {
+                            extraContributor: snap.extraContributorSeats,
+                            extraViewer: snap.extraViewerSeats,
+                        },
+                    })
+                ) {
                     const caps = capabilitiesFor(patch.planKey);
                     throw new BadRequestException(
                         caps.maxMembers !== null && memberCount > caps.maxMembers
                             ? `Cannot switch to ${patch.planKey}: household has ${memberCount} members (max ${caps.maxMembers})`
-                            : `Cannot switch to ${patch.planKey}: household kind ${nextKind} is not allowed`
+                            : caps.maxWritableMembers !== null &&
+                                writableCount > caps.maxWritableMembers
+                              ? `Cannot switch to ${patch.planKey}: household has ${writableCount} writable members (max ${caps.maxWritableMembers})`
+                              : caps.maxViewerMembers !== null &&
+                                  viewerCount > caps.maxViewerMembers
+                                ? `Cannot switch to ${patch.planKey}: household has ${viewerCount} viewers (max ${caps.maxViewerMembers})`
+                                : `Cannot switch to ${patch.planKey}: household kind ${nextKind} is not allowed`
                     );
                 }
             }

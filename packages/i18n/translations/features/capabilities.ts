@@ -107,7 +107,7 @@ const capabilities = {
     },
     'platform-invite': {
         name: 'Invite',
-        description: 'Invite a partner, family, or friend to the household.',
+        description: 'Invite a partner, family, friend, or coach (viewer) to the household.',
     },
 } as const;
 

@@ -4,7 +4,7 @@ import { PlanKey } from '@rumtelo/contracts';
 
 import { usePageTour } from '@/components/features/tour';
 import { useAuth } from '@/components/features/shell/auth-provider';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useOptionalPlanIntent } from '@/components/features/shell/plan-intent-provider';
 import { UpgradeCheckoutOverlay } from '@/components/features/shell/upgrade-checkout-overlay';
 
@@ -14,7 +14,7 @@ import { UpgradeCheckoutOverlay } from '@/components/features/shell/upgrade-chec
  */
 export function PendingPlanCheckout() {
     const { householdId, isPending } = useAuth();
-    const { onboardingOpen } = useAppShell();
+    const { onboardingOpen } = useHouseholdShell();
     const { requestTourOffer } = usePageTour();
     const planIntent = useOptionalPlanIntent();
     const intent = planIntent?.intent ?? null;

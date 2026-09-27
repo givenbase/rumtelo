@@ -5,7 +5,7 @@
  * - forms      controls + RHF Form helpers
  * - cards      Card / AccentCard
  * - feedback   Badge, EmptyState, StatusPage, BrandLoader, Celebrate, toasts, notices
- * - layout     Section, Sheet, Dialog, Tabs
+ * - layout     Section, Sheet, Dialog, Tabs, Table
  * - display    Meter, StatTile, HeroNumber, Icon
  * - navigation DropdownMenu
  * - theme      ThemeProvider, ThemeToggle (tone: default | inverse), useTheme

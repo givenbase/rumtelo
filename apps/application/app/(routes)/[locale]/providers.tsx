@@ -8,7 +8,7 @@ import { ThemeProvider, BrandLoader } from '@rumtelo/ui';
 
 import { setClientHouseholdId } from '@/app/_lib/household-api-context';
 import { AccountThemeProvider } from '@/components/features/shell/account-theme-sync';
-import { AppShellProvider } from '@/components/features/shell/app-shell-context';
+import { HouseholdShellProvider } from '@/components/features/shell/household-shell-context';
 import { AuthProvider, useAuth } from '@/components/features/shell/auth-provider';
 import { PlanIntentProvider } from '@/components/features/shell/plan-intent-provider';
 
@@ -57,7 +57,7 @@ export function Providers({ children }: { children: ReactNode }) {
                         <PlanIntentProvider>
                             <HouseholdHeaderSync>
                                 <AccountThemeProvider>
-                                    <AppShellProvider>{children}</AppShellProvider>
+                                    <HouseholdShellProvider>{children}</HouseholdShellProvider>
                                 </AccountThemeProvider>
                             </HouseholdHeaderSync>
                         </PlanIntentProvider>

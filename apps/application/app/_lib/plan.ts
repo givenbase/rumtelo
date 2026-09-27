@@ -122,15 +122,20 @@ export function lockCopyFor(
 }
 
 export function memberLimitLabel(plan: PlanKey, t?: TranslateFn): string {
-    const max = capabilitiesFor(plan).maxMembers;
+    const caps = capabilitiesFor(plan);
+    const max = caps.maxMembers;
+    const writable = caps.maxWritableMembers;
+    const viewers = caps.maxViewerMembers;
     if (t) {
         if (max === null) return t('pages.settings.plan.members_unlimited');
-        if (max === 1) return t('pages.settings.plan.members_solo');
-        return t('pages.settings.plan.members_up_to', { max: String(max) });
+        return t('pages.settings.plan.members_matrix', {
+            max: String(max),
+            full: String(writable ?? 0),
+            viewers: String(viewers ?? 0),
+        });
     }
     if (max === null) return 'Unlimited members';
-    if (max === 1) return '1 member (solo)';
-    return `Up to ${max} members`;
+    return `Up to ${max} (${writable} writable / ${viewers} viewer)`;
 }
 
 function formatCeiling(value: number | null, unit: string, t?: TranslateFn): string {
@@ -227,6 +232,18 @@ export function diffPlans(from: PlanKey, to: PlanKey, t?: TranslateFn): PlanChan
         t?.('pages.settings.plan.unit_members') ?? 'members',
         fromLimits.maxMembers,
         toLimits.maxMembers
+    );
+    pushLimit(
+        t?.('pages.settings.plan.limit_full_members') ?? 'Writable seats',
+        t?.('pages.settings.plan.unit_full_members') ?? 'writable seats',
+        fromLimits.maxWritableMembers,
+        toLimits.maxWritableMembers
+    );
+    pushLimit(
+        t?.('pages.settings.plan.limit_viewer_members') ?? 'Viewer seats',
+        t?.('pages.settings.plan.unit_viewer_members') ?? 'viewer seats',
+        fromLimits.maxViewerMembers,
+        toLimits.maxViewerMembers
     );
     pushLimit(
         t?.('pages.settings.plan.limit_goals') ?? 'Goals',

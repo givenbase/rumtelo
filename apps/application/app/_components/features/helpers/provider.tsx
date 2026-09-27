@@ -15,6 +15,7 @@ import {
     subscribeHelpersEnabled,
     writeHelpersEnabled,
 } from '@/app/_lib/feature-helpers';
+import { usePracticePreview } from '@/components/features/shell/practice-preview';
 
 type FeatureHelpersContextValue = {
     /** Inline helpers visible (why-lines, jar guides, …). */
@@ -25,13 +26,18 @@ type FeatureHelpersContextValue = {
 
 const FeatureHelpersContext = createContext<FeatureHelpersContextValue | null>(null);
 
-/** Live preference — use in gates and toggles (no provider required for read). */
+/**
+ * Live preference — false while Practice is previewing a client board
+ * (helpers are for household members, not coaches).
+ */
 export function useHelpersEnabled(): boolean {
-    return useSyncExternalStore(
+    const preferred = useSyncExternalStore(
         subscribeHelpersEnabled,
         readHelpersEnabled,
         getHelpersServerSnapshot
     );
+    const { capabilities } = usePracticePreview();
+    return preferred && capabilities.showHelpers;
 }
 
 /**

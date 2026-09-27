@@ -16,7 +16,7 @@ import { resolveCoachMessage } from '@/app/_lib/coach-message-copy';
 import { whyLineFor } from '@/app/_lib/why-lines';
 import { PAGE_CONTENT_WIDTH, type PageContentWidth } from '@/components/layout/page-content';
 import { usePageContentWidth } from '@/components/layout/page-content-width';
-import { useAppShell } from '@/components/features/shell/app-shell-context';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 import { useHelpersEnabled } from './provider';
@@ -48,7 +48,7 @@ export function WhyCaption({ pathname, locked = false }: WhyCaptionProps) {
     const coachGuidesEnabled = useHelpersEnabled();
     const contentWidth = usePageContentWidth();
     const { householdId } = useAuth();
-    const { period } = useAppShell();
+    const { period } = useHouseholdShell();
     const path = normalizeAppPathname(pathname);
     const liveWeek = isLiveData(householdId) && path === ENERGY_WEEK;
 
