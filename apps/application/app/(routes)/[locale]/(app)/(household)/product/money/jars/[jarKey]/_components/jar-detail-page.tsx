@@ -31,6 +31,7 @@ import { listFixedCostsForPeriodView } from '@/app/_lib/period-plan-list';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { isLiveData } from '@/app/_lib/preview';
+import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { JarGuideCard } from '@/components/features/helpers';
@@ -60,6 +61,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
     const tJars = useTranslations('features.money.jars');
     const { householdId } = useAuth();
     const { period } = useHouseholdShell();
+    const { showCreateFlows } = useBoardWriteAccess();
     const { formatMoney } = useHouseholdCurrency();
     const appLocale = useLocale();
     const periodKey = toPeriodKey(period.year, period.month);
@@ -252,7 +254,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                         </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
-                        {caps.canSpend ? (
+                        {caps.canSpend && showCreateFlows ? (
                             <>
                                 <Button
                                     as={Link}
@@ -340,11 +342,13 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                         <Typography as="h2" variant="eyebrow" color="primary">
                             {t('goals_on_jar')}
                         </Typography>
-                        <Link
-                            href={addGoalHref}
-                            className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
-                            {t('add_goal')}
-                        </Link>
+                        {showCreateFlows ? (
+                            <Link
+                                href={addGoalHref}
+                                className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
+                                {t('add_goal')}
+                            </Link>
+                        ) : null}
                     </div>
                     {focusGoal ? (
                         <Card className="grid gap-2 border-accent/30 bg-accent-soft/50 p-4">

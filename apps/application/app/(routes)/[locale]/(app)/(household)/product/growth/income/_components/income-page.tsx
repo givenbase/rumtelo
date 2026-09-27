@@ -22,6 +22,7 @@ import { useTranslations } from '@rumtelo/i18n';
 import { CREATE_HREF, updateHref } from '@/app/_lib/create-routes';
 import { listIncomeForPeriodView } from '@/app/_lib/period-plan-list';
 import { isLiveData } from '@/app/_lib/preview';
+import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { IncomeSimulator } from '@/components/features/growth/income-simulator';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -45,6 +46,7 @@ export function IncomePageClient() {
     const tFixed = useTranslations('features.money.fixed');
     const { householdId } = useAuth();
     const { period } = useHouseholdShell();
+    const { showCreateFlows } = useBoardWriteAccess();
     const { formatMoney } = useHouseholdCurrency();
     const periodKey = toPeriodKey(period.year, period.month);
     const travel = describePeriodTravel(period);
@@ -138,9 +140,11 @@ export function IncomePageClient() {
                         {t('page_title')}
                     </Typography>
                 </div>
-                <Button as={Link} href={CREATE_HREF.income} size="sm">
-                    {t('add_income')}
-                </Button>
+                {showCreateFlows ? (
+                    <Button as={Link} href={CREATE_HREF.income} size="sm">
+                        {t('add_income')}
+                    </Button>
+                ) : null}
             </div>
 
             <div className="grid gap-4">

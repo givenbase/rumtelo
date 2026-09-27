@@ -40,6 +40,7 @@ import { jarChrome } from '@/app/_lib/jar-meta';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
+import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
@@ -85,10 +86,13 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
     const tAction = useTranslations('common.action');
     const tChips = useTranslations('features.money.chips');
     const { period, showToast } = useHouseholdShell();
+    const { canMutate, showCreateFlows } = useBoardWriteAccess();
     const apiError = useApiError();
     const queryClient = useQueryClient();
     const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
+    const writable = live && canMutate;
+    const editable = live && showCreateFlows;
     const periodKey = toPeriodKey(period.year, period.month);
     const { byKey: jarByKey } = useJarCatalog();
     const categoryTemplatesQuery = useCategoryTemplates(live);
@@ -304,68 +308,70 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                         </div>
                     </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-2" data-mutate>
-                    {lifecycle === FixedCostLifecycle.ACTIVE ? (
-                        <>
+                {editable ? (
+                    <div className="flex flex-wrap items-center gap-2" data-mutate>
+                        {lifecycle === FixedCostLifecycle.ACTIVE ? (
+                            <>
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    disabled={busy}
+                                    onClick={openPauseConfirm}>
+                                    <Icon name="pause" size="sm" appearance="filled" />
+                                    {t('pause_short')}
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    disabled={busy}
+                                    onClick={openEndConfirm}>
+                                    <Icon name="square" size="sm" appearance="filled" />
+                                    {t('end_short')}
+                                </Button>
+                            </>
+                        ) : null}
+                        {lifecycle === FixedCostLifecycle.PAUSED ? (
+                            <>
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    disabled={busy}
+                                    onClick={() => lifecycleMutation.mutate({ isActive: true })}>
+                                    <Icon name="play" size="sm" appearance="filled" />
+                                    {t('resume_short')}
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    disabled={busy}
+                                    onClick={openEndConfirm}>
+                                    <Icon name="square" size="sm" appearance="filled" />
+                                    {t('end_short')}
+                                </Button>
+                            </>
+                        ) : null}
+                        {lifecycle === FixedCostLifecycle.ENDED ? (
                             <Button
                                 type="button"
                                 variant="secondary"
-                                disabled={busy || !live}
-                                onClick={openPauseConfirm}>
-                                <Icon name="pause" size="sm" appearance="filled" />
-                                {t('pause_short')}
+                                disabled={busy}
+                                onClick={() =>
+                                    lifecycleMutation.mutate({ isActive: true, endsOn: null })
+                                }>
+                                <Icon name="refresh-cw" size="sm" />
+                                {t('reactivate_short')}
                             </Button>
-                            <Button
-                                type="button"
-                                variant="secondary"
-                                disabled={busy || !live}
-                                onClick={openEndConfirm}>
-                                <Icon name="square" size="sm" appearance="filled" />
-                                {t('end_short')}
-                            </Button>
-                        </>
-                    ) : null}
-                    {lifecycle === FixedCostLifecycle.PAUSED ? (
-                        <>
-                            <Button
-                                type="button"
-                                variant="secondary"
-                                disabled={busy || !live}
-                                onClick={() => lifecycleMutation.mutate({ isActive: true })}>
-                                <Icon name="play" size="sm" appearance="filled" />
-                                {t('resume_short')}
-                            </Button>
-                            <Button
-                                type="button"
-                                variant="secondary"
-                                disabled={busy || !live}
-                                onClick={openEndConfirm}>
-                                <Icon name="square" size="sm" appearance="filled" />
-                                {t('end_short')}
-                            </Button>
-                        </>
-                    ) : null}
-                    {lifecycle === FixedCostLifecycle.ENDED ? (
+                        ) : null}
                         <Button
-                            type="button"
+                            as={Link}
+                            href={updateHref('fixed', item.id)}
                             variant="secondary"
-                            disabled={busy || !live}
-                            onClick={() =>
-                                lifecycleMutation.mutate({ isActive: true, endsOn: null })
-                            }>
-                            <Icon name="refresh-cw" size="sm" />
-                            {t('reactivate_short')}
+                            data-mutate>
+                            <Icon name="pencil" size="sm" />
+                            {tAction('edit')}
                         </Button>
-                    ) : null}
-                    <Button
-                        as={Link}
-                        href={updateHref('fixed', item.id)}
-                        variant="secondary"
-                        data-mutate>
-                        <Icon name="pencil" size="sm" />
-                        {tAction('edit')}
-                    </Button>
-                </div>
+                    </div>
+                ) : null}
             </div>
 
             <Dialog
@@ -651,14 +657,14 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                 {t('detail.no_payment_linked')}
                             </Typography>
                         )}
-                        {canSettle ? (
+                        {canSettle && writable ? (
                             <div
                                 className="flex flex-wrap gap-2 border-t border-line px-5 py-3"
                                 data-mutate>
                                 {status !== FixedCostPeriodStatus.TAKEN ? (
                                     <Button
                                         type="button"
-                                        disabled={settleBusy || !live}
+                                        disabled={settleBusy}
                                         onClick={() => settleMutation.mutate('paid')}>
                                         {t('detail.mark_paid')}
                                     </Button>
@@ -667,7 +673,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                     <Button
                                         type="button"
                                         variant="secondary"
-                                        disabled={settleBusy || !live}
+                                        disabled={settleBusy}
                                         onClick={() => settleMutation.mutate('skip')}>
                                         {t('detail.skip_period')}
                                     </Button>
@@ -676,7 +682,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                     <Button
                                         type="button"
                                         variant="secondary"
-                                        disabled={settleBusy || !live}
+                                        disabled={settleBusy}
                                         onClick={() => settleMutation.mutate('unlink')}>
                                         {t('detail.reopen_period')}
                                     </Button>

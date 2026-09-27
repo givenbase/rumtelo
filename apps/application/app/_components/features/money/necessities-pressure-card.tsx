@@ -8,6 +8,7 @@ import { Button } from '@rumtelo/ui';
 import { CREATE_HREF } from '@/app/_lib/create-routes';
 import type { NecessitiesPressure } from '@/app/_lib/necessities-pressure';
 import { productPath } from '@/app/_lib/routes';
+import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { CoachTipCard } from '@/components/features/helpers';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
@@ -25,6 +26,7 @@ export function NecessitiesPressureCard({
 }) {
     const t = useTranslations('features.money.necessities_pressure');
     const { formatMoney } = useHouseholdCurrency();
+    const { showCreateFlows } = useBoardWriteAccess();
     if (!pressure.active) return null;
 
     const shortfallLine =
@@ -71,9 +73,11 @@ export function NecessitiesPressureCard({
                             {t('open_jar')}
                         </Button>
                     )}
-                    <Button as={Link} href={CREATE_HREF.income} size="sm">
-                        {t('raise_income')}
-                    </Button>
+                    {showCreateFlows ? (
+                        <Button as={Link} href={CREATE_HREF.income} size="sm">
+                            {t('raise_income')}
+                        </Button>
+                    ) : null}
                 </>
             }>
             {shortfallLine} {t('body', { pct: pressure.necessitiesPct })}

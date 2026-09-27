@@ -31,6 +31,8 @@ type Props = {
     householdId: string;
     step: CoachStep;
     progressLabel: string;
+    /** False when period is closed or looking ahead — show step, block answers. */
+    canMutate?: boolean;
     onAdvanced: () => void;
 };
 
@@ -49,7 +51,13 @@ export function CoachStepCard(props: Props) {
     return <CoachStepCardInner key={props.step.id} {...props} />;
 }
 
-function CoachStepCardInner({ householdId, step, progressLabel, onAdvanced }: Props) {
+function CoachStepCardInner({
+    householdId,
+    step,
+    progressLabel,
+    canMutate = true,
+    onAdvanced,
+}: Props) {
     const t = useTranslations('features.coach.session');
     const apiError = useApiError();
     const queryClient = useQueryClient();
@@ -216,8 +224,10 @@ function CoachStepCardInner({ householdId, step, progressLabel, onAdvanced }: Pr
         gratitude.isPending ||
         score.isPending ||
         weekCheck.isPending;
+    const locked = busy || !canMutate;
 
     const applyHeard = (transcript: string) => {
+        if (!canMutate) return;
         setHeard(transcript);
         const lower = transcript.toLowerCase();
 
@@ -251,7 +261,7 @@ function CoachStepCardInner({ householdId, step, progressLabel, onAdvanced }: Pr
     };
 
     const confirmHeard = () => {
-        if (!pendingConfirm) return;
+        if (!canMutate || !pendingConfirm) return;
         if (step.input === 'jar_pick') sortInbox.mutate(pendingConfirm);
         else if (step.input === 'paid_skip')
             billAction.mutate(pendingConfirm === 'paid' ? 'paid' : 'skip');
@@ -288,7 +298,11 @@ function CoachStepCardInner({ householdId, step, progressLabel, onAdvanced }: Pr
                     ) : null}
                     {pendingConfirm ? (
                         <div className="flex flex-wrap gap-2">
-                            <Button type="button" size="sm" disabled={busy} onClick={confirmHeard}>
+                            <Button
+                                type="button"
+                                size="sm"
+                                disabled={locked}
+                                onClick={confirmHeard}>
                                 {t('voice_confirm')}
                             </Button>
                             <Button
@@ -313,7 +327,7 @@ function CoachStepCardInner({ householdId, step, progressLabel, onAdvanced }: Pr
                             <button
                                 key={jar.id}
                                 type="button"
-                                disabled={busy}
+                                disabled={locked}
                                 onClick={() => sortInbox.mutate(jar.id)}
                                 className={cn(
                                     'rounded-xl border border-line px-4 py-2.5 text-sm font-medium transition-colors hover:border-accent hover:bg-accent-soft',
@@ -329,14 +343,14 @@ function CoachStepCardInner({ householdId, step, progressLabel, onAdvanced }: Pr
                     <div className="flex flex-wrap items-center gap-2">
                         <Button
                             type="button"
-                            disabled={busy}
+                            disabled={locked}
                             onClick={() => billAction.mutate('paid')}>
                             {t('paid')}
                         </Button>
                         <Button
                             type="button"
                             variant="secondary"
-                            disabled={busy}
+                            disabled={locked}
                             onClick={() => billAction.mutate('skip')}>
                             {t('skip')}
                         </Button>
@@ -345,7 +359,10 @@ function CoachStepCardInner({ householdId, step, progressLabel, onAdvanced }: Pr
 
                 {step.input === 'yes_typical' ? (
                     <div className="flex flex-wrap items-center gap-2">
-                        <Button type="button" disabled={busy} onClick={() => timeTypical.mutate()}>
+                        <Button
+                            type="button"
+                            disabled={locked}
+                            onClick={() => timeTypical.mutate()}>
                             {t('yes_typical')}
                         </Button>
                         {step.href ? (
@@ -361,6 +378,7 @@ function CoachStepCardInner({ householdId, step, progressLabel, onAdvanced }: Pr
                         className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center"
                         onSubmit={event => {
                             event.preventDefault();
+                            if (!canMutate) return;
                             const line = text.trim();
                             if (line) gratitude.mutate(line);
                         }}>
@@ -371,7 +389,7 @@ function CoachStepCardInner({ householdId, step, progressLabel, onAdvanced }: Pr
                             placeholder={t('gratitude_placeholder')}
                             className="w-full rounded-xl border border-line bg-raised px-3.5 py-2.5 text-sm outline-none focus:border-accent"
                         />
-                        <Button type="submit" disabled={busy || !text.trim()}>
+                        <Button type="submit" disabled={locked || !text.trim()}>
                             {t('save')}
                         </Button>
                     </form>
@@ -387,7 +405,7 @@ function CoachStepCardInner({ householdId, step, progressLabel, onAdvanced }: Pr
                                 <button
                                     key={chip.value}
                                     type="button"
-                                    disabled={busy}
+                                    disabled={locked}
                                     onClick={() => score.mutate(chip.value)}
                                     className="rounded-xl border border-line px-4 py-2.5 text-sm font-medium transition-colors hover:border-accent hover:bg-accent-soft">
                                     {t(chip.labelKey)}
@@ -401,7 +419,7 @@ function CoachStepCardInner({ householdId, step, progressLabel, onAdvanced }: Pr
                     <div className="flex flex-wrap items-center gap-2">
                         <Button
                             type="button"
-                            disabled={busy}
+                            disabled={locked}
                             onClick={() => weekCheck.mutate({ stage: WeekCheckStage.REDIRECT })}>
                             {t('look_continue')}
                         </Button>
@@ -422,7 +440,7 @@ function CoachStepCardInner({ householdId, step, progressLabel, onAdvanced }: Pr
                                     <button
                                         key={jar.id}
                                         type="button"
-                                        disabled={busy}
+                                        disabled={locked}
                                         onClick={() =>
                                             weekCheck.mutate({
                                                 stage: WeekCheckStage.INTEND,
@@ -447,7 +465,7 @@ function CoachStepCardInner({ householdId, step, progressLabel, onAdvanced }: Pr
                         <Button
                             type="button"
                             variant="secondary"
-                            disabled={busy}
+                            disabled={locked}
                             onClick={() => weekCheck.mutate({ stage: WeekCheckStage.INTEND })}>
                             {t('redirect_skip')}
                         </Button>
@@ -459,6 +477,7 @@ function CoachStepCardInner({ householdId, step, progressLabel, onAdvanced }: Pr
                         className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center"
                         onSubmit={event => {
                             event.preventDefault();
+                            if (!canMutate) return;
                             const intention = text.trim();
                             if (!intention) return;
                             weekCheck.mutate({ stage: WeekCheckStage.DONE, intention });
@@ -470,7 +489,7 @@ function CoachStepCardInner({ householdId, step, progressLabel, onAdvanced }: Pr
                             placeholder={t('intend_placeholder')}
                             className="w-full rounded-xl border border-line bg-raised px-3.5 py-2.5 text-sm outline-none focus:border-accent"
                         />
-                        <Button type="submit" disabled={busy || !text.trim()}>
+                        <Button type="submit" disabled={locked || !text.trim()}>
                             {t('intend_save')}
                         </Button>
                     </form>
@@ -484,7 +503,11 @@ function CoachStepCardInner({ householdId, step, progressLabel, onAdvanced }: Pr
             </div>
 
             <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
-                <CoachVoiceControls prompt={prompt} voice={step.voice} onHeard={applyHeard} />
+                {canMutate ? (
+                    <CoachVoiceControls prompt={prompt} voice={step.voice} onHeard={applyHeard} />
+                ) : (
+                    <span />
+                )}
                 {step.href && step.input !== 'link_only' ? (
                     <Link
                         href={step.href}

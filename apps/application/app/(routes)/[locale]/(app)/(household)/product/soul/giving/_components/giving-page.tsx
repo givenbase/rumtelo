@@ -31,6 +31,7 @@ import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { listFixedCostsForPeriodView } from '@/app/_lib/period-plan-list';
 import { isLiveData } from '@/app/_lib/preview';
 import { productPath } from '@/app/_lib/routes';
+import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
@@ -92,6 +93,7 @@ export function GivingPageClient() {
     const locale = useLocale();
     const { householdId } = useAuth();
     const { period } = useHouseholdShell();
+    const { showCreateFlows } = useBoardWriteAccess();
     const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
@@ -350,12 +352,14 @@ export function GivingPageClient() {
                             <Typography as="p" size="sm" color="secondary">
                                 {t('pledge_pitch')}
                             </Typography>
-                            <Button
-                                as={Link}
-                                href={createGoalHref({ kind: GoalKind.GIVE })}
-                                size="sm">
-                                {t('set_pledge')}
-                            </Button>
+                            {showCreateFlows ? (
+                                <Button
+                                    as={Link}
+                                    href={createGoalHref({ kind: GoalKind.GIVE })}
+                                    size="sm">
+                                    {t('set_pledge')}
+                                </Button>
+                            ) : null}
                         </>
                     )}
                 </Card>

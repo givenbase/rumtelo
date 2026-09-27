@@ -30,6 +30,7 @@ import { suggestFixedCostForTx } from '@/app/_lib/fixed-cost-match';
 import { buildPayeeJarMemory, suggestInboxJar } from '@/app/_lib/inbox-suggest';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
+import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { partyMark, findCatalogMerchantFromFeed } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
@@ -109,6 +110,7 @@ export function TransactionsPageClient() {
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { showToast, period } = useHouseholdShell();
+    const { showCreateFlows, canMutate } = useBoardWriteAccess();
     const apiError = useApiError();
     const { formatMoney } = useHouseholdCurrency();
     const appLocale = useLocale();
@@ -385,7 +387,10 @@ export function TransactionsPageClient() {
                 createLabel={tab === 'IN' ? t('add_in') : t('add_out')}
                 createHref={createTxHref({ direction: tab === 'IN' ? 'in' : 'out' })}
                 secondary={
-                    live && (tab === 'INBOX' || tab === 'RULES') && managedRules.length > 0 ? (
+                    live &&
+                    canMutate &&
+                    (tab === 'INBOX' || tab === 'RULES') &&
+                    managedRules.length > 0 ? (
                         <Button
                             variant="secondary"
                             size="sm"
@@ -430,14 +435,16 @@ export function TransactionsPageClient() {
 
             {tab === 'INBOX' ? (
                 <div className="mb-3 grid gap-2.5">
-                    <p className="text-sm text-fg-muted">
-                        {t('import_hint_lead')}{' '}
-                        <Link
-                            href={CREATE_HREF.importStatement}
-                            className="font-medium text-accent hover:underline">
-                            {t('import_hint_link')}
-                        </Link>
-                    </p>
+                    {showCreateFlows ? (
+                        <p className="text-sm text-fg-muted">
+                            {t('import_hint_lead')}{' '}
+                            <Link
+                                href={CREATE_HREF.importStatement}
+                                className="font-medium text-accent hover:underline">
+                                {t('import_hint_link')}
+                            </Link>
+                        </p>
+                    ) : null}
                     <ListControls
                         search={{
                             value: search,

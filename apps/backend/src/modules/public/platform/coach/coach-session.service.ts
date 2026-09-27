@@ -11,7 +11,7 @@ import {
     WeekCheckStage,
 } from '@rumtelo/contracts';
 import type { CoachSession, CoachStep } from '@rumtelo/contracts';
-import { fixedCostPeriodStatus } from '@rumtelo/utils';
+import { fixedCostAppliesAsOf, fixedCostPeriodStatus, endOfPeriodIso } from '@rumtelo/utils';
 
 import { currentHouseholdId } from '../../../../common/household/household.context';
 import { HouseholdScopedRepository } from '../../../../common/household/household-scoped.repository';
@@ -74,19 +74,26 @@ export class CoachSessionService {
     // ? READ Operations
     // ====================================================================
 
-    async session(): Promise<CoachSession> {
-        const period = currentPeriod();
+    async session(periodKey?: string | null): Promise<CoachSession> {
+        const period = periodKey ?? currentPeriod();
         const week = currentWeek();
         const { account } = await this.accounts.ensureCurrentAccount();
         const householdId = currentHouseholdId();
+        const livePeriod = currentPeriod();
 
         const steps: CoachStep[] = [];
-        await this.pushInbox(steps);
+        const viewingLive = period === livePeriod;
+        // Inbox + week/energy/soul fills are live-month only; due bills follow the viewed period.
+        if (viewingLive) {
+            await this.pushInbox(steps);
+        }
         await this.pushDueBills(steps, period);
-        await this.pushWeekCheck(steps, week);
-        await this.pushTime(steps, account.id, week);
-        await this.pushGratitude(steps, account.id, week);
-        await this.pushEnergyScore(steps, account.id);
+        if (viewingLive) {
+            await this.pushWeekCheck(steps, week);
+            await this.pushTime(steps, account.id, week);
+            await this.pushGratitude(steps, account.id, week);
+            await this.pushEnergyScore(steps, account.id);
+        }
 
         const totalAvailable = steps.length;
         const capped = steps.slice(0, COACH_SESSION_STEP_CAP);
@@ -153,8 +160,10 @@ export class CoachSessionService {
                 return [costId, row] as const;
             })
         );
+        const asOf = endOfPeriodIso(period);
 
         for (const cost of costs) {
+            if (!fixedCostAppliesAsOf(cost, asOf)) continue;
             const settlement = byCost.get(cost.id);
             const status = fixedCostPeriodStatus(
                 { isActive: cost.isActive, dueDay: cost.dueDay },

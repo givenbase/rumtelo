@@ -38,9 +38,9 @@ export function useHelpersEnabled(): boolean {
         getHelpersServerSnapshot
     );
     const { capabilities } = usePracticePreview();
-    const { periodClosed } = useBoardWriteAccess();
-    // Closed months are a finished record — no coach nudges or helper chrome.
-    return preferred && capabilities.showHelpers && !periodClosed;
+    const { periodClosed, periodLookingAhead } = useBoardWriteAccess();
+    // Closed / future months are a finished or projected record — no coach nudges or helper chrome.
+    return preferred && capabilities.showHelpers && !periodClosed && !periodLookingAhead;
 }
 
 /**

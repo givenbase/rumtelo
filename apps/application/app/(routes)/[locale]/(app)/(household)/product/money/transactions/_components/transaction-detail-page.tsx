@@ -9,7 +9,12 @@ import { TransactionSource, TransactionStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Icon, Button, Card, Typography, VendorMark } from '@rumtelo/ui';
-import { isFixedCostCounting, toPeriodKey } from '@rumtelo/utils';
+import {
+    describePeriodTravel,
+    endOfPeriodIso,
+    isFixedCostCounting,
+    toPeriodKey,
+} from '@rumtelo/utils';
 
 import {
     debtDetailHref,
@@ -23,6 +28,7 @@ import { resolveJarSubtitle } from '@/app/_lib/jar-copy';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
+import { listFixedCostsForPeriodView } from '@/app/_lib/period-plan-list';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
@@ -253,10 +259,17 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
         : undefined;
 
     const activeFixed = (fixedQuery.data ?? []).filter(item => isFixedCostCounting(item));
+    const asOf = endOfPeriodIso(periodKey);
+    const travel = describePeriodTravel(period);
+    const { applying: applyingFixed } = listFixedCostsForPeriodView(
+        activeFixed,
+        asOf,
+        travel.direction
+    );
     const linkedBill = tx?.fixedCostId
         ? activeFixed.find(item => item.id === tx.fixedCostId)
         : undefined;
-    const suggestedBill = !linkedBill && tx ? suggestFixedCostForTx(tx, activeFixed) : undefined;
+    const suggestedBill = !linkedBill && tx ? suggestFixedCostForTx(tx, applyingFixed) : undefined;
 
     if (live && (listQuery.isLoading || periodQuery.isLoading || inboxQuery.isLoading) && !tx) {
         return <p className="text-sm text-fg-muted">{tTx('loading')}</p>;

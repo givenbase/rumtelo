@@ -51,7 +51,7 @@ export function CoachPageClient() {
 
     const sessionQuery = useLiveQuery(
         apiQuery.coach.session.queryOptions({
-            input: { householdId: householdId! },
+            input: { householdId: householdId!, period: periodKey },
         }),
         {
             householdId: householdId ?? '',
@@ -188,6 +188,7 @@ export function CoachPageClient() {
                     householdId={householdId}
                     step={activeStep}
                     progressLabel={progressLabel}
+                    canMutate={canMutate}
                     onAdvanced={() => {
                         void queryClient.invalidateQueries({
                             queryKey: apiQuery.coach.session.key(),
@@ -229,7 +230,7 @@ export function CoachPageClient() {
                                         <Typography as="span" variant="eyebrow" color="primary">
                                             {coachKindDisplay(message.kind, tKind)}
                                         </Typography>
-                                        {live ? (
+                                        {live && canMutate ? (
                                             <Button
                                                 type="button"
                                                 variant="ghost"
