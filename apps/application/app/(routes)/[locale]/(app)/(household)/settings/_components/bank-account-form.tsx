@@ -18,6 +18,10 @@ import {
     FormMessage,
     Input,
     Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
     VendorMark,
 } from '@rumtelo/ui';
 import { cn, formatIban, isEnumValue, isValidIban, nlIbanBankCode } from '@rumtelo/utils';
@@ -25,6 +29,10 @@ import type { UseFormReturn } from 'react-hook-form';
 
 import type { BankAccountFormValues } from '../_utils/settings-form-zod';
 import { isIbanStub } from '../_utils/settings-shared';
+
+const MENU_CONTENT = 'rounded-lg border-line bg-surface text-fg shadow-md';
+const MENU_ITEM =
+    'rounded-md focus:bg-accent/10 focus:text-fg data-[highlighted]:bg-accent/10 data-[highlighted]:text-fg';
 
 export type BankAccountFormProps = {
     form: UseFormReturn<BankAccountFormValues>;
@@ -257,41 +265,50 @@ export function BankAccountForm({
                     name="kind"
                     render={({ field }) => (
                         <FormItem>
-                            <Field
-                                label={t('pages.settings.panels.bank.type')}
-                                htmlFor={`acc-kind-${formKey}`}>
-                                <FormControl>
-                                    <Select
-                                        id={`acc-kind-${formKey}`}
-                                        value={field.value}
-                                        onChange={event => {
-                                            const { value } = event.target;
-                                            if (!isEnumValue(AccountKind, value)) return;
-                                            field.onChange(value);
-                                            if (value !== AccountKind.CREDIT) {
-                                                form.setValue('settlementAccountId', null, {
-                                                    shouldDirty: true,
-                                                });
-                                            }
-                                        }}
-                                        disabled={!live}>
-                                        <option value={AccountKind.CHECKING}>
+                            <Field label={t('pages.settings.panels.bank.type')}>
+                                <Select
+                                    value={field.value}
+                                    onValueChange={value => {
+                                        if (!isEnumValue(AccountKind, value)) return;
+                                        field.onChange(value);
+                                        if (value !== AccountKind.CREDIT) {
+                                            form.setValue('settlementAccountId', null, {
+                                                shouldDirty: true,
+                                            });
+                                        }
+                                    }}
+                                    disabled={!live}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent position="popper" className={MENU_CONTENT}>
+                                        <SelectItem
+                                            value={AccountKind.CHECKING}
+                                            className={MENU_ITEM}>
                                             {kindLabel(AccountKind.CHECKING)}
-                                        </option>
-                                        <option value={AccountKind.SAVINGS}>
+                                        </SelectItem>
+                                        <SelectItem
+                                            value={AccountKind.SAVINGS}
+                                            className={MENU_ITEM}>
                                             {kindLabel(AccountKind.SAVINGS)}
-                                        </option>
-                                        <option value={AccountKind.CREDIT}>
+                                        </SelectItem>
+                                        <SelectItem
+                                            value={AccountKind.CREDIT}
+                                            className={MENU_ITEM}>
                                             {kindLabel(AccountKind.CREDIT)}
-                                        </option>
-                                        <option value={AccountKind.CASH}>
+                                        </SelectItem>
+                                        <SelectItem value={AccountKind.CASH} className={MENU_ITEM}>
                                             {kindLabel(AccountKind.CASH)}
-                                        </option>
-                                        <option value={AccountKind.INVESTMENT}>
+                                        </SelectItem>
+                                        <SelectItem
+                                            value={AccountKind.INVESTMENT}
+                                            className={MENU_ITEM}>
                                             {kindLabel(AccountKind.INVESTMENT)}
-                                        </option>
-                                    </Select>
-                                </FormControl>
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </Field>
                         </FormItem>
                     )}
@@ -304,27 +321,32 @@ export function BankAccountForm({
                             <FormItem>
                                 <Field
                                     label={t('pages.settings.panels.bank.pay_from')}
-                                    htmlFor={`acc-settle-${formKey}`}
                                     hint={t('pages.settings.panels.bank.pay_from_hint')}>
-                                    <FormControl>
-                                        <Select
-                                            id={`acc-settle-${formKey}`}
-                                            value={field.value ?? ''}
-                                            onChange={event => {
-                                                const next = event.target.value;
-                                                field.onChange(next ? next : null);
-                                            }}
-                                            disabled={!live || settlementOptions.length === 0}>
-                                            <option value="">
+                                    <Select
+                                        value={field.value ?? 'none'}
+                                        onValueChange={value =>
+                                            field.onChange(value === 'none' ? null : value)
+                                        }
+                                        disabled={!live || settlementOptions.length === 0}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent position="popper" className={MENU_CONTENT}>
+                                            <SelectItem value="none" className={MENU_ITEM}>
                                                 {t('pages.settings.panels.bank.pay_from_none')}
-                                            </option>
+                                            </SelectItem>
                                             {settlementOptions.map(row => (
-                                                <option key={row.id} value={row.id}>
+                                                <SelectItem
+                                                    key={row.id}
+                                                    value={row.id}
+                                                    className={MENU_ITEM}>
                                                     {row.name}
-                                                </option>
+                                                </SelectItem>
                                             ))}
-                                        </Select>
-                                    </FormControl>
+                                        </SelectContent>
+                                    </Select>
                                 </Field>
                                 <FormMessage />
                             </FormItem>

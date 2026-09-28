@@ -11,5 +11,6 @@ export { ExportSettings } from './export-settings';
 export { ImportSettings } from './import-settings';
 export { PracticeLinksSettings } from './practice-links-settings';
 export { HouseholdSettings } from './household-members-settings';
+export { DevicesSettings } from './devices-settings';
 export { PreferencesSettings } from './preferences-settings';
 export { SecuritySettings } from './security-settings';

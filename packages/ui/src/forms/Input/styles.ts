@@ -1,5 +1,5 @@
 /**
- * Shared control chrome for Input / Select / Textarea / Phone / Password.
+ * Shared control chrome for Input / SelectTrigger / Textarea / Phone / Password.
  * Keep tokens aligned so composed controls (affixes, phone dialer) match.
  */
 
@@ -7,7 +7,7 @@ const FOCUS =
     'outline-none transition-colors focus:border-accent focus-visible:border-accent ' +
     'focus-visible:ring-2 focus-visible:ring-accent/35';
 
-/** Standalone control — full border + fill (Input without affixes, Textarea, Select). */
+/** Standalone control — full border + fill (Input without affixes, Textarea). */
 export const controlClasses =
     'h-11 w-full rounded-lg border border-line-strong bg-surface px-3 text-sm text-fg shadow-sm ' +
     'placeholder:text-fg-muted ' +

@@ -96,6 +96,8 @@ const message = {
             auth_not_ready: 'Auth is not ready',
             time_entry_not_found: 'Time entry not found',
             account_settings_not_found: 'Account settings not found',
+            device_not_found: 'Device not found',
+            device_kind_invalid: 'That device kind is not in the catalog',
             invalid_email_or_password: 'Invalid email or password',
             user_not_found: 'User not found',
             email_not_verified: 'Email not verified',

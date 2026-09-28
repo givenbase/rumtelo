@@ -24,6 +24,7 @@ import { LeverPresetSeeder } from './product/growth/LeverPresetSeeder';
 import { AssetKindSeeder } from './product/growth/AssetKindSeeder';
 import { AssetPresetSeeder } from './product/growth/AssetPresetSeeder';
 import { WealthStageSeeder } from './product/growth/WealthStageSeeder';
+import { DeviceKindSeeder } from './product/platform/DeviceKindSeeder';
 import { DemoHouseholdSeeder } from './demo/DemoHouseholdSeeder';
 import { DemoPracticeSeeder } from './demo/DemoPracticeSeeder';
 
@@ -58,6 +59,7 @@ export class DatabaseSeeder extends Seeder {
             LeverPresetSeeder,
             BookPresetSeeder,
             WatchPresetSeeder,
+            DeviceKindSeeder,
             PlanSeeder,
             ...(isLaunchProductsDeferred() ? [] : [DemoHouseholdSeeder, DemoPracticeSeeder]),
         ];

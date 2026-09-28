@@ -486,6 +486,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -1012,6 +1021,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -1588,6 +1606,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -2145,6 +2172,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -2686,6 +2722,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -3209,6 +3254,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -3872,6 +3926,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -4404,6 +4467,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -5009,6 +5081,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -5529,6 +5610,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -6022,6 +6112,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -6701,6 +6800,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -7327,6 +7435,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -7774,6 +7891,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -8320,6 +8446,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -8814,6 +8949,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -9481,6 +9625,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -10071,6 +10224,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -10792,6 +10954,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -11559,6 +11730,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -12229,6 +12409,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -12976,6 +13165,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -13523,6 +13721,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -14145,6 +14352,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -14753,6 +14969,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -15335,6 +15560,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -15926,6 +16160,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -16588,6 +16831,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -17505,6 +17757,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -18079,6 +18340,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -18651,6 +18921,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -19181,6 +19460,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -19770,6 +20058,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -20285,6 +20582,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -20855,6 +21161,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -21364,6 +21679,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -21881,6 +22205,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -22531,6 +22864,701 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
+        "platform_household_kind": {
+          "name": "platform_household_kind",
+          "schema": "public",
+          "items": [
+            "FAMILY",
+            "PARTNERS",
+            "FRIENDS",
+            "SOLO"
+          ]
+        },
+        "platform_practice_address_kind": {
+          "name": "platform_practice_address_kind",
+          "schema": "public",
+          "items": [
+            "BILLING",
+            "REGISTERED"
+          ]
+        },
+        "platform_practice_client_access": {
+          "name": "platform_practice_client_access",
+          "schema": "public",
+          "items": [
+            "VIEW",
+            "MANAGE"
+          ]
+        },
+        "platform_practice_client_control_flag": {
+          "name": "platform_practice_client_control_flag",
+          "schema": "public",
+          "items": [
+            "SPONSOR_PLAN",
+            "CAN_UNLINK"
+          ]
+        },
+        "platform_practice_client_invite_status": {
+          "name": "platform_practice_client_invite_status",
+          "schema": "public",
+          "items": [
+            "PENDING",
+            "ACCEPTED",
+            "REVOKED"
+          ]
+        },
+        "platform_practice_client_link_status": {
+          "name": "platform_practice_client_link_status",
+          "schema": "public",
+          "items": [
+            "INVITED",
+            "ACTIVE",
+            "REVOKED"
+          ]
+        },
+        "platform_practice_role": {
+          "name": "platform_practice_role",
+          "schema": "public",
+          "items": [
+            "OWNER",
+            "ADMIN",
+            "COACH"
+          ]
+        },
+        "platform_practice_subscription_status": {
+          "name": "platform_practice_subscription_status",
+          "schema": "public",
+          "items": [
+            "NONE",
+            "TRIALING",
+            "ACTIVE",
+            "PAST_DUE",
+            "UNPAID",
+            "CANCELED",
+            "INCOMPLETE"
+          ]
+        }
+      },
+      "comment": null
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "household_id": {
+          "name": "household_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(60)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 60,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "kind_key": {
+          "name": "kind_key",
+          "type": "varchar(64)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 64,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "vendor": {
+          "name": "vendor",
+          "type": "varchar(60)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 60,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "model": {
+          "name": "model",
+          "type": "varchar(60)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 60,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "external_id": {
+          "name": "external_id",
+          "type": "varchar(120)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 120,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "capabilities": {
+          "name": "capabilities",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "json"
+        },
+        "paired_at": {
+          "name": "paired_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "last_seen_at": {
+          "name": "last_seen_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "connection": {
+          "name": "connection",
+          "type": "platform_device_connection",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "platform_device_connection"
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        }
+      },
+      "name": "platform_device",
+      "schema": "public",
+      "indexes": [
+        {
+          "columnNames": [
+            "household_id",
+            "account_id"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "platform_device_household_id_account_id_index",
+          "unique": false,
+          "primary": false
+        },
+        {
+          "columnNames": [
+            "household_id",
+            "external_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "keyName": "platform_device_household_id_external_id_unique",
+          "unique": true,
+          "primary": false
+        },
+        {
+          "columnNames": [
+            "household_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "platform_device_household_id_index",
+          "unique": false,
+          "primary": false
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "platform_device_pkey",
+          "unique": true,
+          "primary": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "platform_device_account_id_foreign": {
+          "columnNames": [
+            "account_id"
+          ],
+          "constraintName": "platform_device_account_id_foreign",
+          "localTableName": "public.platform_device",
+          "referencedTableName": "auth.account",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "set null"
+        },
+        "platform_device_household_id_foreign": {
+          "columnNames": [
+            "household_id"
+          ],
+          "constraintName": "platform_device_household_id_foreign",
+          "localTableName": "public.platform_device",
+          "referencedTableName": "auth.household",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        }
+      },
+      "nativeEnums": {
+        "auth_account_address_kind": {
+          "name": "auth_account_address_kind",
+          "schema": "public",
+          "items": [
+            "BILLING",
+            "HOME",
+            "MAILING"
+          ]
+        },
+        "auth_locale": {
+          "name": "auth_locale",
+          "schema": "public",
+          "items": [
+            "EN",
+            "NL",
+            "ES",
+            "FR"
+          ]
+        },
+        "auth_theme": {
+          "name": "auth_theme",
+          "schema": "public",
+          "items": [
+            "LIGHT",
+            "DARK",
+            "SYSTEM"
+          ]
+        },
+        "backoffice_capability_kind": {
+          "name": "backoffice_capability_kind",
+          "schema": "public",
+          "items": [
+            "screen",
+            "action"
+          ]
+        },
+        "backoffice_plan_key": {
+          "name": "backoffice_plan_key",
+          "schema": "public",
+          "items": [
+            "BASIC",
+            "PLUS",
+            "MAX"
+          ]
+        },
+        "growth_learn_progress_status": {
+          "name": "growth_learn_progress_status",
+          "schema": "public",
+          "items": [
+            "QUEUE",
+            "NOW",
+            "DONE"
+          ]
+        },
+        "growth_learn_watch_kind": {
+          "name": "growth_learn_watch_kind",
+          "schema": "public",
+          "items": [
+            "FILM",
+            "VIDEO",
+            "SERIES",
+            "PODCAST",
+            "COURSE"
+          ]
+        },
+        "money_account_kind": {
+          "name": "money_account_kind",
+          "schema": "public",
+          "items": [
+            "CHECKING",
+            "SAVINGS",
+            "CREDIT",
+            "CASH",
+            "INVESTMENT"
+          ]
+        },
+        "money_cadence": {
+          "name": "money_cadence",
+          "schema": "public",
+          "items": [
+            "WEEKLY",
+            "MONTHLY",
+            "QUARTERLY",
+            "YEARLY",
+            "ONCE"
+          ]
+        },
+        "money_debt_kind": {
+          "name": "money_debt_kind",
+          "schema": "public",
+          "items": [
+            "CREDIT_CARD",
+            "LOAN",
+            "STUDENT",
+            "MORTGAGE",
+            "FAMILY",
+            "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
+          ]
+        },
+        "money_flow_direction": {
+          "name": "money_flow_direction",
+          "schema": "public",
+          "items": [
+            "IN",
+            "OUT"
+          ]
+        },
+        "money_giving_cause": {
+          "name": "money_giving_cause",
+          "schema": "public",
+          "items": [
+            "GLOBAL_HEALTH",
+            "POVERTY",
+            "EDUCATION",
+            "CLIMATE",
+            "ANIMALS",
+            "COMMUNITY",
+            "EMERGENCY",
+            "WATER"
+          ]
+        },
+        "money_goal_kind": {
+          "name": "money_goal_kind",
+          "schema": "public",
+          "items": [
+            "SAVE",
+            "EARN",
+            "GIVE"
+          ]
+        },
+        "money_goal_status": {
+          "name": "money_goal_status",
+          "schema": "public",
+          "items": [
+            "ACTIVE",
+            "REACHED",
+            "PAUSED",
+            "ARCHIVED"
+          ]
+        },
+        "money_income_kind": {
+          "name": "money_income_kind",
+          "schema": "public",
+          "items": [
+            "SALARY",
+            "FREELANCE",
+            "BENEFIT",
+            "RENTAL",
+            "DIVIDEND",
+            "OTHER"
+          ]
+        },
+        "money_jar_key": {
+          "name": "money_jar_key",
+          "schema": "public",
+          "items": [
+            "NECESSITIES",
+            "FINANCIAL_FREEDOM",
+            "EDUCATION",
+            "LONG_TERM_SAVINGS",
+            "PLAY",
+            "GIVE"
+          ]
+        },
+        "money_merchant_highlight": {
+          "name": "money_merchant_highlight",
+          "schema": "public",
+          "items": [
+            "FEATURED",
+            "NEW",
+            "POPULAR"
+          ]
+        },
+        "money_month_score_event_kind": {
+          "name": "money_month_score_event_kind",
+          "schema": "public",
+          "items": [
+            "JAR_HELD",
+            "JAR_OVERSPENT",
+            "INBOX_CLEARED",
+            "WEEK_CHECK_DONE",
+            "GOAL_REACHED",
+            "DEBT_CLEARED",
+            "INCOME_LOGGED",
+            "STREAK_KEPT"
+          ]
+        },
+        "money_rule_field": {
+          "name": "money_rule_field",
+          "schema": "public",
+          "items": [
+            "DESCRIPTION",
+            "COUNTERPARTY",
+            "AMOUNT"
+          ]
+        },
+        "money_rule_matcher": {
+          "name": "money_rule_matcher",
+          "schema": "public",
+          "items": [
+            "CONTAINS",
+            "EQUALS",
+            "STARTS_WITH",
+            "REGEX"
+          ]
+        },
+        "money_spending_style": {
+          "name": "money_spending_style",
+          "schema": "public",
+          "items": [
+            "SPENDER",
+            "SAVER",
+            "BALANCED",
+            "UNKNOWN"
+          ]
+        },
+        "money_transaction_source": {
+          "name": "money_transaction_source",
+          "schema": "public",
+          "items": [
+            "MANUAL",
+            "CSV",
+            "BANK",
+            "RECURRING"
+          ]
+        },
+        "money_transaction_status": {
+          "name": "money_transaction_status",
+          "schema": "public",
+          "items": [
+            "INBOX",
+            "SORTED",
+            "IGNORED"
+          ]
+        },
+        "money_week_check_stage": {
+          "name": "money_week_check_stage",
+          "schema": "public",
+          "items": [
+            "LOOK",
+            "REDIRECT",
+            "INTEND",
+            "DONE"
+          ]
+        },
+        "platform_coach_kind": {
+          "name": "platform_coach_kind",
+          "schema": "public",
+          "items": [
+            "NUDGE",
+            "WIN",
+            "WARNING",
+            "INSIGHT",
+            "WEEK_CHECK"
+          ]
+        },
+        "platform_currency": {
+          "name": "platform_currency",
+          "schema": "public",
+          "items": [
+            "EUR",
+            "USD",
+            "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -23122,6 +24150,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -23647,6 +24684,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -24265,6 +25311,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -24887,6 +25942,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -25514,6 +26578,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -26010,6 +27083,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -26570,6 +27652,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -27199,6 +28290,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -27756,6 +28856,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -28323,6 +29432,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -28985,6 +30103,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -29510,6 +30637,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -30111,6 +31247,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -30558,6 +31703,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -31273,6 +32427,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -31830,6 +32993,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -32423,6 +33595,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -33014,6 +34195,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -33461,6 +34651,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -34030,6 +35229,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -34581,6 +35789,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -35112,6 +36329,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -35763,6 +36989,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -36210,6 +37445,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -36743,6 +37987,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -37368,6 +38621,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -37974,6 +39236,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -38546,6 +39817,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -39147,6 +40427,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -39658,6 +40947,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -40165,6 +41463,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -40722,6 +42029,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -41390,6 +42706,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -41837,6 +43162,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -42406,6 +43740,588 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
+        "platform_household_kind": {
+          "name": "platform_household_kind",
+          "schema": "public",
+          "items": [
+            "FAMILY",
+            "PARTNERS",
+            "FRIENDS",
+            "SOLO"
+          ]
+        },
+        "platform_practice_address_kind": {
+          "name": "platform_practice_address_kind",
+          "schema": "public",
+          "items": [
+            "BILLING",
+            "REGISTERED"
+          ]
+        },
+        "platform_practice_client_access": {
+          "name": "platform_practice_client_access",
+          "schema": "public",
+          "items": [
+            "VIEW",
+            "MANAGE"
+          ]
+        },
+        "platform_practice_client_control_flag": {
+          "name": "platform_practice_client_control_flag",
+          "schema": "public",
+          "items": [
+            "SPONSOR_PLAN",
+            "CAN_UNLINK"
+          ]
+        },
+        "platform_practice_client_invite_status": {
+          "name": "platform_practice_client_invite_status",
+          "schema": "public",
+          "items": [
+            "PENDING",
+            "ACCEPTED",
+            "REVOKED"
+          ]
+        },
+        "platform_practice_client_link_status": {
+          "name": "platform_practice_client_link_status",
+          "schema": "public",
+          "items": [
+            "INVITED",
+            "ACTIVE",
+            "REVOKED"
+          ]
+        },
+        "platform_practice_role": {
+          "name": "platform_practice_role",
+          "schema": "public",
+          "items": [
+            "OWNER",
+            "ADMIN",
+            "COACH"
+          ]
+        },
+        "platform_practice_subscription_status": {
+          "name": "platform_practice_subscription_status",
+          "schema": "public",
+          "items": [
+            "NONE",
+            "TRIALING",
+            "ACTIVE",
+            "PAST_DUE",
+            "UNPAID",
+            "CANCELED",
+            "INCOMPLETE"
+          ]
+        }
+      },
+      "comment": null
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "key": {
+          "name": "key",
+          "type": "varchar(64)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": 64,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(120)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 120,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "sort_order": {
+          "name": "sort_order",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": "0",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "bool",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "true",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "icon": {
+          "name": "icon",
+          "type": "varchar(40)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 40,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "default_capabilities": {
+          "name": "default_capabilities",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "json"
+        },
+        "default_connection": {
+          "name": "default_connection",
+          "type": "platform_device_connection",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "platform_device_connection"
+        }
+      },
+      "name": "reference_platform_device_kind",
+      "schema": "backoffice",
+      "indexes": [
+        {
+          "columnNames": [
+            "key"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "reference_platform_device_kind_key_unique",
+          "unique": true,
+          "primary": false
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "reference_platform_device_kind_pkey",
+          "unique": true,
+          "primary": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {
+        "auth_account_address_kind": {
+          "name": "auth_account_address_kind",
+          "schema": "public",
+          "items": [
+            "BILLING",
+            "HOME",
+            "MAILING"
+          ]
+        },
+        "auth_locale": {
+          "name": "auth_locale",
+          "schema": "public",
+          "items": [
+            "EN",
+            "NL",
+            "ES",
+            "FR"
+          ]
+        },
+        "auth_theme": {
+          "name": "auth_theme",
+          "schema": "public",
+          "items": [
+            "LIGHT",
+            "DARK",
+            "SYSTEM"
+          ]
+        },
+        "backoffice_capability_kind": {
+          "name": "backoffice_capability_kind",
+          "schema": "public",
+          "items": [
+            "screen",
+            "action"
+          ]
+        },
+        "backoffice_plan_key": {
+          "name": "backoffice_plan_key",
+          "schema": "public",
+          "items": [
+            "BASIC",
+            "PLUS",
+            "MAX"
+          ]
+        },
+        "growth_learn_progress_status": {
+          "name": "growth_learn_progress_status",
+          "schema": "public",
+          "items": [
+            "QUEUE",
+            "NOW",
+            "DONE"
+          ]
+        },
+        "growth_learn_watch_kind": {
+          "name": "growth_learn_watch_kind",
+          "schema": "public",
+          "items": [
+            "FILM",
+            "VIDEO",
+            "SERIES",
+            "PODCAST",
+            "COURSE"
+          ]
+        },
+        "money_account_kind": {
+          "name": "money_account_kind",
+          "schema": "public",
+          "items": [
+            "CHECKING",
+            "SAVINGS",
+            "CREDIT",
+            "CASH",
+            "INVESTMENT"
+          ]
+        },
+        "money_cadence": {
+          "name": "money_cadence",
+          "schema": "public",
+          "items": [
+            "WEEKLY",
+            "MONTHLY",
+            "QUARTERLY",
+            "YEARLY",
+            "ONCE"
+          ]
+        },
+        "money_debt_kind": {
+          "name": "money_debt_kind",
+          "schema": "public",
+          "items": [
+            "CREDIT_CARD",
+            "LOAN",
+            "STUDENT",
+            "MORTGAGE",
+            "FAMILY",
+            "OTHER"
+          ]
+        },
+        "money_debt_schedule_kind": {
+          "name": "money_debt_schedule_kind",
+          "schema": "public",
+          "items": [
+            "OPEN",
+            "TERM",
+            "DEADLINE"
+          ]
+        },
+        "money_fixed_cost_settlement_source": {
+          "name": "money_fixed_cost_settlement_source",
+          "schema": "public",
+          "items": [
+            "MATCHED",
+            "MARK_PAID",
+            "SKIP",
+            "LINKED"
+          ]
+        },
+        "money_fixed_cost_settlement_status": {
+          "name": "money_fixed_cost_settlement_status",
+          "schema": "public",
+          "items": [
+            "PAID",
+            "SKIPPED"
+          ]
+        },
+        "money_flow_direction": {
+          "name": "money_flow_direction",
+          "schema": "public",
+          "items": [
+            "IN",
+            "OUT"
+          ]
+        },
+        "money_giving_cause": {
+          "name": "money_giving_cause",
+          "schema": "public",
+          "items": [
+            "GLOBAL_HEALTH",
+            "POVERTY",
+            "EDUCATION",
+            "CLIMATE",
+            "ANIMALS",
+            "COMMUNITY",
+            "EMERGENCY",
+            "WATER"
+          ]
+        },
+        "money_goal_kind": {
+          "name": "money_goal_kind",
+          "schema": "public",
+          "items": [
+            "SAVE",
+            "EARN",
+            "GIVE"
+          ]
+        },
+        "money_goal_status": {
+          "name": "money_goal_status",
+          "schema": "public",
+          "items": [
+            "ACTIVE",
+            "REACHED",
+            "PAUSED",
+            "ARCHIVED"
+          ]
+        },
+        "money_income_kind": {
+          "name": "money_income_kind",
+          "schema": "public",
+          "items": [
+            "SALARY",
+            "FREELANCE",
+            "BENEFIT",
+            "RENTAL",
+            "DIVIDEND",
+            "OTHER"
+          ]
+        },
+        "money_jar_key": {
+          "name": "money_jar_key",
+          "schema": "public",
+          "items": [
+            "NECESSITIES",
+            "FINANCIAL_FREEDOM",
+            "EDUCATION",
+            "LONG_TERM_SAVINGS",
+            "PLAY",
+            "GIVE"
+          ]
+        },
+        "money_merchant_highlight": {
+          "name": "money_merchant_highlight",
+          "schema": "public",
+          "items": [
+            "FEATURED",
+            "NEW",
+            "POPULAR"
+          ]
+        },
+        "money_month_score_event_kind": {
+          "name": "money_month_score_event_kind",
+          "schema": "public",
+          "items": [
+            "JAR_HELD",
+            "JAR_OVERSPENT",
+            "INBOX_CLEARED",
+            "WEEK_CHECK_DONE",
+            "GOAL_REACHED",
+            "DEBT_CLEARED",
+            "INCOME_LOGGED",
+            "STREAK_KEPT"
+          ]
+        },
+        "money_rule_field": {
+          "name": "money_rule_field",
+          "schema": "public",
+          "items": [
+            "DESCRIPTION",
+            "COUNTERPARTY",
+            "AMOUNT"
+          ]
+        },
+        "money_rule_matcher": {
+          "name": "money_rule_matcher",
+          "schema": "public",
+          "items": [
+            "CONTAINS",
+            "EQUALS",
+            "STARTS_WITH",
+            "REGEX"
+          ]
+        },
+        "money_spending_style": {
+          "name": "money_spending_style",
+          "schema": "public",
+          "items": [
+            "SPENDER",
+            "SAVER",
+            "BALANCED",
+            "UNKNOWN"
+          ]
+        },
+        "money_transaction_source": {
+          "name": "money_transaction_source",
+          "schema": "public",
+          "items": [
+            "MANUAL",
+            "CSV",
+            "BANK",
+            "RECURRING"
+          ]
+        },
+        "money_transaction_status": {
+          "name": "money_transaction_status",
+          "schema": "public",
+          "items": [
+            "INBOX",
+            "SORTED",
+            "IGNORED"
+          ]
+        },
+        "money_week_check_stage": {
+          "name": "money_week_check_stage",
+          "schema": "public",
+          "items": [
+            "LOOK",
+            "REDIRECT",
+            "INTEND",
+            "DONE"
+          ]
+        },
+        "platform_coach_kind": {
+          "name": "platform_coach_kind",
+          "schema": "public",
+          "items": [
+            "NUDGE",
+            "WIN",
+            "WARNING",
+            "INSIGHT",
+            "WEEK_CHECK"
+          ]
+        },
+        "platform_currency": {
+          "name": "platform_currency",
+          "schema": "public",
+          "items": [
+            "EUR",
+            "USD",
+            "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -42955,6 +44871,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -43514,6 +45439,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -44027,6 +45961,15 @@
             "EUR",
             "USD",
             "GBP"
+          ]
+        },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
           ]
         },
         "platform_household_kind": {
@@ -44556,6 +46499,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -45041,6 +46993,15 @@
             "GBP"
           ]
         },
+        "platform_device_connection": {
+          "name": "platform_device_connection",
+          "schema": "public",
+          "items": [
+            "BLUETOOTH",
+            "WIFI",
+            "CLOUD"
+          ]
+        },
         "platform_household_kind": {
           "name": "platform_household_kind",
           "schema": "public",
@@ -45410,6 +47371,15 @@
         "EUR",
         "USD",
         "GBP"
+      ]
+    },
+    "platform_device_connection": {
+      "name": "platform_device_connection",
+      "schema": "public",
+      "items": [
+        "BLUETOOTH",
+        "WIFI",
+        "CLOUD"
       ]
     },
     "platform_household_kind": {

@@ -63,6 +63,8 @@ export const API_ERROR_MESSAGES = [
     'auth_not_ready',
     'time_entry_not_found',
     'account_settings_not_found',
+    'device_not_found',
+    'device_kind_invalid',
     // Better Auth / rate limit — prefer mapping by `code`, English is fallback only
     'invalid_email_or_password',
     'user_not_found',

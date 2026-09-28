@@ -8,6 +8,7 @@ import { isProductEnabled } from './launch-products';
 export type SettingsTab =
     | 'account'
     | 'household'
+    | 'devices'
     | 'preferences'
     | 'security'
     | 'practice'
@@ -43,6 +44,7 @@ export type SettingsNavSection = {
 export const SETTINGS_HREF: Record<SettingsTab, string> = {
     account: '/settings',
     household: '/settings/general/household',
+    devices: '/settings/general/devices',
     preferences: '/settings/general/preferences',
     security: '/settings/general/security',
     practice: '/settings/general/practice',
@@ -73,6 +75,11 @@ const ALL_SETTINGS_SECTIONS: SettingsNavSection[] = [
                 key: 'household',
                 labelKey: 'pages.settings.tabs.household.label',
                 subKey: 'pages.settings.tabs.household.sub',
+            },
+            {
+                key: 'devices',
+                labelKey: 'pages.settings.tabs.devices.label',
+                subKey: 'pages.settings.tabs.devices.sub',
             },
             {
                 key: 'preferences',

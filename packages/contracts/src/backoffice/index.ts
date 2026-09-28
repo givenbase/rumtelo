@@ -5,3 +5,4 @@
  * Mirror: apps/backend/src/modules/backoffice/
  */
 export * from './plan';
+export * from './reference';

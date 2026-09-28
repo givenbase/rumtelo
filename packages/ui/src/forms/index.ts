@@ -3,7 +3,6 @@ export * from './Input';
 export * from './Email';
 export * from './Phone';
 export * from './Password';
-export * from './Select';
 export * from './Textarea';
 export * from './Field';
 export * from './Label';
@@ -33,16 +32,16 @@ export {
     type FormInvalidNotifyOptions,
 } from './Form/form-submit';
 
-/** Radix select primitives — prefer native {@link Select} for simple forms. */
+/** Styled Radix select — use for all dropdowns (no native `<select>`). */
 export {
-    Select as SelectMenu,
-    SelectContent as SelectMenuContent,
-    SelectGroup as SelectMenuGroup,
-    SelectItem as SelectMenuItem,
-    SelectLabel as SelectMenuLabel,
-    SelectScrollDownButton as SelectMenuScrollDownButton,
-    SelectScrollUpButton as SelectMenuScrollUpButton,
-    SelectSeparator as SelectMenuSeparator,
-    SelectTrigger as SelectMenuTrigger,
-    SelectValue as SelectMenuValue,
-} from './SelectMenu';
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectScrollDownButton,
+    SelectScrollUpButton,
+    SelectSeparator,
+    SelectTrigger,
+    SelectValue,
+} from './Select';

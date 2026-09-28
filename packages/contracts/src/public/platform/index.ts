@@ -14,5 +14,6 @@ export * from './billing';
 export * from './coach';
 export * from './contact';
 export * from './demo';
+export * from './device';
 export * from './household';
 export * from './practice';
