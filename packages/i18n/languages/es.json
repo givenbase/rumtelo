@@ -87,6 +87,7 @@
                     "not_authenticated": "No autenticado",
                     "no_household_selected": "No se ha seleccionado ningún hogar",
                     "not_household_member": "No forma parte de este hogar",
+                    "household_mismatch": "El hogar indicado en la solicitud no coincide con el hogar seleccionado.",
                     "plan_missing_capability": "Este plan no incluye esa función.",
                     "plan_limit_reached": "Se ha alcanzado el límite del plan",
                     "capability_unavailable": "Esta función aún no está disponible",

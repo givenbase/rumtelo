@@ -21,12 +21,11 @@ export class GratitudeService {
 
     async create(input: { householdId: string; week: string; text: string }) {
         const { account } = await this.accounts.ensureCurrentAccount();
-        const row = this.em.create(Gratitude, {
-            household: input.householdId,
+        const row = this.repo.create({
             account: account.id,
             week: input.week,
             text: input.text,
-        } as never);
+        });
         await this.em.persist(row).flush();
         return {
             id: row.id,

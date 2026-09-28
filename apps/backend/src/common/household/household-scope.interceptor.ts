@@ -74,7 +74,8 @@ export class HouseholdScopeInterceptor implements NestInterceptor {
 
         const pathname = (req.url ?? '').split('?')[0] ?? '';
         const isOnboard = pathname.endsWith('/household/onboard');
-        const isPractice = pathname.includes('/practice');
+        // Practice control plane only — not household.practiceLinks (dual-consent on the board).
+        const isPractice = isPracticeControlPlanePath(pathname);
 
         const householdId = resolveHouseholdId(req);
         const headers = toAuthHeaders(req);
@@ -152,18 +153,37 @@ function isSystemPublicPath(pathname: string): boolean {
 
 /** Explicit header wins, then the oRPC input body, then the session's active org.
  * All three are Better Auth opaque AuthIds (not Rumtelo uuids).
+ * Header and body must agree when both are present — never trust a foreign body id.
  */
 function resolveHouseholdId(req: Req): string | null {
     const header = req.headers['x-household-id'];
-    if (typeof header === 'string' && header.length > 0) return header;
+    const headerId = typeof header === 'string' && header.length > 0 ? header : null;
 
     const body = req.body as { householdId?: string } | undefined;
-    if (body?.householdId) return body.householdId;
+    const bodyId =
+        typeof body?.householdId === 'string' && body.householdId.length > 0
+            ? body.householdId
+            : null;
+
+    if (headerId && bodyId && headerId !== bodyId) {
+        throw apiForbidden('household_mismatch');
+    }
+
+    if (headerId) return headerId;
+    if (bodyId) return bodyId;
 
     // SDK name remains activeOrganizationId; DB column is active_household_id.
     const activeOrg = (req.session?.session as { activeOrganizationId?: string | null } | undefined)
         ?.activeOrganizationId;
     return activeOrg ?? null;
+}
+
+/** Practice oRPC routes — exclude household dual-consent `practiceLinks`. */
+function isPracticeControlPlanePath(pathname: string): boolean {
+    if (pathname.includes('practiceLinks') || pathname.includes('practice-links')) {
+        return false;
+    }
+    return pathname.includes('/practice');
 }
 
 /** Optional `x-practice-id` — role is resolved in PracticeService when needed. */
