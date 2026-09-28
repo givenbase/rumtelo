@@ -741,6 +741,8 @@
                 "give_hint": "Pick a cause, then an organisation with independent checks — same Coach shortlist as on Why & where.",
                 "give_recurring_hint": "Choosing an organisation opens a recurring gift (fixed cost). For a one-time gift, use",
                 "add_transaction": "Add transaction",
+                "learn_nudge_title": "Grow with Learn",
+                "learn_nudge": "Put titles on your Learn shelf, browse the library for inspiration, and add a goal on this jar when you are ready to claim the spend.",
                 "split_inside": "Split inside this jar",
                 "footer": "The Coach — tips without shame.",
                 "turn_off": "Turn tips off"
@@ -1404,8 +1406,9 @@
                 "lead_library": "Search, then narrow by what it is and what it is about. Mark a title and it lands on Learn.",
                 "partner_max": "Courses on Max are on MasterClass. Basic and Plus point at Udemy instead. Books, films, and series open as the plan allows — we recommend them, we do not host them.",
                 "partner_default": "Courses on Basic and Plus are on Udemy. Max points at MasterClass instead. Books, films, and series open as the plan allows — we recommend them, we do not host them.",
+                "jar_coach_title": "Education jar",
                 "jar_banner": "Your Education jar is where this spending lives. What raises your earning power pays itself back into Financial Freedom.",
-                "jar_cta": "View Education jar ›",
+                "jar_cta": "View Education jar",
                 "browse_library": "Browse library",
                 "tab_focus": "Focus",
                 "tab_done": "Done",
@@ -1713,7 +1716,7 @@
                     },
                     "EDUCATION": {
                         "subtitle": "Grow yourself",
-                        "note": "Books, courses, mentors, tools. The only spend that raises your earning power.",
+                        "note": "Books, courses, mentors, tools. The only spend that raises your earning power. Use Learn for what you are working through, browse the library for inspiration, and put a goal on this jar when you are ready to claim it.",
                         "not_allowed": "Only if it raises your earning power. A course you never finish belongs in Play.",
                         "allowed": {
                             "books": "Books",
@@ -1723,8 +1726,10 @@
                             "conferences": "Conferences"
                         },
                         "links": {
-                            "transactions": "Transactions",
-                            "goals": "Goals"
+                            "learn": "Learn",
+                            "library": "Library",
+                            "goals": "Goals",
+                            "transactions": "Transactions"
                         }
                     },
                     "PLAY": {

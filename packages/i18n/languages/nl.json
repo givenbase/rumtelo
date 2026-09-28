@@ -741,6 +741,8 @@
                 "give_hint": "Kies een goed doel en vervolgens een organisatie die onafhankelijk wordt gecontroleerd — dezelfde shortlist van Coach als op Waarom en waar.",
                 "give_recurring_hint": "Als je een organisatie kiest, wordt er een periodieke donatie (vaste kosten) ingesteld. Voor een eenmalige donatie gebruik je",
                 "add_transaction": "Transactie toevoegen",
+                "learn_nudge_title": "Groei met Leren",
+                "learn_nudge": "Zet titels op je Leren-plank, blader door de bibliotheek voor inspiratie, en voeg een doel toe op deze pot als je klaar bent om de uitgave te claimen.",
                 "split_inside": "Verdeeld in deze pot",
                 "footer": "De Coach — tips zonder schaamte.",
                 "turn_off": "Tips uitschakelen"
@@ -1404,8 +1406,9 @@
                 "lead_library": "Zoek, en filter vervolgens op wat het is en waar het over gaat. Selecteer een titel en deze verschijnt op Leren.",
                 "partner_max": "Cursussen over Max zijn te vinden op MasterClass. Basic en Plus zijn daarentegen te vinden op Udemy. Boeken, films en series zijn beschikbaar naargelang het abonnement — we raden ze aan, maar bieden ze niet zelf aan.",
                 "partner_default": "Cursussen op Basic en Plus staan op Udemy. Cursussen op MasterClass leveren het maximale aantal punten op. Boeken, films en series zijn beschikbaar afhankelijk van het abonnement — we raden ze aan, maar bieden ze niet zelf aan.",
+                "jar_coach_title": "Opleiding-pot",
                 "jar_banner": "In je ‘Opleiding’-pot worden deze uitgaven ondergebracht. Wat je verdiencapaciteit vergroot, draagt bij aan je financiële vrijheid.",
-                "jar_cta": "Bekijk de ‘Opleiding’-pot ›",
+                "jar_cta": "Bekijk de ‘Opleiding’-pot",
                 "browse_library": "Door de bibliotheek bladeren",
                 "tab_focus": "Focus",
                 "tab_done": "Klaar",
@@ -1449,7 +1452,7 @@
                     "format_plural": {
                         "book": "Boeken",
                         "film": "Films",
-                        "series": "Series",
+                        "series": "Serie",
                         "video": "Video's",
                         "podcast": "Podcasts",
                         "course": "Cursussen"
@@ -1476,7 +1479,7 @@
                         }
                     },
                     "section": {
-                        "MIND": "Mindset",
+                        "MIND": "Mentaliteit",
                         "SAVE": "Sparen",
                         "SPEND": "Uitgeven",
                         "EARN": "Meer verdienen",
@@ -1713,7 +1716,7 @@
                     },
                     "EDUCATION": {
                         "subtitle": "Ontwikkel jezelf",
-                        "note": "Boeken, cursussen, mentoren, hulpmiddelen. De enige uitgaven die je verdiencapaciteit vergroten.",
+                        "note": "Boeken, cursussen, mentoren, hulpmiddelen. De enige uitgaven die je verdiencapaciteit vergroten. Gebruik Leren voor wat je doorwerkt, blader door de bibliotheek voor inspiratie, en zet een doel op deze pot als je klaar bent om het te claimen.",
                         "not_allowed": "Alleen als het je verdiencapaciteit vergroot. Een cursus die je nooit afmaakt, hoort thuis in Play.",
                         "allowed": {
                             "books": "Boeken",
@@ -1723,8 +1726,10 @@
                             "conferences": "Conferenties"
                         },
                         "links": {
-                            "transactions": "Transacties",
-                            "goals": "Doelstellingen"
+                            "learn": "Leren",
+                            "library": "Bibliotheek",
+                            "goals": "Doelstellingen",
+                            "transactions": "Transacties"
                         }
                     },
                     "PLAY": {

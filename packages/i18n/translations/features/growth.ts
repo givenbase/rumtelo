@@ -312,9 +312,10 @@ const growth = {
             'Courses on Max are on MasterClass. Basic and Plus point at Udemy instead. Books, films, and series open as the plan allows — we recommend them, we do not host them.',
         partner_default:
             'Courses on Basic and Plus are on Udemy. Max points at MasterClass instead. Books, films, and series open as the plan allows — we recommend them, we do not host them.',
+        jar_coach_title: 'Education jar',
         jar_banner:
             'Your Education jar is where this spending lives. What raises your earning power pays itself back into Financial Freedom.',
-        jar_cta: 'View Education jar ›',
+        jar_cta: 'View Education jar',
         browse_library: 'Browse library',
         tab_focus: 'Focus',
         tab_done: 'Done',

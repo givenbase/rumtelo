@@ -741,6 +741,8 @@
                 "give_hint": "Elige una causa y, a continuación, una organización que cuente con controles independientes; la misma lista de candidatos de Coach que aparece en «Why & where».",
                 "give_recurring_hint": "Al elegir una organización, se activa una donación periódica (coste fijo). Para una donación única, utiliza",
                 "add_transaction": "Añadir transacción",
+                "learn_nudge_title": "Crece con Aprender",
+                "learn_nudge": "Pon títulos en tu estantería de Aprender, explora la biblioteca para inspirarte y añade un objetivo a este bote cuando estés listo para reclamar el gasto.",
                 "split_inside": "Divídelo dentro de este tarro",
                 "footer": "The Coach: consejos sin complejos.",
                 "turn_off": "Desactivar las sugerencias"
@@ -1394,7 +1396,7 @@
                 "catalog_matches": "Catálogo más amplio",
                 "pick_about_to_add": "Elige de qué trata y luego añádelo.",
                 "search_catalog_aria": "Buscar en el catálogo público",
-                "search_catalog_placeholder": "The Secret, Atomic Habits…",
+                "search_catalog_placeholder": "El secreto, Hábitos atómicos…",
                 "back": "← Aprender",
                 "eyebrow_shelf": "✦ LO QUE APRENDO",
                 "eyebrow_library": "✦ LA BIBLIOTECA",
@@ -1404,8 +1406,9 @@
                 "lead_library": "Busca y, a continuación, filtra los resultados por tipo y tema. Si marcas un título, aparecerá en la sección «Aprender».",
                 "partner_max": "Los cursos sobre Max están disponibles en MasterClass. Los de Basic y Plus, en cambio, se encuentran en Udemy. Los libros, las películas y las series se pueden acceder según lo permita el plan; los recomendamos, pero no los alojamos.",
                 "partner_default": "Los cursos de los niveles «Básico» y «Plus» están en Udemy. Los de nivel «Máximo» se encuentran en MasterClass. Los libros, las películas y las series se pueden acceder según lo permita el plan; los recomendamos, pero no los alojamos nosotros.",
+                "jar_coach_title": "Bote Educación",
                 "jar_banner": "Tu «hucha de la educación» es donde se destina este gasto. Lo que aumenta tu capacidad de generar ingresos se reinvierte en tu libertad financiera.",
-                "jar_cta": "Ver el bote Educación ›",
+                "jar_cta": "Ver el bote Educación",
                 "browse_library": "Explorar la biblioteca",
                 "tab_focus": "Enfoque",
                 "tab_done": "Hecho",
@@ -1449,7 +1452,7 @@
                     "format_plural": {
                         "book": "Libros",
                         "film": "Películas",
-                        "series": "Series",
+                        "series": "Serie",
                         "video": "Vídeos",
                         "podcast": "Podcasts",
                         "course": "Cursos"
@@ -1713,7 +1716,7 @@
                     },
                     "EDUCATION": {
                         "subtitle": "Crece como persona",
-                        "note": "Libros, cursos, mentores, herramientas. El único gasto que aumenta tu capacidad de generar ingresos.",
+                        "note": "Libros, cursos, mentores, herramientas. El único gasto que aumenta tu capacidad de generar ingresos. Usa Aprender para lo que estás trabajando, explora la biblioteca para inspirarte y añade un objetivo a este bote cuando estés listo para reclamarlo.",
                         "not_allowed": "Solo si aumenta tu capacidad de generar ingresos. Un curso que nunca terminas debe estar en «Play».",
                         "allowed": {
                             "books": "Libros",
@@ -1723,8 +1726,10 @@
                             "conferences": "Conferencias"
                         },
                         "links": {
-                            "transactions": "Transacciones",
-                            "goals": "Objetivos"
+                            "learn": "Aprender",
+                            "library": "Biblioteca",
+                            "goals": "Objetivos",
+                            "transactions": "Transacciones"
                         }
                     },
                     "PLAY": {

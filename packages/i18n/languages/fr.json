@@ -741,6 +741,8 @@
                 "give_hint": "Choisissez une cause, puis une association faisant l'objet de contrôles indépendants — la même sélection proposée par Coach que sur « Why & where ».",
                 "give_recurring_hint": "Le choix d'une organisation donne lieu à un don récurrent (montant fixe). Pour un don ponctuel, utilisez",
                 "add_transaction": "Ajouter une transaction",
+                "learn_nudge_title": "Grandir avec Apprendre",
+                "learn_nudge": "Mettez des titres sur votre rayon Apprendre, parcourez la bibliothèque pour l'inspiration, et ajoutez un objectif sur ce pot quand vous êtes prêt à revendiquer la dépense.",
                 "split_inside": "Diviser à l'intérieur de ce bocal",
                 "footer": "The Coach — des conseils sans complexe.",
                 "turn_off": "Désactiver les conseils"
@@ -1394,7 +1396,7 @@
                 "catalog_matches": "Catalogue élargi",
                 "pick_about_to_add": "Choisissez de quoi il s'agit, puis ajoutez.",
                 "search_catalog_aria": "Consulter le catalogue public",
-                "search_catalog_placeholder": "The Secret, Atomic Habits…",
+                "search_catalog_placeholder": "Le Secret, Atomic Habits…",
                 "back": "← En savoir plus",
                 "eyebrow_shelf": "✦ CE QUE J'APPRENDS",
                 "eyebrow_library": "✦ LA BIBLIOTHÈQUE",
@@ -1404,8 +1406,9 @@
                 "lead_library": "Effectuez une recherche, puis affinez les résultats en fonction du type de contenu et du sujet. Sélectionnez un titre pour l'ajouter à la rubrique « Apprendre ».",
                 "partner_max": "Les cours sur Max sont disponibles sur MasterClass. Les formules Basic et Plus sont quant à elles proposées sur Udemy. Les livres, films et séries sont accessibles selon les conditions de l'abonnement — nous les recommandons, mais ne les hébergeons pas.",
                 "partner_default": "Les cours « Basic » et « Plus » sont disponibles sur Udemy. Les cours « Max » sont quant à eux proposés sur MasterClass. Les livres, films et séries sont accessibles selon les conditions de l'abonnement — nous les recommandons, mais nous ne les hébergeons pas.",
+                "jar_coach_title": "Pot Éducation",
                 "jar_banner": "C'est dans votre « tirelire Éducation » que sont affectées ces dépenses. Tout ce qui augmente votre capacité de gain contribue à vous mener vers la liberté financière.",
-                "jar_cta": "Voir le pot Éducation ›",
+                "jar_cta": "Voir le pot Éducation",
                 "browse_library": "Parcourir la bibliothèque",
                 "tab_focus": "Focus",
                 "tab_done": "Terminé",
@@ -1476,7 +1479,7 @@
                         }
                     },
                     "section": {
-                        "MIND": "Mindset",
+                        "MIND": "État d'esprit",
                         "SAVE": "Épargne",
                         "SPEND": "Dépenses",
                         "EARN": "Gagner plus",
@@ -1487,7 +1490,7 @@
                         "MONEY": "Argent",
                         "COMMUNICATION": "Communication",
                         "MARKETING": "Marketing",
-                        "LEADERSHIP": "Leadership"
+                        "LEADERSHIP": "Direction"
                     },
                     "partner": {
                         "UDEMY": "Udemy",
@@ -1713,7 +1716,7 @@
                     },
                     "EDUCATION": {
                         "subtitle": "Épanouissez-vous",
-                        "note": "Livres, formations, mentors, outils. La seule dépense qui vous permet d'augmenter votre capacité à générer des revenus.",
+                        "note": "Livres, formations, mentors, outils. La seule dépense qui augmente votre capacité à gagner. Utilisez Apprendre pour ce que vous travaillez, parcourez la bibliothèque pour l'inspiration, et placez un objectif sur ce pot quand vous êtes prêt à le revendiquer.",
                         "not_allowed": "À condition que cela vous permette d'augmenter vos revenus. Une formation que vous ne terminez jamais a sa place dans la rubrique « Play ».",
                         "allowed": {
                             "books": "Livres",
@@ -1723,8 +1726,10 @@
                             "conferences": "Conférences"
                         },
                         "links": {
-                            "transactions": "Transactions",
-                            "goals": "Objectifs"
+                            "learn": "Apprendre",
+                            "library": "Bibliothèque",
+                            "goals": "Objectifs",
+                            "transactions": "Transactions"
                         }
                     },
                     "PLAY": {

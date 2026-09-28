@@ -138,6 +138,9 @@ const coach = {
         give_recurring_hint:
             'Choosing an organisation opens a recurring gift (fixed cost). For a one-time gift, use',
         add_transaction: 'Add transaction',
+        learn_nudge_title: 'Grow with Learn',
+        learn_nudge:
+            'Put titles on your Learn shelf, browse the library for inspiration, and add a goal on this jar when you are ready to claim the spend.',
         split_inside: 'Split inside this jar',
         footer: 'The Coach — tips without shame.',
         turn_off: 'Turn tips off',

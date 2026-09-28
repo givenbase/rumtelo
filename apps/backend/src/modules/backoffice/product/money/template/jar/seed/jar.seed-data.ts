@@ -106,7 +106,7 @@ export const JAR_TEMPLATE_SEED: readonly Seed[] = [
         percentage: '10.00',
         capabilities: JAR_CAPABILITIES[JarKey.EDUCATION],
         guide: {
-            note: 'Books, courses, mentors, tools. The only spend that raises your earning power.',
+            note: 'Books, courses, mentors, tools. The only spend that raises your earning power. Use Learn for what you are working through, browse the library for inspiration, and put a goal on this jar when you are ready to claim it.',
             allowed: [
                 { label: 'Books', icon: '📖' },
                 { label: 'Courses & training', icon: '🎓' },
@@ -117,8 +117,10 @@ export const JAR_TEMPLATE_SEED: readonly Seed[] = [
             notAllowed:
                 'Only if it raises your earning power. A course you never finish belongs in Play.',
             links: [
-                { href: '/product/money/transactions', label: 'Transactions', icon: '↔' },
+                { href: '/product/growth/learn', label: 'Learn', icon: '✦' },
+                { href: '/product/growth/learn/library', label: 'Library', icon: '📚' },
                 { href: '/product/growth/goals', label: 'Goals', icon: '🎯' },
+                { href: '/product/money/transactions', label: 'Transactions', icon: '↔' },
             ],
         },
     },

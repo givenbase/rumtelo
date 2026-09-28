@@ -123,7 +123,7 @@ const money = {
             },
             EDUCATION: {
                 subtitle: 'Grow yourself',
-                note: 'Books, courses, mentors, tools. The only spend that raises your earning power.',
+                note: 'Books, courses, mentors, tools. The only spend that raises your earning power. Use Learn for what you are working through, browse the library for inspiration, and put a goal on this jar when you are ready to claim it.',
                 not_allowed:
                     'Only if it raises your earning power. A course you never finish belongs in Play.',
                 allowed: {
@@ -134,8 +134,10 @@ const money = {
                     conferences: 'Conferences',
                 },
                 links: {
-                    transactions: 'Transactions',
+                    learn: 'Learn',
+                    library: 'Library',
                     goals: 'Goals',
+                    transactions: 'Transactions',
                 },
             },
             PLAY: {

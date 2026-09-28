@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
 
-import { CoachFeatureId, SpendingStyle } from '@rumtelo/contracts';
+import { CoachFeatureId, JarKey, SpendingStyle } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Icon, Button, Card, EmptyState, Typography } from '@rumtelo/ui';
@@ -12,10 +12,12 @@ import { cn } from '@rumtelo/utils';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { isCoachFeatureEnabled } from '@/app/_lib/coach-readiness';
+import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { isLiveData } from '@/app/_lib/preview';
 import { PlanKey } from '@/app/_lib/plan';
+import { productPath } from '@/app/_lib/routes';
 import { env } from '@/app/_utils/get-env';
-import { CoachMark, useHelpersEnabled } from '@/components/features/helpers';
+import { CoachMark, CoachTipCard, useHelpersEnabled } from '@/components/features/helpers';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
@@ -500,22 +502,19 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
             </div>
 
             {browsing ? null : (
-                <div
-                    className="flex flex-wrap items-center gap-4 rounded-2xl border border-accent/40 bg-accent-soft px-5 py-4"
-                    style={{ boxShadow: 'var(--shadow-glow)' }}>
-                    <Typography
-                        as="p"
-                        size="sm"
-                        color="secondary"
-                        className="min-w-0 flex-1 basis-72 text-pretty">
-                        {tLearn('jar_banner')}
-                    </Typography>
-                    <Link
-                        href="/product/money/jars"
-                        className="flex-none rounded-full border border-line-strong px-4 py-2.5 font-mono text-xs tracking-wide whitespace-nowrap text-fg-secondary uppercase transition-colors hover:border-accent-hover hover:text-accent">
-                        {tLearn('jar_cta')}
-                    </Link>
-                </div>
+                <CoachTipCard
+                    title={tLearn('jar_coach_title')}
+                    actions={
+                        <Button
+                            as={Link}
+                            href={productPath(`money/jars/${jarKeyToSlug(JarKey.EDUCATION)}`)}
+                            size="sm"
+                            variant="secondary">
+                            {tLearn('jar_cta')}
+                        </Button>
+                    }>
+                    {tLearn('jar_banner')}
+                </CoachTipCard>
             )}
 
             {browsing ? null : (
