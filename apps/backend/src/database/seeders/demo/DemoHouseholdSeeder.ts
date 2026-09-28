@@ -7,7 +7,6 @@ import {
     Cadence,
     Currency,
     DebtKind,
-    EnergyMetric,
     FlowDirection,
     GoalKind,
     GoalStatus,
@@ -40,7 +39,6 @@ import { JarTemplate } from '../../../modules/backoffice/product/money/template/
 import { Bank } from '../../../modules/backoffice/product/money/catalog/bank/bank.entity';
 import { HouseholdSettings } from '../../../modules/auth/household/household-settings/household-settings.entity';
 import { HouseholdBilling } from '../../../modules/auth/household/household-billing/household-billing.entity';
-import { EnergyLog } from '../../../modules/public/product/energy/log/energy-log.entity';
 import { IncomeLever } from '../../../modules/public/product/growth/income-lever/income-lever.entity';
 import { IncomeMilestone } from '../../../modules/public/product/growth/income-milestone/income-milestone.entity';
 import { BankAccount } from '../../../modules/public/product/money/ledger/bank-account/bank-account.entity';
@@ -56,7 +54,6 @@ import { Goal } from '../../../modules/public/product/money/targets/goal/goal.en
 import { Asset } from '../../../modules/public/product/growth/asset/asset.entity';
 import { LearnSkillFocus } from '../../../modules/public/product/growth/learn/focus/focus.entity';
 import { LearnProgress } from '../../../modules/public/product/growth/learn/progress/progress.entity';
-import { Gratitude } from '../../../modules/public/product/soul/gratitude/gratitude.entity';
 import { CategoryTemplate } from '../../../modules/backoffice/product/money/template/category/category.entity';
 import { FixedCostPreset } from '../../../modules/backoffice/product/money/preset/fixed-cost/fixed-cost.entity';
 import { MerchantPreset } from '../../../modules/backoffice/product/money/preset/merchant/merchant.entity';
@@ -553,22 +550,6 @@ export class DemoHouseholdSeeder extends Seeder {
             this.createTx(em, householdId, checking, tx);
         }
 
-        this.seedEnergyDays(em, householdId, accountId, [
-            { daysAgo: 0, metric: EnergyMetric.SLEEP, value: '48.00', note: 'Short night' },
-            { daysAgo: 1, metric: EnergyMetric.SLEEP, value: '52.00' },
-            { daysAgo: 2, metric: EnergyMetric.SLEEP, value: '55.00' },
-            { daysAgo: 3, metric: EnergyMetric.SLEEP, value: '44.00', note: 'Worried about bills' },
-            { daysAgo: 4, metric: EnergyMetric.MIND, value: '40.00' },
-            { daysAgo: 5, metric: EnergyMetric.SLEEP, value: '58.00' },
-        ]);
-
-        em.create(Gratitude, {
-            household: householdId,
-            account: accountId,
-            week: isoWeekKey(daysAgoDate(2)),
-            text: 'Got through the month without overdraft — small win.',
-        } as never);
-
         em.create(IncomeLever, {
             household: householdId,
             name: 'Ask for a small raise',
@@ -840,32 +821,6 @@ export class DemoHouseholdSeeder extends Seeder {
             },
         ] as const) {
             this.createTx(em, householdId, checking, tx);
-        }
-
-        this.seedEnergyDays(em, householdId, accountId, [
-            { daysAgo: 0, metric: EnergyMetric.SLEEP, value: '42.00', note: 'Deadline night' },
-            { daysAgo: 0, metric: EnergyMetric.FOOD, value: '38.00', note: 'Skipped lunch' },
-            { daysAgo: 1, metric: EnergyMetric.SLEEP, value: '50.00' },
-            { daysAgo: 1, metric: EnergyMetric.TRAIN, value: '25.00' },
-            { daysAgo: 2, metric: EnergyMetric.SLEEP, value: '48.00' },
-            { daysAgo: 2, metric: EnergyMetric.FOOD, value: '55.00' },
-            { daysAgo: 3, metric: EnergyMetric.TRAIN, value: '60.00', note: 'Gym — rare win' },
-            { daysAgo: 4, metric: EnergyMetric.SLEEP, value: '40.00' },
-            { daysAgo: 4, metric: EnergyMetric.MIND, value: '35.00', note: 'Invoice anxiety' },
-            { daysAgo: 5, metric: EnergyMetric.FOOD, value: '45.00' },
-            { daysAgo: 6, metric: EnergyMetric.SLEEP, value: '55.00' },
-        ]);
-
-        for (const [weekOffset, text] of [
-            [0, 'Client paid on time — rare calm Tuesday.'],
-            [1, 'Finished a proposal before midnight.'],
-        ] as const) {
-            em.create(Gratitude, {
-                household: householdId,
-                account: accountId,
-                week: isoWeekKey(daysAgoDate(weekOffset * 7)),
-                text,
-            } as never);
         }
 
         em.create(IncomeLever, {
@@ -1436,38 +1391,6 @@ export class DemoHouseholdSeeder extends Seeder {
             this.createTx(em, householdId, checking, tx);
         }
 
-        this.seedEnergyDays(em, householdId, accountId, [
-            { daysAgo: 0, metric: EnergyMetric.SLEEP, value: '78.00' },
-            { daysAgo: 0, metric: EnergyMetric.TRAIN, value: '72.00', note: 'Morning run' },
-            { daysAgo: 0, metric: EnergyMetric.FOOD, value: '80.00' },
-            { daysAgo: 0, metric: EnergyMetric.MIND, value: '75.00' },
-            { daysAgo: 1, metric: EnergyMetric.SLEEP, value: '82.00' },
-            { daysAgo: 1, metric: EnergyMetric.TRAIN, value: '65.00' },
-            { daysAgo: 1, metric: EnergyMetric.FOOD, value: '78.00' },
-            { daysAgo: 2, metric: EnergyMetric.SLEEP, value: '76.00' },
-            { daysAgo: 2, metric: EnergyMetric.MIND, value: '80.00', note: 'Deep work block' },
-            { daysAgo: 3, metric: EnergyMetric.TRAIN, value: '70.00' },
-            { daysAgo: 3, metric: EnergyMetric.FOOD, value: '74.00' },
-            { daysAgo: 4, metric: EnergyMetric.SLEEP, value: '80.00' },
-            { daysAgo: 5, metric: EnergyMetric.TRAIN, value: '68.00' },
-            { daysAgo: 5, metric: EnergyMetric.MIND, value: '77.00' },
-            { daysAgo: 6, metric: EnergyMetric.SLEEP, value: '85.00' },
-            { daysAgo: 6, metric: EnergyMetric.FOOD, value: '82.00' },
-        ]);
-
-        for (const [weekOffset, text] of [
-            [0, 'Reinvested the rental surplus without second-guessing.'],
-            [1, 'Partner and I aligned on the next property criteria.'],
-            [2, 'Hit the monthly FF transfer on the first try.'],
-        ] as const) {
-            em.create(Gratitude, {
-                household: householdId,
-                account: accountId,
-                week: isoWeekKey(daysAgoDate(weekOffset * 7)),
-                text,
-            } as never);
-        }
-
         em.create(IncomeLever, {
             household: householdId,
             name: 'Raise studio day rate',
@@ -1612,29 +1535,6 @@ export class DemoHouseholdSeeder extends Seeder {
             status: input.status,
             source: input.source ?? TransactionSource.MANUAL,
         } as never);
-    }
-
-    private seedEnergyDays(
-        em: EntityManager,
-        householdId: string,
-        accountId: string,
-        rows: readonly {
-            daysAgo: number;
-            metric: EnergyMetric;
-            value: string;
-            note?: string;
-        }[]
-    ): void {
-        for (const row of rows) {
-            em.create(EnergyLog, {
-                household: householdId,
-                account: accountId,
-                metric: row.metric,
-                value: row.value,
-                loggedOn: isoDate(daysAgoDate(row.daysAgo)),
-                note: row.note ?? null,
-            } as never);
-        }
     }
 
     /**
@@ -1831,13 +1731,4 @@ function monthsAhead(months: number): string {
     const date = new Date();
     date.setUTCMonth(date.getUTCMonth() + months);
     return isoDate(date);
-}
-
-function isoWeekKey(date: Date): string {
-    const target = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    const day = target.getUTCDay() || 7;
-    target.setUTCDate(target.getUTCDate() + 4 - day);
-    const yearStart = new Date(Date.UTC(target.getUTCFullYear(), 0, 1));
-    const week = Math.ceil(((target.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7);
-    return `${target.getUTCFullYear()}-W${String(week).padStart(2, '0')}`;
 }

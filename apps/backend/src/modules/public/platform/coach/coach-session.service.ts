@@ -4,9 +4,7 @@ import {
     COACH_SESSION_STEP_CAP,
     CoachKind,
     coachStepVoice,
-    EnergyMetric,
     FixedCostPeriodStatus,
-    TimeDayKind,
     TransactionStatus,
     WeekCheckStage,
 } from '@rumtelo/contracts';
@@ -17,27 +15,11 @@ import { currentHouseholdId } from '../../../../common/household/household.conte
 import { HouseholdScopedRepository } from '../../../../common/household/household-scoped.repository';
 import { currentPeriod, currentWeek } from '../../../../common/utils/period.util';
 import { AccountService } from '../../../auth/user/account/account.service';
-import { EnergyLog } from '../../product/energy/log/energy-log.entity';
-import { TimeEntry } from '../../product/energy/time/time-entry.entity';
-import { weekRange } from '../../product/energy/time/time-week.util';
-import { TimeTemplate } from '../../product/energy/time-template/time-template.entity';
 import { Transaction } from '../../product/money/ledger/transaction/transaction.entity';
 import { FixedCost } from '../../product/money/plan/fixed-cost/fixed-cost.entity';
 import { FixedCostSettlement } from '../../product/money/plan/fixed-cost/fixed-cost-settlement.entity';
 import { Jar } from '../../product/money/plan/jar/jar.entity';
 import { MoneyWeekCheck } from '../../product/money/week-check/money-week-check.entity';
-import { Gratitude } from '../../product/soul/gratitude/gratitude.entity';
-
-const WEEKDAY_NAMES = [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday',
-];
-const CATCH_UP_MIN = 3;
 
 /**
  * Builds the Coach fill queue from live household data.
@@ -50,10 +32,6 @@ export class CoachSessionService {
     private readonly fixedCosts: HouseholdScopedRepository<FixedCost>;
     private readonly settlements: HouseholdScopedRepository<FixedCostSettlement>;
     private readonly weekChecks: HouseholdScopedRepository<MoneyWeekCheck>;
-    private readonly templates: HouseholdScopedRepository<TimeTemplate>;
-    private readonly timeEntries: HouseholdScopedRepository<TimeEntry>;
-    private readonly gratitude: HouseholdScopedRepository<Gratitude>;
-    private readonly energyLogs: HouseholdScopedRepository<EnergyLog>;
 
     constructor(
         @Inject(EntityManager) private readonly em: EntityManager,
@@ -64,10 +42,6 @@ export class CoachSessionService {
         this.fixedCosts = new HouseholdScopedRepository(em, FixedCost);
         this.settlements = new HouseholdScopedRepository(em, FixedCostSettlement);
         this.weekChecks = new HouseholdScopedRepository(em, MoneyWeekCheck);
-        this.templates = new HouseholdScopedRepository(em, TimeTemplate);
-        this.timeEntries = new HouseholdScopedRepository(em, TimeEntry);
-        this.gratitude = new HouseholdScopedRepository(em, Gratitude);
-        this.energyLogs = new HouseholdScopedRepository(em, EnergyLog);
     }
 
     // ====================================================================
@@ -77,22 +51,20 @@ export class CoachSessionService {
     async session(periodKey?: string | null): Promise<CoachSession> {
         const period = periodKey ?? currentPeriod();
         const week = currentWeek();
-        const { account } = await this.accounts.ensureCurrentAccount();
+        await this.accounts.ensureCurrentAccount();
         const householdId = currentHouseholdId();
         const livePeriod = currentPeriod();
 
         const steps: CoachStep[] = [];
         const viewingLive = period === livePeriod;
-        // Inbox + week/energy/soul fills are live-month only; due bills follow the viewed period.
+        // Inbox + week fills are live-month only; due bills follow the viewed period.
+        // Energy / Soul coach producers stay off until those entities return to MikroORM.
         if (viewingLive) {
             await this.pushInbox(steps);
         }
         await this.pushDueBills(steps, period);
         if (viewingLive) {
             await this.pushWeekCheck(steps, week);
-            await this.pushTime(steps, account.id, week);
-            await this.pushGratitude(steps, account.id, week);
-            await this.pushEnergyScore(steps, account.id);
         }
 
         const totalAvailable = steps.length;
@@ -248,133 +220,6 @@ export class CoachSessionService {
             });
         }
     }
-
-    private async pushTime(steps: CoachStep[], accountId: string, week: string): Promise<void> {
-        const templates: TimeTemplate[] = await this.templates.find({ account: accountId });
-        if (templates.length === 0) {
-            this.enqueue(steps, {
-                id: 'energy.time.needs_setup',
-                portal: 'energy',
-                kind: CoachKind.NUDGE,
-                prompt: 'Three screens and logging a day becomes one tap. Set how your week mostly looks.',
-                input: 'link_only',
-                payload: { type: 'link', href: '/product/energy/week' },
-                href: '/product/energy/week',
-                hrefLabel: 'Set up my typical week',
-            });
-            return;
-        }
-
-        const { from, to } = weekRange(week);
-        const entries: TimeEntry[] = await this.timeEntries.find({
-            account: accountId,
-            loggedOn: { $gte: from, $lte: to },
-        });
-        const logged = new Set(entries.map(row => row.loggedOn));
-        const today = new Date().toISOString().slice(0, 10);
-
-        const missingPast: { on: string; dayLabel: string }[] = [];
-        for (let offset = 0; offset < 7; offset++) {
-            const on = addDays(from, offset);
-            if (on >= today) break;
-            if (!logged.has(on)) {
-                missingPast.push({ on, dayLabel: dayLabel(on) });
-            }
-        }
-
-        if (missingPast.length >= CATCH_UP_MIN) {
-            this.enqueue(steps, {
-                id: `energy.time.catch_up:${week}`,
-                portal: 'energy',
-                kind: CoachKind.NUDGE,
-                prompt: `${missingPast.length} days this week are not logged. Log them as typical in one go?`,
-                input: 'yes_typical',
-                payload: {
-                    type: 'time_catch_up',
-                    days: missingPast,
-                    count: missingPast.length,
-                },
-                href: '/product/energy/week',
-                hrefLabel: 'Open my week',
-            });
-            return;
-        }
-
-        const checkDay = today >= from && today <= to ? today : null;
-        if (checkDay && !logged.has(checkDay)) {
-            const weekday = isoWeekday(checkDay);
-            const template = templates.find(row => row.weekdays.includes(weekday)) ?? templates[0]!;
-            const kindLabel = template.kind === TimeDayKind.WORKDAY ? 'workday' : 'day off';
-            this.enqueue(steps, {
-                id: `energy.time.check_in:${checkDay}`,
-                portal: 'energy',
-                kind: CoachKind.NUDGE,
-                prompt: `Was ${dayLabel(checkDay)} a typical ${kindLabel}?`,
-                input: 'yes_typical',
-                payload: {
-                    type: 'time_day',
-                    on: checkDay,
-                    dayLabel: dayLabel(checkDay),
-                    kindLabel,
-                },
-                href: '/product/energy/week',
-                hrefLabel: 'Adjust on My week',
-            });
-        }
-    }
-
-    private async pushGratitude(
-        steps: CoachStep[],
-        accountId: string,
-        week: string
-    ): Promise<void> {
-        const rows = await this.gratitude.find({ account: accountId, week }, { limit: 1 });
-        if (rows.length > 0) return;
-
-        this.enqueue(steps, {
-            id: `soul.gratitude:${week}`,
-            portal: 'soul',
-            kind: CoachKind.NUDGE,
-            prompt: 'What are you grateful for this week? One line is enough.',
-            input: 'gratitude_text',
-            payload: { type: 'gratitude', week },
-            href: '/product/soul/gratitude',
-            hrefLabel: 'Open gratitude',
-        });
-    }
-
-    private async pushEnergyScore(steps: CoachStep[], accountId: string): Promise<void> {
-        const today = new Date().toISOString().slice(0, 10);
-        const metrics: { metric: EnergyMetric; prompt: string }[] = [
-            {
-                metric: EnergyMetric.SLEEP,
-                prompt: 'How rested do you feel today? (quality, not hours.)',
-            },
-            { metric: EnergyMetric.FOOD, prompt: 'How well did you fuel today?' },
-            { metric: EnergyMetric.TRAIN, prompt: 'Did you train today? How was the session?' },
-            { metric: EnergyMetric.MIND, prompt: 'Stillness today — how settled do you feel?' },
-        ];
-
-        const existing = await this.energyLogs.find({
-            account: accountId,
-            loggedOn: today,
-            metric: { $in: metrics.map(row => row.metric) },
-        });
-        const logged = new Set(existing.map(row => row.metric));
-        const candidate = metrics.find(row => !logged.has(row.metric));
-        if (!candidate) return;
-
-        this.enqueue(steps, {
-            id: `energy.score.${candidate.metric}:${today}`,
-            portal: 'energy',
-            kind: CoachKind.NUDGE,
-            prompt: candidate.prompt,
-            input: 'score_chips',
-            payload: { type: 'energy_score', metric: candidate.metric, on: today },
-            href: null,
-            hrefLabel: null,
-        });
-    }
 }
 
 function formatEuro(cents: number): string {
@@ -382,20 +227,4 @@ function formatEuro(cents: number): string {
     const abs = Math.abs(cents);
     const euros = (abs / 100).toFixed(abs % 100 === 0 ? 0 : 2);
     return `${sign}€${euros}`;
-}
-
-function isoWeekday(iso: string): number {
-    const [year, month, day] = iso.split('-').map(Number) as [number, number, number];
-    return new Date(Date.UTC(year, month - 1, day)).getUTCDay() || 7;
-}
-
-function addDays(iso: string, delta: number): string {
-    const [year, month, day] = iso.split('-').map(Number) as [number, number, number];
-    const date = new Date(Date.UTC(year, month - 1, day));
-    date.setUTCDate(date.getUTCDate() + delta);
-    return date.toISOString().slice(0, 10);
-}
-
-function dayLabel(iso: string): string {
-    return WEEKDAY_NAMES[isoWeekday(iso) - 1] ?? iso;
 }
