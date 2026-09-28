@@ -35,9 +35,11 @@ packages/brand/assets/
 ```
 
 **App:** SVG. **Email:** PNG (clients don’t reliably render SVG). Resend delivery
-embeds them as **CID attachments** (Gmail strips data-URIs). `/email-preview`
-uses data-URIs so logos still show in the browser. Masters stay full resolution;
-email variants are generated with **sharp** (Lanczos3, lossless PNG, 3× CSS display):
+embeds them as **CID attachments** (Gmail strips data-URIs) — light + dark wordmarks
+plus the colorful icon. Header swaps wordmarks with `prefers-color-scheme` (same
+on-light / on-dark pair as the app). `/email-preview` uses data-URIs so logos still
+show in the browser. Masters stay full resolution; email variants are generated with
+**sharp** (Lanczos3, lossless PNG, 3× CSS display):
 
 ```bash
 pnpm --filter @rumtelo/brand email-assets

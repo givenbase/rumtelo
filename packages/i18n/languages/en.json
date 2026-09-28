@@ -150,6 +150,7 @@
                 "sign_in_goals": "Sign in to save goals",
                 "week_set": "Your typical week is set",
                 "fixed_saved": "Fixed cost saved",
+                "fixed_saved_and_linked": "Fixed cost saved and linked to this transaction",
                 "fixed_updated": "Fixed cost updated",
                 "goal_saved": "Goal saved",
                 "goal_updated": "Goal updated"
@@ -2039,6 +2040,9 @@
                     "status_ignored": "Ignored (not in budget maths)",
                     "hint_linked_settlement": "Linked settlement for this period",
                     "hint_suggested_bill": "Suggested recurring bill — link when sorting",
+                    "make_fixed_cost": "Add as fixed cost",
+                    "hint_make_fixed_cost": "Copy into a recurring bill and mark this month paid",
+                    "open_make_fixed": "Add ›",
                     "hint_applied_debt": "Applied to a debt balance",
                     "hint_manage_rules": "Manage rules on the Transactions page",
                     "hint_catalog_sorted": "No household rule matched — the merchant catalog placed this",

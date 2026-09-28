@@ -17,6 +17,7 @@ import {
 } from '@rumtelo/utils';
 
 import {
+    createFixedHref,
     debtDetailHref,
     fixedDetailHref,
     txDetailHref,
@@ -27,6 +28,7 @@ import { suggestFixedCostForTx } from '@/app/_lib/fixed-cost-match';
 import { resolveJarSubtitle } from '@/app/_lib/jar-copy';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { jarChrome } from '@/app/_lib/jar-meta';
+import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { listFixedCostsForPeriodView } from '@/app/_lib/period-plan-list';
 import { isLiveData } from '@/app/_lib/preview';
@@ -363,6 +365,28 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                 hint={tTx('hint_suggested_bill')}
                 href={fixedDetailHref(suggestedBill.id)}
                 openLinkLabel={tTx('open_link')}
+            />
+        );
+    }
+    if (!linkedBill && !tx.debtId && tx.amount < 0) {
+        const dueDay = Number(tx.bookedOn.slice(8, 10));
+        related.push(
+            <RelatedRow
+                key="make-fixed"
+                label={tTx('fixed_cost')}
+                value={tTx('make_fixed_cost')}
+                hint={tTx('hint_make_fixed_cost')}
+                href={createFixedHref({
+                    jarId: tx.jarId ?? undefined,
+                    name: tx.description,
+                    counterparty: tx.counterparty?.trim() || undefined,
+                    merchantKey: tx.appliedMerchantKey ?? undefined,
+                    amount: minorUnitsToAmountInput(Math.abs(tx.amount)),
+                    categoryId: tx.categoryId ?? undefined,
+                    dueDay: Number.isFinite(dueDay) ? dueDay : undefined,
+                    transactionId: tx.id,
+                })}
+                openLinkLabel={tTx('open_make_fixed')}
             />
         );
     }

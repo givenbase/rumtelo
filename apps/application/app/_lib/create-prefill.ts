@@ -18,12 +18,29 @@ export function fixedCostPrefillFromParams(params: ParamSource) {
     const name = params.get('name')?.trim();
     const orgKey = params.get('orgKey')?.trim();
     const merchantKey = params.get('merchantKey')?.trim();
+    const amount = params.get('amount')?.trim();
+    const categoryId = params.get('categoryId')?.trim();
+    const dueDayRaw = params.get('dueDay')?.trim();
+    const due = dueDayRaw && Number.isFinite(Number(dueDayRaw)) ? Number(dueDayRaw) : null;
+    const dueDay = due !== null && due >= 1 && due <= 31 ? String(due) : undefined;
+    const transactionId = params.get('transactionId')?.trim();
     const payeeModeRaw = params.get('payeeMode')?.trim();
     const payeeMode =
         payeeModeRaw && (GIVE_PAYEE_MODES as readonly string[]).includes(payeeModeRaw)
             ? (payeeModeRaw as GivePayeeModePrefill)
             : undefined;
-    if (!jarId && !counterparty && !name && !payeeMode && !orgKey && !merchantKey) {
+    if (
+        !jarId &&
+        !counterparty &&
+        !name &&
+        !payeeMode &&
+        !orgKey &&
+        !merchantKey &&
+        !amount &&
+        !categoryId &&
+        !dueDay &&
+        !transactionId
+    ) {
         return undefined;
     }
     return {
@@ -33,6 +50,10 @@ export function fixedCostPrefillFromParams(params: ParamSource) {
         ...(payeeMode ? { payeeMode } : {}),
         ...(orgKey ? { orgKey } : {}),
         ...(merchantKey ? { merchantKey } : {}),
+        ...(amount ? { amount } : {}),
+        ...(categoryId ? { categoryId } : {}),
+        ...(dueDay ? { dueDay } : {}),
+        ...(transactionId ? { transactionId } : {}),
     };
 }
 

@@ -63,6 +63,14 @@ export function createFixedHref(opts?: {
     orgKey?: string;
     /** MerchantPreset key (typed or Coach chip). */
     merchantKey?: string;
+    /** Form amount string (major units, e.g. "49,95"). */
+    amount?: string;
+    /** Household category id to copy from a ledger row. */
+    categoryId?: string;
+    /** Day of month 1–31 (e.g. from bookedOn). */
+    dueDay?: number | string;
+    /** After create, link this transaction as settlement for the new bill. */
+    transactionId?: string;
 }) {
     const params = new URLSearchParams();
     if (opts?.jarId) params.set('jarId', opts.jarId);
@@ -74,6 +82,12 @@ export function createFixedHref(opts?: {
     }
     if (opts?.name) params.set('name', opts.name);
     if (opts?.payeeMode) params.set('payeeMode', opts.payeeMode);
+    if (opts?.amount?.trim()) params.set('amount', opts.amount.trim());
+    if (opts?.categoryId) params.set('categoryId', opts.categoryId);
+    if (opts?.dueDay !== undefined && opts.dueDay !== null && String(opts.dueDay).trim()) {
+        params.set('dueDay', String(opts.dueDay).trim());
+    }
+    if (opts?.transactionId) params.set('transactionId', opts.transactionId);
     const qs = params.toString();
     return qs ? `${CREATE_HREF.fixed}?${qs}` : CREATE_HREF.fixed;
 }

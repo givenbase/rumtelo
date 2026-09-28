@@ -1,8 +1,9 @@
 /**
- * Email chrome brand — header wordmark + footer icon.
+ * Email chrome brand — header wordmark (light + dark) + footer icon.
  *
  * Resend delivery uses CID attachments (`logoMode: 'cid'`).
  * `/email-preview` uses data URIs (browsers cannot resolve `cid:`).
+ * Wordmark swaps on-light / on-dark via `prefers-color-scheme` (same pair as the app).
  */
 export const EMAIL_BRAND = {
     name: 'Rumtelo',
