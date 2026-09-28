@@ -11,6 +11,7 @@ import { accountContract } from './account/account.contract';
 import { billingContract } from './billing/billing.contract';
 import { coachContract } from './coach/coach.contract';
 import { contactContract } from './contact/contact.contract';
+import { deviceContract } from './device/device.contract';
 import { householdContract } from './household/household.contract';
 import { practiceContract } from './practice/practice.contract';
 
@@ -25,6 +26,8 @@ export const contract = {
     billing: billingContract,
     coach: coachContract,
     contact: contactContract,
+    /** Household device registry (wearables, hubs, scales). */
+    device: deviceContract,
     /** B2B Practice control plane. */
     practice: practiceContract,
 };

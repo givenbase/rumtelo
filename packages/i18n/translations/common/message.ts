@@ -39,6 +39,8 @@ const message = {
                 'This month is closed — you cannot add or change anything for that period.',
             month_close_incomplete:
                 'Finish open work before closing this month ({inbox} unsorted in inbox, {bills} bills unpaid or unskipped).',
+            month_close_prior_open:
+                'Close {period} first — months must be finished in order so the log stays honest.',
             bill_link_outflow: 'Link an outflow to settle an outgoing bill.',
             bill_link_inflow: 'Link an inflow to settle a recurring credit.',
             iban_already_linked: 'This IBAN is already linked to an account.',
@@ -94,6 +96,8 @@ const message = {
             auth_not_ready: 'Auth is not ready',
             time_entry_not_found: 'Time entry not found',
             account_settings_not_found: 'Account settings not found',
+            device_not_found: 'Device not found',
+            device_kind_invalid: 'That device kind is not in the catalog',
             invalid_email_or_password: 'Invalid email or password',
             user_not_found: 'User not found',
             email_not_verified: 'Email not verified',

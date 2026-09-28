@@ -127,3 +127,23 @@ export enum PracticeSubscriptionStatus {
     CANCELED = 'CANCELED',
     INCOMPLETE = 'INCOMPLETE',
 }
+
+/** How a household device talks to Rumtelo (or will, after ingest). */
+export enum DeviceConnection {
+    BLUETOOTH = 'BLUETOOTH',
+    WIFI = 'WIFI',
+    CLOUD = 'CLOUD',
+}
+
+/**
+ * What a device can sense or act on — product screens deep-link by capability.
+ * Aligns with EnergyMetric where overlap exists (SLEEP / TRAIN→TRAINING / MIND).
+ */
+export enum DeviceCapability {
+    SLEEP = 'SLEEP',
+    STEPS = 'STEPS',
+    TRAINING = 'TRAINING',
+    HEART_RATE = 'HEART_RATE',
+    ALARM = 'ALARM',
+    MIND = 'MIND',
+}

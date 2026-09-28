@@ -20,6 +20,10 @@ import {
     Input,
     Phone,
     Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
     Textarea,
     bindFormSubmit,
     createFormInvalidHandler,
@@ -31,6 +35,10 @@ import { useApiErrorFallbacks, useApiErrorMessage } from '@/app/_lib/api-error-m
 import { api } from '@/lib/api';
 
 const TOPICS = ['support', 'press', 'privacy', 'other'] as const satisfies readonly ContactTopic[];
+
+const MENU_CONTENT = 'rounded-lg border-line bg-surface text-fg shadow-md';
+const MENU_ITEM =
+    'rounded-md focus:bg-accent/10 focus:text-fg data-[highlighted]:bg-accent/10 data-[highlighted]:text-fg';
 
 /** Localized contact form → `api.contact.submit` (Resend). */
 export function ContactForm() {
@@ -228,15 +236,23 @@ export function ContactForm() {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>{t('pages.support.contact.form.topic')}</FormLabel>
-                            <FormControl>
-                                <Select {...field} disabled={busy}>
+                            <Select
+                                value={field.value}
+                                onValueChange={field.onChange}
+                                disabled={busy}>
+                                <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent position="popper" className={MENU_CONTENT}>
                                     {TOPICS.map(topic => (
-                                        <option key={topic} value={topic}>
+                                        <SelectItem key={topic} value={topic} className={MENU_ITEM}>
                                             {t(`pages.support.contact.form.topics.${topic}`)}
-                                        </option>
+                                        </SelectItem>
                                     ))}
-                                </Select>
-                            </FormControl>
+                                </SelectContent>
+                            </Select>
                             <FormMessage />
                         </FormItem>
                     )}

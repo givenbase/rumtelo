@@ -14,6 +14,7 @@ export const API_ERROR_MESSAGES = [
     'income_kind_cadence_locked',
     'period_closed',
     'month_close_incomplete',
+    'month_close_prior_open',
     'bill_link_outflow',
     'bill_link_inflow',
     'iban_already_linked',
@@ -62,6 +63,8 @@ export const API_ERROR_MESSAGES = [
     'auth_not_ready',
     'time_entry_not_found',
     'account_settings_not_found',
+    'device_not_found',
+    'device_kind_invalid',
     // Better Auth / rate limit — prefer mapping by `code`, English is fallback only
     'invalid_email_or_password',
     'user_not_found',

@@ -36,6 +36,7 @@ const meta = {
     sign_in: 'Sign in',
     settings_account: 'Account — Settings',
     settings_household: 'Household — Settings',
+    settings_devices: 'Devices — Settings',
     settings_preferences: 'Preferences — Settings',
     settings_security: 'Security — Settings',
     settings_practice: 'Practice coaches — Settings',

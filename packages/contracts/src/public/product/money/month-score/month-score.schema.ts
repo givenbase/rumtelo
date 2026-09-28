@@ -38,6 +38,10 @@ export const MonthScore = z.object({
     period: PeriodKey,
     score: z.int(),
     maxScore: z.int(),
+    /**
+     * Signed days to the period’s last calendar day (UTC).
+     * Positive = still open · 0 = last day · negative = overdue to close.
+     */
     daysLeft: z.int(),
     isClosed: z.boolean(),
     /** Level index (1–5). Display label comes from client i18n. */
@@ -48,6 +52,11 @@ export const MonthScore = z.object({
      * When open: inbox + due bills that must be cleared before close.
      */
     closeBlockers: MonthCloseBlockers.nullable(),
+    /**
+     * Nearest earlier period that still needs closing before this one can lock.
+     * Null when the close chain is clear. Current-month writes stay allowed.
+     */
+    priorOpenPeriod: PeriodKey.nullable(),
 });
 
 /** Stable unlock keys — client maps to `pages.dashboard.levels.unlocks.*`. */

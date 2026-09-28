@@ -4,6 +4,12 @@ const dashboard = {
         label: 'Score',
         days_left_one: '1 day left',
         days_left_other: '{count} days left',
+        /** Last calendar day of an open period. */
+        last_day: 'Last day to close',
+        /** Past period end and still open. */
+        overdue: 'Overdue',
+        overdue_days_one: '1 day overdue',
+        overdue_days_other: '{count} days overdue',
         /** Persistent badge when this period’s score is locked. */
         closed_badge: 'Closed',
         closed_hint:
@@ -11,6 +17,12 @@ const dashboard = {
         /** Why close matters — shown while the period is still open. */
         close_explain:
             'Closing locks this score and freezes the month. Clear the inbox and bills first so the log stays honest.',
+        close_explain_soon:
+            'The month ends soon — clear the inbox and bills so you can close successfully.',
+        close_explain_today:
+            'Today is the last day. Finish open work and close so next month starts clean.',
+        close_explain_overdue:
+            'This month is overdue to close. Finish open work and close it — we recommend closing every month successfully.',
         /** Compact period-travel note (lives here instead of a Coach slide). */
         travel_past_one: '{stamp} · about {money} through jars over {horizon} month',
         travel_past_other: '{stamp} · about {money} through jars over {horizon} months',
@@ -29,6 +41,11 @@ const dashboard = {
     close_blocked_bills_other: '{count} bills still unpaid or unskipped{names}',
     close_blocked_bill_names: ' ({list})',
     close_blocked_open_bills: 'Open bills ▸',
+    /** Soft sequential-close: finish an earlier month before locking this one. */
+    prior_open_title: 'Finish the earlier month first',
+    prior_open_body:
+        '{period} is still open. Close months in order so the score and log stay consistent.',
+    prior_open_cta: 'Go to {period} ▸',
     closing: 'Closing…',
     month_closed: 'Month closed',
     /** Toast after close — recap is the surplus/overspent line. */

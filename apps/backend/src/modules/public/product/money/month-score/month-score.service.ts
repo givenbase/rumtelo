@@ -7,11 +7,12 @@ import { apiBadRequest } from '../../../../../common/errors/api-user-error';
 import { HouseholdScopedRepository } from '../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../common/household/household.context';
 import { sum } from '../../../../../common/utils/money.util';
-import { daysInPeriod } from '../../../../../common/utils/period.util';
+import { daysUntilPeriodEnd } from '../../../../../common/utils/period.util';
 import { JarService } from '../plan/jar/jar.service';
 import { closeBlockersReady, collectCloseBlockers } from './close-blockers.util';
 import { MonthScore } from './month-score.entity';
 import { MonthScoreEvent } from './month-score-event.entity';
+import { findPriorOpenPeriod } from './prior-open-period.util';
 
 /** Level thresholds are cumulative score. Display labels and unlock copy live in client i18n. */
 export const LEVELS: {
@@ -55,13 +56,14 @@ export class MonthScoreService {
         const level = levelFor(score);
         const isClosed = monthScore?.isClosed ?? false;
         const closeBlockers = isClosed ? null : await collectCloseBlockers(this.em, period);
+        const priorOpenPeriod = isClosed ? null : await findPriorOpenPeriod(this.em, period);
 
         return {
             householdId: currentHouseholdId(),
             period,
             score,
             maxScore: monthScore?.maxScore ?? 100,
-            daysLeft: Math.max(0, daysInPeriod(period) - new Date().getUTCDate()),
+            daysLeft: daysUntilPeriodEnd(period),
             isClosed,
             level: level.index,
             events: events.map(event => ({
@@ -74,6 +76,7 @@ export class MonthScoreService {
                 points: event.points,
             })),
             closeBlockers,
+            priorOpenPeriod,
         };
     }
 
@@ -95,6 +98,11 @@ export class MonthScoreService {
         let monthScore = await this.scores.findOne({ period });
         if (monthScore?.isClosed) {
             return this.buildRecap(period, monthScore);
+        }
+
+        const priorOpenPeriod = await findPriorOpenPeriod(this.em, period);
+        if (priorOpenPeriod) {
+            throw apiBadRequest('month_close_prior_open', { period: priorOpenPeriod });
         }
 
         const blockers = await collectCloseBlockers(this.em, period);
