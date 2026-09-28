@@ -123,18 +123,8 @@ export type DemoPracticeAccount = {
         };
     };
     /**
-     * Household slug for ACTIVE MANAGE after household accepted
-     * (sponsored board + snapshot — typically Plus/Max).
-     */
-    clientHouseholdSlug: string;
-    /**
-     * Household slug for ACTIVE VIEW after household accepted.
-     * Stays on its own plan (Basic) so coaches can preview locked gates.
-     */
-    viewClientHouseholdSlug: string;
-    /**
-     * Household slug for a pending INVITED contract (dual-consent not yet accepted).
-     * Lets Practice roster show “waiting” and household settings show Accept / Decline.
+     * Household slug for the only seeded pending INVITED contract
+     * (dual-consent not yet accepted — Accept / Decline on Basic home + settings).
      */
     pendingClientHouseholdSlug: string;
 };
@@ -168,12 +158,8 @@ export const DEMO_PRACTICE: DemoPracticeAccount = {
             country: 'NL',
         },
     },
-    /** Blake (Max) — ACTIVE MANAGE after household accepted (board + snapshot). */
-    clientHouseholdSlug: 'demo-max',
-    /** Rivera (Basic) — ACTIVE VIEW; plan stays Basic so locked gates are visible. */
-    viewClientHouseholdSlug: 'demo-basic',
-    /** Chen (Plus) — INVITED VIEW pending household accept. */
-    pendingClientHouseholdSlug: 'demo-plus',
+    /** Rivera (Basic) — only demo household with a pending Practice invite. */
+    pendingClientHouseholdSlug: 'demo-basic',
 };
 
 const DEMO_EMAILS = new Set([

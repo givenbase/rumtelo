@@ -1,4 +1,4 @@
-import { practiceTest, plusTest, expect } from '../../../../shared/fixtures';
+import { practiceTest, basicTest, expect } from '../../../../shared/fixtures';
 import { fetchPracticeInviteToken } from '../../../../shared/practice/outbox';
 
 practiceTest.describe('practice client invite @practice', () => {
@@ -41,28 +41,31 @@ practiceTest.describe('practice client invite @practice', () => {
     );
 });
 
-plusTest.describe('practice dual-consent @practice', () => {
-    plusTest('Plus accepts seeded Practice invite (or already active)', async ({ personaPage }) => {
-        await personaPage.goto('/settings');
-        await expect(personaPage).not.toHaveURL(/sign-in/);
+basicTest.describe('practice dual-consent @practice', () => {
+    basicTest(
+        'Basic accepts seeded Practice invite (or already active)',
+        async ({ personaPage }) => {
+            await personaPage.goto('/settings/general/practice');
+            await expect(personaPage).not.toHaveURL(/sign-in/);
 
-        const accept = personaPage.getByTestId('practice-link-accept');
-        await expect
-            .poll(async () => accept.count(), { timeout: 30_000 })
-            .toBeGreaterThanOrEqual(0);
+            const accept = personaPage.getByTestId('practice-link-accept');
+            await expect
+                .poll(async () => accept.count(), { timeout: 30_000 })
+                .toBeGreaterThanOrEqual(0);
 
-        if ((await accept.count()) > 0) {
-            await accept.first().click();
-            const toast = personaPage.getByTestId('toast');
-            await expect(toast).toBeVisible({ timeout: 30_000 });
-            await expect(toast).toContainText(/accepted/i);
+            if ((await accept.count()) > 0) {
+                await accept.first().click();
+                const toast = personaPage.getByTestId('toast');
+                await expect(toast).toBeVisible({ timeout: 30_000 });
+                await expect(toast).toContainText(/accepted/i);
+            }
+
+            // Seeded Rumtelo Coaching link is pending or already accepted after prior runs.
+            await expect(
+                personaPage.getByText(/Rumtelo Coaching|Practice coaches/i).first()
+            ).toBeVisible({
+                timeout: 15_000,
+            });
         }
-
-        // Seeded Rumtelo Coaching link is pending or already accepted after prior runs.
-        await expect(
-            personaPage.getByText(/Rumtelo Coaching|Practice coaches/i).first()
-        ).toBeVisible({
-            timeout: 15_000,
-        });
-    });
+    );
 });

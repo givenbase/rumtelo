@@ -1,7 +1,7 @@
 /**
  * Seeds the Practice demo persona (`practice@rumtelo.com`) + control-plane rows.
- * Runs after DemoHouseholdSeeder so demo households can be linked as clients:
- * Max → ACTIVE MANAGE, Basic → ACTIVE VIEW, Plus → INVITED.
+ * Runs after DemoHouseholdSeeder. Only Basic (`demo-basic`) gets a pending
+ * INVITED client link — Max/Plus stay unlinked.
  */
 import type { EntityManager } from '@mikro-orm/postgresql';
 import { Seeder } from '@mikro-orm/seeder';
@@ -245,180 +245,51 @@ export class DemoPracticeSeeder extends Seeder {
         }
 
         const clientHousehold = await em.findOne(AuthHousehold, {
-            slug: demo.clientHouseholdSlug,
+            slug: demo.pendingClientHouseholdSlug,
         });
         if (clientHousehold) {
-            practiceBilling.billableClientCount = Math.max(practiceBilling.billableClientCount, 1);
-            await this.ensureAcceptedManageLink({
+            await this.ensurePendingInviteLink({
                 em,
                 practiceId: practice.id,
                 householdId: clientHousehold.id,
                 addedByAccountId: rumteloAccount.id,
-            });
-        }
-
-        // Active VIEW — Basic household stays on Basic (no sponsor) so coaches see locks.
-        const viewClientHousehold = await em.findOne(AuthHousehold, {
-            slug: demo.viewClientHouseholdSlug,
-        });
-        if (viewClientHousehold) {
-            await this.ensureAcceptedViewLink({
-                em,
-                practiceId: practice.id,
-                householdId: viewClientHousehold.id,
-                addedByAccountId: rumteloAccount.id,
-            });
-        }
-
-        // Pending invite — dual consent not accepted yet (no snapshot / board).
-        const pendingHousehold = await em.findOne(AuthHousehold, {
-            slug: demo.pendingClientHouseholdSlug,
-        });
-        if (pendingHousehold) {
-            await this.ensurePendingInviteLink({
-                em,
-                practiceId: practice.id,
-                householdId: pendingHousehold.id,
-                addedByAccountId: rumteloAccount.id,
                 access: PracticeClientAccess.VIEW,
             });
         }
 
+        // Drop stale ACTIVE/INVITED links on other demo households from older seeds.
+        await this.revokeStaleDemoClientLinks({
+            em,
+            practiceId: practice.id,
+            keepHouseholdSlug: demo.pendingClientHouseholdSlug,
+        });
+
+        practiceBilling.billableClientCount = 0;
         await em.flush();
     }
 
-    /**
-     * Dual-consent ACTIVE MANAGE: practice offered (`createdAt`) then household
-     * accepted (`householdAcceptedAt` + `activatedAt`) → Practice may snapshot/board.
-     */
-    private async ensureAcceptedManageLink(input: {
+    /** Revoke demo practice↔household links that are no longer part of the seed story. */
+    private async revokeStaleDemoClientLinks(input: {
         em: EntityManager;
         practiceId: string;
-        householdId: string;
-        addedByAccountId: string;
+        keepHouseholdSlug: string;
     }): Promise<void> {
-        const { em, practiceId, householdId, addedByAccountId } = input;
-        const offeredAt = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-        const acceptedAt = new Date(Date.now() - 6 * 24 * 60 * 60 * 1000);
-
-        let link = await em.findOne(PracticeClientLink, {
-            practice: practiceId,
-            household: householdId,
-        });
-        if (!link) {
-            link = em.create(PracticeClientLink, {
-                practice: practiceId,
-                household: householdId,
-                status: PracticeClientLinkStatus.ACTIVE,
-                access: PracticeClientAccess.MANAGE,
-                addedByAccount: addedByAccountId,
-                createdAt: offeredAt,
-                householdAcceptedAt: acceptedAt,
-                activatedAt: acceptedAt,
-                revokedAt: null,
-            } as never);
-            em.persist(link);
-            await em.flush();
-        } else {
-            link.status = PracticeClientLinkStatus.ACTIVE;
-            link.access = PracticeClientAccess.MANAGE;
-            link.addedByAccount = addedByAccountId;
-            link.revokedAt = null;
-            // Preserve existing offer time when present; always ensure accept stamps.
-            if (!link.householdAcceptedAt) {
-                link.householdAcceptedAt = link.activatedAt ?? acceptedAt;
-            }
-            link.activatedAt = link.householdAcceptedAt;
+        const { em, practiceId, keepHouseholdSlug } = input;
+        const keep = await em.findOne(AuthHousehold, { slug: keepHouseholdSlug });
+        const links = await em.find(PracticeClientLink, { practice: practiceId });
+        const now = new Date();
+        for (const link of links) {
+            if (keep && link.household === keep.id) continue;
+            if (link.status === PracticeClientLinkStatus.REVOKED) continue;
+            link.status = PracticeClientLinkStatus.REVOKED;
+            link.revokedAt = now;
+            link.activatedAt = null;
+            const sponsor = await em.findOne(PracticeClientLinkFlag, {
+                link: link.id,
+                flag: PracticeClientControlFlag.SPONSOR_PLAN,
+            });
+            if (sponsor) em.remove(sponsor);
         }
-
-        let clientBilling = await em.findOne(HouseholdBilling, { household: householdId });
-        if (!clientBilling) {
-            clientBilling = em.create(HouseholdBilling, {
-                household: householdId,
-                planKey: PlanKey.PLUS,
-            } as never);
-            em.persist(clientBilling);
-        } else if (
-            clientBilling.planKey === PlanKey.BASIC ||
-            clientBilling.planKey === PlanKey.PLUS
-        ) {
-            clientBilling.planKey = PlanKey.PLUS;
-        }
-
-        const sponsorFlag = await em.findOne(PracticeClientLinkFlag, {
-            link: link.id,
-            flag: PracticeClientControlFlag.SPONSOR_PLAN,
-        });
-        if (!sponsorFlag) {
-            em.persist(
-                em.create(PracticeClientLinkFlag, {
-                    link: link.id,
-                    flag: PracticeClientControlFlag.SPONSOR_PLAN,
-                } as never)
-            );
-        }
-    }
-
-    /**
-     * Dual-consent ACTIVE VIEW: household accepted, coach may open the board
-     * read-only. Keeps BASIC plan and never attaches SPONSOR_PLAN.
-     */
-    private async ensureAcceptedViewLink(input: {
-        em: EntityManager;
-        practiceId: string;
-        householdId: string;
-        addedByAccountId: string;
-    }): Promise<void> {
-        const { em, practiceId, householdId, addedByAccountId } = input;
-        const offeredAt = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
-        const acceptedAt = new Date(Date.now() - 4 * 24 * 60 * 60 * 1000);
-
-        let link = await em.findOne(PracticeClientLink, {
-            practice: practiceId,
-            household: householdId,
-        });
-        if (!link) {
-            link = em.create(PracticeClientLink, {
-                practice: practiceId,
-                household: householdId,
-                status: PracticeClientLinkStatus.ACTIVE,
-                access: PracticeClientAccess.VIEW,
-                addedByAccount: addedByAccountId,
-                createdAt: offeredAt,
-                householdAcceptedAt: acceptedAt,
-                activatedAt: acceptedAt,
-                revokedAt: null,
-            } as never);
-            em.persist(link);
-            await em.flush();
-        } else {
-            link.status = PracticeClientLinkStatus.ACTIVE;
-            link.access = PracticeClientAccess.VIEW;
-            link.addedByAccount = addedByAccountId;
-            link.revokedAt = null;
-            if (!link.householdAcceptedAt) {
-                link.householdAcceptedAt = link.activatedAt ?? acceptedAt;
-            }
-            link.activatedAt = link.householdAcceptedAt;
-        }
-
-        // Re-seed restores Basic — previous MANAGE demo may have upgraded this household.
-        let clientBilling = await em.findOne(HouseholdBilling, { household: householdId });
-        if (!clientBilling) {
-            clientBilling = em.create(HouseholdBilling, {
-                household: householdId,
-                planKey: PlanKey.BASIC,
-            } as never);
-            em.persist(clientBilling);
-        } else {
-            clientBilling.planKey = PlanKey.BASIC;
-        }
-
-        const sponsor = await em.findOne(PracticeClientLinkFlag, {
-            link: link.id,
-            flag: PracticeClientControlFlag.SPONSOR_PLAN,
-        });
-        if (sponsor) em.remove(sponsor);
     }
 
     /** INVITED only — household has not accepted; no sponsor, no board access. */
