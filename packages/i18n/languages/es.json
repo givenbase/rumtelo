@@ -150,6 +150,7 @@
                 "sign_in_goals": "Inicia sesión para guardar tus objetivos",
                 "week_set": "Ya tienes programada tu semana habitual",
                 "fixed_saved": "Ahorro en costes fijos",
+                "fixed_saved_and_linked": "Coste fijo ahorrado y vinculado a esta transacción",
                 "fixed_updated": "Se han actualizado los costes fijos",
                 "goal_saved": "Parada",
                 "goal_updated": "Objetivo actualizado"
@@ -2039,6 +2040,9 @@
                     "status_ignored": "No se ha tenido en cuenta (no se ha incluido en los cálculos presupuestarios)",
                     "hint_linked_settlement": "Liquidación vinculada para este periodo",
                     "hint_suggested_bill": "Factura periódica sugerida — enlace al ordenar",
+                    "make_fixed_cost": "Añadir como coste fijo",
+                    "hint_make_fixed_cost": "Cópialo en una factura periódica y marca este mes como pagado",
+                    "open_make_fixed": "Añadir ›",
                     "hint_applied_debt": "Aplicado al saldo de la deuda",
                     "hint_manage_rules": "Gestionar las reglas en la página «Transacciones»",
                     "hint_catalog_sorted": "No se ha encontrado ninguna regla doméstica que coincida: el catálogo comercial lo clasificó así",

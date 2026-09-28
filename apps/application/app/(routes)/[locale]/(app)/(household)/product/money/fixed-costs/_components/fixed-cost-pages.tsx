@@ -14,6 +14,8 @@ export type FixedCostCreatePrefill = Partial<FixedCostFormValues> & {
     payeeMode?: GivePayeeMode;
     orgKey?: string;
     merchantKey?: string;
+    /** Link this ledger row after create (settlement for the booked month). */
+    transactionId?: string;
 };
 
 export function FixedCostCreatePage({
@@ -23,7 +25,7 @@ export function FixedCostCreatePage({
     embedded?: boolean;
     defaultValues?: FixedCostCreatePrefill;
 }) {
-    const { payeeMode, orgKey, merchantKey, ...formDefaults } = defaultValues ?? {};
+    const { payeeMode, orgKey, merchantKey, transactionId, ...formDefaults } = defaultValues ?? {};
     return (
         <FixedCostForm
             mode="create"
@@ -32,6 +34,7 @@ export function FixedCostCreatePage({
             defaultGivePayeeMode={payeeMode ?? null}
             defaultOrgKey={orgKey ?? null}
             defaultMerchantKey={merchantKey ?? null}
+            linkTransactionId={transactionId ?? null}
         />
     );
 }

@@ -135,6 +135,7 @@ const message = {
         sign_in_goals: 'Sign in to save goals',
         week_set: 'Your typical week is set',
         fixed_saved: 'Fixed cost saved',
+        fixed_saved_and_linked: 'Fixed cost saved and linked to this transaction',
         fixed_updated: 'Fixed cost updated',
         goal_saved: 'Goal saved',
         goal_updated: 'Goal updated',

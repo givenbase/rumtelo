@@ -78,6 +78,8 @@ type FixedCostFormProps = {
     defaultOrgKey?: string | null;
     /** Merchant catalog key from URL — resolved to counterparty name once merchants load. */
     defaultMerchantKey?: string | null;
+    /** After create, link this transaction as the period settlement. */
+    linkTransactionId?: string | null;
     embedded?: boolean;
     mode?: 'create' | 'edit';
     entityId?: string;
@@ -93,6 +95,7 @@ export function FixedCostForm({
     defaultGivePayeeMode = null,
     defaultOrgKey = null,
     defaultMerchantKey = null,
+    linkTransactionId = null,
     embedded = true,
     mode = 'create',
     entityId,
@@ -539,7 +542,7 @@ export function FixedCostForm({
                 note: null,
             });
         },
-        onSuccess: async () => {
+        onSuccess: async result => {
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.byJar.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
@@ -547,10 +550,36 @@ export function FixedCostForm({
                 const preset = fixedCostPresets.find(row => row.key === selectedBillPresetKey);
                 await mergeImplied(audienceKeysFromFixedCostPreset(preset?.audienceKeys));
             }
+
+            let linked = false;
+            if (mode === 'create' && linkTransactionId && householdId && result?.id) {
+                try {
+                    await api.money.transactions.update({
+                        householdId,
+                        id: linkTransactionId,
+                        fixedCostId: result.id,
+                    });
+                    void queryClient.invalidateQueries({
+                        queryKey: apiQuery.money.transactions.list.key(),
+                    });
+                    void queryClient.invalidateQueries({
+                        queryKey: apiQuery.money.transactions.inbox.key(),
+                    });
+                    void queryClient.invalidateQueries({
+                        queryKey: apiQuery.money.fixedCosts.listSettlements.key(),
+                    });
+                    linked = true;
+                } catch (error: unknown) {
+                    showToast(apiError(error), 'error');
+                }
+            }
+
             showToast(
                 mode === 'edit'
                     ? t('common.message.entity.fixed_updated')
-                    : t('common.message.entity.fixed_saved'),
+                    : linked
+                      ? t('common.message.entity.fixed_saved_and_linked')
+                      : t('common.message.entity.fixed_saved'),
                 'success'
             );
             dismiss();

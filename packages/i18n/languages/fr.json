@@ -150,6 +150,7 @@
                 "sign_in_goals": "Connectez-vous pour enregistrer vos objectifs",
                 "week_set": "Votre semaine type est définie",
                 "fixed_saved": "Économie sur les coûts fixes",
+                "fixed_saved_and_linked": "Économie de coûts fixes liée à cette transaction",
                 "fixed_updated": "Mise à jour des coûts fixes",
                 "goal_saved": "But arrêté",
                 "goal_updated": "Objectif mis à jour"
@@ -2039,6 +2040,9 @@
                     "status_ignored": "Non pris en compte (ne figure pas dans les calculs budgétaires)",
                     "hint_linked_settlement": "Règlement lié pour cette période",
                     "hint_suggested_bill": "Facture récurrente suggérée — lien lors du tri",
+                    "make_fixed_cost": "Ajouter en tant que coût fixe",
+                    "hint_make_fixed_cost": "Copier dans une facture récurrente et marquer ce mois comme payé",
+                    "open_make_fixed": "Ajouter ›",
                     "hint_applied_debt": "Appliqué au solde de la dette",
                     "hint_manage_rules": "Gérer les règles sur la page « Transactions »",
                     "hint_catalog_sorted": "Aucune règle interne ne correspondait — le catalogue du commerçant classait cet article",
