@@ -40,11 +40,9 @@ export const CoachStepVoice = z.object({
 export type CoachStepVoice = z.infer<typeof CoachStepVoice>;
 
 /** Derive voice flags from the step’s input kind (single source for producers + UI). */
-export function coachStepVoice(input: CoachStepInput): CoachStepVoice {
-    if (input === 'link_only') {
-        return { speak: true, listen: false };
-    }
-    return { speak: true, listen: true };
+export function coachStepVoice(_input: CoachStepInput): CoachStepVoice {
+    // Voice chrome parked — TTS/STT stay off until the Coach voice UX ships.
+    return { speak: false, listen: false };
 }
 
 /**

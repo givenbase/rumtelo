@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import EmailLayout from '../../../components/EmailLayout';
 import { createEmailStyles, emailBrand } from '../../../styles';
+import type { EmailLogoMode } from '../../../utils/email-brand-images.util';
 
 export interface ContactFormTemplateProps {
     darkMode?: boolean;
@@ -14,6 +15,7 @@ export interface ContactFormTemplateProps {
     phone?: string;
     topic: string;
     websiteUrl?: string;
+    logoMode?: EmailLogoMode;
 }
 
 /** Ops notification — new marketing-site contact form submission. */
@@ -25,6 +27,7 @@ export const ContactFormTemplate: React.FC<ContactFormTemplateProps> = ({
     message,
     darkMode = false,
     websiteUrl,
+    logoMode,
 }) => {
     const styles = createEmailStyles(darkMode);
 
@@ -32,6 +35,7 @@ export const ContactFormTemplate: React.FC<ContactFormTemplateProps> = ({
         <EmailLayout
             darkMode={darkMode}
             websiteUrl={websiteUrl}
+            logoMode={logoMode}
             previewText={`Contact form — ${name} (${topic})`}
             title="Contact form">
             <Heading style={styles.heading}>New contact form submission</Heading>

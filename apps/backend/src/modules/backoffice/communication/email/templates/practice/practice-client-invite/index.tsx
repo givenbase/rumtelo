@@ -5,6 +5,7 @@ import * as React from 'react';
 import Button from '../../../components/Button';
 import EmailLayout from '../../../components/EmailLayout';
 import { createEmailStyles } from '../../../styles';
+import type { EmailLogoMode } from '../../../utils/email-brand-images.util';
 import { createEmailTranslator } from '../../../utils/email-translation.util';
 
 import { languageObject } from './translations';
@@ -19,6 +20,7 @@ export interface PracticeClientInviteTemplateProps {
     variant?: 'new_or_continue' | 'existing_household';
     locale?: string;
     websiteUrl?: string;
+    logoMode?: EmailLogoMode;
 }
 
 /**
@@ -33,6 +35,7 @@ export const PracticeClientInviteTemplate: React.FC<PracticeClientInviteTemplate
     darkMode = false,
     locale = 'en',
     websiteUrl,
+    logoMode,
 }) => {
     const translate = createEmailTranslator(languageObject, locale);
     const styles = createEmailStyles(darkMode);
@@ -48,6 +51,7 @@ export const PracticeClientInviteTemplate: React.FC<PracticeClientInviteTemplate
         <EmailLayout
             darkMode={darkMode}
             websiteUrl={websiteUrl}
+            logoMode={logoMode}
             previewText={translate('email.practice.client_invite.header.preview_text')}
             title={translate('email.practice.client_invite.header.title')}>
             <Heading style={styles.heading}>

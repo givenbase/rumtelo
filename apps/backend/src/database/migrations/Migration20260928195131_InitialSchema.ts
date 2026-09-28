@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260928101704_InitialSchema extends Migration {
+export class Migration20260928195131_InitialSchema extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create schema if not exists "backoffice";`);
@@ -15,6 +15,7 @@ export class Migration20260928101704_InitialSchema extends Migration {
     this.addSql(`create type "money_debt_kind" as enum ('CREDIT_CARD', 'LOAN', 'STUDENT', 'MORTGAGE', 'FAMILY', 'OTHER');`);
     this.addSql(`create type "money_debt_schedule_kind" as enum ('OPEN', 'TERM', 'DEADLINE');`);
     this.addSql(`create type "money_cadence" as enum ('WEEKLY', 'MONTHLY', 'QUARTERLY', 'YEARLY', 'ONCE');`);
+    this.addSql(`create type "platform_device_connection" as enum ('BLUETOOTH', 'WIFI', 'CLOUD');`);
     this.addSql(`create type "platform_household_kind" as enum ('FAMILY', 'PARTNERS', 'FRIENDS', 'SOLO');`);
     this.addSql(`create type "platform_currency" as enum ('EUR', 'USD', 'GBP');`);
     this.addSql(`create type "money_income_kind" as enum ('SALARY', 'FREELANCE', 'BENEFIT', 'RENTAL', 'DIVIDEND', 'OTHER');`);
@@ -105,6 +106,14 @@ export class Migration20260928101704_InitialSchema extends Migration {
 
     this.addSql(`create table "backoffice"."reference_money_debt_preset" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "key" varchar(64) not null, "name" varchar(120) not null, "sort_order" int not null default 0, "is_active" boolean not null default true, "icon" varchar(8) null, "kind" "public"."money_debt_kind" not null, constraint "reference_money_debt_preset_pkey" primary key ("id"));`);
     this.addSql(`alter table "backoffice"."reference_money_debt_preset" add constraint "reference_money_debt_preset_key_unique" unique ("key");`);
+
+    this.addSql(`create table "platform_device" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "name" varchar(60) not null, "kind_key" varchar(64) not null, "vendor" varchar(60) null, "model" varchar(60) null, "external_id" varchar(120) null, "capabilities" jsonb not null, "paired_at" timestamptz not null, "last_seen_at" timestamptz null, "connection" "public"."platform_device_connection" not null, "account_id" uuid null, constraint "platform_device_pkey" primary key ("id"));`);
+    this.addSql(`create index "platform_device_household_id_index" on "platform_device" ("household_id");`);
+    this.addSql(`create index "platform_device_household_id_account_id_index" on "platform_device" ("household_id", "account_id");`);
+    this.addSql(`alter table "platform_device" add constraint "platform_device_household_id_external_id_unique" unique ("household_id", "external_id");`);
+
+    this.addSql(`create table "backoffice"."reference_platform_device_kind" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "key" varchar(64) not null, "name" varchar(120) not null, "sort_order" int not null default 0, "is_active" boolean not null default true, "icon" varchar(40) not null, "default_capabilities" jsonb not null, "default_connection" "public"."platform_device_connection" not null, constraint "reference_platform_device_kind_pkey" primary key ("id"));`);
+    this.addSql(`alter table "backoffice"."reference_platform_device_kind" add constraint "reference_platform_device_kind_key_unique" unique ("key");`);
 
     this.addSql(`create table "backoffice"."reference_money_giving_organization" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "key" varchar(64) not null, "name" varchar(120) not null, "sort_order" int not null default 0, "is_active" boolean not null default true, "description" text not null, "country" varchar(2) null, "scope" varchar(64) null, "reporting" text null, "causes" jsonb not null default '[]', "signals" jsonb not null default '[]', "website" text not null, constraint "reference_money_giving_organization_pkey" primary key ("id"));`);
     this.addSql(`alter table "backoffice"."reference_money_giving_organization" add constraint "reference_money_giving_organization_key_unique" unique ("key");`);
@@ -354,6 +363,9 @@ export class Migration20260928101704_InitialSchema extends Migration {
     this.addSql(`alter table "platform_coach_message" add constraint "platform_coach_message_account_id_foreign" foreign key ("account_id") references "auth"."account" ("id") on update cascade on delete cascade;`);
 
     this.addSql(`alter table "money_debt" add constraint "money_debt_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
+
+    this.addSql(`alter table "platform_device" add constraint "platform_device_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
+    this.addSql(`alter table "platform_device" add constraint "platform_device_account_id_foreign" foreign key ("account_id") references "auth"."account" ("id") on update cascade on delete set null;`);
 
     this.addSql(`alter table "growth_week_check" add constraint "growth_week_check_household_id_foreign" foreign key ("household_id") references "auth"."household" ("id") on update cascade on delete cascade;`);
 

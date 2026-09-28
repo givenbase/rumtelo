@@ -11,6 +11,7 @@ import type {
     SendEmailInput,
 } from './email.types';
 import { EMAIL_BRAND } from './utils/brand.constants';
+import { emailBrandCidAttachments } from './utils/email-brand-images.util';
 import { pushMemoryEmail } from './utils/memory-outbox';
 import { EmailTemplate, renderTemplate } from './utils/template-adapter';
 
@@ -27,8 +28,8 @@ import { loadEnv } from '../../../../common/config/env.config';
  *   resend  — Resend API when EMAIL_PROVIDER=resend + RESEND_API_KEY
  * EMAIL_LOG_ONLY=true forces memory behavior even when provider is resend.
  *
- * Brand logos are data-URI inlined in the HTML (sharp 3× PNGs) so
- * `/email-preview` and real clients render without remote fetches or CID.
+ * Logos: Resend uses CID attachments (Gmail strips data-URIs). `/email-preview`
+ * and the memory provider keep data-URIs so HTML is viewable in a browser.
  */
 @Injectable()
 export class EmailService {
@@ -74,6 +75,8 @@ export class EmailService {
             return true;
         }
 
+        const attachments = input.attachments ?? emailBrandCidAttachments();
+
         const { error } = await this.resend.emails.send({
             from,
             to,
@@ -81,6 +84,12 @@ export class EmailService {
             html: input.html,
             text: input.text,
             replyTo: input.replyTo,
+            attachments: attachments.map(a => ({
+                filename: a.filename,
+                content: a.content,
+                contentId: a.contentId,
+                contentType: a.contentType,
+            })),
         });
 
         if (error) {
@@ -90,6 +99,11 @@ export class EmailService {
 
         this.logger.log(`Sent email to ${to.join(', ')} — ${input.subject}`);
         return true;
+    }
+
+    /** True when this send will hit Resend (not memory / log-only). */
+    private get usesResend(): boolean {
+        return this.provider === 'resend' && Boolean(this.resend);
     }
 
     /** Render React Email template + send. */
@@ -105,10 +119,17 @@ export class EmailService {
             {
                 ...data,
                 websiteUrl: this.webOrigin,
+                // Gmail strips data: URIs — CID + attachments for real delivery.
+                logoMode: this.usesResend ? 'cid' : 'data-uri',
             },
             locale
         );
-        return this.send({ to, subject, html });
+        return this.send({
+            to,
+            subject,
+            html,
+            attachments: this.usesResend ? emailBrandCidAttachments() : undefined,
+        });
     }
 
     /** Household invite — called after better-auth createInvitation. */
@@ -213,6 +234,7 @@ export class EmailService {
                 message: input.message,
                 phone: input.phone,
                 websiteUrl: this.webOrigin,
+                logoMode: this.usesResend ? 'cid' : 'data-uri',
             },
             locale
         );
@@ -222,6 +244,7 @@ export class EmailService {
             subject: `Contact: ${input.topic} — ${input.name}`,
             html,
             replyTo: input.email,
+            attachments: this.usesResend ? emailBrandCidAttachments() : undefined,
         });
     }
 

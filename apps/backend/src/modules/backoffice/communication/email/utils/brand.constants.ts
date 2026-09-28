@@ -1,8 +1,8 @@
 /**
  * Email chrome brand — header wordmark + footer icon.
  *
- * Logos are inlined as `data:image/png;base64,…` (see `email-brand-images.util.ts`)
- * so `/email-preview` and mail clients both render without remote URLs or CID.
+ * Resend delivery uses CID attachments (`logoMode: 'cid'`).
+ * `/email-preview` uses data URIs (browsers cannot resolve `cid:`).
  */
 export const EMAIL_BRAND = {
     name: 'Rumtelo',

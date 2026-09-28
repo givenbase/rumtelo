@@ -1,5 +1,12 @@
 export type EmailProvider = 'resend' | 'memory';
 
+export type EmailCidAttachment = {
+    filename: string;
+    content: string;
+    contentId: string;
+    contentType?: string;
+};
+
 export type SendEmailInput = {
     to: string | string[];
     subject: string;
@@ -7,6 +14,8 @@ export type SendEmailInput = {
     text?: string;
     from?: string;
     replyTo?: string;
+    /** CID logo attachments for Resend (base64 content). */
+    attachments?: EmailCidAttachment[];
 };
 
 export type HouseholdInviteEmailInput = {

@@ -5,6 +5,7 @@ import * as React from 'react';
 import Button from '../../../components/Button';
 import EmailLayout from '../../../components/EmailLayout';
 import { createEmailStyles } from '../../../styles';
+import type { EmailLogoMode } from '../../../utils/email-brand-images.util';
 import { createEmailTranslator } from '../../../utils/email-translation.util';
 
 import { languageObject } from './translations';
@@ -17,6 +18,7 @@ export interface HouseholdInviteTemplateProps {
     locale?: string;
     role?: string;
     websiteUrl?: string;
+    logoMode?: EmailLogoMode;
 }
 
 /**
@@ -30,6 +32,7 @@ export const HouseholdInviteTemplate: React.FC<HouseholdInviteTemplateProps> = (
     darkMode = false,
     locale = 'en',
     websiteUrl,
+    logoMode,
 }) => {
     const translate = createEmailTranslator(languageObject, locale);
     const styles = createEmailStyles(darkMode);
@@ -40,6 +43,7 @@ export const HouseholdInviteTemplate: React.FC<HouseholdInviteTemplateProps> = (
         <EmailLayout
             darkMode={darkMode}
             websiteUrl={websiteUrl}
+            logoMode={logoMode}
             previewText={translate('email.household.invite.header.preview_text')}
             title={translate('email.household.invite.header.title')}>
             <Heading style={styles.heading}>

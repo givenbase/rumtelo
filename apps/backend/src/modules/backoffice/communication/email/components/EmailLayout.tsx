@@ -10,6 +10,7 @@ import {
     emailShadow,
 } from '../styles/email-tokens';
 import { getTheme } from '../styles/theme-styles';
+import type { EmailLogoMode } from '../utils/email-brand-images.util';
 import EmailFooter from './EmailFooter';
 import EmailHeader from './EmailHeader';
 
@@ -22,6 +23,11 @@ interface EmailLayoutProps {
     title?: string;
     /** Marketing site origin — wires header/footer logo links + legal URLs. */
     websiteUrl?: string;
+    /**
+     * `cid` for Resend delivery (Gmail-safe with attachments).
+     * `data-uri` for `/email-preview` (default — browsers ignore cid:).
+     */
+    logoMode?: EmailLogoMode;
 }
 
 /**
@@ -35,16 +41,20 @@ const EmailLayout: React.FC<EmailLayoutProps> = ({
     previewText,
     title,
     websiteUrl,
+    logoMode = 'data-uri',
 }) => {
     const theme = getTheme(darkMode);
-    const chrome = websiteUrl
-        ? {
-              websiteUrl,
-              privacyUrl: `${websiteUrl.replace(/\/$/, '')}/legal/privacy`,
-              termsUrl: `${websiteUrl.replace(/\/$/, '')}/legal/terms`,
-              cookiesUrl: `${websiteUrl.replace(/\/$/, '')}/legal/cookies`,
-          }
-        : undefined;
+    const chrome = {
+        logoMode,
+        ...(websiteUrl
+            ? {
+                  websiteUrl,
+                  privacyUrl: `${websiteUrl.replace(/\/$/, '')}/legal/privacy`,
+                  termsUrl: `${websiteUrl.replace(/\/$/, '')}/legal/terms`,
+                  cookiesUrl: `${websiteUrl.replace(/\/$/, '')}/legal/cookies`,
+              }
+            : {}),
+    };
 
     return (
         <Html>
