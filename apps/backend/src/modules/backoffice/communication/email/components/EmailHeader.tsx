@@ -15,7 +15,7 @@ interface EmailHeaderProps {
     logoMode?: EmailLogoMode;
 }
 
-/** Header chrome — full wordmark only; tagline lives in the footer. */
+/** Header chrome — on-light / on-dark wordmark pair; tagline lives in the footer. */
 const EmailHeader: React.FC<EmailHeaderProps> = ({
     websiteUrl = EMAIL_BRAND.websiteUrl,
     darkMode = false,
@@ -26,7 +26,13 @@ const EmailHeader: React.FC<EmailHeaderProps> = ({
 
     const theme = getTheme(darkMode);
     const { width, height } = EMAIL_LOGO_SIZE.wordmark;
-    const { wordmark } = emailBrandLogoSrcs(logoMode);
+    const logos = emailBrandLogoSrcs(logoMode);
+    const imgStyle = {
+        display: 'block' as const,
+        height: `${height}px`,
+        margin: '0 auto',
+        width: `${width}px`,
+    };
 
     return (
         <Section style={{ margin: 0, padding: 0 }}>
@@ -47,18 +53,36 @@ const EmailHeader: React.FC<EmailHeaderProps> = ({
                     textAlign: 'center',
                 }}>
                 <Link href={websiteUrl} style={{ textDecoration: 'none', display: 'inline-block' }}>
-                    <Img
-                        src={wordmark}
-                        alt={EMAIL_BRAND.name}
-                        width={width}
-                        height={height}
-                        style={{
-                            display: 'block',
-                            height: `${height}px`,
-                            margin: '0 auto',
-                            width: `${width}px`,
-                        }}
-                    />
+                    {darkMode ? (
+                        <Img
+                            src={logos.wordmarkDark}
+                            alt={EMAIL_BRAND.name}
+                            width={width}
+                            height={height}
+                            style={imgStyle}
+                        />
+                    ) : (
+                        <>
+                            {/* Light default — hidden when client is in dark mode (see EMAIL_WORDMARK_THEME_CSS). */}
+                            <Img
+                                className="rumtelo-wm-light"
+                                src={logos.wordmarkLight}
+                                alt={EMAIL_BRAND.name}
+                                width={width}
+                                height={height}
+                                style={imgStyle}
+                            />
+                            {/* Dark surface wordmark — shown under prefers-color-scheme: dark. */}
+                            <Img
+                                className="rumtelo-wm-dark"
+                                src={logos.wordmarkDark}
+                                alt=""
+                                width={width}
+                                height={height}
+                                style={{ ...imgStyle, display: 'none' }}
+                            />
+                        </>
+                    )}
                 </Link>
             </Section>
         </Section>

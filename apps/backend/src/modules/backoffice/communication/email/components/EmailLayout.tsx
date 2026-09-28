@@ -11,6 +11,7 @@ import {
 } from '../styles/email-tokens';
 import { getTheme } from '../styles/theme-styles';
 import type { EmailLogoMode } from '../utils/email-brand-images.util';
+import { EMAIL_WORDMARK_THEME_CSS } from '../utils/email-brand-images.util';
 import EmailFooter from './EmailFooter';
 import EmailHeader from './EmailHeader';
 
@@ -58,7 +59,11 @@ const EmailLayout: React.FC<EmailLayoutProps> = ({
 
     return (
         <Html>
-            <Head>{title ? <title>{title}</title> : null}</Head>
+            <Head>
+                {title ? <title>{title}</title> : null}
+                {/* Swap on-light / on-dark wordmark with the client color scheme. */}
+                {!darkMode ? <style>{EMAIL_WORDMARK_THEME_CSS}</style> : null}
+            </Head>
             {previewText ? <Preview>{previewText}</Preview> : null}
             <Body
                 style={{

@@ -5,14 +5,19 @@ const require = createRequire(import.meta.url);
 
 /** Content-IDs referenced as `cid:…` in Resend HTML (must match attachment.contentId). */
 export const EMAIL_LOGO_CID = {
-    wordmark: 'rumtelo-wordmark',
+    wordmarkLight: 'rumtelo-wordmark-light',
+    wordmarkDark: 'rumtelo-wordmark-dark',
     icon: 'rumtelo-icon',
 } as const;
 
 export type EmailLogoMode = 'cid' | 'data-uri';
 
 export type EmailBrandLogoSrcs = {
-    wordmark: string;
+    /** Wordmark for light surfaces (dark ink). */
+    wordmarkLight: string;
+    /** Wordmark for dark surfaces (light ink). */
+    wordmarkDark: string;
+    /** Colorful icon mark — theme-independent. */
     icon: string;
 };
 
@@ -33,13 +38,20 @@ function toDataUri(png: Buffer): string {
     return `data:image/png;base64,${png.toString('base64')}`;
 }
 
-let dataUriCache: EmailBrandLogoSrcs | undefined;
-let pngCache: { wordmark: Buffer; icon: Buffer } | undefined;
+type BrandPngs = {
+    wordmarkLight: Buffer;
+    wordmarkDark: Buffer;
+    icon: Buffer;
+};
 
-function brandPngs() {
+let dataUriCache: EmailBrandLogoSrcs | undefined;
+let pngCache: BrandPngs | undefined;
+
+function brandPngs(): BrandPngs {
     if (!pngCache) {
         pngCache = {
-            wordmark: readBrandPng('logo/wordmark-on-light-email.png'),
+            wordmarkLight: readBrandPng('logo/wordmark-on-light-email.png'),
+            wordmarkDark: readBrandPng('logo/wordmark-on-dark-email.png'),
             icon: readBrandPng('logo/icon-email.png'),
         };
     }
@@ -51,20 +63,27 @@ export function emailBrandDataUris(): EmailBrandLogoSrcs {
     if (dataUriCache) return dataUriCache;
     const pngs = brandPngs();
     dataUriCache = {
-        wordmark: toDataUri(pngs.wordmark),
+        wordmarkLight: toDataUri(pngs.wordmarkLight),
+        wordmarkDark: toDataUri(pngs.wordmarkDark),
         icon: toDataUri(pngs.icon),
     };
     return dataUriCache;
 }
 
-/** Resend MIME inline images — pair with `<img src="cid:…">`. */
+/** Resend MIME inline images — light + dark wordmarks + icon. */
 export function emailBrandCidAttachments(): EmailCidAttachment[] {
     const pngs = brandPngs();
     return [
         {
-            filename: 'rumtelo-wordmark.png',
-            content: pngs.wordmark.toString('base64'),
-            contentId: EMAIL_LOGO_CID.wordmark,
+            filename: 'rumtelo-wordmark-light.png',
+            content: pngs.wordmarkLight.toString('base64'),
+            contentId: EMAIL_LOGO_CID.wordmarkLight,
+            contentType: 'image/png',
+        },
+        {
+            filename: 'rumtelo-wordmark-dark.png',
+            content: pngs.wordmarkDark.toString('base64'),
+            contentId: EMAIL_LOGO_CID.wordmarkDark,
             contentType: 'image/png',
         },
         {
@@ -84,9 +103,23 @@ export function emailBrandCidAttachments(): EmailCidAttachment[] {
 export function emailBrandLogoSrcs(mode: EmailLogoMode = 'data-uri'): EmailBrandLogoSrcs {
     if (mode === 'cid') {
         return {
-            wordmark: `cid:${EMAIL_LOGO_CID.wordmark}`,
+            wordmarkLight: `cid:${EMAIL_LOGO_CID.wordmarkLight}`,
+            wordmarkDark: `cid:${EMAIL_LOGO_CID.wordmarkDark}`,
             icon: `cid:${EMAIL_LOGO_CID.icon}`,
         };
     }
     return emailBrandDataUris();
 }
+
+/**
+ * Header wordmark CSS — swaps on-light / on-dark with the client color scheme
+ * (same pair as the app `RumteloLogo` light/dark swap).
+ */
+export const EMAIL_WORDMARK_THEME_CSS = `
+.rumtelo-wm-light { display: block !important; }
+.rumtelo-wm-dark { display: none !important; max-height: 0; overflow: hidden; }
+@media (prefers-color-scheme: dark) {
+  .rumtelo-wm-light { display: none !important; max-height: 0 !important; overflow: hidden !important; }
+  .rumtelo-wm-dark { display: block !important; max-height: none !important; overflow: visible !important; }
+}
+`.trim();
