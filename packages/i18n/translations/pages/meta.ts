@@ -30,7 +30,7 @@ const meta = {
     gratitude: 'Gratitude',
     giving: 'Giving',
     intent: 'Intent',
-    centres: 'Centres',
+    centers: 'Centers',
     coach: 'The Coach',
     why: 'Why',
     sign_in: 'Sign in',

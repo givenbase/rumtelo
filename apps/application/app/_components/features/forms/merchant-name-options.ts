@@ -32,7 +32,7 @@ export function merchantsToNameOptions(
         keyPrefix?: string;
         categoryTemplateKey?: string;
         /**
-         * Drop merchants that mirror GivingOrganisation — Coach owns those names
+         * Drop merchants that mirror GivingOrganization — Coach owns those names
          * in the fixed-cost / Give pickers.
          */
         excludeGivingLinked?: boolean;
@@ -45,7 +45,7 @@ export function merchantsToNameOptions(
         : [...merchants];
 
     if (opts?.excludeGivingLinked) {
-        rows = rows.filter(merchant => !merchant.givingOrganisationKey);
+        rows = rows.filter(merchant => !merchant.givingOrganizationKey);
     }
 
     return rows.map(merchant => {

@@ -219,7 +219,7 @@ household is active. Surfaces without APIs yet show empty / “binnenkort”.
 **Typed stubs / incomplete:** full onboarding create-household flow; rule replay;
 month-score close; week-check stage transitions; Stripe billing.
 
-**Not built:** i18n (copy is hardcoded); holdings / stillness / centres / detailed
+**Not built:** i18n (copy is hardcoded); holdings / stillness / centers / detailed
 energy APIs; full CRUD e2e suite.
 
 ---

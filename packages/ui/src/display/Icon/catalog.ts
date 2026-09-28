@@ -77,13 +77,14 @@ export const EMPTY_STATE_LUCIDE_ICONS = [
     'dumbbell',
 ] as const;
 
-/** Reserved custom keys — not registered yet (locale flags, partner marks). */
+/** Reserved / registered custom keys — locale flags, partner marks. */
 export const RESERVED_CUSTOM_ICONS = [
     'custom/flag-en',
     'custom/flag-nl',
     'custom/flag-es',
     'custom/flag-fr',
     'custom/masterclass',
+    'custom/spotify',
 ] as const;
 
 /**

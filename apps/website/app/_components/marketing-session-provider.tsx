@@ -109,22 +109,22 @@ export function MarketingSessionProvider({ children }: { children: ReactNode }) 
     useEffect(() => {
         if (!isAuthenticated || !householdId) return;
 
-        let cancelled = false;
+        let canceled = false;
         void (async () => {
             try {
                 const settings = await api.household.settings({ householdId });
-                if (cancelled) return;
+                if (canceled) return;
                 setPlanFetch({
                     householdId,
                     planKey: parsePlanKey(settings.planKey) ?? PlanKey.BASIC,
                 });
             } catch {
-                if (!cancelled) setPlanFetch({ householdId, planKey: null });
+                if (!canceled) setPlanFetch({ householdId, planKey: null });
             }
         })();
 
         return () => {
-            cancelled = true;
+            canceled = true;
         };
     }, [isAuthenticated, householdId]);
 

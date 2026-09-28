@@ -45,8 +45,8 @@ import {
 import { useSettingsMutation } from '../_utils/use-settings-mutation';
 import {
     BankLinkWizard,
-    type BankLinkWizardAuthoriseInput,
-    type BankLinkWizardAuthoriseResult,
+    type BankLinkWizardAuthorizeInput,
+    type BankLinkWizardAuthorizeResult,
 } from './bank-link-wizard';
 import { BankLinkedAccounts } from './bank-linked-accounts';
 import { BankManualAccounts } from './bank-manual-accounts';
@@ -428,9 +428,9 @@ export function BankSettings() {
         else createAccount.mutate(values);
     }
 
-    async function runWizardAuthorise(
-        input: BankLinkWizardAuthoriseInput
-    ): Promise<BankLinkWizardAuthoriseResult> {
+    async function runWizardAuthorize(
+        input: BankLinkWizardAuthorizeInput
+    ): Promise<BankLinkWizardAuthorizeResult> {
         if (!householdId || !input.institutionId) return 'failed';
         try {
             let bankAccountId = input.seatId;
@@ -565,7 +565,7 @@ export function BankSettings() {
                         manualAccounts={manualAccounts}
                         primaryBankId={primaryBankId}
                         formatMoney={formatMoney}
-                        onAuthorise={runWizardAuthorise}
+                        onAuthorize={runWizardAuthorize}
                     />
                 ) : null}
             </SettingsInkCard>

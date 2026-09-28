@@ -73,7 +73,7 @@ export const WATCH_FILM_SEED: readonly WatchSeedRow[] = [
         name: 'Groundhog Day',
         creator: 'Harold Ramis',
         description:
-            'The same day until the behaviour changes. A film about the loop, not a lecture on habits.',
+            'The same day until the behavior changes. A film about the loop, not a lecture on habits.',
         topic: 'MIND',
         minPlan: PlanKey.BASIC,
         spendingStyles: [],

@@ -1,6 +1,7 @@
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable } from '@nestjs/common';
 import type { LearnWatchPreset } from '@rumtelo/contracts';
+import { shuffled } from '@rumtelo/utils';
 
 import { WatchPreset } from './watch.entity';
 
@@ -9,16 +10,16 @@ export class WatchPresetService {
     constructor(@Inject(EntityManager) private readonly em: EntityManager) {}
 
     /**
-     * Active films, videos, and series, in shelf order.
-     * Plan and spending-style filtering stay with the caller.
+     * Active films, videos, series, podcasts, and courses — shuffled each fetch so the
+     * library does not read as a fixed seed order. Plan filtering stays with the caller.
      */
     async listActive(): Promise<LearnWatchPreset[]> {
         const rows = await this.em.find(
             WatchPreset,
             { isActive: true },
-            { orderBy: { sortOrder: 'ASC' } }
+            { populate: ['merchant'] }
         );
-        return rows.map(toDto);
+        return shuffled(rows).map(toDto);
     }
 }
 
@@ -37,5 +38,6 @@ function toDto(row: WatchPreset): LearnWatchPreset {
         youtubeId: row.youtubeId,
         url: row.url,
         watchUrl: row.watchUrl,
+        merchantKey: row.merchant?.key ?? null,
     };
 }

@@ -159,7 +159,7 @@
                 "PENDING": "In afwachting",
                 "COMPLETED": "Afgerond",
                 "IN_PROGRESS": "Bezig",
-                "CANCELLED": "Geannuleerd",
+                "CANCELED": "Geannuleerd",
                 "OVERDUE": "Achterstallig",
                 "DRAFT": "Concept",
                 "OK": "Oké",
@@ -609,7 +609,7 @@
                 "name": "Doel",
                 "description": "Weekdoelstelling."
             },
-            "soul-centres": {
+            "soul-centers": {
                 "name": "Centra",
                 "description": "De zeven centra en waar energie vastloopt."
             },
@@ -1197,7 +1197,7 @@
                     "cause_aria": "Aanleiding geven",
                     "cause_any": "Om welke reden dan ook",
                     "cause_open_hint": "Open toezegging — elke bijdrage uit de ‘Give’-pot telt mee.",
-                    "organisation": "Organisatie",
+                    "organization": "Organisatie",
                     "give_mode_aria": "Hoe concreet is deze toezegging?",
                     "give_mode_hint": "Ik weet wie — vul de naam in van degene aan wie je al doneert. Help me kiezen — een shortlist van coaches met onafhankelijke beoordelingen. Houd het open — noem alleen het goede doel, nog geen organisatie.",
                     "pledge_name": "Naam van de toezegging",
@@ -1410,6 +1410,8 @@
                 "jar_banner": "In je ‘Opleiding’-pot worden deze uitgaven ondergebracht. Wat je verdiencapaciteit vergroot, draagt bij aan je financiële vrijheid.",
                 "jar_cta": "Bekijk de ‘Opleiding’-pot",
                 "browse_library": "Door de bibliotheek bladeren",
+                "show_more": "Meer tonen",
+                "show_more_remaining": "Meer tonen · nog {remaining}",
                 "tab_focus": "Focus",
                 "tab_done": "Klaar",
                 "search_placeholder": "Zoek op titel, auteur of onderwerp",
@@ -1495,6 +1497,8 @@
                     "partner": {
                         "UDEMY": "Udemy",
                         "MASTERCLASS": "MasterClass",
+                        "SPOTIFY": "Spotify",
+                        "NETFLIX": "Netflix",
                         "recommend": "Aanbevelen"
                     },
                     "store": {
@@ -1508,12 +1512,12 @@
                         "watch": "Bekijk",
                         "trailer": "Trailer",
                         "where_to_watch": "Waar te bekijken",
-                        "watch_on_youtube": "Bekijk op YouTube",
                         "listen": "Luister",
                         "where_to_listen": "Waar te beluisteren",
-                        "listen_on_spotify": "Luister op Spotify",
-                        "view_on_udemy": "Bekijk op Udemy",
-                        "view_on_masterclass": "Bekijk op MasterClass"
+                        "watch_on": "Bekijk op {name}",
+                        "listen_on": "Luister op {name}",
+                        "view_on": "Bekijk op {name}",
+                        "view_course": "Bekijk cursus"
                     }
                 }
             },
@@ -2556,7 +2560,7 @@
                         "set": "Instellen",
                         "note_empty": "voor deze week"
                     },
-                    "centres": {
+                    "centers": {
                         "name": "Centra",
                         "note": "de centra die vandaag zijn bekendgemaakt"
                     }
@@ -2621,7 +2625,7 @@
                 "tip": "Een goed voornemen is klein, concreet en gaat over gedrag — niet over een resultaat. „Ik controleer elke zondag mijn potjes” werkt beter dan „Ik ben financieel bewuster.”",
                 "stillness_link": "Ga naar stilte →"
             },
-            "centres": {
+            "centers": {
                 "eyebrow": "De centra",
                 "title": "Waar voelt het alsof het vastzit?",
                 "lead": "Geen esoterische score — een routekaart om aan te geven waar het deze week vastloopt, zodat je intentie ergens terecht kan komen.",
@@ -4112,7 +4116,7 @@
             "gratitude": "Dankbaarheid",
             "giving": "Geven",
             "intent": "Doel",
-            "centres": "Centra",
+            "centers": "Centra",
             "coach": "De coach",
             "why": "Waarom",
             "sign_in": "Inloggen",
@@ -4180,7 +4184,7 @@
                 "gratitude": "Dankbaarheid",
                 "giving": "Geven",
                 "intent": "Intentie",
-                "centres": "Centra"
+                "centers": "Centra"
             }
         },
         "onboarding": {
@@ -4800,7 +4804,7 @@
                     "connect_bank": "Een bank koppelen",
                     "wizard_step_institution": "1 · Kies een bank",
                     "wizard_step_seat": "2 · Kies een account",
-                    "wizard_step_authorise": "3 · Toestaan",
+                    "wizard_step_authorize": "3 · Toestaan",
                     "wizard_institution_hint": "Tip voor de Sandbox: kies voor Mock ASPSP of Rabobank.",
                     "wizard_institution_sandbox_hint": "Sandbox: kies ‘Mock ASPSP’ (of ‘Rabobank’) om te testen zonder in te loggen bij een echte bank.",
                     "wizard_sandbox_badge": "Vraaggedeelte",
@@ -4812,15 +4816,15 @@
                     "wizard_pick_seat": "Welk account moeten we koppelen?",
                     "wizard_pick_seat_bank": "Welk {bank}-account moeten we koppelen?",
                     "wizard_no_matching_seats": "Er zijn nog geen {bank}-accounts. Maak hieronder een account aan — deze wordt dan aan die bank gekoppeld.",
-                    "wizard_authorise": "Ga verder naar de bank",
-                    "wizard_authorise_hint": "Je verlaat Rumtelo even om bij de bank de toegang met alleen-lezen-rechten goed te keuren, en keert daarna hier weer terug.",
-                    "wizard_authorise_what_1": "Alleen-lezen: uitsluitend saldi en transacties.",
-                    "wizard_authorise_what_2": "Je kunt deze koppeling op elk moment in de instellingen ongedaan maken.",
-                    "wizard_authorise_what_3": "Na goedkeuring voeren we één keer een synchronisatie uit, waarna we je weer hierheen sturen.",
-                    "wizard_authorise_bank": "Bank moet toestemming verlenen",
-                    "wizard_authorise_seat": "Te koppelen account",
-                    "wizard_authorise_seat_new": "Nieuw account · {bank}",
-                    "wizard_authorise_mismatch": "De bank die u autoriseert ({aspsp}) kan afwijken van de bank van het Rumtelo-label ({catalog}). Voor testdoeleinden is dat geen probleem; in het dagelijks gebruik komen ze meestal overeen.",
+                    "wizard_authorize": "Ga verder naar de bank",
+                    "wizard_authorize_hint": "Je verlaat Rumtelo even om bij de bank de toegang met alleen-lezen-rechten goed te keuren, en keert daarna hier weer terug.",
+                    "wizard_authorize_what_1": "Alleen-lezen: uitsluitend saldi en transacties.",
+                    "wizard_authorize_what_2": "Je kunt deze koppeling op elk moment in de instellingen ongedaan maken.",
+                    "wizard_authorize_what_3": "Na goedkeuring voeren we één keer een synchronisatie uit, waarna we je weer hierheen sturen.",
+                    "wizard_authorize_bank": "Bank moet toestemming verlenen",
+                    "wizard_authorize_seat": "Te koppelen account",
+                    "wizard_authorize_seat_new": "Nieuw account · {bank}",
+                    "wizard_authorize_mismatch": "De bank die u autoriseert ({aspsp}) kan afwijken van de bank van het Rumtelo-label ({catalog}). Voor testdoeleinden is dat geen probleem; in het dagelijks gebruik komen ze meestal overeen.",
                     "wizard_cancel": "Annuleren",
                     "group_accounts": "{count} accounts",
                     "not_connected": "Geen verbinding",
@@ -5463,7 +5467,7 @@
                 "soul_gratitude": "Iemand die ziet wat hij al heeft, koopt minder om een leemte op te vullen.",
                 "soul_giving": "Een vast aandeel dat verdwijnt voordat je het in bezit kunt nemen, zorgt ervoor dat geld een hulpmiddel blijft en geen meester.",
                 "soul_intent": "Een voornemen is een opdracht aan jezelf. Een voornemen is een wens.",
-                "soul_centres": "Geef aan waar het vastloopt, en dan wordt de volgende stap meestal vanzelf duidelijk.",
+                "soul_centers": "Geef aan waar het vastloopt, en dan wordt de volgende stap meestal vanzelf duidelijk.",
                 "growth_income": "Er is een ondergrens aan kostenbesparingen. Dat geldt niet voor het verhogen van de inkomsten.",
                 "growth_learn": "Een boek waarvoor je geen nut kunt bedenken, was een uitgave voor vermaak, geen uitgave voor onderwijs.",
                 "growth_learn_library": "Wij geven advies over wat je kunt aanschaffen en wie je kunt steunen. Wij hosten het werk zelf nooit.",

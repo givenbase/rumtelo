@@ -6,6 +6,7 @@ import {
     ManyToMany,
     ManyToOne,
     OneToOne,
+    Property,
     Unique,
 } from '@mikro-orm/core';
 import { MerchantHighlight } from '@rumtelo/contracts';
@@ -13,7 +14,7 @@ import { MerchantHighlight } from '@rumtelo/contracts';
 import { CatalogEntity } from '../../../../../../common/database/catalog.entity';
 import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
-import { GivingOrganisation } from '../../catalog/giving-organisation/giving-organisation.entity';
+import { GivingOrganization } from '../../catalog/giving-organization/giving-organization.entity';
 import { Market } from '../../catalog/market/market.entity';
 import { CategoryTemplate } from '../../template/category/category.entity';
 import { JarTemplate } from '../../template/jar/jar.entity';
@@ -44,10 +45,18 @@ import type { MerchantMatching } from './merchant-matching.entity';
 @Unique({ properties: ['key'] })
 @Index({ properties: ['jarTemplate'] })
 @Index({ properties: ['categoryTemplate'] })
-@Index({ properties: ['givingOrganisation'] })
+@Index({ properties: ['givingOrganization'] })
 export class MerchantPreset extends CatalogEntity {
+    // ? PROPERTIES
+    /**
+     * Rumtelo partner — affiliate / preferred open-home (Spotify, Udemy, Netflix, …).
+     * Not every spend merchant is a partner; Bruna/Canva stay false.
+     */
+    @Property({ default: false })
+    isPartner: boolean = false;
+
     // ? ENUMS
-    /** Editorial pin: FEATURED | NEW | POPULAR; null = normal. */
+    /** Editorial pin: FEATURED | NEW | POPULAR; null = normal. Sorts money chips / shelves. */
     @Enum(NativeEnum({ MerchantHighlight, domain: 'money', nullable: true }))
     highlight: MerchantHighlight | null = null;
 
@@ -61,11 +70,11 @@ export class MerchantPreset extends CatalogEntity {
     categoryTemplate!: CategoryTemplate;
 
     /**
-     * When set, this merchant mirrors a GivingOrganisation. The org catalog owns
+     * When set, this merchant mirrors a GivingOrganization. The org catalog owns
      * editorial identity; the merchant row stays for bank matching.
      */
-    @ManyToOne(() => GivingOrganisation, { nullable: true, deleteRule: 'set null' })
-    givingOrganisation: GivingOrganisation | null = null;
+    @ManyToOne(() => GivingOrganization, { nullable: true, deleteRule: 'set null' })
+    givingOrganization: GivingOrganization | null = null;
 
     /** Markets where this merchant is listed (N:M, owner side). */
     @ManyToMany(() => Market, undefined, {

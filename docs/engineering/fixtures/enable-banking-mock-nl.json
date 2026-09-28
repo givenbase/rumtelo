@@ -66,7 +66,7 @@
                     "creditor": {
                         "name": "SPAR CITY",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -96,7 +96,7 @@
                     "creditor": {
                         "name": "CAFE DE JAREN",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -126,7 +126,7 @@
                     "creditor": {
                         "name": "ALBERT HEIJN 1582",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -156,7 +156,7 @@
                     "creditor": {
                         "name": "UBER *TRIP",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -186,7 +186,7 @@
                     "creditor": {
                         "name": "STARBUCKS",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -216,7 +216,7 @@
                     "creditor": {
                         "name": "DELIVEROO",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -246,7 +246,7 @@
                     "creditor": {
                         "name": "ADOBE SYSTEMS",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -276,7 +276,7 @@
                     "creditor": {
                         "name": "ODIDO",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -306,7 +306,7 @@
                     "creditor": {
                         "name": "JUMBO SUPERMARKT",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -336,7 +336,7 @@
                     "creditor": {
                         "name": "GVB Amsterdam",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -366,7 +366,7 @@
                     "creditor": {
                         "name": "ETOS BV",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -396,7 +396,7 @@
                     "creditor": {
                         "name": "NS Groep",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -426,7 +426,7 @@
                     "creditor": {
                         "name": "SHELL NL",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -456,7 +456,7 @@
                     "creditor": {
                         "name": "BOL.COM",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -486,7 +486,7 @@
                     "creditor": {
                         "name": "SPOTIFY",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -516,7 +516,7 @@
                     "creditor": {
                         "name": "NETFLIX",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -546,7 +546,7 @@
                     "creditor": {
                         "name": "THUISBEZORGD",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -578,7 +578,7 @@
                     "debtor": {
                         "name": "RETAIL GROUP NL BV",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "debtor_account": null,
@@ -606,7 +606,7 @@
                     "creditor": {
                         "name": "WONINGSTICHTING ROCHDALE",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -636,7 +636,7 @@
                     "creditor": {
                         "name": "ZILVEREN KRUIS",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -666,7 +666,7 @@
                     "creditor": {
                         "name": "LIDL NL",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -698,7 +698,7 @@
                     "debtor": {
                         "name": "BAKKERIJ DE GUNST BV",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "debtor_account": null,
@@ -726,7 +726,7 @@
                     "creditor": {
                         "name": "KRUIDVAT",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -756,7 +756,7 @@
                     "creditor": {
                         "name": "DE LAGE LANDEN FINANCE",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -786,7 +786,7 @@
                     "creditor": {
                         "name": "RET Rotterdam",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -816,7 +816,7 @@
                     "creditor": {
                         "name": "PLUS supermarket",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -846,7 +846,7 @@
                     "creditor": {
                         "name": "GiveDirectly",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -876,7 +876,7 @@
                     "creditor": {
                         "name": "AH TO GO",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -908,7 +908,7 @@
                     "debtor": {
                         "name": "RETAIL GROUP NL BV",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "debtor_account": null,
@@ -936,7 +936,7 @@
                     "creditor": {
                         "name": "WONINGSTICHTING ROCHDALE",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -966,7 +966,7 @@
                     "creditor": {
                         "name": "APPLE.COM/BILL",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -996,7 +996,7 @@
                     "creditor": {
                         "name": "DIRK VAN DEN BROEK",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -1026,7 +1026,7 @@
                     "creditor": {
                         "name": "GIRO555",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -1056,7 +1056,7 @@
                     "creditor": {
                         "name": "GOOGLE *",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -1086,7 +1086,7 @@
                     "creditor": {
                         "name": "ZIGGO BV",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -1118,7 +1118,7 @@
                     "debtor": {
                         "name": "RETAIL GROUP NL BV",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "debtor_account": null,
@@ -1206,7 +1206,7 @@
                     "debtor": {
                         "name": "VAN EIGEN REKENING",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "debtor_account": null,
@@ -1234,7 +1234,7 @@
                     "creditor": {
                         "name": "NAAR EIGEN REKENING",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -1266,7 +1266,7 @@
                     "debtor": {
                         "name": "VAN EIGEN REKENING",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "debtor_account": null,
@@ -1296,7 +1296,7 @@
                     "debtor": {
                         "name": "VAN EIGEN REKENING",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "debtor_account": null,
@@ -1326,7 +1326,7 @@
                     "debtor": {
                         "name": "BUNQ BV",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "debtor_account": null,
@@ -1412,7 +1412,7 @@
                     "creditor": {
                         "name": "ADOBE SYSTEMS",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -1442,7 +1442,7 @@
                     "creditor": {
                         "name": "RESTAURANT RIJKS",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -1472,7 +1472,7 @@
                     "creditor": {
                         "name": "AIRBNB",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -1502,7 +1502,7 @@
                     "creditor": {
                         "name": "NS Groep",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -1534,7 +1534,7 @@
                     "debtor": {
                         "name": "ICS CREDITCARD",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "debtor_account": null,
@@ -1562,7 +1562,7 @@
                     "creditor": {
                         "name": "AMAZON.NL",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,
@@ -1592,7 +1592,7 @@
                     "creditor": {
                         "name": "SHELL NL",
                         "postal_address": null,
-                        "organisation_id": null,
+                        "organization_id": null,
                         "private_id": null
                     },
                     "creditor_account": null,

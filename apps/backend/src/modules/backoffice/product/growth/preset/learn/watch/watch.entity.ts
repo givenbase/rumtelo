@@ -1,17 +1,19 @@
-import { Entity, Enum, Property, Unique } from '@mikro-orm/core';
+import { Entity, Enum, ManyToOne, Property, Unique } from '@mikro-orm/core';
 import { LearnWatchKind, PlanKey, type SpendingStyle } from '@rumtelo/contracts';
 
 import { CatalogEntity } from '../../../../../../../common/database/catalog.entity';
 import { entityConfig } from '../../../../../../../common/database/entity-config.util';
 import { NativeEnum } from '../../../../../../../common/database/native-enum.util';
+import { MerchantPreset } from '../../../../money/preset/merchant/merchant.entity';
 
 /**
  * Watch Preset Entity
  *
- * Films, YouTube videos, and series Rumtelo points at from Growth → Learn.
- * We store who made it and where to watch the pointer. We do not store the work.
+ * Films, videos, series, podcasts, and courses Rumtelo points at from Growth → Learn.
+ * We store who made it and where to open the pointer. We do not store the work.
  *
- * @see LearnWatchKind — film, video, series, or podcast
+ * @see LearnWatchKind — film, video, series, podcast, or course
+ * @see MerchantPreset — optional home (Spotify, Udemy, Netflix, …) when one merchant owns the open
  * @see PlanKey — lowest tier that may see this title
  * @see https://mikro-orm.io/docs/defining-entities
  */
@@ -30,7 +32,7 @@ export class WatchPreset extends CatalogEntity {
     @Property({ type: 'text' })
     description!: string;
 
-    /** Director, host, or the person the household is pointed at. */
+    /** Director, host, instructor, or the person the household is pointed at. */
     @Property({ length: 120 })
     creator!: string;
 
@@ -53,7 +55,7 @@ export class WatchPreset extends CatalogEntity {
     @Property({ type: 'json', default: [] })
     spendingStyles: SpendingStyle[] = [];
 
-    /** Where to watch the trailer, the talk, or who to support. We do not host the work. */
+    /** Where to watch the trailer, the talk, the class, or who to support. We do not host the work. */
     @Property({ length: 280 })
     url!: string;
 
@@ -62,11 +64,20 @@ export class WatchPreset extends CatalogEntity {
     watchUrl: string | null = null;
 
     // ? ENUMS
-    /** Film, standalone video, series, or podcast show. */
+    /** Film, standalone video, series, podcast show, or course. */
     @Enum(NativeEnum({ LearnWatchKind, domain: 'growth' }))
     format!: LearnWatchKind;
 
     /** Lowest plan that should see this title. */
     @Enum(NativeEnum({ PlanKey, domain: 'backoffice' }))
     minPlan!: PlanKey;
+
+    // ? RELATIONSHIPS
+    /**
+     * Where the household opens this when one merchant is the home
+     * (Spotify show, Udemy class, Netflix title). Null when the pointer is multi-home
+     * (JustWatch) or the maker's own page.
+     */
+    @ManyToOne(() => MerchantPreset, { nullable: true, deleteRule: 'set null' })
+    merchant: MerchantPreset | null = null;
 }

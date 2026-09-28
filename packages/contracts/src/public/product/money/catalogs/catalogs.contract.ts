@@ -16,7 +16,7 @@ import {
     FixedCostPreset,
     GivingCauseCatalog,
     GivingEvaluatorCatalog,
-    GivingOrganisation,
+    GivingOrganization,
     GoalPreset,
     IncomeSourcePreset,
     JarTemplate,
@@ -89,10 +89,10 @@ export const catalogsContract = {
             )
             .output(z.array(MerchantPreset)),
     },
-    givingOrganisations: {
+    givingOrganizations: {
         list: oc
             .input(HouseholdScoped.extend({ cause: z.enum(GivingCause).nullish() }))
-            .output(z.array(GivingOrganisation)),
+            .output(z.array(GivingOrganization)),
     },
     givingCauses: {
         list: oc.input(HouseholdScoped).output(z.array(GivingCauseCatalog)),

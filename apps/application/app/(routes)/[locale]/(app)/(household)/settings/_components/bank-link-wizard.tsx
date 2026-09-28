@@ -37,7 +37,7 @@ import {
 } from '../_utils/settings-form-zod';
 import { SettingsRowLabel } from './settings-chrome';
 
-export type BankLinkWizardAuthoriseInput = {
+export type BankLinkWizardAuthorizeInput = {
     institutionId: string;
     seatMode: 'existing' | 'new';
     seatId: string;
@@ -45,7 +45,7 @@ export type BankLinkWizardAuthoriseInput = {
     catalogBankId: string;
 };
 
-export type BankLinkWizardAuthoriseResult = 'ok' | 'name_taken' | 'failed';
+export type BankLinkWizardAuthorizeResult = 'ok' | 'name_taken' | 'failed';
 
 export type BankLinkWizardProps = {
     live: boolean;
@@ -61,9 +61,9 @@ export type BankLinkWizardProps = {
     manualAccounts: Account[];
     primaryBankId: string | null;
     formatMoney: (amount: number) => string;
-    onAuthorise: (
-        input: BankLinkWizardAuthoriseInput
-    ) => BankLinkWizardAuthoriseResult | Promise<BankLinkWizardAuthoriseResult>;
+    onAuthorize: (
+        input: BankLinkWizardAuthorizeInput
+    ) => BankLinkWizardAuthorizeResult | Promise<BankLinkWizardAuthorizeResult>;
 };
 
 export function BankLinkWizard({
@@ -79,7 +79,7 @@ export function BankLinkWizard({
     manualAccounts,
     primaryBankId,
     formatMoney,
-    onAuthorise,
+    onAuthorize,
 }: BankLinkWizardProps) {
     const t = useTranslations();
     const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(1);
@@ -150,7 +150,7 @@ export function BankLinkWizard({
             ? wizardSeat.name
             : wizardNewLabel.trim() ||
               (wizardSeatCatalog
-                  ? t('pages.settings.panels.bank.wizard_authorise_seat_new', {
+                  ? t('pages.settings.panels.bank.wizard_authorize_seat_new', {
                         bank: wizardSeatCatalog.name,
                     })
                   : t('pages.settings.panels.bank.wizard_seat_new'));
@@ -234,7 +234,7 @@ export function BankLinkWizard({
                     ? t('pages.settings.panels.bank.wizard_step_institution')
                     : wizardStep === 2
                       ? t('pages.settings.panels.bank.wizard_step_seat')
-                      : t('pages.settings.panels.bank.wizard_step_authorise')}
+                      : t('pages.settings.panels.bank.wizard_step_authorize')}
             </p>
 
             {wizardStep === 1 ? (
@@ -621,7 +621,7 @@ export function BankLinkWizard({
                 <div className="grid gap-3">
                     <div className="grid gap-2">
                         <p className="text-sm text-fg-muted">
-                            {t('pages.settings.panels.bank.wizard_authorise_hint')}
+                            {t('pages.settings.panels.bank.wizard_authorize_hint')}
                         </p>
                         <ul className="grid gap-1.5 text-sm text-fg-secondary">
                             <li className="flex gap-2">
@@ -629,7 +629,7 @@ export function BankLinkWizard({
                                     ·
                                 </span>
                                 <span>
-                                    {t('pages.settings.panels.bank.wizard_authorise_what_1')}
+                                    {t('pages.settings.panels.bank.wizard_authorize_what_1')}
                                 </span>
                             </li>
                             <li className="flex gap-2">
@@ -637,7 +637,7 @@ export function BankLinkWizard({
                                     ·
                                 </span>
                                 <span>
-                                    {t('pages.settings.panels.bank.wizard_authorise_what_2')}
+                                    {t('pages.settings.panels.bank.wizard_authorize_what_2')}
                                 </span>
                             </li>
                             <li className="flex gap-2">
@@ -645,7 +645,7 @@ export function BankLinkWizard({
                                     ·
                                 </span>
                                 <span>
-                                    {t('pages.settings.panels.bank.wizard_authorise_what_3')}
+                                    {t('pages.settings.panels.bank.wizard_authorize_what_3')}
                                 </span>
                             </li>
                         </ul>
@@ -653,7 +653,7 @@ export function BankLinkWizard({
                     <div className="grid gap-3 rounded-xl border border-line px-3 py-3">
                         <div className="grid gap-2">
                             <p className="font-mono text-[10px] tracking-[0.14em] text-fg-faint uppercase">
-                                {t('pages.settings.panels.bank.wizard_authorise_bank')}
+                                {t('pages.settings.panels.bank.wizard_authorize_bank')}
                             </p>
                             {wizardInstitution && wizardInstitutionMark ? (
                                 <div className="flex items-center gap-2.5">
@@ -682,7 +682,7 @@ export function BankLinkWizard({
                         <div className="border-t border-line" />
                         <div className="grid gap-2">
                             <p className="font-mono text-[10px] tracking-[0.14em] text-fg-faint uppercase">
-                                {t('pages.settings.panels.bank.wizard_authorise_seat')}
+                                {t('pages.settings.panels.bank.wizard_authorize_seat')}
                             </p>
                             <div className="flex items-center gap-2.5">
                                 {wizardSeatMark ? (
@@ -696,7 +696,7 @@ export function BankLinkWizard({
                             </div>
                             {showAspspCatalogMismatch ? (
                                 <p className="text-xs text-fg-muted">
-                                    {t('pages.settings.panels.bank.wizard_authorise_mismatch', {
+                                    {t('pages.settings.panels.bank.wizard_authorize_mismatch', {
                                         aspsp: wizardInstitution!.name,
                                         catalog: wizardSeatCatalog!.name,
                                     })}
@@ -719,7 +719,7 @@ export function BankLinkWizard({
                                 void (async () => {
                                     if (!(await ensureNewSeatFormReady())) return;
                                     const values = seatForm.getValues();
-                                    const result = await onAuthorise({
+                                    const result = await onAuthorize({
                                         institutionId: wizardInstitutionId,
                                         seatMode: wizardSeatMode,
                                         seatId: wizardSeatId,
@@ -739,7 +739,7 @@ export function BankLinkWizard({
                             }}>
                             {wizardBusy
                                 ? t('pages.settings.panels.bank.linking')
-                                : t('pages.settings.panels.bank.wizard_authorise')}
+                                : t('pages.settings.panels.bank.wizard_authorize')}
                         </Button>
                     </div>
                 </div>

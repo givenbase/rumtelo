@@ -1,4 +1,4 @@
-import { JarKey, MerchantHighlight } from '@rumtelo/contracts';
+import { MerchantHighlight, JarKey } from '@rumtelo/contracts';
 
 export { MerchantHighlight };
 
@@ -11,13 +11,15 @@ export type MerchantSeed = {
     jarKey: JarKey;
     categoryTemplateKey: string;
     /**
-     * When set, this merchant mirrors GivingOrganisation.key — bank matching only;
+     * When set, this merchant mirrors GivingOrganization.key — bank matching only;
      * Coach catalog owns the editorial identity.
      */
-    givingOrganisationKey?: string | null;
+    givingOrganizationKey?: string | null;
     logoDomain: string | null;
     website?: string | null;
     highlight?: MerchantHighlight | null;
+    /** When true, this merchant is a Rumtelo partner (Learn open-home, featured chips, …). */
+    isPartner?: boolean;
     markets?: string[];
     matchPriority?: number;
     providerIds?: Record<string, string>;

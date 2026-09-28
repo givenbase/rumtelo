@@ -7,7 +7,7 @@ import type {
     CategoryTemplate,
     FixedCost,
     FixedCostSettlement,
-    GivingOrganisation,
+    GivingOrganization,
     MerchantPreset,
     Transaction,
 } from '@rumtelo/contracts';
@@ -101,7 +101,7 @@ export function JarCategoryBreakdown({
     jarByKey?: Map<string, { icon: string | null }>;
     categoryTemplates: readonly Pick<CategoryTemplate, 'name' | 'icon'>[];
     merchants: readonly MerchantPreset[];
-    givingOrgs: readonly Pick<GivingOrganisation, 'name' | 'website'>[];
+    givingOrgs: readonly Pick<GivingOrganization, 'name' | 'website'>[];
     allowFixedCosts: boolean;
 }) {
     const { formatMoney } = useHouseholdCurrency();

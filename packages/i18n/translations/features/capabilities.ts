@@ -101,9 +101,9 @@ const capabilities = {
         name: 'Intent',
         description: 'Weekly intent.',
     },
-    'soul-centres': {
-        name: 'Centres',
-        description: 'The seven centres and where energy gets stuck.',
+    'soul-centers': {
+        name: 'Centers',
+        description: 'The seven centers and where energy gets stuck.',
     },
     'platform-invite': {
         name: 'Invite',

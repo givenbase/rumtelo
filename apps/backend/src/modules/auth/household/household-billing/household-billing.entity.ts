@@ -37,7 +37,7 @@ export class HouseholdBilling extends HouseholdEntity {
     @Property({ type: 'varchar', length: 255, nullable: true })
     stripeCustomerId: string | null = null;
 
-    /** Active Stripe Subscription id (`sub_…`). Null when cancelled / Basic. Server-only. */
+    /** Active Stripe Subscription id (`sub_…`). Null when canceled / Basic. Server-only. */
     @Property({ type: 'varchar', length: 255, nullable: true })
     stripeSubscriptionId: string | null = null;
 
@@ -49,7 +49,7 @@ export class HouseholdBilling extends HouseholdEntity {
     @Property({ type: 'int', default: 0 })
     extraViewerSeats = 0;
 
-    /** Stripe `cancel_at_period_end` — cancelled, but access runs until {@link periodEndsAt}. */
+    /** Stripe `cancel_at_period_end` — canceled, but access runs until {@link periodEndsAt}. */
     @Property({ type: 'boolean', default: false })
     willCancelAtPeriodEnd = false;
 

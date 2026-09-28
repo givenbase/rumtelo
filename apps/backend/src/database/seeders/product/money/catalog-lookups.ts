@@ -2,7 +2,7 @@ import type { Collection } from '@mikro-orm/core';
 import type { EntityManager } from '@mikro-orm/postgresql';
 
 import { Audience } from '../../../../modules/backoffice/product/money/catalog/audience/audience.entity';
-import { GivingOrganisation } from '../../../../modules/backoffice/product/money/catalog/giving-organisation/giving-organisation.entity';
+import { GivingOrganization } from '../../../../modules/backoffice/product/money/catalog/giving-organization/giving-organization.entity';
 import { Market } from '../../../../modules/backoffice/product/money/catalog/market/market.entity';
 import { MerchantPreset } from '../../../../modules/backoffice/product/money/preset/merchant/merchant.entity';
 import { CategoryTemplate } from '../../../../modules/backoffice/product/money/template/category/category.entity';
@@ -46,8 +46,8 @@ export async function loadMarkets(em: EntityManager, owner: string) {
     return requireFrom(await loadByKey(em, Market), 'Market', owner);
 }
 
-export async function loadGivingOrganisations(em: EntityManager, owner: string) {
-    return requireFrom(await loadByKey(em, GivingOrganisation), 'GivingOrganisation', owner);
+export async function loadGivingOrganizations(em: EntityManager, owner: string) {
+    return requireFrom(await loadByKey(em, GivingOrganization), 'GivingOrganization', owner);
 }
 
 export async function loadMerchantPresets(em: EntityManager, owner: string) {

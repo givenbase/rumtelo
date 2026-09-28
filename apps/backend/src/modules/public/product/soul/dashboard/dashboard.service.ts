@@ -42,7 +42,7 @@ export class SoulDashboardService {
             stillnessStreakDays: mindDays.size === 0 ? null : streakEndingToday(mindDays),
             gratitudeThisWeek: thanks.length,
             intention: moneyWeekCheck?.intention?.trim() ? moneyWeekCheck.intention : null,
-            centresNamedToday: 0,
+            centersNamedToday: 0,
             coach,
         };
     }

@@ -5,7 +5,7 @@ import { CatalogEntity } from '../../../../../../common/database/catalog.entity'
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
 
 /**
- * Giving Organisation Entity
+ * Giving Organization Entity
  *
  * Vetted places the Give jar can flow to. Editorial, company-authored list.
  * Every row cites at least one independent evaluator or register (GiveWell, CBF,
@@ -22,11 +22,11 @@ import { entityConfig } from '../../../../../../common/database/entity-config.ut
         schema: 'backoffice',
         domain: 'reference',
         group: 'money',
-        tableName: 'giving_organisation',
+        tableName: 'giving_organization',
     })
 )
 @Unique({ properties: ['key'] })
-export class GivingOrganisation extends CatalogEntity {
+export class GivingOrganization extends CatalogEntity {
     // ? PROPERTIES
     /** One neutral sentence on what they do. */
     @Property({ type: 'text' })
@@ -40,11 +40,11 @@ export class GivingOrganisation extends CatalogEntity {
     @Property({ length: 64, nullable: true })
     scope: string | null = null;
 
-    /** How donors hear back — annual report, live feed, per-programme updates. */
+    /** How donors hear back — annual report, live feed, per-program updates. */
     @Property({ type: 'text', nullable: true })
     reporting: string | null = null;
 
-    /** GivingCause keys this organisation serves (TS enum — no catalog table). */
+    /** GivingCause keys this organization serves (TS enum — no catalog table). */
     @Property({ type: 'json', default: [] })
     causes: GivingCause[] = [];
 

@@ -9,7 +9,7 @@ import { FixedCostPreset } from './fixed-cost.entity';
  * Fixed Cost Preset Merchant Entity
  *
  * Ordered link between a fixed-cost preset and the merchants offered as
- * "Paid to" chips. Modelled as an entity (not a bare N:M) because the link
+ * "Paid to" chips. Modeled as an entity (not a bare N:M) because the link
  * carries data: chip order.
  *
  * @see FixedCostPreset.merchantLinks

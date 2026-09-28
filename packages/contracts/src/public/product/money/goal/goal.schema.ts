@@ -35,10 +35,10 @@ export const Goal = z.object({
      */
     cause: z.enum(GivingCause).nullable().default(null),
     /**
-     * GIVE only — GivingOrganisation catalog key when the pledge names an org.
+     * GIVE only — GivingOrganization catalog key when the pledge names an org.
      * Free-text / open pledges leave this null. SAVE / EARN always null.
      */
-    givingOrganisationKey: z.string().min(1).max(64).nullable().default(null),
+    givingOrganizationKey: z.string().min(1).max(64).nullable().default(null),
     /** When an EARN goal crossed the target (null while open / for SAVE). */
     fulfilledOn: IsoDate.nullable(),
     /**

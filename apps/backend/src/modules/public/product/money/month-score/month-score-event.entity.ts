@@ -31,7 +31,7 @@ export class MonthScoreEvent extends HouseholdEntity {
     occurredOn!: string;
 
     // ? ENUMS
-    /** What kind of behaviour earned the points. */
+    /** What kind of behavior earned the points. */
     @Enum(NativeEnum({ MonthScoreEventKind, domain: 'money' }))
     kind!: MonthScoreEventKind;
 

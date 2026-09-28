@@ -48,7 +48,7 @@ What stays design-independent: monorepo, contracts, backend hierarchy, household
 
 ## Brand visual notes
 
-See [brand/positioning.md](../brand/positioning.md) for logo, colour, and typography direction used with external designers.
+See [brand/positioning.md](../brand/positioning.md) for logo, color, and typography direction used with external designers.
 
 ---
 

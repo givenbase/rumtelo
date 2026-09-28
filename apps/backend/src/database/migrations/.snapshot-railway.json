@@ -12465,8 +12465,8 @@
           "enumItems": [],
           "mappedType": "integer"
         },
-        "giving_organisation_key": {
-          "name": "giving_organisation_key",
+        "giving_organization_key": {
+          "name": "giving_organization_key",
           "type": "varchar(64)",
           "unsigned": false,
           "autoincrement": false,
@@ -36955,7 +36955,7 @@
           "mappedType": "text"
         }
       },
-      "name": "reference_money_giving_organisation",
+      "name": "reference_money_giving_organization",
       "schema": "backoffice",
       "indexes": [
         {
@@ -36964,7 +36964,7 @@
           ],
           "composite": false,
           "constraint": true,
-          "keyName": "reference_money_giving_organisation_key_unique",
+          "keyName": "reference_money_giving_organization_key_unique",
           "unique": true,
           "primary": false
         },
@@ -36974,7 +36974,7 @@
           ],
           "composite": false,
           "constraint": false,
-          "keyName": "reference_money_giving_organisation_pkey",
+          "keyName": "reference_money_giving_organization_pkey",
           "unique": true,
           "primary": true
         }
@@ -40867,8 +40867,8 @@
           "enumItems": [],
           "mappedType": "uuid"
         },
-        "giving_organisation_id": {
-          "name": "giving_organisation_id",
+        "giving_organization_id": {
+          "name": "giving_organization_id",
           "type": "uuid",
           "unsigned": false,
           "autoincrement": false,
@@ -40899,11 +40899,11 @@
         },
         {
           "columnNames": [
-            "giving_organisation_id"
+            "giving_organization_id"
           ],
           "composite": false,
           "constraint": false,
-          "keyName": "reference_money_merchant_preset_giving_organisation_id_index",
+          "keyName": "reference_money_merchant_preset_giving_organization_id_index",
           "unique": false,
           "primary": false
         },
@@ -40953,13 +40953,13 @@
           "updateRule": "cascade",
           "deleteRule": "restrict"
         },
-        "reference_money_merchant_preset_giving_organisation_id_foreign": {
+        "reference_money_merchant_preset_giving_organization_id_foreign": {
           "columnNames": [
-            "giving_organisation_id"
+            "giving_organization_id"
           ],
-          "constraintName": "reference_money_merchant_preset_giving_organisation_id_foreign",
+          "constraintName": "reference_money_merchant_preset_giving_organization_id_foreign",
           "localTableName": "backoffice.reference_money_merchant_preset",
-          "referencedTableName": "backoffice.reference_money_giving_organisation",
+          "referencedTableName": "backoffice.reference_money_giving_organization",
           "referencedColumnNames": [
             "id"
           ],

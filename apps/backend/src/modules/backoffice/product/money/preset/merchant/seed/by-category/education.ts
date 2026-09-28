@@ -1,3 +1,5 @@
+import { MerchantHighlight } from '@rumtelo/contracts';
+
 import type { MerchantSeed } from '../types';
 import { education } from '../types';
 
@@ -118,7 +120,7 @@ export const EDUCATION_MERCHANTS: readonly MerchantSeed[] = [
         categoryTemplateKey: 'COURSES',
         logoDomain: 'udemy.com',
         website: 'https://udemy.com',
-        highlight: null,
+        highlight: MerchantHighlight.FEATURED,
         markets: ['NL'],
         matchPriority: 0,
         isActive: true,
@@ -178,7 +180,7 @@ export const EDUCATION_MERCHANTS: readonly MerchantSeed[] = [
         categoryTemplateKey: 'COURSES',
         logoDomain: 'masterclass.com',
         website: 'https://masterclass.com',
-        highlight: null,
+        highlight: MerchantHighlight.FEATURED,
         markets: ['NL'],
         matchPriority: 0,
         isActive: true,

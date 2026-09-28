@@ -10,7 +10,7 @@ import { CoachMessage } from '../../../platform/coach/coach.schema';
 
 /**
  * Soul portal hub composition. Stillness streak uses energy MIND logs when present;
- * centres stay 0 until a centres entity exists; intention is money week-check text
+ * centers stay 0 until a centers entity exists; intention is money week-check text
  * when that practice set one (closest persisted "intent" today).
  */
 export const SoulDashboard = z.object({
@@ -19,8 +19,8 @@ export const SoulDashboard = z.object({
     gratitudeThisWeek: z.int(),
     /** Money week-check intention for the current week, if any. */
     intention: z.string().max(280).nullable(),
-    /** No centres entity yet. */
-    centresNamedToday: z.int(),
+    /** No centers entity yet. */
+    centersNamedToday: z.int(),
     coach: z.array(CoachMessage),
 });
 

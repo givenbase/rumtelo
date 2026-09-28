@@ -368,7 +368,7 @@ export const WATCH_VIDEO_SEED: readonly WatchSeedRow[] = [
         name: 'Are You a Giver or a Taker?',
         creator: 'Adam Grant',
         description:
-            'Givers finish first when takers are weeded out. The five-minute favour that builds a network.',
+            'Givers finish first when takers are weeded out. The five-minute favor that builds a network.',
         topic: 'EARN',
         skill: 'LEADERSHIP',
         minPlan: PlanKey.PLUS,

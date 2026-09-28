@@ -47,7 +47,7 @@ export const TimeBand = z.object({
     targetHigh: z.int().nullable(),
     ceiling: z.int().nullable(),
     /**
-     * Daily behaviour (sleep, screen) — safe to pro-rate by days logged.
+     * Daily behavior (sleep, screen) — safe to pro-rate by days logged.
      * Weekly accumulators (work, exercise) are only judged on a full week: an 8 h
      * workday is not a 56 h week.
      */

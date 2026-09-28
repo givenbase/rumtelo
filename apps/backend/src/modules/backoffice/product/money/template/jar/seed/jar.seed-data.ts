@@ -160,8 +160,7 @@ export const JAR_TEMPLATE_SEED: readonly Seed[] = [
                 { label: 'Church or community', icon: '⛪' },
                 { label: 'Helping someone who needs it', icon: '🤝' },
             ],
-            notAllowed:
-                'No favours expected, no tax-deduction thinking. Giving keeps money a tool.',
+            notAllowed: 'No favors expected, no tax-deduction thinking. Giving keeps money a tool.',
             links: [
                 { href: '/product/soul/giving', label: 'Why & where', icon: '✦' },
                 { href: '/product/money/fixed-costs', label: 'Fixed costs', icon: '📌' },

@@ -120,7 +120,7 @@ async function main() {
         '| From → to | Storage |',
         '|---|---|',
         '| backoffice → backoffice | relation (id FK / pivot entity) |',
-        '| household → backoffice | `*Key` snapshot string (`Jar.templateKey`, `Goal.givingOrganisationKey`, `Transaction.inflowKey`, `FixedCost.presetKey`) |',
+        '| household → backoffice | `*Key` snapshot string (`Jar.templateKey`, `Goal.givingOrganizationKey`, `Transaction.inflowKey`, `FixedCost.presetKey`) |',
         '| household → household | relation with explicit `deleteRule` |',
         ''
     );

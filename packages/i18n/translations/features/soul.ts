@@ -29,9 +29,9 @@ const soul = {
                 set: 'Set',
                 note_empty: 'for this week',
             },
-            centres: {
-                name: 'Centres',
-                note: 'centres named today',
+            centers: {
+                name: 'Centers',
+                note: 'centers named today',
             },
         },
     },
@@ -95,11 +95,11 @@ const soul = {
         example: 'Ten minutes of stillness before I open my inbox.',
         my_intention: 'My intention',
         set_for_week: '✦ Set for this week',
-        tip: 'A good intention is small, concrete, and about behaviour — not an outcome. "I check my jars every Sunday" works better than "I am more financially aware."',
+        tip: 'A good intention is small, concrete, and about behavior — not an outcome. "I check my jars every Sunday" works better than "I am more financially aware."',
         stillness_link: 'Go to stillness →',
     },
-    centres: {
-        eyebrow: 'The centres',
+    centers: {
+        eyebrow: 'The centers',
         title: 'Where does it feel stuck?',
         lead: 'Not an esoteric score — a map to name where things feel stuck this week, so your intention has somewhere to land.',
         set_intent: 'Set as intention →',
@@ -171,7 +171,7 @@ const soul = {
         empty_auto_body: 'Add a fixed cost on the Give jar to plan monthly gifts.',
         empty_ledger_title: 'No sorted giving this year.',
         empty_ledger_body: 'Gifts that leave Give show up here once sorted.',
-        no_org: 'No organisation named yet',
+        no_org: 'No organization named yet',
         received_year: 'Received this year',
         to_whom: 'To whom',
         pick_who: 'How do you want to pick who receives this gift?',
@@ -180,14 +180,14 @@ const soul = {
         pick_coach: 'Help me choose',
         pick_hint:
             'I know who — type whoever you already give to. Help me choose — Coach shortlist with independent checks (Doneer Effectief, GiveWell, ACE, CBF).',
-        checks_heading: 'Four checks for any organisation',
-        checks_aria: 'The Coach: four checks for any organisation',
+        checks_heading: 'Four checks for any organization',
+        checks_aria: 'The Coach: four checks for any organization',
         check_1_title: 'Independent proof',
         check_1_body:
-            'Someone outside the organisation — GiveWell, CBF, ACE — has checked the work, not just the books.',
+            'Someone outside the organization — GiveWell, CBF, ACE — has checked the work, not just the books.',
         check_2_title: 'Public spending',
         check_2_body:
-            'A yearly report anyone can read, with the share that reached the programme and the share that ran the office.',
+            'A yearly report anyone can read, with the share that reached the program and the share that ran the office.',
         check_3_title: 'Reporting back',
         check_3_body:
             'Updates that describe what changed for the people or animals — not a thank-you card.',
@@ -198,7 +198,7 @@ const soul = {
         coach_tip_1:
             'It does not have to be much. Five percent, transferred automatically, to a place you chose on purpose. The amount is not the point — the habit is.',
         coach_tip_2:
-            'Choose where it goes the way you choose everything else here: with evidence, not with a logo. An organisation that publishes what it spends and what changed is one you can keep giving to for years.',
+            'Choose where it goes the way you choose everything else here: with evidence, not with a logo. An organization that publishes what it spends and what changed is one you can keep giving to for years.',
         causes: {
             GLOBAL_HEALTH: {
                 name: 'Health',

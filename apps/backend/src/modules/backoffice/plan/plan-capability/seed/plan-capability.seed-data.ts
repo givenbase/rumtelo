@@ -16,7 +16,7 @@ import {
  *   energy-week/training/food        ✓     ✓
  *   platform-invite               ✓     ✓
  *   growth-income/net-worth/learn           ✓
- *   soul-centres                         ✓
+ *   soul-centers                         ✓
  *
  * Source of truth: packages/contracts PLAN_ACCESS / CAPABILITY_CATALOG
  */

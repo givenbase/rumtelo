@@ -1,6 +1,6 @@
 # Bank data — CSV import, Enable Banking, and moving money
 
-How Rumtelo gets bank transactions into the Inbox. **Statement file import (CAMT.053 / MT940 / CSV) is always-on** behind `moneyImport`. **Live PSD2 sync is Enable Banking** (AIS balances + transactions), behind a feature flag. **Moving money (PIS) is not on the near roadmap** — see [Moving money](#moving-money--pis-licences-bunq-vs-revolut) for why and for the three routes.
+How Rumtelo gets bank transactions into the Inbox. **Statement file import (CAMT.053 / MT940 / CSV) is always-on** behind `moneyImport`. **Live PSD2 sync is Enable Banking** (AIS balances + transactions), behind a feature flag. **Moving money (PIS) is not on the near roadmap** — see [Moving money](#moving-money--pis-licenses-bunq-vs-revolut) for why and for the three routes.
 
 ---
 
@@ -19,8 +19,8 @@ Rows land as transactions in **Inbox** (`status: INBOX`). The household sorts th
 
 | Pattern | Who | Approach |
 |---|---|---|
-| Bank-first | Dutch apps like **Dyme** | PSD2 bank koppelen (own DNB licence or partner). Auto-categorise. Re-consent ~every 90 days. Product barely works without connect. |
-| Move-the-money | **Flow (Flow Your Money)** | Own DNB licence (AISP + PISP, R166735). Deep **bunq** integration: real IBAN sub-accounts + realtime triggers = salary lands → jars filled. Other banks (incl. **Revolut**) are only "Flow Contacts" — external IBANs they pay *to*; no balance read, Pockets unreachable. Now also sells the rails as **FlowOS** (embedded finance). |
+| Bank-first | Dutch apps like **Dyme** | PSD2 bank koppelen (own DNB license or partner). Auto-categorise. Re-consent ~every 90 days. Product barely works without connect. |
+| Move-the-money | **Flow (Flow Your Money)** | Own DNB license (AISP + PISP, R166735). Deep **bunq** integration: real IBAN sub-accounts + realtime triggers = salary lands → jars filled. Other banks (incl. **Revolut**) are only "Flow Contacts" — external IBANs they pay *to*; no balance read, Pockets unreachable. Now also sells the rails as **FlowOS** (embedded finance). |
 | Sync + files | **YNAB** and similar | Direct Import where an aggregator covers the bank; **CSV / OFX** with column mapping as the reliable fallback. NL coverage is often incomplete — community converters and third-party syncers fill gaps. |
 | File-first | Converters / DIY | Bank CSV → map columns → import with dedupe. No aggregator bill; more friction. |
 
@@ -92,7 +92,7 @@ Imported rows: `source: CSV` (file import vs AIS `BANK`), amounts in eurocents, 
 
 ## Enable Banking (live sync)
 
-- **Licence / path:** PSD2 AIS via Enable Banking; we do not talk to ING/Rabobank APIs ourselves.
+- **License / path:** PSD2 AIS via Enable Banking; we do not talk to ING/Rabobank APIs ourselves.
 - **NL coverage (major):** ABN AMRO, ING, Rabobank have production AISP. Other Dutch ASPSPs (Volksbank brands, Triodos, etc.) — check [Enable Banking NL docs](https://enablebanking.com/docs/markets/nl/) and their ASPSP list.
 - **Consent:** typically expires ~**90 days**; UI must warn before expiry when sync ships.
 - **Code:** [`BankingPort`](../../apps/backend/src/banking/banking.port.ts) imports shared DTOs (`BankInstitution`, start-link result) from `@rumtelo/contracts`; provider-only shapes stay on the port. Null adapter by default; [`EnableBankingAdapter`](../../apps/backend/src/banking/adapters/enable-banking.adapter.ts) when `FEATURE_BANK_SYNC` is on.
@@ -102,7 +102,7 @@ Imported rows: `source: CSV` (file import vs AIS `BANK`), amounts in eurocents, 
 
 AIS does **not** push every booking. Rumtelo polls:
 
-| Trigger | Where | Behaviour |
+| Trigger | Where | Behavior |
 |---|---|---|
 | **Cron (every 6h)** | Nest `BankSyncScheduler` (`0 */6 * * *`) | Walks every seat with `connectionId`; skips if synced within **30 minutes**; runs each pull inside `householdStorage` |
 | **On visit** | Money hub, Transactions (Inbox), Bank settings | `useBankSyncOnVisit` → `bankSync.syncStale` once per mount; same 30‑minute freshness gate; silent if sync is off |
@@ -115,7 +115,7 @@ Constants: [`bank-sync.constants.ts`](../../apps/backend/src/modules/public/prod
 
 Each pull also refreshes `BankAccount.balance` from AIS (`GET …/balances`, preferring interim/closing available). Consent requests `balances` + `transactions` explicitly. Transaction pages follow `continuation_key` (capped).
 
-**Consent (~90 days):** when the bank session expires, pulls fail until the user Connects again. UI warning for expiry is still a follow-up. Seats authorised **before** balances/transactions scopes were requested need a fresh Connect to pick up saldo.
+**Consent (~90 days):** when the bank session expires, pulls fail until the user Connects again. UI warning for expiry is still a follow-up. Seats authorized **before** balances/transactions scopes were requested need a fresh Connect to pick up saldo.
 
 ### Redirect URLs (Control Panel whitelist)
 
@@ -162,7 +162,7 @@ Live ASPSPs in sandbox often return **empty** transaction lists. For local AIS t
 
 ## Pricing
 
-Enable Banking does **not** publish a public price list for unrestricted production. You get a quote for AIS volume, countries, and whether you use their TPP licence.
+Enable Banking does **not** publish a public price list for unrestricted production. You get a quote for AIS volume, countries, and whether you use their TPP license.
 
 | Tier | Cost |
 |---|---|
@@ -179,7 +179,7 @@ When you have a real quote (“NL, AIS only, ~N households, no PIS”), replace 
 
 ---
 
-## Moving money — PIS, licences, bunq vs Revolut
+## Moving money — PIS, licenses, bunq vs Revolut
 
 Everything above is **AIS** (read). "Salary lands → six jars fill *in the bank*" is **PIS** (payment initiation). This section records what we verified in Sep 2026 so we do not re-research it.
 
@@ -187,11 +187,11 @@ Everything above is **AIS** (read). "Salary lands → six jars fill *in the bank
 
 | Capability | Who may do it | What Rumtelo has |
 |---|---|---|
-| Read accounts/transactions (AIS) | Licensed AISP, **or** an agent using an aggregator's licence | Enable Banking — planned, behind `FEATURE_BANK_SYNC` |
-| Initiate a payment (PIS) | **PISP licence holder only.** Enable Banking: *"in PRODUCTION, payment initiation is only available to companies holding a PISP license."* | Nothing |
+| Read accounts/transactions (AIS) | Licensed AISP, **or** an agent using an aggregator's license | Enable Banking — planned, behind `FEATURE_BANK_SYNC` |
+| Initiate a payment (PIS) | **PISP license holder only.** Enable Banking: *"in PRODUCTION, payment initiation is only available to companies holding a PISP license."* | Nothing |
 | Move money without per-payment SCA | Bank-specific automation (bunq internal transfers, standing orders). No EU-wide variable recurring payments yet (UK-only VRP). | Nothing |
 
-A PISP licence is a full payment-institution application at DNB: minimum own funds, compliance officer, safeguarding, security audit, ~9–18 months, six-figure cost. Only worth it if moving money becomes the product. Our positioning is **"a coach, not a bank"** — so it is not.
+A PISP license is a full payment-institution application at DNB: minimum own funds, compliance officer, safeguarding, security audit, ~9–18 months, six-figure cost. Only worth it if moving money becomes the product. Our positioning is **"a coach, not a bank"** — so it is not.
 
 ### Revolut — what is and isn't possible
 
@@ -206,26 +206,26 @@ A PISP licence is a full payment-institution application at DNB: minimum own fun
 
 - Up to **25 real IBAN sub-accounts** per user, one fee. Each can be a jar.
 - Realtime push on incoming payments (this is what makes Flow instant).
-- PSD2 sandbox open; production needs a QSeal certificate (i.e. a licence — ours or an umbrella's). bunq's OAuth for non-TPPs exists but bunq explicitly warns it "may be subject to PSD2" for other users' data — do not build on that.
+- PSD2 sandbox open; production needs a QSeal certificate (i.e. a license — ours or an umbrella's). bunq's OAuth for non-TPPs exists but bunq explicitly warns it "may be subject to PSD2" for other users' data — do not build on that.
 - Also in Enable Banking coverage for AIS.
 
 If we ever do "real jars", **bunq is the bank**, exactly as it is for Flow.
 
 ### Three routes, in order
 
-1. **Now — read, don't move (no licence).**
+1. **Now — read, don't move (no license).**
    Enable Banking AIS for Revolut, bunq, ING, Rabobank, ABN AMRO. Jars stay virtual in the ledger. New product piece: **map a real sub-account (bunq IBAN, Revolut currency account) to a jar**, so the jar balance mirrors the bank. Fits `BankingPort` as-is; needs a `jar ↔ external account` link on the household.
 2. **Next — "Split assist" with one tap.**
-   Salary lands → Coach computes the split → user approves the transfers in one flow (SCA per payment, bank rules apply). Needs PIS **without our own licence**, via one of:
-   - **Agent / licence umbrella** — ask Enable Banking (or Yapily / Tink) whether they onboard a PIS *agent* under their licence, and at what price.
+   Salary lands → Coach computes the split → user approves the transfers in one flow (SCA per payment, bank rules apply). Needs PIS **without our own license**, via one of:
+   - **Agent / license umbrella** — ask Enable Banking (or Yapily / Tink) whether they onboard a PIS *agent* under their license, and at what price.
    - **FlowOS** — embed Flow's rails; Rumtelo stays the brain (jars, Coach, energy, soul). Turns the closest NL competitor into infra.
    Whichever says yes first decides the route. Outreach drafts: [outreach-pis.md](./outreach-pis.md).
-3. **Later, if ever — full automation, own DNB licence.**
+3. **Later, if ever — full automation, own DNB license.**
    Only if route 2 proves demand *and* per-payment SCA is what users churn on.
 
 ### What this means for copy and trust
 
-- Keep **"Read-only, ever"** in the trust cards and footer until route 2 ships; it is both the honest state and what the licence allows.
+- Keep **"Read-only, ever"** in the trust cards and footer until route 2 ships; it is both the honest state and what the license allows.
 - Roadmap card "Live bank sync — PSD2, read-only" stays accurate. Do not add "automatic transfers" anywhere on the site.
 - If route 2 ships, the product language is "Rumtelo *proposes*, you *approve*" — never "Rumtelo moves your money".
 

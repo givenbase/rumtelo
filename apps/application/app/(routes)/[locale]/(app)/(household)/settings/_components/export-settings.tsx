@@ -60,24 +60,24 @@ export function ExportSettings() {
 
     useEffect(() => {
         if (!previewKey || !householdId) return;
-        let cancelled = false;
+        let canceled = false;
         void (async () => {
             try {
                 const next = await fetchHouseholdExportBundle(householdId, {
                     includeDebts,
                     includeGoals,
                 });
-                if (!cancelled) {
+                if (!canceled) {
                     setPreview({ key: previewKey, bundle: next, failed: false });
                 }
             } catch {
-                if (!cancelled) {
+                if (!canceled) {
                     setPreview({ key: previewKey, bundle: null, failed: true });
                 }
             }
         })();
         return () => {
-            cancelled = true;
+            canceled = true;
         };
     }, [previewKey, householdId, includeDebts, includeGoals]);
 

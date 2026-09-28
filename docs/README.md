@@ -14,7 +14,7 @@ Start here to understand the whole project — product direction, brand, researc
 | [research/money-awareness.md](./research/money-awareness.md) | Why people lose the money picture — and what we solve |
 | [engineering/architecture.md](./engineering/architecture.md) | Stack, layout, hierarchy, conventions |
 | [engineering/banking.md](./engineering/banking.md) | CSV import, Enable Banking / PSD2, pricing, moving money (PIS, bunq vs Revolut) |
-| [engineering/outreach-pis.md](./engineering/outreach-pis.md) | Draft mails to Enable Banking and Flow/FlowOS for PIS access without own licence |
+| [engineering/outreach-pis.md](./engineering/outreach-pis.md) | Draft mails to Enable Banking and Flow/FlowOS for PIS access without own license |
 | [engineering/traps.md](./engineering/traps.md) | Traps already hit — do not re-learn |
 | [design/README.md](./design/README.md) | Design source of truth and rebuild rules |
 

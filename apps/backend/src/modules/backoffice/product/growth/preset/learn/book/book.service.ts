@@ -1,6 +1,7 @@
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable } from '@nestjs/common';
 import type { LearnBookPreset } from '@rumtelo/contracts';
+import { shuffled } from '@rumtelo/utils';
 
 import { BookPreset } from './book.entity';
 
@@ -9,17 +10,12 @@ export class BookPresetService {
     constructor(@Inject(EntityManager) private readonly em: EntityManager) {}
 
     /**
-     * Active recommended books, in shelf order.
-     * Plan and spending-style filtering stay with the caller: the row carries
-     * minPlan and spendingStyles so the household can be told what it may see.
+     * Active recommended books — shuffled each fetch so the library does not
+     * read as a fixed seed order. Plan filtering stays with the caller.
      */
     async listActive(): Promise<LearnBookPreset[]> {
-        const rows = await this.em.find(
-            BookPreset,
-            { isActive: true },
-            { orderBy: { sortOrder: 'ASC' } }
-        );
-        return rows.map(toDto);
+        const rows = await this.em.find(BookPreset, { isActive: true });
+        return shuffled(rows).map(toDto);
     }
 }
 

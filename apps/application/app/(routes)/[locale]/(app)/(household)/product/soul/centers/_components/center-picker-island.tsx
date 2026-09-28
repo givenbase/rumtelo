@@ -10,11 +10,11 @@ import { cn } from '@rumtelo/utils';
 
 import { PageContent } from '@/components/layout/page-content';
 
-const CENTRE_IDS = ['root', 'sacral', 'solar', 'heart', 'throat', 'third', 'crown'] as const;
+const CENTER_IDS = ['root', 'sacral', 'solar', 'heart', 'throat', 'third', 'crown'] as const;
 
-type CentreId = (typeof CENTRE_IDS)[number];
+type CenterId = (typeof CENTER_IDS)[number];
 
-const CENTRE_COLORS: Record<CentreId, string> = {
+const CENTER_COLORS: Record<CenterId, string> = {
     root: '#dc2626',
     sacral: '#ea580c',
     solar: '#ca8a04',
@@ -24,9 +24,9 @@ const CENTRE_COLORS: Record<CentreId, string> = {
     crown: '#7c3aed',
 };
 
-export function CentrePickerIsland() {
-    const t = useTranslations('features.soul.centres');
-    const [pick, setPick] = useState<CentreId | null>('throat');
+export function CenterPickerIsland() {
+    const t = useTranslations('features.soul.centers');
+    const [pick, setPick] = useState<CenterId | null>('throat');
 
     return (
         <PageContent width="prose" className="grid animate-rise gap-6">
@@ -36,9 +36,9 @@ export function CentrePickerIsland() {
                 </Typography>
             </Section>
 
-            {/* ── Centre picker ── */}
+            {/* ── Center picker ── */}
             <div className="grid gap-2">
-                {CENTRE_IDS.map(id => {
+                {CENTER_IDS.map(id => {
                     const active = pick === id;
                     return (
                         <button
@@ -53,7 +53,7 @@ export function CentrePickerIsland() {
                             )}>
                             <span
                                 className="size-2.5 shrink-0 rounded-full"
-                                style={{ background: CENTRE_COLORS[id] }}
+                                style={{ background: CENTER_COLORS[id] }}
                             />
                             <Typography as="h3" className="min-w-0 flex-1">
                                 {t(`items.${id}.name`)}
@@ -70,13 +70,13 @@ export function CentrePickerIsland() {
             {pick && (
                 <div
                     className="grid animate-rise gap-3 rounded-2xl border border-l-4 border-accent/30 bg-surface p-6 shadow-glow"
-                    style={{ borderLeftColor: CENTRE_COLORS[pick] }}>
+                    style={{ borderLeftColor: CENTER_COLORS[pick] }}>
                     <Typography
                         as="p"
                         variant="eyebrow"
                         weight="semibold"
                         className="uppercase"
-                        style={{ color: CENTRE_COLORS[pick] }}>
+                        style={{ color: CENTER_COLORS[pick] }}>
                         {t(`items.${pick}.name`)}
                     </Typography>
                     <Typography

@@ -38,7 +38,7 @@ const legal = {
                 title: 'Your account and household',
                 items: [
                     'Provide accurate registration details (including name and email) and keep them current. Date of birth, if you give it, must be accurate.',
-                    'Keep login credentials and two-factor codes confidential. You are responsible for activity under your account unless you told us of unauthorised access without delay.',
+                    'Keep login credentials and two-factor codes confidential. You are responsible for activity under your account unless you told us of unauthorized access without delay.',
                     'A household is a shared workspace. People you invite can see that household’s jars, transactions, goals and related data. Invite only people you trust and only if you are allowed to share that data with them.',
                     'If you are invited, you must use household data only for the household’s own overview — not to copy, publish, or misuse another member’s information.',
                     'We may refuse, suspend, or close an account that is inaccurate, abusive, or creates a security or legal risk.',
@@ -57,8 +57,8 @@ const legal = {
                 ],
             },
             content: {
-                title: 'Your data and our licence to operate the Service',
-                body: 'You retain ownership of the household and account data you enter or import (“Your Content”). You grant Rumtelo a limited, worldwide, non-exclusive licence to host, store, process, display, and back up Your Content solely to provide, secure, and improve the Service, and to meet the law. That licence ends when Your Content is deleted from our live systems and residual backups expire, except where we must keep a copy (for example invoices).',
+                title: 'Your data and our license to operate the Service',
+                body: 'You retain ownership of the household and account data you enter or import (“Your Content”). You grant Rumtelo a limited, worldwide, non-exclusive license to host, store, process, display, and back up Your Content solely to provide, secure, and improve the Service, and to meet the law. That license ends when Your Content is deleted from our live systems and residual backups expire, except where we must keep a copy (for example invoices).',
                 after: 'You represent that you have the right to submit Your Content — including bank statements you import and data about household members — and that it does not violate the law or these Terms.',
             },
             ip: {
@@ -67,7 +67,7 @@ const legal = {
             },
             billing: {
                 title: 'Plans, prices and VAT',
-                body: 'Basic may be offered free. Paid plans (for example Plus and Max) are subscriptions billed in advance, monthly or yearly, until cancelled. Prices are shown before you pay. Where VAT or similar tax applies, it is included or shown as required for your country. We charge through our payment provider (Stripe). We do not store full card numbers.',
+                body: 'Basic may be offered free. Paid plans (for example Plus and Max) are subscriptions billed in advance, monthly or yearly, until canceled. Prices are shown before you pay. Where VAT or similar tax applies, it is included or shown as required for your country. We charge through our payment provider (Stripe). We do not store full card numbers.',
                 after: 'A free plan does not guarantee that every current feature stays free. If we introduce a charge for something you already use, we will say so in advance and you may cancel.',
             },
             withdrawal: {
@@ -128,7 +128,7 @@ const legal = {
                 items: [
                     'If a provision is invalid, the rest stays in force. A valid provision as close as possible to the invalid one applies where the law allows.',
                     'These Terms, plus the Privacy Policy, Cookie Policy, and any plan details shown at checkout, are the entire agreement for the Service.',
-                    'You may not assign the contract without our consent. We may assign it in a reorganisation or sale of the Service, provided your consumer rights are not reduced.',
+                    'You may not assign the contract without our consent. We may assign it in a reorganization or sale of the Service, provided your consumer rights are not reduced.',
                     'We communicate in English. Translations are a convenience. If a translation conflicts with the English text, English prevails — except where mandatory consumer law of your country requires otherwise.',
                     'Failure to enforce a term is not a waiver.',
                 ],
@@ -170,7 +170,7 @@ const legal = {
             special: {
                 title: 'Special-category and sensitive data',
                 body: 'Energy logs (sleep, training, food, rest) and soul or intention notes can reveal health or philosophical information. Under GDPR that may be special-category data (Article 9). We process it only if you choose to use those features. By entering that data you give explicit consent for us to store and display it to you and to household members you invite, and to use it to generate Coach tips inside the product. You may stop logging and ask us to delete it. We do not use this data for advertising, scoring your credit, or inferring characteristics for third parties.',
-                after: 'US “sensitive personal information” (including precise financial account data and health-related logs) is used only to provide the features you request. We do not sell it or share it for cross-context behavioural advertising.',
+                after: 'US “sensitive personal information” (including precise financial account data and health-related logs) is used only to provide the features you request. We do not sell it or share it for cross-context behavioral advertising.',
             },
             sources: {
                 title: 'How we obtain data',
@@ -216,9 +216,9 @@ const legal = {
                     'An optional PSD2/AIS provider if you connect a live bank feed.',
                     'Professional advisers (accountant, lawyer) under confidentiality, when needed.',
                     'Authorities if the law requires it, or if we must protect users, the Service, or our legal rights.',
-                    'A buyer or successor if we reorganise or sell the Service, under continued protection and notice where the law requires.',
+                    'A buyer or successor if we reorganize or sell the Service, under continued protection and notice where the law requires.',
                 ],
-                after: 'We do not sell personal information and we do not share it for cross-context behavioural advertising. We do not allow processors to use your household data for their own marketing.',
+                after: 'We do not sell personal information and we do not share it for cross-context behavioral advertising. We do not allow processors to use your household data for their own marketing.',
             },
             transfers: {
                 title: 'International transfers',
@@ -245,9 +245,9 @@ const legal = {
             },
             rights_us: {
                 title: 'Your rights in the United States',
-                body: 'If you are a resident of California or another US state with a comprehensive privacy law (for example Virginia, Colorado, Connecticut, Utah, Texas, Oregon), you may have the right to know/access, correct, delete, obtain a copy, opt out of “sale” or “sharing” of personal information, and limit use of sensitive personal information, and not to be discriminated against for exercising those rights. You may use an authorised agent where the statute allows, with proof of authority.',
+                body: 'If you are a resident of California or another US state with a comprehensive privacy law (for example Virginia, Colorado, Connecticut, Utah, Texas, Oregon), you may have the right to know/access, correct, delete, obtain a copy, opt out of “sale” or “sharing” of personal information, and limit use of sensitive personal information, and not to be discriminated against for exercising those rights. You may use an authorized agent where the statute allows, with proof of authority.',
                 items: [
-                    'We do not sell personal information and we do not share it for cross-context behavioural advertising, as those terms are defined in the CCPA/CPRA. A “Do Not Sell or Share” request is therefore already how we operate; email us if you want that confirmed in writing.',
+                    'We do not sell personal information and we do not share it for cross-context behavioral advertising, as those terms are defined in the CCPA/CPRA. A “Do Not Sell or Share” request is therefore already how we operate; email us if you want that confirmed in writing.',
                     'Categories we collect, sources, purposes, recipients and retention are described in this policy (notice at collection). In the last 12 months we have not sold or shared personal information for advertising.',
                     'To exercise US rights, email support@rumtelo.com from your account address with the subject “US privacy request” and your state. We will verify the request and respond within the statutory period (generally 45 days under CCPA, extendable as allowed).',
                     'California “Shine the Light”: we do not disclose personal information to third parties for their own direct marketing.',
@@ -297,7 +297,7 @@ const legal = {
             },
             manage: {
                 title: 'How you can control cookies',
-                body: 'You can delete or block cookies in your browser settings. If you block strictly necessary cookies, sign-in, household switching, and checkout hand-off may fail — that is a technical limit, not a penalty. We do not currently offer a consent banner because we do not set optional cookies. If we add analytics or marketing cookies later, a banner or preference centre will appear and you will be able to refuse them.',
+                body: 'You can delete or block cookies in your browser settings. If you block strictly necessary cookies, sign-in, household switching, and checkout hand-off may fail — that is a technical limit, not a penalty. We do not currently offer a consent banner because we do not set optional cookies. If we add analytics or marketing cookies later, a banner or preference center will appear and you will be able to refuse them.',
             },
             third: {
                 title: 'Third parties',
@@ -322,7 +322,7 @@ const legal = {
         sections: {
             roles: {
                 title: 'Roles',
-                body: 'For your Rumtelo account and household data, Rumtelo is the data controller (GDPR Article 4(7)). Infrastructure, email and payment vendors are processors (Article 4(8) and Article 28) — they may process data only on our documented instructions, with confidentiality, security, and deletion or return at the end of the contract. An optional PSD2/AIS provider is typically an independent controller or a processor of the bank connection you start; we receive only the account information you authorise. Household members you invite are separate users, not our processors.',
+                body: 'For your Rumtelo account and household data, Rumtelo is the data controller (GDPR Article 4(7)). Infrastructure, email and payment vendors are processors (Article 4(8) and Article 28) — they may process data only on our documented instructions, with confidentiality, security, and deletion or return at the end of the contract. An optional PSD2/AIS provider is typically an independent controller or a processor of the bank connection you start; we receive only the account information you authorize. Household members you invite are separate users, not our processors.',
             },
             purposes: {
                 title: 'Purposes and legal bases',
@@ -348,7 +348,7 @@ const legal = {
             },
             measures: {
                 title: 'Security measures (summary)',
-                body: 'TLS in transit; encryption at rest on the hosted database; password hashing; optional 2FA; row-level household isolation in the application; access limited to operators who need it; backups in the same EU region. Processors are required to implement appropriate technical and organisational measures under Article 28.',
+                body: 'TLS in transit; encryption at rest on the hosted database; password hashing; optional 2FA; row-level household isolation in the application; access limited to operators who need it; backups in the same EU region. Processors are required to implement appropriate technical and organizational measures under Article 28.',
             },
             transfers: {
                 title: 'International transfers',
@@ -405,7 +405,7 @@ const legal = {
             },
             regulated: {
                 title: 'What we are not',
-                body: 'Rumtelo is not authorised by De Nederlandsche Bank or the AFM as a bank, investment firm, or adviser. Coach output is education. Optional bank sync, when offered, will be provided through a third party that holds its own PSD2 licence. We do not move your money.',
+                body: 'Rumtelo is not authorized by De Nederlandsche Bank or the AFM as a bank, investment firm, or adviser. Coach output is education. Optional bank sync, when offered, will be provided through a third party that holds its own PSD2 license. We do not move your money.',
             },
         },
     },

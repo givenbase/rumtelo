@@ -69,7 +69,7 @@ const why = {
         soul_giving:
             'A fixed share that leaves before you can hold it keeps money a tool, not a master.',
         soul_intent: 'An intention is an instruction to yourself. A resolution is a hope.',
-        soul_centres: 'Name where it feels stuck, and the next step usually names itself.',
+        soul_centers: 'Name where it feels stuck, and the next step usually names itself.',
         growth_income: 'Cutting costs has a floor. Raising income does not.',
         growth_learn: 'A book you cannot name a use for was Play spending, not Education.',
         growth_learn_library:

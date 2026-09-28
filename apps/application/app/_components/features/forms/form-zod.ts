@@ -88,7 +88,7 @@ export function createGoalFormSchema(msg: FormT) {
         jarId: z.string().optional(),
         why: z.string().max(500).optional(),
         cause: z.enum(GivingCause).nullable().optional(),
-        givingOrganisationKey: z.string().max(64).nullable().optional(),
+        givingOrganizationKey: z.string().max(64).nullable().optional(),
     });
 }
 

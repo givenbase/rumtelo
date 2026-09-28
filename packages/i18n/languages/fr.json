@@ -159,7 +159,7 @@
                 "PENDING": "En attente",
                 "COMPLETED": "Terminé",
                 "IN_PROGRESS": "En cours",
-                "CANCELLED": "Annulé",
+                "CANCELED": "Annulé",
                 "OVERDUE": "En retard",
                 "DRAFT": "Brouillon",
                 "OK": "OK",
@@ -609,7 +609,7 @@
                 "name": "Objectif",
                 "description": "Objectif hebdomadaire."
             },
-            "soul-centres": {
+            "soul-centers": {
                 "name": "Centres",
                 "description": "Les sept centres et les points de blocage énergétique."
             },
@@ -1197,7 +1197,7 @@
                     "cause_aria": "Donner lieu à",
                     "cause_any": "Toute cause",
                     "cause_open_hint": "Engagement libre — tout don versé dans la « cagnotte Give » est pris en compte.",
-                    "organisation": "Organisation",
+                    "organization": "Organisation",
                     "give_mode_aria": "Dans quelle mesure cet engagement est-il précis ?",
                     "give_mode_hint": "Je sais à qui : indiquez le nom de l'organisme auquel vous faites déjà des dons. Aidez-moi à choisir : une sélection de coachs avec des vérifications indépendantes. Laissez la question ouverte : indiquez uniquement la cause, sans préciser d'organisme pour l'instant.",
                     "pledge_name": "Nom de la promesse de don",
@@ -1410,6 +1410,8 @@
                 "jar_banner": "C'est dans votre « tirelire Éducation » que sont affectées ces dépenses. Tout ce qui augmente votre capacité de gain contribue à vous mener vers la liberté financière.",
                 "jar_cta": "Voir le pot Éducation",
                 "browse_library": "Parcourir la bibliothèque",
+                "show_more": "Afficher plus",
+                "show_more_remaining": "Afficher plus · {remaining} restants",
                 "tab_focus": "Focus",
                 "tab_done": "Terminé",
                 "search_placeholder": "Rechercher un titre, un auteur ou un sujet",
@@ -1495,6 +1497,8 @@
                     "partner": {
                         "UDEMY": "Udemy",
                         "MASTERCLASS": "MasterClass",
+                        "SPOTIFY": "Spotify",
+                        "NETFLIX": "Netflix",
                         "recommend": "Recommander"
                     },
                     "store": {
@@ -1508,12 +1512,12 @@
                         "watch": "Regarder",
                         "trailer": "Bande-annonce",
                         "where_to_watch": "Où regarder",
-                        "watch_on_youtube": "Regarder sur YouTube",
                         "listen": "Écouter",
                         "where_to_listen": "Où écouter",
-                        "listen_on_spotify": "Écouter sur Spotify",
-                        "view_on_udemy": "Voir sur Udemy",
-                        "view_on_masterclass": "Regarder sur MasterClass"
+                        "watch_on": "Regarder sur {name}",
+                        "listen_on": "Écouter sur {name}",
+                        "view_on": "Voir sur {name}",
+                        "view_course": "Voir le cours"
                     }
                 }
             },
@@ -2556,7 +2560,7 @@
                         "set": "Ensemble",
                         "note_empty": "pour cette semaine"
                     },
-                    "centres": {
+                    "centers": {
                         "name": "Centres",
                         "note": "les centres désignés aujourd'hui"
                     }
@@ -2621,7 +2625,7 @@
                 "tip": "Une bonne intention est modeste, concrète et porte sur un comportement — et non sur un résultat. « Je vérifie mes bocaux tous les dimanches » fonctionne mieux que « Je suis plus attentif à mes finances ».",
                 "stillness_link": "Aller vers le calme →"
             },
-            "centres": {
+            "centers": {
                 "eyebrow": "Les centres",
                 "title": "À quel endroit as-tu l'impression que ça coince ?",
                 "lead": "Ce n'est pas une partition ésotérique, mais une carte qui vous aide à identifier les points où vous vous sentez bloqué cette semaine, afin que votre intention puisse trouver un point d'ancrage.",
@@ -4112,7 +4116,7 @@
             "gratitude": "Reconnaissance",
             "giving": "Donner",
             "intent": "Objectif",
-            "centres": "Centres",
+            "centers": "Centres",
             "coach": "L'entraîneur",
             "why": "Pourquoi",
             "sign_in": "Se connecter",
@@ -4180,7 +4184,7 @@
                 "gratitude": "Reconnaissance",
                 "giving": "Donner",
                 "intent": "Objectif",
-                "centres": "Centres"
+                "centers": "Centres"
             }
         },
         "onboarding": {
@@ -4800,7 +4804,7 @@
                     "connect_bank": "Associer une banque",
                     "wizard_step_institution": "1 · Choisir une banque",
                     "wizard_step_seat": "2 · Choisir un compte",
-                    "wizard_step_authorise": "3 · Autoriser",
+                    "wizard_step_authorize": "3 · Autoriser",
                     "wizard_institution_hint": "Astuce pour le Sandbox : choisissez « Mock ASPSP » ou « Rabobank ».",
                     "wizard_institution_sandbox_hint": "Environnement de test : sélectionnez « Mock ASPSP » (ou « Rabobank ») pour effectuer des tests sans avoir à vous connecter à une véritable banque.",
                     "wizard_sandbox_badge": "Banque de questions",
@@ -4812,15 +4816,15 @@
                     "wizard_pick_seat": "Quel compte devons-nous associer ?",
                     "wizard_pick_seat_bank": "Quel compte {bank} devons-nous associer ?",
                     "wizard_no_matching_seats": "Vous n'avez pas encore de compte {bank}. Créez-en un ci-dessous : il sera associé à cette banque.",
-                    "wizard_authorise": "Continuer vers la banque",
-                    "wizard_authorise_hint": "Vous quitterez brièvement Rumtelo pour valider un accès en lecture seule à la banque, puis vous reviendrez ici.",
-                    "wizard_authorise_what_1": "En lecture seule : soldes et opérations uniquement.",
-                    "wizard_authorise_what_2": "Vous pouvez désactiver ce lien à tout moment dans les Paramètres.",
-                    "wizard_authorise_what_3": "Une fois la validation effectuée, nous effectuons une synchronisation, puis nous vous redirigeons vers cette page.",
-                    "wizard_authorise_bank": "La banque doit autoriser",
-                    "wizard_authorise_seat": "Compte à associer",
-                    "wizard_authorise_seat_new": "Nouveau compte · {bank}",
-                    "wizard_authorise_mismatch": "La banque que vous autorisez ({aspsp}) peut être différente de la banque associée au label Rumtelo ({catalog}). Cela ne pose pas de problème pour les tests ; dans la pratique quotidienne, elles coïncident généralement.",
+                    "wizard_authorize": "Continuer vers la banque",
+                    "wizard_authorize_hint": "Vous quitterez brièvement Rumtelo pour valider un accès en lecture seule à la banque, puis vous reviendrez ici.",
+                    "wizard_authorize_what_1": "En lecture seule : soldes et opérations uniquement.",
+                    "wizard_authorize_what_2": "Vous pouvez désactiver ce lien à tout moment dans les Paramètres.",
+                    "wizard_authorize_what_3": "Une fois la validation effectuée, nous effectuons une synchronisation, puis nous vous redirigeons vers cette page.",
+                    "wizard_authorize_bank": "La banque doit autoriser",
+                    "wizard_authorize_seat": "Compte à associer",
+                    "wizard_authorize_seat_new": "Nouveau compte · {bank}",
+                    "wizard_authorize_mismatch": "La banque que vous autorisez ({aspsp}) peut être différente de la banque associée au label Rumtelo ({catalog}). Cela ne pose pas de problème pour les tests ; dans la pratique quotidienne, elles coïncident généralement.",
                     "wizard_cancel": "Annuler",
                     "group_accounts": "{count} comptes",
                     "not_connected": "Non connecté",
@@ -5463,7 +5467,7 @@
                 "soul_gratitude": "Celui qui prend conscience de ce qu’il possède déjà achète moins pour combler un manque.",
                 "soul_giving": "Une part fixe qui disparaît avant que vous n'ayez pu la conserver permet à l'argent de rester un outil, et non un maître.",
                 "soul_intent": "Une intention, c'est une consigne que l'on se donne à soi-même. Une résolution, c'est un espoir.",
-                "soul_centres": "Identifiez où se situe le blocage, et la prochaine étape s'impose généralement d'elle-même.",
+                "soul_centers": "Identifiez où se situe le blocage, et la prochaine étape s'impose généralement d'elle-même.",
                 "growth_income": "La réduction des coûts a une limite minimale. L'augmentation des revenus, non.",
                 "growth_learn": "Un livre dont on ne voit pas à quoi il pourrait servir relevait des dépenses de loisirs, et non de l'éducation.",
                 "growth_learn_library": "Nous vous conseillons sur les produits à acheter et les créateurs à soutenir. Nous n'hébergeons jamais les œuvres.",

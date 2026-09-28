@@ -134,9 +134,9 @@ const coach = {
         allowed: 'This may go to',
         give_who: 'Who should receive it?',
         give_hint:
-            'Pick a cause, then an organisation with independent checks — same Coach shortlist as on Why & where.',
+            'Pick a cause, then an organization with independent checks — same Coach shortlist as on Why & where.',
         give_recurring_hint:
-            'Choosing an organisation opens a recurring gift (fixed cost). For a one-time gift, use',
+            'Choosing an organization opens a recurring gift (fixed cost). For a one-time gift, use',
         add_transaction: 'Add transaction',
         learn_nudge_title: 'Grow with Learn',
         learn_nudge:

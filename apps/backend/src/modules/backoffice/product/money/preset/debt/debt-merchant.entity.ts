@@ -9,7 +9,7 @@ import { DebtPreset } from './debt.entity';
  * Debt Preset Merchant Entity
  *
  * Ordered link between a debt preset and the merchants offered as
- * "Who do you owe?" chips. Modelled as an entity (not a bare N:M) because the
+ * "Who do you owe?" chips. Modeled as an entity (not a bare N:M) because the
  * link carries data: chip order.
  *
  * @see DebtPreset.merchantLinks

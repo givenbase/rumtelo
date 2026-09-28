@@ -136,7 +136,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
         live
     );
     const givingOrgsQuery = useLiveQuery(
-        apiQuery.money.catalogs.givingOrganisations.list.queryOptions({
+        apiQuery.money.catalogs.givingOrganizations.list.queryOptions({
             input: { householdId: householdId! },
         }),
         [] as never,

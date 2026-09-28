@@ -7,7 +7,7 @@ import { TimeBandStatus } from '../enums';
 import type { TimeBand } from './time.schema';
 
 /**
- * Bands are weekly. Daily behaviours are compared against the proportional share so
+ * Bands are weekly. Daily behaviors are compared against the proportional share so
  * three logged days are not judged as a short week. Weekly accumulators are returned
  * unchanged — they are only meaningful on a full week (see {@link bandStatus}).
  */

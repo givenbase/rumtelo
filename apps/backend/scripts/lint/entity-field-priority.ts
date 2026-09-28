@@ -258,7 +258,7 @@ const JSON_BAG_NAMES = new Set([
     'answers',
     // AccountSettings guided-tour progress
     'tour',
-    // JarTemplate / Jar behaviour flags + Coach helper copy (mirrors contracts JarGuide)
+    // JarTemplate / Jar behavior flags + Coach helper copy (mirrors contracts JarGuide)
     'capabilities',
     'guide',
 ]);
@@ -395,7 +395,7 @@ export const EXACT_FIELD_PRIORITY: Record<string, number> = {
     dedupeKey: 7,
     inflowKey: 7,
     appliedMerchantKey: 7,
-    givingOrganisationKey: 7,
+    givingOrganizationKey: 7,
     registrationNumber: 7,
     vatNumber: 7,
     extraContributorSeats: 7,

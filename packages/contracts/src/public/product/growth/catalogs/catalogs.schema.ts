@@ -69,8 +69,10 @@ export const LearnBookPreset = CatalogItemBase.extend({
 });
 
 /**
- * A film, YouTube video, series, or podcast we recommend. Same gates as a book:
+ * A film, YouTube video, series, podcast, or course we recommend. Same gates as a book:
  * minPlan hides it, spendingStyles only suggests it. We store the pointer.
+ * merchantKey is MerchantPreset.key when one company is the open-home
+ * (Spotify, Udemy, Netflix, …); null when JustWatch / the maker's page is enough.
  */
 export const LearnWatchPreset = CatalogItemBase.extend({
     description: z.string().min(1).max(280),
@@ -84,10 +86,15 @@ export const LearnWatchPreset = CatalogItemBase.extend({
     format: z.enum(LearnWatchKind),
     /** YouTube id for the poster. Null when the pointer is a page, not a video. */
     youtubeId: z.string().min(8).max(16).nullable(),
-    /** Trailer, talk, or the maker's own page. */
+    /** Trailer, talk, class page, or the maker's own page. */
     url: z.string().url().max(280),
     /** Where to stream or rent it (JustWatch title page). Null = url is the only pointer. */
     watchUrl: z.string().url().max(280).nullable(),
+    /**
+     * MerchantPreset.key for the open-home (UDEMY, SPOTIFY, NETFLIX, …).
+     * Null when multi-home or no single merchant. Wire is the key; DB stores the FK.
+     */
+    merchantKey: z.string().min(1).max(64).nullable(),
 });
 
 /**

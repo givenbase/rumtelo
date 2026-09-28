@@ -59,7 +59,7 @@ export function createFixedHref(opts?: {
     name?: string;
     /** Give “To whom” path — known | coach | manual */
     payeeMode?: 'known' | 'coach' | 'manual';
-    /** GivingOrganisation catalog key (Coach path). */
+    /** GivingOrganization catalog key (Coach path). */
     orgKey?: string;
     /** MerchantPreset key (typed or Coach chip). */
     merchantKey?: string;

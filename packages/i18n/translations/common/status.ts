@@ -7,7 +7,7 @@ const status = {
         PENDING: 'Pending',
         COMPLETED: 'Completed',
         IN_PROGRESS: 'In progress',
-        CANCELLED: 'Cancelled',
+        CANCELED: 'Canceled',
         OVERDUE: 'Overdue',
         DRAFT: 'Draft',
         OK: 'OK',

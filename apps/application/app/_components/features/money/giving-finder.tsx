@@ -3,7 +3,7 @@
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMemo, useState } from 'react';
 
-import type { GivingCause, GivingOrganisation } from '@rumtelo/contracts';
+import type { GivingCause, GivingOrganization } from '@rumtelo/contracts';
 import { CoachFeatureId, JarKey, GivingSignalTier } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
@@ -26,8 +26,8 @@ import { CoachMark } from '@/components/features/helpers/helper-mark';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 type GivingFinderProps = {
-    /** Called with the organisation the household picked. */
-    onPick: (organisation: GivingOrganisation) => void;
+    /** Called with the organization the household picked. */
+    onPick: (organization: GivingOrganization) => void;
     /** Currently chosen counterparty name — marks the matching card. */
     selectedName?: string | null;
     /** Stable catalog key — preferred over selectedName for deep-links. */
@@ -41,7 +41,7 @@ type GivingFinderProps = {
 
 /**
  * The Coach — features.money.giving_finder.title
- * Cause chips → vetted organisations with their independent signals.
+ * Cause chips → vetted organizations with their independent signals.
  * Rumtelo shows who checked them and what that check measures — nothing more.
  */
 export function GivingFinder({
@@ -69,25 +69,25 @@ export function GivingFinder({
     }
 
     const query = useLiveQuery(
-        apiQuery.money.catalogs.givingOrganisations.list.queryOptions({
+        apiQuery.money.catalogs.givingOrganizations.list.queryOptions({
             input: { householdId: householdId! },
         }),
         [],
         live && open
     );
-    const organisations = useMemo(() => query.data ?? [], [query.data]);
+    const organizations = useMemo(() => query.data ?? [], [query.data]);
 
     const selectedOrg = useMemo(() => {
         if (selectedKey) {
-            const byKey = organisations.find(org => org.key === selectedKey);
+            const byKey = organizations.find(org => org.key === selectedKey);
             if (byKey) return byKey;
         }
         if (selectedName?.trim()) {
             const needle = selectedName.trim().toLowerCase();
-            return organisations.find(org => org.name.toLowerCase() === needle) ?? null;
+            return organizations.find(org => org.name.toLowerCase() === needle) ?? null;
         }
         return null;
-    }, [organisations, selectedKey, selectedName]);
+    }, [organizations, selectedKey, selectedName]);
 
     // Deep-link: open the cause that contains the pre-selected org (adjust during render).
     if (
@@ -103,15 +103,15 @@ export function GivingFinder({
     const causesWithRows = useMemo(
         () =>
             GIVING_CAUSE_CATALOG.filter(meta =>
-                organisations.some(organisation => organisation.causes.includes(meta.key))
+                organizations.some(organization => organization.causes.includes(meta.key))
             ),
-        [organisations]
+        [organizations]
     );
 
     const shown = useMemo(
         () =>
-            cause ? organisations.filter(organisation => organisation.causes.includes(cause)) : [],
-        [organisations, cause]
+            cause ? organizations.filter(organization => organization.causes.includes(cause)) : [],
+        [organizations, cause]
     );
 
     const activeCause = cause ? givingCauseCopy(tRoot, cause) : null;
@@ -216,16 +216,16 @@ export function GivingFinder({
                             <p className="text-sm text-fg-muted">{t('empty_cause')}</p>
                         ) : (
                             <ul className="grid gap-2">
-                                {shown.map(organisation => (
-                                    <li key={organisation.key}>
-                                        <GivingOrganisationCard
-                                            organisation={organisation}
+                                {shown.map(organization => (
+                                    <li key={organization.key}>
+                                        <GivingOrganizationCard
+                                            organization={organization}
                                             selected={
-                                                selectedOrg?.key === organisation.key ||
+                                                selectedOrg?.key === organization.key ||
                                                 selectedName?.trim().toLowerCase() ===
-                                                    organisation.name.toLowerCase()
+                                                    organization.name.toLowerCase()
                                             }
-                                            onPick={() => onPick(organisation)}
+                                            onPick={() => onPick(organization)}
                                         />
                                     </li>
                                 ))}
@@ -238,12 +238,12 @@ export function GivingFinder({
     );
 }
 
-function GivingOrganisationCard({
-    organisation,
+function GivingOrganizationCard({
+    organization,
     selected,
     onPick,
 }: {
-    organisation: GivingOrganisation;
+    organization: GivingOrganization;
     selected: boolean;
     onPick: () => void;
 }) {
@@ -252,11 +252,11 @@ function GivingOrganisationCard({
     const tRoot = useTranslations();
     const signalTiers = givingSignalTiers(tRoot);
     const { byKey: jarByKey } = useJarCatalog();
-    const where = [organisation.scope, organisation.country].filter(Boolean).join(' · ');
+    const where = [organization.scope, organization.country].filter(Boolean).join(' · ');
     const mark = partyMark(
         {
-            name: organisation.name,
-            website: organisation.website,
+            name: organization.name,
+            website: organization.website,
         },
         catalogMarkChrome({
             jarKey: JarKey.GIVE,
@@ -280,7 +280,7 @@ function GivingOrganisationCard({
                         className="mt-0.5"
                     />
                     <div className="min-w-0">
-                        <p className="text-sm font-medium text-fg">{organisation.name}</p>
+                        <p className="text-sm font-medium text-fg">{organization.name}</p>
                         {where ? (
                             <p className="mt-0.5 font-mono text-[10px] tracking-wide text-fg-faint uppercase">
                                 {where}
@@ -301,10 +301,10 @@ function GivingOrganisationCard({
                 </button>
             </div>
 
-            <p className="text-sm leading-relaxed text-fg-secondary">{organisation.description}</p>
+            <p className="text-sm leading-relaxed text-fg-secondary">{organization.description}</p>
 
             <ul className="flex flex-wrap gap-1.5" aria-label={tForm('aria.independent_signals')}>
-                {organisation.signals.map(signal => {
+                {organization.signals.map(signal => {
                     const evaluator = givingEvaluatorMeta(signal.evaluator);
                     const tier = signalTiers[evaluator?.tier ?? GivingSignalTier.GOVERNANCE];
                     const text = `${evaluator?.name ?? signal.evaluator} · ${signal.label}${
@@ -340,13 +340,13 @@ function GivingOrganisationCard({
             </ul>
 
             <div className="flex flex-wrap items-center justify-between gap-2">
-                {organisation.reporting ? (
-                    <p className="font-mono text-xs text-fg-faint">↺ {organisation.reporting}</p>
+                {organization.reporting ? (
+                    <p className="font-mono text-xs text-fg-faint">↺ {organization.reporting}</p>
                 ) : (
                     <span />
                 )}
                 <a
-                    href={organisation.website}
+                    href={organization.website}
                     target="_blank"
                     rel="noreferrer noopener"
                     className="font-mono text-xs font-medium tracking-wide text-fg-muted uppercase hover:text-accent">

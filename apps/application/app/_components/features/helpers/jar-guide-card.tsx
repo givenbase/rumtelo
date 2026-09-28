@@ -35,7 +35,7 @@ type JarGuideCardProps = {
 
 /**
  * Coach guide for a jar — what it is for, with icons and next moves.
- * Give also embeds the organisation finder (same Coach path as Soul → Giving).
+ * Give also embeds the organization finder (same Coach path as Soul → Giving).
  * Hidden when Coach guides are off (Help or Settings → Account).
  */
 export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: JarGuideCardProps) {
@@ -107,12 +107,12 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
                             <GivingFinder
                                 defaultOpen
                                 className="border-line ring-0"
-                                onPick={organisation => {
+                                onPick={organization => {
                                     if (jarId) {
                                         router.push(
                                             createFixedHref({
                                                 jarId,
-                                                orgKey: organisation.key,
+                                                orgKey: organization.key,
                                                 payeeMode: 'coach',
                                             })
                                         );
@@ -121,7 +121,7 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
                                     router.push(
                                         createTxHref({
                                             direction: 'out',
-                                            counterparty: organisation.name,
+                                            counterparty: organization.name,
                                         })
                                     );
                                 }}
