@@ -3,8 +3,28 @@ import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
 
+/** Content-IDs referenced as `cid:…` in Resend HTML (must match attachment.contentId). */
+export const EMAIL_LOGO_CID = {
+    wordmark: 'rumtelo-wordmark',
+    icon: 'rumtelo-icon',
+} as const;
+
+export type EmailLogoMode = 'cid' | 'data-uri';
+
+export type EmailBrandLogoSrcs = {
+    wordmark: string;
+    icon: string;
+};
+
+export type EmailCidAttachment = {
+    filename: string;
+    /** Base64 — required by Resend when sending local file content. */
+    content: string;
+    contentId: string;
+    contentType: 'image/png';
+};
+
 function readBrandPng(assetFile: string): Buffer {
-    // `@rumtelo/brand` exports `./assets/*` → packages/brand/assets/*
     const absolute = require.resolve(`@rumtelo/brand/assets/${assetFile}`);
     return readFileSync(absolute);
 }
@@ -13,27 +33,60 @@ function toDataUri(png: Buffer): string {
     return `data:image/png;base64,${png.toString('base64')}`;
 }
 
-export type EmailBrandDataUris = {
-    /** Header wordmark — Lanczos3 3× display PNG. */
-    wordmark: string;
-    /** Footer icon — Lanczos3 3× display PNG. */
-    icon: string;
-};
+let dataUriCache: EmailBrandLogoSrcs | undefined;
+let pngCache: { wordmark: Buffer; icon: Buffer } | undefined;
 
-let cached: EmailBrandDataUris | undefined;
+function brandPngs() {
+    if (!pngCache) {
+        pngCache = {
+            wordmark: readBrandPng('logo/wordmark-on-light-email.png'),
+            icon: readBrandPng('logo/icon-email.png'),
+        };
+    }
+    return pngCache;
+}
+
+/** Browser `/email-preview` — data URIs (Gmail strips these; never use for Resend). */
+export function emailBrandDataUris(): EmailBrandLogoSrcs {
+    if (dataUriCache) return dataUriCache;
+    const pngs = brandPngs();
+    dataUriCache = {
+        wordmark: toDataUri(pngs.wordmark),
+        icon: toDataUri(pngs.icon),
+    };
+    return dataUriCache;
+}
+
+/** Resend MIME inline images — pair with `<img src="cid:…">`. */
+export function emailBrandCidAttachments(): EmailCidAttachment[] {
+    const pngs = brandPngs();
+    return [
+        {
+            filename: 'rumtelo-wordmark.png',
+            content: pngs.wordmark.toString('base64'),
+            contentId: EMAIL_LOGO_CID.wordmark,
+            contentType: 'image/png',
+        },
+        {
+            filename: 'rumtelo-icon.png',
+            content: pngs.icon.toString('base64'),
+            contentId: EMAIL_LOGO_CID.icon,
+            contentType: 'image/png',
+        },
+    ];
+}
 
 /**
- * Self-contained logo sources for email HTML.
- *
- * Data URIs work in `/email-preview` (browser) and most mail clients without
- * depending on remote `/brand/*` URLs or CID multipart (which browsers ignore).
- * Sources are sharp-generated `*-email.png` masters — small enough to inline.
+ * Resolve logo `src` values.
+ * - `cid` — real Resend delivery (Gmail-safe)
+ * - `data-uri` — `/email-preview` + memory outbox HTML in a browser
  */
-export function emailBrandDataUris(): EmailBrandDataUris {
-    if (cached) return cached;
-    cached = {
-        wordmark: toDataUri(readBrandPng('logo/wordmark-on-light-email.png')),
-        icon: toDataUri(readBrandPng('logo/icon-email.png')),
-    };
-    return cached;
+export function emailBrandLogoSrcs(mode: EmailLogoMode = 'data-uri'): EmailBrandLogoSrcs {
+    if (mode === 'cid') {
+        return {
+            wordmark: `cid:${EMAIL_LOGO_CID.wordmark}`,
+            icon: `cid:${EMAIL_LOGO_CID.icon}`,
+        };
+    }
+    return emailBrandDataUris();
 }

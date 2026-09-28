@@ -5,6 +5,7 @@ import * as React from 'react';
 import Button from '../../../components/Button';
 import EmailLayout from '../../../components/EmailLayout';
 import { createEmailStyles } from '../../../styles';
+import type { EmailLogoMode } from '../../../utils/email-brand-images.util';
 import { createEmailTranslator } from '../../../utils/email-translation.util';
 
 import { languageObject } from './translations';
@@ -16,6 +17,7 @@ export interface PasswordResetTemplateProps {
     locale?: string;
     resetUrl: string;
     websiteUrl?: string;
+    logoMode?: EmailLogoMode;
 }
 
 /**
@@ -28,6 +30,7 @@ export const PasswordResetTemplate: React.FC<PasswordResetTemplateProps> = ({
     darkMode = false,
     locale = 'en',
     websiteUrl,
+    logoMode,
 }) => {
     const translate = createEmailTranslator(languageObject, locale);
     const styles = createEmailStyles(darkMode);
@@ -36,6 +39,7 @@ export const PasswordResetTemplate: React.FC<PasswordResetTemplateProps> = ({
         <EmailLayout
             darkMode={darkMode}
             websiteUrl={websiteUrl}
+            logoMode={logoMode}
             previewText={translate('email.auth.password_reset.header.preview_text')}
             title={translate('email.auth.password_reset.header.title')}>
             <Heading style={styles.heading}>

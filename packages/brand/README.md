@@ -34,10 +34,10 @@ packages/brand/assets/
     manifest.webmanifest           # web app manifest
 ```
 
-**App:** SVG. **Email:** PNG (clients don’t reliably render SVG), inlined as
-`data:image/png;base64,…` in the HTML so `/email-preview` and mail clients both
-render without remote URLs or CID. Masters stay full resolution; email variants
-are generated with **sharp** (Lanczos3, lossless PNG, 3× CSS display size):
+**App:** SVG. **Email:** PNG (clients don’t reliably render SVG). Resend delivery
+embeds them as **CID attachments** (Gmail strips data-URIs). `/email-preview`
+uses data-URIs so logos still show in the browser. Masters stay full resolution;
+email variants are generated with **sharp** (Lanczos3, lossless PNG, 3× CSS display):
 
 ```bash
 pnpm --filter @rumtelo/brand email-assets

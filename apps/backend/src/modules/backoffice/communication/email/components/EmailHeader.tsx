@@ -5,12 +5,14 @@ import * as React from 'react';
 import { emailBrand, emailLayout } from '../styles/email-tokens';
 import { getTheme } from '../styles/theme-styles';
 import { EMAIL_BRAND, EMAIL_LOGO_SIZE } from '../utils/brand.constants';
-import { emailBrandDataUris } from '../utils/email-brand-images.util';
+import { emailBrandLogoSrcs, type EmailLogoMode } from '../utils/email-brand-images.util';
 
 interface EmailHeaderProps {
     darkMode?: boolean;
     showLogo?: boolean;
     websiteUrl?: string;
+    /** `cid` for Resend; `data-uri` for browser preview. */
+    logoMode?: EmailLogoMode;
 }
 
 /** Header chrome — full wordmark only; tagline lives in the footer. */
@@ -18,12 +20,13 @@ const EmailHeader: React.FC<EmailHeaderProps> = ({
     websiteUrl = EMAIL_BRAND.websiteUrl,
     darkMode = false,
     showLogo = true,
+    logoMode = 'data-uri',
 }) => {
     if (!showLogo) return null;
 
     const theme = getTheme(darkMode);
     const { width, height } = EMAIL_LOGO_SIZE.wordmark;
-    const { wordmark } = emailBrandDataUris();
+    const { wordmark } = emailBrandLogoSrcs(logoMode);
 
     return (
         <Section style={{ margin: 0, padding: 0 }}>

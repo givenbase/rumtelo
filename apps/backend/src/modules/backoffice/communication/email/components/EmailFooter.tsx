@@ -5,7 +5,7 @@ import * as React from 'react';
 import { emailBrand, emailFonts, emailLayout } from '../styles/email-tokens';
 import { getTheme } from '../styles/theme-styles';
 import { EMAIL_BRAND, EMAIL_LOGO_SIZE } from '../utils/brand.constants';
-import { emailBrandDataUris } from '../utils/email-brand-images.util';
+import { emailBrandLogoSrcs, type EmailLogoMode } from '../utils/email-brand-images.util';
 
 interface EmailFooterProps {
     companyName?: string;
@@ -15,9 +15,11 @@ interface EmailFooterProps {
     termsUrl?: string;
     cookiesUrl?: string;
     websiteUrl?: string;
+    /** `cid` for Resend; `data-uri` for browser preview. */
+    logoMode?: EmailLogoMode;
 }
 
-/** Footer chrome — icon mark (data-URI inlined), not a text wordmark. */
+/** Footer chrome — icon mark + tagline (not a text wordmark). */
 const EmailFooter: React.FC<EmailFooterProps> = ({
     companyName = EMAIL_BRAND.name,
     currentYear = new Date().getFullYear(),
@@ -26,10 +28,11 @@ const EmailFooter: React.FC<EmailFooterProps> = ({
     termsUrl = `${EMAIL_BRAND.websiteUrl}/legal/terms`,
     cookiesUrl = `${EMAIL_BRAND.websiteUrl}/legal/cookies`,
     websiteUrl = EMAIL_BRAND.websiteUrl,
+    logoMode = 'data-uri',
 }) => {
     const theme = getTheme(darkMode);
     const { width, height } = EMAIL_LOGO_SIZE.icon;
-    const { icon } = emailBrandDataUris();
+    const { icon } = emailBrandLogoSrcs(logoMode);
 
     const linkStyle = {
         color: darkMode ? '#4ed9d2' : emailBrand.accent,
