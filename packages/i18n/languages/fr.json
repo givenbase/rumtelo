@@ -87,6 +87,7 @@
                     "not_authenticated": "Non authentifié",
                     "no_household_selected": "Aucun foyer sélectionné",
                     "not_household_member": "N'est pas membre de ce foyer",
+                    "household_mismatch": "Le foyer indiqué dans la demande ne correspond pas au foyer sélectionné.",
                     "plan_missing_capability": "Cette formule ne comprend pas cette fonctionnalité.",
                     "plan_limit_reached": "Limite du forfait atteinte",
                     "capability_unavailable": "Cette fonctionnalité n'est pas encore disponible.",

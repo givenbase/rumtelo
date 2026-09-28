@@ -87,6 +87,7 @@
                     "not_authenticated": "Niet aangemeld",
                     "no_household_selected": "Er is geen huishouden geselecteerd",
                     "not_household_member": "Geen lid van dit huishouden",
+                    "household_mismatch": "Het huishouden in de aanvraag komt niet overeen met het geselecteerde huishouden.",
                     "plan_missing_capability": "Dit plan bevat die functie niet",
                     "plan_limit_reached": "Limiet van het abonnement bereikt",
                     "capability_unavailable": "Deze functie is nog niet beschikbaar",
@@ -3035,19 +3036,19 @@
                 "overspent": "Er is te veel uitgegeven aan een of meer potten"
             },
             "household": {
-                "eyebrow": "Uw huishouden",
-                "blurb": "De mensen op dit forum, en alle Practice-coaches die hebben gevraagd om mee te kijken.",
-                "open_settings": "Manage in settings",
+                "eyebrow": "Jullie huishouden",
+                "blurb": "Mensen op dit bord, en Practice-coaches die vroegen om mee te kijken.",
+                "open_settings": "Mensen beheren",
                 "open_practice": "Coaches beheren",
                 "members_label": "Mensen",
-                "members_hint": "Leden met toegang tot dit forum",
-                "practice_label": "Oefening",
+                "members_hint": "Leden met toegang tot dit bord",
+                "practice_label": "Oefenen",
                 "practice_hint": "Externe coaches — wederzijdse toestemming",
                 "practice_none": "Geen coach gekoppeld",
-                "practice_pending": "{count, plural, one {# invite pending} other {# invites pending}}",
-                "practice_active": "{name}",
-                "attention_eyebrow": "Moet door jou worden goedgekeurd",
-                "attention_blurb": "Een praktijk heeft gevraagd om dit prikbord te mogen bekijken of beheren. Accepteer dit verzoek alleen als je deze praktijk kent."
+                "practice_pending": "{count, plural, one {# uitnodiging open} other {# uitnodigingen open}}",
+                "practice_active": "{count, plural, one {Gekoppeld · {name}} other {# Practices gekoppeld}}",
+                "attention_eyebrow": "Jouw OK nodig",
+                "attention_blurb": "Een Practice vroeg om dit bord te bekijken of te beheren. Accepteer alleen als je ze kent."
             },
             "coach": {
                 "inbox_one": "{count}-transactie wacht op een pot.",

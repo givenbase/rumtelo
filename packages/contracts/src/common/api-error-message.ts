@@ -39,6 +39,7 @@ export const API_ERROR_MESSAGES = [
     'not_authenticated',
     'no_household_selected',
     'not_household_member',
+    'household_mismatch',
     'plan_missing_capability',
     'plan_limit_reached',
     'capability_unavailable',

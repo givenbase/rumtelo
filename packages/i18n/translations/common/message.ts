@@ -69,6 +69,7 @@ const message = {
             not_authenticated: 'Not authenticated',
             no_household_selected: 'No household selected',
             not_household_member: 'Not a member of this household',
+            household_mismatch: 'Household in the request does not match the selected household.',
             plan_missing_capability: 'This plan does not include that feature',
             plan_limit_reached: 'Plan limit reached',
             capability_unavailable: 'This feature is not available yet',
