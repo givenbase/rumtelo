@@ -18,6 +18,17 @@ export function daysInPeriod(period: string): number {
     return new Date(Date.UTC(year, month, 0)).getUTCDate();
 }
 
+/**
+ * Signed calendar days from today (UTC) to the last day of `period`.
+ * Positive = days still left · 0 = last day · negative = days overdue.
+ */
+export function daysUntilPeriodEnd(period: string, now = new Date()): number {
+    const [year, month] = period.split('-').map(Number) as [number, number];
+    const endMs = Date.UTC(year, month, 0);
+    const todayMs = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+    return Math.round((endMs - todayMs) / 86_400_000);
+}
+
 /** ISO week key, YYYY-Www. The unit of the weekly week check. */
 export function currentWeek(date = new Date()): string {
     const thursday = new Date(

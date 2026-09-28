@@ -147,6 +147,7 @@ export function HomeDashboardClient() {
         level: 1,
         events: [],
         closeBlockers: { inboxCount: 0, dueBillCount: 0, dueBillNames: [] },
+        priorOpenPeriod: null,
     };
 
     const { byKey: catalogByKey } = useJarCatalog();
@@ -405,6 +406,7 @@ export function HomeDashboardClient() {
                 events={monthScore.events}
                 isClosed={liveData?.monthScore?.isClosed}
                 closeBlockers={monthScore.closeBlockers}
+                priorOpenPeriod={monthScore.priorOpenPeriod}
                 periodNote={periodScoreNote}
                 canCloseMonth={
                     live &&

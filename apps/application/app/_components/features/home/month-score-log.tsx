@@ -3,12 +3,13 @@
 import Link from 'next/link';
 
 import type { MonthCloseBlockers, MonthScoreEvent } from '@rumtelo/contracts';
-import { useTranslations } from '@rumtelo/i18n';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Eyebrow } from '@rumtelo/ui';
-import { cn } from '@rumtelo/utils';
+import { cn, formatPeriod, parsePeriodKey } from '@rumtelo/utils';
 
-import { monthScoreLevelLabel } from '@/app/_lib/month-score-copy';
+import { monthCloseUrgency, monthScoreLevelLabel } from '@/app/_lib/month-score-copy';
 import { ConfirmActionButton } from '@/components/features/forms/confirm-action-button';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 
 export type { MonthScoreEvent };
 
@@ -33,6 +34,7 @@ export function MonthScoreLog({
     events,
     isClosed = false,
     closeBlockers = null,
+    priorOpenPeriod = null,
     periodNote = null,
     onCloseMonth,
     closeMonthPending = false,
@@ -41,11 +43,14 @@ export function MonthScoreLog({
     compact = false,
 }: {
     score: number;
+    /** Signed: positive left · 0 last day · negative overdue. */
     daysLeft: number;
     level: number;
     events?: readonly Pick<MonthScoreEvent, 'occurredOn' | 'text' | 'points' | 'kind'>[];
     isClosed?: boolean;
     closeBlockers?: MonthCloseBlockers | null;
+    /** Earlier month that must close before this one can lock. */
+    priorOpenPeriod?: string | null;
     /** Compact looking-back / looking-ahead line for stacked periods. */
     periodNote?: string | null;
     /** Close the open month score — shown in the header when available. */
@@ -56,10 +61,16 @@ export function MonthScoreLog({
 }) {
     const t = useTranslations('pages.dashboard.month_score');
     const tDashboard = useTranslations('pages.dashboard');
+    const locale = useLocale();
+    const { setPeriod } = useHouseholdShell();
     const levelLabel = monthScoreLevelLabel(tDashboard, level);
-    const ready = closeReady(closeBlockers);
+    const blockersReady = closeReady(closeBlockers);
+    const chainReady = !priorOpenPeriod;
+    const ready = blockersReady && chainReady;
+    const urgency = monthCloseUrgency(daysLeft, isClosed);
+    const priorLabel = priorOpenPeriod ? formatPeriod(priorOpenPeriod, locale) : null;
     const blockerLines: string[] = [];
-    if (closeBlockers && !ready) {
+    if (closeBlockers && !blockersReady) {
         if (closeBlockers.inboxCount === 1) {
             blockerLines.push(tDashboard('close_blocked_inbox_one'));
         } else if (closeBlockers.inboxCount > 1) {
@@ -85,11 +96,42 @@ export function MonthScoreLog({
         }
     }
 
+    const timingLabel = (() => {
+        if (isClosed) return null;
+        if (urgency === 'overdue') {
+            const late = Math.abs(daysLeft);
+            return late === 1 ? t('overdue_days_one') : t('overdue_days_other', { count: late });
+        }
+        if (urgency === 'today') return t('last_day');
+        if (daysLeft === 1) return t('days_left_one');
+        return t('days_left_other', { count: daysLeft });
+    })();
+
+    const explain =
+        urgency === 'overdue'
+            ? t('close_explain_overdue')
+            : urgency === 'today'
+              ? t('close_explain_today')
+              : urgency === 'soon'
+                ? t('close_explain_soon')
+                : t('close_explain');
+
+    function goToPriorPeriod() {
+        if (!priorOpenPeriod) return;
+        setPeriod(parsePeriodKey(priorOpenPeriod));
+    }
+
     return (
         <div
             className={cn(
                 'rounded-2xl border bg-surface p-6 shadow-md',
-                isClosed ? 'border-success/35 ring-1 ring-success/15' : 'border-line'
+                isClosed
+                    ? 'border-success/35 ring-1 ring-success/15'
+                    : urgency === 'overdue'
+                      ? 'border-danger/40 ring-1 ring-danger/15'
+                      : urgency === 'today' || urgency === 'soon'
+                        ? 'border-warning/40 ring-1 ring-warning/15'
+                        : 'border-line'
             )}>
             {/* Header */}
             <div className="flex flex-wrap items-center justify-between gap-3.5">
@@ -109,13 +151,19 @@ export function MonthScoreLog({
                             <span className="rounded-full bg-success/15 px-2.5 py-0.5 font-mono text-[10px] font-bold tracking-[0.12em] text-success uppercase">
                                 {t('closed_badge')}
                             </span>
-                        ) : (
-                            <span className="font-mono text-xs text-fg-faint">
-                                {daysLeft === 1
-                                    ? t('days_left_one')
-                                    : t('days_left_other', { count: daysLeft })}
+                        ) : timingLabel ? (
+                            <span
+                                className={cn(
+                                    'font-mono text-xs',
+                                    urgency === 'overdue'
+                                        ? 'rounded-full bg-danger/12 px-2.5 py-0.5 font-bold tracking-[0.08em] text-danger uppercase'
+                                        : urgency === 'today' || urgency === 'soon'
+                                          ? 'rounded-full bg-warning/15 px-2.5 py-0.5 font-bold tracking-[0.08em] text-warning uppercase'
+                                          : 'text-fg-faint'
+                                )}>
+                                {timingLabel}
                             </span>
-                        )}
+                        ) : null}
                     </span>
                 </div>
                 {canCloseMonth && onCloseMonth ? (
@@ -146,11 +194,33 @@ export function MonthScoreLog({
             ) : canCloseMonth ? (
                 <p
                     className={cn(
-                        'text-sm text-pretty text-fg-muted',
-                        periodNote ? 'mt-1.5' : 'mt-3'
+                        'text-sm text-pretty',
+                        periodNote ? 'mt-1.5' : 'mt-3',
+                        urgency === 'overdue'
+                            ? 'text-danger'
+                            : urgency === 'today' || urgency === 'soon'
+                              ? 'text-warning'
+                              : 'text-fg-muted'
                     )}>
-                    {t('close_explain')}
+                    {explain}
                 </p>
+            ) : null}
+
+            {!isClosed && priorOpenPeriod && priorLabel ? (
+                <div className="mt-3 rounded-xl border border-accent/30 bg-accent-soft/40 px-3.5 py-3">
+                    <p className="font-mono text-[10px] font-bold tracking-[0.12em] text-accent uppercase">
+                        {tDashboard('prior_open_title')}
+                    </p>
+                    <p className="mt-2 text-sm text-pretty text-fg-secondary">
+                        {tDashboard('prior_open_body', { period: priorLabel })}
+                    </p>
+                    <button
+                        type="button"
+                        onClick={goToPriorPeriod}
+                        className="mt-2.5 font-mono text-xs font-medium tracking-wide text-accent uppercase transition-colors hover:text-accent-hover">
+                        {tDashboard('prior_open_cta', { period: priorLabel })}
+                    </button>
+                </div>
             ) : null}
 
             {!isClosed && blockerLines.length > 0 ? (

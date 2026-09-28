@@ -14,6 +14,7 @@ export const API_ERROR_MESSAGES = [
     'income_kind_cadence_locked',
     'period_closed',
     'month_close_incomplete',
+    'month_close_prior_open',
     'bill_link_outflow',
     'bill_link_inflow',
     'iban_already_linked',

@@ -39,6 +39,8 @@ const message = {
                 'This month is closed — you cannot add or change anything for that period.',
             month_close_incomplete:
                 'Finish open work before closing this month ({inbox} unsorted in inbox, {bills} bills unpaid or unskipped).',
+            month_close_prior_open:
+                'Close {period} first — months must be finished in order so the log stays honest.',
             bill_link_outflow: 'Link an outflow to settle an outgoing bill.',
             bill_link_inflow: 'Link an inflow to settle a recurring credit.',
             iban_already_linked: 'This IBAN is already linked to an account.',

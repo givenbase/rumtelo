@@ -86,6 +86,7 @@ export function CoachPageClient() {
             level: 1,
             events: [],
             closeBlockers: { inboxCount: 0, dueBillCount: 0, dueBillNames: [] },
+            priorOpenPeriod: null,
         },
         live
     );
@@ -205,6 +206,7 @@ export function CoachPageClient() {
                     level={monthScore.level}
                     isClosed={monthScore.isClosed}
                     closeBlockers={monthScore.closeBlockers}
+                    priorOpenPeriod={monthScore.priorOpenPeriod}
                     canCloseMonth={canCloseMonth}
                     closeMonthPending={closeMonth.isPending}
                     onCloseMonth={() => closeMonth.mutate()}

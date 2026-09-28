@@ -12,7 +12,7 @@ import {
 } from '@rumtelo/utils';
 
 import { sum } from '../../../../../common/utils/money.util';
-import { daysInPeriod } from '../../../../../common/utils/period.util';
+import { daysInPeriod, daysUntilPeriodEnd } from '../../../../../common/utils/period.util';
 import { CoachService } from '../../../platform/coach/coach.service';
 import { HouseholdSettingsService } from '../../../../auth/household/household-settings/household-settings.service';
 import { TransactionService } from '../ledger/transaction/transaction.service';
@@ -104,7 +104,7 @@ export class DashboardService {
         const safeSource = baselineJars;
         const daysLeft =
             meta.travel.direction === 'current'
-                ? Math.max(1, daysInPeriod(period) - new Date().getUTCDate())
+                ? Math.max(1, daysUntilPeriodEnd(period))
                 : daysInPeriod(period);
         const spendableRemaining = sum(
             safeSource
