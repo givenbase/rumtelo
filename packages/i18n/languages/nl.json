@@ -3042,7 +3042,7 @@
                 "open_practice": "Coaches beheren",
                 "members_label": "Mensen",
                 "members_hint": "Leden met toegang tot dit bord",
-                "practice_label": "Oefenen",
+                "practice_label": "Practice",
                 "practice_hint": "Externe coaches — wederzijdse toestemming",
                 "practice_none": "Geen coach gekoppeld",
                 "practice_pending": "{count, plural, one {# uitnodiging open} other {# uitnodigingen open}}",

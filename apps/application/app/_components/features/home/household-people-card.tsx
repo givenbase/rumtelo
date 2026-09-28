@@ -6,6 +6,7 @@ import { HouseholdRole, PracticeClientAccess, PracticeClientLinkStatus } from '@
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
 import { Badge, Button, Icon } from '@rumtelo/ui';
+import { cn } from '@rumtelo/utils';
 
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
@@ -15,8 +16,8 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 import { useSettingsMutation } from '@/household/settings/_utils/use-settings-mutation';
 
 /**
- * Household home: member count + Practice link status.
- * Pending Practice invites (OWNER/ADMIN) can accept here — same dual-consent as Settings.
+ * Household home: member count + Practice link status (only when there is a
+ * pending invite or an active coach link — hide the empty Practice column).
  */
 export function HouseholdPeopleCard() {
     const t = useTranslations();
@@ -29,7 +30,7 @@ export function HouseholdPeopleCard() {
         live
     );
 
-    const myMember = (membersQuery.data ?? []).find(m => m.userId === session?.user?.id);
+    const myMember = (membersQuery.data ?? []).find(member => member.userId === session?.user?.id);
     const canManage =
         myMember?.role === HouseholdRole.OWNER || myMember?.role === HouseholdRole.ADMIN;
 
@@ -45,6 +46,7 @@ export function HouseholdPeopleCard() {
     const links = linksQuery.data ?? [];
     const pending = links.filter(link => link.status === PracticeClientLinkStatus.INVITED);
     const active = links.filter(link => link.status === PracticeClientLinkStatus.ACTIVE);
+    const showPractice = canManage && (pending.length > 0 || active.length > 0);
 
     const accept = useSettingsMutation({
         mutationFn: (linkId: string) =>
@@ -67,12 +69,10 @@ export function HouseholdPeopleCard() {
     const practiceSummary =
         pending.length > 0
             ? t('pages.dashboard.household.practice_pending', { count: pending.length })
-            : active.length > 0
-              ? t('pages.dashboard.household.practice_active', {
-                    name: active[0]?.practiceName ?? '',
-                    count: active.length,
-                })
-              : t('pages.dashboard.household.practice_none');
+            : t('pages.dashboard.household.practice_active', {
+                  name: active[0]?.practiceName ?? '',
+                  count: active.length,
+              });
 
     return (
         <div className="overflow-hidden rounded-2xl border border-line bg-surface">
@@ -82,7 +82,9 @@ export function HouseholdPeopleCard() {
                         {t('pages.dashboard.household.eyebrow')}
                     </p>
                     <p className="mt-1 text-sm text-fg-muted">
-                        {t('pages.dashboard.household.blurb')}
+                        {showPractice
+                            ? t('pages.dashboard.household.blurb')
+                            : t('pages.dashboard.household.members_hint')}
                     </p>
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-1">
@@ -91,7 +93,7 @@ export function HouseholdPeopleCard() {
                         className="font-mono text-[10px] text-accent hover:underline">
                         {t('pages.dashboard.household.open_settings')}
                     </Link>
-                    {canManage ? (
+                    {showPractice ? (
                         <Link
                             href={settingsHref('practice')}
                             className="font-mono text-[10px] text-accent hover:underline">
@@ -101,7 +103,7 @@ export function HouseholdPeopleCard() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-px bg-line">
+            <div className={cn('gap-px bg-line', showPractice ? 'grid grid-cols-2' : 'grid')}>
                 <div className="bg-surface px-4 py-3.5 sm:px-5">
                     <p className="font-mono text-[10px] tracking-wide text-fg-muted uppercase">
                         {t('pages.dashboard.household.members_label')}
@@ -113,18 +115,20 @@ export function HouseholdPeopleCard() {
                         {t('pages.dashboard.household.members_hint')}
                     </p>
                 </div>
-                <div className="bg-surface px-4 py-3.5 sm:px-5">
-                    <p className="font-mono text-[10px] tracking-wide text-fg-muted uppercase">
-                        {t('pages.dashboard.household.practice_label')}
-                    </p>
-                    <p className="mt-1 text-sm font-medium text-fg">{practiceSummary}</p>
-                    <p className="mt-0.5 text-xs text-fg-muted">
-                        {t('pages.dashboard.household.practice_hint')}
-                    </p>
-                </div>
+                {showPractice ? (
+                    <div className="bg-surface px-4 py-3.5 sm:px-5">
+                        <p className="font-mono text-[10px] tracking-wide text-fg-muted uppercase">
+                            {t('pages.dashboard.household.practice_label')}
+                        </p>
+                        <p className="mt-1 text-sm font-medium text-fg">{practiceSummary}</p>
+                        <p className="mt-0.5 text-xs text-fg-muted">
+                            {t('pages.dashboard.household.practice_hint')}
+                        </p>
+                    </div>
+                ) : null}
             </div>
 
-            {canManage && pending.length > 0 ? (
+            {showPractice && pending.length > 0 ? (
                 <div className="border-t border-line">
                     <div className="px-4 pt-3.5 sm:px-5">
                         <p className="font-mono text-[10px] tracking-[0.14em] text-warning uppercase">
