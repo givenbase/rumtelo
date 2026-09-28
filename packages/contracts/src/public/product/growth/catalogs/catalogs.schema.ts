@@ -69,7 +69,7 @@ export const LearnBookPreset = CatalogItemBase.extend({
 });
 
 /**
- * A film, YouTube video, or series we recommend. Same gates as a book:
+ * A film, YouTube video, series, or podcast we recommend. Same gates as a book:
  * minPlan hides it, spendingStyles only suggests it. We store the pointer.
  */
 export const LearnWatchPreset = CatalogItemBase.extend({

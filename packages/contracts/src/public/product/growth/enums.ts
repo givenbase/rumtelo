@@ -7,4 +7,5 @@ export enum LearnWatchKind {
     FILM = 'FILM',
     VIDEO = 'VIDEO',
     SERIES = 'SERIES',
+    PODCAST = 'PODCAST',
 }

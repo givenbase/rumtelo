@@ -13,9 +13,10 @@ import {
 
 type BookStore = 'BOL' | 'AMAZON';
 
-function pickKind(format: LearnFormat): 'book' | 'watch' | 'take' {
+function pickKind(format: LearnFormat): 'book' | 'watch' | 'listen' | 'take' {
     if (format === 'BOOK') return 'book';
     if (format === 'FILM' || format === 'SERIES' || format === 'VIDEO') return 'watch';
+    if (format === 'PODCAST') return 'listen';
     return 'take';
 }
 

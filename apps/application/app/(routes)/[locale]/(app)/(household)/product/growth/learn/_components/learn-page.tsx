@@ -7,20 +7,7 @@ import { useState, type ReactNode } from 'react';
 import { CoachFeatureId, SpendingStyle } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
-import {
-    Icon,
-    Button,
-    Card,
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuLabel,
-    DropdownMenuRadioGroup,
-    DropdownMenuRadioItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-    EmptyState,
-    Typography,
-} from '@rumtelo/ui';
+import { Icon, Button, Card, EmptyState, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
@@ -32,7 +19,7 @@ import { CoachMark, useHelpersEnabled } from '@/components/features/helpers';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
-import { ListSearchField } from '@/components/layout/list-controls';
+import { ListControls } from '@/components/layout/list-controls';
 import { ListToolbar, ListToolbarTab } from '@/components/layout/list-toolbar';
 
 import { useLearnShelf } from './learn-shelf';
@@ -42,6 +29,7 @@ import { dueLine, FinishBy } from './learn-due';
 
 import {
     ABOUT_ORDER,
+    FORMAT_ICON,
     FORMAT_ORDER,
     PIECES,
     SKILLS,
@@ -359,86 +347,6 @@ function StatusPick({
     );
 }
 
-function FilterMenu({
-    label,
-    options,
-}: {
-    label: string;
-    options: ReadonlyArray<{
-        key: string;
-        label: string;
-        count: number;
-        tint?: string;
-        on: boolean;
-        onSelect: () => void;
-    }>;
-}) {
-    const current = options.find(option => option.on) ?? options[0];
-    const skillKeys = new Set<string>(SKILLS.map(skill => skill.key));
-    const tLearn = useTranslations('features.growth.learn');
-    const groups = [
-        { name: '', rows: options.filter(option => option.key === 'ALL') },
-        {
-            name: tLearn('filter_sections'),
-            rows: options.filter(option => option.key !== 'ALL' && !skillKeys.has(option.key)),
-        },
-        {
-            name: tLearn('filter_skills'),
-            rows: options.filter(option => skillKeys.has(option.key)),
-        },
-    ].filter(group => group.rows.length > 0);
-    return (
-        <div className="grid gap-2.5 px-4 py-3.5">
-            <Typography as="span" variant="eyebrow">
-                {label}
-            </Typography>
-            <DropdownMenu>
-                <DropdownMenuTrigger className="flex h-11 w-full items-center gap-3 rounded-lg border border-line bg-raised px-3 text-left text-sm text-fg outline-none focus-visible:border-accent">
-                    {current?.tint ? <Tint pip={current.tint} /> : null}
-                    <span className="min-w-0 flex-1 truncate">{current?.label}</span>
-                    <span className="font-mono text-xs text-fg-muted tabular-nums">
-                        {current?.count}
-                    </span>
-                    <Chevron />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                    align="start"
-                    className="max-h-80 w-(--radix-dropdown-menu-trigger-width) overflow-y-auto rounded-xl border-line bg-surface p-1.5 shadow-lg">
-                    <DropdownMenuRadioGroup
-                        value={current?.key}
-                        onValueChange={key =>
-                            options.find(option => option.key === key)?.onSelect()
-                        }>
-                        {groups.map((group, index) => (
-                            <div key={group.name || 'all'}>
-                                {index > 0 ? <DropdownMenuSeparator className="bg-line" /> : null}
-                                {group.name ? (
-                                    <DropdownMenuLabel className="font-mono text-[10px] tracking-wide text-fg-muted uppercase">
-                                        {group.name}
-                                    </DropdownMenuLabel>
-                                ) : null}
-                                {group.rows.map(option => (
-                                    <DropdownMenuRadioItem
-                                        key={option.key}
-                                        value={option.key}
-                                        className="rounded-lg py-2 pr-3 focus:bg-accent-soft focus:text-fg data-[state=checked]:bg-accent-soft data-[state=checked]:text-accent">
-                                        <span className="min-w-0 flex-1 truncate">
-                                            {option.label}
-                                        </span>
-                                        <span className="font-mono text-xs text-fg-muted tabular-nums">
-                                            {option.count}
-                                        </span>
-                                    </DropdownMenuRadioItem>
-                                ))}
-                            </div>
-                        ))}
-                    </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-            </DropdownMenu>
-        </div>
-    );
-}
-
 function Tint({ pip }: { pip?: string }) {
     return (
         <span
@@ -446,70 +354,6 @@ function Tint({ pip }: { pip?: string }) {
             className="size-2 shrink-0 rounded-full"
             style={pip ? { background: pip } : undefined}
         />
-    );
-}
-
-function Chevron() {
-    return <Icon name="chevron-down" size="md" color="muted" />;
-}
-
-function FilterLane({
-    label,
-    divided,
-    options,
-}: {
-    label: string;
-    divided?: boolean;
-    options: ReadonlyArray<{
-        key: string;
-        label: string;
-        count: number;
-        tint?: string;
-        on: boolean;
-        onSelect: () => void;
-    }>;
-}) {
-    return (
-        <div className={cn('grid gap-2.5 px-4 py-3.5', divided && 'border-b border-line')}>
-            <Typography as="span" variant="eyebrow">
-                {label}
-            </Typography>
-            <div
-                role="group"
-                aria-label={label}
-                className="grid gap-px overflow-hidden rounded-xl bg-line"
-                style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}>
-                {options.map(option => (
-                    <button
-                        key={option.key}
-                        type="button"
-                        aria-pressed={option.on}
-                        onClick={option.onSelect}
-                        className={cn(
-                            'bg-surface px-1.5 py-2 text-center transition-colors hover:bg-raised',
-                            option.on && 'bg-accent-soft'
-                        )}
-                        style={
-                            option.tint ? { boxShadow: `inset 0 3px 0 ${option.tint}` } : undefined
-                        }>
-                        <span
-                            className={cn(
-                                'block truncate font-mono text-[10px] tracking-wide uppercase',
-                                option.on ? 'text-accent' : 'text-fg-muted'
-                            )}>
-                            {option.label}
-                        </span>
-                        <span
-                            className={cn(
-                                'mt-0.5 block font-mono text-sm',
-                                option.on ? 'text-accent' : 'text-fg'
-                            )}>
-                            {option.count}
-                        </span>
-                    </button>
-                ))}
-            </div>
-        </div>
     );
 }
 
@@ -612,6 +456,9 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
     const aboutsPresent = ABOUT_ORDER.filter(about =>
         searched.some(piece => aboutOf(piece) === about)
     );
+    const skillKeys = new Set<string>(SKILLS.map(skill => skill.key));
+    const sectionsPresent = aboutsPresent.filter(key => !skillKeys.has(key));
+    const skillsPresent = aboutsPresent.filter((key): key is LearnSkill => skillKeys.has(key));
     const filtering = search.trim() !== '' || formatFilter !== 'ALL' || aboutFilter !== 'ALL';
 
     const listSkills = new Set<LearnSkill>(
@@ -705,74 +552,93 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
             )}
 
             {browsing ? (
-                <div className="grid overflow-hidden rounded-2xl border border-line bg-surface">
-                    <div className="flex flex-wrap items-center gap-3 border-b border-line px-4 py-3.5">
-                        <ListSearchField
-                            value={search}
-                            onChange={setSearch}
-                            placeholder={tLearn('search_placeholder')}
-                            ariaLabel={tLearn('search_aria')}
-                            className="min-w-0 flex-1 basis-64"
+                <div className="grid gap-3">
+                    <ListControls
+                        search={{
+                            value: search,
+                            onChange: setSearch,
+                            placeholder: tLearn('search_placeholder'),
+                            ariaLabel: tLearn('search_aria'),
+                        }}
+                        filters={{
+                            value: formatFilter,
+                            options: (['ALL', ...formatsPresent] as const).map(key => ({
+                                key,
+                                label:
+                                    key === 'ALL'
+                                        ? tLearn('filter_everything')
+                                        : labels.formatPlural(key),
+                                leading:
+                                    key === 'ALL' ? undefined : (
+                                        <Icon
+                                            name={FORMAT_ICON[key]}
+                                            size="sm"
+                                            className="size-3.5"
+                                        />
+                                    ),
+                            })),
+                            onChange: setFormatFilter,
+                            ariaLabel: tLearn('filter_what'),
+                        }}
+                        end={
+                            <>
+                                <span className="font-mono text-xs text-fg-muted">
+                                    {tLearn('count_of', {
+                                        shown: shown.length,
+                                        total: catalog.length,
+                                    })}
+                                </span>
+                                {filtering ? (
+                                    <button
+                                        type="button"
+                                        onClick={resetFilters}
+                                        className="font-mono text-[11px] tracking-wide text-accent uppercase">
+                                        {t('ui.button.actions.clear')}
+                                    </button>
+                                ) : null}
+                                {live && householdId ? (
+                                    <Button
+                                        size="sm"
+                                        onClick={() => {
+                                            setAddSeed(search.trim());
+                                            setAddOpen(true);
+                                        }}>
+                                        {tLearn('add_learning')}
+                                    </Button>
+                                ) : null}
+                            </>
+                        }
+                    />
+                    <ListControls
+                        title={tLearn('filter_sections')}
+                        filters={{
+                            value: aboutFilter,
+                            options: (['ALL', ...sectionsPresent] as const).map(key => ({
+                                key,
+                                label:
+                                    key === 'ALL'
+                                        ? tLearn('filter_anything')
+                                        : labels.aboutLabel(key),
+                            })),
+                            onChange: setAboutFilter,
+                            ariaLabel: tLearn('filter_sections'),
+                        }}
+                    />
+                    {skillsPresent.length > 0 ? (
+                        <ListControls
+                            title={tLearn('filter_skills')}
+                            filters={{
+                                value: aboutFilter,
+                                options: skillsPresent.map(key => ({
+                                    key,
+                                    label: labels.aboutLabel(key),
+                                    leading: <Tint pip={skillDef(key).tint} />,
+                                })),
+                                onChange: setAboutFilter,
+                                ariaLabel: tLearn('filter_skills'),
+                            }}
                         />
-                        <span className="font-mono text-xs text-fg-muted">
-                            {tLearn('count_of', { shown: shown.length, total: catalog.length })}
-                        </span>
-                        {filtering ? (
-                            <button
-                                type="button"
-                                onClick={resetFilters}
-                                className="font-mono text-[11px] tracking-wide text-accent uppercase">
-                                {t('ui.button.actions.clear')}
-                            </button>
-                        ) : null}
-                        {live && householdId ? (
-                            <Button
-                                size="sm"
-                                onClick={() => {
-                                    setAddSeed(search.trim());
-                                    setAddOpen(true);
-                                }}>
-                                {tLearn('add_learning')}
-                            </Button>
-                        ) : null}
-                    </div>
-                    <FilterLane
-                        label={tLearn('filter_what')}
-                        divided
-                        options={(['ALL', ...formatsPresent] as const).map(key => ({
-                            key,
-                            label:
-                                key === 'ALL'
-                                    ? tLearn('filter_everything')
-                                    : labels.formatPlural(key),
-                            count:
-                                key === 'ALL'
-                                    ? searched.length
-                                    : searched.filter(piece => piece.format === key).length,
-                            on: formatFilter === key,
-                            onSelect: () => setFormatFilter(key),
-                        }))}
-                    />
-                    <FilterMenu
-                        label={tLearn('filter_about')}
-                        options={(['ALL', ...aboutsPresent] as const).map(key => ({
-                            key,
-                            label:
-                                key === 'ALL' ? tLearn('filter_anything') : labels.aboutLabel(key),
-                            count:
-                                key === 'ALL'
-                                    ? searched.length
-                                    : searched.filter(piece => aboutOf(piece) === key).length,
-                            tint:
-                                key === 'COMMUNICATION' || key === 'MARKETING'
-                                    ? skillDef(key).tint
-                                    : key === 'ALL'
-                                      ? undefined
-                                      : skillDef('MONEY').tint,
-                            on: aboutFilter === key,
-                            onSelect: () => setAboutFilter(key),
-                        }))}
-                    />
+                    ) : null}
                 </div>
             ) : null}
 
@@ -850,8 +716,17 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
                         return (
                             <section key={format} className="grid gap-3">
                                 <div className="flex items-baseline justify-between gap-3 px-1">
-                                    <Typography as="h2" variant="eyebrow" color="primary">
-                                        ✦ {labels.formatPlural(format).toUpperCase()}
+                                    <Typography
+                                        as="h2"
+                                        variant="eyebrow"
+                                        color="primary"
+                                        className="inline-flex items-center gap-2">
+                                        <Icon
+                                            name={FORMAT_ICON[format]}
+                                            size="sm"
+                                            className="size-3.5"
+                                        />
+                                        {labels.formatPlural(format).toUpperCase()}
                                     </Typography>
                                     <span className="font-mono text-xs text-fg-muted">
                                         {items.length}

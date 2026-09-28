@@ -11,7 +11,7 @@ import { NativeEnum } from '../../../../../../../common/database/native-enum.uti
  * Films, YouTube videos, and series Rumtelo points at from Growth → Learn.
  * We store who made it and where to watch the pointer. We do not store the work.
  *
- * @see LearnWatchKind — film, video, or series
+ * @see LearnWatchKind — film, video, series, or podcast
  * @see PlanKey — lowest tier that may see this title
  * @see https://mikro-orm.io/docs/defining-entities
  */
@@ -62,7 +62,7 @@ export class WatchPreset extends CatalogEntity {
     watchUrl: string | null = null;
 
     // ? ENUMS
-    /** Film, standalone video, or series. */
+    /** Film, standalone video, series, or podcast show. */
     @Enum(NativeEnum({ LearnWatchKind, domain: 'growth' }))
     format!: LearnWatchKind;
 

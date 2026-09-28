@@ -34,6 +34,16 @@ export const ACTION_LUCIDE_ICONS = [
     'chevron-down',
 ] as const;
 
+/** Learn format filter chips / section headings. */
+export const LEARN_FORMAT_LUCIDE_ICONS = [
+    'book-open',
+    'film',
+    'tv',
+    'video',
+    'headphones',
+    'graduation-cap',
+] as const;
+
 /** Landing jars / portals / principles / trust. */
 export const LANDING_LUCIDE_ICONS = [
     'home',

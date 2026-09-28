@@ -5,6 +5,7 @@
  * Courses follow the plan: Udemy on Basic and Plus, Masterclass on Max.
  */
 
+import type { IconName } from '@rumtelo/ui';
 import {
     type LearnBookPreset,
     type LearnBook,
@@ -16,7 +17,7 @@ import {
     SpendingStyle,
 } from '@rumtelo/contracts';
 
-export type LearnFormat = 'BOOK' | 'FILM' | 'SERIES' | 'VIDEO' | 'COURSE';
+export type LearnFormat = 'BOOK' | 'FILM' | 'SERIES' | 'VIDEO' | 'PODCAST' | 'COURSE';
 export type LearnStatus = 'NOW' | 'QUEUE' | 'DONE' | 'SHELF';
 
 /** Stable keys for outbound link CTAs — resolved via `features.growth.learn.catalog.links.*`. */
@@ -28,6 +29,9 @@ export type LearnLinkKey =
     | 'trailer'
     | 'where_to_watch'
     | 'watch_on_youtube'
+    | 'listen'
+    | 'where_to_listen'
+    | 'listen_on_spotify'
     | 'view_on_udemy'
     | 'view_on_masterclass';
 
@@ -115,7 +119,24 @@ export const PARTNERS = [
     { key: 'MASTERCLASS', name: 'Masterclass' },
 ] as const;
 
-export const FORMAT_ORDER: readonly LearnFormat[] = ['BOOK', 'FILM', 'SERIES', 'VIDEO', 'COURSE'];
+export const FORMAT_ORDER: readonly LearnFormat[] = [
+    'BOOK',
+    'FILM',
+    'SERIES',
+    'VIDEO',
+    'PODCAST',
+    'COURSE',
+];
+
+/** Lucide names for format filter chips and section headings. */
+export const FORMAT_ICON: Record<LearnFormat, IconName> = {
+    BOOK: 'book-open',
+    FILM: 'film',
+    SERIES: 'tv',
+    VIDEO: 'video',
+    PODCAST: 'headphones',
+    COURSE: 'graduation-cap',
+};
 
 export const PIECES: readonly LearnPiece[] = [
     {
@@ -300,6 +321,7 @@ export function formatLabel(format: LearnFormat): string {
     if (format === 'FILM') return 'Film';
     if (format === 'SERIES') return 'Series';
     if (format === 'VIDEO') return 'Video';
+    if (format === 'PODCAST') return 'Podcast';
     return 'Course';
 }
 
@@ -309,19 +331,23 @@ export function partnerLabel(partner: string | undefined): string {
 
 export function pickLabel(format: LearnFormat, status: LearnStatus): string {
     const watch = format === 'FILM' || format === 'SERIES' || format === 'VIDEO';
+    const listen = format === 'PODCAST';
     if (status === 'QUEUE') {
         if (format === 'BOOK') return 'Need to read';
         if (watch) return 'Need to watch';
+        if (listen) return 'Need to listen';
         return 'Need to take';
     }
     if (status === 'NOW') {
         if (format === 'BOOK') return 'Reading';
         if (watch) return 'Watching';
+        if (listen) return 'Listening';
         return 'Taking';
     }
     if (status === 'DONE') {
         if (format === 'BOOK') return 'Read';
         if (watch) return 'Watched';
+        if (listen) return 'Listened';
         return 'Finished';
     }
     return 'Shelf';
@@ -377,6 +403,7 @@ export function formatPlural(format: LearnFormat): string {
     if (format === 'FILM') return 'Films';
     if (format === 'SERIES') return 'Series';
     if (format === 'VIDEO') return 'Videos';
+    if (format === 'PODCAST') return 'Podcasts';
     return 'Courses';
 }
 
@@ -514,6 +541,34 @@ export function addedBookToPiece(book: LearnBook, store: BookStore, tags: StoreT
 }
 
 export function watchToPiece(watch: LearnWatchPreset): LearnPiece {
+    if (watch.format === LearnWatchKind.PODCAST) {
+        const spotify = Boolean(watch.watchUrl?.includes('spotify.com'));
+        const youtube = /youtube\.com|youtu\.be/.test(watch.url);
+        return {
+            id: watch.key,
+            format: 'PODCAST',
+            skill: asLearnSkill(watch.skill),
+            title: watch.name,
+            by: watch.creator,
+            use: watch.description,
+            status: 'SHELF',
+            youtubeId: watch.youtubeId ?? undefined,
+            primary: watch.watchUrl
+                ? {
+                      labelKey: spotify ? 'listen_on_spotify' : 'where_to_listen',
+                      href: watch.watchUrl,
+                  }
+                : { labelKey: 'listen', href: watch.url },
+            secondary: watch.watchUrl
+                ? {
+                      labelKey: youtube ? 'watch_on_youtube' : 'listen',
+                      href: watch.url,
+                  }
+                : undefined,
+            topic: watch.topic,
+            minPlan: watch.minPlan,
+        };
+    }
     const video = watch.format === LearnWatchKind.VIDEO;
     const pointer: LearnLink = { labelKey: video ? 'watch' : 'trailer', href: watch.url };
     return {

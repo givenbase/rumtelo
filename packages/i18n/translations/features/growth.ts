@@ -287,21 +287,25 @@ const growth = {
             'The coach has a few below. Mark one and it lands here, in the order you want to take it.',
         reading_heading: 'To read',
         add_learning: 'Add learning',
-        add_learning_description: 'Search by title. We save where to find it, not the book itself.',
+        add_learning_description:
+            'Start typing — we suggest from our shelf first. Search finds titles we have not listed yet. We save where to find it, not the book itself.',
         search: 'Search',
         catalog_error: 'The catalog did not answer. Try again.',
         save_error: 'That title could not be saved.',
         add_button: 'Add',
         nothing_found: 'Nothing under that name.',
+        library_matches: 'In our library',
+        catalog_matches: 'Wider catalog',
+        pick_about_to_add: 'Pick what it is about, then add.',
         search_catalog_aria: 'Search the public catalog',
-        search_catalog_placeholder: 'The 5 Love Languages',
+        search_catalog_placeholder: 'The Secret, Atomic Habits…',
         back: '← Learn',
         eyebrow_shelf: '✦ WHAT I LEARN',
         eyebrow_library: '✦ THE LIBRARY',
         title_shelf: "Distribution has a floor. Learning doesn't.",
         title_library: 'What we recommend. We do not host it.',
         lead_shelf:
-            'A skill is the decision. A book, film, series, video, or course is how you work it. We recommend what to get and who to support — we never host the work.',
+            'A skill is the decision. A book, film, series, video, podcast, or course is how you work it. We recommend what to get and who to support — we never host the work.',
         lead_library:
             'Search, then narrow by what it is and what it is about. Mark a title and it lands on Learn.',
         partner_max:
@@ -329,7 +333,7 @@ const growth = {
         coach_recommended_body:
             'These are not need-to-read yet. Mark one and it joins the list, at the end.',
         footer_stores:
-            'Books open at {store}. Films and series open on JustWatch, which shows where they stream in your country. Courses open at Udemy or MasterClass.',
+            'Books open at {store}. Films and series open on JustWatch, which shows where they stream in your country. Podcasts open on Spotify or the show page. Courses open at Udemy or MasterClass.',
         footer_commission:
             ' Some of these links earn Rumtelo a small commission. The price is the same for you.',
         footer_no_commission: ' We recommend and point — we never host the work.',
@@ -351,6 +355,7 @@ const growth = {
                 film: 'Film',
                 series: 'Series',
                 video: 'Video',
+                podcast: 'Podcast',
                 course: 'Course',
             },
             format_plural: {
@@ -358,6 +363,7 @@ const growth = {
                 film: 'Films',
                 series: 'Series',
                 video: 'Videos',
+                podcast: 'Podcasts',
                 course: 'Courses',
             },
             pick: {
@@ -365,16 +371,19 @@ const growth = {
                 queue: {
                     book: 'Need to read',
                     watch: 'Need to watch',
+                    listen: 'Need to listen',
                     take: 'Need to take',
                 },
                 now: {
                     book: 'Reading',
                     watch: 'Watching',
+                    listen: 'Listening',
                     take: 'Taking',
                 },
                 done: {
                     book: 'Read',
                     watch: 'Watched',
+                    listen: 'Listened',
                     take: 'Finished',
                 },
             },
@@ -409,6 +418,9 @@ const growth = {
                 trailer: 'Trailer',
                 where_to_watch: 'Where to watch',
                 watch_on_youtube: 'Watch on YouTube',
+                listen: 'Listen',
+                where_to_listen: 'Where to listen',
+                listen_on_spotify: 'Listen on Spotify',
                 view_on_udemy: 'View on Udemy',
                 view_on_masterclass: 'View on MasterClass',
             },
