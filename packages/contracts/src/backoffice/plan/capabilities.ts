@@ -77,7 +77,7 @@ export const FEATURES = {
         gratitude: capabilityKey(CapabilityProduct.SOUL, 'gratitude'),
         giving: capabilityKey(CapabilityProduct.SOUL, 'giving'),
         intent: capabilityKey(CapabilityProduct.SOUL, 'intent'),
-        centres: capabilityKey(CapabilityProduct.SOUL, 'centres'),
+        centers: capabilityKey(CapabilityProduct.SOUL, 'centers'),
     },
     [CapabilityProduct.PLATFORM]: {
         invite: capabilityKey(CapabilityProduct.PLATFORM, 'invite'),
@@ -111,7 +111,7 @@ export const CAPABILITIES = {
     soulGratitude: FEATURES.soul.gratitude,
     soulGiving: FEATURES.soul.giving,
     soulIntent: FEATURES.soul.intent,
-    soulCentres: FEATURES.soul.centres,
+    soulCenters: FEATURES.soul.centers,
     platformInvite: FEATURES.platform.invite,
 } as const;
 

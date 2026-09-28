@@ -9,7 +9,7 @@ import type {
     CategoryTemplate,
     FixedCost,
     FixedCostSettlement,
-    GivingOrganisation,
+    GivingOrganization,
     MerchantPreset,
     Transaction,
 } from '@rumtelo/contracts';
@@ -37,7 +37,7 @@ export type JarDrilldownExtras = {
     settlements?: readonly FixedCostSettlement[];
     categoryTemplates: readonly Pick<CategoryTemplate, 'name' | 'icon'>[];
     merchants: readonly MerchantPreset[];
-    givingOrgs: readonly Pick<GivingOrganisation, 'name' | 'website'>[];
+    givingOrgs: readonly Pick<GivingOrganization, 'name' | 'website'>[];
     jarByKey?: Map<string, { icon: string | null }>;
 };
 

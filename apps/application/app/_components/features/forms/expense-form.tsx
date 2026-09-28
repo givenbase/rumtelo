@@ -785,8 +785,8 @@ export function ExpenseForm({
                             defaultOpen
                             selectedKey={giveOrgKey}
                             selectedName={intent.vendor}
-                            onPick={organisation => {
-                                applyGivePayee(organisation.name, organisation.key);
+                            onPick={organization => {
+                                applyGivePayee(organization.name, organization.key);
                             }}
                         />
                     )}

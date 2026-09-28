@@ -123,7 +123,7 @@ const money = {
             },
             EDUCATION: {
                 subtitle: 'Grow yourself',
-                note: 'Books, courses, mentors, tools. The only spend that raises your earning power.',
+                note: 'Books, courses, mentors, tools. The only spend that raises your earning power. Use Learn for what you are working through, browse the library for inspiration, and put a goal on this jar when you are ready to claim it.',
                 not_allowed:
                     'Only if it raises your earning power. A course you never finish belongs in Play.',
                 allowed: {
@@ -134,8 +134,10 @@ const money = {
                     conferences: 'Conferences',
                 },
                 links: {
-                    transactions: 'Transactions',
+                    learn: 'Learn',
+                    library: 'Library',
                     goals: 'Goals',
+                    transactions: 'Transactions',
                 },
             },
             PLAY: {
@@ -158,7 +160,7 @@ const money = {
                 subtitle: 'Pass it on',
                 note: 'Giving keeps money a tool and not a master. Transferred automatically — the Coach helps you choose where.',
                 not_allowed:
-                    'No favours expected, no tax-deduction thinking. Giving keeps money a tool.',
+                    'No favors expected, no tax-deduction thinking. Giving keeps money a tool.',
                 allowed: {
                     foundation: 'Your foundation',
                     charities: 'Charities',
@@ -674,9 +676,9 @@ const money = {
         hide: 'Hide',
         help_choose: 'Help me choose',
         collapsed_lead:
-            'Pick a cause, and see organisations that publish what they spend and what changed — checked by people outside the organisation.',
+            'Pick a cause, and see organizations that publish what they spend and what changed — checked by people outside the organization.',
         expanded_lead:
-            'Pick a cause first. Each organisation shows who checked it and what that check actually measures — you decide what counts.',
+            'Pick a cause first. Each organization shows who checked it and what that check actually measures — you decide what counts.',
         sign_in: 'Sign in to see the list.',
         loading: 'Loading the list…',
         empty_list:
@@ -697,7 +699,7 @@ const money = {
         category_auto: 'Auto from name / preset',
         category_from_preset: 'From preset ({name})',
         paid_to: 'Paid to (optional)',
-        to_whom: 'To whom (organisation)',
+        to_whom: 'To whom (organization)',
         give_known: 'I know who',
         give_coach: 'Help me choose',
         give_hint:

@@ -118,7 +118,7 @@ export const GIVING_EVALUATOR_CATALOG: readonly GivingEvaluatorCatalogItem[] = [
         name: 'GiveWell',
         tier: GivingSignalTier.IMPACT,
         measures:
-            'Cost per life saved or improved, from published trials, plus room for more funding. Recommends only a handful of programmes; every model is public.',
+            'Cost per life saved or improved, from published trials, plus room for more funding. Recommends only a handful of programs; every model is public.',
         url: 'https://www.givewell.org/how-we-work/criteria',
     },
     {
@@ -142,7 +142,7 @@ export const GIVING_EVALUATOR_CATALOG: readonly GivingEvaluatorCatalogItem[] = [
         name: 'Giving Green',
         tier: GivingSignalTier.IMPACT,
         measures:
-            'Climate organisations weighed on scale, feasibility, funding need and potential for systemic change; reassessed every year or two.',
+            'Climate organizations weighed on scale, feasibility, funding need and potential for systemic change; reassessed every year or two.',
         url: 'https://www.givinggreen.earth/top-climate-nonprofits',
     },
     {
@@ -150,7 +150,7 @@ export const GIVING_EVALUATOR_CATALOG: readonly GivingEvaluatorCatalogItem[] = [
         name: 'Animal Charity Evaluators',
         tier: GivingSignalTier.IMPACT,
         measures:
-            'Impact per unit given for animal-welfare organisations — theory of change, cost per animal, room for funding, organisational health.',
+            'Impact per unit given for animal-welfare organizations — theory of change, cost per animal, room for funding, organizational health.',
         url: 'https://animalcharityevaluators.org/charity-reviews/evaluating-charities/evaluation-criteria/',
     },
     {

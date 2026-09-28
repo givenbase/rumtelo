@@ -31,7 +31,7 @@ export enum TimeCategory {
     HOUSEHOLD_CARE = 'HOUSEHOLD_CARE',
     /** HETUS 38/39 — childcare and care for adults. */
     FAMILY_CARE = 'FAMILY_CARE',
-    /** HETUS 4 — organisational work, informal help, religious/participatory. */
+    /** HETUS 4 — organizational work, informal help, religious/participatory. */
     VOLUNTEERING = 'VOLUNTEERING',
     /** HETUS 51/52 — visits, celebrations, conversation, culture, going out. */
     SOCIAL = 'SOCIAL',

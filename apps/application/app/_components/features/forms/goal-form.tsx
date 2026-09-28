@@ -94,7 +94,7 @@ function resolveGiveTargetMode(
     defaults: Partial<GoalFormValues> | undefined,
     t: TranslateFn
 ): GiveTargetMode {
-    if (defaults?.givingOrganisationKey?.trim()) return 'org';
+    if (defaults?.givingOrganizationKey?.trim()) return 'org';
     if (defaults?.name?.trim() && defaults.name !== givePledgeName(defaults.cause ?? null, t)) {
         return 'manual';
     }
@@ -183,16 +183,16 @@ export function GoalForm({
             jarId: defaultValues?.jarId ?? '',
             why: defaultValues?.why ?? '',
             cause: defaultValues?.cause ?? null,
-            givingOrganisationKey: defaultValues?.givingOrganisationKey ?? null,
+            givingOrganizationKey: defaultValues?.givingOrganizationKey ?? null,
         },
         resolver: zodResolver(goalFormSchema),
     });
 
     const kind = useWatch({ control: form.control, name: 'kind' });
     const cause = useWatch({ control: form.control, name: 'cause' });
-    const givingOrganisationKey = useWatch({
+    const givingOrganizationKey = useWatch({
         control: form.control,
-        name: 'givingOrganisationKey',
+        name: 'givingOrganizationKey',
     });
     const name = useWatch({ control: form.control, name: 'name' });
     const carBrandSearch = carBrandQuery.trim().length > 0;
@@ -240,14 +240,14 @@ export function GoalForm({
         form.setValue('kind', next);
         if (next === GoalKind.GIVE) {
             form.setValue('cause', null);
-            form.setValue('givingOrganisationKey', null);
+            form.setValue('givingOrganizationKey', null);
             form.setValue('name', givePledgeName(null, t), { shouldDirty: false });
             setGiveTargetMode('open');
             selectedIcon.current = '💛';
             return;
         }
         form.setValue('cause', null);
-        form.setValue('givingOrganisationKey', null);
+        form.setValue('givingOrganizationKey', null);
         if (kind === GoalKind.GIVE) {
             form.setValue('name', '', { shouldDirty: false });
             selectedIcon.current = null;
@@ -257,7 +257,7 @@ export function GoalForm({
     function selectCause(next: GivingCause | null) {
         form.setValue('cause', next, { shouldDirty: true });
         if (giveTargetMode === 'open') {
-            form.setValue('givingOrganisationKey', null);
+            form.setValue('givingOrganizationKey', null);
             form.setValue('name', givePledgeName(next, t), { shouldDirty: true });
             const meta = next ? givingCauseMeta(next) : null;
             selectedIcon.current = meta?.icon ?? '💛';
@@ -267,7 +267,7 @@ export function GoalForm({
     function selectGiveTargetMode(next: GiveTargetMode) {
         if (next === giveTargetMode) return;
         setGiveTargetMode(next);
-        form.setValue('givingOrganisationKey', null);
+        form.setValue('givingOrganizationKey', null);
         if (next === 'open') {
             form.setValue('name', givePledgeName(cause ?? null, t), { shouldDirty: true });
             const meta = cause ? givingCauseMeta(cause) : null;
@@ -301,8 +301,8 @@ export function GoalForm({
             const jarId = earn ? null : values.jarId || null;
             const why = values.why?.trim() || null;
             const causeValue = give ? (values.cause ?? null) : null;
-            const givingOrganisationKeyValue = give
-                ? values.givingOrganisationKey?.trim() || null
+            const givingOrganizationKeyValue = give
+                ? values.givingOrganizationKey?.trim() || null
                 : null;
             if (mode === 'edit' && entityId) {
                 return api.money.goals.update({
@@ -315,7 +315,7 @@ export function GoalForm({
                     jarId,
                     why,
                     cause: causeValue,
-                    givingOrganisationKey: givingOrganisationKeyValue,
+                    givingOrganizationKey: givingOrganizationKeyValue,
                 });
             }
             return api.money.goals.create({
@@ -334,7 +334,7 @@ export function GoalForm({
                 status: GoalStatus.ACTIVE,
                 why,
                 cause: causeValue,
-                givingOrganisationKey: givingOrganisationKeyValue,
+                givingOrganizationKey: givingOrganizationKeyValue,
             });
         },
         onSuccess: () => {
@@ -534,7 +534,7 @@ export function GoalForm({
 
                     <div className="grid gap-2">
                         <p className="font-mono text-[10px] font-semibold tracking-widest text-fg-faint uppercase">
-                            {tForm('organisation')}
+                            {tForm('organization')}
                         </p>
                         <div
                             className="flex flex-wrap gap-2"
@@ -568,14 +568,14 @@ export function GoalForm({
                         <GivingFinder
                             defaultOpen
                             initialCause={cause ?? null}
-                            selectedKey={givingOrganisationKey}
+                            selectedKey={givingOrganizationKey}
                             selectedName={name}
-                            onPick={organisation => {
-                                form.setValue('givingOrganisationKey', organisation.key, {
+                            onPick={organization => {
+                                form.setValue('givingOrganizationKey', organization.key, {
                                     shouldDirty: true,
                                 });
-                                form.setValue('name', organisation.name, { shouldDirty: true });
-                                const orgCause = organisation.causes[0] ?? null;
+                                form.setValue('name', organization.name, { shouldDirty: true });
+                                const orgCause = organization.causes[0] ?? null;
                                 if (orgCause && !cause) {
                                     form.setValue('cause', orgCause, { shouldDirty: true });
                                 }

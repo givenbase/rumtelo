@@ -32,7 +32,7 @@ const ACE_RECOMMENDED = 'https://animalcharityevaluators.org/recommended-chariti
 const GIVING_GREEN_TOP = 'https://www.givinggreen.earth/top-climate-nonprofits';
 
 /**
- * Giving organisation catalog (English). Sort = array order.
+ * Giving organization catalog (English). Sort = array order.
  *
  * Editorial rules:
  * - Every row cites at least one *independent* signal with a source URL and the
@@ -41,10 +41,10 @@ const GIVING_GREEN_TOP = 'https://www.givinggreen.earth/top-climate-nonprofits';
  *   CBF register (continuous).
  * - No education row: no rigorous evaluator currently recommends one. Better an
  *   honest gap than a padded list.
- * - Large agency brands are deliberately absent; the list favours organisations
- *   that publish what reached the programme and what changed.
+ * - Large agency brands are deliberately absent; the list favors organizations
+ *   that publish what reached the program and what changed.
  */
-export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
+export const GIVING_ORGANIZATION_SEED: readonly Seed[] = [
     // ── Global health ────────────────────────────────────────────────────────
     {
         key: 'AGAINST_MALARIA_FOUNDATION',
@@ -194,7 +194,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
         key: 'NUTRITION_INTERNATIONAL',
         name: 'Nutrition International',
         description:
-            'Vitamin A and other micronutrient programmes with governments — cheap doses that prevent blindness and child deaths.',
+            'Vitamin A and other micronutrient programs with governments — cheap doses that prevent blindness and child deaths.',
         causes: [GLOBAL_HEALTH],
         country: 'CA',
         scope: 'Africa & Asia',
@@ -214,13 +214,13 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
             },
         ],
         reporting:
-            'Yearly results and audited statements; programme coverage and cost-per-dose published by country.',
+            'Yearly results and audited statements; program coverage and cost-per-dose published by country.',
     },
     {
         key: 'GIVEWELL_ALL_GRANTS_FUND',
         name: 'GiveWell All Grants Fund',
         description:
-            'A pooled fund that grants to whichever programmes clear GiveWell’s cost-effectiveness bar this year.',
+            'A pooled fund that grants to whichever programs clear GiveWell’s cost-effectiveness bar this year.',
         causes: [GLOBAL_HEALTH, POVERTY],
         country: 'US',
         scope: 'Global',
@@ -240,7 +240,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
             },
         ],
         reporting:
-            'Every grant published with its reasoning and a later look-back; donors are told which programme received their money.',
+            'Every grant published with its reasoning and a later look-back; donors are told which program received their money.',
     },
 
     // ── Direct to people ─────────────────────────────────────────────────────
@@ -558,7 +558,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
             },
         ],
         reporting:
-            'Annual and financial reports every year — people reached, programmes, countries — checked through the CBF passport.',
+            'Annual and financial reports every year — people reached, programs, countries — checked through the CBF passport.',
     },
 
     // ── Meta: one Dutch door to the evidence-based picks ─────────────────────
@@ -566,7 +566,7 @@ export const GIVING_ORGANISATION_SEED: readonly Seed[] = [
         key: 'DONEER_EFFECTIEF',
         name: 'Doneer Effectief',
         description:
-            'A Dutch platform that passes gifts through, in full, to the evaluator-backed organisations above — with Dutch tax deduction.',
+            'A Dutch platform that passes gifts through, in full, to the evaluator-backed organizations above — with Dutch tax deduction.',
         causes: [GLOBAL_HEALTH, POVERTY, CLIMATE, ANIMALS],
         country: 'NL',
         scope: 'Global · from the Netherlands',

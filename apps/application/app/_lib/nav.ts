@@ -168,9 +168,9 @@ const ALL_NAV_GROUPS = [
                 capabilityKey: CAPABILITIES.soulIntent,
             },
             {
-                href: productPath('soul/centres'),
-                labelKey: 'pages.nav.children.centres',
-                capabilityKey: CAPABILITIES.soulCentres,
+                href: productPath('soul/centers'),
+                labelKey: 'pages.nav.children.centers',
+                capabilityKey: CAPABILITIES.soulCenters,
             },
         ],
     },

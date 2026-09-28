@@ -33,7 +33,7 @@ Person-scoped `SpendingStyle` on `account_settings` (`SPENDER` | `SAVER` | `BALA
 
 Spending style is descriptive, never judgmental — “leans spender”, never “bad with money”.
 
-### B2 — Infer from behaviour (later)
+### B2 — Infer from behavior (later)
 
 Optional inferred override with low confidence until enough periods exist (spend rate on Play, FF underfunded, etc.).
 

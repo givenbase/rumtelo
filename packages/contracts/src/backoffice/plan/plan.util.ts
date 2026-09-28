@@ -203,11 +203,11 @@ export const CAPABILITY_CATALOG: Record<CapabilityKey, CapabilityDefinition> = {
         description: 'Weekly intent.',
         sortOrder: 44,
     },
-    [CAPABILITIES.soulCentres]: {
-        key: CAPABILITIES.soulCentres,
+    [CAPABILITIES.soulCenters]: {
+        key: CAPABILITIES.soulCenters,
         kind: CapabilityKind.SCREEN,
-        name: 'Centres',
-        description: 'The seven centres and where energy gets stuck.',
+        name: 'Centers',
+        description: 'The seven centers and where energy gets stuck.',
         sortOrder: 45,
     },
     [CAPABILITIES.platformInvite]: {
@@ -282,7 +282,7 @@ const MAX_EXTRA: ProductFeatureMap = {
     [CapabilityProduct.MONEY]: [],
     [CapabilityProduct.GROWTH]: [CAPABILITIES.growthNetWorth],
     [CapabilityProduct.ENERGY]: [],
-    [CapabilityProduct.SOUL]: [CAPABILITIES.soulCentres],
+    [CapabilityProduct.SOUL]: [CAPABILITIES.soulCenters],
     [CapabilityProduct.PLATFORM]: [],
 };
 

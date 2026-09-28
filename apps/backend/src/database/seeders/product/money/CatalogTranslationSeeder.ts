@@ -16,7 +16,7 @@ import {
     Translation,
 } from '../../../../modules/backoffice/admin/translation';
 import { AUDIENCE_TRANSLATIONS } from '../../../../modules/backoffice/product/money/catalog/audience/seed/audience-translations';
-import { GIVING_CAUSE_TRANSLATIONS } from '../../../../modules/backoffice/product/money/catalog/giving-organisation/seed/giving-cause-translations';
+import { GIVING_CAUSE_TRANSLATIONS } from '../../../../modules/backoffice/product/money/catalog/giving-organization/seed/giving-cause-translations';
 import { CATEGORY_TEMPLATE_TRANSLATIONS } from '../../../../modules/backoffice/product/money/template/category/seed/category-translations';
 import { JAR_TEMPLATE_TRANSLATIONS } from '../../../../modules/backoffice/product/money/template/jar/seed/jar-translations';
 import { DEBT_PRESET_TRANSLATIONS } from '../../../../modules/backoffice/product/money/preset/debt/seed/debt-translations';

@@ -32,7 +32,7 @@ export class FixedCost extends HouseholdEntity {
     @Property({ type: 'text', nullable: true })
     note: string | null = null;
 
-    /** Who receives it (landlord, insurer, organisation). Mirrors Transaction.counterparty. */
+    /** Who receives it (landlord, insurer, organization). Mirrors Transaction.counterparty. */
     @Property({ length: 160, nullable: true })
     counterparty: string | null = null;
 

@@ -1,10 +1,10 @@
 /**
- * Curated Learn shelf. Courses stay here.
- * Books, films, series, and videos we recommend live in the preset catalogs.
- *
- * Courses follow the plan: Udemy on Basic and Plus, Masterclass on Max.
+ * Curated Learn shelf helpers.
+ * Books, films, series, videos, podcasts, and courses come from watch/book presets via the API.
+ * Course school is filtered by plan via merchantKey (UDEMY vs MASTERCLASS); CTA labels use merchantKey dynamically.
  */
 
+import type { IconName } from '@rumtelo/ui';
 import {
     type LearnBookPreset,
     type LearnBook,
@@ -16,10 +16,11 @@ import {
     SpendingStyle,
 } from '@rumtelo/contracts';
 
-export type LearnFormat = 'BOOK' | 'FILM' | 'SERIES' | 'VIDEO' | 'COURSE';
+export type LearnFormat = 'BOOK' | 'FILM' | 'SERIES' | 'VIDEO' | 'PODCAST' | 'COURSE';
 export type LearnStatus = 'NOW' | 'QUEUE' | 'DONE' | 'SHELF';
 
-/** Stable keys for outbound link CTAs — resolved via `features.growth.learn.catalog.links.*`. */
+/** Stable keys for outbound link CTAs — resolved via `features.growth.learn.catalog.links.*`.
+ * Platform names (Spotify, Udemy, …) come from `merchantKey`, not from this union. */
 export type LearnLinkKey =
     | 'get_book'
     | 'read_free'
@@ -27,12 +28,20 @@ export type LearnLinkKey =
     | 'watch'
     | 'trailer'
     | 'where_to_watch'
-    | 'watch_on_youtube'
-    | 'view_on_udemy'
-    | 'view_on_masterclass';
+    | 'listen'
+    | 'where_to_listen'
+    /** Watch / listen / view on {merchant name}. */
+    | 'watch_on'
+    | 'listen_on'
+    | 'view_on';
 
 /** One link out. We recommend and point; we never host. */
-export type LearnLink = { labelKey: LearnLinkKey; href: string };
+export type LearnLink = {
+    labelKey: LearnLinkKey;
+    href: string;
+    /** Overrides piece.merchantKey when this CTA’s home differs (e.g. Spotify primary, YouTube secondary). */
+    merchantKey?: string;
+};
 
 export type LearnPiece = {
     id: string;
@@ -50,7 +59,8 @@ export type LearnPiece = {
     primary: LearnLink;
     /** The free text, the trailer, or the author. */
     secondary?: LearnLink;
-    partner?: string;
+    /** MerchantPreset.key when one company is the open-home (UDEMY, SPOTIFY, …). */
+    merchantKey?: string;
     /** This household added it. The note is the coach, not a blurb. */
     added?: boolean;
     /** Learning section key. Not an enum. */
@@ -60,36 +70,28 @@ export type LearnPiece = {
 
 /**
  * The skills we teach. Add a row here. The stored value is the key, not a database enum.
- * Labels and the type both come from this list — do not copy the keys elsewhere.
+ * Labels come from i18n (`catalog.skill.*`); tint is for UI chips.
  */
 export const SKILLS = [
     {
         key: 'MONEY',
         name: 'Money',
-        why: 'Behaviour changes slow progress faster than a better strategy.',
         tint: 'var(--color-jar-ff)',
-        line: 'How you decide',
     },
     {
         key: 'COMMUNICATION',
         name: 'Communication',
-        why: 'Earning power follows how clearly you can ask, explain, and hold a room.',
         tint: 'var(--color-jar-edu)',
-        line: 'How it lands',
     },
     {
         key: 'MARKETING',
         name: 'Marketing',
-        why: 'A skill nobody hears about stays a hobby. This is how the work pays the Education jar back.',
         tint: 'var(--color-jar-play)',
-        line: 'How the work is found',
     },
     {
         key: 'LEADERSHIP',
         name: 'Leadership',
-        why: 'A team moves when someone owns the decision and says it plainly.',
         tint: 'var(--color-jar-lts)',
-        line: 'How the room is led',
     },
 ] as const;
 
@@ -98,7 +100,7 @@ export type LearnSkillDef = (typeof SKILLS)[number];
 
 /**
  * Learning sections. Add a row here. The stored value is the key, like a category key.
- * Labels come from this list — not from an enum.
+ * Labels come from i18n (`catalog.section.*`).
  */
 export const SECTIONS = [
     { key: 'MIND', name: 'Mindset' },
@@ -109,222 +111,37 @@ export const SECTIONS = [
     { key: 'HEALTH', name: 'Health' },
 ] as const;
 
-/** Where a course is bought. A key, so the next school is a row, not a union. */
-export const PARTNERS = [
-    { key: 'UDEMY', name: 'Udemy' },
-    { key: 'MASTERCLASS', name: 'Masterclass' },
-] as const;
-
-export const FORMAT_ORDER: readonly LearnFormat[] = ['BOOK', 'FILM', 'SERIES', 'VIDEO', 'COURSE'];
-
-export const PIECES: readonly LearnPiece[] = [
-    {
-        id: 'udemy-communication',
-        format: 'COURSE',
-        skill: 'COMMUNICATION',
-        title: 'Communication Skills Master Class',
-        by: 'TJ Walker · Udemy',
-        use: 'Interviews, raises, rooms, and the one-to-one. A practical class, not a lecture series.',
-        status: 'SHELF',
-        primary: {
-            labelKey: 'view_on_udemy',
-            href: 'https://www.udemy.com/course/the-complete-communication-skills-master-class-for-life/',
-        },
-        partner: 'UDEMY',
-    },
-    {
-        id: 'udemy-marketing',
-        format: 'COURSE',
-        skill: 'MARKETING',
-        title: 'Marketing Strategy: Winning Messages',
-        by: 'TJ Walker · Udemy',
-        use: 'Cut a hundred messages down to the three a stranger can repeat.',
-        status: 'SHELF',
-        primary: {
-            labelKey: 'view_on_udemy',
-            href: 'https://www.udemy.com/course/how-to-create-winning-messages/',
-        },
-        partner: 'UDEMY',
-    },
-    {
-        id: 'mc-voss',
-        format: 'COURSE',
-        skill: 'COMMUNICATION',
-        title: 'The Art of Negotiation',
-        by: 'Chris Voss · Masterclass',
-        use: 'Tactical empathy for the conversations where the number, or the no, actually matters.',
-        status: 'SHELF',
-        primary: {
-            labelKey: 'view_on_masterclass',
-            href: 'https://www.masterclass.com/classes/chris-voss-teaches-the-art-of-negotiation',
-        },
-        partner: 'MASTERCLASS',
-    },
-    {
-        id: 'mc-pink',
-        format: 'COURSE',
-        skill: 'MARKETING',
-        title: 'Sales and Persuasion',
-        by: 'Daniel Pink · Masterclass',
-        use: 'How to frame an offer so the right person can say yes without being pushed.',
-        status: 'SHELF',
-        primary: {
-            labelKey: 'view_on_masterclass',
-            href: 'https://www.masterclass.com/classes/daniel-pink-teaches-sales-and-persuasion',
-        },
-        partner: 'MASTERCLASS',
-    },
-    {
-        id: 'mc-blakely',
-        format: 'COURSE',
-        skill: 'MONEY',
-        title: 'Self-Made Entrepreneurship',
-        by: 'Sara Blakely · Masterclass',
-        use: 'Invent, sell, and get a product known — bootstrapped, not borrowed.',
-        status: 'SHELF',
-        primary: {
-            labelKey: 'view_on_masterclass',
-            href: 'https://www.masterclass.com/classes/sara-blakely-teaches-self-made-entrepreneurship',
-        },
-        partner: 'MASTERCLASS',
-        topic: 'EARN',
-    },
-    {
-        id: 'mc-iger',
-        format: 'COURSE',
-        skill: 'LEADERSHIP',
-        title: 'Business Strategy and Leadership',
-        topic: 'EARN',
-        by: 'Bob Iger · Masterclass',
-        use: 'Three priorities, then the capital follows. How Disney was steered, not decorated.',
-        status: 'SHELF',
-        primary: {
-            labelKey: 'view_on_masterclass',
-            href: 'https://www.masterclass.com/classes/bob-iger-teaches-business-strategy-and-leadership',
-        },
-        partner: 'MASTERCLASS',
-    },
-    {
-        id: 'mc-wintour',
-        format: 'COURSE',
-        skill: 'LEADERSHIP',
-        title: 'Creativity and Leadership',
-        topic: 'EARN',
-        by: 'Anna Wintour · Masterclass',
-        use: 'A point of view, a room that can hold it, and the edit that makes the work recognizable.',
-        status: 'SHELF',
-        primary: {
-            labelKey: 'view_on_masterclass',
-            href: 'https://www.masterclass.com/classes/anna-wintour-teaches-creativity-and-leadership',
-        },
-        partner: 'MASTERCLASS',
-    },
-    {
-        id: 'mc-gladwell',
-        format: 'COURSE',
-        skill: 'COMMUNICATION',
-        title: 'Writing',
-        by: 'Malcolm Gladwell · Masterclass',
-        use: 'How a strange fact becomes a sentence someone else can retell.',
-        status: 'SHELF',
-        primary: {
-            labelKey: 'view_on_masterclass',
-            href: 'https://www.masterclass.com/classes/malcolm-gladwell-teaches-writing',
-        },
-        partner: 'MASTERCLASS',
-    },
-    {
-        id: 'mc-sorkin',
-        format: 'COURSE',
-        skill: 'COMMUNICATION',
-        title: 'Screenwriting',
-        by: 'Aaron Sorkin · Masterclass',
-        use: 'Intention and obstacle. The same shape as a hard conversation.',
-        status: 'SHELF',
-        primary: {
-            labelKey: 'view_on_masterclass',
-            href: 'https://www.masterclass.com/classes/aaron-sorkin-teaches-screenwriting',
-        },
-        partner: 'MASTERCLASS',
-    },
-    {
-        id: 'mc-rhimes',
-        format: 'COURSE',
-        skill: 'COMMUNICATION',
-        title: 'Writing for Television',
-        by: 'Shonda Rhimes · Masterclass',
-        use: 'Say the thing, then say it so the room stays. A class on holding attention.',
-        status: 'SHELF',
-        primary: {
-            labelKey: 'view_on_masterclass',
-            href: 'https://www.masterclass.com/classes/shonda-rhimes-teaches-writing-for-television',
-        },
-        partner: 'MASTERCLASS',
-    },
-    {
-        id: 'mc-dvf',
-        format: 'COURSE',
-        skill: 'MARKETING',
-        title: 'Building a Fashion Business',
-        by: 'Diane von Furstenberg · Masterclass',
-        use: 'One product people can name, then the discipline to keep it that.',
-        status: 'SHELF',
-        primary: {
-            labelKey: 'view_on_masterclass',
-            href: 'https://www.masterclass.com/classes/diane-von-furstenberg-teaches-building-a-fashion-business',
-        },
-        partner: 'MASTERCLASS',
-    },
-    {
-        id: 'udemy-digital-marketing',
-        format: 'COURSE',
-        skill: 'MARKETING',
-        title: 'The Complete Digital Marketing Course',
-        by: 'Rob Percival · Udemy',
-        use: 'Search, ads, and the page a stranger lands on. Practical, not a brand manifesto.',
-        status: 'SHELF',
-        primary: {
-            labelKey: 'view_on_udemy',
-            href: 'https://www.udemy.com/course/the-complete-digital-marketing-course-12-courses-in-1/',
-        },
-        partner: 'UDEMY',
-    },
+export const FORMAT_ORDER: readonly LearnFormat[] = [
+    'BOOK',
+    'COURSE',
+    'FILM',
+    'SERIES',
+    'VIDEO',
+    'PODCAST',
 ];
+
+/** Lucide names for format filter chips and section headings. */
+export const FORMAT_ICON: Record<LearnFormat, IconName> = {
+    BOOK: 'book-open',
+    FILM: 'film',
+    SERIES: 'tv',
+    VIDEO: 'video',
+    PODCAST: 'headphones',
+    COURSE: 'graduation-cap',
+};
 
 export function skillDef(key: LearnSkill): LearnSkillDef {
     return SKILLS.find(skill => skill.key === key) ?? SKILLS[0];
 }
 
-export function formatLabel(format: LearnFormat): string {
+/** English tokens for client search only — UI labels come from `useLearnCatalogLabels`. */
+function formatSearchLabel(format: LearnFormat): string {
     if (format === 'BOOK') return 'Book';
     if (format === 'FILM') return 'Film';
     if (format === 'SERIES') return 'Series';
     if (format === 'VIDEO') return 'Video';
+    if (format === 'PODCAST') return 'Podcast';
     return 'Course';
-}
-
-export function partnerLabel(partner: string | undefined): string {
-    return PARTNERS.find(row => row.key === partner)?.name ?? 'Recommend';
-}
-
-export function pickLabel(format: LearnFormat, status: LearnStatus): string {
-    const watch = format === 'FILM' || format === 'SERIES' || format === 'VIDEO';
-    if (status === 'QUEUE') {
-        if (format === 'BOOK') return 'Need to read';
-        if (watch) return 'Need to watch';
-        return 'Need to take';
-    }
-    if (status === 'NOW') {
-        if (format === 'BOOK') return 'Reading';
-        if (watch) return 'Watching';
-        return 'Taking';
-    }
-    if (status === 'DONE') {
-        if (format === 'BOOK') return 'Read';
-        if (watch) return 'Watched';
-        return 'Finished';
-    }
-    return 'Shelf';
 }
 
 /** A few titles start already in motion so the board is not empty. */
@@ -336,10 +153,6 @@ export const BOOK_STARTER: Partial<Record<string, LearnStatus>> = {
 };
 
 export const TOPIC_ORDER: readonly string[] = SECTIONS.map(section => section.key);
-
-export function topicLabel(topic: string): string {
-    return SECTIONS.find(section => section.key === topic)?.name ?? topic;
-}
 
 /**
  * One plain answer to "what is this about?". A section key, or a skill that is
@@ -358,10 +171,10 @@ export function aboutOf(piece: LearnPiece): string {
     return piece.topic ?? 'MIND';
 }
 
-export function aboutLabel(about: string): string {
+function aboutSearchLabel(about: string): string {
     const skill = SKILLS.find(row => row.key === about);
     if (skill) return skill.name;
-    return topicLabel(about);
+    return SECTIONS.find(section => section.key === about)?.name ?? about;
 }
 
 /** File an "about" chip as a section key plus a skill key. Money is the default skill. */
@@ -371,19 +184,17 @@ export function aboutFields(about: string): { topic: string; skill: LearnSkill }
     return { topic: about, skill: 'MONEY' };
 }
 
-/** Plural, for the "what" filter row. */
-export function formatPlural(format: LearnFormat): string {
-    if (format === 'BOOK') return 'Books';
-    if (format === 'FILM') return 'Films';
-    if (format === 'SERIES') return 'Series';
-    if (format === 'VIDEO') return 'Videos';
-    return 'Courses';
-}
-
 export function matchesSearch(piece: LearnPiece, query: string): boolean {
     const needle = query.trim().toLowerCase();
     if (!needle) return true;
-    return [piece.title, piece.by, piece.use, formatLabel(piece.format), aboutLabel(aboutOf(piece))]
+    return [
+        piece.title,
+        piece.by,
+        piece.use,
+        piece.merchantKey,
+        formatSearchLabel(piece.format),
+        aboutSearchLabel(aboutOf(piece)),
+    ]
         .join(' ')
         .toLowerCase()
         .includes(needle);
@@ -427,10 +238,6 @@ export type StoreTags = {
 /** Dutch households buy at bol.com; everyone else is sent to Amazon. */
 export function storeFor(locale: Locale): BookStore {
     return locale === Locale.NL ? 'BOL' : 'AMAZON';
-}
-
-export function storeName(store: BookStore): string {
-    return store === 'BOL' ? 'bol.com' : 'Amazon';
 }
 
 /** ISBN-13 with a 978 prefix folds to the ISBN-10 Amazon uses as ASIN. */
@@ -514,8 +321,56 @@ export function addedBookToPiece(book: LearnBook, store: BookStore, tags: StoreT
 }
 
 export function watchToPiece(watch: LearnWatchPreset): LearnPiece {
+    const merchantKey = watch.merchantKey ?? undefined;
+    if (watch.format === LearnWatchKind.COURSE) {
+        return {
+            id: watch.key,
+            format: 'COURSE',
+            skill: asLearnSkill(watch.skill),
+            title: watch.name,
+            by: watch.creator,
+            use: watch.description,
+            status: 'SHELF',
+            youtubeId: watch.youtubeId ?? undefined,
+            primary: {
+                labelKey: 'view_on',
+                href: watch.url,
+                merchantKey,
+            },
+            merchantKey,
+            topic: watch.topic,
+            minPlan: watch.minPlan,
+        };
+    }
+    if (watch.format === LearnWatchKind.PODCAST) {
+        return {
+            id: watch.key,
+            format: 'PODCAST',
+            skill: asLearnSkill(watch.skill),
+            title: watch.name,
+            by: watch.creator,
+            use: watch.description,
+            status: 'SHELF',
+            youtubeId: watch.youtubeId ?? undefined,
+            primary: watch.watchUrl
+                ? {
+                      labelKey: merchantKey ? 'listen_on' : 'where_to_listen',
+                      href: watch.watchUrl,
+                      merchantKey,
+                  }
+                : { labelKey: 'listen', href: watch.url, merchantKey },
+            secondary: watch.watchUrl ? { labelKey: 'watch', href: watch.url } : undefined,
+            merchantKey,
+            topic: watch.topic,
+            minPlan: watch.minPlan,
+        };
+    }
     const video = watch.format === LearnWatchKind.VIDEO;
-    const pointer: LearnLink = { labelKey: video ? 'watch' : 'trailer', href: watch.url };
+    const pointer: LearnLink = {
+        labelKey: video ? 'watch' : 'trailer',
+        href: watch.url,
+        merchantKey,
+    };
     return {
         id: watch.key,
         format: watch.format,
@@ -527,8 +382,11 @@ export function watchToPiece(watch: LearnWatchPreset): LearnPiece {
         youtubeId: watch.youtubeId ?? undefined,
         primary: watch.watchUrl
             ? { labelKey: 'where_to_watch', href: watch.watchUrl }
-            : { labelKey: video ? 'watch' : 'watch_on_youtube', href: watch.url },
+            : merchantKey
+              ? { labelKey: 'watch_on', href: watch.url, merchantKey }
+              : { labelKey: video ? 'watch' : 'trailer', href: watch.url },
         secondary: watch.watchUrl ? pointer : undefined,
+        merchantKey,
         topic: watch.topic,
         minPlan: watch.minPlan,
     };

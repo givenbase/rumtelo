@@ -4,7 +4,7 @@
  * Cause / evaluator glossary lives in @rumtelo/contracts (company catalog).
  * Doctrine: Money owns the *flow* (Give jar, fixed cost, transaction);
  * Soul owns the *meaning*. The Coach connects them. Rumtelo never claims to
- * vet an organisation itself — it shows who does, and what they measure.
+ * vet an organization itself — it shows who does, and what they measure.
  */
 import {
     type GivingCause,

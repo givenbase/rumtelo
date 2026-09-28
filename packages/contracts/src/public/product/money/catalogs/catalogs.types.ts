@@ -16,5 +16,5 @@ export type {
     GoalPreset,
     MerchantPreset,
     GivingSignal,
-    GivingOrganisation,
+    GivingOrganization,
 } from './catalogs.schema';

@@ -9,7 +9,7 @@ import { BankSeeder } from './product/money/BankSeeder';
 import { CategoryTemplateSeeder } from './product/money/CategoryTemplateSeeder';
 import { DebtPresetSeeder } from './product/money/DebtPresetSeeder';
 import { FixedCostPresetSeeder } from './product/money/FixedCostPresetSeeder';
-import { GivingOrganisationSeeder } from './product/money/GivingOrganisationSeeder';
+import { GivingOrganizationSeeder } from './product/money/GivingOrganizationSeeder';
 import { GoalPresetSeeder } from './product/money/GoalPresetSeeder';
 import { IncomeSourcePresetSeeder } from './product/money/IncomeSourcePresetSeeder';
 import { CatalogTranslationSeeder } from './product/money/CatalogTranslationSeeder';
@@ -43,7 +43,7 @@ export class DatabaseSeeder extends Seeder {
             AudienceSeeder,
             MarketSeeder,
             BankSeeder,
-            GivingOrganisationSeeder,
+            GivingOrganizationSeeder,
             MerchantPresetSeeder,
             // Presets that link to merchants.
             FixedCostPresetSeeder,

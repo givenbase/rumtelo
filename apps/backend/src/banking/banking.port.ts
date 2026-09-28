@@ -21,7 +21,7 @@ export interface BankConnection {
     expiresAt: string | null;
 }
 
-/** Provider account after AIS authorisation — not an oRPC DTO. */
+/** Provider account after AIS authorization — not an oRPC DTO. */
 export interface BankAccountRef {
     uid: string;
     iban: string | null;
@@ -55,7 +55,7 @@ export interface BankingPort {
     isEnabled(): boolean;
     listInstitutions(country: string): Promise<BankInstitution[]>;
     /**
-     * Start AIS authorisation. `state` is echoed back on redirect (we put the
+     * Start AIS authorization. `state` is echoed back on redirect (we put the
      * Rumtelo bank-account id there). Returns the ASPSP auth URL.
      */
     startLink(input: {
@@ -63,7 +63,7 @@ export interface BankingPort {
         redirectUrl: string;
         state: string;
     }): Promise<BankSyncStartLinkResult>;
-    /** Exchange the OAuth `code` for a session + authorised accounts. */
+    /** Exchange the OAuth `code` for a session + authorized accounts. */
     completeLink(input: { code: string; state: string }): Promise<BankLinkResult>;
     getConnection(connectionId: string): Promise<BankConnection | null>;
     /**

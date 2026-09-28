@@ -36,7 +36,7 @@ export function TimeBandCard({ summary, daysLogged }: Props) {
     const reference = TIME_REFERENCE[summary.category];
     const kind = TIME_KIND_META[summary.kind];
     const band = reference.band;
-    // Daily behaviours read as a daily figure; weekly accumulators (work, exercise) as a weekly total.
+    // Daily behaviors read as a daily figure; weekly accumulators (work, exercise) as a weekly total.
     const perDay = band ? band.perDay : summary.kind === TimeKind.PERSONAL;
 
     const rangeText = band

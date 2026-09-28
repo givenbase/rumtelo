@@ -25,7 +25,7 @@ import { loadEnv } from '../../../../common/config/env.config';
  * Providers:
  *   memory  — log only (default; safe for local)
  *   resend  — Resend API when EMAIL_PROVIDER=resend + RESEND_API_KEY
- * EMAIL_LOG_ONLY=true forces memory behaviour even when provider is resend.
+ * EMAIL_LOG_ONLY=true forces memory behavior even when provider is resend.
  *
  * Brand logos are data-URI inlined in the HTML (sharp 3× PNGs) so
  * `/email-preview` and real clients render without remote fetches or CID.

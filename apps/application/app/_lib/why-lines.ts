@@ -21,7 +21,7 @@ const PATH_TO_WHY_SLUG = {
     '/product/soul/gratitude': 'soul_gratitude',
     '/product/soul/giving': 'soul_giving',
     '/product/soul/intent': 'soul_intent',
-    '/product/soul/centres': 'soul_centres',
+    '/product/soul/centers': 'soul_centers',
     '/product/growth/income': 'growth_income',
     '/product/growth/learn': 'growth_learn',
     '/product/growth/learn/library': 'growth_learn_library',

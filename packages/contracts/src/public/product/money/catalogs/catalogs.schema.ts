@@ -128,15 +128,20 @@ export const MerchantPreset = CatalogItemBase.extend({
     jarKey: z.enum(JarKey),
     categoryTemplateKey: z.string().min(1).max(64),
     /**
-     * When set, mirrors GivingOrganisation.key — bank matching only;
+     * When set, mirrors GivingOrganization.key — bank matching only;
      * Coach catalog owns editorial identity.
      */
-    givingOrganisationKey: z.string().min(1).max(64).nullable(),
+    givingOrganizationKey: z.string().min(1).max(64).nullable(),
     /** Favicon hostname — client builds logo URL; no client brand mirror. */
     logoDomain: z.string().min(1).max(120).nullable(),
     website: z.string().max(240).nullable(),
     /** Editorial pin + chip label; null = normal. */
     highlight: z.enum(MerchantHighlight).nullable(),
+    /**
+     * Rumtelo partner — preferred open-home / affiliate (Spotify, Udemy, Netflix).
+     * False for ordinary spend merchants (Bruna, Canva).
+     */
+    isPartner: z.boolean(),
     /** ISO markets where this merchant is listed (e.g. NL). */
     markets: z.array(z.string().length(2)).min(1),
     matchPriority: z.int(),
@@ -161,7 +166,7 @@ export const Bank = CatalogItemBase.extend({
     partnerBankKeys: z.array(z.string().min(1).max(64)),
 });
 
-/** One independent signal about an organisation — who says so, what, and where to check. */
+/** One independent signal about an organization — who says so, what, and where to check. */
 export const GivingSignal = z.object({
     evaluator: z.enum(GivingEvaluator),
     /** Short claim as the evaluator phrases it, e.g. "Top Charity 2025". */
@@ -172,10 +177,10 @@ export const GivingSignal = z.object({
 });
 
 /**
- * A vetted organisation for the Give jar. Editorial catalog: every row must
+ * A vetted organization for the Give jar. Editorial catalog: every row must
  * carry at least one independent signal; the app never claims its own vetting.
  */
-export const GivingOrganisation = CatalogItemBase.extend({
+export const GivingOrganization = CatalogItemBase.extend({
     /** One neutral sentence on what they do. */
     description: z.string().min(1).max(280),
     causes: z.array(z.enum(GivingCause)).min(1),
@@ -185,7 +190,7 @@ export const GivingOrganisation = CatalogItemBase.extend({
     scope: z.string().max(64).nullable(),
     website: z.url(),
     signals: z.array(GivingSignal).min(1),
-    /** How donors hear back — annual report, live feed, per-programme updates. */
+    /** How donors hear back — annual report, live feed, per-program updates. */
     reporting: z.string().max(280).nullable(),
 });
 
@@ -204,7 +209,7 @@ export const GivingEvaluatorCatalog = CatalogItemBase.extend({
 
 // Inferred types (same-module merge for consumers)
 export type GivingSignal = z.infer<typeof GivingSignal>;
-export type GivingOrganisation = z.infer<typeof GivingOrganisation>;
+export type GivingOrganization = z.infer<typeof GivingOrganization>;
 export type CategoryTemplate = z.infer<typeof CategoryTemplate>;
 export type Audience = z.infer<typeof Audience>;
 export type Bank = z.infer<typeof Bank>;

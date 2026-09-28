@@ -52,12 +52,12 @@ export class Goal extends HouseholdEntity {
     sortOrder = 0;
 
     /**
-     * GIVE: `GivingOrganisation.key` when a named organisation was picked.
+     * GIVE: `GivingOrganization.key` when a named organization was picked.
      * Snapshot, not an FK — household rows never depend on mutable catalog rows.
      * Null = open / free-text.
      */
     @Property({ length: 64, nullable: true })
-    givingOrganisationKey: string | null = null;
+    givingOrganizationKey: string | null = null;
 
     /** GIVE: date the pledge was honoured. */
     @Property({ type: 'date', nullable: true })

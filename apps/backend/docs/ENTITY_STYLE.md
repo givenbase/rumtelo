@@ -133,7 +133,7 @@ Rumtelo calendar-date suffix is **`*On`** (Rails-style). Prefer `startedOn` / `e
 | From → to | Store | Why |
 |-----------|-------|-----|
 | **backoffice → backoffice** (preset → template, lever → posture, plan → capability) | real `@ManyToOne` / `@ManyToMany` / pivot entity on `id` | same owner, same lifecycle; the DB enforces integrity and services filter in SQL |
-| **household → backoffice** (`Jar.templateKey`, `Goal.givingOrganisationKey`, `Transaction.inflowKey`) | **key snapshot** string | catalogs are mutable and can be retired; household history must never break or cascade |
+| **household → backoffice** (`Jar.templateKey`, `Goal.givingOrganizationKey`, `Transaction.inflowKey`) | **key snapshot** string | catalogs are mutable and can be retired; household history must never break or cascade |
 | **household → household** (`Transaction.jar`, `WeekCheckAllocation.weekCheck`) | real relation with `deleteRule` | same tenant, cascade / restrict is a product decision to state explicitly |
 
 Pivot entities with their own data (`FixedCostPresetMerchant.sortOrder`) are explicit classes extending `BaseEntity`; plain M2M without payload uses `@ManyToMany({ pivotTable })`. Inverse-side collections use `import type` + the string entity name (`@OneToMany('PlanFeature', 'product')`) so entity files never import each other in a cycle.

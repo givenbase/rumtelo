@@ -159,7 +159,7 @@
                 "PENDING": "Pending",
                 "COMPLETED": "Completed",
                 "IN_PROGRESS": "In progress",
-                "CANCELLED": "Cancelled",
+                "CANCELED": "Canceled",
                 "OVERDUE": "Overdue",
                 "DRAFT": "Draft",
                 "OK": "OK",
@@ -609,9 +609,9 @@
                 "name": "Intent",
                 "description": "Weekly intent."
             },
-            "soul-centres": {
-                "name": "Centres",
-                "description": "The seven centres and where energy gets stuck."
+            "soul-centers": {
+                "name": "Centers",
+                "description": "The seven centers and where energy gets stuck."
             },
             "platform-invite": {
                 "name": "Invite",
@@ -738,9 +738,11 @@
                 "heading": "What can I use this for?",
                 "allowed": "This may go to",
                 "give_who": "Who should receive it?",
-                "give_hint": "Pick a cause, then an organisation with independent checks — same Coach shortlist as on Why & where.",
-                "give_recurring_hint": "Choosing an organisation opens a recurring gift (fixed cost). For a one-time gift, use",
+                "give_hint": "Pick a cause, then an organization with independent checks — same Coach shortlist as on Why & where.",
+                "give_recurring_hint": "Choosing an organization opens a recurring gift (fixed cost). For a one-time gift, use",
                 "add_transaction": "Add transaction",
+                "learn_nudge_title": "Grow with Learn",
+                "learn_nudge": "Put titles on your Learn shelf, browse the library for inspiration, and add a goal on this jar when you are ready to claim the spend.",
                 "split_inside": "Split inside this jar",
                 "footer": "The Coach — tips without shame.",
                 "turn_off": "Turn tips off"
@@ -1195,9 +1197,9 @@
                     "cause_aria": "Giving cause",
                     "cause_any": "Any cause",
                     "cause_open_hint": "Open pledge — any giving from the Give jar counts.",
-                    "organisation": "Organisation",
+                    "organization": "Organization",
                     "give_mode_aria": "How specific is this pledge?",
-                    "give_mode_hint": "I know who — type whoever you already give to. Help me choose — Coach shortlist with independent checks. Keep it open — name the cause only, no organisation yet.",
+                    "give_mode_hint": "I know who — type whoever you already give to. Help me choose — Coach shortlist with independent checks. Keep it open — name the cause only, no organization yet.",
                     "pledge_name": "Pledge name",
                     "pledge_placeholder_open": "e.g. Health pledge",
                     "pledge_placeholder_manual": "e.g. local food bank",
@@ -1290,7 +1292,7 @@
                     "open_link": "Open ›",
                     "open_jar": "Open jar",
                     "giving": "Giving",
-                    "giving_sub": "Pledge & organisations",
+                    "giving_sub": "Pledge & organizations",
                     "income": "Income",
                     "income_sub": "Sources & monthly net",
                     "move_money": "Move money",
@@ -1384,26 +1386,32 @@
                 "reading_empty_body": "The coach has a few below. Mark one and it lands here, in the order you want to take it.",
                 "reading_heading": "To read",
                 "add_learning": "Add learning",
-                "add_learning_description": "Search by title. We save where to find it, not the book itself.",
+                "add_learning_description": "Start typing — we suggest from our shelf first. Search finds titles we have not listed yet. We save where to find it, not the book itself.",
                 "search": "Search",
                 "catalog_error": "The catalog did not answer. Try again.",
                 "save_error": "That title could not be saved.",
                 "add_button": "Add",
                 "nothing_found": "Nothing under that name.",
+                "library_matches": "In our library",
+                "catalog_matches": "Wider catalog",
+                "pick_about_to_add": "Pick what it is about, then add.",
                 "search_catalog_aria": "Search the public catalog",
-                "search_catalog_placeholder": "The 5 Love Languages",
+                "search_catalog_placeholder": "The Secret, Atomic Habits…",
                 "back": "← Learn",
                 "eyebrow_shelf": "✦ WHAT I LEARN",
                 "eyebrow_library": "✦ THE LIBRARY",
                 "title_shelf": "Distribution has a floor. Learning doesn't.",
                 "title_library": "What we recommend. We do not host it.",
-                "lead_shelf": "A skill is the decision. A book, film, series, video, or course is how you work it. We recommend what to get and who to support — we never host the work.",
+                "lead_shelf": "A skill is the decision. A book, film, series, video, podcast, or course is how you work it. We recommend what to get and who to support — we never host the work.",
                 "lead_library": "Search, then narrow by what it is and what it is about. Mark a title and it lands on Learn.",
                 "partner_max": "Courses on Max are on MasterClass. Basic and Plus point at Udemy instead. Books, films, and series open as the plan allows — we recommend them, we do not host them.",
                 "partner_default": "Courses on Basic and Plus are on Udemy. Max points at MasterClass instead. Books, films, and series open as the plan allows — we recommend them, we do not host them.",
+                "jar_coach_title": "Education jar",
                 "jar_banner": "Your Education jar is where this spending lives. What raises your earning power pays itself back into Financial Freedom.",
-                "jar_cta": "View Education jar ›",
+                "jar_cta": "View Education jar",
                 "browse_library": "Browse library",
+                "show_more": "Show more",
+                "show_more_remaining": "Show more · {remaining} left",
                 "tab_focus": "Focus",
                 "tab_done": "Done",
                 "search_placeholder": "Search a title, author, or subject",
@@ -1419,7 +1427,7 @@
                 "recommended": "✦ Recommended",
                 "coach_not_on_list": "Not on your list",
                 "coach_recommended_body": "These are not need-to-read yet. Mark one and it joins the list, at the end.",
-                "footer_stores": "Books open at {store}. Films and series open on JustWatch, which shows where they stream in your country. Courses open at Udemy or MasterClass.",
+                "footer_stores": "Books open at {store}. Films and series open on JustWatch, which shows where they stream in your country. Podcasts open on Spotify or the show page. Courses open at Udemy or MasterClass.",
                 "footer_commission": " Some of these links earn Rumtelo a small commission. The price is the same for you.",
                 "footer_no_commission": " We recommend and point — we never host the work.",
                 "finish_by": "Finish by",
@@ -1440,6 +1448,7 @@
                         "film": "Film",
                         "series": "Series",
                         "video": "Video",
+                        "podcast": "Podcast",
                         "course": "Course"
                     },
                     "format_plural": {
@@ -1447,6 +1456,7 @@
                         "film": "Films",
                         "series": "Series",
                         "video": "Videos",
+                        "podcast": "Podcasts",
                         "course": "Courses"
                     },
                     "pick": {
@@ -1454,16 +1464,19 @@
                         "queue": {
                             "book": "Need to read",
                             "watch": "Need to watch",
+                            "listen": "Need to listen",
                             "take": "Need to take"
                         },
                         "now": {
                             "book": "Reading",
                             "watch": "Watching",
+                            "listen": "Listening",
                             "take": "Taking"
                         },
                         "done": {
                             "book": "Read",
                             "watch": "Watched",
+                            "listen": "Listened",
                             "take": "Finished"
                         }
                     },
@@ -1484,6 +1497,8 @@
                     "partner": {
                         "UDEMY": "Udemy",
                         "MASTERCLASS": "MasterClass",
+                        "SPOTIFY": "Spotify",
+                        "NETFLIX": "Netflix",
                         "recommend": "Recommend"
                     },
                     "store": {
@@ -1497,9 +1512,12 @@
                         "watch": "Watch",
                         "trailer": "Trailer",
                         "where_to_watch": "Where to watch",
-                        "watch_on_youtube": "Watch on YouTube",
-                        "view_on_udemy": "View on Udemy",
-                        "view_on_masterclass": "View on MasterClass"
+                        "listen": "Listen",
+                        "where_to_listen": "Where to listen",
+                        "watch_on": "Watch on {name}",
+                        "listen_on": "Listen on {name}",
+                        "view_on": "View on {name}",
+                        "view_course": "View course"
                     }
                 }
             },
@@ -1702,7 +1720,7 @@
                     },
                     "EDUCATION": {
                         "subtitle": "Grow yourself",
-                        "note": "Books, courses, mentors, tools. The only spend that raises your earning power.",
+                        "note": "Books, courses, mentors, tools. The only spend that raises your earning power. Use Learn for what you are working through, browse the library for inspiration, and put a goal on this jar when you are ready to claim it.",
                         "not_allowed": "Only if it raises your earning power. A course you never finish belongs in Play.",
                         "allowed": {
                             "books": "Books",
@@ -1712,8 +1730,10 @@
                             "conferences": "Conferences"
                         },
                         "links": {
-                            "transactions": "Transactions",
-                            "goals": "Goals"
+                            "learn": "Learn",
+                            "library": "Library",
+                            "goals": "Goals",
+                            "transactions": "Transactions"
                         }
                     },
                     "PLAY": {
@@ -1734,7 +1754,7 @@
                     "GIVE": {
                         "subtitle": "Pass it on",
                         "note": "Giving keeps money a tool and not a master. Transferred automatically — the Coach helps you choose where.",
-                        "not_allowed": "No favours expected, no tax-deduction thinking. Giving keeps money a tool.",
+                        "not_allowed": "No favors expected, no tax-deduction thinking. Giving keeps money a tool.",
                         "allowed": {
                             "foundation": "Your foundation",
                             "charities": "Charities",
@@ -2230,8 +2250,8 @@
                 "title": "Where do you want to help?",
                 "hide": "Hide",
                 "help_choose": "Help me choose",
-                "collapsed_lead": "Pick a cause, and see organisations that publish what they spend and what changed — checked by people outside the organisation.",
-                "expanded_lead": "Pick a cause first. Each organisation shows who checked it and what that check actually measures — you decide what counts.",
+                "collapsed_lead": "Pick a cause, and see organizations that publish what they spend and what changed — checked by people outside the organization.",
+                "expanded_lead": "Pick a cause first. Each organization shows who checked it and what that check actually measures — you decide what counts.",
                 "sign_in": "Sign in to see the list.",
                 "loading": "Loading the list…",
                 "empty_list": "The list is empty right now. Use I know who and type the name — the four checks still apply.",
@@ -2250,7 +2270,7 @@
                 "category_auto": "Auto from name / preset",
                 "category_from_preset": "From preset ({name})",
                 "paid_to": "Paid to (optional)",
-                "to_whom": "To whom (organisation)",
+                "to_whom": "To whom (organization)",
                 "give_known": "I know who",
                 "give_coach": "Help me choose",
                 "give_hint": "I know who — type whoever you already give to. Help me choose — Coach shortlist with independent checks (Doneer Effectief, GiveWell, ACE, CBF).",
@@ -2540,9 +2560,9 @@
                         "set": "Set",
                         "note_empty": "for this week"
                     },
-                    "centres": {
-                        "name": "Centres",
-                        "note": "centres named today"
+                    "centers": {
+                        "name": "Centers",
+                        "note": "centers named today"
                     }
                 }
             },
@@ -2602,11 +2622,11 @@
                 "example": "Ten minutes of stillness before I open my inbox.",
                 "my_intention": "My intention",
                 "set_for_week": "✦ Set for this week",
-                "tip": "A good intention is small, concrete, and about behaviour — not an outcome. \"I check my jars every Sunday\" works better than \"I am more financially aware.\"",
+                "tip": "A good intention is small, concrete, and about behavior — not an outcome. \"I check my jars every Sunday\" works better than \"I am more financially aware.\"",
                 "stillness_link": "Go to stillness →"
             },
-            "centres": {
-                "eyebrow": "The centres",
+            "centers": {
+                "eyebrow": "The centers",
                 "title": "Where does it feel stuck?",
                 "lead": "Not an esoteric score — a map to name where things feel stuck this week, so your intention has somewhere to land.",
                 "set_intent": "Set as intention →",
@@ -2674,7 +2694,7 @@
                 "empty_auto_body": "Add a fixed cost on the Give jar to plan monthly gifts.",
                 "empty_ledger_title": "No sorted giving this year.",
                 "empty_ledger_body": "Gifts that leave Give show up here once sorted.",
-                "no_org": "No organisation named yet",
+                "no_org": "No organization named yet",
                 "received_year": "Received this year",
                 "to_whom": "To whom",
                 "pick_who": "How do you want to pick who receives this gift?",
@@ -2682,19 +2702,19 @@
                 "pick_known": "I know who",
                 "pick_coach": "Help me choose",
                 "pick_hint": "I know who — type whoever you already give to. Help me choose — Coach shortlist with independent checks (Doneer Effectief, GiveWell, ACE, CBF).",
-                "checks_heading": "Four checks for any organisation",
-                "checks_aria": "The Coach: four checks for any organisation",
+                "checks_heading": "Four checks for any organization",
+                "checks_aria": "The Coach: four checks for any organization",
                 "check_1_title": "Independent proof",
-                "check_1_body": "Someone outside the organisation — GiveWell, CBF, ACE — has checked the work, not just the books.",
+                "check_1_body": "Someone outside the organization — GiveWell, CBF, ACE — has checked the work, not just the books.",
                 "check_2_title": "Public spending",
-                "check_2_body": "A yearly report anyone can read, with the share that reached the programme and the share that ran the office.",
+                "check_2_body": "A yearly report anyone can read, with the share that reached the program and the share that ran the office.",
                 "check_3_title": "Reporting back",
                 "check_3_body": "Updates that describe what changed for the people or animals — not a thank-you card.",
                 "check_4_title": "Room for more",
                 "check_4_body": "A clear answer to “what would an extra amount do?” If they cannot say, the money sits.",
                 "coach_tip_title": "Why this is in a money app",
                 "coach_tip_1": "It does not have to be much. Five percent, transferred automatically, to a place you chose on purpose. The amount is not the point — the habit is.",
-                "coach_tip_2": "Choose where it goes the way you choose everything else here: with evidence, not with a logo. An organisation that publishes what it spends and what changed is one you can keep giving to for years.",
+                "coach_tip_2": "Choose where it goes the way you choose everything else here: with evidence, not with a logo. An organization that publishes what it spends and what changed is one you can keep giving to for years.",
                 "causes": {
                     "GLOBAL_HEALTH": {
                         "name": "Health",
@@ -3276,7 +3296,7 @@
                     "f1": "Stillness — one minute counts",
                     "f2": "Gratitude, written down",
                     "f3": "One intention a week",
-                    "f4": "The seven centres — where energy gets stuck"
+                    "f4": "The seven centers — where energy gets stuck"
                 }
             },
             "portal_cta": {
@@ -3398,7 +3418,7 @@
                     "psychology": {
                         "title": "The Psychology of Money",
                         "author": "Morgan Housel",
-                        "line": "Behaviour beats cleverness — calm systems over panic and shame."
+                        "line": "Behavior beats cleverness — calm systems over panic and shame."
                     },
                     "secret": {
                         "title": "The Secret",
@@ -3585,7 +3605,7 @@
                     "f1": "Everything in Plus",
                     "f2": "GROWTH · net worth, returns and your freedom number",
                     "f3": "GROWTH · Learn courses on Masterclass, not Udemy",
-                    "f4": "SOUL · the seven centres",
+                    "f4": "SOUL · the seven centers",
                     "f5": "Up to {maxMembers} seats (more full access)",
                     "f6": "Devices — watch, scale, ring (coming)"
                 }
@@ -3694,7 +3714,7 @@
                         "title": "Your account and household",
                         "items": [
                             "Provide accurate registration details (including name and email) and keep them current. Date of birth, if you give it, must be accurate.",
-                            "Keep login credentials and two-factor codes confidential. You are responsible for activity under your account unless you told us of unauthorised access without delay.",
+                            "Keep login credentials and two-factor codes confidential. You are responsible for activity under your account unless you told us of unauthorized access without delay.",
                             "A household is a shared workspace. People you invite can see that household’s jars, transactions, goals and related data. Invite only people you trust and only if you are allowed to share that data with them.",
                             "If you are invited, you must use household data only for the household’s own overview — not to copy, publish, or misuse another member’s information.",
                             "We may refuse, suspend, or close an account that is inaccurate, abusive, or creates a security or legal risk."
@@ -3713,8 +3733,8 @@
                         ]
                     },
                     "content": {
-                        "title": "Your data and our licence to operate the Service",
-                        "body": "You retain ownership of the household and account data you enter or import (“Your Content”). You grant Rumtelo a limited, worldwide, non-exclusive licence to host, store, process, display, and back up Your Content solely to provide, secure, and improve the Service, and to meet the law. That licence ends when Your Content is deleted from our live systems and residual backups expire, except where we must keep a copy (for example invoices).",
+                        "title": "Your data and our license to operate the Service",
+                        "body": "You retain ownership of the household and account data you enter or import (“Your Content”). You grant Rumtelo a limited, worldwide, non-exclusive license to host, store, process, display, and back up Your Content solely to provide, secure, and improve the Service, and to meet the law. That license ends when Your Content is deleted from our live systems and residual backups expire, except where we must keep a copy (for example invoices).",
                         "after": "You represent that you have the right to submit Your Content — including bank statements you import and data about household members — and that it does not violate the law or these Terms."
                     },
                     "ip": {
@@ -3723,7 +3743,7 @@
                     },
                     "billing": {
                         "title": "Plans, prices and VAT",
-                        "body": "Basic may be offered free. Paid plans (for example Plus and Max) are subscriptions billed in advance, monthly or yearly, until cancelled. Prices are shown before you pay. Where VAT or similar tax applies, it is included or shown as required for your country. We charge through our payment provider (Stripe). We do not store full card numbers.",
+                        "body": "Basic may be offered free. Paid plans (for example Plus and Max) are subscriptions billed in advance, monthly or yearly, until canceled. Prices are shown before you pay. Where VAT or similar tax applies, it is included or shown as required for your country. We charge through our payment provider (Stripe). We do not store full card numbers.",
                         "after": "A free plan does not guarantee that every current feature stays free. If we introduce a charge for something you already use, we will say so in advance and you may cancel."
                     },
                     "withdrawal": {
@@ -3784,7 +3804,7 @@
                         "items": [
                             "If a provision is invalid, the rest stays in force. A valid provision as close as possible to the invalid one applies where the law allows.",
                             "These Terms, plus the Privacy Policy, Cookie Policy, and any plan details shown at checkout, are the entire agreement for the Service.",
-                            "You may not assign the contract without our consent. We may assign it in a reorganisation or sale of the Service, provided your consumer rights are not reduced.",
+                            "You may not assign the contract without our consent. We may assign it in a reorganization or sale of the Service, provided your consumer rights are not reduced.",
                             "We communicate in English. Translations are a convenience. If a translation conflicts with the English text, English prevails — except where mandatory consumer law of your country requires otherwise.",
                             "Failure to enforce a term is not a waiver."
                         ]
@@ -3826,7 +3846,7 @@
                     "special": {
                         "title": "Special-category and sensitive data",
                         "body": "Energy logs (sleep, training, food, rest) and soul or intention notes can reveal health or philosophical information. Under GDPR that may be special-category data (Article 9). We process it only if you choose to use those features. By entering that data you give explicit consent for us to store and display it to you and to household members you invite, and to use it to generate Coach tips inside the product. You may stop logging and ask us to delete it. We do not use this data for advertising, scoring your credit, or inferring characteristics for third parties.",
-                        "after": "US “sensitive personal information” (including precise financial account data and health-related logs) is used only to provide the features you request. We do not sell it or share it for cross-context behavioural advertising."
+                        "after": "US “sensitive personal information” (including precise financial account data and health-related logs) is used only to provide the features you request. We do not sell it or share it for cross-context behavioral advertising."
                     },
                     "sources": {
                         "title": "How we obtain data",
@@ -3872,9 +3892,9 @@
                             "An optional PSD2/AIS provider if you connect a live bank feed.",
                             "Professional advisers (accountant, lawyer) under confidentiality, when needed.",
                             "Authorities if the law requires it, or if we must protect users, the Service, or our legal rights.",
-                            "A buyer or successor if we reorganise or sell the Service, under continued protection and notice where the law requires."
+                            "A buyer or successor if we reorganize or sell the Service, under continued protection and notice where the law requires."
                         ],
-                        "after": "We do not sell personal information and we do not share it for cross-context behavioural advertising. We do not allow processors to use your household data for their own marketing."
+                        "after": "We do not sell personal information and we do not share it for cross-context behavioral advertising. We do not allow processors to use your household data for their own marketing."
                     },
                     "transfers": {
                         "title": "International transfers",
@@ -3901,9 +3921,9 @@
                     },
                     "rights_us": {
                         "title": "Your rights in the United States",
-                        "body": "If you are a resident of California or another US state with a comprehensive privacy law (for example Virginia, Colorado, Connecticut, Utah, Texas, Oregon), you may have the right to know/access, correct, delete, obtain a copy, opt out of “sale” or “sharing” of personal information, and limit use of sensitive personal information, and not to be discriminated against for exercising those rights. You may use an authorised agent where the statute allows, with proof of authority.",
+                        "body": "If you are a resident of California or another US state with a comprehensive privacy law (for example Virginia, Colorado, Connecticut, Utah, Texas, Oregon), you may have the right to know/access, correct, delete, obtain a copy, opt out of “sale” or “sharing” of personal information, and limit use of sensitive personal information, and not to be discriminated against for exercising those rights. You may use an authorized agent where the statute allows, with proof of authority.",
                         "items": [
-                            "We do not sell personal information and we do not share it for cross-context behavioural advertising, as those terms are defined in the CCPA/CPRA. A “Do Not Sell or Share” request is therefore already how we operate; email us if you want that confirmed in writing.",
+                            "We do not sell personal information and we do not share it for cross-context behavioral advertising, as those terms are defined in the CCPA/CPRA. A “Do Not Sell or Share” request is therefore already how we operate; email us if you want that confirmed in writing.",
                             "Categories we collect, sources, purposes, recipients and retention are described in this policy (notice at collection). In the last 12 months we have not sold or shared personal information for advertising.",
                             "To exercise US rights, email support@rumtelo.com from your account address with the subject “US privacy request” and your state. We will verify the request and respond within the statutory period (generally 45 days under CCPA, extendable as allowed).",
                             "California “Shine the Light”: we do not disclose personal information to third parties for their own direct marketing.",
@@ -3953,7 +3973,7 @@
                     },
                     "manage": {
                         "title": "How you can control cookies",
-                        "body": "You can delete or block cookies in your browser settings. If you block strictly necessary cookies, sign-in, household switching, and checkout hand-off may fail — that is a technical limit, not a penalty. We do not currently offer a consent banner because we do not set optional cookies. If we add analytics or marketing cookies later, a banner or preference centre will appear and you will be able to refuse them."
+                        "body": "You can delete or block cookies in your browser settings. If you block strictly necessary cookies, sign-in, household switching, and checkout hand-off may fail — that is a technical limit, not a penalty. We do not currently offer a consent banner because we do not set optional cookies. If we add analytics or marketing cookies later, a banner or preference center will appear and you will be able to refuse them."
                     },
                     "third": {
                         "title": "Third parties",
@@ -3977,7 +3997,7 @@
                 "sections": {
                     "roles": {
                         "title": "Roles",
-                        "body": "For your Rumtelo account and household data, Rumtelo is the data controller (GDPR Article 4(7)). Infrastructure, email and payment vendors are processors (Article 4(8) and Article 28) — they may process data only on our documented instructions, with confidentiality, security, and deletion or return at the end of the contract. An optional PSD2/AIS provider is typically an independent controller or a processor of the bank connection you start; we receive only the account information you authorise. Household members you invite are separate users, not our processors."
+                        "body": "For your Rumtelo account and household data, Rumtelo is the data controller (GDPR Article 4(7)). Infrastructure, email and payment vendors are processors (Article 4(8) and Article 28) — they may process data only on our documented instructions, with confidentiality, security, and deletion or return at the end of the contract. An optional PSD2/AIS provider is typically an independent controller or a processor of the bank connection you start; we receive only the account information you authorize. Household members you invite are separate users, not our processors."
                     },
                     "purposes": {
                         "title": "Purposes and legal bases",
@@ -4003,7 +4023,7 @@
                     },
                     "measures": {
                         "title": "Security measures (summary)",
-                        "body": "TLS in transit; encryption at rest on the hosted database; password hashing; optional 2FA; row-level household isolation in the application; access limited to operators who need it; backups in the same EU region. Processors are required to implement appropriate technical and organisational measures under Article 28."
+                        "body": "TLS in transit; encryption at rest on the hosted database; password hashing; optional 2FA; row-level household isolation in the application; access limited to operators who need it; backups in the same EU region. Processors are required to implement appropriate technical and organizational measures under Article 28."
                     },
                     "transfers": {
                         "title": "International transfers",
@@ -4060,7 +4080,7 @@
                     },
                     "regulated": {
                         "title": "What we are not",
-                        "body": "Rumtelo is not authorised by De Nederlandsche Bank or the AFM as a bank, investment firm, or adviser. Coach output is education. Optional bank sync, when offered, will be provided through a third party that holds its own PSD2 licence. We do not move your money."
+                        "body": "Rumtelo is not authorized by De Nederlandsche Bank or the AFM as a bank, investment firm, or adviser. Coach output is education. Optional bank sync, when offered, will be provided through a third party that holds its own PSD2 license. We do not move your money."
                     }
                 }
             }
@@ -4096,7 +4116,7 @@
             "gratitude": "Gratitude",
             "giving": "Giving",
             "intent": "Intent",
-            "centres": "Centres",
+            "centers": "Centers",
             "coach": "The Coach",
             "why": "Why",
             "sign_in": "Sign in",
@@ -4164,7 +4184,7 @@
                 "gratitude": "Gratitude",
                 "giving": "Giving",
                 "intent": "Intent",
-                "centres": "Centres"
+                "centers": "Centers"
             }
         },
         "onboarding": {
@@ -4784,7 +4804,7 @@
                     "connect_bank": "Connect a bank",
                     "wizard_step_institution": "1 · Choose bank",
                     "wizard_step_seat": "2 · Choose account",
-                    "wizard_step_authorise": "3 · Authorise",
+                    "wizard_step_authorize": "3 · Authorize",
                     "wizard_institution_hint": "Next you’ll sign in at your bank. Rumtelo only reads transactions.",
                     "wizard_institution_sandbox_hint": "Sandbox: pick Mock ASPSP (or Rabobank) to test without a real bank login.",
                     "wizard_sandbox_badge": "Test bank",
@@ -4796,15 +4816,15 @@
                     "wizard_pick_seat": "Which account should we link?",
                     "wizard_pick_seat_bank": "Which {bank} account should we link?",
                     "wizard_no_matching_seats": "No {bank} accounts yet. Create one below — it will be labelled for that bank.",
-                    "wizard_authorise": "Continue to bank",
-                    "wizard_authorise_hint": "Next you leave Rumtelo briefly, sign in at the bank, and approve read-only access. We never move money. When you return, transactions sync into your Inbox.",
-                    "wizard_authorise_what_1": "Read-only: balances and transactions only.",
-                    "wizard_authorise_what_2": "You can disconnect this link any time in Settings.",
-                    "wizard_authorise_what_3": "After approval we sync once, then return you here.",
-                    "wizard_authorise_bank": "Bank that must approve",
-                    "wizard_authorise_seat": "Rumtelo account to link",
-                    "wizard_authorise_seat_new": "New account · {bank}",
-                    "wizard_authorise_mismatch": "The bank you authorise ({aspsp}) can differ from the Rumtelo label bank ({catalog}). That is fine for testing; in daily use they usually match.",
+                    "wizard_authorize": "Continue to bank",
+                    "wizard_authorize_hint": "Next you leave Rumtelo briefly, sign in at the bank, and approve read-only access. We never move money. When you return, transactions sync into your Inbox.",
+                    "wizard_authorize_what_1": "Read-only: balances and transactions only.",
+                    "wizard_authorize_what_2": "You can disconnect this link any time in Settings.",
+                    "wizard_authorize_what_3": "After approval we sync once, then return you here.",
+                    "wizard_authorize_bank": "Bank that must approve",
+                    "wizard_authorize_seat": "Rumtelo account to link",
+                    "wizard_authorize_seat_new": "New account · {bank}",
+                    "wizard_authorize_mismatch": "The bank you authorize ({aspsp}) can differ from the Rumtelo label bank ({catalog}). That is fine for testing; in daily use they usually match.",
                     "wizard_cancel": "Cancel",
                     "group_accounts": "{count} accounts",
                     "not_connected": "Not connected",
@@ -4816,7 +4836,7 @@
                     "connected": "Linked",
                     "sync_now": "Sync now",
                     "disconnect_bank": "Disconnect",
-                    "pick_institution": "Choose bank to authorise",
+                    "pick_institution": "Choose bank to authorize",
                     "linking": "Opening bank…",
                     "linked_toast": "Bank linked — syncing…",
                     "synced_toast": "Imported {count} transactions",
@@ -5447,7 +5467,7 @@
                 "soul_gratitude": "Someone who sees what he already has buys less to fill a hole.",
                 "soul_giving": "A fixed share that leaves before you can hold it keeps money a tool, not a master.",
                 "soul_intent": "An intention is an instruction to yourself. A resolution is a hope.",
-                "soul_centres": "Name where it feels stuck, and the next step usually names itself.",
+                "soul_centers": "Name where it feels stuck, and the next step usually names itself.",
                 "growth_income": "Cutting costs has a floor. Raising income does not.",
                 "growth_learn": "A book you cannot name a use for was Play spending, not Education.",
                 "growth_learn_library": "We recommend what to get and who to support. We never host the work.",

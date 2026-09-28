@@ -43,7 +43,7 @@ Promote `preview` → `ship` only after the checklist boxes for that row are don
 
 | Id | Intent | Notes |
 |---|---|---|
-| `split_coach_b2` | Infer spending style from behaviour | See `apps/application/app/_lib/split-coach/README.md` |
+| `split_coach_b2` | Infer spending style from behavior | See `apps/application/app/_lib/split-coach/README.md` |
 | `split_coach_c` | Weekly Home / Jars tip card | Same README |
 | `money_tip_producers` | `CoachService.registerRefresher` for money | Only time coach registers today |
 | `growth_tip_producers` | Growth inbox tips | — |

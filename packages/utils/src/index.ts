@@ -1,5 +1,6 @@
 export { cn } from './cn';
 export { isEnumValue, parseEnum } from './enum';
+export { shuffled } from './shuffle';
 
 export {
     extractErrorMessage,

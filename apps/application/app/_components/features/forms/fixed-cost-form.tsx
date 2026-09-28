@@ -209,7 +209,7 @@ export function FixedCostForm({
         live
     );
     const givingOrgsQuery = useLiveQuery(
-        apiQuery.money.catalogs.givingOrganisations.list.queryOptions({
+        apiQuery.money.catalogs.givingOrganizations.list.queryOptions({
             input: { householdId: householdId! },
         }),
         [],
@@ -349,7 +349,7 @@ export function FixedCostForm({
         return merchants.filter(
             merchant =>
                 merchant.categoryTemplateKey === activeCategoryTemplateKey &&
-                !merchant.givingOrganisationKey
+                !merchant.givingOrganizationKey
         );
     }, [merchants, activeCategoryTemplateKey, selectedBillPresetKey, fixedCostPresets]);
 
@@ -947,9 +947,9 @@ export function FixedCostForm({
                                         defaultOpen
                                         selectedKey={giveOrgKey}
                                         selectedName={counterparty}
-                                        onPick={organisation => {
-                                            setGiveOrgKey(organisation.key);
-                                            form.setValue('counterparty', organisation.name, {
+                                        onPick={organization => {
+                                            setGiveOrgKey(organization.key);
+                                            form.setValue('counterparty', organization.name, {
                                                 shouldDirty: true,
                                             });
                                             if (

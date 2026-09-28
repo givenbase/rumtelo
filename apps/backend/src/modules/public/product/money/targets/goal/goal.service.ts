@@ -46,7 +46,7 @@ export class GoalService {
         status?: string;
         why?: string | null;
         cause?: string | null;
-        givingOrganisationKey?: string | null;
+        givingOrganizationKey?: string | null;
     }) {
         await this.planAccess.assertCapability(CAPABILITIES.growthGoals);
         const occupied = await this.repo.count({ status: GoalStatus.ACTIVE });
@@ -74,7 +74,7 @@ export class GoalService {
             status: (input.status as GoalStatus) ?? GoalStatus.ACTIVE,
             why: input.why ?? null,
             cause: isGive ? ((input.cause as GivingCause | null | undefined) ?? null) : null,
-            givingOrganisationKey: isGive ? input.givingOrganisationKey?.trim() || null : null,
+            givingOrganizationKey: isGive ? input.givingOrganizationKey?.trim() || null : null,
         } as never);
         await this.em.persist(entity).flush();
         if (kind === GoalKind.EARN) {
@@ -259,7 +259,7 @@ export class GoalService {
             why: string | null;
             fulfilledOn: string | null;
             cause: string | null;
-            givingOrganisationKey: string | null;
+            givingOrganizationKey: string | null;
             sortOrder: number;
         }>
     ) {
@@ -294,20 +294,20 @@ export class GoalService {
                     ? ((patch.cause as GivingCause | null) ?? null)
                     : null;
         }
-        if (patch.givingOrganisationKey !== undefined) {
-            entity.givingOrganisationKey =
-                entity.kind === GoalKind.GIVE ? patch.givingOrganisationKey?.trim() || null : null;
+        if (patch.givingOrganizationKey !== undefined) {
+            entity.givingOrganizationKey =
+                entity.kind === GoalKind.GIVE ? patch.givingOrganizationKey?.trim() || null : null;
         }
         if (entity.kind === GoalKind.EARN) {
             entity.jar = null;
             entity.monthlyContribution = 0;
             entity.cause = null;
-            entity.givingOrganisationKey = null;
+            entity.givingOrganizationKey = null;
             entity.sortOrder = 0;
         }
         if (entity.kind === GoalKind.SAVE) {
             entity.cause = null;
-            entity.givingOrganisationKey = null;
+            entity.givingOrganizationKey = null;
         }
         if (entity.kind === GoalKind.GIVE) {
             entity.sortOrder = 0;
@@ -478,7 +478,7 @@ export function toDto(goal: Goal) {
         status: goal.status,
         why: goal.why,
         cause: goal.cause ?? null,
-        givingOrganisationKey: goal.givingOrganisationKey ?? null,
+        givingOrganizationKey: goal.givingOrganizationKey ?? null,
         fulfilledOn: goal.fulfilledOn,
         sortOrder: goal.sortOrder ?? 0,
     };

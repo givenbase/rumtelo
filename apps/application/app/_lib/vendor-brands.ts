@@ -177,15 +177,15 @@ export function findCatalogMerchantFromFeed(
 export function findPartyVendor(
     name: string,
     merchants: readonly MerchantPreset[],
-    organisations?: readonly { name: string; website?: string | null }[]
+    organizations?: readonly { name: string; website?: string | null }[]
 ): ResolveVendorInput {
     const catalog =
         findCatalogVendor(name, merchants) ?? findCatalogVendorFromFeed(name, merchants);
     if (catalog) return catalog;
     const needle = name.trim().toLowerCase();
-    const organisation = organisations?.find(row => row.name.toLowerCase() === needle);
-    if (organisation) {
-        return { name: organisation.name, website: organisation.website };
+    const organization = organizations?.find(row => row.name.toLowerCase() === needle);
+    if (organization) {
+        return { name: organization.name, website: organization.website };
     }
     return { name };
 }

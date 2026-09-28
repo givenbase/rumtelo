@@ -1,18 +1,18 @@
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { GivingCause, GivingOrganisation as GivingOrganisationDto } from '@rumtelo/contracts';
+import type { GivingCause, GivingOrganization as GivingOrganizationDto } from '@rumtelo/contracts';
 
-import { GivingOrganisation } from './giving-organisation.entity';
+import { GivingOrganization } from './giving-organization.entity';
 
 @Injectable()
-export class GivingOrganisationService {
+export class GivingOrganizationService {
     constructor(@Inject(EntityManager) private readonly em: EntityManager) {}
 
-    /** Active organisations; `cause` filter is a JSON containment check in SQL. */
-    async listActive(filters?: { cause?: GivingCause }): Promise<GivingOrganisationDto[]> {
+    /** Active organizations; `cause` filter is a JSON containment check in SQL. */
+    async listActive(filters?: { cause?: GivingCause }): Promise<GivingOrganizationDto[]> {
         const rows = await this.em.find(
-            GivingOrganisation,
+            GivingOrganization,
             {
                 isActive: true,
                 ...(filters?.cause ? { causes: { $contains: [filters.cause] } } : {}),

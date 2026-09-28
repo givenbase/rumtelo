@@ -29,7 +29,7 @@ import { formatPlanPrice, toMinorUnits } from '@rumtelo/utils';
  *
  * Full catalog (26 keys). Basic grants free surfaces + growth goals/income/learn (capped goals).
  * Plus adds debt / bank / import / energy week·train·food / invite.
- * Max adds growth net-worth / soul-centres. Learn courses switch from Udemy to Masterclass.
+ * Max adds growth net-worth / soul-centers. Learn courses switch from Udemy to Masterclass.
  */
 
 export {

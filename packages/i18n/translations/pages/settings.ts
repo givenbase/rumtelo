@@ -259,7 +259,7 @@ const settings = {
             connect_bank: 'Connect a bank',
             wizard_step_institution: '1 · Choose bank',
             wizard_step_seat: '2 · Choose account',
-            wizard_step_authorise: '3 · Authorise',
+            wizard_step_authorize: '3 · Authorize',
             wizard_institution_hint:
                 'Next you’ll sign in at your bank. Rumtelo only reads transactions.',
             wizard_institution_sandbox_hint:
@@ -274,17 +274,17 @@ const settings = {
             wizard_pick_seat_bank: 'Which {bank} account should we link?',
             wizard_no_matching_seats:
                 'No {bank} accounts yet. Create one below — it will be labelled for that bank.',
-            wizard_authorise: 'Continue to bank',
-            wizard_authorise_hint:
+            wizard_authorize: 'Continue to bank',
+            wizard_authorize_hint:
                 'Next you leave Rumtelo briefly, sign in at the bank, and approve read-only access. We never move money. When you return, transactions sync into your Inbox.',
-            wizard_authorise_what_1: 'Read-only: balances and transactions only.',
-            wizard_authorise_what_2: 'You can disconnect this link any time in Settings.',
-            wizard_authorise_what_3: 'After approval we sync once, then return you here.',
-            wizard_authorise_bank: 'Bank that must approve',
-            wizard_authorise_seat: 'Rumtelo account to link',
-            wizard_authorise_seat_new: 'New account · {bank}',
-            wizard_authorise_mismatch:
-                'The bank you authorise ({aspsp}) can differ from the Rumtelo label bank ({catalog}). That is fine for testing; in daily use they usually match.',
+            wizard_authorize_what_1: 'Read-only: balances and transactions only.',
+            wizard_authorize_what_2: 'You can disconnect this link any time in Settings.',
+            wizard_authorize_what_3: 'After approval we sync once, then return you here.',
+            wizard_authorize_bank: 'Bank that must approve',
+            wizard_authorize_seat: 'Rumtelo account to link',
+            wizard_authorize_seat_new: 'New account · {bank}',
+            wizard_authorize_mismatch:
+                'The bank you authorize ({aspsp}) can differ from the Rumtelo label bank ({catalog}). That is fine for testing; in daily use they usually match.',
             wizard_cancel: 'Cancel',
             group_accounts: '{count} accounts',
             not_connected: 'Not connected',
@@ -296,7 +296,7 @@ const settings = {
             connected: 'Linked',
             sync_now: 'Sync now',
             disconnect_bank: 'Disconnect',
-            pick_institution: 'Choose bank to authorise',
+            pick_institution: 'Choose bank to authorize',
             linking: 'Opening bank…',
             linked_toast: 'Bank linked — syncing…',
             synced_toast: 'Imported {count} transactions',

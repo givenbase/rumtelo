@@ -73,7 +73,7 @@ export enum MerchantHighlight {
     POPULAR = 'POPULAR',
 }
 
-/** Where a household wants its giving to land. Catalog filter for GivingOrganisation. */
+/** Where a household wants its giving to land. Catalog filter for GivingOrganization. */
 export enum GivingCause {
     GLOBAL_HEALTH = 'GLOBAL_HEALTH',
     POVERTY = 'POVERTY',
@@ -86,7 +86,7 @@ export enum GivingCause {
 }
 
 /**
- * Independent evaluators / registers a GivingOrganisation can cite.
+ * Independent evaluators / registers a GivingOrganization can cite.
  * Each one measures something different — the app explains what, and tiers
  * them: evidence of impact › governance & transparency › tax status.
  */

@@ -11,7 +11,7 @@ import { type LearnProgressStatus, type LearnShelf as LearnShelfDto } from '@rum
 import { useLiveQuery } from '@rumtelo/hooks';
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
 
-import { PIECES, SKILLS, type LearnSkill, type LearnStatus } from '../_utils/learn-catalog';
+import { SKILLS, type LearnSkill, type LearnStatus } from '../_utils/learn-catalog';
 
 type LearnShelfApi = {
     statusById: Record<string, LearnStatus>;
@@ -47,9 +47,7 @@ export function useLearnShelf(): LearnShelfApi {
 }
 
 function useLocalShelf(): LearnShelfApi {
-    const [statusById, setStatusById] = useState<Record<string, LearnStatus>>(() =>
-        Object.fromEntries(PIECES.map(piece => [piece.id, piece.status]))
-    );
+    const [statusById, setStatusById] = useState<Record<string, LearnStatus>>({});
     const [dueById, setDueById] = useState<Record<string, string>>({});
     const [rankById, setRankById] = useState<Record<string, number>>({});
     const [focused, setFocused] = useState<Set<LearnSkill>>(() => new Set(['MONEY']));

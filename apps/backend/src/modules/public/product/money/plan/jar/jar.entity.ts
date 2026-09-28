@@ -42,7 +42,7 @@ export class Jar extends HouseholdEntity {
     sortOrder = 0;
 
     /**
-     * Behaviour flags (spend / save / invest / safe-to-spend).
+     * Behavior flags (spend / save / invest / safe-to-spend).
      * Copied from the template at onboard — do not infer from key in services.
      */
     @Property({ type: 'json' })

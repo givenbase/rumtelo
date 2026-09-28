@@ -2,11 +2,15 @@ import type { ComponentType } from 'react';
 
 import type { CustomIconName, IconSvgProps } from '../types';
 
+import { SpotifyIcon } from './spotify';
+
 /**
  * Manual brand glyphs. Keys **must** be `custom/<id>`.
  * Add components here when Lucide is not enough — same size/color/appearance via Icon.
  */
-export const CUSTOM_ICONS = {} as const satisfies Record<never, ComponentType<IconSvgProps>>;
+export const CUSTOM_ICONS = {
+    'custom/spotify': SpotifyIcon,
+} as const satisfies Record<string, ComponentType<IconSvgProps>>;
 
 export type RegisteredCustomIconName = keyof typeof CUSTOM_ICONS;
 

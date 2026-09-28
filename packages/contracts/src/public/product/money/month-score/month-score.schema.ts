@@ -11,7 +11,7 @@ import { MonthScoreEventKind } from '../enums';
 
 /**
  * Monthly score for one budget period (YYYY-MM). Accrues from observable
- * behaviour, closes on rollover, and is never re-openable — the log is the
+ * behavior, closes on rollover, and is never re-openable — the log is the
  * household's honest history, not a leaderboard to be gamed.
  */
 export const MonthScoreEvent = z.object({
@@ -19,7 +19,7 @@ export const MonthScoreEvent = z.object({
     householdId: HouseholdId,
     period: PeriodKey,
     kind: z.enum(MonthScoreEventKind),
-    /** Calendar date the behaviour happened (`YYYY-MM-DD`). */
+    /** Calendar date the behavior happened (`YYYY-MM-DD`). */
     occurredOn: IsoDate,
     text: z.string().max(240),
     points: z.int(),

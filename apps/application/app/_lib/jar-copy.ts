@@ -62,6 +62,8 @@ const LINK_HREF_SUFFIX: Record<string, string> = {
     '/product/money/transactions': 'links.transactions',
     '/product/growth/net-worth': 'links.net_worth',
     '/product/growth/goals': 'links.goals',
+    '/product/growth/learn': 'links.learn',
+    '/product/growth/learn/library': 'links.library',
     '/product/soul/giving': 'links.giving',
 };
 

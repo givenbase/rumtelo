@@ -194,7 +194,7 @@ const landing = {
             f1: 'Stillness — one minute counts',
             f2: 'Gratitude, written down',
             f3: 'One intention a week',
-            f4: 'The seven centres — where energy gets stuck',
+            f4: 'The seven centers — where energy gets stuck',
         },
     },
     portal_cta: {
@@ -296,7 +296,7 @@ const landing = {
             psychology: {
                 title: 'The Psychology of Money',
                 author: 'Morgan Housel',
-                line: 'Behaviour beats cleverness — calm systems over panic and shame.',
+                line: 'Behavior beats cleverness — calm systems over panic and shame.',
             },
             secret: {
                 title: 'The Secret',
@@ -488,7 +488,7 @@ const landing = {
             f1: 'Everything in Plus',
             f2: 'GROWTH · net worth, returns and your freedom number',
             f3: 'GROWTH · Learn courses on Masterclass, not Udemy',
-            f4: 'SOUL · the seven centres',
+            f4: 'SOUL · the seven centers',
             f5: 'Up to {maxMembers} seats (more full access)',
             f6: 'Devices — watch, scale, ring (coming)',
         },

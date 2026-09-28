@@ -38,7 +38,7 @@ const nav = {
         gratitude: 'Gratitude',
         giving: 'Giving',
         intent: 'Intent',
-        centres: 'Centres',
+        centers: 'Centers',
     },
 } as const;
 

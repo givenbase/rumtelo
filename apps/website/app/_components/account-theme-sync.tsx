@@ -47,11 +47,11 @@ export function AccountThemeProvider({ children }: { children: ReactNode }) {
             return;
         }
 
-        let cancelled = false;
+        let canceled = false;
         void (async () => {
             try {
                 const settings = await api.account.settings();
-                if (cancelled) return;
+                if (canceled) return;
                 setAccountThemeState(settings.theme);
                 if (hydratedForUser.current === userId) return;
                 hydratedForUser.current = userId;
@@ -62,7 +62,7 @@ export function AccountThemeProvider({ children }: { children: ReactNode }) {
         })();
 
         return () => {
-            cancelled = true;
+            canceled = true;
         };
     }, [isAuthenticated, userId, setTheme]);
 

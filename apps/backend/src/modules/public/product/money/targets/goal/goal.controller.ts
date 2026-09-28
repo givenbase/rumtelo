@@ -32,7 +32,7 @@ export class GoalController {
                 status: input.status,
                 why: input.why,
                 cause: input.cause,
-                givingOrganisationKey: input.givingOrganisationKey,
+                givingOrganizationKey: input.givingOrganizationKey,
             })
         );
     }

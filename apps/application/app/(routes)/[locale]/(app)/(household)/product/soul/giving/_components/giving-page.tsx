@@ -188,7 +188,7 @@ export function GivingPageClient() {
         live
     );
     const givingOrgsQuery = useLiveQuery(
-        apiQuery.money.catalogs.givingOrganisations.list.queryOptions({
+        apiQuery.money.catalogs.givingOrganizations.list.queryOptions({
             input: { householdId: householdId! },
         }),
         [] as never,
@@ -516,11 +516,11 @@ export function GivingPageClient() {
                 {givePickMode === 'coach' ? (
                     <GivingFinder
                         defaultOpen
-                        onPick={organisation =>
+                        onPick={organization =>
                             router.push(
                                 createFixedHref({
                                     jarId: giveJar?.id,
-                                    orgKey: organisation.key,
+                                    orgKey: organization.key,
                                     payeeMode: 'coach',
                                 })
                             )

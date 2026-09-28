@@ -11,21 +11,21 @@ import {
     loadJarTemplateMap,
 } from '../../../../modules/backoffice/product/money/require-jar-template';
 
-import { loadCategoryTemplates, loadGivingOrganisations, loadMarkets } from './catalog-lookups';
+import { loadCategoryTemplates, loadGivingOrganizations, loadMarkets } from './catalog-lookups';
 
 const DEFAULT_MARKETS = ['NL'] as const;
 const OWNER = 'MerchantPresetSeeder';
 
 /**
  * Seeds backoffice.reference_money_merchant_preset and its 1:1 children.
- * Requires JarTemplate, CategoryTemplate, Market and GivingOrganisation seeded first.
+ * Requires JarTemplate, CategoryTemplate, Market and GivingOrganization seeded first.
  */
 export class MerchantPresetSeeder extends Seeder {
     async run(em: EntityManager): Promise<void> {
         const jarByKey = await loadJarTemplateMap(em);
         const categoryByKey = await loadCategoryTemplates(em, OWNER);
         const marketByKey = await loadMarkets(em, OWNER);
-        const organisationByKey = await loadGivingOrganisations(em, OWNER);
+        const organizationByKey = await loadGivingOrganizations(em, OWNER);
 
         const seedKeys = new Set(MERCHANT_PRESET_SEED.map(row => row.key));
         const existingRows = await em.find(
@@ -38,12 +38,13 @@ export class MerchantPresetSeeder extends Seeder {
         for (const [sortOrder, row] of MERCHANT_PRESET_SEED.entries()) {
             const jarTemplate = jarTemplateFromMap(jarByKey, row.jarKey);
             const categoryTemplate = categoryByKey(row.categoryTemplateKey);
-            const givingOrganisation = row.givingOrganisationKey
-                ? organisationByKey(row.givingOrganisationKey)
+            const givingOrganization = row.givingOrganizationKey
+                ? organizationByKey(row.givingOrganizationKey)
                 : null;
             const markets = (row.markets?.length ? row.markets : DEFAULT_MARKETS).map(marketByKey);
             const isActive = row.isActive ?? true;
             const highlight = row.highlight ?? null;
+            const isPartner = row.isPartner ?? false;
             const matchPriority = row.matchPriority ?? 0;
             const providerIds = { ...row.providerIds };
             const logoDomain = row.logoDomain;
@@ -54,9 +55,10 @@ export class MerchantPresetSeeder extends Seeder {
                 existing.name = row.name;
                 existing.jarTemplate = jarTemplate;
                 existing.categoryTemplate = categoryTemplate;
-                existing.givingOrganisation = givingOrganisation;
+                existing.givingOrganization = givingOrganization;
                 existing.markets.set(markets);
                 existing.highlight = highlight;
+                existing.isPartner = isPartner;
                 existing.sortOrder = sortOrder;
                 existing.isActive = isActive;
 
@@ -88,8 +90,9 @@ export class MerchantPresetSeeder extends Seeder {
                 name: row.name,
                 jarTemplate,
                 categoryTemplate,
-                givingOrganisation,
+                givingOrganization,
                 highlight,
+                isPartner,
                 sortOrder,
                 isActive,
             } as never);

@@ -97,7 +97,7 @@ export function SoulPortalHubClient() {
     const streak = data?.stillnessStreakDays;
     const thanks = data?.gratitudeThisWeek ?? 0;
     const intention = data?.intention;
-    const centres = data?.centresNamedToday ?? 0;
+    const centers = data?.centersNamedToday ?? 0;
 
     const givingNote = pledge
         ? pledgeAt?.fulfilledByPeriod
@@ -169,12 +169,12 @@ export function SoulPortalHubClient() {
                 href: '/product/soul/intent',
             },
             {
-                name: tc('centres.name'),
-                value: String(centres),
-                note: tc('centres.note'),
+                name: tc('centers.name'),
+                value: String(centers),
+                note: tc('centers.note'),
                 color: 'var(--color-jar-edu)',
                 chart: { kind: 'ring', pct: 0 },
-                href: '/product/soul/centres',
+                href: '/product/soul/centers',
             },
         ],
     };

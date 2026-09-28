@@ -29,7 +29,7 @@ export const FixedCost = z.object({
     debtId: Id.nullable().default(null),
     name: z.string().min(1).max(120),
     /**
-     * Who the money goes to — landlord, insurer, or the organisation you give to.
+     * Who the money goes to — landlord, insurer, or the organization you give to.
      * Optional; surfaced mainly for Give so a household can see *whom* it supports.
      */
     counterparty: z.string().max(160).nullable().default(null),

@@ -14,7 +14,7 @@ export type { IconName };
 /**
  * Ambient background video behind the hero. Decorative only — the scrim in
  * `landing-hero.tsx` keeps the copy readable over it.
- * TEMP — Pexels clip (free licence). Self-host the final in /public/media/ before launch.
+ * TEMP — Pexels clip (free license). Self-host the final in /public/media/ before launch.
  */
 export const HERO_VIDEO = {
     src: 'https://videos.pexels.com/video-files/18069235/18069235-hd_1920_1080_24fps.mp4',

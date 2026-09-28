@@ -1,6 +1,6 @@
 # Modules
 
-Organised by **Postgres plane / who writes**, then product.
+Organized by **Postgres plane / who writes**, then product.
 A group is a parent module that imports its children; a child is one aggregate
 with its `*.entity.ts`, service, controller and module as flat siblings.
 
@@ -192,7 +192,7 @@ Every entity, its base, table and relations: `apps/backend/docs/ENTITY_INVENTORY
 
 - Money → `MoneyType` (bigint eurocents, `number` at runtime); ratios stay `decimal`
 - Text → `name` / `description`; catalog defaults are plain nouns (`cadence`, not `defaultCadence`)
-- backoffice → backoffice = real relations (`categoryTemplate`, `audiences`, `merchantLinks`, `postures`, `minWealthStage`); household → backoffice = `*Key` snapshot (`Jar.templateKey`, `Goal.givingOrganisationKey`)
+- backoffice → backoffice = real relations (`categoryTemplate`, `audiences`, `merchantLinks`, `postures`, `minWealthStage`); household → backoffice = `*Key` snapshot (`Jar.templateKey`, `Goal.givingOrganizationKey`)
 - Inverse collections: `import type` + string entity name (`@OneToMany('PlanFeature', 'product')`) — no entity import cycles
 
 ### Entity comments

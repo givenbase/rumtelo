@@ -21,11 +21,17 @@ import {
     Input,
 } from '@rumtelo/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 
-import { ABOUT_ORDER, aboutFields, asLearnSkill, type LearnSkill } from '../_utils/learn-catalog';
+import {
+    ABOUT_ORDER,
+    SKILLS,
+    aboutFields,
+    asLearnSkill,
+    type LearnSkill,
+} from '../_utils/learn-catalog';
 import { useLearnCatalogLabels } from '../_utils/learn-labels';
 
 type AddLearningDialogProps = {
@@ -44,9 +50,31 @@ const searchFormSchema = z.object({
 
 type SearchFormValues = z.infer<typeof searchFormSchema>;
 
+const ABOUT_ALL = 'ALL';
+
+const SKILL_ABOUT: ReadonlySet<string> = new Set(
+    SKILLS.filter(skill => skill.key !== 'MONEY').map(skill => skill.key)
+);
+
+function bookMatchesAbout(book: LearnBookPreset, about: string) {
+    if (about === ABOUT_ALL) return true;
+    if (SKILL_ABOUT.has(about)) return book.skill === about;
+    return book.topic === about;
+}
+
+function bookMatchesQuery(book: LearnBookPreset, query: string) {
+    const needle = query.trim().toLowerCase();
+    if (needle.length < 2) return false;
+    return (
+        book.name.toLowerCase().includes(needle) ||
+        book.author.toLowerCase().includes(needle) ||
+        book.description.toLowerCase().includes(needle)
+    );
+}
+
 /**
- * Search the public catalog and save a pointer on this household's shelf.
- * Fields: useForm. Results: TanStack query (not mutation + hits state).
+ * Suggest from our shelf as you type. Search reaches titles we have not listed.
+ * We save a pointer, not the work.
  */
 export function AddLearningDialog({
     open,
@@ -101,14 +129,23 @@ function AddLearningForm({
     const apiError = useApiError();
 
     const form = useForm<SearchFormValues>({
-        defaultValues: { query: initialQuery, about: 'MIND' },
+        defaultValues: { query: initialQuery, about: ABOUT_ALL },
         resolver: zodResolver(searchFormSchema),
     });
     const query = useWatch({ control: form.control, name: 'query' }) ?? '';
-    const about = useWatch({ control: form.control, name: 'about' }) ?? 'MIND';
+    const about = useWatch({ control: form.control, name: 'about' }) ?? ABOUT_ALL;
+    const aboutChosen = about !== ABOUT_ALL;
     const [committedQuery, setCommittedQuery] = useState(() =>
         initialQuery.trim().length >= 2 ? initialQuery.trim() : ''
     );
+
+    const libraryHits = useMemo(() => {
+        const text = query.trim();
+        if (text.length < 2) return [];
+        return books
+            .filter(book => bookMatchesQuery(book, text) && bookMatchesAbout(book, about))
+            .slice(0, 8);
+    }, [about, books, query]);
 
     const searchOptions = apiQuery.growth.learn.searchBooks.queryOptions({
         input: { householdId, query: committedQuery || 'xx' },
@@ -120,6 +157,9 @@ function AddLearningForm({
 
     const hits: readonly LearnBookHit[] = searchQuery.data ?? [];
     const searched = committedQuery.length >= 2 && !searchQuery.isPending;
+    const catalogHits = hits.filter(
+        hit => !books.some(book => book.isbn13 !== null && book.isbn13 === hit.isbn13)
+    );
 
     const add = useMutation({
         mutationFn: (input: LearnBookDraft) =>
@@ -134,13 +174,18 @@ function AddLearningForm({
         onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
+    function pickLibrary(book: LearnBookPreset) {
+        onPick(book.key, asLearnSkill(book.skill));
+        onDone();
+    }
+
     function pick(hit: LearnBookHit) {
         const known = books.find(book => book.isbn13 !== null && book.isbn13 === hit.isbn13);
         if (known) {
-            onPick(known.key, asLearnSkill(known.skill));
-            onDone();
+            pickLibrary(known);
             return;
         }
+        if (!aboutChosen) return;
         const filed = aboutFields(about);
         add.mutate({ ...hit, ...filed });
     }
@@ -166,6 +211,7 @@ function AddLearningForm({
                                         placeholder={tLearn('search_catalog_placeholder')}
                                         aria-label={tLearn('search_catalog_aria')}
                                         className="min-w-0 flex-1"
+                                        autoComplete="off"
                                     />
                                 </FormControl>
                             </FormItem>
@@ -185,7 +231,7 @@ function AddLearningForm({
                     render={({ field }) => (
                         <FormItem>
                             <div className="flex flex-wrap gap-1.5">
-                                {ABOUT_ORDER.map(option => (
+                                {[ABOUT_ALL, ...ABOUT_ORDER].map(option => (
                                     <button
                                         key={option}
                                         type="button"
@@ -195,7 +241,9 @@ function AddLearningForm({
                                                 ? 'rounded-full bg-accent-soft px-2.5 py-1 font-mono text-[11px] tracking-wide text-accent uppercase'
                                                 : 'rounded-full px-2.5 py-1 font-mono text-[11px] tracking-wide text-fg-muted uppercase'
                                         }>
-                                        {labels.aboutLabel(option)}
+                                        {option === ABOUT_ALL
+                                            ? tLearn('filter_anything')
+                                            : labels.aboutLabel(option)}
                                     </button>
                                 ))}
                             </div>
@@ -203,36 +251,74 @@ function AddLearningForm({
                     )}
                 />
 
+                {libraryHits.length > 0 ? (
+                    <div className="grid gap-2">
+                        <p className="font-mono text-[10px] tracking-wide text-fg-muted uppercase">
+                            {tLearn('library_matches')}
+                        </p>
+                        <ul className="grid max-h-56 gap-2 overflow-auto">
+                            {libraryHits.map(book => (
+                                <li key={book.key}>
+                                    <button
+                                        type="button"
+                                        onClick={() => pickLibrary(book)}
+                                        className="flex w-full items-baseline justify-between gap-3 rounded-xl border border-line px-3 py-2.5 text-left hover:border-accent">
+                                        <span className="min-w-0">
+                                            <span className="block truncate text-sm text-fg">
+                                                {book.name}
+                                            </span>
+                                            <span className="block truncate text-xs text-fg-muted">
+                                                {book.author}
+                                            </span>
+                                        </span>
+                                        <span className="flex-none font-mono text-[11px] tracking-wide text-accent uppercase">
+                                            {tLearn('add_button')}
+                                        </span>
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ) : null}
+
                 {searchQuery.isError ? (
                     <p className="text-sm text-danger">{tLearn('catalog_error')}</p>
                 ) : null}
                 {add.isError ? <p className="text-sm text-danger">{tLearn('save_error')}</p> : null}
 
-                {hits.length > 0 ? (
-                    <ul className="grid max-h-72 gap-2 overflow-auto">
-                        {hits.map(hit => (
-                            <li key={hit.sourceKey}>
-                                <button
-                                    type="button"
-                                    disabled={add.isPending}
-                                    onClick={() => pick(hit)}
-                                    className="flex w-full items-baseline justify-between gap-3 rounded-xl border border-line px-3 py-2.5 text-left hover:border-accent">
-                                    <span className="min-w-0">
-                                        <span className="block truncate text-sm text-fg">
-                                            {hit.name}
+                {catalogHits.length > 0 ? (
+                    <div className="grid gap-2">
+                        <p className="font-mono text-[10px] tracking-wide text-fg-muted uppercase">
+                            {tLearn('catalog_matches')}
+                        </p>
+                        {!aboutChosen ? (
+                            <p className="text-sm text-fg-muted">{tLearn('pick_about_to_add')}</p>
+                        ) : null}
+                        <ul className="grid max-h-72 gap-2 overflow-auto">
+                            {catalogHits.map(hit => (
+                                <li key={hit.sourceKey}>
+                                    <button
+                                        type="button"
+                                        disabled={add.isPending || !aboutChosen}
+                                        onClick={() => pick(hit)}
+                                        className="flex w-full items-baseline justify-between gap-3 rounded-xl border border-line px-3 py-2.5 text-left hover:border-accent disabled:opacity-50">
+                                        <span className="min-w-0">
+                                            <span className="block truncate text-sm text-fg">
+                                                {hit.name}
+                                            </span>
+                                            <span className="block truncate text-xs text-fg-muted">
+                                                {hit.author}
+                                            </span>
                                         </span>
-                                        <span className="block truncate text-xs text-fg-muted">
-                                            {hit.author}
+                                        <span className="flex-none font-mono text-[11px] tracking-wide text-accent uppercase">
+                                            {tLearn('add_button')}
                                         </span>
-                                    </span>
-                                    <span className="flex-none font-mono text-[11px] tracking-wide text-accent uppercase">
-                                        {tLearn('add_button')}
-                                    </span>
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                ) : searched && !searchQuery.isFetching ? (
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ) : searched && !searchQuery.isFetching && libraryHits.length === 0 ? (
                     <p className="text-sm text-fg-muted">{tLearn('nothing_found')}</p>
                 ) : null}
             </form>

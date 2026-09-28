@@ -1,5 +1,5 @@
 /**
- * Display metadata for the time diary: labels, colours and status copy.
+ * Display metadata for the time diary: labels, colors and status copy.
  * Bands, sources and kinds come from `@rumtelo/contracts` — this file is chrome only.
  */
 

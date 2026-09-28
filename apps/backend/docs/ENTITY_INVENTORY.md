@@ -79,7 +79,7 @@ Planes: `auth` = identity (better-auth + Rumtelo person/household rows) · `publ
 | Entity | Base | Table | File | Relations |
 |---|---|---|---|---|
 | `Audience` | `CatalogEntity` | `backoffice.reference_money_audience` | `modules/backoffice/product/money/catalog/audience/audience.entity.ts` | — |
-| `GivingOrganisation` | `CatalogEntity` | `backoffice.reference_money_giving_organisation` | `modules/backoffice/product/money/catalog/giving-organisation/giving-organisation.entity.ts` | — |
+| `GivingOrganization` | `CatalogEntity` | `backoffice.reference_money_giving_organization` | `modules/backoffice/product/money/catalog/giving-organization/giving-organization.entity.ts` | — |
 | `Market` | `CatalogEntity` | `backoffice.reference_money_market` | `modules/backoffice/product/money/catalog/market/market.entity.ts` | — |
 | `DebtPresetMerchant` | `BaseEntity` | `backoffice.reference_money_debt_preset_merchant` | `modules/backoffice/product/money/preset/debt/debt-merchant.entity.ts` | `preset` N:1 → DebtPreset on delete cascade<br>`merchant` N:1 → MerchantPreset on delete cascade |
 | `DebtPreset` | `CatalogEntity` | `backoffice.reference_money_debt_preset` | `modules/backoffice/product/money/preset/debt/debt.entity.ts` | `merchantLinks` 1:N → DebtPresetMerchant |
@@ -90,7 +90,7 @@ Planes: `auth` = identity (better-auth + Rumtelo person/household rows) · `publ
 | `MerchantBanking` | `BaseEntity` | `backoffice.reference_money_merchant_banking` | `modules/backoffice/product/money/preset/merchant/merchant-banking.entity.ts` | `preset` 1:1 → MerchantPreset on delete cascade |
 | `MerchantBranding` | `BaseEntity` | `backoffice.reference_money_merchant_branding` | `modules/backoffice/product/money/preset/merchant/merchant-branding.entity.ts` | `preset` 1:1 → MerchantPreset on delete cascade |
 | `MerchantMatching` | `BaseEntity` | `backoffice.reference_money_merchant_matching` | `modules/backoffice/product/money/preset/merchant/merchant-matching.entity.ts` | `preset` 1:1 → MerchantPreset on delete cascade |
-| `MerchantPreset` | `CatalogEntity` | `backoffice.reference_money_merchant_preset` | `modules/backoffice/product/money/preset/merchant/merchant.entity.ts` | `jarTemplate` N:1 → JarTemplate on delete restrict<br>`categoryTemplate` N:1 → CategoryTemplate on delete restrict<br>`givingOrganisation` N:1 → GivingOrganisation on delete set null<br>`markets` N:M → Market<br>`matching` 1:1 → MerchantMatching<br>`branding` 1:1 → MerchantBranding<br>`banking` 1:1 → MerchantBanking |
+| `MerchantPreset` | `CatalogEntity` | `backoffice.reference_money_merchant_preset` | `modules/backoffice/product/money/preset/merchant/merchant.entity.ts` | `jarTemplate` N:1 → JarTemplate on delete restrict<br>`categoryTemplate` N:1 → CategoryTemplate on delete restrict<br>`givingOrganization` N:1 → GivingOrganization on delete set null<br>`markets` N:M → Market<br>`matching` 1:1 → MerchantMatching<br>`branding` 1:1 → MerchantBranding<br>`banking` 1:1 → MerchantBanking |
 | `TransactionInPreset` | `CatalogEntity` | `backoffice.reference_money_transaction_in_preset` | `modules/backoffice/product/money/preset/transaction-in/transaction-in.entity.ts` | — |
 | `CategoryTemplate` | `CatalogEntity` | `backoffice.reference_money_category_template` | `modules/backoffice/product/money/template/category/category.entity.ts` | `jarTemplate` N:1 → JarTemplate on delete restrict |
 | `JarTemplate` | `BaseEntity` | `backoffice.reference_money_jar_template` | `modules/backoffice/product/money/template/jar/jar.entity.ts` | — |
@@ -124,5 +124,5 @@ Planes: `auth` = identity (better-auth + Rumtelo person/household rows) · `publ
 | From → to | Storage |
 |---|---|
 | backoffice → backoffice | relation (id FK / pivot entity) |
-| household → backoffice | `*Key` snapshot string (`Jar.templateKey`, `Goal.givingOrganisationKey`, `Transaction.inflowKey`, `FixedCost.presetKey`) |
+| household → backoffice | `*Key` snapshot string (`Jar.templateKey`, `Goal.givingOrganizationKey`, `Transaction.inflowKey`, `FixedCost.presetKey`) |
 | household → household | relation with explicit `deleteRule` |

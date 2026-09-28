@@ -3,7 +3,6 @@
 import { useTranslations } from '@rumtelo/i18n';
 
 import {
-    PARTNERS,
     SECTIONS,
     SKILLS,
     type LearnFormat,
@@ -13,15 +12,32 @@ import {
 
 type BookStore = 'BOL' | 'AMAZON';
 
-function pickKind(format: LearnFormat): 'book' | 'watch' | 'take' {
+const ON_MERCHANT_KEYS = new Set<LearnLinkKey>(['watch_on', 'listen_on', 'view_on']);
+
+function pickKind(format: LearnFormat): 'book' | 'watch' | 'listen' | 'take' {
     if (format === 'BOOK') return 'book';
     if (format === 'FILM' || format === 'SERIES' || format === 'VIDEO') return 'watch';
+    if (format === 'PODCAST') return 'listen';
     return 'take';
+}
+
+function humanizeMerchantKey(key: string): string {
+    return key
+        .split('_')
+        .map(part => part.charAt(0) + part.slice(1).toLowerCase())
+        .join(' ');
 }
 
 /** Localized chip and filter labels for the Learn shelf. Content titles stay in the catalog. */
 export function useLearnCatalogLabels() {
     const t = useTranslations('features.growth.learn.catalog');
+
+    function partnerLabel(partner: string | undefined) {
+        if (!partner) return t('partner.recommend');
+        const key = `partner.${partner}` as 'partner.UDEMY';
+        if (t.has(key)) return t(key);
+        return humanizeMerchantKey(partner);
+    }
 
     return {
         formatLabel(format: LearnFormat) {
@@ -44,16 +60,22 @@ export function useLearnCatalogLabels() {
             }
             return about;
         },
-        partnerLabel(partner: string | undefined) {
-            if (partner && PARTNERS.some(row => row.key === partner)) {
-                return t(`partner.${partner}` as 'partner.UDEMY');
-            }
-            return t('partner.recommend');
-        },
+        partnerLabel,
         storeName(store: BookStore) {
             return t(`store.${store}` as 'store.BOL');
         },
-        linkLabel(key: LearnLinkKey) {
+        /** `*_on` keys take `{name}` from merchantKey (MerchantPreset.key). */
+        linkLabel(key: LearnLinkKey, merchantKey?: string) {
+            if (ON_MERCHANT_KEYS.has(key)) {
+                if (!merchantKey) {
+                    if (key === 'view_on') return t('links.view_course');
+                    if (key === 'listen_on') return t('links.listen');
+                    return t('links.watch');
+                }
+                return t(`links.${key}` as 'links.view_on', {
+                    name: partnerLabel(merchantKey),
+                });
+            }
             return t(`links.${key}` as 'links.get_book');
         },
     };

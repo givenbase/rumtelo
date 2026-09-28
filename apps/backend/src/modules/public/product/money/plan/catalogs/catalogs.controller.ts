@@ -17,7 +17,7 @@ import {
     CategoryTemplateService,
     DebtPresetService,
     FixedCostPresetService,
-    GivingOrganisationService,
+    GivingOrganizationService,
     GoalPresetService,
     IncomeSourcePresetService,
     JarTemplateService,
@@ -39,8 +39,8 @@ export class MoneyCatalogsController {
         private readonly transactionIns: TransactionInPresetService,
         @Inject(GoalPresetService) private readonly goals: GoalPresetService,
         @Inject(MerchantPresetService) private readonly merchants: MerchantPresetService,
-        @Inject(GivingOrganisationService)
-        private readonly givingOrganisations: GivingOrganisationService,
+        @Inject(GivingOrganizationService)
+        private readonly givingOrganizations: GivingOrganizationService,
         @Inject(AccountSettingsService) private readonly accountSettings: AccountSettingsService,
         @Inject(TranslationService) private readonly translations: TranslationService
     ) {}
@@ -241,10 +241,11 @@ export class MoneyCatalogsController {
                     mcc: preset.matching?.mcc ?? null,
                     jarKey: preset.jarTemplate.key,
                     categoryTemplateKey: preset.categoryTemplate.key,
-                    givingOrganisationKey: preset.givingOrganisation?.key ?? null,
+                    givingOrganizationKey: preset.givingOrganization?.key ?? null,
                     logoDomain: preset.branding?.logoDomain ?? null,
                     website: preset.branding?.website ?? null,
                     highlight: preset.highlight ?? null,
+                    isPartner: preset.isPartner,
                     markets: preset.markets.getItems().map(market => market.key),
                     matchPriority: preset.matching?.matchPriority ?? 0,
                     providerIds: preset.matching?.providerIds ?? {},
@@ -253,10 +254,10 @@ export class MoneyCatalogsController {
         );
     }
 
-    @Implement(contract.money.catalogs.givingOrganisations.list)
-    listGivingOrganisations() {
-        return implement(contract.money.catalogs.givingOrganisations.list).handler(({ input }) =>
-            this.givingOrganisations.listActive({
+    @Implement(contract.money.catalogs.givingOrganizations.list)
+    listGivingOrganizations() {
+        return implement(contract.money.catalogs.givingOrganizations.list).handler(({ input }) =>
+            this.givingOrganizations.listActive({
                 cause: (input.cause as GivingCause | null) ?? undefined,
             })
         );

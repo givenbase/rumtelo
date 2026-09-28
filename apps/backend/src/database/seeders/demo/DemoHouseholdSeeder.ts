@@ -60,7 +60,7 @@ import { MerchantPreset } from '../../../modules/backoffice/product/money/preset
 
 loadEnvFiles();
 
-/** Where the max persona's Give jar flows — a name from the giving-organisation catalog. */
+/** Where the max persona's Give jar flows — a name from the giving-organization catalog. */
 const DEMO_GIVE_COUNTERPARTY = 'GiveDirectly';
 
 /** Persona jar splits (must sum to 100) — shaped for the story, not the catalog default. */

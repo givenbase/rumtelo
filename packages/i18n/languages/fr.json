@@ -159,7 +159,7 @@
                 "PENDING": "En attente",
                 "COMPLETED": "Terminé",
                 "IN_PROGRESS": "En cours",
-                "CANCELLED": "Annulé",
+                "CANCELED": "Annulé",
                 "OVERDUE": "En retard",
                 "DRAFT": "Brouillon",
                 "OK": "OK",
@@ -609,7 +609,7 @@
                 "name": "Objectif",
                 "description": "Objectif hebdomadaire."
             },
-            "soul-centres": {
+            "soul-centers": {
                 "name": "Centres",
                 "description": "Les sept centres et les points de blocage énergétique."
             },
@@ -741,6 +741,8 @@
                 "give_hint": "Choisissez une cause, puis une association faisant l'objet de contrôles indépendants — la même sélection proposée par Coach que sur « Why & where ».",
                 "give_recurring_hint": "Le choix d'une organisation donne lieu à un don récurrent (montant fixe). Pour un don ponctuel, utilisez",
                 "add_transaction": "Ajouter une transaction",
+                "learn_nudge_title": "Grandir avec Apprendre",
+                "learn_nudge": "Mettez des titres sur votre rayon Apprendre, parcourez la bibliothèque pour l'inspiration, et ajoutez un objectif sur ce pot quand vous êtes prêt à revendiquer la dépense.",
                 "split_inside": "Diviser à l'intérieur de ce bocal",
                 "footer": "The Coach — des conseils sans complexe.",
                 "turn_off": "Désactiver les conseils"
@@ -1195,7 +1197,7 @@
                     "cause_aria": "Donner lieu à",
                     "cause_any": "Toute cause",
                     "cause_open_hint": "Engagement libre — tout don versé dans la « cagnotte Give » est pris en compte.",
-                    "organisation": "Organisation",
+                    "organization": "Organisation",
                     "give_mode_aria": "Dans quelle mesure cet engagement est-il précis ?",
                     "give_mode_hint": "Je sais à qui : indiquez le nom de l'organisme auquel vous faites déjà des dons. Aidez-moi à choisir : une sélection de coachs avec des vérifications indépendantes. Laissez la question ouverte : indiquez uniquement la cause, sans préciser d'organisme pour l'instant.",
                     "pledge_name": "Nom de la promesse de don",
@@ -1384,55 +1386,61 @@
                 "reading_empty_body": "Le car en propose quelques-uns ci-dessous. Cochez-en un et il s'arrêtera ici, dans l'ordre que vous souhaitez.",
                 "reading_heading": "À lire",
                 "add_learning": "Ajouter un apprentissage",
-                "add_learning_description": "Recherche par titre. Nous enregistrons où le trouver, et non le livre lui-même.",
+                "add_learning_description": "Commencez à taper — nous suggérons d'abord notre rayon. La recherche trouve les titres que nous n'avons pas encore. Nous enregistrons où le trouver, pas le livre lui-même.",
                 "search": "Rechercher",
                 "catalog_error": "Le catalogue n'a pas répondu. Réessayez.",
                 "save_error": "Ce titre n'a pas pu être enregistré.",
                 "add_button": "Ajouter",
                 "nothing_found": "Il n'y a rien sous ce nom.",
+                "library_matches": "Dans notre bibliothèque",
+                "catalog_matches": "Catalogue élargi",
+                "pick_about_to_add": "Choisissez de quoi il s'agit, puis ajoutez.",
                 "search_catalog_aria": "Consulter le catalogue public",
-                "search_catalog_placeholder": "Les 5 langages de l'amour",
+                "search_catalog_placeholder": "Le Secret, Atomic Habits…",
                 "back": "← En savoir plus",
                 "eyebrow_shelf": "✦ CE QUE J'APPRENDS",
                 "eyebrow_library": "✦ LA BIBLIOTHÈQUE",
                 "title_shelf": "La distribution a un seuil minimal. L'apprentissage, non.",
                 "title_library": "Ce que nous recommandons. Nous ne l'hébergeons pas.",
-                "lead_shelf": "Une compétence, c'est la décision. Un livre, un film, une série, une vidéo ou un cours, c'est la manière de la mettre en pratique. Nous vous recommandons quoi acheter et qui soutenir — nous n'hébergeons jamais les œuvres elles-mêmes.",
+                "lead_shelf": "Une compétence, c'est la décision. Un livre, un film, une série, une vidéo, un podcast ou un cours, c'est la manière de la mettre en pratique. Nous vous recommandons quoi acheter et qui soutenir — nous n'hébergeons jamais les œuvres elles-mêmes.",
                 "lead_library": "Effectuez une recherche, puis affinez les résultats en fonction du type de contenu et du sujet. Sélectionnez un titre pour l'ajouter à la rubrique « Apprendre ».",
                 "partner_max": "Les cours sur Max sont disponibles sur MasterClass. Les formules Basic et Plus sont quant à elles proposées sur Udemy. Les livres, films et séries sont accessibles selon les conditions de l'abonnement — nous les recommandons, mais ne les hébergeons pas.",
                 "partner_default": "Les cours « Basic » et « Plus » sont disponibles sur Udemy. Les cours « Max » sont quant à eux proposés sur MasterClass. Les livres, films et séries sont accessibles selon les conditions de l'abonnement — nous les recommandons, mais nous ne les hébergeons pas.",
+                "jar_coach_title": "Pot Éducation",
                 "jar_banner": "C'est dans votre « tirelire Éducation » que sont affectées ces dépenses. Tout ce qui augmente votre capacité de gain contribue à vous mener vers la liberté financière.",
-                "jar_cta": "Voir le fichier « Education » ›",
+                "jar_cta": "Voir le pot Éducation",
                 "browse_library": "Parcourir la bibliothèque",
+                "show_more": "Afficher plus",
+                "show_more_remaining": "Afficher plus · {remaining} restants",
                 "tab_focus": "Focus",
                 "tab_done": "Terminé",
                 "search_placeholder": "Rechercher un titre, un auteur ou un sujet",
                 "search_aria": "Rechercher dans la bibliothèque",
                 "count_of": "{shown} sur {total}",
-                "filter_what": "Quoi ?",
-                "filter_about": "À propos",
+                "filter_what": "Quoi",
+                "filter_about": "Sujet",
                 "filter_everything": "Tout",
-                "filter_anything": "N'importe quoi",
-                "filter_sections": "Rubriques",
+                "filter_anything": "Tout",
+                "filter_sections": "Sujets",
                 "filter_skills": "Compétences",
                 "for_you": "Pour toi",
                 "recommended": "✦ Recommandé",
-                "coach_not_on_list": "Ce n'est pas sur votre liste",
-                "coach_recommended_body": "Ce ne sont pas encore des livres à lire absolument. Si tu en marques un, il sera ajouté à la liste, à la fin.",
-                "footer_stores": "Les livres sont disponibles sur {store}. Les films et séries sont disponibles sur JustWatch, qui indique où ils sont disponibles en streaming dans votre pays. Les cours sont disponibles sur Udemy ou MasterClass.",
-                "footer_commission": " Certains de ces liens permettent à Rumtelo de percevoir une petite commission. Le prix reste le même pour vous.",
-                "footer_no_commission": " Nous recommandons et redirigeons — nous n'hébergeons jamais les contenus.",
-                "finish_by": "Terminez en",
-                "finish_by_line": "Terminer par · {text}",
-                "due_today": "À rendre aujourd'hui",
-                "due_tomorrow": "À rendre demain",
-                "due_over": "{days} jour de plus",
-                "due_over_many": "{days} jours de plus",
-                "due_left": "Il reste {days} jours",
+                "coach_not_on_list": "Pas encore sur ta liste",
+                "coach_recommended_body": "Ce ne sont pas encore des lectures obligatoires. Marque-en un et il rejoint la liste, à la fin.",
+                "footer_stores": "Les livres s’ouvrent sur {store}. Les films et séries s’ouvrent sur JustWatch, qui montre où ils sont en streaming dans ton pays. Les podcasts s’ouvrent sur Spotify ou la page du show. Les cours s’ouvrent sur Udemy ou MasterClass.",
+                "footer_commission": " Certains de ces liens rapportent une petite commission à Rumtelo. Le prix reste le même pour toi.",
+                "footer_no_commission": " Nous recommandons et renvoyons — nous n’hébergeons jamais l’œuvre.",
+                "finish_by": "Terminer pour",
+                "finish_by_line": "Terminer pour · {text}",
+                "due_today": "Aujourd’hui",
+                "due_tomorrow": "Demain",
+                "due_over": "{days} jour de retard",
+                "due_over_many": "{days} jours de retard",
+                "due_left": "{days} jours restants",
                 "edit_done": "Terminé",
                 "edit": "Modifier",
-                "status_group_aria": "Où cela se situe-t-il ?",
-                "move_earlier": "Auparavant",
+                "status_group_aria": "Où cela se trouve",
+                "move_earlier": "Plus tôt",
                 "move_later": "Plus tard",
                 "catalog": {
                     "format": {
@@ -1440,36 +1448,41 @@
                         "film": "Film",
                         "series": "Série",
                         "video": "Vidéo",
+                        "podcast": "Podcast",
                         "course": "Cours"
                     },
                     "format_plural": {
                         "book": "Livres",
                         "film": "Films",
-                        "series": "Série",
+                        "series": "Séries",
                         "video": "Vidéos",
+                        "podcast": "Podcasts",
                         "course": "Cours"
                     },
                     "pick": {
                         "shelf": "Étagère",
                         "queue": {
                             "book": "À lire",
-                            "watch": "À voir absolument",
-                            "take": "Il faut prendre"
+                            "watch": "À regarder",
+                            "listen": "À écouter",
+                            "take": "À suivre"
                         },
                         "now": {
-                            "book": "Lecture",
-                            "watch": "Regarder",
-                            "take": "Prendre"
+                            "book": "En cours de lecture",
+                            "watch": "En cours de visionnage",
+                            "listen": "En cours d'écoute",
+                            "take": "En cours"
                         },
                         "done": {
-                            "book": "Lire",
+                            "book": "Lu",
                             "watch": "Vu",
+                            "listen": "Écouté",
                             "take": "Terminé"
                         }
                     },
                     "section": {
                         "MIND": "État d'esprit",
-                        "SAVE": "Enregistrement",
+                        "SAVE": "Épargne",
                         "SPEND": "Dépenses",
                         "EARN": "Gagner plus",
                         "RELATIONSHIPS": "Relations",
@@ -1484,6 +1497,8 @@
                     "partner": {
                         "UDEMY": "Udemy",
                         "MASTERCLASS": "MasterClass",
+                        "SPOTIFY": "Spotify",
+                        "NETFLIX": "Netflix",
                         "recommend": "Recommander"
                     },
                     "store": {
@@ -1497,9 +1512,12 @@
                         "watch": "Regarder",
                         "trailer": "Bande-annonce",
                         "where_to_watch": "Où regarder",
-                        "watch_on_youtube": "Regarder sur YouTube",
-                        "view_on_udemy": "Voir sur Udemy",
-                        "view_on_masterclass": "Regarder sur MasterClass"
+                        "listen": "Écouter",
+                        "where_to_listen": "Où écouter",
+                        "watch_on": "Regarder sur {name}",
+                        "listen_on": "Écouter sur {name}",
+                        "view_on": "Voir sur {name}",
+                        "view_course": "Voir le cours"
                     }
                 }
             },
@@ -1702,7 +1720,7 @@
                     },
                     "EDUCATION": {
                         "subtitle": "Épanouissez-vous",
-                        "note": "Livres, formations, mentors, outils. La seule dépense qui vous permet d'augmenter votre capacité à générer des revenus.",
+                        "note": "Livres, formations, mentors, outils. La seule dépense qui augmente votre capacité à gagner. Utilisez Apprendre pour ce que vous travaillez, parcourez la bibliothèque pour l'inspiration, et placez un objectif sur ce pot quand vous êtes prêt à le revendiquer.",
                         "not_allowed": "À condition que cela vous permette d'augmenter vos revenus. Une formation que vous ne terminez jamais a sa place dans la rubrique « Play ».",
                         "allowed": {
                             "books": "Livres",
@@ -1712,8 +1730,10 @@
                             "conferences": "Conférences"
                         },
                         "links": {
-                            "transactions": "Transactions",
-                            "goals": "Objectifs"
+                            "learn": "Apprendre",
+                            "library": "Bibliothèque",
+                            "goals": "Objectifs",
+                            "transactions": "Transactions"
                         }
                     },
                     "PLAY": {
@@ -2540,7 +2560,7 @@
                         "set": "Ensemble",
                         "note_empty": "pour cette semaine"
                     },
-                    "centres": {
+                    "centers": {
                         "name": "Centres",
                         "note": "les centres désignés aujourd'hui"
                     }
@@ -2605,7 +2625,7 @@
                 "tip": "Une bonne intention est modeste, concrète et porte sur un comportement — et non sur un résultat. « Je vérifie mes bocaux tous les dimanches » fonctionne mieux que « Je suis plus attentif à mes finances ».",
                 "stillness_link": "Aller vers le calme →"
             },
-            "centres": {
+            "centers": {
                 "eyebrow": "Les centres",
                 "title": "À quel endroit as-tu l'impression que ça coince ?",
                 "lead": "Ce n'est pas une partition ésotérique, mais une carte qui vous aide à identifier les points où vous vous sentez bloqué cette semaine, afin que votre intention puisse trouver un point d'ancrage.",
@@ -4096,7 +4116,7 @@
             "gratitude": "Reconnaissance",
             "giving": "Donner",
             "intent": "Objectif",
-            "centres": "Centres",
+            "centers": "Centres",
             "coach": "L'entraîneur",
             "why": "Pourquoi",
             "sign_in": "Se connecter",
@@ -4164,7 +4184,7 @@
                 "gratitude": "Reconnaissance",
                 "giving": "Donner",
                 "intent": "Objectif",
-                "centres": "Centres"
+                "centers": "Centres"
             }
         },
         "onboarding": {
@@ -4784,7 +4804,7 @@
                     "connect_bank": "Associer une banque",
                     "wizard_step_institution": "1 · Choisir une banque",
                     "wizard_step_seat": "2 · Choisir un compte",
-                    "wizard_step_authorise": "3 · Autoriser",
+                    "wizard_step_authorize": "3 · Autoriser",
                     "wizard_institution_hint": "Astuce pour le Sandbox : choisissez « Mock ASPSP » ou « Rabobank ».",
                     "wizard_institution_sandbox_hint": "Environnement de test : sélectionnez « Mock ASPSP » (ou « Rabobank ») pour effectuer des tests sans avoir à vous connecter à une véritable banque.",
                     "wizard_sandbox_badge": "Banque de questions",
@@ -4796,15 +4816,15 @@
                     "wizard_pick_seat": "Quel compte devons-nous associer ?",
                     "wizard_pick_seat_bank": "Quel compte {bank} devons-nous associer ?",
                     "wizard_no_matching_seats": "Vous n'avez pas encore de compte {bank}. Créez-en un ci-dessous : il sera associé à cette banque.",
-                    "wizard_authorise": "Continuer vers la banque",
-                    "wizard_authorise_hint": "Vous quitterez brièvement Rumtelo pour valider un accès en lecture seule à la banque, puis vous reviendrez ici.",
-                    "wizard_authorise_what_1": "En lecture seule : soldes et opérations uniquement.",
-                    "wizard_authorise_what_2": "Vous pouvez désactiver ce lien à tout moment dans les Paramètres.",
-                    "wizard_authorise_what_3": "Une fois la validation effectuée, nous effectuons une synchronisation, puis nous vous redirigeons vers cette page.",
-                    "wizard_authorise_bank": "La banque doit autoriser",
-                    "wizard_authorise_seat": "Compte à associer",
-                    "wizard_authorise_seat_new": "Nouveau compte · {bank}",
-                    "wizard_authorise_mismatch": "La banque que vous autorisez ({aspsp}) peut être différente de la banque associée au label Rumtelo ({catalog}). Cela ne pose pas de problème pour les tests ; dans la pratique quotidienne, elles coïncident généralement.",
+                    "wizard_authorize": "Continuer vers la banque",
+                    "wizard_authorize_hint": "Vous quitterez brièvement Rumtelo pour valider un accès en lecture seule à la banque, puis vous reviendrez ici.",
+                    "wizard_authorize_what_1": "En lecture seule : soldes et opérations uniquement.",
+                    "wizard_authorize_what_2": "Vous pouvez désactiver ce lien à tout moment dans les Paramètres.",
+                    "wizard_authorize_what_3": "Une fois la validation effectuée, nous effectuons une synchronisation, puis nous vous redirigeons vers cette page.",
+                    "wizard_authorize_bank": "La banque doit autoriser",
+                    "wizard_authorize_seat": "Compte à associer",
+                    "wizard_authorize_seat_new": "Nouveau compte · {bank}",
+                    "wizard_authorize_mismatch": "La banque que vous autorisez ({aspsp}) peut être différente de la banque associée au label Rumtelo ({catalog}). Cela ne pose pas de problème pour les tests ; dans la pratique quotidienne, elles coïncident généralement.",
                     "wizard_cancel": "Annuler",
                     "group_accounts": "{count} comptes",
                     "not_connected": "Non connecté",
@@ -5447,7 +5467,7 @@
                 "soul_gratitude": "Celui qui prend conscience de ce qu’il possède déjà achète moins pour combler un manque.",
                 "soul_giving": "Une part fixe qui disparaît avant que vous n'ayez pu la conserver permet à l'argent de rester un outil, et non un maître.",
                 "soul_intent": "Une intention, c'est une consigne que l'on se donne à soi-même. Une résolution, c'est un espoir.",
-                "soul_centres": "Identifiez où se situe le blocage, et la prochaine étape s'impose généralement d'elle-même.",
+                "soul_centers": "Identifiez où se situe le blocage, et la prochaine étape s'impose généralement d'elle-même.",
                 "growth_income": "La réduction des coûts a une limite minimale. L'augmentation des revenus, non.",
                 "growth_learn": "Un livre dont on ne voit pas à quoi il pourrait servir relevait des dépenses de loisirs, et non de l'éducation.",
                 "growth_learn_library": "Nous vous conseillons sur les produits à acheter et les créateurs à soutenir. Nous n'hébergeons jamais les œuvres.",

@@ -38,7 +38,7 @@ export class MerchantPresetService {
                 populate: [
                     'jarTemplate',
                     'categoryTemplate',
-                    'givingOrganisation',
+                    'givingOrganization',
                     'markets',
                     'matching',
                     'branding',

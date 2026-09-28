@@ -34,18 +34,18 @@ export function MaintenanceGate({ children }: { children: ReactNode }) {
     }, []);
 
     useEffect(() => {
-        let cancelled = false;
+        let canceled = false;
         void (async () => {
             const ready = await probeApiReady();
-            if (!cancelled) setApiReady(ready);
+            if (!canceled) setApiReady(ready);
         })();
         const timer = window.setInterval(() => {
             void probeApiReady().then(ready => {
-                if (!cancelled) setApiReady(ready);
+                if (!canceled) setApiReady(ready);
             });
         }, POLL_MS);
         return () => {
-            cancelled = true;
+            canceled = true;
             window.clearInterval(timer);
         };
     }, []);
