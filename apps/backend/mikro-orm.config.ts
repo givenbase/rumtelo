@@ -2,7 +2,6 @@ import { Migrator } from '@mikro-orm/migrations';
 import { defineConfig } from '@mikro-orm/postgresql';
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 import { SeedManager } from '@mikro-orm/seeder';
-import { shouldDeferLaunchProducts } from '@rumtelo/contracts';
 
 import { loadEnvFiles } from './src/common/config/load-env';
 
@@ -12,26 +11,19 @@ loadEnvFiles();
 const isProd = process.env.NODE_ENV === 'production';
 
 /**
- * Production launch defers Energy/Soul concept schemas — exclude those entities
- * so Nest / `db:gen` do not touch MVP tables that will be redesigned later.
- * Non-production (`development` / `staging` / `test`) keep the full entity graph.
+ * Energy / Soul concept schemas stay in the repo but must not hit Postgres until
+ * redesigned. `afterDiscovered` strips them even when Nest/decorator imports
+ * (coach, seeders) still register the classes.
  */
-const deferLaunchProducts = shouldDeferLaunchProducts({
-    nodeEnv: process.env.NODE_ENV,
-});
-
-const entityGlobs = deferLaunchProducts
-    ? [
-          './src/**/*.entity.ts',
-          '!./src/modules/public/product/energy/**/*.entity.ts',
-          '!./src/modules/public/product/soul/**/*.entity.ts',
-      ]
-    : ['./src/**/*.entity.ts'];
+const excludedEntityPathPatterns = [
+    '/modules/public/product/energy/',
+    '/modules/public/product/soul/',
+];
 
 export default defineConfig({
     // Source entities — tsx / Nest load .ts; TsMorph reads these paths for metadata.
-    entities: entityGlobs,
-    entitiesTs: entityGlobs,
+    entities: ['./src/**/*.entity.ts'],
+    entitiesTs: ['./src/**/*.entity.ts'],
     clientUrl: process.env.DATABASE_URL,
     driverOptions:
         process.env.DATABASE_SSL === 'true'
@@ -43,6 +35,22 @@ export default defineConfig({
     // TsMorph: tsx does not emit design:type Reflect metadata.
     metadataProvider: TsMorphMetadataProvider,
     metadataCache: { enabled: true, options: { cacheDir: 'temp' } },
+    discovery: {
+        warnWhenNoEntities: true,
+        afterDiscovered(storage) {
+            // getAll() is a Dictionary (plain object), not a Map — use Object.entries.
+            // reset() takes the class name string.
+            for (const [className, metadata] of Object.entries(storage.getAll())) {
+                if (
+                    metadata.path &&
+                    excludedEntityPathPatterns.some(pattern => metadata.path.includes(pattern))
+                ) {
+                    console.log(`Excluding entity: ${metadata.className} from ${metadata.path}`);
+                    storage.reset(className);
+                }
+            }
+        },
+    },
     extensions: [Migrator, SeedManager],
     // Never auto-sync a schema that holds money. Migrations only.
     migrations: {
