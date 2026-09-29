@@ -1,4 +1,4 @@
-import { Entity, Property, Unique } from '@mikro-orm/core';
+import { Entity, Property, Unique } from '@mikro-orm/decorators/legacy';
 import type { GivingCause, GivingSignal } from '@rumtelo/contracts';
 
 import { CatalogEntity } from '../../../../../../common/database/catalog.entity';

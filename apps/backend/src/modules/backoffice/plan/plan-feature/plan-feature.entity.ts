@@ -1,8 +1,16 @@
-import { Collection, Entity, Index, ManyToOne, OneToMany, Property, Unique } from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import {
+    Entity,
+    Index,
+    ManyToOne,
+    OneToMany,
+    Property,
+    Unique,
+} from '@mikro-orm/decorators/legacy';
 
 import { CatalogEntity } from '../../../../common/database/catalog.entity';
 import { entityConfig } from '../../../../common/database/entity-config.util';
-import type { PlanCapability } from '../plan-capability/plan-capability.entity';
+import { PlanCapability } from '../plan-capability/plan-capability.entity';
 import { PlanProduct } from '../plan-product/plan-product.entity';
 
 /**
@@ -30,6 +38,6 @@ export class PlanFeature extends CatalogEntity {
     product!: PlanProduct;
 
     /** Capability keys under this feature (1:N). */
-    @OneToMany('PlanCapability', 'feature')
+    @OneToMany(() => PlanCapability, entity => entity.feature)
     capabilities = new Collection<PlanCapability>(this);
 }

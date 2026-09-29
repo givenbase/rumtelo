@@ -1,6 +1,6 @@
-import { Entity, OneToOne, Property } from '@mikro-orm/core';
+import { Entity, OneToOne, Property } from '@mikro-orm/decorators/legacy';
 
-import type { AccountSettings } from './account-settings/account-settings.entity';
+import { AccountSettings } from './account-settings/account-settings.entity';
 
 import { BaseEntity } from '../../../../common/database/base.entity';
 import { entityConfig } from '../../../../common/database/entity-config.util';
@@ -54,6 +54,6 @@ export class Account extends BaseEntity {
     user!: AuthUser;
 
     /** Person-scoped UI prefs (1:1, inverse side). */
-    @OneToOne('AccountSettings', { mappedBy: 'account' })
+    @OneToOne(() => AccountSettings, entity => entity.account)
     settings?: AccountSettings;
 }

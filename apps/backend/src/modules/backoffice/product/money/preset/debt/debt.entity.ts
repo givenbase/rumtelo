@@ -1,10 +1,11 @@
-import { Collection, Entity, Enum, OneToMany, Property, Unique } from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import { Entity, Enum, OneToMany, Property, Unique } from '@mikro-orm/decorators/legacy';
 import { DebtKind } from '@rumtelo/contracts';
 
 import { CatalogEntity } from '../../../../../../common/database/catalog.entity';
 import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
-import type { DebtPresetMerchant } from './debt-merchant.entity';
+import { DebtPresetMerchant } from './debt-merchant.entity';
 
 /**
  * Debt Preset Entity
@@ -39,7 +40,7 @@ export class DebtPreset extends CatalogEntity {
     // ? RELATIONSHIPS
     /** Ordered "Who do you owe?" merchant chips (1:N to the pivot; empty = free text only). */
     @OneToMany<DebtPresetMerchant, DebtPreset>({
-        entity: 'DebtPresetMerchant',
+        entity: () => DebtPresetMerchant,
         mappedBy: 'preset',
         orderBy: { sortOrder: 'ASC' },
         orphanRemoval: true,

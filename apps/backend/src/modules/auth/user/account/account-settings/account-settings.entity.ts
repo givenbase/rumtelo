@@ -1,4 +1,4 @@
-import { Entity, Enum, OneToOne, Property } from '@mikro-orm/core';
+import { Entity, Enum, OneToOne, Property } from '@mikro-orm/decorators/legacy';
 import {
     DEFAULT_ACCOUNT_TOUR_PROGRESS,
     Locale,

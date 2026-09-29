@@ -13,7 +13,7 @@ Better Auth mirrors under `modules/auth/*/managed/` are library-owned and exclud
 ## File layout
 
 ```text
-1. Imports        → common/database → mikro-orm → @rumtelo/contracts → local entities
+1. Imports        → @mikro-orm/core (Collection, types) → @mikro-orm/decorators/legacy (decorators) → @rumtelo/contracts → common/database → local entities
 2. Class JSDoc    → name, purpose, @see MikroORM link
 3. Decorators     → @Entity(entityConfig(...)), @Unique, @Index
 4. export class   → grouped sections (below)
@@ -138,7 +138,7 @@ Rumtelo calendar-date suffix is **`*On`** (Rails-style). Prefer `startedOn` / `e
 | **household → backoffice** (`Jar.templateKey`, `Goal.givingOrganizationKey`, `Transaction.inflowKey`) | **key snapshot** string | catalogs are mutable and can be retired; household history must never break or cascade |
 | **household → household** (`Transaction.jar`, `WeekCheckAllocation.weekCheck`) | real relation with `deleteRule` | same tenant, cascade / restrict is a product decision to state explicitly |
 
-Pivot entities with their own data (`FixedCostPresetMerchant.sortOrder`) are explicit classes extending `BaseEntity`; plain M2M without payload uses `@ManyToMany({ pivotTable })`. Inverse-side collections use `import type` + the string entity name (`@OneToMany('PlanFeature', 'product')`) so entity files never import each other in a cycle.
+Pivot entities with their own data (`FixedCostPresetMerchant.sortOrder`) are explicit classes extending `BaseEntity`; plain M2M without payload uses `@ManyToMany({ pivotTable })`. Inverse-side collections use a lazy class reference (`@OneToMany(() => PlanFeature, feature => feature.product)`) with a normal value import — MikroORM 7 no longer accepts string entity names. Import cycles between entity files are fine because the arrow is evaluated after both modules load.
 
 ### Booleans & enums
 

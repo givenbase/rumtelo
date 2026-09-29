@@ -1,4 +1,4 @@
-import { Entity, Unique } from '@mikro-orm/core';
+import { Entity, Unique } from '@mikro-orm/decorators/legacy';
 
 import { WeekCheckEntity } from '../../../../../common/database/week-check.entity';
 import { entityConfig } from '../../../../../common/database/entity-config.util';

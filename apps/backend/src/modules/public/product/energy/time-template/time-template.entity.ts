@@ -1,4 +1,4 @@
-import { Entity, Enum, ManyToOne, Property, Unique } from '@mikro-orm/core';
+import { Entity, Enum, ManyToOne, Property, Unique } from '@mikro-orm/decorators/legacy';
 import { TimeDayKind } from '@rumtelo/contracts';
 import type { TimeCategory } from '@rumtelo/contracts';
 

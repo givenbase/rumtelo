@@ -1,4 +1,5 @@
-import { Collection, Entity, ManyToMany, Property, Unique } from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import { Entity, ManyToMany, Property, Unique } from '@mikro-orm/decorators/legacy';
 
 import { CatalogEntity } from '../../../../../../common/database/catalog.entity';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
@@ -51,6 +52,9 @@ export class Bank extends CatalogEntity {
     @ManyToMany(() => Bank, undefined, {
         owner: true,
         pivotTable: 'reference_money_bank_partner',
+        // v7 names self-referencing pivot columns after the table; keep the short form.
+        joinColumn: 'bank_1_id',
+        inverseJoinColumn: 'bank_2_id',
     })
     partnerBanks = new Collection<Bank>(this);
 }

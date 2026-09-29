@@ -1,5 +1,5 @@
+import { Collection } from '@mikro-orm/core';
 import {
-    Collection,
     Entity,
     Enum,
     Index,
@@ -8,7 +8,7 @@ import {
     OneToOne,
     Property,
     Unique,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 import { MerchantHighlight } from '@rumtelo/contracts';
 
 import { CatalogEntity } from '../../../../../../common/database/catalog.entity';
@@ -19,8 +19,8 @@ import { Market } from '../../catalog/market/market.entity';
 import { CategoryTemplate } from '../../template/category/category.entity';
 import { JarTemplate } from '../../template/jar/jar.entity';
 
-import type { MerchantBranding } from './merchant-branding.entity';
-import type { MerchantMatching } from './merchant-matching.entity';
+import { MerchantBranding } from './merchant-branding.entity';
+import { MerchantMatching } from './merchant-matching.entity';
 
 /**
  * Merchant Preset Entity
@@ -83,10 +83,10 @@ export class MerchantPreset extends CatalogEntity {
     markets = new Collection<Market>(this);
 
     /** Feed matching needles (always present). */
-    @OneToOne('MerchantMatching', { mappedBy: 'preset' })
+    @OneToOne(() => MerchantMatching, entity => entity.preset)
     matching?: MerchantMatching;
 
     /** Logo / website (always present). */
-    @OneToOne('MerchantBranding', { mappedBy: 'preset' })
+    @OneToOne(() => MerchantBranding, entity => entity.preset)
     branding?: MerchantBranding;
 }

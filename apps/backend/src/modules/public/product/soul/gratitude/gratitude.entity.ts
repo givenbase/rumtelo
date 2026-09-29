@@ -1,4 +1,4 @@
-import { Entity, Index, ManyToOne, Property } from '@mikro-orm/core';
+import { Entity, Index, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 
 import { HouseholdEntity } from '../../../../../common/database/household.entity';
 import { entityConfig } from '../../../../../common/database/entity-config.util';

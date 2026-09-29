@@ -1,12 +1,12 @@
+import { Collection } from '@mikro-orm/core';
 import {
-    Collection,
     Entity,
     Index,
     ManyToMany,
     ManyToOne,
     Property,
     Unique,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 import type { SpendingStyle } from '@rumtelo/contracts';
 
 import { CatalogEntity } from '../../../../../../common/database/catalog.entity';

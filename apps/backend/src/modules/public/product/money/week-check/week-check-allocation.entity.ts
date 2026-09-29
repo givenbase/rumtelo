@@ -1,4 +1,4 @@
-import { Entity, Index, ManyToOne, Property, Unique } from '@mikro-orm/core';
+import { Entity, Index, ManyToOne, Property, Unique } from '@mikro-orm/decorators/legacy';
 
 import { HouseholdEntity } from '../../../../../common/database/household.entity';
 import { MoneyType } from '../../../../../common/database/money.type';

@@ -1,4 +1,4 @@
-import { ManyToOne } from '@mikro-orm/core';
+import { ManyToOne } from '@mikro-orm/decorators/legacy';
 
 import { AuthHousehold } from '../../modules/auth/household/managed/household/auth-household.entity';
 

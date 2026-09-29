@@ -126,6 +126,12 @@
                 "id-length": "off",
                 "no-await-in-loop": "off"
             }
+        },
+        {
+            "files": ["**/*.entity.ts"],
+            "rules": {
+                "import/no-cycle": "off"
+            }
         }
     ]
 }

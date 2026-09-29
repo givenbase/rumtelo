@@ -1,4 +1,4 @@
-import { Entity, Enum, ManyToOne, Unique } from '@mikro-orm/core';
+import { Entity, Enum, ManyToOne, Unique } from '@mikro-orm/decorators/legacy';
 import { PracticeAddressKind } from '@rumtelo/contracts';
 
 import { BaseEntity } from '../../../../../common/database/base.entity';

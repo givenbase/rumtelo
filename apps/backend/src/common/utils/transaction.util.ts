@@ -1,4 +1,4 @@
-import { type EntityManager, type PostgreSqlDriver } from '@mikro-orm/postgresql';
+import type { EntityManager } from '@mikro-orm/postgresql';
 import { Logger } from '@nestjs/common';
 
 const logger = new Logger('TransactionUtils');
@@ -8,9 +8,9 @@ const logger = new Logger('TransactionUtils');
  * reuse it; otherwise open `em.transactional`.
  */
 export async function executeWithTransaction<T>(
-    operation: (em: EntityManager<PostgreSqlDriver>) => Promise<T>,
-    em: EntityManager<PostgreSqlDriver>,
-    providedEm?: EntityManager<PostgreSqlDriver>
+    operation: (em: EntityManager) => Promise<T>,
+    em: EntityManager,
+    providedEm?: EntityManager
 ): Promise<T> {
     try {
         if (providedEm) return operation(providedEm);

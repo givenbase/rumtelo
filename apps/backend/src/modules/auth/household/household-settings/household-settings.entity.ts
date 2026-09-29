@@ -1,4 +1,5 @@
-import { Collection, Entity, Enum, ManyToMany, Property, Unique } from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import { Entity, Enum, ManyToMany, Property, Unique } from '@mikro-orm/decorators/legacy';
 import {
     Currency,
     HouseholdKind,

@@ -36,7 +36,7 @@ Full rules + linter: `apps/backend/docs/ENTITY_STYLE.md` (`pnpm --filter @rumtel
 - Base class by row kind: `BaseEntity` (account, pivots, enum-keyed catalogs) · `CatalogEntity` (company catalogs with `key/name/sortOrder/isActive`) · `HouseholdEntity` (household rows, via `HouseholdScopedRepository`) · `WeekCheckEntity` (portal week checks)
 - Money columns use `MoneyType` (bigint eurocents → `number`); ratios stay `decimal` strings
 - Names: `is*/has*/can*` booleans · `*At` instant · `*On` date · `*Day` ordinal · `name`/`description` for text (no `label`/`summary`) · no `default*`/`suggested*` prefixes on catalog rows
-- References: backoffice → backoffice = real relations (id FKs, pivot entities); household → backoffice = `*Key` snapshot string; inverse collections use `import type` + string entity name (no import cycles)
+- References: backoffice → backoffice = real relations (id FKs, pivot entities); household → backoffice = `*Key` snapshot string; inverse collections use lazy class refs `() => Entity` (MikroORM 7: no string entity names; decorators from `@mikro-orm/decorators/legacy`)
 - Enums from `@rumtelo/contracts` only — `@Enum(NativeEnum({ DebtKind, domain: 'money', … }))`, never local `export enum`
 - Persistence: `await em.persist(e).flush()` / `await em.remove(e).flush()` — never deprecated `persistAndFlush` / `removeAndFlush`
 - Naming: no single-letter locals; prefer domain words (`goal`/`debt`/`transaction`, not `g`/`d`/`tx`)

@@ -1,4 +1,4 @@
-import { Entity, Enum, ManyToOne, Property, Unique } from '@mikro-orm/core';
+import { Entity, Enum, ManyToOne, Property, Unique } from '@mikro-orm/decorators/legacy';
 import { LearnWatchKind, PlanKey, type SpendingStyle } from '@rumtelo/contracts';
 
 import { CatalogEntity } from '../../../../../../../common/database/catalog.entity';
