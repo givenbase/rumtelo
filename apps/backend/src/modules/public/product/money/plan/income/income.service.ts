@@ -9,6 +9,7 @@ import { currentHouseholdId } from '../../../../../../common/household/household
 import { splitByPercentage } from '../../../../../../common/utils/money.util';
 import { GoalService } from '../../targets/goal/goal.service';
 import { JarService } from '../jar/jar.service';
+import { type CounterpartyPatch, PartyService } from '../party/party.service';
 import { IncomeAmountPeriod } from './income-amount-period.entity';
 import { IncomeSource } from './income-source.entity';
 
@@ -28,6 +29,7 @@ export class IncomeService {
     constructor(
         @Inject(EntityManager) private readonly em: EntityManager,
         @Inject(JarService) private readonly jars: JarService,
+        @Inject(PartyService) private readonly parties: PartyService,
         @Inject(forwardRef(() => GoalService)) private readonly goals: GoalService
     ) {
         this.sources = new HouseholdScopedRepository(em, IncomeSource);
@@ -38,20 +40,28 @@ export class IncomeService {
     // ? CREATE Operations
     // ====================================================================
 
-    async create(input: {
-        name: string;
-        kind: string;
-        amount: number;
-        cadence?: string;
-        expectedDay?: number | null;
-        isActive?: boolean;
-        startedOn?: string | null;
-        endsOn?: string | null;
-    }) {
+    async create(
+        input: CounterpartyPatch & {
+            name: string;
+            kind: string;
+            amount: number;
+            cadence?: string;
+            expectedDay?: number | null;
+            isActive?: boolean;
+            startedOn?: string | null;
+            endsOn?: string | null;
+            presetKey?: string | null;
+        }
+    ) {
         const effectiveOn = input.startedOn ?? todayIso();
+        const other = await this.parties.resolveCounterparty(input);
         const source = this.em.create(IncomeSource, {
             household: currentHouseholdId(),
             name: input.name,
+            presetKey: input.presetKey ?? null,
+            counterparty: other.counterparty,
+            merchantKey: other.merchantKey,
+            party: other.party,
             kind: input.kind as IncomeKind,
             amount: input.amount,
             cadence: (input.cadence as Cadence) ?? Cadence.MONTHLY,
@@ -100,17 +110,19 @@ export class IncomeService {
 
     async update(
         id: string,
-        patch: Partial<{
-            name: string;
-            kind: string;
-            amount: number;
-            cadence: string;
-            expectedDay: number | null;
-            isActive: boolean;
-            startedOn: string | null;
-            endsOn: string | null;
-            amountEffectiveFrom: string | null;
-        }>
+        patch: CounterpartyPatch &
+            Partial<{
+                name: string;
+                kind: string;
+                amount: number;
+                cadence: string;
+                expectedDay: number | null;
+                isActive: boolean;
+                startedOn: string | null;
+                endsOn: string | null;
+                amountEffectiveFrom: string | null;
+                presetKey: string | null;
+            }>
     ) {
         const source = await this.sources.findOneOrFail({ id });
         if (
@@ -120,6 +132,18 @@ export class IncomeService {
             throw apiBadRequest('income_kind_cadence_locked');
         }
         if (patch.name !== undefined) source.name = patch.name;
+        if (patch.presetKey !== undefined) source.presetKey = patch.presetKey;
+        if (
+            patch.counterparty !== undefined ||
+            patch.merchantKey !== undefined ||
+            patch.partyId !== undefined ||
+            patch.saveParty
+        ) {
+            const other = await this.parties.resolveCounterparty(patch, source);
+            source.counterparty = other.counterparty;
+            source.merchantKey = other.merchantKey;
+            source.party = other.party;
+        }
         if (patch.expectedDay !== undefined) source.expectedDay = patch.expectedDay;
         if (patch.isActive !== undefined) source.isActive = patch.isActive;
         if (patch.startedOn !== undefined) source.startedOn = patch.startedOn;
@@ -194,6 +218,10 @@ export class IncomeService {
             id: source.id,
             householdId: source.household,
             name: source.name,
+            presetKey: source.presetKey,
+            counterparty: source.counterparty,
+            merchantKey: source.merchantKey,
+            partyId: source.party,
             kind: source.kind,
             amount: source.amount,
             cadence: source.cadence,

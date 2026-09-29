@@ -36,6 +36,13 @@ const message = {
             due_month_required: 'Pick which month you are charged for quarterly or yearly bills.',
             income_kind_cadence_locked:
                 'Type and frequency cannot change on an existing income. End it and create a new one.',
+            party_or_merchant:
+                'Pick either a catalog merchant or one of your saved parties, not both.',
+            party_name_taken: 'You already have a party with this name.',
+            party_not_found: 'That party is not in your list.',
+            party_merge_same: 'Choose two different parties to merge.',
+            party_already_suggested: 'You already suggested this party to Rumtelo.',
+            party_already_in_catalog: 'This party is already linked to the Rumtelo catalog.',
             period_closed:
                 'This month is closed — you cannot add or change anything for that period.',
             month_close_incomplete:

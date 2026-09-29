@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
 
 import { AuthHousehold } from '../household/auth-household.entity';
 import { AuthUser } from '../../../user/managed/user/auth-user.entity';

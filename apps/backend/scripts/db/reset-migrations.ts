@@ -4,8 +4,8 @@
  * Default (`pnpm db:reset`):
  *   1. Strict confirm — type RESET ALL ENVS
  *   2. Squash migration files once (delete + gen InitialSchema) against **development**
- *   3. Rebuild development DB
- *   4. Confirm + `db:fresh` staging (keep files; wipe + migrate)
+ *   3. Rebuild development DB + flush Better Auth Redis
+ *   4. Confirm + `db:fresh` staging (wipe DB + flush Redis; keep migration files)
  *   5. Confirm + `db:fresh` production
  *
  * Local only:
@@ -13,11 +13,13 @@
  *
  * Single-env wipe without touching migration files:
  *   pnpm db:fresh / db:fresh:stag / db:fresh:prod
+ *   (`db:fresh` always flushes `better-auth:*` Redis keys after migrate.)
  *
  * `--yes` / DB_DROP_CONFIRM never skips the phrase confirm for all-envs.
  * Optional CI escape hatch: DB_RESET_ALL_CONFIRM="RESET ALL ENVS"
  *
- * TS scripts run with `bun` (no global `--import tsx`, which breaks contracts build).
+ * TS scripts run with `pnpm exec tsx` (same runtime as `pnpm start` / `db:push`); never set a
+ * global `NODE_OPTIONS=--import tsx`, which breaks the contracts build.
  */
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, unlinkSync } from 'node:fs';
@@ -134,10 +136,10 @@ async function confirmPhrase(): Promise<boolean> {
     console.warn('⚠️  RARE / DESTRUCTIVE — migration squash + wipe DBs');
     console.warn('   1. Delete Migration*.ts + snapshot (repo)');
     console.warn('   2. Generate one InitialSchema against development');
-    console.warn('   3. Rebuild development DB');
+    console.warn('   3. Rebuild development DB + flush Better Auth Redis');
     if (!localOnly) {
-        console.warn('   4. db:fresh staging (wipe + apply same migrations)');
-        console.warn('   5. db:fresh production (wipe + apply same migrations)');
+        console.warn('   4. db:fresh staging (wipe DB + Redis auth keys + migrate)');
+        console.warn('   5. db:fresh production (wipe DB + Redis auth keys + migrate)');
     }
     console.warn('');
     console.warn('   --yes does NOT skip this. Commit the new migration after.');
@@ -191,7 +193,12 @@ function squashAndRebuildDev(): void {
 
     const env = envFor('development');
 
-    run('bun', ['scripts/db/drop-schema-cascade.ts', '--yes'], 'dev: drop schemas', env);
+    run(
+        'pnpm',
+        ['exec', 'tsx', 'scripts/db/drop-schema-cascade.ts', '--yes'],
+        'dev: drop schemas',
+        env
+    );
 
     // MikroORM CLI still via pnpm; clean env (no --import tsx).
     run(
@@ -213,13 +220,26 @@ function squashAndRebuildDev(): void {
         }
     );
 
-    run('bun', ['scripts/db/migration-up.ts'], 'dev: migration:up', env);
+    run('pnpm', ['exec', 'tsx', 'scripts/db/migration-up.ts'], 'dev: migration:up', env);
 
-    run('bun', ['src/modules/auth/engine/auth.migrate.ts'], 'dev: auth:migrate', env);
+    run(
+        'pnpm',
+        ['exec', 'tsx', 'src/modules/auth/engine/auth.migrate.ts'],
+        'dev: auth:migrate',
+        env
+    );
+
+    // Same as db:fresh — wipe Better Auth Redis so cookies don't point at deleted users.
+    run(
+        'pnpm',
+        ['exec', 'tsx', 'scripts/db/flush-better-auth-redis.ts'],
+        'dev: flush auth redis',
+        env
+    );
 
     if (wantSeed) {
         run('pnpm', ['--filter', '@rumtelo/contracts', 'build'], 'dev: build contracts', env);
-        run('bun', ['scripts/db/seeder-run.ts'], 'dev: seed', env);
+        run('pnpm', ['exec', 'tsx', 'scripts/db/seeder-run.ts'], 'dev: seed', env);
     }
 }
 

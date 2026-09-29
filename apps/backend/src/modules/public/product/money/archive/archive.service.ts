@@ -119,6 +119,11 @@ export class ArchiveService {
             if (!dryRun) {
                 await this.income.create({
                     name: row.name,
+                    presetKey: row.presetKey ?? null,
+                    counterparty: row.counterparty ?? null,
+                    merchantKey: row.merchantKey ?? null,
+                    // Relink by name when the export marked a saved party.
+                    saveParty: Boolean(row.partyName?.trim()),
                     kind: row.kind,
                     amount: row.amount,
                     cadence: row.cadence,
@@ -152,6 +157,7 @@ export class ArchiveService {
                 if (!dryRun) {
                     const created = await this.debts.create({
                         name: row.name,
+                        presetKey: row.presetKey ?? null,
                         kind: row.kind,
                         balance: row.balance,
                         originalBalance: row.originalBalance,
@@ -197,6 +203,7 @@ export class ArchiveService {
                 await this.fixedCosts.create({
                     jarId,
                     name: row.name,
+                    presetKey: row.presetKey ?? null,
                     amount: row.amount,
                     cadence: row.cadence,
                     direction: row.direction,

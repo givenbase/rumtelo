@@ -35,7 +35,6 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { CoachVerdict } from '@/components/features/home/coach-verdict';
 import { HeroKluis } from '@/components/features/home/hero-kluis';
-import { HouseholdPeopleCard } from '@/components/features/home/household-people-card';
 import { PortalWidget } from '@/components/features/home/portal-widget';
 import { MonthScoreLog } from '@/components/features/home/month-score-log';
 import { JarDrilldownTable } from '@/components/features/money/jar-drilldown-table';
@@ -396,8 +395,6 @@ export function HomeDashboardClient() {
             </div>
 
             <CoachVerdict messages={coach} recap={fallbackRecap} />
-
-            <HouseholdPeopleCard />
 
             <MonthScoreLog
                 score={monthScore.score}

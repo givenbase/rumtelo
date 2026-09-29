@@ -1,8 +1,9 @@
-import { Entity, Enum, ManyToOne, Property, Unique } from '@mikro-orm/core';
+import { Entity, Enum, ManyToOne, Property, Unique } from '@mikro-orm/decorators/legacy';
 import { LearnWatchKind, PlanKey, type SpendingStyle } from '@rumtelo/contracts';
 
 import { CatalogEntity } from '../../../../../../../common/database/catalog.entity';
 import { entityConfig } from '../../../../../../../common/database/entity-config.util';
+import { Jsonb } from '../../../../../../../common/database/jsonb.util';
 import { NativeEnum } from '../../../../../../../common/database/native-enum.util';
 import { MerchantPreset } from '../../../../money/preset/merchant/merchant.entity';
 
@@ -52,7 +53,7 @@ export class WatchPreset extends CatalogEntity {
     youtubeId: string | null = null;
 
     /** Empty = relevant for every spending style. Otherwise a suggestion, not a lock. */
-    @Property({ type: 'json', default: [] })
+    @Property(Jsonb({ emptyArray: true }))
     spendingStyles: SpendingStyle[] = [];
 
     /** Where to watch the trailer, the talk, the class, or who to support. We do not host the work. */

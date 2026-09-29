@@ -19,6 +19,7 @@ import { Debt } from '../../targets/debt/debt.entity';
 import { Category } from '../jar/category.entity';
 import { Jar } from '../jar/jar.entity';
 import { JarService } from '../jar/jar.service';
+import { type CounterpartyPatch, PartyService } from '../party/party.service';
 import { assertPeriodOpen } from '../../month-score/period-lock.util';
 import { applyFixedCostLinkChange } from './fixed-cost-link.util';
 import { FixedCost } from './fixed-cost.entity';
@@ -31,7 +32,8 @@ export class FixedCostService {
 
     constructor(
         @Inject(EntityManager) private readonly em: EntityManager,
-        @Inject(JarService) private readonly jars: JarService
+        @Inject(JarService) private readonly jars: JarService,
+        @Inject(PartyService) private readonly parties: PartyService
     ) {
         this.repo = new HouseholdScopedRepository(em, FixedCost);
         this.settlements = new HouseholdScopedRepository(em, FixedCostSettlement);
@@ -41,33 +43,39 @@ export class FixedCostService {
     // ? CREATE Operations
     // ====================================================================
 
-    async create(input: {
-        jarId: string;
-        categoryId?: string | null;
-        debtId?: string | null;
-        name: string;
-        counterparty?: string | null;
-        amount: number;
-        cadence?: string;
-        dueDay?: number | null;
-        dueMonth?: number | null;
-        direction?: 'IN' | 'OUT';
-        isActive?: boolean;
-        startedOn?: string | null;
-        endsOn?: string | null;
-        note?: string | null;
-    }) {
+    async create(
+        input: CounterpartyPatch & {
+            jarId: string;
+            categoryId?: string | null;
+            debtId?: string | null;
+            name: string;
+            amount: number;
+            cadence?: string;
+            dueDay?: number | null;
+            dueMonth?: number | null;
+            direction?: 'IN' | 'OUT';
+            isActive?: boolean;
+            startedOn?: string | null;
+            endsOn?: string | null;
+            note?: string | null;
+            presetKey?: string | null;
+        }
+    ) {
         await assertJarAllowsFixedCosts(this.em, input.jarId);
         const cadence = (input.cadence as Cadence) ?? Cadence.MONTHLY;
         const dueMonth = normalizeDueMonth(input.dueMonth, cadence);
         assertDueMonthForCadence(cadence, dueMonth);
+        const other = await this.parties.resolveCounterparty(input);
         const entity = this.em.create(FixedCost, {
             household: currentHouseholdId(),
             jar: this.em.getReference(Jar, input.jarId),
             category: input.categoryId ? this.em.getReference(Category, input.categoryId) : null,
             debt: input.debtId ? this.em.getReference(Debt, input.debtId) : null,
             name: input.name,
-            counterparty: input.counterparty ?? null,
+            presetKey: input.presetKey ?? null,
+            counterparty: other.counterparty,
+            merchantKey: other.merchantKey,
+            party: other.party,
             amount: input.amount,
             cadence,
             dueDay: input.dueDay ?? null,
@@ -273,22 +281,23 @@ export class FixedCostService {
 
     async update(
         id: string,
-        patch: Partial<{
-            jarId: string;
-            categoryId: string | null;
-            debtId: string | null;
-            name: string;
-            counterparty: string | null;
-            amount: number;
-            cadence: string;
-            dueDay: number | null;
-            dueMonth: number | null;
-            direction: 'IN' | 'OUT';
-            isActive: boolean;
-            startedOn: string | null;
-            endsOn: string | null;
-            note: string | null;
-        }>
+        patch: CounterpartyPatch &
+            Partial<{
+                jarId: string;
+                categoryId: string | null;
+                debtId: string | null;
+                name: string;
+                amount: number;
+                cadence: string;
+                dueDay: number | null;
+                dueMonth: number | null;
+                direction: 'IN' | 'OUT';
+                isActive: boolean;
+                startedOn: string | null;
+                endsOn: string | null;
+                note: string | null;
+                presetKey: string | null;
+            }>
     ) {
         const entity = await this.repo.findOneOrFail({ id });
         if (patch.jarId !== undefined) {
@@ -304,7 +313,18 @@ export class FixedCostService {
             entity.debt = patch.debtId ? this.em.getReference(Debt, patch.debtId) : null;
         }
         if (patch.name !== undefined) entity.name = patch.name;
-        if (patch.counterparty !== undefined) entity.counterparty = patch.counterparty;
+        if (patch.presetKey !== undefined) entity.presetKey = patch.presetKey;
+        if (
+            patch.counterparty !== undefined ||
+            patch.merchantKey !== undefined ||
+            patch.partyId !== undefined ||
+            patch.saveParty
+        ) {
+            const other = await this.parties.resolveCounterparty(patch, entity);
+            entity.counterparty = other.counterparty;
+            entity.merchantKey = other.merchantKey;
+            entity.party = other.party;
+        }
         if (patch.amount !== undefined) entity.amount = patch.amount;
         if (patch.cadence !== undefined) entity.cadence = patch.cadence as Cadence;
         if (patch.dueDay !== undefined) entity.dueDay = patch.dueDay;
@@ -369,7 +389,10 @@ export function toDto(fixedCost: FixedCost) {
         categoryId: fixedCost.category?.id ?? null,
         debtId: fixedCost.debt?.id ?? null,
         name: fixedCost.name,
+        presetKey: fixedCost.presetKey,
         counterparty: fixedCost.counterparty,
+        merchantKey: fixedCost.merchantKey,
+        partyId: fixedCost.party,
         amount: fixedCost.amount,
         cadence: fixedCost.cadence,
         dueDay: fixedCost.dueDay,

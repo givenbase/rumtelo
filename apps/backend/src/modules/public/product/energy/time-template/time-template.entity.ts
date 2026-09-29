@@ -1,10 +1,11 @@
-import { Entity, Enum, ManyToOne, Property, Unique } from '@mikro-orm/core';
+import { Entity, Enum, ManyToOne, Property, Unique } from '@mikro-orm/decorators/legacy';
 import { TimeDayKind } from '@rumtelo/contracts';
 import type { TimeCategory } from '@rumtelo/contracts';
 
 import { HouseholdEntity } from '../../../../../common/database/household.entity';
-import { NativeEnum } from '../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../common/database/entity-config.util';
+import { Jsonb } from '../../../../../common/database/jsonb.util';
+import { NativeEnum } from '../../../../../common/database/native-enum.util';
 import { Account } from '../../../../auth/user/account/account.entity';
 
 /**
@@ -24,11 +25,11 @@ import { Account } from '../../../../auth/user/account/account.entity';
 export class TimeTemplate extends HouseholdEntity {
     // ? PROPERTIES
     /** ISO weekdays (1 = Monday … 7 = Sunday) this shape applies to. */
-    @Property({ type: 'jsonb' })
+    @Property(Jsonb())
     weekdays: number[] = [];
 
     /** Minutes per {@link TimeCategory} for one such day. Missing keys mean 0. */
-    @Property({ type: 'jsonb' })
+    @Property(Jsonb())
     minutes: Partial<Record<TimeCategory, number>> = {};
 
     // ? ENUMS

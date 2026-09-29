@@ -16,6 +16,7 @@ import {
     refineDebtDueMonth,
     refineDebtSchedule,
 } from './debt.schema';
+import { SaveParty } from '../party/party.schema';
 
 const ok = z.object({ ok: z.literal(true) });
 
@@ -27,6 +28,7 @@ export const debtCreate = oc
     .input(
         Debt.omit({ id: true })
             .extend({
+                ...SaveParty.shape,
                 /** When true (default), upsert a Necessities fixed cost for the minimum. */
                 linkFixedCost: z.boolean().optional().default(true),
             })
@@ -57,6 +59,7 @@ export const debtUpdate = oc
     .input(
         Debt.partial()
             .extend({
+                ...SaveParty.shape,
                 id: Id,
                 householdId: HouseholdId,
                 /** Create or sync the linked Necessities fixed cost. */

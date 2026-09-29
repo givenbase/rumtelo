@@ -27,7 +27,7 @@ import {
 } from '@rumtelo/ui';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { CategoryTemplate, MerchantPreset } from '@rumtelo/contracts';
+import type { CategoryTemplate, FixedCostPreset, MerchantPreset } from '@rumtelo/contracts';
 import {
     Cadence,
     FlowDirection,
@@ -53,11 +53,18 @@ import { CoachTipCard } from '@/components/features/helpers';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
-import { findByNameOrAlias, namesMatch, normalizeDueDay, normalizeDueMonth } from '@rumtelo/utils';
+import {
+    findByNameOrAlias,
+    namesMatch,
+    normalizeDueDay,
+    normalizeDueMonth,
+    resolveVendorPresets,
+} from '@rumtelo/utils';
 
 import { createFixedCostFormSchema, type FixedCostFormSchemaValues } from './form-zod';
 import { CadencePicker, type CadencePickerOption, toRecurringCadence } from './cadence-picker';
 import { clampDueDayInput, clampDueMonthInput, DueDayField } from './due-day-field';
+import { CatalogCandidateChips } from './catalog-candidate-chips';
 import { CATALOG_CHIP_IDLE_LIMIT, CatalogChipPicker } from './catalog-chip-picker';
 import { ConfirmActionButton } from './confirm-action-button';
 import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
@@ -65,9 +72,11 @@ import { FormDatePicker } from './form-date-picker';
 import { FormInput } from './form-input';
 import {
     MERCHANT_OPTION_PREFIX,
-    isMerchantOptionKey,
-    merchantKeyFromOptionKey,
+    OTHER_OPTION_KEY,
     merchantsToNameOptions,
+    nameLockFromOptionKey,
+    nameLockToOptionKey,
+    type NameLock,
 } from './merchant-name-options';
 import { PresetNameField, type NamePresetOption } from './preset-name-field';
 
@@ -77,10 +86,15 @@ function isKnowWho(mode: GivePayeeMode | null): boolean {
     return mode === 'known' || mode === 'manual';
 }
 
+/** Tie-break for vendors linked to several bill types: prefer the vendor's own category. */
+function sameCategoryAs(merchant: MerchantPreset) {
+    return (preset: FixedCostPreset) => preset.categoryTemplateKey === merchant.categoryTemplateKey;
+}
+
 export type FixedCostFormValues = FixedCostFormSchemaValues;
 
 type FixedCostFormProps = {
-    defaultValues?: Partial<FixedCostFormValues>;
+    defaultValues?: Partial<FixedCostFormValues> & { presetKey?: string | null };
     /** Soul → Giving deep-link: lock the Give “To whom” path. */
     defaultGivePayeeMode?: GivePayeeMode | null;
     /** Coach catalog key from URL — resolved to counterparty name once orgs load. */
@@ -157,8 +171,8 @@ export function FixedCostForm({
     const [pendingCategoryTemplateKey, setPendingCategoryTemplateKey] = useState<string | null>(
         null
     );
-    /** Bill-type preset key (VPN, INTERNET, …) — narrows Paid-to chips within Subscriptions. */
-    const [selectedBillPresetKey, setSelectedBillPresetKey] = useState<string | null>(null);
+    /** What the name field is locked to: a bill type, a vendor, or free text ("Other"). */
+    const [nameLock, setNameLock] = useState<NameLock | null>(null);
     const [customPayee, setCustomPayee] = useState(false);
     const [vendorQuery, setVendorQuery] = useState('');
     /** Edit: resolve bill preset + payee chips once catalogs are ready. */
@@ -281,6 +295,14 @@ export function FixedCostForm({
 
     const merchants = useMemo(() => merchantsQuery.data ?? [], [merchantsQuery.data]);
     const fixedCostPresets = useMemo(() => presetsQuery.data ?? [], [presetsQuery.data]);
+    const merchantByKey = useMemo(
+        () => new Map(merchants.map(merchant => [merchant.key, merchant])),
+        [merchants]
+    );
+    const presetByKey = useMemo(
+        () => new Map(fixedCostPresets.map(preset => [preset.key, preset])),
+        [fixedCostPresets]
+    );
     const audiences = useMemo(() => audiencesQuery.data ?? [], [audiencesQuery.data]);
 
     const baselineAudienceKeys = useMemo(
@@ -295,10 +317,12 @@ export function FixedCostForm({
 
     /** Bill-type presets + brand catalog — type Netflix, get Media + Play auto-filled. */
     const nameOptions = useMemo((): NamePresetOption[] => {
+        const billTypeBadge = tFixed('option_badge_bill_type');
         const fromMerchants = merchantsToNameOptions(merchants, {
             keyPrefix: MERCHANT_OPTION_PREFIX,
             categoryMeta: categoryByKey,
             excludeGivingLinked: true,
+            badge: tFixed('option_badge_vendor'),
         });
         const fromPresets: NamePresetOption[] = fixedCostPresets
             .filter(
@@ -319,6 +343,7 @@ export function FixedCostForm({
                     group: category?.name ?? preset.categoryTemplateKey,
                     icon: category?.icon ?? null,
                     aliases: preset.aliases,
+                    badge: billTypeBadge,
                 };
             });
         // Brands first so “netflix” hits Netflix before “Streaming video”.
@@ -331,7 +356,12 @@ export function FixedCostForm({
         baselineAudienceKeys,
         showAllPresets,
         mode,
+        tFixed,
     ]);
+    const nameOptionByKey = useMemo(
+        () => new Map(nameOptions.map(option => [option.key, option])),
+        [nameOptions]
+    );
 
     const fixedCostFormSchema = useMemo(() => createFixedCostFormSchema(tForm), [tForm]);
 
@@ -380,50 +410,93 @@ export function FixedCostForm({
         return templateKeyByCategoryName.get(householdCategory.name.trim().toLowerCase()) ?? null;
     }, [pendingCategoryTemplateKey, selectedCategoryId, jarCategories, templateKeyByCategoryName]);
 
+    const lockedBillPreset =
+        nameLock?.kind === 'preset' ? (presetByKey.get(nameLock.key) ?? null) : null;
+    const lockedVendor =
+        nameLock?.kind === 'vendor' ? (merchantByKey.get(nameLock.merchantKey) ?? null) : null;
+
+    /** Vendor locked as the name but linked to several bill types → let the household pick. */
+    const vendorBillCandidates = useMemo(() => {
+        if (!lockedVendor) return [];
+        const ownCategory = sameCategoryAs(lockedVendor);
+        const resolution = resolveVendorPresets(fixedCostPresets, lockedVendor.key, ownCategory);
+        if (resolution.kind !== 'ambiguous') return [];
+        return [...resolution.candidates]
+            .sort((left, right) => Number(ownCategory(right)) - Number(ownCategory(left)))
+            .map(preset => ({
+                ...preset,
+                icon: categoryByKey.get(preset.categoryTemplateKey)?.icon ?? null,
+            }));
+    }, [lockedVendor, fixedCostPresets, categoryByKey]);
+
     const vendorsForCategory = useMemo(() => {
-        const byKey = new Map(merchants.map(merchant => [merchant.key, merchant]));
         // Bill preset owns Paid-to chips in the catalog (cross-category OK).
-        if (selectedBillPresetKey) {
-            const bill = fixedCostPresets.find(preset => preset.key === selectedBillPresetKey);
-            const keys = bill?.merchantKeys ?? [];
-            if (keys.length > 0) {
-                return keys
-                    .map(key => byKey.get(key))
-                    .filter((merchant): merchant is MerchantPreset => Boolean(merchant));
-            }
-            // Preset has no merchant links yet — fall through to category chips.
-        }
+        const presetVendors = (lockedBillPreset?.merchantKeys ?? [])
+            .map(key => merchantByKey.get(key))
+            .filter((merchant): merchant is MerchantPreset => Boolean(merchant));
+        if (presetVendors.length > 0) return presetVendors;
+        // No preset (or no links yet) — every vendor in the active category.
         if (!activeCategoryTemplateKey) return [] as MerchantPreset[];
         return merchants.filter(
             merchant =>
                 merchant.categoryTemplateKey === activeCategoryTemplateKey &&
                 !merchant.givingOrganizationKey
         );
-    }, [merchants, activeCategoryTemplateKey, selectedBillPresetKey, fixedCostPresets]);
+    }, [merchants, merchantByKey, activeCategoryTemplateKey, lockedBillPreset]);
 
     const givingOrgNames = useMemo(() => givingOrgsQuery.data ?? [], [givingOrgsQuery.data]);
 
-    // Edit hydrate: lock bill type from saved name → unlock Paid-to merchant chips.
+    // Edit hydrate: resolve the saved name to a bill type / vendor lock → unlock Paid-to chips.
+    // Only the lock, category hint and payee are touched; jar, cadence and due day stay as saved.
     if (
         mode === 'edit' &&
         !editCatalogHydrated &&
         presetsQuery.data !== undefined &&
         merchantsQuery.data !== undefined
     ) {
-        const savedName = defaultValues?.name ?? form.getValues('name');
-        const matched = findByNameOrAlias(fixedCostPresets, savedName);
-        if (matched) {
-            setSelectedBillPresetKey(matched.key);
-            setPendingCategoryTemplateKey(matched.categoryTemplateKey);
-            const savedPayee = defaultValues?.counterparty ?? form.getValues('counterparty');
-            if (savedPayee?.trim()) {
-                const byKey = new Map(merchants.map(merchant => [merchant.key, merchant]));
-                const onChip = matched.merchantKeys.some(key => {
-                    const merchant = byKey.get(key);
-                    return Boolean(merchant && namesMatch(merchant.name, savedPayee));
-                });
-                if (!onChip) setCustomPayee(true);
+        const savedName = (defaultValues?.name ?? form.getValues('name') ?? '').trim();
+        const savedPayee = (
+            defaultValues?.counterparty ??
+            form.getValues('counterparty') ??
+            ''
+        ).trim();
+        // Prefer stored presetKey — skips findByNameOrAlias for the type lookup.
+        const matchedPreset =
+            (defaultValues?.presetKey ? presetByKey.get(defaultValues.presetKey) : null) ??
+            findByNameOrAlias(fixedCostPresets, savedName);
+        const matchedVendor = matchedPreset ? null : findByNameOrAlias(merchants, savedName);
+
+        if (matchedPreset) {
+            setNameLock({ kind: 'preset', key: matchedPreset.key });
+            setPendingCategoryTemplateKey(matchedPreset.categoryTemplateKey);
+            const onChip = matchedPreset.merchantKeys.some(key => {
+                const merchant = merchantByKey.get(key);
+                return Boolean(merchant && namesMatch(merchant.name, savedPayee));
+            });
+            if (savedPayee && !onChip) setCustomPayee(true);
+        } else if (matchedVendor) {
+            // Saved as a brand (HelloFresh, KPN) — same resolution as a fresh vendor pick.
+            const resolution = resolveVendorPresets(
+                fixedCostPresets,
+                matchedVendor.key,
+                sameCategoryAs(matchedVendor)
+            );
+            if (resolution.kind === 'preset') {
+                setNameLock({ kind: 'preset', key: resolution.preset.key });
+                setPendingCategoryTemplateKey(resolution.preset.categoryTemplateKey);
+                form.setValue('name', resolution.preset.name, { shouldDirty: false });
+            } else {
+                setNameLock({ kind: 'vendor', merchantKey: matchedVendor.key });
+                setPendingCategoryTemplateKey(matchedVendor.categoryTemplateKey);
             }
+            if (!savedPayee) {
+                form.setValue('counterparty', matchedVendor.name, { shouldDirty: false });
+            } else if (!namesMatch(savedPayee, matchedVendor.name)) {
+                setCustomPayee(true);
+            }
+        } else if (savedName) {
+            // Truly free-text — lock as Other so the label still shows.
+            setNameLock({ kind: 'other' });
         }
         setEditCatalogHydrated(true);
     }
@@ -548,8 +621,23 @@ export function FixedCostForm({
                 values.dueMonth?.trim() ? Number(values.dueMonth) : null,
                 values.cadence
             );
-            const name = values.name.trim();
             const counterpartyValue = values.counterparty?.trim() || null;
+            const merchantKey = nameLock?.kind === 'vendor' ? nameLock.merchantKey : null;
+            const saveParty = Boolean(counterpartyValue) && !merchantKey;
+            const jarBalanceForName = (balancesQuery.data ?? []).find(
+                jar => jar.id === values.jarId
+            );
+            const categoryLabel =
+                (values.categoryId
+                    ? jarBalanceForName?.categories.find(row => row.id === values.categoryId)?.name
+                    : null) ??
+                (pendingCategoryTemplateKey
+                    ? categoryByKey.get(pendingCategoryTemplateKey)?.name
+                    : null) ??
+                null;
+            // Prefer typed name → vendor → category (never save a blank label).
+            const name = values.name.trim() || counterpartyValue || categoryLabel?.trim() || '';
+            if (!name) throw new Error('Name required');
 
             let categoryId = values.categoryId ?? null;
             const templateKey =
@@ -582,13 +670,19 @@ export function FixedCostForm({
             setPendingCategoryTemplateKey(null);
 
             const endsOn = values.endsOn?.trim() ? values.endsOn.slice(0, 10) : null;
+            const presetKeyToSave = nameLock?.kind === 'preset' ? nameLock.key : null;
+
             if (mode === 'edit' && entityId) {
                 const startedOn = values.startedOn?.trim() ? values.startedOn.slice(0, 10) : null;
                 return api.money.fixedCosts.update({
                     id: entityId,
                     householdId,
                     name,
+                    presetKey: presetKeyToSave,
                     counterparty: counterpartyValue,
+                    merchantKey,
+                    partyId: null,
+                    saveParty,
                     amount: cents,
                     cadence: values.cadence,
                     jarId: values.jarId,
@@ -607,7 +701,11 @@ export function FixedCostForm({
                 jarId: values.jarId,
                 categoryId,
                 name,
+                presetKey: presetKeyToSave,
                 counterparty: counterpartyValue,
+                merchantKey,
+                partyId: null,
+                saveParty,
                 amount: cents,
                 cadence: values.cadence,
                 dueDay,
@@ -622,10 +720,10 @@ export function FixedCostForm({
         onSuccess: async result => {
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.byJar.key() });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.parties.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
-            if (mode === 'create' && selectedBillPresetKey && selectedBillPresetKey !== 'OTHER') {
-                const preset = fixedCostPresets.find(row => row.key === selectedBillPresetKey);
-                await mergeImplied(audienceKeysFromFixedCostPreset(preset?.audienceKeys));
+            if (mode === 'create' && lockedBillPreset) {
+                await mergeImplied(audienceKeysFromFixedCostPreset(lockedBillPreset.audienceKeys));
             }
 
             let linked = false;
@@ -715,6 +813,78 @@ export function FixedCostForm({
         form.setValue('categoryId', null);
     }
 
+    /** Jar by catalog key → household category; falls back to a pending template when unknown. */
+    function applyJarAndCategory(jarKey: JarKey, categoryTemplateKey: string) {
+        const jar = jars.find(row => row.key === jarKey);
+        if (jar) {
+            form.setValue('jarId', jar.id);
+            applyCategoryFromTemplate(jar.id, categoryTemplateKey);
+            return;
+        }
+        setPendingCategoryTemplateKey(categoryTemplateKey);
+        form.setValue('categoryId', null);
+    }
+
+    /** Give jar owns a "to whom" chooser; any other jar clears it. */
+    function syncGiveMode(jarKey: JarKey) {
+        const give = jarKey === JarKey.GIVE;
+        setGivePayeeMode(give ? 'known' : null);
+        setGiveModeHydrated(give);
+    }
+
+    /** Single place that writes Paid-to; empty string clears it. */
+    function setPayee(name: string, opts: { dirty: boolean }) {
+        setCustomPayee(false);
+        form.setValue('counterparty', name, {
+            shouldDirty: opts.dirty,
+            shouldValidate: opts.dirty,
+        });
+    }
+
+    /** Bill type picked (or resolved from a vendor): lock, jar/category, schedule defaults. */
+    function applyBillPreset(preset: FixedCostPreset, opts: { keepPayee: boolean }) {
+        setNameLock({ kind: 'preset', key: preset.key });
+        applyJarAndCategory(preset.jarKey, preset.categoryTemplateKey);
+        if (preset.dueDay !== null) form.setValue('dueDay', String(preset.dueDay));
+        form.setValue('cadence', toRecurringCadence(preset.cadence));
+        if (!opts.keepPayee) setPayee('', { dirty: false });
+        syncGiveMode(preset.jarKey);
+    }
+
+    /**
+     * Vendor picked as the bill name (HelloFresh, KPN): resolve its bill type when
+     * unambiguous, derive jar/category, and lock Paid-to to the vendor.
+     * Returns the option the name field should lock to when the vendor resolved to a bill type.
+     */
+    function applyVendorPick(merchant: MerchantPreset): NamePresetOption | undefined {
+        const resolution = resolveVendorPresets(
+            fixedCostPresets,
+            merchant.key,
+            sameCategoryAs(merchant)
+        );
+        if (resolution.kind === 'preset') {
+            applyBillPreset(resolution.preset, { keepPayee: true });
+            form.setValue('name', resolution.preset.name, { shouldDirty: true });
+        } else {
+            setNameLock({ kind: 'vendor', merchantKey: merchant.key });
+            applyJarAndCategory(merchant.jarKey, merchant.categoryTemplateKey);
+            form.setValue('name', merchant.name, { shouldDirty: true });
+            syncGiveMode(merchant.jarKey);
+        }
+        setPayee(merchant.name, { dirty: true });
+        return resolution.kind === 'preset'
+            ? nameOptionByKey.get(resolution.preset.key)
+            : undefined;
+    }
+
+    /** Ambiguous vendor: the household picked which of its bill types this is. */
+    function chooseBillTypeForVendor(candidate: { key: string }) {
+        const preset = presetByKey.get(candidate.key);
+        if (!preset) return;
+        applyBillPreset(preset, { keepPayee: true });
+        form.setValue('name', preset.name, { shouldDirty: true });
+    }
+
     const pendingLabel = pendingCategoryTemplateKey
         ? categoryByKey.get(pendingCategoryTemplateKey)?.name
         : null;
@@ -781,89 +951,33 @@ export function FixedCostForm({
                                 freeTextPlaceholder={tFixed('name_free_placeholder')}
                                 options={nameOptions}
                                 lockPresets
-                                freeTextKeys={['OTHER']}
-                                initialLockedKey={
-                                    selectedBillPresetKey && selectedBillPresetKey !== 'OTHER'
-                                        ? selectedBillPresetKey
-                                        : null
-                                }
+                                freeTextKeys={[OTHER_OPTION_KEY]}
+                                initialLockedKey={nameLockToOptionKey(nameLock)}
                                 onClear={() => {
                                     setPendingCategoryTemplateKey(null);
-                                    setSelectedBillPresetKey(null);
-                                    setCustomPayee(false);
+                                    setNameLock(null);
+                                    setPayee('', { dirty: false });
                                     form.setValue('categoryId', null);
-                                    form.setValue('counterparty', '', {
-                                        shouldDirty: false,
-                                    });
                                     setGivePayeeMode(null);
                                     setGiveModeHydrated(false);
                                 }}
                                 onSelect={opt => {
-                                    // Keep OTHER as the selected key; only skip jar/category apply.
-                                    if (opt.key === 'OTHER') {
-                                        setSelectedBillPresetKey('OTHER');
-                                        return;
-                                    }
-
-                                    if (isMerchantOptionKey(opt.key)) {
-                                        const merchantKey = merchantKeyFromOptionKey(opt.key);
-                                        const merchant = merchants.find(
-                                            row => row.key === merchantKey
-                                        );
-                                        if (!merchant) return;
-                                        setSelectedBillPresetKey(null);
-                                        const jar = jars.find(j => j.key === merchant.jarKey);
-                                        if (jar) {
-                                            form.setValue('jarId', jar.id);
-                                            applyCategoryFromTemplate(
-                                                jar.id,
-                                                merchant.categoryTemplateKey
-                                            );
-                                        } else {
-                                            setPendingCategoryTemplateKey(
-                                                merchant.categoryTemplateKey
-                                            );
-                                            form.setValue('categoryId', null);
+                                    const lock = nameLockFromOptionKey(opt.key);
+                                    switch (lock.kind) {
+                                        case 'other':
+                                            // Identity stays Other; the label is free text.
+                                            setNameLock(lock);
+                                            return;
+                                        case 'vendor': {
+                                            const merchant = merchantByKey.get(lock.merchantKey);
+                                            return merchant ? applyVendorPick(merchant) : undefined;
                                         }
-                                        setCustomPayee(false);
-                                        form.setValue('counterparty', merchant.name, {
-                                            shouldDirty: true,
-                                        });
-                                        if (merchant.jarKey === JarKey.GIVE) {
-                                            setGivePayeeMode('known');
-                                            setGiveModeHydrated(true);
-                                        } else {
-                                            setGivePayeeMode(null);
-                                            setGiveModeHydrated(false);
+                                        case 'preset': {
+                                            const preset = presetByKey.get(lock.key);
+                                            if (preset)
+                                                applyBillPreset(preset, { keepPayee: false });
+                                            return;
                                         }
-                                        return;
-                                    }
-
-                                    const full = fixedCostPresets.find(
-                                        preset => preset.key === opt.key
-                                    );
-                                    if (!full) return;
-                                    setSelectedBillPresetKey(full.key);
-                                    const jar = jars.find(j => j.key === full.jarKey);
-                                    if (jar) {
-                                        form.setValue('jarId', jar.id);
-                                        applyCategoryFromTemplate(jar.id, full.categoryTemplateKey);
-                                    } else {
-                                        setPendingCategoryTemplateKey(full.categoryTemplateKey);
-                                        form.setValue('categoryId', null);
-                                    }
-                                    if (full.dueDay !== null) {
-                                        form.setValue('dueDay', String(full.dueDay));
-                                    }
-                                    form.setValue('cadence', toRecurringCadence(full.cadence));
-                                    setCustomPayee(false);
-                                    form.setValue('counterparty', '', { shouldDirty: false });
-                                    if (full.jarKey === JarKey.GIVE) {
-                                        setGivePayeeMode('known');
-                                        setGiveModeHydrated(true);
-                                    } else {
-                                        setGivePayeeMode(null);
-                                        setGiveModeHydrated(false);
                                     }
                                 }}
                             />
@@ -872,6 +986,15 @@ export function FixedCostForm({
                     </FormItem>
                 )}
             />
+
+            {lockedVendor ? (
+                <CatalogCandidateChips
+                    label={tFixed('bill_type_for_vendor', { vendor: lockedVendor.name })}
+                    candidates={vendorBillCandidates}
+                    disabled={busy}
+                    onPick={chooseBillTypeForVendor}
+                />
+            ) : null}
 
             {mode === 'create' && householdAudienceKeys.length > 0 ? (
                 showAllPresets ? (
@@ -968,9 +1091,8 @@ export function FixedCostForm({
                                 field.onChange(value);
                                 form.setValue('categoryId', null);
                                 setPendingCategoryTemplateKey(null);
-                                setSelectedBillPresetKey(null);
-                                setCustomPayee(false);
-                                form.setValue('counterparty', '', { shouldDirty: false });
+                                setNameLock(null);
+                                setPayee('', { dirty: false });
                                 setGivePayeeMode(null);
                                 setGiveModeHydrated(false);
                             }}>
@@ -1002,8 +1124,7 @@ export function FixedCostForm({
                             value={toFormSelectValue(field.value)}
                             onValueChange={value => {
                                 setPendingCategoryTemplateKey(null);
-                                setCustomPayee(false);
-                                form.setValue('counterparty', '', { shouldDirty: false });
+                                setPayee('', { dirty: false });
                                 field.onChange(fromFormSelectValue(value));
                             }}>
                             <FormSelectItem value={FORM_SELECT_NONE}>
@@ -1142,14 +1263,12 @@ export function FixedCostForm({
                                                             : 'inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent'
                                                     }
                                                     onClick={() => {
-                                                        form.setValue(
-                                                            'counterparty',
-                                                            merchant.name,
-                                                            {
-                                                                shouldValidate: true,
-                                                                shouldDirty: true,
-                                                            }
-                                                        );
+                                                        // No bill name yet → the vendor names the bill too.
+                                                        if (!form.getValues('name')?.trim()) {
+                                                            applyVendorPick(merchant);
+                                                            return;
+                                                        }
+                                                        setPayee(merchant.name, { dirty: true });
                                                     }}>
                                                     <VendorMark
                                                         name={mark.name}

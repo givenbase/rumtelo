@@ -1,4 +1,4 @@
-import { Entity, Enum, Property, Unique } from '@mikro-orm/core';
+import { Entity, Enum, Property, Unique } from '@mikro-orm/decorators/legacy';
 import { Cadence, IncomeKind } from '@rumtelo/contracts';
 
 import { CatalogEntity } from '../../../../../../common/database/catalog.entity';

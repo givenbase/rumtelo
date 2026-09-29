@@ -24,12 +24,18 @@ export type NamePresetOption = Pick<CatalogItemBase, 'key' | 'name'> & {
     /** Favicon hostname — rendered as VendorMark when set (merchant / org pickers). */
     logoDomain?: string | null;
     website?: string | null;
+    /** Right-aligned row tag (already translated), e.g. "Vendor" vs "Bill type". */
+    badge?: string | null;
 };
 
 type PresetNameFieldProps = {
     value: string;
     onChange: (name: string) => void;
-    onSelect?: (preset: NamePresetOption) => void;
+    /**
+     * Fired before the pick is applied. Return another option to lock that one
+     * instead (e.g. a vendor pick that resolves to its bill type).
+     */
+    onSelect?: (preset: NamePresetOption) => NamePresetOption | undefined | void;
     /**
      * Fired when the locked preset is cleared (×) or a non-custom name is wiped.
      * Not fired while typing a custom name under a freeTextKeys lock (e.g. OTHER).
@@ -115,6 +121,7 @@ export function PresetNameField({
     );
     const [hydratedLockKey, setHydratedLockKey] = useState(initialLockedKey);
     const [filterQuery, setFilterQuery] = useState('');
+    const [seededSearchFromValue, setSeededSearchFromValue] = useState(false);
     const rootRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const listboxId = `${id ?? 'preset-name'}-listbox`;
@@ -128,6 +135,16 @@ export function PresetNameField({
     if (initialLockedKey !== hydratedLockKey) {
         setHydratedLockKey(initialLockedKey);
         setLocked(resolveLockedPreset(lockPresets, initialLockedKey, options));
+        setSeededSearchFromValue(false);
+    }
+
+    // Edit free-text: searchOnly would otherwise show an empty filter box while `value` is set.
+    if (searchOnly && !seededSearchFromValue && value.trim() && filterQuery === '') {
+        setFilterQuery(value);
+        setSeededSearchFromValue(true);
+    }
+    if (!searchOnly && seededSearchFromValue) {
+        setSeededSearchFromValue(false);
     }
 
     const query = (searchOnly ? filterQuery : value).trim();
@@ -175,8 +192,8 @@ export function PresetNameField({
         requestAnimationFrame(() => inputRef.current?.focus({ preventScroll: true }));
     }
 
-    function pickOption(opt: NamePresetOption) {
-        onSelect?.(opt);
+    function pickOption(picked: NamePresetOption) {
+        const opt = onSelect?.(picked) ?? picked;
         setFilterQuery('');
         setOpen(false);
         if (lockPresets && freeKeySet.has(opt.key)) {
@@ -206,13 +223,7 @@ export function PresetNameField({
                         'flex h-11 w-full items-center gap-2 rounded-lg border border-accent bg-raised px-3',
                         disabled && 'opacity-50'
                     )}>
-                    {locked.icon ? (
-                        <span className="shrink-0 text-base" aria-hidden>
-                            {locked.icon}
-                        </span>
-                    ) : locked.logoDomain || locked.website ? (
-                        <OptionVendorMark option={locked} />
-                    ) : null}
+                    <OptionMark option={locked} className="shrink-0 text-base" />
                     <span className="min-w-0 flex-1 truncate text-sm font-medium text-fg">
                         {value.trim() || locked.name}
                     </span>
@@ -252,7 +263,11 @@ export function PresetNameField({
                             const next = event.target.value;
                             if (searchOnly) {
                                 setFilterQuery(next);
-                                if (value) {
+                                // Keep the form value in sync while searching so edit labels
+                                // are not wiped until the user clears the field.
+                                if (next.trim()) {
+                                    onChange(next);
+                                } else if (value) {
                                     onChange('');
                                     onClear?.();
                                 }
@@ -347,23 +362,20 @@ export function PresetNameField({
                                                         aria-hidden>
                                                         ✓
                                                     </span>
-                                                    {opt.icon ? (
-                                                        <span
-                                                            className="w-5 shrink-0 text-center"
-                                                            aria-hidden>
-                                                            {opt.icon}
-                                                        </span>
-                                                    ) : opt.logoDomain || opt.website ? (
-                                                        <OptionVendorMark option={opt} />
-                                                    ) : null}
+                                                    <OptionMark
+                                                        option={opt}
+                                                        className="w-5 shrink-0 text-center"
+                                                    />
                                                     <span className="min-w-0 flex-1">
                                                         {opt.name}
                                                     </span>
-                                                    {lockPresets && isFree ? (
-                                                        <span className="shrink-0 text-[10px] tracking-wide text-bg/45 uppercase">
-                                                            Custom
-                                                        </span>
-                                                    ) : null}
+                                                    <OptionBadge
+                                                        label={
+                                                            lockPresets && isFree
+                                                                ? tForm('option_badge_custom')
+                                                                : opt.badge
+                                                        }
+                                                    />
                                                 </button>
                                             </li>
                                         );
@@ -376,6 +388,22 @@ export function PresetNameField({
             ) : null}
         </div>
     );
+}
+
+/** Brand logo when the option has one (vendors), otherwise the catalog emoji (presets). */
+function OptionMark({ option, className }: { option: NamePresetOption; className: string }) {
+    if (option.logoDomain || option.website) return <OptionVendorMark option={option} />;
+    if (!option.icon) return null;
+    return (
+        <span className={className} aria-hidden>
+            {option.icon}
+        </span>
+    );
+}
+
+function OptionBadge({ label }: { label: string | null | undefined }) {
+    if (!label) return null;
+    return <span className="shrink-0 text-[10px] tracking-wide text-bg/45 uppercase">{label}</span>;
 }
 
 function OptionVendorMark({ option }: { option: NamePresetOption }) {

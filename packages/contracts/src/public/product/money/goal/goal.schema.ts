@@ -45,7 +45,7 @@ export const Goal = z.object({
      * SAVE: priority within the same jar — lower = higher focus (#1 first).
      * EARN / GIVE: unused (always 0).
      */
-    sortOrder: z.number().int().nonnegative().default(0),
+    sortOrder: z.int().nonnegative().default(0),
 });
 
 export const GoalProjection = z.object({

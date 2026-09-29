@@ -395,6 +395,7 @@ export const EXACT_FIELD_PRIORITY: Record<string, number> = {
     dedupeKey: 7,
     inflowKey: 7,
     appliedMerchantKey: 7,
+    merchantKey: 7,
     givingOrganizationKey: 7,
     registrationNumber: 7,
     vatNumber: 7,

@@ -1,6 +1,7 @@
-import { Collection, Entity, OneToMany, Property, Unique } from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import { Entity, OneToMany, Property, Unique } from '@mikro-orm/decorators/legacy';
 
-import type { MonthScoreEvent } from './month-score-event.entity';
+import { MonthScoreEvent } from './month-score-event.entity';
 
 import { HouseholdEntity } from '../../../../../common/database/household.entity';
 import { entityConfig } from '../../../../../common/database/entity-config.util';
@@ -43,6 +44,6 @@ export class MonthScore extends HouseholdEntity {
 
     // ? RELATIONSHIPS
     /** Points log for this period (1:N, inverse side). */
-    @OneToMany('MonthScoreEvent', 'monthScore')
+    @OneToMany(() => MonthScoreEvent, entity => entity.monthScore)
     events = new Collection<MonthScoreEvent>(this);
 }

@@ -1,7 +1,8 @@
-import { Collection, Entity, Enum, OneToMany, Property, Unique } from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import { Entity, Enum, OneToMany, Property, Unique } from '@mikro-orm/decorators/legacy';
 import { WeekCheckStage } from '@rumtelo/contracts';
 
-import type { WeekCheckAllocation } from './week-check-allocation.entity';
+import { WeekCheckAllocation } from './week-check-allocation.entity';
 
 import { MoneyType } from '../../../../../common/database/money.type';
 import { NativeEnum } from '../../../../../common/database/native-enum.util';
@@ -36,6 +37,6 @@ export class MoneyWeekCheck extends WeekCheckEntity {
 
     // ? RELATIONSHIPS
     /** Where the surplus was redirected (1:N, inverse side). */
-    @OneToMany('WeekCheckAllocation', 'weekCheck')
+    @OneToMany(() => WeekCheckAllocation, entity => entity.weekCheck)
     allocations = new Collection<WeekCheckAllocation>(this);
 }

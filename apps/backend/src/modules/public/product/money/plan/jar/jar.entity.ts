@@ -1,11 +1,13 @@
-import { Collection, Entity, Enum, OneToMany, Property, Unique } from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import { Entity, Enum, OneToMany, Property, Unique } from '@mikro-orm/decorators/legacy';
 import { JarKey, type JarCapabilities } from '@rumtelo/contracts';
 
-import type { Category } from './category.entity';
+import { Category } from './category.entity';
 
 import { HouseholdEntity } from '../../../../../../common/database/household.entity';
-import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import { Jsonb } from '../../../../../../common/database/jsonb.util';
+import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 
 /**
  * Jar Entity
@@ -45,7 +47,7 @@ export class Jar extends HouseholdEntity {
      * Behavior flags (spend / save / invest / safe-to-spend).
      * Copied from the template at onboard — do not infer from key in services.
      */
-    @Property({ type: 'json' })
+    @Property(Jsonb())
     capabilities!: JarCapabilities;
 
     // ? ENUMS
@@ -55,6 +57,6 @@ export class Jar extends HouseholdEntity {
 
     // ? RELATIONSHIPS
     /** Spending lines inside this jar (1:N, inverse side). */
-    @OneToMany('Category', 'jar')
+    @OneToMany(() => Category, entity => entity.jar)
     categories = new Collection<Category>(this);
 }

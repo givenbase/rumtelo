@@ -20,7 +20,7 @@ export const PendingPlanIntent = z.object({
 export const BillingPriceDisplay = z.object({
     priceId: z.string(),
     /** Stripe `unit_amount` in the smallest currency unit (e.g. cents). */
-    amountCents: z.number().int().nonnegative(),
+    amountCents: z.int().nonnegative(),
     currency: z.string(),
     /** Price nickname, else Product name, else null. */
     label: z.string().nullish(),
@@ -35,8 +35,8 @@ const IsoDateTime = z.preprocess((value: unknown) => {
 /** Purchased seat add-on quantities (0 until Stripe add-on qty is live). */
 export const SeatAddonQuantities = z.object({
     /** Extra contributor seats (assignable as admin or member). */
-    extraContributor: z.number().int().nonnegative(),
-    extraViewer: z.number().int().nonnegative(),
+    extraContributor: z.int().nonnegative(),
+    extraViewer: z.int().nonnegative(),
 });
 
 /** Household commercial snapshot for plan UI (period-end cancel / downgrade). */
@@ -83,7 +83,7 @@ export const HouseholdBillingStatus = z.object({
      * Stub catalog for seat add-ons (€2.50 / seat). Stripe price ids null until seeded.
      */
     seatAddonCatalog: z.object({
-        unitAmountCents: z.number().int().nonnegative(),
+        unitAmountCents: z.int().nonnegative(),
         currency: z.literal('eur'),
         kinds: z.array(z.enum(SeatAddonKind)),
     }),

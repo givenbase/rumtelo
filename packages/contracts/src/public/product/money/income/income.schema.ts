@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { Cadence } from '../../../../common/common.enums';
 import { HouseholdId, Id, IsoDate, Money } from '../../../../common/common.schema';
 import { IncomeKind } from '../enums';
+import { CounterpartyRef } from '../party/party.schema';
 
 /** Dated amount for an income source — history of raises / cuts. */
 export const IncomeAmountPeriod = z.object({
@@ -21,6 +22,10 @@ export const IncomeSource = z.object({
     id: Id,
     householdId: HouseholdId,
     name: z.string().min(1).max(120),
+    /** IncomeSourcePreset.key when picked from the catalog. Null when free-typed. */
+    presetKey: z.string().min(1).max(64).nullable().default(null),
+    /** Received from — employer, client, or platform. See `CounterpartyRef` for the three states. */
+    ...CounterpartyRef.shape,
     kind: z.enum(IncomeKind),
     /** Cached current amount (latest period) — used by jar monthly net. */
     amount: Money,

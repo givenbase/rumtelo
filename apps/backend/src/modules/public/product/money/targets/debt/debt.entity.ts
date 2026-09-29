@@ -1,10 +1,14 @@
-import { Entity, Enum, Property } from '@mikro-orm/core';
+import { Check, Entity, Enum, Index, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { Cadence, DebtKind, DebtScheduleKind } from '@rumtelo/contracts';
 
+import { CatalogKey } from '../../../../../../common/database/catalog-key.util';
 import { HouseholdEntity } from '../../../../../../common/database/household.entity';
 import { MoneyType } from '../../../../../../common/database/money.type';
 import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import { DebtPreset } from '../../../../../backoffice/product/money/preset/debt/debt.entity';
+import { MerchantPreset } from '../../../../../backoffice/product/money/preset/merchant/merchant.entity';
+import { Party } from '../../plan/party/party.entity';
 
 /**
  * Debt Entity
@@ -12,17 +16,36 @@ import { entityConfig } from '../../../../../../common/database/entity-config.ut
  * Money owed. Payments arrive as linked transactions; the planned payment is a
  * linked fixed cost. Payoff order follows `HouseholdSettings.money.payoffStrategy`.
  *
+ * `name` + optional `presetKey` = what debt (type label); counterparty triple =
+ * who the lender is (catalog merchant, saved party, or free text).
+ *
  * @see Transaction.debt
  * @see FixedCost.debt
  * @see DebtPreset — backoffice starting points
  * @see https://mikro-orm.io/docs/defining-entities
  */
 @Entity(entityConfig({ schema: 'public', domain: 'money', tableName: 'debt' }))
+@Index({ properties: ['party'] })
+@Check({
+    name: 'money_debt_merchant_xor_party',
+    expression: '(merchant_key IS NULL) OR (party_id IS NULL)',
+})
+@Check({
+    name: 'money_debt_counterparty_when_linked',
+    expression: '((merchant_key IS NULL) AND (party_id IS NULL)) OR (counterparty IS NOT NULL)',
+})
 export class Debt extends HouseholdEntity {
     // ? PROPERTIES
-    /** Household-facing label ("Student loan DUO"). */
+    /** Type label ("Student loan", "Mortgage") — snapshot of the preset or typed name. */
     @Property({ length: 120 })
     name!: string;
+
+    /**
+     * Lender display snapshot. Always set when `merchantKey` or `party` is;
+     * survives both being cleared.
+     */
+    @Property({ length: 160, nullable: true })
+    counterparty: string | null = null;
 
     /** Outstanding balance in minor units. */
     @Property({ type: MoneyType })
@@ -88,4 +111,26 @@ export class Debt extends HouseholdEntity {
     /** How often a payment is due. */
     @Enum(NativeEnum({ Cadence, domain: 'money', defaultValue: Cadence.MONTHLY }))
     paymentCadence: Cadence = Cadence.MONTHLY;
+
+    // ? RELATIONSHIPS
+    /**
+     * Household party when the lender is a saved name (N:1, optional).
+     * Mutually exclusive with `merchantKey`.
+     */
+    @ManyToOne(() => Party, { mapToPk: true, nullable: true, deleteRule: 'set null' })
+    party: string | null = null;
+
+    /**
+     * Debt-type catalog pick — natural-key FK on `DebtPreset.key`.
+     * Null when the name was free-typed. Retiring the preset nulls this; `name` stays.
+     */
+    @ManyToOne(() => DebtPreset, CatalogKey('preset_key'))
+    presetKey: string | null = null;
+
+    /**
+     * Catalog merchant when the lender was picked from the catalog (N:1, optional).
+     * Natural-key FK on `MerchantPreset.key`.
+     */
+    @ManyToOne(() => MerchantPreset, CatalogKey('merchant_key'))
+    merchantKey: string | null = null;
 }

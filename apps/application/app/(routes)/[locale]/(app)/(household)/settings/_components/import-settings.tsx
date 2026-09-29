@@ -5,6 +5,7 @@ import { useRef, useState } from 'react';
 import type { ArchiveRestorePayload, ArchiveRestoreResult } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import { Button, StubNotice } from '@rumtelo/ui';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { api } from '@/app/_lib/api';
 import {
@@ -101,6 +102,7 @@ function sourceLabel(t: ReturnType<typeof useTranslations>, source: ArchiveImpor
 
 export function ImportSettings() {
     const t = useTranslations();
+    const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { showToast } = useHouseholdShell();
     const { planReady } = usePlanCapabilities();
@@ -165,6 +167,12 @@ export function ImportSettings() {
                 applyJarSplit: true,
             });
             setPreview(result);
+            if (!dryRun) {
+                // Import mutates jars/income/costs/debts/goals/rules/tx — drop stale
+                // caches and refetch every active query for this tenant session.
+                await queryClient.cancelQueries();
+                await queryClient.invalidateQueries();
+            }
             showToast(
                 t(
                     dryRun

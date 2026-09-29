@@ -1,14 +1,17 @@
-import { Entity, Property } from '@mikro-orm/core';
+import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 
+import { CatalogKey } from '../../../../../common/database/catalog-key.util';
 import { HouseholdEntity } from '../../../../../common/database/household.entity';
 import { entityConfig } from '../../../../../common/database/entity-config.util';
 import { MoneyType } from '../../../../../common/database/money.type';
+import { AssetPreset } from '../../../../backoffice/product/growth/preset/asset/asset.entity';
+import { AssetKind } from '../../../../backoffice/product/growth/preset/asset/kind/asset-kind.entity';
 
 /**
  * Asset Entity
  *
- * Something this household owns. The class is a catalog key copied onto the
- * row, so a renamed preset does not move their number.
+ * Something this household owns. The class is a natural-key FK on the catalog
+ * (`kindKey`), so a renamed key follows and a kind in use cannot be removed.
  *
  * @see AssetKind — the class (portfolio, property, …)
  * @see AssetPreset — the suggested name, when they picked one
@@ -21,14 +24,6 @@ export class Asset extends HouseholdEntity {
     @Property({ length: 120 })
     name!: string;
 
-    /** AssetKind.key at the time they filed it. Not a foreign key. */
-    @Property({ length: 64 })
-    kindKey!: string;
-
-    /** AssetPreset.key when the name came from the catalog. Null if they typed it. */
-    @Property({ length: 64, nullable: true })
-    presetKey: string | null = null;
-
     /** Worth in minor units. */
     @Property({ type: MoneyType })
     value!: number;
@@ -36,4 +31,13 @@ export class Asset extends HouseholdEntity {
     /** Pays the household each month, in minor units. Zero when it only sits there. */
     @Property({ type: MoneyType, default: 0 })
     flow = 0;
+
+    // ? RELATIONSHIPS
+    /** The class (portfolio, property, …) — natural-key FK on `AssetKind.key`; a kind in use cannot be removed. */
+    @ManyToOne(() => AssetKind, CatalogKey('kind_key', { required: true }))
+    kindKey!: string;
+
+    /** Catalog suggestion the name came from — natural-key FK on `AssetPreset.key`. Null if they typed it. */
+    @ManyToOne(() => AssetPreset, CatalogKey('preset_key'))
+    presetKey: string | null = null;
 }

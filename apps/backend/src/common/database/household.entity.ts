@@ -1,4 +1,4 @@
-import { ManyToOne } from '@mikro-orm/core';
+import { Index, ManyToOne } from '@mikro-orm/decorators/legacy';
 
 import { AuthHousehold } from '../../modules/auth/household/managed/household/auth-household.entity';
 
@@ -23,6 +23,7 @@ import { BaseEntity } from './base.entity';
  *
  * @see common/household — interceptor + HouseholdScopedRepository
  */
+@Index({ properties: ['household'] })
 export abstract class HouseholdEntity extends BaseEntity {
     /**
      * FK to Better Auth `auth.household.id` (uuid).
@@ -33,7 +34,6 @@ export abstract class HouseholdEntity extends BaseEntity {
     @ManyToOne(() => AuthHousehold, {
         mapToPk: true,
         fieldName: 'household_id',
-        index: true,
         deleteRule: 'cascade',
     })
     household!: string;

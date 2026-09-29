@@ -1,8 +1,9 @@
-import { Collection, Entity, OneToMany, Unique } from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import { Entity, OneToMany, Unique } from '@mikro-orm/decorators/legacy';
 
 import { CatalogEntity } from '../../../../common/database/catalog.entity';
 import { entityConfig } from '../../../../common/database/entity-config.util';
-import type { PlanFeature } from '../plan-feature/plan-feature.entity';
+import { PlanFeature } from '../plan-feature/plan-feature.entity';
 
 /**
  * Plan Product Entity
@@ -18,6 +19,6 @@ import type { PlanFeature } from '../plan-feature/plan-feature.entity';
 export class PlanProduct extends CatalogEntity {
     // ? RELATIONSHIPS
     /** Feature segments under this product (1:N). */
-    @OneToMany('PlanFeature', 'product')
+    @OneToMany(() => PlanFeature, entity => entity.product)
     features = new Collection<PlanFeature>(this);
 }

@@ -25,10 +25,9 @@ export default defineConfig({
     entities: ['./src/**/*.entity.ts'],
     entitiesTs: ['./src/**/*.entity.ts'],
     clientUrl: process.env.DATABASE_URL,
+    // v7: driverOptions go straight to pg.Pool (no knex `connection` nesting).
     driverOptions:
-        process.env.DATABASE_SSL === 'true'
-            ? { connection: { ssl: { rejectUnauthorized: false } } }
-            : {},
+        process.env.DATABASE_SSL === 'true' ? { ssl: { rejectUnauthorized: false } } : {},
     // Planes: auth, public (app/household), backoffice.
     // Product areas are folders under modules/public — not separate DB schemas.
     schema: 'public',
@@ -38,15 +37,14 @@ export default defineConfig({
     discovery: {
         warnWhenNoEntities: true,
         afterDiscovered(storage) {
-            // getAll() is a Dictionary (plain object), not a Map — use Object.entries.
-            // reset() takes the class name string.
-            for (const [className, metadata] of Object.entries(storage.getAll())) {
+            // v7: getAll() is a Map keyed by entity name / class; reset() takes that key.
+            for (const [entityName, metadata] of storage.getAll()) {
                 if (
                     metadata.path &&
                     excludedEntityPathPatterns.some(pattern => metadata.path.includes(pattern))
                 ) {
                     console.log(`Excluding entity: ${metadata.className} from ${metadata.path}`);
-                    storage.reset(className);
+                    storage.reset(entityName);
                 }
             }
         },

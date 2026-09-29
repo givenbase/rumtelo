@@ -29,6 +29,7 @@ const form = {
     no_matches_other: 'No matches — pick Other for a custom name.',
     no_matches_keep_typing: 'No matches — keep typing for a custom name.',
     change: 'Change',
+    option_badge_custom: 'Custom',
     other: 'Other…',
     skip: 'Skip',
     selected: 'Selected',

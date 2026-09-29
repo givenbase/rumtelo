@@ -61,7 +61,7 @@ export const AccountTourProgress = z.object({
     offer: AccountTourOfferStatus,
     tours: z.record(z.string(), AccountTourChapterStatus),
     seriesActive: z.boolean(),
-    seriesIndex: z.number().int().min(0),
+    seriesIndex: z.int().min(0),
 });
 
 export const DEFAULT_ACCOUNT_TOUR_PROGRESS = {

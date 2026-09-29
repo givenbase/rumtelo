@@ -1,5 +1,5 @@
+import { Collection } from '@mikro-orm/core';
 import {
-    Collection,
     Entity,
     Enum,
     Index,
@@ -8,7 +8,7 @@ import {
     OneToMany,
     Property,
     Unique,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 import { Cadence, FlowDirection } from '@rumtelo/contracts';
 
 import { CatalogEntity } from '../../../../../../common/database/catalog.entity';
@@ -17,7 +17,7 @@ import { entityConfig } from '../../../../../../common/database/entity-config.ut
 import { Audience } from '../../catalog/audience/audience.entity';
 import { CategoryTemplate } from '../../template/category/category.entity';
 import { JarTemplate } from '../../template/jar/jar.entity';
-import type { FixedCostPresetMerchant } from './fixed-cost-merchant.entity';
+import { FixedCostPresetMerchant } from './fixed-cost-merchant.entity';
 
 /**
  * Fixed Cost Preset Entity
@@ -74,7 +74,7 @@ export class FixedCostPreset extends CatalogEntity {
 
     /** Ordered "Paid to" merchant chips (1:N to the pivot; empty = free text only). */
     @OneToMany<FixedCostPresetMerchant, FixedCostPreset>({
-        entity: 'FixedCostPresetMerchant',
+        entity: () => FixedCostPresetMerchant,
         mappedBy: 'preset',
         orderBy: { sortOrder: 'ASC' },
         orphanRemoval: true,

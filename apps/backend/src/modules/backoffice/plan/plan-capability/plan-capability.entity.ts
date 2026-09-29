@@ -1,5 +1,5 @@
+import { Collection } from '@mikro-orm/core';
 import {
-    Collection,
     Entity,
     Enum,
     Index,
@@ -7,13 +7,13 @@ import {
     OneToMany,
     Property,
     Unique,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 import { CapabilityKind } from '@rumtelo/contracts';
 
 import { CatalogEntity } from '../../../../common/database/catalog.entity';
 import { NativeEnum } from '../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../common/database/entity-config.util';
-import type { PlanCapabilityGrant } from '../plan-capability-grant/plan-capability-grant.entity';
+import { PlanCapabilityGrant } from '../plan-capability-grant/plan-capability-grant.entity';
 import { PlanFeature } from '../plan-feature/plan-feature.entity';
 
 /**
@@ -46,6 +46,6 @@ export class PlanCapability extends CatalogEntity {
     feature!: PlanFeature;
 
     /** Plans that grant this capability (1:N to the grant rows). */
-    @OneToMany('PlanCapabilityGrant', 'capability')
+    @OneToMany(() => PlanCapabilityGrant, entity => entity.capability)
     grants = new Collection<PlanCapabilityGrant>(this);
 }

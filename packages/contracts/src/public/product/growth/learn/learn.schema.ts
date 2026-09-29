@@ -37,7 +37,7 @@ export const LearnProgress = z.object({
     /** The day they want to be finished. Null until they pick one. */
     dueOn: IsoDate.nullable(),
     /** 1 is next. The person sets this. Reading does not change it. */
-    rank: z.number().int().min(1).max(999),
+    rank: z.int().min(1).max(999),
 });
 
 /** The shelf for the signed-in person: picked titles, plus which skills are in focus. */
@@ -55,9 +55,9 @@ export const LearnBookHit = z.object({
     sourceKey: z.string().min(1).max(64),
     name: z.string().min(1).max(160),
     author: z.string().min(1).max(120),
-    coverId: z.number().int().positive().nullable(),
+    coverId: z.int().positive().nullable(),
     isbn13: z.string().regex(ISBN13).nullable(),
-    url: z.string().url().max(280),
+    url: z.url().max(280),
 });
 
 /** A book this household added. The pointer, not a title string. */

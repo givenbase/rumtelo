@@ -1,4 +1,4 @@
-import { PrimaryKey, Property } from '@mikro-orm/core';
+import { PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
 import { v7 as uuidv7 } from 'uuid';
 
 /**

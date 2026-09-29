@@ -23,6 +23,7 @@ import { Transaction } from '../../ledger/transaction/transaction.entity';
 import { FixedCost } from '../../plan/fixed-cost/fixed-cost.entity';
 import { Category } from '../../plan/jar/category.entity';
 import { Jar } from '../../plan/jar/jar.entity';
+import { type CounterpartyPatch, PartyService } from '../../plan/party/party.service';
 
 import { assertBookedOnPeriodOpen } from '../../month-score/period-lock.util';
 import { applyDebtBalanceDelta, syncLinkedFixedCostLifecycle } from './debt-link.util';
@@ -34,7 +35,10 @@ const DEBT_PAYMENTS_CATEGORY_NAME = 'Debt payments';
 @Injectable()
 export class DebtService {
     private readonly repo: HouseholdScopedRepository<Debt>;
-    constructor(@Inject(EntityManager) private readonly em: EntityManager) {
+    constructor(
+        @Inject(EntityManager) private readonly em: EntityManager,
+        @Inject(PartyService) private readonly parties: PartyService
+    ) {
         this.repo = new HouseholdScopedRepository(em, Debt);
     }
 
@@ -42,31 +46,39 @@ export class DebtService {
     // ? CREATE Operations
     // ====================================================================
 
-    async create(input: {
-        name: string;
-        kind: string;
-        balance: number;
-        originalBalance?: number;
-        interestRate: number;
-        minimumPayment?: number;
-        extraPayment?: number;
-        dueDay?: number | null;
-        dueMonth?: number | null;
-        closedOn?: string | null;
-        startedOn?: string | null;
-        scheduleKind?: DebtScheduleKind;
-        paymentCadence?: Cadence;
-        termPayments?: number | null;
-        maturityOn?: string | null;
-        linkFixedCost?: boolean;
-    }) {
+    async create(
+        input: CounterpartyPatch & {
+            name: string;
+            kind: string;
+            balance: number;
+            originalBalance?: number;
+            interestRate: number;
+            minimumPayment?: number;
+            extraPayment?: number;
+            dueDay?: number | null;
+            dueMonth?: number | null;
+            closedOn?: string | null;
+            startedOn?: string | null;
+            scheduleKind?: DebtScheduleKind;
+            paymentCadence?: Cadence;
+            termPayments?: number | null;
+            maturityOn?: string | null;
+            linkFixedCost?: boolean;
+            presetKey?: string | null;
+        }
+    ) {
         const scheduleKind = input.scheduleKind ?? DebtScheduleKind.OPEN;
         const paymentCadence = input.paymentCadence ?? Cadence.MONTHLY;
         const dueMonth = normalizeDueMonth(input.dueMonth, paymentCadence);
         assertDueMonthForCadence(paymentCadence, dueMonth);
+        const other = await this.parties.resolveCounterparty(input);
         const entity = this.em.create(Debt, {
             household: currentHouseholdId(),
             name: input.name,
+            presetKey: input.presetKey ?? null,
+            counterparty: other.counterparty,
+            merchantKey: other.merchantKey,
+            party: other.party,
             kind: input.kind as DebtKind,
             balance: input.balance,
             originalBalance: input.originalBalance ?? input.balance,
@@ -119,7 +131,9 @@ export class DebtService {
             amount: outflow,
             bookedOn: input.bookedOn,
             description: `Debt payment · ${debt.name}`,
-            counterparty: debt.name,
+            counterparty: debt.counterparty,
+            merchantKey: debt.merchantKey,
+            party: debt.party,
             inflowKey: null,
             note: input.note ?? null,
             status: jar ? TransactionStatus.SORTED : TransactionStatus.INBOX,
@@ -209,27 +223,41 @@ export class DebtService {
 
     async update(
         id: string,
-        patch: Partial<{
-            name: string;
-            kind: string;
-            balance: number;
-            originalBalance: number;
-            interestRate: number;
-            minimumPayment: number;
-            extraPayment: number;
-            dueDay: number | null;
-            dueMonth: number | null;
-            closedOn: string | null;
-            startedOn: string | null;
-            scheduleKind: DebtScheduleKind;
-            paymentCadence: Cadence;
-            termPayments: number | null;
-            maturityOn: string | null;
-            linkFixedCost: boolean;
-        }>
+        patch: CounterpartyPatch &
+            Partial<{
+                name: string;
+                kind: string;
+                balance: number;
+                originalBalance: number;
+                interestRate: number;
+                minimumPayment: number;
+                extraPayment: number;
+                dueDay: number | null;
+                dueMonth: number | null;
+                closedOn: string | null;
+                startedOn: string | null;
+                scheduleKind: DebtScheduleKind;
+                paymentCadence: Cadence;
+                termPayments: number | null;
+                maturityOn: string | null;
+                linkFixedCost: boolean;
+                presetKey: string | null;
+            }>
     ) {
         const entity = await this.repo.findOneOrFail({ id });
         if (patch.name !== undefined) entity.name = patch.name;
+        if (patch.presetKey !== undefined) entity.presetKey = patch.presetKey;
+        if (
+            patch.counterparty !== undefined ||
+            patch.merchantKey !== undefined ||
+            patch.partyId !== undefined ||
+            patch.saveParty
+        ) {
+            const other = await this.parties.resolveCounterparty(patch, entity);
+            entity.counterparty = other.counterparty;
+            entity.merchantKey = other.merchantKey;
+            entity.party = other.party;
+        }
         if (patch.kind !== undefined) entity.kind = patch.kind as DebtKind;
         if (patch.balance !== undefined) entity.balance = patch.balance;
         if (patch.originalBalance !== undefined) entity.originalBalance = patch.originalBalance;
@@ -341,7 +369,9 @@ export class DebtService {
                 category: category ? this.em.getReference(Category, category.id) : null,
                 debt,
                 name: debt.name,
-                counterparty: debt.name,
+                counterparty: debt.counterparty ?? debt.name,
+                merchantKey: debt.merchantKey,
+                party: debt.party,
                 amount: debt.minimumPayment,
                 cadence: debt.paymentCadence,
                 dueDay: debt.dueDay,
@@ -357,7 +387,9 @@ export class DebtService {
         }
 
         fixed.name = debt.name;
-        fixed.counterparty = debt.name;
+        fixed.counterparty = debt.counterparty ?? debt.name;
+        fixed.merchantKey = debt.merchantKey;
+        fixed.party = debt.party;
         fixed.amount = debt.minimumPayment;
         fixed.cadence = debt.paymentCadence;
         fixed.dueDay = debt.dueDay;
@@ -414,6 +446,10 @@ export function toDto(debt: Debt) {
         id: debt.id,
         householdId: debt.household,
         name: debt.name,
+        presetKey: debt.presetKey,
+        counterparty: debt.counterparty,
+        merchantKey: debt.merchantKey,
+        partyId: debt.party,
         kind: debt.kind,
         balance: debt.balance,
         originalBalance: debt.originalBalance,
@@ -444,6 +480,8 @@ function toPaymentDto(transaction: Transaction) {
         bookedOn: transaction.bookedOn,
         description: transaction.description,
         counterparty: transaction.counterparty,
+        merchantKey: transaction.merchantKey,
+        partyId: transaction.party,
         inflowKey: transaction.inflowKey,
         status: transaction.status,
         source: transaction.source,
@@ -462,7 +500,10 @@ function toLinkedFixedCostDto(fixedCost: FixedCost) {
         categoryId: fixedCost.category?.id ?? null,
         debtId: fixedCost.debt?.id ?? null,
         name: fixedCost.name,
+        presetKey: fixedCost.presetKey,
         counterparty: fixedCost.counterparty,
+        merchantKey: fixedCost.merchantKey,
+        partyId: fixedCost.party,
         amount: fixedCost.amount,
         cadence: fixedCost.cadence,
         dueDay: fixedCost.dueDay,

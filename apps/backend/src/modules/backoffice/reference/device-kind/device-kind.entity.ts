@@ -1,8 +1,9 @@
-import { Entity, Enum, Property, Unique } from '@mikro-orm/core';
+import { Entity, Enum, Property, Unique } from '@mikro-orm/decorators/legacy';
 import { DeviceConnection } from '@rumtelo/contracts';
 
 import { CatalogEntity } from '../../../../common/database/catalog.entity';
 import { entityConfig } from '../../../../common/database/entity-config.util';
+import { Jsonb } from '../../../../common/database/jsonb.util';
 import { NativeEnum } from '../../../../common/database/native-enum.util';
 
 /**
@@ -10,7 +11,7 @@ import { NativeEnum } from '../../../../common/database/native-enum.util';
  *
  * Company-authored classes of hardware a household can register. Rows, not a
  * Postgres enum — adding WRISTBAND_V2 or SLEEP_PAD is a seed, not a migration.
- * Household {@link Device} rows snapshot `key` as `kindKey` (not a FK).
+ * Household {@link Device} rows reference `key` as `kindKey` (natural-key FK, restrict).
  *
  * @see https://mikro-orm.io/docs/defining-entities
  */
@@ -30,7 +31,7 @@ export class DeviceKindCatalog extends CatalogEntity {
     icon!: string;
 
     /** Suggested capabilities for the pair form — stored as JSON string[]. */
-    @Property({ type: 'json' })
+    @Property(Jsonb())
     defaultCapabilities!: string[];
 
     // ? ENUMS

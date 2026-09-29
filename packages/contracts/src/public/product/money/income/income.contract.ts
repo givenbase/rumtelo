@@ -7,6 +7,7 @@ import { oc } from '@orpc/contract';
 import { z } from 'zod';
 
 import { HouseholdId, HouseholdScoped, Id, IsoDate, Money } from '../../../../common/common.schema';
+import { SaveParty } from '../party/party.schema';
 import { IncomeSource } from './income.schema';
 
 const ok = z.object({ ok: z.literal(true) });
@@ -16,7 +17,7 @@ const ok = z.object({ ok: z.literal(true) });
 // ====================================================================
 
 export const incomeCreate = oc
-    .input(IncomeSource.omit({ id: true, periods: true }))
+    .input(IncomeSource.omit({ id: true, periods: true }).extend(SaveParty.shape))
     .output(IncomeSource);
 
 // ====================================================================
@@ -31,12 +32,15 @@ export const incomeList = oc.input(HouseholdScoped).output(z.array(IncomeSource)
 
 export const incomeUpdate = oc
     .input(
-        IncomeSource.partial().omit({ periods: true }).extend({
-            id: Id,
-            householdId: HouseholdId,
-            /** When amount changes: date the new amount takes effect (default today). */
-            amountEffectiveFrom: IsoDate.nullish(),
-        })
+        IncomeSource.partial()
+            .omit({ periods: true })
+            .extend({
+                ...SaveParty.shape,
+                id: Id,
+                householdId: HouseholdId,
+                /** When amount changes: date the new amount takes effect (default today). */
+                amountEffectiveFrom: IsoDate.nullish(),
+            })
     )
     .output(IncomeSource);
 

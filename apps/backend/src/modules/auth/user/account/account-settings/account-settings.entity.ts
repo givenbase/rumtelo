@@ -1,4 +1,4 @@
-import { Entity, Enum, OneToOne, Property } from '@mikro-orm/core';
+import { Entity, Enum, OneToOne, Property } from '@mikro-orm/decorators/legacy';
 import {
     DEFAULT_ACCOUNT_TOUR_PROGRESS,
     Locale,
@@ -9,6 +9,7 @@ import {
 
 import { BaseEntity } from '../../../../../common/database/base.entity';
 import { entityConfig } from '../../../../../common/database/entity-config.util';
+import { Jsonb } from '../../../../../common/database/jsonb.util';
 import { NativeEnum } from '../../../../../common/database/native-enum.util';
 import { Account } from '../account.entity';
 
@@ -27,7 +28,7 @@ import { Account } from '../account.entity';
 export class AccountSettings extends BaseEntity {
     // ? PROPERTIES
     /** Guided tour / Help walkthrough progress (offer + per-chapter status). */
-    @Property({ type: 'json' })
+    @Property(Jsonb())
     tour: AccountTourProgress = { ...DEFAULT_ACCOUNT_TOUR_PROGRESS, tours: {} };
 
     /**
@@ -59,7 +60,8 @@ export class AccountSettings extends BaseEntity {
     // ? RELATIONSHIPS
     /**
      * Owning account (1:1). Cascades when the account is deleted.
+     * OneToOne (not ManyToOne+@Unique) so Account.settings can stay the inverse side.
      */
-    @OneToOne(() => Account, { owner: true, deleteRule: 'cascade', unique: true })
+    @OneToOne(() => Account, { owner: true, deleteRule: 'cascade' })
     account!: Account;
 }

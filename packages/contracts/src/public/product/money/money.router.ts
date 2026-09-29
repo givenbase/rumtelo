@@ -17,12 +17,15 @@ import { goalContract } from './goal/goal.contract';
 import { incomeContract } from './income/income.contract';
 import { jarContract } from './jar/jar.contract';
 import { monthScoreContract } from './month-score/month-score.contract';
+import { partyContract } from './party/party.contract';
 import { ruleContract } from './rule/rule.contract';
 import { weekCheckContract } from './week-check/week-check.contract';
 
 export const contract = {
     jars: jarContract,
     income: incomeContract,
+    /** Household-saved counterparties (employers, landlords, lenders) shared across rows. */
+    parties: partyContract,
     fixedCosts: fixedCostContract,
     accounts: accountsContract,
     transactions: transactionContract,

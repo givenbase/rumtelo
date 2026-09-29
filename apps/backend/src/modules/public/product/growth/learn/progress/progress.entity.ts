@@ -1,4 +1,4 @@
-import { Entity, Enum, ManyToOne, Property, Unique } from '@mikro-orm/core';
+import { Entity, Enum, ManyToOne, Property, Unique } from '@mikro-orm/decorators/legacy';
 import { LearnProgressStatus } from '@rumtelo/contracts';
 
 import { HouseholdEntity } from '../../../../../../common/database/household.entity';

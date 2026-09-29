@@ -13,6 +13,8 @@ import { MikroORM } from '@mikro-orm/postgresql';
 import config from '../../mikro-orm.config';
 import { DatabaseSeeder } from '../../src/database/seeders/DatabaseSeeder';
 
+import { withTransientRetry } from './transient-retry.ts';
+
 function formatSeedError(error: unknown): string {
     if (error instanceof Error) {
         return error.stack ?? `${error.name}: ${error.message}`;
@@ -25,10 +27,10 @@ function formatSeedError(error: unknown): string {
 }
 
 async function main() {
-    const orm = await MikroORM.init(config);
+    const orm = await withTransientRetry('seed:init', () => MikroORM.init(config));
     let failed: unknown;
     try {
-        await orm.seeder.seed(DatabaseSeeder);
+        await withTransientRetry('seed:run', () => orm.seeder.seed(DatabaseSeeder));
         console.log('Seeder finished.');
     } catch (error: unknown) {
         failed = error;

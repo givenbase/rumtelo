@@ -12,10 +12,10 @@ Same pattern everywhere a create picker locks a name and edit must re-lock + sho
 
 | Form | Preset key state | Chips | Prefer stored key? |
 |------|------------------|-------|--------------------|
-| `fixed-cost-form` | `selectedBillPresetKey` | Paid-to merchants | No — match name |
-| `debt-form` | `typeKey` | Lenders | Kind + merchant / type name |
-| `income-form` | locked from name | — | No — match name |
-| `goal-form` | `goalPresetKey` | Car brands when CAR | No — match name |
+| `fixed-cost-form` | `nameLock` (`NameLock` union: preset / vendor / other) | Paid-to merchants | **Yes** — persist `presetKey` |
+| `debt-form` | `presetKey` | Lenders — reverse lookup via `presetForMerchant` | **Yes** — persist `presetKey` |
+| `income-form` | locked from name / stored `presetKey` | — | **Yes** — persist `presetKey` |
+| `goal-form` | `goalPresetKey` | Car brands when CAR | No — match name (persist later) |
 | `asset-form` | `presetKey` | — | **Yes** — persist `presetKey` when possible |
 
 Canonical helpers: `findByNameOrAlias` / `namesMatch` from `@rumtelo/utils`. Catalog DTOs expose `aliases` (EN + other locales). Seed wiring: `aliasesFor*Preset` next to each preset’s translations.
@@ -27,12 +27,16 @@ Canonical helpers: `findByNameOrAlias` / `namesMatch` from `@rumtelo/utils`. Cat
 3. **Lock UI:** pass `initialLockedKey={presetKey}` into `PresetNameField` so edit shows the chip, not a free text box.
 4. **mapRow:** pass through every ID the form needs (`categoryId`, `kind`, `presetKey`, …). Dropping them breaks category / chip fallback.
 5. **New name catalog:** add `aliases` on the Zod preset, return `aliasesFor…Preset(key, name)` from the catalogs list handler, hydrate with `findByNameOrAlias`.
+6. **Vendor picked as the name (HelloFresh, KPN, ING):** run `resolveVendorPresets(presets, merchant.key, prefer?)` from `@rumtelo/utils` (presets link vendors via `merchantKeys`). Exactly one → lock that preset (fixed-cost: preset name + cadence/dueDay; debt: type + kind). Several → keep the vendor name and show `CatalogCandidateChips` so the household picks. None → vendor name only. Always fill the party field (Paid-to / lender) with the vendor. Same helper on create pick and edit hydrate so both paths agree.
+7. **Mixed preset + vendor picker:** keep the lock typed (`NameLock` + `nameLockFromOptionKey` / `nameLockToOptionKey` in `merchant-name-options.ts`); the `merchant:` prefix never leaks into form state or JSX. Give vendor rows a `badge` ("Vendor") and preset rows another ("Bill type") so the dropdown shows the difference.
 
 ## Don't
 
 - Match edit labels with raw `===` or locale-only `findByName` when the catalog has `aliases`
 - Re-run hydrate every render (always gate on `!*Hydrated`)
 - Invent a second autocomplete for “paid to” / lender — reuse `CatalogChipPicker` + preset `merchantKeys`
+- Store vendor keys in the bill-type / preset state, or pick the *first* preset a vendor is linked to — use `resolveVendorPresets` and let the household choose when it is ambiguous
+- Derive the payee from the name lock at render time — the party field is written once by the pick routine and read from form state
 
 ## Prefer when adding entities
 

@@ -1,13 +1,25 @@
-import { Entity, Enum, Index, ManyToOne, Property, Unique } from '@mikro-orm/core';
+import {
+    Check,
+    Entity,
+    Enum,
+    Index,
+    ManyToOne,
+    Property,
+    Unique,
+} from '@mikro-orm/decorators/legacy';
 import { TransactionSource, TransactionStatus } from '@rumtelo/contracts';
 
+import { CatalogKey } from '../../../../../../common/database/catalog-key.util';
 import { HouseholdEntity } from '../../../../../../common/database/household.entity';
 import { MoneyType } from '../../../../../../common/database/money.type';
 import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import { MerchantPreset } from '../../../../../backoffice/product/money/preset/merchant/merchant.entity';
+import { TransactionInPreset } from '../../../../../backoffice/product/money/preset/transaction-in/transaction-in.entity';
 import { FixedCost } from '../../plan/fixed-cost/fixed-cost.entity';
 import { Category } from '../../plan/jar/category.entity';
 import { Jar } from '../../plan/jar/jar.entity';
+import { Party } from '../../plan/party/party.entity';
 import { Debt } from '../../targets/debt/debt.entity';
 import { BankAccount } from '../bank-account/bank-account.entity';
 import { SortRule } from '../sort-rule/sort-rule.entity';
@@ -34,8 +46,17 @@ import { SortRule } from '../sort-rule/sort-rule.entity';
 @Index({ properties: ['debt'] })
 @Index({ properties: ['fixedCost'] })
 @Index({ properties: ['appliedRule'] })
+@Index({ properties: ['party'] })
 // Idempotent imports: the same statement line can never land twice in one household.
 @Unique({ properties: ['household', 'dedupeKey'] })
+@Check({
+    name: 'money_transaction_merchant_xor_party',
+    expression: '(merchant_key IS NULL) OR (party_id IS NULL)',
+})
+@Check({
+    name: 'money_transaction_counterparty_when_linked',
+    expression: '((merchant_key IS NULL) AND (party_id IS NULL)) OR (counterparty IS NOT NULL)',
+})
 export class Transaction extends HouseholdEntity {
     // ? PROPERTIES
     /** Bank / user description as booked. */
@@ -53,22 +74,6 @@ export class Transaction extends HouseholdEntity {
     /** Negative = money out, positive = money in. Integer minor units, never floats. */
     @Property({ type: MoneyType })
     amount!: number;
-
-    /**
-     * Stable Transaction In preset key (GIFT, REFUND, …) copied at creation.
-     * Snapshot, not an FK — household rows never depend on mutable catalog rows.
-     * Null for Out, custom In labels, and bank/CSV imports.
-     */
-    @Property({ length: 64, nullable: true })
-    inflowKey: string | null = null;
-
-    /**
-     * MerchantPreset.key that auto-sorted this row, when no household rule matched.
-     * Snapshot, not an FK — retiring a merchant must not rewrite history.
-     * Cleared when a rule or the user sorts the row themselves.
-     */
-    @Property({ length: 64, nullable: true })
-    appliedMerchantKey: string | null = null;
 
     /**
      * Stable hash of (account, date, amount, description) — see class-level UNIQUE.
@@ -119,4 +124,34 @@ export class Transaction extends HouseholdEntity {
      */
     @ManyToOne(() => SortRule, { mapToPk: true, nullable: true, deleteRule: 'set null' })
     appliedRule: string | null = null;
+
+    /**
+     * Household party when the other side is a saved name (N:1, optional).
+     * Mutually exclusive with catalog `merchantKey` on the counterparty triple
+     * (auto-sort still uses `appliedMerchantKey` separately).
+     */
+    @ManyToOne(() => Party, { mapToPk: true, nullable: true, deleteRule: 'set null' })
+    party: string | null = null;
+
+    /**
+     * Catalog merchant when the user picked one for this row (N:1, optional).
+     * Distinct from `appliedMerchantKey` (auto-sort provenance).
+     */
+    @ManyToOne(() => MerchantPreset, CatalogKey('merchant_key'))
+    merchantKey: string | null = null;
+
+    /**
+     * Transaction In preset (GIFT, REFUND, …) picked at creation — natural-key FK on
+     * `TransactionInPreset.key`. Null for Out, custom In labels, and bank/CSV imports.
+     */
+    @ManyToOne(() => TransactionInPreset, CatalogKey('inflow_key'))
+    inflowKey: string | null = null;
+
+    /**
+     * Merchant that auto-sorted this row when no household rule matched — natural-key
+     * FK on `MerchantPreset.key`; retiring the merchant nulls it, history stays.
+     * Cleared when a rule or the user sorts the row themselves.
+     */
+    @ManyToOne(() => MerchantPreset, CatalogKey('applied_merchant_key'))
+    appliedMerchantKey: string | null = null;
 }

@@ -61,6 +61,12 @@
                     "bill_paused_no_settlement": "Gepauzeerde of beëindigde vaste lasten kunnen geen nieuwe afrekeningen krijgen.",
                     "due_month_required": "Kies de maand waarvoor de kosten in rekening worden gebracht bij driemaandelijkse of jaarlijkse facturen.",
                     "income_kind_cadence_locked": "Type en frequentie kun je niet wijzigen op bestaande inkomsten. Beëindig ze en maak nieuwe aan.",
+                    "party_or_merchant": "Kies ofwel een catalogusverkoper ofwel een van uw opgeslagen contacten, maar niet beide.",
+                    "party_name_taken": "Er bestaat al een groep met deze naam.",
+                    "party_not_found": "Dat feestje staat niet op je lijstje.",
+                    "party_merge_same": "Kies twee verschillende partijen om samen te voegen.",
+                    "party_already_suggested": "Je hebt dit feestje al aan Rumtelo aanbevolen.",
+                    "party_already_in_catalog": "Dit feest is al gekoppeld aan de Rumtelo-catalogus.",
                     "period_closed": "Deze maand is afgesloten — je kunt niets toevoegen of wijzigen voor die periode.",
                     "month_close_incomplete": "Rond openstaande zaken af vóór je deze maand afsluit ({inbox} ongeordend in de inbox, {bills} rekeningen onbetaald of niet overgeslagen).",
                     "month_close_prior_open": "Sluit eerst {period} — de maanden moeten in volgorde worden afgerond, zodat het logboek een getrouw beeld blijft geven.",
@@ -233,6 +239,7 @@
             "no_matches_other": "Geen resultaten — kies ‘Overig’ om een eigen naam in te voeren.",
             "no_matches_keep_typing": "Geen resultaten — typ verder om een eigen naam in te voeren.",
             "change": "Wijzigen",
+            "option_badge_custom": "Eigen naam",
             "other": "Overige…",
             "skip": "Overslaan",
             "selected": "Geselecteerd",
@@ -2152,6 +2159,12 @@
                 "toast_ended": "Inkomsten beëindigd",
                 "name_placeholder": "bijv. salaris",
                 "free_text_placeholder": "Vertel eens waar het vandaan komt…",
+                "received_from": "Ontvangen van (optioneel)",
+                "received_from_placeholder": "bijv. ACME BV, DEGIRO, HelloFresh",
+                "option_badge_payer": "Betaler",
+                "option_badge_saved": "Opgeslagen",
+                "option_group_saved": "Jullie feestjes",
+                "option_group_catalog": "Catalogus",
                 "kind_salary": "Salaris",
                 "kind_freelance": "Freelancer",
                 "kind_benefit": "Voordeel",
@@ -2169,6 +2182,10 @@
                 "cadence_quarterly": "Per kwartaal",
                 "cadence_yearly": "Jaarlijks",
                 "cadence_once": "Eenmalig"
+            },
+            "party_field": {
+                "save_for_next_time": "Wil je “{name}” bewaren voor een volgende keer?",
+                "save_for_next_time_hint": "Zorg ervoor dat deze naam in je groepen blijft staan, zodat hij automatisch wordt aangevuld bij inkomsten, rekeningen en leningen."
             },
             "move": {
                 "toast_moved": "Geld dat tussen potten is overgeheveld",
@@ -2300,6 +2317,9 @@
                 "name_placeholder": "bijv. Netflix, huren",
                 "name_free_placeholder": "Typ een eigen naam voor de factuur in…",
                 "name_edit_placeholder": "bijv. huur",
+                "option_badge_vendor": "Leverancier",
+                "option_badge_bill_type": "Rekeningtype",
+                "bill_type_for_vendor": "Welke {vendor}-rekening is dit?",
                 "amount_label": "Bedrag per maand ({symbol})",
                 "amount_label_weekly": "Bedrag per week ({symbol})",
                 "amount_label_quarterly": "Bedrag per kwartaal ({symbol})",
@@ -2408,6 +2428,8 @@
                     "lender_example": "bijv. ING, DUO, Klarna",
                     "lender_example_short": "bijv. ING, DUO",
                     "lender_free": "Typ de naam van een kredietverstrekker in…",
+                    "option_badge_lender": "Kredietverstrekker",
+                    "type_for_lender": "Welke {lender}-schuld is dit?",
                     "balance": "Saldo ({symbol})",
                     "interest": "Rentevoet (% per jaar)",
                     "interest_placeholder": "12,9",
@@ -4197,6 +4219,7 @@
             "settings_import": "Importeren — Instellingen",
             "settings_jars": "Potten — Instellingen",
             "settings_debt": "Schulden — Instellingen",
+            "settings_parties": "Partijen — Instellingen",
             "settings_bank": "Bank — Instellingen",
             "banking_callback": "Verbindende bank…",
             "settings_automation": "Automatiseringsinstellingen",
@@ -4628,6 +4651,10 @@
                     "label": "Schulden",
                     "sub": "Afbouwmethode"
                 },
+                "parties": {
+                    "label": "Partijen",
+                    "sub": "Opgeslagen namen in verschillende valuta’s"
+                },
                 "bank": {
                     "label": "Bank",
                     "sub": "Rekeningen en PSD2"
@@ -4914,6 +4941,27 @@
                     "minimal_tag": "Uitgangssituatie",
                     "minimal_desc": "Betaal uitsluitend het contractuele minimum — geen extra bedrag, geen overdracht.",
                     "minimal_metric": "Langzaamste pad · Handig als vergelijkingsbasis"
+                },
+                "parties": {
+                    "entity": "Feest",
+                    "eyebrow": "Jullie feestjes",
+                    "blurb": "Namen die je hebt opgeslagen voor een volgende keer — werkgevers, verhuurders, kredietverstrekkers, winkels. Pas de opmaak hier aan; als je de tekst verwijdert, blijft deze op de oude rijen staan.",
+                    "empty": "Er zijn nog geen gegevens opgeslagen. Vink ‘Opslaan voor de volgende keer’ aan wanneer je een vrije naam invoert bij inkomsten, rekeningen of leningen.",
+                    "field_name": "Naam",
+                    "field_note": "Opmerking",
+                    "field_icon": "Pictogram",
+                    "field_color": "Kleur",
+                    "field_website": "Website",
+                    "usage_none": "Niet gekoppeld aan rijen",
+                    "usage_count": "Toegepast op {count} rijen",
+                    "confirm_remove": "Feestje afzeggen?",
+                    "remove_hint": "Als je een partij verwijdert, wordt alleen de koppeling verwijderd. Bij inkomsten, rekeningen en leningen blijft de naam als gewone tekst staan.",
+                    "suggest": "Een suggestie doen aan Rumtelo",
+                    "suggest_done": "Voorgesteld — bedankt",
+                    "status_open": "Aanbevolen",
+                    "status_accepted": "In de catalogus",
+                    "status_rejected": "Niet toegevoegd",
+                    "already_catalog": "Staat al in de catalogus"
                 },
                 "bank": {
                     "eyebrow": "Open Banking",

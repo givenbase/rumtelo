@@ -1,4 +1,4 @@
-import { Entity, Enum, Index, Property, Unique } from '@mikro-orm/core';
+import { Entity, Enum, Index, Property, Unique } from '@mikro-orm/decorators/legacy';
 import { PlanKey } from '@rumtelo/contracts';
 
 import { entityConfig } from '../../../../common/database/entity-config.util';

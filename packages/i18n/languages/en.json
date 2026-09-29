@@ -61,6 +61,12 @@
                     "bill_paused_no_settlement": "Paused or ended bills cannot take new settlements.",
                     "due_month_required": "Pick which month you are charged for quarterly or yearly bills.",
                     "income_kind_cadence_locked": "Type and frequency cannot change on an existing income. End it and create a new one.",
+                    "party_or_merchant": "Pick either a catalog merchant or one of your saved parties, not both.",
+                    "party_name_taken": "You already have a party with this name.",
+                    "party_not_found": "That party is not in your list.",
+                    "party_merge_same": "Choose two different parties to merge.",
+                    "party_already_suggested": "You already suggested this party to Rumtelo.",
+                    "party_already_in_catalog": "This party is already linked to the Rumtelo catalog.",
                     "period_closed": "This month is closed — you cannot add or change anything for that period.",
                     "month_close_incomplete": "Finish open work before closing this month ({inbox} unsorted in inbox, {bills} bills unpaid or unskipped).",
                     "month_close_prior_open": "Close {period} first — months must be finished in order so the log stays honest.",
@@ -233,6 +239,7 @@
             "no_matches_other": "No matches — pick Other for a custom name.",
             "no_matches_keep_typing": "No matches — keep typing for a custom name.",
             "change": "Change",
+            "option_badge_custom": "Custom",
             "other": "Other…",
             "skip": "Skip",
             "selected": "Selected",
@@ -2152,6 +2159,12 @@
                 "toast_ended": "Income ended",
                 "name_placeholder": "e.g. salary",
                 "free_text_placeholder": "Describe where it came from…",
+                "received_from": "Received from (optional)",
+                "received_from_placeholder": "e.g. ACME BV, DEGIRO, HelloFresh",
+                "option_badge_payer": "Payer",
+                "option_badge_saved": "Saved",
+                "option_group_saved": "Your parties",
+                "option_group_catalog": "Catalog",
                 "kind_salary": "Salary",
                 "kind_freelance": "Freelance",
                 "kind_benefit": "Benefit",
@@ -2169,6 +2182,10 @@
                 "cadence_quarterly": "Quarterly",
                 "cadence_yearly": "Yearly",
                 "cadence_once": "One-time"
+            },
+            "party_field": {
+                "save_for_next_time": "Save “{name}” for next time?",
+                "save_for_next_time_hint": "Keeps this name in your parties so it autocompletes on income, bills, and loans."
             },
             "move": {
                 "toast_moved": "Money moved between jars",
@@ -2300,6 +2317,9 @@
                 "name_placeholder": "e.g. Netflix, rent",
                 "name_free_placeholder": "Type a custom bill name…",
                 "name_edit_placeholder": "e.g. rent",
+                "option_badge_vendor": "Vendor",
+                "option_badge_bill_type": "Bill type",
+                "bill_type_for_vendor": "Which {vendor} bill is this?",
                 "amount_label": "Amount per month ({symbol})",
                 "amount_label_weekly": "Amount per week ({symbol})",
                 "amount_label_quarterly": "Amount per quarter ({symbol})",
@@ -2408,6 +2428,8 @@
                     "lender_example": "e.g. ING, DUO, Klarna",
                     "lender_example_short": "e.g. ING, DUO",
                     "lender_free": "Type a lender name…",
+                    "option_badge_lender": "Lender",
+                    "type_for_lender": "Which {lender} debt is this?",
                     "balance": "Balance ({symbol})",
                     "interest": "Interest rate (% per year)",
                     "interest_placeholder": "12,9",
@@ -4197,6 +4219,7 @@
             "settings_import": "Import — Settings",
             "settings_jars": "Jars — Settings",
             "settings_debt": "Debt — Settings",
+            "settings_parties": "Parties — Settings",
             "settings_bank": "Bank — Settings",
             "banking_callback": "Connecting bank…",
             "settings_automation": "Automation settings",
@@ -4628,6 +4651,10 @@
                     "label": "Debt",
                     "sub": "Payoff method"
                 },
+                "parties": {
+                    "label": "Parties",
+                    "sub": "Saved names across money"
+                },
                 "bank": {
                     "label": "Bank",
                     "sub": "Accounts and PSD2"
@@ -4914,6 +4941,27 @@
                     "minimal_tag": "Baseline",
                     "minimal_desc": "Pay each contractual minimum only — no extra, no rollover.",
                     "minimal_metric": "Slowest path · Useful as a comparison baseline"
+                },
+                "parties": {
+                    "entity": "Party",
+                    "eyebrow": "Your parties",
+                    "blurb": "Names you saved for next time — employers, landlords, lenders, shops. Edit style here; deleting keeps the text on old rows.",
+                    "empty": "No saved parties yet. Tick “Save for next time” when you type a free name on income, bills, or loans.",
+                    "field_name": "Name",
+                    "field_note": "Note",
+                    "field_icon": "Icon",
+                    "field_color": "Color",
+                    "field_website": "Website",
+                    "usage_none": "Not linked to any rows",
+                    "usage_count": "Used on {count} rows",
+                    "confirm_remove": "Remove party?",
+                    "remove_hint": "Removing a party clears the link only. Income, bills, and loans keep the name as plain text.",
+                    "suggest": "Suggest to Rumtelo",
+                    "suggest_done": "Suggested — thanks",
+                    "status_open": "Suggested",
+                    "status_accepted": "In catalog",
+                    "status_rejected": "Not added",
+                    "already_catalog": "Already in catalog"
                 },
                 "bank": {
                     "eyebrow": "Open Banking",

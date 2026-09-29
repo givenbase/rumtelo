@@ -1,11 +1,12 @@
-import { Collection, Entity, Enum, OneToMany, Property, Unique } from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import { Entity, Enum, OneToMany, Property, Unique } from '@mikro-orm/decorators/legacy';
 import { PlanKey } from '@rumtelo/contracts';
 
 import { BaseEntity } from '../../../common/database/base.entity';
 import { MoneyType } from '../../../common/database/money.type';
 import { NativeEnum } from '../../../common/database/native-enum.util';
 import { entityConfig } from '../../../common/database/entity-config.util';
-import type { PlanCapabilityGrant } from './plan-capability-grant/plan-capability-grant.entity';
+import { PlanCapabilityGrant } from './plan-capability-grant/plan-capability-grant.entity';
 
 /**
  * Plan Entity
@@ -48,6 +49,6 @@ export class Plan extends BaseEntity {
 
     // ? RELATIONSHIPS
     /** Capabilities this tier unlocks (1:N to the grant rows). */
-    @OneToMany('PlanCapabilityGrant', 'plan')
+    @OneToMany(() => PlanCapabilityGrant, entity => entity.plan)
     grants = new Collection<PlanCapabilityGrant>(this);
 }

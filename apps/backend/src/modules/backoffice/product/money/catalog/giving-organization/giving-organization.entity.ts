@@ -1,8 +1,9 @@
-import { Entity, Property, Unique } from '@mikro-orm/core';
+import { Entity, Property, Unique } from '@mikro-orm/decorators/legacy';
 import type { GivingCause, GivingSignal } from '@rumtelo/contracts';
 
 import { CatalogEntity } from '../../../../../../common/database/catalog.entity';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import { Jsonb } from '../../../../../../common/database/jsonb.util';
 
 /**
  * Giving Organization Entity
@@ -45,11 +46,11 @@ export class GivingOrganization extends CatalogEntity {
     reporting: string | null = null;
 
     /** GivingCause keys this organization serves (TS enum — no catalog table). */
-    @Property({ type: 'json', default: [] })
+    @Property(Jsonb({ emptyArray: true }))
     causes: GivingCause[] = [];
 
     /** Independent signals: evaluator, claim, source URL, year confirmed. */
-    @Property({ type: 'json', default: [] })
+    @Property(Jsonb({ emptyArray: true }))
     signals: GivingSignal[] = [];
 
     /** Official website. */

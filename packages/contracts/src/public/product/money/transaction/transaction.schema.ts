@@ -15,6 +15,7 @@ import {
     PeriodKey,
 } from '../../../../common/common.schema';
 import { AccountKind, TransactionSource, TransactionStatus } from '../enums';
+import { CounterpartyRef, SaveParty } from '../party/party.schema';
 
 // ====================================================================
 // Transactions
@@ -45,7 +46,8 @@ export const Transaction = z.object({
     amount: Money,
     bookedOn: IsoDate,
     description: z.string().max(280),
-    counterparty: z.string().max(160).nullable(),
+    /** Other side — see `CounterpartyRef` for the three states. */
+    ...CounterpartyRef.shape,
     /**
      * Stable Transaction In source tag (e.g. GIFT, REFUND).
      * Null for Out / free-typed In / bank imports.
@@ -83,7 +85,8 @@ export const CreateTransaction = z.object({
     amount: Money,
     bookedOn: IsoDate,
     description: z.string().min(1).max(280),
-    counterparty: z.string().max(160).nullish(),
+    ...CounterpartyRef.partial().shape,
+    ...SaveParty.shape,
     /** Set when logging In from a known preset — omit/null for Out or custom labels. */
     inflowKey: z.string().min(1).max(64).nullish(),
     note: z.string().max(500).nullish(),

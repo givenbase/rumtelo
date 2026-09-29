@@ -21,6 +21,11 @@ export class IncomeController {
         return implement(contract.money.income.create).handler(({ input }) =>
             this.income.create({
                 name: input.name,
+                presetKey: input.presetKey,
+                counterparty: input.counterparty,
+                merchantKey: input.merchantKey,
+                partyId: input.partyId,
+                saveParty: input.saveParty,
                 kind: input.kind,
                 amount: input.amount,
                 cadence: input.cadence,

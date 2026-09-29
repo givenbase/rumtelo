@@ -38,7 +38,7 @@ export type InviteFormValues = z.infer<ReturnType<typeof createInviteFormSchema>
 
 export function createPeriodFormSchema(_v: SettingsFormT) {
     return z.object({
-        periodStartDay: z.number().int().min(1).max(28),
+        periodStartDay: z.int().min(1).max(28),
     });
 }
 
@@ -61,7 +61,7 @@ export function createBankAccountFormSchema(msg: SettingsFormT) {
                     }
                     return isValidIban(normalizeIban(trimmed));
                 },
-                { message: msg('pages.settings.panels.bank.iban') }
+                { error: msg('pages.settings.panels.bank.iban') }
             ),
         kind: z.enum(AccountKind),
         bankId: z.uuid(),

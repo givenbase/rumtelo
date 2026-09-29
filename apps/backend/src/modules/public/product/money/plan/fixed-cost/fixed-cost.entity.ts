@@ -1,18 +1,31 @@
-import { Entity, Enum, Index, ManyToOne, Property, Unique } from '@mikro-orm/core';
+import {
+    Check,
+    Entity,
+    Enum,
+    Index,
+    ManyToOne,
+    Property,
+    Unique,
+} from '@mikro-orm/decorators/legacy';
 import { Cadence, FlowDirection } from '@rumtelo/contracts';
 
+import { CatalogKey } from '../../../../../../common/database/catalog-key.util';
 import { HouseholdEntity } from '../../../../../../common/database/household.entity';
 import { MoneyType } from '../../../../../../common/database/money.type';
 import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import { FixedCostPreset } from '../../../../../backoffice/product/money/preset/fixed-cost/fixed-cost.entity';
+import { MerchantPreset } from '../../../../../backoffice/product/money/preset/merchant/merchant.entity';
 import { Debt } from '../../targets/debt/debt.entity';
 import { Category } from '../jar/category.entity';
 import { Jar } from '../jar/jar.entity';
+import { Party } from '../party/party.entity';
 
 /**
  * Fixed Cost Entity
  *
  * Recurring obligations. They draw from a jar so they are visible before they hit.
+ * `name` + optional `presetKey` = what bill; counterparty triple = who is paid.
  *
  * @see FixedCostPreset — backoffice starting points the household picks from
  * @see https://mikro-orm.io/docs/defining-entities
@@ -22,9 +35,18 @@ import { Jar } from '../jar/jar.entity';
 @Unique({ properties: ['debt'] })
 @Index({ properties: ['jar'] })
 @Index({ properties: ['category'] })
+@Index({ properties: ['party'] })
+@Check({
+    name: 'money_fixed_cost_merchant_xor_party',
+    expression: '(merchant_key IS NULL) OR (party_id IS NULL)',
+})
+@Check({
+    name: 'money_fixed_cost_counterparty_when_linked',
+    expression: '((merchant_key IS NULL) AND (party_id IS NULL)) OR (counterparty IS NOT NULL)',
+})
 export class FixedCost extends HouseholdEntity {
     // ? PROPERTIES
-    /** Household-facing label ("Rent", "Netflix"). */
+    /** Household-facing label ("Rent", "Netflix") — snapshot of the preset or typed name. */
     @Property({ length: 120 })
     name!: string;
 
@@ -32,7 +54,10 @@ export class FixedCost extends HouseholdEntity {
     @Property({ type: 'text', nullable: true })
     note: string | null = null;
 
-    /** Who receives it (landlord, insurer, organization). Mirrors Transaction.counterparty. */
+    /**
+     * Who receives it — display snapshot (landlord, insurer, organization).
+     * Always set when `merchantKey` or `party` is; survives both being cleared.
+     */
     @Property({ length: 160, nullable: true })
     counterparty: string | null = null;
 
@@ -84,4 +109,25 @@ export class FixedCost extends HouseholdEntity {
     /** Planned payment for a debt — see class-level UNIQUE. Cleared if the debt goes. */
     @ManyToOne(() => Debt, { nullable: true, deleteRule: 'set null' })
     debt: Debt | null = null;
+
+    /**
+     * Household party when the payee is one of their saved names (N:1, optional).
+     * Mutually exclusive with `merchantKey`.
+     */
+    @ManyToOne(() => Party, { mapToPk: true, nullable: true, deleteRule: 'set null' })
+    party: string | null = null;
+
+    /**
+     * Bill-type catalog pick — natural-key FK on `FixedCostPreset.key`.
+     * Null when the name was free-typed. Retiring the preset nulls this; `name` stays.
+     */
+    @ManyToOne(() => FixedCostPreset, CatalogKey('preset_key'))
+    presetKey: string | null = null;
+
+    /**
+     * Catalog merchant when the payee was picked from the catalog (N:1, optional).
+     * Natural-key FK on `MerchantPreset.key`.
+     */
+    @ManyToOne(() => MerchantPreset, CatalogKey('merchant_key'))
+    merchantKey: string | null = null;
 }

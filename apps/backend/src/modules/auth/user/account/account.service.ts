@@ -8,6 +8,7 @@ import type {
 } from '@rumtelo/contracts';
 
 import { currentUserId } from '../../../../common/household/household.context';
+import { apiUnauthorized } from '../../../../common/errors/api-user-error';
 import { AuthUser } from '../managed/user/auth-user.entity';
 import { Account } from './account.entity';
 
@@ -61,12 +62,16 @@ export class AccountService {
      * Ensure the Account row exists for a Better Auth user (onboarding / members).
      * Does not create settings — that stays in AccountSettingsService.
      * Optional {@link seed} fills empty profile fields when creating or when still null.
+     *
+     * Ghost sessions (Redis session after a DB wipe) → 401 so the client re-auths
+     * instead of retrying INTERNAL_SERVER_ERROR forever.
      */
     async ensureAccountForUser(
         userId: string,
         seed?: AccountProfileSeed
     ): Promise<{ account: Account; user: AuthUser }> {
-        const user = await this.em.findOneOrFail(AuthUser, { id: userId });
+        const user = await this.em.findOne(AuthUser, { id: userId });
+        if (!user) throw apiUnauthorized('not_authenticated');
         let account = await this.em.findOne(Account, { user: userId }, { populate: ['user'] });
         if (!account) {
             account = this.em.create(Account, {

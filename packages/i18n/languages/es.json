@@ -61,6 +61,12 @@
                     "bill_paused_no_settlement": "Las facturas en suspenso o cerradas no pueden aceptar nuevas liquidaciones.",
                     "due_month_required": "Elige en qué mes se te cobra en el caso de las facturas trimestrales o anuales.",
                     "income_kind_cadence_locked": "El tipo y la frecuencia no se pueden modificar en una renta ya existente. Cierra esa renta y crea una nueva.",
+                    "party_or_merchant": "Elige entre un comerciante del catálogo o uno de tus contactos guardados, pero no ambos.",
+                    "party_name_taken": "Ya hay un grupo con ese nombre.",
+                    "party_not_found": "Esa fiesta no está en tu lista.",
+                    "party_merge_same": "Elige dos grupos diferentes para fusionarlos.",
+                    "party_already_suggested": "Ya le has recomendado esta fiesta a Rumtelo.",
+                    "party_already_in_catalog": "Esta fiesta ya está vinculada al catálogo de Rumtelo.",
                     "period_closed": "Este mes está cerrado; no se puede añadir ni modificar nada correspondiente a ese periodo.",
                     "month_close_incomplete": "Termina las tareas pendientes antes de que termine el mes ({inbox} sin clasificar en la bandeja de entrada, {bills} facturas pendientes de pago o que no se han saltado).",
                     "month_close_prior_open": "Cierra primero {period}: hay que completar los meses en orden para que el registro sea fiel a la realidad.",
@@ -233,6 +239,7 @@
             "no_matches_other": "No se han encontrado coincidencias: selecciona «Otro» para introducir un nombre personalizado.",
             "no_matches_keep_typing": "No se han encontrado resultados: sigue escribiendo para crear un nombre personalizado.",
             "change": "Cambiar",
+            "option_badge_custom": "Personalizado",
             "other": "Otros…",
             "skip": "Saltar",
             "selected": "Seleccionado",
@@ -2152,6 +2159,12 @@
                 "toast_ended": "Los ingresos han finalizado",
                 "name_placeholder": "p. ej., el sueldo",
                 "free_text_placeholder": "Explica de dónde viene…",
+                "received_from": "Enviado por (opcional)",
+                "received_from_placeholder": "p. ej., ACME BV, DEGIRO, HelloFresh",
+                "option_badge_payer": "Pagador",
+                "option_badge_saved": "Guardado",
+                "option_group_saved": "Tus fiestas",
+                "option_group_catalog": "Catálogo",
                 "kind_salary": "Salario",
                 "kind_freelance": "Autónomo",
                 "kind_benefit": "Beneficio",
@@ -2169,6 +2182,10 @@
                 "cadence_quarterly": "Trimestral",
                 "cadence_yearly": "Anual",
                 "cadence_once": "Único"
+            },
+            "party_field": {
+                "save_for_next_time": "¿Guardas «{name}» para la próxima vez?",
+                "save_for_next_time_hint": "Añade este nombre a tus grupos para que se autocomplete en los ingresos, las facturas y los préstamos."
             },
             "move": {
                 "toast_moved": "El dinero que se traspasó de un tarro a otro",
@@ -2300,6 +2317,9 @@
                 "name_placeholder": "p. ej., Netflix, alquiler",
                 "name_free_placeholder": "Escribe un nombre personalizado para la factura…",
                 "name_edit_placeholder": "p. ej., alquiler",
+                "option_badge_vendor": "Proveedor",
+                "option_badge_bill_type": "Tipo de factura",
+                "bill_type_for_vendor": "¿Qué proyecto de ley {vendor} es este?",
                 "amount_label": "Importe mensual ({symbol})",
                 "amount_label_weekly": "Importe semanal ({symbol})",
                 "amount_label_quarterly": "Importe por trimestre ({symbol})",
@@ -2408,6 +2428,8 @@
                     "lender_example": "p. ej., ING, DUO, Klarna",
                     "lender_example_short": "p. ej., ING, DUO",
                     "lender_free": "Escribe el nombre de una entidad crediticia…",
+                    "option_badge_lender": "Entidad crediticia",
+                    "type_for_lender": "¿De qué deuda {lender} se trata?",
                     "balance": "Saldo ({symbol})",
                     "interest": "Tipo de interés (% anual)",
                     "interest_placeholder": "12,9",
@@ -4197,6 +4219,7 @@
             "settings_import": "Importar — Configuración",
             "settings_jars": "Jars — Configuración",
             "settings_debt": "Deuda — Configuración",
+            "settings_parties": "Fiestas — Configuración",
             "settings_bank": "Banco — Ajustes",
             "banking_callback": "Banco de conexión…",
             "settings_automation": "Configuración de la automatización",
@@ -4628,6 +4651,10 @@
                     "label": "Deuda",
                     "sub": "Método de pago"
                 },
+                "parties": {
+                    "label": "Partidos",
+                    "sub": "Nombres guardados en diferentes cuentas"
+                },
                 "bank": {
                     "label": "Banco",
                     "sub": "Cuentas y PSD2"
@@ -4914,6 +4941,27 @@
                     "minimal_tag": "Situación inicial",
                     "minimal_desc": "Paga únicamente el mínimo contractual: ni más, ni acumulado.",
                     "minimal_metric": "La ruta más lenta · Útil como referencia para la comparación"
+                },
+                "parties": {
+                    "entity": "Fiesta",
+                    "eyebrow": "Tus fiestas",
+                    "blurb": "Nombres que has guardado para la próxima vez: empresas, propietarios, entidades crediticias, tiendas. Edita el estilo aquí; al borrar, el texto de las filas anteriores se mantiene.",
+                    "empty": "Aún no hay datos guardados. Marca la casilla «Guardar para la próxima vez» cuando introduzcas un nombre libre en «Ingresos», «Facturas» o «Préstamos».",
+                    "field_name": "Nombre",
+                    "field_note": "Nota",
+                    "field_icon": "Icono",
+                    "field_color": "Color",
+                    "field_website": "Página web",
+                    "usage_none": "No está vinculado a ninguna fila",
+                    "usage_count": "Se ha utilizado en {count} filas",
+                    "confirm_remove": "¿Eliminar el grupo?",
+                    "remove_hint": "Al eliminar un participante, solo se borra el enlace. Los ingresos, las facturas y los préstamos conservan el nombre como texto sin formato.",
+                    "suggest": "Enviar una sugerencia a Rumtelo",
+                    "suggest_done": "Sugerido — gracias",
+                    "status_open": "Sugerido",
+                    "status_accepted": "En el catálogo",
+                    "status_rejected": "No se ha añadido",
+                    "already_catalog": "Ya está en el catálogo"
                 },
                 "bank": {
                     "eyebrow": "Conexión bancaria",
