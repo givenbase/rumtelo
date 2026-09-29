@@ -2,6 +2,7 @@ import { Collection, Entity, ManyToMany, Property, Unique } from '@mikro-orm/cor
 
 import { CatalogEntity } from '../../../../../../common/database/catalog.entity';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import { Jsonb } from '../../../../../../common/database/jsonb.util';
 
 /**
  * Bank catalog — company pick-list of institutions (logo, countries, IBAN code).
@@ -28,7 +29,7 @@ export class Bank extends CatalogEntity {
     description: string | null = null;
 
     /** ISO-2 markets this institution serves, e.g. ['NL'] or ['NL','DE']. */
-    @Property({ type: 'json' })
+    @Property(Jsonb())
     countries!: string[];
 
     /** NL IBAN positions 5–8 when applicable (INGB, ABNA). */

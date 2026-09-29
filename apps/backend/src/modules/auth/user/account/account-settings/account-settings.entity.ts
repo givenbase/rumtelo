@@ -9,6 +9,7 @@ import {
 
 import { BaseEntity } from '../../../../../common/database/base.entity';
 import { entityConfig } from '../../../../../common/database/entity-config.util';
+import { Jsonb } from '../../../../../common/database/jsonb.util';
 import { NativeEnum } from '../../../../../common/database/native-enum.util';
 import { Account } from '../account.entity';
 
@@ -27,7 +28,7 @@ import { Account } from '../account.entity';
 export class AccountSettings extends BaseEntity {
     // ? PROPERTIES
     /** Guided tour / Help walkthrough progress (offer + per-chapter status). */
-    @Property({ type: 'json' })
+    @Property(Jsonb())
     tour: AccountTourProgress = { ...DEFAULT_ACCOUNT_TOUR_PROGRESS, tours: {} };
 
     /**

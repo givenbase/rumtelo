@@ -11,6 +11,7 @@ import type { SpendingStyle } from '@rumtelo/contracts';
 
 import { CatalogEntity } from '../../../../../../common/database/catalog.entity';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import { Jsonb } from '../../../../../../common/database/jsonb.util';
 import { IncomePosture } from '../../catalog/income-posture/income-posture.entity';
 import { WealthStage } from '../../catalog/wealth-stage/wealth-stage.entity';
 
@@ -42,7 +43,7 @@ export class LeverPreset extends CatalogEntity {
     description!: string;
 
     /** Empty = relevant for every spending style (contracts enum values). */
-    @Property({ type: 'json', default: [] })
+    @Property(Jsonb({ emptyArray: true }))
     spendingStyles: SpendingStyle[] = [];
 
     // ? UI METADATA

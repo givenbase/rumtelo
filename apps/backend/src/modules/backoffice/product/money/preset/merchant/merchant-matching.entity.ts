@@ -2,6 +2,7 @@ import { Entity, OneToOne, Property } from '@mikro-orm/core';
 
 import { BaseEntity } from '../../../../../../common/database/base.entity';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import { Jsonb } from '../../../../../../common/database/jsonb.util';
 
 import { MerchantPreset } from './merchant.entity';
 
@@ -39,11 +40,11 @@ export class MerchantMatching extends BaseEntity {
      * Extra bank-feed needles (Revolut / SEPA / card descriptors).
      * Matched case-insensitively alongside matchValue.
      */
-    @Property({ type: 'json', default: [] })
+    @Property(Jsonb({ emptyArray: true }))
     aliases: string[] = [];
 
     /** Aggregator merchant ids when Open Banking is wired. */
-    @Property({ type: 'json' })
+    @Property(Jsonb())
     providerIds: Record<string, string> = {};
 
     // ? RELATIONSHIPS

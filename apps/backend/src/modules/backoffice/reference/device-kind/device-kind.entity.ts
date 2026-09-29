@@ -3,6 +3,7 @@ import { DeviceConnection } from '@rumtelo/contracts';
 
 import { CatalogEntity } from '../../../../common/database/catalog.entity';
 import { entityConfig } from '../../../../common/database/entity-config.util';
+import { Jsonb } from '../../../../common/database/jsonb.util';
 import { NativeEnum } from '../../../../common/database/native-enum.util';
 
 /**
@@ -30,7 +31,7 @@ export class DeviceKindCatalog extends CatalogEntity {
     icon!: string;
 
     /** Suggested capabilities for the pair form — stored as JSON string[]. */
-    @Property({ type: 'json' })
+    @Property(Jsonb())
     defaultCapabilities!: string[];
 
     // ? ENUMS

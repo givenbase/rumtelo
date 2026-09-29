@@ -2,8 +2,9 @@ import { Entity, Enum, Property, Unique } from '@mikro-orm/core';
 import { JarKey, type JarCapabilities, type JarGuide } from '@rumtelo/contracts';
 
 import { BaseEntity } from '../../../../../../common/database/base.entity';
-import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import { Jsonb } from '../../../../../../common/database/jsonb.util';
+import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 
 /**
  * Jar Template Entity
@@ -48,14 +49,14 @@ export class JarTemplate extends BaseEntity {
     sortOrder = 0;
 
     /** Coach helper copy — what belongs in this jar. */
-    @Property({ type: 'json', nullable: true })
+    @Property(Jsonb({ nullable: true }))
     guide: JarGuide | null = null;
 
     /**
      * What jars of this key may do (spend / save / invest / safe-to-spend).
      * Mirror of contracts JAR_CAPABILITIES[key]; copied onto household jars.
      */
-    @Property({ type: 'json' })
+    @Property(Jsonb())
     capabilities!: JarCapabilities;
 
     /** Soft-disable without deleting historical household jars that used this key. */

@@ -2,8 +2,9 @@ import { Entity, Enum, Index, ManyToOne, Property, Unique } from '@mikro-orm/cor
 import { DeviceConnection } from '@rumtelo/contracts';
 
 import { HouseholdEntity } from '../../../../common/database/household.entity';
-import { NativeEnum } from '../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../common/database/entity-config.util';
+import { Jsonb } from '../../../../common/database/jsonb.util';
+import { NativeEnum } from '../../../../common/database/native-enum.util';
 import { Account } from '../../../auth/user/account/account.entity';
 
 /**
@@ -43,7 +44,7 @@ export class Device extends HouseholdEntity {
     externalId: string | null = null;
 
     /** Live capability set — may diverge from catalog defaults after edit. */
-    @Property({ type: 'json' })
+    @Property(Jsonb())
     capabilities!: string[];
 
     /** When the device was first registered with this household. */

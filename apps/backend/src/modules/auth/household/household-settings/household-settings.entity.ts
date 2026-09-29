@@ -12,6 +12,7 @@ import {
 
 import { entityConfig } from '../../../../common/database/entity-config.util';
 import { HouseholdEntity } from '../../../../common/database/household.entity';
+import { Jsonb } from '../../../../common/database/jsonb.util';
 import { NativeEnum } from '../../../../common/database/native-enum.util';
 import { Audience } from '../../../backoffice/product/money/catalog/audience/audience.entity';
 
@@ -62,22 +63,22 @@ export class HouseholdSettings extends HouseholdEntity {
      * Money board: period rollover, income stability, debt payoff order.
      * Queried via the settings row — not filtered as SQL columns.
      */
-    @Property({ type: 'json' })
+    @Property(Jsonb())
     money: HouseholdMoneySettings = { ...DEFAULT_MONEY_SETTINGS };
 
     /** Week-check reminder slot (weekday + local HH:mm). Null day/at disables. */
-    @Property({ type: 'json' })
+    @Property(Jsonb())
     weekCheck: HouseholdWeekCheckSettings = { ...DEFAULT_WEEK_CHECK_SETTINGS };
 
     /** Feature toggles for the board (bank sync, coach, …). */
-    @Property({ type: 'json' })
+    @Property(Jsonb())
     features: HouseholdFeatureSettings = { ...DEFAULT_FEATURE_SETTINGS };
 
     /**
      * Extensible household Q&A (onboarding / coach prompts).
      * Keys are stable question ids — grow without new columns.
      */
-    @Property({ type: 'json' })
+    @Property(Jsonb())
     answers: HouseholdAnswers = {};
 
     /**

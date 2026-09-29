@@ -123,6 +123,8 @@ Rumtelo calendar-date suffix is **`*On`** (Rails-style). Prefer `startedOn` / `e
 
 1. **Prefer a normalised child table** when you filter, join, sum, or cascade on elements (see `week-check-allocation` — allocations are rows, not jsonb on the week-check).
 2. **Use jsonb** for opaque bags, small string lists, or snapshots that are always read/written as a whole.
+   - Prefer `@Property(Jsonb())` from `common/database/jsonb.util` — same role as `NativeEnum` for enums. Do not use `type: 'json'`; it drifts the snapshot and re-emits alter noise on every `db:gen`.
+   - Empty-array defaults: `@Property(Jsonb({ emptyArray: true }))` plus `= []` on the field. Do **not** use `default: []` alone — MikroORM cannot emit a stable SQL default from a JS array.
 3. **Name the bag by contents**, not by storage:
    - Arrays → plural (`aliases`, `unlocks`)
    - Objects → `metadata` / `settings` / `*Snapshot` / `*Payload` / `*Json` when the noun alone is ambiguous
@@ -246,6 +248,7 @@ When adding a new **1:1** household-owned entity, add its class name to `HOUSEHO
 - [ ] Relation fields are nouns (`household`, `account`, `jar`) — never `householdId` / `accountId` on `@ManyToOne` / `@OneToOne`
 - [ ] Booleans named `is*` / `has*` / `can*` (affirmative)
 - [ ] Temporal suffixes match types (`*Day` int, `*On` date, `*At` timestamptz) — never `dueDate` for day-of-month
+- [ ] jsonb fields use `@Property(Jsonb())` (empty arrays: `Jsonb({ emptyArray: true })`) — never `type: 'json'`
 - [ ] jsonb fields are plural arrays or clear bags (`metadata` / `*Json` / `*Payload`)
 - [ ] Class JSDoc with `@see` link
 - [ ] `entityConfig({ schema, domain, tableName })` correct

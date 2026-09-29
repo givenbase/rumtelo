@@ -2,8 +2,9 @@ import { Entity, Enum, Property, Unique } from '@mikro-orm/core';
 import { PlanKey, type SpendingStyle } from '@rumtelo/contracts';
 
 import { CatalogEntity } from '../../../../../../../common/database/catalog.entity';
-import { NativeEnum } from '../../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../../common/database/entity-config.util';
+import { Jsonb } from '../../../../../../../common/database/jsonb.util';
+import { NativeEnum } from '../../../../../../../common/database/native-enum.util';
 
 /**
  * Book Preset Entity
@@ -56,7 +57,7 @@ export class BookPreset extends CatalogEntity {
     isbn13: string | null = null;
 
     /** Empty = relevant for every spending style. Otherwise a suggestion, not a lock. */
-    @Property({ type: 'json', default: [] })
+    @Property(Jsonb({ emptyArray: true }))
     spendingStyles: SpendingStyle[] = [];
 
     /** Where to get the book or who to support. We do not host the work. */
