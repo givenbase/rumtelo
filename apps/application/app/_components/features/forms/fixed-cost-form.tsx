@@ -898,7 +898,7 @@ export function FixedCostForm({
                                 </Button>
                                 <Button
                                     as={Link}
-                                    href={SETTINGS_HREF.account}
+                                    href={SETTINGS_HREF.household}
                                     size="sm"
                                     variant="secondary">
                                     {tProfile('open_settings')}

@@ -733,7 +733,7 @@
                 "saver-play": "Votre approche est plutôt prudente : un peu plus de « jeu » pourrait rendre ce projet viable. La joie planifiée n'est pas du gaspillage."
             },
             "helpers": {
-                "mark_title": "Conseil de The Coach : activez ou désactivez les astuces à l'écran dans Réglages → Compte",
+                "mark_title": "Conseil de The Coach : activez ou désactivez les astuces à l'écran dans Paramètres → Préférences",
                 "mark_label": "L'entraîneur",
                 "tip_aria": "L'entraîneur : {title}",
                 "locked_cta": "🔒 {cta}",
@@ -2580,7 +2580,7 @@
             },
             "household_profile": {
                 "filter_tip_title": "La liste des factures est personnalisée",
-                "filter_tip_body": "Certains types de factures restent masqués en fonction du profil de votre foyer. Vous pouvez modifier ce paramètre dans les « Paramètres » ou afficher tous les types pour ce formulaire.",
+                "filter_tip_body": "Certains types de factures restent masqués en fonction du profil de votre foyer. Modifiez-le dans Paramètres → Ménage, ou affichez tous les types pour ce formulaire.",
                 "show_all": "Tout afficher",
                 "use_filter": "Utiliser le filtre de profil",
                 "open_settings": "Profil du ménage",
@@ -2827,7 +2827,7 @@
                 "replay_tour": "Revivre le circuit",
                 "no_tour": "Il n'y a pas encore de visite guidée sur cet écran — le descriptif ci-dessus présente les éléments essentiels.",
                 "helpers_label": "Diffuser « The Coach » à l'écran",
-                "helpers_hint": "Lignes « Pourquoi » et fiches « jar » de The Coach (✦ The Coach). Identique à Paramètres → Compte. Activé par défaut pour les débutants.",
+                "helpers_hint": "Lignes « Pourquoi » et fiches « jar » de The Coach (✦ The Coach). Identique à Paramètres → Préférences. Activé par défaut pour les débutants.",
                 "helpers_on": "Le",
                 "helpers_off": "Désactivé",
                 "settings": {
@@ -4272,7 +4272,7 @@
             "money_style": "Votre rapport à l'argent",
             "money_style_body": "Il n'y a pas de bonne réponse. Seules les étiquettes souples sont disponibles, pour que les embouts s'adaptent à vous. Les membres d'un même foyer peuvent faire des choix différents par la suite.",
             "coach": "Le coach reste à vos côtés",
-            "coach_body": "De petits conseils s'affichent à l'écran (signalés par ✦ « The Coach ») pendant que vous apprenez — ils sont utiles et ne vous font jamais sentir coupable. Ouvrez « The Coach » à tout moment pour connaître les prochaines étapes. Vous pouvez désactiver ces conseils ultérieurement dans Réglages → Compte.",
+            "coach_body": "De petits conseils s'affichent à l'écran (signalés par ✦ « The Coach ») pendant que vous apprenez — ils sont utiles et ne vous font jamais sentir coupable. Ouvrez « The Coach » à tout moment pour connaître les prochaines étapes. Vous pouvez désactiver ces conseils ultérieurement dans Paramètres → Préférences.",
             "coach_points": {
                 "tips": "Des conseils à l'écran tout au long de votre apprentissage",
                 "open": "Accédez à The Coach à tout moment",

@@ -121,7 +121,7 @@ const coach = {
             'Your pattern leans saver — a little more Play can make the plan sustainable. Joy that is planned is not waste.',
     },
     helpers: {
-        mark_title: 'From The Coach — turn on-screen tips on or off in Settings → Account',
+        mark_title: 'From The Coach — turn on-screen tips on or off in Settings → Preferences',
         mark_label: 'The Coach',
         tip_aria: 'The Coach: {title}',
         locked_cta: '🔒 {cta}',

@@ -167,9 +167,9 @@ export class EmailService {
         );
     }
 
-    /** App settings (account) — practice dual-consent accept card. */
+    /** App settings (practice links) — practice dual-consent accept card. */
     practiceClientAcceptUrl(): string {
-        return `${this.appOrigin}/settings`;
+        return `${this.appOrigin}/settings/general/practice`;
     }
 
     /** Marketing signup with practice invite token (brand-new account). */

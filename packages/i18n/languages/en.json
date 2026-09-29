@@ -733,7 +733,7 @@
                 "saver-play": "Your pattern leans saver — a little more Play can make the plan sustainable. Joy that is planned is not waste."
             },
             "helpers": {
-                "mark_title": "From The Coach — turn on-screen tips on or off in Settings → Account",
+                "mark_title": "From The Coach — turn on-screen tips on or off in Settings → Preferences",
                 "mark_label": "The Coach",
                 "tip_aria": "The Coach: {title}",
                 "locked_cta": "🔒 {cta}",
@@ -2580,7 +2580,7 @@
             },
             "household_profile": {
                 "filter_tip_title": "Bill list is tailored",
-                "filter_tip_body": "Some bill types stay hidden based on your household profile. Change it in Settings, or show every type for this form.",
+                "filter_tip_body": "Some bill types stay hidden based on your household profile. Change it in Settings → Household, or show every type for this form.",
                 "show_all": "Show all",
                 "use_filter": "Use profile filter",
                 "open_settings": "Household profile",
@@ -2827,7 +2827,7 @@
                 "replay_tour": "Replay tour",
                 "no_tour": "No guided tour on this screen yet — the brief above covers the basics.",
                 "helpers_label": "Show The Coach on screens",
-                "helpers_hint": "Why-lines and jar cards from The Coach (✦ The Coach). Same as Settings → Account. On by default for beginners.",
+                "helpers_hint": "Why-lines and jar cards from The Coach (✦ The Coach). Same as Settings → Preferences. On by default for beginners.",
                 "helpers_on": "On",
                 "helpers_off": "Off",
                 "settings": {
@@ -4272,7 +4272,7 @@
             "money_style": "How you handle money",
             "money_style_body": "There are no right answers. Soft labels only, so tips fit you. Partners in the same household can choose differently later.",
             "coach": "The Coach stays with you",
-            "coach_body": "Short tips on screen (marked ✦ The Coach) stay on while you learn — helpful, never shaming. Open The Coach anytime for next steps. Turn tips off later in Settings → Account.",
+            "coach_body": "Short tips on screen (marked ✦ The Coach) stay on while you learn — helpful, never shaming. Open The Coach anytime for next steps. Turn tips off later in Settings → Preferences.",
             "coach_points": {
                 "tips": "On-screen tips while you learn",
                 "open": "Open The Coach anytime",

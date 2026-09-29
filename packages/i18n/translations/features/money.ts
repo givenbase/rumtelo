@@ -1016,7 +1016,7 @@ const money = {
     household_profile: {
         filter_tip_title: 'Bill list is tailored',
         filter_tip_body:
-            'Some bill types stay hidden based on your household profile. Change it in Settings, or show every type for this form.',
+            'Some bill types stay hidden based on your household profile. Change it in Settings → Household, or show every type for this form.',
         show_all: 'Show all',
         use_filter: 'Use profile filter',
         open_settings: 'Household profile',

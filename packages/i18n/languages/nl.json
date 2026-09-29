@@ -733,7 +733,7 @@
                 "saver-play": "Je patroon neigt naar veilig — een beetje meer speelsheid kan het plan duurzaam maken. Geplande vreugde is geen verspilling."
             },
             "helpers": {
-                "mark_title": "Van de Coach — schakel tips op het scherm in of uit via Instellingen → Account",
+                "mark_title": "Van de Coach — schakel tips op het scherm in of uit via Instellingen → Voorkeuren",
                 "mark_label": "De coach",
                 "tip_aria": "De coach: {title}",
                 "locked_cta": "🔒 {cta}",
@@ -2580,7 +2580,7 @@
             },
             "household_profile": {
                 "filter_tip_title": "Rekeninglijst is afgestemd",
-                "filter_tip_body": "Sommige soorten rekeningen blijven verborgen op basis van je huishoudprofiel. Pas het aan in Instellingen, of toon alle soorten voor dit formulier.",
+                "filter_tip_body": "Sommige soorten rekeningen blijven verborgen op basis van je huishoudprofiel. Pas het aan in Instellingen → Huishouden, of toon alle soorten voor dit formulier.",
                 "show_all": "Alles tonen",
                 "use_filter": "Profiel filter gebruiken",
                 "open_settings": "Huishoudprofiel",
@@ -2827,7 +2827,7 @@
                 "replay_tour": "Tour opnieuw afspelen",
                 "no_tour": "Op dit scherm staat nog geen rondleiding — in de bovenstaande samenvatting worden de basisprincipes behandeld.",
                 "helpers_label": "De Coach op de schermen weergeven",
-                "helpers_hint": "Waarom-regels en potkaarten van De Coach (✦ De Coach). Hetzelfde als Instellingen → Account. Standaard ingeschakeld voor beginners.",
+                "helpers_hint": "Waarom-regels en potkaarten van De Coach (✦ De Coach). Hetzelfde als Instellingen → Voorkeuren. Standaard ingeschakeld voor beginners.",
                 "helpers_on": "Op",
                 "helpers_off": "Uit",
                 "settings": {
@@ -4272,7 +4272,7 @@
             "money_style": "Hoe je met geld omgaat",
             "money_style_body": "Er zijn geen foute antwoorden. Alleen zachte labels, zodat tips bij jou passen. Partners in hetzelfde huishouden kunnen later iets anders kiezen.",
             "coach": "De Coach blijft bij je",
-            "coach_body": "Korte tips op het scherm (✦ De Coach) blijven aan terwijl je leert — behulpzaam, nooit beschamend. Open De Coach wanneer je wilt voor volgende stappen. Zet tips later uit via Instellingen → Account.",
+            "coach_body": "Korte tips op het scherm (✦ De Coach) blijven aan terwijl je leert — behulpzaam, nooit beschamend. Open De Coach wanneer je wilt voor volgende stappen. Zet tips later uit via Instellingen → Voorkeuren.",
             "coach_points": {
                 "tips": "Tips op het scherm terwijl je leert",
                 "open": "Open De Coach wanneer je wilt",

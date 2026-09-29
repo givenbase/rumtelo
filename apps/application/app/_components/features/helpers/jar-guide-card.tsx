@@ -227,7 +227,7 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
                         </Link>
                         {' · '}
                         <Link
-                            href={settingsHref('account')}
+                            href={settingsHref('preferences')}
                             className="font-medium text-accent underline-offset-2 hover:underline">
                             {t('turn_off')}
                         </Link>
