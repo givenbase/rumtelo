@@ -104,6 +104,9 @@ export const FIXED_COST_PRESET_TRANSLATIONS: Partial<Record<IntlLocale, Record<s
         FOOD_BANK: 'Steun aan voedselbanken',
         EMERGENCY_RELIEF: 'Noodhulpfonds',
         HELPING_SOMEONE: 'Iemand rechtstreeks helpen',
+        FAMILY_SUPPORT: 'Familiehulp',
+        BIRTHDAY_GIFTS: 'Verjaardagscadeaus',
+        HOLIDAY_GIFTS: 'Feestdagencadeaus',
         OTHER: 'Overige',
     },
     es: {
@@ -205,6 +208,9 @@ export const FIXED_COST_PRESET_TRANSLATIONS: Partial<Record<IntlLocale, Record<s
         FOOD_BANK: 'Ayuda a los bancos de alimentos',
         EMERGENCY_RELIEF: 'Fondo de ayuda de emergencia',
         HELPING_SOMEONE: 'Ayudar a alguien directamente',
+        FAMILY_SUPPORT: 'Ayuda familiar',
+        BIRTHDAY_GIFTS: 'Regalos de cumpleaños',
+        HOLIDAY_GIFTS: 'Regalos de fiestas',
         OTHER: 'Otros',
     },
     fr: {
@@ -306,6 +312,9 @@ export const FIXED_COST_PRESET_TRANSLATIONS: Partial<Record<IntlLocale, Record<s
         FOOD_BANK: 'Soutien aux banques alimentaires',
         EMERGENCY_RELIEF: "Fonds d'aide d'urgence",
         HELPING_SOMEONE: "Aider quelqu'un directement",
+        FAMILY_SUPPORT: 'Aide familiale',
+        BIRTHDAY_GIFTS: 'Cadeaux d’anniversaire',
+        HOLIDAY_GIFTS: 'Cadeaux de fêtes',
         OTHER: 'Autres',
     },
 };
