@@ -1,4 +1,12 @@
-import { Entity, Enum, Index, ManyToOne, Property, Unique } from '@mikro-orm/decorators/legacy';
+import {
+    Check,
+    Entity,
+    Enum,
+    Index,
+    ManyToOne,
+    Property,
+    Unique,
+} from '@mikro-orm/decorators/legacy';
 import { TransactionSource, TransactionStatus } from '@rumtelo/contracts';
 
 import { CatalogKey } from '../../../../../../common/database/catalog-key.util';
@@ -11,6 +19,7 @@ import { TransactionInPreset } from '../../../../../backoffice/product/money/pre
 import { FixedCost } from '../../plan/fixed-cost/fixed-cost.entity';
 import { Category } from '../../plan/jar/category.entity';
 import { Jar } from '../../plan/jar/jar.entity';
+import { Party } from '../../plan/party/party.entity';
 import { Debt } from '../../targets/debt/debt.entity';
 import { BankAccount } from '../bank-account/bank-account.entity';
 import { SortRule } from '../sort-rule/sort-rule.entity';
@@ -37,8 +46,17 @@ import { SortRule } from '../sort-rule/sort-rule.entity';
 @Index({ properties: ['debt'] })
 @Index({ properties: ['fixedCost'] })
 @Index({ properties: ['appliedRule'] })
+@Index({ properties: ['party'] })
 // Idempotent imports: the same statement line can never land twice in one household.
 @Unique({ properties: ['household', 'dedupeKey'] })
+@Check({
+    name: 'money_transaction_merchant_xor_party',
+    expression: '(merchant_key IS NULL) OR (party_id IS NULL)',
+})
+@Check({
+    name: 'money_transaction_counterparty_when_linked',
+    expression: '((merchant_key IS NULL) AND (party_id IS NULL)) OR (counterparty IS NOT NULL)',
+})
 export class Transaction extends HouseholdEntity {
     // ? PROPERTIES
     /** Bank / user description as booked. */
@@ -106,6 +124,21 @@ export class Transaction extends HouseholdEntity {
      */
     @ManyToOne(() => SortRule, { mapToPk: true, nullable: true, deleteRule: 'set null' })
     appliedRule: string | null = null;
+
+    /**
+     * Household party when the other side is a saved name (N:1, optional).
+     * Mutually exclusive with catalog `merchantKey` on the counterparty triple
+     * (auto-sort still uses `appliedMerchantKey` separately).
+     */
+    @ManyToOne(() => Party, { mapToPk: true, nullable: true, deleteRule: 'set null' })
+    party: string | null = null;
+
+    /**
+     * Catalog merchant when the user picked one for this row (N:1, optional).
+     * Distinct from `appliedMerchantKey` (auto-sort provenance).
+     */
+    @ManyToOne(() => MerchantPreset, CatalogKey('merchant_key'))
+    merchantKey: string | null = null;
 
     /**
      * Transaction In preset (GIFT, REFUND, …) picked at creation — natural-key FK on

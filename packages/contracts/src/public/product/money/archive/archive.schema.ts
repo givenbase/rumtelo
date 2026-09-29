@@ -28,8 +28,11 @@ export const ArchiveJar = z.looseObject({
 
 export const ArchiveIncome = z.looseObject({
     name: z.string().min(1).max(120),
+    presetKey: z.string().min(1).max(64).nullish(),
     counterparty: z.string().max(160).nullish(),
     merchantKey: z.string().min(1).max(64).nullish(),
+    /** Party display name — restore relinks / saves by name (ids differ per household). */
+    partyName: z.string().max(160).nullish(),
     kind: z.enum(IncomeKind),
     amount: Money,
     cadence: z.enum(Cadence).optional(),
@@ -43,6 +46,7 @@ export const ArchiveFixedCost = z.looseObject({
     id: Id.optional(),
     jarId: Id,
     name: z.string().min(1).max(120),
+    presetKey: z.string().min(1).max(64).nullish(),
     amount: Money,
     cadence: z.enum(Cadence).optional(),
     direction: z.enum(FlowDirection).optional(),
@@ -59,6 +63,7 @@ export const ArchiveFixedCost = z.looseObject({
 export const ArchiveDebt = z.looseObject({
     id: Id.optional(),
     name: z.string().min(1).max(120),
+    presetKey: z.string().min(1).max(64).nullish(),
     kind: z.enum(DebtKind),
     balance: Money,
     originalBalance: Money.optional(),

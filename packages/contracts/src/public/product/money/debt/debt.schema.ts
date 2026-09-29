@@ -10,6 +10,7 @@ import { Cadence } from '../../../../common/common.enums';
 import { HouseholdId, Id, IsoDate, Money } from '../../../../common/common.schema';
 import { DebtKind, DebtScheduleKind, PayoffStrategy } from '../enums';
 import { FixedCost } from '../fixed-cost/fixed-cost.schema';
+import { CounterpartyRef } from '../party/party.schema';
 import { Transaction } from '../transaction/transaction.schema';
 
 /** Planned payment rhythm — ONCE is not a debt schedule. */
@@ -24,6 +25,10 @@ export const Debt = z.object({
     id: Id,
     householdId: HouseholdId,
     name: z.string().min(1).max(120),
+    /** DebtPreset.key when picked from the catalog. Null when free-typed. */
+    presetKey: z.string().min(1).max(64).nullable().default(null),
+    /** Lender — see `CounterpartyRef`. `name` stays the type label. */
+    ...CounterpartyRef.shape,
     kind: z.enum(DebtKind),
     balance: Money,
     originalBalance: Money,

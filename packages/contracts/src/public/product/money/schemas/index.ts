@@ -10,6 +10,7 @@ export * from '../fixed-cost';
 export * from '../goal';
 export * from '../income';
 export * from '../jar';
+export * from '../party';
 export * from '../week-check';
 export * from '../rule';
 export * from '../transaction';

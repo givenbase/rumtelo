@@ -8,6 +8,7 @@ import type {
     Goal,
     IncomeSource,
     Jar,
+    Party,
     Rule,
     Transaction,
 } from '@rumtelo/contracts';
@@ -32,6 +33,7 @@ export type HouseholdExportBundle = {
     access: HouseholdExportAccess;
     jars: Jar[];
     income: IncomeSource[];
+    parties: Party[];
     fixedCosts: FixedCost[];
     debts: Debt[];
     goals: Goal[];
@@ -68,21 +70,28 @@ export async function fetchHouseholdExportBundle(
     householdId: string,
     access: HouseholdExportAccess
 ): Promise<HouseholdExportBundle> {
-    const [jars, income, fixedCosts, debts, goals, rules, transactions] = await Promise.all([
-        api.money.jars.list({ householdId }),
-        api.money.income.list({ householdId }),
-        api.money.fixedCosts.list({ householdId }),
-        access.includeDebts ? api.money.debts.list({ householdId }) : Promise.resolve([] as Debt[]),
-        access.includeGoals ? api.money.goals.list({ householdId }) : Promise.resolve([] as Goal[]),
-        api.money.rules.list({ householdId }),
-        listAllTransactions(householdId),
-    ]);
+    const [jars, income, parties, fixedCosts, debts, goals, rules, transactions] =
+        await Promise.all([
+            api.money.jars.list({ householdId }),
+            api.money.income.list({ householdId }),
+            api.money.parties.list({ householdId }),
+            api.money.fixedCosts.list({ householdId }),
+            access.includeDebts
+                ? api.money.debts.list({ householdId })
+                : Promise.resolve([] as Debt[]),
+            access.includeGoals
+                ? api.money.goals.list({ householdId })
+                : Promise.resolve([] as Goal[]),
+            api.money.rules.list({ householdId }),
+            listAllTransactions(householdId),
+        ]);
     return {
         exportedAt: new Date().toISOString(),
         householdId,
         access,
         jars,
         income,
+        parties,
         fixedCosts,
         debts,
         goals,
@@ -164,16 +173,37 @@ export function buildExportSheets(bundle: HouseholdExportBundle): ExportSheet[] 
         },
         {
             name: 'Income',
-            rows: bundle.income.map(source => ({
-                id: source.id,
-                name: source.name,
-                counterparty: source.counterparty ?? '',
-                merchantKey: source.merchantKey ?? '',
-                kind: source.kind,
-                amountCents: source.amount,
-                cadence: source.cadence,
-                expectedDay: source.expectedDay ?? '',
-                isActive: source.isActive,
+            rows: bundle.income.map(source => {
+                const party = source.partyId
+                    ? bundle.parties.find(row => row.id === source.partyId)
+                    : undefined;
+                return {
+                    id: source.id,
+                    name: source.name,
+                    presetKey: source.presetKey ?? '',
+                    counterparty: source.counterparty ?? '',
+                    merchantKey: source.merchantKey ?? '',
+                    partyName: party?.name ?? '',
+                    kind: source.kind,
+                    amountCents: source.amount,
+                    cadence: source.cadence,
+                    expectedDay: source.expectedDay ?? '',
+                    isActive: source.isActive,
+                };
+            }),
+        },
+        {
+            name: 'Parties',
+            rows: bundle.parties.map(party => ({
+                id: party.id,
+                name: party.name,
+                note: party.note ?? '',
+                aliases: party.aliases.join('|'),
+                merchantKey: party.merchantKey ?? '',
+                color: party.color ?? '',
+                icon: party.icon ?? '',
+                logoDomain: party.logoDomain ?? '',
+                website: party.website ?? '',
             })),
         },
         {
@@ -181,6 +211,7 @@ export function buildExportSheets(bundle: HouseholdExportBundle): ExportSheet[] 
             rows: bundle.fixedCosts.map(cost => ({
                 id: cost.id,
                 name: cost.name,
+                presetKey: cost.presetKey ?? '',
                 amountCents: cost.amount,
                 cadence: cost.cadence,
                 direction: cost.direction,
@@ -202,6 +233,7 @@ export function buildExportSheets(bundle: HouseholdExportBundle): ExportSheet[] 
             rows: bundle.debts.map(debt => ({
                 id: debt.id,
                 name: debt.name,
+                presetKey: debt.presetKey ?? '',
                 kind: debt.kind,
                 balanceCents: debt.balance,
                 interestRate: debt.interestRate,

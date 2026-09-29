@@ -18,7 +18,8 @@
  * `--yes` / DB_DROP_CONFIRM never skips the phrase confirm for all-envs.
  * Optional CI escape hatch: DB_RESET_ALL_CONFIRM="RESET ALL ENVS"
  *
- * TS scripts run with `bun` (no global `--import tsx`, which breaks contracts build).
+ * TS scripts run with `pnpm exec tsx` (same runtime as `pnpm start` / `db:push`); never set a
+ * global `NODE_OPTIONS=--import tsx`, which breaks the contracts build.
  */
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, unlinkSync } from 'node:fs';
@@ -192,7 +193,12 @@ function squashAndRebuildDev(): void {
 
     const env = envFor('development');
 
-    run('bun', ['scripts/db/drop-schema-cascade.ts', '--yes'], 'dev: drop schemas', env);
+    run(
+        'pnpm',
+        ['exec', 'tsx', 'scripts/db/drop-schema-cascade.ts', '--yes'],
+        'dev: drop schemas',
+        env
+    );
 
     // MikroORM CLI still via pnpm; clean env (no --import tsx).
     run(
@@ -214,16 +220,26 @@ function squashAndRebuildDev(): void {
         }
     );
 
-    run('bun', ['scripts/db/migration-up.ts'], 'dev: migration:up', env);
+    run('pnpm', ['exec', 'tsx', 'scripts/db/migration-up.ts'], 'dev: migration:up', env);
 
-    run('bun', ['src/modules/auth/engine/auth.migrate.ts'], 'dev: auth:migrate', env);
+    run(
+        'pnpm',
+        ['exec', 'tsx', 'src/modules/auth/engine/auth.migrate.ts'],
+        'dev: auth:migrate',
+        env
+    );
 
     // Same as db:fresh — wipe Better Auth Redis so cookies don't point at deleted users.
-    run('bun', ['scripts/db/flush-better-auth-redis.ts'], 'dev: flush auth redis', env);
+    run(
+        'pnpm',
+        ['exec', 'tsx', 'scripts/db/flush-better-auth-redis.ts'],
+        'dev: flush auth redis',
+        env
+    );
 
     if (wantSeed) {
         run('pnpm', ['--filter', '@rumtelo/contracts', 'build'], 'dev: build contracts', env);
-        run('bun', ['scripts/db/seeder-run.ts'], 'dev: seed', env);
+        run('pnpm', ['exec', 'tsx', 'scripts/db/seeder-run.ts'], 'dev: seed', env);
     }
 }
 

@@ -62,7 +62,10 @@ import {
 export type DebtFormValues = DebtFormSchemaValues;
 
 type DebtFormProps = {
-    defaultValues?: Partial<DebtFormValues>;
+    defaultValues?: Partial<DebtFormValues> & {
+        presetKey?: string | null;
+        partyId?: string | null;
+    };
     embedded?: boolean;
     mode?: 'create' | 'edit';
     entityId?: string;
@@ -133,7 +136,7 @@ export function DebtForm({
     const dismiss = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
     const { mergeImplied } = useMergeHouseholdAudiences();
-    const [typeKey, setTypeKey] = useState<string | null>(null);
+    const [presetKey, setPresetKey] = useState<string | null>(defaultValues?.presetKey ?? null);
     const [typeQuery, setTypeQuery] = useState('');
     const [customLender, setCustomLender] = useState(false);
     const [lenderQuery, setLenderQuery] = useState('');
@@ -157,7 +160,7 @@ export function DebtForm({
     const debtTypes = useMemo(() => debtTypesQuery.data ?? [], [debtTypesQuery.data]);
     const merchants = useMemo(() => merchantsQuery.data ?? [], [merchantsQuery.data]);
     const { byKey: jarByKey } = useJarCatalog();
-    const selectedType = debtTypes.find(option => option.key === typeKey) ?? null;
+    const selectedType = debtTypes.find(option => option.key === presetKey) ?? null;
     const lenderChrome = catalogMarkChrome({
         icon: selectedType?.icon,
         jarKey: JarKey.NECESSITIES,
@@ -214,37 +217,47 @@ export function DebtForm({
     const paymentCadence = useWatch({ control: form.control, name: 'paymentCadence' });
     const dueMonthValue = useWatch({ control: form.control, name: 'dueMonth' });
 
-    // Edit hydrate: lock debt type from lender name / kind → unlock lender chips.
+    // Edit hydrate: lock debt type from stored presetKey (preferred) or lender name / kind.
+    // Runs once when catalogs are ready; determines customLender chip state.
     if (
         mode === 'edit' &&
         !editCatalogHydrated &&
         debtTypesQuery.data !== undefined &&
         merchantsQuery.data !== undefined
     ) {
-        const savedName = defaultValues?.name ?? '';
+        // `defaultValues.name` is the lender name (counterparty) from mapRow.
+        const lenderName = defaultValues?.name ?? '';
         const savedKind = defaultValues?.kind;
-        // Lender → its debt type; when the lender serves several, the saved kind decides.
-        const savedLender = findByNameOrAlias(merchants, savedName);
-        const lenderMatch = savedLender
-            ? presetForMerchant(
-                  debtTypes,
-                  savedLender.key,
-                  savedKind ? debtType => debtType.kind === savedKind : undefined
-              )
-            : null;
-        const typeNameMatch = findByNameOrAlias(debtTypes, savedName);
-        const kindMatch = savedKind
-            ? (debtTypes.find(debtType => debtType.kind === savedKind) ?? null)
-            : null;
-        const matched = lenderMatch ?? typeNameMatch ?? kindMatch ?? null;
+
+        // Prefer the stored presetKey — skips findByNameOrAlias for the type lookup.
+        const storedPresetKey = defaultValues?.presetKey ?? null;
+        const matched: (typeof debtTypes)[number] | null = storedPresetKey
+            ? (debtTypes.find(t => t.key === storedPresetKey) ?? null)
+            : (() => {
+                  // Fallback: resolve from lender name / kind (pre-fix rows).
+                  const savedLender = findByNameOrAlias(merchants, lenderName);
+                  const lenderMatch = savedLender
+                      ? presetForMerchant(
+                            debtTypes,
+                            savedLender.key,
+                            savedKind ? debtType => debtType.kind === savedKind : undefined
+                        )
+                      : null;
+                  const typeNameMatch = findByNameOrAlias(debtTypes, lenderName);
+                  const kindMatch = savedKind
+                      ? (debtTypes.find(debtType => debtType.kind === savedKind) ?? null)
+                      : null;
+                  return lenderMatch ?? typeNameMatch ?? kindMatch ?? null;
+              })();
+
         if (matched) {
-            setTypeKey(matched.key);
+            setPresetKey(matched.key);
             form.setValue('kind', matched.kind);
             const lendersForMatched = (matched.merchantKeys ?? [])
                 .map(key => merchants.find(row => row.key === key))
                 .filter((row): row is MerchantPreset => Boolean(row));
-            const nameInChips = Boolean(findByNameOrAlias(lendersForMatched, savedName));
-            if (savedName && !nameInChips) setCustomLender(true);
+            const nameInChips = Boolean(findByNameOrAlias(lendersForMatched, lenderName));
+            if (lenderName && !nameInChips) setCustomLender(true);
         } else {
             setEditNoTypeMatch(true);
         }
@@ -265,7 +278,17 @@ export function DebtForm({
                 : 0;
             const extraPayment = extraRaw === null ? 0 : extraRaw;
             const interestRate = Number(values.interestRate.replace(',', '.'));
-            const name = values.name.trim();
+            // Lender name lives in the "who" field (form's `name`).
+            const lenderName = values.name.trim();
+            // Entity name = type label when a type is locked; lender name as fallback (editNoTypeMatch).
+            const name =
+                presetKey && presetKey !== 'OTHER' && selectedType ? selectedType.name : lenderName;
+            const matchedLender = findByNameOrAlias(merchants, lenderName);
+            const merchantKey = matchedLender?.key ?? null;
+            // Prefer an already-linked party on edit when the lender is free text.
+            const partyId = merchantKey || !lenderName ? null : (defaultValues?.partyId ?? null);
+            const saveParty = Boolean(lenderName) && !merchantKey && !partyId;
+            const presetKeyToSave = presetKey && presetKey !== 'OTHER' ? presetKey : null;
             const dueDay = normalizeDueDay(
                 values.dueDay?.trim() ? Number(values.dueDay) : null,
                 values.paymentCadence
@@ -298,6 +321,11 @@ export function DebtForm({
                     id: entityId,
                     householdId,
                     name,
+                    counterparty: lenderName || null,
+                    merchantKey,
+                    partyId,
+                    saveParty,
+                    presetKey: presetKeyToSave,
                     kind: values.kind,
                     balance,
                     interestRate,
@@ -309,6 +337,11 @@ export function DebtForm({
             return api.money.debts.create({
                 householdId,
                 name,
+                counterparty: lenderName || null,
+                merchantKey,
+                partyId,
+                saveParty,
+                presetKey: presetKeyToSave,
                 kind: values.kind,
                 balance,
                 originalBalance: balance,
@@ -322,11 +355,12 @@ export function DebtForm({
         onSuccess: async () => {
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.key() });
-            if (mode === 'create' && typeKey && typeKey !== 'OTHER') {
-                const selected = debtTypes.find(option => option.key === typeKey);
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.parties.list.key() });
+            if (mode === 'create' && presetKey && presetKey !== 'OTHER') {
+                const selected = debtTypes.find(option => option.key === presetKey);
                 await mergeImplied(
                     audienceKeysFromDebt({
-                        presetKey: typeKey,
+                        presetKey,
                         kind: selected?.kind ?? form.getValues('kind'),
                     })
                 );
@@ -363,7 +397,7 @@ export function DebtForm({
             showToast(t('common.message.error.sign_in_to_save'), 'error');
             return;
         }
-        if (mode === 'create' && !typeKey) {
+        if (mode === 'create' && !presetKey) {
             showToast(t('features.money.debt.pick_type_first'), 'error');
             return;
         }
@@ -377,7 +411,7 @@ export function DebtForm({
 
     /** Lender chosen before a type: adopt its debt type when exactly one is linked. */
     function applyDebtType(debtType: DebtPreset) {
-        setTypeKey(debtType.key);
+        setPresetKey(debtType.key);
         setTypeQuery('');
         setEditNoTypeMatch(false);
         setCustomLender(false);
@@ -386,19 +420,19 @@ export function DebtForm({
 
     function applyLenderPick(option: NamePresetOption) {
         form.setValue('name', option.name, { shouldDirty: true, shouldValidate: true });
-        if (typeKey) return; // Type already chosen — the pick only names the lender.
+        if (presetKey) return; // Type already chosen — the pick only names the lender.
         const debtType = presetForMerchant(debtTypes, option.key);
         if (debtType) applyDebtType(debtType);
     }
 
     /** No type yet and the lender serves several (ING: mortgage, loan, card) → household picks. */
     const lenderTypeCandidates = useMemo(() => {
-        if (typeKey || !editNoTypeMatch) return [];
+        if (presetKey || !editNoTypeMatch) return [];
         const lender = findByNameOrAlias(merchants, selectedLenderName);
         if (!lender) return [];
         const resolution = resolveVendorPresets(debtTypes, lender.key);
         return resolution.kind === 'ambiguous' ? resolution.candidates : [];
-    }, [typeKey, editNoTypeMatch, merchants, debtTypes, selectedLenderName]);
+    }, [presetKey, editNoTypeMatch, merchants, debtTypes, selectedLenderName]);
 
     return (
         <FormCreateEditShell
@@ -504,7 +538,7 @@ export function DebtForm({
                                     type="button"
                                     className="font-mono text-xs tracking-wide text-accent uppercase hover:underline"
                                     onClick={() => {
-                                        setTypeKey(null);
+                                        setPresetKey(null);
                                         setTypeQuery('');
                                         setCustomLender(false);
                                         form.setValue('name', '');
@@ -522,7 +556,7 @@ export function DebtForm({
                                 onSelect={opt => {
                                     const full = debtTypes.find(preset => preset.key === opt.key);
                                     if (!full) return;
-                                    setTypeKey(full.key);
+                                    setPresetKey(full.key);
                                     setTypeQuery('');
                                     setCustomLender(false);
                                     form.setValue('kind', full.kind);

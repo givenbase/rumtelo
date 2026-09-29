@@ -20,7 +20,11 @@ export function DebtUpdatePage({ id, embedded = false }: { id: string; embedded?
         }),
         id,
         mapRow: row => ({
-            name: row.name,
+            // Lender name lives in the form's "who" field — prefer stored counterparty,
+            // fallback to name for pre-fix rows (where name == lender).
+            name: row.counterparty ?? row.name,
+            presetKey: row.presetKey ?? null,
+            partyId: row.partyId ?? null,
             balance: minorUnitsToAmountInput(row.balance),
             interestRate: String(row.interestRate),
             minimumPayment: minorUnitsToAmountInput(row.minimumPayment),

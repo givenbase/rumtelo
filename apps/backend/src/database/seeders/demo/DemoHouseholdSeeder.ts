@@ -47,6 +47,7 @@ import { Transaction } from '../../../modules/public/product/money/ledger/transa
 import { FixedCost } from '../../../modules/public/product/money/plan/fixed-cost/fixed-cost.entity';
 import { IncomeAmountPeriod } from '../../../modules/public/product/money/plan/income/income-amount-period.entity';
 import { IncomeSource } from '../../../modules/public/product/money/plan/income/income-source.entity';
+import { Party } from '../../../modules/public/product/money/plan/party/party.entity';
 import { Jar } from '../../../modules/public/product/money/plan/jar/jar.entity';
 import { Category } from '../../../modules/public/product/money/plan/jar/category.entity';
 import { Debt } from '../../../modules/public/product/money/targets/debt/debt.entity';
@@ -432,6 +433,7 @@ export class DemoHouseholdSeeder extends Seeder {
             amount: 1_850,
             expectedDay: 25,
             counterparty: 'RETAIL GROUP NL BV',
+            saveParty: true,
         });
 
         for (const row of [
@@ -582,6 +584,7 @@ export class DemoHouseholdSeeder extends Seeder {
             amount: 2_800,
             expectedDay: 15,
             counterparty: 'ACME DESIGN BV',
+            saveParty: true,
         });
         this.createIncome(em, householdId, {
             name: 'One-off gigs',
@@ -589,6 +592,7 @@ export class DemoHouseholdSeeder extends Seeder {
             amount: 650,
             expectedDay: 28,
             counterparty: 'NOVA STUDIO BV',
+            saveParty: true,
         });
 
         for (const row of [
@@ -1028,6 +1032,7 @@ export class DemoHouseholdSeeder extends Seeder {
             amount: 5_200,
             expectedDay: 1,
             counterparty: 'STUDIO NOORD BV',
+            saveParty: true,
         });
         this.createIncome(em, householdId, {
             name: 'Dividend portfolio',
@@ -1043,6 +1048,7 @@ export class DemoHouseholdSeeder extends Seeder {
             amount: 1_400,
             expectedDay: 1,
             counterparty: 'HUURDER J. DE VRIES',
+            saveParty: true,
         });
 
         for (const row of [
@@ -1457,15 +1463,24 @@ export class DemoHouseholdSeeder extends Seeder {
             expectedDay: number;
             counterparty?: string;
             merchantKey?: string;
+            presetKey?: string;
+            /** Persist free-typed counterparty as a household Party (demo "saved for next time"). */
+            saveParty?: boolean;
         }
     ): void {
         const startedOn = monthsAgo(6);
         const amount = toMinorUnits(input.amount);
+        let partyId: string | null = null;
+        if (input.saveParty && input.counterparty && !input.merchantKey) {
+            partyId = this.ensureParty(em, householdId, input.counterparty).id;
+        }
         const source = em.create(IncomeSource, {
             household: householdId,
             name: input.name,
+            presetKey: input.presetKey ?? null,
             counterparty: input.counterparty ?? null,
             merchantKey: input.merchantKey ?? null,
+            party: partyId,
             kind: input.kind,
             amount,
             expectedDay: input.expectedDay,
@@ -1481,15 +1496,39 @@ export class DemoHouseholdSeeder extends Seeder {
         } as never);
     }
 
+    /** Case-insensitive find-or-create for demo parties (same household). */
+    private readonly partyByHouseholdName = new Map<string, Party>();
+
+    private ensureParty(em: EntityManager, householdId: string, rawName: string): Party {
+        const name = rawName.trim().replaceAll(/\s+/g, ' ');
+        const cacheKey = `${householdId}:${name.toLowerCase()}`;
+        const cached = this.partyByHouseholdName.get(cacheKey);
+        if (cached) return cached;
+        const party = em.create(Party, {
+            household: householdId,
+            name,
+            aliases: [],
+        } as never);
+        this.partyByHouseholdName.set(cacheKey, party);
+        return party;
+    }
+
     private createFixed(
         em: EntityManager,
         householdId: string,
         jar: Jar,
-        input: { name: string; amount: number; dueDay: number; counterparty?: string }
+        input: {
+            name: string;
+            amount: number;
+            dueDay: number;
+            counterparty?: string;
+            presetKey?: string;
+        }
     ): void {
         em.create(FixedCost, {
             household: householdId,
             name: input.name,
+            presetKey: input.presetKey ?? null,
             counterparty: input.counterparty ?? null,
             amount: toMinorUnits(input.amount),
             dueDay: input.dueDay,

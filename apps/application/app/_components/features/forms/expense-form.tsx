@@ -449,6 +449,8 @@ export function ExpenseForm({
 
             const vendor = isIn ? label : intent.vendor.trim();
             const note = values.note.trim();
+            const merchantKey = !isIn ? intent.merchantKey?.trim() || null : null;
+            const saveParty = Boolean(vendor) && !merchantKey;
             const description = isIn
                 ? note || label || tExpense('money_in')
                 : note || intent.categoryName?.trim() || vendor || tExpense('default_description');
@@ -497,6 +499,9 @@ export function ExpenseForm({
                 accountId: null,
                 categoryId,
                 counterparty: vendor || null,
+                merchantKey,
+                partyId: null,
+                saveParty,
                 note: note || null,
                 inflowKey: isIn ? inflowKey : null,
                 debtId: isIn ? null : debtId,
@@ -509,6 +514,7 @@ export function ExpenseForm({
             void queryClient.invalidateQueries({
                 queryKey: apiQuery.money.transactions.inbox.key(),
             });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.parties.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.key() });

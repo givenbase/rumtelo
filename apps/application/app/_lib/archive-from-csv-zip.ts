@@ -216,8 +216,10 @@ export function archivePayloadFromCsvSheets(files: Map<string, string>): Payload
             if (!row.name || amount === null) return null;
             return {
                 name: row.name,
+                presetKey: row.presetKey || null,
                 counterparty: row.counterparty || null,
                 merchantKey: row.merchantKey || null,
+                partyName: row.partyName || null,
                 kind: enumOr(row.kind, Object.values(IncomeKind), IncomeKind.SALARY),
                 amount,
                 cadence: row.cadence
@@ -238,6 +240,7 @@ export function archivePayloadFromCsvSheets(files: Map<string, string>): Payload
                 id: row.id || undefined,
                 jarId,
                 name: row.name,
+                presetKey: row.presetKey || null,
                 amount,
                 cadence: row.cadence
                     ? enumOr(row.cadence, Object.values(Cadence), Cadence.MONTHLY)
@@ -260,6 +263,7 @@ export function archivePayloadFromCsvSheets(files: Map<string, string>): Payload
             return {
                 id: row.id || undefined,
                 name: row.name,
+                presetKey: row.presetKey || null,
                 kind: enumOr(row.kind, Object.values(DebtKind), DebtKind.OTHER),
                 balance,
                 interestRate: Number.isFinite(interest) ? interest : 0,

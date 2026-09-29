@@ -17,6 +17,7 @@ export type SettingsTab =
     | 'import'
     | 'jars'
     | 'debt'
+    | 'parties'
     | 'bank'
     | 'automation'
     | 'goals'
@@ -53,6 +54,7 @@ export const SETTINGS_HREF: Record<SettingsTab, string> = {
     import: '/settings/data/import',
     jars: '/settings/product/money/jars',
     debt: '/settings/product/money/debt',
+    parties: '/settings/product/money/parties',
     bank: '/settings/product/money/bank',
     automation: '/settings/product/money/automation',
     goals: '/settings/product/growth/goals',
@@ -118,6 +120,11 @@ const ALL_SETTINGS_SECTIONS: SettingsNavSection[] = [
                 labelKey: 'pages.settings.tabs.debt.label',
                 subKey: 'pages.settings.tabs.debt.sub',
                 productChild: 'debt',
+            },
+            {
+                key: 'parties',
+                labelKey: 'pages.settings.tabs.parties.label',
+                subKey: 'pages.settings.tabs.parties.sub',
             },
             {
                 key: 'bank',
@@ -242,6 +249,7 @@ export function settingsTabForPathname(pathname: string): SettingsTab {
     const path = pathname.replace(/\/$/, '') || '/';
 
     if (path.includes('/product/money/debt')) return 'debt';
+    if (path.includes('/product/money/parties')) return 'parties';
     if (path.includes('/product/money/jars')) return 'jars';
     if (path.includes('/product/money/fixed-costs')) return 'jars';
     if (path.includes('/product/money/transactions')) return 'automation';

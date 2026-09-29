@@ -73,6 +73,13 @@ export enum MerchantHighlight {
     POPULAR = 'POPULAR',
 }
 
+/** Staff review queue for household-nominated merchants. */
+export enum MerchantSuggestionStatus {
+    OPEN = 'OPEN',
+    ACCEPTED = 'ACCEPTED',
+    REJECTED = 'REJECTED',
+}
+
 /** Where a household wants its giving to land. Catalog filter for GivingOrganization. */
 export enum GivingCause {
     GLOBAL_HEALTH = 'GLOBAL_HEALTH',

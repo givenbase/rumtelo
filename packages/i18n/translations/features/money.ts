@@ -570,6 +570,9 @@ const money = {
         received_from: 'Received from (optional)',
         received_from_placeholder: 'e.g. ACME BV, DEGIRO, HelloFresh',
         option_badge_payer: 'Payer',
+        option_badge_saved: 'Saved',
+        option_group_saved: 'Your parties',
+        option_group_catalog: 'Catalog',
         kind_salary: 'Salary',
         kind_freelance: 'Freelance',
         kind_benefit: 'Benefit',
@@ -587,6 +590,11 @@ const money = {
         cadence_quarterly: 'Quarterly',
         cadence_yearly: 'Yearly',
         cadence_once: 'One-time',
+    },
+    party_field: {
+        save_for_next_time: 'Save “{name}” for next time?',
+        save_for_next_time_hint:
+            'Keeps this name in your parties so it autocompletes on income, bills, and loans.',
     },
     move: {
         toast_moved: 'Money moved between jars',

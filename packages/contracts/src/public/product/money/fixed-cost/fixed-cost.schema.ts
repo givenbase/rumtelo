@@ -16,6 +16,7 @@ import {
 } from '../../../../common/common.schema';
 import { Cadence, FlowDirection } from '../../../../common/common.enums';
 import { FixedCostSettlementSource, FixedCostSettlementStatus, JarKey } from '../enums';
+import { CounterpartyRef } from '../party/party.schema';
 
 export const FixedCost = z.object({
     id: Id,
@@ -28,11 +29,10 @@ export const FixedCost = z.object({
      */
     debtId: Id.nullable().default(null),
     name: z.string().min(1).max(120),
-    /**
-     * Who the money goes to — landlord, insurer, or the organization you give to.
-     * Optional; surfaced mainly for Give so a household can see *whom* it supports.
-     */
-    counterparty: z.string().max(160).nullable().default(null),
+    /** FixedCostPreset.key when picked from the catalog. Null when free-typed. */
+    presetKey: z.string().min(1).max(64).nullable().default(null),
+    /** Payee — see `CounterpartyRef` for the three states. */
+    ...CounterpartyRef.shape,
     amount: Money,
     cadence: z.enum(Cadence),
     dueDay: z.int().min(1).max(31).nullable(),

@@ -1,6 +1,7 @@
 export { AccountSettings } from './account-settings';
 export { JarsSettings } from './jars-settings';
 export { DebtSettings } from './debt-settings';
+export { PartiesSettings } from './parties-settings';
 export { BankSettings } from './bank-settings';
 export { GrowthSettings } from './growth-settings';
 export { EnergySettings } from './energy-settings';

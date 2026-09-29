@@ -44,6 +44,8 @@ import { createIncomeFormSchema, type IncomeFormSchemaValues } from './form-zod'
 import { FormDatePicker } from './form-date-picker';
 import { FormInput } from './form-input';
 import { merchantsToNameOptions } from './merchant-name-options';
+import { PartyField } from './party-field';
+import { partiesToNameOptions } from './party-name-options';
 import { PresetNameField } from './preset-name-field';
 
 const INCOME_KIND_ICON: Record<IncomeKind, string> = {
@@ -58,7 +60,7 @@ const INCOME_KIND_ICON: Record<IncomeKind, string> = {
 export type IncomeFormValues = IncomeFormSchemaValues;
 
 type IncomeFormProps = {
-    defaultValues?: Partial<IncomeFormValues>;
+    defaultValues?: Partial<IncomeFormValues> & { presetKey?: string | null };
     periods?: IncomeAmountPeriod[];
     embedded?: boolean;
     mode?: 'create' | 'edit';
@@ -102,6 +104,14 @@ export function IncomeForm({
     );
     const merchantsQuery = useLiveQuery(
         apiQuery.money.catalogs.merchantPresets.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [],
+        live
+    );
+
+    const partiesQuery = useLiveQuery(
+        apiQuery.money.parties.list.queryOptions({
             input: { householdId: householdId! },
         }),
         [],
@@ -184,13 +194,16 @@ export function IncomeForm({
         [presetsQuery.data, incomeKindGroup]
     );
 
-    const payerOptions = useMemo(
-        () =>
-            merchantsToNameOptions(merchantsQuery.data ?? [], {
-                badge: tIncome('option_badge_payer'),
-            }),
-        [merchantsQuery.data, tIncome]
-    );
+    const payerOptions = useMemo(() => {
+        const saved = partiesToNameOptions(partiesQuery.data ?? [], {
+            badge: tIncome('option_badge_saved'),
+            group: tIncome('option_group_saved'),
+        });
+        const catalog = merchantsToNameOptions(merchantsQuery.data ?? [], {
+            badge: tIncome('option_badge_payer'),
+        }).map(opt => ({ ...opt, group: tIncome('option_group_catalog') }));
+        return [...saved, ...catalog];
+    }, [merchantsQuery.data, partiesQuery.data, tIncome]);
 
     const incomeFormSchema = useMemo(() => createIncomeFormSchema(tForm), [tForm]);
 
@@ -199,6 +212,8 @@ export function IncomeForm({
             name: defaultValues?.name ?? '',
             counterparty: defaultValues?.counterparty ?? '',
             merchantKey: defaultValues?.merchantKey ?? '',
+            partyId: defaultValues?.partyId ?? '',
+            saveParty: defaultValues?.saveParty ?? true,
             amount: defaultValues?.amount ?? '',
             kind: defaultValues?.kind ?? IncomeKind.SALARY,
             cadence: defaultValues?.cadence ?? Cadence.MONTHLY,
@@ -208,6 +223,10 @@ export function IncomeForm({
         },
         resolver: zodResolver(incomeFormSchema),
     });
+
+    const watchedMerchantKey = useWatch({ control: form.control, name: 'merchantKey' }) ?? '';
+    const watchedPartyId = useWatch({ control: form.control, name: 'partyId' }) ?? '';
+    const watchedSaveParty = useWatch({ control: form.control, name: 'saveParty' }) ?? true;
 
     const onError = createFormInvalidHandler(
         ({ title, description }) => {
@@ -221,6 +240,7 @@ export function IncomeForm({
 
     const invalidateIncome = () => {
         void queryClient.invalidateQueries({ queryKey: apiQuery.money.income.list.key() });
+        void queryClient.invalidateQueries({ queryKey: apiQuery.money.parties.list.key() });
         void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
         void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
         void queryClient.invalidateQueries({ queryKey: apiQuery.money.goals.list.key() });
@@ -237,15 +257,25 @@ export function IncomeForm({
             const name = values.name.trim();
             const counterparty = values.counterparty?.trim() || null;
             const merchantKey = counterparty ? values.merchantKey?.trim() || null : null;
+            const partyId = counterparty ? values.partyId?.trim() || null : null;
+            const saveParty =
+                Boolean(counterparty) && !merchantKey && !partyId && (values.saveParty ?? true);
             const endsOn = values.endsOn?.trim() ? values.endsOn.slice(0, 10) : null;
+            // Resolve presetKey from the locked income preset (by name match).
+            const presets = presetsQuery.data ?? [];
+            const matchedPreset = findByNameOrAlias(presets, name);
+            const presetKey = matchedPreset?.key ?? null;
             if (mode === 'edit' && entityId) {
                 const startedOn = values.startedOn?.trim() ? values.startedOn.slice(0, 10) : null;
                 return api.money.income.update({
                     id: entityId,
                     householdId,
                     name,
+                    presetKey,
                     counterparty,
                     merchantKey,
+                    partyId,
+                    saveParty,
                     amount: cents,
                     startedOn,
                     endsOn,
@@ -259,8 +289,11 @@ export function IncomeForm({
             return api.money.income.create({
                 householdId,
                 name,
+                presetKey,
                 counterparty,
                 merchantKey,
+                partyId,
+                saveParty,
                 amount: cents,
                 kind: values.kind,
                 cadence: values.cadence,
@@ -388,9 +421,12 @@ export function IncomeForm({
                 control={form.control}
                 name="name"
                 render={({ field }) => {
+                    // Prefer stored presetKey; fallback to name-alias search for pre-fix rows.
                     const lockedIncomeKey =
                         mode === 'edit'
-                            ? (findByNameOrAlias(presetOptions, field.value)?.key ?? null)
+                            ? (defaultValues?.presetKey ??
+                              findByNameOrAlias(presetOptions, field.value)?.key ??
+                              null)
                             : null;
                     return (
                         <FormItem>
@@ -432,20 +468,25 @@ export function IncomeForm({
                     <FormItem>
                         <FormLabel>{tIncome('received_from')}</FormLabel>
                         <FormControl>
-                            <PresetNameField
-                                value={field.value ?? ''}
-                                onChange={next => {
-                                    field.onChange(next);
-                                    // Typing away from a catalog pick → treat as free text.
-                                    if (form.getValues('merchantKey')) {
-                                        form.setValue('merchantKey', '', { shouldDirty: true });
-                                    }
-                                }}
+                            <PartyField
+                                label={tIncome('received_from')}
                                 placeholder={tIncome('received_from_placeholder')}
                                 options={payerOptions}
-                                onSelect={opt => {
-                                    field.onChange(opt.name);
-                                    form.setValue('merchantKey', opt.key, { shouldDirty: true });
+                                value={{
+                                    counterparty: field.value ?? '',
+                                    merchantKey: watchedMerchantKey,
+                                    partyId: watchedPartyId,
+                                    saveParty: watchedSaveParty,
+                                }}
+                                onChange={next => {
+                                    field.onChange(next.counterparty);
+                                    form.setValue('merchantKey', next.merchantKey, {
+                                        shouldDirty: true,
+                                    });
+                                    form.setValue('partyId', next.partyId, { shouldDirty: true });
+                                    form.setValue('saveParty', next.saveParty, {
+                                        shouldDirty: true,
+                                    });
                                 }}
                             />
                         </FormControl>

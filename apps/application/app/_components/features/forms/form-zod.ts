@@ -76,6 +76,10 @@ export function createIncomeFormSchema(msg: FormT) {
         counterparty: z.string().max(160).optional(),
         /** MerchantPreset.key when Received from was a catalog pick; empty = free text. */
         merchantKey: z.string().max(64).optional(),
+        /** Household Party id when Received from was a saved party. */
+        partyId: z.string().uuid().optional().or(z.literal('')),
+        /** Ask: save free-typed counterparty for next time (default true). */
+        saveParty: z.boolean().optional(),
         amount: positiveMoneyInput(msg),
         kind: z.enum(IncomeKind),
         cadence: z.enum(Cadence),

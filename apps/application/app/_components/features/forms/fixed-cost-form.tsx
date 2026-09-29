@@ -94,7 +94,7 @@ function sameCategoryAs(merchant: MerchantPreset) {
 export type FixedCostFormValues = FixedCostFormSchemaValues;
 
 type FixedCostFormProps = {
-    defaultValues?: Partial<FixedCostFormValues>;
+    defaultValues?: Partial<FixedCostFormValues> & { presetKey?: string | null };
     /** Soul → Giving deep-link: lock the Give “To whom” path. */
     defaultGivePayeeMode?: GivePayeeMode | null;
     /** Coach catalog key from URL — resolved to counterparty name once orgs load. */
@@ -460,7 +460,10 @@ export function FixedCostForm({
             form.getValues('counterparty') ??
             ''
         ).trim();
-        const matchedPreset = findByNameOrAlias(fixedCostPresets, savedName);
+        // Prefer stored presetKey — skips findByNameOrAlias for the type lookup.
+        const matchedPreset =
+            (defaultValues?.presetKey ? presetByKey.get(defaultValues.presetKey) : null) ??
+            findByNameOrAlias(fixedCostPresets, savedName);
         const matchedVendor = matchedPreset ? null : findByNameOrAlias(merchants, savedName);
 
         if (matchedPreset) {
@@ -619,6 +622,8 @@ export function FixedCostForm({
                 values.cadence
             );
             const counterpartyValue = values.counterparty?.trim() || null;
+            const merchantKey = nameLock?.kind === 'vendor' ? nameLock.merchantKey : null;
+            const saveParty = Boolean(counterpartyValue) && !merchantKey;
             const jarBalanceForName = (balancesQuery.data ?? []).find(
                 jar => jar.id === values.jarId
             );
@@ -665,13 +670,19 @@ export function FixedCostForm({
             setPendingCategoryTemplateKey(null);
 
             const endsOn = values.endsOn?.trim() ? values.endsOn.slice(0, 10) : null;
+            const presetKeyToSave = nameLock?.kind === 'preset' ? nameLock.key : null;
+
             if (mode === 'edit' && entityId) {
                 const startedOn = values.startedOn?.trim() ? values.startedOn.slice(0, 10) : null;
                 return api.money.fixedCosts.update({
                     id: entityId,
                     householdId,
                     name,
+                    presetKey: presetKeyToSave,
                     counterparty: counterpartyValue,
+                    merchantKey,
+                    partyId: null,
+                    saveParty,
                     amount: cents,
                     cadence: values.cadence,
                     jarId: values.jarId,
@@ -690,7 +701,11 @@ export function FixedCostForm({
                 jarId: values.jarId,
                 categoryId,
                 name,
+                presetKey: presetKeyToSave,
                 counterparty: counterpartyValue,
+                merchantKey,
+                partyId: null,
+                saveParty,
                 amount: cents,
                 cadence: values.cadence,
                 dueDay,
@@ -705,6 +720,7 @@ export function FixedCostForm({
         onSuccess: async result => {
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.byJar.key() });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.parties.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
             if (mode === 'create' && lockedBillPreset) {
                 await mergeImplied(audienceKeysFromFixedCostPreset(lockedBillPreset.audienceKeys));

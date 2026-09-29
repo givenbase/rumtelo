@@ -9,6 +9,7 @@ import { currentHouseholdId } from '../../../../../../common/household/household
 import { MerchantPresetService } from '../../../../../backoffice/product/money/preset/merchant/merchant.service';
 import { Category } from '../../plan/jar/category.entity';
 import { Jar } from '../../plan/jar/jar.entity';
+import { type CounterpartyPatch, PartyService } from '../../plan/party/party.service';
 import { applyDebtLinkChange } from '../../targets/debt/debt-link.util';
 import {
     applyFixedCostLinkChange,
@@ -35,7 +36,8 @@ export class TransactionService {
     constructor(
         @Inject(EntityManager) private readonly em: EntityManager,
         @Inject(SortRuleService) private readonly rules: SortRuleService,
-        @Inject(MerchantPresetService) private readonly merchants: MerchantPresetService
+        @Inject(MerchantPresetService) private readonly merchants: MerchantPresetService,
+        @Inject(PartyService) private readonly parties: PartyService
     ) {
         this.transactions = new HouseholdScopedRepository(em, Transaction);
     }
@@ -44,19 +46,20 @@ export class TransactionService {
     // ? CREATE Operations
     // ====================================================================
 
-    async create(input: {
-        accountId?: string | null;
-        jarId?: string | null;
-        categoryId?: string | null;
-        debtId?: string | null;
-        fixedCostId?: string | null;
-        amount: number;
-        bookedOn: string;
-        description: string;
-        counterparty?: string | null;
-        inflowKey?: string | null;
-        note?: string | null;
-    }) {
+    async create(
+        input: CounterpartyPatch & {
+            accountId?: string | null;
+            jarId?: string | null;
+            categoryId?: string | null;
+            debtId?: string | null;
+            fixedCostId?: string | null;
+            amount: number;
+            bookedOn: string;
+            description: string;
+            inflowKey?: string | null;
+            note?: string | null;
+        }
+    ) {
         if (input.debtId && input.fixedCostId) {
             throw new BadRequestException(
                 'Link either a debt or a fixed cost on one transaction, not both.'
@@ -66,6 +69,7 @@ export class TransactionService {
             await assertJarAllowsOutflow(this.em, input.jarId, input.amount);
         }
         await assertBookedOnPeriodOpen(this.em, input.bookedOn);
+        const other = await this.parties.resolveCounterparty(input);
         const entity = this.em.create(Transaction, {
             household: currentHouseholdId(),
             account: input.accountId ? this.em.getReference(BankAccount, input.accountId) : null,
@@ -76,7 +80,9 @@ export class TransactionService {
             amount: input.amount,
             bookedOn: input.bookedOn,
             description: input.description,
-            counterparty: input.counterparty ?? null,
+            counterparty: other.counterparty,
+            merchantKey: other.merchantKey,
+            party: other.party,
             inflowKey: input.amount > 0 ? input.inflowKey?.trim() || null : null,
             note: input.note ?? null,
             status: input.jarId ? TransactionStatus.SORTED : TransactionStatus.INBOX,
@@ -525,6 +531,8 @@ export function toDto(transaction: Transaction) {
         bookedOn: transaction.bookedOn,
         description: transaction.description,
         counterparty: transaction.counterparty,
+        merchantKey: transaction.merchantKey,
+        partyId: transaction.party,
         inflowKey: transaction.inflowKey,
         status: transaction.status,
         source: transaction.source,
