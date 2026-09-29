@@ -153,5 +153,5 @@ export {
 } from './practice-invite-intent';
 export { accountThemeFromCss, cssThemeFromAccount, type CssTheme } from './theme';
 export { formatIban, isValidIban, nlIbanBankCode, normalizeIban } from './iban';
-export { containsWord } from './text-match';
+export { containsWord, findByName, namesMatch } from './text-match';
 export { shouldShowStagingBanner } from './staging-banner';

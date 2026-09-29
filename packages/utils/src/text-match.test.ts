@@ -1,7 +1,28 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { containsWord } from './text-match';
+import { containsWord, findByName, namesMatch } from './text-match';
+
+describe('namesMatch', () => {
+    it('trims and ignores case', () => {
+        assert.equal(namesMatch('  Odido ', 'odido'), true);
+        assert.equal(namesMatch('Zilveren Kruis', 'zilveren kruis'), true);
+    });
+
+    it('treats nullish as empty', () => {
+        assert.equal(namesMatch(null, ''), true);
+        assert.equal(namesMatch(undefined, 'x'), false);
+    });
+});
+
+describe('findByName', () => {
+    it('returns the first case-insensitive name hit', () => {
+        const rows = [{ name: 'KPN' }, { name: 'Odido' }];
+        assert.equal(findByName(rows, ' odido ')?.name, 'Odido');
+        assert.equal(findByName(rows, 'missing'), null);
+        assert.equal(findByName(rows, '  '), null);
+    });
+});
 
 describe('containsWord', () => {
     it('matches whole words case-insensitively', () => {

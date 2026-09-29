@@ -45,6 +45,7 @@ import { FormInput } from './form-input';
 import { merchantsToNameOptions } from './merchant-name-options';
 import { PresetNameField, type NamePresetOption } from './preset-name-field';
 import type { MerchantPreset } from '@rumtelo/contracts';
+import { namesMatch } from '@rumtelo/utils';
 
 export type DebtFormValues = DebtFormSchemaValues;
 
@@ -110,13 +111,15 @@ export function DebtForm({
     const [typeQuery, setTypeQuery] = useState('');
     const [customLender, setCustomLender] = useState(false);
     const [lenderQuery, setLenderQuery] = useState('');
+    const [editCatalogHydrated, setEditCatalogHydrated] = useState(mode !== 'edit');
+    const [editNoTypeMatch, setEditNoTypeMatch] = useState(false);
 
     const debtTypesQuery = useLiveQuery(
         apiQuery.money.catalogs.debtPresets.list.queryOptions({
             input: { householdId: householdId! },
         }),
         [],
-        live && mode === 'create'
+        live
     );
     const merchantsQuery = useLiveQuery(
         apiQuery.money.catalogs.merchantPresets.list.queryOptions({
@@ -179,6 +182,39 @@ export function DebtForm({
 
     const scheduleKind = useWatch({ control: form.control, name: 'scheduleKind' });
     const paymentCadence = useWatch({ control: form.control, name: 'paymentCadence' });
+
+    // Edit hydrate: lock debt type from lender name / kind → unlock lender chips.
+    if (
+        mode === 'edit' &&
+        !editCatalogHydrated &&
+        debtTypesQuery.data !== undefined &&
+        merchantsQuery.data !== undefined
+    ) {
+        const savedName = defaultValues?.name ?? '';
+        const savedKind = defaultValues?.kind;
+        const merchantMatch = debtTypes.find(debtType =>
+            (debtType.merchantKeys ?? []).some(key => {
+                const merchant = merchants.find(row => row.key === key);
+                return Boolean(merchant && namesMatch(merchant.name, savedName));
+            })
+        );
+        const kindMatch =
+            merchantMatch ??
+            (savedKind ? (debtTypes.find(debtType => debtType.kind === savedKind) ?? null) : null);
+        const matched = merchantMatch ?? kindMatch ?? null;
+        if (matched) {
+            setTypeKey(matched.key);
+            form.setValue('kind', matched.kind);
+            const lendersForMatched = (matched.merchantKeys ?? [])
+                .map(key => merchants.find(row => row.key === key))
+                .filter((row): row is MerchantPreset => Boolean(row));
+            const nameInChips = lendersForMatched.some(row => namesMatch(row.name, savedName));
+            if (savedName && !nameInChips) setCustomLender(true);
+        } else {
+            setEditNoTypeMatch(true);
+        }
+        setEditCatalogHydrated(true);
+    }
 
     const saveMutation = useMutation({
         mutationFn: async (values: DebtFormValues) => {
@@ -331,7 +367,57 @@ export function DebtForm({
                     ) : null}
                 </div>
             }>
-            {mode === 'create' ? (
+            {editNoTypeMatch ? (
+                <>
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>{tDebt('who_label')}</FormLabel>
+                                <FormControl>
+                                    <PresetNameField
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        options={lenderOptions}
+                                        placeholder={tDebt('lender_example_short')}
+                                        freeTextPlaceholder={tDebt('lender_free')}
+                                        disabled={busy}
+                                        onSelect={opt => {
+                                            field.onChange(opt.name);
+                                        }}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="kind"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>{tForm('type')}</FormLabel>
+                                <FormControl>
+                                    <select
+                                        className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
+                                        {...field}>
+                                        <option value="CREDIT_CARD">
+                                            {tDebt('kind_credit_card')}
+                                        </option>
+                                        <option value="LOAN">{tDebt('kind_loan')}</option>
+                                        <option value="STUDENT">{tDebt('kind_student')}</option>
+                                        <option value="MORTGAGE">{tDebt('kind_mortgage')}</option>
+                                        <option value="FAMILY">{tDebt('kind_family')}</option>
+                                        <option value="OTHER">{tDebt('kind_other')}</option>
+                                    </select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </>
+            ) : (
                 <>
                     <div className="grid gap-2">
                         <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
@@ -483,56 +569,6 @@ export function DebtForm({
                             )}
                         </div>
                     ) : null}
-                </>
-            ) : (
-                <>
-                    <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>{tDebt('who_label')}</FormLabel>
-                                <FormControl>
-                                    <PresetNameField
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        options={lenderOptions}
-                                        placeholder={tDebt('lender_example_short')}
-                                        freeTextPlaceholder={tDebt('lender_free')}
-                                        disabled={busy}
-                                        onSelect={opt => {
-                                            field.onChange(opt.name);
-                                        }}
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="kind"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>{tForm('type')}</FormLabel>
-                                <FormControl>
-                                    <select
-                                        className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
-                                        {...field}>
-                                        <option value="CREDIT_CARD">
-                                            {tDebt('kind_credit_card')}
-                                        </option>
-                                        <option value="LOAN">{tDebt('kind_loan')}</option>
-                                        <option value="STUDENT">{tDebt('kind_student')}</option>
-                                        <option value="MORTGAGE">{tDebt('kind_mortgage')}</option>
-                                        <option value="FAMILY">{tDebt('kind_family')}</option>
-                                        <option value="OTHER">{tDebt('kind_other')}</option>
-                                    </select>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
                 </>
             )}
 
