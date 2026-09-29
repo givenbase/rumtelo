@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260928195131_InitialSchema extends Migration {
+export class Migration20260929141914_InitialSchema extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create schema if not exists "backoffice";`);
@@ -101,7 +101,7 @@ export class Migration20260928195131_InitialSchema extends Migration {
     this.addSql(`create index "platform_coach_message_household_id_account_id_key_index" on "platform_coach_message" ("household_id", "account_id", "key");`);
     this.addSql(`create index "platform_coach_message_household_id_period_index" on "platform_coach_message" ("household_id", "period");`);
 
-    this.addSql(`create table "money_debt" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "name" varchar(120) not null, "balance" bigint not null, "original_balance" bigint not null, "interest_rate" numeric(5,2) not null default 0.00, "minimum_payment" bigint not null default 0, "extra_payment" bigint not null default 0, "term_payments" smallint null, "due_day" smallint null, "started_on" date null, "maturity_on" date null, "closed_on" date null, "kind" "public"."money_debt_kind" not null default 'LOAN', "schedule_kind" "public"."money_debt_schedule_kind" not null default 'OPEN', "payment_cadence" "public"."money_cadence" not null default 'MONTHLY', constraint "money_debt_pkey" primary key ("id"));`);
+    this.addSql(`create table "money_debt" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "name" varchar(120) not null, "balance" bigint not null, "original_balance" bigint not null, "interest_rate" numeric(5,2) not null default 0.00, "minimum_payment" bigint not null default 0, "extra_payment" bigint not null default 0, "term_payments" smallint null, "due_month" smallint null, "due_day" smallint null, "started_on" date null, "maturity_on" date null, "closed_on" date null, "kind" "public"."money_debt_kind" not null default 'LOAN', "schedule_kind" "public"."money_debt_schedule_kind" not null default 'OPEN', "payment_cadence" "public"."money_cadence" not null default 'MONTHLY', constraint "money_debt_pkey" primary key ("id"));`);
     this.addSql(`create index "money_debt_household_id_index" on "money_debt" ("household_id");`);
 
     this.addSql(`create table "backoffice"."reference_money_debt_preset" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "key" varchar(64) not null, "name" varchar(120) not null, "sort_order" int not null default 0, "is_active" boolean not null default true, "icon" varchar(8) null, "kind" "public"."money_debt_kind" not null, constraint "reference_money_debt_preset_pkey" primary key ("id"));`);
@@ -166,7 +166,7 @@ export class Migration20260928195131_InitialSchema extends Migration {
     this.addSql(`create index "money_category_jar_id_index" on "money_category" ("jar_id");`);
     this.addSql(`alter table "money_category" add constraint "money_category_household_id_jar_id_name_unique" unique ("household_id", "jar_id", "name");`);
 
-    this.addSql(`create table "money_fixed_cost" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "name" varchar(120) not null, "note" text null, "counterparty" varchar(160) null, "amount" bigint not null, "is_active" boolean not null default true, "due_day" smallint null, "started_on" date null, "ends_on" date null, "cadence" "public"."money_cadence" not null default 'MONTHLY', "direction" "public"."money_flow_direction" not null default 'OUT', "jar_id" uuid not null, "category_id" uuid null, "debt_id" uuid null, constraint "money_fixed_cost_pkey" primary key ("id"));`);
+    this.addSql(`create table "money_fixed_cost" ("id" uuid not null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "household_id" uuid not null, "name" varchar(120) not null, "note" text null, "counterparty" varchar(160) null, "amount" bigint not null, "is_active" boolean not null default true, "due_month" smallint null, "due_day" smallint null, "started_on" date null, "ends_on" date null, "cadence" "public"."money_cadence" not null default 'MONTHLY', "direction" "public"."money_flow_direction" not null default 'OUT', "jar_id" uuid not null, "category_id" uuid null, "debt_id" uuid null, constraint "money_fixed_cost_pkey" primary key ("id"));`);
     this.addSql(`create index "money_fixed_cost_household_id_index" on "money_fixed_cost" ("household_id");`);
     this.addSql(`create index "money_fixed_cost_category_id_index" on "money_fixed_cost" ("category_id");`);
     this.addSql(`create index "money_fixed_cost_jar_id_index" on "money_fixed_cost" ("jar_id");`);

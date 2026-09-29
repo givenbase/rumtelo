@@ -8,6 +8,8 @@ import { MikroORM } from '@mikro-orm/postgresql';
 
 import config from '../../mikro-orm.config';
 
+import { withTransientRetry } from './transient-retry.ts';
+
 /** GitHub Actions / any host outside Railway cannot resolve private mesh DNS. */
 function assertPublicDatabaseUrl(url: string | undefined): void {
     if (!url) {
@@ -27,7 +29,7 @@ function assertPublicDatabaseUrl(url: string | undefined): void {
 async function main() {
     assertPublicDatabaseUrl(process.env.DATABASE_URL);
 
-    const orm = await MikroORM.init(config);
+    const orm = await withTransientRetry('migrate:init', () => MikroORM.init(config));
     try {
         const migrator = orm.migrator;
         const pending = await migrator.getPendingMigrations();
@@ -36,7 +38,7 @@ async function main() {
             return;
         }
         console.log(`Applying ${pending.length} migration(s)…`);
-        const executed = await migrator.up();
+        const executed = await withTransientRetry('migrate:up', () => migrator.up());
         for (const m of executed) {
             console.log(`  ✓ ${m.name}`);
         }

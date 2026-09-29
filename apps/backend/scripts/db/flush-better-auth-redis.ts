@@ -1,13 +1,14 @@
 /**
- * Better Auth Redis session cleanup.
+ * Wipe Rumtelo Redis after a DB reset (ghost Better Auth sessions).
  *
- * Sessions live only in Redis (`better-auth:`). After a DB wipe, cookies still
- * look signed-in while `auth.user` is gone → ghost sessions.
+ * This Redis is app-owned: sessions, rate-limit counters, sign-up stash —
+ * nothing durable. Default is `FLUSHDB` (empty the current DB).
  *
- * Usage (env: DATABASE_REDIS_URL, and DATABASE_URL for --orphans):
- *   pnpm redis:flush-auth              # wipe all better-auth:* keys (post db:fresh)
- *   pnpm redis:flush-auth -- --orphans # delete only sessions whose userId is missing
- *   pnpm redis:flush-auth -- --dry-run # orphans mode: report only
+ * Usage (env: DATABASE_REDIS_URL; DATABASE_URL for --orphans):
+ *   pnpm redis:flush-auth              # FLUSHDB — full wipe (post db:fresh)
+ *   pnpm redis:flush-auth -- --auth-only  # only delete better-auth:* keys
+ *   pnpm redis:flush-auth -- --orphans # sessions whose auth.user is gone
+ *   pnpm redis:flush-auth -- --dry-run # report only (auth-only / orphans)
  */
 import { loadEnvFiles } from '../../src/common/config/load-env.ts';
 
@@ -23,22 +24,37 @@ const ACTIVE_PREFIX = `${KEY_PREFIX}active-sessions-`;
 const SCAN_COUNT = 200;
 
 const orphansOnly = process.argv.includes('--orphans');
+const authOnly = process.argv.includes('--auth-only');
 const dryRun = process.argv.includes('--dry-run');
 
 async function connectRedis(): Promise<Redis | null> {
     const url = process.env.DATABASE_REDIS_URL;
     if (!url) {
-        console.log('[flush-better-auth-redis] DATABASE_REDIS_URL unset — skip');
+        const nodeEnv = process.env.NODE_ENV || 'development';
+        if (nodeEnv === 'staging' || nodeEnv === 'production') {
+            console.warn(
+                `[flush-better-auth-redis] DATABASE_REDIS_URL unset under NODE_ENV=${nodeEnv} — skip.\n` +
+                    `  Run: pnpm env:use:${nodeEnv}  (copies Redis URL from .env.github.secrets.${nodeEnv})`
+            );
+        } else {
+            console.log('[flush-better-auth-redis] DATABASE_REDIS_URL unset — skip');
+        }
         return null;
     }
     if (!isRedisUrl(url)) {
         console.warn(`[flush-better-auth-redis] invalid URL (${redactRedisUrl(url)}) — skip`);
         return null;
     }
-    return new Redis(url, {
+    const client = new Redis(url, {
         maxRetriesPerRequest: 3,
-        enableOfflineQueue: false,
+        enableOfflineQueue: true,
+        retryStrategy: times => (times > 3 ? null : Math.min(times * 200, 1000)),
     });
+    client.on('error', (err: Error) => {
+        console.warn(`[flush-better-auth-redis] redis error: ${err.message}`);
+    });
+    await client.ping();
+    return client;
 }
 
 async function scanKeys(client: Redis, match: string): Promise<string[]> {
@@ -52,7 +68,20 @@ async function scanKeys(client: Redis, match: string): Promise<string[]> {
     return found;
 }
 
-async function flushAll(client: Redis): Promise<void> {
+async function flushDb(client: Redis): Promise<void> {
+    const target = redactRedisUrl(process.env.DATABASE_REDIS_URL);
+    if (dryRun) {
+        const size = await client.dbsize();
+        console.log(
+            `[flush-better-auth-redis] dry-run: would FLUSHDB (${size} key(s)) → ${target}`
+        );
+        return;
+    }
+    await client.flushdb();
+    console.log(`[flush-better-auth-redis] FLUSHDB ok → ${target}`);
+}
+
+async function flushAuthKeys(client: Redis): Promise<void> {
     const keys = await scanKeys(client, `${KEY_PREFIX}*`);
     if (keys.length === 0) {
         console.log(`[flush-better-auth-redis] no ${KEY_PREFIX}* keys`);
@@ -64,12 +93,9 @@ async function flushAll(client: Redis): Promise<void> {
     }
     let deleted = 0;
     for (let i = 0; i < keys.length; i += 100) {
-        const chunk = keys.slice(i, i + 100);
-        deleted += await client.del(...chunk);
+        deleted += await client.del(...keys.slice(i, i + 100));
     }
-    console.log(
-        `[flush-better-auth-redis] deleted ${deleted} key(s) under ${KEY_PREFIX}* (${redactRedisUrl(process.env.DATABASE_REDIS_URL)})`
-    );
+    console.log(`[flush-better-auth-redis] deleted ${deleted} ${KEY_PREFIX}* key(s)`);
 }
 
 type SessionRef = { token?: string; expiresAt?: number };
@@ -98,10 +124,6 @@ async function flushOrphans(client: Redis): Promise<void> {
 
     try {
         const listKeys = await scanKeys(client, `${ACTIVE_PREFIX}*`);
-        console.log(
-            `[flush-better-auth-redis] scanning ${listKeys.length} active-sessions list(s)`
-        );
-
         let orphanUsers = 0;
         let deletedKeys = 0;
 
@@ -145,7 +167,8 @@ async function main(): Promise<void> {
 
     try {
         if (orphansOnly) await flushOrphans(client);
-        else await flushAll(client);
+        else if (authOnly) await flushAuthKeys(client);
+        else await flushDb(client);
     } finally {
         client.disconnect();
     }
