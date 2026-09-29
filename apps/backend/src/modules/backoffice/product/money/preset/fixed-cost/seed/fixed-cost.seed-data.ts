@@ -239,6 +239,13 @@ export const FIXED_COST_PRESET_SEED: readonly Seed[] = [
         audienceKeys: [AudienceKey.CAR_OWNER],
     },
     {
+        key: 'CAR_RENTAL',
+        name: 'Car rental / car sharing',
+        jarKey: necessities,
+        categoryTemplateKey: 'TRANSPORT',
+        audienceKeys: [AudienceKey.CAR_OWNER, AudienceKey.COMMON],
+    },
+    {
         key: 'CAR_LOAN_PAYMENT',
         name: 'Car loan payment',
         jarKey: necessities,
