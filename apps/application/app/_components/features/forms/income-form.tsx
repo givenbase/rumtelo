@@ -25,6 +25,7 @@ import type { IncomeAmountPeriod, IncomeSourcePreset } from '@rumtelo/contracts'
 import { Cadence, IncomeKind } from '@rumtelo/contracts';
 
 import { useTranslations } from '@rumtelo/i18n';
+import { findByName } from '@rumtelo/utils';
 
 import { CREATE_HREF } from '@/app/_lib/create-routes';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
@@ -359,11 +360,15 @@ export function IncomeForm({
             <FormField
                 control={form.control}
                 name="name"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>{tForm('fields.name')}</FormLabel>
-                        <FormControl>
-                            {mode === 'create' ? (
+                render={({ field }) => {
+                    const lockedIncomeKey =
+                        mode === 'edit'
+                            ? (findByName(presetOptions, field.value)?.key ?? null)
+                            : null;
+                    return (
+                        <FormItem>
+                            <FormLabel>{tForm('fields.name')}</FormLabel>
+                            <FormControl>
                                 <PresetNameField
                                     value={field.value}
                                     onChange={field.onChange}
@@ -372,6 +377,7 @@ export function IncomeForm({
                                     options={presetOptions}
                                     lockPresets
                                     freeTextKeys={['OTHER']}
+                                    initialLockedKey={lockedIncomeKey}
                                     onClear={() => {
                                         form.setValue('kind', IncomeKind.SALARY);
                                         form.setValue('cadence', Cadence.MONTHLY);
@@ -385,13 +391,11 @@ export function IncomeForm({
                                         form.setValue('cadence', full.cadence);
                                     }}
                                 />
-                            ) : (
-                                <FormInput placeholder={tIncome('name_placeholder')} {...field} />
-                            )}
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    );
+                }}
             />
 
             <FormField

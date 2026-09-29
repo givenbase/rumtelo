@@ -15,7 +15,7 @@ import {
     VendorMark,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
-import { cn } from '@rumtelo/utils';
+import { cn, findByName, namesMatch } from '@rumtelo/utils';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { AssetKind, AssetPreset, MerchantPreset } from '@rumtelo/contracts';
@@ -94,6 +94,9 @@ export function AssetForm({
     const { mergeImplied } = useMergeHouseholdAudiences();
     const queryClient = useQueryClient();
     const [presetKey, setPresetKey] = useState(defaultValues?.presetKey ?? null);
+    const [assetPresetHydrated, setAssetPresetHydrated] = useState(
+        mode !== 'edit' || Boolean(defaultValues?.presetKey)
+    );
     const [showAllCarBrands, setShowAllCarBrands] = useState(false);
     const [carBrandQuery, setCarBrandQuery] = useState('');
 
@@ -124,6 +127,8 @@ export function AssetForm({
         () => filterCarBrands(merchantsQuery.data ?? EMPTY_MERCHANTS),
         [merchantsQuery.data]
     );
+
+    const hasOtherPreset = presets.some(p => p.key === 'OTHER');
 
     const assetFormSchema = useMemo(() => createAssetFormSchema(tForm), [tForm]);
 
@@ -214,6 +219,24 @@ export function AssetForm({
         form.setValue('name', brand.name, { shouldDirty: true, shouldValidate: true });
         const carPreset = presets.find(row => row.key === 'CAR');
         setPresetKey(carPreset?.key ?? null);
+    }
+
+    // Edit hydrate: lock name to catalog preset when presetKey was not saved.
+    if (mode === 'edit' && !assetPresetHydrated && presetsQuery.data !== undefined) {
+        const savedName = (defaultValues?.name ?? '').trim();
+        if (savedName && presetKey === null) {
+            const matched = findByName(presets, savedName);
+            if (matched) {
+                setPresetKey(matched.key);
+            } else {
+                const savedKind = form.getValues('kind');
+                const kindMatch = presets.find(
+                    preset => preset.kindKey === savedKind && namesMatch(preset.name, savedName)
+                );
+                if (kindMatch) setPresetKey(kindMatch.key);
+            }
+        }
+        setAssetPresetHydrated(true);
     }
 
     const saveMutation = useMutation({
@@ -408,6 +431,9 @@ export function AssetForm({
                                 options={suggestions}
                                 placeholder={tAsset('name_placeholder')}
                                 freeTextPlaceholder={tAsset('name_free_placeholder')}
+                                lockPresets
+                                freeTextKeys={hasOtherPreset ? ['OTHER'] : undefined}
+                                initialLockedKey={presetKey}
                                 onChange={value => {
                                     field.onChange(value);
                                     const preset = presets.find(row => row.key === presetKey);

@@ -6,6 +6,7 @@ import { useLiveQuery } from '@rumtelo/hooks';
 
 import { isLiveData } from '@/app/_lib/preview';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { namesMatch } from '@rumtelo/utils';
 
 /** Resolve or create a household category under a jar by display name. */
 export async function resolveCategoryId(opts: {
@@ -18,7 +19,7 @@ export async function resolveCategoryId(opts: {
     const name = opts.categoryName.trim();
     if (!name) return null;
     const found = opts.existing.find(
-        category => !category.isArchived && category.name.toLowerCase() === name.toLowerCase()
+        category => !category.isArchived && namesMatch(category.name, name)
     );
     if (found) return found.id;
     const created = await opts.api.money.jars.createCategory({

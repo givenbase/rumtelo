@@ -41,6 +41,7 @@ import { GivingFinder } from '@/components/features/money/giving-finder';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
+import { findByName, namesMatch } from '@rumtelo/utils';
 import { createGoalFormSchema, type GoalFormSchemaValues } from './form-zod';
 import { CatalogChipPicker } from './catalog-chip-picker';
 import { matchesChipQuery } from './chip-search';
@@ -131,6 +132,7 @@ export function GoalForm({
         resolveGiveTargetMode(defaultValues, t)
     );
     const [goalPresetKey, setGoalPresetKey] = useState<string | null>(null);
+    const [goalPresetHydrated, setGoalPresetHydrated] = useState(mode !== 'edit');
     const [showAllCarBrands, setShowAllCarBrands] = useState(false);
     const [carBrandQuery, setCarBrandQuery] = useState('');
 
@@ -146,7 +148,7 @@ export function GoalForm({
             input: { householdId: householdId! },
         }),
         [],
-        live && mode === 'create'
+        live
     );
     const presetOptions = useMemo(
         () =>
@@ -164,7 +166,7 @@ export function GoalForm({
             input: { householdId: householdId! },
         }),
         [],
-        live && mode === 'create'
+        live
     );
     const carBrands = useMemo(
         () => filterCarBrands(merchantsQuery.data ?? []),
@@ -224,6 +226,21 @@ export function GoalForm({
             form.setValue('jarId', lts?.id ?? jars[0]!.id);
         }
     }, [jars, form, isEarn, isGive]);
+
+    // Edit hydrate: lock save-goal name to catalog preset (or CAR brand).
+    if (mode === 'edit' && !goalPresetHydrated && presetsQuery.data !== undefined) {
+        const savedName = (defaultValues?.name ?? '').trim();
+        if (savedName) {
+            const matched = findByName(presetOptions, savedName);
+            if (matched) {
+                setGoalPresetKey(matched.key);
+            } else if (carBrands.some(brand => namesMatch(brand.name, savedName))) {
+                const carPreset = presetOptions.find(preset => preset.key === 'CAR');
+                if (carPreset) setGoalPresetKey(carPreset.key);
+            }
+        }
+        setGoalPresetHydrated(true);
+    }
 
     const onError = createFormInvalidHandler(
         ({ title, description }) => {
@@ -599,7 +616,7 @@ export function GoalForm({
                                 : tUiForm('fields.name')}
                         </FormLabel>
                         <FormControl>
-                            {mode === 'create' && !isEarn && !isGive ? (
+                            {!isEarn && !isGive ? (
                                 <PresetNameField
                                     value={field.value}
                                     placeholder={tForm('name_placeholder_save')}
@@ -607,6 +624,11 @@ export function GoalForm({
                                     options={presetOptions}
                                     lockPresets
                                     freeTextKeys={['OTHER']}
+                                    initialLockedKey={
+                                        goalPresetKey !== null && goalPresetKey !== 'OTHER'
+                                            ? goalPresetKey
+                                            : null
+                                    }
                                     onChange={value => {
                                         field.onChange(value);
                                         if (

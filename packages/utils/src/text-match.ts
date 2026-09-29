@@ -1,5 +1,22 @@
 const WORD_CHAR = /[\p{L}\p{N}]/u;
 
+/** Trim + case-insensitive equality for display names / payees / presets. */
+export function namesMatch(
+    left: string | null | undefined,
+    right: string | null | undefined
+): boolean {
+    return (left ?? '').trim().toLowerCase() === (right ?? '').trim().toLowerCase();
+}
+
+/** First catalog row whose `name` matches the needle (trim + case-insensitive). */
+export function findByName<T extends { name: string }>(
+    items: readonly T[],
+    name: string | null | undefined
+): T | null {
+    if (!name?.trim()) return null;
+    return items.find(item => namesMatch(item.name, name)) ?? null;
+}
+
 /**
  * Case-insensitive needle match that respects word edges on the needle's own
  * letter/digit ends — the shared first-pass matcher for merchant needles.
