@@ -73,6 +73,7 @@ export type ExpenseFormSchemaValues = z.infer<ReturnType<typeof createExpenseFor
 export function createIncomeFormSchema(msg: FormT) {
     return z.object({
         name: z.string().min(1, msg('validation.name_required')).max(120),
+        counterparty: z.string().max(160).optional(),
         amount: positiveMoneyInput(msg),
         kind: z.enum(IncomeKind),
         cadence: z.enum(Cadence),

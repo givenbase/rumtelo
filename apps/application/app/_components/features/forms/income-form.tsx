@@ -43,6 +43,7 @@ import { ConfirmActionButton } from './confirm-action-button';
 import { createIncomeFormSchema, type IncomeFormSchemaValues } from './form-zod';
 import { FormDatePicker } from './form-date-picker';
 import { FormInput } from './form-input';
+import { merchantsToNameOptions } from './merchant-name-options';
 import { PresetNameField } from './preset-name-field';
 
 const INCOME_KIND_ICON: Record<IncomeKind, string> = {
@@ -94,6 +95,13 @@ export function IncomeForm({
 
     const presetsQuery = useLiveQuery(
         apiQuery.money.catalogs.incomeSourcePresets.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [],
+        live
+    );
+    const merchantsQuery = useLiveQuery(
+        apiQuery.money.catalogs.merchantPresets.list.queryOptions({
             input: { householdId: householdId! },
         }),
         [],
@@ -176,11 +184,20 @@ export function IncomeForm({
         [presetsQuery.data, incomeKindGroup]
     );
 
+    const payerOptions = useMemo(
+        () =>
+            merchantsToNameOptions(merchantsQuery.data ?? [], {
+                badge: tIncome('option_badge_payer'),
+            }),
+        [merchantsQuery.data, tIncome]
+    );
+
     const incomeFormSchema = useMemo(() => createIncomeFormSchema(tForm), [tForm]);
 
     const form = useForm<IncomeFormValues>({
         defaultValues: {
             name: defaultValues?.name ?? '',
+            counterparty: defaultValues?.counterparty ?? '',
             amount: defaultValues?.amount ?? '',
             kind: defaultValues?.kind ?? IncomeKind.SALARY,
             cadence: defaultValues?.cadence ?? Cadence.MONTHLY,
@@ -217,6 +234,7 @@ export function IncomeForm({
             const cents = parseAmountToMinorUnits(values.amount);
             if (cents === null || cents <= 0) throw new Error('Invalid amount');
             const name = values.name.trim();
+            const counterparty = values.counterparty?.trim() || null;
             const endsOn = values.endsOn?.trim() ? values.endsOn.slice(0, 10) : null;
             if (mode === 'edit' && entityId) {
                 const startedOn = values.startedOn?.trim() ? values.startedOn.slice(0, 10) : null;
@@ -224,6 +242,7 @@ export function IncomeForm({
                     id: entityId,
                     householdId,
                     name,
+                    counterparty,
                     amount: cents,
                     startedOn,
                     endsOn,
@@ -237,6 +256,7 @@ export function IncomeForm({
             return api.money.income.create({
                 householdId,
                 name,
+                counterparty,
                 amount: cents,
                 kind: values.kind,
                 cadence: values.cadence,
@@ -399,6 +419,28 @@ export function IncomeForm({
                         </FormItem>
                     );
                 }}
+            />
+
+            <FormField
+                control={form.control}
+                name="counterparty"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>{tIncome('received_from')}</FormLabel>
+                        <FormControl>
+                            <PresetNameField
+                                value={field.value ?? ''}
+                                onChange={field.onChange}
+                                placeholder={tIncome('received_from_placeholder')}
+                                options={payerOptions}
+                                onSelect={opt => {
+                                    field.onChange(opt.name);
+                                }}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
             />
 
             <FormField

@@ -119,6 +119,7 @@ export class ArchiveService {
             if (!dryRun) {
                 await this.income.create({
                     name: row.name,
+                    counterparty: row.counterparty ?? null,
                     kind: row.kind,
                     amount: row.amount,
                     cadence: row.cadence,

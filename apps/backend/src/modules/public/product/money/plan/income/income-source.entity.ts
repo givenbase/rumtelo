@@ -19,9 +19,13 @@ import { entityConfig } from '../../../../../../common/database/entity-config.ut
 @Entity(entityConfig({ schema: 'public', domain: 'money', tableName: 'income_source' }))
 export class IncomeSource extends HouseholdEntity {
     // ? PROPERTIES
-    /** Household-facing label ("Salary Anna"). */
+    /** Household-facing label ("Salary", "Trading"). */
     @Property({ length: 120 })
     name!: string;
+
+    /** Employer, client, or platform (DEGIRO, ACME BV). Mirrors Transaction.counterparty. */
+    @Property({ length: 160, nullable: true })
+    counterparty: string | null = null;
 
     /** Current amount per cadence in minor units — mirror of the latest amount period. */
     @Property({ type: MoneyType })

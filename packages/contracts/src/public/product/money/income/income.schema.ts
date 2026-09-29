@@ -21,6 +21,8 @@ export const IncomeSource = z.object({
     id: Id,
     householdId: HouseholdId,
     name: z.string().min(1).max(120),
+    /** Employer, client, or platform (DEGIRO, ACME BV). Optional. */
+    counterparty: z.string().max(160).nullable().default(null),
     kind: z.enum(IncomeKind),
     /** Cached current amount (latest period) — used by jar monthly net. */
     amount: Money,

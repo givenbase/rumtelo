@@ -167,6 +167,7 @@ export function buildExportSheets(bundle: HouseholdExportBundle): ExportSheet[] 
             rows: bundle.income.map(source => ({
                 id: source.id,
                 name: source.name,
+                counterparty: source.counterparty ?? '',
                 kind: source.kind,
                 amountCents: source.amount,
                 cadence: source.cadence,

@@ -40,6 +40,7 @@ export class IncomeService {
 
     async create(input: {
         name: string;
+        counterparty?: string | null;
         kind: string;
         amount: number;
         cadence?: string;
@@ -52,6 +53,7 @@ export class IncomeService {
         const source = this.em.create(IncomeSource, {
             household: currentHouseholdId(),
             name: input.name,
+            counterparty: input.counterparty ?? null,
             kind: input.kind as IncomeKind,
             amount: input.amount,
             cadence: (input.cadence as Cadence) ?? Cadence.MONTHLY,
@@ -102,6 +104,7 @@ export class IncomeService {
         id: string,
         patch: Partial<{
             name: string;
+            counterparty: string | null;
             kind: string;
             amount: number;
             cadence: string;
@@ -120,6 +123,7 @@ export class IncomeService {
             throw apiBadRequest('income_kind_cadence_locked');
         }
         if (patch.name !== undefined) source.name = patch.name;
+        if (patch.counterparty !== undefined) source.counterparty = patch.counterparty;
         if (patch.expectedDay !== undefined) source.expectedDay = patch.expectedDay;
         if (patch.isActive !== undefined) source.isActive = patch.isActive;
         if (patch.startedOn !== undefined) source.startedOn = patch.startedOn;
@@ -194,6 +198,7 @@ export class IncomeService {
             id: source.id,
             householdId: source.household,
             name: source.name,
+            counterparty: source.counterparty,
             kind: source.kind,
             amount: source.amount,
             cadence: source.cadence,

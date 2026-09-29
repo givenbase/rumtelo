@@ -272,9 +272,15 @@ export function IncomePageClient() {
                                         href={updateHref('income', source.id)}
                                         className="flex w-full items-center justify-between gap-3 border-b border-line px-4 py-2.5 text-left last:border-b-0 hover:bg-raised sm:px-5 sm:py-3">
                                         <div>
-                                            <div className="text-sm text-fg">{source.name}</div>
+                                            <div className="text-sm text-fg">
+                                                {source.counterparty?.trim() || source.name}
+                                            </div>
                                             <div className="mt-0.5 font-mono text-xs tracking-normal text-fg-faint">
-                                                {applies ? source.kind : tFixed('status_planned')}
+                                                {applies
+                                                    ? source.counterparty?.trim()
+                                                        ? source.name
+                                                        : source.kind
+                                                    : tFixed('status_planned')}
                                             </div>
                                         </div>
                                         <span
