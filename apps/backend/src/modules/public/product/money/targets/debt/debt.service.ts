@@ -14,6 +14,7 @@ import {
     type DebtKind,
     type DebtPaymentCadence,
 } from '@rumtelo/contracts';
+import { normalizeDueMonth } from '@rumtelo/utils';
 
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
@@ -50,6 +51,7 @@ export class DebtService {
         minimumPayment?: number;
         extraPayment?: number;
         dueDay?: number | null;
+        dueMonth?: number | null;
         closedOn?: string | null;
         startedOn?: string | null;
         scheduleKind?: DebtScheduleKind;
@@ -59,6 +61,9 @@ export class DebtService {
         linkFixedCost?: boolean;
     }) {
         const scheduleKind = input.scheduleKind ?? DebtScheduleKind.OPEN;
+        const paymentCadence = input.paymentCadence ?? Cadence.MONTHLY;
+        const dueMonth = normalizeDueMonth(input.dueMonth, paymentCadence);
+        assertDueMonthForCadence(paymentCadence, dueMonth);
         const entity = this.em.create(Debt, {
             household: currentHouseholdId(),
             name: input.name,
@@ -69,10 +74,11 @@ export class DebtService {
             minimumPayment: input.minimumPayment ?? 0,
             extraPayment: input.extraPayment ?? 0,
             dueDay: input.dueDay ?? null,
+            dueMonth,
             closedOn: input.closedOn ?? null,
             startedOn: input.startedOn ?? null,
             scheduleKind,
-            paymentCadence: input.paymentCadence ?? Cadence.MONTHLY,
+            paymentCadence,
             termPayments:
                 scheduleKind === DebtScheduleKind.TERM ? (input.termPayments ?? null) : null,
             maturityOn:
@@ -212,6 +218,7 @@ export class DebtService {
             minimumPayment: number;
             extraPayment: number;
             dueDay: number | null;
+            dueMonth: number | null;
             closedOn: string | null;
             startedOn: string | null;
             scheduleKind: DebtScheduleKind;
@@ -232,6 +239,7 @@ export class DebtService {
         if (patch.minimumPayment !== undefined) entity.minimumPayment = patch.minimumPayment;
         if (patch.extraPayment !== undefined) entity.extraPayment = patch.extraPayment;
         if (patch.dueDay !== undefined) entity.dueDay = patch.dueDay;
+        if (patch.dueMonth !== undefined) entity.dueMonth = patch.dueMonth;
         if (patch.closedOn !== undefined) entity.closedOn = patch.closedOn;
         if (patch.startedOn !== undefined) entity.startedOn = patch.startedOn;
         if (patch.paymentCadence !== undefined) entity.paymentCadence = patch.paymentCadence;
@@ -254,6 +262,9 @@ export class DebtService {
             if (patch.termPayments !== undefined) entity.termPayments = patch.termPayments;
             if (patch.maturityOn !== undefined) entity.maturityOn = patch.maturityOn;
         }
+
+        entity.dueMonth = normalizeDueMonth(entity.dueMonth, entity.paymentCadence);
+        assertDueMonthForCadence(entity.paymentCadence, entity.dueMonth);
 
         const linked = await this.em.findOne(FixedCost, {
             debt: entity.id,
@@ -334,6 +345,7 @@ export class DebtService {
                 amount: debt.minimumPayment,
                 cadence: debt.paymentCadence,
                 dueDay: debt.dueDay,
+                dueMonth: debt.dueMonth,
                 direction: FlowDirection.OUT,
                 isActive: !debt.closedOn,
                 startedOn: debt.startedOn,
@@ -349,6 +361,7 @@ export class DebtService {
         fixed.amount = debt.minimumPayment;
         fixed.cadence = debt.paymentCadence;
         fixed.dueDay = debt.dueDay;
+        fixed.dueMonth = debt.dueMonth;
         fixed.isActive = !debt.closedOn;
         fixed.endsOn = debt.closedOn ?? debt.maturityOn;
         if (category) fixed.category = this.em.getReference(Category, category.id);
@@ -391,6 +404,11 @@ function addMonths(months: number): string {
         .slice(0, 10);
 }
 
+function assertDueMonthForCadence(cadence: Cadence, dueMonth: number | null) {
+    if (cadence !== Cadence.QUARTERLY && cadence !== Cadence.YEARLY) return;
+    if (dueMonth === null) throw apiBadRequest('due_month_required');
+}
+
 export function toDto(debt: Debt) {
     return {
         id: debt.id,
@@ -403,6 +421,7 @@ export function toDto(debt: Debt) {
         minimumPayment: debt.minimumPayment,
         extraPayment: debt.extraPayment,
         dueDay: debt.dueDay,
+        dueMonth: debt.dueMonth,
         closedOn: debt.closedOn,
         startedOn: debt.startedOn,
         scheduleKind: debt.scheduleKind,
@@ -447,6 +466,7 @@ function toLinkedFixedCostDto(fixedCost: FixedCost) {
         amount: fixedCost.amount,
         cadence: fixedCost.cadence,
         dueDay: fixedCost.dueDay,
+        dueMonth: fixedCost.dueMonth,
         direction: fixedCost.direction,
         isActive: fixedCost.isActive,
         startedOn: fixedCost.startedOn,

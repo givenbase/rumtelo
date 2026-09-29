@@ -48,6 +48,12 @@ export class Debt extends HouseholdEntity {
     @Property({ type: 'smallint', nullable: true })
     termPayments: number | null = null;
 
+    /**
+     * When in the period: QUARTERLY → 1–3; YEARLY → 1–12. Null for WEEKLY / MONTHLY.
+     */
+    @Property({ type: 'smallint', nullable: true })
+    dueMonth: number | null = null;
+
     /** Day of month the payment is due (1–31); null = unknown. */
     @Property({ type: 'smallint', nullable: true })
     dueDay: number | null = null;

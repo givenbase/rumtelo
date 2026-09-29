@@ -53,10 +53,11 @@ import { CoachTipCard } from '@/components/features/helpers';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
-import { findByNameOrAlias, namesMatch } from '@rumtelo/utils';
+import { findByNameOrAlias, namesMatch, normalizeDueDay, normalizeDueMonth } from '@rumtelo/utils';
 
 import { createFixedCostFormSchema, type FixedCostFormSchemaValues } from './form-zod';
 import { CadencePicker, type CadencePickerOption, toRecurringCadence } from './cadence-picker';
+import { clampDueDayInput, clampDueMonthInput, DueDayField } from './due-day-field';
 import { CATALOG_CHIP_IDLE_LIMIT, CatalogChipPicker } from './catalog-chip-picker';
 import { ConfirmActionButton } from './confirm-action-button';
 import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
@@ -107,6 +108,7 @@ export function FixedCostForm({
 }: FixedCostFormProps) {
     const t = useTranslations();
     const tFixed = useTranslations('features.money.fixed_form');
+    const tChips = useTranslations('features.money.chips');
     const tProfile = useTranslations('features.money.household_profile');
     const tForm = useTranslations('ui.form');
     const tBtn = useTranslations('ui.button.actions');
@@ -342,6 +344,7 @@ export function FixedCostForm({
             jarId: defaultValues?.jarId ?? '',
             categoryId: defaultValues?.categoryId ?? null,
             dueDay: defaultValues?.dueDay ?? '',
+            dueMonth: defaultValues?.dueMonth ?? '',
             startedOn: defaultValues?.startedOn ?? periodDefaultDate,
             endsOn: defaultValues?.endsOn ?? '',
         },
@@ -352,6 +355,7 @@ export function FixedCostForm({
     const selectedCategoryId = useWatch({ control: form.control, name: 'categoryId' });
     const counterparty = useWatch({ control: form.control, name: 'counterparty' });
     const cadence = useWatch({ control: form.control, name: 'cadence' });
+    const dueMonthValue = useWatch({ control: form.control, name: 'dueMonth' });
     const isGive = useMemo(
         () => jars.find(jar => jar.id === selectedJarId)?.key === JarKey.GIVE,
         [jars, selectedJarId]
@@ -536,8 +540,14 @@ export function FixedCostForm({
             if (!householdId) throw new Error('No household');
             const cents = parseAmountToMinorUnits(values.amount);
             if (cents === null || cents <= 0) throw new Error('Invalid amount');
-            const due = values.dueDay?.trim() ? Number(values.dueDay) : null;
-            const dueDay = due !== null && due >= 1 && due <= 31 ? due : null;
+            const dueDay = normalizeDueDay(
+                values.dueDay?.trim() ? Number(values.dueDay) : null,
+                values.cadence
+            );
+            const dueMonth = normalizeDueMonth(
+                values.dueMonth?.trim() ? Number(values.dueMonth) : null,
+                values.cadence
+            );
             const name = values.name.trim();
             const counterpartyValue = values.counterparty?.trim() || null;
 
@@ -584,6 +594,7 @@ export function FixedCostForm({
                     jarId: values.jarId,
                     categoryId,
                     dueDay,
+                    dueMonth,
                     startedOn,
                     endsOn,
                 });
@@ -600,6 +611,7 @@ export function FixedCostForm({
                 amount: cents,
                 cadence: values.cadence,
                 dueDay,
+                dueMonth,
                 direction: FlowDirection.OUT,
                 isActive: true,
                 startedOn,
@@ -921,12 +933,26 @@ export function FixedCostForm({
                 options={cadenceOptions}
                 value={cadence ?? Cadence.MONTHLY}
                 disabled={busy}
-                onChange={next =>
+                onChange={next => {
                     form.setValue('cadence', next, {
                         shouldValidate: true,
                         shouldDirty: true,
-                    })
-                }
+                    });
+                    form.setValue(
+                        'dueDay',
+                        clampDueDayInput(form.getValues('dueDay') ?? '', next),
+                        {
+                            shouldDirty: true,
+                        }
+                    );
+                    form.setValue(
+                        'dueMonth',
+                        clampDueMonthInput(form.getValues('dueMonth') ?? '', next),
+                        {
+                            shouldDirty: true,
+                        }
+                    );
+                }}
             />
 
             <FormField
@@ -1165,13 +1191,31 @@ export function FixedCostForm({
                 control={form.control}
                 name="dueDay"
                 render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>{tFixed('due_day')}</FormLabel>
-                        <FormControl>
-                            <FormInput type="number" min={1} max={31} placeholder="1" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
+                    <DueDayField
+                        cadence={cadence ?? Cadence.MONTHLY}
+                        value={field.value ?? ''}
+                        onChange={field.onChange}
+                        dueMonth={dueMonthValue ?? ''}
+                        onDueMonthChange={next =>
+                            form.setValue('dueMonth', next, { shouldDirty: true })
+                        }
+                        disabled={busy}
+                        label={
+                            (cadence ?? Cadence.MONTHLY) === Cadence.WEEKLY
+                                ? tFixed('due_day_weekly')
+                                : tFixed('due_day')
+                        }
+                        weekdayLabel={day => tChips(`due_weekday_${day}`)}
+                        quarterMonthLabel={month => tChips(`due_quarter_${month}`)}
+                        calendarMonthLabel={month => tChips(`due_month_${month}`)}
+                        monthOfPeriodLabel={
+                            (cadence ?? Cadence.MONTHLY) === Cadence.QUARTERLY
+                                ? tFixed('due_month_quarter')
+                                : (cadence ?? Cadence.MONTHLY) === Cadence.YEARLY
+                                  ? tFixed('due_month_year')
+                                  : undefined
+                        }
+                    />
                 )}
             />
 

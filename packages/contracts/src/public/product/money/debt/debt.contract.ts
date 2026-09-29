@@ -8,7 +8,14 @@ import { z } from 'zod';
 
 import { HouseholdId, HouseholdScoped, Id } from '../../../../common/common.schema';
 import { PayoffStrategy } from '../enums';
-import { Debt, DebtDetail, DebtPlan, RecordDebtPayment, refineDebtSchedule } from './debt.schema';
+import {
+    Debt,
+    DebtDetail,
+    DebtPlan,
+    RecordDebtPayment,
+    refineDebtDueMonth,
+    refineDebtSchedule,
+} from './debt.schema';
 
 const ok = z.object({ ok: z.literal(true) });
 
@@ -24,6 +31,7 @@ export const debtCreate = oc
                 linkFixedCost: z.boolean().optional().default(true),
             })
             .superRefine(refineDebtSchedule)
+            .superRefine(refineDebtDueMonth)
     )
     .output(Debt);
 
@@ -64,6 +72,10 @@ export const debtUpdate = oc
                     },
                     ctx
                 );
+            })
+            .superRefine((value, ctx) => {
+                if (value.paymentCadence === undefined) return;
+                refineDebtDueMonth(value, ctx);
             })
     )
     .output(Debt);

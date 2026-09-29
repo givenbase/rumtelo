@@ -14,6 +14,7 @@ import {
     FixedCostsByJar,
     ListFixedCostSettlements,
     MarkFixedCostPaid,
+    refineFixedCostDueMonth,
     SkipFixedCostPeriod,
     UnlinkFixedCostSettlement,
 } from './fixed-cost.schema';
@@ -24,7 +25,9 @@ const ok = z.object({ ok: z.literal(true) });
 // ? CREATE Operations
 // ====================================================================
 
-export const fixedCostCreate = oc.input(FixedCost.omit({ id: true })).output(FixedCost);
+export const fixedCostCreate = oc
+    .input(FixedCost.omit({ id: true }).superRefine(refineFixedCostDueMonth))
+    .output(FixedCost);
 
 export const fixedCostMarkPaid = oc.input(MarkFixedCostPaid).output(FixedCostSettlement);
 
@@ -49,7 +52,15 @@ export const fixedCostListSettlements = oc
 // ====================================================================
 
 export const fixedCostUpdate = oc
-    .input(FixedCost.partial().extend({ id: Id, householdId: HouseholdId }))
+    .input(
+        FixedCost.partial()
+            .extend({ id: Id, householdId: HouseholdId })
+            .superRefine((value, ctx) => {
+                // Only when cadence is present on the patch (create-like); else service checks final row.
+                if (value.cadence === undefined) return;
+                refineFixedCostDueMonth(value, ctx);
+            })
+    )
     .output(FixedCost);
 
 // ====================================================================

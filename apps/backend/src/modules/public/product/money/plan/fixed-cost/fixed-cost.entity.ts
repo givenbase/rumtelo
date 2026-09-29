@@ -44,7 +44,14 @@ export class FixedCost extends HouseholdEntity {
     @Property({ default: true })
     isActive = true;
 
-    /** Day of month it is charged (1–31); null = unknown / irregular. */
+    /**
+     * When in the period: QUARTERLY → 1–3 (month of quarter); YEARLY → 1–12
+     * (calendar month). Null for WEEKLY / MONTHLY.
+     */
+    @Property({ type: 'smallint', nullable: true })
+    dueMonth: number | null = null;
+
+    /** Day of month (1–31) or ISO weekday (1=Mon…7=Sun) when cadence is WEEKLY. */
     @Property({ type: 'smallint', nullable: true })
     dueDay: number | null = null;
 

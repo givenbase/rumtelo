@@ -11,6 +11,7 @@ export const API_ERROR_MESSAGES = [
     'goal_no_jar_spend',
     'payment_amount_positive',
     'bill_paused_no_settlement',
+    'due_month_required',
     'income_kind_cadence_locked',
     'period_closed',
     'month_close_incomplete',

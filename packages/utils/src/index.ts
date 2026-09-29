@@ -71,6 +71,16 @@ export {
     type IncomePeriodLike,
 } from './money-plan';
 export {
+    dueDayMaxForCadence,
+    dueDayReachedInMonth,
+    dueMonthMaxForCadence,
+    isChargeMonth,
+    isoWeekday,
+    monthInQuarter,
+    normalizeDueDay,
+    normalizeDueMonth,
+} from './due-day';
+export {
     horizonMonths,
     parsePeriodKey,
     periodKeysInclusive,

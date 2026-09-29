@@ -441,6 +441,7 @@ export const EXACT_FIELD_PRIORITY: Record<string, number> = {
 
     // 11 — day ordinals (int, repeat every period)
     dueDay: 11,
+    dueMonth: 11,
     expectedDay: 11,
     periodStartDay: 11,
     weekCheckReminderDay: 11,
@@ -480,6 +481,7 @@ export const SAME_PRIORITY_ORDER: readonly (readonly string[])[] = [
     ['isBankSyncEnabled', 'isCoachEnabled'],
     ['money', 'weekCheck', 'features', 'answers'],
     ['periodStartDay', 'weekCheckReminderDay', 'weekCheckReminderAt'],
+    ['dueMonth', 'dueDay'],
     ['isActive', 'isArchived'],
 ];
 

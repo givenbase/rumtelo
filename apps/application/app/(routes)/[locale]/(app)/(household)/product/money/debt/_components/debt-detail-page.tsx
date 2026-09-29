@@ -318,7 +318,11 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
                         <MetaChip>{td('start_not_set')}</MetaChip>
                     )}
                     <MetaChip>{cadenceLabel(debt.paymentCadence, tChips)}</MetaChip>
-                    {debt.dueDay ? <MetaChip>{formatDueDay(debt.dueDay, tChips)}</MetaChip> : null}
+                    {debt.dueDay ? (
+                        <MetaChip>
+                            {formatDueDay(debt.dueDay, tChips, debt.paymentCadence, debt.dueMonth)}
+                        </MetaChip>
+                    ) : null}
                     {debt.scheduleKind === DebtScheduleKind.TERM && debt.termPayments !== null ? (
                         <MetaChip>{td('payments_count', { count: debt.termPayments })}</MetaChip>
                     ) : null}
@@ -483,7 +487,7 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
                         title={detail.linkedFixedCost.name}
                         subtitle={`${cadenceLabel(detail.linkedFixedCost.cadence, tChips)}${
                             detail.linkedFixedCost.dueDay
-                                ? ` · ${formatDueDay(detail.linkedFixedCost.dueDay, tChips)}`
+                                ? ` · ${formatDueDay(detail.linkedFixedCost.dueDay, tChips, detail.linkedFixedCost.cadence, detail.linkedFixedCost.dueMonth)}`
                                 : ''
                         }`}
                         mark={partyMark(
