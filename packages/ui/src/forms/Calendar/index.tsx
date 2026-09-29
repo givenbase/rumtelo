@@ -5,6 +5,8 @@ import { useMemo, useState } from 'react';
 
 import { cn } from '@rumtelo/utils';
 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../Select';
+
 const WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'] as const;
 
 const MONTHS_SHORT = [
@@ -122,7 +124,7 @@ function monthSelectable(
 }
 
 const captionSelectClass =
-    'h-8 max-w-[5.75rem] cursor-pointer appearance-none rounded-full border border-line bg-background px-2.5 pr-6 font-mono text-[11px] font-medium tracking-wide text-fg uppercase outline-none transition-colors hover:border-accent-hover focus:border-accent disabled:opacity-40';
+    'h-8 max-w-[5.75rem] rounded-full border-line bg-background px-2.5 font-mono text-[11px] font-medium tracking-wide text-fg uppercase shadow-none hover:border-accent-hover';
 
 export type CalendarProps = {
     value?: string | null;
@@ -233,58 +235,64 @@ export function Calendar({ value, onSelect, min, max, className, locale, labels 
                 </button>
 
                 <div className="flex min-w-0 flex-1 items-center justify-center gap-1">
-                    <label className="relative inline-flex min-w-0">
-                        <span className="sr-only">{monthLabel}</span>
-                        <select
-                            aria-label={monthLabel}
-                            className={cn(captionSelectClass, 'min-w-0 flex-1')}
-                            value={visibleMonth.getMonth()}
-                            onChange={event =>
-                                jumpTo(visibleMonth.getFullYear(), Number(event.target.value))
+                    <div className="relative inline-flex min-w-0">
+                        <Select
+                            value={String(visibleMonth.getMonth())}
+                            onValueChange={value =>
+                                jumpTo(visibleMonth.getFullYear(), Number(value))
                             }>
-                            {monthsShort.map((label, monthIndex) => (
-                                <option
-                                    key={label}
-                                    value={monthIndex}
-                                    disabled={
-                                        !monthSelectable(
-                                            visibleMonth.getFullYear(),
-                                            monthIndex,
-                                            minDate,
-                                            maxDate
-                                        )
-                                    }>
-                                    {label}
-                                </option>
-                            ))}
-                        </select>
-                        <span
-                            className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-[8px] text-fg-faint"
-                            aria-hidden>
-                            ▾
-                        </span>
-                    </label>
-                    <label className="relative inline-flex">
-                        <span className="sr-only">{yearLabel}</span>
-                        <select
-                            aria-label={yearLabel}
-                            className={captionSelectClass}
-                            value={visibleMonth.getFullYear()}
-                            onChange={event =>
-                                jumpTo(Number(event.target.value), visibleMonth.getMonth())
-                            }>
-                            {years.map(year => (
-                                <option key={year} value={year}>
-                                    {year}
-                                </option>
-                            ))}
-                        </select>
-                        <span
-                            className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-[8px] text-fg-faint"
-                            aria-hidden>
-                            ▾
-                        </span>
-                    </label>
+                            <SelectTrigger
+                                size="sm"
+                                aria-label={monthLabel}
+                                className={cn(captionSelectClass, 'min-w-0 flex-1')}>
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent
+                                position="popper"
+                                className="rounded-lg border-line bg-surface text-fg shadow-md">
+                                {monthsShort.map((label, monthIndex) => (
+                                    <SelectItem
+                                        key={label}
+                                        value={String(monthIndex)}
+                                        disabled={
+                                            !monthSelectable(
+                                                visibleMonth.getFullYear(),
+                                                monthIndex,
+                                                minDate,
+                                                maxDate
+                                            )
+                                        }
+                                        className="font-mono text-[11px] tracking-wide uppercase">
+                                        {label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="relative inline-flex">
+                        <Select
+                            value={String(visibleMonth.getFullYear())}
+                            onValueChange={value => jumpTo(Number(value), visibleMonth.getMonth())}>
+                            <SelectTrigger
+                                size="sm"
+                                aria-label={yearLabel}
+                                className={captionSelectClass}>
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent
+                                position="popper"
+                                className="rounded-lg border-line bg-surface text-fg shadow-md">
+                                {years.map(year => (
+                                    <SelectItem
+                                        key={year}
+                                        value={String(year)}
+                                        className="font-mono text-[11px] tracking-wide uppercase">
+                                        {year}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
 
                 <button

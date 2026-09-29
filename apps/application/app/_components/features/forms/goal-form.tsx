@@ -15,6 +15,8 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
+    FormSelect,
+    FormSelectItem,
     Button,
     VendorMark,
     createFormInvalidHandler,
@@ -796,18 +798,16 @@ export function GoalForm({
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>{tUiForm('jar')}</FormLabel>
-                                    <FormControl>
-                                        <select
-                                            className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
-                                            {...field}>
-                                            {jars.map(jar => (
-                                                <option key={jar.id} value={jar.id}>
-                                                    {jar.icon ? `${jar.icon} ` : ''}
-                                                    {jar.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </FormControl>
+                                    <FormSelect
+                                        value={field.value ?? ''}
+                                        onValueChange={field.onChange}>
+                                        {jars.map(jar => (
+                                            <FormSelectItem key={jar.id} value={jar.id}>
+                                                {jar.icon ? `${jar.icon} ` : ''}
+                                                {jar.name}
+                                            </FormSelectItem>
+                                        ))}
+                                    </FormSelect>
                                     <FormMessage />
                                 </FormItem>
                             )}

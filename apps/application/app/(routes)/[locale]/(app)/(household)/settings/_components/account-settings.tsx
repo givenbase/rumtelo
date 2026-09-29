@@ -26,6 +26,7 @@ import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import { SettingsInkCard, SettingsPanel, SettingsRow, SettingsRowLabel } from './settings-chrome';
+import { FormDatePicker } from '@/components/features/forms/form-date-picker';
 import { createProfileFormSchema, type ProfileFormValues } from '../_utils/settings-form-zod';
 import { initials } from '../_utils/settings-shared';
 import { useSettingsMutation } from '../_utils/use-settings-mutation';
@@ -269,16 +270,15 @@ export function AccountSettings() {
                                 name="dateOfBirth"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormControl>
-                                            <Input
-                                                type="date"
-                                                {...field}
-                                                aria-label={t(
-                                                    'pages.settings.panels.profile.date_of_birth'
-                                                )}
-                                                pickerAriaLabel={t('ui.form.aria.open_date_picker')}
-                                            />
-                                        </FormControl>
+                                        <FormDatePicker
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            onBlur={field.onBlur}
+                                            name={field.name}
+                                            aria-label={t(
+                                                'pages.settings.panels.profile.date_of_birth'
+                                            )}
+                                        />
                                     </FormItem>
                                 )}
                             />

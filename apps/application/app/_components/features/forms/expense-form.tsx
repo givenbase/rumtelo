@@ -14,6 +14,10 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
+    FormSelect,
+    FormSelectItem,
+    FORM_SELECT_NONE,
+    toFormSelectValue,
     Button,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
@@ -659,22 +663,22 @@ export function ExpenseForm({
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>{tForm('jar')}</FormLabel>
-                            <FormControl>
-                                <select
-                                    className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
-                                    {...field}>
-                                    {jarChoices.length === 0 ? (
-                                        <option value="">{tExpense('no_jars')}</option>
-                                    ) : (
-                                        jarChoices.map(jar => (
-                                            <option key={jar.id} value={jar.id}>
-                                                {jar.icon ? `${jar.icon} ` : ''}
-                                                {jar.name}
-                                            </option>
-                                        ))
-                                    )}
-                                </select>
-                            </FormControl>
+                            <FormSelect
+                                value={toFormSelectValue(field.value)}
+                                onValueChange={field.onChange}>
+                                {jarChoices.length === 0 ? (
+                                    <FormSelectItem value={FORM_SELECT_NONE} disabled>
+                                        {tExpense('no_jars')}
+                                    </FormSelectItem>
+                                ) : (
+                                    jarChoices.map(jar => (
+                                        <FormSelectItem key={jar.id} value={jar.id}>
+                                            {jar.icon ? `${jar.icon} ` : ''}
+                                            {jar.name}
+                                        </FormSelectItem>
+                                    ))
+                                )}
+                            </FormSelect>
                             <FormMessage />
                         </FormItem>
                     )}
@@ -833,18 +837,22 @@ export function ExpenseForm({
                     <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
                         {tExpense('apply_to_debt')}
                     </p>
-                    <select
-                        value={debtId ?? ''}
+                    <FormSelect
+                        value={toFormSelectValue(debtId)}
                         disabled={busy}
-                        onChange={event => setDebtId(event.target.value || null)}
-                        className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none">
-                        <option value="">{tExpense('dont_link')}</option>
+                        withFormControl={false}
+                        onValueChange={value =>
+                            setDebtId(value === FORM_SELECT_NONE ? null : value)
+                        }>
+                        <FormSelectItem value={FORM_SELECT_NONE}>
+                            {tExpense('dont_link')}
+                        </FormSelectItem>
                         {openDebts.map(debt => (
-                            <option key={debt.id} value={debt.id}>
+                            <FormSelectItem key={debt.id} value={debt.id}>
                                 {debt.name}
-                            </option>
+                            </FormSelectItem>
                         ))}
-                    </select>
+                    </FormSelect>
                 </div>
             ) : null}
 
@@ -873,22 +881,22 @@ export function ExpenseForm({
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>{tExpense('into_jar')}</FormLabel>
-                                <FormControl>
-                                    <select
-                                        className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
-                                        {...field}>
-                                        {jarChoices.length === 0 ? (
-                                            <option value="">{tExpense('no_jars')}</option>
-                                        ) : (
-                                            jarChoices.map(jar => (
-                                                <option key={jar.id} value={jar.id}>
-                                                    {jar.icon ? `${jar.icon} ` : ''}
-                                                    {jar.name}
-                                                </option>
-                                            ))
-                                        )}
-                                    </select>
-                                </FormControl>
+                                <FormSelect
+                                    value={toFormSelectValue(field.value)}
+                                    onValueChange={field.onChange}>
+                                    {jarChoices.length === 0 ? (
+                                        <FormSelectItem value={FORM_SELECT_NONE} disabled>
+                                            {tExpense('no_jars')}
+                                        </FormSelectItem>
+                                    ) : (
+                                        jarChoices.map(jar => (
+                                            <FormSelectItem key={jar.id} value={jar.id}>
+                                                {jar.icon ? `${jar.icon} ` : ''}
+                                                {jar.name}
+                                            </FormSelectItem>
+                                        ))
+                                    )}
+                                </FormSelect>
                                 <FormMessage />
                             </FormItem>
                         )}
