@@ -514,7 +514,9 @@ export function FixedCostsPageClient() {
                                                                   : null;
                                                           const due = formatDueDay(
                                                               fixedCost.dueDay,
-                                                              tChips
+                                                              tChips,
+                                                              fixedCost.cadence,
+                                                              fixedCost.dueMonth
                                                           );
                                                           const settlement = settlementById.get(
                                                               fixedCost.id

@@ -39,6 +39,26 @@ function nonNegativeMoneyInput(msg: FormT) {
         );
 }
 
+/** Quarterly / yearly need a dueMonth (1–3 or 1–12). Path dueDay so it shows under DueDayField. */
+function refineDueMonthRequired(
+    cadence: Cadence | string,
+    dueMonth: string | undefined,
+    ctx: z.RefinementCtx,
+    msg: FormT
+) {
+    if (cadence !== Cadence.QUARTERLY && cadence !== Cadence.YEARLY) return;
+    const max = cadence === Cadence.QUARTERLY ? 3 : 12;
+    const trimmed = dueMonth?.trim() ?? '';
+    const month = trimmed ? Number(trimmed) : NaN;
+    if (!trimmed || !Number.isFinite(month) || month < 1 || month > max) {
+        ctx.addIssue({
+            code: 'custom',
+            path: ['dueDay'],
+            message: msg('validation.due_month_required'),
+        });
+    }
+}
+
 export function createExpenseFormSchema(msg: FormT) {
     return z.object({
         amount: positiveMoneyInput(msg),
@@ -65,18 +85,23 @@ export function createIncomeFormSchema(msg: FormT) {
 export type IncomeFormSchemaValues = z.infer<ReturnType<typeof createIncomeFormSchema>>;
 
 export function createFixedCostFormSchema(msg: FormT) {
-    return z.object({
-        name: z.string().min(1, msg('validation.name_required')).max(120),
-        counterparty: z.string().max(160).optional(),
-        amount: positiveMoneyInput(msg),
-        /** Recurring frequency — amount is per this cadence (budget converts to monthly). */
-        cadence: z.enum([Cadence.WEEKLY, Cadence.MONTHLY, Cadence.QUARTERLY, Cadence.YEARLY]),
-        jarId: z.string().min(1, msg('validation.choose_jar')),
-        categoryId: z.string().nullable().optional(),
-        dueDay: z.string().optional(),
-        startedOn: z.string().optional(),
-        endsOn: z.string().optional(),
-    });
+    return z
+        .object({
+            name: z.string().min(1, msg('validation.name_required')).max(120),
+            counterparty: z.string().max(160).optional(),
+            amount: positiveMoneyInput(msg),
+            /** Recurring frequency — amount is per this cadence (budget converts to monthly). */
+            cadence: z.enum([Cadence.WEEKLY, Cadence.MONTHLY, Cadence.QUARTERLY, Cadence.YEARLY]),
+            jarId: z.string().min(1, msg('validation.choose_jar')),
+            categoryId: z.string().nullable().optional(),
+            dueDay: z.string().optional(),
+            dueMonth: z.string().optional(),
+            startedOn: z.string().optional(),
+            endsOn: z.string().optional(),
+        })
+        .superRefine((value, ctx) => {
+            refineDueMonthRequired(value.cadence, value.dueMonth, ctx, msg);
+        });
 }
 
 export type FixedCostFormSchemaValues = z.infer<ReturnType<typeof createFixedCostFormSchema>>;
@@ -114,6 +139,7 @@ export function createDebtFormSchema(msg: FormT) {
             minimumPayment: z.string().optional(),
             extraPayment: z.string().optional(),
             dueDay: z.string().optional(),
+            dueMonth: z.string().optional(),
             startedOn: z.string().optional(),
             scheduleKind: z.enum(DebtScheduleKind),
             paymentCadence: z.enum([
@@ -145,6 +171,7 @@ export function createDebtFormSchema(msg: FormT) {
                     message: msg('validation.pick_deadline'),
                 });
             }
+            refineDueMonthRequired(value.paymentCadence, value.dueMonth, ctx, msg);
         });
 }
 

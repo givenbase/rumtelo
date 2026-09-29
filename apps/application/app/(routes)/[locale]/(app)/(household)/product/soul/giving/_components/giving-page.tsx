@@ -61,7 +61,10 @@ type GivePledge = Pick<
     | 'fulfilledOn'
 >;
 
-type GiveFixedRow = Pick<FixedCost, 'id' | 'name' | 'counterparty' | 'cadence' | 'dueDay'> & {
+type GiveFixedRow = Pick<
+    FixedCost,
+    'id' | 'name' | 'counterparty' | 'cadence' | 'dueDay' | 'dueMonth'
+> & {
     monthly: number;
     applies: boolean;
 };
@@ -173,6 +176,7 @@ export function GivingPageClient() {
             counterparty: item.counterparty,
             cadence: item.cadence,
             dueDay: item.dueDay,
+            dueMonth: item.dueMonth,
             monthly: monthlyAmount(Math.abs(item.amount), item.cadence),
             applies: applyingIds.has(item.id),
         }));
@@ -386,7 +390,12 @@ export function GivingPageClient() {
                         ) : (
                             giveFixed.map(item => {
                                 const company = item.counterparty?.trim() || item.name;
-                                const due = formatDueDay(item.dueDay, tChips);
+                                const due = formatDueDay(
+                                    item.dueDay,
+                                    tChips,
+                                    item.cadence,
+                                    item.dueMonth
+                                );
                                 return (
                                     <MoneyPartyRow
                                         key={item.id}

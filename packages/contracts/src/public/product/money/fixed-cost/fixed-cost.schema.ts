@@ -36,6 +36,11 @@ export const FixedCost = z.object({
     amount: Money,
     cadence: z.enum(Cadence),
     dueDay: z.int().min(1).max(31).nullable(),
+    /**
+     * When in the period the bill is charged:
+     * QUARTERLY → month of quarter 1–3; YEARLY → calendar month 1–12; else null.
+     */
+    dueMonth: z.int().min(1).max(12).nullable().default(null),
     /** Direction: money out (a bill) or money in (a recurring credit). */
     direction: z.enum(FlowDirection),
     isActive: z.boolean().default(true),
@@ -44,6 +49,25 @@ export const FixedCost = z.object({
     endsOn: IsoDate.nullable(),
     note: z.string().max(500).nullable(),
 });
+
+/** Q/Y create/update must pick dueMonth in range; W/M clear it. */
+export function refineFixedCostDueMonth(
+    value: { cadence?: string; dueMonth?: number | null },
+    ctx: z.RefinementCtx
+) {
+    const cadence = value.cadence;
+    if (cadence === undefined) return;
+    if (cadence !== Cadence.QUARTERLY && cadence !== Cadence.YEARLY) return;
+    const max = cadence === Cadence.QUARTERLY ? 3 : 12;
+    const month = value.dueMonth;
+    if (month === null || month === undefined || month < 1 || month > max) {
+        ctx.addIssue({
+            code: 'custom',
+            path: ['dueMonth'],
+            message: 'Pick which month you are charged',
+        });
+    }
+}
 
 export const FixedCostsByJar = z.object({
     jarId: Id,

@@ -78,6 +78,7 @@ const form = {
         who_owe_required: 'Who you owe is required',
         term_payments: 'Enter how many payments',
         pick_deadline: 'Pick a deadline',
+        due_month_required: 'Pick which month you are charged',
     },
     aria: {
         pick_mode: 'How do you want to pick?',

@@ -358,7 +358,12 @@ export function JarCategoryBreakdown({
                                                     item.counterparty.trim() !== item.name.trim()
                                                         ? item.name
                                                         : null;
-                                                const due = formatDueDay(item.dueDay, tChips);
+                                                const due = formatDueDay(
+                                                    item.dueDay,
+                                                    tChips,
+                                                    item.cadence,
+                                                    item.dueMonth
+                                                );
                                                 return (
                                                     <li key={`fc-${item.id}`}>
                                                         <MoneyPartyRow

@@ -47,7 +47,12 @@ export async function collectCloseBlockers(
     for (const cost of costs) {
         const settlement = byCost.get(cost.id);
         const status = fixedCostPeriodStatus(
-            { isActive: cost.isActive, dueDay: cost.dueDay },
+            {
+                isActive: cost.isActive,
+                dueDay: cost.dueDay,
+                dueMonth: cost.dueMonth,
+                cadence: cost.cadence,
+            },
             settlement ? { status: settlement.status } : null,
             period
         );

@@ -73,7 +73,7 @@ export function DebtListRow({
         (key, values) => t(`detail.${key}`, values),
         appLocale
     );
-    const due = formatDueDay(debt.dueDay, tChips);
+    const due = formatDueDay(debt.dueDay, tChips, debt.paymentCadence, debt.dueMonth);
     const recent = (detailQuery.data?.payments ?? []).slice(0, 3);
     const showDelta =
         baselineBalance !== null &&

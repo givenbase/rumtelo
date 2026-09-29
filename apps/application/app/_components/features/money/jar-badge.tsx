@@ -62,9 +62,39 @@ export function MetaChip({ children, className }: { children: ReactNode; classNa
 
 export function formatDueDay(
     dueDay: number | null | undefined,
-    t: (key: string, values?: Record<string, string | number>) => string
+    t: (key: string, values?: Record<string, string | number>) => string,
+    cadence?: string | null,
+    dueMonth?: number | null
 ): string | null {
     if (dueDay === null || dueDay === undefined) return null;
+    if (cadence === 'WEEKLY' && dueDay >= 1 && dueDay <= 7) {
+        const weekday = t(`due_weekday_${dueDay}`);
+        return t('due_day_weekly', { weekday });
+    }
+    if (
+        cadence === 'QUARTERLY' &&
+        dueMonth !== null &&
+        dueMonth !== undefined &&
+        dueMonth >= 1 &&
+        dueMonth <= 3
+    ) {
+        return t('due_day_quarterly', {
+            day: dueDay,
+            month: t(`due_quarter_${dueMonth}`),
+        });
+    }
+    if (
+        cadence === 'YEARLY' &&
+        dueMonth !== null &&
+        dueMonth !== undefined &&
+        dueMonth >= 1 &&
+        dueMonth <= 12
+    ) {
+        return t('due_day_yearly', {
+            day: dueDay,
+            month: t(`due_month_${dueMonth}`),
+        });
+    }
     return t('due_day', { day: dueDay });
 }
 

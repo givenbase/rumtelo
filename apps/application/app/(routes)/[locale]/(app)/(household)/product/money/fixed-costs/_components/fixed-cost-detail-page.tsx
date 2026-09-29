@@ -272,7 +272,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
             categoryTemplates,
         })
     );
-    const due = formatDueDay(item.dueDay, tChips);
+    const due = formatDueDay(item.dueDay, tChips, item.cadence, item.dueMonth);
     const signedMonthly =
         item.direction === FlowDirection.IN ? Math.abs(monthly) : -Math.abs(monthly);
     const jarHref = jar?.key ? `/product/money/jars/${jarKeyToSlug(jar.key)}` : null;

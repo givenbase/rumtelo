@@ -26,6 +26,7 @@ export function DebtUpdatePage({ id, embedded = false }: { id: string; embedded?
             minimumPayment: minorUnitsToAmountInput(row.minimumPayment),
             extraPayment: row.extraPayment > 0 ? minorUnitsToAmountInput(row.extraPayment) : '',
             dueDay: row.dueDay !== null ? String(row.dueDay) : '',
+            dueMonth: row.dueMonth !== null ? String(row.dueMonth) : '',
             startedOn: row.startedOn ?? '',
             scheduleKind: row.scheduleKind ?? DebtScheduleKind.OPEN,
             paymentCadence: row.paymentCadence ?? Cadence.MONTHLY,

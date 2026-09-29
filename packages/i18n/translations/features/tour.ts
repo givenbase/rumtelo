@@ -19,7 +19,7 @@ const tour = {
         no_tour: 'No guided tour on this screen yet — the brief above covers the basics.',
         helpers_label: 'Show The Coach on screens',
         helpers_hint:
-            'Why-lines and jar cards from The Coach (✦ The Coach). Same as Settings → Account. On by default for beginners.',
+            'Why-lines and jar cards from The Coach (✦ The Coach). Same as Settings → Preferences. On by default for beginners.',
         helpers_on: 'On',
         helpers_off: 'Off',
         settings: {

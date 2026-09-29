@@ -20,7 +20,7 @@ const onboarding = {
         'There are no right answers. Soft labels only, so tips fit you. Partners in the same household can choose differently later.',
     coach: 'The Coach stays with you',
     coach_body:
-        'Short tips on screen (marked ✦ The Coach) stay on while you learn — helpful, never shaming. Open The Coach anytime for next steps. Turn tips off later in Settings → Account.',
+        'Short tips on screen (marked ✦ The Coach) stay on while you learn — helpful, never shaming. Open The Coach anytime for next steps. Turn tips off later in Settings → Preferences.',
     coach_points: {
         tips: 'On-screen tips while you learn',
         open: 'Open The Coach anytime',

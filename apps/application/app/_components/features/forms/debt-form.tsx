@@ -44,12 +44,13 @@ import { createDebtFormSchema, type DebtFormSchemaValues } from './form-zod';
 import { CadencePicker, type CadencePickerOption } from './cadence-picker';
 import { CATALOG_CHIP_IDLE_LIMIT, CatalogChipPicker } from './catalog-chip-picker';
 import { ConfirmActionButton } from './confirm-action-button';
+import { clampDueDayInput, clampDueMonthInput, DueDayField } from './due-day-field';
 import { FormDatePicker } from './form-date-picker';
 import { FormInput } from './form-input';
 import { merchantsToNameOptions } from './merchant-name-options';
 import { PresetNameField, type NamePresetOption } from './preset-name-field';
 import type { MerchantPreset } from '@rumtelo/contracts';
-import { findByNameOrAlias } from '@rumtelo/utils';
+import { findByNameOrAlias, normalizeDueDay, normalizeDueMonth } from '@rumtelo/utils';
 
 export type DebtFormValues = DebtFormSchemaValues;
 
@@ -73,6 +74,7 @@ export function DebtForm({
     const { symbol } = useHouseholdCurrency();
     const t = useTranslations();
     const tDebt = useTranslations('features.money.debt.form');
+    const tChips = useTranslations('features.money.chips');
     const tForm = useTranslations('ui.form');
     const tBtn = useTranslations('ui.button.actions');
     const scheduleOptions: ReadonlyArray<{
@@ -176,6 +178,7 @@ export function DebtForm({
             minimumPayment: defaultValues?.minimumPayment ?? '',
             extraPayment: defaultValues?.extraPayment ?? '',
             dueDay: defaultValues?.dueDay ?? '',
+            dueMonth: defaultValues?.dueMonth ?? '',
             startedOn: defaultValues?.startedOn ?? periodDefaultDate,
             scheduleKind: defaultValues?.scheduleKind ?? DebtScheduleKind.OPEN,
             paymentCadence: defaultValues?.paymentCadence ?? Cadence.MONTHLY,
@@ -199,6 +202,7 @@ export function DebtForm({
 
     const scheduleKind = useWatch({ control: form.control, name: 'scheduleKind' });
     const paymentCadence = useWatch({ control: form.control, name: 'paymentCadence' });
+    const dueMonthValue = useWatch({ control: form.control, name: 'dueMonth' });
 
     // Edit hydrate: lock debt type from lender name / kind → unlock lender chips.
     if (
@@ -249,14 +253,14 @@ export function DebtForm({
             const extraPayment = extraRaw === null ? 0 : extraRaw;
             const interestRate = Number(values.interestRate.replace(',', '.'));
             const name = values.name.trim();
-            const dueDayRaw = values.dueDay?.trim() ? Number(values.dueDay) : null;
-            const dueDay =
-                dueDayRaw !== null &&
-                Number.isFinite(dueDayRaw) &&
-                dueDayRaw >= 1 &&
-                dueDayRaw <= 31
-                    ? dueDayRaw
-                    : null;
+            const dueDay = normalizeDueDay(
+                values.dueDay?.trim() ? Number(values.dueDay) : null,
+                values.paymentCadence
+            );
+            const dueMonth = normalizeDueMonth(
+                values.dueMonth?.trim() ? Number(values.dueMonth) : null,
+                values.paymentCadence
+            );
             const startedOn = values.startedOn?.trim() || null;
             const termPayments =
                 values.scheduleKind === DebtScheduleKind.TERM ? Number(values.termPayments) : null;
@@ -272,6 +276,7 @@ export function DebtForm({
                 maturityOn,
                 startedOn,
                 dueDay,
+                dueMonth,
                 extraPayment,
             };
 
@@ -673,28 +678,57 @@ export function DebtForm({
                 options={cadenceOptions}
                 value={paymentCadence ?? Cadence.MONTHLY}
                 disabled={busy}
-                onChange={next =>
+                onChange={next => {
                     form.setValue('paymentCadence', next, {
                         shouldValidate: true,
-                    })
-                }
+                    });
+                    form.setValue(
+                        'dueDay',
+                        clampDueDayInput(form.getValues('dueDay') ?? '', next),
+                        {
+                            shouldDirty: true,
+                        }
+                    );
+                    form.setValue(
+                        'dueMonth',
+                        clampDueMonthInput(form.getValues('dueMonth') ?? '', next),
+                        {
+                            shouldDirty: true,
+                        }
+                    );
+                }}
             />
 
             <FormField
                 control={form.control}
                 name="dueDay"
                 render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>{tDebt('due_day')}</FormLabel>
-                        <FormControl>
-                            <FormInput
-                                inputMode="numeric"
-                                placeholder={tDebt('due_day_placeholder')}
-                                {...field}
-                            />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
+                    <DueDayField
+                        cadence={paymentCadence ?? Cadence.MONTHLY}
+                        value={field.value ?? ''}
+                        onChange={field.onChange}
+                        dueMonth={dueMonthValue ?? ''}
+                        onDueMonthChange={next =>
+                            form.setValue('dueMonth', next, { shouldDirty: true })
+                        }
+                        disabled={busy}
+                        label={
+                            (paymentCadence ?? Cadence.MONTHLY) === Cadence.WEEKLY
+                                ? tDebt('due_day_weekly')
+                                : tDebt('due_day')
+                        }
+                        weekdayLabel={day => tChips(`due_weekday_${day}`)}
+                        quarterMonthLabel={month => tChips(`due_quarter_${month}`)}
+                        calendarMonthLabel={month => tChips(`due_month_${month}`)}
+                        monthOfPeriodLabel={
+                            (paymentCadence ?? Cadence.MONTHLY) === Cadence.QUARTERLY
+                                ? tDebt('due_month_quarter')
+                                : (paymentCadence ?? Cadence.MONTHLY) === Cadence.YEARLY
+                                  ? tDebt('due_month_year')
+                                  : undefined
+                        }
+                        placeholder={tDebt('due_day_placeholder')}
+                    />
                 )}
             />
 

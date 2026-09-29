@@ -6,6 +6,8 @@ import {
     type Cadence,
 } from '@rumtelo/contracts';
 
+import { dueDayReachedInMonth, isChargeMonth } from './due-day';
+
 /** Convert a cadence amount to a monthly-equivalent (integer minor units). */
 export function monthlyAmount(amount: number, cadence: Cadence | string): number {
     const factor = CADENCE_TO_MONTHLY[cadence as Cadence] ?? 0;
@@ -177,7 +179,12 @@ export function fixedCostAppliesAsOf(
  * Shared by the fixed-costs UI and the Coach session queue.
  */
 export function fixedCostPeriodStatus(
-    item: { isActive?: boolean; dueDay?: number | null },
+    item: {
+        isActive?: boolean;
+        dueDay?: number | null;
+        dueMonth?: number | null;
+        cadence?: Cadence | string | null;
+    },
     settlement: { status: string } | null | undefined,
     period: { year: number; month: number } | string,
     today: Date = new Date()
@@ -198,6 +205,12 @@ export function fixedCostPeriodStatus(
                   return { year: Number(yearPart), month: Number(monthPart) };
               })()
             : period;
+
+    // Non-charge months (quarterly / yearly) stay UPCOMING — including past months.
+    if (!isChargeMonth(item.cadence, item.dueMonth, parts.month)) {
+        return FixedCostPeriodStatus.UPCOMING;
+    }
+
     const periodIsCurrent =
         today.getFullYear() === parts.year && today.getMonth() + 1 === parts.month;
     const periodIsPast =
@@ -206,7 +219,9 @@ export function fixedCostPeriodStatus(
 
     if (periodIsPast) return FixedCostPeriodStatus.DUE;
     if (!periodIsCurrent) return FixedCostPeriodStatus.UPCOMING;
-    return today.getDate() >= dueDay ? FixedCostPeriodStatus.DUE : FixedCostPeriodStatus.UPCOMING;
+    return dueDayReachedInMonth(dueDay, item.cadence, parts, today, item.dueMonth)
+        ? FixedCostPeriodStatus.DUE
+        : FixedCostPeriodStatus.UPCOMING;
 }
 
 /**

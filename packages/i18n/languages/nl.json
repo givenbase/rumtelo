@@ -59,6 +59,7 @@
                     "goal_no_jar_spend": "Het doel heeft geen pot om uit te geven",
                     "payment_amount_positive": "Het betalingsbedrag moet positief zijn",
                     "bill_paused_no_settlement": "Gepauzeerde of beëindigde vaste lasten kunnen geen nieuwe afrekeningen krijgen.",
+                    "due_month_required": "Kies de maand waarvoor de kosten in rekening worden gebracht bij driemaandelijkse of jaarlijkse facturen.",
                     "income_kind_cadence_locked": "Type en frequentie kun je niet wijzigen op bestaande inkomsten. Beëindig ze en maak nieuwe aan.",
                     "period_closed": "Deze maand is afgesloten — je kunt niets toevoegen of wijzigen voor die periode.",
                     "month_close_incomplete": "Rond openstaande zaken af vóór je deze maand afsluit ({inbox} ongeordend in de inbox, {bills} rekeningen onbetaald of niet overgeslagen).",
@@ -280,7 +281,8 @@
                 "interest_range": "De waarde moet tussen 0 en 100 liggen",
                 "who_owe_required": "Je moet aangeven aan wie je geld verschuldigd bent",
                 "term_payments": "Voer het aantal betalingen in",
-                "pick_deadline": "Kies een deadline"
+                "pick_deadline": "Kies een deadline",
+                "due_month_required": "Kies de maand waarvoor de kosten in rekening worden gebracht"
             },
             "aria": {
                 "pick_mode": "Hoe wil je kiezen?",
@@ -731,7 +733,7 @@
                 "saver-play": "Je patroon neigt naar veilig — een beetje meer speelsheid kan het plan duurzaam maken. Geplande vreugde is geen verspilling."
             },
             "helpers": {
-                "mark_title": "Van de Coach — schakel tips op het scherm in of uit via Instellingen → Account",
+                "mark_title": "Van de Coach — schakel tips op het scherm in of uit via Instellingen → Voorkeuren",
                 "mark_label": "De coach",
                 "tip_aria": "De coach: {title}",
                 "locked_cta": "🔒 {cta}",
@@ -2067,6 +2069,31 @@
             },
             "chips": {
                 "due_day": "Dag {day}",
+                "due_day_weekly": "Elke {weekday}",
+                "due_day_quarterly": "Elke {day} · {month} van het kwartaal",
+                "due_day_yearly": "Elke {day} {month}",
+                "due_weekday_1": "Maandag",
+                "due_weekday_2": "dinsdag",
+                "due_weekday_3": "woensdag",
+                "due_weekday_4": "donderdag",
+                "due_weekday_5": "vrijdag",
+                "due_weekday_6": "zaterdag",
+                "due_weekday_7": "zondag",
+                "due_quarter_1": "1e maand",
+                "due_quarter_2": "2e maand",
+                "due_quarter_3": "3e maand",
+                "due_month_1": "januari",
+                "due_month_2": "februari",
+                "due_month_3": "maart",
+                "due_month_4": "april",
+                "due_month_5": "mei",
+                "due_month_6": "juni",
+                "due_month_7": "juli",
+                "due_month_8": "augustus",
+                "due_month_9": "september",
+                "due_month_10": "oktober",
+                "due_month_11": "november",
+                "due_month_12": "december",
                 "cadence_weekly": "Wekelijks",
                 "cadence_monthly": "Maandelijks",
                 "cadence_quarterly": "Per kwartaal",
@@ -2298,6 +2325,9 @@
                 "payee_name": "Naam van de begunstigde",
                 "payee_placeholder": "bijv. verhuurder, verzekeraar",
                 "due_day": "Vervaldag (dag van de maand)",
+                "due_day_weekly": "Op welke dag van de week wordt het bedrag afgeschreven?",
+                "due_month_quarter": "Welke maand van het kwartaal?",
+                "due_month_year": "Welke maand van het jaar?",
                 "start_date": "Startdatum",
                 "end_date": "Einddatum (optioneel)"
             },
@@ -2393,7 +2423,10 @@
                     "cadence_yearly": "Jaarlijks",
                     "cadence_yearly_hint": "Eenmaal per jaar",
                     "due_day": "Vervaldag (1–31)",
+                    "due_day_weekly": "Op welke dag van de week wordt het bedrag in rekening gebracht?",
                     "due_day_placeholder": "bijv. 28",
+                    "due_month_quarter": "Welke maand van het kwartaal?",
+                    "due_month_year": "Welke maand van het jaar?",
                     "started_on": "De betalingen gaan van start",
                     "schedule_heading": "Tijdschema",
                     "schedule_open": "Openen",
@@ -2547,7 +2580,7 @@
             },
             "household_profile": {
                 "filter_tip_title": "Rekeninglijst is afgestemd",
-                "filter_tip_body": "Sommige soorten rekeningen blijven verborgen op basis van je huishoudprofiel. Pas het aan in Instellingen, of toon alle soorten voor dit formulier.",
+                "filter_tip_body": "Sommige soorten rekeningen blijven verborgen op basis van je huishoudprofiel. Pas het aan in Instellingen → Huishouden, of toon alle soorten voor dit formulier.",
                 "show_all": "Alles tonen",
                 "use_filter": "Profiel filter gebruiken",
                 "open_settings": "Huishoudprofiel",
@@ -2605,7 +2638,7 @@
                 "mind_tie": "Een onrustige geest stuurt geld niet aan — hij geeft het uit en noemt dat een beslissing. Rust is geen meditatie, maar een strategie: de enige oefening die niets kost en al het andere beschermt. Elke munt die je niet impulsief uitgeeft, is een munt die voor een pot kiest.",
                 "practices": {
                     "breathing": {
-                        "meta": "2–5 min",
+                        "meta": "2–5 minuten",
                         "name": "Ademhaling",
                         "desc": "Vier keer in, zeven keer vasthouden, acht keer uit. Eén minuut is genoeg als de dag al vol zit."
                     },
@@ -2794,7 +2827,7 @@
                 "replay_tour": "Tour opnieuw afspelen",
                 "no_tour": "Op dit scherm staat nog geen rondleiding — in de bovenstaande samenvatting worden de basisprincipes behandeld.",
                 "helpers_label": "De Coach op de schermen weergeven",
-                "helpers_hint": "Waarom-regels en potkaarten van De Coach (✦ De Coach). Hetzelfde als Instellingen → Account. Standaard ingeschakeld voor beginners.",
+                "helpers_hint": "Waarom-regels en potkaarten van De Coach (✦ De Coach). Hetzelfde als Instellingen → Voorkeuren. Standaard ingeschakeld voor beginners.",
                 "helpers_on": "Op",
                 "helpers_off": "Uit",
                 "settings": {
@@ -4239,7 +4272,7 @@
             "money_style": "Hoe je met geld omgaat",
             "money_style_body": "Er zijn geen foute antwoorden. Alleen zachte labels, zodat tips bij jou passen. Partners in hetzelfde huishouden kunnen later iets anders kiezen.",
             "coach": "De Coach blijft bij je",
-            "coach_body": "Korte tips op het scherm (✦ De Coach) blijven aan terwijl je leert — behulpzaam, nooit beschamend. Open De Coach wanneer je wilt voor volgende stappen. Zet tips later uit via Instellingen → Account.",
+            "coach_body": "Korte tips op het scherm (✦ De Coach) blijven aan terwijl je leert — behulpzaam, nooit beschamend. Open De Coach wanneer je wilt voor volgende stappen. Zet tips later uit via Instellingen → Voorkeuren.",
             "coach_points": {
                 "tips": "Tips op het scherm terwijl je leert",
                 "open": "Open De Coach wanneer je wilt",

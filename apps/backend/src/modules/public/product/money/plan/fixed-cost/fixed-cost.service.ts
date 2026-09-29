@@ -11,7 +11,7 @@ import {
     type JarKey,
     jarCapabilitiesFor,
 } from '@rumtelo/contracts';
-import { isFixedCostCounting, sumMonthlyFixedOut } from '@rumtelo/utils';
+import { isFixedCostCounting, normalizeDueMonth, sumMonthlyFixedOut } from '@rumtelo/utils';
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { Transaction } from '../../ledger/transaction/transaction.entity';
@@ -50,6 +50,7 @@ export class FixedCostService {
         amount: number;
         cadence?: string;
         dueDay?: number | null;
+        dueMonth?: number | null;
         direction?: 'IN' | 'OUT';
         isActive?: boolean;
         startedOn?: string | null;
@@ -57,6 +58,9 @@ export class FixedCostService {
         note?: string | null;
     }) {
         await assertJarAllowsFixedCosts(this.em, input.jarId);
+        const cadence = (input.cadence as Cadence) ?? Cadence.MONTHLY;
+        const dueMonth = normalizeDueMonth(input.dueMonth, cadence);
+        assertDueMonthForCadence(cadence, dueMonth);
         const entity = this.em.create(FixedCost, {
             household: currentHouseholdId(),
             jar: this.em.getReference(Jar, input.jarId),
@@ -65,8 +69,9 @@ export class FixedCostService {
             name: input.name,
             counterparty: input.counterparty ?? null,
             amount: input.amount,
-            cadence: (input.cadence as Cadence) ?? Cadence.MONTHLY,
+            cadence,
             dueDay: input.dueDay ?? null,
+            dueMonth,
             direction: (input.direction as FlowDirection) ?? FlowDirection.OUT,
             isActive: input.isActive ?? true,
             startedOn: input.startedOn ?? null,
@@ -277,6 +282,7 @@ export class FixedCostService {
             amount: number;
             cadence: string;
             dueDay: number | null;
+            dueMonth: number | null;
             direction: 'IN' | 'OUT';
             isActive: boolean;
             startedOn: string | null;
@@ -302,11 +308,14 @@ export class FixedCostService {
         if (patch.amount !== undefined) entity.amount = patch.amount;
         if (patch.cadence !== undefined) entity.cadence = patch.cadence as Cadence;
         if (patch.dueDay !== undefined) entity.dueDay = patch.dueDay;
+        if (patch.dueMonth !== undefined) entity.dueMonth = patch.dueMonth;
         if (patch.direction !== undefined) entity.direction = patch.direction as FlowDirection;
         if (patch.isActive !== undefined) entity.isActive = patch.isActive;
         if (patch.startedOn !== undefined) entity.startedOn = patch.startedOn;
         if (patch.endsOn !== undefined) entity.endsOn = patch.endsOn;
         if (patch.note !== undefined) entity.note = patch.note;
+        entity.dueMonth = normalizeDueMonth(entity.dueMonth, entity.cadence);
+        assertDueMonthForCadence(entity.cadence, entity.dueMonth);
         await this.em.flush();
         if (entity.category === null) {
             await this.jars.reconcileFixedCostCategories();
@@ -347,6 +356,11 @@ async function assertJarAllowsFixedCosts(em: EntityManager, jarId: string) {
     }
 }
 
+function assertDueMonthForCadence(cadence: Cadence, dueMonth: number | null) {
+    if (cadence !== Cadence.QUARTERLY && cadence !== Cadence.YEARLY) return;
+    if (dueMonth === null) throw apiBadRequest('due_month_required');
+}
+
 export function toDto(fixedCost: FixedCost) {
     return {
         id: fixedCost.id,
@@ -359,6 +373,7 @@ export function toDto(fixedCost: FixedCost) {
         amount: fixedCost.amount,
         cadence: fixedCost.cadence,
         dueDay: fixedCost.dueDay,
+        dueMonth: fixedCost.dueMonth,
         direction: fixedCost.direction,
         isActive: fixedCost.isActive,
         startedOn: fixedCost.startedOn,

@@ -32,6 +32,11 @@ export const Debt = z.object({
     minimumPayment: Money,
     extraPayment: Money,
     dueDay: z.int().min(1).max(31).nullable(),
+    /**
+     * When in the period the payment is due:
+     * QUARTERLY → month of quarter 1–3; YEARLY → calendar month 1–12; else null.
+     */
+    dueMonth: z.int().min(1).max(12).nullable().default(null),
     closedOn: IsoDate.nullable(),
     /** When scheduled payments begin (null = not set). */
     startedOn: IsoDate.nullable(),
@@ -102,6 +107,25 @@ export function refineDebtSchedule(
             code: 'custom',
             path: ['maturityOn'],
             message: 'Open schedule cannot set a deadline',
+        });
+    }
+}
+
+/** Q/Y debts must pick dueMonth in range. */
+export function refineDebtDueMonth(
+    value: { paymentCadence?: string; dueMonth?: number | null },
+    ctx: z.RefinementCtx
+) {
+    const cadence = value.paymentCadence;
+    if (cadence === undefined) return;
+    if (cadence !== Cadence.QUARTERLY && cadence !== Cadence.YEARLY) return;
+    const max = cadence === Cadence.QUARTERLY ? 3 : 12;
+    const month = value.dueMonth;
+    if (month === null || month === undefined || month < 1 || month > max) {
+        ctx.addIssue({
+            code: 'custom',
+            path: ['dueMonth'],
+            message: 'Pick which month you are charged',
         });
     }
 }

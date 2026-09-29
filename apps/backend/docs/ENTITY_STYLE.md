@@ -175,7 +175,7 @@ Order domain fields as follows:
 | 8 | Config JSON | `metadata`, `aliases`, `unlocks`, `audienceTags` |
 | 9 | Link / media URLs | `url`, `imageUrl` |
 | 10 | Boolean flags | `isActive`, `isArchived`, `isCoachEnabled` |
-| 11 | Day ordinals | `dueDay`, `expectedDay`, `periodStartDay` |
+| 11 | Day / month ordinals | `dueDay`, `dueMonth`, `expectedDay`, `periodStartDay` |
 | 12 | Domain dates & instants | `startedOn`, `endsOn`, `expiresAt`, `closedAt` |
 
 **Identifier cluster rule:** IDs belong together immediately after the primary key — never separated by descriptive fields.

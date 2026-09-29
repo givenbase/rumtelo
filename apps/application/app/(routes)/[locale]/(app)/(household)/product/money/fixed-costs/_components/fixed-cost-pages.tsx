@@ -56,6 +56,7 @@ export function FixedCostUpdatePage({ id, embedded = false }: { id: string; embe
             jarId: row.jarId,
             categoryId: row.categoryId,
             dueDay: row.dueDay !== null ? String(row.dueDay) : '',
+            dueMonth: row.dueMonth !== null ? String(row.dueMonth) : '',
             startedOn: row.startedOn ?? '',
             endsOn: row.endsOn ?? '',
         }),
