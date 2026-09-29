@@ -7,6 +7,7 @@ import {
     type FixedCostFormValues,
     type GivePayeeMode,
 } from '@/components/features/forms/fixed-cost-form';
+import { toRecurringCadence } from '@/components/features/forms/cadence-picker';
 import { useEntityForEdit } from '@/components/features/forms/use-entity-for-edit';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
@@ -51,6 +52,7 @@ export function FixedCostUpdatePage({ id, embedded = false }: { id: string; embe
             name: row.name,
             counterparty: row.counterparty ?? '',
             amount: minorUnitsToAmountInput(Math.abs(row.amount)),
+            cadence: toRecurringCadence(row.cadence),
             jarId: row.jarId,
             categoryId: row.categoryId,
             dueDay: row.dueDay !== null ? String(row.dueDay) : '',

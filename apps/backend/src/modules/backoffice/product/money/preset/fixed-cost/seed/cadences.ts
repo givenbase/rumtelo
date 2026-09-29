@@ -6,6 +6,8 @@ import { Cadence } from '@rumtelo/contracts';
  * Only list bills whose NL cadence is unambiguous.
  */
 export const CADENCE_BY_PRESET: Readonly<Record<string, Cadence>> = {
+    // Meal kits are typically billed per delivery week.
+    MEAL_KIT: Cadence.WEEKLY,
     // Motorrijtuigenbelasting is assessed per quarter.
     ROAD_TAX: Cadence.QUARTERLY,
     // One assessment per year (instalments are a payment choice, not the bill's cadence).
