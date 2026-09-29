@@ -7,7 +7,14 @@ import { useForm, useWatch } from 'react-hook-form';
 import type { Debt, FixedCost, Jar, Transaction } from '@rumtelo/contracts';
 import { JarKey } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
-import { Button, VendorMark } from '@rumtelo/ui';
+import {
+    Button,
+    FormSelect,
+    FormSelectItem,
+    FORM_SELECT_NONE,
+    toFormSelectValue,
+    VendorMark,
+} from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
@@ -313,22 +320,24 @@ export function InboxSortCard({
                         className="font-mono text-[10px] tracking-widest text-fg-muted uppercase">
                         {tExpense('apply_to_debt')}
                     </label>
-                    <select
-                        id="inbox-apply-debt"
-                        value={debtId ?? ''}
-                        onChange={event => {
-                            const next = event.target.value || null;
+                    <FormSelect
+                        value={toFormSelectValue(debtId)}
+                        withFormControl={false}
+                        aria-label={tExpense('apply_to_debt')}
+                        onValueChange={value => {
+                            const next = value === FORM_SELECT_NONE ? null : value;
                             form.setValue('debtId', next);
                             if (next) form.setValue('linkFixedCost', false);
-                        }}
-                        className="h-10 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg outline-none focus:border-accent">
-                        <option value="">{tExpense('dont_link')}</option>
+                        }}>
+                        <FormSelectItem value={FORM_SELECT_NONE}>
+                            {tExpense('dont_link')}
+                        </FormSelectItem>
                         {debts.map(debt => (
-                            <option key={debt.id} value={debt.id}>
+                            <FormSelectItem key={debt.id} value={debt.id}>
                                 {debt.name}
-                            </option>
+                            </FormSelectItem>
                         ))}
-                    </select>
+                    </FormSelect>
                 </div>
             ) : null}
 

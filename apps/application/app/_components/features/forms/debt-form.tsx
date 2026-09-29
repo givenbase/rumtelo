@@ -14,6 +14,8 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
+    FormSelect,
+    FormSelectItem,
     Button,
     Typography,
     VendorMark,
@@ -41,11 +43,12 @@ import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell'
 import { createDebtFormSchema, type DebtFormSchemaValues } from './form-zod';
 import { CATALOG_CHIP_IDLE_LIMIT, CatalogChipPicker } from './catalog-chip-picker';
 import { ConfirmActionButton } from './confirm-action-button';
+import { FormDatePicker } from './form-date-picker';
 import { FormInput } from './form-input';
 import { merchantsToNameOptions } from './merchant-name-options';
 import { PresetNameField, type NamePresetOption } from './preset-name-field';
 import type { MerchantPreset } from '@rumtelo/contracts';
-import { namesMatch } from '@rumtelo/utils';
+import { findByNameOrAlias } from '@rumtelo/utils';
 
 export type DebtFormValues = DebtFormSchemaValues;
 
@@ -195,20 +198,21 @@ export function DebtForm({
         const merchantMatch = debtTypes.find(debtType =>
             (debtType.merchantKeys ?? []).some(key => {
                 const merchant = merchants.find(row => row.key === key);
-                return Boolean(merchant && namesMatch(merchant.name, savedName));
+                return Boolean(merchant && findByNameOrAlias([merchant], savedName));
             })
         );
-        const kindMatch =
-            merchantMatch ??
-            (savedKind ? (debtTypes.find(debtType => debtType.kind === savedKind) ?? null) : null);
-        const matched = merchantMatch ?? kindMatch ?? null;
+        const typeNameMatch = findByNameOrAlias(debtTypes, savedName);
+        const kindMatch = savedKind
+            ? (debtTypes.find(debtType => debtType.kind === savedKind) ?? null)
+            : null;
+        const matched = merchantMatch ?? typeNameMatch ?? kindMatch ?? null;
         if (matched) {
             setTypeKey(matched.key);
             form.setValue('kind', matched.kind);
             const lendersForMatched = (matched.merchantKeys ?? [])
                 .map(key => merchants.find(row => row.key === key))
                 .filter((row): row is MerchantPreset => Boolean(row));
-            const nameInChips = lendersForMatched.some(row => namesMatch(row.name, savedName));
+            const nameInChips = Boolean(findByNameOrAlias(lendersForMatched, savedName));
             if (savedName && !nameInChips) setCustomLender(true);
         } else {
             setEditNoTypeMatch(true);
@@ -398,20 +402,26 @@ export function DebtForm({
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>{tForm('type')}</FormLabel>
-                                <FormControl>
-                                    <select
-                                        className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
-                                        {...field}>
-                                        <option value="CREDIT_CARD">
-                                            {tDebt('kind_credit_card')}
-                                        </option>
-                                        <option value="LOAN">{tDebt('kind_loan')}</option>
-                                        <option value="STUDENT">{tDebt('kind_student')}</option>
-                                        <option value="MORTGAGE">{tDebt('kind_mortgage')}</option>
-                                        <option value="FAMILY">{tDebt('kind_family')}</option>
-                                        <option value="OTHER">{tDebt('kind_other')}</option>
-                                    </select>
-                                </FormControl>
+                                <FormSelect value={field.value} onValueChange={field.onChange}>
+                                    <FormSelectItem value="CREDIT_CARD">
+                                        {tDebt('kind_credit_card')}
+                                    </FormSelectItem>
+                                    <FormSelectItem value="LOAN">
+                                        {tDebt('kind_loan')}
+                                    </FormSelectItem>
+                                    <FormSelectItem value="STUDENT">
+                                        {tDebt('kind_student')}
+                                    </FormSelectItem>
+                                    <FormSelectItem value="MORTGAGE">
+                                        {tDebt('kind_mortgage')}
+                                    </FormSelectItem>
+                                    <FormSelectItem value="FAMILY">
+                                        {tDebt('kind_family')}
+                                    </FormSelectItem>
+                                    <FormSelectItem value="OTHER">
+                                        {tDebt('kind_other')}
+                                    </FormSelectItem>
+                                </FormSelect>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -697,13 +707,12 @@ export function DebtForm({
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>{tDebt('started_on')}</FormLabel>
-                        <FormControl>
-                            <FormInput
-                                type="date"
-                                pickerAriaLabel={tForm('aria.open_date_picker')}
-                                {...field}
-                            />
-                        </FormControl>
+                        <FormDatePicker
+                            value={field.value}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                        />
                         <FormMessage />
                     </FormItem>
                 )}
@@ -776,13 +785,12 @@ export function DebtForm({
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>{tDebt('pay_off_by')}</FormLabel>
-                            <FormControl>
-                                <FormInput
-                                    type="date"
-                                    pickerAriaLabel={tForm('aria.open_date_picker')}
-                                    {...field}
-                                />
-                            </FormControl>
+                            <FormDatePicker
+                                value={field.value}
+                                onChange={field.onChange}
+                                onBlur={field.onBlur}
+                                name={field.name}
+                            />
                             <FormMessage />
                         </FormItem>
                     )}

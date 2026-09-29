@@ -16,6 +16,11 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
+    FormSelect,
+    FormSelectItem,
+    FORM_SELECT_NONE,
+    fromFormSelectValue,
+    toFormSelectValue,
     Button,
     VendorMark,
     createFormInvalidHandler,
@@ -48,12 +53,13 @@ import { CoachTipCard } from '@/components/features/helpers';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
-import { findByName, namesMatch } from '@rumtelo/utils';
+import { findByNameOrAlias, namesMatch } from '@rumtelo/utils';
 
 import { createFixedCostFormSchema, type FixedCostFormSchemaValues } from './form-zod';
 import { CATALOG_CHIP_IDLE_LIMIT, CatalogChipPicker } from './catalog-chip-picker';
 import { ConfirmActionButton } from './confirm-action-button';
 import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
+import { FormDatePicker } from './form-date-picker';
 import { FormInput } from './form-input';
 import {
     MERCHANT_OPTION_PREFIX,
@@ -281,6 +287,7 @@ export function FixedCostForm({
                     name: preset.name,
                     group: category?.name ?? preset.categoryTemplateKey,
                     icon: category?.icon ?? null,
+                    aliases: preset.aliases,
                 };
             });
         // Brands first so “netflix” hits Netflix before “Streaming video”.
@@ -344,10 +351,12 @@ export function FixedCostForm({
         if (selectedBillPresetKey) {
             const bill = fixedCostPresets.find(preset => preset.key === selectedBillPresetKey);
             const keys = bill?.merchantKeys ?? [];
-            if (keys.length === 0) return [] as MerchantPreset[];
-            return keys
-                .map(key => byKey.get(key))
-                .filter((merchant): merchant is MerchantPreset => Boolean(merchant));
+            if (keys.length > 0) {
+                return keys
+                    .map(key => byKey.get(key))
+                    .filter((merchant): merchant is MerchantPreset => Boolean(merchant));
+            }
+            // Preset has no merchant links yet — fall through to category chips.
         }
         if (!activeCategoryTemplateKey) return [] as MerchantPreset[];
         return merchants.filter(
@@ -363,13 +372,14 @@ export function FixedCostForm({
     if (
         mode === 'edit' &&
         !editCatalogHydrated &&
-        fixedCostPresets.length > 0 &&
-        !merchantsQuery.isLoading
+        presetsQuery.data !== undefined &&
+        merchantsQuery.data !== undefined
     ) {
         const savedName = defaultValues?.name ?? form.getValues('name');
-        const matched = findByName(fixedCostPresets, savedName);
+        const matched = findByNameOrAlias(fixedCostPresets, savedName);
         if (matched) {
             setSelectedBillPresetKey(matched.key);
+            setPendingCategoryTemplateKey(matched.categoryTemplateKey);
             const savedPayee = defaultValues?.counterparty ?? form.getValues('counterparty');
             if (savedPayee?.trim()) {
                 const byKey = new Map(merchants.map(merchant => [merchant.key, merchant]));
@@ -881,32 +891,32 @@ export function FixedCostForm({
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>{tForm('jar')}</FormLabel>
-                        <FormControl>
-                            <select
-                                className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
-                                {...field}
-                                onChange={event => {
-                                    field.onChange(event);
-                                    form.setValue('categoryId', null);
-                                    setPendingCategoryTemplateKey(null);
-                                    setSelectedBillPresetKey(null);
-                                    setCustomPayee(false);
-                                    form.setValue('counterparty', '', { shouldDirty: false });
-                                    setGivePayeeMode(null);
-                                    setGiveModeHydrated(false);
-                                }}>
-                                {billJars.length === 0 ? (
-                                    <option value="">{tFixed('no_jars')}</option>
-                                ) : (
-                                    billJars.map(jar => (
-                                        <option key={jar.id} value={jar.id}>
-                                            {jar.icon ? `${jar.icon} ` : ''}
-                                            {jar.name}
-                                        </option>
-                                    ))
-                                )}
-                            </select>
-                        </FormControl>
+                        <FormSelect
+                            value={toFormSelectValue(field.value)}
+                            onValueChange={value => {
+                                if (value === FORM_SELECT_NONE) return;
+                                field.onChange(value);
+                                form.setValue('categoryId', null);
+                                setPendingCategoryTemplateKey(null);
+                                setSelectedBillPresetKey(null);
+                                setCustomPayee(false);
+                                form.setValue('counterparty', '', { shouldDirty: false });
+                                setGivePayeeMode(null);
+                                setGiveModeHydrated(false);
+                            }}>
+                            {billJars.length === 0 ? (
+                                <FormSelectItem value={FORM_SELECT_NONE} disabled>
+                                    {tFixed('no_jars')}
+                                </FormSelectItem>
+                            ) : (
+                                billJars.map(jar => (
+                                    <FormSelectItem key={jar.id} value={jar.id}>
+                                        {jar.icon ? `${jar.icon} ` : ''}
+                                        {jar.name}
+                                    </FormSelectItem>
+                                ))
+                            )}
+                        </FormSelect>
                         <FormMessage />
                     </FormItem>
                 )}
@@ -918,28 +928,25 @@ export function FixedCostForm({
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>{tForm('category')}</FormLabel>
-                        <FormControl>
-                            <select
-                                className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
-                                value={field.value ?? ''}
-                                onChange={event => {
-                                    setPendingCategoryTemplateKey(null);
-                                    setCustomPayee(false);
-                                    form.setValue('counterparty', '', { shouldDirty: false });
-                                    field.onChange(event.target.value || null);
-                                }}>
-                                <option value="">
-                                    {pendingLabel
-                                        ? tFixed('category_from_preset', { name: pendingLabel })
-                                        : tFixed('category_auto')}
-                                </option>
-                                {jarCategories.map(category => (
-                                    <option key={category.id} value={category.id}>
-                                        {category.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </FormControl>
+                        <FormSelect
+                            value={toFormSelectValue(field.value)}
+                            onValueChange={value => {
+                                setPendingCategoryTemplateKey(null);
+                                setCustomPayee(false);
+                                form.setValue('counterparty', '', { shouldDirty: false });
+                                field.onChange(fromFormSelectValue(value));
+                            }}>
+                            <FormSelectItem value={FORM_SELECT_NONE}>
+                                {pendingLabel
+                                    ? tFixed('category_from_preset', { name: pendingLabel })
+                                    : tFixed('category_auto')}
+                            </FormSelectItem>
+                            {jarCategories.map(category => (
+                                <FormSelectItem key={category.id} value={category.id}>
+                                    {category.name}
+                                </FormSelectItem>
+                            ))}
+                        </FormSelect>
                         <FormMessage />
                     </FormItem>
                 )}
@@ -1130,13 +1137,12 @@ export function FixedCostForm({
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>{tFixed('start_date')}</FormLabel>
-                        <FormControl>
-                            <FormInput
-                                type="date"
-                                pickerAriaLabel={tForm('aria.open_date_picker')}
-                                {...field}
-                            />
-                        </FormControl>
+                        <FormDatePicker
+                            value={field.value}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                        />
                         <FormMessage />
                     </FormItem>
                 )}
@@ -1148,13 +1154,12 @@ export function FixedCostForm({
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>{tFixed('end_date')}</FormLabel>
-                        <FormControl>
-                            <FormInput
-                                type="date"
-                                pickerAriaLabel={tForm('aria.open_date_picker')}
-                                {...field}
-                            />
-                        </FormControl>
+                        <FormDatePicker
+                            value={field.value}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                        />
                         <FormMessage />
                     </FormItem>
                 )}

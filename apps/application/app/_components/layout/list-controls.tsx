@@ -2,7 +2,15 @@
 
 import type { ReactNode } from 'react';
 
-import { Icon, Typography } from '@rumtelo/ui';
+import {
+    Icon,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+    Typography,
+} from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 export type ListControlOption<T extends string = string> = {
@@ -116,20 +124,30 @@ function SortControl<T extends string>({ sort }: { sort: ListControlsSort<T> }) 
             <span className="font-mono text-[10px] leading-none tracking-widest uppercase">
                 {sort.label}
             </span>
-            <select
-                value={sort.value}
-                onChange={event => sort.onChange(event.target.value as T)}
-                aria-label={sort.ariaLabel}
-                className={cn(
-                    'h-8 rounded-full border border-line-strong bg-surface px-3 font-mono text-[11px] tracking-wide text-fg uppercase',
-                    FOCUS_RING
-                )}>
-                {sort.options.map(option => (
-                    <option key={option.key} value={option.key}>
-                        {option.label}
-                    </option>
-                ))}
-            </select>
+            <Select value={sort.value} onValueChange={value => sort.onChange(value as T)}>
+                <SelectTrigger
+                    size="sm"
+                    aria-label={sort.ariaLabel}
+                    className={cn(
+                        'h-8 min-w-[7rem] rounded-full border-line-strong bg-surface px-3 font-mono text-[11px] tracking-wide text-fg uppercase shadow-none',
+                        FOCUS_RING
+                    )}>
+                    <SelectValue />
+                </SelectTrigger>
+                <SelectContent
+                    position="popper"
+                    align="end"
+                    className="rounded-lg border-line bg-surface text-fg shadow-md">
+                    {sort.options.map(option => (
+                        <SelectItem
+                            key={option.key}
+                            value={option.key}
+                            className="font-mono text-[11px] tracking-wide uppercase">
+                            {option.label}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
         </label>
     );
 }

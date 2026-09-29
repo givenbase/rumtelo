@@ -1,10 +1,10 @@
 'use client';
 
-import { Icon } from '../../display/Icon';
-import { useEffect, useId, useRef, useState } from 'react';
+import { forwardRef, useEffect, useId, useRef, useState } from 'react';
 
 import { cn } from '@rumtelo/utils';
 
+import { Icon } from '../../display/Icon';
 import { Button } from '../Button';
 import controlClasses from '../Input/styles';
 import { Calendar, formatDisplayDate } from '../Calendar';
@@ -12,6 +12,8 @@ import { Calendar, formatDisplayDate } from '../Calendar';
 export type DatePickerProps = {
     value?: string | null;
     onChange?: (iso: string) => void;
+    onBlur?: () => void;
+    name?: string;
     min?: string | null;
     max?: string | null;
     placeholder?: string;
@@ -36,20 +38,26 @@ export type DatePickerProps = {
 };
 
 /** Branded date field — replaces native `type="date"` so pickers match the design system. */
-export function DatePicker({
-    value,
-    onChange,
-    min,
-    max,
-    placeholder = 'Pick a date',
-    disabled,
-    id,
-    className,
-    locale,
-    labels,
-    closeLabel = 'Close',
-    inline = false,
-}: DatePickerProps) {
+export const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(function DatePicker(
+    {
+        value,
+        onChange,
+        onBlur,
+        name,
+        min,
+        max,
+        placeholder = 'Pick a date',
+        disabled,
+        id,
+        className,
+        locale,
+        labels,
+        closeLabel = 'Close',
+        inline = false,
+        ...triggerProps
+    },
+    ref
+) {
     const autoId = useId();
     const fieldId = id ?? autoId;
     const rootRef = useRef<HTMLDivElement>(null);
@@ -75,11 +83,15 @@ export function DatePicker({
     return (
         <div ref={rootRef} className={cn('relative grid gap-2', className)}>
             <button
+                {...triggerProps}
+                ref={ref}
                 type="button"
                 id={fieldId}
+                name={name}
                 disabled={disabled}
                 aria-haspopup="dialog"
                 aria-expanded={open}
+                onBlur={onBlur}
                 onClick={() => {
                     if (!inline) setOpen(current => !current);
                 }}
@@ -125,4 +137,5 @@ export function DatePicker({
             ) : null}
         </div>
     );
-}
+});
+DatePicker.displayName = 'DatePicker';

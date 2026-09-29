@@ -15,6 +15,8 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
+    FormSelect,
+    FormSelectItem,
     Button,
     Typography,
     createFormInvalidHandler,
@@ -25,7 +27,7 @@ import type { IncomeAmountPeriod, IncomeSourcePreset } from '@rumtelo/contracts'
 import { Cadence, IncomeKind } from '@rumtelo/contracts';
 
 import { useTranslations } from '@rumtelo/i18n';
-import { findByName } from '@rumtelo/utils';
+import { findByNameOrAlias } from '@rumtelo/utils';
 
 import { CREATE_HREF } from '@/app/_lib/create-routes';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
@@ -39,6 +41,7 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 import { ConfirmActionButton } from './confirm-action-button';
 import { createIncomeFormSchema, type IncomeFormSchemaValues } from './form-zod';
+import { FormDatePicker } from './form-date-picker';
 import { FormInput } from './form-input';
 import { PresetNameField } from './preset-name-field';
 
@@ -363,7 +366,7 @@ export function IncomeForm({
                 render={({ field }) => {
                     const lockedIncomeKey =
                         mode === 'edit'
-                            ? (findByName(presetOptions, field.value)?.key ?? null)
+                            ? (findByNameOrAlias(presetOptions, field.value)?.key ?? null)
                             : null;
                     return (
                         <FormItem>
@@ -427,13 +430,12 @@ export function IncomeForm({
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>{tIncome('effective_from')}</FormLabel>
-                            <FormControl>
-                                <FormInput
-                                    type="date"
-                                    pickerAriaLabel={tForm('aria.open_date_picker')}
-                                    {...field}
-                                />
-                            </FormControl>
+                            <FormDatePicker
+                                value={field.value}
+                                onChange={field.onChange}
+                                onBlur={field.onBlur}
+                                name={field.name}
+                            />
                             <FormMessage />
                         </FormItem>
                     )}
@@ -446,13 +448,12 @@ export function IncomeForm({
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>{tIncome('start_date')}</FormLabel>
-                        <FormControl>
-                            <FormInput
-                                type="date"
-                                pickerAriaLabel={tForm('aria.open_date_picker')}
-                                {...field}
-                            />
-                        </FormControl>
+                        <FormDatePicker
+                            value={field.value}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                        />
                         <FormMessage />
                     </FormItem>
                 )}
@@ -464,13 +465,12 @@ export function IncomeForm({
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>{tIncome('end_date')}</FormLabel>
-                        <FormControl>
-                            <FormInput
-                                type="date"
-                                pickerAriaLabel={tForm('aria.open_date_picker')}
-                                {...field}
-                            />
-                        </FormControl>
+                        <FormDatePicker
+                            value={field.value}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                        />
                         <FormMessage />
                     </FormItem>
                 )}
@@ -484,27 +484,23 @@ export function IncomeForm({
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>{tIncome('how_often')}</FormLabel>
-                                <FormControl>
-                                    <select
-                                        className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
-                                        {...field}>
-                                        <option value={Cadence.WEEKLY}>
-                                            {tIncome('cadence_weekly')}
-                                        </option>
-                                        <option value={Cadence.MONTHLY}>
-                                            {tIncome('cadence_monthly')}
-                                        </option>
-                                        <option value={Cadence.QUARTERLY}>
-                                            {tIncome('cadence_quarterly')}
-                                        </option>
-                                        <option value={Cadence.YEARLY}>
-                                            {tIncome('cadence_yearly')}
-                                        </option>
-                                        <option value={Cadence.ONCE}>
-                                            {tIncome('cadence_once')}
-                                        </option>
-                                    </select>
-                                </FormControl>
+                                <FormSelect value={field.value} onValueChange={field.onChange}>
+                                    <FormSelectItem value={Cadence.WEEKLY}>
+                                        {tIncome('cadence_weekly')}
+                                    </FormSelectItem>
+                                    <FormSelectItem value={Cadence.MONTHLY}>
+                                        {tIncome('cadence_monthly')}
+                                    </FormSelectItem>
+                                    <FormSelectItem value={Cadence.QUARTERLY}>
+                                        {tIncome('cadence_quarterly')}
+                                    </FormSelectItem>
+                                    <FormSelectItem value={Cadence.YEARLY}>
+                                        {tIncome('cadence_yearly')}
+                                    </FormSelectItem>
+                                    <FormSelectItem value={Cadence.ONCE}>
+                                        {tIncome('cadence_once')}
+                                    </FormSelectItem>
+                                </FormSelect>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -516,20 +512,26 @@ export function IncomeForm({
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>{tIncome('type')}</FormLabel>
-                                <FormControl>
-                                    <select
-                                        className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
-                                        {...field}>
-                                        <option value="SALARY">{tIncome('kind_salary')}</option>
-                                        <option value="FREELANCE">
-                                            {tIncome('kind_freelance')}
-                                        </option>
-                                        <option value="BENEFIT">{tIncome('kind_benefit')}</option>
-                                        <option value="RENTAL">{tIncome('kind_rental')}</option>
-                                        <option value="DIVIDEND">{tIncome('kind_dividend')}</option>
-                                        <option value="OTHER">{tIncome('kind_other')}</option>
-                                    </select>
-                                </FormControl>
+                                <FormSelect value={field.value} onValueChange={field.onChange}>
+                                    <FormSelectItem value="SALARY">
+                                        {tIncome('kind_salary')}
+                                    </FormSelectItem>
+                                    <FormSelectItem value="FREELANCE">
+                                        {tIncome('kind_freelance')}
+                                    </FormSelectItem>
+                                    <FormSelectItem value="BENEFIT">
+                                        {tIncome('kind_benefit')}
+                                    </FormSelectItem>
+                                    <FormSelectItem value="RENTAL">
+                                        {tIncome('kind_rental')}
+                                    </FormSelectItem>
+                                    <FormSelectItem value="DIVIDEND">
+                                        {tIncome('kind_dividend')}
+                                    </FormSelectItem>
+                                    <FormSelectItem value="OTHER">
+                                        {tIncome('kind_other')}
+                                    </FormSelectItem>
+                                </FormSelect>
                                 <FormMessage />
                             </FormItem>
                         )}

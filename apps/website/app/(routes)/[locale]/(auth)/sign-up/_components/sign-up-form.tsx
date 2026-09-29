@@ -19,12 +19,13 @@ import {
     Email,
     Phone,
     Password,
+    DatePicker,
     bindFormSubmit,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
 import { AUTH_MIN_PASSWORD_LENGTH, composeDisplayName } from '@rumtelo/contracts';
 import type { SignUpForm as SignUpFormSchema } from '@rumtelo/contracts';
-import { useTranslations } from '@rumtelo/i18n';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -56,6 +57,8 @@ function verifyCallbackUrl(
 
 export function SignUpForm() {
     const t = useTranslations();
+    const tForm = useTranslations('ui.form');
+    const locale = useLocale();
     const tPlans = useTranslations('pages.landing.plans');
     const schemas = useAuthFormSchemas();
     const errorMessages = useApiErrorFallbacks();
@@ -339,12 +342,23 @@ export function SignUpForm() {
                                         {t('features.auth.sign_up.birthday')}
                                     </FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="date"
-                                            autoComplete="bday"
+                                        <DatePicker
+                                            value={field.value || null}
+                                            onChange={field.onChange}
+                                            onBlur={field.onBlur}
+                                            name={field.name}
                                             disabled={busy}
-                                            pickerAriaLabel={t('ui.form.aria.open_date_picker')}
-                                            {...field}
+                                            placeholder={t('ui.form.pick_a_date')}
+                                            locale={locale}
+                                            labels={{
+                                                previousMonth: tForm('previous_month'),
+                                                nextMonth: tForm('next_month'),
+                                                month: tForm('month'),
+                                                year: tForm('year'),
+                                                today: tForm('today'),
+                                                pickADay: tForm('pick_a_day'),
+                                            }}
+                                            closeLabel={t('ui.button.actions.close')}
                                         />
                                     </FormControl>
                                     <FormMessage />

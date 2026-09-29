@@ -50,6 +50,11 @@ export const FixedCostPreset = CatalogItemBase.extend({
     audienceKeys: z.array(z.string().min(1).max(64)),
     /** Ordered MerchantPreset.key chips for “Paid to” after this bill type is picked. */
     merchantKeys: z.array(z.string().min(1).max(64)),
+    /**
+     * Other locale / source names for this bill type — edit hydrate matches a
+     * saved household name even when the account locale changed since create.
+     */
+    aliases: z.array(z.string().min(1).max(120)),
 });
 
 export const DebtPreset = CatalogItemBase.extend({
@@ -57,6 +62,8 @@ export const DebtPreset = CatalogItemBase.extend({
     icon: z.string().max(8).nullable(),
     /** Ordered MerchantPreset.key chips for "Who do you owe?" after this type is picked. */
     merchantKeys: z.array(z.string().min(1).max(64)),
+    /** Other locale / source names — edit hydrate across locales. */
+    aliases: z.array(z.string().min(1).max(120)),
 });
 
 export const JarGuideItem = z.object({
@@ -103,6 +110,8 @@ export const IncomeSourcePreset = CatalogItemBase.extend({
     cadence: z.enum(Cadence),
     /** Emoji for the create picker. */
     icon: z.string().max(8).nullable(),
+    /** Other locale / source names — edit hydrate across locales. */
+    aliases: z.array(z.string().min(1).max(120)),
 });
 
 export const TransactionInPreset = CatalogItemBase.extend({
@@ -117,6 +126,8 @@ export const GoalPreset = CatalogItemBase.extend({
     jarKey: z.enum(JarKey),
     categoryTemplateKey: z.string().min(1).max(64).nullable(),
     icon: z.string().max(8).nullable(),
+    /** Other locale / source names — edit hydrate across locales. */
+    aliases: z.array(z.string().min(1).max(120)),
 });
 
 export const MerchantPreset = CatalogItemBase.extend({

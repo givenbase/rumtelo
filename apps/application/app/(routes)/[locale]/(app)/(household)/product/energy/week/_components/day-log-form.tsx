@@ -19,6 +19,7 @@ import {
     timeCategoryName,
 } from '@/app/_lib/time-meta';
 import { formatDayLabel, shiftDay, todayIso } from '@/app/_lib/week-key';
+import { FormDatePicker } from '@/components/features/forms/form-date-picker';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 
 type HoursByCategory = Record<TimeCategory, string>;
@@ -180,14 +181,13 @@ export function DayLogForm({ householdId, entries, defaultOn, onSaved }: Props) 
                         onClick={() => changeDay(shiftDay(on, -1))}>
                         ←
                     </Button>
-                    <Input
-                        type="date"
+                    <FormDatePicker
                         value={on}
                         max={todayIso()}
+                        withFormControl={false}
                         aria-label={td('day_aria')}
-                        pickerAriaLabel={t('ui.form.aria.open_date_picker')}
-                        onChange={event => changeDay(event.target.value)}
-                        className="w-auto"
+                        onChange={changeDay}
+                        className="w-auto min-w-[10rem]"
                     />
                     <Button
                         type="button"

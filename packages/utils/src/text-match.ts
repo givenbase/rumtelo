@@ -18,6 +18,24 @@ export function findByName<T extends { name: string }>(
 }
 
 /**
+ * Like {@link findByName}, also checking `aliases` (other locales / source names).
+ * Used when a saved household label may not match the current catalog locale.
+ */
+export function findByNameOrAlias<T extends { name: string; aliases?: readonly string[] }>(
+    items: readonly T[],
+    name: string | null | undefined
+): T | null {
+    if (!name?.trim()) return null;
+    return (
+        items.find(
+            item =>
+                namesMatch(item.name, name) ||
+                (item.aliases?.some(alias => namesMatch(alias, name)) ?? false)
+        ) ?? null
+    );
+}
+
+/**
  * Case-insensitive needle match that respects word edges on the needle's own
  * letter/digit ends — the shared first-pass matcher for merchant needles.
  *

@@ -15,6 +15,8 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
+    FormSelect,
+    FormSelectItem,
     Button,
     VendorMark,
     createFormInvalidHandler,
@@ -41,7 +43,7 @@ import { GivingFinder } from '@/components/features/money/giving-finder';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
-import { findByName, namesMatch } from '@rumtelo/utils';
+import { findByNameOrAlias, namesMatch } from '@rumtelo/utils';
 import { createGoalFormSchema, type GoalFormSchemaValues } from './form-zod';
 import { CatalogChipPicker } from './catalog-chip-picker';
 import { matchesChipQuery } from './chip-search';
@@ -231,7 +233,7 @@ export function GoalForm({
     if (mode === 'edit' && !goalPresetHydrated && presetsQuery.data !== undefined) {
         const savedName = (defaultValues?.name ?? '').trim();
         if (savedName) {
-            const matched = findByName(presetOptions, savedName);
+            const matched = findByNameOrAlias(presetOptions, savedName);
             if (matched) {
                 setGoalPresetKey(matched.key);
             } else if (carBrands.some(brand => namesMatch(brand.name, savedName))) {
@@ -796,18 +798,16 @@ export function GoalForm({
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>{tUiForm('jar')}</FormLabel>
-                                    <FormControl>
-                                        <select
-                                            className="h-11 w-full rounded-lg border border-line bg-raised px-3 text-sm text-fg focus:border-accent focus:outline-none"
-                                            {...field}>
-                                            {jars.map(jar => (
-                                                <option key={jar.id} value={jar.id}>
-                                                    {jar.icon ? `${jar.icon} ` : ''}
-                                                    {jar.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </FormControl>
+                                    <FormSelect
+                                        value={field.value ?? ''}
+                                        onValueChange={field.onChange}>
+                                        {jars.map(jar => (
+                                            <FormSelectItem key={jar.id} value={jar.id}>
+                                                {jar.icon ? `${jar.icon} ` : ''}
+                                                {jar.name}
+                                            </FormSelectItem>
+                                        ))}
+                                    </FormSelect>
                                     <FormMessage />
                                 </FormItem>
                             )}

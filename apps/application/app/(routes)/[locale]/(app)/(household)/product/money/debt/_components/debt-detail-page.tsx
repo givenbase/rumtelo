@@ -42,6 +42,7 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
 import { findCatalogVendor, partyMark } from '@/app/_lib/vendor-brands';
+import { FormDatePicker } from '@/components/features/forms/form-date-picker';
 import { FormInput } from '@/components/features/forms/form-input';
 import { MetaChip, formatBookedDate, formatDueDay } from '@/components/features/money/jar-badge';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
@@ -389,13 +390,12 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>{tForm('fields.date')}</FormLabel>
-                                        <FormControl>
-                                            <FormInput
-                                                {...field}
-                                                type="date"
-                                                pickerAriaLabel={tForm('aria.open_date_picker')}
-                                            />
-                                        </FormControl>
+                                        <FormDatePicker
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            onBlur={field.onBlur}
+                                            name={field.name}
+                                        />
                                         <FormMessage />
                                     </FormItem>
                                 )}
