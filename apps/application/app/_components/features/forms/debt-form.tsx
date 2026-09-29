@@ -41,6 +41,7 @@ import { useHouseholdShell } from '@/components/features/shell/household-shell-c
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 import { createDebtFormSchema, type DebtFormSchemaValues } from './form-zod';
+import { CadencePicker, type CadencePickerOption } from './cadence-picker';
 import { CATALOG_CHIP_IDLE_LIMIT, CatalogChipPicker } from './catalog-chip-picker';
 import { ConfirmActionButton } from './confirm-action-button';
 import { FormDatePicker } from './form-date-picker';
@@ -95,14 +96,27 @@ export function DebtForm({
             hint: tDebt('schedule_deadline_hint'),
         },
     ];
-    const cadenceOptions: ReadonlyArray<{
-        id: DebtFormValues['paymentCadence'];
-        label: string;
-    }> = [
-        { id: Cadence.WEEKLY, label: tDebt('cadence_weekly') },
-        { id: Cadence.MONTHLY, label: tDebt('cadence_monthly') },
-        { id: Cadence.QUARTERLY, label: tDebt('cadence_quarterly') },
-        { id: Cadence.YEARLY, label: tDebt('cadence_yearly') },
+    const cadenceOptions: ReadonlyArray<CadencePickerOption> = [
+        {
+            id: Cadence.WEEKLY,
+            label: tDebt('cadence_weekly'),
+            hint: tDebt('cadence_weekly_hint'),
+        },
+        {
+            id: Cadence.MONTHLY,
+            label: tDebt('cadence_monthly'),
+            hint: tDebt('cadence_monthly_hint'),
+        },
+        {
+            id: Cadence.QUARTERLY,
+            label: tDebt('cadence_quarterly'),
+            hint: tDebt('cadence_quarterly_hint'),
+        },
+        {
+            id: Cadence.YEARLY,
+            label: tDebt('cadence_yearly'),
+            hint: tDebt('cadence_yearly_hint'),
+        },
     ];
     const { showToast, period } = useHouseholdShell();
     const periodDefaultDate = viewedPeriodDefaultIso(period);
@@ -654,34 +668,17 @@ export function DebtForm({
                 )}
             />
 
-            <div className="grid gap-2">
-                <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
-                    {tDebt('cadence_heading')}
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                    {cadenceOptions.map(option => {
-                        const selected = paymentCadence === option.id;
-                        return (
-                            <button
-                                key={option.id}
-                                type="button"
-                                disabled={busy}
-                                className={
-                                    selected
-                                        ? 'rounded-xl border border-accent bg-accent/15 px-3 py-1.5 text-sm text-accent'
-                                        : 'rounded-xl border border-line bg-raised px-3 py-1.5 text-sm text-fg hover:border-accent'
-                                }
-                                onClick={() =>
-                                    form.setValue('paymentCadence', option.id, {
-                                        shouldValidate: true,
-                                    })
-                                }>
-                                {option.label}
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
+            <CadencePicker
+                heading={tDebt('cadence_heading')}
+                options={cadenceOptions}
+                value={paymentCadence ?? Cadence.MONTHLY}
+                disabled={busy}
+                onChange={next =>
+                    form.setValue('paymentCadence', next, {
+                        shouldValidate: true,
+                    })
+                }
+            />
 
             <FormField
                 control={form.control}

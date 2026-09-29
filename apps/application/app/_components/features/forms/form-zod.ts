@@ -69,6 +69,8 @@ export function createFixedCostFormSchema(msg: FormT) {
         name: z.string().min(1, msg('validation.name_required')).max(120),
         counterparty: z.string().max(160).optional(),
         amount: positiveMoneyInput(msg),
+        /** Recurring frequency — amount is per this cadence (budget converts to monthly). */
+        cadence: z.enum([Cadence.WEEKLY, Cadence.MONTHLY, Cadence.QUARTERLY, Cadence.YEARLY]),
         jarId: z.string().min(1, msg('validation.choose_jar')),
         categoryId: z.string().nullable().optional(),
         dueDay: z.string().optional(),

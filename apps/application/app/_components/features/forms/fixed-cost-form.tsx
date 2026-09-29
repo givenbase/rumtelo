@@ -56,6 +56,7 @@ import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell'
 import { findByNameOrAlias, namesMatch } from '@rumtelo/utils';
 
 import { createFixedCostFormSchema, type FixedCostFormSchemaValues } from './form-zod';
+import { CadencePicker, type CadencePickerOption, toRecurringCadence } from './cadence-picker';
 import { CATALOG_CHIP_IDLE_LIMIT, CatalogChipPicker } from './catalog-chip-picker';
 import { ConfirmActionButton } from './confirm-action-button';
 import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
@@ -113,9 +114,37 @@ export function FixedCostForm({
         { id: 'known', label: tFixed('give_known') },
         { id: 'coach', label: tFixed('give_coach') },
     ];
+    const cadenceOptions: ReadonlyArray<CadencePickerOption> = [
+        {
+            id: Cadence.WEEKLY,
+            label: tFixed('cadence_weekly'),
+            hint: tFixed('cadence_weekly_hint'),
+        },
+        {
+            id: Cadence.MONTHLY,
+            label: tFixed('cadence_monthly'),
+            hint: tFixed('cadence_monthly_hint'),
+        },
+        {
+            id: Cadence.QUARTERLY,
+            label: tFixed('cadence_quarterly'),
+            hint: tFixed('cadence_quarterly_hint'),
+        },
+        {
+            id: Cadence.YEARLY,
+            label: tFixed('cadence_yearly'),
+            hint: tFixed('cadence_yearly_hint'),
+        },
+    ];
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { symbol } = useHouseholdCurrency();
+    const amountLabelByCadence: Record<FixedCostFormValues['cadence'], string> = {
+        [Cadence.WEEKLY]: tFixed('amount_label_weekly', { symbol }),
+        [Cadence.MONTHLY]: tFixed('amount_label', { symbol }),
+        [Cadence.QUARTERLY]: tFixed('amount_label_quarterly', { symbol }),
+        [Cadence.YEARLY]: tFixed('amount_label_yearly', { symbol }),
+    };
     const { showToast, period } = useHouseholdShell();
     const periodDefaultDate = viewedPeriodDefaultIso(period);
     const apiError = useApiError();
@@ -309,6 +338,7 @@ export function FixedCostForm({
             name: defaultValues?.name ?? '',
             counterparty: defaultValues?.counterparty ?? '',
             amount: defaultValues?.amount ?? '',
+            cadence: defaultValues?.cadence ?? Cadence.MONTHLY,
             jarId: defaultValues?.jarId ?? '',
             categoryId: defaultValues?.categoryId ?? null,
             dueDay: defaultValues?.dueDay ?? '',
@@ -321,6 +351,7 @@ export function FixedCostForm({
     const selectedJarId = useWatch({ control: form.control, name: 'jarId' });
     const selectedCategoryId = useWatch({ control: form.control, name: 'categoryId' });
     const counterparty = useWatch({ control: form.control, name: 'counterparty' });
+    const cadence = useWatch({ control: form.control, name: 'cadence' });
     const isGive = useMemo(
         () => jars.find(jar => jar.id === selectedJarId)?.key === JarKey.GIVE,
         [jars, selectedJarId]
@@ -549,6 +580,7 @@ export function FixedCostForm({
                     name,
                     counterparty: counterpartyValue,
                     amount: cents,
+                    cadence: values.cadence,
                     jarId: values.jarId,
                     categoryId,
                     dueDay,
@@ -566,9 +598,7 @@ export function FixedCostForm({
                 name,
                 counterparty: counterpartyValue,
                 amount: cents,
-                cadence:
-                    fixedCostPresets.find(preset => preset.key === selectedBillPresetKey)
-                        ?.cadence ?? Cadence.MONTHLY,
+                cadence: values.cadence,
                 dueDay,
                 direction: FlowDirection.OUT,
                 isActive: true,
@@ -813,6 +843,7 @@ export function FixedCostForm({
                                     if (full.dueDay !== null) {
                                         form.setValue('dueDay', String(full.dueDay));
                                     }
+                                    form.setValue('cadence', toRecurringCadence(full.cadence));
                                     setCustomPayee(false);
                                     form.setValue('counterparty', '', { shouldDirty: false });
                                     if (full.jarKey === JarKey.GIVE) {
@@ -872,7 +903,7 @@ export function FixedCostForm({
                 name="amount"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>{tFixed('amount_label', { symbol })}</FormLabel>
+                        <FormLabel>{amountLabelByCadence[cadence ?? Cadence.MONTHLY]}</FormLabel>
                         <FormControl>
                             <FormInput
                                 inputMode="decimal"
@@ -883,6 +914,19 @@ export function FixedCostForm({
                         <FormMessage />
                     </FormItem>
                 )}
+            />
+
+            <CadencePicker
+                heading={tFixed('cadence_heading')}
+                options={cadenceOptions}
+                value={cadence ?? Cadence.MONTHLY}
+                disabled={busy}
+                onChange={next =>
+                    form.setValue('cadence', next, {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                    })
+                }
             />
 
             <FormField
