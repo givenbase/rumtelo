@@ -47,6 +47,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         const openNativePicker = () => {
             const el = inputRef.current;
             if (!el || el.disabled || props.readOnly) return;
+            // Clear leftover autofill-guard readonly so the native picker can open.
+            el.removeAttribute('readonly');
             try {
                 if (typeof el.showPicker === 'function') {
                     el.showPicker();
