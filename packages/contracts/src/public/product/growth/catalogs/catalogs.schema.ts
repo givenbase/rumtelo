@@ -62,10 +62,10 @@ export const LearnBookPreset = CatalogItemBase.extend({
     /** Empty = not tied to saver / spender. */
     spendingStyles: z.array(z.enum(SpendingStyle)),
     /** Open Library cover id. Null when the catalog has no image. */
-    coverId: z.number().int().positive().nullable(),
+    coverId: z.int().positive().nullable(),
     /** ISBN-13 of the edition to buy. Null = no store link, only the author pointer. */
     isbn13: z.string().regex(ISBN13).nullable(),
-    url: z.string().url().max(280),
+    url: z.url().max(280),
 });
 
 /**
@@ -87,9 +87,9 @@ export const LearnWatchPreset = CatalogItemBase.extend({
     /** YouTube id for the poster. Null when the pointer is a page, not a video. */
     youtubeId: z.string().min(8).max(16).nullable(),
     /** Trailer, talk, class page, or the maker's own page. */
-    url: z.string().url().max(280),
+    url: z.url().max(280),
     /** Where to stream or rent it (JustWatch title page). Null = url is the only pointer. */
-    watchUrl: z.string().url().max(280).nullable(),
+    watchUrl: z.url().max(280).nullable(),
     /**
      * MerchantPreset.key for the open-home (UDEMY, SPOTIFY, NETFLIX, …).
      * Null when multi-home or no single merchant. Wire is the key; DB stores the FK.

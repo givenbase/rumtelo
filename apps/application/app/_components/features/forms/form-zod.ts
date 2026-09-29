@@ -22,7 +22,7 @@ function positiveMoneyInput(msg: FormT) {
                 const cents = parseAmountToMinorUnits(value);
                 return cents !== null && cents > 0;
             },
-            { message: msg('validation.valid_amount') }
+            { error: msg('validation.valid_amount') }
         );
 }
 
@@ -35,7 +35,7 @@ function nonNegativeMoneyInput(msg: FormT) {
                 const cents = parseAmountToMinorUnits(value);
                 return cents !== null && cents >= 0;
             },
-            { message: msg('validation.valid_amount') }
+            { error: msg('validation.valid_amount') }
         );
 }
 
@@ -74,6 +74,8 @@ export function createIncomeFormSchema(msg: FormT) {
     return z.object({
         name: z.string().min(1, msg('validation.name_required')).max(120),
         counterparty: z.string().max(160).optional(),
+        /** MerchantPreset.key when Received from was a catalog pick; empty = free text. */
+        merchantKey: z.string().max(64).optional(),
         amount: positiveMoneyInput(msg),
         kind: z.enum(IncomeKind),
         cadence: z.enum(Cadence),
@@ -135,7 +137,7 @@ export function createDebtFormSchema(msg: FormT) {
                         const parsed = Number(value.replace(',', '.'));
                         return Number.isFinite(parsed) && parsed >= 0 && parsed <= 100;
                     },
-                    { message: msg('validation.interest_range') }
+                    { error: msg('validation.interest_range') }
                 ),
             minimumPayment: z.string().optional(),
             extraPayment: z.string().optional(),
@@ -187,7 +189,7 @@ export function createMoveMoneyFormSchema(msg: FormT) {
             note: z.string().max(280),
         })
         .refine(values => values.fromJarId !== values.toJarId, {
-            message: msg('validation.different_jars'),
+            error: msg('validation.different_jars'),
             path: ['toJarId'],
         });
 }

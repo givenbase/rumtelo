@@ -156,7 +156,7 @@ export const DebtPlan = z.object({
 export const RecordDebtPayment = z.object({
     householdId: HouseholdId,
     debtId: Id,
-    amount: Money.refine(value => value > 0, { message: 'Payment must be positive' }),
+    amount: Money.refine(value => value > 0, { error: 'Payment must be positive' }),
     bookedOn: IsoDate,
     note: z.string().max(500).nullish(),
 });

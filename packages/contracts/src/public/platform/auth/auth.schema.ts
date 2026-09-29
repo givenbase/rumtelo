@@ -57,7 +57,7 @@ export const LandingSignUpForm = z.object({
     firstName: AuthFirstName,
     lastName: AuthLastName,
     email: AuthEmail,
-    terms: z.boolean().refine(value => value, { message: 'Please agree to the terms.' }),
+    terms: z.boolean().refine(value => value, { error: 'Please agree to the terms.' }),
 });
 
 export const ForgotPasswordForm = z.object({
@@ -70,7 +70,7 @@ export const ResetPasswordForm = z
         confirm: z.string(),
     })
     .refine(data => data.password === data.confirm, {
-        message: 'Passwords do not match',
+        error: 'Passwords do not match',
         path: ['confirm'],
     });
 

@@ -34,7 +34,7 @@ export function useAuthFormSchemas() {
             firstName,
             lastName,
             email,
-            terms: z.boolean().refine(value => value, { message: t('terms_required') }),
+            terms: z.boolean().refine(value => value, { error: t('terms_required') }),
         });
 
         const signUp = z.object({
@@ -55,7 +55,7 @@ export function useAuthFormSchemas() {
                 confirm: z.string(),
             })
             .refine(data => data.password === data.confirm, {
-                message: t('passwords_match'),
+                error: t('passwords_match'),
                 path: ['confirm'],
             });
 

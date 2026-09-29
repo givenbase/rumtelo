@@ -95,7 +95,7 @@ export const PracticeClientLink = z.object({
     /** Owner display name from auth.user (nullable if missing). */
     ownerName: z.string().max(120).nullable(),
     /** Active household members (auth.member count). */
-    memberCount: z.number().int().nonnegative(),
+    memberCount: z.int().nonnegative(),
     status: z.enum(PracticeClientLinkStatus),
     access: z.enum(PracticeClientAccess),
     controlFlags: z.array(z.enum(PracticeClientControlFlag)).default([]),
@@ -138,13 +138,13 @@ export const PracticeClientPortalSnapshot = z.object({
     currency: z.string().min(3).max(3),
     period: z.string().min(7).max(7),
     /** Money spent this period (minor units). */
-    moneySpentTotal: z.number().int(),
+    moneySpentTotal: z.int(),
     /** Growth income monthly (minor units). */
-    growthIncomeMonthly: z.number().int(),
+    growthIncomeMonthly: z.int(),
     /** Energy TRAIN sessions this ISO week. */
-    energyTrainSessionsThisWeek: z.number().int(),
+    energyTrainSessionsThisWeek: z.int(),
     /** Soul stillness streak days; null when never logged. */
-    soulStillnessStreakDays: z.number().int().nullable(),
+    soulStillnessStreakDays: z.int().nullable(),
 });
 
 /** Practice Stripe / meter snapshot. */
@@ -159,13 +159,13 @@ export const PracticeBillingStatus = z.object({
     /** When the Practice org was created. */
     practiceStartedAt: IsoDateTime,
     /** Billable staff members (seat_billable). */
-    billableSeatCount: z.number().int().nonnegative(),
+    billableSeatCount: z.int().nonnegative(),
     /** Active managed client household links (meter). */
-    billableClientCount: z.number().int().nonnegative(),
+    billableClientCount: z.int().nonnegative(),
     /** Catalog prices (eurocents / month). */
-    baseAmountCents: z.number().int().nonnegative(),
-    staffUnitAmountCents: z.number().int().nonnegative(),
-    clientUnitAmountCents: z.number().int().nonnegative(),
+    baseAmountCents: z.int().nonnegative(),
+    staffUnitAmountCents: z.int().nonnegative(),
+    clientUnitAmountCents: z.int().nonnegative(),
     currency: z.literal('eur'),
     /** Current Stripe period start (null if no subscription). */
     periodStartedAt: IsoDateTime.nullable(),

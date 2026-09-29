@@ -168,6 +168,7 @@ export function buildExportSheets(bundle: HouseholdExportBundle): ExportSheet[] 
                 id: source.id,
                 name: source.name,
                 counterparty: source.counterparty ?? '',
+                merchantKey: source.merchantKey ?? '',
                 kind: source.kind,
                 amountCents: source.amount,
                 cadence: source.cadence,

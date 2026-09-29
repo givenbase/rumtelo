@@ -21,6 +21,7 @@ export function IncomeUpdatePage({ id, embedded = false }: { id: string; embedde
         mapRow: row => ({
             name: row.name,
             counterparty: row.counterparty ?? '',
+            merchantKey: row.merchantKey ?? '',
             amount: minorUnitsToAmountInput(row.amount),
             kind: row.kind,
             cadence: row.cadence,

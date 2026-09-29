@@ -431,6 +431,7 @@ export class DemoHouseholdSeeder extends Seeder {
             kind: IncomeKind.SALARY,
             amount: 1_850,
             expectedDay: 25,
+            counterparty: 'RETAIL GROUP NL BV',
         });
 
         for (const row of [
@@ -580,12 +581,14 @@ export class DemoHouseholdSeeder extends Seeder {
             kind: IncomeKind.FREELANCE,
             amount: 2_800,
             expectedDay: 15,
+            counterparty: 'ACME DESIGN BV',
         });
         this.createIncome(em, householdId, {
             name: 'One-off gigs',
             kind: IncomeKind.FREELANCE,
             amount: 650,
             expectedDay: 28,
+            counterparty: 'NOVA STUDIO BV',
         });
 
         for (const row of [
@@ -1024,18 +1027,22 @@ export class DemoHouseholdSeeder extends Seeder {
             kind: IncomeKind.OTHER,
             amount: 5_200,
             expectedDay: 1,
+            counterparty: 'STUDIO NOORD BV',
         });
         this.createIncome(em, householdId, {
             name: 'Dividend portfolio',
             kind: IncomeKind.DIVIDEND,
             amount: 950,
             expectedDay: 15,
+            counterparty: 'DEGIRO',
+            merchantKey: 'DEGIRO',
         });
         this.createIncome(em, householdId, {
             name: 'Rental unit',
             kind: IncomeKind.RENTAL,
             amount: 1_400,
             expectedDay: 1,
+            counterparty: 'HUURDER J. DE VRIES',
         });
 
         for (const row of [
@@ -1443,13 +1450,22 @@ export class DemoHouseholdSeeder extends Seeder {
     private createIncome(
         em: EntityManager,
         householdId: string,
-        input: { name: string; kind: IncomeKind; amount: number; expectedDay: number }
+        input: {
+            name: string;
+            kind: IncomeKind;
+            amount: number;
+            expectedDay: number;
+            counterparty?: string;
+            merchantKey?: string;
+        }
     ): void {
         const startedOn = monthsAgo(6);
         const amount = toMinorUnits(input.amount);
         const source = em.create(IncomeSource, {
             household: householdId,
             name: input.name,
+            counterparty: input.counterparty ?? null,
+            merchantKey: input.merchantKey ?? null,
             kind: input.kind,
             amount,
             expectedDay: input.expectedDay,

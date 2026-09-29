@@ -198,6 +198,7 @@ export function IncomeForm({
         defaultValues: {
             name: defaultValues?.name ?? '',
             counterparty: defaultValues?.counterparty ?? '',
+            merchantKey: defaultValues?.merchantKey ?? '',
             amount: defaultValues?.amount ?? '',
             kind: defaultValues?.kind ?? IncomeKind.SALARY,
             cadence: defaultValues?.cadence ?? Cadence.MONTHLY,
@@ -235,6 +236,7 @@ export function IncomeForm({
             if (cents === null || cents <= 0) throw new Error('Invalid amount');
             const name = values.name.trim();
             const counterparty = values.counterparty?.trim() || null;
+            const merchantKey = counterparty ? values.merchantKey?.trim() || null : null;
             const endsOn = values.endsOn?.trim() ? values.endsOn.slice(0, 10) : null;
             if (mode === 'edit' && entityId) {
                 const startedOn = values.startedOn?.trim() ? values.startedOn.slice(0, 10) : null;
@@ -243,6 +245,7 @@ export function IncomeForm({
                     householdId,
                     name,
                     counterparty,
+                    merchantKey,
                     amount: cents,
                     startedOn,
                     endsOn,
@@ -257,6 +260,7 @@ export function IncomeForm({
                 householdId,
                 name,
                 counterparty,
+                merchantKey,
                 amount: cents,
                 kind: values.kind,
                 cadence: values.cadence,
@@ -430,11 +434,18 @@ export function IncomeForm({
                         <FormControl>
                             <PresetNameField
                                 value={field.value ?? ''}
-                                onChange={field.onChange}
+                                onChange={next => {
+                                    field.onChange(next);
+                                    // Typing away from a catalog pick → treat as free text.
+                                    if (form.getValues('merchantKey')) {
+                                        form.setValue('merchantKey', '', { shouldDirty: true });
+                                    }
+                                }}
                                 placeholder={tIncome('received_from_placeholder')}
                                 options={payerOptions}
                                 onSelect={opt => {
                                     field.onChange(opt.name);
+                                    form.setValue('merchantKey', opt.key, { shouldDirty: true });
                                 }}
                             />
                         </FormControl>

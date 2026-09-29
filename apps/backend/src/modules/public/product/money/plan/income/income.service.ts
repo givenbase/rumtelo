@@ -41,6 +41,7 @@ export class IncomeService {
     async create(input: {
         name: string;
         counterparty?: string | null;
+        merchantKey?: string | null;
         kind: string;
         amount: number;
         cadence?: string;
@@ -54,6 +55,7 @@ export class IncomeService {
             household: currentHouseholdId(),
             name: input.name,
             counterparty: input.counterparty ?? null,
+            merchantKey: input.merchantKey ?? null,
             kind: input.kind as IncomeKind,
             amount: input.amount,
             cadence: (input.cadence as Cadence) ?? Cadence.MONTHLY,
@@ -105,6 +107,7 @@ export class IncomeService {
         patch: Partial<{
             name: string;
             counterparty: string | null;
+            merchantKey: string | null;
             kind: string;
             amount: number;
             cadence: string;
@@ -124,6 +127,7 @@ export class IncomeService {
         }
         if (patch.name !== undefined) source.name = patch.name;
         if (patch.counterparty !== undefined) source.counterparty = patch.counterparty;
+        if (patch.merchantKey !== undefined) source.merchantKey = patch.merchantKey;
         if (patch.expectedDay !== undefined) source.expectedDay = patch.expectedDay;
         if (patch.isActive !== undefined) source.isActive = patch.isActive;
         if (patch.startedOn !== undefined) source.startedOn = patch.startedOn;
@@ -199,6 +203,7 @@ export class IncomeService {
             householdId: source.household,
             name: source.name,
             counterparty: source.counterparty,
+            merchantKey: source.merchantKey,
             kind: source.kind,
             amount: source.amount,
             cadence: source.cadence,

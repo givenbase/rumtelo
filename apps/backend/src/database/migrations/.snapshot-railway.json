@@ -14049,6 +14049,22 @@
           ],
           "mappedType": "unknown",
           "nativeEnumName": "money_cadence"
+        },
+        "counterparty": {
+          "name": "counterparty",
+          "type": "varchar(160)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 160,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
         }
       },
       "name": "money_income_source",

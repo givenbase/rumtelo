@@ -120,6 +120,7 @@ export class ArchiveService {
                 await this.income.create({
                     name: row.name,
                     counterparty: row.counterparty ?? null,
+                    merchantKey: row.merchantKey ?? null,
                     kind: row.kind,
                     amount: row.amount,
                     cadence: row.cadence,

@@ -31,6 +31,14 @@ export class IncomeSource extends HouseholdEntity {
     @Property({ type: MoneyType })
     amount!: number;
 
+    /**
+     * MerchantPreset.key when Received from was picked from the catalog.
+     * Snapshot, not an FK — same pattern as Transaction.appliedMerchantKey.
+     * Null for free-typed employers / platforms.
+     */
+    @Property({ length: 64, nullable: true })
+    merchantKey: string | null = null;
+
     /** Inactive sources stay for history but leave the income total. */
     @Property({ default: true })
     isActive = true;

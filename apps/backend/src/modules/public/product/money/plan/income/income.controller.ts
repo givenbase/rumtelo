@@ -22,6 +22,7 @@ export class IncomeController {
             this.income.create({
                 name: input.name,
                 counterparty: input.counterparty,
+                merchantKey: input.merchantKey,
                 kind: input.kind,
                 amount: input.amount,
                 cadence: input.cadence,

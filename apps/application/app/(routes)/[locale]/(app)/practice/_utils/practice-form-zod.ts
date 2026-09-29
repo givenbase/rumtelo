@@ -73,7 +73,7 @@ export function createAddClientSchema(_t: ReturnType<typeof useTranslations>) {
             access: z.enum(PracticeClientAccess),
         })
         .refine(data => data.email || data.householdId, {
-            message: 'Provide an email or household ID',
+            error: 'Provide an email or household ID',
             path: ['email'],
         });
 }

@@ -217,6 +217,7 @@ export function archivePayloadFromCsvSheets(files: Map<string, string>): Payload
             return {
                 name: row.name,
                 counterparty: row.counterparty || null,
+                merchantKey: row.merchantKey || null,
                 kind: enumOr(row.kind, Object.values(IncomeKind), IncomeKind.SALARY),
                 amount,
                 cadence: row.cadence

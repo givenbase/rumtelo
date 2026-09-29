@@ -23,6 +23,11 @@ export const IncomeSource = z.object({
     name: z.string().min(1).max(120),
     /** Employer, client, or platform (DEGIRO, ACME BV). Optional. */
     counterparty: z.string().max(160).nullable().default(null),
+    /**
+     * MerchantPreset.key when Received from was picked from the catalog.
+     * Null for free-typed employers / platforms.
+     */
+    merchantKey: z.string().min(1).max(64).nullable().default(null),
     kind: z.enum(IncomeKind),
     /** Cached current amount (latest period) — used by jar monthly net. */
     amount: Money,

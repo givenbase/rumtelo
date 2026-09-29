@@ -17,39 +17,39 @@ import { CapabilityKind, PlanKey } from './enums';
 /** Named capacity ceilings — null = unlimited. */
 export const PlanLimits = z.object({
     /** Total household seats (owner included). null = unlimited. */
-    maxMembers: z.number().int().positive().nullable(),
+    maxMembers: z.int().positive().nullable(),
     /**
      * Writable seats: OWNER + ADMIN + MEMBER (not viewer).
      * null = unlimited. Distinct from {@link SeatAddonKind} / BA role strings.
      */
-    maxWritableMembers: z.number().int().positive().nullable(),
+    maxWritableMembers: z.int().positive().nullable(),
     /** Viewer / look-along seats. null = unlimited. */
-    maxViewerMembers: z.number().int().min(0).nullable(),
-    maxGoals: z.number().int().positive().nullable(),
-    maxAssets: z.number().int().positive().nullable(),
-    maxIncomeStreams: z.number().int().positive().nullable(),
-    maxLearnEntries: z.number().int().positive().nullable(),
+    maxViewerMembers: z.int().min(0).nullable(),
+    maxGoals: z.int().positive().nullable(),
+    maxAssets: z.int().positive().nullable(),
+    maxIncomeStreams: z.int().positive().nullable(),
+    maxLearnEntries: z.int().positive().nullable(),
     /** Live Open Banking linked seats. 0 = none (Basic). null = unlimited. */
-    maxBankLinks: z.number().int().min(0).nullable(),
+    maxBankLinks: z.int().min(0).nullable(),
 });
 
 export const PlanCapabilities = z.object({
     /** Ceiling on household members (owner included). null = unlimited. */
-    maxMembers: z.number().int().positive().nullable(),
+    maxMembers: z.int().positive().nullable(),
     /** Writable seats (OWNER + ADMIN + MEMBER). null = unlimited. */
-    maxWritableMembers: z.number().int().positive().nullable(),
+    maxWritableMembers: z.int().positive().nullable(),
     /** Viewer / look-along seats. null = unlimited. */
-    maxViewerMembers: z.number().int().min(0).nullable(),
+    maxViewerMembers: z.int().min(0).nullable(),
     /** Goals create ceiling. null = unlimited. */
-    maxGoals: z.number().int().positive().nullable(),
+    maxGoals: z.int().positive().nullable(),
     /** Net-worth assets ceiling. null = unlimited. */
-    maxAssets: z.number().int().positive().nullable(),
+    maxAssets: z.int().positive().nullable(),
     /** Growth income/lever streams ceiling. null = unlimited. */
-    maxIncomeStreams: z.number().int().positive().nullable(),
+    maxIncomeStreams: z.int().positive().nullable(),
     /** Learn entries ceiling. null = unlimited. */
-    maxLearnEntries: z.number().int().positive().nullable(),
+    maxLearnEntries: z.int().positive().nullable(),
     /** Live AIS linked seats ceiling. 0 = none. null = unlimited. */
-    maxBankLinks: z.number().int().min(0).nullable(),
+    maxBankLinks: z.int().min(0).nullable(),
     /** Household shapes this tier may use. Basic = solo only. */
     householdKinds: z.array(z.enum(HouseholdKind)).min(1),
     /** Flat capability keys granted on this tier (derived from PLAN_ACCESS). */
@@ -63,15 +63,15 @@ export const PlanCapabilities = z.object({
  * `extraContributor` / `extraViewer` are inventory counts — not roles.
  */
 export const SeatExtras = z.object({
-    extraContributor: z.number().int().nonnegative().default(0),
-    extraViewer: z.number().int().nonnegative().default(0),
+    extraContributor: z.int().nonnegative().default(0),
+    extraViewer: z.int().nonnegative().default(0),
 });
 
 /** Effective caps after included plan limits + purchased extras. */
 export const EffectiveSeatCaps = z.object({
-    maxMembers: z.number().int().positive().nullable(),
-    maxWritable: z.number().int().positive().nullable(),
-    maxViewer: z.number().int().min(0).nullable(),
+    maxMembers: z.int().positive().nullable(),
+    maxWritable: z.int().positive().nullable(),
+    maxViewer: z.int().min(0).nullable(),
 });
 
 // ====================================================================
