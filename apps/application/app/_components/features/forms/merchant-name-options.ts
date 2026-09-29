@@ -12,6 +12,8 @@ export function merchantToNameOption(
         /** Display group label (usually category name). */
         group?: string;
         icon?: string | null;
+        /** Row tag that tells vendors apart from presets in a mixed picker. */
+        badge?: string | null;
     }
 ): NamePresetOption {
     return {
@@ -22,6 +24,7 @@ export function merchantToNameOption(
         aliases: merchant.aliases,
         logoDomain: merchant.logoDomain,
         website: merchant.website,
+        badge: opts?.badge ?? null,
     };
 }
 
@@ -38,6 +41,7 @@ export function merchantsToNameOptions(
         excludeGivingLinked?: boolean;
         /** categoryTemplateKey → human group label + optional icon */
         categoryMeta?: ReadonlyMap<string, { name: string; icon?: string | null }>;
+        badge?: string | null;
     }
 ): NamePresetOption[] {
     let rows = opts?.categoryTemplateKey
@@ -54,14 +58,43 @@ export function merchantsToNameOptions(
             keyPrefix: opts?.keyPrefix,
             group: meta?.name ?? merchant.categoryTemplateKey,
             icon: meta?.icon ?? null,
+            badge: opts?.badge,
         });
     });
 }
 
-export function isMerchantOptionKey(key: string, prefix = MERCHANT_OPTION_PREFIX): boolean {
-    return key.startsWith(prefix);
+/** Free-text option key shared by name pickers (label editable, identity "Other"). */
+export const OTHER_OPTION_KEY = 'OTHER';
+
+/**
+ * What a name field is locked to. Presets (bill types, …) and vendors are
+ * different things even when they share one dropdown — keep them apart here
+ * instead of encoding the difference in a string prefix.
+ */
+export type NameLock =
+    | { kind: 'preset'; key: string }
+    | { kind: 'vendor'; merchantKey: string }
+    | { kind: 'other' };
+
+/** Option key in a mixed preset + vendor picker → typed lock. */
+export function nameLockFromOptionKey(key: string, prefix = MERCHANT_OPTION_PREFIX): NameLock {
+    if (key === OTHER_OPTION_KEY) return { kind: 'other' };
+    if (key.startsWith(prefix)) return { kind: 'vendor', merchantKey: key.slice(prefix.length) };
+    return { kind: 'preset', key };
 }
 
-export function merchantKeyFromOptionKey(key: string, prefix = MERCHANT_OPTION_PREFIX): string {
-    return key.startsWith(prefix) ? key.slice(prefix.length) : key;
+/** Typed lock → the option key `PresetNameField` should show as locked. */
+export function nameLockToOptionKey(
+    lock: NameLock | null,
+    prefix = MERCHANT_OPTION_PREFIX
+): string | null {
+    if (!lock) return null;
+    switch (lock.kind) {
+        case 'preset':
+            return lock.key;
+        case 'vendor':
+            return `${prefix}${lock.merchantKey}`;
+        case 'other':
+            return OTHER_OPTION_KEY;
+    }
 }

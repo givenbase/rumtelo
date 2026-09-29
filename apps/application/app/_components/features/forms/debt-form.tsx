@@ -42,6 +42,7 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 import { createDebtFormSchema, type DebtFormSchemaValues } from './form-zod';
 import { CadencePicker, type CadencePickerOption } from './cadence-picker';
+import { CatalogCandidateChips } from './catalog-candidate-chips';
 import { CATALOG_CHIP_IDLE_LIMIT, CatalogChipPicker } from './catalog-chip-picker';
 import { ConfirmActionButton } from './confirm-action-button';
 import { clampDueDayInput, clampDueMonthInput, DueDayField } from './due-day-field';
@@ -49,8 +50,14 @@ import { FormDatePicker } from './form-date-picker';
 import { FormInput } from './form-input';
 import { merchantsToNameOptions } from './merchant-name-options';
 import { PresetNameField, type NamePresetOption } from './preset-name-field';
-import type { MerchantPreset } from '@rumtelo/contracts';
-import { findByNameOrAlias, normalizeDueDay, normalizeDueMonth } from '@rumtelo/utils';
+import type { DebtPreset, MerchantPreset } from '@rumtelo/contracts';
+import {
+    findByNameOrAlias,
+    normalizeDueDay,
+    normalizeDueMonth,
+    presetForMerchant,
+    resolveVendorPresets,
+} from '@rumtelo/utils';
 
 export type DebtFormValues = DebtFormSchemaValues;
 
@@ -147,8 +154,8 @@ export function DebtForm({
         [],
         live
     );
-    const debtTypes = debtTypesQuery.data ?? [];
-    const merchants = merchantsQuery.data ?? [];
+    const debtTypes = useMemo(() => debtTypesQuery.data ?? [], [debtTypesQuery.data]);
+    const merchants = useMemo(() => merchantsQuery.data ?? [], [merchantsQuery.data]);
     const { byKey: jarByKey } = useJarCatalog();
     const selectedType = debtTypes.find(option => option.key === typeKey) ?? null;
     const lenderChrome = catalogMarkChrome({
@@ -166,8 +173,11 @@ export function DebtForm({
     })();
 
     /** Suggested lenders + full merchant catalog (banks, BNPL, …) for typeahead. */
-    const fromMerchants = merchantsToNameOptions(merchants);
-    const lenderOptions: NamePresetOption[] = fromMerchants;
+    const lenderOptions = useMemo(
+        (): NamePresetOption[] =>
+            merchantsToNameOptions(merchants, { badge: tDebt('option_badge_lender') }),
+        [merchants, tDebt]
+    );
     const debtFormSchema = useMemo(() => createDebtFormSchema(tForm), [tForm]);
 
     const form = useForm<DebtFormValues>({
@@ -213,17 +223,20 @@ export function DebtForm({
     ) {
         const savedName = defaultValues?.name ?? '';
         const savedKind = defaultValues?.kind;
-        const merchantMatch = debtTypes.find(debtType =>
-            (debtType.merchantKeys ?? []).some(key => {
-                const merchant = merchants.find(row => row.key === key);
-                return Boolean(merchant && findByNameOrAlias([merchant], savedName));
-            })
-        );
+        // Lender → its debt type; when the lender serves several, the saved kind decides.
+        const savedLender = findByNameOrAlias(merchants, savedName);
+        const lenderMatch = savedLender
+            ? presetForMerchant(
+                  debtTypes,
+                  savedLender.key,
+                  savedKind ? debtType => debtType.kind === savedKind : undefined
+              )
+            : null;
         const typeNameMatch = findByNameOrAlias(debtTypes, savedName);
         const kindMatch = savedKind
             ? (debtTypes.find(debtType => debtType.kind === savedKind) ?? null)
             : null;
-        const matched = merchantMatch ?? typeNameMatch ?? kindMatch ?? null;
+        const matched = lenderMatch ?? typeNameMatch ?? kindMatch ?? null;
         if (matched) {
             setTypeKey(matched.key);
             form.setValue('kind', matched.kind);
@@ -362,6 +375,31 @@ export function DebtForm({
     const selectedLenderName = useWatch({ control: form.control, name: 'name' }) ?? '';
     const showLenderInput = customLender || lendersForType.length === 0;
 
+    /** Lender chosen before a type: adopt its debt type when exactly one is linked. */
+    function applyDebtType(debtType: DebtPreset) {
+        setTypeKey(debtType.key);
+        setTypeQuery('');
+        setEditNoTypeMatch(false);
+        setCustomLender(false);
+        form.setValue('kind', debtType.kind);
+    }
+
+    function applyLenderPick(option: NamePresetOption) {
+        form.setValue('name', option.name, { shouldDirty: true, shouldValidate: true });
+        if (typeKey) return; // Type already chosen — the pick only names the lender.
+        const debtType = presetForMerchant(debtTypes, option.key);
+        if (debtType) applyDebtType(debtType);
+    }
+
+    /** No type yet and the lender serves several (ING: mortgage, loan, card) → household picks. */
+    const lenderTypeCandidates = useMemo(() => {
+        if (typeKey || !editNoTypeMatch) return [];
+        const lender = findByNameOrAlias(merchants, selectedLenderName);
+        if (!lender) return [];
+        const resolution = resolveVendorPresets(debtTypes, lender.key);
+        return resolution.kind === 'ambiguous' ? resolution.candidates : [];
+    }, [typeKey, editNoTypeMatch, merchants, debtTypes, selectedLenderName]);
+
     return (
         <FormCreateEditShell
             embedded={embedded}
@@ -406,14 +444,18 @@ export function DebtForm({
                                         placeholder={tDebt('lender_example_short')}
                                         freeTextPlaceholder={tDebt('lender_free')}
                                         disabled={busy}
-                                        onSelect={opt => {
-                                            field.onChange(opt.name);
-                                        }}
+                                        onSelect={applyLenderPick}
                                     />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
+                    />
+                    <CatalogCandidateChips
+                        label={tDebt('type_for_lender', { lender: selectedLenderName })}
+                        candidates={lenderTypeCandidates}
+                        disabled={busy}
+                        onPick={applyDebtType}
                     />
                     <FormField
                         control={form.control}
@@ -576,9 +618,7 @@ export function DebtForm({
                                                     }
                                                     freeTextPlaceholder={tDebt('lender_free')}
                                                     disabled={busy}
-                                                    onSelect={opt => {
-                                                        field.onChange(opt.name);
-                                                    }}
+                                                    onSelect={applyLenderPick}
                                                 />
                                             </FormControl>
                                             <FormMessage />
