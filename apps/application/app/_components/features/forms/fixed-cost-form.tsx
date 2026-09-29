@@ -48,7 +48,7 @@ import { CoachTipCard } from '@/components/features/helpers';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
-import { findByName, namesMatch } from '@rumtelo/utils';
+import { findByNameOrAlias, namesMatch } from '@rumtelo/utils';
 
 import { createFixedCostFormSchema, type FixedCostFormSchemaValues } from './form-zod';
 import { CATALOG_CHIP_IDLE_LIMIT, CatalogChipPicker } from './catalog-chip-picker';
@@ -281,6 +281,7 @@ export function FixedCostForm({
                     name: preset.name,
                     group: category?.name ?? preset.categoryTemplateKey,
                     icon: category?.icon ?? null,
+                    aliases: preset.aliases,
                 };
             });
         // Brands first so “netflix” hits Netflix before “Streaming video”.
@@ -344,10 +345,12 @@ export function FixedCostForm({
         if (selectedBillPresetKey) {
             const bill = fixedCostPresets.find(preset => preset.key === selectedBillPresetKey);
             const keys = bill?.merchantKeys ?? [];
-            if (keys.length === 0) return [] as MerchantPreset[];
-            return keys
-                .map(key => byKey.get(key))
-                .filter((merchant): merchant is MerchantPreset => Boolean(merchant));
+            if (keys.length > 0) {
+                return keys
+                    .map(key => byKey.get(key))
+                    .filter((merchant): merchant is MerchantPreset => Boolean(merchant));
+            }
+            // Preset has no merchant links yet — fall through to category chips.
         }
         if (!activeCategoryTemplateKey) return [] as MerchantPreset[];
         return merchants.filter(
@@ -363,13 +366,14 @@ export function FixedCostForm({
     if (
         mode === 'edit' &&
         !editCatalogHydrated &&
-        fixedCostPresets.length > 0 &&
-        !merchantsQuery.isLoading
+        presetsQuery.data !== undefined &&
+        merchantsQuery.data !== undefined
     ) {
         const savedName = defaultValues?.name ?? form.getValues('name');
-        const matched = findByName(fixedCostPresets, savedName);
+        const matched = findByNameOrAlias(fixedCostPresets, savedName);
         if (matched) {
             setSelectedBillPresetKey(matched.key);
+            setPendingCategoryTemplateKey(matched.categoryTemplateKey);
             const savedPayee = defaultValues?.counterparty ?? form.getValues('counterparty');
             if (savedPayee?.trim()) {
                 const byKey = new Map(merchants.map(merchant => [merchant.key, merchant]));

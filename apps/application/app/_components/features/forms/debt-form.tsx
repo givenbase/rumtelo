@@ -45,7 +45,7 @@ import { FormInput } from './form-input';
 import { merchantsToNameOptions } from './merchant-name-options';
 import { PresetNameField, type NamePresetOption } from './preset-name-field';
 import type { MerchantPreset } from '@rumtelo/contracts';
-import { namesMatch } from '@rumtelo/utils';
+import { findByNameOrAlias } from '@rumtelo/utils';
 
 export type DebtFormValues = DebtFormSchemaValues;
 
@@ -195,20 +195,21 @@ export function DebtForm({
         const merchantMatch = debtTypes.find(debtType =>
             (debtType.merchantKeys ?? []).some(key => {
                 const merchant = merchants.find(row => row.key === key);
-                return Boolean(merchant && namesMatch(merchant.name, savedName));
+                return Boolean(merchant && findByNameOrAlias([merchant], savedName));
             })
         );
-        const kindMatch =
-            merchantMatch ??
-            (savedKind ? (debtTypes.find(debtType => debtType.kind === savedKind) ?? null) : null);
-        const matched = merchantMatch ?? kindMatch ?? null;
+        const typeNameMatch = findByNameOrAlias(debtTypes, savedName);
+        const kindMatch = savedKind
+            ? (debtTypes.find(debtType => debtType.kind === savedKind) ?? null)
+            : null;
+        const matched = merchantMatch ?? typeNameMatch ?? kindMatch ?? null;
         if (matched) {
             setTypeKey(matched.key);
             form.setValue('kind', matched.kind);
             const lendersForMatched = (matched.merchantKeys ?? [])
                 .map(key => merchants.find(row => row.key === key))
                 .filter((row): row is MerchantPreset => Boolean(row));
-            const nameInChips = lendersForMatched.some(row => namesMatch(row.name, savedName));
+            const nameInChips = Boolean(findByNameOrAlias(lendersForMatched, savedName));
             if (savedName && !nameInChips) setCustomLender(true);
         } else {
             setEditNoTypeMatch(true);

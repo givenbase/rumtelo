@@ -25,7 +25,7 @@ import type { IncomeAmountPeriod, IncomeSourcePreset } from '@rumtelo/contracts'
 import { Cadence, IncomeKind } from '@rumtelo/contracts';
 
 import { useTranslations } from '@rumtelo/i18n';
-import { findByName } from '@rumtelo/utils';
+import { findByNameOrAlias } from '@rumtelo/utils';
 
 import { CREATE_HREF } from '@/app/_lib/create-routes';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
@@ -363,7 +363,7 @@ export function IncomeForm({
                 render={({ field }) => {
                     const lockedIncomeKey =
                         mode === 'edit'
-                            ? (findByName(presetOptions, field.value)?.key ?? null)
+                            ? (findByNameOrAlias(presetOptions, field.value)?.key ?? null)
                             : null;
                     return (
                         <FormItem>

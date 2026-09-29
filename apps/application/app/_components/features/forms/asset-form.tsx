@@ -15,7 +15,7 @@ import {
     VendorMark,
     createFormInvalidHandler,
 } from '@rumtelo/ui';
-import { cn, findByName, namesMatch } from '@rumtelo/utils';
+import { cn, findByNameOrAlias, namesMatch } from '@rumtelo/utils';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { AssetKind, AssetPreset, MerchantPreset } from '@rumtelo/contracts';
@@ -225,7 +225,7 @@ export function AssetForm({
     if (mode === 'edit' && !assetPresetHydrated && presetsQuery.data !== undefined) {
         const savedName = (defaultValues?.name ?? '').trim();
         if (savedName && presetKey === null) {
-            const matched = findByName(presets, savedName);
+            const matched = findByNameOrAlias(presets, savedName);
             if (matched) {
                 setPresetKey(matched.key);
             } else {

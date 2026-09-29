@@ -24,6 +24,10 @@ import {
     MerchantPresetService,
     TransactionInPresetService,
 } from '../../../../../backoffice/product';
+import { aliasesForFixedCostPreset } from '../../../../../backoffice/product/money/preset/fixed-cost/seed/fixed-cost-name-aliases';
+import { aliasesForDebtPreset } from '../../../../../backoffice/product/money/preset/debt/seed/debt-name-aliases';
+import { aliasesForIncomeSourcePreset } from '../../../../../backoffice/product/money/preset/income/seed/income-name-aliases';
+import { aliasesForGoalPreset } from '../../../../../backoffice/product/money/preset/goal/seed/goal-name-aliases';
 
 @ControllerSwagger('money/catalogs', 'public')
 export class MoneyCatalogsController {
@@ -105,6 +109,7 @@ export class MoneyCatalogsController {
                     direction: preset.direction,
                     audienceKeys: preset.audiences.getItems().map(audience => audience.key),
                     merchantKeys: preset.merchantLinks.getItems().map(link => link.merchant.key),
+                    aliases: aliasesForFixedCostPreset(preset.key, preset.name),
                 }));
             }
         );
@@ -162,6 +167,7 @@ export class MoneyCatalogsController {
                 kind: preset.kind,
                 icon: preset.icon,
                 merchantKeys: preset.merchantLinks.getItems().map(link => link.merchant.key),
+                aliases: aliasesForDebtPreset(preset.key, preset.name),
             }));
         });
     }
@@ -182,6 +188,7 @@ export class MoneyCatalogsController {
                     kind: preset.kind,
                     cadence: preset.cadence,
                     icon: preset.icon,
+                    aliases: aliasesForIncomeSourcePreset(preset.key, preset.name),
                 }));
             }
         );
@@ -218,6 +225,7 @@ export class MoneyCatalogsController {
                 jarKey: preset.jarTemplate.key,
                 categoryTemplateKey: preset.categoryTemplate?.key ?? null,
                 icon: preset.icon,
+                aliases: aliasesForGoalPreset(preset.key, preset.name),
             }));
         });
     }

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { containsWord, findByName, namesMatch } from './text-match';
+import { containsWord, findByName, findByNameOrAlias, namesMatch } from './text-match';
 
 describe('namesMatch', () => {
     it('trims and ignores case', () => {
@@ -21,6 +21,18 @@ describe('findByName', () => {
         assert.equal(findByName(rows, ' odido ')?.name, 'Odido');
         assert.equal(findByName(rows, 'missing'), null);
         assert.equal(findByName(rows, '  '), null);
+    });
+});
+
+describe('findByNameOrAlias', () => {
+    it('matches display name or an alias', () => {
+        const rows = [
+            { name: 'Mobile phone', aliases: ['Mobiele telefoon', 'Teléfono móvil'] },
+            { name: 'Internet', aliases: ['Internet'] },
+        ];
+        assert.equal(findByNameOrAlias(rows, 'Mobiele telefoon')?.name, 'Mobile phone');
+        assert.equal(findByNameOrAlias(rows, 'mobile phone')?.name, 'Mobile phone');
+        assert.equal(findByNameOrAlias(rows, 'missing'), null);
     });
 });
 
