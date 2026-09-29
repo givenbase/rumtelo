@@ -59,5 +59,7 @@ export const CATEGORY_TEMPLATE_SEED = [
     { key: 'SPORT', name: 'Sport', jarKey: JarKey.PLAY, icon: '⚽' },
     // GIVE
     { key: 'DONATIONS', name: 'Donations', jarKey: JarKey.GIVE, icon: '❤️' },
+    /** Direct help to relatives — not charity, not a gift. */
+    { key: 'FAMILY_SUPPORT', name: 'Family support', jarKey: JarKey.GIVE, icon: '🤝' },
     { key: 'GIFTS', name: 'Gifts', jarKey: JarKey.GIVE, icon: '🎁' },
 ] as const;

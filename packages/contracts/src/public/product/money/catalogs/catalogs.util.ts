@@ -22,7 +22,7 @@ export function matchesAudience(
 
 /**
  * Default Give spend category: first Give-jar template by sortOrder.
- * Company seed puts Donations before Gifts.
+ * Company seed puts Donations first (then Family support, then Gifts).
  */
 export function defaultGiveCategoryTemplate<T extends { jarKey: JarKey; sortOrder: number }>(
     categories: readonly T[]

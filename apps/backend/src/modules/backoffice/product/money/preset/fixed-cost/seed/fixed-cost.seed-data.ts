@@ -719,6 +719,27 @@ export const FIXED_COST_PRESET_SEED: readonly Seed[] = [
         audienceKeys: [AudienceKey.COMMON],
     },
     {
+        key: 'FAMILY_SUPPORT',
+        name: 'Family / relative support',
+        jarKey: give,
+        categoryTemplateKey: 'FAMILY_SUPPORT',
+        audienceKeys: [AudienceKey.COMMON],
+    },
+    {
+        key: 'BIRTHDAY_GIFTS',
+        name: 'Birthday gifts',
+        jarKey: give,
+        categoryTemplateKey: 'GIFTS',
+        audienceKeys: [AudienceKey.COMMON],
+    },
+    {
+        key: 'HOLIDAY_GIFTS',
+        name: 'Holiday / seasonal gifts',
+        jarKey: give,
+        categoryTemplateKey: 'GIFTS',
+        audienceKeys: [AudienceKey.COMMON],
+    },
+    {
         key: 'OTHER',
         name: 'Other',
         jarKey: necessities,

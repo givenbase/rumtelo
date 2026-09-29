@@ -49,6 +49,7 @@ export const CATEGORY_TEMPLATE_TRANSLATIONS: Partial<Record<IntlLocale, Record<s
         MEDIA: 'Media',
         SPORT: 'Sport',
         DONATIONS: 'Donaties',
+        FAMILY_SUPPORT: 'Familiehulp',
         GIFTS: 'Cadeaus',
     },
     es: {
@@ -93,6 +94,7 @@ export const CATEGORY_TEMPLATE_TRANSLATIONS: Partial<Record<IntlLocale, Record<s
         MEDIA: 'Medios',
         SPORT: 'Deporte',
         DONATIONS: 'Donaciones',
+        FAMILY_SUPPORT: 'Ayuda familiar',
         GIFTS: 'Regalos',
     },
     fr: {
@@ -137,6 +139,7 @@ export const CATEGORY_TEMPLATE_TRANSLATIONS: Partial<Record<IntlLocale, Record<s
         MEDIA: 'Médias',
         SPORT: 'Sport',
         DONATIONS: 'Dons',
+        FAMILY_SUPPORT: 'Aide familiale',
         GIFTS: 'Cadeaux',
     },
 };
