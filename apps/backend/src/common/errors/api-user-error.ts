@@ -4,6 +4,7 @@ import {
     ForbiddenException,
     NotFoundException,
     ServiceUnavailableException,
+    UnauthorizedException,
 } from '@nestjs/common';
 
 import { type ApiErrorMessageKey } from '@rumtelo/contracts';
@@ -17,6 +18,14 @@ export type ApiErrorParams = Record<string, string | number>;
 export function apiBadRequest(key: ApiErrorMessageKey, params?: ApiErrorParams) {
     if (params) return new BadRequestException({ message: key, params });
     return new BadRequestException(key);
+}
+
+export function apiUnauthorized(
+    key: ApiErrorMessageKey = 'not_authenticated',
+    params?: ApiErrorParams
+) {
+    if (params) return new UnauthorizedException({ message: key, params });
+    return new UnauthorizedException(key);
 }
 
 export function apiConflict(key: ApiErrorMessageKey, params?: ApiErrorParams) {

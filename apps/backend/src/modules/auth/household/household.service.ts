@@ -237,6 +237,9 @@ export class HouseholdService {
 
     private async onboardInternal(input: z.infer<typeof OnboardingInput>, headers: Headers) {
         const userId = currentUserId();
+        // Fail fast on ghost sessions (Redis cookie after DB wipe) before BA org create.
+        await this.accounts.ensureAccountForUser(userId);
+
         const planKey = PlanKey.BASIC;
         const kind = canUseHouseholdKind(planKey, input.kind) ? input.kind : HouseholdKind.SOLO;
 
