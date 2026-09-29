@@ -48,7 +48,10 @@ export class MerchantMatching extends BaseEntity {
     providerIds: Record<string, string> = {};
 
     // ? RELATIONSHIPS
-    /** Owning merchant preset (1:1). Cascades when the preset is deleted. */
-    @OneToOne(() => MerchantPreset, { owner: true, deleteRule: 'cascade', unique: true })
+    /**
+     * Owning merchant preset (1:1). Cascades when the preset is deleted.
+     * OneToOne (not ManyToOne+@Unique) so MerchantPreset.matching can stay the inverse.
+     */
+    @OneToOne(() => MerchantPreset, { owner: true, deleteRule: 'cascade' })
     preset!: MerchantPreset;
 }

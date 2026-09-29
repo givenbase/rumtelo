@@ -18,6 +18,7 @@ pnpm --filter @rumtelo/backend dev   # :3002
   - `DatabaseSeeder` orchestrates `product/{money|growth}` + `plan` catalog seeders, then `demo/DemoHouseholdSeeder`
   - Catalog seed **data** lives next to the aggregate (`modules/backoffice/product/.../seed/`)
   - Seeder runners mirror that tree under `database/seeders/`
+  - Demo money rows set `presetKey` when they match a catalog type (`RENT`, `SALARY`, …); free-typed labels (e.g. Groceries) leave it null
 - Swagger UI (dev): `http://localhost:3002/api/docs` — controllers use `@ControllerSwagger`
 - Shared helpers: `common/database/entity-config.util.ts`, constraint → CONFLICT, `executeWithTransaction`, date/timezone utils
 - Outbound email: `modules/backoffice/communication/email` (`EMAIL_PROVIDER=memory|resend`)

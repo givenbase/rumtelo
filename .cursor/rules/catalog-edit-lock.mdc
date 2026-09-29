@@ -12,10 +12,10 @@ Same pattern everywhere a create picker locks a name and edit must re-lock + sho
 
 | Form | Preset key state | Chips | Prefer stored key? |
 |------|------------------|-------|--------------------|
-| `fixed-cost-form` | `nameLock` (`NameLock` union: preset / vendor / other) | Paid-to merchants | No — match name |
-| `debt-form` | `typeKey` | Lenders — reverse lookup via `presetForMerchant` | Kind + lender / type name |
-| `income-form` | locked from name | — | No — match name |
-| `goal-form` | `goalPresetKey` | Car brands when CAR | No — match name |
+| `fixed-cost-form` | `nameLock` (`NameLock` union: preset / vendor / other) | Paid-to merchants | **Yes** — persist `presetKey` |
+| `debt-form` | `presetKey` | Lenders — reverse lookup via `presetForMerchant` | **Yes** — persist `presetKey` |
+| `income-form` | locked from name / stored `presetKey` | — | **Yes** — persist `presetKey` |
+| `goal-form` | `goalPresetKey` | Car brands when CAR | No — match name (persist later) |
 | `asset-form` | `presetKey` | — | **Yes** — persist `presetKey` when possible |
 
 Canonical helpers: `findByNameOrAlias` / `namesMatch` from `@rumtelo/utils`. Catalog DTOs expose `aliases` (EN + other locales). Seed wiring: `aliasesFor*Preset` next to each preset’s translations.

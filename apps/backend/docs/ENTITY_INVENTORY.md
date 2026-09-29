@@ -137,5 +137,5 @@ Planes: `auth` = identity (better-auth + Rumtelo person/household rows) · `publ
 | From → to | Storage |
 |---|---|
 | backoffice → backoffice | relation (id FK / pivot entity) |
-| household → backoffice | `*Key` snapshot string (`Jar.templateKey`, `Goal.givingOrganizationKey`, `Transaction.inflowKey`, `FixedCost.presetKey`) |
+| household → backoffice | natural-key FK via `CatalogKey` (`FixedCost` / `IncomeSource` / `Debt` / `Asset`.`presetKey`, `IncomeSource.merchantKey`, `Goal.givingOrganizationKey`, `Transaction.inflowKey`, …) |
 | household → household | relation with explicit `deleteRule` |

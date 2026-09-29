@@ -192,7 +192,8 @@ Every entity, its base, table and relations: `apps/backend/docs/ENTITY_INVENTORY
 
 - Money → `MoneyType` (bigint eurocents, `number` at runtime); ratios stay `decimal`
 - Text → `name` / `description`; catalog defaults are plain nouns (`cadence`, not `defaultCadence`)
-- backoffice → backoffice = real relations (`categoryTemplate`, `audiences`, `merchantLinks`, `postures`, `minWealthStage`); household → backoffice catalog = natural-key FK via `CatalogKey()` (`IncomeSource.merchantKey`, `Goal.givingOrganizationKey`, `Asset.kindKey`) — see `docs/ENTITY_STYLE.md` → References
+- backoffice → backoffice = real relations (`categoryTemplate`, `audiences`, `merchantLinks`, `postures`, `minWealthStage`); household → backoffice catalog = natural-key FK via `CatalogKey()` (`*.presetKey` for type catalogs, `merchantKey` / `givingOrganizationKey` / `kindKey` / `inflowKey` for the rest) — see `docs/ENTITY_STYLE.md` → References
+- Money plan rows: **what** = `name` + `presetKey`; **who** = `counterparty` + `merchantKey` XOR `party` (shared `PartyService.resolveCounterparty`)
 - Inverse collections: lazy class ref (`@OneToMany(() => PlanFeature, feature => feature.product)`) — MikroORM 7 has no string entity names; decorators import from `@mikro-orm/decorators/legacy`
 
 ### Entity comments

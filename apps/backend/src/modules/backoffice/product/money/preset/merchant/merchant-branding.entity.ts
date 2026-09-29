@@ -32,7 +32,10 @@ export class MerchantBranding extends BaseEntity {
     website: string | null = null;
 
     // ? RELATIONSHIPS
-    /** Owning merchant preset (1:1). Cascades when the preset is deleted. */
-    @OneToOne(() => MerchantPreset, { owner: true, deleteRule: 'cascade', unique: true })
+    /**
+     * Owning merchant preset (1:1). Cascades when the preset is deleted.
+     * OneToOne (not ManyToOne+@Unique) so MerchantPreset.branding can stay the inverse.
+     */
+    @OneToOne(() => MerchantPreset, { owner: true, deleteRule: 'cascade' })
     preset!: MerchantPreset;
 }

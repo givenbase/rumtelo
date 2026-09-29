@@ -21,7 +21,7 @@ import { Party } from './party.entity';
 export class PartySuggestion extends HouseholdEntity {
     // ? RELATIONSHIPS
     /** The party that was suggested — cascade when the party is deleted. */
-    @ManyToOne(() => Party, { deleteRule: 'cascade', unique: true })
+    @ManyToOne(() => Party, { deleteRule: 'cascade' })
     party!: Party;
 
     /** Aggregated catalog nomination. Restrict so we keep the vote tally honest. */

@@ -1,4 +1,4 @@
-import { Entity, OneToOne, Property } from '@mikro-orm/decorators/legacy';
+import { Entity, ManyToOne, OneToOne, Property, Unique } from '@mikro-orm/decorators/legacy';
 
 import { AccountSettings } from './account-settings/account-settings.entity';
 
@@ -26,6 +26,7 @@ import { AuthUser } from '../managed/user/auth-user.entity';
  * @see https://mikro-orm.io/docs/defining-entities
  */
 @Entity(entityConfig({ schema: 'auth', tableName: 'account' }))
+@Unique({ properties: ['user'] })
 export class Account extends BaseEntity {
     // ? PROPERTIES
     /** Legal first name (not the greeting — that is `AuthUser.name`). */
@@ -49,8 +50,8 @@ export class Account extends BaseEntity {
     dateOfBirth: string | null = null;
 
     // ? RELATIONSHIPS
-    /** Better Auth login identity (1:1, owner side). Cascades when the user is deleted. */
-    @OneToOne(() => AuthUser, { deleteRule: 'cascade', unique: true })
+    /** Better Auth login identity (1:1). Cascades when the user is deleted. */
+    @ManyToOne(() => AuthUser, { deleteRule: 'cascade' })
     user!: AuthUser;
 
     /** Person-scoped UI prefs (1:1, inverse side). */

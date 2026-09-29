@@ -60,7 +60,8 @@ export class AccountSettings extends BaseEntity {
     // ? RELATIONSHIPS
     /**
      * Owning account (1:1). Cascades when the account is deleted.
+     * OneToOne (not ManyToOne+@Unique) so Account.settings can stay the inverse side.
      */
-    @OneToOne(() => Account, { owner: true, deleteRule: 'cascade', unique: true })
+    @OneToOne(() => Account, { owner: true, deleteRule: 'cascade' })
     account!: Account;
 }

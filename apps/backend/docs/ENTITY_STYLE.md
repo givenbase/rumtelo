@@ -135,7 +135,7 @@ Rumtelo calendar-date suffix is **`*On`** (Rails-style). Prefer `startedOn` / `e
 | From → to | Store | Why |
 |-----------|-------|-----|
 | **backoffice → backoffice** (preset → template, lever → posture, plan → capability) | real `@ManyToOne` / `@ManyToMany` / pivot entity on `id` | same owner, same lifecycle; the DB enforces integrity and services filter in SQL |
-| **household → backoffice catalog** (`IncomeSource.merchantKey`, `Goal.givingOrganizationKey`, `Transaction.inflowKey`, `Asset.kindKey`, `Device.kindKey`) | **natural-key FK**: `@ManyToOne(() => Catalog, CatalogKey('x_key'))` → `xKey: string \| null` | catalog ids differ per environment and exports / links carry keys, so the column stays the key — but it is a real FK on `CatalogEntity.key`: unknown keys are rejected at the DB, renames cascade, retiring a preset nulls optional refs (the row's name snapshot stays) and is blocked (`restrict`) for required ones |
+| **household → backoffice catalog** (`IncomeSource.merchantKey` / `presetKey`, `FixedCost.presetKey`, `Debt.presetKey`, `Goal.givingOrganizationKey`, `Transaction.inflowKey`, `Asset.kindKey` / `presetKey`, `Device.kindKey`) | **natural-key FK**: `@ManyToOne(() => Catalog, CatalogKey('x_key'))` → `xKey: string \| null` | catalog ids differ per environment and exports / links carry keys, so the column stays the key — but it is a real FK on `CatalogEntity.key`: unknown keys are rejected at the DB, renames cascade, retiring a preset nulls optional refs (the row's name snapshot stays) and is blocked (`restrict`) for required ones |
 | **household → household** (`Transaction.jar`, `WeekCheckAllocation.weekCheck`, `IncomeSource.party`) | real relation on `id` with `deleteRule` | same tenant, cascade / restrict is a product decision to state explicitly |
 | **enum keys** (`Jar.key: JarKey`, `Plan.key: PlanKey`) | `@Enum` | closed sets owned by `@rumtelo/contracts`, not catalog rows |
 | **mixed-meaning keys** (`LearnProgress.pieceKey`, `Book.sourceKey`, `Transaction.dedupeKey`) | plain `@Property` string | not a single catalog (composite / hashed / cross-source); document why in the JSDoc |
@@ -155,6 +155,7 @@ When a “flag” needs more than two values later, use an **enum** (`status`) i
 | Situation | Prefer |
 |-----------|--------|
 | Household-owned money rows | `HouseholdEntity` + `household` relation (`mapToPk` string — row-level isolation) |
+| Money **what** vs **who** | Type catalog → `name` snapshot + nullable `presetKey` (`FixedCost` / `IncomeSource` / `Debt`, same as `Asset.presetKey`). Payee/lender → counterparty triple (`counterparty` + `merchantKey` XOR `party`). Do not merge bill types with merchants. |
 | Person attribution on household rows | `account` relation (`@ManyToOne` + `mapToPk`) → `auth.account` — **not** Better Auth `userId`; DTO maps as `accountId: row.account` |
 | Catalog we publish | `backoffice.*` extends `CatalogEntity` — households **copy**, do not FK live money to mutable catalog rows except stable template keys |
 | Money columns | `@Property({ type: MoneyType })` — integer eurocents, hydrated as `number`; never `Number(row.amount)` in services |
