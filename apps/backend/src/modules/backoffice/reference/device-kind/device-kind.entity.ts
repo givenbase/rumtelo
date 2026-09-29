@@ -11,7 +11,7 @@ import { NativeEnum } from '../../../../common/database/native-enum.util';
  *
  * Company-authored classes of hardware a household can register. Rows, not a
  * Postgres enum — adding WRISTBAND_V2 or SLEEP_PAD is a seed, not a migration.
- * Household {@link Device} rows snapshot `key` as `kindKey` (not a FK).
+ * Household {@link Device} rows reference `key` as `kindKey` (natural-key FK, restrict).
  *
  * @see https://mikro-orm.io/docs/defining-entities
  */

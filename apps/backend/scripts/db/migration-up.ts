@@ -32,7 +32,7 @@ async function main() {
     const orm = await withTransientRetry('migrate:init', () => MikroORM.init(config));
     try {
         const migrator = orm.migrator;
-        const pending = await migrator.getPendingMigrations();
+        const pending = await migrator.getPending();
         if (pending.length === 0) {
             console.log('No pending migrations.');
             return;

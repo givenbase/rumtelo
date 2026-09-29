@@ -1,10 +1,13 @@
 import { Entity, Enum, Index, ManyToOne, Property, Unique } from '@mikro-orm/decorators/legacy';
 import { TransactionSource, TransactionStatus } from '@rumtelo/contracts';
 
+import { CatalogKey } from '../../../../../../common/database/catalog-key.util';
 import { HouseholdEntity } from '../../../../../../common/database/household.entity';
 import { MoneyType } from '../../../../../../common/database/money.type';
 import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import { MerchantPreset } from '../../../../../backoffice/product/money/preset/merchant/merchant.entity';
+import { TransactionInPreset } from '../../../../../backoffice/product/money/preset/transaction-in/transaction-in.entity';
 import { FixedCost } from '../../plan/fixed-cost/fixed-cost.entity';
 import { Category } from '../../plan/jar/category.entity';
 import { Jar } from '../../plan/jar/jar.entity';
@@ -55,22 +58,6 @@ export class Transaction extends HouseholdEntity {
     amount!: number;
 
     /**
-     * Stable Transaction In preset key (GIFT, REFUND, …) copied at creation.
-     * Snapshot, not an FK — household rows never depend on mutable catalog rows.
-     * Null for Out, custom In labels, and bank/CSV imports.
-     */
-    @Property({ length: 64, nullable: true })
-    inflowKey: string | null = null;
-
-    /**
-     * MerchantPreset.key that auto-sorted this row, when no household rule matched.
-     * Snapshot, not an FK — retiring a merchant must not rewrite history.
-     * Cleared when a rule or the user sorts the row themselves.
-     */
-    @Property({ length: 64, nullable: true })
-    appliedMerchantKey: string | null = null;
-
-    /**
      * Stable hash of (account, date, amount, description) — see class-level UNIQUE.
      * Null for manual entries, which are never de-duplicated.
      */
@@ -119,4 +106,19 @@ export class Transaction extends HouseholdEntity {
      */
     @ManyToOne(() => SortRule, { mapToPk: true, nullable: true, deleteRule: 'set null' })
     appliedRule: string | null = null;
+
+    /**
+     * Transaction In preset (GIFT, REFUND, …) picked at creation — natural-key FK on
+     * `TransactionInPreset.key`. Null for Out, custom In labels, and bank/CSV imports.
+     */
+    @ManyToOne(() => TransactionInPreset, CatalogKey('inflow_key'))
+    inflowKey: string | null = null;
+
+    /**
+     * Merchant that auto-sorted this row when no household rule matched — natural-key
+     * FK on `MerchantPreset.key`; retiring the merchant nulls it, history stays.
+     * Cleared when a rule or the user sorts the row themselves.
+     */
+    @ManyToOne(() => MerchantPreset, CatalogKey('applied_merchant_key'))
+    appliedMerchantKey: string | null = null;
 }

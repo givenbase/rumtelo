@@ -1,4 +1,7 @@
-import { UniqueConstraintViolationException } from '@mikro-orm/core';
+import {
+    ForeignKeyConstraintViolationException,
+    UniqueConstraintViolationException,
+} from '@mikro-orm/core';
 import { HttpException } from '@nestjs/common';
 import { ORPCError } from '@orpc/server';
 import { APIError } from 'better-auth/api';
@@ -155,12 +158,118 @@ export function uniqueConstraintToOrpcError(
     });
 }
 
-/** Map unique-constraint / Nest / Better Auth failures to oRPC client errors. */
+export type ParsedForeignKeyViolation = {
+    constraint?: string;
+    field?: string;
+    /** `missing` = referenced row does not exist; `referenced` = row is still in use (restrict). */
+    kind: 'missing' | 'referenced';
+    message: string;
+    value?: string;
+};
+
+/**
+ * Postgres `23503` (foreign_key_violation). Two shapes:
+ * - insert/update with an unknown key → `Key (merchant_key)=(FOO) is not present in table "…"`
+ * - delete of a row still in use (`restrict`) → `Key (key)=(HOME) is still referenced from table "…"`
+ */
+export function parseForeignKeyViolation(error: unknown): null | ParsedForeignKeyViolation {
+    const nodes = walkErrorNodes(error);
+    const blob = nodes
+        .map(node => {
+            if (node instanceof Error) return node.message;
+            if (typeof node === 'string') return node;
+            return '';
+        })
+        .filter(Boolean)
+        .join('\n');
+
+    let constraint = '';
+    let detail = '';
+    let code = '';
+
+    for (const node of nodes) {
+        if (!node || typeof node !== 'object') continue;
+        const row = node as { code?: unknown; constraint?: unknown; detail?: unknown };
+        constraint = firstString(constraint, row.constraint);
+        detail = firstString(detail, row.detail);
+        code = firstString(code, row.code);
+    }
+
+    const isForeignKey =
+        error instanceof ForeignKeyConstraintViolationException ||
+        nodes.some(
+            node =>
+                typeof node === 'object' &&
+                node !== null &&
+                'name' in node &&
+                (node as { name?: unknown }).name === 'ForeignKeyConstraintViolationException'
+        ) ||
+        code === '23503' ||
+        /violates foreign key constraint/i.test(blob);
+
+    if (!isForeignKey) return null;
+
+    if (!constraint) constraint = blob.match(/foreign key constraint "([^"]+)"/i)?.[1] ?? '';
+
+    const text = detail || blob;
+    const referenced = /is still referenced/i.test(text);
+    const detailMatch = text.match(/Key \(([^)]+)\)=\(([^)]*)\)/i);
+    const columns = (detailMatch?.[1] ?? '')
+        .split(',')
+        .map(part => part.trim())
+        .filter(Boolean);
+    const value = detailMatch?.[2]?.trim() ?? '';
+    const field = columns.length === 1 ? toFormFieldName(columns[0] ?? '') : '';
+
+    if (referenced) {
+        return {
+            constraint: constraint || undefined,
+            kind: 'referenced',
+            message: 'This item is still in use and cannot be removed.',
+            value: value || undefined,
+        };
+    }
+
+    return {
+        constraint: constraint || undefined,
+        ...(field ? { field } : {}),
+        kind: 'missing',
+        message: field
+            ? `Unknown ${humanizeField(field)}${value ? ` "${value}"` : ''}.`
+            : 'One of the referenced items does not exist.',
+        value: value || undefined,
+    };
+}
+
+export function foreignKeyViolationToOrpcError(
+    parsed: ParsedForeignKeyViolation
+): ORPCError<
+    'BAD_REQUEST' | 'CONFLICT',
+    { field?: string; issues?: ConstraintFieldIssue[]; message: string }
+> {
+    const issues: ConstraintFieldIssue[] | undefined = parsed.field
+        ? [{ path: [parsed.field], message: parsed.message }]
+        : undefined;
+
+    return new ORPCError(parsed.kind === 'referenced' ? 'CONFLICT' : 'BAD_REQUEST', {
+        message: parsed.message,
+        data: {
+            message: parsed.message,
+            ...(parsed.field ? { field: parsed.field } : {}),
+            ...(issues ? { issues } : {}),
+        },
+    });
+}
+
+/** Map unique / foreign-key constraint, Nest, and Better Auth failures to oRPC client errors. */
 export function mapToOrpcClientError(error: unknown): unknown {
     if (error instanceof ORPCError) return error;
 
     const parsed = parseUniqueConstraint(error);
     if (parsed) return uniqueConstraintToOrpcError(parsed);
+
+    const foreignKey = parseForeignKeyViolation(error);
+    if (foreignKey) return foreignKeyViolationToOrpcError(foreignKey);
 
     if (error instanceof APIError) {
         const status = typeof error.statusCode === 'number' ? error.statusCode : 400;

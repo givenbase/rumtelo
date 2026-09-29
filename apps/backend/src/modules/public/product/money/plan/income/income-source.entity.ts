@@ -1,10 +1,12 @@
-import { Entity, Enum, Property } from '@mikro-orm/decorators/legacy';
+import { Entity, Enum, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { Cadence, IncomeKind } from '@rumtelo/contracts';
 
+import { CatalogKey } from '../../../../../../common/database/catalog-key.util';
 import { HouseholdEntity } from '../../../../../../common/database/household.entity';
 import { MoneyType } from '../../../../../../common/database/money.type';
 import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import { MerchantPreset } from '../../../../../backoffice/product/money/preset/merchant/merchant.entity';
 
 /**
  * Income Source Entity
@@ -31,14 +33,6 @@ export class IncomeSource extends HouseholdEntity {
     @Property({ type: MoneyType })
     amount!: number;
 
-    /**
-     * MerchantPreset.key when Received from was picked from the catalog.
-     * Snapshot, not an FK — same pattern as Transaction.appliedMerchantKey.
-     * Null for free-typed employers / platforms.
-     */
-    @Property({ length: 64, nullable: true })
-    merchantKey: string | null = null;
-
     /** Inactive sources stay for history but leave the income total. */
     @Property({ default: true })
     isActive = true;
@@ -63,4 +57,13 @@ export class IncomeSource extends HouseholdEntity {
     /** How often it lands. */
     @Enum(NativeEnum({ Cadence, domain: 'money', defaultValue: Cadence.MONTHLY }))
     cadence: Cadence = Cadence.MONTHLY;
+
+    // ? RELATIONSHIPS
+    /**
+     * Catalog merchant when Received from was picked from the catalog (N:1, optional).
+     * Natural-key FK on `MerchantPreset.key`; retiring the preset nulls it
+     * (`counterparty` keeps the name). Null for free-typed employers / platforms.
+     */
+    @ManyToOne(() => MerchantPreset, CatalogKey('merchant_key'))
+    merchantKey: string | null = null;
 }

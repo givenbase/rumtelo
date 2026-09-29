@@ -1,10 +1,12 @@
 import { Entity, Enum, Index, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { GivingCause, GoalKind, GoalStatus } from '@rumtelo/contracts';
 
+import { CatalogKey } from '../../../../../../common/database/catalog-key.util';
 import { HouseholdEntity } from '../../../../../../common/database/household.entity';
 import { MoneyType } from '../../../../../../common/database/money.type';
 import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import { GivingOrganization } from '../../../../../backoffice/product/money/catalog/giving-organization/giving-organization.entity';
 import { Jar } from '../../plan/jar/jar.entity';
 
 /**
@@ -51,14 +53,6 @@ export class Goal extends HouseholdEntity {
     @Property({ type: 'int', default: 0 })
     sortOrder = 0;
 
-    /**
-     * GIVE: `GivingOrganization.key` when a named organization was picked.
-     * Snapshot, not an FK — household rows never depend on mutable catalog rows.
-     * Null = open / free-text.
-     */
-    @Property({ length: 64, nullable: true })
-    givingOrganizationKey: string | null = null;
-
     /** GIVE: date the pledge was honoured. */
     @Property({ type: 'date', nullable: true })
     fulfilledOn: string | null = null;
@@ -84,4 +78,11 @@ export class Goal extends HouseholdEntity {
     /** SAVE: jar the savings live in. Cleared if the jar goes. */
     @ManyToOne(() => Jar, { nullable: true, deleteRule: 'set null' })
     jar: Jar | null = null;
+
+    /**
+     * GIVE: organization picked from the catalog — natural-key FK on
+     * `GivingOrganization.key`; retiring the org nulls it. Null = open / free-text.
+     */
+    @ManyToOne(() => GivingOrganization, CatalogKey('giving_organization_key'))
+    givingOrganizationKey: string | null = null;
 }
