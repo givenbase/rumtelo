@@ -21,10 +21,17 @@ type MoneyPartyRowProps = {
     amountClassName?: string;
     badges?: ReactNode;
     /**
+     * Left of the row body (e.g. multi-select checkbox).
+     * Outside the navigation hit-target.
+     */
+    leading?: ReactNode;
+    /**
      * Right-rail control next to the amount (e.g. Due → mark paid).
      * Outside the row link so it does not navigate.
      */
     status?: ReactNode;
+    /** Soft accent wash when the row is part of an active multi-select. */
+    selected?: boolean;
     /** Prefer for pure navigation — enables prefetch + open-in-new-tab. */
     href?: string;
     /** Use only when navigation is conditional or follows another action. */
@@ -41,12 +48,18 @@ export function MoneyPartyRow({
     amount,
     amountClassName,
     badges,
+    leading,
     status,
+    selected = false,
     href,
     onClick,
 }: MoneyPartyRowProps) {
-    const mainClass =
-        'flex min-w-0 flex-1 cursor-pointer items-center gap-3 px-5 py-3.5 text-left hover:bg-raised';
+    const mainClass = cn(
+        'flex min-w-0 flex-1 cursor-pointer items-center gap-3 py-3.5 text-left transition-colors',
+        'focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent',
+        selected ? 'bg-accent/8 hover:bg-accent/12' : 'hover:bg-raised',
+        leading ? 'pr-5 pl-3' : 'px-5'
+    );
 
     const main = (
         <>
@@ -73,7 +86,20 @@ export function MoneyPartyRow({
     );
 
     return (
-        <div className="flex w-full items-center border-b border-line last:border-b-0">
+        <div
+            className={cn(
+                'flex w-full items-center border-b border-line last:border-b-0',
+                selected && 'bg-accent/8'
+            )}>
+            {leading ? (
+                <div
+                    className={cn(
+                        'flex shrink-0 items-center self-stretch py-3.5 pl-5',
+                        selected && 'bg-accent/8'
+                    )}>
+                    {leading}
+                </div>
+            ) : null}
             {href ? (
                 <Link href={href} aria-label={title} className={mainClass}>
                     {main}

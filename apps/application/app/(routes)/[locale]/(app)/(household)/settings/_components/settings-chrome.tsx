@@ -85,10 +85,10 @@ export function SettingsPill({
         <span
             className={cn(
                 'inline-flex items-center rounded-full border px-2 py-0.5 font-mono text-[9px] font-medium tracking-widest uppercase',
-                tone === 'accent' && 'border-accent/40 text-accent',
-                tone === 'success' && 'border-success/40 text-success',
-                tone === 'danger' && 'border-danger/40 text-danger',
-                tone === 'neutral' && 'border-line text-fg-secondary',
+                tone === 'accent' && 'border-accent bg-accent-soft text-accent',
+                tone === 'success' && 'border-success bg-success/5 text-success',
+                tone === 'danger' && 'border-danger bg-danger/5 text-danger',
+                tone === 'neutral' && 'border-fg-muted text-fg-secondary',
                 className
             )}>
             {children}

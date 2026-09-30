@@ -27,9 +27,9 @@ export const PRODUCT_LUCIDE_ICONS = [
 /** Former action-icons.tsx + learn accordion. */
 export const ACTION_LUCIDE_ICONS = [
     'pencil',
-    'pause',
-    'square',
-    'play',
+    'clock',
+    'flag',
+    'circle-check',
     'refresh-cw',
     'chevron-down',
 ] as const;

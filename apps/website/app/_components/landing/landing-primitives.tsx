@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 import { Typography } from '@rumtelo/ui';
 
-import { cn } from '@/lib/cn';
+import { cn } from '@rumtelo/utils';
 
 /** Mono eyebrow with the house ✦ mark. */
 export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {

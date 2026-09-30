@@ -67,6 +67,90 @@ export function formatDisplayDate(iso: string, locale?: string): string {
     });
 }
 
+type DatePart = 'day' | 'month' | 'year';
+
+/** Locale-aware day/month/year order for typed input (nl → dmy, en-US → mdy). */
+export function dateInputOrder(locale?: string): DatePart[] {
+    const tag = locale?.trim() || 'en-GB';
+    try {
+        const parts = new Intl.DateTimeFormat(tag, {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        }).formatToParts(new Date(2020, 0, 2));
+        const order = parts
+            .map(part => part.type)
+            .filter(
+                (type): type is DatePart => type === 'day' || type === 'month' || type === 'year'
+            );
+        if (order.length === 3) return order;
+    } catch {
+        // fall through
+    }
+    return ['day', 'month', 'year'];
+}
+
+/** Typed-field placeholder — e.g. `dd-mm-yyyy` / `mm-dd-yyyy`. */
+export function dateInputPlaceholder(locale?: string): string {
+    return dateInputOrder(locale)
+        .map(part => (part === 'year' ? 'yyyy' : part === 'month' ? 'mm' : 'dd'))
+        .join('-');
+}
+
+/** Format ISO as a typed value (`01-01-1990`) matching the locale order. */
+export function formatInputDate(iso: string, locale?: string): string {
+    const date = parseIsoDate(iso);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = String(date.getFullYear());
+    const values: Record<DatePart, string> = { day, month, year };
+    return dateInputOrder(locale)
+        .map(part => values[part])
+        .join('-');
+}
+
+function isValidYmd(year: number, month: number, day: number): boolean {
+    if (!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) return false;
+    if (year < 1000 || year > 9999 || month < 1 || month > 12 || day < 1 || day > 31) return false;
+    const date = new Date(year, month - 1, day);
+    return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+}
+
+/**
+ * Parse a typed date into ISO `YYYY-MM-DD`.
+ * Accepts ISO, and locale-ordered digits with `-` `/` `.` separators (`01-01-1990`).
+ */
+export function parseInputDate(raw: string, locale?: string): string | null {
+    const text = raw.trim();
+    if (!text) return null;
+
+    const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text);
+    if (isoMatch) {
+        const year = Number(isoMatch[1]);
+        const month = Number(isoMatch[2]);
+        const day = Number(isoMatch[3]);
+        return isValidYmd(year, month, day) ? toIsoDate(new Date(year, month - 1, day)) : null;
+    }
+
+    const digits = text.split(/[/.\-\s]+/).filter(Boolean);
+    if (digits.length !== 3) return null;
+
+    const order = dateInputOrder(locale);
+    const map: Partial<Record<DatePart, number>> = {};
+    for (let index = 0; index < 3; index++) {
+        const part = order[index];
+        const chunk = digits[index];
+        if (!part || !chunk || !/^\d{1,4}$/.test(chunk)) return null;
+        map[part] = Number(chunk);
+    }
+
+    const year = map.year;
+    const month = map.month;
+    const day = map.day;
+    if (year === undefined || month === undefined || day === undefined) return null;
+    return isValidYmd(year, month, day) ? toIsoDate(new Date(year, month - 1, day)) : null;
+}
+
 function startOfMonth(date: Date): Date {
     return new Date(date.getFullYear(), date.getMonth(), 1);
 }
@@ -124,7 +208,7 @@ function monthSelectable(
 }
 
 const captionSelectClass =
-    'h-8 max-w-[5.75rem] rounded-full border-line bg-background px-2.5 font-mono text-[11px] font-medium tracking-wide text-fg uppercase shadow-none hover:border-accent-hover';
+    'h-8 max-w-[5.5rem] rounded-lg border-transparent bg-transparent px-2 font-mono text-[11px] font-semibold tracking-[0.12em] text-fg uppercase shadow-none hover:bg-accent-soft/70 hover:text-accent focus-visible:border-accent/40 focus-visible:ring-1 focus-visible:ring-accent/30';
 
 export type CalendarProps = {
     value?: string | null;
@@ -217,39 +301,43 @@ export function Calendar({ value, onSelect, min, max, className, locale, labels 
         setVisibleMonth(next);
     }
 
+    const navBtnClass =
+        'grid size-8 shrink-0 place-items-center rounded-lg text-fg-muted transition-colors ' +
+        'hover:bg-accent-soft hover:text-accent disabled:pointer-events-none disabled:opacity-35';
+
     return (
         <div
             className={cn(
-                'w-full max-w-[18.5rem] rounded-xl border border-line bg-raised p-3 shadow-sm',
+                'w-full max-w-[19rem] overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_18px_50px_-28px_rgba(15,23,42,0.45)] ring-1 ring-black/3',
                 className
             )}
             data-slot="calendar">
-            <div className="mb-3 flex items-center justify-between gap-1.5">
-                <button
-                    type="button"
-                    aria-label={previousMonthLabel}
-                    disabled={!canGoPrev}
-                    onClick={() => setVisibleMonth(current => addMonths(current, -1))}
-                    className="grid size-8 shrink-0 place-items-center rounded-full border border-line text-fg-muted transition-colors hover:border-accent-hover hover:text-accent disabled:pointer-events-none disabled:opacity-40">
-                    <Icon name="chevron-left" size="md" />
-                </button>
+            <div className="border-b border-line/80 bg-gradient-to-b from-accent-soft/40 to-transparent px-3 pt-3 pb-2.5">
+                <div className="flex items-center justify-between gap-1">
+                    <button
+                        type="button"
+                        aria-label={previousMonthLabel}
+                        disabled={!canGoPrev}
+                        onClick={() => setVisibleMonth(current => addMonths(current, -1))}
+                        className={navBtnClass}>
+                        <Icon name="chevron-left" size="md" />
+                    </button>
 
-                <div className="flex min-w-0 flex-1 items-center justify-center gap-1">
-                    <div className="relative inline-flex min-w-0">
+                    <div className="flex min-w-0 flex-1 items-center justify-center gap-0.5">
                         <Select
                             value={String(visibleMonth.getMonth())}
-                            onValueChange={value =>
-                                jumpTo(visibleMonth.getFullYear(), Number(value))
+                            onValueChange={next =>
+                                jumpTo(visibleMonth.getFullYear(), Number(next))
                             }>
                             <SelectTrigger
                                 size="sm"
                                 aria-label={monthLabel}
-                                className={cn(captionSelectClass, 'min-w-0 flex-1')}>
+                                className={cn(captionSelectClass, 'min-w-0')}>
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent
                                 position="popper"
-                                className="rounded-lg border-line bg-surface text-fg shadow-md">
+                                className="z-[60] max-h-64 rounded-xl border-line bg-surface text-fg shadow-lg">
                                 {monthsShort.map((label, monthIndex) => (
                                     <SelectItem
                                         key={label}
@@ -268,11 +356,9 @@ export function Calendar({ value, onSelect, min, max, className, locale, labels 
                                 ))}
                             </SelectContent>
                         </Select>
-                    </div>
-                    <div className="relative inline-flex">
                         <Select
                             value={String(visibleMonth.getFullYear())}
-                            onValueChange={value => jumpTo(Number(value), visibleMonth.getMonth())}>
+                            onValueChange={next => jumpTo(Number(next), visibleMonth.getMonth())}>
                             <SelectTrigger
                                 size="sm"
                                 aria-label={yearLabel}
@@ -281,99 +367,106 @@ export function Calendar({ value, onSelect, min, max, className, locale, labels 
                             </SelectTrigger>
                             <SelectContent
                                 position="popper"
-                                className="rounded-lg border-line bg-surface text-fg shadow-md">
+                                className="z-[60] max-h-64 rounded-xl border-line bg-surface text-fg shadow-lg">
                                 {years.map(year => (
                                     <SelectItem
                                         key={year}
                                         value={String(year)}
-                                        className="font-mono text-[11px] tracking-wide uppercase">
+                                        className="font-mono text-[11px] tracking-wide uppercase tabular-nums">
                                         {year}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
                     </div>
+
+                    <button
+                        type="button"
+                        aria-label={nextMonthLabel}
+                        disabled={!canGoNext}
+                        onClick={() => setVisibleMonth(current => addMonths(current, 1))}
+                        className={navBtnClass}>
+                        <Icon name="chevron-right" size="md" />
+                    </button>
+                </div>
+            </div>
+
+            <div className="px-3 pt-2.5 pb-3">
+                <div className="mb-1 grid grid-cols-7 gap-0.5">
+                    {weekdays.map(day => (
+                        <div
+                            key={day}
+                            className="grid h-7 place-items-center font-mono text-[10px] font-medium tracking-[0.14em] text-fg-faint uppercase">
+                            {day}
+                        </div>
+                    ))}
                 </div>
 
-                <button
-                    type="button"
-                    aria-label={nextMonthLabel}
-                    disabled={!canGoNext}
-                    onClick={() => setVisibleMonth(current => addMonths(current, 1))}
-                    className="grid size-8 shrink-0 place-items-center rounded-full border border-line text-fg-muted transition-colors hover:border-accent-hover hover:text-accent disabled:pointer-events-none disabled:opacity-40">
-                    <Icon name="chevron-right" size="md" />
-                </button>
-            </div>
+                <div className="grid grid-cols-7 gap-0.5">
+                    {days.map(cell => {
+                        if (!cell.date) {
+                            return <div key={cell.key} className="h-9" />;
+                        }
+                        const date = cell.date;
+                        const iso = cell.key;
+                        const dayDisabled =
+                            (minDate !== null && isBeforeDay(date, minDate)) ||
+                            (maxDate !== null && isAfterDay(date, maxDate));
+                        const isSelected = selected ? sameDay(date, selected) : false;
+                        const isToday = sameDay(date, today);
 
-            <div className="mb-1 grid grid-cols-7 gap-0.5">
-                {weekdays.map(day => (
-                    <div
-                        key={day}
-                        className="grid h-8 place-items-center font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                        {day}
-                    </div>
-                ))}
-            </div>
+                        return (
+                            <button
+                                key={iso}
+                                type="button"
+                                disabled={dayDisabled}
+                                aria-label={formatDisplayDate(iso, locale)}
+                                aria-pressed={isSelected}
+                                onClick={() => onSelect?.(iso)}
+                                className={cn(
+                                    'grid h-9 place-items-center rounded-xl font-mono text-sm tabular-nums transition-[color,background-color,box-shadow,transform] duration-150',
+                                    dayDisabled && 'pointer-events-none text-fg-faint/40',
+                                    !dayDisabled &&
+                                        !isSelected &&
+                                        'text-fg hover:bg-accent-soft hover:text-accent active:scale-[0.96]',
+                                    isToday &&
+                                        !isSelected &&
+                                        'bg-accent-soft/55 font-medium text-accent ring-1 ring-accent/25 ring-inset',
+                                    isSelected &&
+                                        'bg-accent font-semibold text-on-accent shadow-[0_8px_18px_-10px_color-mix(in_oklab,var(--color-accent)_80%,transparent)]'
+                                )}>
+                                {date.getDate()}
+                            </button>
+                        );
+                    })}
+                </div>
 
-            <div className="grid grid-cols-7 gap-0.5">
-                {days.map(cell => {
-                    if (!cell.date) {
-                        return <div key={cell.key} className="h-9" />;
-                    }
-                    const date = cell.date;
-                    const iso = cell.key;
-                    const disabled =
-                        (minDate !== null && isBeforeDay(date, minDate)) ||
-                        (maxDate !== null && isAfterDay(date, maxDate));
-                    const isSelected = selected ? sameDay(date, selected) : false;
-                    const isToday = sameDay(date, today);
-
-                    return (
-                        <button
-                            key={iso}
-                            type="button"
-                            disabled={disabled}
-                            aria-label={formatDisplayDate(iso, locale)}
-                            aria-pressed={isSelected}
-                            onClick={() => onSelect?.(iso)}
-                            className={cn(
-                                'grid h-9 place-items-center rounded-full font-mono text-sm transition-colors',
-                                disabled && 'pointer-events-none text-fg-faint/50',
-                                !disabled &&
-                                    !isSelected &&
-                                    'text-fg hover:bg-accent-soft hover:text-accent',
-                                isToday && !isSelected && 'ring-1 ring-accent/35',
-                                isSelected && 'bg-accent font-semibold text-on-accent shadow-glow'
-                            )}>
-                            {date.getDate()}
-                        </button>
-                    );
-                })}
-            </div>
-
-            <div className="mt-3 flex items-center justify-between border-t border-line pt-2.5">
-                <button
-                    type="button"
-                    disabled={
-                        maxDate !== null && isAfterDay(today, maxDate)
-                            ? true
-                            : minDate !== null && isBeforeDay(today, minDate)
-                    }
-                    onClick={() => {
-                        const iso = toIsoDate(today);
-                        setVisibleMonth(startOfMonth(today));
-                        onSelect?.(iso);
-                    }}
-                    className="font-mono text-[11px] tracking-wide text-accent uppercase hover:underline disabled:pointer-events-none disabled:opacity-40">
-                    {todayLabel}
-                </button>
-                {selected ? (
-                    <span className="font-mono text-[11px] text-fg-muted">
-                        {formatDisplayDate(toIsoDate(selected), locale)}
-                    </span>
-                ) : (
-                    <span className="font-mono text-[11px] text-fg-faint">{pickADayLabel}</span>
-                )}
+                <div className="mt-3 flex items-center justify-between border-t border-line/70 pt-2.5">
+                    <button
+                        type="button"
+                        disabled={
+                            maxDate !== null && isAfterDay(today, maxDate)
+                                ? true
+                                : minDate !== null && isBeforeDay(today, minDate)
+                        }
+                        onClick={() => {
+                            const iso = toIsoDate(today);
+                            setVisibleMonth(startOfMonth(today));
+                            onSelect?.(iso);
+                        }}
+                        className="rounded-md px-1.5 py-0.5 font-mono text-[11px] font-medium tracking-[0.14em] text-accent uppercase transition-colors hover:bg-accent-soft disabled:pointer-events-none disabled:opacity-40">
+                        {todayLabel}
+                    </button>
+                    {selected ? (
+                        <span className="font-mono text-[11px] text-fg-muted tabular-nums">
+                            {formatDisplayDate(toIsoDate(selected), locale)}
+                        </span>
+                    ) : (
+                        <span className="font-mono text-[11px] tracking-wide text-fg-faint">
+                            {pickADayLabel}
+                        </span>
+                    )}
+                </div>
             </div>
         </div>
     );

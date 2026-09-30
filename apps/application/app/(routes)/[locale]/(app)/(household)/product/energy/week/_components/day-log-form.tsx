@@ -270,7 +270,7 @@ export function DayLogForm({ householdId, entries, defaultOn, onSaved }: Props) 
                 <Typography
                     as="p"
                     size="sm"
-                    className={cn(overDay ? 'text-danger' : 'text-fg-muted')}>
+                    className={cn('text-fg-muted', overDay && 'text-danger')}>
                     <span className="font-mono font-semibold text-fg tabular-nums">
                         {formatMinutes(totalMinutes, t)}
                     </span>{' '}

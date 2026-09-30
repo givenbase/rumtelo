@@ -86,9 +86,9 @@ export function DebtListRow({
             className={cn(
                 'rounded-2xl border bg-raised transition-colors',
                 clearedByPeriod
-                    ? 'border-success/35 bg-success/5 opacity-80'
+                    ? 'border-success bg-success/5 opacity-80'
                     : isFocus
-                      ? 'border-accent/40 ring-1 ring-accent/15'
+                      ? 'border-accent ring-1 ring-accent/20'
                       : 'border-line'
             )}>
             <div className="flex w-full items-start gap-2 p-4.5">

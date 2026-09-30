@@ -36,10 +36,6 @@ import { api } from '@/lib/api';
 
 const TOPICS = ['support', 'press', 'privacy', 'other'] as const satisfies readonly ContactTopic[];
 
-const MENU_CONTENT = 'rounded-lg border-line bg-surface text-fg shadow-md';
-const MENU_ITEM =
-    'rounded-md focus:bg-accent/10 focus:text-fg data-[highlighted]:bg-accent/10 data-[highlighted]:text-fg';
-
 /** Localized contact form → `api.contact.submit` (Resend). */
 export function ContactForm() {
     const t = useTranslations();
@@ -245,9 +241,9 @@ export function ContactForm() {
                                         <SelectValue />
                                     </SelectTrigger>
                                 </FormControl>
-                                <SelectContent position="popper" className={MENU_CONTENT}>
+                                <SelectContent position="popper">
                                     {TOPICS.map(topic => (
-                                        <SelectItem key={topic} value={topic} className={MENU_ITEM}>
+                                        <SelectItem key={topic} value={topic}>
                                             {t(`pages.support.contact.form.topics.${topic}`)}
                                         </SelectItem>
                                     ))}

@@ -650,7 +650,7 @@ export function ExpenseForm({
                     <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
                         {tForm('jar')}
                     </p>
-                    <div className="flex items-center gap-3 rounded-xl border border-accent/40 bg-accent-soft px-3 py-3">
+                    <div className="flex items-center gap-3 rounded-xl border border-accent bg-accent-soft px-3 py-3">
                         <span className="text-lg" aria-hidden>
                             {selectedJar.icon ?? '◇'}
                         </span>
@@ -772,7 +772,7 @@ export function ExpenseForm({
                                     onClick={() => setGivePayeeMode(option.id)}
                                     className={
                                         on
-                                            ? 'rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                            ? 'rounded-full border border-accent bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
                                             : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
                                     }>
                                     {option.label}
@@ -868,7 +868,7 @@ export function ExpenseForm({
                         <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
                             {tExpense('into_jar')}
                         </p>
-                        <div className="flex items-center gap-3 rounded-xl border border-accent/40 bg-accent-soft px-3 py-3">
+                        <div className="flex items-center gap-3 rounded-xl border border-accent bg-accent-soft px-3 py-3">
                             <span className="text-lg" aria-hidden>
                                 {selectedJar.icon ?? '◇'}
                             </span>

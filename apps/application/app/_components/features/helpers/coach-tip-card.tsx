@@ -43,8 +43,8 @@ export function CoachTipCard({
             className={cn(
                 'grid gap-3 rounded-2xl border p-4 shadow-sm lg:p-5',
                 tone === 'warning'
-                    ? 'border-warning/40 bg-warning/5'
-                    : 'border-accent/20 bg-surface ring-1 ring-accent/10',
+                    ? 'border-warning bg-warning/5'
+                    : 'border-accent bg-surface ring-1 ring-accent/15',
                 className
             )}
             data-coach-guide="tip"

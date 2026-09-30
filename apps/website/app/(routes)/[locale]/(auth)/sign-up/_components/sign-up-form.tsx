@@ -167,7 +167,7 @@ export function SignUpForm() {
                     {t('features.auth.sign_up.subtitle')}
                 </Typography>
                 {intent ? (
-                    <p className="mt-3 rounded-lg border border-accent/35 bg-accent-soft/40 px-3 py-2 text-sm text-fg-secondary">
+                    <p className="mt-3 rounded-lg border border-accent bg-accent-soft/40 px-3 py-2 text-sm text-fg-secondary">
                         {t('features.auth.sign_up.plan_intent', {
                             plan: tPlans(`${planSlug(intent.planKey)}.name`),
                             interval:
@@ -348,8 +348,8 @@ export function SignUpForm() {
                                             onBlur={field.onBlur}
                                             name={field.name}
                                             disabled={busy}
-                                            placeholder={t('ui.form.pick_a_date')}
                                             locale={locale}
+                                            openCalendarLabel={tForm('aria.open_date_picker')}
                                             labels={{
                                                 previousMonth: tForm('previous_month'),
                                                 nextMonth: tForm('next_month'),
@@ -358,7 +358,6 @@ export function SignUpForm() {
                                                 today: tForm('today'),
                                                 pickADay: tForm('pick_a_day'),
                                             }}
-                                            closeLabel={t('ui.button.actions.close')}
                                         />
                                     </FormControl>
                                     <FormMessage />

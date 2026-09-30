@@ -4,6 +4,7 @@ import { Typography } from '@rumtelo/ui';
 import { useTranslations } from '@rumtelo/i18n';
 
 import { PORTALS } from '@/lib/landing-content';
+import { cn } from '@rumtelo/utils';
 
 import { CARD, SectionHeading } from './landing-primitives';
 
@@ -44,7 +45,7 @@ export function LandingCoach() {
 
                 {/* Mock of the Coach feed — mirrors the app's coach card chrome */}
                 <div
-                    className={`${CARD} relative min-w-0 overflow-hidden p-4 shadow-lg sm:p-5`}
+                    className={cn(CARD, 'relative min-w-0 overflow-hidden p-4 shadow-lg sm:p-5')}
                     aria-label={t('coach_section.demo_aria')}>
                     <span className="absolute inset-x-0 top-0 block h-1 bg-(image:--gradient-accent)" />
                     <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2 pt-1">

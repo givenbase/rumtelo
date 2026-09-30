@@ -27,7 +27,7 @@ export function FormRoutePageShell({ children, closeHref, meta }: FormRoutePageS
 
     return (
         <div className="animate-rise px-4 py-6 sm:py-10">
-            <div className={cn('mx-auto w-full', width === 'wide' ? 'max-w-lg' : 'max-w-md')}>
+            <div className={cn('mx-auto w-full max-w-md', width === 'wide' && 'max-w-lg')}>
                 {dismissHref ? (
                     <Link
                         href={dismissHref}

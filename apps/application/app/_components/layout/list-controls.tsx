@@ -51,7 +51,7 @@ const CHIP =
 
 const CHIP_IDLE =
     'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent';
-const CHIP_ACTIVE = 'border-accent/50 bg-accent-soft text-accent';
+const CHIP_ACTIVE = 'border-accent bg-accent-soft text-accent';
 
 /**
  * Primary list search — surface field, strong border, leading icon.

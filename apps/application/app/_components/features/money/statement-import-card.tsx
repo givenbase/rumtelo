@@ -344,7 +344,7 @@ export function StatementImportCard({
                 />
                 {accountMismatch && dialectMismatch ? (
                     <div
-                        className="grid gap-2 rounded-xl border border-warning/40 bg-warning/10 px-3.5 py-3"
+                        className="grid gap-2 rounded-xl border border-warning bg-warning/10 px-3.5 py-3"
                         role="alert"
                         aria-live="assertive">
                         <div className="flex items-center gap-2">

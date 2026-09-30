@@ -48,7 +48,7 @@ export function CenterPickerIsland() {
                             className={cn(
                                 'flex items-center gap-3.5 rounded-xl border px-4 py-3.5 text-left transition-all',
                                 active
-                                    ? 'border-accent/40 bg-accent-soft'
+                                    ? 'border-accent bg-accent-soft'
                                     : 'border-line bg-surface hover:border-accent-hover'
                             )}>
                             <span

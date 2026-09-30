@@ -316,7 +316,7 @@ export function AccountSettings() {
                         <Button
                             variant="secondary"
                             size="sm"
-                            className="rounded-full border-danger/40 font-mono text-[10px] tracking-[0.12em] text-danger uppercase hover:border-danger"
+                            className="rounded-full border-danger font-mono text-xs tracking-[0.12em] text-danger uppercase hover:bg-danger/5"
                             disabled={signingOut}
                             onClick={() => void handleSignOut()}>
                             {signingOut ? '…' : t('pages.settings.account.sign_out')}

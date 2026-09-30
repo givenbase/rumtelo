@@ -115,7 +115,7 @@ export function WeekCheckWizard({
                             variant="eyebrow"
                             weight="semibold"
                             color={i === step ? 'primary' : 'muted'}
-                            className={i === step ? undefined : 'text-fg-faint'}>
+                            className={cn(i !== step && 'text-fg-faint')}>
                             {t('step', { n: i + 1 })}
                         </Typography>
                         <Typography

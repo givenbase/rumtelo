@@ -9,8 +9,8 @@ export type FormDatePickerProps = DatePickerProps & {
 };
 
 /**
- * Form-ready {@link DatePicker} — wraps the trigger in {@link FormControl}.
- * Pass `locale` / `labels` / `closeLabel` from the app (`useTranslations`).
+ * Form-ready {@link DatePicker} — wraps the field in {@link FormControl}.
+ * Pass `locale` / `labels` / `openCalendarLabel` from the app (`useTranslations`).
  */
 export function FormDatePicker({ withFormControl = true, value, ...props }: FormDatePickerProps) {
     const picker = <DatePicker value={value || null} {...props} />;

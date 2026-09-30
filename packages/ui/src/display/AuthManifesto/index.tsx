@@ -200,7 +200,7 @@ export function AuthManifesto({
                                     ? `${item.name} ${item.share}%`
                                     : item.name
                             }>
-                            <div className={`${item.tone} h-2 rounded-sm`} />
+                            <div className={cn(item.tone, 'h-2 rounded-sm')} />
                             <p className="mt-1 truncate font-mono text-[8px] tracking-wide text-white/75 uppercase">
                                 {item.short}
                             </p>

@@ -1,9 +1,15 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import type { CatalogItemBase } from '@rumtelo/contracts';
-import { VendorMark } from '@rumtelo/ui';
+import {
+    SuggestionPanel,
+    VendorMark,
+    suggestionGroupClass,
+    suggestionMutedClass,
+    suggestionOptionClass,
+} from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { useTranslations } from '@rumtelo/i18n';
@@ -175,13 +181,10 @@ export function PresetNameField({
         return [...map.entries()];
     }, [filtered]);
 
-    useEffect(() => {
-        function onDoc(event: MouseEvent) {
-            if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-        }
-        document.addEventListener('mousedown', onDoc);
-        return () => document.removeEventListener('mousedown', onDoc);
-    }, []);
+    const showLockedChip = Boolean(lockPresets && locked && !isCustomLock);
+    const inputValue = searchOnly ? filterQuery : value;
+    const inputPlaceholder = isCustomLock ? resolvedFreeTextPlaceholder : resolvedPlaceholder;
+    const emptyHint = lockPresets ? tForm('no_matches_other') : tForm('no_matches_keep_typing');
 
     function clearLock() {
         setLocked(null);
@@ -210,11 +213,6 @@ export function PresetNameField({
         onChange(opt.name);
     }
 
-    const showLockedChip = Boolean(lockPresets && locked && !isCustomLock);
-    const inputValue = searchOnly ? filterQuery : value;
-    const inputPlaceholder = isCustomLock ? resolvedFreeTextPlaceholder : resolvedPlaceholder;
-    const emptyHint = lockPresets ? tForm('no_matches_other') : tForm('no_matches_keep_typing');
-
     return (
         <div ref={rootRef} className="relative">
             {showLockedChip && locked ? (
@@ -231,7 +229,7 @@ export function PresetNameField({
                         type="button"
                         disabled={disabled}
                         aria-label={tForm('aria.clear_selection')}
-                        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-fg-muted hover:bg-fg/5 hover:text-fg disabled:opacity-40"
+                        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-fg-muted hover:bg-accent-soft hover:text-accent disabled:opacity-40"
                         onClick={clearLock}>
                         <span aria-hidden>×</span>
                     </button>
@@ -306,7 +304,7 @@ export function PresetNameField({
                             type="button"
                             disabled={disabled}
                             aria-label={tForm('aria.clear_selection')}
-                            className="absolute top-1/2 right-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-fg-muted hover:bg-fg/5 hover:text-fg disabled:opacity-40"
+                            className="absolute top-1/2 right-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-fg-muted hover:bg-accent-soft hover:text-accent disabled:opacity-40"
                             onClick={clearLock}>
                             <span aria-hidden>×</span>
                         </button>
@@ -323,69 +321,72 @@ export function PresetNameField({
                     </button>
                 </div>
             )}
-            {open && options.length > 0 ? (
-                <div
-                    id={listboxId}
-                    role="listbox"
-                    className="absolute z-30 mt-1 max-h-64 w-full overflow-auto rounded-xl bg-fg py-1.5 text-sm text-bg shadow-lg">
-                    {filtered.length === 0 ? (
-                        <p className="px-3 py-2 text-bg/60">{emptyHint}</p>
-                    ) : (
-                        grouped.map(([group, items]) => (
-                            <div key={group || 'all'}>
-                                {group ? (
-                                    <div className="px-3 pt-2.5 pb-1">
-                                        <div className="text-[10px] font-semibold tracking-wider text-bg/50 uppercase">
-                                            {group}
-                                        </div>
-                                        {items[0]?.description ? (
-                                            <p className="mt-0.5 text-xs leading-snug font-normal tracking-normal text-bg/60 normal-case">
-                                                {items[0].description}
-                                            </p>
-                                        ) : null}
-                                    </div>
-                                ) : null}
-                                <ul>
-                                    {items.map(opt => {
-                                        const selected = opt.key === selectedKey;
-                                        const isFree = freeKeySet.has(opt.key);
-                                        return (
-                                            <li key={opt.key}>
-                                                <button
-                                                    type="button"
-                                                    role="option"
-                                                    aria-selected={selected}
-                                                    className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-bg/10"
-                                                    onClick={() => pickOption(opt)}>
-                                                    <span
-                                                        className={`w-4 shrink-0 text-center ${selected ? 'opacity-100' : 'opacity-0'}`}
-                                                        aria-hidden>
-                                                        ✓
-                                                    </span>
-                                                    <OptionMark
-                                                        option={opt}
-                                                        className="w-5 shrink-0 text-center"
-                                                    />
-                                                    <span className="min-w-0 flex-1">
-                                                        {opt.name}
-                                                    </span>
-                                                    <OptionBadge
-                                                        label={
-                                                            lockPresets && isFree
-                                                                ? tForm('option_badge_custom')
-                                                                : opt.badge
-                                                        }
-                                                    />
-                                                </button>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
-                            </div>
-                        ))
-                    )}
-                </div>
-            ) : null}
+            <SuggestionPanel
+                anchorRef={rootRef}
+                open={open && options.length > 0}
+                onClose={() => setOpen(false)}
+                id={listboxId}
+                maxHeightClassName="max-h-64">
+                {filtered.length === 0 ? (
+                    <p className={cn('px-3 py-2', suggestionMutedClass)}>{emptyHint}</p>
+                ) : (
+                    grouped.map(([group, items]) => (
+                        <div key={group || 'all'}>
+                            {group ? (
+                                <div className="px-3 pt-2.5 pb-1">
+                                    <div className={suggestionGroupClass}>{group}</div>
+                                    {items[0]?.description ? (
+                                        <p
+                                            className={cn(
+                                                'mt-0.5 text-xs leading-snug font-normal tracking-normal normal-case',
+                                                suggestionMutedClass
+                                            )}>
+                                            {items[0].description}
+                                        </p>
+                                    ) : null}
+                                </div>
+                            ) : null}
+                            <ul>
+                                {items.map(opt => {
+                                    const selected = opt.key === selectedKey;
+                                    const isFree = freeKeySet.has(opt.key);
+                                    return (
+                                        <li key={opt.key}>
+                                            <button
+                                                type="button"
+                                                role="option"
+                                                aria-selected={selected}
+                                                className={suggestionOptionClass}
+                                                onClick={() => pickOption(opt)}>
+                                                <span
+                                                    className={cn(
+                                                        'w-4 shrink-0 text-center text-accent opacity-0',
+                                                        selected && 'opacity-100'
+                                                    )}
+                                                    aria-hidden>
+                                                    ✓
+                                                </span>
+                                                <OptionMark
+                                                    option={opt}
+                                                    className="w-5 shrink-0 text-center"
+                                                />
+                                                <span className="min-w-0 flex-1">{opt.name}</span>
+                                                <OptionBadge
+                                                    label={
+                                                        lockPresets && isFree
+                                                            ? tForm('option_badge_custom')
+                                                            : opt.badge
+                                                    }
+                                                />
+                                            </button>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </div>
+                    ))
+                )}
+            </SuggestionPanel>
         </div>
     );
 }
@@ -403,7 +404,11 @@ function OptionMark({ option, className }: { option: NamePresetOption; className
 
 function OptionBadge({ label }: { label: string | null | undefined }) {
     if (!label) return null;
-    return <span className="shrink-0 text-[10px] tracking-wide text-bg/45 uppercase">{label}</span>;
+    return (
+        <span className="shrink-0 font-mono text-[10px] tracking-wide text-fg-faint uppercase">
+            {label}
+        </span>
+    );
 }
 
 function OptionVendorMark({ option }: { option: NamePresetOption }) {

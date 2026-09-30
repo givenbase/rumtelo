@@ -85,7 +85,7 @@ export function ListToolbarTab({
             className={cn(
                 TAB,
                 active
-                    ? 'border-accent/50 bg-accent-soft text-accent'
+                    ? 'border-accent bg-accent-soft text-accent'
                     : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent',
                 className
             )}>

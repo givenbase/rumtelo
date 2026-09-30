@@ -39,7 +39,6 @@ export function FinishBy({
     className?: string;
 }) {
     const locale = useLocale();
-    const t = useTranslations();
     const tForm = useTranslations('ui.form');
     const tLearn = useTranslations('features.growth.learn');
     const line = value ? dueLine(value, tLearn) : null;
@@ -55,7 +54,7 @@ export function FinishBy({
                 min={todayIso()}
                 onChange={onChange}
                 locale={locale}
-                placeholder={t('ui.form.pick_a_date')}
+                openCalendarLabel={tForm('aria.open_date_picker')}
                 labels={{
                     previousMonth: tForm('previous_month'),
                     nextMonth: tForm('next_month'),
@@ -64,11 +63,10 @@ export function FinishBy({
                     today: tForm('today'),
                     pickADay: tForm('pick_a_day'),
                 }}
-                closeLabel={t('ui.button.actions.close')}
                 className="w-40 font-sans text-xs tracking-normal normal-case"
             />
             {line ? (
-                <span className={line.over ? 'text-danger' : 'text-accent'}>{line.text}</span>
+                <span className={cn('text-accent', line.over && 'text-danger')}>{line.text}</span>
             ) : null}
         </div>
     );

@@ -114,5 +114,5 @@ export function BankAccountRow({
         );
     }
 
-    return <div className={cn(isPicker ? undefined : 'flex min-w-0', className)}>{identity}</div>;
+    return <div className={cn(!isPicker && 'flex min-w-0', className)}>{identity}</div>;
 }

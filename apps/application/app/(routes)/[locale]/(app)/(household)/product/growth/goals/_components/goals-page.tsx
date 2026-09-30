@@ -372,7 +372,7 @@ export function GoalsPageClient() {
                             className={cn(
                                 'flex items-baseline gap-2 rounded-full border px-4 py-2.5 font-mono text-xs font-medium tracking-wide uppercase transition-all duration-200',
                                 tab === tabKey
-                                    ? 'border-accent/50 bg-accent-soft text-accent'
+                                    ? 'border-accent bg-accent-soft text-accent'
                                     : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
                             )}>
                             {tabKey === 'ON_TRACK' ? t('tab_on_track') : t('tab_reached')}
@@ -406,7 +406,7 @@ export function GoalsPageClient() {
                                       className={cn(
                                           'rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
                                           on
-                                              ? 'border-accent/50 bg-accent-soft text-accent'
+                                              ? 'border-accent bg-accent-soft text-accent'
                                               : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
                                       )}>
                                       {label}
@@ -435,7 +435,7 @@ export function GoalsPageClient() {
                                       className={cn(
                                           'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
                                           on
-                                              ? 'border-accent/50 bg-accent-soft text-accent'
+                                              ? 'border-accent bg-accent-soft text-accent'
                                               : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
                                       )}>
                                       <JarMark jarKey={key} icon={catalog?.icon} />
@@ -497,7 +497,7 @@ export function GoalsPageClient() {
                                             {kindEyebrow(goal.kind, tDetail)}
                                         </span>
                                         {focus ? (
-                                            <span className="inline-flex items-center rounded-full border border-accent/40 bg-accent-soft px-2.5 py-1 font-mono text-[10px] tracking-widest text-accent uppercase">
+                                            <span className="inline-flex items-center rounded-full border border-accent bg-accent-soft px-2.5 py-1 font-mono text-[10px] tracking-widest text-accent uppercase">
                                                 {t('focus')}
                                             </span>
                                         ) : rank !== null && rank > 1 ? (
@@ -506,7 +506,7 @@ export function GoalsPageClient() {
                                             </span>
                                         ) : null}
                                         {projection?.fulfilledByPeriod && reachedLabel ? (
-                                            <span className="inline-flex items-center rounded-full border border-success/40 bg-success/10 px-2.5 py-1 font-mono text-[10px] tracking-widest text-success uppercase">
+                                            <span className="inline-flex items-center rounded-full border border-success bg-success/10 px-2.5 py-1 font-mono text-[10px] tracking-widest text-success uppercase">
                                                 {t('reached_badge', { when: reachedLabel })}
                                             </span>
                                         ) : null}

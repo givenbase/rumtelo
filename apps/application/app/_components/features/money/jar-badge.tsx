@@ -52,7 +52,7 @@ export function MetaChip({ children, className }: { children: ReactNode; classNa
     return (
         <span
             className={cn(
-                'inline-flex items-center rounded-full border border-line bg-surface px-2 py-0.5 font-mono text-[10px] font-medium tracking-wide text-fg-muted uppercase',
+                'inline-flex min-h-6 items-center rounded-full border border-line bg-surface px-2.5 py-1 font-mono text-[10px] font-medium tracking-wide text-fg-muted uppercase',
                 className
             )}>
             {children}

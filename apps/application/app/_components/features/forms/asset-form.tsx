@@ -376,7 +376,7 @@ export function AssetForm({
                                             className={cn(
                                                 'flex items-start gap-3 rounded-xl border px-3 py-3 text-left transition-colors',
                                                 on
-                                                    ? 'border-accent/40 bg-accent-soft'
+                                                    ? 'border-accent bg-accent-soft'
                                                     : 'border-line bg-raised hover:border-accent-hover'
                                             )}>
                                             <span

@@ -34,9 +34,6 @@ const EMPTY_DEVICES: Device[] = [];
 const ASSIGNEE_TRIGGER =
     'h-8 min-w-[9rem] rounded-lg border-line-strong bg-surface px-2.5 text-xs shadow-sm ' +
     'focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent/35';
-const ASSIGNEE_CONTENT = 'rounded-lg border-line bg-surface text-fg shadow-md';
-const ASSIGNEE_ITEM =
-    'rounded-md text-xs focus:bg-accent/10 focus:text-fg data-[highlighted]:bg-accent/10 data-[highlighted]:text-fg';
 
 const KIND_ICON: Record<string, IconName> = {
     WRISTBAND: 'watch',
@@ -154,7 +151,7 @@ export function DevicesSettings() {
     return (
         <SettingsPanel>
             {preferCapability ? (
-                <p className="rounded-xl border border-accent/30 bg-accent/5 px-3.5 py-2.5 text-sm text-fg">
+                <p className="rounded-xl border border-accent bg-accent/5 px-3.5 py-2.5 text-sm text-fg">
                     {t('pages.settings.panels.devices.capability_banner', {
                         capability:
                             capabilityLabels[preferCapability] ?? preferCapability.toLowerCase(),
@@ -226,18 +223,14 @@ export function DevicesSettings() {
                                         aria-label={t('pages.settings.panels.devices.reassign')}>
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent
-                                        position="popper"
-                                        align="end"
-                                        className={ASSIGNEE_CONTENT}>
-                                        <SelectItem value="shared" className={ASSIGNEE_ITEM}>
+                                    <SelectContent position="popper" align="end">
+                                        <SelectItem value="shared">
                                             {t('pages.settings.panels.devices.shared')}
                                         </SelectItem>
                                         {members.map(member => (
                                             <SelectItem
                                                 key={member.accountId}
-                                                value={member.accountId}
-                                                className={ASSIGNEE_ITEM}>
+                                                value={member.accountId}>
                                                 {member.displayName}
                                             </SelectItem>
                                         ))}

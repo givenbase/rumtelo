@@ -450,7 +450,7 @@ export function GoalForm({
                                             onClick={() => selectKind(option.id)}
                                             className={
                                                 on
-                                                    ? 'flex flex-col items-start gap-1 rounded-xl border border-accent/40 bg-accent-soft px-3 py-3 text-left transition-colors'
+                                                    ? 'flex flex-col items-start gap-1 rounded-xl border border-accent bg-accent-soft px-3 py-3 text-left transition-colors'
                                                     : 'flex flex-col items-start gap-1 rounded-xl border border-line bg-raised px-3 py-3 text-left transition-colors hover:border-accent-hover'
                                             }>
                                             <span className="flex items-center gap-2">
@@ -509,7 +509,7 @@ export function GoalForm({
                                             onClick={() => selectCause(null)}
                                             className={
                                                 !cause
-                                                    ? 'rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                                    ? 'rounded-full border border-accent bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
                                                     : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
                                             }>
                                             {tForm('cause_any')}
@@ -527,7 +527,7 @@ export function GoalForm({
                                                     }
                                                     className={
                                                         on
-                                                            ? 'flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                                            ? 'flex items-center gap-1.5 rounded-full border border-accent bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
                                                             : 'flex items-center gap-1.5 rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
                                                     }>
                                                     <span aria-hidden>{meta.icon}</span>
@@ -570,7 +570,7 @@ export function GoalForm({
                                         onClick={() => selectGiveTargetMode(option.id)}
                                         className={
                                             on
-                                                ? 'rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                                ? 'rounded-full border border-accent bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
                                                 : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
                                         }>
                                         {tForm(option.labelKey)}

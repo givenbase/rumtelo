@@ -50,7 +50,7 @@ export function FormSelect({
             <SelectContent
                 position="popper"
                 className={cn(
-                    'rounded-lg border-line bg-surface text-fg shadow-md',
+                    'rounded-xl border-line bg-surface text-fg shadow-lg',
                     contentClassName
                 )}>
                 {children}

@@ -190,7 +190,7 @@ export function GivingFinder({
                                         className={cn(
                                             'flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
                                             on
-                                                ? 'border-accent/40 bg-accent-soft text-accent'
+                                                ? 'border-accent bg-accent-soft text-accent'
                                                 : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
                                         )}>
                                         <span aria-hidden>{meta.icon}</span>

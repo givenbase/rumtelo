@@ -3,6 +3,7 @@
 import { PLAN_LIMITS, PlanKey } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import { Typography } from '@rumtelo/ui';
+import { cn } from '@rumtelo/utils';
 
 import { CARD, SectionHeading } from './landing-primitives';
 
@@ -27,7 +28,7 @@ export function LandingFaq() {
                             <details
                                 key={key}
                                 open={index === 0}
-                                className={`${CARD} group open:border-accent/35`}>
+                                className={cn(CARD, 'group open:border-accent/35')}>
                                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 [&::-webkit-details-marker]:hidden">
                                     <Typography as="h4" size="lg">
                                         {t(`faq.${key}.question`)}

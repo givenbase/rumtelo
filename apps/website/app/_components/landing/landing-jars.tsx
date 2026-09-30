@@ -4,6 +4,7 @@ import { Icon, Typography } from '@rumtelo/ui';
 import { useTranslations } from '@rumtelo/i18n';
 
 import { JARS } from '@/lib/landing-content';
+import { cn } from '@rumtelo/utils';
 
 import { CARD, SectionHeading } from './landing-primitives';
 
@@ -52,7 +53,7 @@ export function LandingJars() {
                     {JARS.map(jar => (
                         <div
                             key={jar.key}
-                            className={`${CARD} grid min-w-0 content-start gap-2.5 p-5`}>
+                            className={cn(CARD, 'grid min-w-0 content-start gap-2.5 p-5')}>
                             <span className="flex flex-wrap items-center gap-3">
                                 <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-line bg-raised">
                                     <Icon

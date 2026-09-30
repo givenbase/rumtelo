@@ -2,6 +2,7 @@
 
 import { Typography } from '@rumtelo/ui';
 import { useTranslations } from '@rumtelo/i18n';
+import { cn } from '@rumtelo/utils';
 
 import { CARD, Eyebrow } from './landing-primitives';
 
@@ -57,7 +58,7 @@ export function LandingWhy() {
                         </Typography>
                         <ul className="mt-6 grid gap-3">
                             {PRIMARY_BOOK_KEYS.map(bookKey => (
-                                <li key={bookKey} className={`${CARD} grid gap-1 p-4`}>
+                                <li key={bookKey} className={cn(CARD, 'grid gap-1 p-4')}>
                                     <span className="text-sm font-semibold text-fg">
                                         {t(`books.${bookKey}.title`)}
                                     </span>
@@ -76,7 +77,9 @@ export function LandingWhy() {
                                     </summary>
                                     <ul className="mt-3 grid gap-3">
                                         {MORE_BOOK_KEYS.map(bookKey => (
-                                            <li key={bookKey} className={`${CARD} grid gap-1 p-4`}>
+                                            <li
+                                                key={bookKey}
+                                                className={cn(CARD, 'grid gap-1 p-4')}>
                                                 <span className="text-sm font-semibold text-fg">
                                                     {t(`books.${bookKey}.title`)}
                                                 </span>

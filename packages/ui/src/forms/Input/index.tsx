@@ -2,8 +2,6 @@
 
 import * as React from 'react';
 
-import { Icon } from '../../display/Icon';
-
 import { cn } from '@rumtelo/utils';
 
 import {
@@ -19,73 +17,20 @@ export type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
     startAffix?: React.ReactNode;
     /** Trailing control inside the field shell (clear, generate, show/hide). */
     endAction?: React.ReactNode;
-    /** aria-label for the native date/time picker button. English fallback when omitted. */
-    pickerAriaLabel?: string;
 };
 
-/** date / month / time — keep typing, surface a visible picker affordance. */
-const TEMPORAL_INPUT_TYPES = new Set(['date', 'datetime-local', 'month', 'time', 'week']);
-
-const temporalFieldClass =
-    '[&::-webkit-calendar-picker-indicator]:h-0 [&::-webkit-calendar-picker-indicator]:w-0 ' +
-    '[&::-webkit-calendar-picker-indicator]:p-0 [&::-webkit-calendar-picker-indicator]:opacity-0';
-
+/**
+ * Text field. For calendar dates use {@link DatePicker} — do not pass `type="date"`.
+ */
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-    ({ className, endAction, pickerAriaLabel, startAffix, type, ...props }, ref) => {
-        const inputRef = React.useRef<HTMLInputElement | null>(null);
-        const isTemporal = Boolean(type && TEMPORAL_INPUT_TYPES.has(type));
-
-        const setRefs = React.useCallback(
-            (node: HTMLInputElement | null) => {
-                inputRef.current = node;
-                if (typeof ref === 'function') ref(node);
-                else if (ref) ref.current = node;
-            },
-            [ref]
-        );
-
-        const openNativePicker = () => {
-            const el = inputRef.current;
-            if (!el || el.disabled || props.readOnly) return;
-            // Clear leftover autofill-guard readonly so the native picker can open.
-            el.removeAttribute('readonly');
-            try {
-                if (typeof el.showPicker === 'function') {
-                    el.showPicker();
-                    return;
-                }
-            } catch {
-                // showPicker can throw outside a user gesture / unsupported.
-            }
-            el.focus();
-            el.click();
-        };
-
-        const resolvedEndAction =
-            endAction ??
-            (isTemporal ? (
-                <button
-                    type="button"
-                    aria-label={pickerAriaLabel ?? 'Open date picker'}
-                    className="inline-flex size-8 items-center justify-center rounded-md text-fg-muted transition-colors hover:text-fg disabled:opacity-50"
-                    disabled={props.disabled}
-                    onClick={openNativePicker}>
-                    <Icon name="calendar" size="md" />
-                </button>
-            ) : null);
-
+    ({ className, endAction, startAffix, type, ...props }, ref) => {
         const hasStartAffix = Boolean(startAffix);
-        const hasEndAction = Boolean(resolvedEndAction);
+        const hasEndAction = Boolean(endAction);
         const composed = hasStartAffix || hasEndAction;
 
         if (!composed) {
             return (
-                <input
-                    ref={setRefs}
-                    type={type}
-                    className={cn(controlClasses, className)}
-                    {...props}
-                />
+                <input ref={ref} type={type} className={cn(controlClasses, className)} {...props} />
             );
         }
 
@@ -99,14 +44,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                     </span>
                 ) : null}
 
-                <input
-                    ref={setRefs}
-                    type={type}
-                    className={cn(fieldControlClasses, isTemporal && temporalFieldClass)}
-                    {...props}
-                />
+                <input ref={ref} type={type} className={fieldControlClasses} {...props} />
 
-                {hasEndAction ? <div className={endActionClasses}>{resolvedEndAction}</div> : null}
+                {hasEndAction ? <div className={endActionClasses}>{endAction}</div> : null}
             </div>
         );
     }

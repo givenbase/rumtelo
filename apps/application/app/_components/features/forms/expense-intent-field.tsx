@@ -1,11 +1,19 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import type { CategoryTemplate, JarKey, MerchantPreset } from '@rumtelo/contracts';
 import { MerchantHighlight } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
-import { Typography, VendorMark } from '@rumtelo/ui';
+import {
+    SuggestionPanel,
+    Typography,
+    VendorMark,
+    suggestionGroupClass,
+    suggestionMutedClass,
+    suggestionOptionClass,
+} from '@rumtelo/ui';
+import { cn } from '@rumtelo/utils';
 
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
@@ -88,7 +96,7 @@ export function ExpenseIntentField({
     const [customVendor, setCustomVendor] = useState(false);
     const [skippedVendor, setSkippedVendor] = useState(false);
     const [vendorChipQuery, setVendorChipQuery] = useState('');
-    const rootRef = useRef<HTMLDivElement>(null);
+    const listAnchorRef = useRef<HTMLDivElement>(null);
     const listboxId = `${id ?? 'expense-intent'}-listbox`;
     const { byKey: jarByKey } = useJarCatalog();
 
@@ -159,14 +167,6 @@ export function ExpenseIntentField({
     const hasSelection = Boolean(value.vendor || value.categoryKey);
     const showVendorPrompt =
         pickMode === 'list' && value.source === 'category' && !value.vendor && !skippedVendor;
-
-    useEffect(() => {
-        function onDoc(event: MouseEvent) {
-            if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-        }
-        document.addEventListener('mousedown', onDoc);
-        return () => document.removeEventListener('mousedown', onDoc);
-    }, []);
 
     function selectPickMode(next: ExpensePickMode) {
         if (next === pickMode) return;
@@ -277,7 +277,7 @@ export function ExpenseIntentField({
         : null;
 
     return (
-        <div ref={rootRef} className="grid gap-3">
+        <div className="grid gap-3">
             {!hasSelection ? (
                 <div className="grid gap-2">
                     <div
@@ -295,7 +295,7 @@ export function ExpenseIntentField({
                                     onClick={() => selectPickMode(option.id)}
                                     className={
                                         on
-                                            ? 'rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                            ? 'rounded-full border border-accent bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
                                             : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
                                     }>
                                     {option.label}
@@ -363,7 +363,7 @@ export function ExpenseIntentField({
                     }}
                 />
             ) : (
-                <div className="relative">
+                <div ref={listAnchorRef} className="relative">
                     <FormInput
                         id={id}
                         name="rumtelo-expense-vendor"
@@ -400,141 +400,135 @@ export function ExpenseIntentField({
                             ···
                         </span>
                     </button>
-                    {open ? (
-                        <div
-                            id={listboxId}
-                            role="listbox"
-                            className="absolute z-30 mt-1 max-h-72 w-full overflow-auto rounded-xl bg-fg py-1.5 text-sm text-bg shadow-lg">
-                            {merchantHits.length === 0 && categoryHits.length === 0 ? (
-                                <div className="grid gap-1 px-3 py-2">
-                                    <p className="text-bg/60">
-                                        {jarKey && scopedCategories.length === 0 && !needle
-                                            ? t('no_types_custom')
-                                            : t('no_matches_enter', {
-                                                  name: query.trim() || '…',
-                                              })}
-                                    </p>
-                                    {query.trim() ? (
-                                        <button
-                                            type="button"
-                                            className="rounded-md px-2 py-1.5 text-left hover:bg-bg/10"
-                                            onClick={() => commitCustomVendor(query)}>
-                                            {t('use_as_vendor', { name: query.trim() })}
-                                        </button>
-                                    ) : null}
-                                </div>
-                            ) : (
-                                <>
-                                    {merchantHits.length > 0 ? (
-                                        <div>
-                                            <div className="px-3 pt-2 pb-1 text-[10px] font-semibold tracking-wider text-bg/50 uppercase">
-                                                {t('vendors')}
-                                            </div>
-                                            <ul>
-                                                {merchantHits.map(merchant => {
-                                                    const category = categories.find(
-                                                        candidate =>
-                                                            candidate.key ===
-                                                            merchant.categoryTemplateKey
-                                                    );
-                                                    const mark = partyMark(
-                                                        {
-                                                            key: merchant.key,
-                                                            name: merchant.name,
-                                                            logoDomain: merchant.logoDomain,
-                                                            website: merchant.website,
-                                                        },
-                                                        intentChrome({
-                                                            icon: category?.icon,
-                                                            billName: category?.name,
-                                                            merchantJarKey: merchant.jarKey,
-                                                        })
-                                                    );
-                                                    const categoryName =
-                                                        category?.name ??
-                                                        merchant.categoryTemplateKey;
-                                                    const badgeLabel = merchant.highlight
-                                                        ? highlightLabel(merchant.highlight)
-                                                        : null;
-                                                    return (
-                                                        <li key={`m-${merchant.key}`}>
-                                                            <button
-                                                                type="button"
-                                                                role="option"
-                                                                aria-selected={false}
-                                                                className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-bg/10"
-                                                                onClick={() =>
-                                                                    selectMerchant(merchant)
-                                                                }>
-                                                                <VendorMark
-                                                                    name={mark.name}
-                                                                    src={mark.src}
-                                                                    fallbackIcon={mark.fallbackIcon}
-                                                                    tone={mark.tone}
-                                                                    size={20}
-                                                                    className="bg-bg/15 ring-bg/20"
-                                                                />
-                                                                <span className="min-w-0 flex-1">
-                                                                    {merchant.name}
-                                                                    <span className="text-bg/50">
-                                                                        {' '}
-                                                                        · {categoryName}
-                                                                    </span>
-                                                                    {badgeLabel ? (
-                                                                        <span className="ml-1 text-[10px] tracking-wide text-bg/60 uppercase">
-                                                                            {badgeLabel}
-                                                                        </span>
-                                                                    ) : null}
-                                                                </span>
-                                                            </button>
-                                                        </li>
-                                                    );
-                                                })}
-                                            </ul>
-                                        </div>
-                                    ) : null}
-                                    {categoryHits.length > 0 ? (
-                                        <div>
-                                            <div className="px-3 pt-2 pb-1 text-[10px] font-semibold tracking-wider text-bg/50 uppercase">
-                                                {t('types')}
-                                            </div>
-                                            <ul>
-                                                {categoryHits.map(category => (
-                                                    <li key={`c-${category.key}`}>
+                    <SuggestionPanel
+                        anchorRef={listAnchorRef}
+                        open={open}
+                        onClose={() => setOpen(false)}
+                        id={listboxId}>
+                        {merchantHits.length === 0 && categoryHits.length === 0 ? (
+                            <div className="grid gap-1 px-3 py-2">
+                                <p className={suggestionMutedClass}>
+                                    {jarKey && scopedCategories.length === 0 && !needle
+                                        ? t('no_types_custom')
+                                        : t('no_matches_enter', {
+                                              name: query.trim() || '…',
+                                          })}
+                                </p>
+                                {query.trim() ? (
+                                    <button
+                                        type="button"
+                                        className={cn(suggestionOptionClass, 'rounded-md')}
+                                        onClick={() => commitCustomVendor(query)}>
+                                        {t('use_as_vendor', { name: query.trim() })}
+                                    </button>
+                                ) : null}
+                            </div>
+                        ) : (
+                            <>
+                                {merchantHits.length > 0 ? (
+                                    <div>
+                                        <div className={suggestionGroupClass}>{t('vendors')}</div>
+                                        <ul>
+                                            {merchantHits.map(merchant => {
+                                                const category = categories.find(
+                                                    candidate =>
+                                                        candidate.key ===
+                                                        merchant.categoryTemplateKey
+                                                );
+                                                const mark = partyMark(
+                                                    {
+                                                        key: merchant.key,
+                                                        name: merchant.name,
+                                                        logoDomain: merchant.logoDomain,
+                                                        website: merchant.website,
+                                                    },
+                                                    intentChrome({
+                                                        icon: category?.icon,
+                                                        billName: category?.name,
+                                                        merchantJarKey: merchant.jarKey,
+                                                    })
+                                                );
+                                                const categoryName =
+                                                    category?.name ?? merchant.categoryTemplateKey;
+                                                const badgeLabel = merchant.highlight
+                                                    ? highlightLabel(merchant.highlight)
+                                                    : null;
+                                                return (
+                                                    <li key={`m-${merchant.key}`}>
                                                         <button
                                                             type="button"
                                                             role="option"
                                                             aria-selected={false}
-                                                            className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-bg/10"
+                                                            className={suggestionOptionClass}
                                                             onClick={() =>
-                                                                selectCategory(category)
+                                                                selectMerchant(merchant)
                                                             }>
-                                                            {category.icon ? (
-                                                                <span
-                                                                    className="w-5 shrink-0 text-center"
-                                                                    aria-hidden>
-                                                                    {category.icon}
+                                                            <VendorMark
+                                                                name={mark.name}
+                                                                src={mark.src}
+                                                                fallbackIcon={mark.fallbackIcon}
+                                                                tone={mark.tone}
+                                                                size={20}
+                                                            />
+                                                            <span className="min-w-0 flex-1">
+                                                                {merchant.name}
+                                                                <span className="text-fg-faint">
+                                                                    {' '}
+                                                                    · {categoryName}
                                                                 </span>
-                                                            ) : null}
-                                                            <span>{category.name}</span>
+                                                                {badgeLabel ? (
+                                                                    <span className="ml-1 font-mono text-[10px] tracking-wide text-fg-faint uppercase">
+                                                                        {badgeLabel}
+                                                                    </span>
+                                                                ) : null}
+                                                            </span>
                                                         </button>
                                                     </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    ) : null}
-                                    {query.trim() ? (
-                                        <button
-                                            type="button"
-                                            className="mt-1 w-full border-t border-bg/10 px-3 py-2 text-left text-bg/70 hover:bg-bg/10"
-                                            onClick={() => commitCustomVendor(query)}>
-                                            {t('use_as_vendor', { name: query.trim() })}
-                                        </button>
-                                    ) : null}
-                                </>
-                            )}
-                        </div>
-                    ) : null}
+                                                );
+                                            })}
+                                        </ul>
+                                    </div>
+                                ) : null}
+                                {categoryHits.length > 0 ? (
+                                    <div>
+                                        <div className={suggestionGroupClass}>{t('types')}</div>
+                                        <ul>
+                                            {categoryHits.map(category => (
+                                                <li key={`c-${category.key}`}>
+                                                    <button
+                                                        type="button"
+                                                        role="option"
+                                                        aria-selected={false}
+                                                        className={suggestionOptionClass}
+                                                        onClick={() => selectCategory(category)}>
+                                                        {category.icon ? (
+                                                            <span
+                                                                className="w-5 shrink-0 text-center"
+                                                                aria-hidden>
+                                                                {category.icon}
+                                                            </span>
+                                                        ) : null}
+                                                        <span>{category.name}</span>
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ) : null}
+                                {query.trim() ? (
+                                    <button
+                                        type="button"
+                                        className={cn(
+                                            suggestionOptionClass,
+                                            'mt-1 border-t border-line'
+                                        )}
+                                        onClick={() => commitCustomVendor(query)}>
+                                        {t('use_as_vendor', { name: query.trim() })}
+                                    </button>
+                                ) : null}
+                            </>
+                        )}
+                    </SuggestionPanel>
                 </div>
             )}
 

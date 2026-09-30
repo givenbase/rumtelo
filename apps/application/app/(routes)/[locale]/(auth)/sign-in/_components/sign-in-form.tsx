@@ -174,7 +174,7 @@ export function SignInForm() {
 
             {verification ? (
                 <div
-                    className="grid gap-3 rounded-xl border border-warning/30 bg-warning/10 p-4"
+                    className="grid gap-3 rounded-xl border border-warning bg-warning/10 p-4"
                     role="status">
                     <Typography as="h4" weight="semibold" className="text-sm">
                         {t('features.auth.sign_in.verification.title')}

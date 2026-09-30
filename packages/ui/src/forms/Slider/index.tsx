@@ -31,7 +31,7 @@ const Slider = React.forwardRef<
             {thumbs.map((_, index) => (
                 <SliderPrimitive.Thumb
                     key={index}
-                    className="ring-offset-canvas block size-4 shrink-0 rounded-full border border-accent/40 bg-raised shadow-sm transition-colors focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none"
+                    className="ring-offset-canvas block size-4 shrink-0 rounded-full border border-accent bg-raised shadow-sm transition-colors focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none"
                 />
             ))}
         </SliderPrimitive.Root>

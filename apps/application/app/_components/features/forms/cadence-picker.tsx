@@ -79,14 +79,14 @@ export function CadencePicker({
                             <Icon
                                 name={CADENCE_ICONS[option.id]}
                                 size="md"
-                                className={selected ? 'text-accent' : 'text-fg-muted'}
+                                className={cn('text-fg-muted', selected && 'text-accent')}
                             />
                             <span className="grid gap-0.5">
                                 <span className="text-sm font-medium">{option.label}</span>
                                 <span
                                     className={cn(
-                                        'text-xs leading-snug',
-                                        selected ? 'text-accent/80' : 'text-fg-muted'
+                                        'text-xs leading-snug text-fg-muted',
+                                        selected && 'text-accent/80'
                                     )}>
                                     {option.hint}
                                 </span>

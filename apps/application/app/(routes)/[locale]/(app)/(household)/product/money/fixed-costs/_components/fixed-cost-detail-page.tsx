@@ -51,19 +51,10 @@ import {
     formatBookedDate,
     formatDueDay,
 } from '@/components/features/money/jar-badge';
+import { FixedCostPeriodStatusControl } from '@/components/features/money/fixed-cost-period-status';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
-
-function statusLabel(
-    status: ReturnType<typeof fixedCostStatus>,
-    t: ReturnType<typeof useTranslations<'features.money.fixed'>>
-) {
-    if (status === FixedCostPeriodStatus.TAKEN) return t('detail_status_taken');
-    if (status === FixedCostPeriodStatus.DUE) return t('detail_status_due');
-    if (status === FixedCostPeriodStatus.SKIPPED) return t('detail_status_skipped');
-    return t('detail_status_planned');
-}
 
 function invalidateFixedCostQueries(queryClient: ReturnType<typeof useQueryClient>) {
     void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.key() });
@@ -76,6 +67,7 @@ type ConfirmKind = 'pause' | 'end' | null;
 /**
  * Fixed-cost detail — see the plan and this period’s status; Edit opens the form.
  * Lifecycle is stored as isActive + endsOn (Active / Paused / Ended).
+ * Period settle actions live on the status pill (same pattern as the list).
  */
 export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string }) {
     const { householdId } = useAuth();
@@ -317,15 +309,16 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                     variant="secondary"
                                     disabled={busy}
                                     onClick={openPauseConfirm}>
-                                    <Icon name="pause" size="sm" appearance="filled" />
+                                    <Icon name="clock" size="sm" />
                                     {t('pause_short')}
                                 </Button>
                                 <Button
                                     type="button"
                                     variant="secondary"
                                     disabled={busy}
-                                    onClick={openEndConfirm}>
-                                    <Icon name="square" size="sm" appearance="filled" />
+                                    onClick={openEndConfirm}
+                                    className="border-danger text-danger hover:bg-danger/5 hover:text-danger">
+                                    <Icon name="flag" size="sm" />
                                     {t('end_short')}
                                 </Button>
                             </>
@@ -337,15 +330,16 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                     variant="secondary"
                                     disabled={busy}
                                     onClick={() => lifecycleMutation.mutate({ isActive: true })}>
-                                    <Icon name="play" size="sm" appearance="filled" />
+                                    <Icon name="circle-check" size="sm" />
                                     {t('resume_short')}
                                 </Button>
                                 <Button
                                     type="button"
                                     variant="secondary"
                                     disabled={busy}
-                                    onClick={openEndConfirm}>
-                                    <Icon name="square" size="sm" appearance="filled" />
+                                    onClick={openEndConfirm}
+                                    className="border-danger text-danger hover:bg-danger/5 hover:text-danger">
+                                    <Icon name="flag" size="sm" />
                                     {t('end_short')}
                                 </Button>
                             </>
@@ -395,7 +389,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                     {tAction('cancel')}
                                 </Button>
                                 <Button type="button" disabled={busy} onClick={confirmPause}>
-                                    <Icon name="pause" size="sm" appearance="filled" />
+                                    <Icon name="clock" size="sm" />
                                     {busy ? t('pausing') : t('pause_bill')}
                                 </Button>
                             </DialogFooter>
@@ -420,10 +414,11 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                             setEndDate(todayIsoDate());
                                         }}
                                         className={cn(
-                                            'rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
+                                            'min-h-9 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
+                                            'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
                                             endWhen === 'today'
-                                                ? 'border-accent/40 bg-accent-soft text-accent'
-                                                : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                                ? 'border-accent bg-accent-soft text-accent'
+                                                : 'border-fg-muted bg-raised text-fg-secondary hover:border-accent hover:text-accent'
                                         )}>
                                         {t('today')}
                                     </button>
@@ -432,10 +427,11 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                         aria-pressed={endWhen === 'earlier'}
                                         onClick={() => setEndWhen('earlier')}
                                         className={cn(
-                                            'rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
+                                            'min-h-9 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
+                                            'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
                                             endWhen === 'earlier'
-                                                ? 'border-accent/40 bg-accent-soft text-accent'
-                                                : 'border-line bg-raised text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                                ? 'border-accent bg-accent-soft text-accent'
+                                                : 'border-fg-muted bg-raised text-fg-secondary hover:border-accent hover:text-accent'
                                         )}>
                                         {t('earlier_date')}
                                     </button>
@@ -472,7 +468,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                     {tAction('cancel')}
                                 </Button>
                                 <Button type="button" disabled={busy} onClick={confirmEnd}>
-                                    <Icon name="square" size="sm" appearance="filled" />
+                                    <Icon name="flag" size="sm" />
                                     {busy ? t('ending') : t('end_bill')}
                                 </Button>
                             </DialogFooter>
@@ -491,14 +487,14 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                             {formatMoney(signedMonthly)}
                         </p>
                     </div>
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap items-center justify-end gap-1.5">
                         <MetaChip
                             className={
                                 lifecycle === FixedCostLifecycle.ACTIVE
-                                    ? 'border-success/30 text-success'
+                                    ? 'border-success bg-success/5 text-success'
                                     : lifecycle === FixedCostLifecycle.PAUSED
-                                      ? 'border-line text-fg-muted'
-                                      : 'border-fg-faint/40 text-fg-faint'
+                                      ? 'border-fg-muted bg-raised text-fg-muted'
+                                      : 'border-fg-muted text-fg-faint'
                             }>
                             {lifecycleLabel(lifecycle, {
                                 active: t('lifecycle_active'),
@@ -507,18 +503,56 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                             })}
                         </MetaChip>
                         {lifecycle === FixedCostLifecycle.ACTIVE ? (
-                            <MetaChip
-                                className={
-                                    status === FixedCostPeriodStatus.TAKEN
-                                        ? 'border-success/30 text-success'
-                                        : status === FixedCostPeriodStatus.DUE
-                                          ? 'border-danger/30 text-danger'
-                                          : status === FixedCostPeriodStatus.SKIPPED
-                                            ? 'border-line text-fg-muted'
-                                            : undefined
-                                }>
-                                {statusLabel(status, t)}
-                            </MetaChip>
+                            <FixedCostPeriodStatusControl
+                                status={status}
+                                labels={{
+                                    taken: t('status_taken'),
+                                    due: t('status_due'),
+                                    skipped: t('status_skipped'),
+                                    planned: t('status_planned'),
+                                    markPaidAria: t('mark_paid_short'),
+                                    markPaidConfirm: t('mark_paid_confirm'),
+                                    markPaidPending: t('mark_paid_pending'),
+                                }}
+                                canMarkPaid={canSettle && writable}
+                                pending={settleBusy}
+                                onMarkPaid={() => settleMutation.mutate('paid')}
+                            />
+                        ) : null}
+                        {canSettle && writable ? (
+                            <>
+                                {status === FixedCostPeriodStatus.DUE ||
+                                status === FixedCostPeriodStatus.UPCOMING ? (
+                                    <button
+                                        type="button"
+                                        data-mutate
+                                        disabled={settleBusy}
+                                        onClick={() => settleMutation.mutate('skip')}
+                                        className="min-h-9 rounded-md px-2 font-mono text-xs font-medium tracking-wide text-fg-secondary uppercase underline-offset-2 hover:text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-50">
+                                        {t('detail.skip_period')}
+                                    </button>
+                                ) : null}
+                                {settlement ? (
+                                    <button
+                                        type="button"
+                                        data-mutate
+                                        disabled={settleBusy}
+                                        onClick={() => settleMutation.mutate('unlink')}
+                                        className="min-h-9 rounded-md px-2 font-mono text-xs font-medium tracking-wide text-fg-secondary uppercase underline-offset-2 hover:text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-50">
+                                        {t('detail.reopen_period')}
+                                    </button>
+                                ) : null}
+                                {status === FixedCostPeriodStatus.UPCOMING ? (
+                                    <button
+                                        type="button"
+                                        data-mutate
+                                        disabled={settleBusy}
+                                        onClick={() => settleMutation.mutate('paid')}
+                                        className="min-h-9 rounded-md border border-accent bg-accent-soft px-2.5 font-mono text-xs font-medium tracking-wide text-accent uppercase hover:bg-accent/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-50">
+                                        {t('detail.mark_paid')}
+                                    </button>
+                                ) : null}
+                            </>
                         ) : null}
                     </div>
                 </div>
@@ -658,38 +692,6 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                 {t('detail.no_payment_linked')}
                             </Typography>
                         )}
-                        {canSettle && writable ? (
-                            <div
-                                className="flex flex-wrap gap-2 border-t border-line px-5 py-3"
-                                data-mutate>
-                                {status !== FixedCostPeriodStatus.TAKEN ? (
-                                    <Button
-                                        type="button"
-                                        disabled={settleBusy}
-                                        onClick={() => settleMutation.mutate('paid')}>
-                                        {t('detail.mark_paid')}
-                                    </Button>
-                                ) : null}
-                                {status !== FixedCostPeriodStatus.SKIPPED ? (
-                                    <Button
-                                        type="button"
-                                        variant="secondary"
-                                        disabled={settleBusy}
-                                        onClick={() => settleMutation.mutate('skip')}>
-                                        {t('detail.skip_period')}
-                                    </Button>
-                                ) : null}
-                                {settlement ? (
-                                    <Button
-                                        type="button"
-                                        variant="secondary"
-                                        disabled={settleBusy}
-                                        onClick={() => settleMutation.mutate('unlink')}>
-                                        {t('detail.reopen_period')}
-                                    </Button>
-                                ) : null}
-                            </div>
-                        ) : null}
                     </Card>
                 </section>
             ) : null}

@@ -11,6 +11,7 @@ import { isRegistrationOpen } from '@/lib/maintenance';
 
 import { LandingPortalScreen } from './landing-portal-screen';
 import { Cta, SectionHeading } from './landing-primitives';
+import { cn } from '@rumtelo/utils';
 
 /** How long each portal stays on stage before the next one auto-advances. */
 const AUTO_ADVANCE_MS = 9000;
@@ -123,11 +124,12 @@ export function LandingPortals() {
                                 aria-controls={`${baseId}-panel`}
                                 tabIndex={active ? 0 : -1}
                                 onClick={() => select(itemIndex)}
-                                className={`relative inline-flex items-center gap-2 overflow-hidden rounded-full px-3.5 py-1.5 font-mono text-xs font-semibold tracking-widest uppercase transition-colors ${
+                                className={cn(
+                                    'relative inline-flex items-center gap-2 overflow-hidden rounded-full px-3.5 py-1.5 font-mono text-xs font-semibold tracking-widest uppercase transition-colors',
                                     active
                                         ? 'bg-surface text-fg shadow-md'
                                         : 'text-fg-muted hover:text-fg'
-                                }`}>
+                                )}>
                                 <span
                                     className="size-1.5 rounded-full"
                                     style={{ background: item.colorVar }}

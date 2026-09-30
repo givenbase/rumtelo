@@ -33,13 +33,13 @@ export function PeriodTravelBanner() {
             role="status"
             className={cn(
                 'mb-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border px-3.5 py-2.5',
-                past ? 'border-amber-500/35 bg-amber-500/8' : 'border-accent/35 bg-accent-soft'
+                past ? 'border-warning bg-warning/10' : 'border-accent bg-accent-soft'
             )}>
             <div className="min-w-0">
                 <p
                     className={cn(
                         'font-mono text-[10px] font-semibold tracking-[0.14em] uppercase',
-                        past ? 'text-amber-800 dark:text-amber-300' : 'text-accent'
+                        past ? 'text-warning' : 'text-accent'
                     )}>
                     {past ? t('period_looking_back') : t('period_looking_ahead')}
                 </p>
@@ -59,10 +59,11 @@ export function PeriodTravelBanner() {
                     setPeriod({ year: now.getFullYear(), month: now.getMonth() + 1 });
                 }}
                 className={cn(
-                    'shrink-0 rounded-full border px-3 py-1.5 font-mono text-[10px] font-medium tracking-wide uppercase transition-colors',
+                    'min-h-9 shrink-0 rounded-full border px-3 py-1.5 font-mono text-xs font-medium tracking-wide uppercase transition-colors',
+                    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
                     past
-                        ? 'border-amber-600/40 text-amber-900 hover:bg-amber-500/15 dark:text-amber-200'
-                        : 'border-accent/50 text-accent hover:bg-accent-soft'
+                        ? 'border-warning text-warning hover:bg-warning/15'
+                        : 'border-accent text-accent hover:bg-accent/15'
                 )}>
                 {t('period_options.this_month')}
             </button>

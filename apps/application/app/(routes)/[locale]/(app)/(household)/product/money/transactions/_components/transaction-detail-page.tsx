@@ -14,6 +14,7 @@ import {
     endOfPeriodIso,
     isFixedCostCounting,
     toPeriodKey,
+    cn,
 } from '@rumtelo/utils';
 
 import {
@@ -495,9 +496,10 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                         {tTx('amount')}
                     </p>
                     <p
-                        className={`mt-1 text-2xl font-semibold ${
-                            tx.amount < 0 ? 'text-fg' : 'text-success'
-                        }`}>
+                        className={cn(
+                            'mt-1 text-2xl font-semibold text-success',
+                            tx.amount < 0 && 'text-fg'
+                        )}>
                         {formatMoney(tx.amount, { signed: true })}
                     </p>
                 </div>

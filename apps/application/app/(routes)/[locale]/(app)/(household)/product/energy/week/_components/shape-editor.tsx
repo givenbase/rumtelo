@@ -93,9 +93,7 @@ export function ShapeEditor({
         <div
             className={cn(
                 'rounded-xl border px-4 py-3 text-sm',
-                over
-                    ? 'border-danger/40 bg-danger/5 text-danger'
-                    : 'border-accent/30 bg-accent/5 text-fg'
+                over ? 'border-danger bg-danger/5 text-danger' : 'border-accent bg-accent/5 text-fg'
             )}>
             {remainder < 0 ? (
                 <>{ts('editor.over_day', { time: formatMinutes(-remainder, tRoot) })}</>

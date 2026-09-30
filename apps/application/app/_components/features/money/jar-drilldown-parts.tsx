@@ -77,8 +77,8 @@ function JarDrilldownBody({
                     <>
                         <div
                             className={cn(
-                                'font-mono text-sm',
-                                jar.overspent ? 'text-danger' : 'text-fg'
+                                'font-mono text-sm text-fg',
+                                jar.overspent && 'text-danger'
                             )}>
                             <span className="text-fg-faint">
                                 {formatMoney(jar.baselineAllocated ?? 0)}
@@ -95,8 +95,8 @@ function JarDrilldownBody({
                     <>
                         <div
                             className={cn(
-                                'font-mono text-sm',
-                                jar.overspent ? 'text-danger' : 'text-fg'
+                                'font-mono text-sm text-fg',
+                                jar.overspent && 'text-danger'
                             )}>
                             {formatMoney(jar.available)}
                         </div>
@@ -185,7 +185,7 @@ export function JarCategoryTable({ categories }: { categories: JarCategory[] }) 
                                 <span className="text-fg">
                                     {t('spent')} {formatMoney(category.actual)}
                                 </span>
-                                <span className={over ? 'text-danger' : 'text-success'}>
+                                <span className={cn('text-success', over && 'text-danger')}>
                                     {formatMoney(diff, { signed: true })}
                                 </span>
                             </span>
@@ -223,8 +223,8 @@ export function JarCategoryTable({ categories }: { categories: JarCategory[] }) 
                                     </td>
                                     <td
                                         className={cn(
-                                            'py-1.5 text-right font-mono text-sm tabular-nums',
-                                            over ? 'text-danger' : 'text-success'
+                                            'py-1.5 text-right font-mono text-sm text-success tabular-nums',
+                                            over && 'text-danger'
                                         )}>
                                         {formatMoney(diff, { signed: true })}
                                     </td>

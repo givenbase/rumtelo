@@ -16,6 +16,7 @@ import {
     endOfPeriodIso,
     projectGoalsAtHorizon,
     toPeriodKey,
+    cn,
 } from '@rumtelo/utils';
 
 import { createMoveHref, goalDetailHref, updateHref } from '@/app/_lib/create-routes';
@@ -471,17 +472,17 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                         {rank !== null && !reached ? (
-                            <MetaChip className="border-accent/30 text-accent">
+                            <MetaChip className="border-accent bg-accent-soft text-accent">
                                 {isFocus ? td('focus_rank') : td('rank', { rank })}
                             </MetaChip>
                         ) : null}
                         <MetaChip
                             className={
                                 reached
-                                    ? 'border-success/30 text-success'
+                                    ? 'border-success bg-success/5 text-success'
                                     : projection?.onTrack === false
-                                      ? 'border-danger/30 text-danger'
-                                      : 'border-success/30 text-success'
+                                      ? 'border-danger bg-danger/5 text-danger'
+                                      : 'border-success bg-success/5 text-success'
                             }>
                             {reachedByThen && reachedMonth
                                 ? td('reached_month', { month: reachedMonth })
@@ -586,9 +587,10 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                                     {td('headroom')}
                                 </dt>
                                 <dd
-                                    className={`mt-0.5 font-mono ${
-                                        pace.jarHeadroomCents >= 0 ? 'text-success' : 'text-danger'
-                                    }`}>
+                                    className={cn(
+                                        'mt-0.5 font-mono text-danger',
+                                        pace.jarHeadroomCents >= 0 && 'text-success'
+                                    )}>
                                     {formatMoney(pace.jarHeadroomCents)}
                                 </dd>
                             </div>

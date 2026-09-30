@@ -143,7 +143,7 @@ function LockedFromJar({
             <div
                 className={cn(
                     'flex items-center gap-3 rounded-xl border px-3 py-3',
-                    blocked ? 'border-danger/40 bg-danger/10' : 'border-accent/40 bg-accent-soft'
+                    blocked ? 'border-danger bg-danger/10' : 'border-accent bg-accent-soft'
                 )}>
                 <span className="text-lg" aria-hidden>
                     {jar.icon}
@@ -518,7 +518,7 @@ export function MoveMoneyForm({
             {!fromJarId ? (
                 <p className="text-[11px] text-fg-faint">{t('choose_source_first')}</p>
             ) : fromEligibility && !fromEligibility.ok ? (
-                <p className="rounded-xl border border-danger/30 bg-danger/10 px-3 py-2.5 text-sm text-danger">
+                <p className="rounded-xl border border-danger bg-danger/10 px-3 py-2.5 text-sm text-danger">
                     {t('source_blocked')}
                 </p>
             ) : (
@@ -634,7 +634,7 @@ export function MoveMoneyForm({
                     />
 
                     {fromJar && toJar && fromEligibility?.ok ? (
-                        <div className="space-y-1.5 rounded-xl border border-accent/30 bg-accent-soft/60 px-3 py-2.5 text-sm text-fg-muted">
+                        <div className="space-y-1.5 rounded-xl border border-accent bg-accent-soft/60 px-3 py-2.5 text-sm text-fg-muted">
                             <p>
                                 {t('moving_preview', {
                                     amount:

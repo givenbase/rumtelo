@@ -187,7 +187,7 @@ export function BankLinkedAccounts({
                                           key={account.id}
                                           className={cn(
                                               isEditing &&
-                                                  'mb-1 rounded-xl border border-accent/40 bg-accent-soft/50 px-3'
+                                                  'mb-1 rounded-xl border border-accent bg-accent-soft/50 px-3'
                                           )}>
                                           <SettingsRow last={isLastVisible && !isEditing}>
                                               <BankAccountRow

@@ -1,6 +1,8 @@
 import type { ComponentProps } from 'react';
 import Image from 'next/image';
 
+import { cn } from '@rumtelo/utils';
+
 import { BRAND_ASSETS } from './assets';
 
 export type RumteloLogoVariant = 'wordmark' | 'wordmarkOnLight' | 'wordmarkOnDark' | 'icon';
@@ -90,7 +92,7 @@ export function RumteloLogo({
     }
 
     return (
-        <span className={['rumtelo-logo', 'inline-grid', className].filter(Boolean).join(' ')}>
+        <span className={cn('rumtelo-logo', 'inline-grid', className)}>
             <Image
                 src={BRAND_ASSETS.wordmarkOnLight}
                 alt={alt}

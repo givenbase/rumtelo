@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import { PLAN_LIMITS, PLAN_RANK, PlanKey } from '@rumtelo/contracts';
-import { planIntentFromPlanKey, planIntentQuery } from '@rumtelo/utils';
+import { cn, planIntentFromPlanKey, planIntentQuery } from '@rumtelo/utils';
 
 import { Typography } from '@rumtelo/ui';
 
@@ -143,11 +143,12 @@ export function LandingPricing() {
                                 role="tab"
                                 aria-selected={active}
                                 onClick={() => setBilling(period)}
-                                className={`flex-1 rounded-full px-3 py-2 font-mono text-xs font-semibold tracking-widest uppercase transition-colors sm:flex-none sm:px-4 ${
+                                className={cn(
+                                    'flex-1 rounded-full px-3 py-2 font-mono text-xs font-semibold tracking-widest uppercase transition-colors sm:flex-none sm:px-4',
                                     active
                                         ? 'bg-(image:--gradient-accent) text-on-accent'
                                         : 'text-fg-muted hover:text-fg'
-                                }`}>
+                                )}>
                                 {period === 'month' ? (
                                     t('interval_monthly')
                                 ) : (
@@ -201,29 +202,32 @@ export function LandingPricing() {
                     return (
                         <div
                             key={plan.key}
-                            className={`flex min-w-0 flex-col overflow-hidden rounded-2xl border bg-surface shadow-md ring-1 ring-fg/6 ring-inset dark:ring-white/6 ${
+                            className={cn(
+                                'flex min-w-0 flex-col overflow-hidden rounded-2xl border bg-surface shadow-md ring-1 ring-fg/6 ring-inset dark:ring-white/6',
                                 isCurrent
                                     ? 'border-accent/50 shadow-glow'
                                     : rec
                                       ? 'border-accent/40 shadow-glow'
                                       : 'border-line'
-                            }`}>
+                            )}>
                             <span
-                                className={`block h-1 ${
+                                className={cn(
+                                    'block h-1',
                                     isCurrent || rec
                                         ? 'bg-(image:--gradient-accent)'
                                         : 'bg-transparent'
-                                }`}
+                                )}
                             />
 
                             <div className="flex flex-wrap items-center justify-between gap-2.5 px-6 pt-6">
                                 <Typography as="h2">{planName}</Typography>
                                 <span
-                                    className={`rounded-full border px-3 py-1 font-mono text-xs font-semibold tracking-wide whitespace-nowrap uppercase ${
+                                    className={cn(
+                                        'rounded-full border px-3 py-1 font-mono text-xs font-semibold tracking-wide whitespace-nowrap uppercase',
                                         isCurrent || rec
                                             ? 'border-transparent bg-(image:--gradient-accent) text-on-accent'
                                             : 'border-line text-fg-faint'
-                                    }`}>
+                                    )}>
                                     {isCurrent ? t('your_plan') : tPlans(`${slug}.tag`)}
                                 </span>
                             </div>
@@ -269,7 +273,10 @@ export function LandingPricing() {
                                 href={href}
                                 variant={isCurrent || rec ? 'primary' : 'ghost'}
                                 size="lg"
-                                className={`mx-6 mt-auto mb-6 ${isCurrent || rec ? '' : 'text-fg-strong'}`}>
+                                className={cn(
+                                    'mx-6 mt-auto mb-6',
+                                    !(isCurrent || rec) && 'text-fg-strong'
+                                )}>
                                 {action.label}
                             </Cta>
                         </div>
