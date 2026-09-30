@@ -16,12 +16,16 @@ export type ResolveVendorInput = Partial<
     Pick<MerchantPreset, 'key' | 'name' | 'logoDomain' | 'website'>
 >;
 
-/** Resolve a brand domain from API logoDomain or website. No hardcoded merchant table. */
+/**
+ * Resolve a brand domain from API logoDomain or website. No hardcoded merchant table.
+ * Keep an explicit `www.` on logoDomain — some hosts (bp.com, dekamarkt.nl) only
+ * resolve a usable Google favicon on the www host; bare apex returns a generic globe.
+ */
 export function resolveVendorBrand(input: ResolveVendorInput): VendorBrand | null {
     if (input.logoDomain?.trim()) {
         return {
             name: input.name?.trim() || input.logoDomain.trim(),
-            domain: input.logoDomain.trim().replace(/^www\./i, ''),
+            domain: input.logoDomain.trim(),
             key: input.key ?? undefined,
         };
     }
@@ -32,11 +36,11 @@ export function resolveVendorBrand(input: ResolveVendorInput): VendorBrand | nul
     return null;
 }
 
-/** Hostname from a website URL, without leading www. */
+/** Hostname from a website URL (keeps www when present — same favicon rule as logoDomain). */
 export function domainFromWebsite(website: string | null | undefined): string | null {
     if (!website?.trim()) return null;
     try {
-        const host = new URL(website.trim()).hostname.replace(/^www\./i, '');
+        const host = new URL(website.trim()).hostname;
         return host || null;
     } catch {
         return null;
