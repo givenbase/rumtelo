@@ -1,0 +1,51 @@
+import type { MerchantSeed } from '../types';
+import { necessities } from '../types';
+
+/** Home services — klusjesman / reparatie platforms. */
+export const HOME_SERVICES_MERCHANTS: readonly MerchantSeed[] = [
+    {
+        key: 'WERKSPOT',
+        name: 'Werkspot',
+        matchValue: 'Werkspot',
+        aliases: ['Werkspot', 'WERKSPOT'],
+        mcc: '7699',
+        jarKey: necessities,
+        categoryTemplateKey: 'HOME_SERVICES',
+        logoDomain: 'werkspot.nl',
+        website: 'https://werkspot.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'SOLVED',
+        name: 'Solved',
+        matchValue: 'Solved',
+        aliases: ['Solved', 'SOLVED', 'Solved.nl'],
+        mcc: '7699',
+        jarKey: necessities,
+        categoryTemplateKey: 'HOME_SERVICES',
+        logoDomain: 'solved.nl',
+        website: 'https://solved.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'FIXLY',
+        name: 'Fixly',
+        matchValue: 'Fixly',
+        aliases: ['Fixly', 'FIXLY'],
+        mcc: '7699',
+        jarKey: necessities,
+        categoryTemplateKey: 'HOME_SERVICES',
+        logoDomain: 'fixly.nl',
+        website: 'https://fixly.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+];

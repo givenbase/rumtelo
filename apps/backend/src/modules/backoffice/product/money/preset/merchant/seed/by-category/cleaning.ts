@@ -1,0 +1,51 @@
+import type { MerchantSeed } from '../types';
+import { necessities } from '../types';
+
+/** Cleaning & laundry — schoonmaak / wasserette. */
+export const CLEANING_MERCHANTS: readonly MerchantSeed[] = [
+    {
+        key: 'HELPLING',
+        name: 'Helpling',
+        matchValue: 'Helpling',
+        aliases: ['Helpling', 'HELPLING'],
+        mcc: '7349',
+        jarKey: necessities,
+        categoryTemplateKey: 'CLEANING',
+        logoDomain: 'helpling.nl',
+        website: 'https://helpling.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'WASBAR',
+        name: 'Wasbar',
+        matchValue: 'Wasbar',
+        aliases: ['Wasbar', 'WASBAR', 'Was Bar'],
+        mcc: '7211',
+        jarKey: necessities,
+        categoryTemplateKey: 'CLEANING',
+        logoDomain: 'wasbar.nl',
+        website: 'https://wasbar.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'WAS_EN_STRIJK',
+        name: 'Was & Strijk',
+        matchValue: 'Was & Strijk',
+        aliases: ['Was & Strijk', 'Was en Strijk', 'WAS EN STRIJK'],
+        mcc: '7211',
+        jarKey: necessities,
+        categoryTemplateKey: 'CLEANING',
+        logoDomain: 'wasenstrijk.nl',
+        website: 'https://wasenstrijk.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+];

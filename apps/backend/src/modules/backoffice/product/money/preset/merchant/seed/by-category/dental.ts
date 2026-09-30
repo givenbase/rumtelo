@@ -1,0 +1,51 @@
+import type { MerchantSeed } from '../types';
+import { necessities } from '../types';
+
+/** Dental — tandarts / dental chains (local practices are free-typed). */
+export const DENTAL_MERCHANTS: readonly MerchantSeed[] = [
+    {
+        key: 'DENTAL_CLINICS',
+        name: 'Dental Clinics',
+        matchValue: 'Dental Clinics',
+        aliases: ['Dental Clinics', 'DentalClinics', 'DENTAL CLINICS'],
+        mcc: '8021',
+        jarKey: necessities,
+        categoryTemplateKey: 'DENTAL',
+        logoDomain: 'dentalclinics.nl',
+        website: 'https://dentalclinics.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'IVORY',
+        name: 'Ivory',
+        matchValue: 'Ivory',
+        aliases: ['Ivory', 'Ivory Tandartsen', 'IVORY'],
+        mcc: '8021',
+        jarKey: necessities,
+        categoryTemplateKey: 'DENTAL',
+        logoDomain: 'ivory.nl',
+        website: 'https://ivory.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'COLLEGE_TANDARTSEN',
+        name: 'College Tandartsen',
+        matchValue: 'College Tandartsen',
+        aliases: ['College Tandartsen', 'CollegeTandartsen'],
+        mcc: '8021',
+        jarKey: necessities,
+        categoryTemplateKey: 'DENTAL',
+        logoDomain: 'collegetandartsen.nl',
+        website: 'https://collegetandartsen.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+];

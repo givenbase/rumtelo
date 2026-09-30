@@ -1,0 +1,51 @@
+import type { MerchantSeed } from '../types';
+import { play } from '../types';
+
+/** Flowers — bloemen / bouquet delivery. */
+export const FLOWERS_MERCHANTS: readonly MerchantSeed[] = [
+    {
+        key: 'BLOOMON',
+        name: 'bloomon',
+        matchValue: 'bloomon',
+        aliases: ['bloomon', 'Bloomon', 'BLOOMON'],
+        mcc: '5992',
+        jarKey: play,
+        categoryTemplateKey: 'FLOWERS',
+        logoDomain: 'bloomon.nl',
+        website: 'https://bloomon.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'INTERFLORA',
+        name: 'Interflora',
+        matchValue: 'Interflora',
+        aliases: ['Interflora', 'INTERFLORA'],
+        mcc: '5992',
+        jarKey: play,
+        categoryTemplateKey: 'FLOWERS',
+        logoDomain: 'interflora.nl',
+        website: 'https://interflora.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'TOPBLOEMEN',
+        name: 'Topbloemen',
+        matchValue: 'Topbloemen',
+        aliases: ['Topbloemen', 'TOPBLOEMEN', 'Top Bloemen'],
+        mcc: '5992',
+        jarKey: play,
+        categoryTemplateKey: 'FLOWERS',
+        logoDomain: 'topbloemen.nl',
+        website: 'https://topbloemen.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+];
