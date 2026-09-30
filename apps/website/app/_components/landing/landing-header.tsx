@@ -17,6 +17,7 @@ import { appHomeUrl, appPlanSettingsUrl, appSignInUrl, webSignUpPath } from '@/l
 import { isRegistrationOpen } from '@/lib/maintenance';
 
 import { Cta } from './landing-primitives';
+import { cn } from '@rumtelo/utils';
 
 const NAV_LINK_KEYS = [
     { href: '#portals', labelKey: 'portals' },
@@ -243,19 +244,22 @@ export function LandingHeader() {
                         onClick={() => setOpen(previous => !previous)}>
                         <span className="relative block size-4" aria-hidden>
                             <span
-                                className={`absolute inset-x-0 top-0.5 h-0.5 rounded-full bg-current transition-transform ${
-                                    open ? 'translate-y-1.5 rotate-45' : ''
-                                }`}
+                                className={cn(
+                                    'absolute inset-x-0 top-0.5 h-0.5 rounded-full bg-current transition-transform',
+                                    open && 'translate-y-1.5 rotate-45'
+                                )}
                             />
                             <span
-                                className={`absolute inset-x-0 top-1.75 h-0.5 rounded-full bg-current transition-opacity ${
-                                    open ? 'opacity-0' : ''
-                                }`}
+                                className={cn(
+                                    'absolute inset-x-0 top-1.75 h-0.5 rounded-full bg-current transition-opacity',
+                                    open && 'opacity-0'
+                                )}
                             />
                             <span
-                                className={`absolute inset-x-0 top-3.25 h-0.5 rounded-full bg-current transition-transform ${
-                                    open ? '-translate-y-1.5 -rotate-45' : ''
-                                }`}
+                                className={cn(
+                                    'absolute inset-x-0 top-3.25 h-0.5 rounded-full bg-current transition-transform',
+                                    open && '-translate-y-1.5 -rotate-45'
+                                )}
                             />
                         </span>
                     </button>

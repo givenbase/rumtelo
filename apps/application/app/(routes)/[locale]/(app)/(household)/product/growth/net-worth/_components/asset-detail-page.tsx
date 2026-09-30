@@ -158,7 +158,7 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                     <div className="flex overflow-hidden rounded-xl border border-line bg-sunken">
                         <span
                             aria-hidden
-                            className={cn('w-1 shrink-0', pays ? 'bg-accent' : 'bg-fg-muted')}
+                            className={cn('w-1 shrink-0 bg-fg-muted', pays && 'bg-accent')}
                         />
                         <div className="grid min-w-0 gap-1.5 px-3.5 py-3">
                             <p className="font-mono text-[10px] tracking-wider text-fg-muted uppercase">

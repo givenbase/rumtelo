@@ -15,6 +15,7 @@ import {
     endOfPeriodIso,
     horizonMonths,
     toPeriodKey,
+    cn,
 } from '@rumtelo/utils';
 
 import { useTranslations } from '@rumtelo/i18n';
@@ -217,9 +218,10 @@ export function IncomePageClient() {
                             <div className="grid gap-1">
                                 <Eyebrow>{t('gap')}</Eyebrow>
                                 <p
-                                    className={`font-display text-2xl leading-none font-semibold tracking-tight sm:text-3xl ${
-                                        gap < 0 ? 'text-success' : 'text-warning'
-                                    }`}>
+                                    className={cn(
+                                        'font-display text-2xl leading-none font-semibold tracking-tight text-warning sm:text-3xl',
+                                        gap < 0 && 'text-success'
+                                    )}>
                                     {gap < 0 ? `+${formatMoney(-gap)}` : formatMoney(gap)}
                                 </p>
                                 <p className="font-mono text-[11px] text-fg-muted">

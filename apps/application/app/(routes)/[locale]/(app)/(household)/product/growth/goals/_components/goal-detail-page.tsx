@@ -16,6 +16,7 @@ import {
     endOfPeriodIso,
     projectGoalsAtHorizon,
     toPeriodKey,
+    cn,
 } from '@rumtelo/utils';
 
 import { createMoveHref, goalDetailHref, updateHref } from '@/app/_lib/create-routes';
@@ -586,9 +587,10 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                                     {td('headroom')}
                                 </dt>
                                 <dd
-                                    className={`mt-0.5 font-mono ${
-                                        pace.jarHeadroomCents >= 0 ? 'text-success' : 'text-danger'
-                                    }`}>
+                                    className={cn(
+                                        'mt-0.5 font-mono text-danger',
+                                        pace.jarHeadroomCents >= 0 && 'text-success'
+                                    )}>
                                     {formatMoney(pace.jarHeadroomCents)}
                                 </dd>
                             </div>

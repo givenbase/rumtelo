@@ -12,6 +12,7 @@ import {
     PORTAL_DEMO_SOUL,
     type Portal,
 } from '@/lib/landing-content';
+import { cn } from '@rumtelo/utils';
 
 /**
  * The "screen" on the right of the Portals stage.
@@ -93,7 +94,7 @@ export function LandingPortalScreen({
                     ) : (
                         <>
                             {/* Mock keeps clear of the play bar so nothing ends up underneath it */}
-                            <div className={hasVideo ? 'h-full pb-16' : 'h-full'}>
+                            <div className={cn('h-full', hasVideo && 'pb-16')}>
                                 <DemoScreen portalKey={portal.key} />
                             </div>
 
@@ -209,9 +210,10 @@ function MoneyDemo() {
                         </span>
                     </span>
                     <span
-                        className={`font-mono text-sm font-medium ${
+                        className={cn(
+                            'font-mono text-sm font-medium',
                             row.amount.startsWith('+') ? 'text-accent' : 'text-fg'
-                        }`}>
+                        )}>
                         {row.amount}
                     </span>
                 </div>

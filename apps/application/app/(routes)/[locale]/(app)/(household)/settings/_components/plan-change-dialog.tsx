@@ -10,6 +10,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@rumtelo/ui';
+import { cn } from '@rumtelo/utils';
 
 import { planLabel, type PlanChangeDiff } from '@/app/_lib/plan';
 
@@ -160,7 +161,10 @@ export function PlanChangeDialog({
                                         <span className="text-fg-faint">{change.from}</span>
                                         <span aria-hidden>→</span>
                                         <span
-                                            className={change.expanded ? 'text-accent' : 'text-fg'}>
+                                            className={cn(
+                                                'text-fg',
+                                                change.expanded && 'text-accent'
+                                            )}>
                                             {change.to}
                                         </span>
                                     </li>

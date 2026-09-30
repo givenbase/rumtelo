@@ -14,7 +14,7 @@ import { useMarketingSession } from '@/app/_components/marketing-session-provide
 import { isRegistrationOpen } from '@/lib/maintenance';
 import { planSlug } from '@/lib/landing-plans';
 import { appHomeUrl, appPlanSettingsUrl, appSignInUrl, webSignUpPath } from '@/lib/portal-urls';
-import { planIntentQuery } from '@rumtelo/utils';
+import { cn, planIntentQuery } from '@rumtelo/utils';
 import { useTranslations } from '@rumtelo/i18n';
 import { Email, Icon, type IconName } from '@rumtelo/ui';
 
@@ -210,9 +210,10 @@ export function LandingSignupForm() {
                                                 placeholder={t(field.placeholderKey)}
                                                 disabled={isSubmitting}
                                                 aria-invalid={Boolean(message)}
-                                                className={`w-full rounded-lg border bg-raised px-3.5 py-3 text-sm text-fg transition-colors outline-none focus:border-accent ${
+                                                className={cn(
+                                                    'w-full rounded-lg border bg-raised px-3.5 py-3 text-sm text-fg transition-colors outline-none focus:border-accent',
                                                     message ? 'border-danger' : 'border-line'
-                                                }`}
+                                                )}
                                                 {...register(field.name)}
                                             />
                                             {message ? (
@@ -237,9 +238,10 @@ export function LandingSignupForm() {
                                             placeholder={t(field.placeholderKey)}
                                             disabled={isSubmitting}
                                             aria-invalid={Boolean(message)}
-                                            className={`w-full rounded-lg border bg-raised px-3.5 py-3 text-sm text-fg transition-colors outline-none focus:border-accent ${
+                                            className={cn(
+                                                'w-full rounded-lg border bg-raised px-3.5 py-3 text-sm text-fg transition-colors outline-none focus:border-accent',
                                                 message ? 'border-danger' : 'border-line'
-                                            }`}
+                                            )}
                                             {...register(field.name)}
                                         />
                                         {message ? (
@@ -254,11 +256,12 @@ export function LandingSignupForm() {
                             <label className="mt-1 flex cursor-pointer items-start gap-2.5">
                                 <input type="checkbox" className="sr-only" {...register('terms')} />
                                 <span
-                                    className={`mt-px grid size-4 shrink-0 place-items-center rounded-sm border text-xs text-on-accent ${
+                                    className={cn(
+                                        'mt-px grid size-4 shrink-0 place-items-center rounded-sm border text-xs text-on-accent',
                                         terms
                                             ? 'border-transparent bg-(image:--gradient-accent)'
                                             : 'border-line-strong bg-transparent'
-                                    }`}>
+                                    )}>
                                     {terms ? '✓' : ''}
                                 </span>
                                 <span className="text-sm leading-relaxed text-fg-muted">

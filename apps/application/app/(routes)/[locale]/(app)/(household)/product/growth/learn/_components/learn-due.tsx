@@ -66,7 +66,7 @@ export function FinishBy({
                 className="w-40 font-sans text-xs tracking-normal normal-case"
             />
             {line ? (
-                <span className={line.over ? 'text-danger' : 'text-accent'}>{line.text}</span>
+                <span className={cn('text-accent', line.over && 'text-danger')}>{line.text}</span>
             ) : null}
         </div>
     );
