@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -157,6 +157,7 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
     const [portalOpen, setPortalOpen] = useState(false);
     const [subOpen, setSubOpen] = useState(false);
     const [signingOut, setSigningOut] = useState(false);
+    const subnavRef = useRef<HTMLDivElement>(null);
     const { plan, showToast } = useHouseholdShell();
     const { setAccountTheme } = useAccountTheme();
     const { resolvedTheme } = useTheme();
@@ -184,6 +185,24 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
         setPortalOpen(false);
         setSubOpen(false);
     }
+
+    useEffect(() => {
+        if (!subOpen) return;
+        function onPointerDown(event: PointerEvent) {
+            if (!subnavRef.current?.contains(event.target as Node)) {
+                setSubOpen(false);
+            }
+        }
+        function onKeyDown(event: KeyboardEvent) {
+            if (event.key === 'Escape') setSubOpen(false);
+        }
+        document.addEventListener('pointerdown', onPointerDown);
+        document.addEventListener('keydown', onKeyDown);
+        return () => {
+            document.removeEventListener('pointerdown', onPointerDown);
+            document.removeEventListener('keydown', onKeyDown);
+        };
+    }, [subOpen]);
 
     async function handleSignOut() {
         setSigningOut(true);
@@ -540,15 +559,17 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                                 </div>
 
                                 {/* Mobile dropdown */}
-                                <div className="relative min-w-0 sm:hidden">
+                                <div ref={subnavRef} className="relative min-w-0 sm:hidden">
                                     <button
                                         type="button"
+                                        aria-expanded={subOpen}
+                                        aria-haspopup="listbox"
                                         onClick={() => {
                                             setPortalOpen(false);
                                             setMenuOpen(false);
                                             setSubOpen(previous => !previous);
                                         }}
-                                        className="flex max-w-[min(100%,14rem)] items-center gap-2 rounded-full border border-line-strong px-3.5 py-2 font-mono text-xs font-semibold tracking-wide text-fg uppercase">
+                                        className="flex max-w-[min(100%,14rem)] items-center gap-2 rounded-full border border-line-strong bg-surface px-3.5 py-2 font-mono text-xs font-semibold tracking-wide text-fg uppercase transition-colors hover:border-accent-hover">
                                         <span className="truncate">
                                             {activeChild &&
                                             subnavChildren.some(
@@ -557,24 +578,38 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                                                 ? t(activeChild.labelKey)
                                                 : t(subnavChildren[0]!.labelKey)}
                                         </span>
-                                        <span className="shrink-0 text-xs opacity-70" aria-hidden>
-                                            ▾
-                                        </span>
+                                        <Icon
+                                            name="chevron-down"
+                                            size="sm"
+                                            className={cn(
+                                                'shrink-0 text-fg-muted transition-transform',
+                                                subOpen && 'rotate-180'
+                                            )}
+                                            aria-hidden
+                                        />
                                     </button>
                                     {subOpen && (
-                                        <div className="absolute top-10 left-0 z-40 grid w-[min(16rem,calc(100vw-2rem))] animate-rise gap-0.5 rounded-xl border border-line-strong bg-surface p-1.5 shadow-xl">
+                                        <div
+                                            role="listbox"
+                                            className="absolute top-11 left-0 z-40 grid w-[min(16rem,calc(100vw-2rem))] animate-rise gap-0.5 rounded-xl border border-line-strong bg-surface p-1.5 shadow-xl">
                                             {subnavChildren.map(child => {
                                                 const locked = isCapabilityLocked(
                                                     child.capabilityKey
                                                 );
+                                                const active = activeChild?.href === child.href;
                                                 return (
                                                     <Link
                                                         key={child.href}
+                                                        role="option"
+                                                        aria-selected={active}
                                                         href={child.href}
                                                         onClick={() => setSubOpen(false)}
                                                         className={cn(
-                                                            'rounded-lg px-3 py-2.5 text-sm text-fg transition-colors hover:bg-raised',
-                                                            locked && 'opacity-55'
+                                                            'rounded-lg px-3 py-2.5 text-sm transition-colors',
+                                                            active
+                                                                ? 'bg-accent-soft font-medium text-accent'
+                                                                : 'text-fg hover:bg-raised',
+                                                            locked && !active && 'opacity-55'
                                                         )}>
                                                         {locked && (
                                                             <span

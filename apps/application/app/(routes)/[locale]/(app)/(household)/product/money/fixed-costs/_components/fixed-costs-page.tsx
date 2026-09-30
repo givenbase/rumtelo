@@ -13,7 +13,7 @@ import {
 } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Card, EmptyState, Typography } from '@rumtelo/ui';
+import { Card, EmptyState, Icon, Typography } from '@rumtelo/ui';
 import {
     cn,
     describePeriodTravel,
@@ -37,7 +37,6 @@ import {
     fixedCostStatus,
     lifecycleLabel,
     settlementsByFixedCostId,
-    type FixedCostStatus,
 } from '@/app/_lib/fixed-cost-match';
 import { evaluateNecessitiesPressure } from '@/app/_lib/necessities-pressure';
 import { jarChrome } from '@/app/_lib/jar-meta';
@@ -62,6 +61,7 @@ import {
     formatDueDay,
 } from '@/components/features/money/jar-badge';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
+import { FixedCostPeriodStatusControl } from '@/components/features/money/fixed-cost-period-status';
 import { NecessitiesPressureCard } from '@/components/features/money/necessities-pressure-card';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -69,61 +69,6 @@ import { ListToolbar } from '@/components/layout/list-toolbar';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 type Tab = 'ERUIT' | 'ERIN';
-
-const META_CHIP =
-    'inline-flex items-center rounded-full border bg-raised px-2 py-0.5 font-mono text-[10px] font-medium tracking-wide uppercase';
-
-/** Right-rail status: Due is the mark-paid control; other states stay read-only. */
-function statusControl(
-    status: FixedCostStatus,
-    t: (key: string) => string,
-    opts?: {
-        canMarkPaid?: boolean;
-        pending?: boolean;
-        onMarkPaid?: () => void;
-    }
-) {
-    if (status === FixedCostPeriodStatus.TAKEN) {
-        return (
-            <span className={cn(META_CHIP, 'border-success/30 bg-success/5 text-success')}>
-                {t('status_taken')}
-            </span>
-        );
-    }
-    if (status === FixedCostPeriodStatus.DUE) {
-        if (opts?.canMarkPaid && opts.onMarkPaid) {
-            return (
-                <button
-                    type="button"
-                    data-mutate
-                    disabled={opts.pending}
-                    title={t('mark_paid_short')}
-                    aria-label={t('mark_paid_short')}
-                    onClick={() => opts.onMarkPaid?.()}
-                    className={cn(
-                        META_CHIP,
-                        'cursor-pointer border-danger/40 bg-danger/5 text-danger transition-colors',
-                        'hover:border-danger hover:bg-danger/15 active:scale-[0.98] disabled:opacity-50'
-                    )}>
-                    {t('status_due')}
-                </button>
-            );
-        }
-        return (
-            <span className={cn(META_CHIP, 'border-danger/30 bg-danger/5 text-danger')}>
-                {t('status_due')}
-            </span>
-        );
-    }
-    if (status === FixedCostPeriodStatus.SKIPPED) {
-        return (
-            <span className={cn(META_CHIP, 'border-line text-fg-muted')}>
-                {t('status_skipped')}
-            </span>
-        );
-    }
-    return <span className={cn(META_CHIP, 'text-fg-muted')}>{t('status_planned')}</span>;
-}
 
 /**
  * Fixed costs & income.
@@ -144,6 +89,8 @@ export function FixedCostsPageClient() {
     const [tab, setTab] = useState<Tab>('ERUIT');
     const [jarFilter, setJarFilter] = useState<JarKey | null>(null);
     const [openJarKeys, setOpenJarKeys] = useState<Set<string>>(() => new Set());
+    const [selectMode, setSelectMode] = useState(false);
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
     const live = isLiveData(householdId);
     const periodKey = toPeriodKey(period.year, period.month);
     const travel = describePeriodTravel(period);
@@ -318,6 +265,36 @@ export function FixedCostsPageClient() {
                 FixedCostPeriodStatus.DUE
         )
         .map(item => item.id);
+    const dueIdSet = new Set(dueIds);
+    const selectedDueIds = [...selectedIds].filter(id => dueIdSet.has(id));
+
+    function exitSelectMode() {
+        setSelectMode(false);
+        setSelectedIds(new Set());
+    }
+
+    function toggleSelected(id: string) {
+        setSelectedIds(previous => {
+            const next = new Set(previous);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    }
+
+    function toggleGroupDue(ids: string[]) {
+        if (ids.length === 0) return;
+        setSelectedIds(previous => {
+            const next = new Set(previous);
+            const allSelected = ids.every(id => next.has(id));
+            if (allSelected) {
+                for (const id of ids) next.delete(id);
+            } else {
+                for (const id of ids) next.add(id);
+            }
+            return next;
+        });
+    }
 
     const markPaidMutation = useMutation({
         mutationFn: async (ids: string[]) => {
@@ -340,6 +317,7 @@ export function FixedCostsPageClient() {
                 queryKey: apiQuery.money.monthScore.current.key(),
             });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
+            exitSelectMode();
             showToast(count === 1 ? t('toast_paid') : t('toast_paid_all', { count }), 'success');
         },
         onError: (error: unknown) => showToast(apiError(error), 'error'),
@@ -393,11 +371,14 @@ export function FixedCostsPageClient() {
                         <button
                             key={tabKey}
                             type="button"
-                            onClick={() => setTab(tabKey)}
+                            onClick={() => {
+                                exitSelectMode();
+                                setTab(tabKey);
+                            }}
                             className={cn(
                                 'flex items-center gap-2.5 rounded-full border px-4 py-2 font-mono text-xs font-medium tracking-wide uppercase transition-all duration-200',
                                 tab === tabKey
-                                    ? 'border-accent/50 bg-accent-soft text-accent'
+                                    ? 'border-accent bg-accent-soft text-accent'
                                     : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
                             )}>
                             {tabKey === 'ERUIT' ? t('tab_out') : t('tab_in')}
@@ -417,25 +398,78 @@ export function FixedCostsPageClient() {
 
             {tab === 'ERUIT' && (
                 <div data-tour="fixed-list" className="grid gap-5">
-                    <div className="grid items-start gap-5 sm:grid-cols-2">
+                    <div className="grid items-start gap-5 sm:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
                         <Card className="p-0">
-                            <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-3.5">
+                            <div
+                                className={cn(
+                                    'flex items-center justify-between gap-3 border-b px-5 py-3.5',
+                                    selectMode ? 'border-accent bg-accent-soft/70' : 'border-line'
+                                )}>
                                 <Typography as="span" variant="eyebrow" color="primary">
                                     ✦ {t('every_month_out')}
                                 </Typography>
                                 <div className="flex shrink-0 items-center gap-2.5">
-                                    {dueIds.length > 0 ? (
-                                        <ConfirmActionButton
-                                            size="sm"
-                                            variant="secondary"
-                                            label={t('mark_all_due')}
-                                            confirmLabel={t('mark_all_due_confirm', {
-                                                count: dueIds.length,
-                                            })}
-                                            pending={markPaidMutation.isPending}
-                                            disabled={!live || !canMutate}
-                                            onConfirm={() => markPaidMutation.mutate(dueIds)}
-                                        />
+                                    {dueIds.length > 0 && live && canMutate ? (
+                                        selectMode ? (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    onClick={exitSelectMode}
+                                                    className="min-h-9 rounded-md px-2 font-mono text-xs font-medium tracking-wide text-fg-secondary uppercase underline-offset-2 hover:text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+                                                    {t('select_cancel')}
+                                                </button>
+                                                {selectedDueIds.length < dueIds.length ? (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setSelectedIds(new Set(dueIds))
+                                                        }
+                                                        className="min-h-9 rounded-md px-2 font-mono text-xs font-medium tracking-wide text-accent uppercase underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+                                                        {t('select_all_due')}
+                                                    </button>
+                                                ) : null}
+                                                {selectedDueIds.length > 0 ? (
+                                                    <ConfirmActionButton
+                                                        size="sm"
+                                                        variant="secondary"
+                                                        label={t('mark_selected', {
+                                                            count: selectedDueIds.length,
+                                                        })}
+                                                        confirmLabel={t('mark_selected_confirm', {
+                                                            count: selectedDueIds.length,
+                                                        })}
+                                                        pending={markPaidMutation.isPending}
+                                                        onConfirm={() =>
+                                                            markPaidMutation.mutate(selectedDueIds)
+                                                        }
+                                                    />
+                                                ) : null}
+                                            </>
+                                        ) : (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setSelectMode(true);
+                                                        setSelectedIds(new Set());
+                                                    }}
+                                                    className="min-h-9 rounded-md border border-accent bg-accent-soft px-2.5 font-mono text-xs font-medium tracking-wide text-accent uppercase hover:bg-accent/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+                                                    {t('select_due')}
+                                                </button>
+                                                <ConfirmActionButton
+                                                    size="sm"
+                                                    variant="secondary"
+                                                    label={t('mark_all_due')}
+                                                    confirmLabel={t('mark_all_due_confirm', {
+                                                        count: dueIds.length,
+                                                    })}
+                                                    pending={markPaidMutation.isPending}
+                                                    onConfirm={() =>
+                                                        markPaidMutation.mutate(dueIds)
+                                                    }
+                                                />
+                                            </>
+                                        )
                                     ) : null}
                                     <span className="font-mono text-sm text-fg-secondary">
                                         {formatMoney(outTotal)}
@@ -459,48 +493,103 @@ export function FixedCostsPageClient() {
                                             openJarKeys.size === 0
                                                 ? true
                                                 : openJarKeys.has(group.jar.key);
+                                        const groupDueIds = group.items
+                                            .filter(item => {
+                                                if (!fixedCostAppliesAsOf(item, asOf)) return false;
+                                                return (
+                                                    fixedCostStatus(
+                                                        item,
+                                                        settlementById.get(item.id),
+                                                        period
+                                                    ) === FixedCostPeriodStatus.DUE
+                                                );
+                                            })
+                                            .map(item => item.id);
+                                        const groupAllSelected =
+                                            groupDueIds.length > 0 &&
+                                            groupDueIds.every(id => selectedIds.has(id));
+                                        const groupSomeSelected =
+                                            groupDueIds.some(id => selectedIds.has(id)) &&
+                                            !groupAllSelected;
                                         return (
                                             <div key={group.jar.key}>
-                                                <button
-                                                    type="button"
-                                                    aria-expanded={open}
-                                                    onClick={() =>
-                                                        setOpenJarKeys(previous => {
-                                                            const baseline =
-                                                                previous.size === 0
-                                                                    ? new Set(
-                                                                          groupedFixedCosts.map(
-                                                                              row => row.jar.key
-                                                                          )
-                                                                      )
-                                                                    : new Set(previous);
-                                                            if (baseline.has(group.jar.key)) {
-                                                                baseline.delete(group.jar.key);
-                                                            } else {
-                                                                baseline.add(group.jar.key);
+                                                <div className="flex w-full items-center border-b border-line bg-raised/60">
+                                                    {selectMode && groupDueIds.length > 0 ? (
+                                                        <button
+                                                            type="button"
+                                                            data-mutate
+                                                            role="checkbox"
+                                                            aria-checked={
+                                                                groupAllSelected
+                                                                    ? true
+                                                                    : groupSomeSelected
+                                                                      ? 'mixed'
+                                                                      : false
                                                             }
-                                                            return baseline;
-                                                        })
-                                                    }
-                                                    className="flex w-full items-center justify-between gap-3 border-b border-line bg-raised/60 px-5 py-2 text-left hover:bg-raised">
-                                                    <JarBadge
-                                                        jarKey={group.jar.key}
-                                                        name={group.jar.name}
-                                                        icon={group.jar.icon}
-                                                    />
-                                                    <span className="flex items-center gap-2">
-                                                        <span className="font-mono text-[11px] text-fg-faint">
-                                                            {formatMoney(-Math.abs(group.monthly))}
-                                                        </span>
-                                                        <span
+                                                            aria-label={t('select_group_due')}
+                                                            onClick={() =>
+                                                                toggleGroupDue(groupDueIds)
+                                                            }
                                                             className={cn(
-                                                                'text-xs text-fg-faint transition-transform duration-200',
-                                                                open && 'rotate-180'
+                                                                'ml-5 grid size-6 shrink-0 place-items-center rounded-full border-2 transition-colors',
+                                                                'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
+                                                                groupAllSelected
+                                                                    ? 'border-accent bg-accent text-on-accent'
+                                                                    : groupSomeSelected
+                                                                      ? 'border-accent bg-accent/20 text-accent dark:bg-accent dark:text-on-accent'
+                                                                      : 'border-fg-muted bg-surface text-transparent hover:border-accent'
                                                             )}>
-                                                            ▾
+                                                            <Icon name="check" size="sm" />
+                                                        </button>
+                                                    ) : null}
+                                                    <button
+                                                        type="button"
+                                                        aria-expanded={open}
+                                                        onClick={() =>
+                                                            setOpenJarKeys(previous => {
+                                                                const baseline =
+                                                                    previous.size === 0
+                                                                        ? new Set(
+                                                                              groupedFixedCosts.map(
+                                                                                  row => row.jar.key
+                                                                              )
+                                                                          )
+                                                                        : new Set(previous);
+                                                                if (baseline.has(group.jar.key)) {
+                                                                    baseline.delete(group.jar.key);
+                                                                } else {
+                                                                    baseline.add(group.jar.key);
+                                                                }
+                                                                return baseline;
+                                                            })
+                                                        }
+                                                        className={cn(
+                                                            'flex min-w-0 flex-1 items-center justify-between gap-3 py-2 text-left hover:bg-raised',
+                                                            selectMode && groupDueIds.length > 0
+                                                                ? 'pr-5 pl-3'
+                                                                : 'px-5'
+                                                        )}>
+                                                        <JarBadge
+                                                            jarKey={group.jar.key}
+                                                            name={group.jar.name}
+                                                            icon={group.jar.icon}
+                                                        />
+                                                        <span className="flex items-center gap-2">
+                                                            <span className="font-mono text-[11px] text-fg-faint">
+                                                                {formatMoney(
+                                                                    -Math.abs(group.monthly)
+                                                                )}
+                                                            </span>
+                                                            <span
+                                                                className={cn(
+                                                                    'text-xs text-fg-faint transition-transform duration-200',
+                                                                    open && 'rotate-180'
+                                                                )}>
+                                                                ▾
+                                                            </span>
                                                         </span>
-                                                    </span>
-                                                </button>
+                                                    </button>
+                                                </div>
                                                 {open
                                                     ? group.items.map(fixedCost => {
                                                           const company =
@@ -535,6 +624,11 @@ export function FixedCostsPageClient() {
                                                           const linkedTx = settlement?.transactionId
                                                               ? txById.get(settlement.transactionId)
                                                               : undefined;
+                                                          const isDue =
+                                                              status === FixedCostPeriodStatus.DUE;
+                                                          const isSelected = selectedIds.has(
+                                                              fixedCost.id
+                                                          );
                                                           return (
                                                               <MoneyPartyRow
                                                                   key={fixedCost.id}
@@ -601,21 +695,98 @@ export function FixedCostsPageClient() {
                                                                           ) : null}
                                                                       </>
                                                                   }
-                                                                  href={fixedDetailHref(
-                                                                      fixedCost.id
-                                                                  )}
-                                                                  status={statusControl(status, t, {
-                                                                      canMarkPaid:
-                                                                          canMutate &&
-                                                                          live &&
-                                                                          applies,
-                                                                      pending:
-                                                                          markPaidMutation.isPending,
-                                                                      onMarkPaid: () =>
-                                                                          markPaidMutation.mutate([
-                                                                              fixedCost.id,
-                                                                          ]),
-                                                                  })}
+                                                                  selected={
+                                                                      selectMode && isSelected
+                                                                  }
+                                                                  leading={
+                                                                      selectMode && isDue ? (
+                                                                          <button
+                                                                              type="button"
+                                                                              data-mutate
+                                                                              role="checkbox"
+                                                                              aria-checked={
+                                                                                  isSelected
+                                                                              }
+                                                                              aria-label={`${t('select_due')}: ${company}`}
+                                                                              onClick={() =>
+                                                                                  toggleSelected(
+                                                                                      fixedCost.id
+                                                                                  )
+                                                                              }
+                                                                              className={cn(
+                                                                                  'grid size-6 place-items-center rounded-full border-2 transition-colors',
+                                                                                  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
+                                                                                  isSelected
+                                                                                      ? 'border-accent bg-accent text-on-accent'
+                                                                                      : 'border-fg-muted bg-surface text-transparent hover:border-accent'
+                                                                              )}>
+                                                                              <Icon
+                                                                                  name="check"
+                                                                                  size="sm"
+                                                                              />
+                                                                          </button>
+                                                                      ) : undefined
+                                                                  }
+                                                                  href={
+                                                                      selectMode && isDue
+                                                                          ? undefined
+                                                                          : fixedDetailHref(
+                                                                                fixedCost.id
+                                                                            )
+                                                                  }
+                                                                  onClick={
+                                                                      selectMode && isDue
+                                                                          ? () =>
+                                                                                toggleSelected(
+                                                                                    fixedCost.id
+                                                                                )
+                                                                          : undefined
+                                                                  }
+                                                                  status={
+                                                                      <FixedCostPeriodStatusControl
+                                                                          status={status}
+                                                                          labels={{
+                                                                              taken: t(
+                                                                                  'status_taken'
+                                                                              ),
+                                                                              due: t('status_due'),
+                                                                              skipped:
+                                                                                  t(
+                                                                                      'status_skipped'
+                                                                                  ),
+                                                                              planned:
+                                                                                  t(
+                                                                                      'status_planned'
+                                                                                  ),
+                                                                              markPaidAria:
+                                                                                  t(
+                                                                                      'mark_paid_short'
+                                                                                  ),
+                                                                              markPaidConfirm:
+                                                                                  t(
+                                                                                      'mark_paid_confirm'
+                                                                                  ),
+                                                                              markPaidPending:
+                                                                                  t(
+                                                                                      'mark_paid_pending'
+                                                                                  ),
+                                                                          }}
+                                                                          canMarkPaid={
+                                                                              !selectMode &&
+                                                                              canMutate &&
+                                                                              live &&
+                                                                              applies
+                                                                          }
+                                                                          pending={
+                                                                              markPaidMutation.isPending
+                                                                          }
+                                                                          onMarkPaid={() =>
+                                                                              markPaidMutation.mutate(
+                                                                                  [fixedCost.id]
+                                                                              )
+                                                                          }
+                                                                      />
+                                                                  }
                                                               />
                                                           );
                                                       })
@@ -648,7 +819,7 @@ export function FixedCostsPageClient() {
                                                 className={cn(
                                                     'flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
                                                     on
-                                                        ? 'border-accent/50 bg-accent-soft text-accent'
+                                                        ? 'border-accent bg-accent-soft text-accent'
                                                         : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
                                                 )}>
                                                 <JarMark jarKey={j.key} icon={j.icon} />
@@ -740,7 +911,9 @@ export function FixedCostsPageClient() {
             )}
 
             {tab === 'ERIN' && (
-                <div data-tour="fixed-list" className="grid items-start gap-5 sm:grid-cols-2">
+                <div
+                    data-tour="fixed-list"
+                    className="grid items-start gap-5 sm:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
                     <Card className="p-0">
                         <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
                             <Typography as="span" variant="eyebrow" color="primary">
@@ -790,9 +963,20 @@ export function FixedCostsPageClient() {
                                                 : CREATE_HREF.income
                                         }
                                         status={
-                                            source.applies
-                                                ? null
-                                                : statusControl(FixedCostPeriodStatus.UPCOMING, t)
+                                            source.applies ? null : (
+                                                <FixedCostPeriodStatusControl
+                                                    status={FixedCostPeriodStatus.UPCOMING}
+                                                    labels={{
+                                                        taken: t('status_taken'),
+                                                        due: t('status_due'),
+                                                        skipped: t('status_skipped'),
+                                                        planned: t('status_planned'),
+                                                        markPaidAria: t('mark_paid_short'),
+                                                        markPaidConfirm: t('mark_paid_confirm'),
+                                                        markPaidPending: t('mark_paid_pending'),
+                                                    }}
+                                                />
+                                            )
                                         }
                                     />
                                 );
