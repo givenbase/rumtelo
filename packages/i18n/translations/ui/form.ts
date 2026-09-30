@@ -27,6 +27,8 @@ const form = {
     type_custom_name: 'Type a custom name…',
     name_example: 'e.g. rent',
     no_matches_other: 'No matches — pick Other for a custom name.',
+    no_matches_use_typed: 'Not in the list — you can still use what you typed.',
+    use_typed_name: 'Use “{name}”',
     no_matches_keep_typing: 'No matches — keep typing for a custom name.',
     change: 'Change',
     option_badge_custom: 'Custom',

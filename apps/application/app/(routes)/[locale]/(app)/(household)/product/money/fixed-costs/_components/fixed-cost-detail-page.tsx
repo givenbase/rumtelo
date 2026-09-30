@@ -585,6 +585,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                 jarKey={jar.key}
                                 name={jar.name}
                                 icon={jar.icon}
+                                showIcon={false}
                                 className="border-0 bg-transparent p-0"
                             />
                         </Link>

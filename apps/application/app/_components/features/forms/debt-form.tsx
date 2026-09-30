@@ -17,6 +17,7 @@ import {
     FormSelect,
     FormSelectItem,
     Button,
+    Toggle,
     Typography,
     VendorMark,
     createFormInvalidHandler,
@@ -50,6 +51,7 @@ import { FormDatePicker } from './form-date-picker';
 import { FormInput } from './form-input';
 import { merchantsToNameOptions } from './merchant-name-options';
 import { PresetNameField, type NamePresetOption } from './preset-name-field';
+import { SavePartyToggle } from './save-party-toggle';
 import type { DebtPreset, MerchantPreset } from '@rumtelo/contracts';
 import {
     findByNameOrAlias,
@@ -199,6 +201,7 @@ export function DebtForm({
             maturityOn: defaultValues?.maturityOn ?? '',
             linkFixedCost: defaultValues?.linkFixedCost ?? true,
             kind: defaultValues?.kind ?? DebtKind.LOAN,
+            saveParty: defaultValues?.saveParty ?? true,
         },
         resolver: zodResolver(debtFormSchema),
     });
@@ -287,7 +290,8 @@ export function DebtForm({
             const merchantKey = matchedLender?.key ?? null;
             // Prefer an already-linked party on edit when the lender is free text.
             const partyId = merchantKey || !lenderName ? null : (defaultValues?.partyId ?? null);
-            const saveParty = Boolean(lenderName) && !merchantKey && !partyId;
+            const saveParty =
+                Boolean(lenderName) && !merchantKey && !partyId && (values.saveParty ?? true);
             const presetKeyToSave = presetKey && presetKey !== 'OTHER' ? presetKey : null;
             const dueDay = normalizeDueDay(
                 values.dueDay?.trim() ? Number(values.dueDay) : null,
@@ -407,7 +411,10 @@ export function DebtForm({
     const busy = form.formState.isSubmitting || saveMutation.isPending || removeMutation.isPending;
 
     const selectedLenderName = useWatch({ control: form.control, name: 'name' }) ?? '';
+    const savePartyWatch = useWatch({ control: form.control, name: 'saveParty' }) ?? true;
     const showLenderInput = customLender || lendersForType.length === 0;
+    const freeTypedLender =
+        Boolean(selectedLenderName.trim()) && !findByNameOrAlias(merchants, selectedLenderName);
 
     /** Lender chosen before a type: adopt its debt type when exactly one is linked. */
     function applyDebtType(debtType: DebtPreset) {
@@ -481,6 +488,18 @@ export function DebtForm({
                                         onSelect={applyLenderPick}
                                     />
                                 </FormControl>
+                                {freeTypedLender ? (
+                                    <SavePartyToggle
+                                        name={selectedLenderName}
+                                        checked={savePartyWatch}
+                                        disabled={busy}
+                                        onCheckedChange={next =>
+                                            form.setValue('saveParty', next, {
+                                                shouldDirty: true,
+                                            })
+                                        }
+                                    />
+                                ) : null}
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -577,7 +596,7 @@ export function DebtForm({
                                     onQueryChange={setLenderQuery}
                                     items={lendersForType}
                                     placeholder={tDebt('lender_search')}
-                                    noMatchesLabel={tForm('no_matches')}
+                                    noMatchesLabel={tForm('no_matches_use_typed')}
                                     disabled={busy}
                                     idleLimit={CATALOG_CHIP_IDLE_LIMIT}
                                     selectedKey={
@@ -588,11 +607,14 @@ export function DebtForm({
                                         )?.key ?? null
                                     }
                                     otherLabel={tForm('other')}
-                                    onOther={() => {
+                                    formatTypedLabel={name => tForm('use_typed_name', { name })}
+                                    onOther={typed => {
                                         setCustomLender(true);
-                                        form.setValue('name', '', {
-                                            shouldValidate: false,
+                                        form.setValue('name', typed?.trim() ?? '', {
+                                            shouldValidate: Boolean(typed?.trim()),
+                                            shouldDirty: true,
                                         });
+                                        setLenderQuery('');
                                     }}
                                     renderChip={lender => {
                                         const selected =
@@ -655,6 +677,18 @@ export function DebtForm({
                                                     onSelect={applyLenderPick}
                                                 />
                                             </FormControl>
+                                            {freeTypedLender ? (
+                                                <SavePartyToggle
+                                                    name={selectedLenderName}
+                                                    checked={savePartyWatch}
+                                                    disabled={busy}
+                                                    onCheckedChange={next =>
+                                                        form.setValue('saveParty', next, {
+                                                            shouldDirty: true,
+                                                        })
+                                                    }
+                                                />
+                                            ) : null}
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -907,23 +941,14 @@ export function DebtForm({
                 name="linkFixedCost"
                 render={({ field }) => (
                     <FormItem>
-                        <div className="flex items-start gap-3 rounded-xl border border-line bg-raised px-3 py-3">
-                            <input
-                                id="debt-link-fixed-cost"
-                                type="checkbox"
-                                className="mt-1"
+                        <div className="rounded-xl border border-line bg-raised px-3">
+                            <Toggle
                                 checked={field.value}
-                                onChange={event => field.onChange(event.target.checked)}
+                                onCheckedChange={field.onChange}
                                 disabled={busy}
+                                label={tDebt('link_fixed_title')}
+                                hint={tDebt('link_fixed_body')}
                             />
-                            <label htmlFor="debt-link-fixed-cost" className="cursor-pointer">
-                                <span className="block text-sm font-medium text-fg">
-                                    {tDebt('link_fixed_title')}
-                                </span>
-                                <Typography as="span" variant="caption" className="mt-0.5 block">
-                                    {tDebt('link_fixed_body')}
-                                </Typography>
-                            </label>
                         </div>
                     </FormItem>
                 )}

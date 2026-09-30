@@ -28,11 +28,14 @@ export function ChipSearch({
     onChange,
     placeholder,
     disabled,
+    onSubmit,
 }: {
     value: string;
     onChange: (next: string) => void;
     placeholder: string;
     disabled?: boolean;
+    /** Enter — e.g. commit typed “use this name” when chips have no match. */
+    onSubmit?: () => void;
 }) {
     return (
         <FormInput
@@ -43,6 +46,11 @@ export function ChipSearch({
             aria-label={placeholder}
             autoComplete="off"
             onChange={event => onChange(event.target.value)}
+            onKeyDown={event => {
+                if (event.key !== 'Enter' || !onSubmit) return;
+                event.preventDefault();
+                onSubmit();
+            }}
         />
     );
 }

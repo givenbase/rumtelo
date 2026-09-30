@@ -23,6 +23,7 @@ export class ArchiveController {
                 payload: input.payload,
                 dryRun: input.dryRun,
                 applyJarSplit: input.applyJarSplit,
+                applySettings: input.applySettings,
             })
         );
     }

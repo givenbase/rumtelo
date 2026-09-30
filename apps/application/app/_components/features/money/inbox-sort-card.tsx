@@ -12,6 +12,7 @@ import {
     FormSelect,
     FormSelectItem,
     FORM_SELECT_NONE,
+    Label,
     toFormSelectValue,
     VendorMark,
 } from '@rumtelo/ui';
@@ -302,24 +303,26 @@ export function InboxSortCard({
                             if (event.target.checked) form.setValue('debtId', null);
                         }}
                     />
-                    <label htmlFor="inbox-link-fixed-cost" className="min-w-0 cursor-pointer">
+                    <Label
+                        htmlFor="inbox-link-fixed-cost"
+                        className="min-w-0 cursor-pointer items-start leading-snug">
                         <span className="block font-mono text-[10px] tracking-widest text-fg-muted uppercase">
                             {tSort('link_fixed_cost')}
                         </span>
                         <span className="mt-0.5 block text-sm text-fg">
                             {suggestedFixedCost.counterparty?.trim() || suggestedFixedCost.name}
                         </span>
-                    </label>
+                    </Label>
                 </div>
             ) : null}
 
             {canApplyDebt ? (
                 <div className="grid gap-2">
-                    <label
+                    <Label
                         htmlFor="inbox-apply-debt"
-                        className="font-mono text-[10px] tracking-widest text-fg-muted uppercase">
+                        className="font-mono text-[10px] font-medium tracking-widest text-fg-muted uppercase">
                         {tExpense('apply_to_debt')}
-                    </label>
+                    </Label>
                     <FormSelect
                         value={toFormSelectValue(debtId)}
                         withFormControl={false}

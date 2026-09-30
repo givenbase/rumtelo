@@ -29,10 +29,12 @@ type JarBadgeProps = {
     name?: string | null;
     icon?: string | null;
     className?: string;
+    /** When a parent already draws the jar mark (tinted tile). Default true. */
+    showIcon?: boolean;
 };
 
 /** Jar pill — icon + name (color lives on jar cards / accents, not as a micro-dot). */
-export function JarBadge({ jarKey, name, icon, className }: JarBadgeProps) {
+export function JarBadge({ jarKey, name, icon, className, showIcon = true }: JarBadgeProps) {
     const label = name?.trim();
     if (!label) return null;
 
@@ -42,7 +44,7 @@ export function JarBadge({ jarKey, name, icon, className }: JarBadgeProps) {
                 'inline-flex items-center gap-1.5 rounded-full border border-line-strong bg-surface px-2 py-0.5 font-mono text-[10px] font-medium tracking-wide text-fg-secondary uppercase',
                 className
             )}>
-            <JarMark jarKey={jarKey} icon={icon} />
+            {showIcon ? <JarMark jarKey={jarKey} icon={icon} /> : null}
             {label}
         </span>
     );

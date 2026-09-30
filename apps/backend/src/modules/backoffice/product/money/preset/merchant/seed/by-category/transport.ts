@@ -72,8 +72,9 @@ export const TRANSPORT_MERCHANTS: readonly MerchantSeed[] = [
         mcc: '5541',
         jarKey: necessities,
         categoryTemplateKey: 'TRANSPORT',
-        logoDomain: 'bp.com',
-        website: 'https://bp.com',
+        // www. — bare bp.com resolves to Google's tiny generic globe favicon
+        logoDomain: 'www.bp.com',
+        website: 'https://www.bp.com',
         highlight: null,
         markets: ['NL'],
         matchPriority: 0,
