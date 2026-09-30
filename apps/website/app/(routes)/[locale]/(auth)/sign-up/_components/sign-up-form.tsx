@@ -348,8 +348,8 @@ export function SignUpForm() {
                                             onBlur={field.onBlur}
                                             name={field.name}
                                             disabled={busy}
-                                            placeholder={t('ui.form.pick_a_date')}
                                             locale={locale}
+                                            openCalendarLabel={tForm('aria.open_date_picker')}
                                             labels={{
                                                 previousMonth: tForm('previous_month'),
                                                 nextMonth: tForm('next_month'),
@@ -358,7 +358,6 @@ export function SignUpForm() {
                                                 today: tForm('today'),
                                                 pickADay: tForm('pick_a_day'),
                                             }}
-                                            closeLabel={t('ui.button.actions.close')}
                                         />
                                     </FormControl>
                                     <FormMessage />

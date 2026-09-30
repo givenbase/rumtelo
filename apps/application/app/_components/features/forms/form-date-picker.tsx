@@ -5,7 +5,7 @@ import { FormDatePicker as UiFormDatePicker, type FormDatePickerProps } from '@r
 
 type AppFormDatePickerProps = Omit<
     FormDatePickerProps,
-    'locale' | 'labels' | 'closeLabel' | 'placeholder'
+    'locale' | 'labels' | 'openCalendarLabel' | 'placeholder'
 > & {
     placeholder?: string;
 };
@@ -16,14 +16,14 @@ type AppFormDatePickerProps = Omit<
  */
 export function FormDatePicker({ placeholder, ...props }: AppFormDatePickerProps) {
     const locale = useLocale();
-    const t = useTranslations();
     const tForm = useTranslations('ui.form');
 
     return (
         <UiFormDatePicker
             {...props}
             locale={locale}
-            placeholder={placeholder ?? t('ui.form.pick_a_date')}
+            placeholder={placeholder}
+            openCalendarLabel={tForm('aria.open_date_picker')}
             labels={{
                 previousMonth: tForm('previous_month'),
                 nextMonth: tForm('next_month'),
@@ -32,7 +32,6 @@ export function FormDatePicker({ placeholder, ...props }: AppFormDatePickerProps
                 today: tForm('today'),
                 pickADay: tForm('pick_a_day'),
             }}
-            closeLabel={t('ui.button.actions.close')}
         />
     );
 }
