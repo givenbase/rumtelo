@@ -531,6 +531,18 @@ const money = {
         amount_per_month: '{amount}/mo',
         amount_per_cadence: '{amount} / {cadence}',
     },
+    /** Optional link from a bill / income / one-off to a Growth holding. Jars untouched. */
+    holding_link: {
+        label: 'Part of a holding',
+        hint: 'Optional. Count this toward your company, a property or another holding. The jar stays the same.',
+        none: 'Not part of a holding',
+        locked_eyebrow: 'Holding',
+        locked_hint: 'Counted on this holding',
+        chip_aria: 'Part of holding {name}',
+        filter_eyebrow: 'Showing only',
+        filter_clear: 'Show all',
+        kind_fallback: 'Holding',
+    },
     expense_form: {
         save_in: 'Save in',
         save_out: 'Save out',
@@ -1035,6 +1047,19 @@ const money = {
         review_fixed: 'Review fixed costs',
         open_jar: 'Open Necessities jar',
         raise_income: '+ Raise income',
+    },
+    /**
+     * BUSINESS holding bills still paid from the private account.
+     * Attribution only — jars stay private; Coach steers toward paying from the business.
+     */
+    business_household_leak: {
+        title: 'Business costs in your jars',
+        body: '{amount} p/m of business costs run through your household. Pay them from the business or raise your draw — then only the draw stays in the jars.',
+        body_named:
+            '{amount} p/m for {name} runs through your household. Pay them from the business or raise your draw — then only the draw stays in the jars.',
+        meta: '{count, plural, =1 {1 linked bill} other {{count} linked bills}}',
+        open_holding: 'Open holding',
+        review_bills: 'See linked bills',
     },
     /** Fixed-cost picker filter notice + smart Huishoudprofiel enable toasts. */
     household_profile: {

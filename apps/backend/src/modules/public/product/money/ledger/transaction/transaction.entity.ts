@@ -16,6 +16,7 @@ import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
 import { MerchantPreset } from '../../../../../backoffice/product/money/preset/merchant/merchant.entity';
 import { TransactionInPreset } from '../../../../../backoffice/product/money/preset/transaction-in/transaction-in.entity';
+import { Asset } from '../../../growth/asset/asset.entity';
 import { FixedCost } from '../../plan/fixed-cost/fixed-cost.entity';
 import { Category } from '../../plan/jar/category.entity';
 import { Jar } from '../../plan/jar/jar.entity';
@@ -47,6 +48,7 @@ import { SortRule } from '../sort-rule/sort-rule.entity';
 @Index({ properties: ['fixedCost'] })
 @Index({ properties: ['appliedRule'] })
 @Index({ properties: ['party'] })
+@Index({ properties: ['asset'] })
 // Idempotent imports: the same statement line can never land twice in one household.
 @Unique({ properties: ['household', 'dedupeKey'] })
 @Check({
@@ -117,6 +119,13 @@ export class Transaction extends HouseholdEntity {
     /** Row settles this recurring bill for the booked month. */
     @ManyToOne(() => FixedCost, { nullable: true, deleteRule: 'set null' })
     fixedCost: FixedCost | null = null;
+
+    /**
+     * Holding this one-off belongs to (laptop for the company, tyres for the car).
+     * Inherited from the bill when the row settles one. Attribution only.
+     */
+    @ManyToOne(() => Asset, { mapToPk: true, nullable: true, deleteRule: 'set null' })
+    asset: string | null = null;
 
     /**
      * Rule that auto-sorted this row — keeps the automation visible and undoable.

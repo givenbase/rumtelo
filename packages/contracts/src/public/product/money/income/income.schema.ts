@@ -26,6 +26,11 @@ export const IncomeSource = z.object({
     presetKey: z.string().min(1).max(64).nullable().default(null),
     /** Received from — employer, client, or platform. See `CounterpartyRef` for the three states. */
     ...CounterpartyRef.shape,
+    /**
+     * Growth asset this income comes from (owner's draw from the company, rent from
+     * a property). Attribution only — the split still runs on the jars.
+     */
+    assetId: Id.nullable().default(null),
     kind: z.enum(IncomeKind),
     /** Cached current amount (latest period) — used by jar monthly net. */
     amount: Money,

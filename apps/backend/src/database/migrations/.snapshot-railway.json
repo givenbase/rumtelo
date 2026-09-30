@@ -12201,6 +12201,23 @@
           "enumItems": [],
           "mappedType": "bigint"
         },
+        "asset_id": {
+          "name": "asset_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
         "cadence": {
           "name": "cadence",
           "type": "money_cadence",
@@ -12556,6 +12573,16 @@
       "indexes": [
         {
           "columnNames": [
+            "asset_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "money_fixed_cost_asset_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
             "category_id"
           ],
           "composite": false,
@@ -12631,6 +12658,18 @@
       ],
       "triggers": [],
       "foreignKeys": {
+        "money_fixed_cost_asset_id_foreign": {
+          "columnNames": [
+            "asset_id"
+          ],
+          "constraintName": "money_fixed_cost_asset_id_foreign",
+          "localTableName": "public.money_fixed_cost",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.growth_asset",
+          "deleteRule": "set null"
+        },
         "money_fixed_cost_category_id_foreign": {
           "columnNames": [
             "category_id"
@@ -13649,6 +13688,23 @@
           "enumItems": [],
           "mappedType": "bigint"
         },
+        "asset_id": {
+          "name": "asset_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
         "cadence": {
           "name": "cadence",
           "type": "money_cadence",
@@ -13923,6 +13979,16 @@
       "indexes": [
         {
           "columnNames": [
+            "asset_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "money_income_source_asset_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
             "household_id"
           ],
           "composite": false,
@@ -13968,6 +14034,18 @@
       ],
       "triggers": [],
       "foreignKeys": {
+        "money_income_source_asset_id_foreign": {
+          "columnNames": [
+            "asset_id"
+          ],
+          "constraintName": "money_income_source_asset_id_foreign",
+          "localTableName": "public.money_income_source",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.growth_asset",
+          "deleteRule": "set null"
+        },
         "money_income_source_household_id_foreign": {
           "columnNames": [
             "household_id"
@@ -15580,6 +15658,23 @@
           "enumItems": [],
           "mappedType": "uuid"
         },
+        "asset_id": {
+          "name": "asset_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
         "booked_on": {
           "name": "booked_on",
           "type": "date",
@@ -15921,6 +16016,16 @@
         },
         {
           "columnNames": [
+            "asset_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "money_transaction_asset_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
             "category_id"
           ],
           "composite": false,
@@ -16074,6 +16179,18 @@
             "id"
           ],
           "referencedTableName": "public.money_sort_rule",
+          "deleteRule": "set null"
+        },
+        "money_transaction_asset_id_foreign": {
+          "columnNames": [
+            "asset_id"
+          ],
+          "constraintName": "money_transaction_asset_id_foreign",
+          "localTableName": "public.money_transaction",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.growth_asset",
           "deleteRule": "set null"
         },
         "money_transaction_category_id_foreign": {

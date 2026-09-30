@@ -59,6 +59,7 @@ export class TransactionController {
                 status: input.status,
                 jarId: input.jarId,
                 debtId: input.debtId,
+                assetId: input.assetId,
                 period: input.period,
                 search: input.search,
                 limit: input.limit,
@@ -107,6 +108,7 @@ export class TransactionController {
                 categoryId: input.categoryId,
                 debtId: input.debtId,
                 fixedCostId: input.fixedCostId,
+                assetId: input.assetId,
             })
         );
     }

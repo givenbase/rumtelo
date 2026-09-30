@@ -41,7 +41,13 @@ export const fixedCostSkip = oc.input(SkipFixedCostPeriod).output(FixedCostSettl
 // ====================================================================
 
 export const fixedCostList = oc
-    .input(HouseholdScoped.extend({ direction: z.enum(FlowDirection).nullish() }))
+    .input(
+        HouseholdScoped.extend({
+            direction: z.enum(FlowDirection).nullish(),
+            /** Only bills attributed to this growth asset. */
+            assetId: Id.nullish(),
+        })
+    )
     .output(z.array(FixedCost));
 
 export const fixedCostByJar = oc.input(HouseholdScoped).output(z.array(FixedCostsByJar));

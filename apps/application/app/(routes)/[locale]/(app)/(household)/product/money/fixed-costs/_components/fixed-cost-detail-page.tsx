@@ -45,6 +45,7 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
+import { HoldingChip } from '@/components/features/money/holding-chip';
 import {
     JarBadge,
     MetaChip,
@@ -592,6 +593,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                     ) : jar ? (
                         <JarBadge jarKey={jar.key} name={jar.name} icon={jar.icon} />
                     ) : null}
+                    <HoldingChip assetId={item.assetId} link />
                 </div>
             </Card>
 

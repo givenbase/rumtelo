@@ -3,10 +3,12 @@ import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 
 import { containsWord, endOfPeriodIso } from '@rumtelo/utils';
+import { PlanAccessService } from '../../../../../../common/capability';
 import { apiBadRequest } from '../../../../../../common/errors/api-user-error';
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { MerchantPresetService } from '../../../../../backoffice/product/money/preset/merchant/merchant.service';
+import { resolveAssetLink } from '../../asset-link.util';
 import { Category } from '../../plan/jar/category.entity';
 import { Jar } from '../../plan/jar/jar.entity';
 import { type CounterpartyPatch, PartyService } from '../../plan/party/party.service';
@@ -37,7 +39,8 @@ export class TransactionService {
         @Inject(EntityManager) private readonly em: EntityManager,
         @Inject(SortRuleService) private readonly rules: SortRuleService,
         @Inject(MerchantPresetService) private readonly merchants: MerchantPresetService,
-        @Inject(PartyService) private readonly parties: PartyService
+        @Inject(PartyService) private readonly parties: PartyService,
+        @Inject(PlanAccessService) private readonly planAccess: PlanAccessService
     ) {
         this.transactions = new HouseholdScopedRepository(em, Transaction);
     }
@@ -53,6 +56,7 @@ export class TransactionService {
             categoryId?: string | null;
             debtId?: string | null;
             fixedCostId?: string | null;
+            assetId?: string | null;
             amount: number;
             bookedOn: string;
             description: string;
@@ -70,6 +74,7 @@ export class TransactionService {
         }
         await assertBookedOnPeriodOpen(this.em, input.bookedOn);
         const other = await this.parties.resolveCounterparty(input);
+        const asset = (await resolveAssetLink(this.em, this.planAccess, input.assetId)) ?? null;
         const entity = this.em.create(Transaction, {
             household: currentHouseholdId(),
             account: input.accountId ? this.em.getReference(BankAccount, input.accountId) : null,
@@ -77,6 +82,7 @@ export class TransactionService {
             category: input.categoryId ? this.em.getReference(Category, input.categoryId) : null,
             debt: null,
             fixedCost: null,
+            asset,
             amount: input.amount,
             bookedOn: input.bookedOn,
             description: input.description,
@@ -301,6 +307,7 @@ export class TransactionService {
         status?: string | null;
         jarId?: string | null;
         debtId?: string | null;
+        assetId?: string | null;
         period?: string | null;
         search?: string | null;
         limit: number;
@@ -309,6 +316,7 @@ export class TransactionService {
         if (filter.status) where.status = filter.status;
         if (filter.jarId) where.jar = filter.jarId;
         if (filter.debtId) where.debt = filter.debtId;
+        if (filter.assetId) where.asset = filter.assetId;
 
         if (filter.period) {
             where.bookedOn = {
@@ -444,12 +452,13 @@ export class TransactionService {
             inflowKey?: string | null;
             debtId?: string | null;
             fixedCostId?: string | null;
+            assetId?: string | null;
         }
     ) {
         const entity = await this.transactions.findOneOrFail({ id });
         await this.em.populate(entity, ['debt', 'fixedCost']);
         await assertBookedOnPeriodOpen(this.em, entity.bookedOn);
-        const { categoryId, inflowKey, debtId, fixedCostId, ...fields } = patch;
+        const { categoryId, inflowKey, debtId, fixedCostId, assetId, ...fields } = patch;
 
         if (debtId && fixedCostId) {
             throw new BadRequestException(
@@ -458,6 +467,8 @@ export class TransactionService {
         }
 
         Object.assign(entity, fields);
+        const asset = await resolveAssetLink(this.em, this.planAccess, assetId);
+        if (asset !== undefined) entity.asset = asset;
         if (categoryId !== undefined) {
             entity.category = categoryId ? this.em.getReference(Category, categoryId) : null;
         }
@@ -527,6 +538,7 @@ export function toDto(transaction: Transaction) {
         categoryId: transaction.category?.id ?? null,
         debtId: transaction.debt?.id ?? null,
         fixedCostId: transaction.fixedCost?.id ?? null,
+        assetId: transaction.asset,
         amount: transaction.amount,
         bookedOn: transaction.bookedOn,
         description: transaction.description,

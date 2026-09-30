@@ -28,6 +28,7 @@ import { HouseholdScopedRepository } from '../../../../../common/household/house
 import { HouseholdSettingsService } from '../../../../auth/household/household-settings/household-settings.service';
 import { AccountSettingsService } from '../../../../auth/user/account/account-settings/account-settings.service';
 import { Bank } from '../../../../backoffice/product/money/catalog/bank/bank.entity';
+import { Asset } from '../../growth/asset/asset.entity';
 import { DebtService } from '../targets/debt/debt.service';
 import { GoalService } from '../targets/goal/goal.service';
 import { BankAccountService } from '../ledger/bank-account/bank-account.service';
@@ -261,6 +262,30 @@ export class ArchiveService {
             }
         }
 
+        // Holdings are not restored by the money archive; income / bills relink by
+        // name to a holding this household already has (Max plan only).
+        const canAssets = hasCapability(CAPABILITIES.growthNetWorth, planKey);
+        const localAssets = canAssets ? await this.em.find(Asset, { household: householdId }) : [];
+        const localAssetByName = new Map(
+            localAssets.map(asset => [asset.name.trim().toLowerCase(), asset.id])
+        );
+        const exportAssetName = new Map<string, string>();
+        for (const asset of payload.assets) {
+            if (asset.id) exportAssetName.set(asset.id, asset.name);
+        }
+        const remapAssetId = (row: {
+            assetId?: string | null;
+            assetName?: string | null;
+        }): string | null => {
+            const name =
+                row.assetName?.trim() ||
+                (row.assetId ? exportAssetName.get(row.assetId) : undefined);
+            if (!name) return null;
+            const local = localAssetByName.get(name.toLowerCase()) ?? null;
+            if (!local) warnings.push('asset_link_unmapped');
+            return local;
+        };
+
         const incomeCounts = emptySection();
         const existingIncome = await this.income.list();
         const incomeNames = new Set(existingIncome.map(row => row.name.toLowerCase()));
@@ -279,6 +304,7 @@ export class ArchiveService {
                     merchantKey: row.merchantKey ?? null,
                     // Relink by name when the export marked a saved party.
                     saveParty: Boolean(row.partyName?.trim()),
+                    assetId: remapAssetId(row),
                     kind: row.kind,
                     amount: row.amount,
                     cadence: row.cadence,
@@ -363,6 +389,7 @@ export class ArchiveService {
                     cadence: row.cadence,
                     direction: row.direction,
                     debtId: row.debtId ? (debtIdMap.get(row.debtId) ?? null) : null,
+                    assetId: remapAssetId(row),
                     counterparty: row.counterparty ?? null,
                     dueDay: row.dueDay ?? null,
                     dueMonth: row.dueMonth ?? null,
@@ -492,6 +519,7 @@ export class ArchiveService {
                     category: null,
                     debt: null,
                     fixedCost: null,
+                    asset: null,
                     amount: row.amount,
                     bookedOn: row.bookedOn,
                     description: row.description,

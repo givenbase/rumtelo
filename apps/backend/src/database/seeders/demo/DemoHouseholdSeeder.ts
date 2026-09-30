@@ -406,6 +406,8 @@ export class DemoHouseholdSeeder extends Seeder {
         if (demo.persona === 'max') {
             const assetCount = await em.count(Asset, { household: householdId });
             if (assetCount === 0) this.seedMaxAssets(em, householdId);
+            await em.flush();
+            await this.linkMaxCompanyMoney(em, householdId, jarMap);
         }
 
         if (demo.persona === 'plus' || demo.persona === 'max') {
@@ -1023,6 +1025,42 @@ export class DemoHouseholdSeeder extends Seeder {
         }
     }
 
+    /**
+     * Asset in / out demo: the company draw is the holding's IN, a hosting bill its
+     * OUT. Attribution only — both rows keep their jar. Idempotent on re-seed.
+     */
+    private async linkMaxCompanyMoney(
+        em: EntityManager,
+        householdId: string,
+        jars: JarMap
+    ): Promise<void> {
+        const company = await em.findOne(Asset, { household: householdId, presetKey: 'COMPANY' });
+        if (!company) return;
+
+        const draw = await em.findOne(IncomeSource, {
+            household: householdId,
+            name: 'Studio profit draw',
+        });
+        if (draw && !draw.asset) draw.asset = company.id;
+
+        const hosting = await em.findOne(FixedCost, {
+            household: householdId,
+            name: 'Studio hosting',
+        });
+        if (!hosting) {
+            this.createFixed(em, householdId, jars.necessities, {
+                name: 'Studio hosting',
+                amount: 89,
+                dueDay: 3,
+                counterparty: 'TRANSIP BV',
+                presetKey: 'SOFTWARE_SUITE',
+                assetId: company.id,
+            });
+        } else if (!hosting.asset) {
+            hosting.asset = company.id;
+        }
+    }
+
     private seedMaxBoard(
         em: EntityManager,
         householdId: string,
@@ -1566,6 +1604,8 @@ export class DemoHouseholdSeeder extends Seeder {
             dueDay: number;
             counterparty?: string;
             presetKey?: string;
+            /** Growth holding this bill is attributed to (asset in / out). */
+            assetId?: string;
         }
     ): void {
         em.create(FixedCost, {
@@ -1573,6 +1613,7 @@ export class DemoHouseholdSeeder extends Seeder {
             name: input.name,
             presetKey: input.presetKey ?? null,
             counterparty: input.counterparty ?? null,
+            asset: input.assetId ?? null,
             amount: toMinorUnits(input.amount),
             dueDay: input.dueDay,
             isActive: true,

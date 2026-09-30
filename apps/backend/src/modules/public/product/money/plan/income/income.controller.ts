@@ -26,6 +26,7 @@ export class IncomeController {
                 merchantKey: input.merchantKey,
                 partyId: input.partyId,
                 saveParty: input.saveParty,
+                assetId: input.assetId,
                 kind: input.kind,
                 amount: input.amount,
                 cadence: input.cadence,
@@ -41,10 +42,12 @@ export class IncomeController {
     // ? READ Operations
     // ====================================================================
 
-    /** Return all income sources for the current household. */
+    /** Return income sources for the current household, optionally for one linked asset. */
     @Implement(contract.money.income.list)
     list() {
-        return implement(contract.money.income.list).handler(() => this.income.list());
+        return implement(contract.money.income.list).handler(({ input }) =>
+            this.income.list(input.assetId)
+        );
     }
 
     // ====================================================================

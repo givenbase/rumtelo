@@ -18,7 +18,15 @@ import {
 import { cn, findByNameOrAlias, namesMatch } from '@rumtelo/utils';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { AssetKind, AssetPreset, MerchantPreset } from '@rumtelo/contracts';
+import { useRouter } from 'next/navigation';
+import type {
+    AssetKind,
+    AssetPreset,
+    FixedCost,
+    IncomeSource,
+    MerchantPreset,
+    Transaction,
+} from '@rumtelo/contracts';
 
 import { api } from '@/app/_lib/api';
 import { useApiError } from '@/app/_lib/api-error-messages';
@@ -29,7 +37,9 @@ import {
     filterCarBrands,
     findCarBrand,
 } from '@/app/_lib/car-brands';
+import { assetDetailHref } from '@/app/_lib/create-routes';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
+import { useHoldings } from '@/app/_lib/use-holdings';
 import { isLiveData } from '@/app/_lib/preview';
 import { audienceKeysFromAsset } from '@/app/_lib/household-audience-from-money';
 import { useTranslations } from '@rumtelo/i18n';
@@ -51,6 +61,12 @@ import { ConfirmActionButton } from './confirm-action-button';
 const EMPTY_KINDS: AssetKind[] = [];
 const EMPTY_PRESETS: AssetPreset[] = [];
 const EMPTY_MERCHANTS: MerchantPreset[] = [];
+const EMPTY_INCOME: IncomeSource[] = [];
+const EMPTY_BILLS: FixedCost[] = [];
+const EMPTY_TX_PAGE: { items: Transaction[]; nextCursor: string | null } = {
+    items: [],
+    nextCursor: null,
+};
 
 type AssetFormValues = AssetFormSchemaValues;
 
@@ -83,14 +99,19 @@ export function AssetForm({
 }: AssetFormProps) {
     const t = useTranslations();
     const tAsset = useTranslations('features.growth.asset_form');
+    const tDetail = useTranslations('features.growth.net_worth.detail');
     const tForm = useTranslations('ui.form');
     const tBtn = useTranslations('ui.button.actions');
     const { showToast } = useHouseholdShell();
     const apiError = useApiError();
     const dismiss = useFormDismiss(onSuccess);
+    const router = useRouter();
     const { symbol } = useHouseholdCurrency();
     const { householdId } = useAuth();
     const live = isLiveData(householdId);
+    const { canLink } = useHoldings();
+    // Edit only: what Money already attributes to this holding.
+    const linkedLive = live && canLink && mode === 'edit' && Boolean(entityId);
     const { mergeImplied } = useMergeHouseholdAudiences();
     const queryClient = useQueryClient();
     const [presetKey, setPresetKey] = useState(defaultValues?.presetKey ?? null);
@@ -121,6 +142,31 @@ export function AssetForm({
         EMPTY_MERCHANTS,
         live
     );
+    const linkedIncomeQuery = useLiveQuery(
+        apiQuery.money.income.list.queryOptions({
+            input: { householdId: householdId!, assetId: entityId ?? '' },
+        }),
+        EMPTY_INCOME,
+        linkedLive
+    );
+    const linkedBillsQuery = useLiveQuery(
+        apiQuery.money.fixedCosts.list.queryOptions({
+            input: { householdId: householdId!, assetId: entityId ?? '' },
+        }),
+        EMPTY_BILLS,
+        linkedLive
+    );
+    const linkedTxQuery = useLiveQuery(
+        apiQuery.money.transactions.list.queryOptions({
+            input: { householdId: householdId!, assetId: entityId ?? '', limit: 100 },
+        }),
+        EMPTY_TX_PAGE,
+        linkedLive
+    );
+    const linkedIncomeCount = linkedIncomeQuery.data?.length ?? 0;
+    const linkedBillsCount = linkedBillsQuery.data?.length ?? 0;
+    const linkedTxCount = linkedTxQuery.data?.items.length ?? 0;
+    const hasLinkedMoney = linkedIncomeCount + linkedBillsCount + linkedTxCount > 0;
     const kinds = kindsQuery.data ?? EMPTY_KINDS;
     const presets = presetsQuery.data ?? EMPTY_PRESETS;
     const carBrands = useMemo(
@@ -264,7 +310,7 @@ export function AssetForm({
             }
             return api.growth.assets.create(payload);
         },
-        onSuccess: async (_data, values) => {
+        onSuccess: async (saved, values) => {
             void queryClient.invalidateQueries({ queryKey: apiQuery.growth.assets.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.growth.assets.get.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.growth.dashboard.get.key() });
@@ -286,6 +332,12 @@ export function AssetForm({
                       }),
                 'success'
             );
+            // New holding on a plan that can link money: land on its detail with the
+            // skippable In → Out register instead of bouncing back to the board.
+            if (mode === 'create' && !onSuccess && canLink) {
+                router.replace(assetDetailHref(saved.id, { setup: 'in' }));
+                return;
+            }
             dismiss();
         },
         onError: (error: unknown) => showToast(apiError(error), 'error'),
@@ -300,6 +352,18 @@ export function AssetForm({
             void queryClient.invalidateQueries({ queryKey: apiQuery.growth.assets.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.growth.assets.get.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.growth.dashboard.get.key() });
+            if (hasLinkedMoney) {
+                // FK is `set null` — the money rows stay, their holding chip goes.
+                void queryClient.invalidateQueries({
+                    queryKey: apiQuery.money.income.list.key(),
+                });
+                void queryClient.invalidateQueries({
+                    queryKey: apiQuery.money.fixedCosts.list.key(),
+                });
+                void queryClient.invalidateQueries({
+                    queryKey: apiQuery.money.transactions.list.key(),
+                });
+            }
             showToast(t('common.message.entity.asset_deleted'), 'success');
             dismiss();
         },
@@ -337,15 +401,26 @@ export function AssetForm({
                               : tAsset('save')}
                     </Button>
                     {mode === 'edit' && entityId ? (
-                        <ConfirmActionButton
-                            variant="ghost"
-                            className="w-full text-danger hover:bg-danger/10 hover:text-danger"
-                            disabled={busy}
-                            pending={removeMutation.isPending}
-                            label={tBtn('delete')}
-                            confirmLabel={tForm('confirm_delete')}
-                            onConfirm={() => void removeMutation.mutateAsync()}
-                        />
+                        <>
+                            <ConfirmActionButton
+                                variant="ghost"
+                                className="w-full text-danger hover:bg-danger/10 hover:text-danger"
+                                disabled={busy}
+                                pending={removeMutation.isPending}
+                                label={tBtn('delete')}
+                                confirmLabel={tForm('confirm_delete')}
+                                onConfirm={() => void removeMutation.mutateAsync()}
+                            />
+                            {hasLinkedMoney ? (
+                                <p className="px-1 text-center text-xs text-pretty text-fg-muted">
+                                    {tDetail('delete_linked_warning', {
+                                        income: linkedIncomeCount,
+                                        bills: linkedBillsCount,
+                                        transactions: linkedTxCount,
+                                    })}
+                                </p>
+                            ) : null}
+                        </>
                     ) : null}
                 </div>
             }>
@@ -523,7 +598,12 @@ export function AssetForm({
                 )}
             />
 
-            {picked?.canPay ? (
+            {picked?.canPay && linkedIncomeCount > 0 ? (
+                // Linked income sources are the truth for "in"; `flow` would double count.
+                <p className="text-sm text-pretty text-fg-muted">
+                    {tAsset('flow_from_sources', { count: linkedIncomeCount })}
+                </p>
+            ) : picked?.canPay ? (
                 <FormField
                     control={form.control}
                     name="flow"

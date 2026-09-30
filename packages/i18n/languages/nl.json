@@ -72,6 +72,7 @@
                     "month_close_prior_open": "Sluit eerst {period} — de maanden moeten in volgorde worden afgerond, zodat het logboek een getrouw beeld blijft geven.",
                     "bill_link_outflow": "Koppel een uitgave om een uitgaande vaste last af te rekenen.",
                     "bill_link_inflow": "Koppel een ontvangst om een terugkerend tegoed te verrekenen.",
+                    "asset_not_found": "Dat bezit staat niet in je nettovermogen.",
                     "iban_already_linked": "Dit IBAN-nummer is al aan een rekening gekoppeld.",
                     "account_name_taken": "Er bestaat al een rekening met deze naam.",
                     "bank_not_found": "Die bank staat niet in de catalogus.",
@@ -1387,7 +1388,41 @@
                 "detail": {
                     "loading": "Laden…",
                     "not_found": "Bezit niet gevonden.",
-                    "back": "← Nettovermogen"
+                    "back": "← Nettovermogen",
+                    "in_eyebrow": "In",
+                    "out_eyebrow": "Uit",
+                    "net_eyebrow": "Netto per maand",
+                    "in_from_sources": "Uit {count} gekoppelde {count, plural, =1 {inkomstenbron} other {inkomstenbronnen}}",
+                    "in_from_flow": "Op basis van wat je bij het bezit hebt ingevuld",
+                    "in_none": "Nog niets gekoppeld",
+                    "out_from_bills": "Uit {count} gekoppelde {count, plural, =1 {rekening} other {rekeningen}}",
+                    "out_none": "Geen rekeningen gekoppeld",
+                    "linked_income_heading": "Komt binnen",
+                    "linked_bills_heading": "Gaat eruit",
+                    "linked_recent_heading": "Eenmalig",
+                    "linked_empty_income": "Geen inkomsten gekoppeld aan dit bezit.",
+                    "linked_empty_bills": "Geen rekeningen gekoppeld aan dit bezit.",
+                    "linked_empty_recent": "Nog geen eenmalige transacties.",
+                    "add_income": "+ Inkomsten",
+                    "add_bill": "+ Rekening",
+                    "add_expense": "+ Eenmalig",
+                    "open_in_money": "Openen in Geld →",
+                    "money_note": "Rekeningen en inkomsten blijven in hun eigen pot. Deze pagina laat alleen zien wat bij dit bezit hoort.",
+                    "delete_linked_warning": "Verwijderen ontkoppelt {income} inkomsten, {bills} rekeningen en {transactions} transacties. Ze blijven in Geld staan.",
+                    "coach_business_title": "Zakelijke kosten in je potten",
+                    "coach_business_body": "{amount} p/m voor dit bezit loopt via je huishouden. Betaal ze vanuit het bedrijf of verhoog je onttrekking — dan blijft alleen de onttrekking in de potten."
+                },
+                "setup": {
+                    "eyebrow": "Registreer de stroom",
+                    "step_in_title": "Wat levert {name} op?",
+                    "step_in_body": "Voeg de inkomsten toe die je eruit haalt — salaris, dividend, huur. Het komt net als elk ander inkomen in je potten terecht; dit bezit krijgt alleen de credits.",
+                    "step_out_title": "Wat kost {name} je per maand?",
+                    "step_out_body": "Hosting, verzekering, software — voeg de rekeningen toe die je ervoor betaalt. Elke rekening houdt zijn eigen pot.",
+                    "step_of": "Stap {step} van 2",
+                    "skip": "Overslaan",
+                    "done": "Klaar",
+                    "add_income": "Inkomsten toevoegen",
+                    "add_bill": "Rekeningen toevoegen"
                 }
             },
             "learn": {
@@ -1614,7 +1649,8 @@
                 "search_brand": "Zoek op merk",
                 "more": "Meer",
                 "locked_pension": "Wordt geblokkeerd totdat je stopt met werken. Het telt mee in het totaal, maar niet als maandelijks inkomen.",
-                "locked_default": "Het telt mee in het totaal, maar niet als maandelijks inkomen."
+                "locked_default": "Het telt mee in het totaal, maar niet als maandelijks inkomen.",
+                "flow_from_sources": "Maandinkomen komt uit {count} gekoppelde {count, plural, =1 {inkomstenbron} other {inkomstenbronnen}}. Pas die aan in Geld → Inkomsten."
             }
         },
         "money": {
@@ -2127,6 +2163,17 @@
                 "amount_per_month": "{amount}/maand",
                 "amount_per_cadence": "{amount} / {cadence}"
             },
+            "holding_link": {
+                "label": "Hoort bij een bezit",
+                "hint": "Optioneel. Tel dit mee voor je bedrijf, een pand of een ander bezit. De pot blijft hetzelfde.",
+                "none": "Hoort niet bij een bezit",
+                "locked_eyebrow": "Bezit",
+                "locked_hint": "Wordt hierbij meegeteld",
+                "chip_aria": "Hoort bij bezit {name}",
+                "filter_eyebrow": "Alleen tonen",
+                "filter_clear": "Alles tonen",
+                "kind_fallback": "Bezit"
+            },
             "expense_form": {
                 "save_in": "Opslaan in",
                 "save_out": "Opslaan",
@@ -2609,6 +2656,14 @@
                 "review_fixed": "Vaste kosten herzien",
                 "open_jar": "Open de pot met basisbenodigdheden",
                 "raise_income": "+ Het inkomen verhogen"
+            },
+            "business_household_leak": {
+                "title": "Zakelijke kosten in je potten",
+                "body": "{amount} p/m aan bedrijfskosten lopen via je huishouden. Betaal ze vanuit het bedrijf of verhoog je onttrekking — dan blijft alleen de onttrekking in de potten.",
+                "body_named": "{amount} p/m voor {name} loopt via je huishouden. Betaal ze vanuit het bedrijf of verhoog je onttrekking — dan blijft alleen de onttrekking in de potten.",
+                "meta": "{count, plural, =1 {1 gekoppelde rekening} other {{count} gekoppelde rekeningen}}",
+                "open_holding": "Open bezit",
+                "review_bills": "Bekijk gekoppelde rekeningen"
             },
             "household_profile": {
                 "filter_tip_title": "Rekeninglijst is afgestemd",

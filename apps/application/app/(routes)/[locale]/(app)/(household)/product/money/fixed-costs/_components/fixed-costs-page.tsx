@@ -1,6 +1,8 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 import {
@@ -25,12 +27,22 @@ import {
     monthlyNetAsOf,
     sumMonthlyFixedOut,
     toPeriodKey,
+    evaluateBusinessHouseholdLeak,
 } from '@rumtelo/utils';
 
 import { api } from '@/app/_lib/api';
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
-import { CREATE_HREF, fixedDetailHref, updateHref } from '@/app/_lib/create-routes';
+import {
+    CREATE_HREF,
+    createFixedHref,
+    createIncomeHref,
+    fixedDetailHref,
+    updateHref,
+} from '@/app/_lib/create-routes';
+import { assetIdFromParams } from '@/app/_lib/create-prefill';
+import { productPath } from '@/app/_lib/routes';
+import { useHoldings } from '@/app/_lib/use-holdings';
 import { cadenceLabel } from '@/app/_lib/jar-chrome';
 import {
     fixedCostLifecycle,
@@ -60,9 +72,11 @@ import {
     formatBookedDate,
     formatDueDay,
 } from '@/components/features/money/jar-badge';
+import { HoldingChip } from '@/components/features/money/holding-chip';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { FixedCostPeriodStatusControl } from '@/components/features/money/fixed-cost-period-status';
 import { NecessitiesPressureCard } from '@/components/features/money/necessities-pressure-card';
+import { BusinessHouseholdLeakCard } from '@/components/features/money/business-household-leak-card';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar } from '@/components/layout/list-toolbar';
@@ -79,6 +93,7 @@ type Tab = 'ERUIT' | 'ERIN';
 export function FixedCostsPageClient() {
     const t = useTranslations('features.money.fixed');
     const tChips = useTranslations('features.money.chips');
+    const tHolding = useTranslations('features.money.holding_link');
     const { householdId } = useAuth();
     const { period, showToast } = useHouseholdShell();
     const { canMutate } = useBoardWriteAccess();
@@ -86,7 +101,12 @@ export function FixedCostsPageClient() {
     const apiError = useApiError();
     const queryClient = useQueryClient();
     const appLocale = useLocale();
-    const [tab, setTab] = useState<Tab>('ERUIT');
+    const searchParams = useSearchParams();
+    // `?assetId=` from a holding's detail page: show only what belongs to it.
+    const assetFilter = assetIdFromParams(searchParams) ?? null;
+    const { byId: holdingById, holdings } = useHoldings();
+    const filteredHolding = assetFilter ? holdingById.get(assetFilter) : undefined;
+    const [tab, setTab] = useState<Tab>(searchParams.get('tab') === 'in' ? 'ERIN' : 'ERUIT');
     const [jarFilter, setJarFilter] = useState<JarKey | null>(null);
     const [openJarKeys, setOpenJarKeys] = useState<Set<string>>(() => new Set());
     const [selectMode, setSelectMode] = useState(false);
@@ -203,6 +223,7 @@ export function FixedCostsPageClient() {
                       cadence: source.cadence,
                       kind: source.kind,
                       dueDay: source.expectedDay,
+                      assetId: source.assetId ?? null,
                       applies,
                   };
               })
@@ -222,9 +243,16 @@ export function FixedCostsPageClient() {
     );
     const leftover = NET - outTotal;
     const commitmentRatio = NET > 0 ? Math.round((outTotal / NET) * 100) : 0;
-    const visibleFixedCosts = jarFilter
-        ? fixedCosts.filter(fixedCost => fixedCost.jarKey === jarFilter)
+    // Holding filter narrows the lists only — totals above stay the household's.
+    const holdingFixedCosts = assetFilter
+        ? fixedCosts.filter(fixedCost => fixedCost.assetId === assetFilter)
         : fixedCosts;
+    const visibleFixedCosts = jarFilter
+        ? holdingFixedCosts.filter(fixedCost => fixedCost.jarKey === jarFilter)
+        : holdingFixedCosts;
+    const visibleIncomeSources = assetFilter
+        ? incomeSources.filter(source => source.assetId === assetFilter)
+        : incomeSources;
 
     const groupedFixedCosts = splitJars
         .filter(jar => visibleFixedCosts.some(item => item.jarKey === jar.key))
@@ -256,6 +284,11 @@ export function FixedCostsPageClient() {
         netMonthlyCents: NET,
         fixedOutMonthlyCents: outTotal,
         necessitiesFixedMonthlyCents: necessitiesFixedMonthly,
+    });
+    const businessLeak = evaluateBusinessHouseholdLeak({
+        assets: holdings,
+        bills: applyingFixedCosts,
+        asOf,
     });
 
     const dueIds = applyingFixedCosts
@@ -345,11 +378,34 @@ export function FixedCostsPageClient() {
 
             {/* Doctrine: money README → “When Necessities can’t fit in 55%” */}
             <NecessitiesPressureCard pressure={necessitiesPressure} variant="plan" />
+            <BusinessHouseholdLeakCard leak={businessLeak} />
+
+            {assetFilter && filteredHolding ? (
+                <div className="flex flex-wrap items-center gap-3 rounded-xl border border-accent/40 bg-accent-soft px-4 py-3">
+                    <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
+                        {tHolding('filter_eyebrow')}
+                    </p>
+                    <HoldingChip assetId={assetFilter} link />
+                    <Link
+                        href={productPath('money/fixed-costs')}
+                        className="ml-auto font-mono text-xs tracking-wide text-accent uppercase hover:underline">
+                        {tHolding('filter_clear')}
+                    </Link>
+                </div>
+            ) : null}
 
             <div data-tour="fixed-tabs">
                 <ListToolbar
                     createLabel={tab === 'ERUIT' ? t('add_fixed') : t('add_income')}
-                    createHref={tab === 'ERUIT' ? CREATE_HREF.fixed : CREATE_HREF.income}
+                    createHref={
+                        tab === 'ERUIT'
+                            ? assetFilter
+                                ? createFixedHref({ assetId: assetFilter })
+                                : CREATE_HREF.fixed
+                            : assetFilter
+                              ? createIncomeHref({ assetId: assetFilter })
+                              : CREATE_HREF.income
+                    }
                     secondary={
                         <span
                             className={cn(
@@ -693,6 +749,11 @@ export function FixedCostsPageClient() {
                                                                                   )}
                                                                               </MetaChip>
                                                                           ) : null}
+                                                                          <HoldingChip
+                                                                              assetId={
+                                                                                  fixedCost.assetId
+                                                                              }
+                                                                          />
                                                                       </>
                                                                   }
                                                                   selected={
@@ -925,7 +986,7 @@ export function FixedCostsPageClient() {
                         </div>
 
                         <div className="grid">
-                            {incomeSources.map((source, i) => {
+                            {visibleIncomeSources.map((source, i) => {
                                 const due = formatDueDay(source.dueDay, tChips);
                                 return (
                                     <MoneyPartyRow
@@ -955,6 +1016,7 @@ export function FixedCostsPageClient() {
                                                         })}
                                                     </MetaChip>
                                                 ) : null}
+                                                <HoldingChip assetId={source.assetId} />
                                             </>
                                         }
                                         href={

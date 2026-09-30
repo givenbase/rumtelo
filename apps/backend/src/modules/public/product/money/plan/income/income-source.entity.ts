@@ -8,6 +8,7 @@ import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
 import { IncomeSourcePreset } from '../../../../../backoffice/product/money/preset/income/income.entity';
 import { MerchantPreset } from '../../../../../backoffice/product/money/preset/merchant/merchant.entity';
+import { Asset } from '../../../growth/asset/asset.entity';
 import { Party } from '../party/party.entity';
 
 /**
@@ -23,6 +24,7 @@ import { Party } from '../party/party.entity';
  */
 @Entity(entityConfig({ schema: 'public', domain: 'money', tableName: 'income_source' }))
 @Index({ properties: ['party'] })
+@Index({ properties: ['asset'] })
 @Check({
     name: 'money_income_source_merchant_xor_party',
     expression: '(merchant_key IS NULL) OR (party_id IS NULL)',
@@ -81,6 +83,13 @@ export class IncomeSource extends HouseholdEntity {
      */
     @ManyToOne(() => Party, { mapToPk: true, nullable: true, deleteRule: 'set null' })
     party: string | null = null;
+
+    /**
+     * Holding this income comes from (the company's draw, rent from a property).
+     * Attribution only — the split still runs on the jars. Cleared if the asset goes.
+     */
+    @ManyToOne(() => Asset, { mapToPk: true, nullable: true, deleteRule: 'set null' })
+    asset: string | null = null;
 
     /**
      * Income-type catalog pick — natural-key FK on `IncomeSourcePreset.key`.

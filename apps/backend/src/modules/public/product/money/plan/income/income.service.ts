@@ -3,10 +3,12 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 import { Cadence, type IncomeKind } from '@rumtelo/contracts';
 
+import { PlanAccessService } from '../../../../../../common/capability';
 import { apiBadRequest } from '../../../../../../common/errors/api-user-error';
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { splitByPercentage } from '../../../../../../common/utils/money.util';
+import { resolveAssetLink } from '../../asset-link.util';
 import { GoalService } from '../../targets/goal/goal.service';
 import { JarService } from '../jar/jar.service';
 import { type CounterpartyPatch, PartyService } from '../party/party.service';
@@ -30,7 +32,8 @@ export class IncomeService {
         @Inject(EntityManager) private readonly em: EntityManager,
         @Inject(JarService) private readonly jars: JarService,
         @Inject(PartyService) private readonly parties: PartyService,
-        @Inject(forwardRef(() => GoalService)) private readonly goals: GoalService
+        @Inject(forwardRef(() => GoalService)) private readonly goals: GoalService,
+        @Inject(PlanAccessService) private readonly planAccess: PlanAccessService
     ) {
         this.sources = new HouseholdScopedRepository(em, IncomeSource);
         this.periods = new HouseholdScopedRepository(em, IncomeAmountPeriod);
@@ -51,10 +54,12 @@ export class IncomeService {
             startedOn?: string | null;
             endsOn?: string | null;
             presetKey?: string | null;
+            assetId?: string | null;
         }
     ) {
         const effectiveOn = input.startedOn ?? todayIso();
         const other = await this.parties.resolveCounterparty(input);
+        const asset = (await resolveAssetLink(this.em, this.planAccess, input.assetId)) ?? null;
         const source = this.em.create(IncomeSource, {
             household: currentHouseholdId(),
             name: input.name,
@@ -62,6 +67,7 @@ export class IncomeService {
             counterparty: other.counterparty,
             merchantKey: other.merchantKey,
             party: other.party,
+            asset,
             kind: input.kind as IncomeKind,
             amount: input.amount,
             cadence: (input.cadence as Cadence) ?? Cadence.MONTHLY,
@@ -86,8 +92,8 @@ export class IncomeService {
     // ? READ Operations
     // ====================================================================
 
-    async list() {
-        const rows = await this.sources.find();
+    async list(assetId?: string | null) {
+        const rows = await this.sources.find(assetId ? { asset: assetId } : {});
         const periods = await this.periods.find();
         const bySource = new Map<string, IncomeAmountPeriod[]>();
         for (const period of periods) {
@@ -122,9 +128,12 @@ export class IncomeService {
                 endsOn: string | null;
                 amountEffectiveFrom: string | null;
                 presetKey: string | null;
+                assetId: string | null;
             }>
     ) {
         const source = await this.sources.findOneOrFail({ id });
+        const asset = await resolveAssetLink(this.em, this.planAccess, patch.assetId);
+        if (asset !== undefined) source.asset = asset;
         if (
             (patch.kind !== undefined && (patch.kind as IncomeKind) !== source.kind) ||
             (patch.cadence !== undefined && (patch.cadence as Cadence) !== source.cadence)
@@ -222,6 +231,7 @@ export class IncomeService {
             counterparty: source.counterparty,
             merchantKey: source.merchantKey,
             partyId: source.party,
+            assetId: source.asset,
             kind: source.kind,
             amount: source.amount,
             cadence: source.cadence,

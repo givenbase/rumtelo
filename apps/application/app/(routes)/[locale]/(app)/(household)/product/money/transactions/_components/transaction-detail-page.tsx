@@ -37,6 +37,7 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { findCatalogVendorFromFeed, partyMark } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
+import { HoldingChip } from '@/components/features/money/holding-chip';
 import { JarBadge, MetaChip, formatBookedDate } from '@/components/features/money/jar-badge';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -575,6 +576,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                     {tx.status === TransactionStatus.INBOX ? (
                         <MetaChip>{tTransactions('inbox_chip')}</MetaChip>
                     ) : null}
+                    <HoldingChip assetId={tx.assetId} link />
                 </div>
             </Card>
 

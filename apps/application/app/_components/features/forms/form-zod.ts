@@ -65,6 +65,8 @@ export function createExpenseFormSchema(msg: FormT) {
         note: z.string().max(280),
         jarId: z.string().min(1, msg('validation.choose_jar')),
         label: z.string().max(120),
+        /** Growth holding this one-off belongs to (asset in / out). Jar stays as picked. */
+        assetId: z.string().nullable().optional(),
     });
 }
 
@@ -86,6 +88,8 @@ export function createIncomeFormSchema(msg: FormT) {
         startedOn: z.string().optional(),
         endsOn: z.string().optional(),
         amountEffectiveFrom: z.string().optional(),
+        /** Growth holding this income comes from (asset in). */
+        assetId: z.string().nullable().optional(),
     });
 }
 
@@ -107,6 +111,8 @@ export function createFixedCostFormSchema(msg: FormT) {
             dueMonth: z.string().optional(),
             startedOn: z.string().optional(),
             endsOn: z.string().optional(),
+            /** Growth holding this bill is paid for (asset out). Jar stays as picked. */
+            assetId: z.string().nullable().optional(),
         })
         .superRefine((value, ctx) => {
             refineDueMonthRequired(value.cadence, value.dueMonth, ctx, msg);

@@ -1,13 +1,45 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
+
 import { apiQuery } from '@/app/_lib/api-hooks';
+import { incomePrefillFromParams } from '@/app/_lib/create-prefill';
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
 import { IncomeForm } from '@/components/features/forms/income-form';
 import { useEntityForEdit } from '@/components/features/forms/use-entity-for-edit';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
-export function IncomeCreatePage({ embedded = false }: { embedded?: boolean }) {
-    return <IncomeForm mode="create" embedded={embedded} />;
+export type IncomeCreatePrefill = {
+    /** Growth holding this income comes from — locks the holding picker (asset in). */
+    assetId?: string;
+};
+
+export function IncomeCreatePage({
+    embedded = false,
+    defaultValues,
+}: {
+    embedded?: boolean;
+    defaultValues?: IncomeCreatePrefill;
+}) {
+    return (
+        <IncomeForm
+            mode="create"
+            embedded={embedded}
+            defaultValues={defaultValues?.assetId ? { assetId: defaultValues.assetId } : undefined}
+            lockAsset={Boolean(defaultValues?.assetId)}
+        />
+    );
+}
+
+/** Create page that reads `?assetId=` itself — for server-rendered route shells. */
+export function IncomeCreateFromParams({ embedded = false }: { embedded?: boolean }) {
+    const searchParams = useSearchParams();
+    return (
+        <IncomeCreatePage
+            embedded={embedded}
+            defaultValues={incomePrefillFromParams(searchParams)}
+        />
+    );
 }
 
 export function IncomeUpdatePage({ id, embedded = false }: { id: string; embedded?: boolean }) {
@@ -30,6 +62,7 @@ export function IncomeUpdatePage({ id, embedded = false }: { id: string; embedde
             cadence: row.cadence,
             startedOn: row.startedOn ?? '',
             endsOn: row.endsOn ?? '',
+            assetId: row.assetId ?? null,
         }),
     });
 

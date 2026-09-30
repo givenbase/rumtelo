@@ -16,6 +16,7 @@ import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
 import { FixedCostPreset } from '../../../../../backoffice/product/money/preset/fixed-cost/fixed-cost.entity';
 import { MerchantPreset } from '../../../../../backoffice/product/money/preset/merchant/merchant.entity';
+import { Asset } from '../../../growth/asset/asset.entity';
 import { Debt } from '../../targets/debt/debt.entity';
 import { Category } from '../jar/category.entity';
 import { Jar } from '../jar/jar.entity';
@@ -36,6 +37,7 @@ import { Party } from '../party/party.entity';
 @Index({ properties: ['jar'] })
 @Index({ properties: ['category'] })
 @Index({ properties: ['party'] })
+@Index({ properties: ['asset'] })
 @Check({
     name: 'money_fixed_cost_merchant_xor_party',
     expression: '(merchant_key IS NULL) OR (party_id IS NULL)',
@@ -109,6 +111,13 @@ export class FixedCost extends HouseholdEntity {
     /** Planned payment for a debt — see class-level UNIQUE. Cleared if the debt goes. */
     @ManyToOne(() => Debt, { nullable: true, deleteRule: 'set null' })
     debt: Debt | null = null;
+
+    /**
+     * Holding this bill belongs to (the company, the car) — attribution only.
+     * The bill keeps its jar; deleting the asset clears the link, the bill stays.
+     */
+    @ManyToOne(() => Asset, { mapToPk: true, nullable: true, deleteRule: 'set null' })
+    asset: string | null = null;
 
     /**
      * Household party when the payee is one of their saved names (N:1, optional).

@@ -90,6 +90,15 @@ export const ArchiveJar = z.looseObject({
     percentage: z.number().min(0).max(100),
 });
 
+/**
+ * Growth holding stub — only so money rows can relink by name on restore.
+ * Assets themselves are not restored by the money archive.
+ */
+export const ArchiveAsset = z.looseObject({
+    id: Id.optional(),
+    name: z.string().min(1).max(120),
+});
+
 export const ArchiveIncome = z.looseObject({
     name: z.string().min(1).max(120),
     presetKey: z.string().min(1).max(64).nullish(),
@@ -97,6 +106,10 @@ export const ArchiveIncome = z.looseObject({
     merchantKey: z.string().min(1).max(64).nullish(),
     /** Party display name — restore relinks / saves by name (ids differ per household). */
     partyName: z.string().max(160).nullish(),
+    /** Foreign asset id (JSON export) — resolved via `assets[]` names on restore. */
+    assetId: Id.nullish(),
+    /** Holding display name (CSV export) — relinks to a local asset with that name. */
+    assetName: z.string().max(120).nullish(),
     kind: z.enum(IncomeKind),
     amount: Money,
     cadence: z.enum(Cadence).optional(),
@@ -115,6 +128,10 @@ export const ArchiveFixedCost = z.looseObject({
     cadence: z.enum(Cadence).optional(),
     direction: z.enum(FlowDirection).optional(),
     debtId: Id.nullish(),
+    /** Foreign asset id (JSON export) — resolved via `assets[]` names on restore. */
+    assetId: Id.nullish(),
+    /** Holding display name (CSV export) — relinks to a local asset with that name. */
+    assetName: z.string().max(120).nullish(),
     counterparty: z.string().max(160).nullish(),
     dueDay: z.int().min(1).max(31).nullish(),
     dueMonth: z.int().min(1).max(12).nullish(),
@@ -186,6 +203,8 @@ export const ArchiveRestorePayload = z.object({
     parties: z.array(ArchiveParty).default([]),
     accounts: z.array(ArchiveBankAccount).default([]),
     jars: z.array(ArchiveJar).default([]),
+    /** Holding names only — used to relink income / bills; not restored. */
+    assets: z.array(ArchiveAsset).default([]),
     income: z.array(ArchiveIncome).default([]),
     fixedCosts: z.array(ArchiveFixedCost).default([]),
     debts: z.array(ArchiveDebt).default([]),
@@ -230,6 +249,7 @@ export const ArchiveRestoreResult = z.object({
 export type ArchiveHouseholdSettings = z.infer<typeof ArchiveHouseholdSettings>;
 export type ArchiveAccountSettings = z.infer<typeof ArchiveAccountSettings>;
 export type ArchiveParty = z.infer<typeof ArchiveParty>;
+export type ArchiveAsset = z.infer<typeof ArchiveAsset>;
 export type ArchiveBankAccount = z.infer<typeof ArchiveBankAccount>;
 export type ArchiveRestorePayload = z.infer<typeof ArchiveRestorePayload>;
 export type ArchiveRestoreInput = z.infer<typeof ArchiveRestoreInput>;

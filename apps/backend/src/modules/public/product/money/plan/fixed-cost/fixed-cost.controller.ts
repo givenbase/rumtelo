@@ -22,6 +22,8 @@ export class FixedCostController {
             this.fixedCosts.create({
                 jarId: input.jarId,
                 categoryId: input.categoryId,
+                debtId: input.debtId,
+                assetId: input.assetId,
                 name: input.name,
                 presetKey: input.presetKey,
                 counterparty: input.counterparty,
@@ -72,11 +74,11 @@ export class FixedCostController {
     // ? READ Operations
     // ====================================================================
 
-    /** List fixed costs, optionally filtered by direction. */
+    /** List fixed costs, optionally filtered by direction and/or linked asset. */
     @Implement(contract.money.fixedCosts.list)
     list() {
         return implement(contract.money.fixedCosts.list).handler(({ input }) =>
-            this.fixedCosts.list(input.direction)
+            this.fixedCosts.list(input.direction, input.assetId)
         );
     }
 

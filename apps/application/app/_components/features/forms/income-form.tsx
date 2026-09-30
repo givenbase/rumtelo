@@ -43,6 +43,7 @@ import { ConfirmActionButton } from './confirm-action-button';
 import { createIncomeFormSchema, type IncomeFormSchemaValues } from './form-zod';
 import { FormDatePicker } from './form-date-picker';
 import { FormInput } from './form-input';
+import { HoldingField } from './holding-field';
 import { merchantsToNameOptions } from './merchant-name-options';
 import { PartyField } from './party-field';
 import { partiesToNameOptions } from './party-name-options';
@@ -62,6 +63,8 @@ export type IncomeFormValues = IncomeFormSchemaValues;
 type IncomeFormProps = {
     defaultValues?: Partial<IncomeFormValues> & { presetKey?: string | null };
     periods?: IncomeAmountPeriod[];
+    /** Opened from a holding (`?assetId=`): the holding is shown, not editable. */
+    lockAsset?: boolean;
     embedded?: boolean;
     mode?: 'create' | 'edit';
     entityId?: string;
@@ -77,6 +80,7 @@ function todayIso(): string {
 export function IncomeForm({
     defaultValues,
     periods = EMPTY_PERIODS,
+    lockAsset = false,
     embedded = true,
     mode = 'create',
     entityId,
@@ -220,10 +224,12 @@ export function IncomeForm({
             startedOn: defaultValues?.startedOn ?? periodDefaultDate,
             endsOn: defaultValues?.endsOn ?? '',
             amountEffectiveFrom: defaultValues?.amountEffectiveFrom ?? periodDefaultDate,
+            assetId: defaultValues?.assetId ?? null,
         },
         resolver: zodResolver(incomeFormSchema),
     });
 
+    const watchedAssetId = useWatch({ control: form.control, name: 'assetId' }) ?? null;
     const watchedMerchantKey = useWatch({ control: form.control, name: 'merchantKey' }) ?? '';
     const watchedPartyId = useWatch({ control: form.control, name: 'partyId' }) ?? '';
     const watchedSaveParty = useWatch({ control: form.control, name: 'saveParty' }) ?? true;
@@ -240,6 +246,7 @@ export function IncomeForm({
 
     const invalidateIncome = () => {
         void queryClient.invalidateQueries({ queryKey: apiQuery.money.income.list.key() });
+        void queryClient.invalidateQueries({ queryKey: apiQuery.growth.dashboard.get.key() });
         void queryClient.invalidateQueries({ queryKey: apiQuery.money.parties.list.key() });
         void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
         void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
@@ -281,6 +288,7 @@ export function IncomeForm({
                     endsOn,
                     amountEffectiveFrom:
                         values.amountEffectiveFrom?.slice(0, 10) || periodDefaultDate,
+                    assetId: values.assetId ?? null,
                 });
             }
             const startedOn = values.startedOn?.trim()
@@ -301,6 +309,7 @@ export function IncomeForm({
                 isActive: true,
                 startedOn,
                 endsOn,
+                assetId: values.assetId ?? null,
             });
         },
         onSuccess: () => {
@@ -493,6 +502,13 @@ export function IncomeForm({
                         <FormMessage />
                     </FormItem>
                 )}
+            />
+
+            <HoldingField
+                value={watchedAssetId}
+                locked={lockAsset}
+                disabled={busy}
+                onChange={next => form.setValue('assetId', next, { shouldDirty: true })}
             />
 
             <FormField

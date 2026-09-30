@@ -36,6 +36,7 @@ export function FixedCostCreatePage({
             defaultOrgKey={orgKey ?? null}
             defaultMerchantKey={merchantKey ?? null}
             linkTransactionId={transactionId ?? null}
+            lockAsset={Boolean(formDefaults.assetId)}
         />
     );
 }
@@ -60,6 +61,7 @@ export function FixedCostUpdatePage({ id, embedded = false }: { id: string; embe
             dueMonth: row.dueMonth !== null ? String(row.dueMonth) : '',
             startedOn: row.startedOn ?? '',
             endsOn: row.endsOn ?? '',
+            assetId: row.assetId ?? null,
         }),
     });
 

@@ -3,6 +3,7 @@
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSearchParams } from 'next/navigation';
 import { useDeferredValue, useMemo, useState } from 'react';
 
 import { useLiveQuery } from '@rumtelo/hooks';
@@ -26,6 +27,8 @@ import {
 
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { CREATE_HREF, createTxHref, txDetailHref } from '@/app/_lib/create-routes';
+import { assetIdFromParams } from '@/app/_lib/create-prefill';
+import { productPath } from '@/app/_lib/routes';
 import { suggestFixedCostForTx } from '@/app/_lib/fixed-cost-match';
 import { buildPayeeJarMemory, suggestInboxJar } from '@/app/_lib/inbox-suggest';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
@@ -34,6 +37,7 @@ import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { partyMark, findCatalogMerchantFromFeed } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
+import { HoldingChip } from '@/components/features/money/holding-chip';
 import { InboxSortCard } from '@/components/features/money/inbox-sort-card';
 import {
     JarBadge,
@@ -112,6 +116,10 @@ const EXPLICIT_RULE_PRIORITY_MAX = 500;
 
 export function TransactionsPageClient() {
     const t = useTranslations('features.money.transactions');
+    const tHolding = useTranslations('features.money.holding_link');
+    const searchParams = useSearchParams();
+    // `?assetId=` from a holding's detail page: only its one-offs.
+    const assetFilter = assetIdFromParams(searchParams) ?? null;
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { showToast, period } = useHouseholdShell();
@@ -146,6 +154,7 @@ export function TransactionsPageClient() {
                 period: periodKey,
                 search: deferredSearch || undefined,
                 jarId: jarFilter === 'all' ? undefined : jarFilter,
+                assetId: assetFilter ?? undefined,
             },
         }),
         EMPTY_TRANSACTION_PAGE,
@@ -393,9 +402,26 @@ export function TransactionsPageClient() {
                 </Typography>
             </div>
 
+            {assetFilter ? (
+                <div className="flex flex-wrap items-center gap-3 rounded-xl border border-accent/40 bg-accent-soft px-4 py-3">
+                    <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
+                        {tHolding('filter_eyebrow')}
+                    </p>
+                    <HoldingChip assetId={assetFilter} link />
+                    <Link
+                        href={productPath('money/transactions')}
+                        className="ml-auto font-mono text-xs tracking-wide text-accent uppercase hover:underline">
+                        {tHolding('filter_clear')}
+                    </Link>
+                </div>
+            ) : null}
+
             <ListToolbar
                 createLabel={tab === 'IN' ? t('add_in') : t('add_out')}
-                createHref={createTxHref({ direction: tab === 'IN' ? 'in' : 'out' })}
+                createHref={createTxHref({
+                    direction: tab === 'IN' ? 'in' : 'out',
+                    assetId: assetFilter ?? undefined,
+                })}
                 secondary={
                     live &&
                     canMutate &&
@@ -729,6 +755,7 @@ export function TransactionsPageClient() {
                                                         icon={jar?.icon}
                                                     />
                                                 )}
+                                                <HoldingChip assetId={transaction.assetId} />
                                             </>
                                         }
                                         href={txDetailHref(transaction.id)}

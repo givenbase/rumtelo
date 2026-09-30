@@ -281,6 +281,7 @@ export function archivePayloadFromCsvSheets(files: Map<string, string>): Payload
                 counterparty: row.counterparty || null,
                 merchantKey: row.merchantKey || null,
                 partyName: row.partyName || null,
+                assetName: row.assetName || null,
                 kind: enumOr(row.kind, Object.values(IncomeKind), IncomeKind.SALARY),
                 amount,
                 cadence: row.cadence
@@ -310,6 +311,7 @@ export function archivePayloadFromCsvSheets(files: Map<string, string>): Payload
                     ? enumOr(row.direction, Object.values(FlowDirection), FlowDirection.OUT)
                     : undefined,
                 debtId: row.debtId || null,
+                assetName: row.assetName || null,
                 counterparty: row.counterparty || null,
                 isActive: asBool(row.isActive),
             };
