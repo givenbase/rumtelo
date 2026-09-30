@@ -41,10 +41,11 @@ export function ExportSettings() {
     const periodKey = toPeriodKey(period.year, period.month);
     const includeDebts = hasCapability(CAPABILITIES.moneyDebt);
     const includeGoals = hasCapability(CAPABILITIES.growthGoals);
-    const exportAccess: HouseholdExportAccess = { includeDebts, includeGoals };
+    const includeAssets = hasCapability(CAPABILITIES.growthNetWorth);
+    const exportAccess: HouseholdExportAccess = { includeDebts, includeGoals, includeAssets };
     const previewKey =
         live && householdId && planReady
-            ? `${householdId}:${includeDebts ? 1 : 0}:${includeGoals ? 1 : 0}`
+            ? `${householdId}:${includeDebts ? 1 : 0}:${includeGoals ? 1 : 0}:${includeAssets ? 1 : 0}`
             : null;
 
     const [preview, setPreview] = useState<{
@@ -66,6 +67,7 @@ export function ExportSettings() {
                 const next = await fetchHouseholdExportBundle(householdId, {
                     includeDebts,
                     includeGoals,
+                    includeAssets,
                 });
                 if (!canceled) {
                     setPreview({ key: previewKey, bundle: next, failed: false });
@@ -79,7 +81,7 @@ export function ExportSettings() {
         return () => {
             canceled = true;
         };
-    }, [previewKey, householdId, includeDebts, includeGoals]);
+    }, [previewKey, householdId, includeDebts, includeGoals, includeAssets]);
 
     async function ensureBundle(): Promise<HouseholdExportBundle | null> {
         if (!householdId || !planReady || !previewKey) return null;

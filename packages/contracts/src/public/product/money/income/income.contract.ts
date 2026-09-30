@@ -24,7 +24,14 @@ export const incomeCreate = oc
 // ? READ Operations
 // ====================================================================
 
-export const incomeList = oc.input(HouseholdScoped).output(z.array(IncomeSource));
+export const incomeList = oc
+    .input(
+        HouseholdScoped.extend({
+            /** Only sources attributed to this growth asset. */
+            assetId: Id.nullish(),
+        })
+    )
+    .output(z.array(IncomeSource));
 
 // ====================================================================
 // ? UPDATE Operations

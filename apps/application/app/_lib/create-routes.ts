@@ -38,6 +38,8 @@ export function createTxHref(opts?: {
     categoryKey?: string;
     /** Display-name fallback only when no catalog key. */
     counterparty?: string;
+    /** Growth holding this one-off belongs to — locks the holding picker. */
+    assetId?: string;
 }) {
     const params = new URLSearchParams();
     if (opts?.jarId) params.set('jarId', opts.jarId);
@@ -47,8 +49,17 @@ export function createTxHref(opts?: {
     if (opts?.counterparty && !opts?.merchantKey) {
         params.set('counterparty', opts.counterparty);
     }
+    if (opts?.assetId) params.set('assetId', opts.assetId);
     const qs = params.toString();
     return qs ? `${CREATE_HREF.tx}?${qs}` : CREATE_HREF.tx;
+}
+
+/** Open the income form; a holding locks the “Part of a holding” picker (asset in). */
+export function createIncomeHref(opts?: { assetId?: string }) {
+    const params = new URLSearchParams();
+    if (opts?.assetId) params.set('assetId', opts.assetId);
+    const qs = params.toString();
+    return qs ? `${CREATE_HREF.income}?${qs}` : CREATE_HREF.income;
 }
 
 /** Open the fixed-cost form pre-filled — used by the Give helper on Soul → Giving. */
@@ -71,9 +82,12 @@ export function createFixedHref(opts?: {
     dueDay?: number | string;
     /** After create, link this transaction as settlement for the new bill. */
     transactionId?: string;
+    /** Growth holding this bill is paid for — locks the holding picker (asset out). */
+    assetId?: string;
 }) {
     const params = new URLSearchParams();
     if (opts?.jarId) params.set('jarId', opts.jarId);
+    if (opts?.assetId) params.set('assetId', opts.assetId);
     if (opts?.orgKey) params.set('orgKey', opts.orgKey);
     if (opts?.merchantKey) params.set('merchantKey', opts.merchantKey);
     // Name only when we have no stable key (manual / legacy links).
@@ -162,6 +176,20 @@ export function goalDetailHref(id: string) {
 }
 
 /** Open asset detail (value, monthly pay, class). Edit stays on update. */
-export function assetDetailHref(id: string) {
-    return productPath(`growth/net-worth/${id}`);
+export function assetDetailHref(id: string, opts?: { setup?: 'in' | 'out' }) {
+    const base = productPath(`growth/net-worth/${id}`);
+    return opts?.setup ? `${base}?setup=${opts.setup}` : base;
+}
+
+/** Geld → Fixed costs filtered to one holding (bills + income). */
+export function fixedCostsForAssetHref(assetId: string, tab?: 'out' | 'in') {
+    const params = new URLSearchParams({ assetId });
+    if (tab) params.set('tab', tab);
+    return `${productPath('money/fixed-costs')}?${params.toString()}`;
+}
+
+/** Geld → Transactions filtered to one holding. */
+export function transactionsForAssetHref(assetId: string) {
+    const params = new URLSearchParams({ assetId });
+    return `${productPath('money/transactions')}?${params.toString()}`;
 }

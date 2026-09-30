@@ -28,6 +28,11 @@ export const FixedCost = z.object({
      * (one fixed cost per debt). Does not reduce the debt balance on its own.
      */
     debtId: Id.nullable().default(null),
+    /**
+     * Growth asset this bill belongs to (the company, the car). Attribution only —
+     * the bill keeps its jar. Null when it is plain household spend.
+     */
+    assetId: Id.nullable().default(null),
     name: z.string().min(1).max(120),
     /** FixedCostPreset.key when picked from the catalog. Null when free-typed. */
     presetKey: z.string().min(1).max(64).nullable().default(null),

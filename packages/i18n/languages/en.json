@@ -72,6 +72,8 @@
                     "month_close_prior_open": "Close {period} first — months must be finished in order so the log stays honest.",
                     "bill_link_outflow": "Link an outflow to settle an outgoing bill.",
                     "bill_link_inflow": "Link an inflow to settle a recurring credit.",
+                    "asset_not_found": "That holding is not in your net worth.",
+                    "bank_account_not_found": "That bank account is not in this household.",
                     "iban_already_linked": "This IBAN is already linked to an account.",
                     "account_name_taken": "An account with this name already exists.",
                     "bank_not_found": "That bank is not in the catalog.",
@@ -1387,7 +1389,41 @@
                 "detail": {
                     "loading": "Loading…",
                     "not_found": "Asset not found.",
-                    "back": "← Net worth"
+                    "back": "← Net worth",
+                    "in_eyebrow": "In",
+                    "out_eyebrow": "Out",
+                    "net_eyebrow": "Net per month",
+                    "in_from_sources": "From {count} linked income {count, plural, =1 {source} other {sources}}",
+                    "in_from_flow": "From what you entered on the asset",
+                    "in_none": "Nothing linked yet",
+                    "out_from_bills": "From {count} linked {count, plural, =1 {bill} other {bills}}",
+                    "out_none": "No bills linked",
+                    "linked_income_heading": "Comes in",
+                    "linked_bills_heading": "Goes out",
+                    "linked_recent_heading": "One-offs",
+                    "linked_empty_income": "No income linked to this holding.",
+                    "linked_empty_bills": "No bills linked to this holding.",
+                    "linked_empty_recent": "No one-off transactions yet.",
+                    "add_income": "+ Income",
+                    "add_bill": "+ Bill",
+                    "add_expense": "+ One-off",
+                    "open_in_money": "Open in Money →",
+                    "money_note": "Bills and income keep their jar. This page only shows what belongs to this holding.",
+                    "delete_linked_warning": "Deleting unlinks {income} income, {bills} bills and {transactions} transactions. They stay in Money.",
+                    "coach_business_title": "Business costs in your jars",
+                    "coach_business_body": "{amount} p/m for this holding runs through your household. Pay them from the business or raise your draw — then only the draw stays in the jars."
+                },
+                "setup": {
+                    "eyebrow": "Register the flow",
+                    "step_in_title": "What does {name} bring in?",
+                    "step_in_body": "Add the income you draw from it — salary, dividend, rent. It lands in your jars like any other income; this holding just gets the credit.",
+                    "step_out_title": "What does {name} cost you each month?",
+                    "step_out_body": "Hosting, insurance, software — add the bills you pay for it. Each bill keeps its jar.",
+                    "step_of": "Step {step} of 2",
+                    "skip": "Skip",
+                    "done": "Done",
+                    "add_income": "Add income",
+                    "add_bill": "Add bill"
                 }
             },
             "learn": {
@@ -1614,7 +1650,8 @@
                 "search_brand": "Search brand",
                 "more": "More",
                 "locked_pension": "Locked until you stop working. It counts in the total, not as monthly income.",
-                "locked_default": "It counts in the total, not as monthly income."
+                "locked_default": "It counts in the total, not as monthly income.",
+                "flow_from_sources": "Monthly income comes from {count} linked income {count, plural, =1 {source} other {sources}}. Edit those in Money → Income."
             }
         },
         "money": {
@@ -2127,6 +2164,27 @@
                 "amount_per_month": "{amount}/mo",
                 "amount_per_cadence": "{amount} / {cadence}"
             },
+            "holding_link": {
+                "label": "Part of a holding",
+                "hint": "Optional. Count this toward your company, a property or another holding. The jar stays the same.",
+                "none": "Not part of a holding",
+                "locked_eyebrow": "Holding",
+                "locked_hint": "Counted on this holding",
+                "chip_aria": "Part of holding {name}",
+                "filter_eyebrow": "Showing only",
+                "filter_clear": "Show all",
+                "kind_fallback": "Holding"
+            },
+            "deposit_link": {
+                "bank_label": "Bank (optional)",
+                "bank_hint": "Where this income is paid — you can pick the seat later.",
+                "bank_none": "No bank yet",
+                "account_label": "Lands in (optional)",
+                "account_hint": "Checking, savings, or cash seat. Picking one sets the bank.",
+                "account_none": "No account yet",
+                "chip_aria_account": "Lands in {name}",
+                "chip_aria_bank": "Expected at {name}"
+            },
             "expense_form": {
                 "save_in": "Save in",
                 "save_out": "Save out",
@@ -2609,6 +2667,14 @@
                 "review_fixed": "Review fixed costs",
                 "open_jar": "Open Necessities jar",
                 "raise_income": "+ Raise income"
+            },
+            "business_household_leak": {
+                "title": "Business costs in your jars",
+                "body": "{amount} p/m of business costs run through your household. Pay them from the business or raise your draw — then only the draw stays in the jars.",
+                "body_named": "{amount} p/m for {name} runs through your household. Pay them from the business or raise your draw — then only the draw stays in the jars.",
+                "meta": "{count, plural, =1 {1 linked bill} other {{count} linked bills}}",
+                "open_holding": "Open holding",
+                "review_bills": "See linked bills"
             },
             "household_profile": {
                 "filter_tip_title": "Bill list is tailored",

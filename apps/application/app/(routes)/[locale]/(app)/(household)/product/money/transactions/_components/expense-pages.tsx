@@ -44,6 +44,7 @@ export function ExpenseCreatePage({
             embedded={embedded}
             direction={direction}
             lockJar={Boolean(defaultJarId)}
+            lockAsset={Boolean(merged?.assetId)}
             defaultValues={merged}
         />
     );
@@ -91,6 +92,7 @@ export function ExpenseUpdatePage({ id, embedded = false }: { id: string; embedd
             inflowKey: row.inflowKey,
             amount: minorUnitsToAmountInput(Math.abs(row.amount)),
             jarId: row.jarId ?? '',
+            assetId: row.assetId ?? null,
             label:
                 row.amount >= 0
                     ? row.counterparty?.trim() ||

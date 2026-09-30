@@ -72,6 +72,8 @@
                     "month_close_prior_open": "Commencez par fermer {period} — les mois doivent être clôturés dans l'ordre pour que le journal reste fiable.",
                     "bill_link_outflow": "Associez une sortie pour régler une facture.",
                     "bill_link_inflow": "Associer un encaissement pour régler un crédit récurrent.",
+                    "asset_not_found": "Ce titre ne fait pas partie de votre patrimoine.",
+                    "bank_account_not_found": "Ce compte bancaire n'appartient pas à ce foyer.",
                     "iban_already_linked": "Cet IBAN est déjà associé à un compte.",
                     "account_name_taken": "Un compte portant ce nom existe déjà.",
                     "bank_not_found": "Cette banque ne figure pas dans le catalogue.",
@@ -1387,7 +1389,41 @@
                 "detail": {
                     "loading": "Chargement en cours…",
                     "not_found": "Élément introuvable.",
-                    "back": "← Patrimoine net"
+                    "back": "← Patrimoine net",
+                    "in_eyebrow": "Dans",
+                    "out_eyebrow": "Sortie",
+                    "net_eyebrow": "Montant net mensuel",
+                    "in_from_sources": "From {count} linked income {count, plural, =1 {source} other {sources}}",
+                    "in_from_flow": "D'après les informations que vous avez saisies concernant l'actif",
+                    "in_none": "Aucun lien pour l'instant",
+                    "out_from_bills": "From {count} linked {count, plural, =1 {bill} other {bills}}",
+                    "out_none": "Aucune facture associée",
+                    "linked_income_heading": "Disponible en",
+                    "linked_bills_heading": "Sort",
+                    "linked_recent_heading": "Pièces uniques",
+                    "linked_empty_income": "Cette participation ne génère aucun revenu.",
+                    "linked_empty_bills": "Aucun projet de loi n'est lié à cette participation.",
+                    "linked_empty_recent": "Il n'y a pas encore eu de transactions ponctuelles.",
+                    "add_income": "+ Revenus",
+                    "add_bill": "+ Bill",
+                    "add_expense": "+ Ponctuel",
+                    "open_in_money": "Ouvrir dans Money →",
+                    "money_note": "Les factures et les revenus restent dans leur bocal. Cette page ne présente que ce qui appartient à ce fonds.",
+                    "delete_linked_warning": "La suppression des liens entraîne la suppression des liens vers {income} revenus, {bills} factures et {transactions} opérations. Ceux-ci restent enregistrés dans Money.",
+                    "coach_business_title": "Les coûts d'exploitation dans vos bocaux",
+                    "coach_business_body": "{amount} par mois pour cette participation est prélevé sur le budget de votre foyer. Versez-le depuis l'entreprise ou augmentez votre prélèvement — ainsi, seul ce prélèvement restera dans les bocaux."
+                },
+                "setup": {
+                    "eyebrow": "Enregistrer le flux",
+                    "step_in_title": "Qu'est-ce que {name} apporte ?",
+                    "step_in_body": "Ajoutez-y les revenus que vous en tirez : salaire, dividendes, loyers. Ils atterrissent dans vos « bocaux » comme n'importe quel autre revenu ; c'est simplement ce placement qui en retire le mérite.",
+                    "step_out_title": "Combien vous coûte {name} chaque mois ?",
+                    "step_out_body": "Hébergement, assurance, logiciels… ajoutez-y les factures que vous payez pour ces services. Chaque facture reste dans son pot.",
+                    "step_of": "Étape {step} sur 2",
+                    "skip": "Passer",
+                    "done": "Terminé",
+                    "add_income": "Ajouter un revenu",
+                    "add_bill": "Ajouter une facture"
                 }
             },
             "learn": {
@@ -1614,7 +1650,8 @@
                 "search_brand": "Rechercher une marque",
                 "more": "Plus",
                 "locked_pension": "Bloqué jusqu'à ce que vous cessiez de travailler. Ce montant est pris en compte dans le total, mais pas dans le revenu mensuel.",
-                "locked_default": "Ce montant est pris en compte dans le total, mais pas dans le revenu mensuel."
+                "locked_default": "Ce montant est pris en compte dans le total, mais pas dans le revenu mensuel.",
+                "flow_from_sources": "Monthly income comes from {count} linked income {count, plural, =1 {source} other {sources}}. Edit those in Money → Income."
             }
         },
         "money": {
@@ -2127,6 +2164,27 @@
                 "amount_per_month": "{amount} par mois",
                 "amount_per_cadence": "{amount} / {cadence}"
             },
+            "holding_link": {
+                "label": "Fait partie d'un groupe",
+                "hint": "Facultatif. Comptez-le dans le total de votre entreprise, d'un bien immobilier ou d'une autre participation. Le bocal reste le même.",
+                "none": "Ne fait pas partie d'un groupe",
+                "locked_eyebrow": "Détention",
+                "locked_hint": "Pris en compte dans ce portefeuille",
+                "chip_aria": "Fait partie du portefeuille {name}",
+                "filter_eyebrow": "Afficher uniquement",
+                "filter_clear": "Tout afficher",
+                "kind_fallback": "Détention"
+            },
+            "deposit_link": {
+                "bank_label": "Banque (facultatif)",
+                "bank_hint": "Où ce revenu est-il versé ? Vous pourrez choisir votre place plus tard.",
+                "bank_none": "Pas encore de banque",
+                "account_label": "Atterrisse à (facultatif)",
+                "account_hint": "Compte courant, compte d'épargne ou compte au comptant. Le choix de l'un d'entre eux détermine la banque.",
+                "account_none": "Vous n'avez pas encore de compte",
+                "chip_aria_account": "Atterrisse à {name}",
+                "chip_aria_bank": "Prévu à {name}"
+            },
             "expense_form": {
                 "save_in": "Enregistrer dans",
                 "save_out": "Enregistrer",
@@ -2609,6 +2667,14 @@
                 "review_fixed": "Examiner les coûts fixes",
                 "open_jar": "Ouvrir le pot « Necessities »",
                 "raise_income": "+ Augmenter les revenus"
+            },
+            "business_household_leak": {
+                "title": "Les coûts d'exploitation dans vos bocaux",
+                "body": "{amount} p/m de frais professionnels sont imputés à votre budget familial. Réglez-les à partir de l'entreprise ou augmentez votre prélèvement — ainsi, seul ce prélèvement restera dans les bocaux.",
+                "body_named": "{amount} p/m pour {name} passe par votre foyer. Versez-leur cette somme depuis l'entreprise ou augmentez votre prélèvement — ainsi, seul ce prélèvement restera dans les bocaux.",
+                "meta": "{count, plural, =1 {1 linked bill} other {{count} linked bills}}",
+                "open_holding": "Position ouverte",
+                "review_bills": "Voir les projets de loi en lien"
             },
             "household_profile": {
                 "filter_tip_title": "La liste des factures est personnalisée",

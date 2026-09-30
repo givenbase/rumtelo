@@ -8,6 +8,7 @@ import type {
     ArchiveAccountSettings,
     ArchiveBankAccount,
     ArchiveHouseholdSettings,
+    Asset,
     Debt,
     FixedCost,
     Goal,
@@ -31,6 +32,8 @@ const MAX_TX_PAGES = 500;
 export type HouseholdExportAccess = {
     includeDebts: boolean;
     includeGoals: boolean;
+    /** Net-worth holdings — only so bills / income keep their holding link. */
+    includeAssets?: boolean;
 };
 
 export type HouseholdExportBundle = {
@@ -42,6 +45,8 @@ export type HouseholdExportBundle = {
     parties: Party[];
     accounts: ArchiveBankAccount[];
     jars: Jar[];
+    /** Name stubs for relinking — holdings themselves live in the Growth portal. */
+    assets: Pick<Asset, 'id' | 'name'>[];
     income: IncomeSource[];
     fixedCosts: FixedCost[];
     debts: Debt[];
@@ -92,6 +97,7 @@ export async function fetchHouseholdExportBundle(
         goals,
         rules,
         transactions,
+        assets,
     ] = await Promise.all([
         api.household.settings({ householdId }),
         api.account.settings(),
@@ -105,6 +111,9 @@ export async function fetchHouseholdExportBundle(
         access.includeGoals ? api.money.goals.list({ householdId }) : Promise.resolve([] as Goal[]),
         api.money.rules.list({ householdId }),
         listAllTransactions(householdId),
+        access.includeAssets
+            ? api.growth.assets.list({ householdId })
+            : Promise.resolve([] as Asset[]),
     ]);
     return {
         exportedAt: new Date().toISOString(),
@@ -115,6 +124,7 @@ export async function fetchHouseholdExportBundle(
         parties,
         accounts: portableBankAccounts(accounts, banks),
         jars,
+        assets: assets.map(asset => ({ id: asset.id, name: asset.name })),
         income,
         fixedCosts,
         debts,
@@ -223,6 +233,7 @@ export function transactionExportRows(
         categoryId: transaction.categoryId ?? '',
         debtId: transaction.debtId ?? '',
         fixedCostId: transaction.fixedCostId ?? '',
+        assetId: transaction.assetId ?? '',
         source: transaction.source,
         note: transaction.note ?? '',
     }));
@@ -231,6 +242,9 @@ export function transactionExportRows(
 export function buildExportSheets(bundle: HouseholdExportBundle): ExportSheet[] {
     const names = jarNameMap(bundle.jars);
     const keys = jarKeyMap(bundle.jars);
+    const assetNames = new Map(bundle.assets.map(asset => [asset.id, asset.name]));
+    const assetName = (assetId: string | null | undefined) =>
+        assetId ? (assetNames.get(assetId) ?? '') : '';
     const sheets: ExportSheet[] = [
         {
             name: 'Settings',
@@ -284,6 +298,7 @@ export function buildExportSheets(bundle: HouseholdExportBundle): ExportSheet[] 
                     counterparty: source.counterparty ?? '',
                     merchantKey: source.merchantKey ?? '',
                     partyName: party?.name ?? '',
+                    assetName: assetName(source.assetId),
                     kind: source.kind,
                     amountCents: source.amount,
                     cadence: source.cadence,
@@ -331,6 +346,7 @@ export function buildExportSheets(bundle: HouseholdExportBundle): ExportSheet[] 
                 jar: names.get(cost.jarId) ?? cost.jarId,
                 jarKey: keys.get(cost.jarId) ?? '',
                 debtId: cost.debtId ?? '',
+                assetName: assetName(cost.assetId),
                 isActive: cost.isActive,
                 counterparty: cost.counterparty ?? '',
             })),
@@ -399,11 +415,12 @@ function csvFileName(sheetName: string): string {
 }
 
 export function downloadHouseholdJson(bundle: HouseholdExportBundle, stamp: string) {
-    const { access, debts, goals, ...rest } = bundle;
+    const { access, debts, goals, assets, ...rest } = bundle;
     const payload = {
         ...rest,
         ...(access.includeDebts ? { debts } : {}),
         ...(access.includeGoals ? { goals } : {}),
+        ...(access.includeAssets ? { assets } : {}),
     };
     downloadTextFile(
         `rumtelo-export-${stamp}.json`,

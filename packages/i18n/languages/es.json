@@ -72,6 +72,8 @@
                     "month_close_prior_open": "Cierra primero {period}: hay que completar los meses en orden para que el registro sea fiel a la realidad.",
                     "bill_link_outflow": "Vincula un gasto para liquidar una factura pendiente.",
                     "bill_link_inflow": "Vincula un ingreso para liquidar un abono periódico.",
+                    "asset_not_found": "Esa participación no forma parte de tu patrimonio neto.",
+                    "bank_account_not_found": "Esa cuenta bancaria no pertenece a este hogar.",
                     "iban_already_linked": "Este IBAN ya está vinculado a una cuenta.",
                     "account_name_taken": "Ya existe una cuenta con este nombre.",
                     "bank_not_found": "Ese banco no aparece en el catálogo.",
@@ -1387,7 +1389,41 @@
                 "detail": {
                     "loading": "Cargando…",
                     "not_found": "No se ha encontrado el recurso.",
-                    "back": "← Patrimonio neto"
+                    "back": "← Patrimonio neto",
+                    "in_eyebrow": "En",
+                    "out_eyebrow": "Fuera",
+                    "net_eyebrow": "Importe neto mensual",
+                    "in_from_sources": "From {count} linked income {count, plural, =1 {source} other {sources}}",
+                    "in_from_flow": "Según lo que has introducido en el activo",
+                    "in_none": "Aún no hay ningún enlace",
+                    "out_from_bills": "From {count} linked {count, plural, =1 {bill} other {bills}}",
+                    "out_none": "No hay facturas asociadas",
+                    "linked_income_heading": "Se presenta en",
+                    "linked_bills_heading": "Se va",
+                    "linked_recent_heading": "Piezas únicas",
+                    "linked_empty_income": "Esta participación no genera ingresos.",
+                    "linked_empty_bills": "No hay facturas asociadas a esta participación.",
+                    "linked_empty_recent": "De momento no hay transacciones puntuales.",
+                    "add_income": "+ Ingresos",
+                    "add_bill": "+ Bill",
+                    "add_expense": "+ Único",
+                    "open_in_money": "Abrir en Money →",
+                    "money_note": "Las facturas y los ingresos se guardan en su tarro. En esta página solo se muestra lo que pertenece a este fondo.",
+                    "delete_linked_warning": "Al eliminar los vínculos, se eliminan {income} ingresos, {bills} facturas y {transactions} transacciones. Estos datos permanecen en Money.",
+                    "coach_business_title": "Los gastos de la empresa en tus tarros",
+                    "coach_business_body": "{amount} al mes de esta participación se destina a los gastos del hogar. Págales con dinero de la empresa o aumenta tu retirada mensual; así, solo la retirada mensual se quedará en los tarros."
+                },
+                "setup": {
+                    "eyebrow": "Registrar el flujo",
+                    "step_in_title": "¿Cuánto aporta {name}?",
+                    "step_in_body": "Suma los ingresos que obtienes de ella: sueldo, dividendos, alquiler. Esos ingresos van a parar a tus huchas como cualquier otro ingreso; simplemente se le atribuye el mérito a esta inversión.",
+                    "step_out_title": "¿Cuánto te cuesta {name} al mes?",
+                    "step_out_body": "Alojamiento web, seguros, software… suma las facturas que pagas por ello. Cada factura va en su propio tarro.",
+                    "step_of": "Paso {step} de 2",
+                    "skip": "Saltar",
+                    "done": "Hecho",
+                    "add_income": "Añadir ingresos",
+                    "add_bill": "Añadir factura"
                 }
             },
             "learn": {
@@ -1614,7 +1650,8 @@
                 "search_brand": "Buscar marca",
                 "more": "Más",
                 "locked_pension": "Queda bloqueado hasta que dejes de trabajar. Se contabiliza en el total, pero no como ingresos mensuales.",
-                "locked_default": "Se tiene en cuenta en el total, pero no como ingresos mensuales."
+                "locked_default": "Se tiene en cuenta en el total, pero no como ingresos mensuales.",
+                "flow_from_sources": "Monthly income comes from {count} linked income {count, plural, =1 {source} other {sources}}. Edit those in Money → Income."
             }
         },
         "money": {
@@ -2127,6 +2164,27 @@
                 "amount_per_month": "{amount} al mes",
                 "amount_per_cadence": "{amount} / {cadence}"
             },
+            "holding_link": {
+                "label": "Parte de un grupo empresarial",
+                "hint": "Opcional. Cuéntalo como parte de tu empresa, una propiedad u otra participación. El frasco sigue siendo el mismo.",
+                "none": "No forma parte de un grupo empresarial",
+                "locked_eyebrow": "Participación",
+                "locked_hint": "Se ha tenido en cuenta esta participación",
+                "chip_aria": "Parte de la cartera de {name}",
+                "filter_eyebrow": "Mostrar solo",
+                "filter_clear": "Mostrar todo",
+                "kind_fallback": "Participación"
+            },
+            "deposit_link": {
+                "bank_label": "Banco (opcional)",
+                "bank_hint": "Dónde se abonan estos ingresos: ya puedes elegir el asiento más adelante.",
+                "bank_none": "Aún no hay ningún banco",
+                "account_label": "Aterriza en (opcional)",
+                "account_hint": "Cuenta corriente, de ahorro o de efectivo. Al elegir una de ellas, se establece el banco.",
+                "account_none": "Aún no tienes cuenta",
+                "chip_aria_account": "Aterriza en {name}",
+                "chip_aria_bank": "Se espera que sea en {name}"
+            },
             "expense_form": {
                 "save_in": "Guardar en",
                 "save_out": "Guardar como",
@@ -2609,6 +2667,14 @@
                 "review_fixed": "Revisar los costes fijos",
                 "open_jar": "Abre el tarro de «Necessities»",
                 "raise_income": "+ Aumentar los ingresos"
+            },
+            "business_household_leak": {
+                "title": "Los gastos de la empresa en tus tarros",
+                "body": "{amount} al mes de gastos de la empresa pasan por tu hogar. Págalos con fondos de la empresa o aumenta tu retirada mensual; así, solo la retirada mensual se quedará en los tarros.",
+                "body_named": "{amount} p/m por {name} se destina a los gastos del hogar. Págales con dinero de la empresa o aumenta tu retirada mensual; así, solo la retirada mensual se quedará en los tarros.",
+                "meta": "{count, plural, =1 {1 linked bill} other {{count} linked bills}}",
+                "open_holding": "Participación abierta",
+                "review_bills": "Ver los proyectos de ley adjuntos"
             },
             "household_profile": {
                 "filter_tip_title": "La lista de facturas se adapta a las necesidades de cada uno",

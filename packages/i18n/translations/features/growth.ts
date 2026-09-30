@@ -272,6 +272,46 @@ const growth = {
             loading: 'Loading…',
             not_found: 'Asset not found.',
             back: '← Net worth',
+            in_eyebrow: 'In',
+            out_eyebrow: 'Out',
+            net_eyebrow: 'Net per month',
+            in_from_sources:
+                'From {count} linked income {count, plural, =1 {source} other {sources}}',
+            in_from_flow: 'From what you entered on the asset',
+            in_none: 'Nothing linked yet',
+            out_from_bills: 'From {count} linked {count, plural, =1 {bill} other {bills}}',
+            out_none: 'No bills linked',
+            linked_income_heading: 'Comes in',
+            linked_bills_heading: 'Goes out',
+            linked_recent_heading: 'One-offs',
+            linked_empty_income: 'No income linked to this holding.',
+            linked_empty_bills: 'No bills linked to this holding.',
+            linked_empty_recent: 'No one-off transactions yet.',
+            add_income: '+ Income',
+            add_bill: '+ Bill',
+            add_expense: '+ One-off',
+            open_in_money: 'Open in Money →',
+            money_note:
+                'Bills and income keep their jar. This page only shows what belongs to this holding.',
+            delete_linked_warning:
+                'Deleting unlinks {income} income, {bills} bills and {transactions} transactions. They stay in Money.',
+            coach_business_title: 'Business costs in your jars',
+            coach_business_body:
+                '{amount} p/m for this holding runs through your household. Pay them from the business or raise your draw — then only the draw stays in the jars.',
+        },
+        setup: {
+            eyebrow: 'Register the flow',
+            step_in_title: 'What does {name} bring in?',
+            step_in_body:
+                'Add the income you draw from it — salary, dividend, rent. It lands in your jars like any other income; this holding just gets the credit.',
+            step_out_title: 'What does {name} cost you each month?',
+            step_out_body:
+                'Hosting, insurance, software — add the bills you pay for it. Each bill keeps its jar.',
+            step_of: 'Step {step} of 2',
+            skip: 'Skip',
+            done: 'Done',
+            add_income: 'Add income',
+            add_bill: 'Add bill',
         },
     },
     learn: {
@@ -512,6 +552,8 @@ const growth = {
         locked_pension:
             'Locked until you stop working. It counts in the total, not as monthly income.',
         locked_default: 'It counts in the total, not as monthly income.',
+        flow_from_sources:
+            'Monthly income comes from {count} linked income {count, plural, =1 {source} other {sources}}. Edit those in Money → Income.',
     },
 } as const;
 

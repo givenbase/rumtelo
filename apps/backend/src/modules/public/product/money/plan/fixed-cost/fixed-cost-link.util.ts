@@ -67,6 +67,9 @@ export async function applyFixedCostLinkChange(
         }
         assertDirectionMatches(fixedCost, transaction.amount);
         transaction.fixedCost = fixedCost;
+        // Settling a bill attributes the row to the bill's holding (the company, the
+        // car) so bank-feed charges land on the asset without a manual pick.
+        if (fixedCost.asset && !transaction.asset) transaction.asset = fixedCost.asset;
         await attachTransactionToSettlement(
             em,
             transaction,

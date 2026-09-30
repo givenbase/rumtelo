@@ -42,6 +42,11 @@ export const Transaction = z.object({
      * Mutually exclusive with debtId on sort in MVP.
      */
     fixedCostId: Id.nullable(),
+    /**
+     * Growth asset this row belongs to (one-off for the company or the car).
+     * Inherited from the bill when the row settles one. Attribution only.
+     */
+    assetId: Id.nullable(),
     /** Negative = money out, positive = money in. Minor units. */
     amount: Money,
     bookedOn: IsoDate,
@@ -72,6 +77,8 @@ export const ListTransactions = Pagination.extend({
     status: z.enum(TransactionStatus).nullish(),
     jarId: Id.nullish(),
     debtId: Id.nullish(),
+    /** Only rows attributed to this growth asset. */
+    assetId: Id.nullish(),
     search: z.string().max(120).nullish(),
 });
 
@@ -82,6 +89,8 @@ export const CreateTransaction = z.object({
     categoryId: Id.nullish(),
     debtId: Id.nullish(),
     fixedCostId: Id.nullish(),
+    /** Attribute this row to a growth asset (holding). */
+    assetId: Id.nullish(),
     amount: Money,
     bookedOn: IsoDate,
     description: z.string().min(1).max(280),

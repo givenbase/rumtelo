@@ -24,6 +24,7 @@ export function fixedCostPrefillFromParams(params: ParamSource) {
     const due = dueDayRaw && Number.isFinite(Number(dueDayRaw)) ? Number(dueDayRaw) : null;
     const dueDay = due !== null && due >= 1 && due <= 31 ? String(due) : undefined;
     const transactionId = params.get('transactionId')?.trim();
+    const assetId = assetIdFromParams(params);
     const payeeModeRaw = params.get('payeeMode')?.trim();
     const payeeMode =
         payeeModeRaw && (GIVE_PAYEE_MODES as readonly string[]).includes(payeeModeRaw)
@@ -39,12 +40,14 @@ export function fixedCostPrefillFromParams(params: ParamSource) {
         !amount &&
         !categoryId &&
         !dueDay &&
-        !transactionId
+        !transactionId &&
+        !assetId
     ) {
         return undefined;
     }
     return {
         ...(jarId ? { jarId } : {}),
+        ...(assetId ? { assetId } : {}),
         ...(counterparty ? { counterparty } : {}),
         ...(name ? { name } : {}),
         ...(payeeMode ? { payeeMode } : {}),
@@ -63,7 +66,8 @@ export function txPrefillFromParams(params: ParamSource) {
     const merchantKey = params.get('merchantKey')?.trim();
     const categoryKey = params.get('categoryKey')?.trim();
     const counterparty = params.get('counterparty')?.trim();
-    if (!jarId && !merchantKey && !categoryKey && !counterparty) {
+    const assetId = assetIdFromParams(params);
+    if (!jarId && !merchantKey && !categoryKey && !counterparty && !assetId) {
         return undefined;
     }
     return {
@@ -71,7 +75,21 @@ export function txPrefillFromParams(params: ParamSource) {
         ...(merchantKey ? { merchantKey } : {}),
         ...(categoryKey ? { categoryKey } : {}),
         ...(counterparty && !merchantKey ? { counterparty } : {}),
+        ...(assetId ? { assetId } : {}),
     };
+}
+
+/** Income create — only the holding it comes from (asset in). */
+export function incomePrefillFromParams(params: ParamSource) {
+    const assetId = assetIdFromParams(params);
+    return assetId ? { assetId } : undefined;
+}
+
+/** Growth holding id (uuid) from `?assetId=` — locks the holding picker on money forms. */
+export function assetIdFromParams(params: ParamSource): string | undefined {
+    const raw = params.get('assetId')?.trim();
+    if (!raw || raw.length > 64) return undefined;
+    return raw;
 }
 
 export function goalKindFromParams(params: ParamSource): GoalKind | undefined {

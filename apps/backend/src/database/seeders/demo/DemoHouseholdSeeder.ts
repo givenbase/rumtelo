@@ -406,6 +406,8 @@ export class DemoHouseholdSeeder extends Seeder {
         if (demo.persona === 'max') {
             const assetCount = await em.count(Asset, { household: householdId });
             if (assetCount === 0) this.seedMaxAssets(em, householdId);
+            await em.flush();
+            await this.linkMaxCompanyMoney(em, householdId, jarMap);
         }
 
         if (demo.persona === 'plus' || demo.persona === 'max') {
@@ -427,6 +429,13 @@ export class DemoHouseholdSeeder extends Seeder {
         demo: DemoAccount,
         banks: DemoBanks
     ): void {
+        const checking = this.createBank(em, householdId, {
+            name: 'Checking',
+            kind: AccountKind.CHECKING,
+            balance: 187.5,
+            bank: banks.primary,
+        });
+
         this.createIncome(em, householdId, {
             name: 'Retail salary',
             kind: IncomeKind.SALARY,
@@ -435,6 +444,7 @@ export class DemoHouseholdSeeder extends Seeder {
             counterparty: 'RETAIL GROUP NL BV',
             saveParty: true,
             presetKey: 'SALARY',
+            account: checking,
         });
 
         for (const row of [
@@ -476,13 +486,6 @@ export class DemoHouseholdSeeder extends Seeder {
             icon: '🚗',
             sortOrder: 1,
         } as never);
-
-        const checking = this.createBank(em, householdId, {
-            name: 'Checking',
-            kind: AccountKind.CHECKING,
-            balance: 187.5,
-            bank: banks.primary,
-        });
 
         // Bank-feed style copy (AIS-like): creditor name + remittance — not English “Milk/Salary” labels.
         for (const tx of [
@@ -579,6 +582,19 @@ export class DemoHouseholdSeeder extends Seeder {
         demo: DemoAccount,
         banks: DemoBanks
     ): void {
+        const checking = this.createBank(em, householdId, {
+            name: 'Business checking',
+            kind: AccountKind.CHECKING,
+            balance: 942,
+            bank: banks.primary,
+        });
+        this.createBank(em, householdId, {
+            name: 'Tax set-aside',
+            kind: AccountKind.SAVINGS,
+            balance: 2_100,
+            bank: banks.primary,
+        });
+
         this.createIncome(em, householdId, {
             name: 'Client retainers',
             kind: IncomeKind.FREELANCE,
@@ -587,6 +603,7 @@ export class DemoHouseholdSeeder extends Seeder {
             counterparty: 'ACME DESIGN BV',
             saveParty: true,
             presetKey: 'FREELANCE',
+            account: checking,
         });
         this.createIncome(em, householdId, {
             name: 'One-off gigs',
@@ -596,6 +613,7 @@ export class DemoHouseholdSeeder extends Seeder {
             counterparty: 'NOVA STUDIO BV',
             saveParty: true,
             presetKey: 'FREELANCE',
+            account: checking,
         });
 
         for (const row of [
@@ -687,19 +705,6 @@ export class DemoHouseholdSeeder extends Seeder {
             why: demo.why,
             icon: '📈',
         } as never);
-
-        const checking = this.createBank(em, householdId, {
-            name: 'Business checking',
-            kind: AccountKind.CHECKING,
-            balance: 942,
-            bank: banks.primary,
-        });
-        this.createBank(em, householdId, {
-            name: 'Tax set-aside',
-            kind: AccountKind.SAVINGS,
-            balance: 2_100,
-            bank: banks.primary,
-        });
 
         em.create(SortRule, {
             household: householdId,
@@ -1023,6 +1028,42 @@ export class DemoHouseholdSeeder extends Seeder {
         }
     }
 
+    /**
+     * Asset in / out demo: the company draw is the holding's IN, a hosting bill its
+     * OUT. Attribution only — both rows keep their jar. Idempotent on re-seed.
+     */
+    private async linkMaxCompanyMoney(
+        em: EntityManager,
+        householdId: string,
+        jars: JarMap
+    ): Promise<void> {
+        const company = await em.findOne(Asset, { household: householdId, presetKey: 'COMPANY' });
+        if (!company) return;
+
+        const draw = await em.findOne(IncomeSource, {
+            household: householdId,
+            name: 'Studio profit draw',
+        });
+        if (draw && !draw.asset) draw.asset = company.id;
+
+        const hosting = await em.findOne(FixedCost, {
+            household: householdId,
+            name: 'Studio hosting',
+        });
+        if (!hosting) {
+            this.createFixed(em, householdId, jars.necessities, {
+                name: 'Studio hosting',
+                amount: 89,
+                dueDay: 3,
+                counterparty: 'TRANSIP BV',
+                presetKey: 'SOFTWARE_SUITE',
+                assetId: company.id,
+            });
+        } else if (!hosting.asset) {
+            hosting.asset = company.id;
+        }
+    }
+
     private seedMaxBoard(
         em: EntityManager,
         householdId: string,
@@ -1031,6 +1072,26 @@ export class DemoHouseholdSeeder extends Seeder {
         demo: DemoAccount,
         banks: DemoBanks
     ): void {
+        const checking = this.createBank(em, householdId, {
+            name: 'Operating checking',
+            kind: AccountKind.CHECKING,
+            balance: 12_400,
+            bank: banks.primary,
+            isPrimary: true,
+        });
+        this.createBank(em, householdId, {
+            name: 'High-yield savings',
+            kind: AccountKind.SAVINGS,
+            balance: 36_500,
+            bank: banks.primary,
+        });
+        const brokerage = this.createBank(em, householdId, {
+            name: 'Brokerage',
+            kind: AccountKind.INVESTMENT,
+            balance: 124_800,
+            bank: banks.secondary,
+        });
+
         this.createIncome(em, householdId, {
             name: 'Studio profit draw',
             kind: IncomeKind.OTHER,
@@ -1039,6 +1100,7 @@ export class DemoHouseholdSeeder extends Seeder {
             counterparty: 'STUDIO NOORD BV',
             saveParty: true,
             presetKey: 'OTHER',
+            account: checking,
         });
         this.createIncome(em, householdId, {
             name: 'Dividend portfolio',
@@ -1048,6 +1110,7 @@ export class DemoHouseholdSeeder extends Seeder {
             counterparty: 'DEGIRO',
             merchantKey: 'DEGIRO',
             presetKey: 'DIVIDEND',
+            account: checking,
         });
         this.createIncome(em, householdId, {
             name: 'Rental unit',
@@ -1057,6 +1120,7 @@ export class DemoHouseholdSeeder extends Seeder {
             counterparty: 'HUURDER J. DE VRIES',
             saveParty: true,
             presetKey: 'RENTAL',
+            account: checking,
         });
 
         for (const row of [
@@ -1232,26 +1296,6 @@ export class DemoHouseholdSeeder extends Seeder {
             why: 'Dividends + rent covering lifestyle floor.',
             icon: '📊',
         } as never);
-
-        const checking = this.createBank(em, householdId, {
-            name: 'Operating checking',
-            kind: AccountKind.CHECKING,
-            balance: 12_400,
-            bank: banks.primary,
-            isPrimary: true,
-        });
-        this.createBank(em, householdId, {
-            name: 'High-yield savings',
-            kind: AccountKind.SAVINGS,
-            balance: 36_500,
-            bank: banks.primary,
-        });
-        const brokerage = this.createBank(em, householdId, {
-            name: 'Brokerage',
-            kind: AccountKind.INVESTMENT,
-            balance: 124_800,
-            bank: banks.secondary,
-        });
 
         em.create(SortRule, {
             household: householdId,
@@ -1509,6 +1553,8 @@ export class DemoHouseholdSeeder extends Seeder {
             presetKey?: string;
             /** Persist free-typed counterparty as a household Party (demo "saved for next time"). */
             saveParty?: boolean;
+            /** Deposit seat — also syncs catalog bank from the account. */
+            account?: BankAccount;
         }
     ): void {
         const startedOn = monthsAgo(6);
@@ -1517,6 +1563,8 @@ export class DemoHouseholdSeeder extends Seeder {
         if (input.saveParty && input.counterparty && !input.merchantKey) {
             partyId = this.ensureParty(em, householdId, input.counterparty).id;
         }
+        const depositAccount = input.account ?? null;
+        const depositBank = depositAccount?.bank ?? null;
         const source = em.create(IncomeSource, {
             household: householdId,
             name: input.name,
@@ -1524,6 +1572,8 @@ export class DemoHouseholdSeeder extends Seeder {
             counterparty: input.counterparty ?? null,
             merchantKey: input.merchantKey ?? null,
             party: partyId,
+            bank: depositBank?.id ?? null,
+            account: depositAccount?.id ?? null,
             kind: input.kind,
             amount,
             expectedDay: input.expectedDay,
@@ -1566,6 +1616,8 @@ export class DemoHouseholdSeeder extends Seeder {
             dueDay: number;
             counterparty?: string;
             presetKey?: string;
+            /** Growth holding this bill is attributed to (asset in / out). */
+            assetId?: string;
         }
     ): void {
         em.create(FixedCost, {
@@ -1573,6 +1625,7 @@ export class DemoHouseholdSeeder extends Seeder {
             name: input.name,
             presetKey: input.presetKey ?? null,
             counterparty: input.counterparty ?? null,
+            asset: input.assetId ?? null,
             amount: toMinorUnits(input.amount),
             dueDay: input.dueDay,
             isActive: true,

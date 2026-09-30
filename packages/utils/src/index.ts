@@ -71,6 +71,18 @@ export {
     type IncomePeriodLike,
 } from './money-plan';
 export {
+    assetFlowSummary,
+    assetMonthlyIn,
+    billsForAsset,
+    evaluateBusinessHouseholdLeak,
+    incomeForAsset,
+    linkedMonthlyOut,
+    type AssetFlowSummary,
+    type AssetLinkedBill,
+    type AssetLinkedIncome,
+    type BusinessHouseholdLeak,
+} from './asset-link';
+export {
     dueDayMaxForCadence,
     dueDayReachedInMonth,
     dueMonthMaxForCadence,

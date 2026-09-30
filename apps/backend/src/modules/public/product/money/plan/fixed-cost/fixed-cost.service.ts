@@ -12,8 +12,10 @@ import {
     jarCapabilitiesFor,
 } from '@rumtelo/contracts';
 import { isFixedCostCounting, normalizeDueMonth, sumMonthlyFixedOut } from '@rumtelo/utils';
+import { PlanAccessService } from '../../../../../../common/capability';
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
+import { resolveAssetLink } from '../../asset-link.util';
 import { Transaction } from '../../ledger/transaction/transaction.entity';
 import { Debt } from '../../targets/debt/debt.entity';
 import { Category } from '../jar/category.entity';
@@ -33,7 +35,8 @@ export class FixedCostService {
     constructor(
         @Inject(EntityManager) private readonly em: EntityManager,
         @Inject(JarService) private readonly jars: JarService,
-        @Inject(PartyService) private readonly parties: PartyService
+        @Inject(PartyService) private readonly parties: PartyService,
+        @Inject(PlanAccessService) private readonly planAccess: PlanAccessService
     ) {
         this.repo = new HouseholdScopedRepository(em, FixedCost);
         this.settlements = new HouseholdScopedRepository(em, FixedCostSettlement);
@@ -48,6 +51,7 @@ export class FixedCostService {
             jarId: string;
             categoryId?: string | null;
             debtId?: string | null;
+            assetId?: string | null;
             name: string;
             amount: number;
             cadence?: string;
@@ -66,11 +70,13 @@ export class FixedCostService {
         const dueMonth = normalizeDueMonth(input.dueMonth, cadence);
         assertDueMonthForCadence(cadence, dueMonth);
         const other = await this.parties.resolveCounterparty(input);
+        const asset = (await resolveAssetLink(this.em, this.planAccess, input.assetId)) ?? null;
         const entity = this.em.create(FixedCost, {
             household: currentHouseholdId(),
             jar: this.em.getReference(Jar, input.jarId),
             category: input.categoryId ? this.em.getReference(Category, input.categoryId) : null,
             debt: input.debtId ? this.em.getReference(Debt, input.debtId) : null,
+            asset,
             name: input.name,
             presetKey: input.presetKey ?? null,
             counterparty: other.counterparty,
@@ -226,8 +232,11 @@ export class FixedCostService {
     // ? READ Operations
     // ====================================================================
 
-    async list(direction?: 'IN' | 'OUT' | null) {
-        const rows = await this.repo.find((direction ? { direction } : {}) as never);
+    async list(direction?: 'IN' | 'OUT' | null, assetId?: string | null) {
+        const where: Record<string, unknown> = {};
+        if (direction) where.direction = direction;
+        if (assetId) where.asset = assetId;
+        const rows = await this.repo.find(where);
         return rows.map(toDto);
     }
 
@@ -286,6 +295,7 @@ export class FixedCostService {
                 jarId: string;
                 categoryId: string | null;
                 debtId: string | null;
+                assetId: string | null;
                 name: string;
                 amount: number;
                 cadence: string;
@@ -312,6 +322,8 @@ export class FixedCostService {
         if (patch.debtId !== undefined) {
             entity.debt = patch.debtId ? this.em.getReference(Debt, patch.debtId) : null;
         }
+        const asset = await resolveAssetLink(this.em, this.planAccess, patch.assetId);
+        if (asset !== undefined) entity.asset = asset;
         if (patch.name !== undefined) entity.name = patch.name;
         if (patch.presetKey !== undefined) entity.presetKey = patch.presetKey;
         if (
@@ -388,6 +400,7 @@ export function toDto(fixedCost: FixedCost) {
         jarId: fixedCost.jar.id,
         categoryId: fixedCost.category?.id ?? null,
         debtId: fixedCost.debt?.id ?? null,
+        assetId: fixedCost.asset,
         name: fixedCost.name,
         presetKey: fixedCost.presetKey,
         counterparty: fixedCost.counterparty,

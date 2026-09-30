@@ -1,6 +1,7 @@
 'use client';
 
 import { GoalCreatePage, GoalUpdatePage } from '@/product/growth/goals/_components/goal-pages';
+import type { IncomeCreatePrefill } from '@/product/growth/income/_components/income-pages';
 import {
     IncomeCreatePage,
     IncomeUpdatePage,
@@ -110,11 +111,14 @@ export function DebtUpdateModalShell({ closeHref, id }: ShellProps & { id: strin
     );
 }
 
-export function IncomeCreateModalShell({ closeHref }: ShellProps) {
+export function IncomeCreateModalShell({
+    closeHref,
+    defaultValues,
+}: ShellProps & { defaultValues?: IncomeCreatePrefill }) {
     const meta = formRoute('incomeCreate');
     return (
         <RouteModalShell closeHref={closeHref} meta={meta}>
-            <IncomeCreatePage embedded />
+            <IncomeCreatePage embedded defaultValues={defaultValues} />
         </RouteModalShell>
     );
 }

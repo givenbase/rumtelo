@@ -44,6 +44,7 @@ import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
 import { ExpenseIntentField, type ExpenseIntentSelection } from './expense-intent-field';
 import { FormInput } from './form-input';
 import { createExpenseFormSchema, type ExpenseFormSchemaValues } from './form-zod';
+import { HoldingField } from './holding-field';
 import { PresetNameField } from './preset-name-field';
 import { SavePartyToggle } from './save-party-toggle';
 
@@ -79,6 +80,8 @@ type ExpenseFormProps = {
     direction?: 'out' | 'in';
     /** When true (opened from a jar page), jar is fixed — no picker. */
     lockJar?: boolean;
+    /** Opened from a holding (`?assetId=`): the holding is shown, not editable. */
+    lockAsset?: boolean;
     /** When set (inbox "Anders"), submit sorts/updates that transaction instead of creating. */
     entityId?: string;
     onSuccess?: () => void;
@@ -206,6 +209,7 @@ export function ExpenseForm({
     mode = 'create',
     direction: directionProp = 'out',
     lockJar = false,
+    lockAsset = false,
     entityId,
     onSuccess,
 }: ExpenseFormProps) {
@@ -334,11 +338,13 @@ export function ExpenseForm({
                 defaultValues?.description && defaultValues.description !== defaultValues.note
                     ? defaultValues.description
                     : (defaultValues?.counterparty ?? ''),
+            assetId: defaultValues?.assetId ?? null,
         },
         resolver: zodResolver(expenseFormSchema),
     });
 
     const selectedJarId = useWatch({ control: form.control, name: 'jarId' });
+    const selectedAssetId = useWatch({ control: form.control, name: 'assetId' }) ?? null;
     const selectedJar = useMemo(
         () => jars.find(jar => jar.id === selectedJarId) ?? null,
         [jars, selectedJarId]
@@ -492,6 +498,7 @@ export function ExpenseForm({
                     counterparty: vendor || null,
                     categoryId,
                     inflowKey: isIn ? inflowKey : null,
+                    assetId: values.assetId ?? null,
                 });
                 return api.money.transactions.sort({
                     householdId,
@@ -518,6 +525,7 @@ export function ExpenseForm({
                 note: note || null,
                 inflowKey: isIn ? inflowKey : null,
                 debtId: isIn ? null : debtId,
+                assetId: values.assetId ?? null,
             });
         },
         onSuccess: () => {
@@ -864,6 +872,13 @@ export function ExpenseForm({
                         <FormMessage />
                     </FormItem>
                 )}
+            />
+
+            <HoldingField
+                value={selectedAssetId}
+                locked={lockAsset}
+                disabled={busy}
+                onChange={next => form.setValue('assetId', next, { shouldDirty: true })}
             />
 
             {!isIn && openDebts.length > 0 ? (

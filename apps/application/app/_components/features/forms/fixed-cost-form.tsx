@@ -70,6 +70,7 @@ import { ConfirmActionButton } from './confirm-action-button';
 import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
 import { FormDatePicker } from './form-date-picker';
 import { FormInput } from './form-input';
+import { HoldingField } from './holding-field';
 import { SavePartyToggle } from './save-party-toggle';
 import {
     MERCHANT_OPTION_PREFIX,
@@ -104,6 +105,8 @@ type FixedCostFormProps = {
     defaultMerchantKey?: string | null;
     /** After create, link this transaction as the period settlement. */
     linkTransactionId?: string | null;
+    /** Opened from a holding (`?assetId=`): the holding is shown, not editable. */
+    lockAsset?: boolean;
     embedded?: boolean;
     mode?: 'create' | 'edit';
     entityId?: string;
@@ -116,6 +119,7 @@ export function FixedCostForm({
     defaultOrgKey = null,
     defaultMerchantKey = null,
     linkTransactionId = null,
+    lockAsset = false,
     embedded = true,
     mode = 'create',
     entityId,
@@ -379,11 +383,13 @@ export function FixedCostForm({
             dueMonth: defaultValues?.dueMonth ?? '',
             startedOn: defaultValues?.startedOn ?? periodDefaultDate,
             endsOn: defaultValues?.endsOn ?? '',
+            assetId: defaultValues?.assetId ?? null,
         },
         resolver: zodResolver(fixedCostFormSchema),
     });
 
     const selectedJarId = useWatch({ control: form.control, name: 'jarId' });
+    const selectedAssetId = useWatch({ control: form.control, name: 'assetId' }) ?? null;
     const selectedCategoryId = useWatch({ control: form.control, name: 'categoryId' });
     const counterparty = useWatch({ control: form.control, name: 'counterparty' });
     const savePartyWatch = useWatch({ control: form.control, name: 'saveParty' }) ?? true;
@@ -712,6 +718,7 @@ export function FixedCostForm({
                     dueMonth,
                     startedOn,
                     endsOn,
+                    assetId: values.assetId ?? null,
                 });
             }
             const startedOn = values.startedOn?.trim()
@@ -721,6 +728,7 @@ export function FixedCostForm({
                 householdId,
                 jarId: values.jarId,
                 categoryId,
+                assetId: values.assetId ?? null,
                 name,
                 presetKey: presetKeyToSave,
                 counterparty: counterpartyValue,
@@ -1162,6 +1170,15 @@ export function FixedCostForm({
                         <FormMessage />
                     </FormItem>
                 )}
+            />
+
+            <HoldingField
+                value={selectedAssetId}
+                locked={lockAsset}
+                disabled={busy}
+                onChange={next =>
+                    form.setValue('assetId', next, { shouldDirty: true, shouldValidate: false })
+                }
             />
 
             <FormField
