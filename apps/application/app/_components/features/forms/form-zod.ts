@@ -96,6 +96,8 @@ export function createFixedCostFormSchema(msg: FormT) {
         .object({
             name: z.string().min(1, msg('validation.name_required')).max(120),
             counterparty: z.string().max(160).optional(),
+            /** Free-typed payee: offer “save for next time” (default on). */
+            saveParty: z.boolean().optional(),
             amount: positiveMoneyInput(msg),
             /** Recurring frequency — amount is per this cadence (budget converts to monthly). */
             cadence: z.enum([Cadence.WEEKLY, Cadence.MONTHLY, Cadence.QUARTERLY, Cadence.YEARLY]),
@@ -132,6 +134,8 @@ export function createDebtFormSchema(msg: FormT) {
     return z
         .object({
             name: z.string().min(1, msg('validation.who_owe_required')).max(120),
+            /** Free-typed lender: offer “save for next time” (default on). */
+            saveParty: z.boolean().optional(),
             balance: nonNegativeMoneyInput(msg),
             interestRate: z
                 .string()

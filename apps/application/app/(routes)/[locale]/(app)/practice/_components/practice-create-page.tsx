@@ -16,6 +16,7 @@ import {
     FormItem,
     FormMessage,
     Input,
+    Label,
     Phone,
     Typography,
 } from '@rumtelo/ui';
@@ -341,11 +342,11 @@ export function PracticeCreatePage() {
                                         />
                                     </FormControl>
                                     <div className="grid gap-0.5">
-                                        <label
+                                        <Label
                                             htmlFor="c-terms"
-                                            className="cursor-pointer text-sm text-fg">
+                                            className="cursor-pointer items-start leading-snug text-fg">
                                             {t('pages.practice.create.accept_terms')}
-                                        </label>
+                                        </Label>
                                         <p id="c-terms-hint" className="text-xs text-fg-muted">
                                             {t('pages.practice.create.accept_terms_hint')}
                                         </p>

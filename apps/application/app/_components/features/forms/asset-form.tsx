@@ -457,7 +457,17 @@ export function AssetForm({
                         onQueryChange={setCarBrandQuery}
                         items={visibleCarBrands}
                         placeholder={tAsset('search_brand')}
-                        noMatchesLabel={tForm('no_matches')}
+                        noMatchesLabel={tForm('no_matches_use_typed')}
+                        formatTypedLabel={typed => tForm('use_typed_name', { name: typed })}
+                        onOther={typed => {
+                            const next = typed?.trim();
+                            if (!next) return;
+                            form.setValue('name', next, {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                            });
+                            setCarBrandQuery('');
+                        }}
                         trailing={
                             !carBrandSearch && visibleCarBrands.length < carBrands.length ? (
                                 <button

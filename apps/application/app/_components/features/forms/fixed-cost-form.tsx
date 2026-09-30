@@ -70,6 +70,7 @@ import { ConfirmActionButton } from './confirm-action-button';
 import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
 import { FormDatePicker } from './form-date-picker';
 import { FormInput } from './form-input';
+import { SavePartyToggle } from './save-party-toggle';
 import {
     MERCHANT_OPTION_PREFIX,
     OTHER_OPTION_KEY,
@@ -369,6 +370,7 @@ export function FixedCostForm({
         defaultValues: {
             name: defaultValues?.name ?? '',
             counterparty: defaultValues?.counterparty ?? '',
+            saveParty: defaultValues?.saveParty ?? true,
             amount: defaultValues?.amount ?? '',
             cadence: defaultValues?.cadence ?? Cadence.MONTHLY,
             jarId: defaultValues?.jarId ?? '',
@@ -384,6 +386,7 @@ export function FixedCostForm({
     const selectedJarId = useWatch({ control: form.control, name: 'jarId' });
     const selectedCategoryId = useWatch({ control: form.control, name: 'categoryId' });
     const counterparty = useWatch({ control: form.control, name: 'counterparty' });
+    const savePartyWatch = useWatch({ control: form.control, name: 'saveParty' }) ?? true;
     const cadence = useWatch({ control: form.control, name: 'cadence' });
     const dueMonthValue = useWatch({ control: form.control, name: 'dueMonth' });
     const isGive = useMemo(
@@ -502,6 +505,10 @@ export function FixedCostForm({
     }
 
     const showPayeeInput = customPayee || vendorsForCategory.length === 0;
+    const freeTypedPayee =
+        Boolean(counterparty?.trim()) &&
+        !merchants.some(merchant => namesMatch(counterparty ?? '', merchant.name)) &&
+        nameLock?.kind !== 'vendor';
 
     useEffect(() => {
         // Wait for jars — otherwise a prefilled Give jarId gets overwritten while the list is empty.
@@ -622,8 +629,22 @@ export function FixedCostForm({
                 values.cadence
             );
             const counterpartyValue = values.counterparty?.trim() || null;
-            const merchantKey = nameLock?.kind === 'vendor' ? nameLock.merchantKey : null;
-            const saveParty = Boolean(counterpartyValue) && !merchantKey;
+            const matchedPayeeMerchant =
+                (counterpartyValue
+                    ? vendorsForCategory.find(merchant =>
+                          namesMatch(counterpartyValue, merchant.name)
+                      )
+                    : null) ??
+                (counterpartyValue
+                    ? merchants.find(merchant => namesMatch(counterpartyValue, merchant.name))
+                    : null) ??
+                null;
+            const merchantKey =
+                nameLock?.kind === 'vendor'
+                    ? nameLock.merchantKey
+                    : (matchedPayeeMerchant?.key ?? null);
+            const saveParty =
+                Boolean(counterpartyValue) && !merchantKey && (values.saveParty ?? true);
             const jarBalanceForName = (balancesQuery.data ?? []).find(
                 jar => jar.id === values.jarId
             );
@@ -1224,7 +1245,7 @@ export function FixedCostForm({
                                         onQueryChange={setVendorQuery}
                                         items={vendorsForCategory}
                                         placeholder={tForm('search_vendor')}
-                                        noMatchesLabel={tForm('no_matches')}
+                                        noMatchesLabel={tForm('no_matches_use_typed')}
                                         disabled={busy}
                                         idleLimit={CATALOG_CHIP_IDLE_LIMIT}
                                         selectedKey={
@@ -1233,11 +1254,14 @@ export function FixedCostForm({
                                             )?.key ?? null
                                         }
                                         otherLabel={tForm('other')}
-                                        onOther={() => {
+                                        formatTypedLabel={name => tForm('use_typed_name', { name })}
+                                        onOther={typed => {
                                             setCustomPayee(true);
-                                            form.setValue('counterparty', '', {
-                                                shouldValidate: false,
+                                            form.setValue('counterparty', typed?.trim() ?? '', {
+                                                shouldValidate: Boolean(typed?.trim()),
+                                                shouldDirty: true,
                                             });
+                                            setVendorQuery('');
                                         }}
                                         renderChip={merchant => {
                                             const selected = namesMatch(
@@ -1299,6 +1323,18 @@ export function FixedCostForm({
                                         <input type="hidden" {...field} />
                                     </FormControl>
                                 )}
+                                {showPayeeInput && freeTypedPayee ? (
+                                    <SavePartyToggle
+                                        name={counterparty ?? ''}
+                                        checked={savePartyWatch}
+                                        disabled={busy}
+                                        onCheckedChange={next =>
+                                            form.setValue('saveParty', next, {
+                                                shouldDirty: true,
+                                            })
+                                        }
+                                    />
+                                ) : null}
                             </>
                         )}
                         <FormMessage />

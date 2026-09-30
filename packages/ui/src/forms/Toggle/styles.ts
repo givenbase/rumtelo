@@ -4,6 +4,7 @@ export function toggleTrackClass(checked: boolean) {
     return cn(
         'relative mt-0.5 h-6 w-10 shrink-0 rounded-full transition-colors',
         'disabled:cursor-not-allowed disabled:opacity-50',
+        'focus-visible:ring-offset-canvas focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:outline-none',
         checked ? 'bg-accent' : 'bg-sunken'
     );
 }

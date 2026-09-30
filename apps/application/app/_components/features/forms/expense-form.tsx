@@ -45,6 +45,7 @@ import { ExpenseIntentField, type ExpenseIntentSelection } from './expense-inten
 import { FormInput } from './form-input';
 import { createExpenseFormSchema, type ExpenseFormSchemaValues } from './form-zod';
 import { PresetNameField } from './preset-name-field';
+import { SavePartyToggle } from './save-party-toggle';
 
 function resolveInflowKey(
     label: string,
@@ -90,6 +91,7 @@ const EMPTY_INTENT: ExpenseIntentSelection = {
     categoryName: null,
     jarKey: null,
     source: null,
+    saveParty: true,
 };
 
 function intentFromMerchant(
@@ -104,6 +106,7 @@ function intentFromMerchant(
         categoryName: category?.name ?? merchant.categoryTemplateKey,
         jarKey: merchant.jarKey,
         source: 'merchant',
+        saveParty: false,
     };
 }
 
@@ -144,6 +147,7 @@ function buildIntentFromDefaults(
             categoryName: category?.name ?? null,
             jarKey: category?.jarKey ?? null,
             source: category ? 'category' : 'custom',
+            saveParty: true,
         };
     }
 
@@ -157,6 +161,7 @@ function buildIntentFromDefaults(
                 categoryName: category.name,
                 jarKey: category.jarKey,
                 source: 'category',
+                saveParty: true,
             };
         }
     }
@@ -173,6 +178,7 @@ function buildIntentFromDefaults(
                 categoryName: category.name,
                 jarKey: category.jarKey,
                 source: 'category',
+                saveParty: true,
             };
         }
         return {
@@ -182,6 +188,7 @@ function buildIntentFromDefaults(
             categoryName: null,
             jarKey: null,
             source: 'custom',
+            saveParty: true,
         };
     }
 
@@ -363,6 +370,7 @@ export function ExpenseForm({
             categoryName: donationsCategory?.name ?? null,
             jarKey: JarKey.GIVE,
             source: name.trim() ? 'custom' : null,
+            saveParty: !orgKey,
         });
     }
 
@@ -392,6 +400,7 @@ export function ExpenseForm({
                 categoryName: donationsCategory?.name ?? null,
                 jarKey: JarKey.GIVE,
                 source: null,
+                saveParty: true,
             });
         }
     }
@@ -450,7 +459,11 @@ export function ExpenseForm({
             const vendor = isIn ? label : intent.vendor.trim();
             const note = values.note.trim();
             const merchantKey = !isIn ? intent.merchantKey?.trim() || null : null;
-            const saveParty = Boolean(vendor) && !merchantKey;
+            const saveParty =
+                Boolean(vendor) &&
+                !merchantKey &&
+                !giveOrgKey &&
+                (isIn || (intent.saveParty ?? true));
             const description = isIn
                 ? note || label || tExpense('money_in')
                 : note || intent.categoryName?.trim() || vendor || tExpense('default_description');
@@ -782,14 +795,29 @@ export function ExpenseForm({
                     </div>
                     <p className="text-xs leading-relaxed text-fg-faint">{tFixed('give_hint')}</p>
                     {givePayeeMode === 'known' ? (
-                        <FormInput
-                            placeholder={tFixed('give_placeholder')}
-                            value={intent.vendor}
-                            disabled={busy}
-                            onChange={event => {
-                                applyGivePayee(event.target.value, null);
-                            }}
-                        />
+                        <div className="grid gap-2">
+                            <FormInput
+                                placeholder={tFixed('give_placeholder')}
+                                value={intent.vendor}
+                                disabled={busy}
+                                onChange={event => {
+                                    applyGivePayee(event.target.value, null);
+                                }}
+                            />
+                            {intent.vendor.trim() && !giveOrgKey ? (
+                                <SavePartyToggle
+                                    name={intent.vendor}
+                                    checked={intent.saveParty}
+                                    disabled={busy}
+                                    onCheckedChange={next =>
+                                        setIntentOverride({
+                                            ...intent,
+                                            saveParty: next,
+                                        })
+                                    }
+                                />
+                            ) : null}
+                        </div>
                     ) : (
                         <GivingFinder
                             defaultOpen

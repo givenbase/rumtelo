@@ -22,6 +22,7 @@ import { partyMark } from '@/app/_lib/vendor-brands';
 import { CATALOG_CHIP_IDLE_LIMIT, CatalogChipPicker } from './catalog-chip-picker';
 import { matchesChipQuery } from './chip-search';
 import { FormInput } from './form-input';
+import { SavePartyToggle } from './save-party-toggle';
 
 /** Form selection state for the expense intent picker (not an API DTO). */
 export type ExpenseIntentSelection = {
@@ -34,6 +35,8 @@ export type ExpenseIntentSelection = {
     jarKey: JarKey | null;
     /** How the intent was chosen — drives follow-up UI */
     source: 'merchant' | 'category' | 'custom' | null;
+    /** Ask: save free-typed vendor for next time. Default ON when free-typing. */
+    saveParty: boolean;
 };
 
 type ExpensePickMode = 'list' | 'manual';
@@ -182,6 +185,7 @@ export function ExpenseIntentField({
             categoryName: null,
             jarKey: null,
             source: null,
+            saveParty: true,
         });
     }
 
@@ -196,6 +200,7 @@ export function ExpenseIntentField({
             categoryName: category?.name ?? merchant.categoryTemplateKey,
             jarKey: merchant.jarKey,
             source: 'merchant',
+            saveParty: false,
         });
         setQuery('');
         setOpen(false);
@@ -211,6 +216,7 @@ export function ExpenseIntentField({
             categoryName: category.name,
             jarKey: category.jarKey,
             source: 'category',
+            saveParty: true,
         });
         setQuery('');
         setOpen(false);
@@ -226,6 +232,7 @@ export function ExpenseIntentField({
             categoryName: null,
             jarKey: null,
             source: null,
+            saveParty: true,
         });
         setCustomVendor(false);
         setSkippedVendor(false);
@@ -243,6 +250,7 @@ export function ExpenseIntentField({
             categoryName: value.categoryName,
             jarKey: value.jarKey,
             source: value.categoryKey ? 'category' : 'custom',
+            saveParty: value.saveParty ?? true,
         });
         setQuery('');
         setOpen(false);
@@ -543,7 +551,7 @@ export function ExpenseIntentField({
                             onQueryChange={setVendorChipQuery}
                             items={vendorsForCategory}
                             placeholder={tForm('search_vendor')}
-                            noMatchesLabel={tForm('no_matches')}
+                            noMatchesLabel={tForm('no_matches_use_typed')}
                             disabled={disabled}
                             idleLimit={CATALOG_CHIP_IDLE_LIMIT}
                             selectedKey={
@@ -554,7 +562,16 @@ export function ExpenseIntentField({
                                 )?.key ?? null
                             }
                             otherLabel={tForm('other')}
-                            onOther={() => setCustomVendor(true)}
+                            formatTypedLabel={name => tForm('use_typed_name', { name })}
+                            onOther={typed => {
+                                const name = typed?.trim();
+                                if (name) {
+                                    commitCustomVendor(name);
+                                    setVendorChipQuery('');
+                                    return;
+                                }
+                                setCustomVendor(true);
+                            }}
                             trailing={
                                 <button
                                     type="button"
@@ -716,6 +733,15 @@ export function ExpenseIntentField({
                 <Typography as="p" size="sm" color="muted">
                     {t('custom_jar_hint')}
                 </Typography>
+            ) : null}
+
+            {value.vendor.trim() && !value.merchantKey ? (
+                <SavePartyToggle
+                    name={value.vendor}
+                    checked={value.saveParty}
+                    disabled={disabled}
+                    onCheckedChange={next => onChange({ ...value, saveParty: next })}
+                />
             ) : null}
         </div>
     );

@@ -700,7 +700,17 @@ export function GoalForm({
                         onQueryChange={setCarBrandQuery}
                         items={visibleCarBrands}
                         placeholder={tForm('search_brand')}
-                        noMatchesLabel={tUiForm('no_matches')}
+                        noMatchesLabel={tUiForm('no_matches_use_typed')}
+                        formatTypedLabel={typed => tUiForm('use_typed_name', { name: typed })}
+                        onOther={typed => {
+                            const next = typed?.trim();
+                            if (!next) return;
+                            form.setValue('name', next, {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                            });
+                            setCarBrandQuery('');
+                        }}
                         trailing={
                             !carBrandSearch && visibleCarBrands.length < carBrands.length ? (
                                 <button
