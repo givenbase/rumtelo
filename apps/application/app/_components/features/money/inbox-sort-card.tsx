@@ -273,7 +273,7 @@ export function InboxSortCard({
                                     className={cn(
                                         'inline-flex items-center gap-2 rounded-full border px-3 py-1.5 font-mono text-xs tracking-widest uppercase transition-colors',
                                         active
-                                            ? 'border-accent/50 bg-accent-soft text-accent'
+                                            ? 'border-accent bg-accent-soft text-accent'
                                             : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
                                     )}>
                                     <JarMark jarKey={jar.key} icon={jar.icon} />
@@ -392,7 +392,7 @@ export function TabPills({
                     className={cn(
                         'flex items-center gap-2 rounded-full border px-4 py-2 font-mono text-xs font-medium tracking-wide uppercase transition-all duration-200',
                         active === tab.id
-                            ? 'border-accent/40 bg-accent-soft text-accent'
+                            ? 'border-accent bg-accent-soft text-accent'
                             : 'border-line text-fg-muted hover:border-line-strong hover:text-fg'
                     )}>
                     {tab.label}

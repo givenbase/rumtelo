@@ -103,13 +103,13 @@ function ChoiceCard({
                 'flex items-center gap-2.5 rounded-xl border px-3 py-3 text-left transition-all',
                 selected
                     ? 'border-accent bg-accent-soft shadow-[inset_0_0_0_1px] shadow-accent/30'
-                    : 'border-line bg-raised hover:border-accent/40 hover:bg-card'
+                    : 'border-line bg-raised hover:border-accent hover:bg-card'
             )}>
             <span
                 className={cn(
                     'grid size-9 shrink-0 place-items-center rounded-lg border',
                     selected
-                        ? 'border-accent/30 bg-surface text-accent'
+                        ? 'border-accent bg-surface text-accent'
                         : 'border-line bg-surface text-fg-muted'
                 )}>
                 <Icon name={icon} size="sm" color="inherit" />
@@ -346,7 +346,7 @@ export function OnboardingOverlay() {
                                                     'grid gap-1 rounded-xl border px-2.5 py-3 text-center transition-all',
                                                     on
                                                         ? 'border-accent bg-accent-soft shadow-[inset_0_0_0_1px] shadow-accent/30'
-                                                        : 'border-line bg-raised hover:border-accent/40'
+                                                        : 'border-line bg-raised hover:border-accent'
                                                 )}>
                                                 <span
                                                     className={cn(
@@ -413,7 +413,7 @@ export function OnboardingOverlay() {
                                             className={cn(
                                                 'rounded-xl border transition-colors',
                                                 open
-                                                    ? 'border-accent/40 bg-accent-soft/30'
+                                                    ? 'border-accent bg-accent-soft/30'
                                                     : 'border-line bg-raised'
                                             )}>
                                             <button
@@ -584,7 +584,7 @@ export function OnboardingOverlay() {
                                             'rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors',
                                             why === t(key)
                                                 ? 'border-accent bg-accent-soft text-accent'
-                                                : 'border-line bg-raised text-fg-muted hover:border-accent/40 hover:text-fg'
+                                                : 'border-line bg-raised text-fg-muted hover:border-accent hover:text-fg'
                                         )}>
                                         {t(key)}
                                     </button>

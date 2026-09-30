@@ -32,12 +32,24 @@ export function Phone({ className, defaultCountry = 'NL', onChange, value, ...pr
         <PhoneInput
             className={cn(
                 fieldWrapperClasses,
-                'gap-2 px-3 [&_.PhoneInputCountry]:shrink-0',
-                '[&_.PhoneInputInput]:min-w-0 [&_.PhoneInputInput]:flex-1',
+                'gap-0 overflow-hidden p-0',
+                // Country dial — branded strip, not the library default chrome.
+                '[&_.PhoneInputCountry]:flex [&_.PhoneInputCountry]:h-full [&_.PhoneInputCountry]:shrink-0',
+                '[&_.PhoneInputCountry]:items-center [&_.PhoneInputCountry]:gap-1.5',
+                '[&_.PhoneInputCountry]:border-r [&_.PhoneInputCountry]:border-line-strong',
+                '[&_.PhoneInputCountry]:bg-raised/80 [&_.PhoneInputCountry]:px-2.5',
+                '[&_.PhoneInputCountryIcon]:overflow-hidden [&_.PhoneInputCountryIcon]:rounded-sm',
+                '[&_.PhoneInputCountrySelect]:absolute [&_.PhoneInputCountrySelect]:inset-0',
+                '[&_.PhoneInputCountrySelect]:z-10 [&_.PhoneInputCountrySelect]:h-full [&_.PhoneInputCountrySelect]:w-full',
+                '[&_.PhoneInputCountrySelect]:cursor-pointer [&_.PhoneInputCountrySelect]:opacity-0',
+                '[&_.PhoneInputCountrySelectArrow]:text-fg-muted [&_.PhoneInputCountrySelectArrow]:opacity-70',
+                // Number input
+                '[&_.PhoneInputInput]:h-11 [&_.PhoneInputInput]:min-w-0 [&_.PhoneInputInput]:flex-1',
                 '[&_.PhoneInputInput]:border-none [&_.PhoneInputInput]:bg-transparent',
-                '[&_.PhoneInputInput]:p-0 [&_.PhoneInputInput]:text-sm [&_.PhoneInputInput]:text-fg',
-                '[&_.PhoneInputInput]:outline-none [&_.PhoneInputInput]:placeholder:text-fg-muted',
-                '[&_.PhoneInputCountrySelect]:bg-transparent [&_.PhoneInputCountrySelectArrow]:opacity-50',
+                '[&_.PhoneInputInput]:px-3 [&_.PhoneInputInput]:font-mono [&_.PhoneInputInput]:text-sm',
+                '[&_.PhoneInputInput]:tracking-wide [&_.PhoneInputInput]:text-fg [&_.PhoneInputInput]:tabular-nums',
+                '[&_.PhoneInputInput]:outline-none [&_.PhoneInputInput]:placeholder:font-sans',
+                '[&_.PhoneInputInput]:placeholder:tracking-normal [&_.PhoneInputInput]:placeholder:text-fg-muted',
                 className
             )}
             international

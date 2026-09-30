@@ -34,10 +34,6 @@ import { cn } from '@rumtelo/utils';
 import { createDeviceFormSchema, type DeviceFormValues } from '../_utils/device-form-zod';
 import { SettingsPill } from './settings-chrome';
 
-const MENU_CONTENT = 'rounded-lg border-line bg-surface text-fg shadow-md';
-const MENU_ITEM =
-    'rounded-md focus:bg-accent/10 focus:text-fg data-[highlighted]:bg-accent/10 data-[highlighted]:text-fg';
-
 type MemberOption = { accountId: string; displayName: string };
 
 type DevicePairDialogProps = {
@@ -193,9 +189,7 @@ export function DevicePairDialog({
                         <section
                             className={cn(
                                 'grid gap-3 rounded-xl border px-3.5 py-3',
-                                paired
-                                    ? 'border-success/40 bg-success/5'
-                                    : 'border-line bg-fg/[0.03]'
+                                paired ? 'border-success bg-success/5' : 'border-line bg-fg/[0.03]'
                             )}>
                             <div className="flex items-start gap-3">
                                 <span
@@ -287,14 +281,11 @@ export function DevicePairDialog({
                                                             <SelectValue />
                                                         </SelectTrigger>
                                                     </FormControl>
-                                                    <SelectContent
-                                                        position="popper"
-                                                        className={MENU_CONTENT}>
+                                                    <SelectContent position="popper">
                                                         {kinds.map(kind => (
                                                             <SelectItem
                                                                 key={kind.key}
-                                                                value={kind.key}
-                                                                className={MENU_ITEM}>
+                                                                value={kind.key}>
                                                                 <Icon
                                                                     name={kind.icon as IconName}
                                                                     size="sm"
@@ -327,15 +318,12 @@ export function DevicePairDialog({
                                                             <SelectValue />
                                                         </SelectTrigger>
                                                     </FormControl>
-                                                    <SelectContent
-                                                        position="popper"
-                                                        className={MENU_CONTENT}>
+                                                    <SelectContent position="popper">
                                                         {Object.values(DeviceConnection).map(
                                                             connection => (
                                                                 <SelectItem
                                                                     key={connection}
-                                                                    value={connection}
-                                                                    className={MENU_ITEM}>
+                                                                    value={connection}>
                                                                     <Icon
                                                                         name={
                                                                             connection ===
@@ -379,19 +367,14 @@ export function DevicePairDialog({
                                                         <SelectValue />
                                                     </SelectTrigger>
                                                 </FormControl>
-                                                <SelectContent
-                                                    position="popper"
-                                                    className={MENU_CONTENT}>
-                                                    <SelectItem
-                                                        value="shared"
-                                                        className={MENU_ITEM}>
+                                                <SelectContent position="popper">
+                                                    <SelectItem value="shared">
                                                         {t('pages.settings.panels.devices.shared')}
                                                     </SelectItem>
                                                     {members.map(member => (
                                                         <SelectItem
                                                             key={member.accountId}
-                                                            value={member.accountId}
-                                                            className={MENU_ITEM}>
+                                                            value={member.accountId}>
                                                             {member.displayName}
                                                         </SelectItem>
                                                     ))}
@@ -427,7 +410,7 @@ export function DevicePairDialog({
                                                             className={cn(
                                                                 'rounded-full border px-2.5 py-1 text-xs font-medium transition-colors',
                                                                 on
-                                                                    ? 'border-accent/50 bg-accent/10 text-accent'
+                                                                    ? 'border-accent bg-accent/10 text-accent'
                                                                     : 'border-line bg-surface text-fg-muted hover:text-fg'
                                                             )}>
                                                             {capabilityLabels[capability]}

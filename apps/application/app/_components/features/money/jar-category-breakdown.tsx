@@ -48,15 +48,23 @@ function statusChip(
 ) {
     if (status === FixedCostPeriodStatus.TAKEN) {
         return (
-            <MetaChip className="border-success/30 text-success">{tFixed('status_taken')}</MetaChip>
+            <MetaChip className="border-success bg-success/5 text-success">
+                {tFixed('status_taken')}
+            </MetaChip>
         );
     }
     if (status === FixedCostPeriodStatus.DUE) {
-        return <MetaChip className="border-danger/30 text-danger">{tFixed('status_due')}</MetaChip>;
+        return (
+            <MetaChip className="border-danger bg-danger/5 text-danger">
+                {tFixed('status_due')}
+            </MetaChip>
+        );
     }
     if (status === FixedCostPeriodStatus.SKIPPED) {
         return (
-            <MetaChip className="border-line text-fg-muted">{tFixed('status_skipped')}</MetaChip>
+            <MetaChip className="border-fg-muted bg-raised text-fg-muted">
+                {tFixed('status_skipped')}
+            </MetaChip>
         );
     }
     return <MetaChip>{plannedLabel}</MetaChip>;
@@ -466,7 +474,7 @@ export function JarCategoryBreakdown({
                                                         }
                                                         badges={
                                                             <>
-                                                                <MetaChip className="border-success/30 text-success">
+                                                                <MetaChip className="border-success bg-success/5 text-success">
                                                                     {tFixed('status_taken')}
                                                                 </MetaChip>
                                                                 <MetaChip>

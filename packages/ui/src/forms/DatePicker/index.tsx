@@ -160,7 +160,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(function
                         'font-mono text-[13px] tracking-wide tabular-nums'
                     )}
                 />
-                <div className={cn(endActionClasses, open && 'border-accent/30 bg-accent-soft/50')}>
+                <div className={cn(endActionClasses, open && 'border-accent bg-accent-soft/50')}>
                     <button
                         type="button"
                         tabIndex={-1}

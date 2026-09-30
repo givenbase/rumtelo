@@ -60,7 +60,7 @@ function SheetContent({
             <SheetPrimitive.Content
                 data-slot="sheet-content"
                 className={cn(
-                    'data-[state=closed]:animate-out data-[state=open]:animate-in fixed z-50 flex flex-col gap-4 bg-background shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500',
+                    'data-[state=closed]:animate-out data-[state=open]:animate-in fixed z-50 flex flex-col gap-4 border-line bg-surface text-fg shadow-[0_24px_60px_-28px_rgba(15,23,42,0.55)] transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500',
                     // Full width on phones; on larger screens fill up to the max so the panel
                     // never shrinks to its content. Callers override the max (sm:max-w-*).
                     side === 'right' &&
@@ -76,7 +76,7 @@ function SheetContent({
                 {...props}>
                 {children}
                 {showCloseButton && (
-                    <SheetPrimitive.Close className="absolute top-4 right-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-secondary">
+                    <SheetPrimitive.Close className="absolute top-4 right-4 grid size-8 place-items-center rounded-lg text-fg-muted transition-colors hover:bg-accent-soft hover:text-accent focus-visible:ring-2 focus-visible:ring-accent/35 focus-visible:outline-hidden disabled:pointer-events-none">
                         <Icon name="x" size="md" />
                         <span className="sr-only">{closeLabel ?? ''}</span>
                     </SheetPrimitive.Close>
@@ -126,7 +126,7 @@ function SheetDescription({
     return (
         <SheetPrimitive.Description
             data-slot="sheet-description"
-            className={cn('text-sm text-muted-foreground', className)}
+            className={cn('text-sm text-fg-muted', className)}
             {...props}
         />
     );

@@ -301,7 +301,7 @@ export function IncomeSimulator({
                             className={cn(
                                 'rounded-full border px-2.5 py-1 transition-colors',
                                 atCurrent
-                                    ? 'border-accent/40 bg-accent-soft text-accent'
+                                    ? 'border-accent bg-accent-soft text-accent'
                                     : 'border-line text-fg-secondary hover:border-accent hover:text-accent'
                             )}>
                             {t('now', { amount: formatMoney(range.current * 100) })}
@@ -315,7 +315,7 @@ export function IncomeSimulator({
                             className={cn(
                                 'rounded-full border px-2.5 py-1 transition-colors',
                                 atTarget
-                                    ? 'border-accent/40 bg-accent-soft text-accent'
+                                    ? 'border-accent bg-accent-soft text-accent'
                                     : 'border-line text-fg-secondary hover:border-accent hover:text-accent'
                             )}>
                             {t('target', { amount: formatMoney(targetMajor * 100) })}
@@ -376,7 +376,7 @@ export function IncomeSimulator({
                                         className={cn(
                                             'flex items-center gap-2 rounded-full border px-3 py-2 text-sm whitespace-nowrap transition-colors',
                                             isActive
-                                                ? 'border-accent/40 bg-accent-soft text-accent'
+                                                ? 'border-accent bg-accent-soft text-accent'
                                                 : 'border-line text-fg-secondary hover:border-accent hover:text-accent',
                                             reached && !isActive && 'opacity-60'
                                         )}>

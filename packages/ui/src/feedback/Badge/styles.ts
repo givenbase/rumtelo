@@ -6,10 +6,10 @@ const badgeVariants = cva(
         defaultVariants: { tone: 'neutral' },
         variants: {
             tone: {
-                neutral: 'bg-raised text-fg-secondary',
-                success: 'bg-success/10 text-success',
-                warning: 'bg-warning/10 text-warning',
-                danger: 'bg-danger/10 text-danger',
+                neutral: 'border border-fg-muted bg-raised text-fg-secondary',
+                success: 'border border-success bg-success/10 text-success',
+                warning: 'border border-warning bg-warning/10 text-warning',
+                danger: 'border border-danger bg-danger/10 text-danger',
             },
         },
     }

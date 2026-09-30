@@ -245,7 +245,7 @@ export function NetWorthPageClient() {
                                 className={cn(
                                     'rounded-full border px-3.5 py-1.5 font-mono text-xs font-medium tracking-wide uppercase transition-colors',
                                     filter === filterOption.key
-                                        ? 'border-accent/40 bg-accent-soft text-accent'
+                                        ? 'border-accent bg-accent-soft text-accent'
                                         : 'border-line text-fg-secondary hover:border-accent-hover hover:text-accent'
                                 )}>
                                 {filterOption.label}
@@ -312,7 +312,7 @@ export function NetWorthPageClient() {
                                                 className={cn(
                                                     'grid cursor-pointer gap-0 overflow-hidden rounded-xl border bg-raised text-left transition-colors hover:border-accent-hover',
                                                     pays
-                                                        ? 'border-accent/40 shadow-glow'
+                                                        ? 'border-accent shadow-glow'
                                                         : 'border-line'
                                                 )}>
                                                 <div

@@ -142,6 +142,10 @@ export function DueDayField({
                             disabled={disabled}
                             value={value}
                             onChange={event => onChange(event.target.value)}
+                            onBlur={() => {
+                                const next = clampDueDayInput(value, cadence);
+                                if (next !== value) onChange(next);
+                            }}
                         />
                     </FormControl>
                 </div>

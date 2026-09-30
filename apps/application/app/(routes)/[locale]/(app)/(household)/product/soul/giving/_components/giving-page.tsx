@@ -492,7 +492,7 @@ export function GivingPageClient() {
                                         onClick={() => setGivePickMode('coach')}
                                         className={
                                             on
-                                                ? 'rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                                ? 'rounded-full border border-accent bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
                                                 : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
                                         }>
                                         {option.label}
@@ -509,7 +509,7 @@ export function GivingPageClient() {
                                     onClick={() => setGivePickMode(option.id)}
                                     className={
                                         on
-                                            ? 'rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                            ? 'rounded-full border border-accent bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
                                             : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
                                     }>
                                     {option.label}

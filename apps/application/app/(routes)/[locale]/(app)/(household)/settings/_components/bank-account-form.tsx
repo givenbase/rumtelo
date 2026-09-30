@@ -30,10 +30,6 @@ import type { UseFormReturn } from 'react-hook-form';
 import type { BankAccountFormValues } from '../_utils/settings-form-zod';
 import { isIbanStub } from '../_utils/settings-shared';
 
-const MENU_CONTENT = 'rounded-lg border-line bg-surface text-fg shadow-md';
-const MENU_ITEM =
-    'rounded-md focus:bg-accent/10 focus:text-fg data-[highlighted]:bg-accent/10 data-[highlighted]:text-fg';
-
 export type BankAccountFormProps = {
     form: UseFormReturn<BankAccountFormValues>;
     formKey: string;
@@ -283,28 +279,20 @@ export function BankAccountForm({
                                             <SelectValue />
                                         </SelectTrigger>
                                     </FormControl>
-                                    <SelectContent position="popper" className={MENU_CONTENT}>
-                                        <SelectItem
-                                            value={AccountKind.CHECKING}
-                                            className={MENU_ITEM}>
+                                    <SelectContent position="popper">
+                                        <SelectItem value={AccountKind.CHECKING}>
                                             {kindLabel(AccountKind.CHECKING)}
                                         </SelectItem>
-                                        <SelectItem
-                                            value={AccountKind.SAVINGS}
-                                            className={MENU_ITEM}>
+                                        <SelectItem value={AccountKind.SAVINGS}>
                                             {kindLabel(AccountKind.SAVINGS)}
                                         </SelectItem>
-                                        <SelectItem
-                                            value={AccountKind.CREDIT}
-                                            className={MENU_ITEM}>
+                                        <SelectItem value={AccountKind.CREDIT}>
                                             {kindLabel(AccountKind.CREDIT)}
                                         </SelectItem>
-                                        <SelectItem value={AccountKind.CASH} className={MENU_ITEM}>
+                                        <SelectItem value={AccountKind.CASH}>
                                             {kindLabel(AccountKind.CASH)}
                                         </SelectItem>
-                                        <SelectItem
-                                            value={AccountKind.INVESTMENT}
-                                            className={MENU_ITEM}>
+                                        <SelectItem value={AccountKind.INVESTMENT}>
                                             {kindLabel(AccountKind.INVESTMENT)}
                                         </SelectItem>
                                     </SelectContent>
@@ -333,15 +321,12 @@ export function BankAccountForm({
                                                 <SelectValue />
                                             </SelectTrigger>
                                         </FormControl>
-                                        <SelectContent position="popper" className={MENU_CONTENT}>
-                                            <SelectItem value="none" className={MENU_ITEM}>
+                                        <SelectContent position="popper">
+                                            <SelectItem value="none">
                                                 {t('pages.settings.panels.bank.pay_from_none')}
                                             </SelectItem>
                                             {settlementOptions.map(row => (
-                                                <SelectItem
-                                                    key={row.id}
-                                                    value={row.id}
-                                                    className={MENU_ITEM}>
+                                                <SelectItem key={row.id} value={row.id}>
                                                     {row.name}
                                                 </SelectItem>
                                             ))}

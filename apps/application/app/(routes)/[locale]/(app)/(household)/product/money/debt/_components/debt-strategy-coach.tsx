@@ -293,8 +293,8 @@ export function DebtStrategyCoach({
                                 className={cn(
                                     'rounded-lg border border-l-4 bg-raised p-3.5 text-left',
                                     isYours
-                                        ? 'border-accent/40 border-l-accent ring-1 ring-accent/15'
-                                        : 'border-line border-l-fg-muted/35'
+                                        ? 'border-accent border-l-accent ring-1 ring-accent/20'
+                                        : 'border-line border-l-fg-muted'
                                 )}>
                                 <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
                                     <div className="grid gap-0.5">

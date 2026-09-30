@@ -143,7 +143,7 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
                     ) : null}
 
                     {jarKey === JarKey.EDUCATION ? (
-                        <div className="grid gap-1.5 rounded-xl border border-dashed border-accent/30 bg-accent/5 px-3 py-3">
+                        <div className="grid gap-1.5 rounded-xl border border-dashed border-accent bg-accent/5 px-3 py-3">
                             <p className="font-mono text-[10px] font-semibold tracking-[0.12em] text-accent uppercase">
                                 {t('learn_nudge_title')}
                             </p>
@@ -192,7 +192,7 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
                         </div>
                     ) : null}
 
-                    <div className="flex gap-2.5 rounded-xl border border-danger/25 bg-danger/5 px-3 py-2.5">
+                    <div className="flex gap-2.5 rounded-xl border border-danger bg-danger/5 px-3 py-2.5">
                         <span className="shrink-0 text-base leading-none" aria-hidden>
                             🚫
                         </span>

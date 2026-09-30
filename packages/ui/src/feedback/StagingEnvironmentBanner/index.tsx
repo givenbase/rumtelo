@@ -44,7 +44,7 @@ export function StagingEnvironmentBanner({
                 />
 
                 <div className="relative mx-auto flex h-10 max-w-7xl items-center justify-center gap-3 px-4">
-                    <span className="inline-flex items-center gap-2 rounded-md border border-accent/35 bg-accent/15 px-2 py-0.5 font-mono text-[10px] font-semibold tracking-[0.18em] text-[#7fd4cf] uppercase">
+                    <span className="inline-flex items-center gap-2 rounded-md border border-accent bg-accent/15 px-2 py-0.5 font-mono text-[10px] font-semibold tracking-[0.18em] text-[#7fd4cf] uppercase">
                         <span aria-hidden className="relative flex size-1.5 shrink-0">
                             <span className="absolute inset-0 animate-ping rounded-full bg-accent opacity-60" />
                             <span className="relative size-1.5 rounded-full bg-accent" />

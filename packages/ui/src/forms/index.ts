@@ -11,6 +11,7 @@ export * from './Slider';
 export * from './Calendar';
 export * from './DatePicker';
 export * from './FileDropzone';
+export * from './SuggestionPanel';
 
 export {
     useFormField,

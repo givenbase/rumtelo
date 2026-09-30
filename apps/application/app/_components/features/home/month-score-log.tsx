@@ -126,11 +126,11 @@ export function MonthScoreLog({
             className={cn(
                 'rounded-2xl border bg-surface p-6 shadow-md',
                 isClosed
-                    ? 'border-success/35 ring-1 ring-success/15'
+                    ? 'border-success ring-1 ring-success/20'
                     : urgency === 'overdue'
-                      ? 'border-danger/40 ring-1 ring-danger/15'
+                      ? 'border-danger ring-1 ring-danger/20'
                       : urgency === 'today' || urgency === 'soon'
-                        ? 'border-warning/40 ring-1 ring-warning/15'
+                        ? 'border-warning ring-1 ring-warning/20'
                         : 'border-line'
             )}>
             {/* Header */}
@@ -207,7 +207,7 @@ export function MonthScoreLog({
             ) : null}
 
             {!isClosed && priorOpenPeriod && priorLabel ? (
-                <div className="mt-3 rounded-xl border border-accent/30 bg-accent-soft/40 px-3.5 py-3">
+                <div className="mt-3 rounded-xl border border-accent bg-accent-soft/40 px-3.5 py-3">
                     <p className="font-mono text-[10px] font-bold tracking-[0.12em] text-accent uppercase">
                         {tDashboard('prior_open_title')}
                     </p>
@@ -224,7 +224,7 @@ export function MonthScoreLog({
             ) : null}
 
             {!isClosed && blockerLines.length > 0 ? (
-                <div className="mt-3 rounded-xl border border-warning/30 bg-warning/8 px-3.5 py-3">
+                <div className="mt-3 rounded-xl border border-warning bg-warning/8 px-3.5 py-3">
                     <p className="font-mono text-[10px] font-bold tracking-[0.12em] text-warning uppercase">
                         {tDashboard('close_blocked_title')}
                     </p>

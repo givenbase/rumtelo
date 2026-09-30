@@ -352,7 +352,7 @@ export function PlanSettings() {
                                 className={cn(
                                     'grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-lg border border-l-[3px] px-3.5 py-3',
                                     cur
-                                        ? 'border-accent/40 border-l-accent bg-accent-soft'
+                                        ? 'border-accent border-l-accent bg-accent-soft'
                                         : 'border-line border-l-line bg-surface'
                                 )}>
                                 <div className="grid min-w-0 gap-1">

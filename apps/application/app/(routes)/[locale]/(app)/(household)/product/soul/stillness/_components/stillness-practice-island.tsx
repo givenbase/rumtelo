@@ -106,7 +106,7 @@ export function StillnessPracticeIsland() {
                         className={cn(
                             'rounded-full border px-4 py-3.5 font-mono text-xs font-bold tracking-wide uppercase transition-all',
                             markedToday
-                                ? 'border-success/25 bg-success/10 text-success'
+                                ? 'border-success bg-success/10 text-success'
                                 : 'border-accent bg-accent text-on-accent hover:brightness-110 disabled:opacity-55'
                         )}>
                         {markedToday ? t('done_today') : t('mark_done')}

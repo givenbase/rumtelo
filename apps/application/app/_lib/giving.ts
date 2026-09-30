@@ -28,9 +28,9 @@ export const GIVING_SIGNAL_TIER_ORDER: readonly GivingSignalTier[] = [
 ];
 
 const SIGNAL_CLASS: Record<GivingSignalTier, string> = {
-    [GivingSignalTier.IMPACT]: 'border-success/30 bg-success/10 text-success',
-    [GivingSignalTier.GOVERNANCE]: 'border-accent/30 bg-accent-soft text-accent',
-    [GivingSignalTier.TAX]: 'border-line bg-raised text-fg-secondary',
+    [GivingSignalTier.IMPACT]: 'border-success bg-success/10 text-success',
+    [GivingSignalTier.GOVERNANCE]: 'border-accent bg-accent-soft text-accent',
+    [GivingSignalTier.TAX]: 'border-fg-muted bg-raised text-fg-secondary',
 };
 
 /**

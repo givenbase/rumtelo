@@ -19,7 +19,7 @@ export function CoachMark({ className, size = 'md' }: CoachMarkProps) {
     return (
         <span
             className={cn(
-                'inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/10 font-mono font-bold tracking-[0.12em] text-accent uppercase',
+                'inline-flex items-center gap-1 rounded-full border border-accent bg-accent/10 font-mono font-bold tracking-[0.12em] text-accent uppercase',
                 size === 'sm' ? 'px-1.5 py-0.5 text-[8px]' : 'px-2 py-0.5 text-[9px]',
                 className
             )}

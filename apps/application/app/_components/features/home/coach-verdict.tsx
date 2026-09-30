@@ -69,7 +69,7 @@ export function CoachVerdict({
     const next = () => setIndex(previous => (previous + 1) % messages.length);
 
     return (
-        <div className="overflow-hidden rounded-2xl border border-accent/40 bg-surface shadow-md">
+        <div className="overflow-hidden rounded-2xl border border-accent bg-surface shadow-md">
             {/* Slide body */}
             <div className="grid gap-3.5 px-5 pt-4.5 pb-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">

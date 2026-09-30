@@ -167,7 +167,7 @@ export function SignUpForm() {
                     {t('features.auth.sign_up.subtitle')}
                 </Typography>
                 {intent ? (
-                    <p className="mt-3 rounded-lg border border-accent/35 bg-accent-soft/40 px-3 py-2 text-sm text-fg-secondary">
+                    <p className="mt-3 rounded-lg border border-accent bg-accent-soft/40 px-3 py-2 text-sm text-fg-secondary">
                         {t('features.auth.sign_up.plan_intent', {
                             plan: tPlans(`${planSlug(intent.planKey)}.name`),
                             interval:

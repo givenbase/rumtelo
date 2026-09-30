@@ -351,7 +351,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                         ) : null}
                     </div>
                     {focusGoal ? (
-                        <Card className="grid gap-2 border-accent/30 bg-accent-soft/50 p-4">
+                        <Card className="grid gap-2 border-accent bg-accent-soft/50 p-4">
                             <p className="font-mono text-[10px] tracking-wider text-accent uppercase">
                                 {t('focus_of', { total: saveQueue.length })}
                             </p>

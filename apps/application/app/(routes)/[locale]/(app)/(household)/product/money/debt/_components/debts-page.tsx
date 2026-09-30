@@ -371,7 +371,7 @@ export function DebtsPageClient() {
                                     className={cn(
                                         'rounded-full border px-3 py-1.5 font-mono text-[10px] font-medium tracking-widest transition-all duration-200',
                                         extra === opt.value
-                                            ? 'border-accent/40 bg-accent-soft text-accent'
+                                            ? 'border-accent bg-accent-soft text-accent'
                                             : 'border-line text-fg-muted hover:border-accent-hover hover:text-accent'
                                     )}>
                                     {opt.label}

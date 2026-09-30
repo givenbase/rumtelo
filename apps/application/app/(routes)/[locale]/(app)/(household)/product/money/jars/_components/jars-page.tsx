@@ -88,7 +88,7 @@ export function JarsPageClient() {
                             </Button>
                         </div>
                     }>
-                    <span className="rounded-full border border-accent/30 bg-accent-soft px-4 py-2 font-mono text-xs font-medium tracking-wide text-accent uppercase">
+                    <span className="rounded-full border border-accent bg-accent-soft px-4 py-2 font-mono text-xs font-medium tracking-wide text-accent uppercase">
                         {t('allocated', {
                             count: jars.length,
                             pct: Math.round(totalPct * 10) / 10,

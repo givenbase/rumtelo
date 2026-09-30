@@ -117,7 +117,7 @@ export function PeriodSelector() {
                             travel.direction === 'current' &&
                                 (open
                                     ? 'border-accent bg-accent-soft text-accent ring-1 ring-accent/25'
-                                    : 'border-accent/50 bg-accent-soft text-accent hover:border-accent')
+                                    : 'border-accent bg-accent-soft text-accent hover:border-accent')
                         )}>
                         <span aria-hidden className="text-[11px] opacity-80">
                             {travel.direction === 'past'
@@ -142,7 +142,7 @@ export function PeriodSelector() {
             <DropdownMenuContent
                 align="end"
                 sideOffset={8}
-                className="w-[min(100vw-2rem,19.5rem)] overflow-hidden rounded-xl border border-line bg-surface p-0 text-fg shadow-lg">
+                className="w-[min(100vw-2rem,19.5rem)] overflow-hidden rounded-2xl border border-line bg-surface p-0 text-fg shadow-[0_18px_50px_-28px_rgba(15,23,42,0.45)]">
                 <div
                     className={cn(
                         'relative overflow-hidden border-b border-line px-4 pt-4 pb-3.5',
@@ -232,10 +232,10 @@ export function PeriodSelector() {
                             disabled={viewYear <= minYear}
                             onPointerDown={event => event.preventDefault()}
                             onClick={() => setViewYear(previous => Math.max(minYear, previous - 1))}
-                            className="inline-flex size-9 items-center justify-center rounded-md text-fg-muted transition-colors hover:bg-raised hover:text-fg disabled:opacity-30">
+                            className="inline-flex size-8 items-center justify-center rounded-lg text-fg-muted transition-colors hover:bg-accent-soft hover:text-accent disabled:opacity-30">
                             ‹
                         </button>
-                        <p className="flex-1 text-center text-sm font-medium tracking-tight text-fg">
+                        <p className="flex-1 text-center font-mono text-sm font-medium tracking-wide text-fg tabular-nums">
                             {viewYear}
                         </p>
                         <button
@@ -244,7 +244,7 @@ export function PeriodSelector() {
                             disabled={viewYear >= maxYear}
                             onPointerDown={event => event.preventDefault()}
                             onClick={() => setViewYear(previous => Math.min(maxYear, previous + 1))}
-                            className="inline-flex size-9 items-center justify-center rounded-md text-fg-muted transition-colors hover:bg-raised hover:text-fg disabled:opacity-30">
+                            className="inline-flex size-8 items-center justify-center rounded-lg text-fg-muted transition-colors hover:bg-accent-soft hover:text-accent disabled:opacity-30">
                             ›
                         </button>
                     </div>
@@ -270,14 +270,14 @@ export function PeriodSelector() {
                                     disabled={disabled}
                                     onClick={() => commit(next)}
                                     className={cn(
-                                        'h-10 rounded-md text-[13px] tracking-tight transition-colors',
+                                        'h-10 rounded-xl font-mono text-[13px] tracking-tight tabular-nums transition-colors',
                                         selected
-                                            ? 'bg-accent font-medium text-on-accent'
+                                            ? 'bg-accent font-semibold text-on-accent shadow-[0_8px_18px_-10px_color-mix(in_oklab,var(--color-accent)_80%,transparent)]'
                                             : disabled
                                               ? 'cursor-not-allowed text-fg-faint opacity-40'
                                               : isCurrent
-                                                ? 'bg-raised font-medium text-fg hover:bg-accent-soft'
-                                                : 'text-fg hover:bg-raised'
+                                                ? 'bg-accent-soft/55 font-medium text-accent ring-1 ring-accent/25 ring-inset hover:bg-accent-soft'
+                                                : 'text-fg hover:bg-accent-soft hover:text-accent'
                                     )}>
                                     {label}
                                 </button>

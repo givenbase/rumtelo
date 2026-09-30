@@ -40,7 +40,7 @@ export function PageHelpButton() {
                 onClick={() => setHelpOpen(true)}
                 className={cn(
                     'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs font-semibold tracking-wide uppercase transition-colors sm:px-3.5',
-                    'border-accent/35 bg-accent/10 text-accent hover:border-accent hover:bg-accent/15'
+                    'border-accent bg-accent/10 text-accent hover:bg-accent/15'
                 )}>
                 <span
                     aria-hidden

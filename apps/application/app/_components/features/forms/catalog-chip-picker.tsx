@@ -64,7 +64,7 @@ export function CatalogChipPicker<T extends ChipItem>({
     })();
 
     return (
-        <div className="grid gap-2">
+        <div className="grid gap-2.5">
             <ChipSearch
                 value={query}
                 onChange={onQueryChange}
@@ -72,7 +72,7 @@ export function CatalogChipPicker<T extends ChipItem>({
                 disabled={disabled}
             />
             {needle && matched.length === 0 ? (
-                <p className="text-sm text-fg-muted">{noMatchesLabel}</p>
+                <p className="font-mono text-xs tracking-wide text-fg-muted">{noMatchesLabel}</p>
             ) : null}
             <div className="flex flex-wrap items-center gap-1.5">
                 {visible.map(item => (
@@ -82,7 +82,7 @@ export function CatalogChipPicker<T extends ChipItem>({
                     <button
                         type="button"
                         disabled={disabled}
-                        className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
+                        className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted transition-colors hover:border-accent hover:bg-accent-soft hover:text-accent"
                         onClick={onOther}>
                         {otherLabel}
                     </button>

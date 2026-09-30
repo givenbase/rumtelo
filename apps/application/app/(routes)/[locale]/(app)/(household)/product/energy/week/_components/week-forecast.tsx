@@ -151,7 +151,7 @@ export function WeekForecast({ templates, entries, from, today, onEditWeek }: Pr
           : tf('title_current');
 
     return (
-        <div className="grid gap-4 rounded-2xl border border-accent/30 bg-accent/5 p-5">
+        <div className="grid gap-4 rounded-2xl border border-accent bg-accent/5 p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                     <Typography as="span" variant="eyebrow" color="primary">
