@@ -4,16 +4,28 @@
  */
 
 import {
+    AccountKind,
     ArchiveRestorePayload,
     Cadence,
+    Currency,
     DebtKind,
     FlowDirection,
     GoalKind,
     GoalStatus,
+    HouseholdKind,
     IncomeKind,
+    IncomeStability,
     JarKey,
+    Locale,
+    PayoffStrategy,
     RuleField,
     RuleMatcher,
+    SpendingStyle,
+    Theme,
+    type ArchiveAccountSettings,
+    type ArchiveBankAccount,
+    type ArchiveHouseholdSettings,
+    type ArchiveParty,
     type ArchiveRestorePayload as Payload,
 } from '@rumtelo/contracts';
 import { toMinorUnits } from '@rumtelo/utils';
@@ -192,6 +204,55 @@ function resolveJarId(
 
 /** Map Rumtelo CSV zip sheets → archive restore payload. */
 export function archivePayloadFromCsvSheets(files: Map<string, string>): Payload {
+    const settings = parseHouseholdSettingsSheet(sheet(files, 'settings.csv')[0]);
+    const accountSettings = parseAccountSettingsSheet(
+        sheet(files, 'account-settings.csv', 'account_settings.csv')[0]
+    );
+
+    const parties = sheet(files, 'parties.csv')
+        .map(row => {
+            if (!row.name) return null;
+            return {
+                name: row.name,
+                note: row.note || null,
+                aliases: row.aliases
+                    ? row.aliases
+                          .split('|')
+                          .map(alias => alias.trim())
+                          .filter(Boolean)
+                    : [],
+                merchantKey: row.merchantKey || null,
+                color: row.color || null,
+                icon: row.icon || null,
+                logoDomain: row.logoDomain || null,
+                website: row.website || null,
+            } satisfies ArchiveParty;
+        })
+        .filter((row): row is NonNullable<typeof row> => row !== null);
+
+    const accounts = sheet(files, 'accounts.csv')
+        .map(row => {
+            if (!row.name || !row.bankKey || !row.kind) return null;
+            if (!(Object.values(AccountKind) as string[]).includes(row.kind)) return null;
+            const balance =
+                row.balanceCents !== undefined && row.balanceCents !== ''
+                    ? asInt(row.balanceCents)
+                    : row.balance !== undefined && row.balance !== ''
+                      ? asMoneyCents(row, 'balanceCents', 'balance')
+                      : 0;
+            return {
+                name: row.name,
+                kind: row.kind as AccountKind,
+                bankKey: row.bankKey,
+                iban: row.iban || null,
+                balance: balance ?? 0,
+                isPrimary: asBool(row.isPrimary, false),
+                wasConnected: asBool(row.wasConnected, false),
+                settlementAccountName: row.settlementAccountName || null,
+            } satisfies ArchiveBankAccount;
+        })
+        .filter((row): row is NonNullable<typeof row> => row !== null);
+
     const jarRows = sheet(files, 'jars.csv');
     const jars = jarRows
         .map(row => {
@@ -340,6 +401,10 @@ export function archivePayloadFromCsvSheets(files: Map<string, string>): Payload
 
     return ArchiveRestorePayload.parse({
         exportedAt: new Date().toISOString(),
+        ...(settings ? { settings } : {}),
+        ...(accountSettings ? { accountSettings } : {}),
+        parties,
+        accounts,
         jars,
         income,
         fixedCosts,
@@ -350,9 +415,101 @@ export function archivePayloadFromCsvSheets(files: Map<string, string>): Payload
     });
 }
 
+function parseHouseholdSettingsSheet(row: Row | undefined): ArchiveHouseholdSettings | undefined {
+    if (!row) return undefined;
+    const money: NonNullable<ArchiveHouseholdSettings['money']> = {};
+    const periodStartDay = asInt(row.periodStartDay);
+    if (periodStartDay !== null) money.periodStartDay = periodStartDay;
+    if (
+        row.incomeStability &&
+        (Object.values(IncomeStability) as string[]).includes(row.incomeStability)
+    ) {
+        money.incomeStability = row.incomeStability as IncomeStability;
+    }
+    if (
+        row.payoffStrategy &&
+        (Object.values(PayoffStrategy) as string[]).includes(row.payoffStrategy)
+    ) {
+        money.payoffStrategy = row.payoffStrategy as PayoffStrategy;
+    }
+
+    const weekCheck: NonNullable<ArchiveHouseholdSettings['weekCheck']> = {};
+    if (row.reminderDay !== undefined && row.reminderDay !== '') {
+        weekCheck.reminderDay = asInt(row.reminderDay);
+    }
+    if (row.reminderAt !== undefined) {
+        weekCheck.reminderAt = row.reminderAt || null;
+    }
+
+    const features: NonNullable<ArchiveHouseholdSettings['features']> = {};
+    if (row.isBankSyncEnabled !== undefined && row.isBankSyncEnabled !== '') {
+        features.isBankSyncEnabled = asBool(row.isBankSyncEnabled, false);
+    }
+    if (row.isCoachEnabled !== undefined && row.isCoachEnabled !== '') {
+        features.isCoachEnabled = asBool(row.isCoachEnabled, false);
+    }
+
+    let answers: ArchiveHouseholdSettings['answers'];
+    if (row.answersJson) {
+        try {
+            const parsed: unknown = JSON.parse(row.answersJson);
+            if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+                answers = parsed as ArchiveHouseholdSettings['answers'];
+            }
+        } catch {
+            /* ignore bad answersJson */
+        }
+    }
+
+    const audienceKeys = row.audienceKeys
+        ? row.audienceKeys
+              .split('|')
+              .map(key => key.trim())
+              .filter(Boolean)
+        : undefined;
+
+    const settings: ArchiveHouseholdSettings = {
+        ...(row.why !== undefined ? { why: row.why || null } : {}),
+        ...(row.kind && (Object.values(HouseholdKind) as string[]).includes(row.kind)
+            ? { kind: row.kind as HouseholdKind }
+            : {}),
+        ...(row.currency && (Object.values(Currency) as string[]).includes(row.currency)
+            ? { currency: row.currency as Currency }
+            : {}),
+        ...(Object.keys(money).length > 0 ? { money } : {}),
+        ...(Object.keys(weekCheck).length > 0 ? { weekCheck } : {}),
+        ...(Object.keys(features).length > 0 ? { features } : {}),
+        ...(answers ? { answers } : {}),
+        ...(audienceKeys ? { audienceKeys } : {}),
+    };
+
+    return Object.keys(settings).length > 0 ? settings : undefined;
+}
+
+function parseAccountSettingsSheet(row: Row | undefined): ArchiveAccountSettings | undefined {
+    if (!row) return undefined;
+    const settings: ArchiveAccountSettings = {
+        ...(row.locale && (Object.values(Locale) as string[]).includes(row.locale)
+            ? { locale: row.locale as Locale }
+            : {}),
+        ...(row.theme && (Object.values(Theme) as string[]).includes(row.theme)
+            ? { theme: row.theme as Theme }
+            : {}),
+        ...(row.spendingStyle &&
+        (Object.values(SpendingStyle) as string[]).includes(row.spendingStyle)
+            ? { spendingStyle: row.spendingStyle as SpendingStyle }
+            : {}),
+    };
+    return Object.keys(settings).length > 0 ? settings : undefined;
+}
+
 export type ArchiveImportSource = 'json' | 'csv-zip' | 'csv';
 
 export type ArchiveImportFound = {
+    settings: boolean;
+    accountSettings: boolean;
+    parties: number;
+    accounts: number;
     jars: number;
     income: number;
     fixedCosts: number;
@@ -372,6 +529,10 @@ export type ArchiveImportParseResult = {
 
 export function summarizeArchivePayload(payload: Payload): ArchiveImportFound {
     return {
+        settings: payload.settings !== undefined,
+        accountSettings: payload.accountSettings !== undefined,
+        parties: payload.parties.length,
+        accounts: payload.accounts.length,
         jars: payload.jars.length,
         income: payload.income.length,
         fixedCosts: payload.fixedCosts.length,
@@ -390,6 +551,11 @@ function hasHeaders(headers: Set<string>, ...needed: string[]): boolean {
 export function detectCsvSheetName(fileName: string, csvText: string): string {
     const base = fileName.split('/').pop()?.toLowerCase() ?? '';
     const known = [
+        'settings.csv',
+        'account-settings.csv',
+        'account_settings.csv',
+        'parties.csv',
+        'accounts.csv',
         'jars.csv',
         'income.csv',
         'fixed-costs.csv',
@@ -399,13 +565,33 @@ export function detectCsvSheetName(fileName: string, csvText: string): string {
         'goals.csv',
         'rules.csv',
     ];
-    if (known.includes(base)) return base === 'fixed_costs.csv' ? 'fixed-costs.csv' : base;
+    if (known.includes(base)) {
+        if (base === 'fixed_costs.csv') return 'fixed-costs.csv';
+        if (base === 'account_settings.csv') return 'account-settings.csv';
+        return base;
+    }
 
     const firstLine = stripBom(csvText).split(/\r?\n/)[0] ?? '';
     const headers = new Set(
         firstLine.split(',').map(header => header.trim().replaceAll(/^"|"$/g, '').toLowerCase())
     );
 
+    if (hasHeaders(headers, 'locale', 'theme') || hasHeaders(headers, 'spendingstyle')) {
+        return 'account-settings.csv';
+    }
+    if (
+        hasHeaders(headers, 'currency', 'kind') ||
+        hasHeaders(headers, 'periodstartday') ||
+        hasHeaders(headers, 'payoffstrategy')
+    ) {
+        return 'settings.csv';
+    }
+    if (hasHeaders(headers, 'bankkey') || hasHeaders(headers, 'wasconnected')) {
+        return 'accounts.csv';
+    }
+    if (hasHeaders(headers, 'aliases') || hasHeaders(headers, 'logodomain')) {
+        return 'parties.csv';
+    }
     if (hasHeaders(headers, 'key', 'percentage')) return 'jars.csv';
     if (hasHeaders(headers, 'field', 'matcher', 'matchvalue')) return 'rules.csv';
     if (

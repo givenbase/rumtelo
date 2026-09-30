@@ -157,6 +157,30 @@ export function ExportSettings() {
 
     const sheets = [
         {
+            name: t('pages.settings.panels.export.sheet_settings'),
+            count: bundle ? 1 : null,
+            cols: t('pages.settings.panels.export.sheet_settings_cols'),
+            fullOnly: true,
+        },
+        {
+            name: t('pages.settings.panels.export.sheet_account_settings'),
+            count: bundle ? 1 : null,
+            cols: t('pages.settings.panels.export.sheet_account_settings_cols'),
+            fullOnly: true,
+        },
+        {
+            name: t('pages.settings.panels.export.sheet_parties'),
+            count: bundle?.parties.length ?? null,
+            cols: t('pages.settings.panels.export.sheet_parties_cols'),
+            fullOnly: true,
+        },
+        {
+            name: t('pages.settings.panels.export.sheet_accounts'),
+            count: bundle?.accounts.length ?? null,
+            cols: t('pages.settings.panels.export.sheet_accounts_cols'),
+            fullOnly: true,
+        },
+        {
             name: t('pages.settings.panels.export.sheet_jars'),
             count: bundle?.jars.length ?? null,
             cols: t('pages.settings.panels.export.sheet_jars_cols'),

@@ -426,16 +426,19 @@ export class PartyService {
         const household = currentHouseholdId();
         const usage = new Map<string, PartyUsage>();
         for (const { entity, usage: key } of PARTY_LINKS) {
-            const rows: Array<{ party: string; count: string | number }> = await this.em
-                .createQueryBuilder(entity)
-                .select(['party', 'count(*) as count'])
-                .where({ household, party: { $ne: null } })
-                .groupBy('party')
-                .execute();
+            // Count via find — QueryBuilder groupBy on mapToPk `party` is unreliable
+            // across MikroORM versions and was 500ing parties.list during export.
+            const rows = await this.em.find(
+                entity,
+                { household, party: { $ne: null } },
+                { fields: ['party'] as never }
+            );
             for (const row of rows) {
-                const current = usage.get(row.party) ?? { ...EMPTY_USAGE };
-                current[key] = Number(row.count);
-                usage.set(row.party, current);
+                const partyId = (row as { party: string | null }).party;
+                if (!partyId) continue;
+                const current = usage.get(partyId) ?? { ...EMPTY_USAGE };
+                current[key] += 1;
+                usage.set(partyId, current);
             }
         }
         return usage;
@@ -452,7 +455,9 @@ export class PartyService {
             { populate: ['suggestion', 'party'] }
         );
         for (const vote of votes) {
-            map.set(vote.party.id, vote.suggestion.status);
+            const partyId = typeof vote.party === 'string' ? vote.party : vote.party?.id;
+            const status = vote.suggestion?.status;
+            if (partyId && status) map.set(partyId, status);
         }
         return map;
     }
@@ -462,13 +467,13 @@ export class PartyService {
             id: party.id,
             householdId: party.household,
             name: party.name,
-            note: party.note,
-            aliases: party.aliases,
-            merchantKey: party.merchantKey,
-            color: party.color,
-            icon: party.icon,
-            logoDomain: party.logoDomain,
-            website: party.website,
+            note: party.note ?? null,
+            aliases: party.aliases ?? [],
+            merchantKey: party.merchantKey ?? null,
+            color: party.color ?? null,
+            icon: party.icon ?? null,
+            logoDomain: party.logoDomain ?? null,
+            website: party.website ?? null,
         };
     }
 }

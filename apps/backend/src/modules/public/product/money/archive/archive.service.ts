@@ -9,10 +9,12 @@ import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable } from '@nestjs/common';
 
 import {
+    AccountKind,
     CAPABILITIES,
     GoalStatus,
     TransactionSource,
     TransactionStatus,
+    canUseHouseholdKind,
     hasCapability,
     type ArchiveRestorePayload,
     type ArchiveRestoreResult,
@@ -23,12 +25,17 @@ import {
 import { PlanAccessService } from '../../../../../common/capability';
 import { currentHouseholdId } from '../../../../../common/household/household.context';
 import { HouseholdScopedRepository } from '../../../../../common/household/household-scoped.repository';
+import { HouseholdSettingsService } from '../../../../auth/household/household-settings/household-settings.service';
+import { AccountSettingsService } from '../../../../auth/user/account/account-settings/account-settings.service';
+import { Bank } from '../../../../backoffice/product/money/catalog/bank/bank.entity';
 import { DebtService } from '../targets/debt/debt.service';
 import { GoalService } from '../targets/goal/goal.service';
+import { BankAccountService } from '../ledger/bank-account/bank-account.service';
 import { FixedCostService } from '../plan/fixed-cost/fixed-cost.service';
 import { IncomeService } from '../plan/income/income.service';
 import { Jar } from '../plan/jar/jar.entity';
 import { JarService } from '../plan/jar/jar.service';
+import { PartyService } from '../plan/party/party.service';
 import { SortRuleService } from '../ledger/sort-rule/sort-rule.service';
 import { Transaction } from '../ledger/transaction/transaction.entity';
 
@@ -46,11 +53,16 @@ export class ArchiveService {
         @Inject(EntityManager) private readonly em: EntityManager,
         @Inject(PlanAccessService) private readonly planAccess: PlanAccessService,
         @Inject(JarService) private readonly jars: JarService,
+        @Inject(PartyService) private readonly parties: PartyService,
         @Inject(IncomeService) private readonly income: IncomeService,
         @Inject(FixedCostService) private readonly fixedCosts: FixedCostService,
         @Inject(DebtService) private readonly debts: DebtService,
         @Inject(GoalService) private readonly goals: GoalService,
-        @Inject(SortRuleService) private readonly rules: SortRuleService
+        @Inject(SortRuleService) private readonly rules: SortRuleService,
+        @Inject(BankAccountService) private readonly accounts: BankAccountService,
+        @Inject(HouseholdSettingsService)
+        private readonly householdSettings: HouseholdSettingsService,
+        @Inject(AccountSettingsService) private readonly accountSettings: AccountSettingsService
     ) {
         this.transactions = new HouseholdScopedRepository(em, Transaction);
     }
@@ -63,13 +75,156 @@ export class ArchiveService {
         payload: ArchiveRestorePayload;
         dryRun: boolean;
         applyJarSplit: boolean;
+        applySettings: boolean;
     }): Promise<ArchiveRestoreResult> {
-        const { payload, dryRun, applyJarSplit } = input;
+        const { payload, dryRun, applyJarSplit, applySettings } = input;
         const warnings: string[] = [];
         const sample: string[] = [];
         const planKey = await this.planAccess.planKeyForCurrentHousehold();
         const canDebt = hasCapability(CAPABILITIES.moneyDebt, planKey);
         const canGoals = hasCapability(CAPABILITIES.growthGoals, planKey);
+        const householdId = currentHouseholdId();
+
+        const settingsCounts = emptySection();
+        const accountSettingsCounts = emptySection();
+        if (applySettings && payload.settings) {
+            const patch = { ...payload.settings };
+            if (patch.kind !== undefined && !canUseHouseholdKind(planKey, patch.kind)) {
+                warnings.push('settings_kind_plan_mismatch');
+                delete patch.kind;
+            }
+            const hasPatch =
+                patch.why !== undefined ||
+                patch.kind !== undefined ||
+                patch.currency !== undefined ||
+                patch.money !== undefined ||
+                patch.weekCheck !== undefined ||
+                patch.features !== undefined ||
+                patch.answers !== undefined ||
+                patch.audienceKeys !== undefined;
+            if (hasPatch) {
+                settingsCounts.willImport = 1;
+                if (!dryRun) {
+                    await this.householdSettings.update(householdId, patch);
+                }
+            } else {
+                settingsCounts.skipped = 1;
+            }
+        }
+
+        if (applySettings && payload.accountSettings) {
+            const { locale, theme, spendingStyle } = payload.accountSettings;
+            const hasPatch =
+                locale !== undefined || theme !== undefined || spendingStyle !== undefined;
+            if (hasPatch) {
+                accountSettingsCounts.willImport = 1;
+                if (!dryRun) {
+                    await this.accountSettings.update({ locale, theme, spendingStyle });
+                }
+            } else {
+                accountSettingsCounts.skipped = 1;
+            }
+        }
+
+        const partyCounts = emptySection();
+        const existingParties = await this.parties.list();
+        const partyNames = new Set(existingParties.map(row => row.name.toLowerCase()));
+        for (const row of payload.parties) {
+            const name = row.name.trim();
+            if (!name || partyNames.has(name.toLowerCase())) {
+                partyCounts.skipped += 1;
+                continue;
+            }
+            partyCounts.willImport += 1;
+            partyNames.add(name.toLowerCase());
+            if (!dryRun) {
+                await this.parties.create({
+                    name,
+                    note: row.note ?? null,
+                    aliases: row.aliases ?? [],
+                    merchantKey: row.merchantKey ?? null,
+                    color: row.color ?? null,
+                    icon: row.icon ?? null,
+                    logoDomain: row.logoDomain ?? null,
+                    website: row.website ?? null,
+                });
+            }
+        }
+
+        const accountCounts = emptySection();
+        const pendingSettlements: Array<{ accountId: string; settlementName: string }> = [];
+        if (payload.accounts.length > 0) {
+            const existingAccounts = await this.accounts.list();
+            const accountNames = new Set(existingAccounts.map(row => row.name.toLowerCase()));
+            const accountIbans = new Set(
+                existingAccounts
+                    .map(row => row.iban)
+                    .filter((iban): iban is string => Boolean(iban))
+            );
+            const bankKeys = [
+                ...new Set(payload.accounts.map(row => row.bankKey.trim()).filter(Boolean)),
+            ];
+            const banks = bankKeys.length
+                ? await this.em.find(Bank, { key: { $in: bankKeys }, isActive: true })
+                : [];
+            const bankIdByKey = new Map(banks.map(bank => [bank.key, bank.id]));
+
+            for (const row of payload.accounts) {
+                const name = row.name.trim();
+                const bankId = bankIdByKey.get(row.bankKey.trim());
+                if (!bankId) {
+                    accountCounts.skipped += 1;
+                    warnings.push(`bank_unknown_key:${row.bankKey}`);
+                    continue;
+                }
+                const iban = row.iban?.trim() || null;
+                if (
+                    !name ||
+                    accountNames.has(name.toLowerCase()) ||
+                    (iban && accountIbans.has(iban))
+                ) {
+                    accountCounts.skipped += 1;
+                    continue;
+                }
+                accountCounts.willImport += 1;
+                accountNames.add(name.toLowerCase());
+                if (iban) accountIbans.add(iban);
+                if (row.wasConnected) warnings.push('account_reconnect_needed');
+                if (!dryRun) {
+                    const created = await this.accounts.create({
+                        name,
+                        iban,
+                        kind: row.kind,
+                        balance: row.balance ?? 0,
+                        bankId,
+                        isPrimary: row.isPrimary,
+                    });
+                    const settlementName = row.settlementAccountName?.trim();
+                    if (row.kind === AccountKind.CREDIT && settlementName) {
+                        pendingSettlements.push({
+                            accountId: created.id,
+                            settlementName,
+                        });
+                    }
+                }
+            }
+
+            if (!dryRun && pendingSettlements.length > 0) {
+                const seats = await this.accounts.list();
+                const idByName = new Map(seats.map(seat => [seat.name.toLowerCase(), seat.id]));
+                for (const link of pendingSettlements) {
+                    const settlementAccountId = idByName.get(link.settlementName.toLowerCase());
+                    if (!settlementAccountId) {
+                        warnings.push('settlement_account_missing');
+                        continue;
+                    }
+                    await this.accounts.update({
+                        id: link.accountId,
+                        settlementAccountId,
+                    });
+                }
+            }
+        }
 
         const localJars = await this.jars.list();
         const localKeyToId = new Map(localJars.map(jar => [jar.key, jar.id]));
@@ -359,6 +514,10 @@ export class ArchiveService {
         return {
             dryRun,
             jarsSplitUpdated,
+            settings: settingsCounts,
+            accountSettings: accountSettingsCounts,
+            parties: partyCounts,
+            accounts: accountCounts,
             income: incomeCounts,
             fixedCosts: fixedCounts,
             debts: debtCounts,

@@ -3,9 +3,15 @@
  */
 
 import type {
+    Account,
+    AccountSettings,
+    ArchiveAccountSettings,
+    ArchiveBankAccount,
+    ArchiveHouseholdSettings,
     Debt,
     FixedCost,
     Goal,
+    HouseholdSettings,
     IncomeSource,
     Jar,
     Party,
@@ -31,9 +37,12 @@ export type HouseholdExportBundle = {
     exportedAt: string;
     householdId: string;
     access: HouseholdExportAccess;
+    settings: ArchiveHouseholdSettings;
+    accountSettings: ArchiveAccountSettings;
+    parties: Party[];
+    accounts: ArchiveBankAccount[];
     jars: Jar[];
     income: IncomeSource[];
-    parties: Party[];
     fixedCosts: FixedCost[];
     debts: Debt[];
     goals: Goal[];
@@ -70,34 +79,96 @@ export async function fetchHouseholdExportBundle(
     householdId: string,
     access: HouseholdExportAccess
 ): Promise<HouseholdExportBundle> {
-    const [jars, income, parties, fixedCosts, debts, goals, rules, transactions] =
-        await Promise.all([
-            api.money.jars.list({ householdId }),
-            api.money.income.list({ householdId }),
-            api.money.parties.list({ householdId }),
-            api.money.fixedCosts.list({ householdId }),
-            access.includeDebts
-                ? api.money.debts.list({ householdId })
-                : Promise.resolve([] as Debt[]),
-            access.includeGoals
-                ? api.money.goals.list({ householdId })
-                : Promise.resolve([] as Goal[]),
-            api.money.rules.list({ householdId }),
-            listAllTransactions(householdId),
-        ]);
+    const [
+        householdSettings,
+        accountSettings,
+        jars,
+        income,
+        parties,
+        accounts,
+        banks,
+        fixedCosts,
+        debts,
+        goals,
+        rules,
+        transactions,
+    ] = await Promise.all([
+        api.household.settings({ householdId }),
+        api.account.settings(),
+        api.money.jars.list({ householdId }),
+        api.money.income.list({ householdId }),
+        api.money.parties.list({ householdId }),
+        api.money.accounts.list({ householdId }),
+        api.money.catalogs.banks.list({ householdId }),
+        api.money.fixedCosts.list({ householdId }),
+        access.includeDebts ? api.money.debts.list({ householdId }) : Promise.resolve([] as Debt[]),
+        access.includeGoals ? api.money.goals.list({ householdId }) : Promise.resolve([] as Goal[]),
+        api.money.rules.list({ householdId }),
+        listAllTransactions(householdId),
+    ]);
     return {
         exportedAt: new Date().toISOString(),
         householdId,
         access,
+        settings: portableHouseholdSettings(householdSettings),
+        accountSettings: portableAccountSettings(accountSettings),
+        parties,
+        accounts: portableBankAccounts(accounts, banks),
         jars,
         income,
-        parties,
         fixedCosts,
         debts,
         goals,
         rules,
         transactions,
     };
+}
+
+function portableHouseholdSettings(settings: HouseholdSettings): ArchiveHouseholdSettings {
+    return {
+        why: settings.why ?? null,
+        kind: settings.kind,
+        currency: settings.currency,
+        money: settings.money,
+        weekCheck: settings.weekCheck,
+        features: settings.features,
+        answers: settings.answers,
+        audienceKeys: settings.audienceKeys,
+    };
+}
+
+function portableAccountSettings(settings: AccountSettings): ArchiveAccountSettings {
+    return {
+        locale: settings.locale,
+        theme: settings.theme,
+        spendingStyle: settings.spendingStyle,
+    };
+}
+
+function portableBankAccounts(
+    accounts: Account[],
+    banks: Array<{ id: string; key: string }>
+): ArchiveBankAccount[] {
+    const bankKeyById = new Map(banks.map(bank => [bank.id, bank.key]));
+    const nameById = new Map(accounts.map(account => [account.id, account.name]));
+    const rows: ArchiveBankAccount[] = [];
+    for (const account of accounts) {
+        const bankKey = bankKeyById.get(account.bankId);
+        if (!bankKey) continue;
+        rows.push({
+            name: account.name,
+            kind: account.kind,
+            bankKey,
+            iban: account.iban,
+            balance: account.balance,
+            isPrimary: account.isPrimary,
+            wasConnected: account.connectionId !== null,
+            settlementAccountName: account.settlementAccountId
+                ? (nameById.get(account.settlementAccountId) ?? null)
+                : null,
+        });
+    }
+    return rows;
 }
 
 export async function fetchTransactionsForExport(
@@ -162,6 +233,35 @@ export function buildExportSheets(bundle: HouseholdExportBundle): ExportSheet[] 
     const keys = jarKeyMap(bundle.jars);
     const sheets: ExportSheet[] = [
         {
+            name: 'Settings',
+            rows: [
+                {
+                    currency: bundle.settings.currency ?? '',
+                    kind: bundle.settings.kind ?? '',
+                    why: bundle.settings.why ?? '',
+                    periodStartDay: bundle.settings.money?.periodStartDay ?? '',
+                    incomeStability: bundle.settings.money?.incomeStability ?? '',
+                    payoffStrategy: bundle.settings.money?.payoffStrategy ?? '',
+                    reminderDay: bundle.settings.weekCheck?.reminderDay ?? '',
+                    reminderAt: bundle.settings.weekCheck?.reminderAt ?? '',
+                    isBankSyncEnabled: bundle.settings.features?.isBankSyncEnabled ?? '',
+                    isCoachEnabled: bundle.settings.features?.isCoachEnabled ?? '',
+                    audienceKeys: (bundle.settings.audienceKeys ?? []).join('|'),
+                    answersJson: JSON.stringify(bundle.settings.answers ?? {}),
+                },
+            ],
+        },
+        {
+            name: 'Account settings',
+            rows: [
+                {
+                    locale: bundle.accountSettings.locale ?? '',
+                    theme: bundle.accountSettings.theme ?? '',
+                    spendingStyle: bundle.accountSettings.spendingStyle ?? '',
+                },
+            ],
+        },
+        {
             name: 'Jars',
             rows: bundle.jars.map(jar => ({
                 id: jar.id,
@@ -204,6 +304,19 @@ export function buildExportSheets(bundle: HouseholdExportBundle): ExportSheet[] 
                 icon: party.icon ?? '',
                 logoDomain: party.logoDomain ?? '',
                 website: party.website ?? '',
+            })),
+        },
+        {
+            name: 'Accounts',
+            rows: bundle.accounts.map(account => ({
+                name: account.name,
+                kind: account.kind,
+                bankKey: account.bankKey,
+                iban: account.iban ?? '',
+                balanceCents: account.balance ?? 0,
+                isPrimary: account.isPrimary ?? false,
+                wasConnected: account.wasConnected ?? false,
+                settlementAccountName: account.settlementAccountName ?? '',
             })),
         },
         {

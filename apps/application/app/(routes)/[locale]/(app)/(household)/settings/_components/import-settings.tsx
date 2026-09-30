@@ -43,6 +43,12 @@ function sectionLine(
 
 function foundParts(t: ReturnType<typeof useTranslations>, found: ArchiveImportFound): string[] {
     const parts: string[] = [];
+    if (found.settings) {
+        parts.push(t('pages.settings.panels.import.found_settings'));
+    }
+    if (found.accountSettings) {
+        parts.push(t('pages.settings.panels.import.found_account_settings'));
+    }
     const push = (count: number, one: string, other: string) => {
         if (count <= 0) return;
         parts.push(
@@ -51,6 +57,16 @@ function foundParts(t: ReturnType<typeof useTranslations>, found: ArchiveImportF
             })
         );
     };
+    push(
+        found.parties,
+        'pages.settings.panels.import.found_parties_one',
+        'pages.settings.panels.import.found_parties_other'
+    );
+    push(
+        found.accounts,
+        'pages.settings.panels.import.found_accounts_one',
+        'pages.settings.panels.import.found_accounts_other'
+    );
     push(
         found.jars,
         'pages.settings.panels.import.found_jars_one',
@@ -131,6 +147,10 @@ export function ImportSettings() {
         try {
             const next = await archivePayloadFromFile(file);
             const total =
+                (next.found.settings ? 1 : 0) +
+                (next.found.accountSettings ? 1 : 0) +
+                next.found.parties +
+                next.found.accounts +
                 next.found.jars +
                 next.found.income +
                 next.found.fixedCosts +
@@ -266,6 +286,26 @@ export function ImportSettings() {
                                     : t('pages.settings.panels.import.split_skip')}
                             </p>
                             {[
+                                sectionLine(
+                                    t,
+                                    t('pages.settings.panels.export.sheet_settings'),
+                                    preview.settings
+                                ),
+                                sectionLine(
+                                    t,
+                                    t('pages.settings.panels.export.sheet_account_settings'),
+                                    preview.accountSettings
+                                ),
+                                sectionLine(
+                                    t,
+                                    t('pages.settings.panels.export.sheet_parties'),
+                                    preview.parties
+                                ),
+                                sectionLine(
+                                    t,
+                                    t('pages.settings.panels.export.sheet_accounts'),
+                                    preview.accounts
+                                ),
                                 sectionLine(
                                     t,
                                     t('pages.settings.panels.export.sheet_income'),
