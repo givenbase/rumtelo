@@ -359,7 +359,10 @@ export function PresetNameField({
                                                 className={suggestionOptionClass}
                                                 onClick={() => pickOption(opt)}>
                                                 <span
-                                                    className={`w-4 shrink-0 text-center text-accent ${selected ? 'opacity-100' : 'opacity-0'}`}
+                                                    className={cn(
+                                                        'w-4 shrink-0 text-center text-accent opacity-0',
+                                                        selected && 'opacity-100'
+                                                    )}
                                                     aria-hidden>
                                                     ✓
                                                 </span>

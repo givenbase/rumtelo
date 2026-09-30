@@ -1,9 +1,10 @@
 'use client';
 
-import { type ReactNode, type RefObject, useEffect, useLayoutEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { type ReactNode, type RefObject } from 'react';
 
 import { cn } from '@rumtelo/utils';
+
+import { Popover as PopoverPrimitive } from 'radix-ui';
 
 export type SuggestionPanelProps = {
     anchorRef: RefObject<HTMLElement | null>;
@@ -12,13 +13,25 @@ export type SuggestionPanelProps = {
     id?: string;
     children: ReactNode;
     className?: string;
-    /** Tailwind max-height utility — default `max-h-72`. */
-    maxHeightClassName?: string;
+    /**
+     * Preferred max height before Popper collision clamp.
+     * @default `max-h-72` (18rem)
+     */
+    maxHeightClassName?: 'max-h-64' | 'max-h-72';
+};
+
+const PREFERRED_MAX_HEIGHT: Record<
+    NonNullable<SuggestionPanelProps['maxHeightClassName']>,
+    string
+> = {
+    'max-h-64': '16rem',
+    'max-h-72': '18rem',
 };
 
 /**
- * Portaled suggestion list under an anchor — escapes sheet/dialog overflow.
- * Rumtelo surface chrome (not inverted). Escape + outside click dismiss.
+ * Portaled suggestion list under an anchor — same stack as shadcn Combobox:
+ * Radix Popover (`modal`) → Portal + RemoveScroll + collision / available-height.
+ * Keeps focus on the input (`onOpenAutoFocus` prevented).
  */
 export function SuggestionPanel({
     anchorRef,
@@ -29,77 +42,43 @@ export function SuggestionPanel({
     className,
     maxHeightClassName = 'max-h-72',
 }: SuggestionPanelProps) {
-    const [box, setBox] = useState<{ top: number; left: number; width: number } | null>(null);
+    const preferredMax = PREFERRED_MAX_HEIGHT[maxHeightClassName];
 
-    useLayoutEffect(() => {
-        if (!open) return;
-
-        function update() {
-            const el = anchorRef.current;
-            if (!el) return;
-            const rect = el.getBoundingClientRect();
-            setBox({
-                top: rect.bottom + 6,
-                left: rect.left,
-                width: rect.width,
-            });
-        }
-
-        update();
-        window.addEventListener('resize', update);
-        window.addEventListener('scroll', update, true);
-        return () => {
-            window.removeEventListener('resize', update);
-            window.removeEventListener('scroll', update, true);
-        };
-    }, [open, anchorRef]);
-
-    useEffect(() => {
-        if (!open) return;
-
-        function onPointerDown(event: MouseEvent) {
-            const target = event.target as Node;
-            if (anchorRef.current?.contains(target)) return;
-            if (id) {
-                const panel = document.getElementById(id);
-                if (panel?.contains(target)) return;
-            }
-            onClose();
-        }
-        function onKey(event: KeyboardEvent) {
-            if (event.key === 'Escape') onClose();
-        }
-        document.addEventListener('mousedown', onPointerDown);
-        document.addEventListener('keydown', onKey);
-        return () => {
-            document.removeEventListener('mousedown', onPointerDown);
-            document.removeEventListener('keydown', onKey);
-        };
-    }, [open, onClose, anchorRef, id]);
-
-    if (!open || !box || typeof document === 'undefined') return null;
-
-    return createPortal(
-        <div
-            id={id}
-            role="listbox"
-            data-slot="suggestion-panel"
-            style={{
-                position: 'fixed',
-                top: box.top,
-                left: box.left,
-                width: Math.max(box.width, 12 * 16),
-                zIndex: 70,
-            }}
-            className={cn(
-                'animate-rise overflow-auto rounded-xl border border-line bg-surface py-1.5 text-sm text-fg',
-                'shadow-[0_18px_50px_-28px_rgba(15,23,42,0.45)] ring-1 ring-black/[0.03]',
-                maxHeightClassName,
-                className
-            )}>
-            {children}
-        </div>,
-        document.body
+    return (
+        <PopoverPrimitive.Root
+            modal
+            open={open}
+            onOpenChange={nextOpen => {
+                if (!nextOpen) onClose();
+            }}>
+            <PopoverPrimitive.Anchor virtualRef={anchorRef} />
+            <PopoverPrimitive.Portal>
+                <PopoverPrimitive.Content
+                    id={id}
+                    role="listbox"
+                    data-slot="suggestion-panel"
+                    side="bottom"
+                    align="start"
+                    sideOffset={6}
+                    collisionPadding={12}
+                    onOpenAutoFocus={event => event.preventDefault()}
+                    onCloseAutoFocus={event => event.preventDefault()}
+                    style={{
+                        width: 'max(12rem, var(--radix-popper-anchor-width))',
+                        maxHeight: `min(${preferredMax}, var(--radix-popper-available-height))`,
+                    }}
+                    className={cn(
+                        'z-70 overflow-y-auto overscroll-contain rounded-xl border border-line bg-surface py-1.5 text-sm text-fg outline-hidden',
+                        'shadow-[0_18px_50px_-28px_rgba(15,23,42,0.45)] ring-1 ring-black/[0.03]',
+                        'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
+                        'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
+                        'data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2',
+                        className
+                    )}>
+                    {children}
+                </PopoverPrimitive.Content>
+            </PopoverPrimitive.Portal>
+        </PopoverPrimitive.Root>
     );
 }
 
