@@ -1,0 +1,51 @@
+import type { MerchantSeed } from '../types';
+import { play } from '../types';
+
+/** Bars & nightlife — café / uitgaan (food stays under Eating out). */
+export const BARS_MERCHANTS: readonly MerchantSeed[] = [
+    {
+        key: 'BREWDOG',
+        name: 'BrewDog',
+        matchValue: 'BrewDog',
+        aliases: ['BrewDog', 'BREWDOG', 'Brew Dog'],
+        mcc: '5813',
+        jarKey: play,
+        categoryTemplateKey: 'BARS',
+        logoDomain: 'brewdog.com',
+        website: 'https://brewdog.com',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'CAFE_HOPPE',
+        name: 'Café Hoppe',
+        matchValue: 'Café Hoppe',
+        aliases: ['Café Hoppe', 'Cafe Hoppe', 'Hoppe'],
+        mcc: '5813',
+        jarKey: play,
+        categoryTemplateKey: 'BARS',
+        logoDomain: 'cafe-hoppe.nl',
+        website: 'https://cafe-hoppe.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+    {
+        key: 'GOLLEM',
+        name: 'Gollem',
+        matchValue: 'Gollem',
+        aliases: ['Gollem', 'Café Gollem', 'GOLLEM'],
+        mcc: '5813',
+        jarKey: play,
+        categoryTemplateKey: 'BARS',
+        logoDomain: 'cafegollem.nl',
+        website: 'https://cafegollem.nl',
+        highlight: null,
+        markets: ['NL'],
+        matchPriority: 0,
+        isActive: true,
+    },
+];
