@@ -37,6 +37,32 @@ Prefer patterns Next.js and React docs endorse. Lint is a hint: keep rules that 
 
 **Banned:** parallel `useState` per form field; Provider/Zustand holding submit field values.
 
+## `@rumtelo/ui` chrome (tokens + overlays)
+
+### Tokens (light/dark)
+
+Prefer **Rumtelo** names in new/edited UI: `fg`, `fg-muted`, `fg-secondary`, `surface`, `raised`, `line`, `line-strong`, `accent`, `accent-soft`, `danger`.
+
+Shadcn aliases (`foreground`, `muted-foreground`, `border`, `primary`, `background`, …) are **`var()` aliases** of those tokens in `packages/config/tailwind/theme.css` — light/dark still works. Prefer Rumtelo names so chrome stays consistent; do not hardcode hex or invent parallel palettes.
+
+### Dates
+
+Use **`DatePicker` / `Calendar`**. Do not pass `type="date"` / `datetime-local` on `Input` (native affordance is removed on purpose).
+
+### Portaled lists inside Sheet / Dialog
+
+Radix Sheet/Dialog lock page scroll via `react-remove-scroll`. A hand-rolled `createPortal(…, document.body)` list **looks** fine but **wheel/touch scroll dies** in the modal (full page still works).
+
+| Need | Use |
+|------|-----|
+| Catalog / name suggestions | **`SuggestionPanel`** — Radix **`Popover` + `modal`** (same idea as shadcn Combobox) |
+| Select menus | **`Select`** from `@rumtelo/ui` (already portals + `RemoveScroll`) |
+| New floating list | Prefer **Popover `modal`** or an existing primitive — not custom portal + DIY viewport clamp |
+
+Do **not** reintroduce local `MENU_CONTENT` / `MENU_ITEM` overrides with `accent/10` — package Select defaults (`accent-soft`) are the chrome.
+
+Keep focus on the text field for combobox-like panels (`onOpenAutoFocus` preventDefault) — see `SuggestionPanel`.
+
 ## Data ownership (use wisely)
 
 | Need | Prefer |
