@@ -73,6 +73,7 @@
                     "bill_link_outflow": "Link an outflow to settle an outgoing bill.",
                     "bill_link_inflow": "Link an inflow to settle a recurring credit.",
                     "asset_not_found": "That holding is not in your net worth.",
+                    "bank_account_not_found": "That bank account is not in this household.",
                     "iban_already_linked": "This IBAN is already linked to an account.",
                     "account_name_taken": "An account with this name already exists.",
                     "bank_not_found": "That bank is not in the catalog.",
@@ -2173,6 +2174,16 @@
                 "filter_eyebrow": "Showing only",
                 "filter_clear": "Show all",
                 "kind_fallback": "Holding"
+            },
+            "deposit_link": {
+                "bank_label": "Bank (optional)",
+                "bank_hint": "Where this income is paid — you can pick the seat later.",
+                "bank_none": "No bank yet",
+                "account_label": "Lands in (optional)",
+                "account_hint": "Checking, savings, or cash seat. Picking one sets the bank.",
+                "account_none": "No account yet",
+                "chip_aria_account": "Lands in {name}",
+                "chip_aria_bank": "Expected at {name}"
             },
             "expense_form": {
                 "save_in": "Save in",

@@ -543,6 +543,17 @@ const money = {
         filter_clear: 'Show all',
         kind_fallback: 'Holding',
     },
+    /** Optional deposit bank / account on income — where cash is expected to land. */
+    deposit_link: {
+        bank_label: 'Bank (optional)',
+        bank_hint: 'Where this income is paid — you can pick the seat later.',
+        bank_none: 'No bank yet',
+        account_label: 'Lands in (optional)',
+        account_hint: 'Checking, savings, or cash seat. Picking one sets the bank.',
+        account_none: 'No account yet',
+        chip_aria_account: 'Lands in {name}',
+        chip_aria_bank: 'Expected at {name}',
+    },
     expense_form: {
         save_in: 'Save in',
         save_out: 'Save out',

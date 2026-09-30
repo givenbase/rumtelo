@@ -41,6 +41,7 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 import { ConfirmActionButton } from './confirm-action-button';
 import { createIncomeFormSchema, type IncomeFormSchemaValues } from './form-zod';
+import { DepositField } from './deposit-field';
 import { FormDatePicker } from './form-date-picker';
 import { FormInput } from './form-input';
 import { HoldingField } from './holding-field';
@@ -225,11 +226,15 @@ export function IncomeForm({
             endsOn: defaultValues?.endsOn ?? '',
             amountEffectiveFrom: defaultValues?.amountEffectiveFrom ?? periodDefaultDate,
             assetId: defaultValues?.assetId ?? null,
+            bankId: defaultValues?.bankId ?? null,
+            accountId: defaultValues?.accountId ?? null,
         },
         resolver: zodResolver(incomeFormSchema),
     });
 
     const watchedAssetId = useWatch({ control: form.control, name: 'assetId' }) ?? null;
+    const watchedBankId = useWatch({ control: form.control, name: 'bankId' }) ?? null;
+    const watchedAccountId = useWatch({ control: form.control, name: 'accountId' }) ?? null;
     const watchedMerchantKey = useWatch({ control: form.control, name: 'merchantKey' }) ?? '';
     const watchedPartyId = useWatch({ control: form.control, name: 'partyId' }) ?? '';
     const watchedSaveParty = useWatch({ control: form.control, name: 'saveParty' }) ?? true;
@@ -289,6 +294,8 @@ export function IncomeForm({
                     amountEffectiveFrom:
                         values.amountEffectiveFrom?.slice(0, 10) || periodDefaultDate,
                     assetId: values.assetId ?? null,
+                    bankId: values.bankId ?? null,
+                    accountId: values.accountId ?? null,
                 });
             }
             const startedOn = values.startedOn?.trim()
@@ -310,6 +317,8 @@ export function IncomeForm({
                 startedOn,
                 endsOn,
                 assetId: values.assetId ?? null,
+                bankId: values.bankId ?? null,
+                accountId: values.accountId ?? null,
             });
         },
         onSuccess: () => {
@@ -509,6 +518,16 @@ export function IncomeForm({
                 locked={lockAsset}
                 disabled={busy}
                 onChange={next => form.setValue('assetId', next, { shouldDirty: true })}
+            />
+
+            <DepositField
+                bankId={watchedBankId}
+                accountId={watchedAccountId}
+                disabled={busy}
+                onChange={next => {
+                    form.setValue('bankId', next.bankId, { shouldDirty: true });
+                    form.setValue('accountId', next.accountId, { shouldDirty: true });
+                }}
             />
 
             <FormField

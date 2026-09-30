@@ -90,6 +90,10 @@ export function createIncomeFormSchema(msg: FormT) {
         amountEffectiveFrom: z.string().optional(),
         /** Growth holding this income comes from (asset in). */
         assetId: z.string().nullable().optional(),
+        /** Catalog bank where income is expected to land. */
+        bankId: z.string().nullable().optional(),
+        /** Household deposit seat (checking / savings / cash). */
+        accountId: z.string().nullable().optional(),
     });
 }
 

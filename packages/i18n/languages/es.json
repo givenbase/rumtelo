@@ -73,6 +73,7 @@
                     "bill_link_outflow": "Vincula un gasto para liquidar una factura pendiente.",
                     "bill_link_inflow": "Vincula un ingreso para liquidar un abono periódico.",
                     "asset_not_found": "Esa participación no forma parte de tu patrimonio neto.",
+                    "bank_account_not_found": "Esa cuenta bancaria no pertenece a este hogar.",
                     "iban_already_linked": "Este IBAN ya está vinculado a una cuenta.",
                     "account_name_taken": "Ya existe una cuenta con este nombre.",
                     "bank_not_found": "Ese banco no aparece en el catálogo.",
@@ -2173,6 +2174,16 @@
                 "filter_eyebrow": "Mostrar solo",
                 "filter_clear": "Mostrar todo",
                 "kind_fallback": "Participación"
+            },
+            "deposit_link": {
+                "bank_label": "Banco (opcional)",
+                "bank_hint": "Dónde se abonan estos ingresos: ya puedes elegir el asiento más adelante.",
+                "bank_none": "Aún no hay ningún banco",
+                "account_label": "Aterriza en (opcional)",
+                "account_hint": "Cuenta corriente, de ahorro o de efectivo. Al elegir una de ellas, se establece el banco.",
+                "account_none": "Aún no tienes cuenta",
+                "chip_aria_account": "Aterriza en {name}",
+                "chip_aria_bank": "Se espera que sea en {name}"
             },
             "expense_form": {
                 "save_in": "Guardar en",

@@ -6,9 +6,11 @@ import { HouseholdEntity } from '../../../../../../common/database/household.ent
 import { MoneyType } from '../../../../../../common/database/money.type';
 import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
+import { Bank } from '../../../../../backoffice/product/money/catalog/bank/bank.entity';
 import { IncomeSourcePreset } from '../../../../../backoffice/product/money/preset/income/income.entity';
 import { MerchantPreset } from '../../../../../backoffice/product/money/preset/merchant/merchant.entity';
 import { Asset } from '../../../growth/asset/asset.entity';
+import { BankAccount } from '../../ledger/bank-account/bank-account.entity';
 import { Party } from '../party/party.entity';
 
 /**
@@ -17,6 +19,7 @@ import { Party } from '../party/party.entity';
  * Money that arrives on a cadence (salary, benefits, freelance). `amount` is the
  * cached current figure; `IncomeAmountPeriod` keeps the dated history behind it.
  * `name` + optional `presetKey` = what income; counterparty triple = who pays.
+ * Optional `bank` / `account` = where the money is expected to land.
  *
  * @see IncomeAmountPeriod
  * @see IncomeSourcePreset — backoffice starting points
@@ -25,6 +28,8 @@ import { Party } from '../party/party.entity';
 @Entity(entityConfig({ schema: 'public', domain: 'money', tableName: 'income_source' }))
 @Index({ properties: ['party'] })
 @Index({ properties: ['asset'] })
+@Index({ properties: ['bank'] })
+@Index({ properties: ['account'] })
 @Check({
     name: 'money_income_source_merchant_xor_party',
     expression: '(merchant_key IS NULL) OR (party_id IS NULL)',
@@ -90,6 +95,20 @@ export class IncomeSource extends HouseholdEntity {
      */
     @ManyToOne(() => Asset, { mapToPk: true, nullable: true, deleteRule: 'set null' })
     asset: string | null = null;
+
+    /**
+     * Catalog institution where this income is expected to land (optional alone).
+     * Synced from `account` when a deposit seat is set.
+     */
+    @ManyToOne(() => Bank, { mapToPk: true, nullable: true, deleteRule: 'set null' })
+    bank: string | null = null;
+
+    /**
+     * Household seat (checking / savings / cash) where this income lands.
+     * Cleared if the account is removed; `bank` may remain.
+     */
+    @ManyToOne(() => BankAccount, { mapToPk: true, nullable: true, deleteRule: 'set null' })
+    account: string | null = null;
 
     /**
      * Income-type catalog pick — natural-key FK on `IncomeSourcePreset.key`.

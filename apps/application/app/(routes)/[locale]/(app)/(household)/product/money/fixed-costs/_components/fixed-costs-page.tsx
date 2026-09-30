@@ -73,6 +73,7 @@ import {
     formatDueDay,
 } from '@/components/features/money/jar-badge';
 import { HoldingChip } from '@/components/features/money/holding-chip';
+import { DepositBankChip } from '@/components/features/money/deposit-bank-chip';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { FixedCostPeriodStatusControl } from '@/components/features/money/fixed-cost-period-status';
 import { NecessitiesPressureCard } from '@/components/features/money/necessities-pressure-card';
@@ -224,6 +225,8 @@ export function FixedCostsPageClient() {
                       kind: source.kind,
                       dueDay: source.expectedDay,
                       assetId: source.assetId ?? null,
+                      bankId: source.bankId ?? null,
+                      accountId: source.accountId ?? null,
                       applies,
                   };
               })
@@ -1017,6 +1020,10 @@ export function FixedCostsPageClient() {
                                                     </MetaChip>
                                                 ) : null}
                                                 <HoldingChip assetId={source.assetId} />
+                                                <DepositBankChip
+                                                    bankId={source.bankId}
+                                                    accountId={source.accountId}
+                                                />
                                             </>
                                         }
                                         href={

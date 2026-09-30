@@ -63,6 +63,8 @@ export function IncomeUpdatePage({ id, embedded = false }: { id: string; embedde
             startedOn: row.startedOn ?? '',
             endsOn: row.endsOn ?? '',
             assetId: row.assetId ?? null,
+            bankId: row.bankId ?? null,
+            accountId: row.accountId ?? null,
         }),
     });
 

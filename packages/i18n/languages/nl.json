@@ -73,6 +73,7 @@
                     "bill_link_outflow": "Koppel een uitgave om een uitgaande vaste last af te rekenen.",
                     "bill_link_inflow": "Koppel een ontvangst om een terugkerend tegoed te verrekenen.",
                     "asset_not_found": "Dat bezit staat niet in je nettovermogen.",
+                    "bank_account_not_found": "Die bankrekening staat niet in dit huishouden.",
                     "iban_already_linked": "Dit IBAN-nummer is al aan een rekening gekoppeld.",
                     "account_name_taken": "Er bestaat al een rekening met deze naam.",
                     "bank_not_found": "Die bank staat niet in de catalogus.",
@@ -2173,6 +2174,16 @@
                 "filter_eyebrow": "Alleen tonen",
                 "filter_clear": "Alles tonen",
                 "kind_fallback": "Bezit"
+            },
+            "deposit_link": {
+                "bank_label": "Bank (optioneel)",
+                "bank_hint": "Waar dit inkomen binnenkomt — de rekening kun je later kiezen.",
+                "bank_none": "Nog geen bank",
+                "account_label": "Komt binnen op (optioneel)",
+                "account_hint": "Betaal-, spaar- of cashrekening. Als je er een kiest, wordt de bank gezet.",
+                "account_none": "Nog geen rekening",
+                "chip_aria_account": "Komt binnen op {name}",
+                "chip_aria_bank": "Verwacht bij {name}"
             },
             "expense_form": {
                 "save_in": "Opslaan in",

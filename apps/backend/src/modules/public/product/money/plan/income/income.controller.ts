@@ -27,6 +27,8 @@ export class IncomeController {
                 partyId: input.partyId,
                 saveParty: input.saveParty,
                 assetId: input.assetId,
+                bankId: input.bankId,
+                accountId: input.accountId,
                 kind: input.kind,
                 amount: input.amount,
                 cadence: input.cadence,

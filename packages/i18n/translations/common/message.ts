@@ -52,6 +52,7 @@ const message = {
             bill_link_outflow: 'Link an outflow to settle an outgoing bill.',
             bill_link_inflow: 'Link an inflow to settle a recurring credit.',
             asset_not_found: 'That holding is not in your net worth.',
+            bank_account_not_found: 'That bank account is not in this household.',
             iban_already_linked: 'This IBAN is already linked to an account.',
             account_name_taken: 'An account with this name already exists.',
             bank_not_found: 'That bank is not in the catalog.',

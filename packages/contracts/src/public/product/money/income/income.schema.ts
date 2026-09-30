@@ -31,6 +31,16 @@ export const IncomeSource = z.object({
      * a property). Attribution only — the split still runs on the jars.
      */
     assetId: Id.nullable().default(null),
+    /**
+     * Catalog bank where this income is expected to land.
+     * Optional alone (“I know the bank, not the seat yet”); synced from `accountId` when set.
+     */
+    bankId: Id.nullable().default(null),
+    /**
+     * Household bank account (checking/savings/cash) where this income lands.
+     * When set, `bankId` is taken from that account.
+     */
+    accountId: Id.nullable().default(null),
     kind: z.enum(IncomeKind),
     /** Cached current amount (latest period) — used by jar monthly net. */
     amount: Money,

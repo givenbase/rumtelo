@@ -9,6 +9,7 @@ import { HouseholdScopedRepository } from '../../../../../../common/household/ho
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { splitByPercentage } from '../../../../../../common/utils/money.util';
 import { resolveAssetLink } from '../../asset-link.util';
+import { resolveDepositLinks } from '../../deposit-link.util';
 import { GoalService } from '../../targets/goal/goal.service';
 import { JarService } from '../jar/jar.service';
 import { type CounterpartyPatch, PartyService } from '../party/party.service';
@@ -55,11 +56,17 @@ export class IncomeService {
             endsOn?: string | null;
             presetKey?: string | null;
             assetId?: string | null;
+            bankId?: string | null;
+            accountId?: string | null;
         }
     ) {
         const effectiveOn = input.startedOn ?? todayIso();
         const other = await this.parties.resolveCounterparty(input);
         const asset = (await resolveAssetLink(this.em, this.planAccess, input.assetId)) ?? null;
+        const deposit = await resolveDepositLinks(this.em, {
+            bankId: input.bankId ?? null,
+            accountId: input.accountId ?? null,
+        });
         const source = this.em.create(IncomeSource, {
             household: currentHouseholdId(),
             name: input.name,
@@ -68,6 +75,8 @@ export class IncomeService {
             merchantKey: other.merchantKey,
             party: other.party,
             asset,
+            bank: deposit.bankId,
+            account: deposit.accountId,
             kind: input.kind as IncomeKind,
             amount: input.amount,
             cadence: (input.cadence as Cadence) ?? Cadence.MONTHLY,
@@ -129,11 +138,22 @@ export class IncomeService {
                 amountEffectiveFrom: string | null;
                 presetKey: string | null;
                 assetId: string | null;
+                bankId: string | null;
+                accountId: string | null;
             }>
     ) {
         const source = await this.sources.findOneOrFail({ id });
         const asset = await resolveAssetLink(this.em, this.planAccess, patch.assetId);
         if (asset !== undefined) source.asset = asset;
+        if (patch.bankId !== undefined || patch.accountId !== undefined) {
+            const deposit = await resolveDepositLinks(
+                this.em,
+                { bankId: patch.bankId, accountId: patch.accountId },
+                { bankId: source.bank, accountId: source.account }
+            );
+            source.bank = deposit.bankId;
+            source.account = deposit.accountId;
+        }
         if (
             (patch.kind !== undefined && (patch.kind as IncomeKind) !== source.kind) ||
             (patch.cadence !== undefined && (patch.cadence as Cadence) !== source.cadence)
@@ -232,6 +252,8 @@ export class IncomeService {
             merchantKey: source.merchantKey,
             partyId: source.party,
             assetId: source.asset,
+            bankId: source.bank,
+            accountId: source.account,
             kind: source.kind,
             amount: source.amount,
             cadence: source.cadence,

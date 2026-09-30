@@ -73,6 +73,7 @@
                     "bill_link_outflow": "Associez une sortie pour régler une facture.",
                     "bill_link_inflow": "Associer un encaissement pour régler un crédit récurrent.",
                     "asset_not_found": "Ce titre ne fait pas partie de votre patrimoine.",
+                    "bank_account_not_found": "Ce compte bancaire n'appartient pas à ce foyer.",
                     "iban_already_linked": "Cet IBAN est déjà associé à un compte.",
                     "account_name_taken": "Un compte portant ce nom existe déjà.",
                     "bank_not_found": "Cette banque ne figure pas dans le catalogue.",
@@ -2173,6 +2174,16 @@
                 "filter_eyebrow": "Afficher uniquement",
                 "filter_clear": "Tout afficher",
                 "kind_fallback": "Détention"
+            },
+            "deposit_link": {
+                "bank_label": "Banque (facultatif)",
+                "bank_hint": "Où ce revenu est-il versé ? Vous pourrez choisir votre place plus tard.",
+                "bank_none": "Pas encore de banque",
+                "account_label": "Atterrisse à (facultatif)",
+                "account_hint": "Compte courant, compte d'épargne ou compte au comptant. Le choix de l'un d'entre eux détermine la banque.",
+                "account_none": "Vous n'avez pas encore de compte",
+                "chip_aria_account": "Atterrisse à {name}",
+                "chip_aria_bank": "Prévu à {name}"
             },
             "expense_form": {
                 "save_in": "Enregistrer dans",
