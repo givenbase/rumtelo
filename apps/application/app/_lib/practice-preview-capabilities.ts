@@ -24,8 +24,6 @@ export type PracticePreviewCapabilities = {
     showSettings: boolean;
     /** Quick-add FAB. */
     showQuickAdd: boolean;
-    /** First-run onboarding overlay. */
-    showOnboarding: boolean;
     /** Plan checkout prompts. */
     showPlanCheckout: boolean;
     /** Create / edit flows (quick-add targets, modal creates). */
@@ -48,7 +46,6 @@ const MEMBER_DEFAULTS: PracticePreviewCapabilities = {
     showWhyCaption: true,
     showSettings: true,
     showQuickAdd: true,
-    showOnboarding: true,
     showPlanCheckout: true,
     showCreateFlows: true,
     showCoachNav: true,
@@ -66,7 +63,6 @@ const PREVIEW_BASE: Omit<PracticePreviewCapabilities, 'access'> = {
     showWhyCaption: false,
     showSettings: false,
     showQuickAdd: false,
-    showOnboarding: false,
     showPlanCheckout: false,
     showCreateFlows: false,
     showCoachNav: false,

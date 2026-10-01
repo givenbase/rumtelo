@@ -27,7 +27,6 @@ import { useLiveQuery } from '@rumtelo/hooks';
 import { useAccountTheme } from '@/components/features/shell/account-theme-sync';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
-import { OnboardingOverlay } from '@/components/features/shell/onboarding-overlay';
 import { PendingPlanCheckout } from '@/components/features/shell/pending-plan-checkout';
 import { PendingPracticeInviteRedeem } from '@/components/features/shell/pending-practice-invite-redeem';
 import { CapabilityGate } from '@/components/features/shell/capability-gate';
@@ -35,7 +34,7 @@ import { BoardMutateRouteGuard } from '@/components/features/shell/board-mutate-
 import { usePracticePreview } from '@/components/features/shell/practice-preview';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
-import { PageHelpButton, PageTourProvider } from '@/components/features/tour';
+import { PageHelpButton, PageTourProvider, usePageTour } from '@/components/features/tour';
 import { FeatureHelpersProvider, WhyCaption } from '@/components/features/helpers';
 import { PageContentWidthProvider } from '@/components/layout/page-content-width';
 
@@ -165,6 +164,16 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
     const { session } = useAuth();
     const { capabilities } = usePracticePreview();
     const { canMutate } = useBoardWriteAccess();
+    const { requestTourOffer } = usePageTour();
+
+    // After jar-bank setup on the onboarding page, a sessionStorage flag triggers
+    // the tour offer once the user lands back in the shell.
+    useEffect(() => {
+        const flag = sessionStorage.getItem('rumtelo:offer-tour');
+        if (!flag) return;
+        sessionStorage.removeItem('rumtelo:offer-tour');
+        requestTourOffer();
+    }, [requestTourOffer]);
 
     const isDark = resolvedTheme === 'dark';
     const planName = planLabel(plan, t);
@@ -693,7 +702,6 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
             {/* ── OVERLAYS ─────────────────────────────────────────────────── */}
             {capabilities.showQuickAdd && canMutate ? <QuickAddFab /> : null}
             <ToastPill />
-            {capabilities.showOnboarding ? <OnboardingOverlay /> : null}
             {capabilities.showPlanCheckout ? <PendingPlanCheckout /> : null}
             <PendingPracticeInviteRedeem />
         </div>

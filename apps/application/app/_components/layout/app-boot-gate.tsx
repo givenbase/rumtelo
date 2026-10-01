@@ -1,5 +1,14 @@
 'use client';
 
+/**
+ * Holds the product shell until auth + household plan are known,
+ * so Plus/Max routes never flash the 🔒 upgrade wall as Basic.
+ *
+ * Onboarding redirects live in `proxy.ts` (`rumtelo-onboarded` cookie) — not here.
+ * Practice-only staff (practice member, no BA household, no client preview) still
+ * go to `/practice` here — proxy cannot see practice membership.
+ */
+
 import { useEffect, type ReactNode } from 'react';
 
 import { usePathname, useRouter } from 'next/navigation';
@@ -14,15 +23,6 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { HouseholdShell } from '@/components/layout/household-shell';
 
-/**
- * Holds the product shell until auth + household plan are known,
- * so Plus/Max routes never flash the 🔒 upgrade wall as Basic.
- * New users (session, no household) pass through so onboarding can mount.
- *
- * Practice B2B routes use PracticeShell — skip household chrome (HOME/GELD/…).
- * Practice-only staff (practice member, no BA household, no client preview) are
- * sent to `/practice` — they manage client boards only via preview headers.
- */
 export function AppBootGate({ children, modal }: { children: ReactNode; modal: ReactNode }) {
     const t = useTranslations();
     const pathname = usePathname();

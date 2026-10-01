@@ -12,7 +12,27 @@ import { PlanKey } from '../../../enums';
 import { HouseholdKind, HouseholdRole, IncomeStability, SpendingStyle } from '../enums';
 import { PayoffStrategy } from '../../product/money/enums';
 
-export { HouseholdKind, HouseholdRole, IncomeStability, SpendingStyle } from '../enums';
+export {
+    BankAccountCount,
+    HouseholdKind,
+    HouseholdRole,
+    IncomeStability,
+    JarExperience,
+    SpendingStyle,
+} from '../enums';
+
+/**
+ * Stable keys inside {@link HouseholdAnswers} for onboarding / jar-bank setup.
+ * Values stay primitives; enums are stored as their string members.
+ */
+export const HouseholdAnswerKey = {
+    JAR_EXPERIENCE: 'jar_experience',
+    BANK_ACCOUNT_COUNT: 'bank_account_count',
+    /** True when the post-onboard bank + jar placement wizard finished or was skipped. */
+    JAR_BANK_SETUP_DONE: 'jar_bank_setup_done',
+} as const;
+
+export type HouseholdAnswerKey = (typeof HouseholdAnswerKey)[keyof typeof HouseholdAnswerKey];
 
 export const Household = z.object({
     id: HouseholdId,

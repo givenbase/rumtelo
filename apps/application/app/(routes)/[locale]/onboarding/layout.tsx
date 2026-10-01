@@ -7,14 +7,13 @@ import { LocaleSwitcher, useTranslations } from '@rumtelo/i18n';
 import { Typography } from '@rumtelo/ui';
 
 import { AccountThemeToggle } from '@/components/features/shell/account-theme-sync';
-
 import { AuthAside } from '@/components/features/brand/auth-aside';
 
 /** Keep chrome on the form column so it never sits on the black aside. */
 const chromeClass =
     'size-8 rounded-full bg-transparent text-sm text-fg-muted hover:border-accent hover:bg-transparent hover:text-accent';
 
-export default function AuthLayout({ children }: { children: React.ReactNode }) {
+export default function OnboardingLayout({ children }: { children: React.ReactNode }) {
     const t = useTranslations();
 
     return (
@@ -27,7 +26,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                     <AccountThemeToggle className={chromeClass} />
                 </div>
 
-                <div className="w-full max-w-md">
+                <div className="w-full max-w-lg">
                     <Link href="/" className="mb-10 inline-grid gap-1.5">
                         <RumteloLogo variant="wordmark" className="h-8 w-auto max-w-[11rem]" />
                         <Typography as="span" variant="caption" color="muted">

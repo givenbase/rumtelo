@@ -27,6 +27,17 @@ export const accountProfile = oc.output(AccountProfile);
 /** Current authenticated user's settings */
 export const accountSettings = oc.output(AccountSettings);
 
+/**
+ * Proxy / boot gate — whether the signed-in person may leave `/onboarding`.
+ * True when personal onboard finished and jar-bank setup is not pending,
+ * or when they are practice-only staff (no personal household required).
+ */
+export const accountBoardReady = oc.output(
+    z.object({
+        ready: z.boolean(),
+    })
+);
+
 // ====================================================================
 // ? UPDATE Operations
 // ====================================================================
@@ -52,6 +63,7 @@ export const accountContract = {
     updateProfile: accountUpdateProfile,
     createSettings: accountCreateSettings,
     settings: accountSettings,
+    boardReady: accountBoardReady,
     updateSettings: accountUpdateSettings,
     deleteSettings: accountDeleteSettings,
 };

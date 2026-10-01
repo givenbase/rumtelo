@@ -90,6 +90,7 @@
                     "demo_no_plan_change": "Los hogares que participan en el programa de demostración no pueden cambiar de plan",
                     "invitation_create_failed": "No se ha podido crear la invitación",
                     "jar_split_total": "El reparto del bote debe sumar el 100 %; recibido {total} %",
+                    "jar_placement_account_invalid": "That bank account is not in this household.",
                     "book_catalog_unavailable": "El catálogo de libros no me dio respuesta.",
                     "contact_send_failed": "No se ha podido enviar tu mensaje. Inténtalo de nuevo o envíanos un correo electrónico directamente.",
                     "contact_message_rejected": "No se ha podido enviar tu mensaje. Elimina los enlaces de más e inténtalo de nuevo, o envíanos un correo electrónico directamente.",
@@ -4421,7 +4422,62 @@
             "household_created": "Se ha creado un hogar",
             "continue": "Continuar",
             "finish": "Abrir Rumtelo",
-            "skip": "Dejarlo para más adelante"
+            "skip": "Dejarlo para más adelante",
+            "banks": "Your bank accounts",
+            "banks_body": "Rumtelo tracks which jar your money lives in. Tell us what you use and we will set up your account seats — or skip this later.",
+            "jar_experience_label": "How familiar are you with banking by jars?",
+            "jar_experience_hint": "No wrong answer — this only affects which setup steps we suggest.",
+            "jar_experience_options": {
+                "new_label": "Brand new to it",
+                "new_hint": "I have accounts but no jar system yet",
+                "familiar_label": "I know the idea",
+                "familiar_hint": "I get it but have not set accounts up yet",
+                "set_up_label": "Already set up",
+                "set_up_hint": "I already bank like jars — just log my seats"
+            },
+            "bank_account_count_label": "How many bank accounts do you use for everyday money?",
+            "bank_account_count_hint": "Savings pots at the same bank count too.",
+            "bank_account_count_options": {
+                "one_label": "One account",
+                "one_hint": "I keep everything in one place",
+                "two_label": "Two accounts",
+                "two_hint": "Usually a checking and a savings",
+                "three_plus_label": "Three or more",
+                "three_plus_hint": "I spread money across multiple accounts"
+            },
+            "banks_setup": {
+                "accounts_title": "Add your accounts",
+                "accounts_body": "We will create a spot for each seat so jars know where to look. Rename them any time in Settings.",
+                "map_title": "Assign jars to accounts",
+                "map_body": "Pick which account each jar lives in. Change this any time in Settings → Jars.",
+                "bank_label": "Bank",
+                "account_name_label": "Account name",
+                "kind_label": "Type",
+                "creating": "Creating…",
+                "saving": "Saving…",
+                "skip": "Skip for now",
+                "finish": "All set",
+                "tips_title": "Tips",
+                "no_accounts_yet": "Create accounts first",
+                "suggested_names": {
+                    "main_checking": "Main checking",
+                    "savings": "Savings",
+                    "freedom": "Freedom savings",
+                    "lts": "Long-term savings",
+                    "education": "Education savings",
+                    "play": "Play savings",
+                    "give": "Give savings",
+                    "seat_2": "Second account",
+                    "seat_3": "Third account"
+                },
+                "tips": {
+                    "one_account": "With one account Rumtelo still shows each jar balance separately — only the physical seat is shared.",
+                    "two_accounts": "Freedom and Long-term Savings sit in your savings account — higher interest, same jar tracking.",
+                    "three_plus": "Each jar gets its own seat. Money stays separate and Rumtelo knows exactly where it is.",
+                    "familiar": "We have set up one seat per account. Map each jar after you create the accounts.",
+                    "already_set_up": "Just record your existing seats. Rumtelo will not touch your real accounts."
+                }
+            }
         },
         "practice": {
             "chrome": {

@@ -59,6 +59,29 @@ export enum IncomeStability {
     NONE = 'NONE',
 }
 
+/**
+ * How familiar the household is with the six-jar method — drives bank-setup coaching.
+ * Stored in `HouseholdAnswers` under {@link HouseholdAnswerKey.JAR_EXPERIENCE}.
+ */
+export enum JarExperience {
+    /** Never used jars — suggest account layout. */
+    NEW = 'NEW',
+    /** Knows the idea — light tips, they map seats. */
+    FAMILIAR = 'FAMILIAR',
+    /** Already banking like jars — just record their seats. */
+    SET_UP = 'SET_UP',
+}
+
+/**
+ * How many real-world bank seats the household uses for money.
+ * Stored in `HouseholdAnswers` under {@link HouseholdAnswerKey.BANK_ACCOUNT_COUNT}.
+ */
+export enum BankAccountCount {
+    ONE = 'ONE',
+    TWO = 'TWO',
+    THREE_PLUS = 'THREE_PLUS',
+}
+
 /** Staff role inside a Practice (B2B control plane). */
 export enum PracticeRole {
     OWNER = 'OWNER',

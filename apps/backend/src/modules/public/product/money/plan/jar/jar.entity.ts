@@ -1,8 +1,9 @@
 import { Collection } from '@mikro-orm/core';
-import { Entity, Enum, OneToMany, Property, Unique } from '@mikro-orm/decorators/legacy';
+import { Entity, Enum, ManyToOne, OneToMany, Property, Unique } from '@mikro-orm/decorators/legacy';
 import { JarKey, type JarCapabilities } from '@rumtelo/contracts';
 
 import { Category } from './category.entity';
+import { BankAccount } from '../../ledger/bank-account/bank-account.entity';
 
 import { HouseholdEntity } from '../../../../../../common/database/household.entity';
 import { entityConfig } from '../../../../../../common/database/entity-config.util';
@@ -56,6 +57,13 @@ export class Jar extends HouseholdEntity {
     key!: JarKey;
 
     // ? RELATIONSHIPS
+    /**
+     * Preferred bank seat for this jar (manual or Open Banking).
+     * Null until the household places it — coach / settings prompt to set one.
+     */
+    @ManyToOne(() => BankAccount, { mapToPk: true, nullable: true, deleteRule: 'set null' })
+    defaultAccount: string | null = null;
+
     /** Spending lines inside this jar (1:N, inverse side). */
     @OneToMany(() => Category, entity => entity.jar)
     categories = new Collection<Category>(this);

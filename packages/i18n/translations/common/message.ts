@@ -71,6 +71,7 @@ const message = {
             demo_no_plan_change: 'Demo households cannot change plans',
             invitation_create_failed: 'Could not create invitation',
             jar_split_total: 'Jar split must total 100%, received {total}%',
+            jar_placement_account_invalid: 'That bank account is not in this household.',
             book_catalog_unavailable: 'The book catalog did not answer.',
             contact_send_failed:
                 'Could not send your message. Please try again or email us directly.',

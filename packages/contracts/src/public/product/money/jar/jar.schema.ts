@@ -47,6 +47,24 @@ export const Jar = z.object({
     percentage: z.number().min(0).max(100),
     capabilities: JarCapabilities,
     sortOrder: z.int(),
+    /**
+     * Preferred real-world bank seat for this jar (manual or linked).
+     * Null = not placed yet — coach / settings prompt to set one.
+     */
+    defaultAccountId: Id.nullable(),
+});
+
+/** Assign each jar to a household bank seat (or clear). */
+export const UpdateJarPlacement = z.object({
+    householdId: HouseholdId,
+    placements: z
+        .array(
+            z.object({
+                jarId: Id,
+                accountId: Id.nullable(),
+            })
+        )
+        .min(1),
 });
 
 /** A jar as shown on the dashboard for one period, with its money resolved. */
@@ -79,3 +97,4 @@ export type Category = z.infer<typeof Category>;
 export type Jar = z.infer<typeof Jar>;
 export type JarBalance = z.infer<typeof JarBalance>;
 export type UpdateJarSplit = z.infer<typeof UpdateJarSplit>;
+export type UpdateJarPlacement = z.infer<typeof UpdateJarPlacement>;

@@ -13,6 +13,7 @@ import {
 
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
+import { apiBadRequest } from '../../../../../../common/errors/api-user-error';
 import { AccountSettingsService } from '../../../../../auth/user/account/account-settings';
 import {
     catalogLocaleFromContracts,
@@ -23,6 +24,7 @@ import {
 } from '../../../../../backoffice/admin/translation';
 import { CATEGORY_TEMPLATE_SEED } from '../../../../../backoffice/product/money/template/category/seed/category.seed-data';
 import { JAR_TEMPLATE_SEED } from '../../../../../backoffice/product/money/template/jar/seed/jar.seed-data';
+import { BankAccount } from '../../ledger/bank-account/bank-account.entity';
 import { Category } from './category.entity';
 import { Jar } from './jar.entity';
 
@@ -326,6 +328,42 @@ export class JarService {
         return this.list();
     }
 
+    /**
+     * Assign each jar to a household bank seat (or clear). Rejects seats outside
+     * this household. One flush for the whole board map.
+     */
+    async updatePlacement(
+        placements: Array<{ jarId: string; accountId: string | null }>
+    ): Promise<JarDto[]> {
+        const accountIds = [
+            ...new Set(placements.map(row => row.accountId).filter((id): id is string => !!id)),
+        ];
+        const accounts =
+            accountIds.length > 0
+                ? await this.em.find(BankAccount, {
+                      id: { $in: accountIds },
+                      household: currentHouseholdId(),
+                  })
+                : [];
+        const allowed = new Set(accounts.map(account => account.id));
+        const jarIds = placements.map(row => row.jarId);
+        const jars = await this.jars.find({ id: { $in: jarIds } });
+        const jarById = new Map(jars.map(jar => [jar.id, jar]));
+
+        for (const row of placements) {
+            if (row.accountId && !allowed.has(row.accountId)) {
+                throw apiBadRequest('jar_placement_account_invalid');
+            }
+            const jar = jarById.get(row.jarId);
+            if (!jar) {
+                throw apiBadRequest('jar_placement_account_invalid');
+            }
+            jar.defaultAccount = row.accountId;
+        }
+        await this.em.flush();
+        return this.list();
+    }
+
     async update(
         id: string,
         patch: Partial<Pick<Jar, 'name' | 'subtitle' | 'icon'>>
@@ -566,5 +604,6 @@ function toJarDto(jar: Jar): JarDto {
         percentage: Number(jar.percentage),
         capabilities: jarCapabilitiesFor(jar.key),
         sortOrder: jar.sortOrder,
+        defaultAccountId: jar.defaultAccount,
     };
 }

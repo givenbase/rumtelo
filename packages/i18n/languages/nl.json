@@ -90,6 +90,7 @@
                     "demo_no_plan_change": "Demo-huishoudens kunnen niet van plan wisselen",
                     "invitation_create_failed": "Uitnodiging kon niet worden aangemaakt",
                     "jar_split_total": "De potverdeling moet samen 100% zijn; ontvangen: {total}%",
+                    "jar_placement_account_invalid": "Die bankrekening hoort niet bij dit huishouden.",
                     "book_catalog_unavailable": "De boekencatalogus gaf geen antwoord.",
                     "contact_send_failed": "Je bericht kon niet worden verzonden. Probeer het nog eens of stuur ons rechtstreeks een e-mail.",
                     "contact_message_rejected": "Je bericht kon niet worden verzonden. Verwijder overbodige links en probeer het opnieuw, of stuur ons rechtstreeks een e-mail.",
@@ -4421,7 +4422,62 @@
             "household_created": "Huishouden aangemaakt",
             "continue": "Doorgaan",
             "finish": "Rumtelo openen",
-            "skip": "Voorlopig overslaan"
+            "skip": "Voorlopig overslaan",
+            "banks": "Jouw bankrekeningen",
+            "banks_body": "Rumtelo houdt bij in welk potje jouw geld zit. Vertel ons wat je gebruikt en we richten je rekeningen in — of sla dit later over.",
+            "jar_experience_label": "Hoe vertrouwd ben je met bankieren per potje?",
+            "jar_experience_hint": "Geen goed of fout antwoord — dit bepaalt alleen welke stappen we voorstellen.",
+            "jar_experience_options": {
+                "new_label": "Helemaal nieuw",
+                "new_hint": "Ik heb rekeningen maar nog geen potjessysteem",
+                "familiar_label": "Ik ken het idee",
+                "familiar_hint": "Ik begrijp het maar heb het nog niet opgezet",
+                "set_up_label": "Al ingesteld",
+                "set_up_hint": "Ik bankier al per potje — ik wil het alleen registreren"
+            },
+            "bank_account_count_label": "Hoeveel bankrekeningen gebruik je voor dagelijks geld?",
+            "bank_account_count_hint": "Spaarrekeningen bij dezelfde bank tellen ook mee.",
+            "bank_account_count_options": {
+                "one_label": "Eén rekening",
+                "one_hint": "Ik houd alles op één plek",
+                "two_label": "Twee rekeningen",
+                "two_hint": "Meestal een betaal- en een spaarrekening",
+                "three_plus_label": "Drie of meer",
+                "three_plus_hint": "Ik spreid geld over meerdere rekeningen"
+            },
+            "banks_setup": {
+                "accounts_title": "Rekeningen toevoegen",
+                "accounts_body": "We maken een plek voor elke rekening zodat potjes weten waar ze moeten kijken. Hernoem ze later in Instellingen.",
+                "map_title": "Potjes toewijzen aan rekeningen",
+                "map_body": "Kies voor elk potje op welke rekening het staat. Aanpassen kan altijd via Instellingen → Potjes.",
+                "bank_label": "Bank",
+                "account_name_label": "Rekeningnaam",
+                "kind_label": "Type",
+                "creating": "Aanmaken…",
+                "saving": "Opslaan…",
+                "skip": "Voorlopig overslaan",
+                "finish": "Klaar",
+                "tips_title": "Tips",
+                "no_accounts_yet": "Maak eerst rekeningen aan",
+                "suggested_names": {
+                    "main_checking": "Hoofdrekening",
+                    "savings": "Spaarrekening",
+                    "freedom": "Vrijheidssparen",
+                    "lts": "Lange-termijnsparen",
+                    "education": "Educatiesparen",
+                    "play": "Plezierrekening",
+                    "give": "Geefrekening",
+                    "seat_2": "Tweede rekening",
+                    "seat_3": "Derde rekening"
+                },
+                "tips": {
+                    "one_account": "Met één rekening toont Rumtelo toch voor elk potje afzonderlijk het saldo — alleen de bankplek is gedeeld.",
+                    "two_accounts": "Financiële vrijheid en Lange-termijnsparen staan op je spaarrekening — hogere rente, zelfde potjesbeheer.",
+                    "three_plus": "Elk potje krijgt zijn eigen rekening. Geld blijft gescheiden en Rumtelo weet precies waar het staat.",
+                    "familiar": "We hebben één plek per rekening aangemaakt. Wijs elk potje toe nadat je de rekeningen hebt aangemaakt.",
+                    "already_set_up": "Registreer gewoon je bestaande rekeningen. Rumtelo raakt je echte rekeningen niet aan."
+                }
+            }
         },
         "practice": {
             "chrome": {

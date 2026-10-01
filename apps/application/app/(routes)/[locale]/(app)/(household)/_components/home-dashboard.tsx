@@ -4,9 +4,7 @@ import { api } from '@/app/_lib/api';
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo } from 'react';
-
-import { useSearchParams } from 'next/navigation';
+import { useMemo } from 'react';
 
 import {
     CoachKind,
@@ -51,11 +49,10 @@ export function HomeDashboardClient() {
     const locale = useLocale();
     const queryClient = useQueryClient();
     const { householdId, session } = useAuth();
-    const { period, showToast, openOnboarding } = useHouseholdShell();
+    const { period, showToast } = useHouseholdShell();
     const { canMutate } = useBoardWriteAccess();
     const apiError = useApiError();
     const { formatMoney } = useHouseholdCurrency();
-    const searchParams = useSearchParams();
 
     const fallbackRecap = useMemo((): CoachRecapItem[] => {
         const items = [
@@ -100,11 +97,6 @@ export function HomeDashboardClient() {
             }));
     }, [t]);
 
-    useEffect(() => {
-        if (searchParams.get('onboarding') === '1' && !householdId) {
-            openOnboarding();
-        }
-    }, [searchParams, householdId, openOnboarding]);
     const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);
 

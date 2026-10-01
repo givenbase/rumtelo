@@ -6,9 +6,17 @@ import type {
     AccountTourProgress,
 } from '@rumtelo/contracts';
 
-import { DEFAULT_ACCOUNT_TOUR_PROGRESS, Locale, SpendingStyle, Theme } from '@rumtelo/contracts';
+import {
+    DEFAULT_ACCOUNT_TOUR_PROGRESS,
+    HouseholdAnswerKey,
+    Locale,
+    SpendingStyle,
+    Theme,
+} from '@rumtelo/contracts';
 import { apiNotFound } from '../../../../../common/errors/api-user-error';
-import { currentUserId } from '../../../../../common/household/household.context';
+import { currentUserId, householdStorage } from '../../../../../common/household/household.context';
+import { PracticeMember } from '../../../../public/platform/practice/practice-member/practice-member.entity';
+import { HouseholdSettings } from '../../../household/household-settings/household-settings.entity';
 import { Account } from '../account.entity';
 import { AccountSettings } from './account-settings.entity';
 
@@ -105,6 +113,30 @@ export class AccountSettingsService {
     async get(): Promise<AccountSettingsDto> {
         const row = await this.upsertForUser(currentUserId());
         return toDto(row);
+    }
+
+    /**
+     * Boot / proxy gate — may the signed-in person leave `/onboarding`?
+     * Uses durable DB state (not a client cookie).
+     */
+    async boardReady(): Promise<{ ready: boolean }> {
+        const settings = await this.get();
+        const householdId = householdStorage.getStore()?.householdId ?? null;
+
+        if (!settings.onboardedAt) {
+            const account = await this.em.findOne(Account, { user: currentUserId() });
+            if (!account) return { ready: false };
+            const practiceSeat = await this.em.findOne(PracticeMember, { account: account.id });
+            return { ready: Boolean(practiceSeat) };
+        }
+
+        if (!householdId) return { ready: true };
+
+        const board = await this.em.findOne(HouseholdSettings, { household: householdId });
+        if (board?.answers?.[HouseholdAnswerKey.JAR_BANK_SETUP_DONE] === false) {
+            return { ready: false };
+        }
+        return { ready: true };
     }
 
     async findOne(id: string): Promise<AccountSettingsDto> {
