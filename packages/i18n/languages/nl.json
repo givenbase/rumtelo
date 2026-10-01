@@ -1590,6 +1590,7 @@
                 "subline_annual": "{amount}/jaar",
                 "loading": "Laden…",
                 "not_found": "Inkomstenbron niet gevonden.",
+                "back": "← Inkomen",
                 "sources_heading": "✦ Inkomstenbronnen",
                 "empty_live_title": "Nog geen inkomstenbronnen.",
                 "empty_live_body": "Voeg er één toe om je potjes te vullen.",

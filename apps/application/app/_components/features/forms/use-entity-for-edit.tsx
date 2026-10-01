@@ -1,10 +1,11 @@
 'use client';
 
 import { isLiveData } from '@/app/_lib/preview';
+import { EntityNotFoundState } from '@/components/features/helpers/entity-not-found-state';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
-import { Typography } from '@rumtelo/ui';
+import { EmptyState, Typography } from '@rumtelo/ui';
 import type { UseQueryOptions } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 
@@ -20,6 +21,9 @@ function editGate<TRow, TValues>(options: {
     mapRow: (row: TRow) => TValues;
     loadingKey?: string;
     notFoundKey?: string;
+    /** When set, missing entity renders EmptyState + link to the list. */
+    listHref?: string;
+    backKey?: string;
 }): EntityForEditResult<TRow, TValues> {
     if (options.loading && !options.row) {
         return {
@@ -32,12 +36,17 @@ function editGate<TRow, TValues>(options: {
         };
     }
     if (!options.row) {
+        const title = options.t(options.notFoundKey ?? 'not_found');
         return {
             status: 'missing',
-            node: (
-                <Typography as="p" size="sm" color="muted">
-                    {options.t(options.notFoundKey ?? 'not_found')}
-                </Typography>
+            node: options.listHref ? (
+                <EntityNotFoundState
+                    title={title}
+                    href={options.listHref}
+                    backLabel={options.t(options.backKey ?? 'back')}
+                />
+            ) : (
+                <EmptyState icon="inbox" title={title} />
             ),
         };
     }
@@ -54,6 +63,9 @@ export function useEntityForEdit<TRow extends { id: string }, TValues>(options: 
     loadingKey?: string;
     notFoundKey?: string;
     translationNamespace: string;
+    /** List URL when the slug is missing (EmptyState CTA). */
+    listHref?: string;
+    backKey?: string;
 }): EntityForEditResult<TRow, TValues> {
     const t = useTranslations(options.translationNamespace);
     const { householdId } = useAuth();
@@ -68,6 +80,8 @@ export function useEntityForEdit<TRow extends { id: string }, TValues>(options: 
         mapRow: options.mapRow,
         loadingKey: options.loadingKey,
         notFoundKey: options.notFoundKey,
+        listHref: options.listHref,
+        backKey: options.backKey,
     });
 }
 
@@ -80,6 +94,8 @@ export function useEntityGetForEdit<TRow, TValues>(options: {
     loadingKey?: string;
     notFoundKey?: string;
     translationNamespace: string;
+    listHref?: string;
+    backKey?: string;
 }): EntityForEditResult<TRow, TValues> {
     const t = useTranslations(options.translationNamespace);
     const { householdId } = useAuth();
@@ -93,6 +109,8 @@ export function useEntityGetForEdit<TRow, TValues>(options: {
         mapRow: options.mapRow,
         loadingKey: options.loadingKey,
         notFoundKey: options.notFoundKey,
+        listHref: options.listHref,
+        backKey: options.backKey,
     });
 }
 
@@ -106,6 +124,8 @@ export function resolveEntityForEdit<TRow, TValues>(options: {
     mapRow: (row: TRow) => TValues;
     loadingKey?: string;
     notFoundKey?: string;
+    listHref?: string;
+    backKey?: string;
 }): EntityForEditResult<TRow, TValues> {
     return editGate(options);
 }

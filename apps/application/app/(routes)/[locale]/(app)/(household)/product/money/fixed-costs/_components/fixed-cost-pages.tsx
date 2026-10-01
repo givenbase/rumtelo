@@ -2,6 +2,7 @@
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
+import { productPath } from '@/app/_lib/routes';
 import {
     FixedCostForm,
     type FixedCostFormValues,
@@ -45,6 +46,7 @@ export function FixedCostUpdatePage({ id, embedded = false }: { id: string; embe
     const { householdId } = useAuth();
     const loaded = useEntityForEdit({
         translationNamespace: 'features.money.fixed.detail',
+        listHref: productPath('money/fixed-costs'),
         listOptions: apiQuery.money.fixedCosts.list.queryOptions({
             input: { householdId: householdId! },
         }),

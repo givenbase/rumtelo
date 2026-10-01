@@ -45,6 +45,7 @@ import { audienceKeysFromAsset } from '@/app/_lib/household-audience-from-money'
 import { useTranslations } from '@rumtelo/i18n';
 
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
+import { formRoute } from '@/app/_lib/form-route-meta';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useMergeHouseholdAudiences } from '@/app/_lib/use-merge-household-audiences';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -104,7 +105,9 @@ export function AssetForm({
     const tBtn = useTranslations('ui.button.actions');
     const { showToast } = useHouseholdShell();
     const apiError = useApiError();
-    const dismiss = useFormDismiss(onSuccess);
+    const { dismiss, dismissAfterRemove } = useFormDismiss(onSuccess, {
+        listHref: formRoute('assetUpdate').closeHref,
+    });
     const router = useRouter();
     const { symbol } = useHouseholdCurrency();
     const { householdId } = useAuth();
@@ -334,8 +337,12 @@ export function AssetForm({
             );
             // New holding on a plan that can link money: land on its detail with the
             // skippable In → Out register instead of bouncing back to the board.
+            // Must dismiss (router.back) so the intercept sheet closes; replace alone
+            // leaves the @modal slot open and allows double-submit duplicates.
             if (mode === 'create' && !onSuccess && canLink) {
-                router.replace(assetDetailHref(saved.id, { setup: 'in' }));
+                const detailHref = assetDetailHref(saved.id, { setup: 'in' });
+                dismiss();
+                router.push(detailHref);
                 return;
             }
             dismiss();
@@ -365,12 +372,13 @@ export function AssetForm({
                 });
             }
             showToast(t('common.message.entity.asset_deleted'), 'success');
-            dismiss();
+            dismissAfterRemove();
         },
         onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
     async function onSubmit(values: AssetFormValues) {
+        if (saveMutation.isPending) return;
         if (!live) {
             showToast(t('common.message.entity.sign_in_asset'), 'error');
             return;

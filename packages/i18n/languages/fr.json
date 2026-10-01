@@ -1590,6 +1590,7 @@
                 "subline_annual": "{amount} par an",
                 "loading": "Chargement en cours…",
                 "not_found": "Source de revenus introuvable.",
+                "back": "← Revenus",
                 "sources_heading": "✦ Sources de revenus",
                 "empty_live_title": "Aucune source de revenus pour l'instant.",
                 "empty_live_body": "Ajoutez-en un pour remplir vos bocaux.",

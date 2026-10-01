@@ -2,6 +2,7 @@
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
+import { productPath } from '@/app/_lib/routes';
 import { DebtForm } from '@/components/features/forms/debt-form';
 import { useEntityForEdit } from '@/components/features/forms/use-entity-for-edit';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -15,6 +16,7 @@ export function DebtUpdatePage({ id, embedded = false }: { id: string; embedded?
     const { householdId } = useAuth();
     const loaded = useEntityForEdit({
         translationNamespace: 'features.money.debt.detail',
+        listHref: productPath('money/debt'),
         listOptions: apiQuery.money.debts.list.queryOptions({
             input: { householdId: householdId! },
         }),

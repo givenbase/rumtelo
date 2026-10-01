@@ -292,7 +292,7 @@ export function MoveMoneyForm({
     const { householdId } = useAuth();
     const { symbol, formatMoney } = useHouseholdCurrency();
     const { showToast, period } = useHouseholdShell();
-    const dismiss = useFormDismiss(onSuccess);
+    const { dismiss } = useFormDismiss(onSuccess);
     const live = isLiveData(householdId);
     const fromLocked = Boolean(defaultFromJarId);
     const periodKey = toPeriodKey(period.year, period.month);

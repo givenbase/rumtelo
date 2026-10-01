@@ -1590,6 +1590,7 @@
                 "subline_annual": "{amount}/yr",
                 "loading": "Loading…",
                 "not_found": "Income source not found.",
+                "back": "← Income",
                 "sources_heading": "✦ Income sources",
                 "empty_live_title": "No income sources yet.",
                 "empty_live_body": "Add one to feed your jars.",

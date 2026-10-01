@@ -1590,6 +1590,7 @@
                 "subline_annual": "{amount} al año",
                 "loading": "Cargando…",
                 "not_found": "No se ha encontrado la fuente de ingresos.",
+                "back": "← Ingresos",
                 "sources_heading": "✦ Fuentes de ingresos",
                 "empty_live_title": "Aún no hay fuentes de ingresos.",
                 "empty_live_body": "Añade uno para llenar tus tarros.",

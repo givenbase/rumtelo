@@ -37,6 +37,7 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { findCatalogVendorFromFeed, partyMark } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
+import { EntityNotFoundState } from '@/components/features/helpers/entity-not-found-state';
 import { HoldingChip } from '@/components/features/money/holding-chip';
 import { JarBadge, MetaChip, formatBookedDate } from '@/components/features/money/jar-badge';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
@@ -280,14 +281,11 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
     }
     if (!tx) {
         return (
-            <div className="grid gap-4">
-                <Link
-                    href="/product/money/transactions"
-                    className="w-fit font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
-                    {tTx('back')}
-                </Link>
-                <p className="text-sm text-fg-muted">{tTx('not_found')}</p>
-            </div>
+            <EntityNotFoundState
+                title={tTx('not_found')}
+                href="/product/money/transactions"
+                backLabel={tTx('back')}
+            />
         );
     }
 

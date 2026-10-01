@@ -84,6 +84,7 @@ export function ExpenseUpdatePage({ id, embedded = false }: { id: string; embedd
         t,
         loading: live && (listQuery.isLoading || inboxQuery.isLoading),
         row: tx,
+        listHref: '/product/money/transactions',
         mapRow: row => ({
             description: row.description,
             counterparty: row.counterparty,
