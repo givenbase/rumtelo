@@ -4404,6 +4404,7 @@
             "bank_account_count_options": {
                 "one_label": "Eén bank (aanbevolen)",
                 "one_hint": "Salaris komt binnen op Noodzakelijk — je hoofdrekening. De andere potjes zijn spaarpotjes bij diezelfde bank (Rumtelo houdt ze apart bij).",
+                "one_help": "Wat zijn spaarpotjes?",
                 "multiple_label": "Meerdere bankrekeningen",
                 "multiple_hint": "Je hebt meer dan één echte rekening. Daarna geef je ze een naam en kies je welk potje waar hoort — Noodzakelijk blijft op de rekening waar geld binnenkomt.",
                 "two_label": "Hoofdrekening + spaarrekening",
@@ -5603,8 +5604,13 @@
             },
             "hub": {
                 "title": "Ondersteuning",
-                "description": "Juridische documenten en hoe u contact met ons kunt opnemen. Rumtelo wordt vanuit Amsterdam beheerd — wij beantwoorden e-mails.",
+                "description": "Gidsen, juridische documenten en hoe je ons bereikt. Rumtelo wordt vanuit Amsterdam geëxploiteerd — we antwoorden per e-mail.",
                 "cards": {
+                    "spaarpotjes": {
+                        "title": "Spaarpotjes & potjes",
+                        "body": "Eén bank, zes potjes: zo werken hoofdrekening en spaarpotjes samen.",
+                        "cta": "Lees de gids"
+                    },
                     "legal": {
                         "title": "Juridisch",
                         "body": "Privacy, gebruiksvoorwaarden, cookies en hoe wij uw gegevens verwerken.",
@@ -5616,6 +5622,30 @@
                         "cta": "Neem contact op"
                     }
                 }
+            },
+            "spaarpotjes": {
+                "title": "Spaarpotjes en de zes potjes",
+                "description": "Korte gids voor huishoudens met één hoofdrekening die de rest splitsen in spaarpotjes.",
+                "sections": {
+                    "what": {
+                        "title": "Wat is een spaarpotje?",
+                        "body": "Een spaarpotje is een gelabeld potje bij je bank — vaak “spaarruimte”, “space” of “spaardoel” genoemd — onder dezelfde login als je hoofdrekening. Het geld blijft bij de bank; jij bepaalt alleen welk potje welk doel heeft."
+                    },
+                    "jars": {
+                        "title": "Hoe Rumtelo dat koppelt",
+                        "body": "Necessity is je hoofdrekening: salaris en vaste lasten landen daar. De andere vijf potjes — Freedom, Long-term Savings, Education, Play, Give — zijn spaarpotjes. Rumtelo houdt de verdeling bij; je bank houdt de euro’s."
+                    },
+                    "banks": {
+                        "title": "Wat je bank meestal biedt",
+                        "body": "De meeste Nederlandse en veel EU-banken laten je meerdere spaarpotjes onder één rekening openen. Noem ze naar de potjes (of houd banknamen en koppel ze in Rumtelo). Je hebt geen zes aparte bankrekeningen nodig."
+                    },
+                    "rumtelo": {
+                        "title": "Wat Rumtelo niet doet",
+                        "body": "Wij verplaatsen nooit geld tussen potjes of rekeningen. Jij boekt bij de bank (of later met alleen-lezen banksync). Rumtelo helpt alleen de verdeling te plannen en te zien waar elke euro voor bedoeld is."
+                    }
+                },
+                "back_support": "Terug naar support",
+                "start_cta": "Gratis starten"
             },
             "legal": {
                 "title": "Juridisch",

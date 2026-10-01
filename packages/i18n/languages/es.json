@@ -4404,6 +4404,7 @@
             "bank_account_count_options": {
                 "one_label": "Un banco (recomendado)",
                 "one_hint": "El sueldo llega a Necesidad: tu cuenta principal. Los demás tarros son subahorros en ese mismo banco (Rumtelo los lleva aparte).",
+                "one_help": "¿Qué son los spaarpotjes?",
                 "multiple_label": "Varias cuentas bancarias",
                 "multiple_hint": "Tienes más de una cuenta real. Después las nombras y eliges qué tarro va dónde — Necesidad se queda en la cuenta donde entra el dinero.",
                 "two_label": "Cuenta principal + cuenta de ahorro",
@@ -5603,8 +5604,13 @@
             },
             "hub": {
                 "title": "Asistencia",
-                "description": "Documentos legales y cómo ponerse en contacto con nosotros. Rumtelo opera desde Ámsterdam; respondemos por correo electrónico.",
+                "description": "Guías, documentos legales y cómo contactarnos. Rumtelo opera desde Ámsterdam — respondemos por correo.",
                 "cards": {
+                    "spaarpotjes": {
+                        "title": "Spaarpotjes y frascos",
+                        "body": "Un banco, seis frascos: cómo encajan la cuenta principal y el subahorro.",
+                        "cta": "Leer la guía"
+                    },
                     "legal": {
                         "title": "Aviso legal",
                         "body": "Política de privacidad, condiciones de uso, cookies y cómo tratamos tus datos.",
@@ -5616,6 +5622,30 @@
                         "cta": "Ponte en contacto con nosotros"
                     }
                 }
+            },
+            "spaarpotjes": {
+                "title": "Spaarpotjes y los seis frascos",
+                "description": "Guía breve para hogares que mantienen una cuenta principal y reparten el resto en spaarpotjes (subahorro).",
+                "sections": {
+                    "what": {
+                        "title": "¿Qué es un spaarpotje?",
+                        "body": "Un spaarpotje es un cajón etiquetado en tu banco — a menudo “hucha”, “espacio” o “subahorro” — bajo el mismo acceso que tu cuenta principal. El dinero no sale del banco; solo decides qué cajón tiene cada propósito."
+                    },
+                    "jars": {
+                        "title": "Cómo lo mapea Rumtelo",
+                        "body": "Necessity es tu cuenta principal: ahí llegan el sueldo y las facturas. Los otros cinco frascos — Freedom, Long-term Savings, Education, Play, Give — son spaarpotjes. Rumtelo sigue el reparto; el banco guarda los euros."
+                    },
+                    "banks": {
+                        "title": "Qué suele ofrecer tu banco",
+                        "body": "La mayoría de bancos neerlandeses y muchos de la UE permiten varios cajones de ahorro bajo una cuenta. Nómbralos como los frascos (o mantén los nombres del banco y enlázalos en Rumtelo). No necesitas seis cuentas bancarias separadas."
+                    },
+                    "rumtelo": {
+                        "title": "Lo que Rumtelo no hace",
+                        "body": "Nunca movemos dinero entre cajones o cuentas. Tú transfieres en el banco (o más adelante con sincronización solo lectura). Rumtelo solo ayuda a planificar el reparto y a ver a dónde debe ir cada euro."
+                    }
+                },
+                "back_support": "Volver a soporte",
+                "start_cta": "Empieza gratis"
             },
             "legal": {
                 "title": "Aviso legal",

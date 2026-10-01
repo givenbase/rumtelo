@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 
 import { BankAccountCount, JarExperience, JarKey } from '@rumtelo/contracts';
-import { useLocale, useTranslations } from '@rumtelo/i18n';
+import { useTranslations } from '@rumtelo/i18n';
 import { FormField, FormItem, FormMessage, Icon, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
@@ -15,11 +15,11 @@ import { ChoiceCard, type DisplayJar, type OnboardingValues } from '../onboardin
 
 export function JarsStep({ displayJars }: { displayJars: DisplayJar[] }) {
     const t = useTranslations('pages.onboarding');
-    const appLocale = useLocale();
     const { control } = useFormContext<OnboardingValues>();
     const bankAccountCount = useWatch({ control, name: 'bankAccountCount' });
     const [expandedJar, setExpandedJar] = useState<JarKey | null>(null);
-    const jarsLearnMoreHref = `${webOrigin()}/${appLocale}#jars`;
+    const jarsLearnMoreHref = `${webOrigin()}/#jars`;
+    const spaarpotjesHelpHref = `${webOrigin()}/support/spaarpotjes`;
 
     const jarBankPreview = useMemo(
         () =>
@@ -154,31 +154,29 @@ export function JarsStep({ displayJars }: { displayJars: DisplayJar[] }) {
                                 className="grid gap-2"
                                 role="group"
                                 aria-labelledby="bank-account-count-label">
-                                {(
-                                    [
-                                        {
-                                            key: BankAccountCount.ONE,
-                                            label: t('bank_account_count_options.one_label'),
-                                            hint: t('bank_account_count_options.one_hint'),
-                                            icon: 'landmark' as const,
-                                        },
-                                        {
-                                            key: BankAccountCount.THREE_PLUS,
-                                            label: t('bank_account_count_options.multiple_label'),
-                                            hint: t('bank_account_count_options.multiple_hint'),
-                                            icon: 'layers' as const,
-                                        },
-                                    ] as const
-                                ).map(option => (
-                                    <ChoiceCard
-                                        key={option.key}
-                                        selected={field.value === option.key}
-                                        icon={option.icon}
-                                        label={option.label}
-                                        hint={option.hint}
-                                        onClick={() => field.onChange(option.key)}
-                                    />
-                                ))}
+                                <ChoiceCard
+                                    selected={field.value === BankAccountCount.ONE}
+                                    icon="landmark"
+                                    label={t('bank_account_count_options.one_label')}
+                                    hint={t('bank_account_count_options.one_hint')}
+                                    onClick={() => field.onChange(BankAccountCount.ONE)}
+                                />
+                                <a
+                                    href={spaarpotjesHelpHref}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="ml-1 inline-flex w-fit items-center gap-1 text-xs font-medium text-fg-muted underline-offset-2 hover:text-accent hover:underline">
+                                    {t('bank_account_count_options.one_help')}
+                                    <span className="sr-only"> (opens in a new tab)</span>
+                                    <Icon name="chevron-right" size="sm" color="inherit" />
+                                </a>
+                                <ChoiceCard
+                                    selected={field.value === BankAccountCount.THREE_PLUS}
+                                    icon="layers"
+                                    label={t('bank_account_count_options.multiple_label')}
+                                    hint={t('bank_account_count_options.multiple_hint')}
+                                    onClick={() => field.onChange(BankAccountCount.THREE_PLUS)}
+                                />
                             </div>
                             <Typography as="p" variant="caption">
                                 {t('bank_account_count_hint')}

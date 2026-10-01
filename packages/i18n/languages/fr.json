@@ -4404,6 +4404,7 @@
             "bank_account_count_options": {
                 "one_label": "Une banque (recommandé)",
                 "one_hint": "Le salaire arrive sur Nécessité — votre compte principal. Les autres pots sont des sous-épargnes chez cette même banque (Rumtelo les suit séparément).",
+                "one_help": "Que sont les spaarpotjes ?",
                 "multiple_label": "Plusieurs comptes bancaires",
                 "multiple_hint": "Vous avez plus d’un vrai compte. Ensuite vous les nommez et choisissez où vit chaque pot — Nécessité reste sur le compte où l’argent arrive.",
                 "two_label": "Compte principal + compte d’épargne",
@@ -5603,8 +5604,13 @@
             },
             "hub": {
                 "title": "Assistance",
-                "description": "Documents juridiques et coordonnées. Rumtelo est géré depuis Amsterdam — nous répondons par e-mail.",
+                "description": "Guides, documents juridiques et comment nous joindre. Rumtelo est exploité depuis Amsterdam — nous répondons par e-mail.",
                 "cards": {
+                    "spaarpotjes": {
+                        "title": "Spaarpotjes et bocaux",
+                        "body": "Une banque, six bocaux : comment le compte principal et les sous-épargnes fonctionnent ensemble.",
+                        "cta": "Lire le guide"
+                    },
                     "legal": {
                         "title": "Mentions légales",
                         "body": "Confidentialité, conditions générales, cookies et modalités de traitement de vos données.",
@@ -5616,6 +5622,30 @@
                         "cta": "Contactez-nous"
                     }
                 }
+            },
+            "spaarpotjes": {
+                "title": "Spaarpotjes et les six bocaux",
+                "description": "Court guide pour les foyers qui gardent un compte principal et répartissent le reste en spaarpotjes (sous-épargnes).",
+                "sections": {
+                    "what": {
+                        "title": "Qu’est-ce qu’un spaarpotje ?",
+                        "body": "Un spaarpotje est un pot étiqueté chez votre banque — souvent appelé « tirelire », « espace » ou « sous-épargne » — sous le même login que votre compte principal. L’argent ne quitte pas la banque ; vous décidez seulement quel pot sert à quel usage."
+                    },
+                    "jars": {
+                        "title": "Comment Rumtelo s’y rattache",
+                        "body": "Necessity est votre compte principal : salaire et factures y arrivent. Les cinq autres bocaux — Freedom, Long-term Savings, Education, Play, Give — sont des spaarpotjes. Rumtelo suit la répartition ; votre banque détient les euros."
+                    },
+                    "banks": {
+                        "title": "Ce que propose en général votre banque",
+                        "body": "La plupart des banques néerlandaises et de nombreuses banques de l’UE permettent plusieurs pots d’épargne sous un même compte. Nommez-les d’après les bocaux (ou gardez les noms de la banque et liez-les dans Rumtelo). Vous n’avez pas besoin de six comptes bancaires séparés."
+                    },
+                    "rumtelo": {
+                        "title": "Ce que Rumtelo ne fait pas",
+                        "body": "Nous ne déplaçons jamais d’argent entre pots ou comptes. Vous virez à la banque (ou plus tard avec une synchro en lecture seule). Rumtelo aide seulement à planifier la répartition et à voir où chaque euro doit aller."
+                    }
+                },
+                "back_support": "Retour au support",
+                "start_cta": "Commencer gratuitement"
             },
             "legal": {
                 "title": "Mentions légales",

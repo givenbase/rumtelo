@@ -1,4 +1,4 @@
-/** Public support — hub, legal index, contact. */
+/** Public support — hub, legal index, contact, spaarpotjes guide. */
 const support = {
     common: {
         eyebrow: 'Support',
@@ -9,8 +9,13 @@ const support = {
     hub: {
         title: 'Support',
         description:
-            'Legal documents and how to reach us. Rumtelo is operated from Amsterdam — we reply by email.',
+            'Guides, legal documents, and how to reach us. Rumtelo is operated from Amsterdam — we reply by email.',
         cards: {
+            spaarpotjes: {
+                title: 'Spaarpotjes & jars',
+                body: 'One bank, six jars: how main account and sub-savings work together.',
+                cta: 'Read the guide',
+            },
             legal: {
                 title: 'Legal',
                 body: 'Privacy, terms, cookies, and how we process your data.',
@@ -22,6 +27,31 @@ const support = {
                 cta: 'Get in touch',
             },
         },
+    },
+    spaarpotjes: {
+        title: 'Spaarpotjes and the six jars',
+        description:
+            'Short guide for households that keep one main bank account and split the rest into spaarpotjes (sub-savings).',
+        sections: {
+            what: {
+                title: 'What is a spaarpotje?',
+                body: 'A spaarpotje is a labelled pot at your bank — often called a “savings pot”, “space”, or “sub-savings” — still under the same login as your main account. Money does not leave the bank; you just decide which pot holds which purpose.',
+            },
+            jars: {
+                title: 'How Rumtelo maps to that',
+                body: 'Necessity is your hoofdrekening (main account): salary and bills land there. The other five jars — Freedom, Long-term Savings, Education, Play, Give — are spaarpotjes. Rumtelo tracks the split; your bank holds the euros.',
+            },
+            banks: {
+                title: 'What your bank usually offers',
+                body: 'Most Dutch and many EU banks let you open several savings pots under one account. Name them after the jars (or keep bank names and link them in Rumtelo). You do not need six separate bank accounts.',
+            },
+            rumtelo: {
+                title: 'What Rumtelo does not do',
+                body: 'We never move money between pots or accounts. You transfer at the bank (or later with read-only bank sync). Rumtelo only helps you plan the split and see where each euro is meant to go.',
+            },
+        },
+        back_support: 'Back to support',
+        start_cta: 'Start free',
     },
     legal: {
         title: 'Legal',
