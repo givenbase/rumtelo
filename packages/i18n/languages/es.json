@@ -4367,8 +4367,8 @@
             "income": "Tus ingresos",
             "income_body": "Estos son tus ingresos personales — los tuyos como la persona que crea esta cuenta para ti. Una estimación basta. Después nombrarás la cuenta bancaria donde llegan.",
             "jars": "Las seis jarras",
-            "jars_body": "Cada tarro tiene una función. Abajo elige cuántas cuentas bancarias quieres usar — la lista se adapta. Reparto inicial 55 / 10 / 10 / 10 / 10 / 5; se puede cambiar después.",
-            "jars_tap_hint": "Toca un tarro para saber por qué existe. Luego elige cuántas cuentas bancarias usas.",
+            "jars_body": "Seis tarros, cada uno con una función. El dinero suele llegar a Necesidad: tu cuenta principal para el alquiler y las facturas. Los demás tarros son donde va el resto del reparto, a menudo como ahorros auxiliares en el mismo banco. Reparto inicial 55 / 10 / 10 / 10 / 10 / 5; se puede cambiar después.",
+            "jars_tap_hint": "Toca un tarro para ver su función. Abajo, elige cómo está tu banco hoy — recomendamos empezar con una cuenta principal.",
             "jars_read_more": "Más información sobre el método de los seis frascos",
             "why": "Tu sueño",
             "why_body": "En una frase breve: ¿por qué quieres Rumtelo, o qué sueño estás persiguiendo? Lo ponemos en tu panel de control como un pequeño recordatorio de aquello por lo que estás trabajando.",
@@ -4399,21 +4399,24 @@
             "continue": "Continuar",
             "finish": "Abrir Rumtelo",
             "skip": "Dejarlo para más adelante",
-            "bank_account_count_label": "¿Cuántas cuentas bancarias quieres usar?",
-            "bank_account_count_hint": "Después les das un nombre — ahora solo elige cuántas.",
+            "bank_account_count_label": "¿Cómo está configurado tu banco?",
+            "bank_account_count_hint": "Después nombras las cuentas. ¿Dudas? Empieza con una cuenta principal.",
             "bank_account_count_options": {
-                "one_label": "Todo en una cuenta",
-                "one_hint": "Todos los tarros en tu cuenta corriente. Rumtelo sigue llevando el saldo de cada tarro por separado.",
-                "two_label": "Corriente + ahorro",
-                "two_hint": "Tarros del día a día en corriente; Libertad y Ahorro a largo plazo en una cuenta de ahorro.",
+                "one_label": "Un banco (recomendado)",
+                "one_hint": "El sueldo llega a Necesidad: tu cuenta principal. Los demás tarros son subahorros en ese mismo banco (Rumtelo los lleva aparte).",
+                "one_help": "¿Qué son los spaarpotjes?",
+                "multiple_label": "Varias cuentas bancarias",
+                "multiple_hint": "Tienes más de una cuenta real. Después las nombras y eliges qué tarro va dónde — Necesidad se queda en la cuenta donde entra el dinero.",
+                "two_label": "Cuenta principal + cuenta de ahorro",
+                "two_hint": "Necesidad y tarros del día a día en tu cuenta principal; Libertad y Ahorro a largo plazo en una cuenta de ahorro aparte. Después nos dices cuál es cuál.",
                 "three_plus_label": "Una cuenta por tarro",
-                "three_plus_hint": "Máxima separación — cada tarro en su propia cuenta bancaria."
+                "three_plus_hint": "Cada tarro tiene su propia cuenta bancaria — máxima separación. Después les pones nombre."
             },
             "banks_setup": {
                 "accounts_title": "Pon nombre a tus cuentas",
-                "accounts_body": "Coinciden con lo que acabas de elegir. Elige tu banco — puedes renombrarlas después en Ajustes.",
+                "accounts_body": "Nombra la cuenta principal donde llega el dinero (Necesidad). Si tienes más cuentas, añádelas aquí — luego vinculas los tarros.",
                 "map_title": "Vincular tarros a cuentas",
-                "map_body": "Elige en qué cuenta bancaria vive cada tarro. Puedes cambiarlo en Ajustes → Tarros.",
+                "map_body": "Necesidad se queda en tu cuenta principal. Pon los demás tarros en la cuenta de ahorro correcta. Cámbialo cuando quieras en Ajustes → Tarros.",
                 "bank_label": "Banco",
                 "account_name_label": "Nombre de la cuenta",
                 "iban_label": "IBAN",
@@ -4430,7 +4433,7 @@
                 "tips_title": "Consejos",
                 "no_accounts_yet": "Crea primero las cuentas",
                 "suggested_names": {
-                    "main_checking": "Comprobación principal",
+                    "main_checking": "Cuenta principal",
                     "savings": "Ahorros",
                     "freedom": "Ahorros para la libertad",
                     "lts": "Ahorro a largo plazo",
@@ -4440,10 +4443,16 @@
                     "seat_2": "Segundo relato",
                     "seat_3": "Tercer relato"
                 },
+                "preview": {
+                    "main_account": "Cuenta principal",
+                    "sub_savings": "Subahorro",
+                    "assign_later": "Vincular después"
+                },
                 "tips": {
-                    "one_account": "Con una sola cuenta Rumtelo sigue mostrando el saldo de cada tarro por separado — solo se comparte la cuenta bancaria.",
-                    "two_accounts": "Libertad y Ahorro a largo plazo van en ahorro — a menudo más interés, mismo seguimiento por tarro.",
-                    "three_plus": "Cada tarro tiene su propia cuenta. El dinero se mantiene separado y Rumtelo sabe exactamente dónde está.",
+                    "one_account": "Empieza aquí si usas sobre todo un banco. Necesidad es donde entra el dinero; los demás tarros son subahorros para saber cómo repartir.",
+                    "multiple_accounts": "Nombra primero tu cuenta principal (Necesidad). Añade otras cuentas y luego vincula cada tarro.",
+                    "two_accounts": "Tu cuenta principal es Necesidad (alquiler, facturas). Tu cuenta de ahorro guarda Libertad y Ahorro a largo plazo — vinculamos los tarros a continuación.",
+                    "three_plus": "Cada tarro corresponde a una cuenta real. Necesidad sigue siendo la cuenta donde llega el ingreso.",
                     "familiar": "Preparamos una cuenta Rumtelo por cuenta bancaria. Vincula cada tarro después de crearlas.",
                     "already_set_up": "Solo anota las cuentas que ya tienes. Rumtelo no toca tu banco real."
                 }
@@ -5595,8 +5604,13 @@
             },
             "hub": {
                 "title": "Asistencia",
-                "description": "Documentos legales y cómo ponerse en contacto con nosotros. Rumtelo opera desde Ámsterdam; respondemos por correo electrónico.",
+                "description": "Guías, documentos legales y cómo contactarnos. Rumtelo opera desde Ámsterdam — respondemos por correo.",
                 "cards": {
+                    "spaarpotjes": {
+                        "title": "Spaarpotjes y frascos",
+                        "body": "Un banco, seis frascos: cómo encajan la cuenta principal y el subahorro.",
+                        "cta": "Leer la guía"
+                    },
                     "legal": {
                         "title": "Aviso legal",
                         "body": "Política de privacidad, condiciones de uso, cookies y cómo tratamos tus datos.",
@@ -5608,6 +5622,30 @@
                         "cta": "Ponte en contacto con nosotros"
                     }
                 }
+            },
+            "spaarpotjes": {
+                "title": "Spaarpotjes y los seis frascos",
+                "description": "Guía breve para hogares que mantienen una cuenta principal y reparten el resto en spaarpotjes (subahorro).",
+                "sections": {
+                    "what": {
+                        "title": "¿Qué es un spaarpotje?",
+                        "body": "Un spaarpotje es un cajón etiquetado en tu banco — a menudo “hucha”, “espacio” o “subahorro” — bajo el mismo acceso que tu cuenta principal. El dinero no sale del banco; solo decides qué cajón tiene cada propósito."
+                    },
+                    "jars": {
+                        "title": "Cómo lo mapea Rumtelo",
+                        "body": "Necessity es tu cuenta principal: ahí llegan el sueldo y las facturas. Los otros cinco frascos — Freedom, Long-term Savings, Education, Play, Give — son spaarpotjes. Rumtelo sigue el reparto; el banco guarda los euros."
+                    },
+                    "banks": {
+                        "title": "Qué suele ofrecer tu banco",
+                        "body": "La mayoría de bancos neerlandeses y muchos de la UE permiten varios cajones de ahorro bajo una cuenta. Nómbralos como los frascos (o mantén los nombres del banco y enlázalos en Rumtelo). No necesitas seis cuentas bancarias separadas."
+                    },
+                    "rumtelo": {
+                        "title": "Lo que Rumtelo no hace",
+                        "body": "Nunca movemos dinero entre cajones o cuentas. Tú transfieres en el banco (o más adelante con sincronización solo lectura). Rumtelo solo ayuda a planificar el reparto y a ver a dónde debe ir cada euro."
+                    }
+                },
+                "back_support": "Volver a soporte",
+                "start_cta": "Empieza gratis"
             },
             "legal": {
                 "title": "Aviso legal",

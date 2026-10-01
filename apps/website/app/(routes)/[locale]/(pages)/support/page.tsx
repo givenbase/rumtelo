@@ -15,6 +15,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const HUB_CARDS = [
     {
+        key: 'spaarpotjes' as const,
+        href: '/support/spaarpotjes',
+    },
+    {
         key: 'legal' as const,
         href: '/legal',
     },

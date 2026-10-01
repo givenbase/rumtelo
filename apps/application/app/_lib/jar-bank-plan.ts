@@ -39,7 +39,7 @@ export function planJarBankSetup({ experience, accountCount, jarKeys }: PlanInpu
         // ── NEW ────────────────────────────────────────────────────────────
 
         if (accountCount === BankAccountCount.ONE) {
-            // One checking; all jars live on it.
+            // One bank: Necessity on main; other jars are sub-savings (same Rumtelo seat for now).
             const placement: Partial<Record<JarKey, string>> = {};
             for (const key of jarKeys) placement[key] = 'main';
             return {
@@ -55,33 +55,10 @@ export function planJarBankSetup({ experience, accountCount, jarKeys }: PlanInpu
             };
         }
 
-        if (accountCount === BankAccountCount.TWO) {
-            // Checking + savings; LTS + Freedom go to savings.
-            const savingsKeys = new Set<JarKey>([
-                JarKey.LONG_TERM_SAVINGS,
-                JarKey.FINANCIAL_FREEDOM,
-            ]);
-            const placement: Partial<Record<JarKey, string>> = {};
-            for (const key of jarKeys) placement[key] = savingsKeys.has(key) ? 'savings' : 'main';
-            return {
-                suggestedAccounts: [
-                    {
-                        localKey: 'main',
-                        nameKey: 'banks_setup.suggested_names.main_checking',
-                        kind: AccountKind.CHECKING,
-                    },
-                    {
-                        localKey: 'savings',
-                        nameKey: 'banks_setup.suggested_names.savings',
-                        kind: AccountKind.SAVINGS,
-                    },
-                ],
-                draftPlacementByJarKey: placement,
-                tipKeys: ['banks_setup.tips.two_accounts'],
-            };
-        }
-
-        // THREE_PLUS — a dedicated seat per jar (Necessities on checking, rest savings).
+        // TWO / THREE_PLUS — multiple real accounts: start with Necessity main;
+        // user adds other accounts and assigns jars on the next screens.
+        const placement: Partial<Record<JarKey, string>> = {};
+        if (jarKeys.includes(JarKey.NECESSITIES)) placement[JarKey.NECESSITIES] = 'main';
         return {
             suggestedAccounts: [
                 {
@@ -89,41 +66,9 @@ export function planJarBankSetup({ experience, accountCount, jarKeys }: PlanInpu
                     nameKey: 'banks_setup.suggested_names.main_checking',
                     kind: AccountKind.CHECKING,
                 },
-                {
-                    localKey: 'freedom',
-                    nameKey: 'banks_setup.suggested_names.freedom',
-                    kind: AccountKind.SAVINGS,
-                },
-                {
-                    localKey: 'lts',
-                    nameKey: 'banks_setup.suggested_names.lts',
-                    kind: AccountKind.SAVINGS,
-                },
-                {
-                    localKey: 'education',
-                    nameKey: 'banks_setup.suggested_names.education',
-                    kind: AccountKind.SAVINGS,
-                },
-                {
-                    localKey: 'play',
-                    nameKey: 'banks_setup.suggested_names.play',
-                    kind: AccountKind.SAVINGS,
-                },
-                {
-                    localKey: 'give',
-                    nameKey: 'banks_setup.suggested_names.give',
-                    kind: AccountKind.SAVINGS,
-                },
             ],
-            draftPlacementByJarKey: {
-                [JarKey.NECESSITIES]: 'main',
-                [JarKey.FINANCIAL_FREEDOM]: 'freedom',
-                [JarKey.LONG_TERM_SAVINGS]: 'lts',
-                [JarKey.EDUCATION]: 'education',
-                [JarKey.PLAY]: 'play',
-                [JarKey.GIVE]: 'give',
-            },
-            tipKeys: ['banks_setup.tips.three_plus'],
+            draftPlacementByJarKey: placement,
+            tipKeys: ['banks_setup.tips.multiple_accounts'],
         };
     }
 
