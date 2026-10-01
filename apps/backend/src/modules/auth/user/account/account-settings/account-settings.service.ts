@@ -118,25 +118,36 @@ export class AccountSettingsService {
     /**
      * Boot / proxy gate — may the signed-in person leave `/onboarding`?
      * Uses durable DB state (not a client cookie).
+     * `home` tells the proxy where ready users belong (practice desk vs board).
      */
-    async boardReady(): Promise<{ ready: boolean }> {
+    async boardReady(): Promise<{ ready: boolean; home: '/' | '/practice' }> {
         const settings = await this.get();
         const householdId = householdStorage.getStore()?.householdId ?? null;
 
         if (!settings.onboardedAt) {
             const account = await this.em.findOne(Account, { user: currentUserId() });
-            if (!account) return { ready: false };
+            if (!account) return { ready: false, home: '/' };
             const practiceSeat = await this.em.findOne(PracticeMember, { account: account.id });
-            return { ready: Boolean(practiceSeat) };
+            if (practiceSeat) return { ready: true, home: '/practice' };
+            return { ready: false, home: '/' };
         }
 
-        if (!householdId) return { ready: true };
+        if (!householdId) {
+            const account = await this.em.findOne(Account, { user: currentUserId() });
+            if (account) {
+                const practiceSeat = await this.em.findOne(PracticeMember, {
+                    account: account.id,
+                });
+                if (practiceSeat) return { ready: true, home: '/practice' };
+            }
+            return { ready: true, home: '/' };
+        }
 
         const board = await this.em.findOne(HouseholdSettings, { household: householdId });
         if (board?.answers?.[HouseholdAnswerKey.JAR_BANK_SETUP_DONE] === false) {
-            return { ready: false };
+            return { ready: false, home: '/' };
         }
-        return { ready: true };
+        return { ready: true, home: '/' };
     }
 
     async findOne(id: string): Promise<AccountSettingsDto> {

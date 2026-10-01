@@ -42,7 +42,6 @@ import { PeriodSelector } from './period-selector';
 import { PeriodTravelBanner } from './period-travel-banner';
 import { PracticePreviewBanner } from './practice-preview-banner';
 import { QuickAddFab } from './quick-add';
-import { ToastPill } from './toast';
 // ── Menu items ───────────────────────────────────────────────────────────────
 
 interface MenuItem {
@@ -701,7 +700,6 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
 
             {/* ── OVERLAYS ─────────────────────────────────────────────────── */}
             {capabilities.showQuickAdd && canMutate ? <QuickAddFab /> : null}
-            <ToastPill />
             {capabilities.showPlanCheckout ? <PendingPlanCheckout /> : null}
             <PendingPracticeInviteRedeem />
         </div>

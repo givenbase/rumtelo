@@ -17,23 +17,25 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
     const t = useTranslations();
 
     return (
-        <div className="grid min-h-dvh lg:grid-cols-2">
+        <div className="grid min-h-dvh lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
             <div
-                className="relative flex flex-col items-center justify-center px-6 py-12 sm:px-10"
+                className="relative flex flex-col px-5 py-4 sm:px-8 sm:py-6 lg:px-10"
                 style={{ background: 'var(--gradient-page)' }}>
-                <div className="absolute top-4 right-4 z-10 flex items-center gap-1.5 sm:top-6 sm:right-6 sm:gap-2">
-                    <LocaleSwitcher triggerClassName="h-8 rounded-full bg-transparent px-2 text-fg-muted hover:border-accent hover:bg-transparent hover:text-accent" />
-                    <AccountThemeToggle className={chromeClass} />
-                </div>
-
-                <div className="w-full max-w-lg">
-                    <Link href="/" className="mb-10 inline-grid gap-1.5">
+                <header className="flex shrink-0 items-start justify-between gap-4">
+                    <Link href="/" className="inline-grid gap-1">
                         <RumteloLogo variant="wordmark" className="h-8 w-auto max-w-[11rem]" />
                         <Typography as="span" variant="caption" color="muted">
                             {t('features.brand.tagline')}
                         </Typography>
                     </Link>
-                    {children}
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                        <LocaleSwitcher triggerClassName="h-8 rounded-full bg-transparent px-2 text-fg-muted hover:border-accent hover:bg-transparent hover:text-accent" />
+                        <AccountThemeToggle className={chromeClass} />
+                    </div>
+                </header>
+
+                <div className="flex flex-1 flex-col items-center justify-center py-8 lg:py-10">
+                    <div className="w-full max-w-xl lg:max-w-2xl">{children}</div>
                 </div>
             </div>
 

@@ -12,6 +12,7 @@ import { HouseholdShellProvider } from '@/components/features/shell/household-sh
 import { AuthProvider, useAuth } from '@/components/features/shell/auth-provider';
 import { PlanIntentProvider } from '@/components/features/shell/plan-intent-provider';
 import { PracticeInviteProvider } from '@/components/features/shell/practice-invite-provider';
+import { ToastPill } from '@/components/layout/toast';
 
 /** Keeps OpenAPILink headers in sync without remounting the oRPC client. */
 function HouseholdHeaderSync({ children }: { children: ReactNode }) {
@@ -59,7 +60,10 @@ export function Providers({ children }: { children: ReactNode }) {
                             <PracticeInviteProvider>
                                 <HouseholdHeaderSync>
                                     <AccountThemeProvider>
-                                        <HouseholdShellProvider>{children}</HouseholdShellProvider>
+                                        <HouseholdShellProvider>
+                                            {children}
+                                            <ToastPill />
+                                        </HouseholdShellProvider>
                                     </AccountThemeProvider>
                                 </HouseholdHeaderSync>
                             </PracticeInviteProvider>

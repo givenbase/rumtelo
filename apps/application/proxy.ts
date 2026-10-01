@@ -2,8 +2,12 @@ import { type NextRequest, NextResponse } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 import { getSessionCookie } from 'better-auth/cookies';
 
-import { createClient } from '@rumtelo/contracts';
-
+import {
+    type BoardGateState,
+    isBoardGatedPath,
+    isPracticePath,
+    resolveBoardRedirect,
+} from './app/_lib/onboarding-gate';
 import { routing } from './i18n/routing';
 
 /**
@@ -12,16 +16,18 @@ import { routing } from './i18n/routing';
  * Session existence uses `getSessionCookie` (optimistic, fast) for public/sign-in
  * redirects — Better Auth docs recommend that to avoid blocking every request.
  *
- * Onboarding gate uses a real API check: `account.boardReady` via same-origin
- * oRPC (`/api/backend`), with the request cookies forwarded. That reads durable
- * `onboardedAt` + jar-bank answers (and practice membership) on Nest — not a
- * client cookie.
+ * Onboarding / board redirects are decided only here via `resolveBoardRedirect`
+ * + Nest `account.boardReady` (durable DB state, not a client cookie).
+ *
+ * Gate fetch goes **directly to Nest** (`DOMAIN_BACK`) — never same-origin
+ * `/api/backend` from middleware (that can stall). No `@rumtelo/contracts` import.
  *
  * @see https://www.better-auth.com/docs/integrations/next#auth-protection
  */
 
 const AUTH_COOKIE_PREFIX = 'rumtelo';
 const intlMiddleware = createMiddleware(routing);
+const BOARD_READY_TIMEOUT_MS = 4_000;
 
 const LOCALE_PREFIX = /^\/(en|nl|es|fr)(?=\/|$)/;
 
@@ -45,30 +51,44 @@ function isPublicAuthRoute(path: string): boolean {
     return isSignInRoute(path) || path.startsWith('/sign-up') || path.startsWith('/verify');
 }
 
-function isOnboardingRoute(path: string): boolean {
-    return path === '/onboarding' || path.startsWith('/onboarding/');
+/** Nest origin for server-side gate calls — mirrors `env.DOMAIN_BACK` without importing contracts. */
+function nestOrigin(): string {
+    const raw =
+        process.env.DOMAIN_BACK || process.env.NEXT_PUBLIC_DOMAIN_BACK || 'http://localhost:3002';
+    return raw.replace(/\/$/, '');
 }
 
-function isPracticeRoute(path: string): boolean {
-    return path === '/practice' || path.startsWith('/practice/');
-}
-
-/** Durable board gate — Nest `account.boardReady` with request cookies. */
-async function fetchBoardReady(request: NextRequest): Promise<boolean | null> {
+/**
+ * Durable board gate — Nest `account.boardReady` directly (OpenAPI POST).
+ */
+async function fetchBoardGate(request: NextRequest): Promise<BoardGateState> {
     const cookie = request.headers.get('cookie') ?? '';
-    if (!cookie) return null;
+    if (!cookie) return { ready: null, home: '/' };
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), BOARD_READY_TIMEOUT_MS);
 
     try {
-        const api = createClient({
-            url: new URL('/api/backend', request.url).toString().replace(/\/$/, ''),
-            headers: { cookie },
-            logErrors: false,
+        const response = await fetch(`${nestOrigin()}/account/boardReady`, {
+            method: 'POST',
+            headers: {
+                cookie,
+                'content-type': 'application/json',
+                accept: 'application/json',
+            },
+            body: '{}',
+            cache: 'no-store',
+            signal: controller.signal,
         });
-        const result = await api.account.boardReady();
-        return result.ready;
+        if (!response.ok) return { ready: null, home: '/' };
+        const result = (await response.json()) as { ready?: unknown; home?: unknown };
+        if (typeof result.ready !== 'boolean') return { ready: null, home: '/' };
+        const home = result.home === '/practice' ? '/practice' : '/';
+        return { ready: result.ready, home };
     } catch {
-        // Backend down / unauthorized — do not invent "ready".
-        return null;
+        return { ready: null, home: '/' };
+    } finally {
+        clearTimeout(timer);
     }
 }
 
@@ -98,8 +118,8 @@ export async function proxy(request: NextRequest) {
     }
 
     if (hasSession && isSignInRoute(path)) {
-        const ready = await fetchBoardReady(request);
-        const fallback = ready === false ? '/onboarding' : '/';
+        const gate = await fetchBoardGate(request);
+        const fallback = gate.ready === false ? '/onboarding' : gate.home;
         const redirectTo = request.nextUrl.searchParams.get('redirectTo');
         const target =
             redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')
@@ -108,25 +128,19 @@ export async function proxy(request: NextRequest) {
         return NextResponse.redirect(new URL(target, request.url));
     }
 
-    // Board gate — only when we care about product vs onboarding (skip practice).
+    // Board / onboarding / practice-home gate — single decision via util.
     if (
         hasSession &&
-        !isPracticeRoute(path) &&
+        !isPracticePath(path) &&
         !isPublicAuthRoute(path) &&
         !isSystemRoute &&
-        (isOnboardingRoute(path) ||
-            path === '/' ||
-            path.startsWith('/product') ||
-            path.startsWith('/settings'))
+        isBoardGatedPath(path)
     ) {
-        const ready = await fetchBoardReady(request);
-        if (ready === false && !isOnboardingRoute(path)) {
-            return NextResponse.redirect(new URL(withLocale('/onboarding', pathname), request.url));
+        const gate = await fetchBoardGate(request);
+        const target = resolveBoardRedirect(path, gate);
+        if (target) {
+            return NextResponse.redirect(new URL(withLocale(target, pathname), request.url));
         }
-        if (ready === true && isOnboardingRoute(path)) {
-            return NextResponse.redirect(new URL(withLocale('/', pathname), request.url));
-        }
-        // ready === null → leave alone (page can still soft-handle)
     }
 
     return intlResponse;

@@ -1,13 +1,15 @@
-import { CAPABILITIES, contract } from '@rumtelo/contracts';
+import { contract } from '@rumtelo/contracts';
 
 import { Inject } from '@nestjs/common';
 import { Implement, implement } from '@orpc/nest';
 
-import { RequireCapability } from '../../../../../../common/capability';
 import { ControllerSwagger } from '../../../../../../common/decorators/controller-swagger.decorators';
 import { BankAccountService } from './bank-account.service';
 
-/** Transport only. Handler order is always CRUD. */
+/**
+ * Manual bank seats (checking/savings/cash) — available on every plan.
+ * Live Open Banking (PSD2) stays behind `money-bank` on bank-sync.
+ */
 @ControllerSwagger('money/accounts', 'public')
 export class BankAccountController {
     constructor(@Inject(BankAccountService) private readonly accounts: BankAccountService) {}
@@ -17,7 +19,6 @@ export class BankAccountController {
     // ====================================================================
 
     /** Register a new bank account for this household. */
-    @RequireCapability(CAPABILITIES.moneyBank)
     @Implement(contract.money.accounts.create)
     create() {
         return implement(contract.money.accounts.create).handler(({ input }) =>
@@ -40,7 +41,6 @@ export class BankAccountController {
     // ====================================================================
 
     /** Update a manual account label, IBAN, or kind. */
-    @RequireCapability(CAPABILITIES.moneyBank)
     @Implement(contract.money.accounts.update)
     update() {
         return implement(contract.money.accounts.update).handler(({ input }) =>
@@ -53,7 +53,6 @@ export class BankAccountController {
     // ====================================================================
 
     /** Remove a manual account. */
-    @RequireCapability(CAPABILITIES.moneyBank)
     @Implement(contract.money.accounts.remove)
     remove() {
         return implement(contract.money.accounts.remove).handler(({ input }) =>
