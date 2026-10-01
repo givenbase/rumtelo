@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 
-import { BankAccountCount, JarExperience, type JarKey } from '@rumtelo/contracts';
+import { BankAccountCount, JarExperience, JarKey } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { FormField, FormItem, FormMessage, Icon, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
@@ -31,13 +31,22 @@ export function JarsStep({ displayJars }: { displayJars: DisplayJar[] }) {
         [bankAccountCount, displayJars]
     );
 
-    function seatLabelForJar(jarKey: JarKey): string | null {
-        const localKey = jarBankPreview.draftPlacementByJarKey[jarKey];
-        if (!localKey) return null;
-        const seat = jarBankPreview.suggestedAccounts.find(
-            account => account.localKey === localKey
-        );
-        return seat ? t(seat.nameKey) : null;
+    /** Preview badge: teach main vs sub-savings vs “assign later”. */
+    function seatLabelForJar(
+        jarKey: JarKey
+    ): { label: string; icon: 'landmark' | 'wallet' } | null {
+        if (bankAccountCount === BankAccountCount.ONE) {
+            if (jarKey === JarKey.NECESSITIES) {
+                return { label: t('banks_setup.preview.main_account'), icon: 'landmark' };
+            }
+            return { label: t('banks_setup.preview.sub_savings'), icon: 'wallet' };
+        }
+
+        // Multiple accounts — Necessity is main; other jars are linked next.
+        if (jarKey === JarKey.NECESSITIES) {
+            return { label: t('banks_setup.preview.main_account'), icon: 'landmark' };
+        }
+        return { label: t('banks_setup.preview.assign_later'), icon: 'wallet' };
     }
 
     return (
@@ -80,11 +89,13 @@ export function JarsStep({ displayJars }: { displayJars: DisplayJar[] }) {
                                             {seatLabel ? (
                                                 <span className="inline-flex max-w-full items-center gap-1 rounded-full border border-accent/30 bg-accent-soft/50 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-accent">
                                                     <Icon
-                                                        name="landmark"
+                                                        name={seatLabel.icon}
                                                         size="sm"
                                                         color="inherit"
                                                     />
-                                                    <span className="truncate">{seatLabel}</span>
+                                                    <span className="truncate">
+                                                        {seatLabel.label}
+                                                    </span>
                                                 </span>
                                             ) : null}
                                         </span>
@@ -152,16 +163,10 @@ export function JarsStep({ displayJars }: { displayJars: DisplayJar[] }) {
                                             icon: 'landmark' as const,
                                         },
                                         {
-                                            key: BankAccountCount.TWO,
-                                            label: t('bank_account_count_options.two_label'),
-                                            hint: t('bank_account_count_options.two_hint'),
-                                            icon: 'layers' as const,
-                                        },
-                                        {
                                             key: BankAccountCount.THREE_PLUS,
-                                            label: t('bank_account_count_options.three_plus_label'),
-                                            hint: t('bank_account_count_options.three_plus_hint'),
-                                            icon: 'grid-3x3' as const,
+                                            label: t('bank_account_count_options.multiple_label'),
+                                            hint: t('bank_account_count_options.multiple_hint'),
+                                            icon: 'layers' as const,
                                         },
                                     ] as const
                                 ).map(option => (

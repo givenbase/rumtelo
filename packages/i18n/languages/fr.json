@@ -4367,8 +4367,8 @@
             "income": "Vos revenus",
             "income_body": "Ce sont vos revenus personnels — les vôtres en tant que personne qui crée ce compte pour vous. Une estimation suffit. Ensuite vous nommerez le compte bancaire où ils arrivent.",
             "jars": "Les six bocaux",
-            "jars_body": "Chaque pot a une fonction. Ci-dessous, choisissez combien de comptes bancaires vous voulez utiliser — la liste s’adapte. Répartition de départ 55 / 10 / 10 / 10 / 10 / 5 ; modifiable plus tard.",
-            "jars_tap_hint": "Appuyez sur un bocal pour découvrir pourquoi il existe. Puis choisissez combien de comptes bancaires vous utilisez.",
+            "jars_body": "Six pots, chacun avec un rôle. L’argent arrive en général dans Nécessité — votre compte principal pour le loyer et les factures. Les autres pots reçoivent le reste de la répartition, souvent en sous-épargne chez la même banque. Répartition de départ 55 / 10 / 10 / 10 / 10 / 5 ; modifiable plus tard.",
+            "jars_tap_hint": "Appuyez sur un pot pour voir son rôle. Ci-dessous, choisissez comment votre banque est organisée — nous recommandons de commencer avec un compte principal.",
             "jars_read_more": "En savoir plus sur la méthode des six bocaux",
             "why": "Ton rêve",
             "why_body": "En une phrase : pourquoi voulez-vous Rumtelo — ou quel rêve cherchez-vous à réaliser ? Nous l'affichons sur votre tableau de bord pour vous rappeler brièvement ce vers quoi vous tendez.",
@@ -4399,21 +4399,23 @@
             "continue": "Continuer",
             "finish": "Ouvrir Rumtelo",
             "skip": "Passer pour l'instant",
-            "bank_account_count_label": "Combien de comptes bancaires voulez-vous utiliser ?",
-            "bank_account_count_hint": "Vous leur donnerez un nom ensuite — pour l’instant, choisissez seulement combien.",
+            "bank_account_count_label": "Comment votre banque est-elle organisée ?",
+            "bank_account_count_hint": "Ensuite vous nommez les comptes. Un doute ? Commencez avec un compte principal.",
             "bank_account_count_options": {
-                "one_label": "Tout sur un seul compte",
-                "one_hint": "Tous les pots sur votre compte courant. Rumtelo suit quand même le solde de chaque pot séparément.",
-                "two_label": "Courant + épargne",
-                "two_hint": "Pots du quotidien sur le courant ; Liberté et Épargne long terme sur un compte d’épargne.",
+                "one_label": "Une banque (recommandé)",
+                "one_hint": "Le salaire arrive sur Nécessité — votre compte principal. Les autres pots sont des sous-épargnes chez cette même banque (Rumtelo les suit séparément).",
+                "multiple_label": "Plusieurs comptes bancaires",
+                "multiple_hint": "Vous avez plus d’un vrai compte. Ensuite vous les nommez et choisissez où vit chaque pot — Nécessité reste sur le compte où l’argent arrive.",
+                "two_label": "Compte principal + compte d’épargne",
+                "two_hint": "Nécessité et pots du quotidien sur votre compte principal ; Liberté et Épargne long terme sur un compte d’épargne séparé. Ensuite vous indiquez lequel est lequel.",
                 "three_plus_label": "Un compte par pot",
-                "three_plus_hint": "Séparation maximale — chaque pot sur son propre compte bancaire."
+                "three_plus_hint": "Chaque pot a son propre compte bancaire — séparation maximale. Ensuite vous les nommez."
             },
             "banks_setup": {
                 "accounts_title": "Nommez vos comptes",
-                "accounts_body": "Ils correspondent à ce que vous venez de choisir. Choisissez votre banque — vous pourrez renommer plus tard dans Paramètres.",
+                "accounts_body": "Nommez le compte principal où l’argent arrive (Nécessité). D’autres comptes ? Ajoutez-les ici — puis liez les pots.",
                 "map_title": "Lier les pots aux comptes",
-                "map_body": "Choisissez sur quel compte bancaire vit chaque pot. Modifiable à tout moment dans Paramètres → Pots.",
+                "map_body": "Nécessité reste sur votre compte principal. Placez les autres pots sur le bon compte d’épargne. Modifiable dans Paramètres → Pots.",
                 "bank_label": "Banque",
                 "account_name_label": "Nom du compte",
                 "iban_label": "IBAN",
@@ -4430,7 +4432,7 @@
                 "tips_title": "Conseils",
                 "no_accounts_yet": "Commencez par créer des comptes",
                 "suggested_names": {
-                    "main_checking": "Vérification principale",
+                    "main_checking": "Compte principal",
                     "savings": "Économies",
                     "freedom": "Épargne « Freedom »",
                     "lts": "Économies à long terme",
@@ -4440,10 +4442,16 @@
                     "seat_2": "Deuxième récit",
                     "seat_3": "Troisième récit"
                 },
+                "preview": {
+                    "main_account": "Compte principal",
+                    "sub_savings": "Sous-épargne",
+                    "assign_later": "Lier ensuite"
+                },
                 "tips": {
-                    "one_account": "Avec un seul compte, Rumtelo affiche quand même le solde de chaque pot séparément — seul le compte bancaire est partagé.",
-                    "two_accounts": "Liberté et Épargne long terme sont sur l’épargne — souvent plus d’intérêts, même suivi par pot.",
-                    "three_plus": "Chaque pot a son propre compte. L’argent reste séparé et Rumtelo sait exactement où il est.",
+                    "one_account": "Commencez ici si vous utilisez surtout une banque. Nécessité est là où l’argent arrive ; les autres pots sont des sous-épargnes pour savoir comment répartir.",
+                    "multiple_accounts": "Nommez d’abord votre compte principal (Nécessité). Ajoutez d’autres comptes, puis liez chaque pot.",
+                    "two_accounts": "Votre compte principal est Nécessité (loyer, factures). Votre compte d’épargne détient Liberté et Épargne long terme — nous lions les pots ensuite.",
+                    "three_plus": "Chaque pot correspond à un vrai compte. Nécessité reste le compte où les revenus arrivent.",
                     "familiar": "Nous préparons un compte Rumtelo par compte bancaire. Liez chaque pot après les avoir créés.",
                     "already_set_up": "Notez simplement les comptes que vous avez déjà. Rumtelo ne touche pas à votre vraie banque."
                 }

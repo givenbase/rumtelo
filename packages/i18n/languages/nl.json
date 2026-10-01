@@ -4367,8 +4367,8 @@
             "income": "Jouw inkomen",
             "income_body": "Dit is jouw persoonlijke inkomen — van jou als de persoon die dit account voor jezelf aanmaakt. Een schatting is genoeg. Daarna geef je de bankrekening een naam waar het binnenkomt.",
             "jars": "De zes potjes",
-            "jars_body": "Elk potje heeft één taak. Kies hieronder hoeveel bankrekeningen je wilt gebruiken — de lijst past zich aan. Startverdeling 55 / 10 / 10 / 10 / 10 / 5; later aanpasbaar.",
-            "jars_tap_hint": "Tik op een potje om te zien waarom het bestaat. Kies daaronder hoeveel bankrekeningen je gebruikt.",
+            "jars_body": "Zes potjes, elk met één taak. Geld komt meestal binnen op Noodzakelijk — je hoofdrekening voor huur en rekeningen. De andere potjes zijn waar de rest van de verdeling naartoe gaat, vaak als spaarpotjes bij dezelfde bank. Startverdeling 55 / 10 / 10 / 10 / 10 / 5; later aanpasbaar.",
+            "jars_tap_hint": "Tik op een potje om te zien wat het doet. Kies daaronder hoe je bank nu is ingericht — we raden aan te beginnen met één hoofdrekening.",
             "jars_read_more": "Lees meer over de zes-potjesmethode",
             "why": "Jouw droom",
             "why_body": "In één korte zin: waarom wil je Rumtelo gebruiken — of welke droom werk je naartoe? Die zin komt op je dashboard als een kleine herinnering waar je het voor doet.",
@@ -4399,21 +4399,23 @@
             "continue": "Doorgaan",
             "finish": "Rumtelo openen",
             "skip": "Voorlopig overslaan",
-            "bank_account_count_label": "Hoeveel bankrekeningen wil je gebruiken?",
-            "bank_account_count_hint": "Straks geef je ze een naam. Nu kies je alleen hoeveel rekeningen.",
+            "bank_account_count_label": "Hoe is je bank ingericht?",
+            "bank_account_count_hint": "Daarna geef je de rekeningen een naam. Twijfel je? Begin met één hoofdrekening.",
             "bank_account_count_options": {
-                "one_label": "Alles op één rekening",
-                "one_hint": "Alle potjes op je betaalrekening. Rumtelo houdt per potje apart bij hoeveel er is.",
-                "two_label": "Betaal- én spaarrekening",
-                "two_hint": "Dagelijkse potjes op je betaalrekening; Vrijheid en Lange-termijn sparen op een spaarrekening.",
+                "one_label": "Eén bank (aanbevolen)",
+                "one_hint": "Salaris komt binnen op Noodzakelijk — je hoofdrekening. De andere potjes zijn spaarpotjes bij diezelfde bank (Rumtelo houdt ze apart bij).",
+                "multiple_label": "Meerdere bankrekeningen",
+                "multiple_hint": "Je hebt meer dan één echte rekening. Daarna geef je ze een naam en kies je welk potje waar hoort — Noodzakelijk blijft op de rekening waar geld binnenkomt.",
+                "two_label": "Hoofdrekening + spaarrekening",
+                "two_hint": "Noodzakelijk en dagelijkse potjes op je hoofdrekening; Vrijheid en Lange-termijn sparen op een aparte spaarrekening. Daarna kies je welke welke is.",
                 "three_plus_label": "Een rekening per potje",
-                "three_plus_hint": "Meeste scheiding — elk potje op een eigen bankrekening."
+                "three_plus_hint": "Elk potje op een eigen bankrekening — maximale scheiding. Daarna geef je ze een naam."
             },
             "banks_setup": {
                 "accounts_title": "Geef je rekeningen een naam",
-                "accounts_body": "Dit past bij wat je net koos. Kies je bank — namen kun je later wijzigen in Instellingen.",
+                "accounts_body": "Geef de hoofdrekening een naam waar geld binnenkomt (Noodzakelijk). Heb je meer rekeningen? Voeg ze hier toe — daarna koppel je de potjes.",
                 "map_title": "Koppel potjes aan rekeningen",
-                "map_body": "Kies voor elk potje op welke bankrekening het staat. Aanpassen kan altijd via Instellingen → Potjes.",
+                "map_body": "Noodzakelijk blijft op je hoofdrekening. Zet de andere potjes op de juiste spaarrekening. Aanpassen kan altijd via Instellingen → Potjes.",
                 "bank_label": "Bank",
                 "account_name_label": "Rekeningnaam",
                 "iban_label": "IBAN",
@@ -4440,10 +4442,16 @@
                     "seat_2": "Tweede rekening",
                     "seat_3": "Derde rekening"
                 },
+                "preview": {
+                    "main_account": "Hoofdrekening",
+                    "sub_savings": "Spaarpotje",
+                    "assign_later": "Later koppelen"
+                },
                 "tips": {
-                    "one_account": "Met één rekening toont Rumtelo toch voor elk potje apart het saldo — alleen de bankrekening is gedeeld.",
-                    "two_accounts": "Vrijheid en Lange-termijnsparen staan op je spaarrekening — vaak hogere rente, zelfde potjesoverzicht.",
-                    "three_plus": "Elk potje krijgt een eigen rekening. Geld blijft gescheiden en Rumtelo weet precies waar het staat.",
+                    "one_account": "Begin hier als je vooral één bank gebruikt. Noodzakelijk is waar geld binnenkomt; de andere potjes zijn spaarpotjes zodat je weet hoe je moet verdelen.",
+                    "multiple_accounts": "Geef eerst je hoofdrekening een naam (Noodzakelijk). Voeg andere rekeningen toe, en koppel daarna elk potje.",
+                    "two_accounts": "Je hoofdrekening is Noodzakelijk (huur, rekeningen). Je spaarrekening houdt Vrijheid en Lange-termijn sparen — we koppelen de potjes hierna.",
+                    "three_plus": "Elk potje hoort bij een echte rekening. Noodzakelijk blijft de rekening waar inkomen binnenkomt.",
                     "familiar": "We zetten één Rumtelo-rekening per bankrekening klaar. Koppel elk potje nadat je ze hebt aangemaakt.",
                     "already_set_up": "Noteer gewoon de rekeningen die je al hebt. Rumtelo raakt je echte bank niet aan."
                 }
