@@ -33,6 +33,7 @@ import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { GoalKindMark } from '@/components/features/growth/goal-kind-mark';
 import { SaveGoalManifestActions } from '@/components/features/growth/save-goal-manifest-actions';
 import { CoachFeatureGate } from '@/components/features/helpers';
+import { EntityNotFoundState } from '@/components/features/helpers/entity-not-found-state';
 import { JarBadge, MetaChip, formatBookedDate } from '@/components/features/money/jar-badge';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -245,16 +246,11 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
 
     if (!goal) {
         return (
-            <div className="grid gap-4">
-                <Link
-                    href="/product/growth/goals"
-                    className="w-fit font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
-                    {td('back')}
-                </Link>
-                <Typography as="p" size="sm" color="muted">
-                    {td('not_found')}
-                </Typography>
-            </div>
+            <EntityNotFoundState
+                title={td('not_found')}
+                href={productPath('growth/goals')}
+                backLabel={td('back')}
+            />
         );
     }
 

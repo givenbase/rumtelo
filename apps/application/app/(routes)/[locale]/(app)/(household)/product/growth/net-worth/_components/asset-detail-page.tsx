@@ -49,6 +49,7 @@ import {
 } from '@/components/features/money/jar-badge';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { CoachTipCard } from '@/components/features/helpers';
+import { EntityNotFoundState } from '@/components/features/helpers/entity-not-found-state';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 
@@ -250,14 +251,11 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
     }
     if (!asset) {
         return (
-            <div className="grid gap-4">
-                <Link
-                    href={boardHref}
-                    className="rounded-sm font-mono text-xs tracking-wide text-accent uppercase hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
-                    {t('detail.back')}
-                </Link>
-                <p className="text-sm text-fg-muted">{t('detail.not_found')}</p>
-            </div>
+            <EntityNotFoundState
+                title={t('detail.not_found')}
+                href={boardHref}
+                backLabel={t('detail.back')}
+            />
         );
     }
 

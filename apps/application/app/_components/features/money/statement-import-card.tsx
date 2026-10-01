@@ -88,7 +88,7 @@ export function StatementImportCard({
     const { currency } = useHouseholdCurrency();
     const live = isLiveData(householdId);
     const queryClient = useQueryClient();
-    const dismiss = useFormDismiss(onSuccess);
+    const { dismiss } = useFormDismiss(onSuccess);
 
     const form = useForm<StatementImportValues>({
         resolver: zodResolver(statementImportSchema),

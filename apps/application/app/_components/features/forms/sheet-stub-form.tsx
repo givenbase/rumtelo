@@ -50,7 +50,7 @@ export function SheetStubForm({
     const tStub = useTranslations('features.energy.stub_form');
     const tUiForm = useTranslations('ui.form');
     const { showToast } = useHouseholdShell();
-    const dismiss = useFormDismiss(onSuccess);
+    const { dismiss } = useFormDismiss(onSuccess);
     const { symbol } = useHouseholdCurrency();
     const submitLabel = kind === 'session' ? tStub('save_training') : tStub('save_asset');
     const amountLabel = kind === 'asset' ? tStub('value_label', { symbol }) : undefined;

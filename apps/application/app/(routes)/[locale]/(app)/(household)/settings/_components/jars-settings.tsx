@@ -75,17 +75,30 @@ export function JarsSettings() {
         [jars]
     );
 
+    /** Seats as stored server-side on each jar's defaultAccountId. */
+    const serverJarSeats = useMemo(
+        () =>
+            Object.fromEntries(
+                jars
+                    .filter(j => j.defaultAccountId !== null)
+                    .map(j => [j.id, j.defaultAccountId as string])
+            ),
+        [jars]
+    );
+
     const form = useForm<JarsSettingsValues>({
         defaultValues: { pct: {}, jarSeats: {} },
     });
-    const pct = useWatch({ control: form.control, name: 'pct' }) ?? {};
-    const jarSeats = useWatch({ control: form.control, name: 'jarSeats' }) ?? {};
+    const pctWatch = useWatch({ control: form.control, name: 'pct' });
+    const jarSeatsWatch = useWatch({ control: form.control, name: 'jarSeats' });
+    const pct = useMemo(() => pctWatch ?? {}, [pctWatch]);
+    const jarSeats = useMemo(() => jarSeatsWatch ?? {}, [jarSeatsWatch]);
 
     useEffect(() => {
         if (jars.length === 0) return;
         if (form.formState.isDirty) return;
-        form.reset({ pct: serverPct, jarSeats: form.getValues('jarSeats') });
-    }, [form, jars.length, serverPct]);
+        form.reset({ pct: serverPct, jarSeats: serverJarSeats });
+    }, [form, jars.length, serverPct, serverJarSeats]);
 
     const [dismissedTips, setDismissedTips] = useState<Record<string, true>>({});
     const [editingJarId, setEditingJarId] = useState<string | null>(null);
@@ -93,17 +106,15 @@ export function JarsSettings() {
     const total = Object.values(pct).reduce((running, value) => running + value, 0);
     const balanced = Math.abs(total - 100) < 0.01;
 
-    const effectiveJarSeats = (() => {
-        if (accounts.length === 0) return jarSeats;
-        const fallbackId = accounts[0]!.id;
-        const next: Record<string, string> = { ...jarSeats };
-        for (const jar of jars) {
-            const current = next[jar.id];
-            if (current && accounts.some(account => account.id === current)) continue;
-            next[jar.id] = fallbackId;
+    // Only show seats that still exist in the current accounts list — stale IDs are dropped.
+    const effectiveJarSeats = useMemo(() => {
+        const validIds = new Set(accounts.map(account => account.id));
+        const next: Record<string, string> = {};
+        for (const [jarId, accountId] of Object.entries(jarSeats)) {
+            if (validIds.has(accountId)) next[jarId] = accountId;
         }
         return next;
-    })();
+    }, [jarSeats, accounts]);
 
     const coachTips = (() => {
         const spendingStyle = accountSettingsQuery.data?.spendingStyle ?? SpendingStyle.UNKNOWN;
@@ -247,6 +258,28 @@ export function JarsSettings() {
                                                     { shouldDirty: true }
                                                 );
                                                 setEditingJarId(null);
+                                                // Persist placement immediately.
+                                                if (householdId) {
+                                                    void api.money.jars
+                                                        .updatePlacement({
+                                                            householdId,
+                                                            placements: [
+                                                                {
+                                                                    jarId: jar.id,
+                                                                    accountId: option.id,
+                                                                },
+                                                            ],
+                                                        })
+                                                        .then(() => {
+                                                            void queryClient.invalidateQueries({
+                                                                queryKey:
+                                                                    apiQuery.money.jars.list.key(),
+                                                            });
+                                                        })
+                                                        .catch((error: unknown) => {
+                                                            showToast(apiError(error), 'error');
+                                                        });
+                                                }
                                                 showToast(
                                                     t(
                                                         'pages.settings.panels.jars_placement.seat_saved',

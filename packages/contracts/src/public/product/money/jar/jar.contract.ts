@@ -13,7 +13,7 @@ import {
     Money,
     PeriodKey,
 } from '../../../../common/common.schema';
-import { Category, Jar, JarBalance, UpdateJarSplit } from './jar.schema';
+import { Category, Jar, JarBalance, UpdateJarPlacement, UpdateJarSplit } from './jar.schema';
 
 const ok = z.object({ ok: z.literal(true) });
 
@@ -32,10 +32,15 @@ export const jarBalances = oc
 // ====================================================================
 
 export const jarUpdate = oc
-    .input(Jar.partial().extend({ id: Id, householdId: HouseholdId }))
+    .input(
+        Jar.partial().omit({ defaultAccountId: true }).extend({ id: Id, householdId: HouseholdId })
+    )
     .output(Jar);
 
 export const jarUpdateSplit = oc.input(UpdateJarSplit).output(z.array(Jar));
+
+/** Map jars onto manual (or linked) bank seats — one write for the board. */
+export const jarUpdatePlacement = oc.input(UpdateJarPlacement).output(z.array(Jar));
 
 export const jarCreateCategory = oc
     .input(
@@ -66,6 +71,7 @@ export const jarContract = {
     balances: jarBalances,
     update: jarUpdate,
     updateSplit: jarUpdateSplit,
+    updatePlacement: jarUpdatePlacement,
     createCategory: jarCreateCategory,
     updateCategory: jarUpdateCategory,
     deleteCategory: jarDeleteCategory,

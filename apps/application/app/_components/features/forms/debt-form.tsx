@@ -36,6 +36,7 @@ import { audienceKeysFromDebt } from '@/app/_lib/household-audience-from-money';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
+import { formRoute } from '@/app/_lib/form-route-meta';
 import { useMergeHouseholdAudiences } from '@/app/_lib/use-merge-household-audiences';
 import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -135,7 +136,9 @@ export function DebtForm({
     const { showToast, period } = useHouseholdShell();
     const periodDefaultDate = viewedPeriodDefaultIso(period);
     const apiError = useApiError();
-    const dismiss = useFormDismiss(onSuccess);
+    const { dismiss, dismissAfterRemove } = useFormDismiss(onSuccess, {
+        listHref: formRoute('debtUpdate').closeHref,
+    });
     const live = isLiveData(householdId);
     const { mergeImplied } = useMergeHouseholdAudiences();
     const [presetKey, setPresetKey] = useState<string | null>(defaultValues?.presetKey ?? null);
@@ -391,7 +394,7 @@ export function DebtForm({
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.plan.key() });
             showToast(t('common.message.entity.debt_deleted'), 'success');
-            dismiss();
+            dismissAfterRemove();
         },
         onError: (error: unknown) => showToast(apiError(error), 'error'),
     });

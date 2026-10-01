@@ -34,6 +34,7 @@ import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
+import { formRoute } from '@/app/_lib/form-route-meta';
 import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
 import { CoachTipCard } from '@/components/features/helpers';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -97,7 +98,9 @@ export function IncomeForm({
     const { showToast, period } = useHouseholdShell();
     const periodDefaultDate = viewedPeriodDefaultIso(period);
     const apiError = useApiError();
-    const dismiss = useFormDismiss(onSuccess);
+    const { dismiss, dismissAfterRemove } = useFormDismiss(onSuccess, {
+        listHref: formRoute('incomeUpdate').closeHref,
+    });
     const live = isLiveData(householdId);
 
     const presetsQuery = useLiveQuery(
@@ -362,7 +365,7 @@ export function IncomeForm({
         onSuccess: () => {
             invalidateIncome();
             showToast(t('common.message.entity.income_deleted'), 'success');
-            dismiss();
+            dismissAfterRemove();
         },
         onError: (error: unknown) => showToast(apiError(error), 'error'),
     });

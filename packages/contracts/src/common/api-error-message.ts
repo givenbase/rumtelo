@@ -42,6 +42,7 @@ export const API_ERROR_MESSAGES = [
     'demo_no_plan_change',
     'invitation_create_failed',
     'jar_split_total',
+    'jar_placement_account_invalid',
     'book_catalog_unavailable',
     'contact_send_failed',
     'contact_message_rejected',

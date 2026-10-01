@@ -45,6 +45,7 @@ import { isLiveData } from '@/app/_lib/preview';
 import { SETTINGS_HREF } from '@/app/_lib/settings-tabs';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
+import { formRoute } from '@/app/_lib/form-route-meta';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { useMergeHouseholdAudiences } from '@/app/_lib/use-merge-household-audiences';
 import { partyMark } from '@/app/_lib/vendor-brands';
@@ -169,7 +170,9 @@ export function FixedCostForm({
     const { showToast, period } = useHouseholdShell();
     const periodDefaultDate = viewedPeriodDefaultIso(period);
     const apiError = useApiError();
-    const dismiss = useFormDismiss(onSuccess);
+    const { dismiss, dismissAfterRemove } = useFormDismiss(onSuccess, {
+        listHref: formRoute('fixedUpdate').closeHref,
+    });
     const live = isLiveData(householdId);
     const { mergeImplied } = useMergeHouseholdAudiences();
     /** Preset category template key — resolved to a household category on save. */
@@ -801,7 +804,7 @@ export function FixedCostForm({
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.byJar.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
             showToast(t('common.message.entity.fixed_deleted'), 'success');
-            dismiss();
+            dismissAfterRemove();
         },
         onError: (error: unknown) => showToast(apiError(error), 'error'),
     });

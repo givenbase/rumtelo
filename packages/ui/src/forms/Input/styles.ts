@@ -10,7 +10,7 @@ const FOCUS =
 /** Standalone control — full border + fill (Input without affixes, Textarea). */
 export const controlClasses =
     'h-11 w-full rounded-lg border border-line-strong bg-surface px-3 text-sm text-fg shadow-sm ' +
-    'placeholder:text-fg-muted ' +
+    'placeholder:text-fg-muted aria-invalid:border-danger ' +
     FOCUS +
     ' disabled:cursor-not-allowed disabled:opacity-60';
 
@@ -18,7 +18,7 @@ export const controlClasses =
 export const fieldWrapperClasses =
     'relative flex h-11 w-full min-w-0 items-center rounded-lg border border-line-strong bg-surface shadow-sm ' +
     'transition-colors focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/35 ' +
-    'disabled:cursor-not-allowed disabled:opacity-60';
+    'aria-invalid:border-danger disabled:cursor-not-allowed disabled:opacity-60';
 
 /** Native input inside an affix shell — no own border. */
 export const fieldControlClasses =

@@ -54,6 +54,14 @@ export class JarController {
         );
     }
 
+    /** Map each jar onto a household bank seat (or clear). */
+    @Implement(contract.money.jars.updatePlacement)
+    updatePlacement() {
+        return implement(contract.money.jars.updatePlacement).handler(({ input }) =>
+            this.jars.updatePlacement(input.placements)
+        );
+    }
+
     /** Rename or re-icon a jar. */
     @Implement(contract.money.jars.update)
     update() {

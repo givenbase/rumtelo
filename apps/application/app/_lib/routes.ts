@@ -40,3 +40,8 @@ export const moneyPath = (...segments: string[]) => productPath('money', ...segm
 export const growthPath = (...segments: string[]) => productPath('growth', ...segments);
 export const energyPath = (...segments: string[]) => productPath('energy', ...segments);
 export const soulPath = (...segments: string[]) => productPath('soul', ...segments);
+
+export const ONBOARDING = '/onboarding' as const;
+export function onboardingPath(...segments: string[]): string {
+    return joinPath(ONBOARDING, ...segments);
+}

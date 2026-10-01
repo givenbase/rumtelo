@@ -21,3 +21,4 @@ export { CoachGuideSurface } from './helper-surface';
 export { CoachTipCard } from './coach-tip-card';
 export { WhyCaption } from './why-caption';
 export { JarGuideCard } from './jar-guide-card';
+export { EntityNotFoundState } from './entity-not-found-state';

@@ -33,6 +33,7 @@ import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
+import { formRoute } from '@/app/_lib/form-route-meta';
 import { GivingFinder } from '@/components/features/money/giving-finder';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -227,7 +228,9 @@ export function ExpenseForm({
     ];
     const { showToast, period } = useHouseholdShell();
     const apiError = useApiError();
-    const dismiss = useFormDismiss(onSuccess);
+    const { dismiss, dismissAfterRemove } = useFormDismiss(onSuccess, {
+        listHref: formRoute('txUpdate').closeHref,
+    });
     const live = isLiveData(householdId);
     const periodDefaultDate = viewedPeriodDefaultIso(period);
     const propDirection: 'out' | 'in' = directionProp === 'in' ? 'in' : 'out';
@@ -567,7 +570,7 @@ export function ExpenseForm({
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
             showToast(t('common.message.entity.transaction_deleted'), 'success');
-            dismiss();
+            dismissAfterRemove();
         },
         onError: (error: unknown) => showToast(apiError(error), 'error'),
     });

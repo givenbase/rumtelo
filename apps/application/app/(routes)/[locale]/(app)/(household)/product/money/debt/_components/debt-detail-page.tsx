@@ -44,6 +44,7 @@ import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
 import { findCatalogVendor, partyMark } from '@/app/_lib/vendor-brands';
 import { FormDatePicker } from '@/components/features/forms/form-date-picker';
 import { FormInput } from '@/components/features/forms/form-input';
+import { EntityNotFoundState } from '@/components/features/helpers/entity-not-found-state';
 import { MetaChip, formatBookedDate, formatDueDay } from '@/components/features/money/jar-badge';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -199,14 +200,11 @@ export function DebtDetailPageClient({ debtId }: { debtId: string }) {
     }
     if (!debt || !detail) {
         return (
-            <div className="grid gap-4">
-                <Link
-                    href={productPath('money/debt')}
-                    className="font-mono text-xs tracking-wide text-accent uppercase hover:underline">
-                    {td('back')}
-                </Link>
-                <p className="text-sm text-fg-muted">{td('not_found')}</p>
-            </div>
+            <EntityNotFoundState
+                title={td('not_found')}
+                href={productPath('money/debt')}
+                backLabel={td('back')}
+            />
         );
     }
 

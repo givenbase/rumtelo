@@ -2,7 +2,7 @@ import { type AbstractIntlMessages, useTranslations as useNextIntlTranslations }
 import { createNavigation } from 'next-intl/navigation';
 import { defineRouting } from 'next-intl/routing';
 
-import { DEFAULT_INTL_LOCALE, INTL_LOCALES, type IntlLocale } from '@rumtelo/contracts';
+import { DEFAULT_INTL_LOCALE, INTL_LOCALES, type IntlLocale } from '@rumtelo/contracts/common';
 
 /**
  * next-intl routing locales — derived from contracts {@link Locale} / {@link INTL_LOCALES}.

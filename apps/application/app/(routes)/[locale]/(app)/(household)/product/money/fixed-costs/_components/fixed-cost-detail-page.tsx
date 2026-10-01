@@ -45,6 +45,7 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
+import { EntityNotFoundState } from '@/components/features/helpers/entity-not-found-state';
 import { HoldingChip } from '@/components/features/money/holding-chip';
 import {
     JarBadge,
@@ -230,16 +231,11 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
     }
     if (!item) {
         return (
-            <div className="grid gap-4">
-                <Link
-                    href="/product/money/fixed-costs"
-                    className="w-fit font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
-                    {t('detail.back')}
-                </Link>
-                <Typography as="p" size="sm" color="muted">
-                    {t('detail.not_found')}
-                </Typography>
-            </div>
+            <EntityNotFoundState
+                title={t('detail.not_found')}
+                href="/product/money/fixed-costs"
+                backLabel={t('detail.back')}
+            />
         );
     }
 

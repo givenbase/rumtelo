@@ -13,6 +13,7 @@ import {
 } from 'react';
 
 import { type Locale, LOCALES, type PlanKey } from '@rumtelo/contracts';
+
 import { fromIntlLocale, toIntlLocale, useLocale, usePathname, useRouter } from '@rumtelo/i18n';
 import { isYearMonthBefore, periodTravelBounds } from '@rumtelo/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -38,12 +39,6 @@ interface HouseholdShellCtx {
     quickOpen: boolean;
     setQuickOpen: (open: boolean) => void;
     toggleQuick: () => void;
-    onboardingOpen: boolean;
-    onboardingStep: number;
-    openOnboarding: (step?: number) => void;
-    closeOnboarding: (completed?: boolean) => void;
-    resetOnboardingFlow: () => void;
-    setOnboardingStep: (step: number) => void;
     plan: PlanKey;
     /** False until auth + household settings resolve — do not trust plan locks yet. */
     planReady: boolean;
@@ -70,8 +65,6 @@ export function HouseholdShellProvider({ children }: { children: ReactNode }) {
     const toastId = useRef(0);
 
     const [quickOpen, setQuickOpen] = useState(false);
-    const [onboardingOpen, setOnboardingOpen] = useState(false);
-    const [onboardingStep, setOnboardingStep] = useState(0);
     /** Mirror next-intl cookie/locale — derive, don't sync via effect. */
     const locale: Locale = fromIntlLocale(intlLocale);
 
@@ -115,6 +108,7 @@ export function HouseholdShellProvider({ children }: { children: ReactNode }) {
     }, [authPending, householdReady, householdId, settingsQuery.isFetched, settingsQuery.isError]);
 
     const householdCreatedAt = settingsQuery.data?.createdAt ?? null;
+
     if (householdCreatedAt) {
         const { floor } = periodTravelBounds(householdCreatedAt);
         if (isYearMonthBefore(period, floor)) {
@@ -130,22 +124,6 @@ export function HouseholdShellProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const toggleQuick = useCallback(() => setQuickOpen(previous => !previous), []);
-
-    const openOnboarding = useCallback((step = 0) => {
-        setOnboardingStep(step);
-        setOnboardingOpen(true);
-    }, []);
-
-    const closeOnboarding = useCallback((_completed = false) => {
-        setOnboardingOpen(false);
-        setOnboardingStep(0);
-        // Durable flag is account/household settings.onboardedAt (set by API).
-    }, []);
-
-    const resetOnboardingFlow = useCallback(() => {
-        setOnboardingStep(0);
-        setOnboardingOpen(true);
-    }, []);
 
     const setLocale = useCallback(
         (next: Locale) => {
@@ -171,7 +149,6 @@ export function HouseholdShellProvider({ children }: { children: ReactNode }) {
             }
             if (event.key === 'Escape') {
                 setQuickOpen(false);
-                setOnboardingOpen(false);
             }
         };
         window.addEventListener('keydown', handler);
@@ -185,12 +162,6 @@ export function HouseholdShellProvider({ children }: { children: ReactNode }) {
             quickOpen,
             setQuickOpen,
             toggleQuick,
-            onboardingOpen,
-            onboardingStep,
-            openOnboarding,
-            closeOnboarding,
-            resetOnboardingFlow,
-            setOnboardingStep,
             plan,
             planReady,
             setPlan,
@@ -207,12 +178,6 @@ export function HouseholdShellProvider({ children }: { children: ReactNode }) {
             quickOpen,
             setQuickOpen,
             toggleQuick,
-            onboardingOpen,
-            onboardingStep,
-            openOnboarding,
-            closeOnboarding,
-            resetOnboardingFlow,
-            setOnboardingStep,
             plan,
             planReady,
             setPlan,

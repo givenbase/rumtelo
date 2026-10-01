@@ -42,6 +42,12 @@ export class AccountSettingsController {
         return implement(contract.account.settings).handler(() => this.settings.get());
     }
 
+    /** Proxy / boot gate — leave `/onboarding` only when ready. */
+    @Implement(contract.account.boardReady)
+    boardReady() {
+        return implement(contract.account.boardReady).handler(() => this.settings.boardReady());
+    }
+
     // ====================================================================
     // ? UPDATE Operations
     // ====================================================================

@@ -8,7 +8,7 @@ import { Typography } from '@rumtelo/ui';
 
 import { AccountThemeToggle } from '@/components/features/shell/account-theme-sync';
 
-import { AuthAside } from './_components/auth-aside';
+import { AuthAside } from '@/components/features/brand/auth-aside';
 
 /** Keep chrome on the form column so it never sits on the black aside. */
 const chromeClass =

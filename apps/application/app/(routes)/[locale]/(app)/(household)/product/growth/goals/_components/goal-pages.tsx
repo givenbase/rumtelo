@@ -2,6 +2,7 @@
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
+import { productPath } from '@/app/_lib/routes';
 import { GoalForm } from '@/components/features/forms/goal-form';
 import { useEntityForEdit } from '@/components/features/forms/use-entity-for-edit';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -31,6 +32,7 @@ export function GoalUpdatePage({ id, embedded = false }: { id: string; embedded?
     const { householdId } = useAuth();
     const loaded = useEntityForEdit({
         translationNamespace: 'features.growth.goals.detail',
+        listHref: productPath('growth/goals'),
         listOptions: apiQuery.money.goals.list.queryOptions({
             input: { householdId: householdId! },
         }),

@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { incomePrefillFromParams } from '@/app/_lib/create-prefill';
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
+import { productPath } from '@/app/_lib/routes';
 import { IncomeForm } from '@/components/features/forms/income-form';
 import { useEntityForEdit } from '@/components/features/forms/use-entity-for-edit';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -46,6 +47,7 @@ export function IncomeUpdatePage({ id, embedded = false }: { id: string; embedde
     const { householdId } = useAuth();
     const loaded = useEntityForEdit({
         translationNamespace: 'features.growth.income',
+        listHref: productPath('growth/income'),
         listOptions: apiQuery.money.income.list.queryOptions({
             input: { householdId: householdId! },
         }),

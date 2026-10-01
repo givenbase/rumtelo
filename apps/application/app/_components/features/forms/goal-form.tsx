@@ -38,6 +38,7 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { CAR_BRAND_PREVIEW, carBrandMark, filterCarBrands } from '@/app/_lib/car-brands';
 import { soulPath } from '@/app/_lib/routes';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
+import { formRoute } from '@/app/_lib/form-route-meta';
 import { CoachTipCard } from '@/components/features/helpers';
 import { GivingFinder } from '@/components/features/money/giving-finder';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -128,7 +129,9 @@ export function GoalForm({
     const { symbol } = useHouseholdCurrency();
     const { showToast } = useHouseholdShell();
     const apiError = useApiError();
-    const dismiss = useFormDismiss(onSuccess);
+    const { dismiss, dismissAfterRemove } = useFormDismiss(onSuccess, {
+        listHref: formRoute('goalUpdate').closeHref,
+    });
     const live = isLiveData(householdId);
     const [giveTargetMode, setGiveTargetMode] = useState<GiveTargetMode>(() =>
         resolveGiveTargetMode(defaultValues, t)
@@ -383,7 +386,7 @@ export function GoalForm({
                 queryKey: apiQuery.money.goals.projections.key(),
             });
             showToast(t('common.message.entity.goal_deleted'), 'success');
-            dismiss();
+            dismissAfterRemove();
         },
         onError: (error: unknown) => showToast(apiError(error), 'error'),
     });

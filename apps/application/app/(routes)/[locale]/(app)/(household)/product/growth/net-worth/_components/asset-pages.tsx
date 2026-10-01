@@ -2,6 +2,7 @@
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
+import { productPath } from '@/app/_lib/routes';
 import { AssetForm } from '@/components/features/forms/asset-form';
 import { useEntityGetForEdit } from '@/components/features/forms/use-entity-for-edit';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -10,6 +11,7 @@ export function AssetUpdatePage({ id, embedded = false }: { id: string; embedded
     const { householdId } = useAuth();
     const loaded = useEntityGetForEdit({
         translationNamespace: 'features.growth.net_worth.detail',
+        listHref: productPath('growth/net-worth'),
         getOptions: apiQuery.growth.assets.get.queryOptions({
             input: { householdId: householdId!, id },
         }),

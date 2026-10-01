@@ -74,6 +74,8 @@ export class HouseholdScopeInterceptor implements NestInterceptor {
 
         const pathname = (req.url ?? '').split('?')[0] ?? '';
         const isOnboard = pathname.endsWith('/household/onboard');
+        // Person-scoped account APIs (theme, locale, board gate) — no household required.
+        const isAccountPersonal = isAccountPersonalPath(pathname);
         // Practice control plane only — not household.practiceLinks (dual-consent on the board).
         const isPractice = isPracticeControlPlanePath(pathname);
 
@@ -102,7 +104,7 @@ export class HouseholdScopeInterceptor implements NestInterceptor {
             };
         }
 
-        if (!householdId && isOnboard) {
+        if (!householdId && (isOnboard || isAccountPersonal)) {
             return {
                 ctx: { userId, householdId: null, role: 'OWNER' },
                 headers,
@@ -184,6 +186,15 @@ function isPracticeControlPlanePath(pathname: string): boolean {
         return false;
     }
     return pathname.includes('/practice');
+}
+
+/**
+ * Account profile + settings + boardReady — keyed by the signed-in user, not a household.
+ * Must work before active org is set (first paint after onboard / soft session).
+ */
+function isAccountPersonalPath(pathname: string): boolean {
+    // Match `/account/...` but not nested household account aliases if any appear later.
+    return /\/account(?:\/|$)/.test(pathname);
 }
 
 /** Optional `x-practice-id` — role is resolved in PracticeService when needed. */

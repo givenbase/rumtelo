@@ -319,7 +319,7 @@ export class HouseholdService {
             const startedOn = new Date().toISOString().slice(0, 10);
             const source = this.em.create(IncomeSource, {
                 household: org.id,
-                name: 'Netto inkomen',
+                name: 'My income',
                 kind: IncomeKind.SALARY,
                 amount: input.monthlyNetIncome,
                 isActive: true,

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from 'react';
 
+import { usePathname } from 'next/navigation';
+
 import { useTranslations } from '@rumtelo/i18n';
 
 import { api } from '@/app/_lib/api';
@@ -18,13 +20,15 @@ export function PendingPracticeInviteRedeem() {
     const t = useTranslations();
     const apiError = useApiError();
     const { householdId, isPending } = useAuth();
-    const { onboardingOpen, showToast } = useHouseholdShell();
+    const pathname = usePathname();
+    const { showToast } = useHouseholdShell();
     const practiceInvite = useOptionalPracticeInvite();
     const token = practiceInvite?.token ?? null;
     const inFlight = useRef(false);
 
     useEffect(() => {
-        if (isPending || !householdId || onboardingOpen || !token || inFlight.current) return;
+        const isOnboarding = pathname.includes('/onboarding');
+        if (isPending || !householdId || isOnboarding || !token || inFlight.current) return;
 
         inFlight.current = true;
         void (async () => {
@@ -39,7 +43,7 @@ export function PendingPracticeInviteRedeem() {
                 inFlight.current = false;
             }
         })();
-    }, [apiError, householdId, isPending, onboardingOpen, practiceInvite, showToast, t, token]);
+    }, [apiError, householdId, isPending, pathname, practiceInvite, showToast, t, token]);
 
     return null;
 }
