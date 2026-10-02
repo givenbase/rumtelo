@@ -1,20 +1,22 @@
 'use client';
 
-import { Currency } from '@rumtelo/contracts';
+import { AccountKind, Currency } from '@rumtelo/contracts';
 import { JAR_CHROME } from '@/app/_lib/jar-meta';
 
 export const JAR_COLOR: Record<string, string> = Object.fromEntries(
     Object.entries(JAR_CHROME).map(([key, chrome]) => [key, chrome.color])
 );
 
+const ACCOUNT_KIND_LABEL: Record<AccountKind, string> = {
+    [AccountKind.CHECKING]: 'pages.settings.panels.bank.checking',
+    [AccountKind.SAVINGS]: 'pages.settings.panels.bank.savings',
+    [AccountKind.CREDIT]: 'pages.settings.panels.bank.credit',
+    [AccountKind.CASH]: 'pages.settings.panels.bank.cash',
+    [AccountKind.INVESTMENT]: 'pages.settings.panels.bank.investment',
+};
+
 export function accountKindLabel(kind: string, t: (key: string) => string): string {
-    const key = {
-        CHECKING: 'pages.settings.panels.bank.checking',
-        SAVINGS: 'pages.settings.panels.bank.savings',
-        CREDIT: 'pages.settings.panels.bank.credit',
-        CASH: 'pages.settings.panels.bank.cash',
-        INVESTMENT: 'pages.settings.panels.bank.investment',
-    }[kind];
+    const key = ACCOUNT_KIND_LABEL[kind as AccountKind];
     return key ? t(key) : kind;
 }
 

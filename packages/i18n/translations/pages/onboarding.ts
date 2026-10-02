@@ -14,8 +14,9 @@ const onboarding = {
     jars_body:
         'Six jars, each with one job. Money usually lands in Necessity — your main account for rent and bills. The other jars are where the rest of the split goes, often as sub-savings at the same bank. Starting split 55 / 10 / 10 / 10 / 10 / 5; change later.',
     jars_tap_hint:
-        'Tap a jar to learn its job. Below, pick how your bank is set up today — we recommend starting with one main account.',
+        'Tap a jar to learn its job. Next you name the account where money lands — start with one main account; add more later if you need them.',
     jars_read_more: 'Read more about the six jars method',
+    jars_spaarpotjes_help: 'What are spaarpotjes?',
     why: 'Your dream',
     why_body:
         'In one short sentence: why do you want Rumtelo — or what dream are you working toward? We put it on your dashboard as a small reminder of what you are working for.',
@@ -49,33 +50,17 @@ const onboarding = {
     finish: 'Open Rumtelo',
     skip: 'Skip for now',
 
-    // ── Jar ↔ bank structure (one-time choice) ─────────────────────────────
-    bank_account_count_label: 'How is your bank set up?',
-    bank_account_count_hint: 'Next you name the accounts. Unsure? Start with one main account.',
-    bank_account_count_options: {
-        one_label: 'One bank (recommended)',
-        one_hint:
-            'Salary lands on Necessity — your main account. The other jars are spaarpotjes / sub-savings at that same bank (Rumtelo tracks them separately).',
-        one_help: 'What are spaarpotjes?',
-        multiple_label: 'Multiple bank accounts',
-        multiple_hint:
-            'You have more than one real account. Next you name them and choose which jar lives where — Necessity stays on the account where money lands.',
-        // Kept for older answers / tooling; not shown in the wizard.
-        two_label: 'Main account + savings account',
-        two_hint:
-            'Necessity and daily jars on your main account; Freedom and Long-term Savings on a separate savings account.',
-        three_plus_label: 'One account per jar',
-        three_plus_hint: 'Each jar has its own bank account — maximum separation.',
-    },
-
     // ── Bank accounts after household create ──────────────────────────────
     banks_setup: {
         accounts_title: 'Name your accounts',
         accounts_body:
-            'Name the main account where money lands (Necessity), then any savings accounts for the other jars. You can rename them later in Settings.',
+            'Name the main account where money lands (Necessity). Need more? Add them here — then you link the jars. You can rename later in Settings.',
         map_title: 'Link jars to accounts',
         map_body:
             'Necessity stays on your main account. Put the other jars on the right savings account. Change this any time in Settings → Jars.',
+        map_body_one:
+            'You have one account — every jar is already linked to it. Change this later in Settings → Jars if you add more accounts.',
+        map_required: 'Choose an account for every jar before you finish.',
         bank_label: 'Bank',
         account_name_label: 'Account name',
         iban_label: 'IBAN',
@@ -99,25 +84,16 @@ const onboarding = {
             education: 'Education savings',
             play: 'Play savings',
             give: 'Give savings',
-            seat_2: 'Second account',
-            seat_3: 'Third account',
         },
         preview: {
             main_account: 'Main account',
             sub_savings: 'Sub-savings',
-            assign_later: 'Assign next',
         },
         tips: {
             one_account:
-                'Start here if you mostly use one bank. Necessity is where money comes in; the other jars are spaarpotjes so you know how to split.',
-            multiple_accounts:
-                'Name your main account first (Necessity). Add any other accounts, then link each jar on the next screen.',
-            two_accounts:
-                'Your main account is Necessity (rent, bills). Your savings account holds Freedom and Long-term Savings — we link the jars next.',
-            three_plus:
-                'Each jar maps to a real account. Necessity stays the account where income lands.',
+                'Start with one main account (Necessity). Add spaarpotjes as extra accounts only if you already bank that way — then link each jar on the next screen.',
             familiar:
-                'We set up one Rumtelo account per bank account. Link each jar after you create them.',
+                'Start with your main account. Add any other accounts you already use, then link each jar.',
             already_set_up:
                 'Just record the accounts you already have. Rumtelo will not touch your real bank.',
         },

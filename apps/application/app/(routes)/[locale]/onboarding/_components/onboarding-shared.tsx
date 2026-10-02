@@ -1,8 +1,7 @@
 'use client';
 
-import { BankAccountCount, Currency, JarKey } from '@rumtelo/contracts';
+import { Currency, JarKey } from '@rumtelo/contracts';
 import { Icon, Typography, type IconName } from '@rumtelo/ui';
-import { cn } from '@rumtelo/utils';
 import { z } from 'zod';
 
 export const ONBOARDING_CURRENCIES = [
@@ -44,7 +43,6 @@ export const onboardingSchema = z.object({
     currency: z.enum(Currency),
     monthlyIncome: z.string().min(1),
     why: z.string().max(500),
-    bankAccountCount: z.enum(BankAccountCount),
 });
 
 export type OnboardingValues = z.infer<typeof onboardingSchema>;
@@ -58,52 +56,6 @@ export type DisplayJar = {
     note: string;
     text: string;
 };
-
-export function ChoiceCard({
-    selected,
-    icon,
-    label,
-    hint,
-    onClick,
-}: {
-    selected: boolean;
-    icon: IconName;
-    label: string;
-    hint?: string;
-    onClick: () => void;
-}) {
-    return (
-        <button
-            type="button"
-            aria-pressed={selected}
-            onClick={onClick}
-            className={cn(
-                'flex items-center gap-2.5 rounded-xl border px-3 py-3 text-left transition-all',
-                selected
-                    ? 'border-accent bg-accent-soft shadow-[inset_0_0_0_1px] shadow-accent/30'
-                    : 'border-line bg-raised hover:border-accent hover:bg-card'
-            )}>
-            <span
-                className={cn(
-                    'grid size-9 shrink-0 place-items-center rounded-lg border',
-                    selected
-                        ? 'border-accent bg-surface text-accent'
-                        : 'border-line bg-surface text-fg-muted'
-                )}>
-                <Icon name={icon} size="sm" color="inherit" />
-            </span>
-            <span className="grid min-w-0 flex-1 gap-0.5">
-                <span className={cn('text-sm font-semibold', selected ? 'text-accent' : 'text-fg')}>
-                    {label}
-                </span>
-                {hint ? <span className="text-xs font-medium text-fg-muted">{hint}</span> : null}
-            </span>
-            {selected ? (
-                <Icon name="circle-check" size="sm" className="shrink-0 text-accent" />
-            ) : null}
-        </button>
-    );
-}
 
 export function PointChip({ icon, label }: { icon: IconName; label: string }) {
     return (
