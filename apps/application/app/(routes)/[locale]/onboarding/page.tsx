@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-import { BankAccountCount, HouseholdAnswerKey, JarExperience } from '@rumtelo/contracts';
+import { HouseholdAnswerKey, JarExperience } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
 import { BrandLoader } from '@rumtelo/ui';
@@ -57,12 +57,8 @@ export default function OnboardingPage() {
             jarBankParams?.experience ??
             (answers?.[HouseholdAnswerKey.JAR_EXPERIENCE] as JarExperience | undefined) ??
             JarExperience.NEW;
-        const accountCount =
-            jarBankParams?.accountCount ??
-            (answers?.[HouseholdAnswerKey.BANK_ACCOUNT_COUNT] as BankAccountCount | undefined) ??
-            BankAccountCount.ONE;
 
-        return <JarBankSetupFlow experience={experience} accountCount={accountCount} />;
+        return <JarBankSetupFlow experience={experience} />;
     }
 
     if (householdId) {

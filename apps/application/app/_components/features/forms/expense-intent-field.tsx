@@ -117,7 +117,12 @@ export function ExpenseIntentField({
         });
 
     const scopedCategories = useMemo(
-        () => (jarKey ? categories.filter(category => category.jarKey === jarKey) : categories),
+        () =>
+            jarKey
+                ? categories.filter(
+                      category => category.jarKeys?.includes(jarKey) || category.jarKey === jarKey
+                  )
+                : categories,
         [categories, jarKey]
     );
 
@@ -209,12 +214,15 @@ export function ExpenseIntentField({
     }
 
     function selectCategory(category: CategoryTemplate) {
+        const keys =
+            category.jarKeys && category.jarKeys.length > 0 ? category.jarKeys : [category.jarKey];
+        const resolvedJar = jarKey && keys.includes(jarKey) ? jarKey : category.jarKey;
         onChange({
             vendor: '',
             merchantKey: null,
             categoryKey: category.key,
             categoryName: category.name,
-            jarKey: category.jarKey,
+            jarKey: resolvedJar,
             source: 'category',
             saveParty: true,
         });

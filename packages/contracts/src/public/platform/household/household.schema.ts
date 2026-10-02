@@ -13,7 +13,6 @@ import { HouseholdKind, HouseholdRole, IncomeStability, SpendingStyle } from '..
 import { PayoffStrategy } from '../../product/money/enums';
 
 export {
-    BankAccountCount,
     HouseholdKind,
     HouseholdRole,
     IncomeStability,
@@ -27,7 +26,6 @@ export {
  */
 export const HouseholdAnswerKey = {
     JAR_EXPERIENCE: 'jar_experience',
-    BANK_ACCOUNT_COUNT: 'bank_account_count',
     /** True when the post-onboard bank + jar placement wizard finished or was skipped. */
     JAR_BANK_SETUP_DONE: 'jar_bank_setup_done',
 } as const;

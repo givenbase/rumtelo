@@ -14,27 +14,31 @@ export class CategoryTemplateSeeder extends Seeder {
         const jarByKey = await loadJarTemplateMap(em);
         const keys = CATEGORY_TEMPLATE_SEED.map(row => row.key);
         const seedKeys = new Set(keys);
-        const existingRows = await em.find(CategoryTemplate, { key: { $in: keys } });
+        const existingRows = await em.find(
+            CategoryTemplate,
+            { key: { $in: keys } },
+            { populate: ['jarTemplates'] }
+        );
         const existingByKey = new Map(existingRows.map(row => [row.key, row]));
         for (const [sortOrder, row] of CATEGORY_TEMPLATE_SEED.entries()) {
-            const jarTemplate = jarTemplateFromMap(jarByKey, row.jarKey);
+            const jars = row.jarKeys.map(key => jarTemplateFromMap(jarByKey, key));
             const existing = existingByKey.get(row.key);
             if (existing) {
                 existing.name = row.name;
                 existing.icon = row.icon;
-                existing.jarTemplate = jarTemplate;
+                existing.jarTemplates.set(jars);
                 existing.sortOrder = sortOrder;
                 existing.isActive = true;
                 continue;
             }
-            em.create(CategoryTemplate, {
+            const created = em.create(CategoryTemplate, {
                 key: row.key,
                 name: row.name,
                 icon: row.icon,
-                jarTemplate,
                 sortOrder,
                 isActive: true,
             } as never);
+            created.jarTemplates.set(jars);
         }
         // Soft-remove templates no longer in the English spine (e.g. CARE → Pharmacy/…).
         const orphaned = await em.find(CategoryTemplate, { key: { $nin: [...seedKeys] } });

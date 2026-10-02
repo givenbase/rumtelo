@@ -255,9 +255,9 @@ export class PartyService {
         const category = await this.em.findOneOrFail(
             CategoryTemplate,
             { key: 'OTHER' },
-            { populate: ['jarTemplate'] }
+            { populate: ['jarTemplates'] }
         );
-        const jar = category.jarTemplate;
+        const jar = category.primaryJarTemplate;
 
         let key = catalogKeyFromName(suggestion.name);
         let suffix = 0;

@@ -1,52 +1,30 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useFormContext, useWatch } from 'react-hook-form';
 
-import { BankAccountCount, JarExperience, JarKey } from '@rumtelo/contracts';
+import { JarExperience, JarKey } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
-import { FormField, FormItem, FormMessage, Icon, Typography } from '@rumtelo/ui';
+import { Icon, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { webOrigin } from '@/app/_lib/auth';
 import { planJarBankSetup } from '@/app/_lib/jar-bank-plan';
 
-import { ChoiceCard, type DisplayJar, type OnboardingValues } from '../onboarding-shared';
+import { type DisplayJar } from '../onboarding-shared';
 
 export function JarsStep({ displayJars }: { displayJars: DisplayJar[] }) {
     const t = useTranslations('pages.onboarding');
-    const { control } = useFormContext<OnboardingValues>();
-    const bankAccountCount = useWatch({ control, name: 'bankAccountCount' });
     const [expandedJar, setExpandedJar] = useState<JarKey | null>(null);
     const jarsLearnMoreHref = `${webOrigin()}/#jars`;
     const spaarpotjesHelpHref = `${webOrigin()}/support/spaarpotjes`;
 
-    const jarBankPreview = useMemo(
-        () =>
-            planJarBankSetup({
-                experience: JarExperience.NEW,
-                accountCount: bankAccountCount,
-                jarKeys: displayJars.map(jar => jar.key),
-            }),
-        [bankAccountCount, displayJars]
-    );
+    const jarBankPreview = useMemo(() => planJarBankSetup(JarExperience.NEW), []);
 
-    /** Preview badge: teach main vs sub-savings vs “assign later”. */
-    function seatLabelForJar(
-        jarKey: JarKey
-    ): { label: string; icon: 'landmark' | 'wallet' } | null {
-        if (bankAccountCount === BankAccountCount.ONE) {
-            if (jarKey === JarKey.NECESSITIES) {
-                return { label: t('banks_setup.preview.main_account'), icon: 'landmark' };
-            }
-            return { label: t('banks_setup.preview.sub_savings'), icon: 'wallet' };
-        }
-
-        // Multiple accounts — Necessity is main; other jars are linked next.
+    function seatLabelForJar(jarKey: JarKey): { label: string; icon: 'landmark' | 'wallet' } {
         if (jarKey === JarKey.NECESSITIES) {
             return { label: t('banks_setup.preview.main_account'), icon: 'landmark' };
         }
-        return { label: t('banks_setup.preview.assign_later'), icon: 'wallet' };
+        return { label: t('banks_setup.preview.sub_savings'), icon: 'wallet' };
     }
 
     return (
@@ -86,18 +64,14 @@ export function JarsStep({ displayJars }: { displayJars: DisplayJar[] }) {
                                             <span className="truncate text-sm font-bold text-fg">
                                                 {jar.name}
                                             </span>
-                                            {seatLabel ? (
-                                                <span className="inline-flex max-w-full items-center gap-1 rounded-full border border-accent/30 bg-accent-soft/50 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-accent">
-                                                    <Icon
-                                                        name={seatLabel.icon}
-                                                        size="sm"
-                                                        color="inherit"
-                                                    />
-                                                    <span className="truncate">
-                                                        {seatLabel.label}
-                                                    </span>
-                                                </span>
-                                            ) : null}
+                                            <span className="inline-flex max-w-full items-center gap-1 rounded-full border border-accent/30 bg-accent-soft/50 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-accent">
+                                                <Icon
+                                                    name={seatLabel.icon}
+                                                    size="sm"
+                                                    color="inherit"
+                                                />
+                                                <span className="truncate">{seatLabel.label}</span>
+                                            </span>
                                         </span>
                                         {jar.subtitle ? (
                                             <span className="truncate text-xs font-medium text-fg-muted">
@@ -130,62 +104,27 @@ export function JarsStep({ displayJars }: { displayJars: DisplayJar[] }) {
                         );
                     })}
                 </ul>
-                <a
-                    href={jarsLearnMoreHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent underline-offset-2 hover:underline">
-                    {t('jars_read_more')}
-                    <span className="sr-only"> (opens in a new tab)</span>
-                    <Icon name="chevron-right" size="sm" color="inherit" />
-                </a>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                    <a
+                        href={jarsLearnMoreHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent underline-offset-2 hover:underline">
+                        {t('jars_read_more')}
+                        <span className="sr-only"> (opens in a new tab)</span>
+                        <Icon name="chevron-right" size="sm" color="inherit" />
+                    </a>
+                    <a
+                        href={spaarpotjesHelpHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs font-medium text-fg-muted underline-offset-2 hover:text-accent hover:underline">
+                        {t('jars_spaarpotjes_help')}
+                        <span className="sr-only"> (opens in a new tab)</span>
+                        <Icon name="chevron-right" size="sm" color="inherit" />
+                    </a>
+                </div>
             </div>
-
-            <FormField
-                control={control}
-                name="bankAccountCount"
-                render={({ field }) => (
-                    <FormItem>
-                        <div className="grid gap-2 border-t border-line pt-4">
-                            <Typography as="p" variant="eyebrow" id="bank-account-count-label">
-                                {t('bank_account_count_label')}
-                            </Typography>
-                            <div
-                                className="grid gap-2"
-                                role="group"
-                                aria-labelledby="bank-account-count-label">
-                                <ChoiceCard
-                                    selected={field.value === BankAccountCount.ONE}
-                                    icon="landmark"
-                                    label={t('bank_account_count_options.one_label')}
-                                    hint={t('bank_account_count_options.one_hint')}
-                                    onClick={() => field.onChange(BankAccountCount.ONE)}
-                                />
-                                <a
-                                    href={spaarpotjesHelpHref}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="ml-1 inline-flex w-fit items-center gap-1 text-xs font-medium text-fg-muted underline-offset-2 hover:text-accent hover:underline">
-                                    {t('bank_account_count_options.one_help')}
-                                    <span className="sr-only"> (opens in a new tab)</span>
-                                    <Icon name="chevron-right" size="sm" color="inherit" />
-                                </a>
-                                <ChoiceCard
-                                    selected={field.value === BankAccountCount.THREE_PLUS}
-                                    icon="layers"
-                                    label={t('bank_account_count_options.multiple_label')}
-                                    hint={t('bank_account_count_options.multiple_hint')}
-                                    onClick={() => field.onChange(BankAccountCount.THREE_PLUS)}
-                                />
-                            </div>
-                            <Typography as="p" variant="caption">
-                                {t('bank_account_count_hint')}
-                            </Typography>
-                        </div>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
 
             {jarBankPreview.tipKeys[0] ? (
                 <p className="rounded-xl border border-accent/20 bg-accent-soft/40 px-3.5 py-2.5 text-sm font-medium text-accent">

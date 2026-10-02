@@ -31,8 +31,18 @@ export function HourChips({ id, question, options, value, onChange, hint }: Prop
         if (Number.isInteger(hours)) return `${hours}${hoursSuffix}`;
         const whole = Math.floor(hours);
         const fraction = hours - whole;
-        const glyph =
-            fraction === 0.25 ? '¼' : fraction === 0.5 ? '½' : fraction === 0.75 ? '¾' : '';
+        let glyph = '';
+        switch (fraction) {
+            case 0.25:
+                glyph = '¼';
+                break;
+            case 0.5:
+                glyph = '½';
+                break;
+            case 0.75:
+                glyph = '¾';
+                break;
+        }
         return glyph && whole === 0
             ? `${glyph}${hoursSuffix}`
             : glyph

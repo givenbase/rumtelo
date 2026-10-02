@@ -4368,8 +4368,9 @@
             "income_body": "Estos son tus ingresos personales — los tuyos como la persona que crea esta cuenta para ti. Una estimación basta. Después nombrarás la cuenta bancaria donde llegan.",
             "jars": "Las seis jarras",
             "jars_body": "Seis tarros, cada uno con una función. El dinero suele llegar a Necesidad: tu cuenta principal para el alquiler y las facturas. Los demás tarros son donde va el resto del reparto, a menudo como ahorros auxiliares en el mismo banco. Reparto inicial 55 / 10 / 10 / 10 / 10 / 5; se puede cambiar después.",
-            "jars_tap_hint": "Toca un tarro para ver su función. Abajo, elige cómo está tu banco hoy — recomendamos empezar con una cuenta principal.",
+            "jars_tap_hint": "Toca un frasco para ver su función. Luego nombra la cuenta donde llega el dinero: empieza con una cuenta principal; añade más después si las necesitas.",
             "jars_read_more": "Más información sobre el método de los seis frascos",
+            "jars_spaarpotjes_help": "¿Qué son los spaarpotjes?",
             "why": "Tu sueño",
             "why_body": "En una frase breve: ¿por qué quieres Rumtelo, o qué sueño estás persiguiendo? Lo ponemos en tu panel de control como un pequeño recordatorio de aquello por lo que estás trabajando.",
             "why_tip": "Escribe un sueño o un motivo, no un número. Que sea sencillo.",
@@ -4399,24 +4400,13 @@
             "continue": "Continuar",
             "finish": "Abrir Rumtelo",
             "skip": "Dejarlo para más adelante",
-            "bank_account_count_label": "¿Cómo está configurado tu banco?",
-            "bank_account_count_hint": "Después nombras las cuentas. ¿Dudas? Empieza con una cuenta principal.",
-            "bank_account_count_options": {
-                "one_label": "Un banco (recomendado)",
-                "one_hint": "El sueldo llega a Necesidad: tu cuenta principal. Los demás tarros son subahorros en ese mismo banco (Rumtelo los lleva aparte).",
-                "one_help": "¿Qué son los spaarpotjes?",
-                "multiple_label": "Varias cuentas bancarias",
-                "multiple_hint": "Tienes más de una cuenta real. Después las nombras y eliges qué tarro va dónde — Necesidad se queda en la cuenta donde entra el dinero.",
-                "two_label": "Cuenta principal + cuenta de ahorro",
-                "two_hint": "Necesidad y tarros del día a día en tu cuenta principal; Libertad y Ahorro a largo plazo en una cuenta de ahorro aparte. Después nos dices cuál es cuál.",
-                "three_plus_label": "Una cuenta por tarro",
-                "three_plus_hint": "Cada tarro tiene su propia cuenta bancaria — máxima separación. Después les pones nombre."
-            },
             "banks_setup": {
                 "accounts_title": "Pon nombre a tus cuentas",
-                "accounts_body": "Nombra la cuenta principal donde llega el dinero (Necesidad). Si tienes más cuentas, añádelas aquí — luego vinculas los tarros.",
+                "accounts_body": "Nombra la cuenta principal donde llega el dinero (Necessity). ¿Necesitas más? Añádelas aquí y luego vincula los frascos. Puedes renombrarlas después en Ajustes.",
                 "map_title": "Vincular tarros a cuentas",
                 "map_body": "Necesidad se queda en tu cuenta principal. Pon los demás tarros en la cuenta de ahorro correcta. Cámbialo cuando quieras en Ajustes → Tarros.",
+                "map_body_one": "Tienes una cuenta: todos los frascos ya están vinculados a ella. Puedes cambiarlo más tarde en Ajustes → Frascos si añades más cuentas.",
+                "map_required": "Elige una cuenta para cada frasco antes de terminar.",
                 "bank_label": "Banco",
                 "account_name_label": "Nombre de la cuenta",
                 "iban_label": "IBAN",
@@ -4439,21 +4429,15 @@
                     "lts": "Ahorro a largo plazo",
                     "education": "Ahorros para la educación",
                     "play": "Ahorros en el juego",
-                    "give": "Ofrecer ahorros",
-                    "seat_2": "Segundo relato",
-                    "seat_3": "Tercer relato"
+                    "give": "Ofrecer ahorros"
                 },
                 "preview": {
                     "main_account": "Cuenta principal",
-                    "sub_savings": "Subahorro",
-                    "assign_later": "Vincular después"
+                    "sub_savings": "Subahorro"
                 },
                 "tips": {
-                    "one_account": "Empieza aquí si usas sobre todo un banco. Necesidad es donde entra el dinero; los demás tarros son subahorros para saber cómo repartir.",
-                    "multiple_accounts": "Nombra primero tu cuenta principal (Necesidad). Añade otras cuentas y luego vincula cada tarro.",
-                    "two_accounts": "Tu cuenta principal es Necesidad (alquiler, facturas). Tu cuenta de ahorro guarda Libertad y Ahorro a largo plazo — vinculamos los tarros a continuación.",
-                    "three_plus": "Cada tarro corresponde a una cuenta real. Necesidad sigue siendo la cuenta donde llega el ingreso.",
-                    "familiar": "Preparamos una cuenta Rumtelo por cuenta bancaria. Vincula cada tarro después de crearlas.",
+                    "one_account": "Empieza con una cuenta principal (Necessity). Añade spaarpotjes solo si ya bancas así; luego vincula cada frasco en la siguiente pantalla.",
+                    "familiar": "Empieza con tu cuenta principal. Añade otras cuentas que ya uses y luego vincula cada frasco.",
                     "already_set_up": "Solo anota las cuentas que ya tienes. Rumtelo no toca tu banco real."
                 }
             }
@@ -4719,7 +4703,7 @@
                 "lead": "Aquí se encuentran las reglas y las opciones. Los números aparecen en sus propias pantallas."
             },
             "sections": {
-                "general": "General",
+                "general": "Generalidades",
                 "money": "Dinero",
                 "growth": "Crecimiento",
                 "energy": "Energía",

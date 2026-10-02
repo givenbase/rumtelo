@@ -1701,7 +1701,7 @@ export class DemoHouseholdSeeder extends Seeder {
         const templates = await em.find(
             CategoryTemplate,
             { isActive: true },
-            { populate: ['jarTemplate'] }
+            { populate: ['jarTemplates'] }
         );
         if (templates.length === 0) return;
 
@@ -1731,9 +1731,11 @@ export class DemoHouseholdSeeder extends Seeder {
         };
 
         for (const template of templates) {
-            const jar = jarByKey.get(template.jarTemplate.key);
-            if (!jar) continue;
-            ensureCategory(jar, template.name, template.sortOrder);
+            for (const jarTemplate of template.jarTemplates.getItems()) {
+                const jar = jarByKey.get(jarTemplate.key);
+                if (!jar) continue;
+                ensureCategory(jar, template.name, template.sortOrder);
+            }
         }
         await em.flush();
 

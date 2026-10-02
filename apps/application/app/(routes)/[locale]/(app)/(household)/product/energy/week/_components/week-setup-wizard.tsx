@@ -101,23 +101,38 @@ export function WeekSetupWizard({ householdId, templates, onDone, onCancel }: Pr
         onError: (error: Error) => showToast(apiError(error), 'error'),
     });
 
-    const canContinue =
-        step === 'weekdays' ? true : step === 'workday' ? !overDay(workday) : !overDay(dayOff);
+    let canContinue = false;
+    switch (step) {
+        case 'weekdays':
+            canContinue = true;
+            break;
+        case 'workday':
+            canContinue = !overDay(workday);
+            break;
+        case 'dayOff':
+            canContinue = !overDay(dayOff);
+            break;
+    }
+
+    let lead: string;
+    switch (step) {
+        case 'weekdays':
+            lead = tw('lead_weekdays');
+            break;
+        case 'workday':
+            lead = tw('lead_workday');
+            break;
+        case 'dayOff':
+            lead = workdays.length === 0 ? tw('lead_dayoff_none') : tw('lead_dayoff');
+            break;
+    }
 
     return (
         <div className="grid gap-6">
             <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                     <Eyebrow>{tw('eyebrow')}</Eyebrow>
-                    <p className="mt-2 max-w-prose text-sm leading-relaxed text-fg-muted">
-                        {step === 'weekdays'
-                            ? tw('lead_weekdays')
-                            : step === 'workday'
-                              ? tw('lead_workday')
-                              : workdays.length === 0
-                                ? tw('lead_dayoff_none')
-                                : tw('lead_dayoff')}
-                    </p>
+                    <p className="mt-2 max-w-prose text-sm leading-relaxed text-fg-muted">{lead}</p>
                 </div>
                 <ol className="flex items-center gap-1.5" aria-label={tw('progress_aria')}>
                     {STEPS.map((candidate, index) => (

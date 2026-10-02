@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-    BankAccountCount,
     Currency,
     DEFAULT_JAR_SPLIT,
     fromIntlLocale,
@@ -51,13 +50,12 @@ import { WhyStep } from './steps/why-step';
 
 export interface JarBankSetupParams {
     experience: JarExperience;
-    accountCount: BankAccountCount;
 }
 
 const STEP_FIELDS: Record<OnboardingStepKey, (keyof OnboardingValues)[]> = {
     welcome: [],
     income: ['currency', 'monthlyIncome', 'householdName'],
-    jars: ['bankAccountCount'],
+    jars: [],
     why: ['why'],
 };
 
@@ -96,7 +94,6 @@ export function OnboardingFlow({
             currency: Currency.EUR,
             monthlyIncome: '',
             why: '',
-            bankAccountCount: BankAccountCount.ONE,
         },
     });
 
@@ -173,7 +170,6 @@ export function OnboardingFlow({
                 householdId: household.id,
                 answers: {
                     [HouseholdAnswerKey.JAR_EXPERIENCE]: JarExperience.NEW,
-                    [HouseholdAnswerKey.BANK_ACCOUNT_COUNT]: values.bankAccountCount,
                     [HouseholdAnswerKey.JAR_BANK_SETUP_DONE]: false,
                 },
             });
@@ -182,7 +178,6 @@ export function OnboardingFlow({
 
             onHouseholdReady?.({
                 experience: JarExperience.NEW,
-                accountCount: values.bankAccountCount,
             });
 
             await setActiveHousehold(household.id);
