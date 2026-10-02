@@ -24,10 +24,13 @@ export function matchesAudience(
  * Default Give spend category: first Give-jar template by sortOrder.
  * Company seed puts Donations first (then Family support, then Gifts).
  */
-export function defaultGiveCategoryTemplate<T extends { jarKey: JarKey; sortOrder: number }>(
-    categories: readonly T[]
-): T | null {
-    const give = categories.filter(category => category.jarKey === JarKey.GIVE);
+export function defaultGiveCategoryTemplate<
+    T extends { jarKey: JarKey; jarKeys?: readonly JarKey[]; sortOrder: number },
+>(categories: readonly T[]): T | null {
+    const give = categories.filter(
+        category =>
+            category.jarKey === JarKey.GIVE || (category.jarKeys?.includes(JarKey.GIVE) ?? false)
+    );
     if (give.length === 0) return null;
     return [...give].sort((left, right) => left.sortOrder - right.sortOrder)[0] ?? null;
 }

@@ -5948,23 +5948,6 @@
           "enumItems": [],
           "mappedType": "boolean"
         },
-        "jar_template_id": {
-          "name": "jar_template_id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        },
         "key": {
           "name": "key",
           "type": "varchar(64)",
@@ -6037,16 +6020,6 @@
       "indexes": [
         {
           "columnNames": [
-            "jar_template_id"
-          ],
-          "composite": false,
-          "constraint": false,
-          "keyName": "reference_money_category_template_jar_template_id_index",
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
             "key"
           ],
           "composite": false,
@@ -6068,17 +6041,115 @@
       ],
       "checks": [],
       "triggers": [],
+      "foreignKeys": {},
+      "comment": null
+    },
+    {
+      "name": "reference_money_category_template_jar_template",
+      "schema": "backoffice",
+      "columns": {
+        "category_template_id": {
+          "name": "category_template_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "jar_template_id": {
+          "name": "jar_template_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "reference_money_category_template_jar_template_pkey",
+          "primary": true,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "category_template_id",
+            "jar_template_id"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "reference_money_category_template_jar_template_unique",
+          "primary": false,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "triggers": [],
       "foreignKeys": {
-        "reference_money_category_template_jar_template_id_foreign": {
+        "reference_money_category_template_jar_template_category_templat": {
+          "columnNames": [
+            "category_template_id"
+          ],
+          "constraintName": "reference_money_category_template_jar_template_category_templat",
+          "localTableName": "backoffice.reference_money_category_template_jar_template",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "backoffice.reference_money_category_template",
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        },
+        "reference_money_category_template_jar_template_jar_template_id_": {
           "columnNames": [
             "jar_template_id"
           ],
-          "constraintName": "reference_money_category_template_jar_template_id_foreign",
-          "localTableName": "backoffice.reference_money_category_template",
+          "constraintName": "reference_money_category_template_jar_template_jar_template_id_",
+          "localTableName": "backoffice.reference_money_category_template_jar_template",
           "referencedColumnNames": [
             "id"
           ],
           "referencedTableName": "backoffice.reference_money_jar_template",
+          "updateRule": "cascade",
           "deleteRule": "restrict"
         }
       },

@@ -27,9 +27,9 @@ export class CategoryTemplateService {
             CategoryTemplate,
             {
                 isActive: true,
-                ...(filters?.jarKey ? { jarTemplate: { key: filters.jarKey } } : {}),
+                ...(filters?.jarKey ? { jarTemplates: { key: filters.jarKey } } : {}),
             },
-            { orderBy: { sortOrder: 'ASC' }, populate: ['jarTemplate'] }
+            { orderBy: { sortOrder: 'ASC' }, populate: ['jarTemplates'] }
         );
         const catalogLocale = catalogLocaleFromContracts(filters?.locale);
         if (isCatalogSourceLocale(catalogLocale) || rows.length === 0) return rows;
@@ -51,7 +51,7 @@ export class CategoryTemplateService {
         return this.em.findOne(
             CategoryTemplate,
             { key, isActive: true },
-            { populate: ['jarTemplate'] }
+            { populate: ['jarTemplates'] }
         );
     }
 

@@ -22,7 +22,10 @@ import { JarCapabilities } from '../jar/jar.schema';
 /** Money company-catalog DTOs (backoffice.product.money templates + presets). */
 
 export const CategoryTemplate = CatalogItemBase.extend({
+    /** Primary jar (first of jarKeys) — home for presets/merchants. */
     jarKey: z.enum(JarKey),
+    /** All jars where this type is offered (shared categories). */
+    jarKeys: z.array(z.enum(JarKey)).min(1),
     icon: z.string().max(8).nullable(),
 });
 

@@ -76,13 +76,17 @@ export class MoneyCatalogsController {
                     jarKey: (input.jarKey as JarKey | null) ?? undefined,
                     locale,
                 });
-                return rows.map(template => ({
-                    key: template.key,
-                    name: template.name,
-                    sortOrder: template.sortOrder,
-                    jarKey: template.jarTemplate.key,
-                    icon: template.icon,
-                }));
+                return rows.map(template => {
+                    const jarKeys = template.jarTemplates.getItems().map(jar => jar.key);
+                    return {
+                        key: template.key,
+                        name: template.name,
+                        sortOrder: template.sortOrder,
+                        jarKey: jarKeys[0]!,
+                        jarKeys,
+                        icon: template.icon,
+                    };
+                });
             }
         );
     }
