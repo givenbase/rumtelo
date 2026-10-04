@@ -58,7 +58,7 @@
                     "goal_not_active": "Het doel is niet actief",
                     "goal_no_jar_spend": "Het doel heeft geen pot om uit te geven",
                     "payment_amount_positive": "Het betalingsbedrag moet positief zijn",
-                    "bill_paused_no_settlement": "Gepauzeerde of beëindigde vaste lasten kunnen geen nieuwe afrekeningen krijgen.",
+                    "bill_paused_no_settlement": "Gepauzeerde of beëindigde vaste kosten kunnen geen nieuwe afrekeningen krijgen.",
                     "due_month_required": "Kies de maand waarvoor de kosten in rekening worden gebracht bij driemaandelijkse of jaarlijkse facturen.",
                     "income_kind_cadence_locked": "Type en frequentie kun je niet wijzigen op bestaande inkomsten. Beëindig ze en maak nieuwe aan.",
                     "party_or_merchant": "Kies ofwel een catalogusverkoper ofwel een van uw opgeslagen contacten, maar niet beide.",
@@ -70,7 +70,7 @@
                     "period_closed": "Deze maand is afgesloten — je kunt niets toevoegen of wijzigen voor die periode.",
                     "month_close_incomplete": "Rond openstaande zaken af vóór je deze maand afsluit ({inbox} ongeordend in de inbox, {bills} rekeningen onbetaald of niet overgeslagen).",
                     "month_close_prior_open": "Sluit eerst {period} — de maanden moeten in volgorde worden afgerond, zodat het logboek een getrouw beeld blijft geven.",
-                    "bill_link_outflow": "Koppel een uitgave om een uitgaande vaste last af te rekenen.",
+                    "bill_link_outflow": "Koppel een uitgave om uitgaande vaste kosten af te rekenen.",
                     "bill_link_inflow": "Koppel een ontvangst om een terugkerend tegoed te verrekenen.",
                     "asset_not_found": "Dat bezit staat niet in je nettovermogen.",
                     "bank_account_not_found": "Die bankrekening staat niet in dit huishouden.",
@@ -160,7 +160,7 @@
                 "sign_in_goals": "Log in om je doelen op te slaan",
                 "week_set": "Je standaardweek staat vast",
                 "fixed_saved": "Vaste kosten opgeslagen",
-                "fixed_saved_and_linked": "Vaste last opgeslagen en gekoppeld aan deze transactie",
+                "fixed_saved_and_linked": "Vaste kosten opgeslagen en gekoppeld aan deze transactie",
                 "fixed_updated": "Vaste kosten bijgewerkt",
                 "goal_saved": "Doel opgeslagen",
                 "goal_updated": "Doel bijgewerkt"
@@ -1180,9 +1180,9 @@
                 "tab_on_track": "Op schema",
                 "tab_reached": "Bereikt",
                 "filter_all": "Alles",
-                "kind_save": "Opslaan",
-                "kind_earn": "Verdien",
-                "kind_give": "Geef",
+                "kind_save": "Sparen",
+                "kind_earn": "Verdienen",
+                "kind_give": "Geven",
                 "add_goal": "+ Doel toevoegen",
                 "preset_group_other": "Overige",
                 "focus": "Focus",
@@ -1203,6 +1203,9 @@
                 "form": {
                     "save_goal": "Doel opslaan",
                     "goal_type": "Soort doel",
+                    "kind_save": "Sparen",
+                    "kind_earn": "Verdienen",
+                    "kind_give": "Geven",
                     "kind_save_line": "Leg geld opzij in een pot",
                     "kind_earn_line": "Een maandelijks inkomensdoel behalen",
                     "kind_give_line": "Geef aan wat je dit jaar wilt doneren",
@@ -1303,7 +1306,7 @@
                     "date_open": "openingsdatum",
                     "jar_context": "Potcontext",
                     "available": "Beschikbaar",
-                    "fixed_out": "Vaste lasten",
+                    "fixed_out": "Vaste kosten",
                     "headroom": "Ruimte over",
                     "other_goals": "Andere doelen op deze pot",
                     "how_to_get_there": "✦ Hoe kom je er?",
@@ -1326,7 +1329,7 @@
                     "advice_earn_engine_title": "Inkomsten zijn de drijvende kracht",
                     "advice_earn_engine_body": "Verhoog je netto-inkomen door je inkomsten te vergroten of door uitgaven te verminderen voordat het geld de potjes bereikt. Het inkomensdoel is een minimum voor je levensstijl, geen wens.",
                     "advice_earn_short_title": "Nog steeds onder de ondergrens",
-                    "advice_earn_short_body": "Bekijk je inkomen en controleer de bronnen. Een loonsverhoging of een verlaging van de vaste lasten op het juiste moment dicht de kloof vaak sneller dan je zou hopen.",
+                    "advice_earn_short_body": "Bekijk je inkomen en controleer de bronnen. Een loonsverhoging of een verlaging van de vaste kosten op het juiste moment dicht de kloof vaak sneller dan je zou hopen.",
                     "advice_give_planned_title": "Geven is een geplande uitgave",
                     "advice_give_planned_body_jar": "Geld dat {jar} verlaat, telt mee voor deze toezegging. Stel een automatische maandelijkse donatie in als je moeite hebt om je aan je voornemen te houden.",
                     "advice_give_planned_body": "Automatiseer een maandelijkse donatie als je wilskracht het knelpunt is — het toegezegde bedrag wordt aangevuld met wat er daadwerkelijk uit de donatiepot is gegaan.",
@@ -2098,7 +2101,7 @@
                     "status_ignored": "Niet meegerekend (niet opgenomen in de begrotingsberekeningen)",
                     "hint_linked_settlement": "Gekoppelde afrekening voor deze periode",
                     "hint_suggested_bill": "Voorgestelde terugkerende factuur — link bij het sorteren",
-                    "make_fixed_cost": "Maak vaste last",
+                    "make_fixed_cost": "Maak vaste kosten",
                     "hint_make_fixed_cost": "Kopieer naar een terugkerende rekening en markeer deze maand als betaald",
                     "open_make_fixed": "Toevoegen ›",
                     "hint_applied_debt": "Toegepast op een schuldsaldo",
@@ -3117,7 +3120,7 @@
                         },
                         "how": {
                             "heading": "Hoe het werkt",
-                            "body": "Voeg elke schuld toe, inclusief het saldo en de aflossing. Bekijk ze als vaste lasten: als de aflossing een gat in de pot slaat, moet het potplan worden herzien."
+                            "body": "Voeg elke schuld toe, inclusief het saldo en de aflossing. Bekijk ze als vaste kosten: als de aflossing een gat in de pot slaat, moet het potplan worden herzien."
                         }
                     }
                 }
@@ -4337,7 +4340,7 @@
                 "jars": "Potten",
                 "transactions": "Transacties",
                 "debt": "Schulden",
-                "fixed_costs": "Vaste lasten",
+                "fixed_costs": "Vaste kosten",
                 "growth_overview": "Overzicht",
                 "goals": "Doelen",
                 "income": "Inkomen",
@@ -5617,7 +5620,7 @@
                     },
                     "jars": {
                         "title": "Hoe Rumtelo dat koppelt",
-                        "body": "Necessity is je hoofdrekening: salaris en vaste lasten landen daar. De andere vijf potjes — Freedom, Long-term Savings, Education, Play, Give — zijn spaarpotjes. Rumtelo houdt de verdeling bij; je bank houdt de euro’s."
+                        "body": "Necessity is je hoofdrekening: salaris en vaste kosten landen daar. De andere vijf potjes — Freedom, Long-term Savings, Education, Play, Give — zijn spaarpotjes. Rumtelo houdt de verdeling bij; je bank houdt de euro’s."
                     },
                     "banks": {
                         "title": "Wat je bank meestal biedt",

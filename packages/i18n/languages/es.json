@@ -1203,6 +1203,9 @@
                 "form": {
                     "save_goal": "Parada",
                     "goal_type": "Tipo de gol",
+                    "kind_save": "Guardar",
+                    "kind_earn": "Ganar",
+                    "kind_give": "Dar",
                     "kind_save_line": "Guarda dinero en un tarro",
                     "kind_earn_line": "Alcanzar un objetivo de ingresos mensuales",
                     "kind_give_line": "Comprométete a donar lo que puedas este año",

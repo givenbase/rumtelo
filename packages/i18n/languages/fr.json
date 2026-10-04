@@ -1203,6 +1203,9 @@
                 "form": {
                     "save_goal": "Arrêt décisif",
                     "goal_type": "Type de but",
+                    "kind_save": "Enregistrer",
+                    "kind_earn": "Gagner",
+                    "kind_give": "Donner",
                     "kind_save_line": "Mettez de l'argent de côté dans un bocal",
                     "kind_earn_line": "Atteindre un objectif de revenu mensuel",
                     "kind_give_line": "Engagez-vous à faire un don cette année",

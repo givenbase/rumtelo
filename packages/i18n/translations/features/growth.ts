@@ -64,6 +64,9 @@ const growth = {
         form: {
             save_goal: 'Save goal',
             goal_type: 'Goal type',
+            kind_save: 'Save',
+            kind_earn: 'Earn',
+            kind_give: 'Give',
             kind_save_line: 'Put money aside in a jar',
             kind_earn_line: 'Reach a monthly income target',
             kind_give_line: "Pledge what you'll give this year",
@@ -167,7 +170,7 @@ const growth = {
             date_open: 'date open',
             jar_context: 'Jar context',
             available: 'Available',
-            fixed_out: 'Fixed out',
+            fixed_out: 'Fixed costs',
             headroom: 'Headroom',
             other_goals: 'Other goals on this jar',
             how_to_get_there: '✦ How to get there',

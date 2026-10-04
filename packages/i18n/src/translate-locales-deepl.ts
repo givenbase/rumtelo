@@ -17,6 +17,7 @@ import * as deepl from 'deepl-node';
 import { DEFAULT_INTL_LOCALE, type IntlLocale } from '@rumtelo/contracts';
 
 import { locales } from './next-intl';
+import { normalizeLocaleTerms } from './locale-term-normalize';
 
 const packageRoot = join(fileURLToPath(import.meta.url), '../..');
 const languagesDir = join(packageRoot, 'languages');
@@ -175,7 +176,10 @@ async function translateLocale(
     });
 
     console.log(`[${locale}] ${jobs.length} identical EN leaves to translate → ${target}`);
-    if (jobs.length === 0) return;
+    if (jobs.length === 0) {
+        writeJsonIfChanged(path, normalizeLocaleTerms(locale, tree));
+        return;
+    }
 
     const batchSize = 40;
     let done = 0;
@@ -203,7 +207,7 @@ async function translateLocale(
         }
         done += batch.length;
         console.log(`[${locale}] Translated ${done}/${jobs.length}`);
-        writeJsonIfChanged(path, tree);
+        writeJsonIfChanged(path, normalizeLocaleTerms(locale, tree));
     }
 
     console.log(`[${locale}] Done — ${jobs.length} leaf(s) considered`);
