@@ -72,6 +72,8 @@ export function createAuth(env: Env) {
         env.DOMAIN_WEB,
         env.DOMAIN_BACK_PUBLIC,
     ]);
+    // Apex + www are included even when DOMAIN_WEB is still a Railway URL
+    // (Better Auth CSRF is exact Origin — cookie Domain `.rumtelo.com` is not enough).
 
     const cookieDomain = isSecureCookieEnv
         ? resolveCrossSubdomainCookieDomain(env.DOMAIN_WEB, env.DOMAIN_APP)

@@ -4,6 +4,9 @@
  * (same pattern as galighticus-platform).
  */
 
+/** Platform hosts — never expand apex/www (would trust railway.app / vercel.app). */
+const PLATFORM_ROOTS = new Set(['railway.app', 'railway.internal', 'vercel.app', 'netlify.app']);
+
 /** e.g. `https://app.example.com` → `example.com` */
 export function extractRootDomainFromUrl(url: string): string | null {
     try {
@@ -33,7 +36,7 @@ export function resolveCrossSubdomainCookieDomain(
         if (!domainUrl) continue;
         try {
             const root = extractRootDomainFromUrl(domainUrl);
-            if (root) return `.${root}`;
+            if (root && !PLATFORM_ROOTS.has(root)) return `.${root}`;
         } catch {
             continue;
         }
@@ -41,13 +44,49 @@ export function resolveCrossSubdomainCookieDomain(
     return undefined;
 }
 
-/** Exact origin (`https://app.example.com`) — Better Auth does not support `*.domain` wildcards. */
+/** Exact origin (`https://app.example.com`). */
 export function normalizeOrigin(url: string): string {
     return new URL(url).origin;
 }
 
+function parseOrigin(value: string): string {
+    try {
+        return normalizeOrigin(value);
+    } catch {
+        return value.replace(/\/$/, '');
+    }
+}
+
 /**
- * Build Better Auth `trustedOrigins` from configured app domains.
+ * Brand hosts always trust apex + www as well as the configured host.
+ *
+ * Better Auth CSRF is an exact Origin match. Cookie Domain `.rumtelo.com` does
+ * not imply `https://rumtelo.com` is trusted. Fastify CORS also needs exact
+ * strings (not `https://*.rumtelo.com`).
+ *
+ * So `https://app.rumtelo.com` also allows `https://rumtelo.com` and
+ * `https://www.rumtelo.com`. Railway / Vercel public hosts are left as-is.
+ */
+export function brandSiblingOrigins(url: string): string[] {
+    const origin = parseOrigin(url);
+    let parsed: URL;
+    try {
+        parsed = new URL(origin);
+    } catch {
+        return [origin];
+    }
+    if (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1') {
+        return [origin];
+    }
+    const root = extractRootDomainFromUrl(origin);
+    if (!root || PLATFORM_ROOTS.has(root)) {
+        return [origin];
+    }
+    return [...new Set([origin, `${parsed.protocol}//${root}`, `${parsed.protocol}//www.${root}`])];
+}
+
+/**
+ * Build Better Auth `trustedOrigins` (and CORS allowlist) from configured app domains.
  */
 export function buildBetterAuthTrustedOrigins(
     sources: (string | undefined)[],
@@ -61,26 +100,14 @@ export function buildBetterAuthTrustedOrigins(
                 .map(value => value.trim())
                 .filter(Boolean)
         )
-        .map(value => {
-            try {
-                return normalizeOrigin(value);
-            } catch {
-                return value.replace(/\/$/, '');
-            }
-        });
+        .flatMap(brandSiblingOrigins);
 
     const extra =
         options?.extraOrigins
             ?.split(',')
             .map(value => value.trim())
             .filter(Boolean)
-            .map(value => {
-                try {
-                    return normalizeOrigin(value);
-                } catch {
-                    return value.replace(/\/$/, '');
-                }
-            }) ?? [];
+            .flatMap(brandSiblingOrigins) ?? [];
 
     return [...new Set([...fromEnv, ...extra])];
 }

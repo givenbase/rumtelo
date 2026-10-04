@@ -137,6 +137,7 @@ export {
 } from './better-auth-client-ip';
 export { rewriteBetterAuthSetCookie } from './better-auth-proxy-cookies';
 export {
+    brandSiblingOrigins,
     buildBetterAuthTrustedOrigins,
     extractRootDomainFromUrl,
     normalizeOrigin,
