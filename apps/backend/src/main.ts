@@ -49,13 +49,15 @@ async function initializeApp(env: Env): Promise<NestFastifyApplication> {
 async function setupApp(app: NestFastifyApplication, env: Env): Promise<void> {
     await app.register(helmet, { contentSecurityPolicy: false });
     await app.register(cookie, { secret: env.BETTER_AUTH_SECRET });
+    const trustedOrigins = buildBetterAuthTrustedOrigins([
+        env.DOMAIN_APP,
+        env.DOMAIN_WEB,
+        env.DOMAIN_BACK_PUBLIC,
+    ]);
+    Logger.log(`Auth/CORS trusted origins: ${trustedOrigins.join(', ')}`, 'Bootstrap');
     await app.register(cors, {
         // Credentials + wildcard origin is not permitted; enumerate frontends (+ public Nest).
-        origin: buildBetterAuthTrustedOrigins([
-            env.DOMAIN_APP,
-            env.DOMAIN_WEB,
-            env.DOMAIN_BACK_PUBLIC,
-        ]),
+        origin: trustedOrigins,
         credentials: true,
         allowedHeaders: ['content-type', 'authorization', 'x-household-id'],
     });
