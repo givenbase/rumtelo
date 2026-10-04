@@ -19,7 +19,7 @@ export const AUDIENCE_TRANSLATIONS: Partial<Record<IntlLocale, Record<string, Au
         },
         RENTER: {
             name: 'Huurder',
-            description: 'Huur, borgsom en woonlasten aan de huurderskant.',
+            description: 'Huur, borgsom en woonkosten aan de huurderskant.',
         },
         HOMEOWNER: {
             name: 'Huiseigenaar',

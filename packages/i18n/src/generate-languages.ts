@@ -15,6 +15,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { locales } from './next-intl';
 import { DEFAULT_INTL_LOCALE } from '@rumtelo/contracts';
+import { normalizeLocaleTerms } from './locale-term-normalize';
 
 const packageRoot = join(fileURLToPath(import.meta.url), '../..');
 const translationsDir = join(packageRoot, 'translations');
@@ -114,7 +115,7 @@ async function main() {
         if (existsSync(path)) {
             current = JSON.parse(readFileSync(path, 'utf8')) as Json;
         }
-        const merged = fillMissing(current, english);
+        const merged = normalizeLocaleTerms(locale, fillMissing(current, english));
         writeJsonIfChanged(
             path,
             merged,

@@ -170,7 +170,7 @@ const growth = {
             date_open: 'date open',
             jar_context: 'Jar context',
             available: 'Available',
-            fixed_out: 'Fixed out',
+            fixed_out: 'Fixed costs',
             headroom: 'Headroom',
             other_goals: 'Other goals on this jar',
             how_to_get_there: '✦ How to get there',

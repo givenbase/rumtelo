@@ -386,7 +386,7 @@ const money = {
             drop_hint: 'CAMT.053 · MT940 · CSV',
             clear_file: 'Remove file',
             after_import:
-                'Rows land in To sort. Match them to jars — and link vaste kosten when the payee matches a monthly bill.',
+                'Rows land in To sort. Match them to jars — and link fixed costs when the payee matches a monthly bill.',
             account: 'Account',
             no_accounts: 'Add a bank account in Settings first',
             choose_file: 'Choose file',

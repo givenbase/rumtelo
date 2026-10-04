@@ -12,7 +12,7 @@ export const JAR_TEMPLATE_TRANSLATIONS: Partial<
     Record<IntlLocale, Partial<Record<JarKey, JarTemplateCopy>>>
 > = {
     nl: {
-        [JarKey.NECESSITIES]: { name: 'Noodzakelijk', subtitle: 'Vaste lasten' },
+        [JarKey.NECESSITIES]: { name: 'Noodzakelijk', subtitle: 'Vaste kosten' },
         [JarKey.FINANCIAL_FREEDOM]: { name: 'Financiële vrijheid', subtitle: 'Nooit uitgeven' },
         [JarKey.LONG_TERM_SAVINGS]: { name: 'Langetermijn sparen', subtitle: 'Grote dingen' },
         [JarKey.EDUCATION]: { name: 'Opleiding', subtitle: 'Investeer in jezelf' },
