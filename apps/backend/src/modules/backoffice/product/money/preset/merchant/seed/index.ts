@@ -4,6 +4,7 @@ import { UTILITIES_MERCHANTS } from './by-category/utilities';
 import { HOUSING_MERCHANTS } from './by-category/housing';
 import { INSURANCE_MERCHANTS } from './by-category/insurance';
 import { SUBSCRIPTIONS_MERCHANTS } from './by-category/subscriptions';
+import { HOSTING_MERCHANTS } from './by-category/hosting';
 import { PHARMACY_MERCHANTS } from './by-category/pharmacy';
 import { DRUGSTORE_MERCHANTS } from './by-category/drugstore';
 import { NUTRITION_MERCHANTS } from './by-category/nutrition';
@@ -51,6 +52,7 @@ export const MERCHANT_PRESET_SEED: readonly MerchantSeed[] = [
     ...HOUSING_MERCHANTS,
     ...INSURANCE_MERCHANTS,
     ...SUBSCRIPTIONS_MERCHANTS,
+    ...HOSTING_MERCHANTS,
     ...PHARMACY_MERCHANTS,
     ...DRUGSTORE_MERCHANTS,
     ...NUTRITION_MERCHANTS,

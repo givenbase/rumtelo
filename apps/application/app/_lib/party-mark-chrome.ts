@@ -19,6 +19,10 @@ const BILL_CATEGORY_ALIASES: ReadonlyArray<{ pattern: RegExp; key: string }> = [
     },
     { pattern: /\bgrocer/i, key: 'GROCERIES' },
     { pattern: /\bpharmacy\b|\bapotheek\b/i, key: 'PHARMACY' },
+    {
+        pattern: /\bhosting\b|\bwebhost\b|\be-?mail\s*host|\bworkspace\b|\bdomein\b|\bdomain\b/i,
+        key: 'HOSTING',
+    },
     { pattern: /\bbookstore\b|\bbooks?\b/i, key: 'BOOKS' },
     { pattern: /\bvanguard\b|\bbrokerage\b|\bindex\s*fund/i, key: 'INDEX_FUNDS' },
     { pattern: /\bairbnb\b|\bhotel\b|\btravel\b/i, key: 'TRAVEL' },

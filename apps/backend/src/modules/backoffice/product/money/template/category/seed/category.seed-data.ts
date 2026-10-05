@@ -26,6 +26,12 @@ export const CATEGORY_TEMPLATE_SEED: readonly CategorySeedRow[] = [
     { key: 'INSURANCE', name: 'Insurance', jarKeys: [JarKey.NECESSITIES], icon: '🛡️' },
     { key: 'TRANSPORT', name: 'Transport', jarKeys: [JarKey.NECESSITIES], icon: '🚌' },
     { key: 'SUBSCRIPTIONS', name: 'Subscriptions', jarKeys: [JarKey.NECESSITIES], icon: '📱' },
+    {
+        key: 'HOSTING',
+        name: 'Hosting & email',
+        jarKeys: [JarKey.NECESSITIES, JarKey.FINANCIAL_FREEDOM],
+        icon: '🖥️',
+    },
     { key: 'TAXES', name: 'Taxes', jarKeys: [JarKey.NECESSITIES], icon: '🧾' },
     { key: 'FINES', name: 'Fines & tickets', jarKeys: [JarKey.NECESSITIES], icon: '🚨' },
     { key: 'FAMILY', name: 'Family', jarKeys: [JarKey.NECESSITIES], icon: '👪' },
