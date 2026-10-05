@@ -85,6 +85,20 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 type Tab = 'ERUIT' | 'ERIN';
 
+function compareByHoldingLast(
+    leftAssetId: string | null | undefined,
+    rightAssetId: string | null | undefined,
+    holdingName: (assetId: string) => string
+): number {
+    const leftLinked = leftAssetId ? 1 : 0;
+    const rightLinked = rightAssetId ? 1 : 0;
+    if (leftLinked !== rightLinked) return leftLinked - rightLinked;
+    if (leftAssetId && rightAssetId && leftAssetId !== rightAssetId) {
+        return holdingName(leftAssetId).localeCompare(holdingName(rightAssetId));
+    }
+    return 0;
+}
+
 /**
  * Fixed costs & income.
  * When fixed OUT blows past the Necessities envelope, see NecessitiesPressureCard
@@ -267,6 +281,12 @@ export function FixedCostsPageClient() {
                     const leftApplies = fixedCostAppliesAsOf(left, asOf) ? 0 : 1;
                     const rightApplies = fixedCostAppliesAsOf(right, asOf) ? 0 : 1;
                     if (leftApplies !== rightApplies) return leftApplies - rightApplies;
+                    const byHolding = compareByHoldingLast(
+                        left.assetId,
+                        right.assetId,
+                        id => holdingById.get(id)?.name ?? id
+                    );
+                    if (byHolding !== 0) return byHolding;
                     const leftDay = left.dueDay ?? 99;
                     const rightDay = right.dueDay ?? 99;
                     if (leftDay !== rightDay) return leftDay - rightDay;
@@ -989,67 +1009,83 @@ export function FixedCostsPageClient() {
                         </div>
 
                         <div className="grid">
-                            {visibleIncomeSources.map((source, i) => {
-                                const due = formatDueDay(source.dueDay, tChips);
-                                return (
-                                    <MoneyPartyRow
-                                        key={source.id ?? i}
-                                        title={source.label}
-                                        mark={partyMark(
-                                            { name: source.label },
-                                            catalogMarkChrome({
-                                                billName: source.label,
-                                                categoryTemplates,
-                                            })
-                                        )}
-                                        amount={formatMoney(source.monthly)}
-                                        amountClassName={
-                                            source.applies ? 'text-success' : 'text-fg-muted'
-                                        }
-                                        badges={
-                                            <>
-                                                {due ? <MetaChip>{due}</MetaChip> : null}
-                                                <MetaChip>
-                                                    {cadenceLabel(source.cadence, tChips)}
-                                                </MetaChip>
-                                                {source.cadence !== Cadence.MONTHLY ? (
+                            {visibleIncomeSources
+                                .slice()
+                                .sort((left, right) => {
+                                    const leftApplies = left.applies ? 0 : 1;
+                                    const rightApplies = right.applies ? 0 : 1;
+                                    if (leftApplies !== rightApplies) {
+                                        return leftApplies - rightApplies;
+                                    }
+                                    const byHolding = compareByHoldingLast(
+                                        left.assetId,
+                                        right.assetId,
+                                        id => holdingById.get(id)?.name ?? id
+                                    );
+                                    if (byHolding !== 0) return byHolding;
+                                    return left.label.localeCompare(right.label);
+                                })
+                                .map((source, i) => {
+                                    const due = formatDueDay(source.dueDay, tChips);
+                                    return (
+                                        <MoneyPartyRow
+                                            key={source.id ?? i}
+                                            title={source.label}
+                                            mark={partyMark(
+                                                { name: source.label },
+                                                catalogMarkChrome({
+                                                    billName: source.label,
+                                                    categoryTemplates,
+                                                })
+                                            )}
+                                            amount={formatMoney(source.monthly)}
+                                            amountClassName={
+                                                source.applies ? 'text-success' : 'text-fg-muted'
+                                            }
+                                            badges={
+                                                <>
+                                                    {due ? <MetaChip>{due}</MetaChip> : null}
                                                     <MetaChip>
-                                                        {tChips('amount_per_month', {
-                                                            amount: formatMoney(source.monthly),
-                                                        })}
+                                                        {cadenceLabel(source.cadence, tChips)}
                                                     </MetaChip>
-                                                ) : null}
-                                                <HoldingChip assetId={source.assetId} />
-                                                <DepositBankChip
-                                                    bankId={source.bankId}
-                                                    accountId={source.accountId}
-                                                />
-                                            </>
-                                        }
-                                        href={
-                                            source.id
-                                                ? updateHref('income', source.id)
-                                                : CREATE_HREF.income
-                                        }
-                                        status={
-                                            source.applies ? null : (
-                                                <FixedCostPeriodStatusControl
-                                                    status={FixedCostPeriodStatus.UPCOMING}
-                                                    labels={{
-                                                        taken: t('status_taken'),
-                                                        due: t('status_due'),
-                                                        skipped: t('status_skipped'),
-                                                        planned: t('status_planned'),
-                                                        markPaidAria: t('mark_paid_short'),
-                                                        markPaidConfirm: t('mark_paid_confirm'),
-                                                        markPaidPending: t('mark_paid_pending'),
-                                                    }}
-                                                />
-                                            )
-                                        }
-                                    />
-                                );
-                            })}
+                                                    {source.cadence !== Cadence.MONTHLY ? (
+                                                        <MetaChip>
+                                                            {tChips('amount_per_month', {
+                                                                amount: formatMoney(source.monthly),
+                                                            })}
+                                                        </MetaChip>
+                                                    ) : null}
+                                                    <HoldingChip assetId={source.assetId} />
+                                                    <DepositBankChip
+                                                        bankId={source.bankId}
+                                                        accountId={source.accountId}
+                                                    />
+                                                </>
+                                            }
+                                            href={
+                                                source.id
+                                                    ? updateHref('income', source.id)
+                                                    : CREATE_HREF.income
+                                            }
+                                            status={
+                                                source.applies ? null : (
+                                                    <FixedCostPeriodStatusControl
+                                                        status={FixedCostPeriodStatus.UPCOMING}
+                                                        labels={{
+                                                            taken: t('status_taken'),
+                                                            due: t('status_due'),
+                                                            skipped: t('status_skipped'),
+                                                            planned: t('status_planned'),
+                                                            markPaidAria: t('mark_paid_short'),
+                                                            markPaidConfirm: t('mark_paid_confirm'),
+                                                            markPaidPending: t('mark_paid_pending'),
+                                                        }}
+                                                    />
+                                                )
+                                            }
+                                        />
+                                    );
+                                })}
                         </div>
 
                         <div className="border-t border-line px-5 py-4">
