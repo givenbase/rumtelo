@@ -14,6 +14,7 @@ import {
 import { PlanKey } from '@rumtelo/contracts';
 
 import { api } from '@/lib/api';
+import { appSignInUrl } from '@/lib/portal-urls';
 import {
     activeHouseholdId,
     listOrganizations,
@@ -131,8 +132,24 @@ export function MarketingSessionProvider({ children }: { children: ReactNode }) 
     const signOut = useCallback(async () => {
         setPlanFetch(null);
         setClientHouseholdId(null);
-        await authSignOut();
-        await refetchRef.current();
+        let navigated = false;
+        const goAppSignIn = () => {
+            if (navigated) return;
+            navigated = true;
+            window.location.assign(appSignInUrl());
+        };
+        try {
+            await authSignOut({
+                fetchOptions: {
+                    credentials: 'include',
+                    onSuccess: goAppSignIn,
+                },
+            });
+        } catch {
+            goAppSignIn();
+            return;
+        }
+        if (!navigated) goAppSignIn();
     }, []);
 
     const value = useMemo(
