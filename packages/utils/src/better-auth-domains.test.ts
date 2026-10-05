@@ -64,8 +64,11 @@ describe('buildBetterAuthTrustedOrigins', () => {
             'https://dev-backend.rumtelo.com/',
         ]);
         assert.ok(origins.includes('https://dev-app.rumtelo.com'));
+        assert.ok(origins.includes('https://www.dev-app.rumtelo.com'));
         assert.ok(origins.includes('https://dev.rumtelo.com'));
+        assert.ok(origins.includes('https://www.dev.rumtelo.com'));
         assert.ok(origins.includes('https://dev-backend.rumtelo.com'));
+        assert.ok(origins.includes('https://www.dev-backend.rumtelo.com'));
         assert.ok(origins.includes('https://rumtelo.com'));
         assert.ok(origins.includes('https://www.rumtelo.com'));
     });
@@ -76,11 +79,38 @@ describe('buildBetterAuthTrustedOrigins', () => {
             'https://backend-prod.up.railway.app',
         ]);
         assert.ok(origins.includes('https://app.rumtelo.com'));
+        assert.ok(origins.includes('https://www.app.rumtelo.com'));
         assert.ok(origins.includes('https://rumtelo.com'));
         assert.ok(origins.includes('https://www.rumtelo.com'));
         assert.ok(origins.includes('https://backend-prod.up.railway.app'));
         assert.equal(origins.includes('https://railway.app'), false);
         assert.equal(origins.includes('https://www.railway.app'), false);
+    });
+
+    it('does not invent other subdomains from apex alone', () => {
+        const origins = buildBetterAuthTrustedOrigins([
+            'https://rumtelo.com',
+            'https://backend-prod.up.railway.app',
+        ]);
+        assert.ok(origins.includes('https://rumtelo.com'));
+        assert.ok(origins.includes('https://www.rumtelo.com'));
+        assert.equal(origins.includes('https://app.rumtelo.com'), false);
+        assert.equal(origins.includes('https://www.app.rumtelo.com'), false);
+    });
+
+    it('trusts the www twin of whatever host is configured', () => {
+        const fromWww = buildBetterAuthTrustedOrigins(['https://www.app.rumtelo.com']);
+        assert.ok(fromWww.includes('https://app.rumtelo.com'));
+        assert.ok(fromWww.includes('https://www.app.rumtelo.com'));
+        assert.ok(fromWww.includes('https://rumtelo.com'));
+        assert.equal(fromWww.includes('https://dev.rumtelo.com'), false);
+    });
+
+    it('does not invent a staging sibling from a single host', () => {
+        const fromWeb = buildBetterAuthTrustedOrigins(['https://dev.rumtelo.com']);
+        assert.ok(fromWeb.includes('https://dev.rumtelo.com'));
+        assert.ok(fromWeb.includes('https://www.dev.rumtelo.com'));
+        assert.equal(fromWeb.includes('https://dev-app.rumtelo.com'), false);
     });
 
     it('does not expand localhost', () => {

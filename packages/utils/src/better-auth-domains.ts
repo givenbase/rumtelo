@@ -57,15 +57,23 @@ function parseOrigin(value: string): string {
     }
 }
 
+/** `app.example.com` ↔ `www.app.example.com` (one `www.` label). */
+function wwwTwinHostnames(hostname: string): string[] {
+    if (hostname.startsWith('www.')) {
+        return [hostname, hostname.slice('www.'.length)];
+    }
+    return [hostname, `www.${hostname}`];
+}
+
 /**
- * Brand hosts always trust apex + www as well as the configured host.
+ * Expand one configured DOMAIN_* URL into CSRF/CORS origins.
  *
- * Better Auth CSRF is an exact Origin match. Cookie Domain `.rumtelo.com` does
- * not imply `https://rumtelo.com` is trusted. Fastify CORS also needs exact
- * strings (not `https://*.rumtelo.com`).
+ * Better Auth and Fastify CORS match Origin exactly. Cookie Domain
+ * `.example.com` is not an allowlist.
  *
- * So `https://app.rumtelo.com` also allows `https://rumtelo.com` and
- * `https://www.rumtelo.com`. Railway / Vercel public hosts are left as-is.
+ * From any brand host we trust: that host, its `www.` twin, apex, and
+ * `www.` + apex. We do not invent other subdomains (`app`, `dev-app`, …) —
+ * those come from other DOMAIN_* values. Platform hosts stay as-is.
  */
 export function brandSiblingOrigins(url: string): string[] {
     const origin = parseOrigin(url);
@@ -82,7 +90,9 @@ export function brandSiblingOrigins(url: string): string[] {
     if (!root || PLATFORM_ROOTS.has(root)) {
         return [origin];
     }
-    return [...new Set([origin, `${parsed.protocol}//${root}`, `${parsed.protocol}//www.${root}`])];
+
+    const hosts = new Set([...wwwTwinHostnames(parsed.hostname), ...wwwTwinHostnames(root)]);
+    return [...hosts].map(host => `${parsed.protocol}//${host}`);
 }
 
 /**
