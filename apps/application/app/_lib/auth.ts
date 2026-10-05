@@ -41,6 +41,50 @@ export const signOut = client.signOut;
 export const useSession = client.useSession;
 export const sendVerificationEmail = client.sendVerificationEmail;
 
+const SIGN_IN_HREF = '/sign-in';
+
+type SignInNav = {
+    replace: (href: string) => void;
+    refresh?: () => void;
+};
+
+function assignSignIn(): void {
+    window.location.assign(SIGN_IN_HREF);
+}
+
+/**
+ * Sign out, then Next `router.replace('/sign-in')` in Better Auth `onSuccess`
+ * (documented client pattern). Hard-assign only if `onSuccess` never ran or
+ * the request threw — leftover cookies + proxy still bounce a too-early
+ * client navigation back to the board.
+ */
+export async function signOutToSignIn(router: SignInNav): Promise<void> {
+    let navigated = false;
+    const goSignIn = (hard: boolean) => {
+        if (navigated) return;
+        navigated = true;
+        if (hard) {
+            assignSignIn();
+            return;
+        }
+        router.replace(SIGN_IN_HREF);
+        router.refresh?.();
+    };
+
+    try {
+        await client.signOut({
+            fetchOptions: {
+                credentials: 'include',
+                onSuccess: () => goSignIn(false),
+            },
+        });
+    } catch {
+        goSignIn(true);
+        return;
+    }
+    if (!navigated) goSignIn(true);
+}
+
 export async function updateUser(data: { name?: string; image?: string | null }) {
     return client.updateUser(data);
 }

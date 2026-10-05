@@ -10,7 +10,7 @@ import { LocaleSwitcher, useTranslations } from '@rumtelo/i18n';
 import { Icon, useTheme } from '@rumtelo/ui';
 import { cn, accountThemeFromCss } from '@rumtelo/utils';
 
-import { signOut } from '@/app/_lib/auth';
+import { signOutToSignIn } from '@/app/_lib/auth';
 import {
     BOTTOM_TABS,
     NAV_GROUPS,
@@ -218,8 +218,7 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
         try {
             // Never leave client-household preview headers after logout.
             forceClearPracticePreview();
-            await signOut();
-            router.replace('/sign-in');
+            await signOutToSignIn(router);
         } catch {
             setSigningOut(false);
         }

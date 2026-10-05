@@ -2,7 +2,7 @@
 
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
-import { signOut } from '@/app/_lib/auth';
+import { signOutToSignIn } from '@/app/_lib/auth';
 import { forceClearPracticePreview } from '@/app/_lib/practice-preview';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -21,8 +21,8 @@ import {
     Input,
     Phone,
 } from '@rumtelo/ui';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
 
 import { SettingsInkCard, SettingsPanel, SettingsRow, SettingsRowLabel } from './settings-chrome';
@@ -79,8 +79,7 @@ export function AccountSettings() {
         setSigningOut(true);
         try {
             forceClearPracticePreview();
-            await signOut();
-            router.push('/sign-in');
+            await signOutToSignIn(router);
         } catch {
             showToast(t('pages.settings.toasts.sign_out_failed'), 'error');
             setSigningOut(false);

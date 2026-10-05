@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from '@rumtelo/i18n';
 import { cn } from '@rumtelo/utils';
 
-import { signOut } from '@/app/_lib/auth';
+import { signOutToSignIn } from '@/app/_lib/auth';
 import { forceClearPracticePreview } from '@/app/_lib/practice-preview';
 import { practiceSettingsHref } from '@/app/_lib/practice-settings-tabs';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -41,8 +41,7 @@ export function PracticeAccountMenu() {
         setOpen(false);
         try {
             forceClearPracticePreview();
-            await signOut();
-            router.replace('/sign-in');
+            await signOutToSignIn(router);
         } catch {
             setSigningOut(false);
         }
