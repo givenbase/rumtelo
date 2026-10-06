@@ -5,7 +5,7 @@ test.describe('application smoke @smoke', () => {
         await personaPage.goto('/');
         await expect(personaPage).not.toHaveURL(/sign-in/);
         await expect(personaPage.locator('body')).toBeVisible();
-        await personaPage.goto('/product/money/jars');
+        await personaPage.goto('/product/money');
         await expect(personaPage).not.toHaveURL(/sign-in/);
         await expect(personaPage.getByTestId('main-nav')).toBeVisible({ timeout: 30_000 });
     });

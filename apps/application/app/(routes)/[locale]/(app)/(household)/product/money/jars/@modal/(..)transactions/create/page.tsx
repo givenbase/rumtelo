@@ -16,10 +16,6 @@ export default function Page() {
     const direction = parseDirection(searchParams.get('direction'));
 
     return (
-        <TxCreateModalShell
-            closeHref="/product/money/jars"
-            defaultJarId={jarId}
-            direction={direction}
-        />
+        <TxCreateModalShell closeHref="/product/money" defaultJarId={jarId} direction={direction} />
     );
 }

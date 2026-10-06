@@ -300,6 +300,12 @@ export function FixedCostsPageClient() {
             return { jar, items, monthly };
         });
 
+    const jarFilterJars = splitJars.filter(
+        jar =>
+            jarCapabilitiesFor(jar.key).allowsFixedCosts &&
+            holdingFixedCosts.some(fixedCost => fixedCost.jarKey === jar.key)
+    );
+
     const necessitiesFixedMonthly = applyingFixedCosts
         .filter(item => item.jarKey === JarKey.NECESSITIES)
         .reduce((total, item) => total + item.monthly, 0);
@@ -555,6 +561,54 @@ export function FixedCostsPageClient() {
                                     </span>
                                 </div>
                             </div>
+
+                            {jarFilterJars.length > 0 ? (
+                                <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-line px-5 py-3">
+                                    <span className="font-mono text-[10px] leading-none tracking-widest text-fg-muted uppercase">
+                                        {t('filter_label')}
+                                    </span>
+                                    <div
+                                        className="flex min-w-0 flex-wrap items-center gap-2"
+                                        role="group"
+                                        aria-label={t('filter_jar_aria')}>
+                                        <button
+                                            type="button"
+                                            onClick={() => setJarFilter(null)}
+                                            aria-pressed={jarFilter === null}
+                                            className={cn(
+                                                'flex items-center rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
+                                                jarFilter === null
+                                                    ? 'border-accent bg-accent-soft text-accent'
+                                                    : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
+                                            )}>
+                                            {t('filter_all')}
+                                        </button>
+                                        {jarFilterJars.map(j => {
+                                            const on = jarFilter === j.key;
+                                            return (
+                                                <button
+                                                    key={j.key}
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setJarFilter(previous =>
+                                                            previous === j.key ? null : j.key
+                                                        )
+                                                    }
+                                                    aria-pressed={on}
+                                                    className={cn(
+                                                        'flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
+                                                        on
+                                                            ? 'border-accent bg-accent-soft text-accent'
+                                                            : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
+                                                    )}>
+                                                    <JarMark jarKey={j.key} icon={j.icon} />
+                                                    {j.name}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            ) : null}
 
                             <div className="grid">
                                 {groupedFixedCosts.length === 0 ? (
@@ -879,38 +933,6 @@ export function FixedCostsPageClient() {
                                         );
                                     })
                                 )}
-                            </div>
-
-                            <div className="flex flex-wrap gap-2 border-t border-line px-5 py-4">
-                                {splitJars
-                                    .filter(
-                                        j =>
-                                            jarCapabilitiesFor(j.key).allowsFixedCosts &&
-                                            fixedCosts.some(fixedCost => fixedCost.jarKey === j.key)
-                                    )
-                                    .map(j => {
-                                        const on = jarFilter === j.key;
-                                        return (
-                                            <button
-                                                key={j.key}
-                                                type="button"
-                                                onClick={() =>
-                                                    setJarFilter(previous =>
-                                                        previous === j.key ? null : j.key
-                                                    )
-                                                }
-                                                aria-pressed={on}
-                                                className={cn(
-                                                    'flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
-                                                    on
-                                                        ? 'border-accent bg-accent-soft text-accent'
-                                                        : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
-                                                )}>
-                                                <JarMark jarKey={j.key} icon={j.icon} />
-                                                {j.name}
-                                            </button>
-                                        );
-                                    })}
                             </div>
                         </Card>
 

@@ -14,7 +14,9 @@ import { moneyPortalShell } from '@/app/_lib/portal-hubs';
 import { PortalHub, type PortalHubProps } from '@/components/features/home/portal-hub';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
+import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { CAPABILITIES } from '@/app/_lib/plan';
 import { useBankSyncOnVisit } from '@/app/_lib/use-bank-sync-on-visit';
 
 function formatDebtFree(on: string | null, locale: string): string {
@@ -37,6 +39,8 @@ export function MoneyPortalHubClient() {
     const { householdId } = useAuth();
     const { period } = useHouseholdShell();
     const { formatMoney } = useHouseholdCurrency();
+    const { hasCapability } = usePlanCapabilities();
+    const canNetWorth = hasCapability(CAPABILITIES.growthNetWorth);
     const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);
 
@@ -48,6 +52,14 @@ export function MoneyPortalHubClient() {
         }),
         null,
         live
+    );
+
+    const netWorthQuery = useLiveQuery(
+        apiQuery.growth.dashboard.get.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        null,
+        live && canNetWorth
     );
 
     const data = query.data;
@@ -63,9 +75,6 @@ export function MoneyPortalHubClient() {
 
     const stacked = data?.travel?.mode === 'stacked';
     const debtsAt = data?.debtsAtPeriod;
-    const goalsAt = data?.goalsAtPeriod ?? [];
-    const fulfilled = goalsAt.filter(goal => goal.fulfilledByPeriod).length;
-    const monthsHorizon = String(data?.travel?.monthsHorizon ?? '—');
 
     const debtValue =
         stacked && debtsAt
@@ -84,16 +93,6 @@ export function MoneyPortalHubClient() {
             : data?.debtMonthsRemaining !== null && data?.debtMonthsRemaining !== undefined
               ? tc('debt.months_to_free', { months: String(data.debtMonthsRemaining) })
               : tc('debt.month_you_are_free');
-
-    const jarsNote = stacked
-        ? goalsAt.length
-            ? tc('jars.note_stacked_goals', {
-                  fulfilled: String(fulfilled),
-                  total: String(goalsAt.length),
-                  months: monthsHorizon,
-              })
-            : tc('jars.note_stacked_horizon', { months: monthsHorizon })
-        : tc('jars.note_period');
 
     const baselineById = new Map(
         (data?.baselineJars ?? []).map(jar => [jar.id, jar.allocated] as const)
@@ -143,24 +142,34 @@ export function MoneyPortalHubClient() {
               ctaHref: message.ctaHref,
           }));
 
+    const jarsCard = {
+        name: tc('jars.name'),
+        value: `${onTrack} / ${total}`,
+        color: 'var(--color-jar-nec)',
+        chart: { kind: 'ring' as const, pct: ringPct },
+        href: '/product/money#jars-list',
+    };
+
+    const netWorthCard = {
+        name: tc('net_worth.name'),
+        value:
+            netWorthQuery.data?.netWorth === null || netWorthQuery.data?.netWorth === undefined
+                ? '—'
+                : formatMoney(netWorthQuery.data.netWorth),
+        color: 'var(--color-jar-ff)',
+        href: '/product/money/net-worth',
+    };
+
     const props: PortalHubProps = {
         ...shell,
+        compact: true,
         coach: pickPortalCoach(coachMessages, shell.fallbackCoach, tCoach, t),
         cards: [
-            {
-                name: tc('jars.name'),
-                value: `${onTrack} / ${total}`,
-                note: jarsNote,
-                color: 'var(--color-jar-nec)',
-                chart: { kind: 'ring', pct: ringPct },
-                href: '/product/money/jars',
-            },
+            canNetWorth ? netWorthCard : jarsCard,
             {
                 name: tc('transactions.name'),
                 value: formatMoney(spent),
-                note: stacked ? tc('transactions.note_stacked') : tc('transactions.note_month'),
                 color: 'var(--color-jar-play)',
-                chart: { kind: 'bars', bars: [0, 0, 0, 0, 0, 0, 0] },
                 href: '/product/money/transactions',
             },
             {
@@ -168,13 +177,11 @@ export function MoneyPortalHubClient() {
                 value: debtValue,
                 note: debtNote,
                 color: 'var(--color-danger)',
-                chart: { kind: 'bars', bars: [0, 0, 0, 0, 0, 0, 0] },
                 href: '/product/money/debt',
             },
             {
                 name: tc('fixed_costs.name'),
                 value: formatMoney(fixed),
-                note: tc('fixed_costs.note'),
                 color: 'var(--color-jar-nec)',
                 chart: { kind: 'ring', pct: fixedRing, tone: 'brand' },
                 href: '/product/money/fixed-costs',

@@ -9,7 +9,7 @@ export default function Page() {
     const searchParams = useSearchParams();
     return (
         <AssetCreateModalShell
-            closeHref="/product/growth/net-worth"
+            closeHref="/product/money/net-worth"
             lockedKind={assetKindFromParams(searchParams)}
         />
     );

@@ -10,7 +10,7 @@ export default function Page() {
     const searchParams = useSearchParams();
     return (
         <FixedCostCreateModalShell
-            closeHref="/product/growth/net-worth"
+            closeHref="/product/money/net-worth"
             defaultValues={fixedCostPrefillFromParams(searchParams)}
         />
     );

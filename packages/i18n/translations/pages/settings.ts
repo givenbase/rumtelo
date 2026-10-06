@@ -485,7 +485,7 @@ const settings = {
             card_plus_feats: '{members} · Any household kind · Debt · ENERGY · Goals',
             card_max_tag: 'All four portals',
             card_max_line: 'Unlimited household, income curve, learning, and net worth.',
-            card_max_feats: '{members} · GROWTH · Masterclass · Net worth',
+            card_max_feats: '{members} · MONEY · Masterclass · Net worth',
             monthly: 'Monthly',
             yearly: 'Yearly · 2 months free',
             per_month_suffix: '/month',

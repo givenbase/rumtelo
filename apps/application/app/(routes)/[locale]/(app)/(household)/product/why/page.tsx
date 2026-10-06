@@ -28,7 +28,7 @@ const WIDER_PORTALS = [
         portalKey: 'pages.nav.pills.money',
         lineKey: 'pages.why.portals.money.line',
         bodyKey: 'pages.why.portals.money.body',
-        href: productPath('money/jars'),
+        href: productPath('money'),
     },
     {
         product: 'growth',
@@ -146,7 +146,7 @@ export default async function WhyFoundationPage() {
                 </Typography>
                 <div className="flex flex-wrap gap-2">
                     <Link
-                        href={productPath('money/jars')}
+                        href={productPath('money')}
                         className="inline-flex h-9 cursor-pointer items-center justify-center rounded-full bg-accent px-4 text-xs font-semibold text-on-accent shadow-glow transition-all duration-200 hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-95">
                         {t('pages.why.cta_jars')}
                     </Link>

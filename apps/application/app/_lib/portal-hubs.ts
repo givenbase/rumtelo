@@ -22,7 +22,7 @@ export function moneyPortalShell(t: TranslateFn): PortalShell {
             kind: t('features.money.hub.fallback_coach_kind'),
             text: t('features.money.hub.fallback_coach_text'),
             cta: t('features.money.hub.fallback_coach_cta'),
-            href: '/product/money/jars',
+            href: '/product/growth/income',
         },
     };
 }

@@ -1145,30 +1145,36 @@
         "growth": {
             "hub": {
                 "eyebrow": "Groei · op lange termijn",
-                "title": "Hoe staat het met je geld?",
-                "line": "Waar je naar streeft, wat je verdient, wat je leert, wat je bezit.",
+                "title": "Waar de volgende loonstrook naartoe gaat.",
+                "line": "Waar je naar streeft, wat je verdient, wat je leert.",
                 "fallback_coach_kind": "DE HENDEL",
                 "fallback_coach_text": "Kostenbesparingen hebben een ondergrens; inkomstenverhoging niet. Inkomsten zijn de snellere hefboom.",
                 "fallback_coach_cta": "Open inkomen",
                 "cards": {
                     "goals": {
                         "name": "Doelstellingen",
-                        "note_travel": "tegen die tijd bereikt · {active} nu open",
-                        "note_current": "doelen in uitvoering"
+                        "note_travel": "tegen die tijd bereikt · {active} nu open"
                     },
                     "income": {
-                        "name": "Inkomen",
-                        "note_travel": "{monthly}/maand · {months} maanden",
-                        "note_current": "per maand nu"
+                        "name": "Inkomen"
                     },
                     "learn": {
-                        "name": "Meer informatie",
-                        "note": "boeken in je wachtrij"
+                        "name": "Meer informatie"
                     },
-                    "net_worth": {
-                        "name": "Nettovermogen",
-                        "note": "echt van jou"
+                    "focus": {
+                        "name": "Focus"
                     }
+                },
+                "overview": {
+                    "eyebrow": "Houd dit vast",
+                    "empty": "Zet een focus of een inkomensdoel op Doelen.",
+                    "lane_edu": "Eerst opleiding",
+                    "lane_earn": "De hefboom",
+                    "lane_due_now": "Deadline nu",
+                    "lane_due_month": "Deadline deze maand",
+                    "lane_due_on": "Deadline {when}",
+                    "lane_next": "Daarna",
+                    "open_goals": "Alle doelen"
                 }
             },
             "goals": {
@@ -1180,6 +1186,9 @@
                 "tab_on_track": "Op schema",
                 "tab_reached": "Bereikt",
                 "filter_all": "Alles",
+                "filter_label": "Filteren",
+                "filter_kind_aria": "Filteren op soort",
+                "filter_jar_aria": "Filteren op pot",
                 "kind_save": "Sparen",
                 "kind_earn": "Verdienen",
                 "kind_give": "Geven",
@@ -1355,8 +1364,8 @@
             },
             "net_worth": {
                 "page_eyebrow": "✦ MIJN VERMOGEN",
-                "page_title": "Hoe je geld er op dit moment voorstaat — niet hoe het zich ontwikkelt.",
-                "page_lead": "Alles wat je bezit, minus alles wat je verschuldigd bent. Bezittingen plus langetermijnspaargeld en financiële vrijheid — niet de spaarpotjes voor de uitgaven van deze maand.",
+                "page_title": "Wat je al bezit — en wat het oplevert of kost.",
+                "page_lead": "Bezit plus langetermijnspaargeld en financiële vrijheid, minus open schulden. Gekoppelde inkomsten en rekeningen zijn geld in beweging, geen verlanglijst.",
                 "add_asset": "+ Bezit toevoegen",
                 "horizon_eyebrow": "✦ Hoe ver kom je hiermee?",
                 "stat_holdings": "Bezit",
@@ -1663,10 +1672,10 @@
             "hub": {
                 "eyebrow": "Geld · deze maand",
                 "title": "Hoe je geld wordt verplaatst.",
-                "line": "Vier vragen, elk één vraag. Ga verder waar je was gebleven.",
+                "line": "Deze maand toewijzen. Stuur wat je al bezit.",
                 "fallback_coach_kind": "BEGIN HIER",
-                "fallback_coach_text": "Voer eerst je inkomsten en vaste kosten in — dan zie je in je grafieken hoeveel je nog overhoudt om te besteden.",
-                "fallback_coach_cta": "Open potten",
+                "fallback_coach_text": "Begin met inkomen en vaste kosten.",
+                "fallback_coach_cta": "Open inkomen",
                 "see_overview": "Zie overzicht",
                 "cards": {
                     "jars": {
@@ -1691,6 +1700,10 @@
                     "fixed_costs": {
                         "name": "Vaste kosten",
                         "note": "vaste kosten per maand"
+                    },
+                    "net_worth": {
+                        "name": "Netto vermogen",
+                        "note": "al van jou"
                     }
                 }
             },
@@ -1868,6 +1881,9 @@
                 "tab_in": "In",
                 "every_month_out": "Elke maand verschijnt er een nieuwe uitgave",
                 "every_month_in": "Elke maand in",
+                "filter_label": "Filteren",
+                "filter_all": "Alles",
+                "filter_jar_aria": "Filteren op pot",
                 "empty_jar_title": "Er zit niets in deze pot.",
                 "empty_jar_body": "Hier worden geen vaste kosten toegerekend.",
                 "empty_all_title": "Er zijn nog geen vaste kosten.",
@@ -3068,11 +3084,11 @@
                     "sections": {
                         "what_for": {
                             "heading": "Waar dit voor dient",
-                            "body": "Een momentopname van de huidige periode: potten, inbox en hoe de maand tot nu toe verloopt."
+                            "body": "Een momentopname van de huidige periode: potten, inbox, wat je al bezit, en hoe de maand tot nu toe verloopt."
                         },
                         "how": {
                             "heading": "Hoe het werkt",
-                            "body": "Klik op ‘Potten’, ‘Transacties’, ‘Schulden’ of ‘Vaste kosten’ voor meer details. Met ‘Periode’ (rechtsboven) kun je van maand wisselen."
+                            "body": "Klik op Potten, Transacties, Schulden, Vaste kosten of Netto vermogen. Met Periode (rechtsboven) wissel je van maand."
                         }
                     }
                 },
@@ -3094,7 +3110,7 @@
                     "sections": {
                         "what_for": {
                             "heading": "Waarvoor dit gedeelte dient",
-                            "body": "Doelen, inkomen en (bij duurdere abonnementen) leerresultaten en vermogen. Begin met inkomen en doelen — die hangen met elkaar samen: verhoog je netto-inkomen, vul je spaarpotten en bereik je spaardoelen sneller."
+                            "body": "Doelen, inkomen en (bij hogere plannen) leren. Begin met inkomen en doelen — die hangen samen: verhoog je netto, vul de potten, haal spaardoelen sneller."
                         }
                     }
                 },
@@ -3773,7 +3789,7 @@
                     "tag": "Het totaalbeeld",
                     "line": "Waar geld geld begint op te leveren — en leren zich begint terug te betalen.",
                     "f1": "Alles in Plus",
-                    "f2": "GROEI · nettovermogen, rendement en je vrijheidscijfer",
+                    "f2": "GELD · nettovermogen, rendement en je vrijheidscijfer",
                     "f3": "GROEI · Volg cursussen op Masterclass, niet op Udemy",
                     "f4": "SOUL · de zeven centra",
                     "f5": "Onbeperkt aantal doelen en leden",
@@ -5213,7 +5229,7 @@
                     "card_plus_feats": "{members} · Alle soorten huishoudens · Schulden · ENERGIE · Doelen",
                     "card_max_tag": "Alle vier de portalen",
                     "card_max_line": "Onbeperkt aantal huishoudens, inkomenscurve, leerproces en nettovermogen.",
-                    "card_max_feats": "{members} · GROEI · Masterclass · Nettovermogen",
+                    "card_max_feats": "{members} · GELD · Masterclass · Nettovermogen",
                     "monthly": "Maandelijks",
                     "yearly": "Jaarabonnement · 2 maanden gratis",
                     "per_month_suffix": "/maand",
@@ -5745,11 +5761,11 @@
             "portals": {
                 "money": {
                     "line": "Geld zorgt voor werk.",
-                    "body": "Zes potjes. Eén overzichtelijk totaalbeeld. Vaste kosten, de inbox en de wekelijkse check zorgen ervoor dat het beeld up-to-date blijft."
+                    "body": "Zes potjes. Eén overzichtelijk totaalbeeld. Vaste kosten, inbox, netto vermogen en de wekelijkse check houden het beeld bij."
                 },
                 "growth": {
                     "line": "Ambitie met een plan — geen gok.",
-                    "body": "Inkomen, doelen en vermogen: zodat ‘meer verdienen’ een concreet plan is, en geen vaag idee."
+                    "body": "Inkomen, doelen en leren: zodat ‘meer verdienen’ een concreet plan is, en geen vaag idee."
                 },
                 "energy": {
                     "line": "Een vermoeid hoofd geeft geld uit. Een uitgerust hoofd neemt beslissingen.",
@@ -5771,7 +5787,7 @@
                 "money_debt": "Schuld is gehuurde tijd. Elke cent aan rente is een uur van je leven waarover iemand anders de beschikking heeft.",
                 "money_fixed_costs": "Vaste kosten zijn beslissingen die je eenmalig hebt genomen en waarvoor je maandelijks betaalt. Bekijk ze dan ook als beslissingen.",
                 "growth_goals": "Een doel zorgt ervoor dat het overschot van deze maand iets blijvends wordt. Met een datum en een potje is het een plan.",
-                "growth_net_worth": "Geld is iets van deze maand. Nettovermogen is iets van de komende jaren. Je bent rijk op de dag dat het je levensonderhoud dekt.",
+                "growth_net_worth": "Wat je al bezit, werkt — of kost — elke maand. Dat is geen wens.",
                 "energy_week": "Je uren bepalen je capaciteit. Die worden bewust verdeeld, of door degene die het hardst om een deel vraagt.",
                 "energy_sleep": "Slaap is de vloer waarop de potjes staan. Haal die weg en alle andere getallen vallen stilletjes naar beneden.",
                 "soul_stillness": "Een rustige geest gaat verstandig met geld om. Een onrustige geest geeft het uit en noemt dat een beslissing.",

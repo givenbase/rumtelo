@@ -331,6 +331,13 @@ export const FIXED_COST_PRESET_SEED: readonly Seed[] = [
         audienceKeys: [AudienceKey.COMMON],
     },
     {
+        key: 'HOSTING_EMAIL',
+        name: 'Hosting & email',
+        jarKey: necessities,
+        categoryTemplateKey: 'HOSTING',
+        audienceKeys: [AudienceKey.COMMON],
+    },
+    {
         key: 'SOFTWARE_SUITE',
         name: 'Software suite (Office / Adobe)',
         jarKey: necessities,

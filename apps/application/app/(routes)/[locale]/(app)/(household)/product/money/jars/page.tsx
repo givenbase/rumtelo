@@ -1,11 +1,8 @@
-import { getTranslations } from '@rumtelo/i18n';
-import { JarsPageClient } from './_components/jars-page';
+import { redirect } from 'next/navigation';
 
-export async function generateMetadata() {
-    const t = await getTranslations('pages.meta');
-    return { title: t('jars') };
-}
+import { productPath } from '@/app/_lib/routes';
 
-export default function JarsPage() {
-    return <JarsPageClient />;
+/** List lives on Money overview. Keep `/jars/{key}` for a single jar. */
+export default function JarsListRedirectPage() {
+    redirect(productPath('money'));
 }

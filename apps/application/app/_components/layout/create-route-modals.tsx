@@ -6,7 +6,7 @@ import {
     IncomeCreatePage,
     IncomeUpdatePage,
 } from '@/product/growth/income/_components/income-pages';
-import { AssetUpdatePage } from '@/product/growth/net-worth/_components/asset-pages';
+import { AssetUpdatePage } from '@/product/money/net-worth/_components/asset-pages';
 import { DebtCreatePage, DebtUpdatePage } from '@/product/money/debt/_components/debt-pages';
 import type { FixedCostCreatePrefill } from '@/product/money/fixed-costs/_components/fixed-cost-pages';
 import {

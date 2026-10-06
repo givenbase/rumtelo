@@ -383,67 +383,96 @@ export function GoalsPageClient() {
             </ListToolbar>
 
             {kindsPresent.length > 1 || saveJarKeys.length > 1 ? (
-                <div className="flex flex-wrap gap-2">
-                    {kindsPresent.length > 1
-                        ? (['ALL', ...kindsPresent] as const).map(key => {
-                              const on = kindFilter === key;
-                              const label = key === 'ALL' ? t('filter_all') : kindLabel(key, t);
-                              const count =
-                                  key === 'ALL'
-                                      ? tabGoals.length
-                                      : tabGoals.filter(goal => goal.kind === key).length;
-                              return (
-                                  <button
-                                      key={key}
-                                      type="button"
-                                      aria-pressed={on}
-                                      onClick={() => {
-                                          setKindFilter(key);
-                                          if (key !== GoalKind.SAVE && key !== 'ALL') {
-                                              setJarFilter(null);
-                                          }
-                                      }}
-                                      className={cn(
-                                          'rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
-                                          on
-                                              ? 'border-accent bg-accent-soft text-accent'
-                                              : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
-                                      )}>
-                                      {label}
-                                      <span className="ml-1.5 opacity-60">{count}</span>
-                                  </button>
-                              );
-                          })
-                        : null}
+                <div className="grid gap-3">
+                    {kindsPresent.length > 1 ? (
+                        <div
+                            className="flex flex-wrap items-center gap-2"
+                            role="group"
+                            aria-label={t('filter_kind_aria')}>
+                            {(['ALL', ...kindsPresent] as const).map(key => {
+                                const on = kindFilter === key;
+                                const label = key === 'ALL' ? t('filter_all') : kindLabel(key, t);
+                                const count =
+                                    key === 'ALL'
+                                        ? tabGoals.length
+                                        : tabGoals.filter(goal => goal.kind === key).length;
+                                return (
+                                    <button
+                                        key={key}
+                                        type="button"
+                                        aria-pressed={on}
+                                        onClick={() => {
+                                            setKindFilter(key);
+                                            if (key !== GoalKind.SAVE && key !== 'ALL') {
+                                                setJarFilter(null);
+                                            }
+                                        }}
+                                        className={cn(
+                                            'rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
+                                            on
+                                                ? 'border-accent bg-accent-soft text-accent'
+                                                : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
+                                        )}>
+                                        {label}
+                                        <span className="ml-1.5 opacity-60">{count}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    ) : null}
                     {(kindFilter === 'ALL' || kindFilter === GoalKind.SAVE) &&
-                    saveJarKeys.length > 1
-                        ? saveJarKeys.map(key => {
-                              const on = jarFilter === key;
-                              const catalog = jarByKey.get(key);
-                              const name =
-                                  catalog?.name ??
-                                  [...jarById.values()].find(jar => jar.key === key)?.name ??
-                                  key;
-                              return (
-                                  <button
-                                      key={key}
-                                      type="button"
-                                      aria-pressed={on}
-                                      onClick={() =>
-                                          setJarFilter(previous => (previous === key ? null : key))
-                                      }
-                                      className={cn(
-                                          'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
-                                          on
-                                              ? 'border-accent bg-accent-soft text-accent'
-                                              : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
-                                      )}>
-                                      <JarMark jarKey={key} icon={catalog?.icon} />
-                                      {name}
-                                  </button>
-                              );
-                          })
-                        : null}
+                    saveJarKeys.length > 1 ? (
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                            <span className="font-mono text-[10px] leading-none tracking-widest text-fg-muted uppercase">
+                                {t('filter_label')}
+                            </span>
+                            <div
+                                className="flex min-w-0 flex-wrap items-center gap-2"
+                                role="group"
+                                aria-label={t('filter_jar_aria')}>
+                                <button
+                                    type="button"
+                                    aria-pressed={jarFilter === null}
+                                    onClick={() => setJarFilter(null)}
+                                    className={cn(
+                                        'rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
+                                        jarFilter === null
+                                            ? 'border-accent bg-accent-soft text-accent'
+                                            : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
+                                    )}>
+                                    {t('filter_all')}
+                                </button>
+                                {saveJarKeys.map(key => {
+                                    const on = jarFilter === key;
+                                    const catalog = jarByKey.get(key);
+                                    const name =
+                                        catalog?.name ??
+                                        [...jarById.values()].find(jar => jar.key === key)?.name ??
+                                        key;
+                                    return (
+                                        <button
+                                            key={key}
+                                            type="button"
+                                            aria-pressed={on}
+                                            onClick={() =>
+                                                setJarFilter(previous =>
+                                                    previous === key ? null : key
+                                                )
+                                            }
+                                            className={cn(
+                                                'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
+                                                on
+                                                    ? 'border-accent bg-accent-soft text-accent'
+                                                    : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
+                                            )}>
+                                            <JarMark jarKey={key} icon={catalog?.icon} />
+                                            {name}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ) : null}
                 </div>
             ) : null}
 

@@ -31,7 +31,7 @@ import { ListToolbar } from '@/components/layout/list-toolbar';
  * → “When Necessities can’t fit in 55%”.
  * Income what-ifs live on Growth → Income (`IncomeSimulator`) — the lever there is income.
  */
-export function JarsPageClient() {
+export function JarsPageClient({ embed = false }: { embed?: boolean }) {
     const t = useTranslations('features.money.jars');
     const { householdId } = useAuth();
     const { period } = useHouseholdShell();
@@ -58,18 +58,24 @@ export function JarsPageClient() {
     const necessitiesPressure = necJar ? necessitiesPressureFromJar(necJar) : null;
 
     return (
-        <div className="grid animate-rise gap-8">
-            <div>
-                <Typography as="span" variant="eyebrow" color="primary">
+        <div className={embed ? 'grid gap-5' : 'grid animate-rise gap-8'}>
+            {embed ? (
+                <Typography as="h2" variant="eyebrow" color="primary">
                     ✦ {t('eyebrow')}
                 </Typography>
-                <Typography as="h1" className="mt-2">
-                    {t('title')}
-                </Typography>
-                <Typography as="p" variant="lead" size="default" className="mt-2">
-                    {t('lead')}
-                </Typography>
-            </div>
+            ) : (
+                <div>
+                    <Typography as="span" variant="eyebrow" color="primary">
+                        ✦ {t('eyebrow')}
+                    </Typography>
+                    <Typography as="h1" className="mt-2">
+                        {t('title')}
+                    </Typography>
+                    <Typography as="p" variant="lead" size="default" className="mt-2">
+                        {t('lead')}
+                    </Typography>
+                </div>
+            )}
 
             <div data-tour="jars-toolbar">
                 <ListToolbar
@@ -79,14 +85,20 @@ export function JarsPageClient() {
                         </span>
                     }
                     createSlot={
-                        <div className="flex flex-wrap items-center gap-2">
-                            <Button as={Link} href={CREATE_HREF.move} size="sm" variant="secondary">
-                                {t('move_between')}
-                            </Button>
-                            <Button as={Link} href={createTxHref()} size="sm">
-                                {t('add_transaction')}
-                            </Button>
-                        </div>
+                        embed ? undefined : (
+                            <div className="flex flex-wrap items-center gap-2">
+                                <Button
+                                    as={Link}
+                                    href={CREATE_HREF.move}
+                                    size="sm"
+                                    variant="secondary">
+                                    {t('move_between')}
+                                </Button>
+                                <Button as={Link} href={createTxHref()} size="sm">
+                                    {t('add_transaction')}
+                                </Button>
+                            </div>
+                        )
                     }>
                     <span className="rounded-full border border-accent bg-accent-soft px-4 py-2 font-mono text-xs font-medium tracking-wide text-accent uppercase">
                         {t('allocated', {
@@ -94,13 +106,15 @@ export function JarsPageClient() {
                             pct: Math.round(totalPct * 10) / 10,
                         })}
                     </span>
-                    <span className="font-mono text-xs font-medium text-fg-faint">
-                        {t('tap_hint')}
-                    </span>
+                    {embed ? null : (
+                        <span className="font-mono text-xs font-medium text-fg-faint">
+                            {t('tap_hint')}
+                        </span>
+                    )}
                 </ListToolbar>
             </div>
 
-            <div data-tour="jars-list">
+            <div id="jars-list" data-tour="jars-list">
                 {/* Doctrine: money README → “When Necessities can’t fit in 55%” */}
                 {necessitiesPressure?.active ? (
                     <div className="mb-4">

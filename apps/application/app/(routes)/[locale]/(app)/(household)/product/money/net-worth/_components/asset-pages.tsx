@@ -11,7 +11,7 @@ export function AssetUpdatePage({ id, embedded = false }: { id: string; embedded
     const { householdId } = useAuth();
     const loaded = useEntityGetForEdit({
         translationNamespace: 'features.growth.net_worth.detail',
-        listHref: productPath('growth/net-worth'),
+        listHref: productPath('money/net-worth'),
         getOptions: apiQuery.growth.assets.get.queryOptions({
             input: { householdId: householdId!, id },
         }),

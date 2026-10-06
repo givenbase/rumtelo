@@ -1145,30 +1145,36 @@
         "growth": {
             "hub": {
                 "eyebrow": "Growth · long term",
-                "title": "Where your money stands.",
-                "line": "What you aim for, what you earn, what you learn, what you own.",
+                "title": "Where the next paycheck is going.",
+                "line": "What you aim for, what you earn, what you learn.",
                 "fallback_coach_kind": "THE LEVER",
                 "fallback_coach_text": "Cutting costs has a floor; raising income does not. Income is the faster lever.",
                 "fallback_coach_cta": "Open income",
                 "cards": {
                     "goals": {
                         "name": "Goals",
-                        "note_travel": "reached by then · {active} open now",
-                        "note_current": "goals in progress"
+                        "note_travel": "reached by then · {active} open now"
                     },
                     "income": {
-                        "name": "Income",
-                        "note_travel": "{monthly}/mo · {months} months",
-                        "note_current": "per month now"
+                        "name": "Income"
                     },
                     "learn": {
-                        "name": "Learn",
-                        "note": "books in your queue"
+                        "name": "Learn"
                     },
-                    "net_worth": {
-                        "name": "Net worth",
-                        "note": "truly yours"
+                    "focus": {
+                        "name": "Focus"
                     }
+                },
+                "overview": {
+                    "eyebrow": "Hold this",
+                    "empty": "Set a focus or an income target on Goals.",
+                    "lane_edu": "Capacity first",
+                    "lane_earn": "The lever",
+                    "lane_due_now": "Due now",
+                    "lane_due_month": "Due this month",
+                    "lane_due_on": "Due {when}",
+                    "lane_next": "Next in line",
+                    "open_goals": "All goals"
                 }
             },
             "goals": {
@@ -1180,6 +1186,9 @@
                 "tab_on_track": "On track",
                 "tab_reached": "Reached",
                 "filter_all": "All",
+                "filter_label": "Filter",
+                "filter_kind_aria": "Filter by kind",
+                "filter_jar_aria": "Filter by jar",
                 "kind_save": "Save",
                 "kind_earn": "Earn",
                 "kind_give": "Give",
@@ -1355,8 +1364,8 @@
             },
             "net_worth": {
                 "page_eyebrow": "✦ MY NET WORTH",
-                "page_title": "Where your money stands — not how it moves.",
-                "page_lead": "Everything you own minus everything you owe. Holdings plus Long-term savings and Financial Freedom — not this month's spending jars.",
+                "page_title": "What you already own — and what it pays or costs.",
+                "page_lead": "Holdings plus Long-term savings and Financial Freedom, minus open debts. Linked income and bills are money in motion, not a wish list.",
                 "add_asset": "+ Add asset",
                 "horizon_eyebrow": "✦ How far this takes you",
                 "stat_holdings": "Holdings",
@@ -1663,10 +1672,10 @@
             "hub": {
                 "eyebrow": "Money · this month",
                 "title": "How your money moves.",
-                "line": "Four places, one question each. Pick up where you left off.",
+                "line": "Assign this month. Run what you already own.",
                 "fallback_coach_kind": "START HERE",
-                "fallback_coach_text": "Add income and fixed costs first — then your jars show what is left to steer.",
-                "fallback_coach_cta": "Open jars",
+                "fallback_coach_text": "Start with income and fixed costs.",
+                "fallback_coach_cta": "Open income",
                 "see_overview": "See overview",
                 "cards": {
                     "jars": {
@@ -1691,6 +1700,10 @@
                     "fixed_costs": {
                         "name": "Fixed costs",
                         "note": "fixed costs per month"
+                    },
+                    "net_worth": {
+                        "name": "Net worth",
+                        "note": "already yours"
                     }
                 }
             },
@@ -1868,6 +1881,9 @@
                 "tab_in": "In",
                 "every_month_out": "Every month out",
                 "every_month_in": "Every month in",
+                "filter_label": "Filter",
+                "filter_all": "All",
+                "filter_jar_aria": "Filter by jar",
                 "empty_jar_title": "Nothing in this jar.",
                 "empty_jar_body": "No fixed costs are assigned here.",
                 "empty_all_title": "No fixed costs yet.",
@@ -3068,11 +3084,11 @@
                     "sections": {
                         "what_for": {
                             "heading": "What this is for",
-                            "body": "A snapshot of the current period: jars, inbox, and how the month is tracking."
+                            "body": "A snapshot of the current period: jars, inbox, what you already own, and how the month is tracking."
                         },
                         "how": {
                             "heading": "How it works",
-                            "body": "Drill into Jars, Transactions, Debt, or Fixed costs for detail. Period (top right) switches months."
+                            "body": "Drill into Jars, Transactions, Debt, Fixed costs, or Net worth. Period (top right) switches months."
                         }
                     }
                 },
@@ -3094,7 +3110,7 @@
                     "sections": {
                         "what_for": {
                             "heading": "What this area is for",
-                            "body": "Goals, income, and (on higher plans) learning and net worth. Start with income and goals — they connect: raise net, fund jars, hit Save targets faster."
+                            "body": "Goals, income, and (on higher plans) learning. Start with income and goals — they connect: raise net, fund jars, hit Save targets faster."
                         }
                     }
                 },
@@ -3773,7 +3789,7 @@
                     "tag": "The whole picture",
                     "line": "Where money starts making money — and learning starts paying back.",
                     "f1": "Everything in Plus",
-                    "f2": "GROWTH · net worth, returns and your freedom number",
+                    "f2": "MONEY · net worth, returns and your freedom number",
                     "f3": "GROWTH · Learn courses on Masterclass, not Udemy",
                     "f4": "SOUL · the seven centers",
                     "f5": "Up to {maxMembers} seats (more full access)",
@@ -5213,7 +5229,7 @@
                     "card_plus_feats": "{members} · Any household kind · Debt · ENERGY · Goals",
                     "card_max_tag": "All four portals",
                     "card_max_line": "Unlimited household, income curve, learning, and net worth.",
-                    "card_max_feats": "{members} · GROWTH · Masterclass · Net worth",
+                    "card_max_feats": "{members} · MONEY · Masterclass · Net worth",
                     "monthly": "Monthly",
                     "yearly": "Yearly · 2 months free",
                     "per_month_suffix": "/month",
@@ -5745,11 +5761,11 @@
             "portals": {
                 "money": {
                     "line": "Money gets a job.",
-                    "body": "Six jars. One calm overview. Fixed costs, inbox, and the week check keep the picture current."
+                    "body": "Six jars. One calm overview. Fixed costs, inbox, net worth, and the week check keep the picture current."
                 },
                 "growth": {
                     "line": "Ambition with a plan — not a guess.",
-                    "body": "Income, goals, and net worth so “earn more” has a map, not a vibe."
+                    "body": "Income, goals, and learning so “earn more” has a map, not a vibe."
                 },
                 "energy": {
                     "line": "A tired head spends. A rested head decides.",
@@ -5771,7 +5787,7 @@
                 "money_debt": "Debt is rented time. Every coin of interest is an hour of your life someone else directs.",
                 "money_fixed_costs": "Fixed costs are decisions you made once and pay for monthly. Review them like decisions.",
                 "growth_goals": "A goal turns this month's surplus into something that lasts. With a date and a jar it is a plan.",
-                "growth_net_worth": "Money is this month. Net worth is the years. You are wealthy the day it pays for your life.",
+                "growth_net_worth": "What you already own is working — or costing — every month. That is not a wish.",
                 "energy_week": "Your hours are your capacity. Divided on purpose, or by whoever asks loudest.",
                 "energy_sleep": "Sleep is the floor the jars stand on. Cut it and every other number quietly drops.",
                 "soul_stillness": "A calm mind directs money. A restless one spends it and calls that a decision.",

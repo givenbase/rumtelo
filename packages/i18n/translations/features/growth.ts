@@ -2,8 +2,8 @@
 const growth = {
     hub: {
         eyebrow: 'Growth · long term',
-        title: 'Where your money stands.',
-        line: 'What you aim for, what you earn, what you learn, what you own.',
+        title: 'Where the next paycheck is going.',
+        line: 'What you aim for, what you earn, what you learn.',
         fallback_coach_kind: 'THE LEVER',
         fallback_coach_text:
             'Cutting costs has a floor; raising income does not. Income is the faster lever.',
@@ -12,21 +12,27 @@ const growth = {
             goals: {
                 name: 'Goals',
                 note_travel: 'reached by then · {active} open now',
-                note_current: 'goals in progress',
             },
             income: {
                 name: 'Income',
-                note_travel: '{monthly}/mo · {months} months',
-                note_current: 'per month now',
             },
             learn: {
                 name: 'Learn',
-                note: 'books in your queue',
             },
-            net_worth: {
-                name: 'Net worth',
-                note: 'truly yours',
+            focus: {
+                name: 'Focus',
             },
+        },
+        overview: {
+            eyebrow: 'Hold this',
+            empty: 'Set a focus or an income target on Goals.',
+            lane_edu: 'Capacity first',
+            lane_earn: 'The lever',
+            lane_due_now: 'Due now',
+            lane_due_month: 'Due this month',
+            lane_due_on: 'Due {when}',
+            lane_next: 'Next in line',
+            open_goals: 'All goals',
         },
     },
     goals: {
@@ -41,6 +47,9 @@ const growth = {
         tab_on_track: 'On track',
         tab_reached: 'Reached',
         filter_all: 'All',
+        filter_label: 'Filter',
+        filter_kind_aria: 'Filter by kind',
+        filter_jar_aria: 'Filter by jar',
         kind_save: 'Save',
         kind_earn: 'Earn',
         kind_give: 'Give',
@@ -232,9 +241,9 @@ const growth = {
     },
     net_worth: {
         page_eyebrow: '✦ MY NET WORTH',
-        page_title: 'Where your money stands — not how it moves.',
+        page_title: 'What you already own — and what it pays or costs.',
         page_lead:
-            "Everything you own minus everything you owe. Holdings plus Long-term savings and Financial Freedom — not this month's spending jars.",
+            'Holdings plus Long-term savings and Financial Freedom, minus open debts. Linked income and bills are money in motion, not a wish list.',
         add_asset: '+ Add asset',
         horizon_eyebrow: '✦ How far this takes you',
         stat_holdings: 'Holdings',

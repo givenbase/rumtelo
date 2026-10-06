@@ -3,11 +3,10 @@ const money = {
     hub: {
         eyebrow: 'Money · this month',
         title: 'How your money moves.',
-        line: 'Four places, one question each. Pick up where you left off.',
+        line: 'Assign this month. Run what you already own.',
         fallback_coach_kind: 'START HERE',
-        fallback_coach_text:
-            'Add income and fixed costs first — then your jars show what is left to steer.',
-        fallback_coach_cta: 'Open jars',
+        fallback_coach_text: 'Start with income and fixed costs.',
+        fallback_coach_cta: 'Open income',
         see_overview: 'See overview',
         cards: {
             jars: {
@@ -33,6 +32,10 @@ const money = {
             fixed_costs: {
                 name: 'Fixed costs',
                 note: 'fixed costs per month',
+            },
+            net_worth: {
+                name: 'Net worth',
+                note: 'already yours',
             },
         },
     },
@@ -218,6 +221,9 @@ const money = {
         tab_in: 'In',
         every_month_out: 'Every month out',
         every_month_in: 'Every month in',
+        filter_label: 'Filter',
+        filter_all: 'All',
+        filter_jar_aria: 'Filter by jar',
         empty_jar_title: 'Nothing in this jar.',
         empty_jar_body: 'No fixed costs are assigned here.',
         empty_all_title: 'No fixed costs yet.',

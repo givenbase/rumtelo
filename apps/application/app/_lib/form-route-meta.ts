@@ -70,12 +70,12 @@ export const FORM_ROUTE = {
     assetCreate: {
         titleKey: 'pages.shell.forms.asset_create.title',
         descriptionKey: 'pages.shell.forms.asset_create.description',
-        closeHref: productPath('growth/net-worth'),
+        closeHref: productPath('money/net-worth'),
     },
     assetUpdate: {
         titleKey: 'pages.shell.forms.asset_update.title',
         descriptionKey: 'pages.shell.forms.asset_update.description',
-        closeHref: productPath('growth/net-worth'),
+        closeHref: productPath('money/net-worth'),
     },
     sessionCreate: {
         titleKey: 'pages.shell.forms.session_create.title',
@@ -84,7 +84,7 @@ export const FORM_ROUTE = {
     moveCreate: {
         titleKey: 'pages.shell.forms.move_create.title',
         descriptionKey: 'pages.shell.forms.move_create.description',
-        closeHref: productPath('money/jars'),
+        closeHref: productPath('money'),
         width: 'wide',
     },
 } as const satisfies Record<string, FormRouteMeta>;

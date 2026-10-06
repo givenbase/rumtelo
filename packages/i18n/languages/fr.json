@@ -1153,22 +1153,28 @@
                 "cards": {
                     "goals": {
                         "name": "Objectifs",
-                        "note_travel": "déjà atteint à ce moment-là · {active} ouvert actuellement",
-                        "note_current": "objectifs en cours"
+                        "note_travel": "déjà atteint à ce moment-là · {active} ouvert actuellement"
                     },
                     "income": {
-                        "name": "Revenus",
-                        "note_travel": "{monthly}/mois · {months} mois",
-                        "note_current": "par mois désormais"
+                        "name": "Revenus"
                     },
                     "learn": {
-                        "name": "En savoir plus",
-                        "note": "les livres de votre liste d'attente"
+                        "name": "En savoir plus"
                     },
-                    "net_worth": {
-                        "name": "Patrimoine net",
-                        "note": "Bien à vous"
+                    "focus": {
+                        "name": "Focus"
                     }
+                },
+                "overview": {
+                    "eyebrow": "À surveiller",
+                    "empty": "Aucun objectif ouvert. Définis la direction dans Objectifs.",
+                    "lane_edu": "La capacité avant tout",
+                    "lane_earn": "Le levier",
+                    "lane_due_now": "À régler immédiatement",
+                    "lane_due_month": "À régler ce mois-ci",
+                    "lane_due_on": "Échéance : {when}",
+                    "lane_next": "Le suivant dans l'ordre",
+                    "open_goals": "Tous les objectifs"
                 }
             },
             "goals": {
@@ -1180,6 +1186,9 @@
                 "tab_on_track": "En bonne voie",
                 "tab_reached": "Atteint",
                 "filter_all": "Tout",
+                "filter_label": "Filtre",
+                "filter_kind_aria": "Filtrer par type",
+                "filter_jar_aria": "Filtrer par bocal",
                 "kind_save": "Enregistrer",
                 "kind_earn": "Gagner",
                 "kind_give": "Donner",
@@ -1691,6 +1700,10 @@
                     "fixed_costs": {
                         "name": "Coûts fixes",
                         "note": "coûts fixes mensuels"
+                    },
+                    "net_worth": {
+                        "name": "Patrimoine net",
+                        "note": "déjà à toi"
                     }
                 }
             },
@@ -1868,6 +1881,9 @@
                 "tab_in": "Dans",
                 "every_month_out": "Chaque mois, en sortie",
                 "every_month_in": "Chaque mois dans",
+                "filter_label": "Filtre",
+                "filter_all": "Tout",
+                "filter_jar_aria": "Filtrer par bocal",
                 "empty_jar_title": "Il n'y a rien dans ce bocal.",
                 "empty_jar_body": "Aucun coût fixe n'est imputé ici.",
                 "empty_all_title": "Il n'y a pas encore de coûts fixes.",
