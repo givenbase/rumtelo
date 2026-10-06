@@ -10,7 +10,7 @@ export default function Page() {
     const searchParams = useSearchParams();
     return (
         <IncomeCreateModalShell
-            closeHref="/product/growth/net-worth"
+            closeHref="/product/money/net-worth"
             defaultValues={incomePrefillFromParams(searchParams)}
         />
     );

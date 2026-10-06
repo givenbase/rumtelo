@@ -31,7 +31,7 @@ export function HeroKluis({
     stats,
     children,
     incomeHref = '/product/growth/income',
-    jarsHref = '/product/money/jars',
+    jarsHref = '/product/money',
     eyebrow,
     totalDelta,
 }: {

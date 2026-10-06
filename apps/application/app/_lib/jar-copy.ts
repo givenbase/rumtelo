@@ -60,6 +60,7 @@ const LINK_HREF_SUFFIX: Record<string, string> = {
     '/product/money/fixed-costs': 'links.fixed_costs',
     '/product/money/debt': 'links.debt',
     '/product/money/transactions': 'links.transactions',
+    '/product/money/net-worth': 'links.net_worth',
     '/product/growth/net-worth': 'links.net_worth',
     '/product/growth/goals': 'links.goals',
     '/product/growth/learn': 'links.learn',

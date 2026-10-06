@@ -16,9 +16,9 @@ import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabi
 interface HubCard {
     name: string;
     value: string;
-    note: string;
+    note?: string;
     color: string;
-    chart:
+    chart?:
         | { kind: 'bars'; bars: number[] }
         /** `progress` (default): gray → warning → green by pct. `brand`: fixed card color. */
         | { kind: 'ring'; pct: number; tone?: 'progress' | 'brand' };
@@ -35,6 +35,8 @@ export interface PortalHubProps {
     line: string;
     coach: { dot: string; kind: string; text: string; cta: string; href: string };
     cards: HubCard[];
+    /** Tighter cards — Money overview sits above the jars list. */
+    compact?: boolean;
 }
 
 /**
@@ -42,7 +44,16 @@ export interface PortalHubProps {
  * Kluis Finance App.dc.html:631-687) — used once each by Money, Growth,
  * Energy and Soul's own overview screen.
  */
-export function PortalHub({ tint, icon, eyebrow, title, line, coach, cards }: PortalHubProps) {
+export function PortalHub({
+    tint,
+    icon,
+    eyebrow,
+    title,
+    line,
+    coach,
+    cards,
+    compact = false,
+}: PortalHubProps) {
     const t = useTranslations('features.coach');
     const tKind = useTranslations('features.coach.verdict');
     const { isCapabilityLocked } = usePlanCapabilities();
@@ -68,9 +79,12 @@ export function PortalHub({ tint, icon, eyebrow, title, line, coach, cards }: Po
 
             {showCoach ? (
                 <div
-                    className="flex flex-wrap items-center gap-4 rounded-2xl border border-l-4 border-line bg-surface p-4 shadow-md sm:p-5"
+                    className={cn(
+                        'flex flex-wrap items-center gap-3 rounded-2xl border border-l-4 border-line bg-surface shadow-md',
+                        compact ? 'p-3 sm:p-3.5' : 'gap-4 p-4 sm:p-5'
+                    )}
                     style={{ borderLeftColor: tint }}>
-                    <div className="grid min-w-0 flex-1 gap-1.5">
+                    <div className="grid min-w-0 flex-1 gap-1">
                         <span className="flex items-center gap-2">
                             <span
                                 className="size-1.75 rounded-full"
@@ -88,8 +102,8 @@ export function PortalHub({ tint, icon, eyebrow, title, line, coach, cards }: Po
                         <Typography
                             as="p"
                             weight="medium"
-                            size="default"
-                            className="leading-snug text-pretty lg:text-lg">
+                            size={compact ? 'sm' : 'default'}
+                            className={cn('leading-snug text-pretty', !compact && 'lg:text-lg')}>
                             {coach.text}
                         </Typography>
                     </div>
@@ -99,7 +113,11 @@ export function PortalHub({ tint, icon, eyebrow, title, line, coach, cards }: Po
                 </div>
             ) : null}
 
-            <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+            <div
+                className={cn(
+                    'grid grid-cols-1 gap-3.5 sm:grid-cols-2',
+                    cards.length >= 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'
+                )}>
                 {cards.map(card => {
                     const locked =
                         card.locked === true ||
@@ -109,7 +127,8 @@ export function PortalHub({ tint, icon, eyebrow, title, line, coach, cards }: Po
                             key={card.name}
                             href={card.href}
                             className={cn(
-                                'grid content-start gap-2.5 rounded-2xl border border-t-4 border-line bg-surface p-5 shadow-md transition-all hover:-translate-y-px hover:border-accent-hover',
+                                'grid content-start rounded-2xl border border-t-4 border-line bg-surface shadow-md transition-all hover:-translate-y-px hover:border-accent-hover',
+                                compact ? 'gap-1.5 p-4' : 'gap-2.5 p-5',
                                 locked && 'opacity-70'
                             )}
                             style={{ borderTopColor: card.color }}>
@@ -124,11 +143,17 @@ export function PortalHub({ tint, icon, eyebrow, title, line, coach, cards }: Po
                                 </Typography>
                                 {locked && <span className="text-xs text-fg-faint">🔒</span>}
                             </span>
-                            <span className="flex min-h-13 items-end justify-between gap-3">
-                                <span className="font-display text-2xl font-semibold tracking-tight text-fg lg:text-3xl">
+                            <span className="flex items-end justify-between gap-3">
+                                <span
+                                    className={cn(
+                                        'font-display font-semibold tracking-tight text-fg',
+                                        compact
+                                            ? 'text-xl lg:text-2xl'
+                                            : 'min-h-13 text-2xl lg:text-3xl'
+                                    )}>
                                     {card.value}
                                 </span>
-                                {card.chart.kind === 'bars' ? (
+                                {card.chart?.kind === 'bars' ? (
                                     <span className="flex h-11 items-end gap-0.75">
                                         {card.chart.bars.map((height, barIndex) => {
                                             const weekday =
@@ -156,21 +181,23 @@ export function PortalHub({ tint, icon, eyebrow, title, line, coach, cards }: Po
                                             );
                                         })}
                                     </span>
-                                ) : (
+                                ) : card.chart?.kind === 'ring' ? (
                                     <RingChart
                                         pct={card.chart.pct}
                                         brandColor={card.color}
                                         tone={card.chart.tone ?? 'progress'}
                                     />
-                                )}
+                                ) : null}
                             </span>
-                            <Typography
-                                as="p"
-                                size="sm"
-                                color="muted"
-                                className="leading-relaxed text-pretty">
-                                {card.note}
-                            </Typography>
+                            {card.note ? (
+                                <Typography
+                                    as="p"
+                                    size="sm"
+                                    color="muted"
+                                    className="leading-relaxed text-pretty">
+                                    {card.note}
+                                </Typography>
+                            ) : null}
                             {card.delta && (
                                 <span className="flex items-center gap-1.5 border-t border-line pt-2.5">
                                     <span

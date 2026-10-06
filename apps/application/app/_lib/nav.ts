@@ -48,11 +48,6 @@ const ALL_NAV_GROUPS = [
                 capabilityKey: CAPABILITIES.moneyOverview,
             },
             {
-                href: productPath('money/jars'),
-                labelKey: 'pages.nav.children.jars',
-                capabilityKey: CAPABILITIES.moneyJars,
-            },
-            {
                 href: productPath('money/transactions'),
                 labelKey: 'pages.nav.children.transactions',
                 capabilityKey: CAPABILITIES.moneySpending,
@@ -63,7 +58,7 @@ const ALL_NAV_GROUPS = [
                 capabilityKey: CAPABILITIES.moneyDebt,
             },
             {
-                href: productPath('growth/net-worth'),
+                href: productPath('money/net-worth'),
                 labelKey: 'pages.nav.children.net_worth',
                 capabilityKey: CAPABILITIES.growthNetWorth,
             },

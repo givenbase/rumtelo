@@ -5,9 +5,8 @@ const money = {
         title: 'How your money moves.',
         line: 'Assign this month. Run what you already own.',
         fallback_coach_kind: 'START HERE',
-        fallback_coach_text:
-            'Add income and fixed costs first — then your jars show what is left to steer.',
-        fallback_coach_cta: 'Open jars',
+        fallback_coach_text: 'Start with income and fixed costs.',
+        fallback_coach_cta: 'Open income',
         see_overview: 'See overview',
         cards: {
             jars: {

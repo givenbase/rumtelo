@@ -486,7 +486,7 @@ const landing = {
             tag: 'The whole picture',
             line: 'Where money starts making money — and learning starts paying back.',
             f1: 'Everything in Plus',
-            f2: 'GROWTH · net worth, returns and your freedom number',
+            f2: 'MONEY · net worth, returns and your freedom number',
             f3: 'GROWTH · Learn courses on Masterclass, not Udemy',
             f4: 'SOUL · the seven centers',
             f5: 'Up to {maxMembers} seats (more full access)',

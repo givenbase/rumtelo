@@ -14,6 +14,7 @@ const PATH_TO_WHY_SLUG = {
     '/product/money/debt': 'money_debt',
     '/product/money/fixed-costs': 'money_fixed_costs',
     '/product/growth/goals': 'growth_goals',
+    '/product/money/net-worth': 'growth_net_worth',
     '/product/growth/net-worth': 'growth_net_worth',
     '/product/energy/week': 'energy_week',
     '/product/energy/sleep': 'energy_sleep',

@@ -1153,22 +1153,28 @@
                 "cards": {
                     "goals": {
                         "name": "Objetivos",
-                        "note_travel": "a los que se ha llegado hasta ahora · {active} abiertos ahora mismo",
-                        "note_current": "objetivos en curso"
+                        "note_travel": "a los que se ha llegado hasta ahora · {active} abiertos ahora mismo"
                     },
                     "income": {
-                        "name": "Ingresos",
-                        "note_travel": "{monthly} al mes · {months} meses",
-                        "note_current": "al mes ahora"
+                        "name": "Ingresos"
                     },
                     "learn": {
-                        "name": "Aprender",
-                        "note": "libros en tu lista de espera"
+                        "name": "Aprender"
                     },
-                    "net_worth": {
-                        "name": "Patrimonio neto",
-                        "note": "Atentamente"
+                    "focus": {
+                        "name": "Enfoque"
                     }
+                },
+                "overview": {
+                    "eyebrow": "Requiere atención",
+                    "empty": "No hay objetivos abiertos. Establece la dirección en Objetivos.",
+                    "lane_edu": "La capacidad es lo primero",
+                    "lane_earn": "La palanca",
+                    "lane_due_now": "Vence ahora",
+                    "lane_due_month": "Vence este mes",
+                    "lane_due_on": "Vence el {when}",
+                    "lane_next": "El siguiente en la fila",
+                    "open_goals": "Todos los objetivos"
                 }
             },
             "goals": {

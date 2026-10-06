@@ -5,8 +5,10 @@ import { useSearchParams } from 'next/navigation';
 import { MoveMoneyCreateModalShell } from '@/components/layout/create-route-modals';
 
 function safeReturnTo(value: string | null): string {
-    if (value && value.startsWith('/product/money/jars')) return value;
-    return '/product/money/jars';
+    if (value === '/product/money' || (value && value.startsWith('/product/money/jars'))) {
+        return value;
+    }
+    return '/product/money';
 }
 
 export default function Page() {

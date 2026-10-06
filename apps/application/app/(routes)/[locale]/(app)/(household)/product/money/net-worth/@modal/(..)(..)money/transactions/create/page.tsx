@@ -18,7 +18,7 @@ export default function Page() {
 
     return (
         <TxCreateModalShell
-            closeHref="/product/growth/net-worth"
+            closeHref="/product/money/net-worth"
             defaultJarId={prefill?.jarId}
             direction={direction}
             defaultValues={prefill}

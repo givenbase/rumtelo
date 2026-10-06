@@ -12,21 +12,27 @@ const growth = {
             goals: {
                 name: 'Goals',
                 note_travel: 'reached by then · {active} open now',
-                note_current: 'goals in progress',
             },
             income: {
                 name: 'Income',
-                note_travel: '{monthly}/mo · {months} months',
-                note_current: 'per month now',
             },
             learn: {
                 name: 'Learn',
-                note: 'books in your queue',
             },
-            net_worth: {
-                name: 'Net worth',
-                note: 'truly yours',
+            focus: {
+                name: 'Focus',
             },
+        },
+        overview: {
+            eyebrow: 'Hold this',
+            empty: 'Set a focus or an income target on Goals.',
+            lane_edu: 'Capacity first',
+            lane_earn: 'The lever',
+            lane_due_now: 'Due now',
+            lane_due_month: 'Due this month',
+            lane_due_on: 'Due {when}',
+            lane_next: 'Next in line',
+            open_goals: 'All goals',
         },
     },
     goals: {

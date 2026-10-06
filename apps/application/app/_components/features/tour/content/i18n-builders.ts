@@ -90,8 +90,8 @@ export function buildJarsTourSteps(t: TranslateFn): PageTourStep[] {
 
 export function buildFullTourChapters(t: TranslateFn): FullTourChapter[] {
     return [
-        { id: 'shell', href: moneyPath('jars'), steps: buildShellTourSteps(t) },
-        { id: 'jars', href: moneyPath('jars'), steps: buildJarsTourSteps(t) },
+        { id: 'shell', href: productPath('money'), steps: buildShellTourSteps(t) },
+        { id: 'jars', href: productPath('money'), steps: buildJarsTourSteps(t) },
         { id: 'fixed', href: moneyPath('fixed-costs'), steps: buildFixedTourSteps(t) },
         { id: 'income', href: growthPath('income'), steps: buildIncomeTourSteps(t) },
     ];
@@ -144,6 +144,17 @@ export function buildPageHelpForPathname(pathname: string, t: TranslateFn): Page
             ),
         },
         {
+            prefix: productPath('money'),
+            exact: true,
+            content: helpContent(
+                t,
+                'pages.jars.title',
+                'pages.jars.sections',
+                ['what_for', 'how'],
+                { id: 'jars', steps: jarsSteps }
+            ),
+        },
+        {
             prefix: moneyPath('jars'),
             content: helpContent(
                 t,
@@ -163,14 +174,6 @@ export function buildPageHelpForPathname(pathname: string, t: TranslateFn): Page
         {
             prefix: moneyPath('debt'),
             content: helpContent(t, 'pages.debt.title', 'pages.debt.sections', ['what_for', 'how']),
-        },
-        {
-            prefix: moneyPath(),
-            exact: true,
-            content: helpContent(t, 'pages.overview.title', 'pages.overview.sections', [
-                'what_for',
-                'how',
-            ]),
         },
         {
             prefix: growthPath('goals'),

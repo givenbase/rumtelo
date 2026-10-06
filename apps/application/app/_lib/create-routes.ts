@@ -9,7 +9,7 @@ export const CREATE_HREF = {
     income: productPath('growth/income/create'),
     goal: productPath('growth/goals/create'),
     session: productPath('energy/training/create'),
-    asset: productPath('growth/net-worth/create'),
+    asset: productPath('money/net-worth/create'),
     move: productPath('money/jars/move/create'),
 } as const;
 
@@ -147,7 +147,7 @@ export function updateHref(
         case 'goal':
             return productPath(`growth/goals/update/${id}`);
         case 'asset':
-            return productPath(`growth/net-worth/update/${id}`);
+            return productPath(`money/net-worth/update/${id}`);
         default: {
             const exhaustive: never = kind;
             throw new Error(`Unhandled update kind: ${String(exhaustive)}`);
@@ -177,7 +177,7 @@ export function goalDetailHref(id: string) {
 
 /** Open asset detail (value, monthly pay, class). Edit stays on update. */
 export function assetDetailHref(id: string, opts?: { setup?: 'in' | 'out' }) {
-    const base = productPath(`growth/net-worth/${id}`);
+    const base = productPath(`money/net-worth/${id}`);
     return opts?.setup ? `${base}?setup=${opts.setup}` : base;
 }
 

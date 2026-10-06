@@ -75,9 +75,6 @@ export function MoneyPortalHubClient() {
 
     const stacked = data?.travel?.mode === 'stacked';
     const debtsAt = data?.debtsAtPeriod;
-    const goalsAt = data?.goalsAtPeriod ?? [];
-    const fulfilled = goalsAt.filter(goal => goal.fulfilledByPeriod).length;
-    const monthsHorizon = String(data?.travel?.monthsHorizon ?? '—');
 
     const debtValue =
         stacked && debtsAt
@@ -96,16 +93,6 @@ export function MoneyPortalHubClient() {
             : data?.debtMonthsRemaining !== null && data?.debtMonthsRemaining !== undefined
               ? tc('debt.months_to_free', { months: String(data.debtMonthsRemaining) })
               : tc('debt.month_you_are_free');
-
-    const jarsNote = stacked
-        ? goalsAt.length
-            ? tc('jars.note_stacked_goals', {
-                  fulfilled: String(fulfilled),
-                  total: String(goalsAt.length),
-                  months: monthsHorizon,
-              })
-            : tc('jars.note_stacked_horizon', { months: monthsHorizon })
-        : tc('jars.note_period');
 
     const baselineById = new Map(
         (data?.baselineJars ?? []).map(jar => [jar.id, jar.allocated] as const)
@@ -155,24 +142,34 @@ export function MoneyPortalHubClient() {
               ctaHref: message.ctaHref,
           }));
 
+    const jarsCard = {
+        name: tc('jars.name'),
+        value: `${onTrack} / ${total}`,
+        color: 'var(--color-jar-nec)',
+        chart: { kind: 'ring' as const, pct: ringPct },
+        href: '/product/money#jars-list',
+    };
+
+    const netWorthCard = {
+        name: tc('net_worth.name'),
+        value:
+            netWorthQuery.data?.netWorth === null || netWorthQuery.data?.netWorth === undefined
+                ? '—'
+                : formatMoney(netWorthQuery.data.netWorth),
+        color: 'var(--color-jar-ff)',
+        href: '/product/money/net-worth',
+    };
+
     const props: PortalHubProps = {
         ...shell,
+        compact: true,
         coach: pickPortalCoach(coachMessages, shell.fallbackCoach, tCoach, t),
         cards: [
-            {
-                name: tc('jars.name'),
-                value: `${onTrack} / ${total}`,
-                note: jarsNote,
-                color: 'var(--color-jar-nec)',
-                chart: { kind: 'ring', pct: ringPct },
-                href: '/product/money/jars',
-            },
+            canNetWorth ? netWorthCard : jarsCard,
             {
                 name: tc('transactions.name'),
                 value: formatMoney(spent),
-                note: stacked ? tc('transactions.note_stacked') : tc('transactions.note_month'),
                 color: 'var(--color-jar-play)',
-                chart: { kind: 'bars', bars: [0, 0, 0, 0, 0, 0, 0] },
                 href: '/product/money/transactions',
             },
             {
@@ -180,25 +177,11 @@ export function MoneyPortalHubClient() {
                 value: debtValue,
                 note: debtNote,
                 color: 'var(--color-danger)',
-                chart: { kind: 'bars', bars: [0, 0, 0, 0, 0, 0, 0] },
                 href: '/product/money/debt',
-            },
-            {
-                name: tc('net_worth.name'),
-                value:
-                    netWorthQuery.data?.netWorth === null ||
-                    netWorthQuery.data?.netWorth === undefined
-                        ? '—'
-                        : formatMoney(netWorthQuery.data.netWorth),
-                note: tc('net_worth.note'),
-                color: 'var(--color-jar-ff)',
-                chart: { kind: 'bars', bars: [0, 0, 0, 0, 0, 0, 0] },
-                href: '/product/growth/net-worth',
             },
             {
                 name: tc('fixed_costs.name'),
                 value: formatMoney(fixed),
-                note: tc('fixed_costs.note'),
                 color: 'var(--color-jar-nec)',
                 chart: { kind: 'ring', pct: fixedRing, tone: 'brand' },
                 href: '/product/money/fixed-costs',

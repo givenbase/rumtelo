@@ -1153,22 +1153,28 @@
                 "cards": {
                     "goals": {
                         "name": "Doelstellingen",
-                        "note_travel": "tegen die tijd bereikt · {active} nu open",
-                        "note_current": "doelen in uitvoering"
+                        "note_travel": "tegen die tijd bereikt · {active} nu open"
                     },
                     "income": {
-                        "name": "Inkomen",
-                        "note_travel": "{monthly}/maand · {months} maanden",
-                        "note_current": "per maand nu"
+                        "name": "Inkomen"
                     },
                     "learn": {
-                        "name": "Meer informatie",
-                        "note": "boeken in je wachtrij"
+                        "name": "Meer informatie"
                     },
-                    "net_worth": {
-                        "name": "Nettovermogen",
-                        "note": "echt van jou"
+                    "focus": {
+                        "name": "Focus"
                     }
+                },
+                "overview": {
+                    "eyebrow": "Houd dit vast",
+                    "empty": "Zet een focus of een inkomensdoel op Doelen.",
+                    "lane_edu": "Eerst opleiding",
+                    "lane_earn": "De hefboom",
+                    "lane_due_now": "Deadline nu",
+                    "lane_due_month": "Deadline deze maand",
+                    "lane_due_on": "Deadline {when}",
+                    "lane_next": "Daarna",
+                    "open_goals": "Alle doelen"
                 }
             },
             "goals": {
@@ -1668,8 +1674,8 @@
                 "title": "Hoe je geld wordt verplaatst.",
                 "line": "Deze maand toewijzen. Stuur wat je al bezit.",
                 "fallback_coach_kind": "BEGIN HIER",
-                "fallback_coach_text": "Voer eerst je inkomsten en vaste kosten in — dan zie je in je grafieken hoeveel je nog overhoudt om te besteden.",
-                "fallback_coach_cta": "Open potten",
+                "fallback_coach_text": "Begin met inkomen en vaste kosten.",
+                "fallback_coach_cta": "Open inkomen",
                 "see_overview": "Zie overzicht",
                 "cards": {
                     "jars": {
@@ -3783,7 +3789,7 @@
                     "tag": "Het totaalbeeld",
                     "line": "Waar geld geld begint op te leveren — en leren zich begint terug te betalen.",
                     "f1": "Alles in Plus",
-                    "f2": "GROEI · nettovermogen, rendement en je vrijheidscijfer",
+                    "f2": "GELD · nettovermogen, rendement en je vrijheidscijfer",
                     "f3": "GROEI · Volg cursussen op Masterclass, niet op Udemy",
                     "f4": "SOUL · de zeven centra",
                     "f5": "Onbeperkt aantal doelen en leden",
@@ -5223,7 +5229,7 @@
                     "card_plus_feats": "{members} · Alle soorten huishoudens · Schulden · ENERGIE · Doelen",
                     "card_max_tag": "Alle vier de portalen",
                     "card_max_line": "Onbeperkt aantal huishoudens, inkomenscurve, leerproces en nettovermogen.",
-                    "card_max_feats": "{members} · GROEI · Masterclass · Nettovermogen",
+                    "card_max_feats": "{members} · GELD · Masterclass · Nettovermogen",
                     "monthly": "Maandelijks",
                     "yearly": "Jaarabonnement · 2 maanden gratis",
                     "per_month_suffix": "/maand",

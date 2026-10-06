@@ -62,7 +62,7 @@ export const JAR_TEMPLATE_SEED: readonly Seed[] = [
             notAllowed:
                 'Never withdraw to buy something. Only the return may leave — and better to leave that in too.',
             links: [
-                { href: '/product/growth/net-worth', label: 'Net worth', icon: '💎' },
+                { href: '/product/money/net-worth', label: 'Net worth', icon: '💎' },
                 { href: '/product/growth/goals', label: 'Goals', icon: '🎯' },
             ],
             subs: [

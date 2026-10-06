@@ -1153,22 +1153,28 @@
                 "cards": {
                     "goals": {
                         "name": "Goals",
-                        "note_travel": "reached by then · {active} open now",
-                        "note_current": "goals in progress"
+                        "note_travel": "reached by then · {active} open now"
                     },
                     "income": {
-                        "name": "Income",
-                        "note_travel": "{monthly}/mo · {months} months",
-                        "note_current": "per month now"
+                        "name": "Income"
                     },
                     "learn": {
-                        "name": "Learn",
-                        "note": "books in your queue"
+                        "name": "Learn"
                     },
-                    "net_worth": {
-                        "name": "Net worth",
-                        "note": "truly yours"
+                    "focus": {
+                        "name": "Focus"
                     }
+                },
+                "overview": {
+                    "eyebrow": "Hold this",
+                    "empty": "Set a focus or an income target on Goals.",
+                    "lane_edu": "Capacity first",
+                    "lane_earn": "The lever",
+                    "lane_due_now": "Due now",
+                    "lane_due_month": "Due this month",
+                    "lane_due_on": "Due {when}",
+                    "lane_next": "Next in line",
+                    "open_goals": "All goals"
                 }
             },
             "goals": {
@@ -1668,8 +1674,8 @@
                 "title": "How your money moves.",
                 "line": "Assign this month. Run what you already own.",
                 "fallback_coach_kind": "START HERE",
-                "fallback_coach_text": "Add income and fixed costs first — then your jars show what is left to steer.",
-                "fallback_coach_cta": "Open jars",
+                "fallback_coach_text": "Start with income and fixed costs.",
+                "fallback_coach_cta": "Open income",
                 "see_overview": "See overview",
                 "cards": {
                     "jars": {
@@ -3783,7 +3789,7 @@
                     "tag": "The whole picture",
                     "line": "Where money starts making money — and learning starts paying back.",
                     "f1": "Everything in Plus",
-                    "f2": "GROWTH · net worth, returns and your freedom number",
+                    "f2": "MONEY · net worth, returns and your freedom number",
                     "f3": "GROWTH · Learn courses on Masterclass, not Udemy",
                     "f4": "SOUL · the seven centers",
                     "f5": "Up to {maxMembers} seats (more full access)",
@@ -5223,7 +5229,7 @@
                     "card_plus_feats": "{members} · Any household kind · Debt · ENERGY · Goals",
                     "card_max_tag": "All four portals",
                     "card_max_line": "Unlimited household, income curve, learning, and net worth.",
-                    "card_max_feats": "{members} · GROWTH · Masterclass · Net worth",
+                    "card_max_feats": "{members} · MONEY · Masterclass · Net worth",
                     "monthly": "Monthly",
                     "yearly": "Yearly · 2 months free",
                     "per_month_suffix": "/month",

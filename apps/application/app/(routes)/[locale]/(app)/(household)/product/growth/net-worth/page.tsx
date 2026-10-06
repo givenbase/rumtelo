@@ -1,11 +1,8 @@
-import { getTranslations } from '@rumtelo/i18n';
-import { NetWorthPageClient } from './_components/net-worth-page';
+import { redirect } from 'next/navigation';
 
-export async function generateMetadata() {
-    const t = await getTranslations('pages.meta');
-    return { title: t('net_worth') };
-}
+import { productPath } from '@/app/_lib/routes';
 
-export default function NetWorthPage() {
-    return <NetWorthPageClient />;
+/** Net worth lives under Money. */
+export default function GrowthNetWorthListRedirectPage() {
+    redirect(productPath('money/net-worth'));
 }

@@ -157,7 +157,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
         return (
             <div className="grid animate-rise gap-6">
                 <Link
-                    href="/product/money/jars"
+                    href="/product/money"
                     className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
                     {t('back_jars')}
                 </Link>
@@ -227,7 +227,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
         <div className="grid animate-rise gap-8">
             <div className="grid gap-4">
                 <Link
-                    href="/product/money/jars"
+                    href="/product/money"
                     className="w-fit font-mono text-xs font-medium tracking-wide text-fg-faint uppercase transition-colors hover:text-accent">
                     {t('back_jars')}
                 </Link>

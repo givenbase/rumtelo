@@ -240,7 +240,7 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
     const { byKey: jarByKey } = useJarCatalog();
 
     const asset = assetQuery.data;
-    const boardHref = productPath('growth/net-worth');
+    const boardHref = productPath('money/net-worth');
 
     if (live && assetQuery.isLoading && !asset) {
         return (
