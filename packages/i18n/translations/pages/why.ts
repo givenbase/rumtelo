@@ -24,11 +24,11 @@ const why = {
     portals: {
         money: {
             line: 'Money gets a job.',
-            body: 'Six jars. One calm overview. Fixed costs, inbox, and the week check keep the picture current.',
+            body: 'Six jars. One calm overview. Fixed costs, inbox, net worth, and the week check keep the picture current.',
         },
         growth: {
             line: 'Ambition with a plan — not a guess.',
-            body: 'Income, goals, and net worth so “earn more” has a map, not a vibe.',
+            body: 'Income, goals, and learning so “earn more” has a map, not a vibe.',
         },
         energy: {
             line: 'A tired head spends. A rested head decides.',
@@ -58,7 +58,7 @@ const why = {
         growth_goals:
             "A goal turns this month's surplus into something that lasts. With a date and a jar it is a plan.",
         growth_net_worth:
-            'Money is this month. Net worth is the years. You are wealthy the day it pays for your life.',
+            'What you already own is working — or costing — every month. That is not a wish.',
         energy_week:
             'Your hours are your capacity. Divided on purpose, or by whoever asks loudest.',
         energy_sleep:

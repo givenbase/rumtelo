@@ -55,7 +55,6 @@ export function GrowthPortalHubClient() {
     const spanIncome = traveling ? income * horizon : income;
     const learn = data?.learnQueued ?? 0;
     const learnProgress = data?.learnProgressPct ?? 0;
-    const netWorth = data?.netWorth;
     const progress = data?.goalsProgressPct ?? 0;
     const fulfilled = useMemo(() => {
         if (!traveling) return 0;
@@ -120,14 +119,6 @@ export function GrowthPortalHubClient() {
                 color: 'var(--color-jar-edu)',
                 chart: { kind: 'ring', pct: learnProgress },
                 href: '/product/growth/learn',
-            },
-            {
-                name: tc('net_worth.name'),
-                value: netWorth === null || netWorth === undefined ? '—' : formatMoney(netWorth),
-                note: tc('net_worth.note'),
-                color: 'var(--color-jar-ff)',
-                chart: { kind: 'bars', bars: [0, 0, 0, 0, 0, 0, 0] },
-                href: '/product/growth/net-worth',
             },
         ],
     };

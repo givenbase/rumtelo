@@ -1694,6 +1694,10 @@
                     "fixed_costs": {
                         "name": "Coûts fixes",
                         "note": "coûts fixes mensuels"
+                    },
+                    "net_worth": {
+                        "name": "Patrimoine net",
+                        "note": "déjà à toi"
                     }
                 }
             },

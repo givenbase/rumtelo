@@ -14,7 +14,9 @@ import { moneyPortalShell } from '@/app/_lib/portal-hubs';
 import { PortalHub, type PortalHubProps } from '@/components/features/home/portal-hub';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
+import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { CAPABILITIES } from '@/app/_lib/plan';
 import { useBankSyncOnVisit } from '@/app/_lib/use-bank-sync-on-visit';
 
 function formatDebtFree(on: string | null, locale: string): string {
@@ -37,6 +39,8 @@ export function MoneyPortalHubClient() {
     const { householdId } = useAuth();
     const { period } = useHouseholdShell();
     const { formatMoney } = useHouseholdCurrency();
+    const { hasCapability } = usePlanCapabilities();
+    const canNetWorth = hasCapability(CAPABILITIES.growthNetWorth);
     const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);
 
@@ -48,6 +52,14 @@ export function MoneyPortalHubClient() {
         }),
         null,
         live
+    );
+
+    const netWorthQuery = useLiveQuery(
+        apiQuery.growth.dashboard.get.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        null,
+        live && canNetWorth
     );
 
     const data = query.data;
@@ -170,6 +182,18 @@ export function MoneyPortalHubClient() {
                 color: 'var(--color-danger)',
                 chart: { kind: 'bars', bars: [0, 0, 0, 0, 0, 0, 0] },
                 href: '/product/money/debt',
+            },
+            {
+                name: tc('net_worth.name'),
+                value:
+                    netWorthQuery.data?.netWorth === null ||
+                    netWorthQuery.data?.netWorth === undefined
+                        ? '—'
+                        : formatMoney(netWorthQuery.data.netWorth),
+                note: tc('net_worth.note'),
+                color: 'var(--color-jar-ff)',
+                chart: { kind: 'bars', bars: [0, 0, 0, 0, 0, 0, 0] },
+                href: '/product/growth/net-worth',
             },
             {
                 name: tc('fixed_costs.name'),

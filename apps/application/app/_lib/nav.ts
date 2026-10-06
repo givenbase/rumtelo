@@ -63,6 +63,11 @@ const ALL_NAV_GROUPS = [
                 capabilityKey: CAPABILITIES.moneyDebt,
             },
             {
+                href: productPath('growth/net-worth'),
+                labelKey: 'pages.nav.children.net_worth',
+                capabilityKey: CAPABILITIES.growthNetWorth,
+            },
+            {
                 href: productPath('money/fixed-costs'),
                 labelKey: 'pages.nav.children.fixed_costs',
                 capabilityKey: CAPABILITIES.moneyFixedCosts,
@@ -94,11 +99,6 @@ const ALL_NAV_GROUPS = [
                 href: productPath('growth/learn'),
                 labelKey: 'pages.nav.children.learn',
                 capabilityKey: CAPABILITIES.growthLearn,
-            },
-            {
-                href: productPath('growth/net-worth'),
-                labelKey: 'pages.nav.children.net_worth',
-                capabilityKey: CAPABILITIES.growthNetWorth,
             },
         ],
     },

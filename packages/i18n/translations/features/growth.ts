@@ -2,8 +2,8 @@
 const growth = {
     hub: {
         eyebrow: 'Growth · long term',
-        title: 'Where your money stands.',
-        line: 'What you aim for, what you earn, what you learn, what you own.',
+        title: 'Where the next paycheck is going.',
+        line: 'What you aim for, what you earn, what you learn.',
         fallback_coach_kind: 'THE LEVER',
         fallback_coach_text:
             'Cutting costs has a floor; raising income does not. Income is the faster lever.',
@@ -235,9 +235,9 @@ const growth = {
     },
     net_worth: {
         page_eyebrow: '✦ MY NET WORTH',
-        page_title: 'Where your money stands — not how it moves.',
+        page_title: 'What you already own — and what it pays or costs.',
         page_lead:
-            "Everything you own minus everything you owe. Holdings plus Long-term savings and Financial Freedom — not this month's spending jars.",
+            'Holdings plus Long-term savings and Financial Freedom, minus open debts. Linked income and bills are money in motion, not a wish list.',
         add_asset: '+ Add asset',
         horizon_eyebrow: '✦ How far this takes you',
         stat_holdings: 'Holdings',

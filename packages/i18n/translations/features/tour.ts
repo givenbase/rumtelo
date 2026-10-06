@@ -167,11 +167,11 @@ const tour = {
             sections: {
                 what_for: {
                     heading: 'What this is for',
-                    body: 'A snapshot of the current period: jars, inbox, and how the month is tracking.',
+                    body: 'A snapshot of the current period: jars, inbox, what you already own, and how the month is tracking.',
                 },
                 how: {
                     heading: 'How it works',
-                    body: 'Drill into Jars, Transactions, Debt, or Fixed costs for detail. Period (top right) switches months.',
+                    body: 'Drill into Jars, Transactions, Debt, Fixed costs, or Net worth. Period (top right) switches months.',
                 },
             },
         },
@@ -193,7 +193,7 @@ const tour = {
             sections: {
                 what_for: {
                     heading: 'What this area is for',
-                    body: 'Goals, income, and (on higher plans) learning and net worth. Start with income and goals — they connect: raise net, fund jars, hit Save targets faster.',
+                    body: 'Goals, income, and (on higher plans) learning. Start with income and goals — they connect: raise net, fund jars, hit Save targets faster.',
                 },
             },
         },
