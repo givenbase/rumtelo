@@ -9,11 +9,12 @@ import { useTranslations } from '@rumtelo/i18n';
 
 import { sendVerificationEmail } from '@/lib/auth';
 import { appSignInAfterAuthUrl, appSignInUrl } from '@/lib/portal-urls';
+import { useOptionalHouseholdInvite } from '@/app/_components/household-invite-provider';
 import { useOptionalPlanIntent } from '@/app/_components/plan-intent-provider';
 import { useOptionalPracticeInvite } from '@/app/_components/practice-invite-provider';
 import { useOptionalSignUpDraft } from '@/app/_components/sign-up-draft-provider';
 import { useApiErrorMessage } from '@/app/_lib/api-error-messages';
-import { planIntentQuery, practiceInviteQuery } from '@rumtelo/utils';
+import { householdInviteQuery, planIntentQuery, practiceInviteQuery } from '@rumtelo/utils';
 
 const RESEND_COOLDOWN_SEC = 60;
 
@@ -28,15 +29,19 @@ export function VerifyPanel() {
     const searchParams = useSearchParams();
     const planIntent = useOptionalPlanIntent();
     const practiceInvite = useOptionalPracticeInvite();
+    const householdInvite = useOptionalHouseholdInvite();
     const signUpDraft = useOptionalSignUpDraft();
     const emailFromDraft = signUpDraft?.draft?.email?.trim() ?? '';
     const emailFromQuery = searchParams.get('email')?.trim() ?? '';
     const lockedEmail = emailFromDraft || emailFromQuery;
     const status = searchParams.get('status');
     const confirmed = status === 'confirmed' || status === 'ok';
+    const householdInviteId = householdInvite?.invitationId ?? null;
     const continueQuery = {
         ...planIntentQuery(planIntent?.intent ?? null),
         ...practiceInviteQuery(practiceInvite?.token ?? null),
+        ...householdInviteQuery(householdInviteId),
+        ...(householdInviteId ? { redirectTo: `/invite/${householdInviteId}` } : {}),
     };
     const [apiError, setApiError] = useState<string | null>(null);
     const [sent, setSent] = useState(false);

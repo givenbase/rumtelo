@@ -33,11 +33,13 @@ export const accountSettings = oc.output(AccountSettings);
  * or when they are practice-only staff (no personal household required).
  *
  * `home` is where the proxy sends them once ready (practice desk vs household board).
+ * `invitePath` — pending household invitee; proxy sends them to accept (never creator onboarding).
  */
 export const accountBoardReady = oc.output(
     z.object({
         ready: z.boolean(),
         home: z.enum(['/', '/practice']),
+        invitePath: z.string().nullable().optional(),
     })
 );
 

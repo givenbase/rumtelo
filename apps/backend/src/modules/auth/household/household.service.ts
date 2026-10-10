@@ -126,7 +126,7 @@ export class HouseholdService {
         await this.email.sendHouseholdInvite({
             to: email,
             householdName: org?.name ?? 'Rumtelo',
-            inviteUrl: this.email.inviteUrl(result.id),
+            inviteUrl: this.email.inviteUrl(result.id, email),
             inviterName: personDisplayName({
                 displayName: user.name,
                 firstName: account.firstName,
@@ -249,6 +249,16 @@ export class HouseholdService {
         const userId = currentUserId();
         // Fail fast on ghost sessions (Redis cookie after DB wipe) before BA org create.
         await this.accounts.ensureAccountForUser(userId);
+
+        // Writable seats already own a board — block a second creator onboard.
+        // VIEWER-only seats may still start their own household (soft upgrade).
+        const existingSeats = await this.em.find(AuthMember, { user: userId });
+        const hasWritableSeat = existingSeats.some(
+            seat => mapRole(seat.role) !== HouseholdRole.VIEWER
+        );
+        if (hasWritableSeat) {
+            throw apiBadRequest('already_household_member');
+        }
 
         const planKey = PlanKey.BASIC;
         const kind = canUseHouseholdKind(planKey, input.kind) ? input.kind : HouseholdKind.SOLO;

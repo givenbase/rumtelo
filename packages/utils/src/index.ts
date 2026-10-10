@@ -174,6 +174,21 @@ export {
     subscribePracticeInvite,
     writePracticeInvite,
 } from './practice-invite-intent';
+export {
+    HOUSEHOLD_INVITE_COOKIE,
+    HOUSEHOLD_INVITE_STORAGE_KEY,
+    HOUSEHOLD_INVITE_CHANGE_EVENT,
+    clearHouseholdInvite,
+    getHouseholdInviteServerSnapshot,
+    getHouseholdInviteSnapshot,
+    householdInviteFromSearchParams,
+    householdInvitePath,
+    householdInviteQuery,
+    parseHouseholdInviteId,
+    readHouseholdInviteFromDocument,
+    subscribeHouseholdInvite,
+    writeHouseholdInvite,
+} from './household-invite-intent';
 export { accountThemeFromCss, cssThemeFromAccount, type CssTheme } from './theme';
 export { formatIban, isValidIban, nlIbanBankCode, normalizeIban } from './iban';
 export { containsWord, findByName, findByNameOrAlias, namesMatch } from './text-match';

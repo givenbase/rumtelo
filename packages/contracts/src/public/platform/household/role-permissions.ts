@@ -124,16 +124,17 @@ export const ROLE_PERMISSIONS: Record<HouseholdRole, RolePermissionMatrix> = {
     },
 
     [HouseholdRole.VIEWER]: {
-        // Need current/settings reads to open the board; no member admin / billing.
+        // Look-along: home + money overview only. No growth/energy/soul/coach/members/billing.
+        // Settings READ so account prefs still open; household member admin stays closed.
         [HouseholdPermissionSection.HOUSEHOLD_SETTINGS]: READ_ONLY,
         [HouseholdPermissionSection.HOUSEHOLD_MEMBERS]: NONE,
         [HouseholdPermissionSection.HOUSEHOLD_BILLING]: NONE,
         [HouseholdPermissionSection.HOME]: READ_ONLY,
         [HouseholdPermissionSection.MONEY]: READ_ONLY,
-        [HouseholdPermissionSection.GROWTH]: READ_ONLY,
-        [HouseholdPermissionSection.ENERGY]: READ_ONLY,
-        [HouseholdPermissionSection.SOUL]: READ_ONLY,
-        [HouseholdPermissionSection.COACH]: READ_ONLY,
+        [HouseholdPermissionSection.GROWTH]: NONE,
+        [HouseholdPermissionSection.ENERGY]: NONE,
+        [HouseholdPermissionSection.SOUL]: NONE,
+        [HouseholdPermissionSection.COACH]: NONE,
     },
 };
 
@@ -233,7 +234,8 @@ export function permissionActionFromPath(
     pathname: string,
     httpMethod: string
 ): HouseholdPermissionAction {
-    const leaf = (pathname.split('?')[0]?.split('/').filter(Boolean).pop() ?? '').toLowerCase();
+    const segments = pathname.split('?')[0]?.split('/').filter(Boolean) ?? [];
+    const leaf = (segments.at(-1) ?? '').toLowerCase();
 
     if (
         /^(list|get|status|current|feed|session|summary|history|balances|members|settings|profile)$/.test(

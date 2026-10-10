@@ -11,6 +11,7 @@ import { AccountThemeProvider } from '@/components/features/shell/account-theme-
 import { HouseholdShellProvider } from '@/components/features/shell/household-shell-context';
 import { AuthProvider, useAuth } from '@/components/features/shell/auth-provider';
 import { PlanIntentProvider } from '@/components/features/shell/plan-intent-provider';
+import { HouseholdInviteProvider } from '@/components/features/shell/household-invite-provider';
 import { PracticeInviteProvider } from '@/components/features/shell/practice-invite-provider';
 import { ToastPill } from '@/components/layout/toast';
 
@@ -64,12 +65,14 @@ export function Providers({ children }: { children: ReactNode }) {
                         <Suspense fallback={<ProvidersFallback />}>
                             <PlanIntentProvider>
                                 <PracticeInviteProvider>
-                                    <HouseholdHeaderSync>
-                                        <AccountThemeProvider>
-                                            {children}
-                                            <ToastPill />
-                                        </AccountThemeProvider>
-                                    </HouseholdHeaderSync>
+                                    <HouseholdInviteProvider>
+                                        <HouseholdHeaderSync>
+                                            <AccountThemeProvider>
+                                                {children}
+                                                <ToastPill />
+                                            </AccountThemeProvider>
+                                        </HouseholdHeaderSync>
+                                    </HouseholdInviteProvider>
                                 </PracticeInviteProvider>
                             </PlanIntentProvider>
                         </Suspense>

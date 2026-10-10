@@ -70,6 +70,11 @@ const message = {
             plan_downgrade_max_only: 'Only Max can schedule a downgrade to Plus',
             demo_no_plan_change: 'Demo households cannot change plans',
             invitation_create_failed: 'Could not create invitation',
+            already_household_member:
+                'You already have a household you can edit. Switch to it instead of creating another.',
+            invitation_not_found: 'This invitation is missing, expired, or already used.',
+            invitation_accept_failed:
+                'Could not accept the invitation. Try again or ask for a new one.',
             jar_split_total: 'Jar split must total 100%, received {total}%',
             jar_placement_account_invalid: 'That bank account is not in this household.',
             book_catalog_unavailable: 'The book catalog did not answer.',

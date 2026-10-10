@@ -9,7 +9,7 @@
  */
 
 import { createAuthClient } from 'better-auth/react';
-import { organizationClient } from 'better-auth/client/plugins';
+import { emailOTPClient, organizationClient } from 'better-auth/client/plugins';
 
 import { env } from '@/app/_utils/get-env';
 
@@ -28,7 +28,7 @@ function getAuthBaseURL(): string {
 
 const client = createAuthClient({
     baseURL: getAuthBaseURL(),
-    plugins: [organizationClient()],
+    plugins: [organizationClient(), emailOTPClient()],
     sessionOptions: {
         refetchInterval: BETTER_AUTH_SESSION_REFETCH_INTERVAL_SEC,
         refetchOnWindowFocus: true,
@@ -40,6 +40,23 @@ export const signIn = client.signIn;
 export const signOut = client.signOut;
 export const useSession = client.useSession;
 export const sendVerificationEmail = client.sendVerificationEmail;
+
+/** Passwordless invite / look-along sign-in — email a 6-digit code. */
+export async function sendSignInOtp(email: string) {
+    return client.emailOtp.sendVerificationOtp({
+        email: email.trim(),
+        type: 'sign-in',
+    });
+}
+
+/** Verify OTP and create a session (creates the user when they are new). */
+export async function signInWithOtp(email: string, otp: string, name?: string) {
+    return client.signIn.emailOtp({
+        email: email.trim(),
+        otp: otp.trim(),
+        ...(name ? { name } : {}),
+    });
+}
 
 const SIGN_IN_HREF = '/sign-in';
 
@@ -98,7 +115,7 @@ export async function changePassword(data: {
 }
 
 /** BA organization plugin — SDK still says organization; Rumtelo calls it household. */
-export async function setActiveOrganization(organizationId: string) {
+export async function setActiveOrganization(organizationId: string | null) {
     await client.organization.setActive({ organizationId });
 }
 
@@ -108,6 +125,27 @@ export async function listOrganizations() {
 
 export async function updateOrganization(organizationId: string, data: { name?: string }) {
     await client.organization.update({ organizationId, data });
+}
+
+/** Accept a household invite (Better Auth organization invitation). */
+export async function acceptOrganizationInvitation(invitationId: string) {
+    return client.organization.acceptInvitation({ invitationId });
+}
+
+/** Load a pending invite (must match signed-in email). */
+export async function getOrganizationInvitation(invitationId: string) {
+    const result = await client.organization.getInvitation({
+        query: { id: invitationId },
+    });
+    if (result.error) throw result.error;
+    return result.data as {
+        id: string;
+        email: string;
+        role: string;
+        organizationId: string;
+        organizationName?: string;
+        status: string;
+    };
 }
 
 export type Session = {

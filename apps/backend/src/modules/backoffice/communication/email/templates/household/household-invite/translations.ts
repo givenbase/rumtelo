@@ -7,7 +7,7 @@ export const languageObject: EmailLanguageObject = {
         'email.household.invite.header.title': 'Household invite — Rumtelo',
         'email.household.invite.header.heading': 'You are invited',
         'email.household.invite.body.message':
-            '{who} invited you to the household {household} as {role}.',
+            '{who} invited you to the household {household} as {role}. Open the link and use a one-time email code — no password needed.',
         'email.household.invite.body.role_viewer': 'viewer',
         'email.household.invite.body.role_member': 'member',
         'email.household.invite.body.role_admin': 'admin',
@@ -22,7 +22,7 @@ export const languageObject: EmailLanguageObject = {
         'email.household.invite.header.title': 'Huishouden uitnodiging — Rumtelo',
         'email.household.invite.header.heading': 'Je bent uitgenodigd',
         'email.household.invite.body.message':
-            '{who} nodigt je uit voor het huishouden {household} als {role}.',
+            '{who} nodigt je uit voor het huishouden {household} als {role}. Open de link en gebruik een eenmalige code uit je mail — geen wachtwoord nodig.',
         'email.household.invite.body.role_viewer': 'kijker',
         'email.household.invite.body.role_member': 'lid',
         'email.household.invite.body.role_admin': 'beheerder',

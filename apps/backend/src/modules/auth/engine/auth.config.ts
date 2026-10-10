@@ -1,6 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { createAuthMiddleware } from 'better-auth/api';
-import { organization, twoFactor } from 'better-auth/plugins';
+import { emailOTP, organization, twoFactor } from 'better-auth/plugins';
 import { SignUpAccountProfile, toSignUpAccountProfile } from '@rumtelo/contracts';
 import { buildBetterAuthTrustedOrigins, resolveCrossSubdomainCookieDomain } from '@rumtelo/utils';
 import { Pool } from 'pg';
@@ -19,6 +19,8 @@ import { stashSignUpAccountProfile, takeSignUpAccountProfile } from './sign-up-p
 const EMAIL_VERIFICATION_EXPIRES_HOURS = 48;
 /** Better Auth password-reset tokens — default is 1 hour. */
 const PASSWORD_RESET_EXPIRES_HOURS = 1;
+/** Email OTP sign-in codes (invitees / passwordless). */
+const SIGN_IN_OTP_EXPIRES_MINUTES = 10;
 
 function authUserFirstName(user: { name?: string | null; email: string }): string {
     const fromName = user.name?.trim().split(/\s+/)[0];
@@ -171,6 +173,8 @@ export function createAuth(env: Env) {
             max: 100,
             customRules: {
                 '/sign-in/email': { window: 60, max: 5 },
+                '/sign-in/email-otp': { window: 60, max: 8 },
+                '/email-otp/send-verification-otp': { window: 300, max: 3 },
                 '/send-verification-email': { window: 300, max: 2 },
                 '/request-password-reset': { window: 300, max: 2 },
                 '/forget-password': { window: 300, max: 2 },
@@ -279,6 +283,25 @@ export function createAuth(env: Env) {
                     user: {
                         fields: { twoFactorEnabled: 'two_factor_enabled' },
                     },
+                },
+            }),
+            // Passwordless codes for invitees (VIEWER look-along) — creates user if needed.
+            emailOTP({
+                otpLength: 6,
+                expiresIn: SIGN_IN_OTP_EXPIRES_MINUTES * 60,
+                allowedAttempts: 5,
+                disableSignUp: false,
+                async sendVerificationOTP({ email, otp, type }) {
+                    if (type !== 'sign-in') return;
+                    const sent = await emailService.sendSignInOtpEmail({
+                        to: email,
+                        firstName: email.split('@')[0] || 'there',
+                        otp,
+                        expiresInMinutes: SIGN_IN_OTP_EXPIRES_MINUTES,
+                    });
+                    if (!sent) {
+                        console.error('[Better Auth] Failed to send sign-in OTP email');
+                    }
                 },
             }),
         ],

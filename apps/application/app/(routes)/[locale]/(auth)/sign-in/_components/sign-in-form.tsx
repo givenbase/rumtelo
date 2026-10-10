@@ -42,8 +42,13 @@ function safeRedirectPath(value: string | null): string {
     return '/';
 }
 
-function postSignInPath(email: string, redirectParam: string | null): string {
+function postSignInPath(
+    email: string,
+    redirectParam: string | null,
+    householdInviteId: string | null
+): string {
     if (redirectParam !== null) return safeRedirectPath(redirectParam);
+    if (householdInviteId) return safeRedirectPath(`/invite/${householdInviteId}`);
     const demo = DEMO_SIGN_IN_ACCOUNTS.find(
         account => account.email.toLowerCase() === email.trim().toLowerCase()
     );
@@ -62,6 +67,7 @@ export function SignInForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const redirectParam = searchParams.get('redirectTo');
+    const householdInviteId = searchParams.get('householdInvite')?.trim() || null;
     const emailFromInvite = searchParams.get('email')?.trim() ?? '';
     const [apiError, setApiError] = useState<unknown>(null);
     const [verification, setVerification] = useState<{
@@ -92,7 +98,7 @@ export function SignInForm() {
         setApiError(null);
         setVerification(null);
 
-        const destination = postSignInPath(values.email, redirectParam);
+        const destination = postSignInPath(values.email, redirectParam, householdInviteId);
 
         const result = await signIn.email({
             email: values.email,
@@ -364,7 +370,13 @@ export function SignInForm() {
 
             <Typography as="p" size="sm" color="muted" className="text-center">
                 {t('features.auth.sign_in.no_account')}{' '}
-                <a href={webSignUpUrl()} className="font-semibold text-accent hover:underline">
+                <a
+                    href={
+                        householdInviteId
+                            ? `${webSignUpUrl()}?householdInvite=${encodeURIComponent(householdInviteId)}&redirectTo=${encodeURIComponent(`/invite/${householdInviteId}`)}`
+                            : webSignUpUrl()
+                    }
+                    className="font-semibold text-accent hover:underline">
                     {t('features.auth.sign_in.create_account')}
                 </a>
             </Typography>

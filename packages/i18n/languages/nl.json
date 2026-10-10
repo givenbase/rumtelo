@@ -89,6 +89,9 @@
                     "plan_downgrade_max_only": "Alleen Max kan een downgrade naar Plus inplannen",
                     "demo_no_plan_change": "Demo-huishoudens kunnen niet van plan wisselen",
                     "invitation_create_failed": "Uitnodiging kon niet worden aangemaakt",
+                    "already_household_member": "Je hebt al een huishouden dat je kunt bewerken. Schakel daarnaar in plaats van een nieuw aan te maken.",
+                    "invitation_not_found": "Deze uitnodiging ontbreekt, is verlopen of al gebruikt.",
+                    "invitation_accept_failed": "Uitnodiging accepteren mislukt. Probeer opnieuw of vraag om een nieuwe.",
                     "jar_split_total": "De potverdeling moet samen 100% zijn; ontvangen: {total}%",
                     "jar_placement_account_invalid": "Die bankrekening hoort niet bij dit huishouden.",
                     "book_catalog_unavailable": "De boekencatalogus gaf geen antwoord.",
@@ -422,6 +425,24 @@
                 "login_failure": "Inloggen mislukt",
                 "logout_success": "Uitgelogd",
                 "logout_failure": "Uitloggen mislukt"
+            },
+            "invite": {
+                "title": "Word lid van dit huishouden",
+                "sign_in_body": "Gebruik het uitgenodigde e-mailadres — we sturen een eenmalige code. Geen wachtwoord. Je vult geen inkomen of potjes in.",
+                "create_account": "Account aanmaken",
+                "body": "Accepteer om dit huishouden te openen als lid. Je doorloopt geen persoonlijke geld-onboarding.",
+                "body_named": "Accepteer om lid te worden van {name}. Je stelt geen inkomen of potjes in — dat heeft het huishouden al.",
+                "no_onboarding": "Kijkers en leden slaan de vragenlijst van de aanmaker over.",
+                "accept": "Lid worden",
+                "go_home": "Terug naar Rumtelo",
+                "email_label": "Uitgenodigd e-mailadres",
+                "send_code": "Stuur me een code",
+                "code_sent": "Code verstuurd — check je inbox.",
+                "code_label": "Eenmalige code",
+                "verify_code": "Doorgaan",
+                "resend_code": "Nieuwe code sturen",
+                "password_instead": "Liever inloggen met wachtwoord",
+                "otp_hint": "Zes cijfers uit de e-mail die we net stuurden."
             }
         },
         "brand": {
@@ -5441,6 +5462,8 @@
                 "settings_sub": "Account, plan, taal",
                 "my_plan": "Mijn plan",
                 "my_plan_sub": "Wat je gebruikt en betaalt",
+                "start_own": "Start mijn huishouden",
+                "start_own_sub": "Je eigen potjes en bord — optioneel",
                 "sign_out": "Uitloggen",
                 "sign_out_sub": "Je blijft 30 dagen ingelogd",
                 "language": "Taal",
@@ -5449,6 +5472,11 @@
                 "appearance_sub": "Licht of donker",
                 "theme_light": "☀ Licht",
                 "theme_dark": "☾ Donker"
+            },
+            "viewer": {
+                "look_along": "Meekijken — alleen lezen",
+                "start_own_banner": "Wil je zelf een Rumtelo-bord? Start wanneer je wilt een huishouden.",
+                "start_own_cta": "Start mijn huishouden"
             },
             "period_options": {
                 "this_month": "Deze maand",

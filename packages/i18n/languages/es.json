@@ -89,6 +89,9 @@
                     "plan_downgrade_max_only": "Solo Max puede programar un cambio a la tarifa Plus",
                     "demo_no_plan_change": "Los hogares que participan en el programa de demostración no pueden cambiar de plan",
                     "invitation_create_failed": "No se ha podido crear la invitación",
+                    "already_household_member": "You already belong to a household. Open Rumtelo instead of creating another one.",
+                    "invitation_not_found": "This invitation is missing, expired, or already used.",
+                    "invitation_accept_failed": "Could not accept the invitation. Try again or ask for a new one.",
                     "jar_split_total": "El reparto del bote debe sumar el 100 %; recibido {total} %",
                     "jar_placement_account_invalid": "Esa cuenta bancaria no pertenece a este hogar.",
                     "book_catalog_unavailable": "El catálogo de libros no me dio respuesta.",
@@ -422,6 +425,24 @@
                 "login_failure": "No se ha podido iniciar sesión",
                 "logout_success": "Se ha desconectado",
                 "logout_failure": "No se ha podido cerrar sesión"
+            },
+            "invite": {
+                "title": "Join this household",
+                "sign_in_body": "Sign in (or create an account) with the invited email — then join. You will not set up income or jars; those belong to the household already.",
+                "create_account": "Create an account",
+                "body": "Accept to open this household as a member. You will not go through personal money onboarding.",
+                "body_named": "Accept to join {name}. You will not set up income or jars — the household already has those.",
+                "no_onboarding": "Viewers and members skip the creator questionnaire.",
+                "accept": "Join household",
+                "go_home": "Back to Rumtelo",
+                "email_label": "Invited email",
+                "send_code": "Email me a code",
+                "code_sent": "Code sent — check your inbox.",
+                "code_label": "One-time code",
+                "verify_code": "Continue",
+                "resend_code": "Send a new code",
+                "password_instead": "Sign in with password instead",
+                "otp_hint": "Six digits from the email we just sent."
             }
         },
         "brand": {
@@ -5441,6 +5462,8 @@
                 "settings_sub": "Cuenta, plan, idioma",
                 "my_plan": "Mi plan",
                 "my_plan_sub": "Lo que consumes y lo que pagas",
+                "start_own": "Start my household",
+                "start_own_sub": "Your own jars and board — optional",
                 "sign_out": "Cerrar sesión",
                 "sign_out_sub": "Permanecerás conectado durante 30 días",
                 "language": "Idioma",
@@ -5449,6 +5472,11 @@
                 "appearance_sub": "Claro u oscuro",
                 "theme_light": "☀ Luz",
                 "theme_dark": "☾ Oscuro"
+            },
+            "viewer": {
+                "look_along": "Looking along — read only",
+                "start_own_banner": "Want your own Rumtelo board? Start a household anytime.",
+                "start_own_cta": "Start my household"
             },
             "period_options": {
                 "this_month": "Este mes",

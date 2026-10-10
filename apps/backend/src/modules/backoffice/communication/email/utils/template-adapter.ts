@@ -5,6 +5,7 @@ import * as React from 'react';
 
 import AccountVerificationTemplate from '../templates/auth/account-verification';
 import PasswordResetTemplate from '../templates/auth/password-reset';
+import SignInOtpTemplate from '../templates/auth/sign-in-otp';
 import ContactFormTemplate from '../templates/forms/contact-form';
 import HouseholdInviteTemplate from '../templates/household/household-invite';
 import PracticeClientInviteTemplate from '../templates/practice/practice-client-invite';
@@ -15,6 +16,7 @@ const logger = new Logger('EmailTemplateAdapter');
 export enum EmailTemplate {
     ACCOUNT_VERIFICATION = 'account-verification',
     PASSWORD_RESET = 'password-reset',
+    SIGN_IN_OTP = 'sign-in-otp',
     HOUSEHOLD_INVITE = 'household-invite',
     PRACTICE_CLIENT_INVITE = 'practice-client-invite',
     CONTACT_FORM = 'contact-form',
@@ -43,6 +45,13 @@ export async function renderTemplate(
                 ...data,
                 locale,
             } as React.ComponentProps<typeof PasswordResetTemplate>);
+            break;
+
+        case EmailTemplate.SIGN_IN_OTP:
+            element = React.createElement(SignInOtpTemplate, {
+                ...data,
+                locale,
+            } as React.ComponentProps<typeof SignInOtpTemplate>);
             break;
 
         case EmailTemplate.HOUSEHOLD_INVITE:

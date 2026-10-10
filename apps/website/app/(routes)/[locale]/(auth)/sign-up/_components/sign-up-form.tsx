@@ -29,20 +29,27 @@ import { useLocale, useTranslations } from '@rumtelo/i18n';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { planIntentQuery, practiceInviteQuery, type PendingPlanIntent } from '@rumtelo/utils';
+import {
+    householdInviteQuery,
+    planIntentQuery,
+    practiceInviteQuery,
+    type PendingPlanIntent,
+} from '@rumtelo/utils';
 
 import { useAuthFormSchemas } from '@/app/_lib/auth-form-schemas';
 import { useApiErrorFallbacks, useApiErrorMessage } from '@/app/_lib/api-error-messages';
 import { signUp } from '@/lib/auth';
 import { planSlug } from '@/lib/landing-plans';
 import { appSignInUrl } from '@/lib/portal-urls';
+import { useOptionalHouseholdInvite } from '@/app/_components/household-invite-provider';
 import { useOptionalPlanIntent } from '@/app/_components/plan-intent-provider';
 import { useOptionalPracticeInvite } from '@/app/_components/practice-invite-provider';
 import { useOptionalSignUpDraft } from '@/app/_components/sign-up-draft-provider';
 
 function verifyCallbackUrl(
     intent: PendingPlanIntent | null,
-    practiceInviteToken: string | null
+    practiceInviteToken: string | null,
+    householdInviteId: string | null
 ): string {
     const params = new URLSearchParams({ status: 'confirmed' });
     const planQuery = planIntentQuery(intent);
@@ -50,6 +57,9 @@ function verifyCallbackUrl(
         params.set(key, value);
     }
     for (const [key, value] of Object.entries(practiceInviteQuery(practiceInviteToken))) {
+        params.set(key, value);
+    }
+    for (const [key, value] of Object.entries(householdInviteQuery(householdInviteId))) {
         params.set(key, value);
     }
     return `/verify?${params.toString()}`;
@@ -67,11 +77,13 @@ export function SignUpForm() {
     const searchParams = useSearchParams();
     const planIntent = useOptionalPlanIntent();
     const practiceInvite = useOptionalPracticeInvite();
+    const householdInvite = useOptionalHouseholdInvite();
     const signUpDraft = useOptionalSignUpDraft();
     const [apiError, setApiError] = useState<unknown>(null);
 
     const intent = planIntent?.intent ?? null;
     const practiceInviteToken = practiceInvite?.token ?? null;
+    const householdInviteId = householdInvite?.invitationId ?? null;
     const draft = signUpDraft?.draft ?? null;
     const emailFromInvite = searchParams.get('email')?.trim() ?? '';
 
@@ -121,7 +133,7 @@ export function SignUpForm() {
             name,
             email: values.email,
             password: values.password,
-            callbackURL: verifyCallbackUrl(intent, practiceInviteToken),
+            callbackURL: verifyCallbackUrl(intent, practiceInviteToken, householdInviteId),
             firstName: values.firstName,
             middleName: values.middleName || undefined,
             lastName: values.lastName,
