@@ -215,12 +215,11 @@ export function navGroupsForRole(role: HouseholdRole): ShellNavGroup[] {
         if (!section) return true;
         return roleCanSee(role, section);
     }).map(group => {
+        // VIEWER may open Why; Coach stays hidden.
         if (group.key !== 'home' || canSeeCoach) return group;
         return {
             ...group,
-            children: group.children.filter(
-                child => !child.href.includes('/coach') && !child.href.includes('/why')
-            ),
+            children: group.children.filter(child => !child.href.includes('/coach')),
         };
     });
 }

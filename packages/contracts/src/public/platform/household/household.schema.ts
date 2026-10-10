@@ -58,6 +58,11 @@ export const HouseholdMember = z.object({
     email: z.email(),
     /** Better Auth may store absolute URLs or leave null. */
     image: z.string().nullable(),
+    /**
+     * Latest Better Auth session activity (`session.updated_at` max).
+     * Null when the member has never had a session row.
+     */
+    lastSeenAt: z.iso.datetime().nullable(),
 });
 
 /** Shared money-board prefs (period, income picture, debt order). */

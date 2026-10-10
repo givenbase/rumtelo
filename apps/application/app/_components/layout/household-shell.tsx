@@ -19,10 +19,11 @@ import {
     resolveNavChildForPath,
     resolveNavGroupForPath,
 } from '@/app/_lib/nav';
+import { HouseholdPermissionSection, roleCanSee } from '@/app/_lib/role-permissions';
 import { planLabel } from '@/app/_lib/plan';
 import { forceClearPracticePreview } from '@/app/_lib/practice-preview';
 import { practicePath, productPath } from '@/app/_lib/routes';
-import { settingsHrefForPathname } from '@/app/_lib/settings-tabs';
+import { settingsHref, settingsHrefForPathname } from '@/app/_lib/settings-tabs';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useAccountTheme } from '@/components/features/shell/account-theme-sync';
@@ -167,6 +168,7 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
     const { canMutate, role } = useBoardWriteAccess();
     const portalGroups = navGroupsForRole(role);
     const isViewer = role === HouseholdRole.VIEWER && !capabilities.active;
+    const canSeeCoach = roleCanSee(role, HouseholdPermissionSection.COACH);
     const bottomTabs = portalGroups.map(group => ({
         href: group.href,
         labelKey: TOP_PILL_LABEL_KEYS[group.key] ?? group.labelKey,
@@ -250,8 +252,13 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
 
     const subnavChildren =
         activeGroup?.children.filter(child => {
-            if (capabilities.showCoachNav) return true;
-            return child.href !== productPath('coach') && child.href !== productPath('why');
+            const isCoach = child.href === productPath('coach');
+            const isWhy = child.href === productPath('why');
+            // Coach is never for VIEWER; Practice preview can also hide Coach nav.
+            if (isCoach && (!canSeeCoach || !capabilities.showCoachNav)) return false;
+            // Why stays for look-along; only Practice preview can hide it.
+            if (isWhy && !capabilities.showCoachNav && capabilities.active) return false;
+            return true;
         }) ?? [];
 
     return (
@@ -505,6 +512,10 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                                             }).map(item => {
                                                 const isPlan =
                                                     item.href === '/settings/general/plan';
+                                                const isSettings = item.href === '__settings__';
+                                                const settingsSubKey = isViewer
+                                                    ? 'pages.shell.menu.settings_sub_viewer'
+                                                    : item.subKey;
                                                 const inner = (
                                                     <>
                                                         <span className="grid min-w-0 flex-1 gap-0.5">
@@ -518,7 +529,11 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                                                                 {t(item.labelKey)}
                                                             </span>
                                                             <span className="text-xs leading-tight text-fg-faint">
-                                                                {t(item.subKey)}
+                                                                {t(
+                                                                    isSettings
+                                                                        ? settingsSubKey
+                                                                        : item.subKey
+                                                                )}
                                                             </span>
                                                         </span>
                                                         {isPlan ? (
@@ -532,7 +547,9 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                                                 if (item.href) {
                                                     const href =
                                                         item.href === '__settings__'
-                                                            ? settingsHrefForPathname(pathname)
+                                                            ? isViewer
+                                                                ? settingsHref('account')
+                                                                : settingsHrefForPathname(pathname)
                                                             : item.href;
                                                     return (
                                                         <Link
@@ -672,10 +689,16 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                                     <div data-tour="shell-period">
                                         <PeriodSelector />
                                     </div>
-                                    {capabilities.showPageHelp ? <PageHelpButton /> : null}
+                                    {canSeeCoach && capabilities.showPageHelp ? (
+                                        <PageHelpButton />
+                                    ) : null}
                                     {capabilities.showSettings ? (
                                         <Link
-                                            href={settingsHrefForPathname(pathname)}
+                                            href={
+                                                isViewer
+                                                    ? settingsHref('account')
+                                                    : settingsHrefForPathname(pathname)
+                                            }
                                             className="hidden items-center gap-1.5 rounded-full border border-line px-3.5 py-1.5 font-mono text-xs font-medium tracking-wide text-fg-faint uppercase transition-colors hover:border-accent-hover hover:text-accent sm:flex">
                                             <span aria-hidden>◇</span>
                                             {t('pages.shell.settings')}
@@ -708,7 +731,7 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                         </Link>
                     </div>
                 ) : null}
-                {capabilities.showWhyCaption ? (
+                {canSeeCoach && capabilities.showWhyCaption ? (
                     <WhyCaption pathname={pathname} locked={access.locked} />
                 ) : null}
                 <main className="min-w-0">

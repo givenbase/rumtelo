@@ -58,6 +58,8 @@ export {
     incomeSourceApplies,
     incomeAmountAsOf,
     fixedCostPeriodStatus,
+    countUnclearedRolledMonths,
+    fixedCostDueMultiplier,
     monthlyNetAsOf,
     incomeDelta,
     earnGoalProgress,
@@ -69,6 +71,7 @@ export {
     type EarnGoalProgress,
     type IncomeSourceForNet,
     type IncomePeriodLike,
+    type FixedCostArrearsSettlement,
 } from './money-plan';
 export {
     assetFlowSummary,

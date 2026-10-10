@@ -49,6 +49,10 @@ const message = {
                 'Finish open work before closing this month ({inbox} unsorted in inbox, {bills} bills unpaid or unskipped).',
             month_close_prior_open:
                 'Close {period} first — months must be finished in order so the log stays honest.',
+            month_close_bill_disposition:
+                'Choose carry forward or skip for every unpaid bill before closing ({name}).',
+            bill_arrears_threshold:
+                'Register as debt only after {count} carried months — keep carrying or pay first.',
             bill_link_outflow: 'Link an outflow to settle an outgoing bill.',
             bill_link_inflow: 'Link an inflow to settle a recurring credit.',
             asset_not_found: 'That holding is not in your net worth.',

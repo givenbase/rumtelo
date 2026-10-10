@@ -48,7 +48,7 @@ export class MonthScoreController {
     @Implement(contract.money.monthScore.close)
     close() {
         return implement(contract.money.monthScore.close).handler(({ input }) =>
-            this.monthScores.close(input.period)
+            this.monthScores.close(input.period, input.billDispositions ?? [])
         );
     }
 }

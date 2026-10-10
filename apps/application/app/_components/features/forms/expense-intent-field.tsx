@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState } from 'react';
 
-import type { CategoryTemplate, JarKey, MerchantPreset } from '@rumtelo/contracts';
+import type { CategoryTemplate, JarKey, MerchantPreset, Party } from '@rumtelo/contracts';
 import { MerchantHighlight } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import {
@@ -24,17 +24,24 @@ import { matchesChipQuery } from './chip-search';
 import { FormInput } from './form-input';
 import { SavePartyToggle } from './save-party-toggle';
 
+type HouseholdParty = Pick<
+    Party,
+    'id' | 'name' | 'aliases' | 'icon' | 'logoDomain' | 'website' | 'color'
+>;
+
 /** Form selection state for the expense intent picker (not an API DTO). */
 export type ExpenseIntentSelection = {
     /** Free-typed or picked vendor → counterparty */
     vendor: string;
     /** MerchantPreset key when picked from catalog — null for free text. */
     merchantKey: string | null;
+    /** Household Party id when picked from saved parties. */
+    partyId: string | null;
     categoryKey: string | null;
     categoryName: string | null;
     jarKey: JarKey | null;
     /** How the intent was chosen — drives follow-up UI */
-    source: 'merchant' | 'category' | 'custom' | null;
+    source: 'merchant' | 'category' | 'party' | 'custom' | null;
     /** Ask: save free-typed vendor for next time. Default ON when free-typing. */
     saveParty: boolean;
 };
@@ -46,6 +53,8 @@ type ExpenseIntentFieldProps = {
     onChange: (next: ExpenseIntentSelection) => void;
     merchants: readonly MerchantPreset[];
     categories: readonly CategoryTemplate[];
+    /** Household saved payees — shown in typeahead alongside catalog. */
+    parties?: readonly HouseholdParty[];
     categoryIconByKey: Map<string, string | null>;
     /** When set, only show types/vendors that belong to this jar. */
     jarKey?: JarKey | null;
@@ -68,6 +77,12 @@ function matchesCategory(category: CategoryTemplate, needle: string) {
     );
 }
 
+function matchesParty(party: HouseholdParty, needle: string) {
+    if (!needle) return true;
+    if (party.name.toLowerCase().includes(needle)) return true;
+    return party.aliases.some(alias => alias.toLowerCase().includes(needle));
+}
+
 /**
  * Unified payee / type picker with an explicit path:
  * Pick from list (search + optional vendor chips) vs Type a name (free text only).
@@ -77,6 +92,7 @@ export function ExpenseIntentField({
     onChange,
     merchants,
     categories,
+    parties = [],
     categoryIconByKey,
     jarKey = null,
     disabled,
@@ -151,6 +167,11 @@ export function ExpenseIntentField({
         [scopedCategories, needle]
     );
 
+    const partyHits = useMemo(
+        () => parties.filter(party => matchesParty(party, needle)).slice(0, 8),
+        [parties, needle]
+    );
+
     const vendorsForCategory = useMemo(() => {
         if (!value.categoryKey) return [];
         // Category already pins the spend type — use the full catalog for that
@@ -186,6 +207,7 @@ export function ExpenseIntentField({
         onChange({
             vendor: '',
             merchantKey: null,
+            partyId: null,
             categoryKey: null,
             categoryName: null,
             jarKey: null,
@@ -201,10 +223,28 @@ export function ExpenseIntentField({
         onChange({
             vendor: merchant.name,
             merchantKey: merchant.key,
+            partyId: null,
             categoryKey: merchant.categoryTemplateKey,
             categoryName: category?.name ?? merchant.categoryTemplateKey,
             jarKey: merchant.jarKey,
             source: 'merchant',
+            saveParty: false,
+        });
+        setQuery('');
+        setOpen(false);
+        setCustomVendor(false);
+        setSkippedVendor(false);
+    }
+
+    function selectParty(party: HouseholdParty) {
+        onChange({
+            vendor: party.name,
+            merchantKey: null,
+            partyId: party.id,
+            categoryKey: value.categoryKey,
+            categoryName: value.categoryName,
+            jarKey: value.jarKey ?? jarKey,
+            source: 'party',
             saveParty: false,
         });
         setQuery('');
@@ -220,6 +260,7 @@ export function ExpenseIntentField({
         onChange({
             vendor: '',
             merchantKey: null,
+            partyId: null,
             categoryKey: category.key,
             categoryName: category.name,
             jarKey: resolvedJar,
@@ -236,6 +277,7 @@ export function ExpenseIntentField({
         onChange({
             vendor: '',
             merchantKey: null,
+            partyId: null,
             categoryKey: null,
             categoryName: null,
             jarKey: null,
@@ -254,6 +296,7 @@ export function ExpenseIntentField({
         onChange({
             vendor: typed,
             merchantKey: null,
+            partyId: null,
             categoryKey: value.categoryKey,
             categoryName: value.categoryName,
             jarKey: value.jarKey,
@@ -278,15 +321,23 @@ export function ExpenseIntentField({
             ? merchants.find(merchant => merchant.name.toLowerCase() === value.vendor.toLowerCase())
             : null);
 
+    const selectedParty =
+        (value.partyId ? parties.find(party => party.id === value.partyId) : null) ??
+        (value.vendor && !value.merchantKey
+            ? (parties.find(party => party.name.toLowerCase() === value.vendor.toLowerCase()) ??
+              null)
+            : null);
+
     const selectedVendorMark = value.vendor
         ? partyMark(
               {
-                  key: selectedMerchant?.key,
+                  key: selectedMerchant?.key ?? selectedParty?.id,
                   name: value.vendor,
-                  logoDomain: selectedMerchant?.logoDomain ?? null,
+                  logoDomain: selectedMerchant?.logoDomain ?? selectedParty?.logoDomain ?? null,
+                  website: selectedMerchant?.website ?? selectedParty?.website ?? null,
               },
               intentChrome({
-                  icon: categoryIcon,
+                  icon: selectedParty?.icon ?? categoryIcon,
                   billName: value.categoryName,
               })
           )
@@ -398,9 +449,11 @@ export function ExpenseIntentField({
                         onKeyDown={event => {
                             if (event.key === 'Enter') {
                                 event.preventDefault();
+                                const firstParty = partyHits[0];
                                 const firstMerchant = merchantHits[0];
                                 const firstCategory = categoryHits[0];
-                                if (firstMerchant) selectMerchant(firstMerchant);
+                                if (firstParty) selectParty(firstParty);
+                                else if (firstMerchant) selectMerchant(firstMerchant);
                                 else if (firstCategory) selectCategory(firstCategory);
                                 else commitCustomVendor(query);
                             }
@@ -421,7 +474,9 @@ export function ExpenseIntentField({
                         open={open}
                         onClose={() => setOpen(false)}
                         id={listboxId}>
-                        {merchantHits.length === 0 && categoryHits.length === 0 ? (
+                        {partyHits.length === 0 &&
+                        merchantHits.length === 0 &&
+                        categoryHits.length === 0 ? (
                             <div className="grid gap-1 px-3 py-2">
                                 <p className={suggestionMutedClass}>
                                     {jarKey && scopedCategories.length === 0 && !needle
@@ -441,6 +496,48 @@ export function ExpenseIntentField({
                             </div>
                         ) : (
                             <>
+                                {partyHits.length > 0 ? (
+                                    <div>
+                                        <div className={suggestionGroupClass}>{t('saved')}</div>
+                                        <ul>
+                                            {partyHits.map(party => {
+                                                const mark = partyMark(
+                                                    {
+                                                        key: party.id,
+                                                        name: party.name,
+                                                        logoDomain: party.logoDomain,
+                                                        website: party.website,
+                                                    },
+                                                    intentChrome({
+                                                        icon: party.icon ?? categoryIcon,
+                                                        billName: value.categoryName,
+                                                    })
+                                                );
+                                                return (
+                                                    <li key={`p-${party.id}`}>
+                                                        <button
+                                                            type="button"
+                                                            role="option"
+                                                            aria-selected={false}
+                                                            className={suggestionOptionClass}
+                                                            onClick={() => selectParty(party)}>
+                                                            <VendorMark
+                                                                name={mark.name}
+                                                                src={mark.src}
+                                                                fallbackIcon={mark.fallbackIcon}
+                                                                tone={mark.tone}
+                                                                size={20}
+                                                            />
+                                                            <span className="min-w-0 flex-1">
+                                                                {party.name}
+                                                            </span>
+                                                        </button>
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
+                                    </div>
+                                ) : null}
                                 {merchantHits.length > 0 ? (
                                     <div>
                                         <div className={suggestionGroupClass}>{t('vendors')}</div>
@@ -743,7 +840,7 @@ export function ExpenseIntentField({
                 </Typography>
             ) : null}
 
-            {value.vendor.trim() && !value.merchantKey ? (
+            {value.vendor.trim() && !value.merchantKey && !value.partyId ? (
                 <SavePartyToggle
                     name={value.vendor}
                     checked={value.saveParty}

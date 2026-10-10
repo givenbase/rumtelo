@@ -70,6 +70,23 @@ export class FixedCostController {
         );
     }
 
+    /** Register carried months as a debt; clears the rolled chain. */
+    @Implement(contract.money.fixedCosts.convertArrearsToDebt)
+    convertArrearsToDebt() {
+        return implement(contract.money.fixedCosts.convertArrearsToDebt).handler(({ input }) =>
+            this.fixedCosts.convertArrearsToDebt({
+                fixedCostId: input.fixedCostId,
+                period: input.period,
+                collectionNoticeSent: input.collectionNoticeSent,
+                collectionFees: input.collectionFees,
+                scheduleKind: input.scheduleKind,
+                paymentCadence: input.paymentCadence,
+                termPayments: input.termPayments,
+                maturityOn: input.maturityOn,
+            })
+        );
+    }
+
     // ====================================================================
     // ? READ Operations
     // ====================================================================

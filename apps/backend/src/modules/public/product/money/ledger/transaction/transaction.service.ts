@@ -447,18 +447,30 @@ export class TransactionService {
         id: string,
         patch: Partial<
             Pick<Transaction, 'description' | 'amount' | 'note' | 'status' | 'counterparty'>
-        > & {
-            categoryId?: string | null;
-            inflowKey?: string | null;
-            debtId?: string | null;
-            fixedCostId?: string | null;
-            assetId?: string | null;
-        }
+        > &
+            CounterpartyPatch & {
+                categoryId?: string | null;
+                inflowKey?: string | null;
+                debtId?: string | null;
+                fixedCostId?: string | null;
+                assetId?: string | null;
+            }
     ) {
         const entity = await this.transactions.findOneOrFail({ id });
         await this.em.populate(entity, ['debt', 'fixedCost']);
         await assertBookedOnPeriodOpen(this.em, entity.bookedOn);
-        const { categoryId, inflowKey, debtId, fixedCostId, assetId, ...fields } = patch;
+        const {
+            categoryId,
+            inflowKey,
+            debtId,
+            fixedCostId,
+            assetId,
+            counterparty,
+            merchantKey,
+            partyId,
+            saveParty,
+            ...fields
+        } = patch;
 
         if (debtId && fixedCostId) {
             throw new BadRequestException(
@@ -467,6 +479,20 @@ export class TransactionService {
         }
 
         Object.assign(entity, fields);
+        if (
+            counterparty !== undefined ||
+            merchantKey !== undefined ||
+            partyId !== undefined ||
+            saveParty
+        ) {
+            const other = await this.parties.resolveCounterparty(
+                { counterparty, merchantKey, partyId, saveParty },
+                entity
+            );
+            entity.counterparty = other.counterparty;
+            entity.merchantKey = other.merchantKey;
+            entity.party = other.party;
+        }
         const asset = await resolveAssetLink(this.em, this.planAccess, assetId);
         if (asset !== undefined) entity.asset = asset;
         if (categoryId !== undefined) {

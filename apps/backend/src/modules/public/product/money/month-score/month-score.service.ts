@@ -1,13 +1,20 @@
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { MonthScoreUnlockKey } from '@rumtelo/contracts';
+import {
+    FixedCostSettlementSource,
+    FixedCostSettlementStatus,
+    type MonthCloseBillDisposition,
+    type MonthScoreUnlockKey,
+} from '@rumtelo/contracts';
 
 import { apiBadRequest } from '../../../../../common/errors/api-user-error';
 import { HouseholdScopedRepository } from '../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../common/household/household.context';
 import { sum } from '../../../../../common/utils/money.util';
 import { daysUntilPeriodEnd } from '../../../../../common/utils/period.util';
+import { FixedCost } from '../plan/fixed-cost/fixed-cost.entity';
+import { FixedCostSettlement } from '../plan/fixed-cost/fixed-cost-settlement.entity';
 import { JarService } from '../plan/jar/jar.service';
 import { closeBlockersReady, collectCloseBlockers } from './close-blockers.util';
 import { MonthScore } from './month-score.entity';
@@ -31,6 +38,7 @@ export const LEVELS: {
 export class MonthScoreService {
     private readonly scores: HouseholdScopedRepository<MonthScore>;
     private readonly events: HouseholdScopedRepository<MonthScoreEvent>;
+    private readonly settlements: HouseholdScopedRepository<FixedCostSettlement>;
 
     constructor(
         @Inject(EntityManager) private readonly em: EntityManager,
@@ -38,6 +46,7 @@ export class MonthScoreService {
     ) {
         this.scores = new HouseholdScopedRepository(em, MonthScore);
         this.events = new HouseholdScopedRepository(em, MonthScoreEvent);
+        this.settlements = new HouseholdScopedRepository(em, FixedCostSettlement);
     }
 
     // ====================================================================
@@ -94,7 +103,7 @@ export class MonthScoreService {
     // ====================================================================
 
     /** Idempotent: closing an already-closed month score returns the existing recap. */
-    async close(period: string) {
+    async close(period: string, billDispositions: MonthCloseBillDisposition[] = []) {
         let monthScore = await this.scores.findOne({ period });
         if (monthScore?.isClosed) {
             return this.buildRecap(period, monthScore);
@@ -105,7 +114,19 @@ export class MonthScoreService {
             throw apiBadRequest('month_close_prior_open', { period: priorOpenPeriod });
         }
 
-        const blockers = await collectCloseBlockers(this.em, period);
+        let blockers = await collectCloseBlockers(this.em, period);
+        if (blockers.inboxCount > 0) {
+            throw apiBadRequest('month_close_incomplete', {
+                inbox: blockers.inboxCount,
+                bills: blockers.dueBillCount,
+            });
+        }
+
+        if (blockers.dueBillCount > 0) {
+            await this.applyBillDispositions(period, blockers.dueBills, billDispositions);
+            blockers = await collectCloseBlockers(this.em, period);
+        }
+
         if (!closeBlockersReady(blockers)) {
             throw apiBadRequest('month_close_incomplete', {
                 inbox: blockers.inboxCount,
@@ -134,6 +155,83 @@ export class MonthScoreService {
     }
 
     // Private
+
+    private async applyBillDispositions(
+        period: string,
+        dueBills: { fixedCostId: string; name: string; amount: number; arrearsMonths: number }[],
+        dispositions: MonthCloseBillDisposition[]
+    ) {
+        const byId = new Map(dispositions.map(row => [row.fixedCostId, row.action]));
+        for (const bill of dueBills) {
+            if (!byId.has(bill.fixedCostId)) {
+                throw apiBadRequest('month_close_bill_disposition', { name: bill.name });
+            }
+        }
+        for (const disposition of dispositions) {
+            if (!dueBills.some(bill => bill.fixedCostId === disposition.fixedCostId)) {
+                throw apiBadRequest('month_close_bill_disposition', {
+                    name: disposition.fixedCostId,
+                });
+            }
+        }
+
+        for (const bill of dueBills) {
+            const action = byId.get(bill.fixedCostId)!;
+            if (action === 'skip') {
+                await this.upsertSettlement(bill.fixedCostId, period, {
+                    status: FixedCostSettlementStatus.SKIPPED,
+                    source: FixedCostSettlementSource.SKIP,
+                });
+                continue;
+            }
+
+            await this.upsertSettlement(bill.fixedCostId, period, {
+                status: FixedCostSettlementStatus.ROLLED,
+                source: FixedCostSettlementSource.ROLL,
+            });
+        }
+
+        await this.em.flush();
+    }
+
+    private async upsertSettlement(
+        fixedCostId: string,
+        period: string,
+        values: {
+            status: FixedCostSettlementStatus;
+            source: FixedCostSettlementSource;
+        }
+    ) {
+        let settlement = await this.settlements.findOne({ fixedCost: fixedCostId, period });
+        if (settlement) {
+            await this.em.populate(settlement, ['transaction']);
+            if (settlement.transaction) {
+                settlement.transaction.fixedCost = null;
+                settlement.transaction = null;
+            }
+            settlement.status = values.status;
+            settlement.source = values.source;
+            settlement.paidAt = null;
+            settlement.amount = null;
+            settlement.clearedByPeriod = null;
+            return settlement;
+        }
+
+        settlement = this.em.create(FixedCostSettlement, {
+            household: currentHouseholdId(),
+            fixedCost: this.em.getReference(FixedCost, fixedCostId),
+            period,
+            status: values.status,
+            source: values.source,
+            paidAt: null,
+            amount: null,
+            transaction: null,
+            note: null,
+            clearedByPeriod: null,
+        } as never);
+        this.em.persist(settlement);
+        return settlement;
+    }
 
     private async buildRecap(period: string, monthScore?: MonthScore | null) {
         const jarRows = await this.jars.balances(period);

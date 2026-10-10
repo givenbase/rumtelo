@@ -39,6 +39,7 @@ import { HouseholdBillingService } from './household-billing/household-billing.s
 import { HouseholdSettingsService } from './household-settings/household-settings.service';
 import { AuthHousehold } from './managed/household/auth-household.entity';
 import { AuthInvitation } from './managed/invitation/auth-invitation.entity';
+import { AuthSession } from '../user/managed/session/auth-session.entity';
 import { AuthMember } from './managed/member/auth-member.entity';
 
 /**
@@ -166,10 +167,13 @@ export class HouseholdService {
             { household: householdId },
             { populate: ['user'] }
         );
+        const userIds = memberships.map(member => member.user.id);
+        const lastSeenByUserId = await this.lastSeenByUserIds(userIds);
         return Promise.all(
             memberships.map(async member => {
                 // Application person is Account; display fields come from Account→User.
                 const { account, user } = await this.accounts.ensureAccountForUser(member.user.id);
+                const lastSeen = lastSeenByUserId.get(user.id);
                 return {
                     id: member.id,
                     householdId,
@@ -179,9 +183,26 @@ export class HouseholdService {
                     displayName: user.name,
                     email: user.email,
                     image: user.image ?? null,
+                    lastSeenAt: lastSeen?.toISOString() ?? null,
                 };
             })
         );
+    }
+
+    /** Max `session.updated_at` per user — proxy for last signed-in activity. */
+    private async lastSeenByUserIds(userIds: string[]): Promise<Map<string, Date>> {
+        const map = new Map<string, Date>();
+        if (userIds.length === 0) return map;
+        const sessions = await this.em.find(
+            AuthSession,
+            { user: { $in: userIds } },
+            { fields: ['user', 'updatedAt'], orderBy: { updatedAt: 'DESC' } }
+        );
+        for (const session of sessions) {
+            const userId = typeof session.user === 'string' ? session.user : session.user.id;
+            if (!map.has(userId)) map.set(userId, session.updatedAt);
+        }
+        return map;
     }
 
     async current(householdId: string) {

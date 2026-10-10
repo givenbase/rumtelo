@@ -8,7 +8,9 @@ import { z } from 'zod';
 
 import { HouseholdId, HouseholdScoped, Id } from '../../../../common/common.schema';
 import { FlowDirection } from '../../../../common/common.enums';
+import { Debt } from '../debt/debt.schema';
 import {
+    ConvertFixedCostArrearsToDebt,
     FixedCost,
     FixedCostSettlement,
     FixedCostsByJar,
@@ -35,6 +37,9 @@ export const fixedCostCreate = oc
 export const fixedCostMarkPaid = oc.input(MarkFixedCostPaid).output(FixedCostSettlement);
 
 export const fixedCostSkip = oc.input(SkipFixedCostPeriod).output(FixedCostSettlement);
+
+/** Register carried months as a debt (user-confirmed; clears the rolled chain). */
+export const fixedCostConvertArrearsToDebt = oc.input(ConvertFixedCostArrearsToDebt).output(Debt);
 
 // ====================================================================
 // ? READ Operations
@@ -88,6 +93,7 @@ export const fixedCostContract = {
     create: fixedCostCreate,
     markPaid: fixedCostMarkPaid,
     skip: fixedCostSkip,
+    convertArrearsToDebt: fixedCostConvertArrearsToDebt,
     update: fixedCostUpdate,
     remove: fixedCostRemove,
     unlinkSettlement: fixedCostUnlinkSettlement,

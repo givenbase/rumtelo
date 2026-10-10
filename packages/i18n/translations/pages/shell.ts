@@ -17,6 +17,7 @@ const shell = {
     menu: {
         settings: 'Settings',
         settings_sub: 'Account, plan, language',
+        settings_sub_viewer: 'Account and security',
         my_plan: 'My plan',
         my_plan_sub: 'What you use and pay',
         start_own: 'Start my household',

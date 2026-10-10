@@ -72,7 +72,8 @@ import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
 import { FormDatePicker } from './form-date-picker';
 import { FormInput } from './form-input';
 import { HoldingField } from './holding-field';
-import { SavePartyToggle } from './save-party-toggle';
+import { PartyField } from './party-field';
+import { partiesToNameOptions } from './party-name-options';
 import {
     MERCHANT_OPTION_PREFIX,
     OTHER_OPTION_KEY,
@@ -269,6 +270,13 @@ export function FixedCostForm({
         [],
         live
     );
+    const partiesQuery = useLiveQuery(
+        apiQuery.money.parties.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [],
+        live
+    );
     const givingOrgsQuery = useLiveQuery(
         apiQuery.money.catalogs.givingOrganizations.list.queryOptions({
             input: { householdId: householdId! },
@@ -302,11 +310,23 @@ export function FixedCostForm({
     }, [categoriesQuery.data]);
 
     const merchants = useMemo(() => merchantsQuery.data ?? [], [merchantsQuery.data]);
+    const parties = useMemo(() => partiesQuery.data ?? [], [partiesQuery.data]);
     const fixedCostPresets = useMemo(() => presetsQuery.data ?? [], [presetsQuery.data]);
     const merchantByKey = useMemo(
         () => new Map(merchants.map(merchant => [merchant.key, merchant])),
         [merchants]
     );
+    const payeeOptions = useMemo((): NamePresetOption[] => {
+        const saved = partiesToNameOptions(parties, {
+            badge: tFixed('option_badge_saved'),
+            group: tFixed('option_group_saved'),
+        });
+        const catalog = merchantsToNameOptions(merchants, {
+            excludeGivingLinked: true,
+            badge: tFixed('option_badge_vendor'),
+        });
+        return [...saved, ...catalog];
+    }, [parties, merchants, tFixed]);
     const presetByKey = useMemo(
         () => new Map(fixedCostPresets.map(preset => [preset.key, preset])),
         [fixedCostPresets]
@@ -377,6 +397,8 @@ export function FixedCostForm({
         defaultValues: {
             name: defaultValues?.name ?? '',
             counterparty: defaultValues?.counterparty ?? '',
+            merchantKey: defaultValues?.merchantKey ?? '',
+            partyId: defaultValues?.partyId ?? '',
             saveParty: defaultValues?.saveParty ?? true,
             amount: defaultValues?.amount ?? '',
             cadence: defaultValues?.cadence ?? Cadence.MONTHLY,
@@ -395,6 +417,8 @@ export function FixedCostForm({
     const selectedAssetId = useWatch({ control: form.control, name: 'assetId' }) ?? null;
     const selectedCategoryId = useWatch({ control: form.control, name: 'categoryId' });
     const counterparty = useWatch({ control: form.control, name: 'counterparty' });
+    const watchedMerchantKey = useWatch({ control: form.control, name: 'merchantKey' }) ?? '';
+    const watchedPartyId = useWatch({ control: form.control, name: 'partyId' }) ?? '';
     const savePartyWatch = useWatch({ control: form.control, name: 'saveParty' }) ?? true;
     const cadence = useWatch({ control: form.control, name: 'cadence' });
     const dueMonthValue = useWatch({ control: form.control, name: 'dueMonth' });
@@ -514,10 +538,6 @@ export function FixedCostForm({
     }
 
     const showPayeeInput = customPayee || vendorsForCategory.length === 0;
-    const freeTypedPayee =
-        Boolean(counterparty?.trim()) &&
-        !merchants.some(merchant => namesMatch(counterparty ?? '', merchant.name)) &&
-        nameLock?.kind !== 'vendor';
 
     useEffect(() => {
         // Wait for jars — otherwise a prefilled Give jarId gets overwritten while the list is empty.
@@ -638,6 +658,8 @@ export function FixedCostForm({
                 values.cadence
             );
             const counterpartyValue = values.counterparty?.trim() || null;
+            const formPartyId = values.partyId?.trim() || null;
+            const formMerchantKey = values.merchantKey?.trim() || null;
             const matchedPayeeMerchant =
                 (counterpartyValue
                     ? vendorsForCategory.find(merchant =>
@@ -649,11 +671,16 @@ export function FixedCostForm({
                     : null) ??
                 null;
             const merchantKey =
-                nameLock?.kind === 'vendor'
+                formMerchantKey ||
+                (nameLock?.kind === 'vendor'
                     ? nameLock.merchantKey
-                    : (matchedPayeeMerchant?.key ?? null);
+                    : (matchedPayeeMerchant?.key ?? null));
+            const partyId = merchantKey || !counterpartyValue ? null : formPartyId;
             const saveParty =
-                Boolean(counterpartyValue) && !merchantKey && (values.saveParty ?? true);
+                Boolean(counterpartyValue) &&
+                !merchantKey &&
+                !partyId &&
+                (values.saveParty ?? true);
             const jarBalanceForName = (balancesQuery.data ?? []).find(
                 jar => jar.id === values.jarId
             );
@@ -711,7 +738,7 @@ export function FixedCostForm({
                     presetKey: presetKeyToSave,
                     counterparty: counterpartyValue,
                     merchantKey,
-                    partyId: null,
+                    partyId,
                     saveParty,
                     amount: cents,
                     cadence: values.cadence,
@@ -736,7 +763,7 @@ export function FixedCostForm({
                 presetKey: presetKeyToSave,
                 counterparty: counterpartyValue,
                 merchantKey,
-                partyId: null,
+                partyId,
                 saveParty,
                 amount: cents,
                 cadence: values.cadence,
@@ -865,12 +892,20 @@ export function FixedCostForm({
     }
 
     /** Single place that writes Paid-to; empty string clears it. */
-    function setPayee(name: string, opts: { dirty: boolean }) {
+    function setPayee(
+        name: string,
+        opts: { dirty: boolean; merchantKey?: string | null; partyId?: string | null }
+    ) {
         setCustomPayee(false);
         form.setValue('counterparty', name, {
             shouldDirty: opts.dirty,
             shouldValidate: opts.dirty,
         });
+        form.setValue('merchantKey', opts.merchantKey ?? '', { shouldDirty: opts.dirty });
+        form.setValue('partyId', opts.partyId ?? '', { shouldDirty: opts.dirty });
+        if (opts.merchantKey || opts.partyId) {
+            form.setValue('saveParty', false, { shouldDirty: opts.dirty });
+        }
     }
 
     /** Bill type picked (or resolved from a vendor): lock, jar/category, schedule defaults. */
@@ -903,7 +938,7 @@ export function FixedCostForm({
             form.setValue('name', merchant.name, { shouldDirty: true });
             syncGiveMode(merchant.jarKey);
         }
-        setPayee(merchant.name, { dirty: true });
+        setPayee(merchant.name, { dirty: true, merchantKey: merchant.key });
         return resolution.kind === 'preset'
             ? nameOptionByKey.get(resolution.preset.key)
             : undefined;
@@ -1223,9 +1258,30 @@ export function FixedCostForm({
 
                                 {isKnowWho(givePayeeMode) ? (
                                     <FormControl>
-                                        <FormInput
+                                        <PartyField
+                                            label={tFixed('to_whom')}
                                             placeholder={tFixed('give_placeholder')}
-                                            {...field}
+                                            options={payeeOptions}
+                                            disabled={busy}
+                                            value={{
+                                                counterparty: field.value ?? '',
+                                                merchantKey: watchedMerchantKey,
+                                                partyId: watchedPartyId,
+                                                saveParty: savePartyWatch,
+                                            }}
+                                            onChange={next => {
+                                                field.onChange(next.counterparty);
+                                                form.setValue('merchantKey', next.merchantKey, {
+                                                    shouldDirty: true,
+                                                });
+                                                form.setValue('partyId', next.partyId, {
+                                                    shouldDirty: true,
+                                                });
+                                                form.setValue('saveParty', next.saveParty, {
+                                                    shouldDirty: true,
+                                                });
+                                                setGiveOrgKey(null);
+                                            }}
                                         />
                                     </FormControl>
                                 ) : (
@@ -1281,6 +1337,8 @@ export function FixedCostForm({
                                                 shouldValidate: Boolean(typed?.trim()),
                                                 shouldDirty: true,
                                             });
+                                            form.setValue('merchantKey', '', { shouldDirty: true });
+                                            form.setValue('partyId', '', { shouldDirty: true });
                                             setVendorQuery('');
                                         }}
                                         renderChip={merchant => {
@@ -1312,7 +1370,10 @@ export function FixedCostForm({
                                                             applyVendorPick(merchant);
                                                             return;
                                                         }
-                                                        setPayee(merchant.name, { dirty: true });
+                                                        setPayee(merchant.name, {
+                                                            dirty: true,
+                                                            merchantKey: merchant.key,
+                                                        });
                                                     }}>
                                                     <VendorMark
                                                         name={mark.name}
@@ -1329,13 +1390,33 @@ export function FixedCostForm({
                                 ) : null}
                                 {showPayeeInput ? (
                                     <FormControl>
-                                        <FormInput
+                                        <PartyField
+                                            label={tFixed('paid_to')}
                                             placeholder={
                                                 vendorsForCategory.length > 0
                                                     ? tFixed('payee_name')
                                                     : tFixed('payee_placeholder')
                                             }
-                                            {...field}
+                                            options={payeeOptions}
+                                            disabled={busy}
+                                            value={{
+                                                counterparty: field.value ?? '',
+                                                merchantKey: watchedMerchantKey,
+                                                partyId: watchedPartyId,
+                                                saveParty: savePartyWatch,
+                                            }}
+                                            onChange={next => {
+                                                field.onChange(next.counterparty);
+                                                form.setValue('merchantKey', next.merchantKey, {
+                                                    shouldDirty: true,
+                                                });
+                                                form.setValue('partyId', next.partyId, {
+                                                    shouldDirty: true,
+                                                });
+                                                form.setValue('saveParty', next.saveParty, {
+                                                    shouldDirty: true,
+                                                });
+                                            }}
                                         />
                                     </FormControl>
                                 ) : (
@@ -1343,18 +1424,6 @@ export function FixedCostForm({
                                         <input type="hidden" {...field} />
                                     </FormControl>
                                 )}
-                                {showPayeeInput && freeTypedPayee ? (
-                                    <SavePartyToggle
-                                        name={counterparty ?? ''}
-                                        checked={savePartyWatch}
-                                        disabled={busy}
-                                        onCheckedChange={next =>
-                                            form.setValue('saveParty', next, {
-                                                shouldDirty: true,
-                                            })
-                                        }
-                                    />
-                                ) : null}
                             </>
                         )}
                         <FormMessage />

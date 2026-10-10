@@ -8,6 +8,7 @@ import PasswordResetTemplate from '../templates/auth/password-reset';
 import SignInOtpTemplate from '../templates/auth/sign-in-otp';
 import ContactFormTemplate from '../templates/forms/contact-form';
 import HouseholdInviteTemplate from '../templates/household/household-invite';
+import HouseholdInviteAcceptedTemplate from '../templates/household/household-invite-accepted';
 import PracticeClientInviteTemplate from '../templates/practice/practice-client-invite';
 
 const logger = new Logger('EmailTemplateAdapter');
@@ -18,6 +19,7 @@ export enum EmailTemplate {
     PASSWORD_RESET = 'password-reset',
     SIGN_IN_OTP = 'sign-in-otp',
     HOUSEHOLD_INVITE = 'household-invite',
+    HOUSEHOLD_INVITE_ACCEPTED = 'household-invite-accepted',
     PRACTICE_CLIENT_INVITE = 'practice-client-invite',
     CONTACT_FORM = 'contact-form',
 }
@@ -59,6 +61,13 @@ export async function renderTemplate(
                 ...data,
                 locale,
             } as React.ComponentProps<typeof HouseholdInviteTemplate>);
+            break;
+
+        case EmailTemplate.HOUSEHOLD_INVITE_ACCEPTED:
+            element = React.createElement(HouseholdInviteAcceptedTemplate, {
+                ...data,
+                locale,
+            } as React.ComponentProps<typeof HouseholdInviteAcceptedTemplate>);
             break;
 
         case EmailTemplate.PRACTICE_CLIENT_INVITE:

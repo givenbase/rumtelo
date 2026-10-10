@@ -188,6 +188,8 @@ const settings = {
             eyebrow: 'Household',
             blurb_suffix: 'Members share jars, rules, and transaction history.',
             members_stub: 'Members appear here once you have a household.',
+            last_seen: 'Last seen {when}',
+            last_seen_never: 'Not signed in yet',
             seat_limit:
                 'Seat limit reached ({limit}). Add a seat (€2.50) or upgrade your plan for more room.',
             invite_email: 'Invite (email)',

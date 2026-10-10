@@ -12,6 +12,7 @@ import { Button, Card, EmptyState, Slider, Typography } from '@rumtelo/ui';
 import { cn, toPeriodKey } from '@rumtelo/utils';
 
 import {
+    HouseholdRole,
     JarKey,
     RuleField,
     RuleMatcher,
@@ -123,11 +124,13 @@ export function TransactionsPageClient() {
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { showToast, period } = useHouseholdShell();
-    const { showCreateFlows, canMutate } = useBoardWriteAccess();
+    const { showCreateFlows, canMutate, role } = useBoardWriteAccess();
+    const lookAlongOnly = role === HouseholdRole.VIEWER;
     const apiError = useApiError();
     const { formatMoney } = useHouseholdCurrency();
     const appLocale = useLocale();
-    const [tab, setTab] = useState<Tab>('INBOX');
+    const [tab, setTab] = useState<Tab>(lookAlongOnly ? 'OUT' : 'INBOX');
+    const activeTab: Tab = lookAlongOnly && (tab === 'INBOX' || tab === 'RULES') ? 'OUT' : tab;
     const [ledgerLayout, setLedgerLayout] = useState<'list' | 'jar'>('list');
     const [openJarIds, setOpenJarIds] = useState<Set<string>>(() => new Set());
     const [search, setSearch] = useState('');
@@ -417,15 +420,15 @@ export function TransactionsPageClient() {
             ) : null}
 
             <ListToolbar
-                createLabel={tab === 'IN' ? t('add_in') : t('add_out')}
+                createLabel={activeTab === 'IN' ? t('add_in') : t('add_out')}
                 createHref={createTxHref({
-                    direction: tab === 'IN' ? 'in' : 'out',
+                    direction: activeTab === 'IN' ? 'in' : 'out',
                     assetId: assetFilter ?? undefined,
                 })}
                 secondary={
                     live &&
                     canMutate &&
-                    (tab === 'INBOX' || tab === 'RULES') &&
+                    (activeTab === 'INBOX' || activeTab === 'RULES') &&
                     managedRules.length > 0 ? (
                         <Button
                             variant="secondary"
@@ -436,22 +439,26 @@ export function TransactionsPageClient() {
                         </Button>
                     ) : null
                 }>
-                {(
-                    [
-                        ['INBOX', t('tab_inbox')],
-                        ['OUT', t('tab_out')],
-                        ['IN', t('tab_in')],
-                        ['RULES', t('tab_rules')],
-                    ] as const
+                {(lookAlongOnly
+                    ? ([
+                          ['OUT', t('tab_out')],
+                          ['IN', t('tab_in')],
+                      ] as const)
+                    : ([
+                          ['INBOX', t('tab_inbox')],
+                          ['OUT', t('tab_out')],
+                          ['IN', t('tab_in')],
+                          ['RULES', t('tab_rules')],
+                      ] as const)
                 ).map(([id, label]) => (
                     <button
                         key={id}
                         type="button"
-                        aria-pressed={tab === id}
+                        aria-pressed={activeTab === id}
                         onClick={() => setTab(id)}
                         className={cn(
                             'flex items-center gap-2 rounded-full border px-4 py-2 font-mono text-xs font-medium tracking-wide uppercase transition-all duration-200',
-                            tab === id
+                            activeTab === id
                                 ? 'border-accent bg-accent-soft text-accent'
                                 : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
                         )}>
@@ -470,7 +477,7 @@ export function TransactionsPageClient() {
                 ))}
             </ListToolbar>
 
-            {tab === 'INBOX' ? (
+            {activeTab === 'INBOX' ? (
                 <div className="mb-3 grid gap-2.5">
                     {showCreateFlows ? (
                         <p className="text-sm text-fg-muted">
@@ -493,7 +500,7 @@ export function TransactionsPageClient() {
                 </div>
             ) : null}
 
-            {tab === 'INBOX' &&
+            {activeTab === 'INBOX' &&
                 (inbox.length === 0 ? (
                     <EmptyState
                         icon="check"
@@ -557,12 +564,12 @@ export function TransactionsPageClient() {
                     </div>
                 ))}
 
-            {tab === 'OUT' || tab === 'IN' ? (
+            {activeTab === 'OUT' || activeTab === 'IN' ? (
                 <div className="grid gap-3">
                     <ListControls
                         title={
                             <Typography as="p" size="sm" color="muted" className="leading-snug">
-                                {tab === 'OUT' ? t('out_lead') : t('in_lead')}
+                                {activeTab === 'OUT' ? t('out_lead') : t('in_lead')}
                             </Typography>
                         }
                         search={{
@@ -664,7 +671,7 @@ export function TransactionsPageClient() {
                     </ListControls>
                     <Card className="overflow-hidden p-0">
                         {(() => {
-                            const items = tab === 'OUT' ? outItems : inItems;
+                            const items = activeTab === 'OUT' ? outItems : inItems;
                             if (items.length === 0) {
                                 const filtering =
                                     deferredSearch.length > 0 ||
@@ -677,14 +684,14 @@ export function TransactionsPageClient() {
                                         title={
                                             filtering
                                                 ? t('empty_search_title')
-                                                : tab === 'OUT'
+                                                : activeTab === 'OUT'
                                                   ? t('empty_out_title')
                                                   : t('empty_in_title')
                                         }
                                         body={
                                             filtering
                                                 ? t('empty_search_body')
-                                                : tab === 'OUT'
+                                                : activeTab === 'OUT'
                                                   ? t('empty_out_body')
                                                   : t('empty_in_body')
                                         }
@@ -850,7 +857,7 @@ export function TransactionsPageClient() {
                 </div>
             ) : null}
 
-            {tab === 'RULES' &&
+            {activeTab === 'RULES' &&
                 (!live ? (
                     <EmptyState
                         icon="diamond"

@@ -27,6 +27,16 @@ export type HouseholdInviteEmailInput = {
     locale?: string;
 };
 
+export type HouseholdInviteAcceptedEmailInput = {
+    to: string;
+    householdName: string;
+    membersUrl: string;
+    memberName: string;
+    memberEmail: string;
+    role?: string;
+    locale?: string;
+};
+
 export type PracticeClientInviteEmailInput = {
     to: string;
     practiceName: string;

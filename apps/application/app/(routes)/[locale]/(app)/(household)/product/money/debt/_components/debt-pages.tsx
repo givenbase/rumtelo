@@ -26,7 +26,7 @@ export function DebtUpdatePage({ id, embedded = false }: { id: string; embedded?
             // fallback to name for pre-fix rows (where name == lender).
             name: row.counterparty ?? row.name,
             presetKey: row.presetKey ?? null,
-            partyId: row.partyId ?? null,
+            partyId: row.partyId ?? '',
             balance: minorUnitsToAmountInput(row.balance),
             interestRate: String(row.interestRate),
             minimumPayment: minorUnitsToAmountInput(row.minimumPayment),

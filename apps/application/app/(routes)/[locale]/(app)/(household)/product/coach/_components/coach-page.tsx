@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 
+import type { MonthCloseBillDisposition } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, EmptyState, Eyebrow, Typography } from '@rumtelo/ui';
@@ -85,7 +86,7 @@ export function CoachPageClient() {
             isClosed: false,
             level: 1,
             events: [],
-            closeBlockers: { inboxCount: 0, dueBillCount: 0, dueBillNames: [] },
+            closeBlockers: { inboxCount: 0, dueBillCount: 0, dueBillNames: [], dueBills: [] },
             priorOpenPeriod: null,
         },
         live
@@ -104,15 +105,23 @@ export function CoachPageClient() {
     });
 
     const closeMonth = useMutation({
-        mutationFn: async () => {
+        mutationFn: async (billDispositions?: MonthCloseBillDisposition[]) => {
             if (!householdId) throw new Error('No household');
-            return api.money.monthScore.close({ householdId, period: periodKey });
+            return api.money.monthScore.close({
+                householdId,
+                period: periodKey,
+                billDispositions,
+            });
         },
         onSuccess: recap => {
             void queryClient.invalidateQueries({
                 queryKey: apiQuery.money.monthScore.current.key(),
             });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
+            void queryClient.invalidateQueries({
+                queryKey: apiQuery.money.fixedCosts.listSettlements.key(),
+            });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.list.key() });
             const recapLine = monthScoreRecapHeadline(
                 tDashboard,
                 recap.headlineKey,
@@ -209,7 +218,8 @@ export function CoachPageClient() {
                     priorOpenPeriod={monthScore.priorOpenPeriod}
                     canCloseMonth={canCloseMonth}
                     closeMonthPending={closeMonth.isPending}
-                    onCloseMonth={() => closeMonth.mutate()}
+                    formatMoney={formatMoney}
+                    onCloseMonth={dispositions => closeMonth.mutate(dispositions)}
                 />
             ) : null}
 

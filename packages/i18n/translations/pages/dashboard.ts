@@ -16,13 +16,13 @@ const dashboard = {
             'This month is closed — the score stays as it was, and nothing can be added or changed for this period.',
         /** Why close matters — shown while the period is still open. */
         close_explain:
-            'Closing locks this score and freezes the month. Clear the inbox and bills first so the log stays honest.',
+            'Closing locks this score and freezes the month. Clear the inbox first; unpaid bills can be carried or skipped when you close.',
         close_explain_soon:
-            'The month ends soon — clear the inbox and bills so you can close successfully.',
+            'The month ends soon — clear the inbox, then carry or skip unpaid bills so you can close.',
         close_explain_today:
-            'Today is the last day. Finish open work and close so next month starts clean.',
+            'Today is the last day. Finish the inbox, then carry or skip unpaid bills and close.',
         close_explain_overdue:
-            'This month is overdue to close. Finish open work and close it — we recommend closing every month successfully.',
+            'This month is overdue to close. Finish the inbox, then carry or skip unpaid bills and close it.',
         /** Compact period-travel note (lives here instead of a Coach slide). */
         travel_past_one: '{stamp} · about {money} through jars over {horizon} month',
         travel_past_other: '{stamp} · about {money} through jars over {horizon} months',
@@ -33,12 +33,24 @@ const dashboard = {
     close_month: 'Close month',
     /** Second click on ConfirmActionButton / coach close CTA. */
     close_month_confirm: 'Are you sure? Close this month',
+    /** Second click when unpaid bills need skip/carry choices. */
+    close_month_review_bills: 'Review unpaid bills',
+    close_bills_title: 'Unpaid bills this month',
+    close_bills_body:
+        'Choose for each bill: carry it into next month (you’ll owe more then), or skip it for this period.',
+    close_bills_roll: 'Carry forward',
+    close_bills_skip: 'Skip',
+    close_bills_roll_hint: 'Next month you’ll owe {due} ({count}× this bill).',
+    close_bills_roll_debt_hint:
+        'After this carry ({count} months open), register it as a debt on Fixed costs — with collection fees and a payment plan if needed.',
+    close_bills_skip_hint: 'This month won’t count — next month starts fresh at 1×.',
+    close_bills_confirm: 'Close month',
     /** Shown above Close when inbox / bills still open. */
     close_blocked_title: 'Finish these before closing this month',
     close_blocked_inbox_one: '1 unsorted transaction in the inbox',
     close_blocked_inbox_other: '{count} unsorted transactions in the inbox',
-    close_blocked_bills_one: '1 bill still unpaid or unskipped{names}',
-    close_blocked_bills_other: '{count} bills still unpaid or unskipped{names}',
+    close_blocked_bills_one: '1 unpaid bill — choose carry or skip when you close{names}',
+    close_blocked_bills_other: '{count} unpaid bills — choose carry or skip when you close{names}',
     close_blocked_bill_names: ' ({list})',
     close_blocked_open_bills: 'Open bills ▸',
     /** Soft sequential-close: finish an earlier month before locking this one. */

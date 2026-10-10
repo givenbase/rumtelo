@@ -22,6 +22,8 @@ export const API_ERROR_MESSAGES = [
     'period_closed',
     'month_close_incomplete',
     'month_close_prior_open',
+    'month_close_bill_disposition',
+    'bill_arrears_threshold',
     'bill_link_outflow',
     'bill_link_inflow',
     'asset_not_found',

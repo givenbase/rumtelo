@@ -111,7 +111,8 @@ export function suggestFixedCostForTx(
             .filter(
                 row =>
                     row.status === FixedCostSettlementStatus.PAID ||
-                    row.status === FixedCostSettlementStatus.SKIPPED
+                    row.status === FixedCostSettlementStatus.SKIPPED ||
+                    row.status === FixedCostSettlementStatus.ROLLED
             )
             .map(row => row.fixedCostId)
     );

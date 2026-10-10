@@ -35,12 +35,18 @@ export class FixedCostSettlement extends HouseholdEntity {
     @Property({ type: MoneyType, nullable: true })
     amount: number | null = null;
 
-    /** Instant marked paid; null when skipped. */
+    /**
+     * Later period (`YYYY-MM`) whose payment cleared this rolled month.
+     * Null while still carrying forward.
+     */
+    @Property({ length: 7, nullable: true })
+    clearedByPeriod: string | null = null;
+
+    /** Instant marked paid; null when skipped or rolled. */
     @Property({ type: 'timestamptz', nullable: true })
     paidAt: Date | null = null;
-
     // ? ENUMS
-    /** Paid vs intentionally skipped for the period. */
+    /** Paid, skipped, or carried forward for the period. */
     @Enum(
         NativeEnum({
             FixedCostSettlementStatus,

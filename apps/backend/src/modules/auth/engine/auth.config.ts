@@ -12,6 +12,7 @@ import { EmailService } from '../../backoffice/communication/email';
 
 import { householdAccessControl, householdRoles } from './access-control.config';
 import { rewriteBetterAuthUrlToOrigin } from './auth-url.util';
+import { notifyHouseholdInviteAccepted } from './invite-accepted-notify.util';
 import { insertAccountForSignUp } from './sign-up-account.util';
 import { stashSignUpAccountProfile, takeSignUpAccountProfile } from './sign-up-profile.store';
 
@@ -239,6 +240,23 @@ export function createAuth(env: Env) {
                 organizationLimit: 5,
                 creatorRole: 'owner',
                 membershipLimit: 20,
+                organizationHooks: {
+                    afterAcceptInvitation: async ({ invitation, user, organization }) => {
+                        void notifyHouseholdInviteAccepted(pool, emailService, {
+                            householdId: organization.id,
+                            householdName: organization.name ?? 'Rumtelo',
+                            accepterUserId: user.id,
+                            accepterName: user.name?.trim() || user.email,
+                            accepterEmail: user.email,
+                            role: invitation.role ?? 'member',
+                        }).catch(error => {
+                            console.error(
+                                '[Better Auth] Failed to notify owners of invite accept',
+                                error
+                            );
+                        });
+                    },
+                },
                 schema: {
                     organization: {
                         // DB table `auth.household` — SDK still uses organization.*

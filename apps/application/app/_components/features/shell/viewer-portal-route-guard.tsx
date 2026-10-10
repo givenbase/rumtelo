@@ -12,9 +12,9 @@ function sectionFromPath(pathname: string): HouseholdPermissionSection {
     if (path.includes('/product/growth')) return HouseholdPermissionSection.GROWTH;
     if (path.includes('/product/energy')) return HouseholdPermissionSection.ENERGY;
     if (path.includes('/product/soul')) return HouseholdPermissionSection.SOUL;
-    if (path.includes('/product/coach') || path.includes('/product/why')) {
-        return HouseholdPermissionSection.COACH;
-    }
+    // Coach product only — Why stays under HOME (VIEWER may open it).
+    if (path.includes('/product/coach')) return HouseholdPermissionSection.COACH;
+    if (path.includes('/product/why')) return HouseholdPermissionSection.HOME;
     if (path.includes('/product/money')) return HouseholdPermissionSection.MONEY;
     if (path.includes('/settings')) return HouseholdPermissionSection.HOUSEHOLD_SETTINGS;
     return HouseholdPermissionSection.HOME;
@@ -22,6 +22,7 @@ function sectionFromPath(pathname: string): HouseholdPermissionSection {
 
 /**
  * VIEWER look-along — bounce off portals they cannot read (growth/energy/soul/coach).
+ * Why (`/product/why`) stays allowed.
  */
 export function ViewerPortalRouteGuard({ children }: { children: ReactNode }) {
     const router = useRouter();
