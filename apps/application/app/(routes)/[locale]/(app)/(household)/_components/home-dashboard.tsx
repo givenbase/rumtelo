@@ -10,6 +10,7 @@ import {
     CoachKind,
     HouseholdRole,
     PracticeClientLinkStatus,
+    type MonthCloseBillDisposition,
     type MonthScore,
 } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
@@ -37,6 +38,7 @@ import { PortalWidget } from '@/components/features/home/portal-widget';
 import { MonthScoreLog } from '@/components/features/home/month-score-log';
 import { JarDrilldownTable } from '@/components/features/money/jar-drilldown-table';
 import type { JarDrilldownItem } from '@/components/features/money/jar-drilldown-parts';
+import { HouseholdPermissionSection, roleCanSee } from '@/app/_lib/role-permissions';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -50,7 +52,11 @@ export function HomeDashboardClient() {
     const queryClient = useQueryClient();
     const { householdId, session } = useAuth();
     const { period, showToast } = useHouseholdShell();
-    const { canMutate } = useBoardWriteAccess();
+    const { canMutate, role } = useBoardWriteAccess();
+    const canSeeCoach = roleCanSee(role, HouseholdPermissionSection.COACH);
+    const canSeeGrowth = roleCanSee(role, HouseholdPermissionSection.GROWTH);
+    const canSeeEnergy = roleCanSee(role, HouseholdPermissionSection.ENERGY);
+    const canSeeSoul = roleCanSee(role, HouseholdPermissionSection.SOUL);
     const apiError = useApiError();
     const { formatMoney } = useHouseholdCurrency();
 
@@ -137,7 +143,7 @@ export function HomeDashboardClient() {
         isClosed: false,
         level: 1,
         events: [],
-        closeBlockers: { inboxCount: 0, dueBillCount: 0, dueBillNames: [] },
+        closeBlockers: { inboxCount: 0, dueBillCount: 0, dueBillNames: [], dueBills: [] },
         priorOpenPeriod: null,
     };
 
@@ -202,12 +208,20 @@ export function HomeDashboardClient() {
     ).length;
 
     const closeMonthScoreMutation = useMutation({
-        mutationFn: async () => {
+        mutationFn: async (billDispositions?: MonthCloseBillDisposition[]) => {
             if (!householdId) throw new Error('No household');
-            return api.money.monthScore.close({ householdId, period: periodKey });
+            return api.money.monthScore.close({
+                householdId,
+                period: periodKey,
+                billDispositions,
+            });
         },
         onSuccess: recap => {
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
+            void queryClient.invalidateQueries({
+                queryKey: apiQuery.money.fixedCosts.listSettlements.key(),
+            });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.list.key() });
             const recapLine = monthScoreRecapHeadline(
                 tDashboard,
                 recap.headlineKey,
@@ -386,7 +400,7 @@ export function HomeDashboardClient() {
                 ) : null}
             </div>
 
-            <CoachVerdict messages={coach} recap={fallbackRecap} />
+            {canSeeCoach ? <CoachVerdict messages={coach} recap={fallbackRecap} /> : null}
 
             <MonthScoreLog
                 score={monthScore.score}
@@ -404,7 +418,8 @@ export function HomeDashboardClient() {
                     !liveData.monthScore.isClosed
                 }
                 closeMonthPending={closeMonthScoreMutation.isPending}
-                onCloseMonth={() => closeMonthScoreMutation.mutate()}
+                formatMoney={formatMoney}
+                onCloseMonth={dispositions => closeMonthScoreMutation.mutate(dispositions)}
             />
 
             <HeroKluis
@@ -447,68 +462,73 @@ export function HomeDashboardClient() {
                 />
             </HeroKluis>
 
-            <div
-                className={cn(
-                    'grid grid-cols-1 gap-4',
-                    isProductEnabled('energy') || isProductEnabled('soul')
-                        ? 'lg:grid-cols-3'
-                        : 'lg:grid-cols-1'
-                )}>
-                <PortalWidget
-                    tint="var(--color-jar-lts)"
-                    icon="trending-up"
-                    title={t('pages.nav.pills.growth')}
-                    href="/product/growth"
-                    stats={[
-                        {
-                            label: stacked
-                                ? t('pages.dashboard.widgets.growth.income_span')
-                                : t('pages.dashboard.widgets.growth.income_month'),
-                            value: formatMoney(dashboard.incomeTotal ?? 0),
-                        },
-                        {
-                            label: t('pages.dashboard.widgets.growth.inbox'),
-                            value: String(dashboard.inboxCount ?? 0),
-                        },
-                    ]}
-                    tagline={t('pages.dashboard.widgets.growth.tagline')}
-                />
-                {isProductEnabled('energy') && (
-                    <PortalWidget
-                        tint="var(--color-jar-play)"
-                        icon={'✳\uFE0E'}
-                        title={t('pages.nav.pills.energy')}
-                        href="/product/energy"
-                        stats={[
-                            {
-                                label: t('pages.dashboard.widgets.energy.trained'),
-                                value: '—',
-                            },
-                            { label: t('pages.dashboard.widgets.energy.sleep'), value: '—' },
-                        ]}
-                        tagline={t('pages.dashboard.widgets.energy.tagline')}
-                    />
-                )}
-                {isProductEnabled('soul') && (
-                    <PortalWidget
-                        tint="var(--color-portal-soul)"
-                        icon="sparkles"
-                        title={t('pages.nav.pills.soul')}
-                        href="/product/soul"
-                        stats={[
-                            {
-                                label: t('pages.dashboard.widgets.soul.stillness'),
-                                value: '—',
-                            },
-                            {
-                                label: t('pages.dashboard.widgets.soul.why'),
-                                value: dashboard.why ? '✓' : '—',
-                            },
-                        ]}
-                        tagline={t('pages.dashboard.widgets.soul.tagline')}
-                    />
-                )}
-            </div>
+            {canSeeGrowth || canSeeEnergy || canSeeSoul ? (
+                <div
+                    className={cn(
+                        'grid grid-cols-1 gap-4',
+                        (canSeeEnergy && isProductEnabled('energy')) ||
+                            (canSeeSoul && isProductEnabled('soul'))
+                            ? 'lg:grid-cols-3'
+                            : 'lg:grid-cols-1'
+                    )}>
+                    {canSeeGrowth ? (
+                        <PortalWidget
+                            tint="var(--color-jar-lts)"
+                            icon="trending-up"
+                            title={t('pages.nav.pills.growth')}
+                            href="/product/growth"
+                            stats={[
+                                {
+                                    label: stacked
+                                        ? t('pages.dashboard.widgets.growth.income_span')
+                                        : t('pages.dashboard.widgets.growth.income_month'),
+                                    value: formatMoney(dashboard.incomeTotal ?? 0),
+                                },
+                                {
+                                    label: t('pages.dashboard.widgets.growth.inbox'),
+                                    value: String(dashboard.inboxCount ?? 0),
+                                },
+                            ]}
+                            tagline={t('pages.dashboard.widgets.growth.tagline')}
+                        />
+                    ) : null}
+                    {canSeeEnergy && isProductEnabled('energy') ? (
+                        <PortalWidget
+                            tint="var(--color-jar-play)"
+                            icon={'✳\uFE0E'}
+                            title={t('pages.nav.pills.energy')}
+                            href="/product/energy"
+                            stats={[
+                                {
+                                    label: t('pages.dashboard.widgets.energy.trained'),
+                                    value: '—',
+                                },
+                                { label: t('pages.dashboard.widgets.energy.sleep'), value: '—' },
+                            ]}
+                            tagline={t('pages.dashboard.widgets.energy.tagline')}
+                        />
+                    ) : null}
+                    {canSeeSoul && isProductEnabled('soul') ? (
+                        <PortalWidget
+                            tint="var(--color-portal-soul)"
+                            icon="sparkles"
+                            title={t('pages.nav.pills.soul')}
+                            href="/product/soul"
+                            stats={[
+                                {
+                                    label: t('pages.dashboard.widgets.soul.stillness'),
+                                    value: '—',
+                                },
+                                {
+                                    label: t('pages.dashboard.widgets.soul.why'),
+                                    value: dashboard.why ? '✓' : '—',
+                                },
+                            ]}
+                            tagline={t('pages.dashboard.widgets.soul.tagline')}
+                        />
+                    ) : null}
+                </div>
+            ) : null}
         </div>
     );
 }

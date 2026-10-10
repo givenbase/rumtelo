@@ -7,6 +7,7 @@ import { oc } from '@orpc/contract';
 import { z } from 'zod';
 
 import { HouseholdId, HouseholdScoped, Id, paginated } from '../../../../common/common.schema';
+import { SaveParty } from '../party/party.schema';
 import {
     Account,
     CreateTransaction,
@@ -54,7 +55,13 @@ export const accountList = oc.input(HouseholdScoped).output(z.array(Account));
 // ====================================================================
 
 export const transactionUpdate = oc
-    .input(Transaction.partial().extend({ id: Id, householdId: HouseholdId }))
+    .input(
+        Transaction.partial().extend({
+            ...SaveParty.shape,
+            id: Id,
+            householdId: HouseholdId,
+        })
+    )
     .output(Transaction);
 
 export const accountUpdate = oc

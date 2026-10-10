@@ -104,6 +104,10 @@ export function createFixedCostFormSchema(msg: FormT) {
         .object({
             name: z.string().min(1, msg('validation.name_required')).max(120),
             counterparty: z.string().max(160).optional(),
+            /** MerchantPreset.key when Paid-to was a catalog pick. */
+            merchantKey: z.string().max(64).optional(),
+            /** Household Party id when Paid-to was a saved party. */
+            partyId: z.string().uuid().optional().or(z.literal('')),
             /** Free-typed payee: offer “save for next time” (default on). */
             saveParty: z.boolean().optional(),
             amount: positiveMoneyInput(msg),
@@ -144,6 +148,8 @@ export function createDebtFormSchema(msg: FormT) {
     return z
         .object({
             name: z.string().min(1, msg('validation.who_owe_required')).max(120),
+            /** Household Party id when lender was a saved party. */
+            partyId: z.string().uuid().optional().or(z.literal('')),
             /** Free-typed lender: offer “save for next time” (default on). */
             saveParty: z.boolean().optional(),
             balance: nonNegativeMoneyInput(msg),

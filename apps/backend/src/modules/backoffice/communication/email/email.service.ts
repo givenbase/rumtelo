@@ -5,6 +5,7 @@ import type {
     ContactFormEmailInput,
     EmailProvider,
     EmailVerificationEmailInput,
+    HouseholdInviteAcceptedEmailInput,
     HouseholdInviteEmailInput,
     PasswordResetEmailInput,
     PracticeClientInviteEmailInput,
@@ -150,6 +151,26 @@ export class EmailService {
         );
     }
 
+    /** Owners/admins — someone accepted a household invite. */
+    async sendHouseholdInviteAccepted(input: HouseholdInviteAcceptedEmailInput): Promise<boolean> {
+        const locale = input.locale ?? 'en';
+        return this.sendTemplatedEmail(
+            input.to,
+            locale === 'nl'
+                ? 'Uitnodiging geaccepteerd — Rumtelo'
+                : 'Invitation accepted — Rumtelo',
+            EmailTemplate.HOUSEHOLD_INVITE_ACCEPTED,
+            {
+                householdName: input.householdName,
+                membersUrl: input.membersUrl,
+                memberName: input.memberName,
+                memberEmail: input.memberEmail,
+                role: input.role,
+            },
+            locale
+        );
+    }
+
     /** Practice client invite — new signup, continue onboarding, or accept in settings. */
     async sendPracticeClientInvite(input: PracticeClientInviteEmailInput): Promise<boolean> {
         const locale = input.locale ?? 'en';
@@ -270,6 +291,11 @@ export class EmailService {
         const url = new URL(`/invite/${invitationId}`, `${this.appOrigin}/`);
         if (email?.trim()) url.searchParams.set('email', email.trim());
         return url.toString();
+    }
+
+    /** Household members settings — for owner/admin notify emails. */
+    householdMembersSettingsUrl(): string {
+        return new URL('/settings/general/household', `${this.appOrigin}/`).toString();
     }
 
     /** Marketing site origin used in email chrome links. */

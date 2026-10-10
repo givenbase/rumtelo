@@ -1,18 +1,26 @@
 import { type EntityManager } from '@mikro-orm/postgresql';
 
 import { FixedCostPeriodStatus, TransactionStatus } from '@rumtelo/contracts';
-import { endOfPeriodIso, fixedCostPeriodStatus } from '@rumtelo/utils';
+import { countUnclearedRolledMonths, endOfPeriodIso, fixedCostPeriodStatus } from '@rumtelo/utils';
 
 import { HouseholdScopedRepository } from '../../../../../common/household/household-scoped.repository';
 import { Transaction } from '../ledger/transaction/transaction.entity';
 import { FixedCost } from '../plan/fixed-cost/fixed-cost.entity';
 import { FixedCostSettlement } from '../plan/fixed-cost/fixed-cost-settlement.entity';
 
+export type MonthCloseDueBill = {
+    fixedCostId: string;
+    name: string;
+    amount: number;
+    arrearsMonths: number;
+};
+
 export type MonthCloseBlockers = {
     inboxCount: number;
     dueBillCount: number;
     /** Sample names for UI (max 3). */
     dueBillNames: string[];
+    dueBills: MonthCloseDueBill[];
 };
 
 /** Open work that must be cleared before a period can close. */
@@ -27,25 +35,28 @@ export async function collectCloseBlockers(
     const periodStart = `${period}-01`;
     const periodEnd = endOfPeriodIso(period);
 
-    const [inboxCount, costs, periodSettlements] = await Promise.all([
+    const [inboxCount, costs, allSettlements] = await Promise.all([
         transactions.count({
             status: TransactionStatus.INBOX,
             bookedOn: { $gte: periodStart, $lte: periodEnd },
         }),
         fixedCosts.find({ isActive: true }),
-        settlements.find({ period }),
+        settlements.find({}),
     ]);
 
-    const byCost = new Map(
-        periodSettlements.map(row => {
-            const costId = typeof row.fixedCost === 'string' ? row.fixedCost : row.fixedCost.id;
-            return [costId, row] as const;
-        })
-    );
+    const byCostPeriod = new Map<string, FixedCostSettlement>();
+    const byCostAll = new Map<string, FixedCostSettlement[]>();
+    for (const row of allSettlements) {
+        const costId = typeof row.fixedCost === 'string' ? row.fixedCost : row.fixedCost.id;
+        byCostPeriod.set(`${costId}:${row.period}`, row);
+        const list = byCostAll.get(costId) ?? [];
+        list.push(row);
+        byCostAll.set(costId, list);
+    }
 
-    const dueNames: string[] = [];
+    const dueBills: MonthCloseDueBill[] = [];
     for (const cost of costs) {
-        const settlement = byCost.get(cost.id);
+        const settlement = byCostPeriod.get(`${cost.id}:${period}`);
         const status = fixedCostPeriodStatus(
             {
                 isActive: cost.isActive,
@@ -57,13 +68,27 @@ export async function collectCloseBlockers(
             period
         );
         if (status !== FixedCostPeriodStatus.DUE) continue;
-        dueNames.push(cost.name);
+        const costSettlements = byCostAll.get(cost.id) ?? [];
+        dueBills.push({
+            fixedCostId: cost.id,
+            name: cost.name,
+            amount: cost.amount,
+            arrearsMonths: countUnclearedRolledMonths(
+                costSettlements.map(row => ({
+                    period: row.period,
+                    status: row.status,
+                    clearedByPeriod: row.clearedByPeriod,
+                })),
+                period
+            ),
+        });
     }
 
     return {
         inboxCount,
-        dueBillCount: dueNames.length,
-        dueBillNames: dueNames.slice(0, 3),
+        dueBillCount: dueBills.length,
+        dueBillNames: dueBills.slice(0, 3).map(bill => bill.name),
+        dueBills,
     };
 }
 

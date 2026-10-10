@@ -15,7 +15,12 @@ import {
     PeriodKey,
 } from '../../../../common/common.schema';
 import { Cadence, FlowDirection } from '../../../../common/common.enums';
-import { FixedCostSettlementSource, FixedCostSettlementStatus, JarKey } from '../enums';
+import {
+    DebtScheduleKind,
+    FixedCostSettlementSource,
+    FixedCostSettlementStatus,
+    JarKey,
+} from '../enums';
 import { CounterpartyRef } from '../party/party.schema';
 
 export const FixedCost = z.object({
@@ -90,12 +95,17 @@ export const FixedCostSettlement = z.object({
     period: PeriodKey,
     status: z.enum(FixedCostSettlementStatus),
     source: z.enum(FixedCostSettlementSource),
-    /** Instant the period was marked paid; null when skipped. */
+    /** Instant the period was marked paid; null when skipped or rolled. */
     paidAt: z.iso.datetime().nullable(),
-    /** Actual amount when paid; null when skipped or unknown. */
+    /** Actual amount when paid; null when skipped, rolled, or unknown. */
     amount: Money.nullable(),
     transactionId: Id.nullable(),
     note: z.string().max(500).nullable(),
+    /**
+     * When a later period’s payment cleared this rolled month (`YYYY-MM`).
+     * Null while still carrying forward (or never rolled).
+     */
+    clearedByPeriod: PeriodKey.nullable().default(null),
 });
 
 export const ListFixedCostSettlements = HouseholdScoped.extend({
@@ -125,6 +135,55 @@ export const UnlinkFixedCostSettlement = z.object({
     id: Id,
 });
 
+/**
+ * Turn uncleared carried months into a debt the household registers themselves.
+ * Clears the rolled chain so the bill returns to 1× next month.
+ */
+export const ConvertFixedCostArrearsToDebt = z
+    .object({
+        householdId: HouseholdId,
+        fixedCostId: Id,
+        /** Clearing stamp + “as of” for counting rolled months (`YYYY-MM`). */
+        period: PeriodKey,
+        /** Whether a collection / dunning notice was already sent. */
+        collectionNoticeSent: z.boolean(),
+        /** Extra collection fees in minor units — only when a notice was sent. */
+        collectionFees: Money.default(0),
+        scheduleKind: z.enum(DebtScheduleKind),
+        paymentCadence: z
+            .enum([Cadence.WEEKLY, Cadence.MONTHLY, Cadence.QUARTERLY, Cadence.YEARLY])
+            .default(Cadence.MONTHLY),
+        termPayments: z.int().positive().nullable().default(null),
+        maturityOn: IsoDate.nullable().default(null),
+    })
+    .superRefine((value, ctx) => {
+        if (value.scheduleKind === DebtScheduleKind.TERM) {
+            if (value.termPayments === null || value.termPayments < 1) {
+                ctx.addIssue({
+                    code: 'custom',
+                    path: ['termPayments'],
+                    message: 'Term schedule needs a payment count',
+                });
+            }
+        }
+        if (value.scheduleKind === DebtScheduleKind.DEADLINE) {
+            if (value.maturityOn === null) {
+                ctx.addIssue({
+                    code: 'custom',
+                    path: ['maturityOn'],
+                    message: 'Deadline schedule needs a maturity date',
+                });
+            }
+        }
+        if (!value.collectionNoticeSent && value.collectionFees > 0) {
+            ctx.addIssue({
+                code: 'custom',
+                path: ['collectionFees'],
+                message: 'Collection fees need a notice first',
+            });
+        }
+    });
+
 // Inferred types (same-module merge for consumers)
 export type FixedCost = z.infer<typeof FixedCost>;
 export type FixedCostsByJar = z.infer<typeof FixedCostsByJar>;
@@ -133,3 +192,4 @@ export type ListFixedCostSettlements = z.infer<typeof ListFixedCostSettlements>;
 export type MarkFixedCostPaid = z.infer<typeof MarkFixedCostPaid>;
 export type SkipFixedCostPeriod = z.infer<typeof SkipFixedCostPeriod>;
 export type UnlinkFixedCostSettlement = z.infer<typeof UnlinkFixedCostSettlement>;
+export type ConvertFixedCostArrearsToDebt = z.infer<typeof ConvertFixedCostArrearsToDebt>;

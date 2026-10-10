@@ -17,6 +17,7 @@ import { roleCanSee } from '@/app/_lib/role-permissions';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import {
     SETTINGS_SECTIONS,
+    isViewerAllowedSettingsTab,
     settingsHref,
     settingsTabFromPathname,
     type SettingsNavItem,
@@ -90,9 +91,12 @@ export function SettingsShell({ children }: { children: ReactNode }) {
         [],
         live
     );
-    const myRole =
-        membersQuery.data?.find(m => m.userId === user?.id)?.role ?? HouseholdRole.VIEWER;
-    const sections = useMemo(() => filterSettingsSections(SETTINGS_SECTIONS, myRole), [myRole]);
+    // Fail-open until members load — default VIEWER would hide jar/export tabs for owners.
+    const myRole = membersQuery.data?.find(m => m.userId === user?.id)?.role ?? null;
+    const sections = useMemo(
+        () => (myRole ? filterSettingsSections(SETTINGS_SECTIONS, myRole) : SETTINGS_SECTIONS),
+        [myRole]
+    );
 
     return (
         <PageContent width="wide" className="animate-rise">
@@ -147,17 +151,22 @@ export function SettingsShell({ children }: { children: ReactNode }) {
     );
 }
 
-/** Hide Plan when role cannot see billing; hide Practice coaches for non-managers. */
+/**
+ * Role filter for settings rail.
+ * VIEWER: account + security only (no jars/household/export — look-along).
+ */
 function filterSettingsSections(
     sections: SettingsNavSection[],
     role: HouseholdRole
 ): SettingsNavSection[] {
     const canSeeBilling = roleCanSee(role, HouseholdPermissionSection.HOUSEHOLD_BILLING);
     const canManagePractice = role === HouseholdRole.OWNER || role === HouseholdRole.ADMIN;
+    const isViewer = role === HouseholdRole.VIEWER;
     return sections
         .map(section => ({
             ...section,
             items: section.items.filter(item => {
+                if (isViewer) return isViewerAllowedSettingsTab(item.key);
                 if (item.key === 'plan') return canSeeBilling;
                 if (item.key === 'practice') return canManagePractice;
                 return true;

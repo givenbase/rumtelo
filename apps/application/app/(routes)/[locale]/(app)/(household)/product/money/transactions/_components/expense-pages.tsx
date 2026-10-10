@@ -88,6 +88,8 @@ export function ExpenseUpdatePage({ id, embedded = false }: { id: string; embedd
         mapRow: row => ({
             description: row.description,
             counterparty: row.counterparty,
+            merchantKey: row.merchantKey ?? null,
+            partyId: row.partyId ?? null,
             note: row.note ?? '',
             categoryId: row.categoryId,
             inflowKey: row.inflowKey,

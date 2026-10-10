@@ -174,6 +174,49 @@ export function fixedCostAppliesAsOf(
     return planItemAppliesAsOf(item, asOfDate);
 }
 
+export type FixedCostArrearsSettlement = {
+    period: string;
+    status: string;
+    clearedByPeriod?: string | null;
+};
+
+/**
+ * Count consecutive uncleared ROLLED months immediately before `period`.
+ * Used for N× due amount and debt-conversion threshold.
+ */
+export function countUnclearedRolledMonths(
+    settlements: readonly FixedCostArrearsSettlement[],
+    beforePeriod: string
+): number {
+    const byPeriod = new Map(settlements.map(row => [row.period, row]));
+    let count = 0;
+    let cursor = previousPeriodKey(beforePeriod);
+    for (let step = 0; step < 24; step += 1) {
+        const row = byPeriod.get(cursor);
+        if (!row || row.status !== FixedCostSettlementStatus.ROLLED || row.clearedByPeriod) {
+            break;
+        }
+        count += 1;
+        cursor = previousPeriodKey(cursor);
+    }
+    return count;
+}
+
+/** Due multiplier for the viewed period: 1 + uncleared rolled months ahead of it. */
+export function fixedCostDueMultiplier(
+    settlements: readonly FixedCostArrearsSettlement[],
+    period: string
+): number {
+    return 1 + countUnclearedRolledMonths(settlements, period);
+}
+
+function previousPeriodKey(period: string): string {
+    const [yearPart, monthPart] = period.split('-');
+    const year = Number(yearPart);
+    const month = Number(monthPart);
+    return month === 1 ? `${year - 1}-12` : `${year}-${String(month - 1).padStart(2, '0')}`;
+}
+
 /**
  * Period status from durable settlements. Heuristic matches are never Taken.
  * Shared by the fixed-costs UI and the Coach session queue.
@@ -193,6 +236,9 @@ export function fixedCostPeriodStatus(
     if (settlement?.status === FixedCostSettlementStatus.PAID) return FixedCostPeriodStatus.TAKEN;
     if (settlement?.status === FixedCostSettlementStatus.SKIPPED) {
         return FixedCostPeriodStatus.SKIPPED;
+    }
+    if (settlement?.status === FixedCostSettlementStatus.ROLLED) {
+        return FixedCostPeriodStatus.ROLLED;
     }
 
     const dueDay = item.dueDay;

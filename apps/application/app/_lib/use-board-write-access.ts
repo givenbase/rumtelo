@@ -28,6 +28,8 @@ function sectionFromPath(pathname: string): HouseholdPermissionSection {
     if (path.includes('/product/energy')) return HouseholdPermissionSection.ENERGY;
     if (path.includes('/product/soul')) return HouseholdPermissionSection.SOUL;
     if (path.includes('/product/coach')) return HouseholdPermissionSection.COACH;
+    // Why is household context, not Coach product — VIEWER may read it.
+    if (path.includes('/product/why')) return HouseholdPermissionSection.HOME;
     if (path.includes('/settings')) return HouseholdPermissionSection.HOUSEHOLD_SETTINGS;
     if (path.includes('/product/money') || path.startsWith('/product')) {
         return HouseholdPermissionSection.MONEY;

@@ -16,6 +16,7 @@ type Labels = {
     taken: string;
     due: string;
     skipped: string;
+    rolled?: string;
     planned: string;
     markPaidAria: string;
     /** Second-tap label — two-click confirm before mark-paid. */
@@ -97,6 +98,13 @@ export function FixedCostPeriodStatusControl({
         return (
             <span className={cn(META_CHIP, 'border-fg-muted bg-raised text-fg-muted', className)}>
                 {labels.skipped}
+            </span>
+        );
+    }
+    if (status === FixedCostPeriodStatus.ROLLED) {
+        return (
+            <span className={cn(META_CHIP, 'border-warning bg-warning/8 text-warning', className)}>
+                {labels.rolled ?? labels.skipped}
             </span>
         );
     }

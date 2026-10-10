@@ -140,10 +140,12 @@ export enum TransactionSource {
     RECURRING = 'RECURRING',
 }
 
-/** Whether a fixed-cost period was settled with a payment or intentionally skipped. */
+/** Whether a fixed-cost period was settled with a payment, skipped, or carried forward. */
 export enum FixedCostSettlementStatus {
     PAID = 'PAID',
     SKIPPED = 'SKIPPED',
+    /** Unpaid at month close — obligation rolls into later months until paid or converted to debt. */
+    ROLLED = 'ROLLED',
 }
 
 /**
@@ -155,6 +157,8 @@ export enum FixedCostPeriodStatus {
     DUE = 'DUE',
     UPCOMING = 'UPCOMING',
     SKIPPED = 'SKIPPED',
+    /** Closed month carried this bill forward (historical). */
+    ROLLED = 'ROLLED',
 }
 
 /** Lifecycle derived from isActive + endsOn — not a separate status column. */
@@ -170,6 +174,8 @@ export enum FixedCostSettlementSource {
     MARK_PAID = 'MARK_PAID',
     SKIP = 'SKIP',
     LINKED = 'LINKED',
+    /** Recorded when closing a month with unpaid bills carried forward. */
+    ROLL = 'ROLL',
 }
 
 export enum RuleField {

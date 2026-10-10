@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useWatch } from 'react-hook-form';
 import { useMemo } from 'react';
+import { useLocale } from 'next-intl';
 
 import {
     HouseholdRole,
@@ -45,6 +46,7 @@ import { SettingsInkCard, SettingsPanel, SettingsRow, SettingsRowLabel } from '.
 /** Members, money style, household profile — `/settings/general/household`. */
 export function HouseholdSettings() {
     const t = useTranslations();
+    const locale = useLocale();
     const { session, householdId } = useAuth();
     const { plan } = useHouseholdShell();
     const live = isLiveData(householdId);
@@ -183,6 +185,18 @@ export function HouseholdSettings() {
                                         </p>
                                         <p className="truncate text-xs text-fg-muted">
                                             {member.email}
+                                        </p>
+                                        <p className="truncate text-[11px] text-fg-faint">
+                                            {member.lastSeenAt
+                                                ? t('pages.settings.panels.household.last_seen', {
+                                                      when: formatMemberLastSeen(
+                                                          member.lastSeenAt,
+                                                          locale
+                                                      ),
+                                                  })
+                                                : t(
+                                                      'pages.settings.panels.household.last_seen_never'
+                                                  )}
                                         </p>
                                     </div>
                                     <Badge>{member.role}</Badge>
@@ -492,4 +506,25 @@ export function HouseholdSettings() {
             </SettingsInkCard>
         </SettingsPanel>
     );
+}
+
+/** Relative last-seen label for household members (session activity). */
+function formatMemberLastSeen(iso: string, locale: string): string {
+    const at = new Date(iso);
+    if (Number.isNaN(at.getTime())) return iso;
+    const diffSec = Math.round((at.getTime() - Date.now()) / 1000);
+    const abs = Math.abs(diffSec);
+    const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+    if (abs < 60) return rtf.format(diffSec, 'second');
+    const diffMin = Math.round(diffSec / 60);
+    if (Math.abs(diffMin) < 60) return rtf.format(diffMin, 'minute');
+    const diffHour = Math.round(diffMin / 60);
+    if (Math.abs(diffHour) < 48) return rtf.format(diffHour, 'hour');
+    const diffDay = Math.round(diffHour / 24);
+    if (Math.abs(diffDay) < 30) return rtf.format(diffDay, 'day');
+    return new Intl.DateTimeFormat(locale, {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+    }).format(at);
 }

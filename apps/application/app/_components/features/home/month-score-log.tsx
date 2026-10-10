@@ -1,14 +1,20 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 
-import type { MonthCloseBlockers, MonthScoreEvent } from '@rumtelo/contracts';
+import type {
+    MonthCloseBillDisposition,
+    MonthCloseBlockers,
+    MonthScoreEvent,
+} from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Eyebrow } from '@rumtelo/ui';
 import { cn, formatPeriod, parsePeriodKey } from '@rumtelo/utils';
 
 import { monthCloseUrgency, monthScoreLevelLabel } from '@/app/_lib/month-score-copy';
 import { ConfirmActionButton } from '@/components/features/forms/confirm-action-button';
+import { CloseMonthDialog } from '@/components/features/home/close-month-dialog';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 
 export type { MonthScoreEvent };
@@ -18,9 +24,9 @@ function dayOfMonth(isoDate: string): number {
     return Number(isoDate.slice(8, 10));
 }
 
-function closeReady(blockers: MonthCloseBlockers | null | undefined): boolean {
+function inboxReady(blockers: MonthCloseBlockers | null | undefined): boolean {
     if (!blockers) return true;
-    return blockers.inboxCount === 0 && blockers.dueBillCount === 0;
+    return blockers.inboxCount === 0;
 }
 
 /**
@@ -39,6 +45,7 @@ export function MonthScoreLog({
     onCloseMonth,
     closeMonthPending = false,
     canCloseMonth = false,
+    formatMoney,
     /** Coach quiet-state: score + close gate, no event log. */
     compact = false,
 }: {
@@ -54,23 +61,27 @@ export function MonthScoreLog({
     /** Compact looking-back / looking-ahead line for stacked periods. */
     periodNote?: string | null;
     /** Close the open month score — shown in the header when available. */
-    onCloseMonth?: () => void;
+    onCloseMonth?: (dispositions?: MonthCloseBillDisposition[]) => void;
     closeMonthPending?: boolean;
     canCloseMonth?: boolean;
+    formatMoney?: (cents: number) => string;
     compact?: boolean;
 }) {
     const t = useTranslations('pages.dashboard.month_score');
     const tDashboard = useTranslations('pages.dashboard');
     const locale = useLocale();
     const { setPeriod } = useHouseholdShell();
+    const [billDialogOpen, setBillDialogOpen] = useState(false);
     const levelLabel = monthScoreLevelLabel(tDashboard, level);
-    const blockersReady = closeReady(closeBlockers);
+    const inboxOk = inboxReady(closeBlockers);
     const chainReady = !priorOpenPeriod;
-    const ready = blockersReady && chainReady;
+    const dueBills = closeBlockers?.dueBills ?? [];
+    const hasDueBills = dueBills.length > 0;
+    const ready = inboxOk && chainReady;
     const urgency = monthCloseUrgency(daysLeft, isClosed);
     const priorLabel = priorOpenPeriod ? formatPeriod(priorOpenPeriod, locale) : null;
     const blockerLines: string[] = [];
-    if (closeBlockers && !blockersReady) {
+    if (closeBlockers && !inboxOk) {
         if (closeBlockers.inboxCount === 1) {
             blockerLines.push(tDashboard('close_blocked_inbox_one'));
         } else if (closeBlockers.inboxCount > 1) {
@@ -78,22 +89,22 @@ export function MonthScoreLog({
                 tDashboard('close_blocked_inbox_other', { count: closeBlockers.inboxCount })
             );
         }
-        if (closeBlockers.dueBillCount > 0) {
-            const names =
-                closeBlockers.dueBillNames.length > 0
-                    ? tDashboard('close_blocked_bill_names', {
-                          list: closeBlockers.dueBillNames.join(', '),
-                      })
-                    : '';
-            blockerLines.push(
-                closeBlockers.dueBillCount === 1
-                    ? tDashboard('close_blocked_bills_one', { names })
-                    : tDashboard('close_blocked_bills_other', {
-                          count: closeBlockers.dueBillCount,
-                          names,
-                      })
-            );
-        }
+    }
+    if (closeBlockers && hasDueBills) {
+        const names =
+            closeBlockers.dueBillNames.length > 0
+                ? tDashboard('close_blocked_bill_names', {
+                      list: closeBlockers.dueBillNames.join(', '),
+                  })
+                : '';
+        blockerLines.push(
+            closeBlockers.dueBillCount === 1
+                ? tDashboard('close_blocked_bills_one', { names })
+                : tDashboard('close_blocked_bills_other', {
+                      count: closeBlockers.dueBillCount,
+                      names,
+                  })
+        );
     }
 
     const timingLabel = (() => {
@@ -119,6 +130,15 @@ export function MonthScoreLog({
     function goToPriorPeriod() {
         if (!priorOpenPeriod) return;
         setPeriod(parsePeriodKey(priorOpenPeriod));
+    }
+
+    function startClose() {
+        if (!onCloseMonth) return;
+        if (hasDueBills) {
+            setBillDialogOpen(true);
+            return;
+        }
+        onCloseMonth();
     }
 
     return (
@@ -167,15 +187,27 @@ export function MonthScoreLog({
                     </span>
                 </div>
                 {canCloseMonth && onCloseMonth ? (
-                    <ConfirmActionButton
-                        size="sm"
-                        label={tDashboard('close_month')}
-                        confirmLabel={tDashboard('close_month_confirm')}
-                        pendingLabel={tDashboard('closing')}
-                        pending={closeMonthPending}
-                        disabled={!ready}
-                        onConfirm={onCloseMonth}
-                    />
+                    hasDueBills ? (
+                        <ConfirmActionButton
+                            size="sm"
+                            label={tDashboard('close_month')}
+                            confirmLabel={tDashboard('close_month_review_bills')}
+                            pendingLabel={tDashboard('closing')}
+                            pending={closeMonthPending}
+                            disabled={!ready}
+                            onConfirm={startClose}
+                        />
+                    ) : (
+                        <ConfirmActionButton
+                            size="sm"
+                            label={tDashboard('close_month')}
+                            confirmLabel={tDashboard('close_month_confirm')}
+                            pendingLabel={tDashboard('closing')}
+                            pending={closeMonthPending}
+                            disabled={!ready}
+                            onConfirm={startClose}
+                        />
+                    )
                 ) : null}
             </div>
 
@@ -241,7 +273,7 @@ export function MonthScoreLog({
                                 {tDashboard('coach.sort_inbox')} ▸
                             </Link>
                         ) : null}
-                        {closeBlockers && closeBlockers.dueBillCount > 0 ? (
+                        {hasDueBills ? (
                             <Link
                                 href="/product/money/fixed-costs"
                                 className="text-accent transition-colors hover:text-accent-hover">
@@ -274,6 +306,20 @@ export function MonthScoreLog({
                         </div>
                     ))}
                 </div>
+            ) : null}
+
+            {formatMoney && hasDueBills && onCloseMonth ? (
+                <CloseMonthDialog
+                    open={billDialogOpen}
+                    onOpenChange={setBillDialogOpen}
+                    dueBills={dueBills}
+                    pending={closeMonthPending}
+                    formatMoney={formatMoney}
+                    onConfirm={dispositions => {
+                        onCloseMonth(dispositions);
+                        setBillDialogOpen(false);
+                    }}
+                />
             ) : null}
         </div>
     );

@@ -26,6 +26,19 @@ export type SettingsTab =
 
 export const DEFAULT_TAB: SettingsTab = 'account';
 
+/**
+ * VIEWER look-along — personal account only.
+ * No household jars/bank/export/import (and no household saves).
+ */
+export const VIEWER_ALLOWED_SETTINGS_TABS = [
+    'account',
+    'security',
+] as const satisfies readonly SettingsTab[];
+
+export function isViewerAllowedSettingsTab(tab: SettingsTab): boolean {
+    return (VIEWER_ALLOWED_SETTINGS_TABS as readonly SettingsTab[]).includes(tab);
+}
+
 export type SettingsNavItem = {
     key: SettingsTab;
     labelKey: string;

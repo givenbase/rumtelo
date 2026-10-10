@@ -12,6 +12,7 @@ import {
     FlowDirection,
     Cadence,
     FixedCostPeriodStatus,
+    FIXED_COST_ARREARS_DEBT_THRESHOLD,
 } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
@@ -21,11 +22,12 @@ import {
     describePeriodTravel,
     endOfPeriodIso,
     fixedCostAppliesAsOf,
+    fixedCostDueMultiplier,
     horizonMonths,
     incomeAmountAsOf,
     monthlyAmount,
     monthlyNetAsOf,
-    sumMonthlyFixedOut,
+    toMinorUnits,
     toPeriodKey,
     evaluateBusinessHouseholdLeak,
 } from '@rumtelo/utils';
@@ -75,6 +77,10 @@ import {
 import { HoldingChip } from '@/components/features/money/holding-chip';
 import { DepositBankChip } from '@/components/features/money/deposit-bank-chip';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
+import {
+    ArrearsDebtDialog,
+    type ArrearsDebtTarget,
+} from '@/components/features/money/arrears-debt-dialog';
 import { FixedCostPeriodStatusControl } from '@/components/features/money/fixed-cost-period-status';
 import { NecessitiesPressureCard } from '@/components/features/money/necessities-pressure-card';
 import { BusinessHouseholdLeakCard } from '@/components/features/money/business-household-leak-card';
@@ -126,6 +132,7 @@ export function FixedCostsPageClient() {
     const [openJarKeys, setOpenJarKeys] = useState<Set<string>>(() => new Set());
     const [selectMode, setSelectMode] = useState(false);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+    const [arrearsTarget, setArrearsTarget] = useState<ArrearsDebtTarget | null>(null);
     const live = isLiveData(householdId);
     const periodKey = toPeriodKey(period.year, period.month);
     const travel = describePeriodTravel(period);
@@ -146,9 +153,10 @@ export function FixedCostsPageClient() {
         live
     );
 
+    /** All settlements — needed to count uncleared carried months for N× due. */
     const settlementsQuery = useLiveQuery(
         apiQuery.money.fixedCosts.listSettlements.queryOptions({
-            input: { householdId: householdId!, period: periodKey },
+            input: { householdId: householdId! },
         }),
         [] as never,
         live
@@ -214,7 +222,15 @@ export function FixedCostsPageClient() {
     );
 
     const periodTransactions = periodTxQuery.data?.items ?? [];
-    const settlementById = settlementsByFixedCostId(settlementsQuery.data ?? []);
+    const allSettlements = settlementsQuery.data ?? [];
+    const periodSettlements = allSettlements.filter(row => row.period === periodKey);
+    const settlementById = settlementsByFixedCostId(periodSettlements);
+    const settlementsByCostId = new Map<string, typeof allSettlements>();
+    for (const row of allSettlements) {
+        const list = settlementsByCostId.get(row.fixedCostId) ?? [];
+        list.push(row);
+        settlementsByCostId.set(row.fixedCostId, list);
+    }
     const txById = new Map(periodTransactions.map(tx => [tx.id, tx]));
 
     const allIncome = incomeQuery.data ?? [];
@@ -247,17 +263,13 @@ export function FixedCostsPageClient() {
             : [];
 
     const NET = monthlyNetAsOf(allIncome, asOf);
-    const outTotal = sumMonthlyFixedOut(
-        applyingFixedCosts.map(item => ({
-            amount: item.amount,
-            cadence: item.cadence,
-            direction: 'OUT' as const,
-            isActive: item.isActive,
-            startedOn: item.startedOn,
-            endsOn: item.endsOn,
-        })),
-        { asOf, activeOnly: false }
-    );
+    const outTotal = applyingFixedCosts.reduce((total, item) => {
+        const multiplier = fixedCostDueMultiplier(
+            settlementsByCostId.get(item.id) ?? [],
+            periodKey
+        );
+        return total + monthlyAmount(Math.abs(item.amount), item.cadence) * multiplier;
+    }, 0);
     const leftover = NET - outTotal;
     const commitmentRatio = NET > 0 ? Math.round((outTotal / NET) * 100) : 0;
     // Holding filter narrows the lists only — totals above stay the household's.
@@ -296,7 +308,13 @@ export function FixedCostsPageClient() {
                 });
             const monthly = items
                 .filter(item => fixedCostAppliesAsOf(item, asOf))
-                .reduce((total, item) => total + item.monthly, 0);
+                .reduce((total, item) => {
+                    const multiplier = fixedCostDueMultiplier(
+                        settlementsByCostId.get(item.id) ?? [],
+                        periodKey
+                    );
+                    return total + item.monthly * multiplier;
+                }, 0);
             return { jar, items, monthly };
         });
 
@@ -330,6 +348,21 @@ export function FixedCostsPageClient() {
     const dueIdSet = new Set(dueIds);
     const selectedDueIds = [...selectedIds].filter(id => dueIdSet.has(id));
 
+    const arrearsDebtCandidates = applyingFixedCosts
+        .map(item => {
+            const arrearsMonths = Math.max(
+                0,
+                fixedCostDueMultiplier(settlementsByCostId.get(item.id) ?? [], periodKey) - 1
+            );
+            return {
+                fixedCostId: item.id,
+                name: item.counterparty?.trim() || item.name,
+                amount: item.amount,
+                arrearsMonths,
+            };
+        })
+        .filter(row => row.arrearsMonths >= FIXED_COST_ARREARS_DEBT_THRESHOLD);
+
     function exitSelectMode() {
         setSelectMode(false);
         setSelectedIds(new Set());
@@ -357,6 +390,41 @@ export function FixedCostsPageClient() {
             return next;
         });
     }
+
+    const convertArrearsMutation = useMutation({
+        mutationFn: async (input: {
+            fixedCostId: string;
+            collectionNoticeSent: boolean;
+            collectionFees: number;
+            scheduleKind: Parameters<
+                typeof api.money.fixedCosts.convertArrearsToDebt
+            >[0]['scheduleKind'];
+            termPayments: number | null;
+            maturityOn: string | null;
+            paymentCadence: Cadence.MONTHLY;
+        }) => {
+            if (!householdId) throw new Error('No household');
+            return api.money.fixedCosts.convertArrearsToDebt({
+                householdId,
+                fixedCostId: input.fixedCostId,
+                period: periodKey,
+                collectionNoticeSent: input.collectionNoticeSent,
+                collectionFees: input.collectionFees,
+                scheduleKind: input.scheduleKind,
+                termPayments: input.termPayments,
+                maturityOn: input.maturityOn,
+                paymentCadence: input.paymentCadence,
+            });
+        },
+        onSuccess: debt => {
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.key() });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.key() });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
+            setArrearsTarget(null);
+            showToast(t('arrears_debt_toast', { name: debt.name }), 'success');
+        },
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
+    });
 
     const markPaidMutation = useMutation({
         mutationFn: async (ids: string[]) => {
@@ -408,6 +476,46 @@ export function FixedCostsPageClient() {
             {/* Doctrine: money README → “When Necessities can’t fit in 55%” */}
             <NecessitiesPressureCard pressure={necessitiesPressure} variant="plan" />
             <BusinessHouseholdLeakCard leak={businessLeak} />
+
+            {arrearsDebtCandidates.length > 0 && canMutate && live ? (
+                <div className="rounded-xl border border-warning bg-warning/8 px-4 py-3.5">
+                    <p className="font-mono text-[10px] font-bold tracking-[0.12em] text-warning uppercase">
+                        {t('arrears_prompt_title')}
+                    </p>
+                    {arrearsDebtCandidates.length === 1 ? (
+                        <p className="mt-2 text-sm text-pretty text-fg-secondary">
+                            {t('arrears_prompt_body', {
+                                name: arrearsDebtCandidates[0]!.name,
+                                count: arrearsDebtCandidates[0]!.arrearsMonths,
+                                amount: formatMoney(
+                                    arrearsDebtCandidates[0]!.amount *
+                                        arrearsDebtCandidates[0]!.arrearsMonths
+                                ),
+                            })}
+                        </p>
+                    ) : (
+                        <p className="mt-2 text-sm text-pretty text-fg-secondary">
+                            {t('arrears_prompt_multi', {
+                                count: arrearsDebtCandidates.length,
+                            })}
+                        </p>
+                    )}
+                    <div className="mt-3 flex flex-wrap gap-2">
+                        {arrearsDebtCandidates.map(candidate => (
+                            <button
+                                key={candidate.fixedCostId}
+                                type="button"
+                                data-mutate
+                                onClick={() => setArrearsTarget(candidate)}
+                                className="rounded-lg border border-warning bg-surface px-2.5 py-1.5 font-mono text-[10px] font-medium tracking-wide text-warning uppercase transition-colors hover:bg-warning/10">
+                                {arrearsDebtCandidates.length === 1
+                                    ? t('arrears_prompt_cta')
+                                    : `${t('arrears_prompt_cta')} · ${candidate.name}`}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            ) : null}
 
             {assetFilter && filteredHolding ? (
                 <div className="flex flex-wrap items-center gap-3 rounded-xl border border-accent/40 bg-accent-soft px-4 py-3">
@@ -759,6 +867,20 @@ export function FixedCostsPageClient() {
                                                               : undefined;
                                                           const isDue =
                                                               status === FixedCostPeriodStatus.DUE;
+                                                          const dueMultiplier = applies
+                                                              ? fixedCostDueMultiplier(
+                                                                    settlementsByCostId.get(
+                                                                        fixedCost.id
+                                                                    ) ?? [],
+                                                                    periodKey
+                                                                )
+                                                              : 1;
+                                                          const arrearsMonths = Math.max(
+                                                              0,
+                                                              dueMultiplier - 1
+                                                          );
+                                                          const dueMonthly =
+                                                              fixedCost.monthly * dueMultiplier;
                                                           const isSelected = selectedIds.has(
                                                               fixedCost.id
                                                           );
@@ -781,7 +903,7 @@ export function FixedCostsPageClient() {
                                                                       })
                                                                   )}
                                                                   amount={formatMoney(
-                                                                      -Math.abs(fixedCost.monthly)
+                                                                      -Math.abs(dueMonthly)
                                                                   )}
                                                                   amountClassName={
                                                                       applies
@@ -801,6 +923,21 @@ export function FixedCostsPageClient() {
                                                                                   tChips
                                                                               )}
                                                                           </MetaChip>
+                                                                          {arrearsMonths > 0 ? (
+                                                                              <MetaChip className="border-warning bg-warning/8 text-warning">
+                                                                                  {arrearsMonths ===
+                                                                                  1
+                                                                                      ? t(
+                                                                                            'arrears_badge_one'
+                                                                                        )
+                                                                                      : t(
+                                                                                            'arrears_badge_other',
+                                                                                            {
+                                                                                                count: arrearsMonths,
+                                                                                            }
+                                                                                        )}
+                                                                              </MetaChip>
+                                                                          ) : null}
                                                                           {linkedTx ? (
                                                                               <MetaChip>
                                                                                   {formatBookedDate(
@@ -892,6 +1029,9 @@ export function FixedCostsPageClient() {
                                                                                   t(
                                                                                       'status_skipped'
                                                                                   ),
+                                                                              rolled: t(
+                                                                                  'status_rolled'
+                                                                              ),
                                                                               planned:
                                                                                   t(
                                                                                       'status_planned'
@@ -1141,6 +1281,29 @@ export function FixedCostsPageClient() {
                     </CoachTipCard>
                 </div>
             )}
+
+            <ArrearsDebtDialog
+                open={Boolean(arrearsTarget)}
+                onOpenChange={open => {
+                    if (!open) setArrearsTarget(null);
+                }}
+                target={arrearsTarget}
+                pending={convertArrearsMutation.isPending}
+                formatMoney={formatMoney}
+                parseMoney={major => {
+                    const normalized = major.replace(',', '.').trim();
+                    const value = Number(normalized);
+                    if (!Number.isFinite(value) || value < 0) return 0;
+                    return toMinorUnits(value);
+                }}
+                onConfirm={input => {
+                    if (!arrearsTarget) return;
+                    convertArrearsMutation.mutate({
+                        fixedCostId: arrearsTarget.fixedCostId,
+                        ...input,
+                    });
+                }}
+            />
         </div>
     );
 }

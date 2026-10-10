@@ -55,6 +55,8 @@ export function FixedCostUpdatePage({ id, embedded = false }: { id: string; embe
             name: row.name,
             presetKey: row.presetKey ?? null,
             counterparty: row.counterparty ?? '',
+            merchantKey: row.merchantKey ?? '',
+            partyId: row.partyId ?? '',
             amount: minorUnitsToAmountInput(Math.abs(row.amount)),
             cadence: toRecurringCadence(row.cadence),
             jarId: row.jarId,

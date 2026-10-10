@@ -51,6 +51,7 @@ import { clampDueDayInput, clampDueMonthInput, DueDayField } from './due-day-fie
 import { FormDatePicker } from './form-date-picker';
 import { FormInput } from './form-input';
 import { merchantsToNameOptions } from './merchant-name-options';
+import { PARTY_OPTION_PREFIX, partiesToNameOptions } from './party-name-options';
 import { PresetNameField, type NamePresetOption } from './preset-name-field';
 import { SavePartyToggle } from './save-party-toggle';
 import type { DebtPreset, MerchantPreset } from '@rumtelo/contracts';
@@ -162,8 +163,16 @@ export function DebtForm({
         [],
         live
     );
+    const partiesQuery = useLiveQuery(
+        apiQuery.money.parties.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [],
+        live
+    );
     const debtTypes = useMemo(() => debtTypesQuery.data ?? [], [debtTypesQuery.data]);
     const merchants = useMemo(() => merchantsQuery.data ?? [], [merchantsQuery.data]);
+    const parties = useMemo(() => partiesQuery.data ?? [], [partiesQuery.data]);
     const { byKey: jarByKey } = useJarCatalog();
     const selectedType = debtTypes.find(option => option.key === presetKey) ?? null;
     const lenderChrome = catalogMarkChrome({
@@ -180,17 +189,23 @@ export function DebtForm({
             .filter((merchant): merchant is MerchantPreset => Boolean(merchant));
     })();
 
-    /** Suggested lenders + full merchant catalog (banks, BNPL, …) for typeahead. */
-    const lenderOptions = useMemo(
-        (): NamePresetOption[] =>
-            merchantsToNameOptions(merchants, { badge: tDebt('option_badge_lender') }),
-        [merchants, tDebt]
-    );
+    /** Saved parties + suggested lenders + full merchant catalog for typeahead. */
+    const lenderOptions = useMemo((): NamePresetOption[] => {
+        const saved = partiesToNameOptions(parties, {
+            badge: tDebt('option_badge_saved'),
+            group: tDebt('option_group_saved'),
+        });
+        const catalog = merchantsToNameOptions(merchants, {
+            badge: tDebt('option_badge_lender'),
+        });
+        return [...saved, ...catalog];
+    }, [parties, merchants, tDebt]);
     const debtFormSchema = useMemo(() => createDebtFormSchema(tForm), [tForm]);
 
     const form = useForm<DebtFormValues>({
         defaultValues: {
             name: defaultValues?.name ?? '',
+            partyId: defaultValues?.partyId ?? '',
             balance: defaultValues?.balance ?? '',
             interestRate: defaultValues?.interestRate ?? '0',
             minimumPayment: defaultValues?.minimumPayment ?? '',
@@ -289,10 +304,10 @@ export function DebtForm({
             // Entity name = type label when a type is locked; lender name as fallback (editNoTypeMatch).
             const name =
                 presetKey && presetKey !== 'OTHER' && selectedType ? selectedType.name : lenderName;
-            const matchedLender = findByNameOrAlias(merchants, lenderName);
+            const formPartyId = values.partyId?.trim() || null;
+            const matchedLender = formPartyId ? null : findByNameOrAlias(merchants, lenderName);
             const merchantKey = matchedLender?.key ?? null;
-            // Prefer an already-linked party on edit when the lender is free text.
-            const partyId = merchantKey || !lenderName ? null : (defaultValues?.partyId ?? null);
+            const partyId = merchantKey || !lenderName ? null : formPartyId;
             const saveParty =
                 Boolean(lenderName) && !merchantKey && !partyId && (values.saveParty ?? true);
             const presetKeyToSave = presetKey && presetKey !== 'OTHER' ? presetKey : null;
@@ -414,10 +429,13 @@ export function DebtForm({
     const busy = form.formState.isSubmitting || saveMutation.isPending || removeMutation.isPending;
 
     const selectedLenderName = useWatch({ control: form.control, name: 'name' }) ?? '';
+    const watchedPartyId = useWatch({ control: form.control, name: 'partyId' }) ?? '';
     const savePartyWatch = useWatch({ control: form.control, name: 'saveParty' }) ?? true;
     const showLenderInput = customLender || lendersForType.length === 0;
     const freeTypedLender =
-        Boolean(selectedLenderName.trim()) && !findByNameOrAlias(merchants, selectedLenderName);
+        Boolean(selectedLenderName.trim()) &&
+        !watchedPartyId &&
+        !findByNameOrAlias(merchants, selectedLenderName);
 
     /** Lender chosen before a type: adopt its debt type when exactly one is linked. */
     function applyDebtType(debtType: DebtPreset) {
@@ -430,6 +448,15 @@ export function DebtForm({
 
     function applyLenderPick(option: NamePresetOption) {
         form.setValue('name', option.name, { shouldDirty: true, shouldValidate: true });
+        if (option.key.startsWith(PARTY_OPTION_PREFIX)) {
+            form.setValue('partyId', option.key.slice(PARTY_OPTION_PREFIX.length), {
+                shouldDirty: true,
+            });
+            form.setValue('saveParty', false, { shouldDirty: true });
+            return;
+        }
+        form.setValue('partyId', '', { shouldDirty: true });
+        form.setValue('saveParty', false, { shouldDirty: true });
         if (presetKey) return; // Type already chosen — the pick only names the lender.
         const debtType = presetForMerchant(debtTypes, option.key);
         if (debtType) applyDebtType(debtType);
@@ -483,7 +510,10 @@ export function DebtForm({
                                 <FormControl>
                                     <PresetNameField
                                         value={field.value}
-                                        onChange={field.onChange}
+                                        onChange={next => {
+                                            field.onChange(next);
+                                            form.setValue('partyId', '', { shouldDirty: true });
+                                        }}
                                         options={lenderOptions}
                                         placeholder={tDebt('lender_example_short')}
                                         freeTextPlaceholder={tDebt('lender_free')}
@@ -617,6 +647,7 @@ export function DebtForm({
                                             shouldValidate: Boolean(typed?.trim()),
                                             shouldDirty: true,
                                         });
+                                        form.setValue('partyId', '', { shouldDirty: true });
                                         setLenderQuery('');
                                     }}
                                     renderChip={lender => {
@@ -641,11 +672,17 @@ export function DebtForm({
                                                         ? 'inline-flex items-center gap-2 rounded-xl border border-accent bg-accent/15 px-2.5 py-1.5 text-sm text-accent'
                                                         : 'inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent'
                                                 }
-                                                onClick={() =>
+                                                onClick={() => {
                                                     form.setValue('name', lender.name, {
                                                         shouldValidate: true,
-                                                    })
-                                                }>
+                                                    });
+                                                    form.setValue('partyId', '', {
+                                                        shouldDirty: true,
+                                                    });
+                                                    form.setValue('saveParty', false, {
+                                                        shouldDirty: true,
+                                                    });
+                                                }}>
                                                 <VendorMark
                                                     name={mark.name}
                                                     src={mark.src}
@@ -668,7 +705,12 @@ export function DebtForm({
                                             <FormControl>
                                                 <PresetNameField
                                                     value={field.value}
-                                                    onChange={field.onChange}
+                                                    onChange={next => {
+                                                        field.onChange(next);
+                                                        form.setValue('partyId', '', {
+                                                            shouldDirty: true,
+                                                        });
+                                                    }}
                                                     options={lenderOptions}
                                                     placeholder={
                                                         lendersForType.length > 0

@@ -7,7 +7,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useState } from 'react';
 
-import { FixedCostLifecycle, FixedCostPeriodStatus, FlowDirection } from '@rumtelo/contracts';
+import {
+    type Cadence,
+    FixedCostLifecycle,
+    FixedCostPeriodStatus,
+    FIXED_COST_ARREARS_DEBT_THRESHOLD,
+    FlowDirection,
+} from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import {
@@ -25,7 +31,7 @@ import {
     VendorMark,
     cn,
 } from '@rumtelo/ui';
-import { monthlyAmount, toPeriodKey } from '@rumtelo/utils';
+import { fixedCostDueMultiplier, monthlyAmount, toMinorUnits, toPeriodKey } from '@rumtelo/utils';
 
 import { debtDetailHref, txDetailHref, updateHref } from '@/app/_lib/create-routes';
 import {
@@ -53,6 +59,7 @@ import {
     formatBookedDate,
     formatDueDay,
 } from '@/components/features/money/jar-badge';
+import { ArrearsDebtDialog } from '@/components/features/money/arrears-debt-dialog';
 import { FixedCostPeriodStatusControl } from '@/components/features/money/fixed-cost-period-status';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -93,6 +100,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
     const [confirmKind, setConfirmKind] = useState<ConfirmKind>(null);
     const [endWhen, setEndWhen] = useState<'today' | 'earlier'>('today');
     const [endDate, setEndDate] = useState(() => todayIsoDate());
+    const [arrearsDialogOpen, setArrearsDialogOpen] = useState(false);
 
     const listQuery = useLiveQuery(
         apiQuery.money.fixedCosts.list.queryOptions({ input: { householdId: householdId! } }),
@@ -116,7 +124,6 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
             input: {
                 householdId: householdId!,
                 fixedCostId,
-                period: periodKey,
             },
         }),
         [] as never,
@@ -144,7 +151,10 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
     const givingOrgs = givingOrgsQuery.data ?? [];
     const categoryTemplates = categoryTemplatesQuery.data ?? [];
     const periodTxs = periodTxQuery.data?.items ?? [];
-    const settlement = (settlementsQuery.data ?? [])[0];
+    const allSettlements = settlementsQuery.data ?? [];
+    const settlement = allSettlements.find(row => row.period === periodKey);
+    const dueMultiplier = fixedCostDueMultiplier(allSettlements, periodKey);
+    const arrearsMonths = Math.max(0, dueMultiplier - 1);
 
     const lifecycleMutation = useMutation({
         mutationFn: async (patch: { isActive: boolean; endsOn?: string | null }) => {
@@ -162,6 +172,34 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
             if (patch.isActive) showToast(t('toast_active'), 'success');
             else if (patch.endsOn) showToast(t('toast_ended'), 'success');
             else showToast(t('toast_paused'), 'success');
+        },
+        onError: (error: unknown) => showToast(apiError(error), 'error'),
+    });
+
+    const convertArrearsMutation = useMutation({
+        mutationFn: async (input: {
+            collectionNoticeSent: boolean;
+            collectionFees: number;
+            scheduleKind: Parameters<
+                typeof api.money.fixedCosts.convertArrearsToDebt
+            >[0]['scheduleKind'];
+            termPayments: number | null;
+            maturityOn: string | null;
+            paymentCadence: Cadence.MONTHLY;
+        }) => {
+            if (!householdId) throw new Error('No household');
+            return api.money.fixedCosts.convertArrearsToDebt({
+                householdId,
+                fixedCostId,
+                period: periodKey,
+                ...input,
+            });
+        },
+        onSuccess: debt => {
+            invalidateFixedCostQueries(queryClient);
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.key() });
+            setArrearsDialogOpen(false);
+            showToast(t('arrears_debt_toast', { name: debt.name }), 'success');
         },
         onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
@@ -262,8 +300,9 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
         })
     );
     const due = formatDueDay(item.dueDay, tChips, item.cadence, item.dueMonth);
+    const dueMonthly = monthly * dueMultiplier;
     const signedMonthly =
-        item.direction === FlowDirection.IN ? Math.abs(monthly) : -Math.abs(monthly);
+        item.direction === FlowDirection.IN ? Math.abs(dueMonthly) : -Math.abs(dueMonthly);
     const jarHref = jar?.key ? `/product/money/jars/${jarKeyToSlug(jar.key)}` : null;
     const jarIcon =
         jar?.icon?.trim() || (jar?.key ? jarByKey.get(jar.key)?.icon?.trim() : null) || '◇';
@@ -506,6 +545,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                                     taken: t('status_taken'),
                                     due: t('status_due'),
                                     skipped: t('status_skipped'),
+                                    rolled: t('status_rolled'),
                                     planned: t('status_planned'),
                                     markPaidAria: t('mark_paid_short'),
                                     markPaidConfirm: t('mark_paid_confirm'),
@@ -556,6 +596,22 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                 <div className="flex flex-wrap gap-1.5">
                     <MetaChip>{cadenceLabel(item.cadence, tChips)}</MetaChip>
                     {due ? <MetaChip>{due}</MetaChip> : null}
+                    {arrearsMonths > 0 ? (
+                        <MetaChip className="border-warning bg-warning/8 text-warning">
+                            {arrearsMonths === 1
+                                ? t('arrears_badge_one')
+                                : t('arrears_badge_other', { count: arrearsMonths })}
+                        </MetaChip>
+                    ) : null}
+                    {arrearsMonths >= FIXED_COST_ARREARS_DEBT_THRESHOLD && writable ? (
+                        <button
+                            type="button"
+                            data-mutate
+                            onClick={() => setArrearsDialogOpen(true)}
+                            className="inline-flex min-h-6 items-center rounded-full border border-warning bg-warning/8 px-2.5 py-1 font-mono text-[10px] font-medium tracking-wide text-warning uppercase transition-colors hover:bg-warning/15">
+                            {t('arrears_prompt_cta')}
+                        </button>
+                    ) : null}
                     {Math.abs(monthly) !== Math.abs(item.amount) ? (
                         <MetaChip>
                             {tChips('amount_per_cadence', {
@@ -712,6 +768,26 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                     </Card>
                 </section>
             ) : null}
+
+            <ArrearsDebtDialog
+                open={arrearsDialogOpen}
+                onOpenChange={setArrearsDialogOpen}
+                target={{
+                    fixedCostId: item.id,
+                    name: company,
+                    amount: item.amount,
+                    arrearsMonths,
+                }}
+                pending={convertArrearsMutation.isPending}
+                formatMoney={formatMoney}
+                parseMoney={major => {
+                    const normalized = major.replace(',', '.').trim();
+                    const value = Number(normalized);
+                    if (!Number.isFinite(value) || value < 0) return 0;
+                    return toMinorUnits(value);
+                }}
+                onConfirm={input => convertArrearsMutation.mutate(input)}
+            />
         </div>
     );
 }

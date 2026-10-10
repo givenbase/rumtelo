@@ -3,6 +3,7 @@ export { EmailService } from './email.service';
 export type {
     EmailProvider,
     EmailVerificationEmailInput,
+    HouseholdInviteAcceptedEmailInput,
     HouseholdInviteEmailInput,
     SendEmailInput,
 } from './email.types';

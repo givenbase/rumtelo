@@ -5,19 +5,29 @@ import { apiBadRequest } from '../../../../../../common/errors/api-user-error';
 
 import {
     Cadence,
+    DebtKind,
+    DebtScheduleKind,
+    FIXED_COST_ARREARS_DEBT_THRESHOLD,
     FixedCostSettlementSource,
     FixedCostSettlementStatus,
     FlowDirection,
     type JarKey,
     jarCapabilitiesFor,
 } from '@rumtelo/contracts';
-import { isFixedCostCounting, normalizeDueMonth, sumMonthlyFixedOut } from '@rumtelo/utils';
+import {
+    countUnclearedRolledMonths,
+    fixedCostDueMultiplier,
+    isFixedCostCounting,
+    normalizeDueMonth,
+    sumMonthlyFixedOut,
+} from '@rumtelo/utils';
 import { PlanAccessService } from '../../../../../../common/capability';
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { resolveAssetLink } from '../../asset-link.util';
 import { Transaction } from '../../ledger/transaction/transaction.entity';
 import { Debt } from '../../targets/debt/debt.entity';
+import { DebtService } from '../../targets/debt/debt.service';
 import { Category } from '../jar/category.entity';
 import { Jar } from '../jar/jar.entity';
 import { JarService } from '../jar/jar.service';
@@ -36,7 +46,8 @@ export class FixedCostService {
         @Inject(EntityManager) private readonly em: EntityManager,
         @Inject(JarService) private readonly jars: JarService,
         @Inject(PartyService) private readonly parties: PartyService,
-        @Inject(PlanAccessService) private readonly planAccess: PlanAccessService
+        @Inject(PlanAccessService) private readonly planAccess: PlanAccessService,
+        @Inject(DebtService) private readonly debts: DebtService
     ) {
         this.repo = new HouseholdScopedRepository(em, FixedCost);
         this.settlements = new HouseholdScopedRepository(em, FixedCostSettlement);
@@ -144,6 +155,7 @@ export class FixedCostService {
             if (input.amount !== undefined && input.amount !== null) {
                 settlement.amount = input.amount;
             }
+            await this.clearRolledArrears(input.fixedCostId, input.period);
             await this.em.flush();
             return toSettlementDto(settlement);
         }
@@ -154,7 +166,16 @@ export class FixedCostService {
         });
 
         const paidAt = input.paidAt ? new Date(input.paidAt) : new Date();
-        const amount = input.amount ?? fixedCost.amount;
+        const priorSettlements = await this.settlements.find({ fixedCost: input.fixedCostId });
+        const multiplier = fixedCostDueMultiplier(
+            priorSettlements.map(row => ({
+                period: row.period,
+                status: row.status,
+                clearedByPeriod: row.clearedByPeriod,
+            })),
+            input.period
+        );
+        const amount = input.amount ?? fixedCost.amount * multiplier;
 
         if (settlement) {
             settlement.status = FixedCostSettlementStatus.PAID;
@@ -163,6 +184,7 @@ export class FixedCostService {
             }
             settlement.paidAt = paidAt;
             settlement.amount = amount;
+            settlement.clearedByPeriod = null;
             if (input.note !== undefined) settlement.note = input.note ?? null;
         } else {
             settlement = this.em.create(FixedCostSettlement, {
@@ -175,10 +197,12 @@ export class FixedCostService {
                 amount,
                 transaction: null,
                 note: input.note ?? null,
+                clearedByPeriod: null,
             } as never);
             this.em.persist(settlement);
         }
 
+        await this.clearRolledArrears(input.fixedCostId, input.period);
         await this.em.flush();
         return toSettlementDto(settlement);
     }
@@ -208,6 +232,7 @@ export class FixedCostService {
             settlement.source = FixedCostSettlementSource.SKIP;
             settlement.paidAt = null;
             settlement.amount = null;
+            settlement.clearedByPeriod = null;
             if (input.note !== undefined) settlement.note = input.note ?? null;
         } else {
             settlement = this.em.create(FixedCostSettlement, {
@@ -220,12 +245,119 @@ export class FixedCostService {
                 amount: null,
                 transaction: null,
                 note: input.note ?? null,
+                clearedByPeriod: null,
             } as never);
             this.em.persist(settlement);
         }
 
         await this.em.flush();
         return toSettlementDto(settlement);
+    }
+
+    /**
+     * User-confirmed: turn uncleared carried months into a debt (+ optional
+     * collection fees), then clear the rolled chain so the bill returns to 1×.
+     */
+    async convertArrearsToDebt(input: {
+        fixedCostId: string;
+        period: string;
+        collectionNoticeSent: boolean;
+        collectionFees: number;
+        scheduleKind: DebtScheduleKind;
+        paymentCadence: Cadence;
+        termPayments?: number | null;
+        maturityOn?: string | null;
+    }) {
+        const fixedCost = await this.repo.findOneOrFail({ id: input.fixedCostId });
+        if (!isFixedCostCounting(fixedCost)) {
+            throw apiBadRequest('bill_paused_no_settlement');
+        }
+
+        const rows = await this.settlements.find({ fixedCost: input.fixedCostId });
+        const rolledCount = countUnclearedRolledMonths(
+            rows.map(row => ({
+                period: row.period,
+                status: row.status,
+                clearedByPeriod: row.clearedByPeriod,
+            })),
+            input.period
+        );
+        if (rolledCount < FIXED_COST_ARREARS_DEBT_THRESHOLD) {
+            throw apiBadRequest('bill_arrears_threshold', {
+                count: FIXED_COST_ARREARS_DEBT_THRESHOLD,
+            });
+        }
+
+        const fees = input.collectionNoticeSent ? Math.max(0, input.collectionFees) : 0;
+        const arrearsBalance = fixedCost.amount * rolledCount;
+        const balance = arrearsBalance + fees;
+        const scheduleKind = input.scheduleKind;
+        const termPayments =
+            scheduleKind === DebtScheduleKind.TERM ? (input.termPayments ?? null) : null;
+        const maturityOn =
+            scheduleKind === DebtScheduleKind.DEADLINE ? (input.maturityOn ?? null) : null;
+        const minimumPayment =
+            scheduleKind === DebtScheduleKind.TERM && termPayments && termPayments > 0
+                ? Math.max(1, Math.round(balance / termPayments))
+                : fixedCost.amount;
+
+        const debt = await this.debts.create({
+            name: `${fixedCost.name} arrears`,
+            kind: DebtKind.OTHER,
+            balance,
+            originalBalance: balance,
+            interestRate: 0,
+            minimumPayment,
+            extraPayment: 0,
+            dueDay: fixedCost.dueDay,
+            dueMonth: fixedCost.dueMonth,
+            startedOn: `${input.period}-01`,
+            scheduleKind,
+            paymentCadence: input.paymentCadence,
+            termPayments,
+            maturityOn,
+            counterparty: fixedCost.counterparty,
+            merchantKey: fixedCost.merchantKey,
+            partyId: fixedCost.party,
+            linkFixedCost: false,
+        });
+
+        await this.clearRolledArrears(input.fixedCostId, input.period, {
+            note: input.collectionNoticeSent
+                ? `Registered as debt (${rolledCount} months + collection fees)`
+                : `Registered as debt (${rolledCount} months)`,
+        });
+        await this.em.flush();
+        return debt;
+    }
+
+    /** Mark consecutive uncleared ROLLED months before `period` as cleared. */
+    private async clearRolledArrears(
+        fixedCostId: string,
+        period: string,
+        opts?: { note?: string }
+    ) {
+        const rows = await this.settlements.find({ fixedCost: fixedCostId });
+        const uncleared = countUnclearedRolledMonths(
+            rows.map(row => ({
+                period: row.period,
+                status: row.status,
+                clearedByPeriod: row.clearedByPeriod,
+            })),
+            period
+        );
+        if (uncleared === 0) return;
+
+        const byPeriod = new Map(rows.map(row => [row.period, row]));
+        let cursor = previousPeriodKey(period);
+        for (let step = 0; step < uncleared; step += 1) {
+            const row = byPeriod.get(cursor);
+            if (row?.status === FixedCostSettlementStatus.ROLLED && !row.clearedByPeriod) {
+                row.clearedByPeriod = period;
+                if (opts?.note) row.note = row.note ?? opts.note;
+            }
+            cursor = previousPeriodKey(cursor);
+        }
     }
 
     // ====================================================================
@@ -393,6 +525,13 @@ function assertDueMonthForCadence(cadence: Cadence, dueMonth: number | null) {
     if (dueMonth === null) throw apiBadRequest('due_month_required');
 }
 
+function previousPeriodKey(period: string): string {
+    const [yearPart, monthPart] = period.split('-');
+    const year = Number(yearPart);
+    const month = Number(monthPart);
+    return month === 1 ? `${year - 1}-12` : `${year}-${String(month - 1).padStart(2, '0')}`;
+}
+
 export function toDto(fixedCost: FixedCost) {
     return {
         id: fixedCost.id,
@@ -430,5 +569,6 @@ export function toSettlementDto(settlement: FixedCostSettlement) {
         amount: settlement.amount,
         transactionId: settlement.transaction?.id ?? null,
         note: settlement.note,
+        clearedByPeriod: settlement.clearedByPeriod ?? null,
     };
 }

@@ -46,8 +46,9 @@ import { ExpenseIntentField, type ExpenseIntentSelection } from './expense-inten
 import { FormInput } from './form-input';
 import { createExpenseFormSchema, type ExpenseFormSchemaValues } from './form-zod';
 import { HoldingField } from './holding-field';
+import { PartyField } from './party-field';
+import { partiesToNameOptions } from './party-name-options';
 import { PresetNameField } from './preset-name-field';
-import { SavePartyToggle } from './save-party-toggle';
 
 function resolveInflowKey(
     label: string,
@@ -69,6 +70,8 @@ export type ExpenseFormValues = ExpenseFormSchemaValues & {
     inflowKey?: string | null;
     /** MerchantPreset key from URL / deep-link — preferred over counterparty name. */
     merchantKey?: string | null;
+    /** Household Party id when the counterparty is a saved party. */
+    partyId?: string | null;
     /** CategoryTemplate key from URL / deep-link. */
     categoryKey?: string | null;
 };
@@ -91,6 +94,7 @@ type ExpenseFormProps = {
 const EMPTY_INTENT: ExpenseIntentSelection = {
     vendor: '',
     merchantKey: null,
+    partyId: null,
     categoryKey: null,
     categoryName: null,
     jarKey: null,
@@ -106,6 +110,7 @@ function intentFromMerchant(
     return {
         vendor: merchant.name,
         merchantKey: merchant.key,
+        partyId: null,
         categoryKey: merchant.categoryTemplateKey,
         categoryName: category?.name ?? merchant.categoryTemplateKey,
         jarKey: merchant.jarKey,
@@ -117,7 +122,8 @@ function intentFromMerchant(
 function buildIntentFromDefaults(
     defaults: Partial<ExpenseFormValues> | undefined,
     merchants: readonly MerchantPreset[],
-    categories: readonly CategoryTemplate[]
+    categories: readonly CategoryTemplate[],
+    parties: ReadonlyArray<{ id: string; name: string }> = []
 ): ExpenseIntentSelection {
     const merchantKey = defaults?.merchantKey?.trim() || '';
     if (merchantKey) {
@@ -126,10 +132,40 @@ function buildIntentFromDefaults(
         // Unknown key — fall through to name / manual.
     }
 
+    const partyId = defaults?.partyId?.trim() || '';
     const categoryKey = defaults?.categoryKey?.trim() || '';
     const vendor = defaults?.counterparty?.trim() || '';
     const description = defaults?.description?.trim() || '';
     const note = defaults?.note?.trim() || '';
+
+    if (partyId || vendor) {
+        const party =
+            (partyId ? parties.find(candidate => candidate.id === partyId) : null) ??
+            (vendor
+                ? (parties.find(
+                      candidate => candidate.name.toLowerCase() === vendor.toLowerCase()
+                  ) ?? null)
+                : null);
+        if (party && !merchantKey) {
+            const categoryFromKey = categoryKey
+                ? categories.find(candidate => candidate.key === categoryKey)
+                : null;
+            const categoryFromDesc = categories.find(
+                candidate => candidate.name.toLowerCase() === description.toLowerCase()
+            );
+            const category = categoryFromKey ?? categoryFromDesc ?? null;
+            return {
+                vendor: party.name,
+                merchantKey: null,
+                partyId: party.id,
+                categoryKey: category?.key ?? null,
+                categoryName: category?.name ?? null,
+                jarKey: category?.jarKey ?? null,
+                source: 'party',
+                saveParty: false,
+            };
+        }
+    }
 
     if (vendor) {
         const merchant =
@@ -147,6 +183,7 @@ function buildIntentFromDefaults(
         return {
             vendor,
             merchantKey: null,
+            partyId: null,
             categoryKey: category?.key ?? null,
             categoryName: category?.name ?? null,
             jarKey: category?.jarKey ?? null,
@@ -161,6 +198,7 @@ function buildIntentFromDefaults(
             return {
                 vendor: '',
                 merchantKey: null,
+                partyId: null,
                 categoryKey: category.key,
                 categoryName: category.name,
                 jarKey: category.jarKey,
@@ -178,6 +216,7 @@ function buildIntentFromDefaults(
             return {
                 vendor: '',
                 merchantKey: null,
+                partyId: null,
                 categoryKey: category.key,
                 categoryName: category.name,
                 jarKey: category.jarKey,
@@ -188,6 +227,7 @@ function buildIntentFromDefaults(
         return {
             vendor: description,
             merchantKey: null,
+            partyId: null,
             categoryKey: null,
             categoryName: null,
             jarKey: null,
@@ -300,9 +340,17 @@ export function ExpenseForm({
         [],
         live
     );
+    const partiesQuery = useLiveQuery(
+        apiQuery.money.parties.list.queryOptions({
+            input: { householdId: householdId! },
+        }),
+        [],
+        live
+    );
     const categoriesQuery = useCategoryTemplates(live);
 
     const merchants = useMemo(() => merchantsQuery.data ?? [], [merchantsQuery.data]);
+    const parties = useMemo(() => partiesQuery.data ?? [], [partiesQuery.data]);
     const categories = useMemo(() => categoriesQuery.data ?? [], [categoriesQuery.data]);
 
     const categoryIconByKey = useMemo(() => {
@@ -313,9 +361,20 @@ export function ExpenseForm({
         return map;
     }, [categories]);
 
-    const catalogsReady = !merchantsQuery.isLoading && !categoriesQuery.isLoading;
+    const givePartyOptions = useMemo(
+        () =>
+            partiesToNameOptions(parties, {
+                badge: tFixed('option_badge_saved'),
+                group: tFixed('option_group_saved'),
+            }),
+        [parties, tFixed]
+    );
+
+    const catalogsReady =
+        !merchantsQuery.isLoading && !categoriesQuery.isLoading && !partiesQuery.isLoading;
     const hasIdentityPrefill = Boolean(
         defaultValues?.merchantKey?.trim() ||
+        defaultValues?.partyId?.trim() ||
         defaultValues?.categoryKey?.trim() ||
         defaultValues?.counterparty?.trim() ||
         (mode === 'edit' &&
@@ -324,8 +383,8 @@ export function ExpenseForm({
     const resolvedIntent = useMemo(() => {
         if (!catalogsReady) return null;
         if (mode !== 'edit' && !hasIdentityPrefill) return null;
-        return buildIntentFromDefaults(defaultValues, merchants, categories);
-    }, [mode, catalogsReady, hasIdentityPrefill, defaultValues, merchants, categories]);
+        return buildIntentFromDefaults(defaultValues, merchants, categories, parties);
+    }, [mode, catalogsReady, hasIdentityPrefill, defaultValues, merchants, categories, parties]);
 
     const intent = intentOverride ?? resolvedIntent ?? EMPTY_INTENT;
     const intentReady = mode === 'create' || resolvedIntent !== null;
@@ -370,16 +429,21 @@ export function ExpenseForm({
 
     const donationsCategory = useMemo(() => defaultGiveCategoryTemplate(categories), [categories]);
 
-    function applyGivePayee(name: string, orgKey: string | null = null) {
+    function applyGivePayee(
+        name: string,
+        orgKey: string | null = null,
+        partyId: string | null = null
+    ) {
         setGiveOrgKey(orgKey);
         setIntentOverride({
             vendor: name,
             merchantKey: null,
+            partyId: orgKey ? null : partyId,
             categoryKey: donationsCategory?.key ?? null,
             categoryName: donationsCategory?.name ?? null,
             jarKey: JarKey.GIVE,
-            source: name.trim() ? 'custom' : null,
-            saveParty: !orgKey,
+            source: partyId ? 'party' : name.trim() ? 'custom' : null,
+            saveParty: !orgKey && !partyId,
         });
     }
 
@@ -405,6 +469,7 @@ export function ExpenseForm({
             setIntentOverride({
                 vendor: '',
                 merchantKey: null,
+                partyId: null,
                 categoryKey: donationsCategory?.key ?? null,
                 categoryName: donationsCategory?.name ?? null,
                 jarKey: JarKey.GIVE,
@@ -468,9 +533,11 @@ export function ExpenseForm({
             const vendor = isIn ? label : intent.vendor.trim();
             const note = values.note.trim();
             const merchantKey = !isIn ? intent.merchantKey?.trim() || null : null;
+            const partyId = !isIn && !merchantKey ? intent.partyId?.trim() || null : null;
             const saveParty =
                 Boolean(vendor) &&
                 !merchantKey &&
+                !partyId &&
                 !giveOrgKey &&
                 (isIn || (intent.saveParty ?? true));
             const description = isIn
@@ -499,6 +566,9 @@ export function ExpenseForm({
                     amount: signedAmount,
                     note: note || null,
                     counterparty: vendor || null,
+                    merchantKey,
+                    partyId,
+                    saveParty,
                     categoryId,
                     inflowKey: isIn ? inflowKey : null,
                     assetId: values.assetId ?? null,
@@ -523,7 +593,7 @@ export function ExpenseForm({
                 categoryId,
                 counterparty: vendor || null,
                 merchantKey,
-                partyId: null,
+                partyId,
                 saveParty,
                 note: note || null,
                 inflowKey: isIn ? inflowKey : null,
@@ -806,29 +876,36 @@ export function ExpenseForm({
                     </div>
                     <p className="text-xs leading-relaxed text-fg-faint">{tFixed('give_hint')}</p>
                     {givePayeeMode === 'known' ? (
-                        <div className="grid gap-2">
-                            <FormInput
-                                placeholder={tFixed('give_placeholder')}
-                                value={intent.vendor}
-                                disabled={busy}
-                                onChange={event => {
-                                    applyGivePayee(event.target.value, null);
-                                }}
-                            />
-                            {intent.vendor.trim() && !giveOrgKey ? (
-                                <SavePartyToggle
-                                    name={intent.vendor}
-                                    checked={intent.saveParty}
-                                    disabled={busy}
-                                    onCheckedChange={next =>
-                                        setIntentOverride({
-                                            ...intent,
-                                            saveParty: next,
-                                        })
-                                    }
-                                />
-                            ) : null}
-                        </div>
+                        <PartyField
+                            label={tFixed('to_whom')}
+                            placeholder={tFixed('give_placeholder')}
+                            options={givePartyOptions}
+                            disabled={busy}
+                            value={{
+                                counterparty: intent.vendor,
+                                merchantKey: '',
+                                partyId: intent.partyId ?? '',
+                                saveParty: intent.saveParty,
+                            }}
+                            onChange={next => {
+                                const nextPartyId = next.partyId.trim() || null;
+                                setGiveOrgKey(null);
+                                setIntentOverride({
+                                    vendor: next.counterparty,
+                                    merchantKey: null,
+                                    partyId: nextPartyId,
+                                    categoryKey: donationsCategory?.key ?? null,
+                                    categoryName: donationsCategory?.name ?? null,
+                                    jarKey: JarKey.GIVE,
+                                    source: nextPartyId
+                                        ? 'party'
+                                        : next.counterparty.trim()
+                                          ? 'custom'
+                                          : null,
+                                    saveParty: next.saveParty,
+                                });
+                            }}
+                        />
                     ) : (
                         <GivingFinder
                             defaultOpen
@@ -850,6 +927,7 @@ export function ExpenseForm({
                         onChange={setIntentOverride}
                         merchants={merchants}
                         categories={categories}
+                        parties={parties}
                         categoryIconByKey={categoryIconByKey}
                         jarKey={selectedJarKey}
                         disabled={busy}

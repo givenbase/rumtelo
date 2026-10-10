@@ -9,6 +9,9 @@ import { z } from 'zod';
 import { HouseholdId, Id, IsoDate, Money, PeriodKey } from '../../../../common/common.schema';
 import { MonthScoreEventKind } from '../enums';
 
+/** Consecutive uncleared rolled months before converting backlog into a debt. */
+export const FIXED_COST_ARREARS_DEBT_THRESHOLD = 3;
+
 /**
  * Monthly score for one budget period (YYYY-MM). Accrues from observable
  * behavior, closes on rollover, and is never re-openable — the log is the
@@ -25,12 +28,29 @@ export const MonthScoreEvent = z.object({
     points: z.int(),
 });
 
+/** One unpaid bill that must be skipped or carried before close. */
+export const MonthCloseDueBill = z.object({
+    fixedCostId: Id,
+    name: z.string(),
+    amount: Money,
+    /** Uncleared rolled months already ahead of this close (0 = first carry). */
+    arrearsMonths: z.int().nonnegative(),
+});
+
 /** Open work that blocks closing this period (inbox + unpaid/unskipped bills). */
 export const MonthCloseBlockers = z.object({
     inboxCount: z.int().nonnegative(),
     dueBillCount: z.int().nonnegative(),
     /** Up to a few bill names for warning copy. */
     dueBillNames: z.array(z.string()),
+    /** Full due-bill list for the close wizard (skip / carry). */
+    dueBills: z.array(MonthCloseDueBill).default([]),
+});
+
+/** Per-bill choice when closing with open fixed costs. */
+export const MonthCloseBillDisposition = z.object({
+    fixedCostId: Id,
+    action: z.enum(['skip', 'roll']),
 });
 
 export const MonthScore = z.object({
@@ -96,7 +116,9 @@ export const PeriodRecap = z.object({
 
 // Inferred types (same-module merge for consumers)
 export type MonthScoreEvent = z.infer<typeof MonthScoreEvent>;
+export type MonthCloseDueBill = z.infer<typeof MonthCloseDueBill>;
 export type MonthCloseBlockers = z.infer<typeof MonthCloseBlockers>;
+export type MonthCloseBillDisposition = z.infer<typeof MonthCloseBillDisposition>;
 export type MonthScore = z.infer<typeof MonthScore>;
 export type Level = z.infer<typeof Level>;
 export type PeriodRecap = z.infer<typeof PeriodRecap>;
