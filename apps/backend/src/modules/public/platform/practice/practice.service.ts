@@ -42,6 +42,7 @@ import { AuthMember } from '../../../auth/household/managed/member/auth-member.e
 import { AuthUser } from '../../../auth/user/managed/user/auth-user.entity';
 import { Account } from '../../../auth/user/account/account.entity';
 import { AccountService } from '../../../auth/user/account/account.service';
+import { personDisplayName } from '../../../auth/user/account/person-display-name.util';
 import { EmailService } from '../../../backoffice/communication/email';
 import { EnergyDashboardService } from '../../product/energy/dashboard/dashboard.service';
 import { GrowthDashboardService } from '../../product/growth/dashboard/dashboard.service';
@@ -196,15 +197,18 @@ export class PracticeService {
     }
 
     async addClient(input: PracticeAddClientInput): Promise<PracticeAddClientResult> {
-        const { account, practice } = await this.assertPracticeRole(input.practiceId, [
+        const { account, user, practice } = await this.assertPracticeRole(input.practiceId, [
             PracticeRole.OWNER,
             PracticeRole.ADMIN,
             PracticeRole.COACH,
         ]);
         const access = input.access ?? PracticeClientAccess.VIEW;
         const practiceName = practice.displayName?.trim() || practice.legalName;
-        const inviterName =
-            [account.firstName, account.lastName].filter(Boolean).join(' ').trim() || undefined;
+        const inviterName = personDisplayName({
+            displayName: user.name,
+            firstName: account.firstName,
+            lastName: account.lastName,
+        });
 
         // Explicit household id — existing household path.
         if (input.householdId) {
@@ -221,10 +225,10 @@ export class PracticeService {
 
         if (!input.email) throw apiBadRequest('practice_invite_user_not_found');
         const email = input.email.trim().toLowerCase();
-        const user = await this.em.findOne(AuthUser, { email });
+        const invitee = await this.em.findOne(AuthUser, { email });
 
         // No Rumtelo account yet → email invite to sign up.
-        if (!user) {
+        if (!invitee) {
             return this.offerEmailInvite({
                 practiceId: input.practiceId,
                 email,
@@ -238,10 +242,9 @@ export class PracticeService {
 
         const membership = await this.em.findOne(
             AuthMember,
-            { user: user.id },
+            { user: invitee.id },
             { orderBy: { createdAt: 'ASC' } }
         );
-
         // Account exists but no household → email invite to finish setup.
         if (!membership) {
             return this.offerEmailInvite({
@@ -595,7 +598,7 @@ export class PracticeService {
     }
 
     private async assertPracticeRole(practiceId: string, allowed: PracticeRole[]) {
-        const { account } = await this.accounts.ensureCurrentAccount();
+        const { account, user } = await this.accounts.ensureCurrentAccount();
         const member = await this.em.findOne(PracticeMember, {
             practice: practiceId,
             account: account.id,
@@ -604,7 +607,7 @@ export class PracticeService {
         if (!allowed.includes(member.role)) throw apiForbidden('practice_forbidden');
         const practice = await this.em.findOne(Practice, { id: practiceId });
         if (!practice) throw apiNotFound('practice_not_found');
-        return { account, member, practice };
+        return { account, user, member, practice };
     }
 
     /**

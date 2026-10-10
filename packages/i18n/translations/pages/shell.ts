@@ -19,6 +19,8 @@ const shell = {
         settings_sub: 'Account, plan, language',
         my_plan: 'My plan',
         my_plan_sub: 'What you use and pay',
+        start_own: 'Start my household',
+        start_own_sub: 'Your own jars and board — optional',
         sign_out: 'Sign out',
         sign_out_sub: 'You stay signed in for 30 days',
         language: 'Language',
@@ -27,6 +29,11 @@ const shell = {
         appearance_sub: 'Light or dark',
         theme_light: '☀ Light',
         theme_dark: '☾ Dark',
+    },
+    viewer: {
+        look_along: 'Looking along — read only',
+        start_own_banner: 'Want your own Rumtelo board? Start a household anytime.',
+        start_own_cta: 'Start my household',
     },
     period_options: {
         this_month: 'This month',

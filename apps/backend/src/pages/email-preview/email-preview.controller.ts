@@ -20,6 +20,7 @@ const TEMPLATES = [
     EmailTemplate.PRACTICE_CLIENT_INVITE,
     EmailTemplate.ACCOUNT_VERIFICATION,
     EmailTemplate.PASSWORD_RESET,
+    EmailTemplate.SIGN_IN_OTP,
     EmailTemplate.CONTACT_FORM,
 ] as const;
 type TemplateId = (typeof TEMPLATES)[number];
@@ -29,6 +30,7 @@ const TEMPLATE_LABELS: Record<TemplateId, string> = {
     [EmailTemplate.PRACTICE_CLIENT_INVITE]: 'Practice invitation',
     [EmailTemplate.ACCOUNT_VERIFICATION]: 'Account verification',
     [EmailTemplate.PASSWORD_RESET]: 'Password reset',
+    [EmailTemplate.SIGN_IN_OTP]: 'Sign-in OTP',
     [EmailTemplate.CONTACT_FORM]: 'Contact form',
 };
 
@@ -149,6 +151,16 @@ export class EmailPreviewController {
                         firstName: 'Anna',
                         resetUrl: 'https://rumtelo.local/reset-password?token=demo',
                         expiresInHours: 1,
+                    },
+                    'en'
+                );
+            case EmailTemplate.SIGN_IN_OTP:
+                return renderTemplate(
+                    EmailTemplate.SIGN_IN_OTP,
+                    {
+                        firstName: 'Anna',
+                        otp: '482913',
+                        expiresInMinutes: 10,
                     },
                     'en'
                 );

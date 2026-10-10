@@ -7,9 +7,19 @@
  * `capabilityKey`: always a catalog key from CAPABILITIES (`{product}-{feature}`).
  * Labels are i18n keys under `pages.nav.*` — resolve with `t(labelKey)` in the shell.
  */
+import { HouseholdPermissionSection, type HouseholdRole, roleCanSee } from '@rumtelo/contracts';
+
 import { isProductEnabled } from './launch-products';
 import { CAPABILITIES } from './plan';
 import { productPath } from './routes';
+
+const NAV_GROUP_SECTION: Record<string, HouseholdPermissionSection> = {
+    home: HouseholdPermissionSection.HOME,
+    money: HouseholdPermissionSection.MONEY,
+    growth: HouseholdPermissionSection.GROWTH,
+    energy: HouseholdPermissionSection.ENERGY,
+    soul: HouseholdPermissionSection.SOUL,
+};
 
 /** Full portal IA — filtered by launch surface for `NAV_GROUPS` / `BOTTOM_TABS`. */
 const ALL_NAV_GROUPS = [
@@ -183,10 +193,37 @@ export const TOP_PILL_LABEL_KEYS: Record<string, string> = {
 export type NavGroup = (typeof ALL_NAV_GROUPS)[number];
 export type NavChild = NavGroup['children'][number];
 
+/** Role-filtered nav — children may be a subset (VIEWER drops Coach / Why). */
+export type ShellNavGroup = {
+    key: NavGroup['key'];
+    labelKey: NavGroup['labelKey'];
+    icon: NavGroup['icon'];
+    href: NavGroup['href'];
+    children: readonly NavChild[];
+};
+
 /** Launch-filtered portals — production hides Energy/Soul. */
 export const NAV_GROUPS: readonly NavGroup[] = ALL_NAV_GROUPS.filter(group =>
     isProductEnabled(group.key)
 );
+
+/** Portals this household role may open (VIEWER = home + money only). */
+export function navGroupsForRole(role: HouseholdRole): ShellNavGroup[] {
+    const canSeeCoach = roleCanSee(role, HouseholdPermissionSection.COACH);
+    return NAV_GROUPS.filter(group => {
+        const section = NAV_GROUP_SECTION[group.key];
+        if (!section) return true;
+        return roleCanSee(role, section);
+    }).map(group => {
+        if (group.key !== 'home' || canSeeCoach) return group;
+        return {
+            ...group,
+            children: group.children.filter(
+                child => !child.href.includes('/coach') && !child.href.includes('/why')
+            ),
+        };
+    });
+}
 
 /** Bottom tabs — design `SHORT` map (same launch filter as nav). */
 export const BOTTOM_TABS = NAV_GROUPS.map(group => ({

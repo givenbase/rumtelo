@@ -54,6 +54,14 @@ export type PasswordResetEmailInput = {
     locale?: string;
 };
 
+export type SignInOtpEmailInput = {
+    to: string;
+    firstName: string;
+    otp: string;
+    expiresInMinutes?: number;
+    locale?: string;
+};
+
 export type ContactFormEmailInput = {
     name: string;
     email: string;

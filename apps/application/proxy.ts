@@ -5,6 +5,8 @@ import { getSessionCookie } from 'better-auth/cookies';
 import {
     type BoardGateState,
     isBoardGatedPath,
+    isCreateOwnHouseholdPath,
+    isInvitePath,
     isPracticePath,
     resolveBoardRedirect,
 } from './app/_lib/onboarding-gate';
@@ -48,7 +50,12 @@ function isSignInRoute(path: string): boolean {
 }
 
 function isPublicAuthRoute(path: string): boolean {
-    return isSignInRoute(path) || path.startsWith('/sign-up') || path.startsWith('/verify');
+    return (
+        isSignInRoute(path) ||
+        path.startsWith('/sign-up') ||
+        path.startsWith('/verify') ||
+        isInvitePath(path)
+    );
 }
 
 /** Nest origin for server-side gate calls — mirrors `env.DOMAIN_BACK` without importing contracts. */
@@ -81,10 +88,18 @@ async function fetchBoardGate(request: NextRequest): Promise<BoardGateState> {
             signal: controller.signal,
         });
         if (!response.ok) return { ready: null, home: '/' };
-        const result = (await response.json()) as { ready?: unknown; home?: unknown };
+        const result = (await response.json()) as {
+            ready?: unknown;
+            home?: unknown;
+            invitePath?: unknown;
+        };
         if (typeof result.ready !== 'boolean') return { ready: null, home: '/' };
         const home = result.home === '/practice' ? '/practice' : '/';
-        return { ready: result.ready, home };
+        const invitePath =
+            typeof result.invitePath === 'string' && result.invitePath.startsWith('/invite/')
+                ? result.invitePath
+                : null;
+        return { ready: result.ready, home, invitePath };
     } catch {
         return { ready: null, home: '/' };
     } finally {
@@ -129,9 +144,13 @@ export async function proxy(request: NextRequest) {
     }
 
     // Board / onboarding / practice-home gate — single decision via util.
+    // `/invite/*` stays open so invitees can accept without creator onboarding.
+    // `/onboarding/create` is the VIEWER soft-upgrade path (own household).
     if (
         hasSession &&
         !isPracticePath(path) &&
+        !isInvitePath(path) &&
+        !isCreateOwnHouseholdPath(path) &&
         !isPublicAuthRoute(path) &&
         !isSystemRoute &&
         isBoardGatedPath(path)

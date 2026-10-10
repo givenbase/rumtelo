@@ -11,10 +11,11 @@ import { Icon, useTheme } from '@rumtelo/ui';
 import { cn, accountThemeFromCss } from '@rumtelo/utils';
 
 import { signOutToSignIn } from '@/app/_lib/auth';
+import { HouseholdRole } from '@rumtelo/contracts';
+
 import {
-    BOTTOM_TABS,
-    NAV_GROUPS,
     TOP_PILL_LABEL_KEYS,
+    navGroupsForRole,
     resolveNavChildForPath,
     resolveNavGroupForPath,
 } from '@/app/_lib/nav';
@@ -31,6 +32,7 @@ import { PendingPlanCheckout } from '@/components/features/shell/pending-plan-ch
 import { PendingPracticeInviteRedeem } from '@/components/features/shell/pending-practice-invite-redeem';
 import { CapabilityGate } from '@/components/features/shell/capability-gate';
 import { BoardMutateRouteGuard } from '@/components/features/shell/board-mutate-route-guard';
+import { ViewerPortalRouteGuard } from '@/components/features/shell/viewer-portal-route-guard';
 import { usePracticePreview } from '@/components/features/shell/practice-preview';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
@@ -162,7 +164,14 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
     const { isCapabilityLocked, accessForPath } = usePlanCapabilities();
     const { session } = useAuth();
     const { capabilities } = usePracticePreview();
-    const { canMutate } = useBoardWriteAccess();
+    const { canMutate, role } = useBoardWriteAccess();
+    const portalGroups = navGroupsForRole(role);
+    const isViewer = role === HouseholdRole.VIEWER && !capabilities.active;
+    const bottomTabs = portalGroups.map(group => ({
+        href: group.href,
+        labelKey: TOP_PILL_LABEL_KEYS[group.key] ?? group.labelKey,
+        glyph: group.icon,
+    }));
     const { requestTourOffer } = usePageTour();
 
     // After jar-bank setup on the onboarding page, a sessionStorage flag triggers
@@ -320,8 +329,8 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                                         className="fixed inset-0 z-30 cursor-default"
                                     />
                                     <div className="absolute top-11 left-0 z-40 w-[min(16.5rem,calc(100vw-2rem))] animate-rise overflow-hidden rounded-2xl border border-line-strong bg-surface p-1.5 shadow-xl">
-                                        {NAV_GROUPS.map(group => {
-                                            const active = group === activeGroup;
+                                        {portalGroups.map(group => {
+                                            const active = group.key === activeGroup?.key;
                                             return (
                                                 <Link
                                                     key={group.key}
@@ -363,8 +372,8 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                             className="pointer-events-none absolute inset-x-0 hidden justify-center md:flex"
                             aria-label={t('pages.shell.aria.main_nav')}>
                             <div className="pointer-events-auto flex items-center gap-0.5 rounded-full border border-line bg-sunken p-1 shadow-md">
-                                {NAV_GROUPS.map(group => {
-                                    const active = group === activeGroup;
+                                {portalGroups.map(group => {
+                                    const active = group.key === activeGroup?.key;
                                     return (
                                         <Link
                                             key={group.key}
@@ -459,8 +468,33 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                                         {/* Practice switcher — shows when user has a practice */}
                                         <PracticeMenuLink onClose={() => setMenuOpen(false)} />
 
+                                        {isViewer ? (
+                                            <div className="grid gap-0.5 border-b border-line p-2">
+                                                <Link
+                                                    href="/onboarding/create"
+                                                    aria-label={t('pages.shell.menu.start_own')}
+                                                    onClick={() => setMenuOpen(false)}
+                                                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-raised">
+                                                    <span className="grid min-w-0 flex-1 gap-0.5">
+                                                        <span className="text-sm text-fg">
+                                                            {t('pages.shell.menu.start_own')}
+                                                        </span>
+                                                        <span className="text-xs leading-tight text-fg-faint">
+                                                            {t('pages.shell.menu.start_own_sub')}
+                                                        </span>
+                                                    </span>
+                                                </Link>
+                                            </div>
+                                        ) : null}
+
                                         <div className="grid gap-0.5 p-2">
                                             {MENU_ITEMS.filter(item => {
+                                                if (
+                                                    isViewer &&
+                                                    item.href === '/settings/general/plan'
+                                                ) {
+                                                    return false;
+                                                }
                                                 if (!capabilities.showSettings) {
                                                     return (
                                                         item.href !== '__settings__' &&
@@ -657,12 +691,31 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
             {/* ── MAIN ─────────────────────────────────────────────────────── */}
             <div className="mx-auto max-w-7xl px-4 py-8 pb-24 md:pb-8">
                 {!access.locked && <PeriodTravelBanner />}
+                {isViewer ? (
+                    <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-line bg-surface/80 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="grid gap-0.5">
+                            <p className="font-mono text-[10px] font-semibold tracking-widest text-fg-faint uppercase">
+                                {t('pages.shell.viewer.look_along')}
+                            </p>
+                            <p className="text-sm text-fg-muted">
+                                {t('pages.shell.viewer.start_own_banner')}
+                            </p>
+                        </div>
+                        <Link
+                            href="/onboarding/create"
+                            className="shrink-0 rounded-full bg-accent px-4 py-2 text-center text-sm font-semibold text-on-accent transition hover:brightness-110">
+                            {t('pages.shell.viewer.start_own_cta')}
+                        </Link>
+                    </div>
+                ) : null}
                 {capabilities.showWhyCaption ? (
                     <WhyCaption pathname={pathname} locked={access.locked} />
                 ) : null}
                 <main className="min-w-0">
                     <CapabilityGate>
-                        <BoardMutateRouteGuard>{children}</BoardMutateRouteGuard>
+                        <ViewerPortalRouteGuard>
+                            <BoardMutateRouteGuard>{children}</BoardMutateRouteGuard>
+                        </ViewerPortalRouteGuard>
                     </CapabilityGate>
                 </main>
             </div>
@@ -671,15 +724,17 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
             <nav
                 className={cn(
                     'fixed inset-x-0 bottom-0 z-50 grid border-t border-line bg-chrome pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden',
-                    BOTTOM_TABS.length <= 3
+                    bottomTabs.length <= 3
                         ? 'grid-cols-3'
-                        : BOTTOM_TABS.length === 4
+                        : bottomTabs.length === 4
                           ? 'grid-cols-4'
                           : 'grid-cols-5'
                 )}
                 aria-label={t('pages.shell.aria.mobile_nav')}>
-                {BOTTOM_TABS.map((tab, i) => {
-                    const active = NAV_GROUPS[i] === activeGroup;
+                {bottomTabs.map(tab => {
+                    const active =
+                        portalGroups.find(group => group.href === tab.href)?.key ===
+                        activeGroup?.key;
                     return (
                         <Link
                             key={tab.href}

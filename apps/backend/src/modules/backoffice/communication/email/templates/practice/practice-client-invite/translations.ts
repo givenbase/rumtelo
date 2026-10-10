@@ -1,7 +1,7 @@
 export const languageObject = {
     en: {
         'email.practice.client_invite.header.preview_text':
-            'You are invited to work with a Practice on Rumtelo',
+            '{who} invited you to work with a Practice on Rumtelo',
         'email.practice.client_invite.header.title': 'Practice invitation — Rumtelo',
         'email.practice.client_invite.header.heading': 'You are invited',
         'email.practice.client_invite.body.message':
@@ -16,7 +16,7 @@ export const languageObject = {
     },
     nl: {
         'email.practice.client_invite.header.preview_text':
-            'Je bent uitgenodigd om met een Practice te werken op Rumtelo',
+            '{who} nodigt je uit om met een Practice te werken op Rumtelo',
         'email.practice.client_invite.header.title': 'Practice-uitnodiging — Rumtelo',
         'email.practice.client_invite.header.heading': 'Je bent uitgenodigd',
         'email.practice.client_invite.body.message':

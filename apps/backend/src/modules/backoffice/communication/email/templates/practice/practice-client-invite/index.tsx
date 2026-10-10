@@ -7,6 +7,7 @@ import EmailLayout from '../../../components/EmailLayout';
 import { createEmailStyles } from '../../../styles';
 import type { EmailLogoMode } from '../../../utils/email-brand-images.util';
 import { createEmailTranslator } from '../../../utils/email-translation.util';
+import { inviterLabel } from '../../../utils/inviter-label.util';
 
 import { languageObject } from './translations';
 
@@ -39,7 +40,7 @@ export const PracticeClientInviteTemplate: React.FC<PracticeClientInviteTemplate
 }) => {
     const translate = createEmailTranslator(languageObject, locale);
     const styles = createEmailStyles(darkMode);
-    const who = inviterName?.trim() || (locale === 'nl' ? 'Iemand' : 'Someone');
+    const who = inviterLabel(inviterName, locale);
     const accessLabel = translate(
         access === 'MANAGE'
             ? 'email.practice.client_invite.body.access_manage'
@@ -52,7 +53,7 @@ export const PracticeClientInviteTemplate: React.FC<PracticeClientInviteTemplate
             darkMode={darkMode}
             websiteUrl={websiteUrl}
             logoMode={logoMode}
-            previewText={translate('email.practice.client_invite.header.preview_text')}
+            previewText={translate('email.practice.client_invite.header.preview_text', { who })}
             title={translate('email.practice.client_invite.header.title')}>
             <Heading style={styles.heading}>
                 {translate('email.practice.client_invite.header.heading')}

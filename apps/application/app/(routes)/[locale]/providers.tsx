@@ -11,6 +11,7 @@ import { AccountThemeProvider } from '@/components/features/shell/account-theme-
 import { HouseholdShellProvider } from '@/components/features/shell/household-shell-context';
 import { AuthProvider, useAuth } from '@/components/features/shell/auth-provider';
 import { PlanIntentProvider } from '@/components/features/shell/plan-intent-provider';
+import { HouseholdInviteProvider } from '@/components/features/shell/household-invite-provider';
 import { PracticeInviteProvider } from '@/components/features/shell/practice-invite-provider';
 import { ToastPill } from '@/components/layout/toast';
 
@@ -55,20 +56,27 @@ export function Providers({ children }: { children: ReactNode }) {
                   “useAuth must be used inside <AuthProvider>”.
                 */}
                 <AuthProvider>
-                    <Suspense fallback={<ProvidersFallback />}>
-                        <PlanIntentProvider>
-                            <PracticeInviteProvider>
-                                <HouseholdHeaderSync>
-                                    <AccountThemeProvider>
-                                        <HouseholdShellProvider>
-                                            {children}
-                                            <ToastPill />
-                                        </HouseholdShellProvider>
-                                    </AccountThemeProvider>
-                                </HouseholdHeaderSync>
-                            </PracticeInviteProvider>
-                        </PlanIntentProvider>
-                    </Suspense>
+                    {/*
+                      Board period lives here (above Suspense). PlanIntent / PracticeInvite
+                      use searchParams and can remount the Suspense tree — period must not
+                      reset when the user is fixing a prior open month across pages.
+                    */}
+                    <HouseholdShellProvider>
+                        <Suspense fallback={<ProvidersFallback />}>
+                            <PlanIntentProvider>
+                                <PracticeInviteProvider>
+                                    <HouseholdInviteProvider>
+                                        <HouseholdHeaderSync>
+                                            <AccountThemeProvider>
+                                                {children}
+                                                <ToastPill />
+                                            </AccountThemeProvider>
+                                        </HouseholdHeaderSync>
+                                    </HouseholdInviteProvider>
+                                </PracticeInviteProvider>
+                            </PlanIntentProvider>
+                        </Suspense>
+                    </HouseholdShellProvider>
                 </AuthProvider>
             </QueryClientProvider>
         </ThemeProvider>

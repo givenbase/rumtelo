@@ -11,6 +11,7 @@ import {
     useSyncExternalStore,
     type ReactNode,
 } from 'react';
+import { usePathname } from 'next/navigation';
 
 import {
     activeHouseholdId,
@@ -51,7 +52,7 @@ interface AuthCtx {
     isAuthenticated: boolean;
     refreshSession: () => Promise<void>;
     /** Sets BA active organization (= Rumtelo household) and refreshes session. */
-    setActiveHousehold: (householdId: string) => Promise<void>;
+    setActiveHousehold: (householdId: string | null) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthCtx | null>(null);
@@ -73,6 +74,7 @@ function toSession(data: ReturnType<typeof useSession>['data']): Session | null 
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const { data, isPending, refetch } = useSession();
+    const pathname = usePathname() ?? '';
     const session = toSession(data);
     const activating = useRef(false);
     /** User id whose org-activation attempt has finished (including "none"). */
@@ -89,13 +91,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const userId = sessionUserId(session);
     const user = session?.user ?? null;
     const isAuthenticated = Boolean(userId);
+    /** Soft-upgrade / invite — do not auto-reattach a look-along household. */
+    const skipAutoActivate =
+        pathname.includes('/onboarding/create') || pathname.includes('/invite/');
 
     const householdReady = useMemo(() => {
         if (isPending) return false;
         if (!userId) return true;
         if (householdId) return true;
+        if (skipAutoActivate) return true;
         return activatedForUserId === userId;
-    }, [isPending, userId, householdId, activatedForUserId]);
+    }, [isPending, userId, householdId, activatedForUserId, skipAutoActivate]);
 
     const refetchRef = useRef(refetch);
     useEffect(() => {
@@ -107,7 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [refetch]);
 
     const setActiveHousehold = useCallback(
-        async (nextHouseholdId: string) => {
+        async (nextHouseholdId: string | null) => {
             await setActiveOrganization(nextHouseholdId);
             await refetch();
         },
@@ -116,8 +122,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // First login / demo: activate the only household if session has none.
     // Skip while practice preview is active — do not steal the coach into their own board.
+    // Skip on invite accept + VIEWER soft-upgrade create path.
     useEffect(() => {
-        if (isPending || !userId || householdId || isPracticePreview) return;
+        if (isPending || !userId || householdId || isPracticePreview || skipAutoActivate) return;
         if (activatedForUserId === userId || activating.current) return;
         activating.current = true;
         const targetUserId = userId;
@@ -134,7 +141,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 setActivatedForUserId(targetUserId);
             }
         })();
-    }, [isPending, userId, householdId, activatedForUserId, isPracticePreview]);
+    }, [isPending, userId, householdId, activatedForUserId, isPracticePreview, skipAutoActivate]);
 
     const value = useMemo(
         () => ({

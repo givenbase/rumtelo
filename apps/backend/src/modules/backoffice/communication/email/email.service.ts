@@ -9,6 +9,7 @@ import type {
     PasswordResetEmailInput,
     PracticeClientInviteEmailInput,
     SendEmailInput,
+    SignInOtpEmailInput,
 } from './email.types';
 import { EMAIL_BRAND } from './utils/brand.constants';
 import { emailBrandCidAttachments } from './utils/email-brand-images.util';
@@ -222,6 +223,22 @@ export class EmailService {
         );
     }
 
+    /** Passwordless sign-in OTP — Better Auth `emailOTP` (`type: sign-in`). */
+    async sendSignInOtpEmail(input: SignInOtpEmailInput): Promise<boolean> {
+        const locale = input.locale ?? 'en';
+        return this.sendTemplatedEmail(
+            input.to,
+            locale === 'nl' ? 'Je inlogcode — Rumtelo' : 'Your sign-in code — Rumtelo',
+            EmailTemplate.SIGN_IN_OTP,
+            {
+                firstName: input.firstName,
+                otp: input.otp,
+                expiresInMinutes: input.expiresInMinutes ?? 10,
+            },
+            locale
+        );
+    }
+
     /** Marketing-site contact form → EMAIL_FROM inbox (reply-to = submitter). */
     async sendContactFormEmail(input: ContactFormEmailInput): Promise<boolean> {
         const locale = input.locale ?? 'en';
@@ -249,8 +266,10 @@ export class EmailService {
     }
 
     /** Accept URL for an invitation id (application route). */
-    inviteUrl(invitationId: string): string {
-        return `${this.appOrigin}/invite/${invitationId}`;
+    inviteUrl(invitationId: string, email?: string): string {
+        const url = new URL(`/invite/${invitationId}`, `${this.appOrigin}/`);
+        if (email?.trim()) url.searchParams.set('email', email.trim());
+        return url.toString();
     }
 
     /** Marketing site origin used in email chrome links. */

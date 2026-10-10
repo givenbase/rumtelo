@@ -79,6 +79,27 @@ const auth = {
         logout_success: 'Signed out',
         logout_failure: 'Could not sign out',
     },
+    /** Household email invite accept (`/invite/{id}`). */
+    invite: {
+        title: 'Join this household',
+        sign_in_body:
+            'Use the invited email — we send a one-time code. No password. You will not set up income or jars.',
+        create_account: 'Create an account',
+        body: 'Accept to open this household as a member. You will not go through personal money onboarding.',
+        body_named:
+            'Accept to join {name}. You will not set up income or jars — the household already has those.',
+        no_onboarding: 'Viewers and members skip the creator questionnaire.',
+        accept: 'Join household',
+        go_home: 'Back to Rumtelo',
+        email_label: 'Invited email',
+        send_code: 'Email me a code',
+        code_sent: 'Code sent — check your inbox.',
+        code_label: 'One-time code',
+        verify_code: 'Continue',
+        resend_code: 'Send a new code',
+        password_instead: 'Sign in with password instead',
+        otp_hint: 'Six digits from the email we just sent.',
+    },
 } as const;
 
 export default auth;

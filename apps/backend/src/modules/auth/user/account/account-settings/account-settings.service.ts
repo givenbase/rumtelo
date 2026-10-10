@@ -16,7 +16,10 @@ import {
 import { apiNotFound } from '../../../../../common/errors/api-user-error';
 import { currentUserId, householdStorage } from '../../../../../common/household/household.context';
 import { PracticeMember } from '../../../../public/platform/practice/practice-member/practice-member.entity';
+import { AuthInvitation } from '../../../household/managed/invitation/auth-invitation.entity';
+import { AuthMember } from '../../../household/managed/member/auth-member.entity';
 import { HouseholdSettings } from '../../../household/household-settings/household-settings.entity';
+import { AuthUser } from '../../../user/managed/user/auth-user.entity';
 import { Account } from '../account.entity';
 import { AccountSettings } from './account-settings.entity';
 
@@ -119,35 +122,87 @@ export class AccountSettingsService {
      * Boot / proxy gate — may the signed-in person leave `/onboarding`?
      * Uses durable DB state (not a client cookie).
      * `home` tells the proxy where ready users belong (practice desk vs board).
+     *
+     * Invitees (VIEWER / MEMBER / ADMIN) must never run creator onboarding.
+     * Personal `onboardedAt` is a pass for them once they have a household seat.
+     * Pending email invites route to `/invite/{id}` — never the income/jars questionnaire.
+     * Incomplete jar-bank setup only blocks the OWNER.
      */
-    async boardReady(): Promise<{ ready: boolean; home: '/' | '/practice' }> {
-        const settings = await this.get();
-        const householdId = householdStorage.getStore()?.householdId ?? null;
+    async boardReady(): Promise<{
+        ready: boolean;
+        home: '/' | '/practice';
+        invitePath?: string | null;
+    }> {
+        const userId = currentUserId();
+        const ctx = householdStorage.getStore();
+        const householdId = ctx?.householdId ?? null;
+        let settings = await this.get();
 
         if (!settings.onboardedAt) {
-            const account = await this.em.findOne(Account, { user: currentUserId() });
-            if (!account) return { ready: false, home: '/' };
-            const practiceSeat = await this.em.findOne(PracticeMember, { account: account.id });
-            if (practiceSeat) return { ready: true, home: '/practice' };
-            return { ready: false, home: '/' };
+            const account = await this.em.findOne(Account, { user: userId });
+            if (!account) {
+                const invitePath = await this.pendingInvitePath(userId);
+                return { ready: false, home: '/', invitePath };
+            }
+
+            const membership = await this.em.findOne(AuthMember, { user: userId });
+            if (membership) {
+                // Joined via invite (or any existing seat) — no income/jars questionnaire.
+                await this.markOnboarded(userId);
+                settings = await this.get();
+            } else {
+                const invitePath = await this.pendingInvitePath(userId);
+                if (invitePath) return { ready: false, home: '/', invitePath };
+
+                const practiceSeat = await this.em.findOne(PracticeMember, {
+                    account: account.id,
+                });
+                if (practiceSeat) return { ready: true, home: '/practice', invitePath: null };
+                return { ready: false, home: '/', invitePath: null };
+            }
         }
 
         if (!householdId) {
-            const account = await this.em.findOne(Account, { user: currentUserId() });
+            const account = await this.em.findOne(Account, { user: userId });
             if (account) {
                 const practiceSeat = await this.em.findOne(PracticeMember, {
                     account: account.id,
                 });
-                if (practiceSeat) return { ready: true, home: '/practice' };
+                if (practiceSeat) {
+                    const membership = await this.em.findOne(AuthMember, { user: userId });
+                    if (!membership) return { ready: true, home: '/practice', invitePath: null };
+                }
             }
-            return { ready: true, home: '/' };
+            const invitePath = await this.pendingInvitePath(userId);
+            if (invitePath) return { ready: false, home: '/', invitePath };
+            return { ready: true, home: '/', invitePath: null };
         }
 
         const board = await this.em.findOne(HouseholdSettings, { household: householdId });
         if (board?.answers?.[HouseholdAnswerKey.JAR_BANK_SETUP_DONE] === false) {
-            return { ready: false, home: '/' };
+            // Only the founding OWNER finishes bank ↔ jar setup for the board.
+            const role = ctx?.role ?? null;
+            if (role === 'OWNER') return { ready: false, home: '/', invitePath: null };
         }
-        return { ready: true, home: '/' };
+        return { ready: true, home: '/', invitePath: null };
+    }
+
+    /** Newest non-expired pending household invite for this user's email, if any. */
+    private async pendingInvitePath(userId: string): Promise<string | null> {
+        const user = await this.em.findOne(AuthUser, { id: userId });
+        const email = user?.email?.trim();
+        if (!email) return null;
+
+        const pending = await this.em.findOne(
+            AuthInvitation,
+            {
+                email: { $ilike: email },
+                status: 'pending',
+                expiresAt: { $gt: new Date() },
+            },
+            { orderBy: { createdAt: 'DESC' } }
+        );
+        return pending ? `/invite/${pending.id}` : null;
     }
 
     async findOne(id: string): Promise<AccountSettingsDto> {
