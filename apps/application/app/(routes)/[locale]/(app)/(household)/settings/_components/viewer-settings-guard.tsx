@@ -15,13 +15,18 @@ import {
 /**
  * VIEWER look-along — bounce off household settings (jars, bank, export, …)
  * back to personal account settings.
+ * Waits for membership to resolve so owners are not bounced off jars mid-load.
  */
 export function ViewerSettingsGuard({ children }: { children: ReactNode }) {
     const router = useRouter();
     const pathname = usePathname() ?? '';
-    const { role } = useBoardWriteAccess();
+    const { membershipRole, membershipPending } = useBoardWriteAccess();
     const tab = settingsTabFromPathname(pathname);
-    const blocked = role === HouseholdRole.VIEWER && !isViewerAllowedSettingsTab(tab);
+    const restricted = !isViewerAllowedSettingsTab(tab);
+    const blocked =
+        restricted &&
+        !membershipPending &&
+        (membershipRole === HouseholdRole.VIEWER || membershipRole === null);
 
     useEffect(() => {
         if (blocked) router.replace(settingsHref('account'));

@@ -19,7 +19,6 @@ import {
     resolveNavChildForPath,
     resolveNavGroupForPath,
 } from '@/app/_lib/nav';
-import { HouseholdPermissionSection, roleCanSee } from '@/app/_lib/role-permissions';
 import { planLabel } from '@/app/_lib/plan';
 import { forceClearPracticePreview } from '@/app/_lib/practice-preview';
 import { practicePath, productPath } from '@/app/_lib/routes';
@@ -165,10 +164,9 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
     const { isCapabilityLocked, accessForPath } = usePlanCapabilities();
     const { session } = useAuth();
     const { capabilities } = usePracticePreview();
-    const { canMutate, role } = useBoardWriteAccess();
+    const { canMutate, role, canSeeCoach } = useBoardWriteAccess();
     const portalGroups = navGroupsForRole(role);
     const isViewer = role === HouseholdRole.VIEWER && !capabilities.active;
-    const canSeeCoach = roleCanSee(role, HouseholdPermissionSection.COACH);
     const bottomTabs = portalGroups.map(group => ({
         href: group.href,
         labelKey: TOP_PILL_LABEL_KEYS[group.key] ?? group.labelKey,
@@ -689,6 +687,7 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                                     <div data-tour="shell-period">
                                         <PeriodSelector />
                                     </div>
+                                    {/* Help is Coach teaching chrome — role gate, not tip preference. */}
                                     {canSeeCoach && capabilities.showPageHelp ? (
                                         <PageHelpButton />
                                     ) : null}
@@ -731,7 +730,7 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                         </Link>
                     </div>
                 ) : null}
-                {canSeeCoach && capabilities.showWhyCaption ? (
+                {capabilities.showWhyCaption ? (
                     <WhyCaption pathname={pathname} locked={access.locked} />
                 ) : null}
                 <main className="min-w-0">

@@ -32,6 +32,7 @@ function inboxReady(blockers: MonthCloseBlockers | null | undefined): boolean {
 /**
  * Month score log — score, close gate, optional period-travel note, event log.
  * Looking-back / looking-ahead copy lives here (not as a separate Coach slide).
+ * Close-blocker / prior-month nudges only when `canCloseMonth` (VIEWER look-along: score only).
  */
 export function MonthScoreLog({
     score,
@@ -238,7 +239,8 @@ export function MonthScoreLog({
                 </p>
             ) : null}
 
-            {!isClosed && priorOpenPeriod && priorLabel ? (
+            {/* Close-chain / blocker nudges — only for people who can close (not VIEWER look-along). */}
+            {canCloseMonth && !isClosed && priorOpenPeriod && priorLabel ? (
                 <div className="mt-3 rounded-xl border border-accent bg-accent-soft/40 px-3.5 py-3">
                     <p className="font-mono text-[10px] font-bold tracking-[0.12em] text-accent uppercase">
                         {tDashboard('prior_open_title')}
@@ -255,7 +257,7 @@ export function MonthScoreLog({
                 </div>
             ) : null}
 
-            {!isClosed && blockerLines.length > 0 ? (
+            {canCloseMonth && !isClosed && blockerLines.length > 0 ? (
                 <div className="mt-3 rounded-xl border border-warning bg-warning/8 px-3.5 py-3">
                     <p className="font-mono text-[10px] font-bold tracking-[0.12em] text-warning uppercase">
                         {tDashboard('close_blocked_title')}

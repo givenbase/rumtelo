@@ -16,6 +16,7 @@ import { useApiError } from '@/app/_lib/api-error-messages';
 import { isLiveData } from '@/app/_lib/preview';
 import { evaluateSplitCoach, pctByJarKey } from '@/app/_lib/split-coach';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { HelperGate } from '@/components/features/helpers';
 import { BankAccountRow } from '@/components/features/money/bank-account-row';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -358,39 +359,41 @@ export function JarsSettings() {
                         );
                     })}
 
-                    {coachTips.length > 0 ? (
-                        <div className="grid gap-1.5 border-t border-line py-2">
-                            <p className="font-mono text-[9px] tracking-[0.14em] text-accent uppercase">
-                                {t('features.coach.helpers.mark_label')}
-                            </p>
-                            {coachTips.map(tip => (
-                                <div
-                                    key={tip.id}
-                                    className={cn(
-                                        'flex items-start justify-between gap-2 rounded-md border px-2.5 py-1.5',
-                                        tip.severity === 'warn'
-                                            ? 'border-amber-500/40 bg-amber-500/5'
-                                            : 'border-line bg-raised/40'
-                                    )}>
-                                    <p className="text-xs leading-snug text-fg">
-                                        {t(`features.coach.split_tips.${tip.id}`)}
-                                    </p>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="shrink-0"
-                                        onClick={() =>
-                                            setDismissedTips(prev => ({
-                                                ...prev,
-                                                [tip.id]: true,
-                                            }))
-                                        }>
-                                        {t('features.coach.got_it')}
-                                    </Button>
-                                </div>
-                            ))}
-                        </div>
-                    ) : null}
+                    <HelperGate>
+                        {coachTips.length > 0 ? (
+                            <div className="grid gap-1.5 border-t border-line py-2">
+                                <p className="font-mono text-[9px] tracking-[0.14em] text-accent uppercase">
+                                    {t('features.coach.helpers.mark_label')}
+                                </p>
+                                {coachTips.map(tip => (
+                                    <div
+                                        key={tip.id}
+                                        className={cn(
+                                            'flex items-start justify-between gap-2 rounded-md border px-2.5 py-1.5',
+                                            tip.severity === 'warn'
+                                                ? 'border-amber-500/40 bg-amber-500/5'
+                                                : 'border-line bg-raised/40'
+                                        )}>
+                                        <p className="text-xs leading-snug text-fg">
+                                            {t(`features.coach.split_tips.${tip.id}`)}
+                                        </p>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="shrink-0"
+                                            onClick={() =>
+                                                setDismissedTips(prev => ({
+                                                    ...prev,
+                                                    [tip.id]: true,
+                                                }))
+                                            }>
+                                            {t('features.coach.got_it')}
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : null}
+                    </HelperGate>
 
                     <div className="flex justify-end gap-2 border-t border-line py-2">
                         <Button variant="ghost" size="sm" onClick={resetDefaults}>

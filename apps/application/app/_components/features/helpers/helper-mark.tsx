@@ -3,6 +3,8 @@
 import { useTranslations } from '@rumtelo/i18n';
 import { cn } from '@rumtelo/utils';
 
+import { useHelpersEnabled } from './provider';
+
 type CoachMarkProps = {
     className?: string;
     /** Compact chip for tight rows (why-line). */
@@ -12,9 +14,12 @@ type CoachMarkProps = {
 /**
  * Badge that marks on-screen tips from The Coach (why-lines, jar cards).
  * Same voice as /product/coach — informatie, nooit schaamte.
+ * Hidden when helpers are off (incl. VIEWER — see {@link useHelpersEnabled}).
  */
 export function CoachMark({ className, size = 'md' }: CoachMarkProps) {
     const t = useTranslations('features.coach.helpers');
+    const enabled = useHelpersEnabled();
+    if (!enabled) return null;
 
     return (
         <span
