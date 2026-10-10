@@ -7,6 +7,7 @@
  *
  * Same voice: informatie, nooit schaamte. Toggle tips in Settings → Account
  * (default on for beginners). Code may still say “helpers”; UI says The Coach.
+ * VIEWER look-along: `useHelpersEnabled` is always false (no tip chrome).
  */
 export {
     FeatureHelpersProvider,

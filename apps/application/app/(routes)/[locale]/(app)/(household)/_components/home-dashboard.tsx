@@ -53,7 +53,6 @@ export function HomeDashboardClient() {
     const { householdId, session } = useAuth();
     const { period, showToast } = useHouseholdShell();
     const { canMutate, role } = useBoardWriteAccess();
-    const canSeeCoach = roleCanSee(role, HouseholdPermissionSection.COACH);
     const canSeeGrowth = roleCanSee(role, HouseholdPermissionSection.GROWTH);
     const canSeeEnergy = roleCanSee(role, HouseholdPermissionSection.ENERGY);
     const canSeeSoul = roleCanSee(role, HouseholdPermissionSection.SOUL);
@@ -400,7 +399,8 @@ export function HomeDashboardClient() {
                 ) : null}
             </div>
 
-            {canSeeCoach ? <CoachVerdict messages={coach} recap={fallbackRecap} /> : null}
+            {/* CoachVerdict self-gates via useHelpersEnabled (role + prefs). */}
+            <CoachVerdict messages={coach} recap={fallbackRecap} />
 
             <MonthScoreLog
                 score={monthScore.score}

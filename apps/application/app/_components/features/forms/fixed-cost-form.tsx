@@ -50,7 +50,7 @@ import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { useMergeHouseholdAudiences } from '@/app/_lib/use-merge-household-audiences';
 import { partyMark } from '@/app/_lib/vendor-brands';
 import { GivingFinder } from '@/components/features/money/giving-finder';
-import { CoachTipCard } from '@/components/features/helpers';
+import { CoachTipCard, useHelpersEnabled } from '@/components/features/helpers';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
@@ -133,9 +133,12 @@ export function FixedCostForm({
     const tProfile = useTranslations('features.money.household_profile');
     const tForm = useTranslations('ui.form');
     const tBtn = useTranslations('ui.button.actions');
+    const coachGuidesEnabled = useHelpersEnabled();
     const givePayeeModes: ReadonlyArray<{ id: GivePayeeMode; label: string }> = [
         { id: 'known', label: tFixed('give_known') },
-        { id: 'coach', label: tFixed('give_coach') },
+        ...(coachGuidesEnabled
+            ? ([{ id: 'coach' as const, label: tFixed('give_coach') }] as const)
+            : []),
     ];
     const cadenceOptions: ReadonlyArray<CadencePickerOption> = [
         {
@@ -556,6 +559,12 @@ export function FixedCostForm({
         setGiveModeHydrated(false);
     }
 
+    // Coach shortlist is tip chrome — fall back when helpers/VIEWER hide it.
+    if (isGive && !coachGuidesEnabled && givePayeeMode === 'coach') {
+        setGivePayeeMode('known');
+        setGiveOrgKey(null);
+    }
+
     // Resolve initial Give path once catalogs are ready.
     // Keys win; display-name counterparty is fallback → coach / known / manual.
     const needsGivingOrgs = Boolean(
@@ -579,7 +588,7 @@ export function FixedCostForm({
             if (org) {
                 form.setValue('counterparty', org.name, { shouldDirty: false });
                 setGiveOrgKey(org.key);
-                setGivePayeeMode(defaultGivePayeeMode ?? 'coach');
+                setGivePayeeMode(defaultGivePayeeMode ?? (coachGuidesEnabled ? 'coach' : 'known'));
                 if (!form.getValues('categoryId') && !pendingCategoryTemplateKey) {
                     if (giveCategoryTemplateKey) {
                         setPendingCategoryTemplateKey(giveCategoryTemplateKey);
@@ -591,7 +600,10 @@ export function FixedCostForm({
                     form.setValue('counterparty', prefillName, { shouldDirty: false });
                 }
                 setGiveOrgKey(null);
-                setGivePayeeMode(defaultGivePayeeMode ?? (prefillName ? 'known' : 'coach'));
+                setGivePayeeMode(
+                    defaultGivePayeeMode ??
+                        (prefillName ? 'known' : coachGuidesEnabled ? 'coach' : 'known')
+                );
                 setCustomPayee(Boolean(prefillName));
             }
         } else if (merchantKey) {
@@ -609,7 +621,7 @@ export function FixedCostForm({
             }
         } else if (prefillName) {
             const coachOrg = givingOrgNames.find(org => namesMatch(org.name, prefillName));
-            if (coachOrg && defaultGivePayeeMode === 'coach') {
+            if (coachOrg && defaultGivePayeeMode === 'coach' && coachGuidesEnabled) {
                 setGiveOrgKey(coachOrg.key);
                 setGivePayeeMode('coach');
             } else {
@@ -617,8 +629,14 @@ export function FixedCostForm({
                 setCustomPayee(true);
             }
         } else if (defaultGivePayeeMode) {
-            setGivePayeeMode(defaultGivePayeeMode === 'manual' ? 'known' : defaultGivePayeeMode);
-            setCustomPayee(isKnowWho(defaultGivePayeeMode));
+            const mode =
+                defaultGivePayeeMode === 'manual'
+                    ? 'known'
+                    : defaultGivePayeeMode === 'coach' && !coachGuidesEnabled
+                      ? 'known'
+                      : defaultGivePayeeMode;
+            setGivePayeeMode(mode);
+            setCustomPayee(isKnowWho(mode));
         } else {
             setGivePayeeMode('known');
         }

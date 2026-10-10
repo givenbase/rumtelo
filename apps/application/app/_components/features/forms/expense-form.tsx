@@ -35,6 +35,7 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { formRoute } from '@/app/_lib/form-route-meta';
 import { GivingFinder } from '@/components/features/money/giving-finder';
+import { useHelpersEnabled } from '@/components/features/helpers';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
@@ -262,9 +263,12 @@ export function ExpenseForm({
     const tExpense = useTranslations('features.money.expense_form');
     const tForm = useTranslations('ui.form');
     const tBtn = useTranslations('ui.button.actions');
+    const coachGuidesEnabled = useHelpersEnabled();
     const givePayeeModes: ReadonlyArray<{ id: GivePayeeMode; label: string }> = [
         { id: 'known', label: tFixed('give_known') },
-        { id: 'coach', label: tFixed('give_coach') },
+        ...(coachGuidesEnabled
+            ? ([{ id: 'coach' as const, label: tFixed('give_coach') }] as const)
+            : []),
     ];
     const { showToast, period } = useHouseholdShell();
     const apiError = useApiError();
@@ -454,6 +458,11 @@ export function ExpenseForm({
         if (intent.jarKey === JarKey.GIVE && intentOverride) {
             setIntentOverride(null);
         }
+    }
+
+    if (isGive && !coachGuidesEnabled && givePayeeMode === 'coach') {
+        setGivePayeeMode('known');
+        if (giveOrgKey) setGiveOrgKey(null);
     }
 
     // Prefill Give payee from edit / deep-link counterparty once.

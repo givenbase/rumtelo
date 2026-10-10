@@ -11,10 +11,7 @@ import { Typography } from '@rumtelo/ui';
 import { useTranslations } from '@rumtelo/i18n';
 import { cn } from '@rumtelo/utils';
 
-import { useAuth } from '@/components/features/shell/auth-provider';
-import { isLiveData } from '@/app/_lib/preview';
 import { roleCanSee } from '@/app/_lib/role-permissions';
-import { apiQuery } from '@/app/_lib/api-hooks';
 import {
     SETTINGS_SECTIONS,
     isViewerAllowedSettingsTab,
@@ -23,8 +20,8 @@ import {
     type SettingsNavItem,
     type SettingsNavSection,
 } from '@/app/_lib/settings-tabs';
+import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { PageContent } from '@/components/layout/page-content';
-import { useLiveQuery } from '@rumtelo/hooks';
 
 function NavLink({
     tab,
@@ -84,18 +81,11 @@ export function SettingsShell({ children }: { children: ReactNode }) {
     const t = useTranslations();
     const pathname = usePathname();
     const activeTab = settingsTabFromPathname(pathname);
-    const { householdId, user } = useAuth();
-    const live = isLiveData(householdId);
-    const membersQuery = useLiveQuery(
-        apiQuery.household.members.queryOptions({ input: { householdId: householdId! } }),
-        [],
-        live
-    );
-    // Fail-open until members load — default VIEWER would hide jar/export tabs for owners.
-    const myRole = membersQuery.data?.find(m => m.userId === user?.id)?.role ?? null;
+    const { membershipRole } = useBoardWriteAccess();
+    // Fail-closed until role known — VIEWER must never see household/jars/export rail.
     const sections = useMemo(
-        () => (myRole ? filterSettingsSections(SETTINGS_SECTIONS, myRole) : SETTINGS_SECTIONS),
-        [myRole]
+        () => filterSettingsSections(SETTINGS_SECTIONS, membershipRole ?? HouseholdRole.VIEWER),
+        [membershipRole]
     );
 
     return (

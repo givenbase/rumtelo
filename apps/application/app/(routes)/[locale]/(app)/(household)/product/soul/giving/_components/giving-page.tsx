@@ -463,11 +463,13 @@ export function GivingPageClient() {
                 </Card>
             </div>
 
-            {/* Choose well — same three paths as the fixed-cost Give form */}
+            {/* Choose well — same paths as the fixed-cost Give form; Coach shortlist is tip chrome. */}
             <Card className="grid gap-4">
                 <div className="grid gap-2">
                     <div className="flex flex-wrap items-center gap-2">
-                        <CoachMark size="sm" />
+                        <HelperGate>
+                            <CoachMark size="sm" />
+                        </HelperGate>
                         <Typography as="span" variant="eyebrow" color="primary">
                             {t('to_whom')}
                         </Typography>
@@ -476,46 +478,32 @@ export function GivingPageClient() {
                         {t('pick_who')}
                     </Typography>
                     <div className="flex flex-wrap gap-2" role="group" aria-label={t('pick_aria')}>
-                        {(
-                            [
-                                { id: 'known' as const, label: t('pick_known') },
-                                { id: 'coach' as const, label: t('pick_coach') },
-                            ] as const
-                        ).map(option => {
-                            const on = givePickMode === option.id;
-                            if (option.id === 'coach') {
-                                return (
-                                    <button
-                                        key={option.id}
-                                        type="button"
-                                        aria-pressed={on}
-                                        onClick={() => setGivePickMode('coach')}
-                                        className={
-                                            on
-                                                ? 'rounded-full border border-accent bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
-                                                : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
-                                        }>
-                                        {option.label}
-                                    </button>
-                                );
-                            }
-                            return (
-                                <Link
-                                    key={option.id}
-                                    href={createFixedHref({
-                                        jarId: giveJar?.id,
-                                        payeeMode: option.id,
-                                    })}
-                                    onClick={() => setGivePickMode(option.id)}
-                                    className={
-                                        on
-                                            ? 'rounded-full border border-accent bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
-                                            : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
-                                    }>
-                                    {option.label}
-                                </Link>
-                            );
-                        })}
+                        <Link
+                            href={createFixedHref({
+                                jarId: giveJar?.id,
+                                payeeMode: 'known',
+                            })}
+                            onClick={() => setGivePickMode('known')}
+                            className={
+                                givePickMode === 'known'
+                                    ? 'rounded-full border border-accent bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                    : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
+                            }>
+                            {t('pick_known')}
+                        </Link>
+                        <HelperGate>
+                            <button
+                                type="button"
+                                aria-pressed={givePickMode === 'coach'}
+                                onClick={() => setGivePickMode('coach')}
+                                className={
+                                    givePickMode === 'coach'
+                                        ? 'rounded-full border border-accent bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                        : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                }>
+                                {t('pick_coach')}
+                            </button>
+                        </HelperGate>
                     </div>
                     <Typography as="p" variant="caption" className="text-fg-faint">
                         {t('pick_hint')}

@@ -30,6 +30,7 @@ const FeatureHelpersContext = createContext<FeatureHelpersContextValue | null>(n
 /**
  * Live preference — false while Practice is previewing a client board
  * (helpers are for household members, not coaches).
+ * VIEWER look-along: no Coach tips, strips, or “✦ De coach” chrome.
  */
 export function useHelpersEnabled(): boolean {
     const preferred = useSyncExternalStore(
@@ -38,9 +39,11 @@ export function useHelpersEnabled(): boolean {
         getHelpersServerSnapshot
     );
     const { capabilities } = usePracticePreview();
-    const { periodClosed, periodLookingAhead } = useBoardWriteAccess();
+    const { periodClosed, periodLookingAhead, canSeeCoach } = useBoardWriteAccess();
     // Closed / future months are a finished or projected record — no coach nudges or helper chrome.
-    return preferred && capabilities.showHelpers && !periodClosed && !periodLookingAhead;
+    return (
+        preferred && capabilities.showHelpers && canSeeCoach && !periodClosed && !periodLookingAhead
+    );
 }
 
 /**
