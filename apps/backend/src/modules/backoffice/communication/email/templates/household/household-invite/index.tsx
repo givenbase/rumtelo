@@ -7,6 +7,7 @@ import EmailLayout from '../../../components/EmailLayout';
 import { createEmailStyles } from '../../../styles';
 import type { EmailLogoMode } from '../../../utils/email-brand-images.util';
 import { createEmailTranslator } from '../../../utils/email-translation.util';
+import { inviterLabel } from '../../../utils/inviter-label.util';
 
 import { languageObject } from './translations';
 
@@ -19,6 +20,14 @@ export interface HouseholdInviteTemplateProps {
     role?: string;
     websiteUrl?: string;
     logoMode?: EmailLogoMode;
+}
+
+function roleTranslationKey(role: string): string {
+    const normalized = role.trim().toLowerCase();
+    if (normalized === 'viewer') return 'email.household.invite.body.role_viewer';
+    if (normalized === 'admin') return 'email.household.invite.body.role_admin';
+    if (normalized === 'owner') return 'email.household.invite.body.role_owner';
+    return 'email.household.invite.body.role_member';
 }
 
 /**
@@ -36,15 +45,15 @@ export const HouseholdInviteTemplate: React.FC<HouseholdInviteTemplateProps> = (
 }) => {
     const translate = createEmailTranslator(languageObject, locale);
     const styles = createEmailStyles(darkMode);
-    const who = inviterName?.trim() || (locale === 'nl' ? 'Iemand' : 'Someone');
-    const roleLabel = role.toLowerCase();
+    const who = inviterLabel(inviterName, locale);
+    const roleLabel = translate(roleTranslationKey(role));
 
     return (
         <EmailLayout
             darkMode={darkMode}
             websiteUrl={websiteUrl}
             logoMode={logoMode}
-            previewText={translate('email.household.invite.header.preview_text')}
+            previewText={translate('email.household.invite.header.preview_text', { who })}
             title={translate('email.household.invite.header.title')}>
             <Heading style={styles.heading}>
                 {translate('email.household.invite.header.heading')}

@@ -55,20 +55,25 @@ export function Providers({ children }: { children: ReactNode }) {
                   “useAuth must be used inside <AuthProvider>”.
                 */}
                 <AuthProvider>
-                    <Suspense fallback={<ProvidersFallback />}>
-                        <PlanIntentProvider>
-                            <PracticeInviteProvider>
-                                <HouseholdHeaderSync>
-                                    <AccountThemeProvider>
-                                        <HouseholdShellProvider>
+                    {/*
+                      Board period lives here (above Suspense). PlanIntent / PracticeInvite
+                      use searchParams and can remount the Suspense tree — period must not
+                      reset when the user is fixing a prior open month across pages.
+                    */}
+                    <HouseholdShellProvider>
+                        <Suspense fallback={<ProvidersFallback />}>
+                            <PlanIntentProvider>
+                                <PracticeInviteProvider>
+                                    <HouseholdHeaderSync>
+                                        <AccountThemeProvider>
                                             {children}
                                             <ToastPill />
-                                        </HouseholdShellProvider>
-                                    </AccountThemeProvider>
-                                </HouseholdHeaderSync>
-                            </PracticeInviteProvider>
-                        </PlanIntentProvider>
-                    </Suspense>
+                                        </AccountThemeProvider>
+                                    </HouseholdHeaderSync>
+                                </PracticeInviteProvider>
+                            </PlanIntentProvider>
+                        </Suspense>
+                    </HouseholdShellProvider>
                 </AuthProvider>
             </QueryClientProvider>
         </ThemeProvider>

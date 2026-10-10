@@ -15,9 +15,15 @@ import {
 import { type Locale, LOCALES, type PlanKey } from '@rumtelo/contracts';
 
 import { fromIntlLocale, toIntlLocale, useLocale, usePathname, useRouter } from '@rumtelo/i18n';
-import { isYearMonthBefore, periodTravelBounds } from '@rumtelo/utils';
+import { periodTravelBounds } from '@rumtelo/utils';
 import { useQuery } from '@tanstack/react-query';
 
+import {
+    clampBoardPeriod,
+    getBoardPeriod,
+    setBoardPeriod,
+    type BoardPeriod,
+} from '@/app/_lib/board-period';
 import { DEFAULT_PLAN } from '@/app/_lib/plan';
 import { resolvePreviewPlan } from '@/app/_lib/preview';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -28,10 +34,7 @@ export interface Toast {
     type: 'success' | 'error' | 'info';
 }
 
-export interface Period {
-    year: number;
-    month: number;
-}
+export type Period = BoardPeriod;
 
 interface HouseholdShellCtx {
     toast: Toast | null;
@@ -68,11 +71,14 @@ export function HouseholdShellProvider({ children }: { children: ReactNode }) {
     /** Mirror next-intl cookie/locale — derive, don't sync via effect. */
     const locale: Locale = fromIntlLocale(intlLocale);
 
-    const now = new Date();
-    const [period, setPeriod] = useState<Period>({
-        year: now.getFullYear(),
-        month: now.getMonth() + 1,
-    });
+    /** Bumps when the user changes period so consumers re-read session memory. */
+    const [, setPeriodEpoch] = useState(0);
+    const [periodHouseholdId, setPeriodHouseholdId] = useState(householdId);
+
+    if (householdId !== periodHouseholdId) {
+        setPeriodHouseholdId(householdId);
+        setPeriodEpoch(epoch => epoch + 1);
+    }
 
     const settingsQuery = useQuery({
         ...apiQuery.household.settings.queryOptions({
@@ -108,13 +114,17 @@ export function HouseholdShellProvider({ children }: { children: ReactNode }) {
     }, [authPending, householdReady, householdId, settingsQuery.isFetched, settingsQuery.isError]);
 
     const householdCreatedAt = settingsQuery.data?.createdAt ?? null;
+    const travelFloor = householdCreatedAt ? periodTravelBounds(householdCreatedAt).floor : null;
 
-    if (householdCreatedAt) {
-        const { floor } = periodTravelBounds(householdCreatedAt);
-        if (isYearMonthBefore(period, floor)) {
-            setPeriod(floor);
-        }
-    }
+    const period = clampBoardPeriod(householdId, getBoardPeriod(householdId), travelFloor);
+
+    const setPeriod = useCallback(
+        (next: Period) => {
+            setBoardPeriod(householdId, next);
+            setPeriodEpoch(epoch => epoch + 1);
+        },
+        [householdId]
+    );
 
     const showToast = useCallback((message: string, type: Toast['type'] = 'info') => {
         if (toastTimer.current) clearTimeout(toastTimer.current);

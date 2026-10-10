@@ -14,6 +14,7 @@ import {
     canUseHouseholdKind,
     effectiveSeatCaps,
     isWritableHouseholdRole,
+    localeToIntl,
     planAllowsInviteRole,
 } from '@rumtelo/contracts';
 
@@ -33,6 +34,7 @@ import { IncomeSource } from '../../public/product/money/plan/income/income-sour
 import { Jar } from '../../public/product/money/plan/jar/jar.entity';
 import { AccountSettingsService } from '../user/account/account-settings/account-settings.service';
 import { AccountService } from '../user/account/account.service';
+import { personDisplayName } from '../user/account/person-display-name.util';
 import { HouseholdBillingService } from './household-billing/household-billing.service';
 import { HouseholdSettingsService } from './household-settings/household-settings.service';
 import { AuthHousehold } from './managed/household/auth-household.entity';
@@ -119,11 +121,19 @@ export class HouseholdService {
         if (!result?.id) throw apiBadRequest('invitation_create_failed');
 
         const org = await this.em.findOne(AuthHousehold, { id: householdId });
+        const { account, user } = await this.accounts.ensureCurrentAccount();
+        const inviterSettings = await this.accountSettings.get();
         await this.email.sendHouseholdInvite({
             to: email,
             householdName: org?.name ?? 'Rumtelo',
             inviteUrl: this.email.inviteUrl(result.id),
+            inviterName: personDisplayName({
+                displayName: user.name,
+                firstName: account.firstName,
+                lastName: account.lastName,
+            }),
             role,
+            locale: localeToIntl(inviterSettings.locale),
         });
 
         return { invitationId: result.id };
