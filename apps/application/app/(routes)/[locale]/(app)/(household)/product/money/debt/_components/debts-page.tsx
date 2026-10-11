@@ -28,6 +28,7 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListControls } from '@/components/layout/list-controls';
 import { ListToolbar, ListToolbarTab } from '@/components/layout/list-toolbar';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { MetricStrip } from '@/components/features/money/metric-strip';
 import { DebtListRow } from './debt-list-row';
 import { DebtStrategyCoach } from './debt-strategy-coach';
 
@@ -296,15 +297,15 @@ export function DebtsPageClient() {
                 ))}
             </ListToolbar>
 
-            <AccentCard tint="var(--color-accent)">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-                    <div className="flex flex-wrap items-end gap-x-6 gap-y-3">
-                        <div className="grid gap-0.5">
-                            <Eyebrow>
-                                {lookingAhead ? t('remaining_then') : t('total_debt')}
-                            </Eyebrow>
-                            <p className="font-display text-xl font-semibold text-fg tabular-nums lg:text-2xl">
-                                {lookingAhead && total !== totalLive ? (
+            <AccentCard tint="var(--color-accent)" className="overflow-hidden p-0">
+                <MetricStrip
+                    size="lg"
+                    className="border-t-0"
+                    items={[
+                        {
+                            label: lookingAhead ? t('remaining_then') : t('total_debt'),
+                            value:
+                                lookingAhead && total !== totalLive ? (
                                     <>
                                         <span className="text-fg-faint">
                                             {formatMoney(totalLive)}
@@ -314,49 +315,39 @@ export function DebtsPageClient() {
                                     </>
                                 ) : (
                                     formatMoney(total)
-                                )}
-                            </p>
-                        </div>
-                        <div className="grid gap-0.5">
-                            <Eyebrow>{t('minimum_mo')}</Eyebrow>
-                            <p className="font-display text-xl font-semibold text-fg tabular-nums lg:text-2xl">
-                                {formatMoney(monthly)}
-                            </p>
-                        </div>
-                        <div className="grid gap-0.5">
-                            <Eyebrow>{t('interest')}</Eyebrow>
-                            <p className="font-display text-xl font-semibold text-fg tabular-nums lg:text-2xl">
-                                {formatMoney(selected.interest)}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-wrap items-end justify-between gap-3 border-t border-line pt-3 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-6">
-                        <div className="grid gap-0.5">
-                            <Eyebrow>{t('payoff_method')}</Eyebrow>
-                            <p className="text-sm text-fg">
-                                <span className="font-medium text-accent">
+                                ),
+                        },
+                        {
+                            label: t('minimum_mo'),
+                            value: formatMoney(monthly),
+                        },
+                        {
+                            label: t('interest'),
+                            value: formatMoney(selected.interest),
+                        },
+                        {
+                            label: t('payoff_method'),
+                            value: (
+                                <span className="text-base font-medium text-accent sm:text-lg">
                                     {payoffStrategyLabel(strategy, t)}
+                                    {strategy === PayoffStrategy.MINIMAL
+                                        ? t('mins_only')
+                                        : focusDebt
+                                          ? ` · ${focusDebt.name}`
+                                          : lookingAhead && projected?.cleared
+                                            ? t('all_clear')
+                                            : null}
                                 </span>
-                                {strategy === PayoffStrategy.MINIMAL
-                                    ? t('mins_only')
-                                    : focusDebt
-                                      ? ` · ${focusDebt.name}`
-                                      : lookingAhead && projected?.cleared
-                                        ? t('all_clear')
-                                        : null}
-                            </p>
-                            {hasExtra ? (
-                                <p className="font-mono text-[10px] text-fg-faint">
-                                    {t('extra_mo', { amount: formatMoney(extraForSim) })}
-                                </p>
-                            ) : null}
-                        </div>
-                    </div>
-                </div>
+                            ),
+                            hint: hasExtra
+                                ? t('extra_mo', { amount: formatMoney(extraForSim) })
+                                : undefined,
+                        },
+                    ]}
+                />
 
                 {!live && tab === 'compare' ? (
-                    <div className="mt-4 border-t border-line pt-3">
+                    <div className="border-t border-line px-5 py-3.5">
                         <Eyebrow className="mb-2">
                             {t('extra_label', {
                                 amount: extra > 0 ? formatMoney(extra) : t('extra_none'),

@@ -9,6 +9,13 @@ type JarProgressBarProps = Pick<JarBalance, 'allocated' | 'spent' | 'committedOu
     colorClass: string;
     className?: string;
     trackClassName?: string;
+    /**
+     * Optional outer band (e.g. coverage-strip padding). Only rendered when the
+     * bar itself is shown — avoids an empty padded gap at 0% used.
+     */
+    bandClassName?: string;
+    /** Skip the track when nothing is used (default). */
+    hideWhenEmpty?: boolean;
 };
 
 /** Shared used-progress bar — maths from jarCoverage / usedPctDisplay. */
@@ -20,12 +27,17 @@ export function JarProgressBar({
     colorClass,
     className,
     trackClassName,
+    bandClassName,
+    hideWhenEmpty = true,
 }: JarProgressBarProps) {
     const coverage = jarCoverage({ allocated, spent, credited, committedOut });
     const pct = usedPctDisplay(coverage);
+    const empty = pct === 0 && !coverage.overspent;
+
+    if (hideWhenEmpty && empty) return null;
 
     // Decorative — amounts next to the bar carry the accessible meaning.
-    return (
+    const track = (
         <span
             aria-hidden
             className={cn(
@@ -42,4 +54,10 @@ export function JarProgressBar({
             />
         </span>
     );
+
+    if (bandClassName) {
+        return <div className={bandClassName}>{track}</div>;
+    }
+
+    return track;
 }

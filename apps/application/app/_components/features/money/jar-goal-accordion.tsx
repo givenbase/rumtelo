@@ -48,12 +48,15 @@ export function JarGoalAccordion({ goals, jarAvailableCents = null }: JarGoalAcc
         return focusSaveGoal(goals, saveJarId)?.id ?? null;
     }, [goals]);
 
-    const ordered = useMemo(() => {
+    const { ordered, activeSaveCount } = useMemo(() => {
         const saveJarId = goals.find(row => row.kind === GoalKind.SAVE && row.jarId)?.jarId ?? null;
         const activeSave = activeSaveGoalsOnJar(goals, saveJarId);
         const activeIds = new Set(activeSave.map(row => row.id));
         const rest = goals.filter(row => !activeIds.has(row.id));
-        return [...activeSave, ...rest];
+        return {
+            ordered: [...activeSave, ...rest],
+            activeSaveCount: activeSave.length,
+        };
     }, [goals]);
 
     if (goals.length === 0) {
@@ -82,7 +85,7 @@ export function JarGoalAccordion({ goals, jarAvailableCents = null }: JarGoalAcc
                         key={goal.id}
                         className={cn(
                             'border-b border-line last:border-b-0',
-                            isFocus && 'bg-accent-soft/40'
+                            isFocus && 'border-l-2 border-l-accent bg-accent-soft/35'
                         )}>
                         <button
                             type="button"
@@ -91,11 +94,19 @@ export function JarGoalAccordion({ goals, jarAvailableCents = null }: JarGoalAcc
                             onClick={() => setOpenId(isOpen ? null : goal.id)}
                             className="flex w-full items-center justify-between gap-3 px-5 py-3 text-left hover:bg-raised">
                             <span className="min-w-0">
-                                <span className="block truncate text-sm text-fg">
+                                <span
+                                    className={cn(
+                                        'block truncate text-sm',
+                                        isFocus ? 'font-medium text-fg' : 'text-fg'
+                                    )}>
                                     {goal.icon ? `${goal.icon} ` : ''}
                                     {goal.name}
                                 </span>
-                                <span className="mt-0.5 block font-mono text-xs text-fg-faint">
+                                <span
+                                    className={cn(
+                                        'mt-0.5 block font-mono text-xs',
+                                        isFocus ? 'text-accent' : 'text-fg-faint'
+                                    )}>
                                     {kindLabel(goal, rank, tAccordion)}
                                 </span>
                             </span>
@@ -120,9 +131,9 @@ export function JarGoalAccordion({ goals, jarAvailableCents = null }: JarGoalAcc
                                         style={{ width: `${Math.round(progress * 100)}%` }}
                                     />
                                 </div>
-                                {isFocus && jarAvailableCents !== null ? (
+                                {isFocus && activeSaveCount > 1 ? (
                                     <p className="text-xs text-fg-muted">
-                                        {tAccordion('jar_available')}
+                                        {tAccordion('fill_jar_first')}
                                     </p>
                                 ) : null}
                                 {!isFocus && isSaveActive && rank !== null ? (

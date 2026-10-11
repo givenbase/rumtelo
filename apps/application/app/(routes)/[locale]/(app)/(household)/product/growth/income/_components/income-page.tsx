@@ -6,7 +6,7 @@ import { useMemo } from 'react';
 
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { AccentCard, Button, Card, EmptyState, Eyebrow, Typography } from '@rumtelo/ui';
+import { AccentCard, Button, Card, EmptyState, Typography } from '@rumtelo/ui';
 import {
     incomeAmountAsOf,
     incomeDelta,
@@ -25,6 +25,7 @@ import { listIncomeForPeriodView } from '@/app/_lib/period-plan-list';
 import { isLiveData } from '@/app/_lib/preview';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { IncomeSimulator } from '@/components/features/growth/income-simulator';
+import { MetricStrip } from '@/components/features/money/metric-strip';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -150,20 +151,19 @@ export function IncomePageClient() {
 
             <div className="grid gap-4">
                 <div data-tour="income-summary" className="min-w-0">
-                    <AccentCard
-                        tint="var(--color-accent)"
-                        className="grid h-full content-center gap-4 p-4 sm:p-5">
-                        <div className="grid grid-cols-3 gap-3 sm:gap-4">
-                            <div className="grid gap-1">
-                                <Eyebrow>
-                                    {travel.direction === 'future'
-                                        ? t('through_then')
-                                        : travel.direction === 'past'
-                                          ? t('then_label')
-                                          : t('now')}
-                                </Eyebrow>
-                                <p className="font-display text-2xl leading-none font-semibold tracking-tight text-fg sm:text-3xl">
-                                    {traveling ? (
+                    <AccentCard tint="var(--color-accent)" className="h-full overflow-hidden p-0">
+                        <MetricStrip
+                            size="lg"
+                            className="border-t-0"
+                            items={[
+                                {
+                                    label:
+                                        travel.direction === 'future'
+                                            ? t('through_then')
+                                            : travel.direction === 'past'
+                                              ? t('then_label')
+                                              : t('now'),
+                                    value: traveling ? (
                                         <>
                                             <span className="text-fg-faint">
                                                 {formatMoney(monthlyNet)}
@@ -175,64 +175,59 @@ export function IncomePageClient() {
                                         </>
                                     ) : (
                                         formatMoney(monthlyNet)
-                                    )}
-                                </p>
-                                <p className="font-mono text-[11px] leading-snug text-fg-muted">
-                                    {traveling
-                                        ? t('subline_travel', {
-                                              amount: formatMoney(monthlyNet),
-                                              months: horizon,
-                                          })
-                                        : t('subline_annual', {
-                                              amount: formatMoney(monthlyNet * 12),
-                                          })}
-                                    {delta && delta.absolute !== 0 && !traveling ? (
+                                    ),
+                                    hint: (
                                         <>
-                                            <br />
-                                            <span
-                                                className={
-                                                    delta.absolute > 0
-                                                        ? 'text-success'
-                                                        : 'text-warning'
-                                                }>
-                                                {delta.absolute > 0 ? '+' : ''}
-                                                {formatMoney(delta.absolute)}
-                                            </span>
+                                            {traveling
+                                                ? t('subline_travel', {
+                                                      amount: formatMoney(monthlyNet),
+                                                      months: horizon,
+                                                  })
+                                                : t('subline_annual', {
+                                                      amount: formatMoney(monthlyNet * 12),
+                                                  })}
+                                            {delta && delta.absolute !== 0 && !traveling ? (
+                                                <span
+                                                    className={cn(
+                                                        'mt-0.5 block',
+                                                        delta.absolute > 0
+                                                            ? 'text-success'
+                                                            : 'text-warning'
+                                                    )}>
+                                                    {delta.absolute > 0 ? '+' : ''}
+                                                    {formatMoney(delta.absolute)}
+                                                </span>
+                                            ) : null}
                                         </>
-                                    ) : null}
-                                </p>
-                            </div>
-                            <div className="grid gap-1">
-                                <Eyebrow>{t('target')}</Eyebrow>
-                                <p
-                                    className="font-display text-2xl leading-none font-semibold tracking-tight sm:text-3xl"
-                                    style={{
-                                        background: 'var(--gradient-accent)',
-                                        WebkitBackgroundClip: 'text',
-                                        WebkitTextFillColor: 'transparent',
-                                    }}>
-                                    {formatMoney(target)}
-                                </p>
-                                <p className="font-mono text-[11px] text-fg-muted">{t('mo_net')}</p>
-                            </div>
-                            <div className="grid gap-1">
-                                <Eyebrow>{t('gap')}</Eyebrow>
-                                <p
-                                    className={cn(
-                                        'font-display text-2xl leading-none font-semibold tracking-tight text-warning sm:text-3xl',
-                                        gap < 0 && 'text-success'
-                                    )}>
-                                    {gap < 0 ? `+${formatMoney(-gap)}` : formatMoney(gap)}
-                                </p>
-                                <p className="font-mono text-[11px] text-fg-muted">
-                                    {gap < 0
-                                        ? t('gap_over')
-                                        : gap === 0
-                                          ? t('gap_met')
-                                          : t('gap_to_go')}
-                                </p>
-                            </div>
-                        </div>
+                                    ),
+                                },
+                                {
+                                    label: t('target'),
+                                    value: (
+                                        <span
+                                            style={{
+                                                background: 'var(--gradient-accent)',
+                                                WebkitBackgroundClip: 'text',
+                                                WebkitTextFillColor: 'transparent',
+                                            }}>
+                                            {formatMoney(target)}
+                                        </span>
+                                    ),
+                                    hint: t('mo_net'),
+                                },
+                                {
+                                    label: t('gap'),
+                                    value: gap < 0 ? `+${formatMoney(-gap)}` : formatMoney(gap),
+                                    tone: gap < 0 ? 'success' : gap === 0 ? 'success' : 'danger',
+                                    hint:
+                                        gap < 0
+                                            ? t('gap_over')
+                                            : gap === 0
+                                              ? t('gap_met')
+                                              : t('gap_to_go'),
+                                },
+                            ]}
+                        />
                     </AccentCard>
                 </div>
 

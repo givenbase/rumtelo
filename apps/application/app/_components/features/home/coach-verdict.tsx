@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 
 import Link from 'next/link';
 
@@ -37,40 +37,50 @@ const KIND_DOTS: Record<string, string> = {
     ALERT: 'var(--color-danger)',
 };
 
+const SCORE_SLIDE_DOT = 'var(--color-accent)';
+
 /**
- * Dashboard coach card (design: Kluis Finance App.dc.html:346-387) —
- * dot-paginated rotating coach messages with a kind badge, a cross-portal
- * recap strip, and a single CTA that changes per slide.
- *
- * Replaces the old CoachCarousel with English user-facing copy and a type that
- * matches the mockCoach / contract.coach shape directly.
+ * Dashboard coach card — rotating advice slides + optional month-score slide
+ * (score is coach advice: close, blockers), then a cross-portal recap strip.
  */
 export function CoachVerdict({
     messages,
     recap,
+    scoreSlide,
 }: {
     messages: readonly CoachVerdictMessage[];
     recap: CoachRecapItem[];
+    /** Month score advice as the last slide (embedded MonthScoreLog). */
+    scoreSlide?: ReactNode;
 }) {
     const t = useTranslations('features.coach.verdict');
     const tCoach = useTranslations('features.coach');
     const tRoot = useTranslations();
     const helpersEnabled = useHelpersEnabled();
+    const hasScore = Boolean(scoreSlide);
+    const slideCount = messages.length + (hasScore ? 1 : 0);
     const [index, setIndex] = useState(0);
-    const msg = messages[index] ?? messages[0];
-    if (!helpersEnabled || !msg) return null;
-    const copy = resolveCoachMessage(msg, tCoach, tRoot);
-    const meta = {
-        label: coachKindDisplay(msg.kind, t),
-        dot: KIND_DOTS[msg.kind] ?? 'var(--color-accent)',
-    };
 
-    const prev = () => setIndex(previous => (previous - 1 + messages.length) % messages.length);
-    const next = () => setIndex(previous => (previous + 1) % messages.length);
+    if (!helpersEnabled || slideCount === 0) return null;
+
+    const safeIndex = Math.min(Math.max(0, index), slideCount - 1);
+    const isScoreSlide = hasScore && safeIndex >= messages.length;
+    const msg = isScoreSlide ? null : (messages[safeIndex] ?? null);
+    const copy = msg ? resolveCoachMessage(msg, tCoach, tRoot) : null;
+    const meta = isScoreSlide
+        ? { label: t('month_score_badge'), dot: SCORE_SLIDE_DOT }
+        : msg
+          ? {
+                label: coachKindDisplay(msg.kind, t),
+                dot: KIND_DOTS[msg.kind] ?? 'var(--color-accent)',
+            }
+          : { label: '', dot: SCORE_SLIDE_DOT };
+
+    const prev = () => setIndex(previous => (previous - 1 + slideCount) % slideCount);
+    const next = () => setIndex(previous => (previous + 1) % slideCount);
 
     return (
         <div className="overflow-hidden rounded-2xl border border-accent bg-surface shadow-md">
-            {/* Slide body */}
             <div className="grid gap-3.5 px-5 pt-4.5 pb-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <Typography as="span" variant="eyebrow" color="primary">
@@ -88,32 +98,41 @@ export function CoachVerdict({
                     </span>
                 </div>
 
-                <Typography
-                    as="h3"
-                    size="lg"
-                    weight="medium"
-                    className="max-w-prose leading-snug text-pretty lg:text-2xl">
-                    {copy.text}
-                </Typography>
+                {isScoreSlide ? (
+                    <div className="min-w-0">{scoreSlide}</div>
+                ) : copy && msg ? (
+                    <Typography
+                        as="h3"
+                        size="lg"
+                        weight="medium"
+                        className="max-w-prose leading-snug text-pretty lg:text-2xl">
+                        {copy.text}
+                    </Typography>
+                ) : null}
 
                 <div className="flex flex-wrap items-center gap-3.5">
-                    {/* Dot pagination */}
                     <span className="flex items-center gap-1.5">
-                        {messages.map((message, i) => (
-                            <button
-                                key={message.id}
-                                type="button"
-                                onClick={() => setIndex(i)}
-                                aria-label={t('message_n', { n: i + 1 })}
-                                className={cn(
-                                    'h-1 rounded-full transition-all duration-300',
-                                    i === index ? 'w-6 bg-accent' : 'w-2.5 bg-line-strong'
-                                )}
-                            />
-                        ))}
+                        {Array.from({ length: slideCount }, (_, i) => {
+                            const scoreDot = hasScore && i === messages.length;
+                            return (
+                                <button
+                                    key={scoreDot ? 'month-score' : (messages[i]?.id ?? i)}
+                                    type="button"
+                                    onClick={() => setIndex(i)}
+                                    aria-label={
+                                        scoreDot
+                                            ? t('month_score_slide')
+                                            : t('message_n', { n: i + 1 })
+                                    }
+                                    className={cn(
+                                        'h-1 rounded-full transition-all duration-300',
+                                        i === safeIndex ? 'w-6 bg-accent' : 'w-2.5 bg-line-strong'
+                                    )}
+                                />
+                            );
+                        })}
                     </span>
 
-                    {/* Prev / count / next */}
                     <span className="flex items-center gap-2">
                         <button
                             type="button"
@@ -123,7 +142,7 @@ export function CoachVerdict({
                             ←
                         </button>
                         <span className="font-mono text-xs font-medium text-fg-faint">
-                            {index + 1} / {messages.length}
+                            {safeIndex + 1} / {slideCount}
                         </span>
                         <button
                             type="button"
@@ -134,29 +153,30 @@ export function CoachVerdict({
                         </button>
                     </span>
 
-                    <span className="ml-auto flex flex-wrap items-center justify-end gap-2">
-                        <button
-                            type="button"
-                            className="rounded-full border border-line-strong px-4 py-2.5 font-mono text-xs font-medium tracking-wide text-fg-secondary uppercase transition-colors hover:border-accent-hover hover:text-accent"
-                            onClick={() => {
-                                if (typeof navigator !== 'undefined' && navigator.share) {
-                                    void navigator.share({
-                                        title: 'Rumtelo',
-                                        text: copy.text,
-                                        url: window.location.href,
-                                    });
-                                }
-                            }}>
-                            {t('share')}
-                        </button>
-                        <Button as={Link} href={msg.ctaHref ?? '/'} size="sm">
-                            {copy.ctaLabel ?? t('open')}
-                        </Button>
-                    </span>
+                    {!isScoreSlide && copy && msg ? (
+                        <span className="ml-auto flex flex-wrap items-center justify-end gap-2">
+                            <button
+                                type="button"
+                                className="rounded-full border border-line-strong px-4 py-2.5 font-mono text-xs font-medium tracking-wide text-fg-secondary uppercase transition-colors hover:border-accent-hover hover:text-accent"
+                                onClick={() => {
+                                    if (typeof navigator !== 'undefined' && navigator.share) {
+                                        void navigator.share({
+                                            title: 'Rumtelo',
+                                            text: copy.text,
+                                            url: window.location.href,
+                                        });
+                                    }
+                                }}>
+                                {t('share')}
+                            </button>
+                            <Button as={Link} href={msg.ctaHref ?? '/'} size="sm">
+                                {copy.ctaLabel ?? t('open')}
+                            </Button>
+                        </span>
+                    ) : null}
                 </div>
             </div>
 
-            {/* Cross-portal recap strip */}
             <div className="grid grid-cols-2 border-t border-line bg-bg-app sm:flex sm:flex-wrap">
                 {recap.map(row => (
                     <Link

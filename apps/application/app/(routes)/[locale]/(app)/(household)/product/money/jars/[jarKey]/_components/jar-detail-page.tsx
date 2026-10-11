@@ -23,7 +23,6 @@ import {
 } from '@rumtelo/utils';
 
 import { claimLinkedFixedCostTxIds } from '@/app/_lib/fixed-cost-match';
-import { activeSaveGoalsOnJar, focusSaveGoal } from '@/app/_lib/goal-focus';
 import { resolveJarSubtitle } from '@/app/_lib/jar-copy';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
@@ -48,7 +47,6 @@ import {
     createGoalHref,
     createMoveHref,
     createTxHref,
-    goalDetailHref,
     txDetailHref,
 } from '@/app/_lib/create-routes';
 
@@ -216,8 +214,6 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                       status: projected.fulfilledByPeriod ? GoalStatus.REACHED : goal.status,
                   };
               });
-    const focusGoal = focusSaveGoal(goalsQuery.data ?? [], jar.id);
-    const saveQueue = activeSaveGoalsOnJar(goalsQuery.data ?? [], jar.id);
     const addGoalHref = createGoalHref({
         jarId: jar.id,
         kind: jar.key === JarKey.GIVE ? GoalKind.GIVE : GoalKind.SAVE,
@@ -351,29 +347,6 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                             </Link>
                         ) : null}
                     </div>
-                    {focusGoal ? (
-                        <Card className="grid gap-2 border-accent bg-accent-soft/50 p-4">
-                            <p className="font-mono text-[10px] tracking-wider text-accent uppercase">
-                                {t('focus_of', { total: saveQueue.length })}
-                            </p>
-                            <div className="flex flex-wrap items-center justify-between gap-3">
-                                <Link
-                                    href={goalDetailHref(focusGoal.id)}
-                                    className="min-w-0 text-sm font-semibold text-fg hover:text-accent">
-                                    {focusGoal.icon ? `${focusGoal.icon} ` : ''}
-                                    {focusGoal.name}
-                                </Link>
-                                <span className="font-mono text-sm text-fg-muted">
-                                    {formatMoney(
-                                        projectionById.get(focusGoal.id)?.projectedSaved ??
-                                            Math.min(focusGoal.target, Math.max(0, jar.available))
-                                    )}{' '}
-                                    / {formatMoney(focusGoal.target)}
-                                </span>
-                            </div>
-                            <p className="text-xs text-fg-muted">{t('fill_jar_first')}</p>
-                        </Card>
-                    ) : null}
                     <Card className="p-0">
                         <JarGoalAccordion
                             goals={goalsForList}

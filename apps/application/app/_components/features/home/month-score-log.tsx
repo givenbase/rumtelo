@@ -31,7 +31,7 @@ function inboxReady(blockers: MonthCloseBlockers | null | undefined): boolean {
 
 /**
  * Month score log — score, close gate, optional period-travel note, event log.
- * Looking-back / looking-ahead copy lives here (not as a separate Coach slide).
+ * On home, embeds as the last CoachVerdict slide (`embedded`); coach page keeps the card.
  * Close-blocker / prior-month nudges only when `canCloseMonth` (VIEWER look-along: score only).
  */
 export function MonthScoreLog({
@@ -49,6 +49,8 @@ export function MonthScoreLog({
     formatMoney,
     /** Coach quiet-state: score + close gate, no event log. */
     compact = false,
+    /** Inside CoachVerdict — no outer card chrome / duplicate eyebrow. */
+    embedded = false,
 }: {
     score: number;
     /** Signed: positive left · 0 last day · negative overdue. */
@@ -67,6 +69,7 @@ export function MonthScoreLog({
     canCloseMonth?: boolean;
     formatMoney?: (cents: number) => string;
     compact?: boolean;
+    embedded?: boolean;
 }) {
     const t = useTranslations('pages.dashboard.month_score');
     const tDashboard = useTranslations('pages.dashboard');
@@ -145,19 +148,23 @@ export function MonthScoreLog({
     return (
         <div
             className={cn(
-                'rounded-2xl border bg-surface p-6 shadow-md',
-                isClosed
-                    ? 'border-success ring-1 ring-success/20'
-                    : urgency === 'overdue'
-                      ? 'border-danger ring-1 ring-danger/20'
-                      : urgency === 'today' || urgency === 'soon'
-                        ? 'border-warning ring-1 ring-warning/20'
-                        : 'border-line'
+                embedded
+                    ? 'min-w-0'
+                    : cn(
+                          'rounded-2xl border bg-surface p-6 shadow-md',
+                          isClosed
+                              ? 'border-success ring-1 ring-success/20'
+                              : urgency === 'overdue'
+                                ? 'border-danger ring-1 ring-danger/20'
+                                : urgency === 'today' || urgency === 'soon'
+                                  ? 'border-warning ring-1 ring-warning/20'
+                                  : 'border-line'
+                      )
             )}>
             {/* Header */}
             <div className="flex flex-wrap items-center justify-between gap-3.5">
                 <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <Eyebrow>{t('eyebrow')}</Eyebrow>
+                    {embedded ? null : <Eyebrow>{t('eyebrow')}</Eyebrow>}
                     <span className="flex flex-wrap items-baseline gap-2">
                         <span className="font-mono text-xs font-medium tracking-widest text-fg-faint uppercase">
                             {t('label')}
