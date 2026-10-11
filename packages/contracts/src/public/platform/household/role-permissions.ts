@@ -86,7 +86,7 @@ function allSections(crud: CrudPermissions): RolePermissionMatrix {
  * | OWNER  | Full CRUD                              | Full CRUD            |
  * | ADMIN  | Settings+members full; billing R/U     | Full CRUD            |
  * | MEMBER | Settings/members read; no billing      | Day-to-day CRUD      |
- * | VIEWER | No org surfaces                        | Read-only portals    |
+ * | VIEWER | Settings+members read; no billing      | Read-only portals    |
  */
 export const ROLE_PERMISSIONS: Record<HouseholdRole, RolePermissionMatrix> = {
     [HouseholdRole.OWNER]: allSections(READ_WRITE),
@@ -124,10 +124,12 @@ export const ROLE_PERMISSIONS: Record<HouseholdRole, RolePermissionMatrix> = {
     },
 
     [HouseholdRole.VIEWER]: {
-        // Look-along: home + money overview only. No growth/energy/soul/coach/members/billing.
-        // Settings READ so account prefs still open; household member admin stays closed.
+        // Look-along: home + money overview only. No growth/energy/soul/coach/billing.
+        // Members READ so the shell can resolve this seat (soft-upgrade, gates);
+        // invite / role admin stays closed (no CREATE/UPDATE/DELETE).
+        // Settings READ so account prefs still open.
         [HouseholdPermissionSection.HOUSEHOLD_SETTINGS]: READ_ONLY,
-        [HouseholdPermissionSection.HOUSEHOLD_MEMBERS]: NONE,
+        [HouseholdPermissionSection.HOUSEHOLD_MEMBERS]: READ_ONLY,
         [HouseholdPermissionSection.HOUSEHOLD_BILLING]: NONE,
         [HouseholdPermissionSection.HOME]: READ_ONLY,
         [HouseholdPermissionSection.MONEY]: READ_ONLY,

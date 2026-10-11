@@ -4,7 +4,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMemo, useState } from 'react';
 
 import type { Debt } from '@rumtelo/contracts';
-import { JarKey, PayoffStrategy } from '@rumtelo/contracts';
+import { HouseholdRole, JarKey, PayoffStrategy } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { AccentCard, Card, EmptyState, Eyebrow, Typography } from '@rumtelo/ui';
@@ -22,6 +22,7 @@ import {
 } from '@/app/_lib/debt-payoff';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
+import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -55,10 +56,14 @@ function isDebtSort(value: string): value is DebtSort {
 export function DebtsPageClient() {
     const t = useTranslations('features.money.debt');
     const tShell = useTranslations('pages.shell');
-    const pageTabs: ReadonlyArray<{ key: DebtPageTab; label: string }> = [
-        { key: 'debts', label: t('tab_debts') },
-        { key: 'compare', label: t('tab_compare') },
-    ];
+    const { role } = useBoardWriteAccess();
+    const lookAlongOnly = role === HouseholdRole.VIEWER;
+    const pageTabs: ReadonlyArray<{ key: DebtPageTab; label: string }> = lookAlongOnly
+        ? [{ key: 'debts', label: t('tab_debts') }]
+        : [
+              { key: 'debts', label: t('tab_debts') },
+              { key: 'compare', label: t('tab_compare') },
+          ];
     const debtFilters: ReadonlyArray<{ key: DebtFilter; label: string }> = [
         { key: 'all', label: t('filter_all') },
         { key: 'expensive', label: t('filter_expensive') },
@@ -100,6 +105,7 @@ export function DebtsPageClient() {
     const { formatMoney } = useHouseholdCurrency();
     const appLocale = useLocale();
     const [tab, setTab] = useState<DebtPageTab>('debts');
+    const activeTab: DebtPageTab = lookAlongOnly && tab === 'compare' ? 'debts' : tab;
     const [extra, setExtra] = useState(30_000);
     const [filter, setFilter] = useState<DebtFilter>('all');
     const [sort, setSort] = useState<DebtSort>('payoff');
@@ -283,7 +289,7 @@ export function DebtsPageClient() {
                 {pageTabs.map(option => (
                     <ListToolbarTab
                         key={option.key}
-                        active={tab === option.key}
+                        active={activeTab === option.key}
                         onClick={() => setTab(option.key)}>
                         {option.label}
                         {option.key === 'debts' && debtsLive.length > 0 ? (
@@ -346,7 +352,7 @@ export function DebtsPageClient() {
                     ]}
                 />
 
-                {!live && tab === 'compare' ? (
+                {!live && activeTab === 'compare' ? (
                     <div className="border-t border-line px-5 py-3.5">
                         <Eyebrow className="mb-2">
                             {t('extra_label', {
@@ -373,7 +379,7 @@ export function DebtsPageClient() {
                 ) : null}
             </AccentCard>
 
-            {tab === 'compare' ? (
+            {activeTab === 'compare' ? (
                 <DebtStrategyCoach
                     debts={debtsLive}
                     strategy={strategy}

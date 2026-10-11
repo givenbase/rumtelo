@@ -68,3 +68,30 @@ describe('roleCan VIEWER money', () => {
         );
     });
 });
+
+describe('roleCan VIEWER members', () => {
+    it('allows READ so the shell can resolve the look-along seat', () => {
+        assert.equal(
+            roleCan(
+                HouseholdRole.VIEWER,
+                HouseholdPermissionSection.HOUSEHOLD_MEMBERS,
+                HouseholdPermissionAction.READ
+            ),
+            true
+        );
+    });
+
+    it('denies invite / member admin', () => {
+        for (const action of [
+            HouseholdPermissionAction.CREATE,
+            HouseholdPermissionAction.UPDATE,
+            HouseholdPermissionAction.DELETE,
+        ]) {
+            assert.equal(
+                roleCan(HouseholdRole.VIEWER, HouseholdPermissionSection.HOUSEHOLD_MEMBERS, action),
+                false,
+                action
+            );
+        }
+    });
+});
