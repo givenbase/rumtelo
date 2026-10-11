@@ -91,6 +91,8 @@ const coach = {
         open: 'Open',
         detail: 'Detail',
         message_n: 'Message {n}',
+        month_score_badge: 'Month score',
+        month_score_slide: 'Month score advice',
         previous: 'Previous',
         next: 'Next',
     },

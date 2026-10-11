@@ -38,6 +38,7 @@ import { PortalWidget } from '@/components/features/home/portal-widget';
 import { MonthScoreLog } from '@/components/features/home/month-score-log';
 import { JarDrilldownTable } from '@/components/features/money/jar-drilldown-table';
 import type { JarDrilldownItem } from '@/components/features/money/jar-drilldown-parts';
+import { useHelpersEnabled } from '@/components/features/helpers';
 import { HouseholdPermissionSection, roleCanSee } from '@/app/_lib/role-permissions';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -53,6 +54,7 @@ export function HomeDashboardClient() {
     const { householdId, session } = useAuth();
     const { period, showToast } = useHouseholdShell();
     const { canMutate, role } = useBoardWriteAccess();
+    const helpersEnabled = useHelpersEnabled();
     const canSeeGrowth = roleCanSee(role, HouseholdPermissionSection.GROWTH);
     const canSeeEnergy = roleCanSee(role, HouseholdPermissionSection.ENERGY);
     const canSeeSoul = roleCanSee(role, HouseholdPermissionSection.SOUL);
@@ -416,28 +418,56 @@ export function HomeDashboardClient() {
                 ) : null}
             </div>
 
-            {/* CoachVerdict self-gates via useHelpersEnabled (role + prefs). */}
-            <CoachVerdict messages={coach} recap={fallbackRecap} />
-
-            <MonthScoreLog
-                score={monthScore.score}
-                daysLeft={monthScore.daysLeft}
-                level={monthScore.level}
-                events={monthScore.events}
-                isClosed={liveData?.monthScore?.isClosed}
-                closeBlockers={monthScore.closeBlockers}
-                priorOpenPeriod={monthScore.priorOpenPeriod}
-                periodNote={periodScoreNote}
-                canCloseMonth={
-                    live &&
-                    canMutate &&
-                    liveData?.monthScore !== undefined &&
-                    !liveData.monthScore.isClosed
+            {/* Coach + month-score advice share one slider when helpers are on. */}
+            <CoachVerdict
+                messages={coach}
+                recap={fallbackRecap}
+                scoreSlide={
+                    <MonthScoreLog
+                        embedded
+                        score={monthScore.score}
+                        daysLeft={monthScore.daysLeft}
+                        level={monthScore.level}
+                        events={monthScore.events}
+                        isClosed={liveData?.monthScore?.isClosed}
+                        closeBlockers={monthScore.closeBlockers}
+                        priorOpenPeriod={monthScore.priorOpenPeriod}
+                        periodNote={periodScoreNote}
+                        canCloseMonth={
+                            live &&
+                            canMutate &&
+                            liveData?.monthScore !== undefined &&
+                            !liveData.monthScore.isClosed
+                        }
+                        closeMonthPending={closeMonthScoreMutation.isPending}
+                        formatMoney={formatMoney}
+                        onCloseMonth={dispositions => closeMonthScoreMutation.mutate(dispositions)}
+                    />
                 }
-                closeMonthPending={closeMonthScoreMutation.isPending}
-                formatMoney={formatMoney}
-                onCloseMonth={dispositions => closeMonthScoreMutation.mutate(dispositions)}
             />
+
+            {/* Helpers off: CoachVerdict is null — keep month-score advice visible. */}
+            {!helpersEnabled ? (
+                <MonthScoreLog
+                    score={monthScore.score}
+                    daysLeft={monthScore.daysLeft}
+                    level={monthScore.level}
+                    events={monthScore.events}
+                    isClosed={liveData?.monthScore?.isClosed}
+                    closeBlockers={monthScore.closeBlockers}
+                    priorOpenPeriod={monthScore.priorOpenPeriod}
+                    periodNote={periodScoreNote}
+                    canCloseMonth={
+                        live &&
+                        canMutate &&
+                        liveData?.monthScore !== undefined &&
+                        !liveData.monthScore.isClosed
+                    }
+                    closeMonthPending={closeMonthScoreMutation.isPending}
+                    formatMoney={formatMoney}
+                    onCloseMonth={dispositions => closeMonthScoreMutation.mutate(dispositions)}
+                />
+            ) : null}
 
             <HeroKluis
                 eyebrow={heroEyebrow}

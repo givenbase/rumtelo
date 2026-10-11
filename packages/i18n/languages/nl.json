@@ -749,6 +749,8 @@
                 "open": "Openen",
                 "detail": "Details",
                 "message_n": "Bericht {n}",
+                "month_score_badge": "Maandscore",
+                "month_score_slide": "Maandscore-advies",
                 "previous": "Vorige",
                 "next": "Volgende"
             },
