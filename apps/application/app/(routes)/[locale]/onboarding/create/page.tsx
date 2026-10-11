@@ -1,16 +1,15 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { HouseholdRole } from '@rumtelo/contracts';
-import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
 import { BrandLoader } from '@rumtelo/ui';
 
 import { setActiveOrganization } from '@/app/_lib/auth';
-import { apiQuery } from '@/app/_lib/api-hooks';
+import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { OnboardingFlow } from '../_components/onboarding-flow';
 
@@ -22,34 +21,47 @@ import { OnboardingFlow } from '../_components/onboarding-flow';
 export default function CreateOwnHouseholdPage() {
     const t = useTranslations();
     const router = useRouter();
-    const { session, isPending, householdId, householdReady, userId, refreshSession } = useAuth();
+    const { session, isPending, householdId, householdReady, refreshSession } = useAuth();
+    const { membershipRole, membershipPending, role } = useBoardWriteAccess();
+    const detachStarted = useRef(false);
 
-    const membersQuery = useLiveQuery(
-        apiQuery.household.members.queryOptions({ input: { householdId: householdId! } }),
-        [],
-        Boolean(householdId)
-    );
-
-    const myRole = membersQuery.data.find(member => member.userId === userId)?.role;
-    const isViewerOnlySeat = !householdId || myRole === HouseholdRole.VIEWER;
+    const lookAlongSeat =
+        membershipRole === HouseholdRole.VIEWER ||
+        (!membershipPending && !membershipRole && role === HouseholdRole.VIEWER);
 
     useEffect(() => {
         if (isPending || !householdReady || !session) return;
         if (!householdId) return;
-        if (myRole && myRole !== HouseholdRole.VIEWER) {
+        if (membershipPending) return;
+
+        if (membershipRole && membershipRole !== HouseholdRole.VIEWER) {
             router.replace('/');
             return;
         }
-        // Detach look-along seat so questionnaire creates a new OWNER board.
-        if (myRole === HouseholdRole.VIEWER) {
-            void (async () => {
+
+        if (!lookAlongSeat || detachStarted.current) return;
+        detachStarted.current = true;
+        void (async () => {
+            try {
                 await setActiveOrganization(null);
                 await refreshSession();
-            })();
-        }
-    }, [householdId, householdReady, isPending, myRole, refreshSession, router, session]);
+            } catch {
+                detachStarted.current = false;
+            }
+        })();
+    }, [
+        householdId,
+        householdReady,
+        isPending,
+        lookAlongSeat,
+        membershipPending,
+        membershipRole,
+        refreshSession,
+        router,
+        session,
+    ]);
 
-    if (isPending || !householdReady) {
+    if (isPending || !householdReady || membershipPending) {
         return <BrandLoader fullScreen label={t('ui.statusPage.loading')} />;
     }
 
@@ -64,12 +76,12 @@ export default function CreateOwnHouseholdPage() {
         );
     }
 
-    if (!isViewerOnlySeat) {
+    if (membershipRole && membershipRole !== HouseholdRole.VIEWER) {
         return <BrandLoader fullScreen label={t('ui.statusPage.loading')} />;
     }
 
     // Still clearing active household after VIEWER detach.
-    if (householdId && myRole === HouseholdRole.VIEWER) {
+    if (householdId && lookAlongSeat) {
         return <BrandLoader fullScreen label={t('ui.statusPage.loading')} />;
     }
 
