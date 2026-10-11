@@ -714,21 +714,24 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
             <div className="mx-auto max-w-7xl px-4 py-8 pb-24 md:pb-8">
                 {!access.locked && <PeriodTravelBanner />}
                 {isViewer ? (
-                    <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-line bg-surface/80 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="grid gap-0.5">
-                            <p className="font-mono text-[10px] font-semibold tracking-widest text-fg-faint uppercase">
+                    <aside
+                        role="status"
+                        aria-label={t('pages.shell.viewer.look_along')}
+                        className="mb-6 flex flex-col gap-3 rounded-2xl border border-line bg-surface px-3 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-4">
+                        <div className="grid min-w-0 gap-1">
+                            <p className="font-mono text-xs font-semibold tracking-wide text-fg-muted uppercase">
                                 {t('pages.shell.viewer.look_along')}
                             </p>
-                            <p className="text-sm text-fg-muted">
+                            <p className="text-sm text-fg-secondary">
                                 {t('pages.shell.viewer.start_own_banner')}
                             </p>
                         </div>
                         <Link
                             href="/onboarding/create"
-                            className="shrink-0 rounded-full bg-accent px-4 py-2 text-center text-sm font-semibold text-on-accent transition hover:brightness-110">
+                            className="focus-visible:ring-offset-canvas inline-flex min-h-10 w-full shrink-0 items-center justify-center rounded-full bg-accent px-4 py-2 text-center text-sm font-semibold text-on-accent transition outline-none hover:brightness-110 focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 sm:w-auto">
                             {t('pages.shell.viewer.start_own_cta')}
                         </Link>
-                    </div>
+                    </aside>
                 ) : null}
                 {capabilities.showWhyCaption ? (
                     <WhyCaption pathname={pathname} locked={access.locked} />

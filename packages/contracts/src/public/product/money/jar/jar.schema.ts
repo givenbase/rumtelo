@@ -80,6 +80,12 @@ export const JarBalance = Jar.extend({
     remaining: Money,
     /** remaining − committedOut — what is left after plan + spend (UI primary). */
     available: Money,
+    /**
+     * Cumulative pot since household start through {@link period}:
+     * Σ monthly allocations + Σ credited − Σ spent (sorted ledger).
+     * Answers “what have I saved in this jar?”, beside month envelope maths.
+     */
+    potBalance: Money,
     /** available / (allocated + credited), clamped 0..1; null when envelope is empty. */
     progress: z.number().min(0).max(1).nullable(),
     overspent: z.boolean(),

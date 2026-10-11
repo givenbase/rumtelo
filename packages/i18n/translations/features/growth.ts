@@ -57,7 +57,7 @@ const growth = {
         preset_group_other: 'Other',
         focus: 'Focus',
         reached_badge: 'Reached {when}',
-        progress_unknown: 'Unknown',
+        progress_unknown: 'Set a monthly amount to see when',
         progress_reached: 'Reached {when}',
         progress_target_met: 'Target met',
         progress_earn_remaining: '{amount} still to earn',
@@ -65,10 +65,19 @@ const growth = {
         progress_pledge_met: 'Pledge met{when}',
         progress_pledge_left: '{amount} left{by}',
         progress_by_year: ' · by {year}',
-        progress_pace_reaches: '{monthly} /mo · reaches {date}',
-        progress_pace_by: '{monthly} /mo · by {date}',
+        /** List/detail pace — monthly plan → months + calendar month. */
+        progress_pace_reaches: '{monthly}/mo · in {months} months ({date})',
+        progress_pace_by: '{monthly}/mo · in {months} months ({date})',
+        progress_pace_months_one: '1 month',
+        progress_pace_months_other: '{count} months',
+        /** Compact trailing label next to %. */
+        progress_eta_short: '{months} mo',
+        progress_eta_unknown: 'no date yet',
         of: 'of',
         per_month: '/mo',
+        /** Page lead when multiple SAVE goals share jars. */
+        share_jar_hint:
+            'Goals on the same jar share monthly room. More goals there usually means each one takes longer — unless one is Focus.',
         group_aria: '{kind} goals ({count})',
         form: {
             save_goal: 'Save goal',
@@ -175,13 +184,17 @@ const growth = {
             earn_remaining: '◇ {amount} still to earn each month',
             give_remaining: '◇ {amount} left on the pledge{by}',
             give_by: ' · by {year}',
-            save_pace: '◇ {monthly} /mo · {date}',
+            save_pace: '◇ {monthly}/mo · in {months} months ({date})',
+            save_pace_open: '◇ Set a monthly amount to see how many months',
             date_open: 'date open',
+            pct_with_months: '{pct}% · {months} mo',
             jar_context: 'Jar context',
             available: 'Available',
             fixed_out: 'Fixed costs',
             headroom: 'Headroom',
             other_goals: 'Other goals on this jar',
+            sibling_pace: '{monthly}/mo · {months} mo',
+            sibling_no_plan: 'no monthly plan',
             how_to_get_there: '✦ How to get there',
             opportunities: '✦ Opportunities',
             open_link: 'Open ›',
@@ -232,7 +245,7 @@ const growth = {
             advice_siblings_title: '{count} other goal shares {jar}',
             advice_siblings_title_plural: '{count} other goals share {jar}',
             advice_siblings_body:
-                'They compete for the same monthly flow. Make one the focus so the jar is not stretched thin.',
+                'They share the same monthly jar room after bills. Every euro planned for another goal lengthens this finish — pick one Focus so the rest wait behind.',
             advice_default_title: 'One decision at a time',
             advice_default_body:
                 'Name the next transfer. Goals move when money moves — not when you revisit the number.',
@@ -542,7 +555,8 @@ const growth = {
         reset_to_your_date: 'Reset to your date',
         reset_to_pace: 'Reset to pace',
         next_goal: 'Next: {name}',
-        tip_no_plan: 'No monthly amount, so there is no date.',
+        tip_no_plan:
+            'No monthly amount, so there is no finish month yet. Set how much goes in each month — then we show how many months and which month you land. Other goals on the same jar share that room, so more goals usually stretch each finish.',
         tip_set_monthly_amount: 'Set monthly amount',
         tip_behind_room: '{need}/mo would finish this in {months} months. The jar has room.',
         tip_raise_monthly_amount: 'Raise monthly amount',

@@ -250,6 +250,7 @@ export function HomeDashboardClient() {
             available: jar.available,
             spent: jar.spent,
             committedOut: jar.committedOut,
+            potBalance: jar.potBalance,
             overspent: jar.overspent,
             categories: jar.categories ?? [],
             href: `/product/money/jars/${jarKeyToSlug(jar.key)}`,
@@ -327,18 +328,34 @@ export function HomeDashboardClient() {
 
     const horizon = travelMeta.monthsHorizon;
     const baselineTotal = dashboard.baselineAllocatedTotal;
-    const totalDelta =
-        stacked && baselineTotal !== null && baselineTotal !== undefined
-            ? {
-                  fromLabel: formatMoney(baselineTotal),
-                  toLabel: formatMoney(dashboard.allocatedTotal ?? 0),
-                  deltaLabel: t('pages.dashboard.travel.delta_months', {
-                      delta: `${dashboard.allocatedTotal - baselineTotal >= 0 ? '+' : ''}${formatMoney(dashboard.allocatedTotal - baselineTotal)}`,
-                      months: horizon,
-                  }),
-                  tone: 'grow' as const,
-              }
-            : null;
+    const selectedTotal = dashboard.allocatedTotal ?? 0;
+    const totalDelta = (() => {
+        if (baselineTotal === null || baselineTotal === undefined) return null;
+        if (baselineTotal === selectedTotal) return null;
+        const signed = `${selectedTotal - baselineTotal >= 0 ? '+' : ''}${formatMoney(selectedTotal - baselineTotal)}`;
+        // Looking Ahead: current monthly → stacked horizon (grow).
+        if (stacked) {
+            return {
+                fromLabel: formatMoney(baselineTotal),
+                toLabel: formatMoney(selectedTotal),
+                deltaLabel: t('pages.dashboard.travel.delta_months', {
+                    delta: signed,
+                    months: horizon,
+                }),
+                tone: 'grow' as const,
+            };
+        }
+        // Looking Back: current monthly → that month (income raise/cut), only when it differs.
+        if (travel.direction === 'past') {
+            return {
+                fromLabel: formatMoney(baselineTotal),
+                toLabel: formatMoney(selectedTotal),
+                deltaLabel: t('pages.dashboard.travel.delta_vs_now', { delta: signed }),
+                tone: 'neutral' as const,
+            };
+        }
+        return null;
+    })();
 
     const debtsAtPeriod = liveData?.debtsAtPeriod ?? null;
     const fulfilledGoals = goalsAtPeriod.filter(goal => goal.fulfilledByPeriod).length;
@@ -425,6 +442,7 @@ export function HomeDashboardClient() {
             <HeroKluis
                 eyebrow={heroEyebrow}
                 total={formatMoney(dashboard.allocatedTotal ?? 0)}
+                potTotal={formatMoney(jars.reduce((sum, jar) => sum + jar.potBalance, 0))}
                 totalDelta={totalDelta}
                 incomeBreakdown={incomeBreakdown}
                 stats={[

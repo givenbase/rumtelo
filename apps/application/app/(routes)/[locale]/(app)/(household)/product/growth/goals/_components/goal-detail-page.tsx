@@ -191,6 +191,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
     const t = useTranslations();
     const td = useTranslations('features.growth.goals.detail');
     const tGoals = useTranslations('features.growth.goals');
+    const tJars = useTranslations('features.money.jars');
     const tAction = useTranslations('common.action');
     const locale = useLocale();
     const live = isLiveData(householdId);
@@ -346,6 +347,16 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
               })
             : null;
 
+    const saveMonthsLeft =
+        goal.kind !== GoalKind.SAVE
+            ? null
+            : (pace?.monthsAtPlan ??
+              (goal.monthlyContribution > 0
+                  ? remaining > 0
+                      ? Math.ceil(remaining / goal.monthlyContribution)
+                      : 0
+                  : null));
+
     const advice = paceAdvice({
         goal,
         verdict: pace?.verdict ?? null,
@@ -488,7 +499,14 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                                     ? td('needs_attention')
                                     : td('on_track')}
                         </MetaChip>
-                        <MetaChip>{Math.round(progress * 100)}%</MetaChip>
+                        <MetaChip>
+                            {goal.kind === GoalKind.SAVE && saveMonthsLeft !== null
+                                ? td('pct_with_months', {
+                                      pct: Math.round(progress * 100),
+                                      months: saveMonthsLeft,
+                                  })
+                                : `${Math.round(progress * 100)}%`}
+                        </MetaChip>
                     </div>
                 </div>
                 <Meter value={progress} />
@@ -510,13 +528,21 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                                         ? td('give_by', { year: goal.targetOn.slice(0, 4) })
                                         : '',
                                 })
-                              : td('save_pace', {
-                                    monthly: formatMoney(goal.monthlyContribution),
-                                    date:
-                                        formatMonthYear(projection?.projectedDate, locale) ??
-                                        formatMonthYear(goal.targetOn, locale) ??
-                                        td('date_open'),
-                                })}
+                              : saveMonthsLeft !== null
+                                ? td('save_pace', {
+                                      monthly: formatMoney(goal.monthlyContribution),
+                                      months: saveMonthsLeft,
+                                      date:
+                                          formatMonthYear(projection?.projectedDate, locale) ??
+                                          (pace?.doneOn
+                                              ? formatMonthYear(
+                                                    pace.doneOn.toISOString().slice(0, 10),
+                                                    locale
+                                                )
+                                              : null) ??
+                                          td('date_open'),
+                                  })
+                                : td('save_pace_open')}
                 </p>
                 {goal.why?.trim() ? (
                     <p className="border-t border-line pt-4 text-sm leading-relaxed text-fg-secondary italic">
@@ -561,19 +587,27 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                         {jarBalance ? (
                             <>
                                 <div>
-                                    <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                        {td('available')}
+                                    <dt className="font-mono text-xs tracking-wide text-fg-muted uppercase">
+                                        {tJars('this_month')}
                                     </dt>
                                     <dd className="mt-0.5 font-mono text-fg">
                                         {formatMoney(jarBalance.available)}
                                     </dd>
                                 </div>
                                 <div>
-                                    <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
+                                    <dt className="font-mono text-xs tracking-wide text-fg-muted uppercase">
                                         {td('fixed_out')}
                                     </dt>
                                     <dd className="mt-0.5 font-mono text-fg">
                                         {formatMoney(jarBalance.committedOut)}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt className="font-mono text-xs tracking-wide text-fg-muted uppercase">
+                                        {tJars('in_pot')}
+                                    </dt>
+                                    <dd className="mt-0.5 font-mono text-fg-secondary">
+                                        {formatMoney(jarBalance.potBalance)}
                                     </dd>
                                 </div>
                             </>
@@ -606,6 +640,14 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                                                   Math.min(1, sibling.saved / sibling.target) * 100
                                               )
                                             : 0;
+                                    const siblingMonths =
+                                        sibling.monthlyContribution > 0 &&
+                                        sibling.target > sibling.saved
+                                            ? Math.ceil(
+                                                  (sibling.target - sibling.saved) /
+                                                      sibling.monthlyContribution
+                                              )
+                                            : null;
                                     return (
                                         <li key={sibling.id}>
                                             <Link
@@ -615,8 +657,18 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                                                     {sibling.icon ? `${sibling.icon} ` : ''}
                                                     {sibling.name}
                                                 </span>
-                                                <span className="shrink-0 font-mono text-[11px] text-fg-muted">
-                                                    {pct}%
+                                                <span className="shrink-0 text-right font-mono text-[11px] leading-tight text-fg-muted">
+                                                    <span className="block">{pct}%</span>
+                                                    <span className="block text-[10px] text-fg-faint">
+                                                        {siblingMonths === null
+                                                            ? td('sibling_no_plan')
+                                                            : td('sibling_pace', {
+                                                                  monthly: formatMoney(
+                                                                      sibling.monthlyContribution
+                                                                  ),
+                                                                  months: siblingMonths,
+                                                              })}
+                                                    </span>
                                                 </span>
                                             </Link>
                                         </li>

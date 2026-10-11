@@ -4,7 +4,8 @@
  * Plug this in anywhere the UI needs “where would I be by that month?” —
  * overview jars, Coach copy, goals pace, debt remaining.
  *
- * Horizon rule (jars): H = |monthsDelta| + 1 (current month alone → 1).
+ * Horizon rule (Looking Ahead jars): H = |monthsDelta| + 1 (current month alone → 1).
+ * Looking Back uses a month snapshot — do not reverse-stack plan deposits.
  * Goal deposits looking ahead: only *future* months beyond today → × monthsDelta
  * on top of live `saved` (do not double-count the current month’s saved).
  */
@@ -381,8 +382,8 @@ export type CoachPeriodTravelCopyStrings = {
 };
 
 export const COACH_PERIOD_TRAVEL_COPY_DEFAULTS: CoachPeriodTravelCopyStrings = {
-    lookingBack: (stamp, relativeLabel, money, horizon) =>
-        `Looking back at ${stamp} (${relativeLabel}): about ${money} moved through your jars across ${horizon} month${horizon === 1 ? '' : 's'}.`,
+    lookingBack: (stamp, relativeLabel, money, _horizon) =>
+        `Looking back at ${stamp} (${relativeLabel}): about ${money} moved through your jars that month.`,
     lookingAhead: (stamp, money, horizon) =>
         `By ${stamp}, if you keep this plan, about ${money} will have moved through your jars across ${horizon} month${horizon === 1 ? '' : 's'}.`,
     paceNeeded: (name, moneyPerMonth) =>
@@ -448,7 +449,11 @@ export function travelForPeriod(period: string, now = new Date()) {
     return {
         travel,
         horizon: horizonMonths(travel),
-        mode: travel.direction === 'current' ? ('snapshot' as const) : ('stacked' as const),
+        /**
+         * Only Looking Ahead stacks plan deposits × horizon.
+         * Looking Back is a true month snapshot (that period’s jars / pot), not a reverse stack.
+         */
+        mode: travel.direction === 'future' ? ('stacked' as const) : ('snapshot' as const),
         selected,
         current: currentYearMonth(now),
     };

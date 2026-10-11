@@ -80,10 +80,9 @@ export class DashboardService {
         const stackedMode = meta.mode === 'stacked';
 
         let jars = baselineJars;
-        // Looking ahead/back: plan fields scale by horizon; ledger (spent + TOEGEVOEGD/
-        // credited Ins) sums by booked_on across current↔selected. Do not zeroLedger on
-        // future — that hid real In credits while allocated still stacked.
-        if (meta.travel.direction === 'future' || meta.travel.direction === 'past') {
+        if (meta.travel.direction === 'future') {
+            // Looking ahead: plan fields × horizon; ledger sums current↔selected.
+            // Do not zeroLedger — that hid real In credits while allocated still stacked.
             const [range, spentByCategory] = await Promise.all([
                 this.jars.spentCreditedByJarBetween(period, currentKey),
                 this.jars.spentByCategoryBetween(period, currentKey),
@@ -93,6 +92,9 @@ export class DashboardService {
                 creditedByJar: range.credited,
                 spentByCategory,
             });
+        } else if (meta.travel.direction === 'past') {
+            // Looking back: true snapshot of that month (allocated / spent / pot as-of then).
+            jars = await this.jars.balances(period);
         }
 
         const allocatedTotal = sum(jars.map(jar => jar.allocated));
@@ -100,8 +102,9 @@ export class DashboardService {
         const jarsOnTrack = jars.filter(jar => !jar.overspent).length;
         const fixedCostsMonthly = sum(byJar.map(group => group.total));
 
-        // Monthly safe-to-spend: use baseline (current) jars, not stacked envelopes.
-        const safeSource = baselineJars;
+        // Safe-to-spend / leftovers: live month for current + Looking Ahead; selected month when Looking Back.
+        const lookingBack = meta.travel.direction === 'past';
+        const safeSource = lookingBack ? jars : baselineJars;
         const daysLeft =
             meta.travel.direction === 'current'
                 ? Math.max(1, daysUntilPeriodEnd(period))
@@ -174,16 +177,19 @@ export class DashboardService {
         });
 
         const baselineAllocatedTotal = sum(baselineJars.map(jar => jar.allocated));
+        /** Live month figures for current→selected deltas (Looking Ahead stack or Looking Back income shift). */
+        const showBaselineDelta = stackedMode || lookingBack;
 
-        // Keep avgLeftOver / playLeft monthly (baseline), not stacked.
-        const avgLeftOver = sum(baselineJars.map(jar => jar.available));
-        const playLeft = baselineJars.find(jar => jar.key === JarKey.PLAY)?.available ?? 0;
+        // Leftovers / Play: selected month when Looking Back; otherwise live month (not stacked).
+        const leftoverSource = lookingBack ? jars : baselineJars;
+        const avgLeftOver = sum(leftoverSource.map(jar => jar.available));
+        const playLeft = leftoverSource.find(jar => jar.key === JarKey.PLAY)?.available ?? 0;
 
         return {
             period,
             periodLabel: formatPeriod(period),
             allocatedTotal,
-            incomeTotal: stackedMode ? income * horizon : income,
+            incomeTotal: stackedMode ? income * horizon : lookingBack ? allocatedTotal : income,
             spentTotal,
             avgLeftOver,
             safePerDay: Math.floor(spendableRemaining / Math.max(1, daysLeft)),
@@ -207,8 +213,8 @@ export class DashboardService {
             },
             goalsAtPeriod,
             debtsAtPeriod: debtList.length > 0 ? debtsAtPeriod : null,
-            baselineAllocatedTotal: stackedMode ? baselineAllocatedTotal : null,
-            baselineJars: stackedMode
+            baselineAllocatedTotal: showBaselineDelta ? baselineAllocatedTotal : null,
+            baselineJars: showBaselineDelta
                 ? baselineJars.map(jar => ({ id: jar.id, allocated: jar.allocated }))
                 : null,
             /** Built on the client from travel + jar params — see buildPeriodTravelCoachText. */

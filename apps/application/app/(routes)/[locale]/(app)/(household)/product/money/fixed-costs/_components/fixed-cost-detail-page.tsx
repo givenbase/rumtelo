@@ -608,7 +608,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                             type="button"
                             data-mutate
                             onClick={() => setArrearsDialogOpen(true)}
-                            className="inline-flex min-h-6 items-center rounded-full border border-warning bg-warning/8 px-2.5 py-1 font-mono text-[10px] font-medium tracking-wide text-warning uppercase transition-colors hover:bg-warning/15">
+                            className="inline-flex min-h-6 items-center rounded-full border border-warning bg-warning/8 px-2.5 py-1 font-mono text-[10px] font-medium tracking-wide text-warning uppercase transition-colors outline-none hover:bg-warning/15 focus-visible:ring-2 focus-visible:ring-accent/35">
                             {t('arrears_prompt_cta')}
                         </button>
                     ) : null}

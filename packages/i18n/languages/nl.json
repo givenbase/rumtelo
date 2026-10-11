@@ -823,8 +823,8 @@
                 }
             },
             "period_travel": {
-                "looking_back_one": "Terugblik op {stamp} ({relativeLabel}): er is in de loop van {horizon} maand ongeveer {money} door je potjes gegaan.",
-                "looking_back_other": "Terugblik op {stamp} ({relativeLabel}): er is ongeveer {money} door je potjes gegaan in de loop van {horizon} maanden.",
+                "looking_back_one": "Terugblik op {stamp} ({relativeLabel}): ongeveer {money} ging die maand door je potjes.",
+                "looking_back_other": "Terugblik op {stamp} ({relativeLabel}): ongeveer {money} ging die maand door je potjes.",
                 "looking_ahead_one": "Tegen {stamp}, als je je aan dit plan houdt, zal er in de loop van {horizon} maand ongeveer {money} door je potjes zijn gegaan.",
                 "looking_ahead_other": "Tegen {stamp}, als je je aan dit plan houdt, zal er in de loop van {horizon} maanden ongeveer {money} door je potjes zijn gegaan.",
                 "pace_needed": "{name} moet nog wat vaart maken — ongeveer {money} netto per maand om de deadline te halen.",
@@ -1219,7 +1219,7 @@
                 "preset_group_other": "Overige",
                 "focus": "Focus",
                 "reached_badge": "Bereikt {when}",
-                "progress_unknown": "Onbekend",
+                "progress_unknown": "Stel een maandelijks bedrag in om te zien wanneer",
                 "progress_reached": "Bereikt {when}",
                 "progress_target_met": "Doel bereikt",
                 "progress_earn_remaining": "{amount} moet nog worden verdiend",
@@ -1227,10 +1227,15 @@
                 "progress_pledge_met": "Toezegging nagekomen{when}",
                 "progress_pledge_left": "{amount} links{by}",
                 "progress_by_year": " · door {year}",
-                "progress_pace_reaches": "{monthly} /maand · bereikt {date}",
-                "progress_pace_by": "{monthly} /maand · door {date}",
+                "progress_pace_reaches": "{monthly}/mnd · over {months} maanden ({date})",
+                "progress_pace_by": "{monthly}/mnd · over {months} maanden ({date})",
+                "progress_pace_months_one": "1 maand",
+                "progress_pace_months_other": "{count} maanden",
+                "progress_eta_short": "{months} mnd",
+                "progress_eta_unknown": "nog geen datum",
                 "of": "van",
                 "per_month": "/maand",
+                "share_jar_hint": "Doelen in dezelfde pot delen de maandelijkse ruimte. Meer doelen daar betekent meestal dat elk doel langer duurt — tenzij er één Focus is.",
                 "group_aria": "{kind}-doelstellingen ({count})",
                 "form": {
                     "save_goal": "Doel opslaan",
@@ -1334,13 +1339,17 @@
                     "earn_remaining": "◇ {amount} moet nog elke maand worden verdiend",
                     "give_remaining": "◇ {amount} nog te gaan op de toezegging{by}",
                     "give_by": " · door {year}",
-                    "save_pace": "◇ {monthly} /maand · {date}",
+                    "save_pace": "◇ {monthly}/mnd · over {months} maanden ({date})",
+                    "save_pace_open": "◇ Stel een maandelijks bedrag in om te zien hoeveel maanden",
                     "date_open": "openingsdatum",
+                    "pct_with_months": "{pct}% · {months} mnd",
                     "jar_context": "Potcontext",
                     "available": "Beschikbaar",
                     "fixed_out": "Vaste kosten",
                     "headroom": "Ruimte over",
                     "other_goals": "Andere doelen op deze pot",
+                    "sibling_pace": "{monthly}/mnd · {months} mnd",
+                    "sibling_no_plan": "geen maandplan",
                     "how_to_get_there": "✦ Hoe kom je er?",
                     "opportunities": "✦ Mogelijkheden",
                     "open_link": "Openen ›",
@@ -1379,7 +1388,7 @@
                     "advice_save_fuel_body": "Verhoog de inkomsten, zorg voor een soepele doorstroming of versoepel de deadline — kies één maatregel in plaats van ze alle drie tegelijk te nemen.",
                     "advice_siblings_title": "{count} overige doelen {jar}",
                     "advice_siblings_title_plural": "{count} andere doelen delen {jar}",
-                    "advice_siblings_body": "Ze strijden om hetzelfde maandelijkse bedrag. Leg de nadruk op één ervan, zodat de pot niet te dun wordt uitgespreid.",
+                    "advice_siblings_body": "Ze delen dezelfde maandelijkse potruimte na vaste kosten. Elke euro voor een ander doel verlengt deze einddatum — kies één Focus zodat de rest wacht.",
                     "advice_default_title": "Eén beslissing tegelijk",
                     "advice_default_body": "Geef de volgende overboeking een naam. Doelen verschuiven wanneer er geld wordt overgemaakt — niet wanneer je het bedrag opnieuw bekijkt.",
                     "this_jar": "Deze pot"
@@ -1668,7 +1677,7 @@
                 "reset_to_your_date": "Terug naar jouw datum",
                 "reset_to_pace": "Terug naar het tempo",
                 "next_goal": "Volgende: {name}",
-                "tip_no_plan": "Er is geen maandelijks bedrag, dus er is geen datum.",
+                "tip_no_plan": "Geen maandelijks bedrag, dus nog geen eindmaand. Stel in hoeveel er elke maand naartoe gaat — dan tonen we hoeveel maanden en in welke maand je landt. Andere doelen in dezelfde pot delen die ruimte, dus meer doelen rekken meestal elke einddatum uit.",
                 "tip_set_monthly_amount": "Maandelijks bedrag instellen",
                 "tip_behind_room": "{need} per maand zou dit in {months} maanden afronden. Er is nog ruimte in de pot.",
                 "tip_raise_monthly_amount": "Maandelijks bedrag verhogen",
@@ -1737,14 +1746,27 @@
                 "on_track": "{on} / {total} liggen op schema",
                 "move_between": "Van pot naar pot gaan",
                 "add_transaction": "+ Transactie toevoegen",
-                "allocated": "{count} potten · {pct}% toegewezen",
-                "tap_hint": "Tik op een potje voor vaste kosten, uitgaven en wat er nog over is",
-                "summary_nothing": "Deze maand niets gepland of uitgegeven",
+                "allocated": "{count} potten · {pct}% opzijgezet",
+                "tap_hint": "Tik op een potje voor vaste kosten, losse uitgaven en wat er nog over is",
+                "summary_nothing": "Deze maand niets opzijgezet of uitgegeven",
                 "of_amount": "van {amount}",
-                "activity_fixed": "{amount} verholpen",
-                "activity_added": "{amount} toegevoegd",
-                "activity_spent": "{amount} uitgegeven",
+                "this_month": "Deze maand",
+                "this_month_of": "{available} van {allocated} deze maand",
+                "in_pot": "In de pot",
+                "in_pot_short": "Pot",
+                "in_pot_amount": "In de pot {amount}",
+                "summary_open_aria": "{name}: {available} deze maand, {pot} in de pot",
+                "activity_fixed": "{amount} vaste kosten",
+                "activity_added": "{amount} extra erbij",
+                "activity_spent": "{amount} losse uitgaven",
                 "activity_categories": "{count} categorieën",
+                "meta_paid": "{count} betaald",
+                "meta_open": "{count} open",
+                "meta_paid_hint": "Vaste kosten die deze maand als betaald staan",
+                "meta_open_hint": "Vaste kosten die deze maand nog openstaan",
+                "meta_fixed_hint": "Terugkerende vaste kosten deze maand",
+                "meta_extra_hint": "Extra geld dat deze maand in dit potje is gesorteerd",
+                "meta_other_spends_hint": "Gesorteerde UIT-transacties deze maand",
                 "footer_stacked": "{on} / {total} potten op schema · opgestapeld gedurende {months} maanden",
                 "footer_period": "{on} / {total}-potten liggen deze periode op schema",
                 "income_link": "Wat zou een loonsverhoging voor deze potjes betekenen? → Inkomen",
@@ -1866,8 +1888,8 @@
                     "categories_month": "✦ Categorieën van deze maand",
                     "all_fixed_costs": "Alle vaste kosten ›",
                     "category": "Categorie",
-                    "planned": "Gepland",
-                    "spent": "Uitgegeven",
+                    "planned": "Opzijgezet",
+                    "spent": "Losse uitgaven",
                     "over_under": "Boven / onder",
                     "goals_on_jar": "✦ Doelen op deze pot",
                     "add_goal": "+ Doel toevoegen",
@@ -1887,7 +1909,7 @@
                     "nothing_booked": "Er is nog niets geboekt in deze categorie.",
                     "bucket_other": "Overige",
                     "bucket_uncategorized": "Niet gecategoriseerd",
-                    "mobile_spent": "Uitgegeven {amount}",
+                    "mobile_spent": "Losse uitgaven {amount}",
                     "mobile_over_under": "{amount} boven / onder",
                     "open_jar_link": "Pot openen ▸"
                 }
@@ -2385,15 +2407,18 @@
                 "highlight_popular": "Populair"
             },
             "jar_coverage": {
-                "allocated": "Toegewezen",
-                "added": "Toegevoegd",
-                "fixed_committed": "Vast (vastgelegd)",
-                "spent": "Uitgegeven",
-                "available_of": "beschikbaar van {amount}",
-                "allocated_only": " toegewezen",
-                "added_breakdown": " ({allocated} + {added} toegevoegd)",
-                "footnote_bills": "Beschikbaar = toegewezen + toegevoegd − uitgegeven − vastgelegd. Als dezelfde factuur zowel als transactie als vaste kosten wordt geboekt, telt deze dubbel mee totdat de betalingen aan de factuur zijn gekoppeld.",
-                "footnote_simple": "Beschikbaar = toegewezen + toegevoegd − besteed."
+                "allocated": "Opzijgezet",
+                "added": "Extra erbij",
+                "fixed_committed": "Vaste kosten",
+                "spent": "Losse uitgaven",
+                "in_pot_label": "In de pot",
+                "in_pot": "In de pot {amount} · opgebouwd over de maanden",
+                "in_pot_hint": "Opgebouwd over de maanden",
+                "available_of": "over van {amount}",
+                "allocated_only": " opzijgezet",
+                "added_breakdown": " ({allocated} + {added} extra)",
+                "footnote_bills": "Over deze maand = opzijgezet + extra − losse uitgaven − vaste kosten. Vaste kosten zijn terugkerende rekeningen. Losse uitgaven zijn gesorteerde transacties. Dezelfde rekening telt dubbel als je die allebei boekt, tot je de betaling koppelt.",
+                "footnote_simple": "Over deze maand = opzijgezet + extra − losse uitgaven."
             },
             "giving_signals": {
                 "impact": {
@@ -3116,11 +3141,11 @@
                     "sections": {
                         "what_for": {
                             "heading": "Waar dit voor dient",
-                            "body": "In zes potjes wordt je maandgeld per doel gespaard. De percentages moeten samen 100% opleveren. Wat er nog overblijft, wordt bepaald door de toegewezen bedragen, de uitgaven en de vaste verplichtingen."
+                            "body": "In zes potjes wordt je maandgeld per doel gespaard. De percentages moeten samen 100% opleveren. Wat je opzijzet, losse uitgaven en vaste kosten bepalen wat er nog over is."
                         },
                         "how": {
                             "heading": "Hoe het werkt",
-                            "body": "Beschikbaar = toegewezen − uitgegeven − vastgelegd in die pot. ‘Te veel uitgegeven’ betekent dat de toezeggingen en uitgaven het budget al hebben opgebruikt. Om te zien wat een loonsverhoging voor deze potten zou betekenen, gebruik je de simulator onder Groei → Inkomen."
+                            "body": "Over deze maand = opzijgezet − losse uitgaven − vaste kosten in die pot. ‘Te veel uitgegeven’ betekent dat rekeningen en uitgaven het maanddeel al hebben opgebruikt. Om te zien wat een loonsverhoging voor deze potten zou betekenen, gebruik je de simulator onder Groei → Inkomen."
                         }
                     },
                     "steps": {
@@ -3298,7 +3323,7 @@
                 "practice_pending_cta": "Uitnodiging voor een recensie"
             },
             "hero": {
-                "money_accumulated": "Geld · Opgebouwd via {period}",
+                "money_accumulated": "Geld · {period}",
                 "money_put_through": "Geld · Verspreid over {months} maanden",
                 "money_put_through_one": "Geld · Over een periode van meer dan 1 maand gestort",
                 "money_distributed": "Geld · Deze maand uitgekeerd",
@@ -3308,6 +3333,8 @@
                 "income_month": "Verspreid over {jars} potten",
                 "income_month_one_jar": "Verdeeld over 1 pot",
                 "see_income": "Zie inkomsten ▸",
+                "in_pots_label": "In de potten",
+                "in_pots_hint": "Opgebouwd over de maanden",
                 "six_jars": "✦ De zes potjes",
                 "see_all_jars": "Alles bekijken ▸"
             },
@@ -3315,12 +3342,13 @@
                 "goals_on_track": "{fulfilled}/{total}-doelstellingen liggen tegen die tijd op schema",
                 "debt_cleared": "De schuld was tegen die tijd afgelost",
                 "debt_shift": "Schuld {from} → {to}",
-                "delta_months": "{delta} · {months} ma"
+                "delta_months": "{delta} · {months} ma",
+                "delta_vs_now": "{delta} · t.o.v. nu"
             },
             "stats": {
-                "avg_left": "Gem. overgebleven/maand",
-                "safe_per_day": "Veilig per dag",
-                "play_left": "Nog in het spel"
+                "avg_left": "Gem. rest",
+                "safe_per_day": "Veilig / dag",
+                "play_left": "In Play"
             },
             "open_portal": "Openen ▸",
             "widgets": {
@@ -5521,7 +5549,7 @@
             },
             "viewer": {
                 "look_along": "Meekijken — alleen lezen",
-                "start_own_banner": "Wil je zelf een Rumtelo-bord? Start wanneer je wilt een huishouden.",
+                "start_own_banner": "Wil je zelf een Rumtelo-bord? Start wanneer je wilt je eigen huishouden.",
                 "start_own_cta": "Start mijn huishouden"
             },
             "period_options": {

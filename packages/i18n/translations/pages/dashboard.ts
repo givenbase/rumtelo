@@ -118,7 +118,7 @@ const dashboard = {
         practice_pending_cta: 'Review invite',
     },
     hero: {
-        money_accumulated: 'Money · Accumulated through {period}',
+        money_accumulated: 'Money · {period}',
         money_put_through: 'Money · Put through over {months} months',
         money_put_through_one: 'Money · Put through over 1 month',
         money_distributed: 'Money · Distributed this month',
@@ -128,6 +128,8 @@ const dashboard = {
         income_month: 'Distributed across {jars} jars',
         income_month_one_jar: 'Distributed across 1 jar',
         see_income: 'See income ▸',
+        in_pots_label: 'In the pots',
+        in_pots_hint: 'Built up over the months',
         six_jars: '✦ The six jars',
         see_all_jars: 'See all ▸',
     },
@@ -136,11 +138,13 @@ const dashboard = {
         debt_cleared: 'Debt cleared by then',
         debt_shift: 'Debt {from} → {to}',
         delta_months: '{delta} · {months} mo',
+        /** Looking Back income/allocation shift vs this month (no horizon stack). */
+        delta_vs_now: '{delta} · vs now',
     },
     stats: {
-        avg_left: 'Avg left/month',
-        safe_per_day: 'Safe per day',
-        play_left: 'Left in Play',
+        avg_left: 'Avg left',
+        safe_per_day: 'Safe / day',
+        play_left: 'In Play',
     },
     open_portal: 'Open ▸',
     widgets: {

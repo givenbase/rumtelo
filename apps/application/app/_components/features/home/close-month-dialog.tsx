@@ -94,14 +94,18 @@ export function CloseMonthDialog({
                                         {t('close_bills_skip_hint')}
                                     </p>
                                 )}
-                                <div className="mt-2.5 flex flex-wrap gap-2">
+                                <div
+                                    className="mt-2.5 flex flex-wrap gap-2"
+                                    role="group"
+                                    aria-label={bill.name}>
                                     <button
                                         type="button"
                                         data-mutate
                                         disabled={pending}
+                                        aria-pressed={action === 'roll'}
                                         onClick={() => setAction(bill.fixedCostId, 'roll')}
                                         className={cn(
-                                            'rounded-lg border px-2.5 py-1 font-mono text-[10px] font-medium tracking-wide uppercase transition-colors',
+                                            'rounded-lg border px-2.5 py-1 font-mono text-[10px] font-medium tracking-wide uppercase transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent/35',
                                             action === 'roll'
                                                 ? 'border-accent bg-accent-soft text-accent'
                                                 : 'border-line text-fg-muted hover:border-accent hover:text-accent'
@@ -112,9 +116,10 @@ export function CloseMonthDialog({
                                         type="button"
                                         data-mutate
                                         disabled={pending}
+                                        aria-pressed={action === 'skip'}
                                         onClick={() => setAction(bill.fixedCostId, 'skip')}
                                         className={cn(
-                                            'rounded-lg border px-2.5 py-1 font-mono text-[10px] font-medium tracking-wide uppercase transition-colors',
+                                            'rounded-lg border px-2.5 py-1 font-mono text-[10px] font-medium tracking-wide uppercase transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent/35',
                                             action === 'skip'
                                                 ? 'border-fg-muted bg-raised text-fg'
                                                 : 'border-line text-fg-muted hover:border-fg-muted hover:text-fg'
