@@ -1300,6 +1300,7 @@
                     "next_rank": "Next · #{rank}",
                     "save": "Save",
                     "jar_available": "Jar available toward this focus goal.",
+                    "fill_jar_first": "Fill this jar first — then claim the goal when you're ready.",
                     "waiting_behind": "Waiting behind focus — fund #{rank} after #1.",
                     "left": "Left",
                     "monthly": "Monthly",

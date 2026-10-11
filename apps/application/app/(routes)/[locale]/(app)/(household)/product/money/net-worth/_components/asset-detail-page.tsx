@@ -18,7 +18,7 @@ import {
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Icon, Button, Card, Typography, VendorMark } from '@rumtelo/ui';
-import { assetFlowSummary, cn, endOfPeriodIso, monthlyAmount, toPeriodKey } from '@rumtelo/utils';
+import { assetFlowSummary, endOfPeriodIso, monthlyAmount, toPeriodKey } from '@rumtelo/utils';
 
 import { carMarkForName } from '@/app/_lib/car-brands';
 import {
@@ -47,6 +47,7 @@ import {
     formatBookedDate,
     formatDueDay,
 } from '@/components/features/money/jar-badge';
+import { MetricStrip } from '@/components/features/money/metric-strip';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { CoachTipCard } from '@/components/features/helpers';
 import { EntityNotFoundState } from '@/components/features/helpers/entity-not-found-state';
@@ -74,49 +75,6 @@ function statusLine(
     if (locked) return t('holding_locked');
     if (pays) return t('holding_pays');
     return t('holding_appreciates');
-}
-
-function Stat({
-    label,
-    value,
-    hint,
-    tone = 'neutral',
-}: {
-    label: string;
-    value: string;
-    hint?: string | null;
-    tone?: 'neutral' | 'accent' | 'success' | 'danger';
-}) {
-    const bar = {
-        neutral: 'bg-fg-muted',
-        accent: 'bg-accent',
-        success: 'bg-success',
-        danger: 'bg-danger',
-    }[tone];
-    const text = {
-        neutral: 'text-fg-muted',
-        accent: 'text-accent',
-        success: 'text-success',
-        danger: 'text-danger',
-    }[tone];
-    return (
-        <div className="flex overflow-hidden rounded-xl border border-line bg-sunken">
-            <span aria-hidden className={cn('w-1 shrink-0', bar)} />
-            <div className="grid min-w-0 gap-1.5 px-3.5 py-3">
-                <p className="font-mono text-[10px] tracking-wider text-fg-muted uppercase">
-                    {label}
-                </p>
-                <p
-                    className={cn(
-                        'font-display text-xl leading-none font-semibold tracking-tight sm:text-2xl',
-                        tone === 'neutral' ? 'text-fg' : text
-                    )}>
-                    {value}
-                </p>
-                {hint ? <p className="text-[11px] leading-snug text-fg-faint">{hint}</p> : null}
-            </div>
-        </div>
-    );
 }
 
 function LinkedSection({
@@ -387,58 +345,69 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                 </Card>
             ) : null}
 
-            <Card className="grid gap-4 p-5">
+            <Card className="grid gap-0 overflow-hidden p-0">
                 {canLink ? (
-                    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                        <Stat label={t('value')} value={formatMoney(asset.value)} tone="accent" />
-                        <Stat
-                            label={t('detail.in_eyebrow')}
-                            value={
-                                locked ? t('not_available_yet') : `+ ${formatMoney(flow.monthlyIn)}`
-                            }
-                            hint={inHint}
-                            tone={pays ? 'success' : 'neutral'}
-                        />
-                        <Stat
-                            label={t('detail.out_eyebrow')}
-                            value={`− ${formatMoney(flow.monthlyOut)}`}
-                            hint={outHint}
-                            tone={flow.monthlyOut > 0 ? 'danger' : 'neutral'}
-                        />
-                        <Stat
-                            label={t('detail.net_eyebrow')}
-                            value={formatMoney(flow.monthlyNet)}
-                            tone={
-                                flow.monthlyNet > 0
-                                    ? 'success'
-                                    : flow.monthlyNet < 0
-                                      ? 'danger'
-                                      : 'neutral'
-                            }
-                        />
-                    </div>
+                    <MetricStrip
+                        className="border-t-0"
+                        items={[
+                            {
+                                label: t('value'),
+                                value: formatMoney(asset.value),
+                                tone: 'accent',
+                            },
+                            {
+                                label: t('detail.in_eyebrow'),
+                                value: locked
+                                    ? t('not_available_yet')
+                                    : `+ ${formatMoney(flow.monthlyIn)}`,
+                                hint: inHint,
+                                tone: pays ? 'success' : 'default',
+                            },
+                            {
+                                label: t('detail.out_eyebrow'),
+                                value: `− ${formatMoney(flow.monthlyOut)}`,
+                                hint: outHint,
+                                tone: flow.monthlyOut > 0 ? 'danger' : 'default',
+                            },
+                            {
+                                label: t('detail.net_eyebrow'),
+                                value: formatMoney(flow.monthlyNet),
+                                tone:
+                                    flow.monthlyNet > 0
+                                        ? 'success'
+                                        : flow.monthlyNet < 0
+                                          ? 'danger'
+                                          : 'default',
+                            },
+                        ]}
+                    />
                 ) : (
-                    <div className="grid grid-cols-2 gap-3">
-                        <Stat label={t('value')} value={formatMoney(asset.value)} tone="accent" />
-                        <Stat
-                            label={t('monthly_income')}
-                            value={
-                                locked
+                    <MetricStrip
+                        className="border-t-0"
+                        items={[
+                            {
+                                label: t('value'),
+                                value: formatMoney(asset.value),
+                                tone: 'accent',
+                            },
+                            {
+                                label: t('monthly_income'),
+                                value: locked
                                     ? t('not_available_yet')
                                     : pays
                                       ? `+ ${formatMoney(asset.flow)}`
-                                      : formatMoney(0)
-                            }
-                            tone={pays ? 'accent' : 'neutral'}
-                        />
-                    </div>
+                                      : formatMoney(0),
+                                tone: pays ? 'accent' : 'default',
+                            },
+                        ]}
+                    />
                 )}
                 {kind?.description ? (
                     <Typography
                         as="p"
                         size="sm"
                         color="muted"
-                        className="border-t border-line pt-4 text-pretty">
+                        className="border-t border-line px-5 py-3.5 text-pretty">
                         {kind.description}
                     </Typography>
                 ) : null}

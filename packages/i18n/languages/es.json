@@ -749,8 +749,8 @@
                 "open": "Abrir",
                 "detail": "Detalle",
                 "message_n": "Mensaje {n}",
-                "month_score_badge": "Month score",
-                "month_score_slide": "Month score advice",
+                "month_score_badge": "Puntuación mensual",
+                "month_score_slide": "Consejos para la puntuación mensual",
                 "previous": "Anterior",
                 "next": "Siguiente"
             },
@@ -1300,6 +1300,7 @@
                     "next_rank": "Siguiente · #{rank}",
                     "save": "Guardar",
                     "jar_available": "Hay un frasco disponible para este objetivo concreto.",
+                    "fill_jar_first": "Llena primero este frasco; después, alcánzalo cuando estés listo.",
                     "waiting_behind": "En espera tras el enfoque: fondo n.º {rank} después del n.º 1.",
                     "left": "Izquierda",
                     "monthly": "Mensual",
@@ -3345,7 +3346,7 @@
                 "debt_cleared": "Deuda saldada para entonces",
                 "debt_shift": "Deuda {from} → {to}",
                 "delta_months": "{delta} · {months} mes",
-                "delta_vs_now": "{delta} · vs now"
+                "delta_vs_now": "{delta} · frente a ahora"
             },
             "stats": {
                 "avg_left": "Promedio restante al mes",

@@ -1300,6 +1300,7 @@
                     "next_rank": "Volgende · #{rank}",
                     "save": "Opslaan",
                     "jar_available": "Er is een pot beschikbaar voor dit doel.",
+                    "fill_jar_first": "Vul eerst deze pot — en bereik dan je doel zodra je er klaar voor bent.",
                     "waiting_behind": "Wachten achter de focus — fonds #{rank} na #1.",
                     "left": "Links",
                     "monthly": "Maandelijks",
@@ -3350,7 +3351,7 @@
             "stats": {
                 "avg_left": "Gem. rest",
                 "safe_per_day": "Veilig / dag",
-                "play_left": "In Play"
+                "play_left": "In het spel"
             },
             "open_portal": "Openen ▸",
             "widgets": {

@@ -16,7 +16,6 @@ import {
     endOfPeriodIso,
     projectGoalsAtHorizon,
     toPeriodKey,
-    cn,
 } from '@rumtelo/utils';
 
 import { createMoveHref, goalDetailHref, updateHref } from '@/app/_lib/create-routes';
@@ -35,6 +34,7 @@ import { SaveGoalManifestActions } from '@/components/features/growth/save-goal-
 import { CoachFeatureGate } from '@/components/features/helpers';
 import { EntityNotFoundState } from '@/components/features/helpers/entity-not-found-state';
 import { JarBadge, MetaChip, formatBookedDate } from '@/components/features/money/jar-badge';
+import { MetricStrip } from '@/components/features/money/metric-strip';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useLocale } from 'next-intl';
@@ -357,6 +357,16 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                       : 0
                   : null));
 
+    const showRankChip = rank !== null && !reached && !(goal.kind === GoalKind.SAVE && isFocus);
+    const statusChip =
+        reachedByThen && reachedMonth
+            ? { label: td('reached_month', { month: reachedMonth }), tone: 'success' as const }
+            : reached
+              ? { label: td('reached'), tone: 'success' as const }
+              : projection?.onTrack === false
+                ? { label: td('needs_attention'), tone: 'danger' as const }
+                : null;
+
     const advice = paceAdvice({
         goal,
         verdict: pace?.verdict ?? null,
@@ -477,37 +487,25 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                             </span>
                         </div>
                     </div>
-                    <div className="flex flex-wrap gap-1.5">
-                        {rank !== null && !reached ? (
-                            <MetaChip className="border-accent bg-accent-soft text-accent">
-                                {isFocus ? td('focus_rank') : td('rank', { rank })}
-                            </MetaChip>
-                        ) : null}
-                        <MetaChip
-                            className={
-                                reached
-                                    ? 'border-success bg-success/5 text-success'
-                                    : projection?.onTrack === false
-                                      ? 'border-danger bg-danger/5 text-danger'
-                                      : 'border-success bg-success/5 text-success'
-                            }>
-                            {reachedByThen && reachedMonth
-                                ? td('reached_month', { month: reachedMonth })
-                                : reached
-                                  ? td('reached')
-                                  : projection?.onTrack === false
-                                    ? td('needs_attention')
-                                    : td('on_track')}
-                        </MetaChip>
-                        <MetaChip>
-                            {goal.kind === GoalKind.SAVE && saveMonthsLeft !== null
-                                ? td('pct_with_months', {
-                                      pct: Math.round(progress * 100),
-                                      months: saveMonthsLeft,
-                                  })
-                                : `${Math.round(progress * 100)}%`}
-                        </MetaChip>
-                    </div>
+                    {showRankChip || statusChip ? (
+                        <div className="flex flex-wrap gap-1.5">
+                            {showRankChip ? (
+                                <MetaChip className="border-accent bg-accent-soft text-accent">
+                                    {td('rank', { rank })}
+                                </MetaChip>
+                            ) : null}
+                            {statusChip ? (
+                                <MetaChip
+                                    className={
+                                        statusChip.tone === 'success'
+                                            ? 'border-success bg-success/5 text-success'
+                                            : 'border-danger bg-danger/5 text-danger'
+                                    }>
+                                    {statusChip.label}
+                                </MetaChip>
+                            ) : null}
+                        </div>
+                    ) : null}
                 </div>
                 <Meter value={progress} />
                 <p className="font-mono text-xs text-fg-muted">
@@ -544,6 +542,17 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                                   })
                                 : td('save_pace_open')}
                 </p>
+                {/* Streefdatum only — monthly/pace live in the line above. */}
+                {!reached && goal.targetOn ? (
+                    <p className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
+                        {td('target_date')} · {formatBookedDate(goal.targetOn, locale)}
+                    </p>
+                ) : null}
+                {goal.cause ? (
+                    <p className="font-mono text-xs text-fg-muted">
+                        {td('cause')} · {givingCauseCopy(t, goal.cause).name}
+                    </p>
+                ) : null}
                 {goal.why?.trim() ? (
                     <p className="border-t border-line pt-4 text-sm leading-relaxed text-fg-secondary italic">
                         “{goal.why.trim()}”
@@ -552,8 +561,8 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
             </Card>
 
             {jar && goal.kind !== GoalKind.EARN ? (
-                <Card className="grid gap-4 p-5">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
+                <Card className="grid gap-0 overflow-hidden p-0">
+                    <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5">
                         <p className="font-mono text-[10px] tracking-wider text-fg-muted uppercase">
                             {td('jar_context')}
                         </p>
@@ -583,52 +592,40 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                             <JarBadge jarKey={jar.key} name={jar.name} icon={jar.icon} />
                         )}
                     </div>
-                    <dl className="grid gap-3 text-sm sm:grid-cols-3">
-                        {jarBalance ? (
-                            <>
-                                <div>
-                                    <dt className="font-mono text-xs tracking-wide text-fg-muted uppercase">
-                                        {tJars('this_month')}
-                                    </dt>
-                                    <dd className="mt-0.5 font-mono text-fg">
-                                        {formatMoney(jarBalance.available)}
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt className="font-mono text-xs tracking-wide text-fg-muted uppercase">
-                                        {td('fixed_out')}
-                                    </dt>
-                                    <dd className="mt-0.5 font-mono text-fg">
-                                        {formatMoney(jarBalance.committedOut)}
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt className="font-mono text-xs tracking-wide text-fg-muted uppercase">
-                                        {tJars('in_pot')}
-                                    </dt>
-                                    <dd className="mt-0.5 font-mono text-fg-secondary">
-                                        {formatMoney(jarBalance.potBalance)}
-                                    </dd>
-                                </div>
-                            </>
-                        ) : null}
-                        {pace?.jarHeadroomCents !== null && pace?.jarHeadroomCents !== undefined ? (
-                            <div>
-                                <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                    {td('headroom')}
-                                </dt>
-                                <dd
-                                    className={cn(
-                                        'mt-0.5 font-mono text-danger',
-                                        pace.jarHeadroomCents >= 0 && 'text-success'
-                                    )}>
-                                    {formatMoney(pace.jarHeadroomCents)}
-                                </dd>
-                            </div>
-                        ) : null}
-                    </dl>
+                    {jarBalance ? (
+                        <MetricStrip
+                            items={[
+                                {
+                                    label: tJars('this_month'),
+                                    value: formatMoney(jarBalance.available),
+                                },
+                                ...(pace?.jarHeadroomCents !== null &&
+                                pace?.jarHeadroomCents !== undefined
+                                    ? [
+                                          {
+                                              label: td('headroom'),
+                                              value: formatMoney(pace.jarHeadroomCents),
+                                              tone:
+                                                  pace.jarHeadroomCents >= 0
+                                                      ? ('success' as const)
+                                                      : ('danger' as const),
+                                          },
+                                      ]
+                                    : []),
+                                {
+                                    label: td('fixed_out'),
+                                    value: formatMoney(jarBalance.committedOut),
+                                },
+                                {
+                                    label: tJars('in_pot'),
+                                    value: formatMoney(jarBalance.potBalance),
+                                    tone: 'muted' as const,
+                                },
+                            ]}
+                        />
+                    ) : null}
                     {siblings.length > 0 ? (
-                        <div className="grid gap-2 border-t border-line pt-3">
+                        <div className="grid gap-2 border-t border-line px-5 py-3.5">
                             <p className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
                                 {td('other_goals')}
                             </p>
@@ -723,54 +720,6 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                     </Card>
                 </section>
             ) : null}
-
-            <Card className="grid gap-3 p-5">
-                <p className="font-mono text-[10px] tracking-wider text-fg-muted uppercase">
-                    {td('plan')}
-                </p>
-                <dl className="grid gap-2 text-sm sm:grid-cols-2">
-                    {!isEarn ? (
-                        <div>
-                            <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                {td('monthly')}
-                            </dt>
-                            <dd className="mt-0.5 text-fg">
-                                {formatMoney(goal.monthlyContribution)}
-                            </dd>
-                        </div>
-                    ) : null}
-                    {goal.targetOn ? (
-                        <div>
-                            <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                {td('target_date')}
-                            </dt>
-                            <dd className="mt-0.5 text-fg">
-                                {formatBookedDate(goal.targetOn, locale)}
-                            </dd>
-                        </div>
-                    ) : null}
-                    {projection?.projectedDate ? (
-                        <div>
-                            <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                {td('at_current_pace')}
-                            </dt>
-                            <dd className="mt-0.5 text-fg">
-                                {formatMonthYear(projection.projectedDate, locale)}
-                            </dd>
-                        </div>
-                    ) : null}
-                    {goal.cause ? (
-                        <div>
-                            <dt className="font-mono text-[10px] tracking-wide text-fg-faint uppercase">
-                                {td('cause')}
-                            </dt>
-                            <dd className="mt-0.5 text-fg">
-                                {givingCauseCopy(t, goal.cause).name}
-                            </dd>
-                        </div>
-                    ) : null}
-                </dl>
-            </Card>
         </div>
     );
 }
