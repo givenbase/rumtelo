@@ -251,7 +251,7 @@ export function MonthScoreLog({
                     <button
                         type="button"
                         onClick={goToPriorPeriod}
-                        className="mt-2.5 font-mono text-xs font-medium tracking-wide text-accent uppercase transition-colors hover:text-accent-hover">
+                        className="mt-2.5 rounded-sm font-mono text-xs font-medium tracking-wide text-accent uppercase transition-colors outline-none hover:text-accent-hover focus-visible:ring-2 focus-visible:ring-accent/35">
                         {tDashboard('prior_open_cta', { period: priorLabel })}
                     </button>
                 </div>
@@ -271,14 +271,14 @@ export function MonthScoreLog({
                         {closeBlockers && closeBlockers.inboxCount > 0 ? (
                             <Link
                                 href="/product/money/transactions"
-                                className="text-accent transition-colors hover:text-accent-hover">
+                                className="rounded-sm text-accent transition-colors outline-none hover:text-accent-hover focus-visible:ring-2 focus-visible:ring-accent/35">
                                 {tDashboard('coach.sort_inbox')} ▸
                             </Link>
                         ) : null}
                         {hasDueBills ? (
                             <Link
                                 href="/product/money/fixed-costs"
-                                className="text-accent transition-colors hover:text-accent-hover">
+                                className="rounded-sm text-accent transition-colors outline-none hover:text-accent-hover focus-visible:ring-2 focus-visible:ring-accent/35">
                                 {tDashboard('close_blocked_open_bills')}
                             </Link>
                         ) : null}

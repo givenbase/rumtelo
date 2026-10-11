@@ -76,8 +76,9 @@ export const Dashboard = z.object({
     /** Debt remaining as-of the selected period (Looking Ahead projected). */
     debtsAtPeriod: DashboardDebtsAtPeriod.nullable(),
     /**
-     * Live-month allocated totals for current→selected deltas.
-     * Null when `travel.mode === 'snapshot'`.
+     * Live-month allocated totals for current→selected deltas
+     * (Looking Ahead stack, or Looking Back when income/split differs).
+     * Null on the live month.
      */
     baselineAllocatedTotal: Money.nullable(),
     baselineJars: z.array(DashboardBaselineJar).nullable(),

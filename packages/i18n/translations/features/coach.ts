@@ -182,9 +182,9 @@ const coach = {
     /** Looking Ahead / Looking Back coach line on money dashboard & portal hub. */
     period_travel: {
         looking_back_one:
-            'Looking back at {stamp} ({relativeLabel}): about {money} moved through your jars across {horizon} month.',
+            'Looking back at {stamp} ({relativeLabel}): about {money} moved through your jars that month.',
         looking_back_other:
-            'Looking back at {stamp} ({relativeLabel}): about {money} moved through your jars across {horizon} months.',
+            'Looking back at {stamp} ({relativeLabel}): about {money} moved through your jars that month.',
         looking_ahead_one:
             'By {stamp}, if you keep this plan, about {money} will have moved through your jars across {horizon} month.',
         looking_ahead_other:

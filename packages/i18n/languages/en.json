@@ -823,8 +823,8 @@
                 }
             },
             "period_travel": {
-                "looking_back_one": "Looking back at {stamp} ({relativeLabel}): about {money} moved through your jars across {horizon} month.",
-                "looking_back_other": "Looking back at {stamp} ({relativeLabel}): about {money} moved through your jars across {horizon} months.",
+                "looking_back_one": "Looking back at {stamp} ({relativeLabel}): about {money} moved through your jars that month.",
+                "looking_back_other": "Looking back at {stamp} ({relativeLabel}): about {money} moved through your jars that month.",
                 "looking_ahead_one": "By {stamp}, if you keep this plan, about {money} will have moved through your jars across {horizon} month.",
                 "looking_ahead_other": "By {stamp}, if you keep this plan, about {money} will have moved through your jars across {horizon} months.",
                 "pace_needed": "{name} still needs pace — roughly {money}/mo net to make the date.",
@@ -1219,7 +1219,7 @@
                 "preset_group_other": "Other",
                 "focus": "Focus",
                 "reached_badge": "Reached {when}",
-                "progress_unknown": "Unknown",
+                "progress_unknown": "Set a monthly amount to see when",
                 "progress_reached": "Reached {when}",
                 "progress_target_met": "Target met",
                 "progress_earn_remaining": "{amount} still to earn",
@@ -1227,10 +1227,15 @@
                 "progress_pledge_met": "Pledge met{when}",
                 "progress_pledge_left": "{amount} left{by}",
                 "progress_by_year": " · by {year}",
-                "progress_pace_reaches": "{monthly} /mo · reaches {date}",
-                "progress_pace_by": "{monthly} /mo · by {date}",
+                "progress_pace_reaches": "{monthly}/mo · in {months} months ({date})",
+                "progress_pace_by": "{monthly}/mo · in {months} months ({date})",
+                "progress_pace_months_one": "1 month",
+                "progress_pace_months_other": "{count} months",
+                "progress_eta_short": "{months} mo",
+                "progress_eta_unknown": "no date yet",
                 "of": "of",
                 "per_month": "/mo",
+                "share_jar_hint": "Goals on the same jar share monthly room. More goals there usually means each one takes longer — unless one is Focus.",
                 "group_aria": "{kind} goals ({count})",
                 "form": {
                     "save_goal": "Save goal",
@@ -1334,13 +1339,17 @@
                     "earn_remaining": "◇ {amount} still to earn each month",
                     "give_remaining": "◇ {amount} left on the pledge{by}",
                     "give_by": " · by {year}",
-                    "save_pace": "◇ {monthly} /mo · {date}",
+                    "save_pace": "◇ {monthly}/mo · in {months} months ({date})",
+                    "save_pace_open": "◇ Set a monthly amount to see how many months",
                     "date_open": "date open",
+                    "pct_with_months": "{pct}% · {months} mo",
                     "jar_context": "Jar context",
                     "available": "Available",
                     "fixed_out": "Fixed costs",
                     "headroom": "Headroom",
                     "other_goals": "Other goals on this jar",
+                    "sibling_pace": "{monthly}/mo · {months} mo",
+                    "sibling_no_plan": "no monthly plan",
                     "how_to_get_there": "✦ How to get there",
                     "opportunities": "✦ Opportunities",
                     "open_link": "Open ›",
@@ -1379,7 +1388,7 @@
                     "advice_save_fuel_body": "Raise income, free jar flow, or ease the deadline — pick one lever instead of pushing all three.",
                     "advice_siblings_title": "{count} other goal shares {jar}",
                     "advice_siblings_title_plural": "{count} other goals share {jar}",
-                    "advice_siblings_body": "They compete for the same monthly flow. Make one the focus so the jar is not stretched thin.",
+                    "advice_siblings_body": "They share the same monthly jar room after bills. Every euro planned for another goal lengthens this finish — pick one Focus so the rest wait behind.",
                     "advice_default_title": "One decision at a time",
                     "advice_default_body": "Name the next transfer. Goals move when money moves — not when you revisit the number.",
                     "this_jar": "This jar"
@@ -1668,7 +1677,7 @@
                 "reset_to_your_date": "Reset to your date",
                 "reset_to_pace": "Reset to pace",
                 "next_goal": "Next: {name}",
-                "tip_no_plan": "No monthly amount, so there is no date.",
+                "tip_no_plan": "No monthly amount, so there is no finish month yet. Set how much goes in each month — then we show how many months and which month you land. Other goals on the same jar share that room, so more goals usually stretch each finish.",
                 "tip_set_monthly_amount": "Set monthly amount",
                 "tip_behind_room": "{need}/mo would finish this in {months} months. The jar has room.",
                 "tip_raise_monthly_amount": "Raise monthly amount",
@@ -1737,14 +1746,27 @@
                 "on_track": "{on} / {total} on track",
                 "move_between": "Move between jars",
                 "add_transaction": "+ Add transaction",
-                "allocated": "{count} jars · {pct}% allocated",
-                "tap_hint": "Tap a jar for fixed costs, spends, and what is left",
-                "summary_nothing": "Nothing planned or spent this month",
+                "allocated": "{count} jars · {pct}% set aside",
+                "tap_hint": "Tap a jar for fixed costs, other spends, and what is left",
+                "summary_nothing": "Nothing set aside or spent this month",
                 "of_amount": "of {amount}",
-                "activity_fixed": "{amount} fixed",
-                "activity_added": "{amount} added",
-                "activity_spent": "{amount} spent",
+                "this_month": "This month",
+                "this_month_of": "{available} of {allocated} this month",
+                "in_pot": "In the pot",
+                "in_pot_short": "Pot",
+                "in_pot_amount": "In the pot {amount}",
+                "summary_open_aria": "{name}: {available} this month, {pot} in the pot",
+                "activity_fixed": "{amount} fixed costs",
+                "activity_added": "{amount} extra in",
+                "activity_spent": "{amount} other spends",
                 "activity_categories": "{count} categories",
+                "meta_paid": "{count} paid",
+                "meta_open": "{count} open",
+                "meta_paid_hint": "Fixed costs marked paid this month",
+                "meta_open_hint": "Fixed costs still due this month",
+                "meta_fixed_hint": "Recurring fixed costs this month",
+                "meta_extra_hint": "Extra money sorted into this jar this month",
+                "meta_other_spends_hint": "Sorted out transactions this month",
                 "footer_stacked": "{on} / {total} jars on track · stacked over {months} months",
                 "footer_period": "{on} / {total} jars on track this period",
                 "income_link": "What would a raise do to these jars? → Income",
@@ -1866,8 +1888,8 @@
                     "categories_month": "✦ Categories this month",
                     "all_fixed_costs": "All fixed costs ›",
                     "category": "Category",
-                    "planned": "Planned",
-                    "spent": "Spent",
+                    "planned": "Set aside",
+                    "spent": "Other spends",
                     "over_under": "Over / under",
                     "goals_on_jar": "✦ Goals on this jar",
                     "add_goal": "+ Add goal",
@@ -1887,7 +1909,7 @@
                     "nothing_booked": "Nothing booked in this category yet.",
                     "bucket_other": "Other",
                     "bucket_uncategorized": "Uncategorized",
-                    "mobile_spent": "Spent {amount}",
+                    "mobile_spent": "Other spends {amount}",
                     "mobile_over_under": "{amount} over / under",
                     "open_jar_link": "Open jar ▸"
                 }
@@ -2385,15 +2407,18 @@
                 "highlight_popular": "Popular"
             },
             "jar_coverage": {
-                "allocated": "Allocated",
-                "added": "Added",
-                "fixed_committed": "Fixed (committed)",
-                "spent": "Spent",
-                "available_of": "available of {amount}",
-                "allocated_only": " allocated",
-                "added_breakdown": " ({allocated} + {added} added)",
-                "footnote_bills": "Available = allocated + added − spent − fixed. Booking the same bill as a transaction and a fixed cost will count twice until payments are linked.",
-                "footnote_simple": "Available = allocated + added − spent."
+                "allocated": "Set aside",
+                "added": "Extra in",
+                "fixed_committed": "Fixed costs",
+                "spent": "Other spends",
+                "in_pot_label": "In the pot",
+                "in_pot": "In the pot {amount} · built up over the months",
+                "in_pot_hint": "Built up over the months",
+                "available_of": "left of {amount}",
+                "allocated_only": " set aside",
+                "added_breakdown": " ({allocated} + {added} extra)",
+                "footnote_bills": "Left this month = set aside + extra − other spends − fixed costs. Fixed costs are recurring bills. Other spends are sorted transactions. The same bill counts twice if booked both ways until you link the payment.",
+                "footnote_simple": "Left this month = set aside + extra − other spends."
             },
             "giving_signals": {
                 "impact": {
@@ -3116,11 +3141,11 @@
                     "sections": {
                         "what_for": {
                             "heading": "What this is for",
-                            "body": "Six jars hold your monthly money by purpose. Percentages must add to 100%. Allocated, spent, and fixed commitments decide what is still available."
+                            "body": "Six jars hold your monthly money by purpose. Percentages must add to 100%. What you set aside, other spends, and fixed costs decide what is still left."
                         },
                         "how": {
                             "heading": "How it works",
-                            "body": "Available = allocated − spent − fixed OUT on that jar. Overspent means commitments and spending already ate the envelope. To ask what a raise would do to these jars, use the simulator on Growth → Income."
+                            "body": "Left this month = set aside − other spends − fixed costs on that jar. Overspent means bills and spends already ate the envelope. To ask what a raise would do to these jars, use the simulator on Growth → Income."
                         }
                     },
                     "steps": {
@@ -3298,7 +3323,7 @@
                 "practice_pending_cta": "Review invite"
             },
             "hero": {
-                "money_accumulated": "Money · Accumulated through {period}",
+                "money_accumulated": "Money · {period}",
                 "money_put_through": "Money · Put through over {months} months",
                 "money_put_through_one": "Money · Put through over 1 month",
                 "money_distributed": "Money · Distributed this month",
@@ -3308,6 +3333,8 @@
                 "income_month": "Distributed across {jars} jars",
                 "income_month_one_jar": "Distributed across 1 jar",
                 "see_income": "See income ▸",
+                "in_pots_label": "In the pots",
+                "in_pots_hint": "Built up over the months",
                 "six_jars": "✦ The six jars",
                 "see_all_jars": "See all ▸"
             },
@@ -3315,12 +3342,13 @@
                 "goals_on_track": "{fulfilled}/{total} goals on track by then",
                 "debt_cleared": "Debt cleared by then",
                 "debt_shift": "Debt {from} → {to}",
-                "delta_months": "{delta} · {months} mo"
+                "delta_months": "{delta} · {months} mo",
+                "delta_vs_now": "{delta} · vs now"
             },
             "stats": {
-                "avg_left": "Avg left/month",
-                "safe_per_day": "Safe per day",
-                "play_left": "Left in Play"
+                "avg_left": "Avg left",
+                "safe_per_day": "Safe / day",
+                "play_left": "In Play"
             },
             "open_portal": "Open ▸",
             "widgets": {

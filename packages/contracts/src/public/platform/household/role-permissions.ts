@@ -229,6 +229,10 @@ export function permissionSectionFromPath(pathname: string): HouseholdPermission
 /**
  * Infer CRUD from the last path segment (`list` → read, `create` → create, …).
  * Falls back to HTTP method when the leaf name is unknown.
+ *
+ * Prefer prefix match for `list*` / `get*` / `find*` so compound reads
+ * (`listSettlements`, `listInstitutions`) stay READ — oRPC defaults to POST,
+ * which would otherwise classify them as CREATE and block VIEWER.
  */
 export function permissionActionFromPath(
     pathname: string,
@@ -238,7 +242,8 @@ export function permissionActionFromPath(
     const leaf = (segments.at(-1) ?? '').toLowerCase();
 
     if (
-        /^(list|get|status|current|feed|session|summary|history|balances|members|settings|profile)$/.test(
+        /^(list|get|find)/.test(leaf) ||
+        /^(status|current|feed|session|summary|history|balances|members|settings|profile|inbox|plan|projections|byjar|levels|recap|forweek|logs)$/.test(
             leaf
         )
     ) {
@@ -250,7 +255,7 @@ export function permissionActionFromPath(
     if (/^(update|apply|dismiss|sort|schedule|change|set)/.test(leaf)) {
         return HouseholdPermissionAction.UPDATE;
     }
-    if (/^(delete|remove|revoke|cancel)/.test(leaf)) {
+    if (/^(delete|remove|revoke|cancel|unlink)/.test(leaf)) {
         return HouseholdPermissionAction.DELETE;
     }
 

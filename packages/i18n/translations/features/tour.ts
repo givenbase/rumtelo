@@ -142,11 +142,11 @@ const tour = {
             sections: {
                 what_for: {
                     heading: 'What this is for',
-                    body: 'Six jars hold your monthly money by purpose. Percentages must add to 100%. Allocated, spent, and fixed commitments decide what is still available.',
+                    body: 'Six jars hold your monthly money by purpose. Percentages must add to 100%. What you set aside, other spends, and fixed costs decide what is still left.',
                 },
                 how: {
                     heading: 'How it works',
-                    body: 'Available = allocated − spent − fixed OUT on that jar. Overspent means commitments and spending already ate the envelope. To ask what a raise would do to these jars, use the simulator on Growth → Income.',
+                    body: 'Left this month = set aside − other spends − fixed costs on that jar. Overspent means bills and spends already ate the envelope. To ask what a raise would do to these jars, use the simulator on Growth → Income.',
                 },
             },
             steps: {

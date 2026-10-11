@@ -281,6 +281,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                 spent={jar.spent}
                 credited={jar.credited}
                 committedOut={jar.committedOut}
+                potBalance={jar.potBalance}
                 colorClass={colorClass}
                 showCommitted={allowsFixedCosts}
                 footnote={

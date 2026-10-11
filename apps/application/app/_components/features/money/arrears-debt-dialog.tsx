@@ -102,14 +102,18 @@ export function ArrearsDebtDialog({
                         <legend className="font-mono text-[10px] font-bold tracking-[0.12em] text-fg-muted uppercase">
                             {t('arrears_debt_notice_legend')}
                         </legend>
-                        <div className="flex flex-wrap gap-2">
+                        <div
+                            className="flex flex-wrap gap-2"
+                            role="group"
+                            aria-label={t('arrears_debt_notice_legend')}>
                             <button
                                 type="button"
                                 data-mutate
                                 disabled={pending}
+                                aria-pressed={noticeSent}
                                 onClick={() => setNoticeSent(true)}
                                 className={cn(
-                                    'rounded-lg border px-2.5 py-1.5 font-mono text-[10px] font-medium tracking-wide uppercase',
+                                    'rounded-lg border px-2.5 py-1.5 font-mono text-[10px] font-medium tracking-wide uppercase outline-none focus-visible:ring-2 focus-visible:ring-accent/35',
                                     noticeSent
                                         ? 'border-warning bg-warning/10 text-warning'
                                         : 'border-line text-fg-muted hover:border-warning'
@@ -120,12 +124,13 @@ export function ArrearsDebtDialog({
                                 type="button"
                                 data-mutate
                                 disabled={pending}
+                                aria-pressed={!noticeSent}
                                 onClick={() => {
                                     setNoticeSent(false);
                                     setFeesMajor('');
                                 }}
                                 className={cn(
-                                    'rounded-lg border px-2.5 py-1.5 font-mono text-[10px] font-medium tracking-wide uppercase',
+                                    'rounded-lg border px-2.5 py-1.5 font-mono text-[10px] font-medium tracking-wide uppercase outline-none focus-visible:ring-2 focus-visible:ring-accent/35',
                                     !noticeSent
                                         ? 'border-accent bg-accent-soft text-accent'
                                         : 'border-line text-fg-muted hover:border-accent'
@@ -155,7 +160,10 @@ export function ArrearsDebtDialog({
                         <legend className="font-mono text-[10px] font-bold tracking-[0.12em] text-fg-muted uppercase">
                             {t('arrears_debt_schedule_legend')}
                         </legend>
-                        <div className="flex flex-wrap gap-2">
+                        <div
+                            className="flex flex-wrap gap-2"
+                            role="group"
+                            aria-label={t('arrears_debt_schedule_legend')}>
                             {(
                                 [
                                     DebtScheduleKind.TERM,
@@ -168,9 +176,10 @@ export function ArrearsDebtDialog({
                                     type="button"
                                     data-mutate
                                     disabled={pending}
+                                    aria-pressed={scheduleKind === kind}
                                     onClick={() => setScheduleKind(kind)}
                                     className={cn(
-                                        'rounded-lg border px-2.5 py-1.5 font-mono text-[10px] font-medium tracking-wide uppercase',
+                                        'rounded-lg border px-2.5 py-1.5 font-mono text-[10px] font-medium tracking-wide uppercase outline-none focus-visible:ring-2 focus-visible:ring-accent/35',
                                         scheduleKind === kind
                                             ? 'border-accent bg-accent-soft text-accent'
                                             : 'border-line text-fg-muted hover:border-accent'

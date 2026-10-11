@@ -18,15 +18,67 @@ interface KluisStat {
     href?: string;
 }
 
+type SideMetricProps = {
+    label: string;
+    value: string;
+    footnote?: ReactNode;
+    href?: string;
+    accent?: boolean;
+    className?: string;
+};
+
+const focusRing =
+    'outline-none focus-visible:ring-2 focus-visible:ring-accent/25 focus-visible:ring-offset-2 focus-visible:ring-offset-surface';
+
 /**
- * Dashboard hero card — "de kluis" (design: Kluis Finance App.dc.html:393-421).
+ * Secondary kluis metric — shared label / value / footnote rows so the four
+ * side figures stay vertically aligned with each other.
+ */
+function SideMetric({ label, value, footnote, href, accent, className }: SideMetricProps) {
+    const body = (
+        <>
+            <Eyebrow className="block min-h-[2.5rem] overflow-hidden text-pretty break-words hyphens-auto">
+                {label}
+            </Eyebrow>
+            <p
+                className={cn(
+                    'metric-value mt-1.5 min-h-8 font-display text-xl leading-none font-semibold tracking-tight tabular-nums transition-colors sm:text-2xl',
+                    accent ? 'text-accent' : 'text-fg'
+                )}>
+                {value}
+            </p>
+            <div className="mt-1.5 min-h-[2.25rem] font-mono text-[10px] leading-snug tracking-wide text-fg-faint uppercase">
+                {footnote ?? '\u00a0'}
+            </div>
+        </>
+    );
+
+    if (href) {
+        return (
+            <Link
+                href={href}
+                className={cn(
+                    'group block min-w-0',
+                    focusRing,
+                    'hover:[&_.metric-value]:text-accent',
+                    className
+                )}>
+                {body}
+            </Link>
+        );
+    }
+
+    return <div className={cn('min-w-0', className)}>{body}</div>;
+}
+
+/**
+ * Dashboard hero card — "de kluis".
  *
- * Shows the gradient allocated-total, a concise income-breakdown line, and a
- * row of three anchor stats. Below the divider, renders whatever is passed as
- * `children` — typically a JarDrilldownTable.
+ * Large allocated figure (only big number) + compact aligned side metrics, then jars.
  */
 export function HeroKluis({
     total,
+    potTotal,
     incomeBreakdown,
     stats,
     children,
@@ -36,6 +88,8 @@ export function HeroKluis({
     totalDelta,
 }: {
     total: string;
+    /** Sum of jar pot balances — stock across all pots. */
+    potTotal: string;
     incomeBreakdown: string;
     stats: KluisStat[];
     children: ReactNode;
@@ -55,13 +109,26 @@ export function HeroKluis({
 }) {
     const t = useTranslations('pages.dashboard.hero');
 
+    const sideMetrics: SideMetricProps[] = [
+        {
+            label: t('in_pots_label'),
+            value: potTotal,
+            footnote: t('in_pots_hint'),
+            href: jarsHref,
+        },
+        ...stats.map(stat => ({
+            label: stat.label,
+            value: stat.value,
+            href: stat.href,
+            accent: stat.tone === 'accent',
+        })),
+    ];
+
     return (
-        <div className="rounded-2xl border border-accent/30 bg-surface p-6 shadow-glow sm:p-7">
-            <div className="flex flex-wrap items-start justify-between gap-6">
-                {/* Hero figure — tap through to income sources */}
-                <Link
-                    href={incomeHref}
-                    className="group rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-accent/25">
+        <div className="border border-accent/30 bg-surface p-5 shadow-glow sm:p-6">
+            <div className="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1.85fr)] lg:items-start lg:gap-6">
+                {/* Only this figure stays hero-sized */}
+                <Link href={incomeHref} className={cn('group block min-w-0', focusRing)}>
                     <Eyebrow>{eyebrow}</Eyebrow>
                     {totalDelta ? (
                         <div className="mt-2.5">
@@ -70,11 +137,11 @@ export function HeroKluis({
                                 toLabel={totalDelta.toLabel}
                                 deltaLabel={totalDelta.deltaLabel}
                                 tone={totalDelta.tone ?? 'grow'}
-                                className="font-display text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl"
+                                className="font-display text-3xl font-semibold tracking-tight sm:text-4xl"
                             />
                         </div>
                     ) : (
-                        <HeroNumber className="mt-2.5 text-4xl leading-none transition-colors group-hover:text-accent sm:text-5xl lg:text-6xl">
+                        <HeroNumber className="mt-2.5 text-4xl leading-none transition-colors group-hover:text-accent sm:text-5xl">
                             {total}
                         </HeroNumber>
                     )}
@@ -82,7 +149,7 @@ export function HeroKluis({
                         as="p"
                         size="sm"
                         color="muted"
-                        className="mt-2 group-hover:text-fg-secondary">
+                        className="mt-2 text-pretty group-hover:text-fg-secondary">
                         {incomeBreakdown}
                         <span className="ml-1.5 font-mono text-xs tracking-wide text-fg-faint uppercase group-hover:text-accent">
                             {t('see_income')}
@@ -90,50 +157,32 @@ export function HeroKluis({
                     </Typography>
                 </Link>
 
-                {/* Anchor stats */}
-                <div className="flex flex-wrap gap-7">
-                    {stats.map(stat => {
-                        const valueClass = cn(
-                            'font-display text-3xl leading-none font-semibold tracking-tight tabular-nums',
-                            stat.tone === 'accent' ? 'text-accent' : 'text-fg'
-                        );
-
-                        if (stat.href) {
-                            return (
-                                <Link
-                                    key={stat.label}
-                                    href={stat.href}
-                                    className="group grid gap-1.5 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-accent/25">
-                                    <Eyebrow className="whitespace-nowrap">{stat.label}</Eyebrow>
-                                    <p
-                                        className={cn(
-                                            valueClass,
-                                            'transition-colors group-hover:text-accent'
-                                        )}>
-                                        {stat.value}
-                                    </p>
-                                </Link>
-                            );
-                        }
-
-                        return (
-                            <div key={stat.label} className="grid gap-1.5">
-                                <Eyebrow className="whitespace-nowrap">{stat.label}</Eyebrow>
-                                <p className={valueClass}>{stat.value}</p>
-                            </div>
-                        );
-                    })}
+                {/* Side metrics: 2×2 on mobile, 4-col aligned strip on lg */}
+                <div className="grid grid-cols-2 gap-x-4 gap-y-4 sm:gap-x-5 lg:grid-cols-4 lg:gap-0 lg:border-l lg:border-line lg:pl-5">
+                    {sideMetrics.map((metric, index) => (
+                        <SideMetric
+                            key={metric.label}
+                            {...metric}
+                            className={cn(
+                                'min-w-0',
+                                index > 0 && 'lg:border-l lg:border-line lg:pl-4',
+                                index < sideMetrics.length - 1 && 'lg:pr-4'
+                            )}
+                        />
+                    ))}
                 </div>
             </div>
 
-            <div className="my-6 h-px bg-line" />
+            <div className="my-5 h-px bg-line" />
 
-            {/* Jar section header */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3">
                 <Eyebrow>{t('six_jars')}</Eyebrow>
                 <Link
                     href={jarsHref}
-                    className="font-mono text-xs font-semibold tracking-wide text-fg-muted uppercase hover:text-accent">
+                    className={cn(
+                        'shrink-0 font-mono text-xs font-semibold tracking-wide text-fg-muted uppercase hover:text-accent',
+                        focusRing
+                    )}>
                     {t('see_all_jars')}
                 </Link>
             </div>

@@ -44,6 +44,7 @@ export {
 export {
     monthlyAmount,
     jarCoverage,
+    jarPotBalance,
     usedPctDisplay,
     allocateByPercentage,
     categoryEnvelope,

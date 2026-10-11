@@ -6,6 +6,8 @@ import { cn, categoryVariance } from '@rumtelo/utils';
 
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
+import { JarMonthMeta, jarMonthMetaAria, type JarMonthMetaFacts } from './jar-month-meta';
+import { JarMonthPotAmounts } from './jar-month-pot-amounts';
 import { JarProgressBar } from './jar-progress-bar';
 
 /** Jar row for dashboard drilldown — balance DTO + chrome / navigation. */
@@ -18,6 +20,7 @@ export type JarDrilldownItem = Pick<
     | 'available'
     | 'spent'
     | 'committedOut'
+    | 'potBalance'
     | 'overspent'
     | 'categories'
 > & {
@@ -32,96 +35,40 @@ export type JarDrilldownItem = Pick<
 
 export type JarCategory = Pick<Category, 'id' | 'name' | 'budgeted' | 'actual'>;
 
-function JarDrilldownBody({
+export function JarDrilldownTrigger({
     jar,
-    spent,
-    committedOut,
+    open,
+    onToggle,
+    meta,
 }: {
     jar: JarDrilldownItem;
-    spent: number;
-    committedOut: number;
+    open: boolean;
+    onToggle: () => void;
+    /** Open bills count — same optional signal as jars list. */
+    meta?: Omit<JarMonthMetaFacts, 'potBalance'>;
 }) {
-    const t = useTranslations('features.money.jars');
+    const t = useTranslations('features.money.jars.drilldown');
+    const tJars = useTranslations('features.money.jars');
     const { formatMoney } = useHouseholdCurrency();
+    const spent = jar.spent ?? 0;
+    const committedOut = jar.committedOut ?? Math.max(0, jar.allocated - spent - jar.available);
     const showDelta =
         jar.baselineAllocated !== null &&
         jar.baselineAllocated !== undefined &&
         jar.baselineAllocated !== jar.allocated;
     const delta = showDelta ? jar.allocated - (jar.baselineAllocated ?? 0) : 0;
-
-    return (
-        <>
-            <span className="flex min-w-0 flex-1 items-center gap-2.5">
-                <span className="grid size-7.5 shrink-0 place-items-center rounded-lg border border-line bg-raised text-sm">
-                    {jar.icon}
-                </span>
-                <span className="grid min-w-0 gap-0.5">
-                    <span className="truncate text-sm text-fg">{jar.name}</span>
-                    <span className="truncate font-mono text-xs tracking-wide text-fg-faint">
-                        {jar.subtitle}
-                    </span>
-                </span>
-            </span>
-
-            <JarProgressBar
-                allocated={jar.allocated}
-                spent={spent}
-                committedOut={committedOut}
-                colorClass={jar.color}
-                className="hidden sm:block"
-                trackClassName="h-2"
-            />
-
-            <span className="shrink-0 text-right tabular-nums">
-                {showDelta ? (
-                    <>
-                        <div
-                            className={cn(
-                                'font-mono text-sm text-fg',
-                                jar.overspent && 'text-danger'
-                            )}>
-                            <span className="text-fg-faint">
-                                {formatMoney(jar.baselineAllocated ?? 0)}
-                            </span>
-                            <span className="mx-1 text-fg-faint">→</span>
-                            {formatMoney(jar.allocated)}
-                        </div>
-                        <div className="font-mono text-xs text-success">
-                            {delta >= 0 ? '+' : ''}
-                            {formatMoney(delta)}
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        <div
-                            className={cn(
-                                'font-mono text-sm text-fg',
-                                jar.overspent && 'text-danger'
-                            )}>
-                            {formatMoney(jar.available)}
-                        </div>
-                        <div className="font-mono text-xs text-fg-faint">
-                            {t('of_amount', { amount: formatMoney(jar.allocated) })}
-                        </div>
-                    </>
-                )}
-            </span>
-        </>
-    );
-}
-
-export function JarDrilldownTrigger({
-    jar,
-    open,
-    onToggle,
-}: {
-    jar: JarDrilldownItem;
-    open: boolean;
-    onToggle: () => void;
-}) {
-    const t = useTranslations('features.money.jars.drilldown');
-    const spent = jar.spent ?? 0;
-    const committedOut = jar.committedOut ?? Math.max(0, jar.allocated - spent - jar.available);
+    const metaFacts = {
+        potBalance: jar.potBalance,
+        openCount: meta?.openCount,
+    };
+    const balanceSummary = [
+        tJars('summary_open_aria', {
+            name: jar.name,
+            available: formatMoney(jar.available),
+            pot: formatMoney(jar.potBalance),
+        }),
+        jarMonthMetaAria(metaFacts, tJars, formatMoney),
+    ].join('. ');
 
     return (
         <button
@@ -130,17 +77,54 @@ export function JarDrilldownTrigger({
             aria-expanded={open}
             aria-label={
                 open
-                    ? t('hide_categories', { name: jar.name })
-                    : t('show_categories', { name: jar.name })
+                    ? `${t('hide_categories', { name: jar.name })}. ${balanceSummary}`
+                    : `${t('show_categories', { name: jar.name })}. ${balanceSummary}`
             }
-            className="grid w-full gap-2 px-1.5 py-2.5 text-left transition-colors outline-none hover:bg-raised focus-visible:ring-2 focus-visible:ring-accent/25 focus-visible:ring-inset">
-            <span className="flex items-center gap-3 sm:grid sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_auto_auto] sm:gap-3">
-                <JarDrilldownBody jar={jar} spent={spent} committedOut={committedOut} />
+            className="grid w-full min-w-0 gap-1.5 px-1 py-2.5 text-left transition-colors outline-none hover:bg-raised focus-visible:ring-2 focus-visible:ring-accent/25 focus-visible:ring-inset sm:px-1.5">
+            {/* Same stack as jars list — no side bar (that left a dead middle gap). */}
+            <span className="flex min-w-0 items-start gap-2 sm:items-center sm:gap-3">
+                <span
+                    className="grid size-7.5 shrink-0 place-items-center rounded-lg border border-line bg-raised text-sm"
+                    aria-hidden>
+                    {jar.icon}
+                </span>
+                <span className="grid min-w-0 flex-1 gap-0.5 pt-0.5 sm:pt-0">
+                    <span className="truncate text-sm text-fg">{jar.name}</span>
+                    <span className="truncate font-mono text-xs tracking-wide text-fg-faint">
+                        {jar.subtitle}
+                    </span>
+                </span>
+                <JarMonthPotAmounts
+                    available={jar.available}
+                    potBalance={jar.potBalance}
+                    overspent={jar.overspent}
+                    pot="none">
+                    {showDelta ? (
+                        <span className="inline-block max-w-full truncate">
+                            <span className="text-fg-faint">
+                                {formatMoney(jar.baselineAllocated ?? 0)}
+                            </span>
+                            <span className="mx-1 text-fg-faint" aria-hidden>
+                                →
+                            </span>
+                            {formatMoney(jar.allocated)}
+                            <span className="ml-1 text-success">
+                                {delta >= 0 ? '+' : ''}
+                                {formatMoney(delta)}
+                            </span>
+                        </span>
+                    ) : (
+                        <span className="inline-block max-w-full truncate">
+                            {tJars('of_amount', { amount: formatMoney(jar.allocated) })}
+                        </span>
+                    )}
+                </JarMonthPotAmounts>
                 <span
                     className={cn(
-                        'shrink-0 text-xs text-fg-faint transition-transform duration-200',
+                        'shrink-0 pt-1 text-xs text-fg-faint transition-transform duration-200 sm:pt-0',
                         open && 'rotate-180'
-                    )}>
+                    )}
+                    aria-hidden>
                     ▾
                 </span>
             </span>
@@ -150,9 +134,10 @@ export function JarDrilldownTrigger({
                 spent={spent}
                 committedOut={committedOut}
                 colorClass={jar.color}
-                className="sm:hidden"
-                trackClassName="h-2"
+                className="w-full"
             />
+
+            <JarMonthMeta facts={metaFacts} />
         </button>
     );
 }

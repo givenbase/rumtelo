@@ -478,7 +478,9 @@ export function FixedCostsPageClient() {
             <BusinessHouseholdLeakCard leak={businessLeak} />
 
             {arrearsDebtCandidates.length > 0 && canMutate && live ? (
-                <div className="rounded-xl border border-warning bg-warning/8 px-4 py-3.5">
+                <div
+                    role="status"
+                    className="rounded-xl border border-warning bg-warning/8 px-4 py-3.5">
                     <p className="font-mono text-[10px] font-bold tracking-[0.12em] text-warning uppercase">
                         {t('arrears_prompt_title')}
                     </p>
@@ -507,7 +509,7 @@ export function FixedCostsPageClient() {
                                 type="button"
                                 data-mutate
                                 onClick={() => setArrearsTarget(candidate)}
-                                className="rounded-lg border border-warning bg-surface px-2.5 py-1.5 font-mono text-[10px] font-medium tracking-wide text-warning uppercase transition-colors hover:bg-warning/10">
+                                className="rounded-lg border border-warning bg-surface px-2.5 py-1.5 font-mono text-[10px] font-medium tracking-wide text-warning uppercase transition-colors outline-none hover:bg-warning/10 focus-visible:ring-2 focus-visible:ring-accent/35">
                                 {arrearsDebtCandidates.length === 1
                                     ? t('arrears_prompt_cta')
                                     : `${t('arrears_prompt_cta')} · ${candidate.name}`}
@@ -525,7 +527,7 @@ export function FixedCostsPageClient() {
                     <HoldingChip assetId={assetFilter} link />
                     <Link
                         href={productPath('money/fixed-costs')}
-                        className="ml-auto font-mono text-xs tracking-wide text-accent uppercase hover:underline">
+                        className="ml-auto rounded-sm font-mono text-xs tracking-wide text-accent uppercase outline-none hover:underline focus-visible:ring-2 focus-visible:ring-accent/35">
                         {tHolding('filter_clear')}
                     </Link>
                 </div>
@@ -684,7 +686,7 @@ export function FixedCostsPageClient() {
                                             onClick={() => setJarFilter(null)}
                                             aria-pressed={jarFilter === null}
                                             className={cn(
-                                                'flex items-center rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
+                                                'flex items-center rounded-full border px-3 py-1.5 font-mono text-xs transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent/35',
                                                 jarFilter === null
                                                     ? 'border-accent bg-accent-soft text-accent'
                                                     : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
@@ -704,7 +706,7 @@ export function FixedCostsPageClient() {
                                                     }
                                                     aria-pressed={on}
                                                     className={cn(
-                                                        'flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
+                                                        'flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent/35',
                                                         on
                                                             ? 'border-accent bg-accent-soft text-accent'
                                                             : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'

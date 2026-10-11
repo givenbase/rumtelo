@@ -12,6 +12,7 @@ import {
     projectDebtsAtHorizon,
     projectGoalsAtHorizon,
     stackPlannedAllocations,
+    travelForPeriod,
 } from './period-stack';
 import { describePeriodTravel, periodTravelBounds } from './period-offset';
 
@@ -21,6 +22,15 @@ describe('period-stack', () => {
         assert.equal(horizonMonths({ monthsDelta: 1 }), 2);
         assert.equal(horizonMonths({ monthsDelta: 3 }), 4);
         assert.equal(horizonMonths({ monthsDelta: -8 }), 9);
+    });
+
+    it('travelForPeriod stacks only Looking Ahead', () => {
+        const now = new Date(Date.UTC(2026, 9, 11)); // Oct 2026
+        assert.equal(travelForPeriod('2026-10', now).mode, 'snapshot');
+        assert.equal(travelForPeriod('2026-09', now).mode, 'snapshot');
+        assert.equal(travelForPeriod('2026-09', now).travel.direction, 'past');
+        assert.equal(travelForPeriod('2026-12', now).mode, 'stacked');
+        assert.equal(travelForPeriod('2026-12', now).travel.direction, 'future');
     });
 
     it('stackPlannedAllocations multiplies monthly split by horizon', () => {

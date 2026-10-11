@@ -5,15 +5,21 @@ import { type Jar as ContractJar, type Cadence, jarCapabilitiesFor } from '@rumt
 import {
     allocateByPercentage,
     categoryEnvelope,
+    endOfPeriodIso,
     fixedCostAppliesAsOf,
     jarCoverage,
+    jarPotBalance,
     monthlyAmount,
     monthlyNetAsOf,
+    parsePeriodKey,
+    periodKeysInclusive,
+    toPeriodKey,
 } from '@rumtelo/utils';
 
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { apiBadRequest } from '../../../../../../common/errors/api-user-error';
+import { AuthHousehold } from '../../../../../auth/household/managed/household/auth-household.entity';
 import { AccountSettingsService } from '../../../../../auth/user/account/account-settings';
 import {
     catalogLocaleFromContracts,
@@ -95,6 +101,7 @@ export class JarService {
 
     async balances(period: string) {
         const jars = await this.jars.find({}, { orderBy: { sortOrder: 'ASC' } });
+        const startPeriod = await this.potStartPeriod(period);
         const [
             jarDtos,
             categoryNameByEnglish,
@@ -104,6 +111,7 @@ export class JarService {
             committedByJar,
             committedByCategory,
             income,
+            lifetime,
         ] = await Promise.all([
             this.applyJarTranslations(jars.map(toJarDto)),
             this.categoryNameOverlay(),
@@ -112,7 +120,8 @@ export class JarService {
             this.spentByCategory(period),
             this.committedOutByJar(),
             this.committedOutByCategory(),
-            this.monthlyNetIncome(),
+            this.monthlyNetIncome(endOfPeriodIso(period)),
+            this.spentCreditedByJarBetween(startPeriod, period),
         ]);
         const jarById = new Map(jarDtos.map(jar => [jar.id, jar]));
         const allocations = new Map(
@@ -121,6 +130,10 @@ export class JarService {
                 jars.map(jar => ({ id: jar.id, percentage: Number(jar.percentage) }))
             ).map(row => [row.id, row.amount])
         );
+        const monthCount = periodKeysInclusive(
+            parsePeriodKey(startPeriod),
+            parsePeriodKey(period)
+        ).length;
 
         return Promise.all(
             jars.map(async jar => {
@@ -130,6 +143,12 @@ export class JarService {
                 const credited = creditedByJar.get(jar.id) ?? 0;
                 const committedOut = committedByJar.get(jar.id) ?? 0;
                 const coverage = jarCoverage({ allocated, spent, credited, committedOut });
+                const potBalance = jarPotBalance({
+                    allocated,
+                    monthCount,
+                    lifetimeCredited: lifetime.credited.get(jar.id) ?? 0,
+                    lifetimeSpent: lifetime.spent.get(jar.id) ?? 0,
+                });
                 const cats = await this.categories.find({ jar: jar.id });
                 return {
                     ...base,
@@ -140,6 +159,7 @@ export class JarService {
                     committedOut,
                     remaining: coverage.remaining,
                     available: coverage.available,
+                    potBalance,
                     progress: coverage.progress,
                     overspent: coverage.overspent,
                     categories: cats.map(category => {
@@ -156,6 +176,16 @@ export class JarService {
                 };
             })
         );
+    }
+
+    /** First period that counts toward cumulative pot (household created → viewed). */
+    private async potStartPeriod(throughPeriod: string): Promise<string> {
+        const householdId = currentHouseholdId();
+        const org = await this.em.findOne(AuthHousehold, { id: householdId });
+        if (!org?.createdAt) return throughPeriod;
+        const created = new Date(org.createdAt);
+        const start = toPeriodKey(created.getUTCFullYear(), created.getUTCMonth() + 1);
+        return start <= throughPeriod ? start : throughPeriod;
     }
 
     /** Overlay catalog locale onto household jars when name/subtitle still match EN seed. */
@@ -192,22 +222,46 @@ export class JarService {
         return this.translations.nameByEnglish(fieldMap, englishNameByKey);
     }
 
-    /** Income normalised to a monthly figure as of today (start/end aware). */
-    async monthlyNetIncome(): Promise<number> {
-        const today = new Date().toISOString().slice(0, 10);
-        const rows = await this.em.getConnection().execute<
-            {
-                amount: string;
-                cadence: Cadence;
-                is_active: boolean;
-                started_on: string | null;
-                ends_on: string | null;
-            }[]
-        >(
-            `SELECT amount::text, cadence, is_active, started_on, ends_on
-             FROM money_income_source WHERE household_id = ?`,
-            [currentHouseholdId()]
-        );
+    /**
+     * Income normalised to a monthly figure as of a date (start/end + amount history).
+     * Defaults to today when `asOfDate` is omitted.
+     */
+    async monthlyNetIncome(asOfDate?: string): Promise<number> {
+        const asOf = (asOfDate ?? new Date().toISOString().slice(0, 10)).slice(0, 10);
+        const householdId = currentHouseholdId();
+        const [rows, periodRows] = await Promise.all([
+            this.em.getConnection().execute<
+                {
+                    id: string;
+                    amount: string;
+                    cadence: Cadence;
+                    is_active: boolean;
+                    started_on: string | null;
+                    ends_on: string | null;
+                }[]
+            >(
+                `SELECT id, amount::text, cadence, is_active, started_on, ends_on
+                 FROM money_income_source WHERE household_id = ?`,
+                [householdId]
+            ),
+            this.em.getConnection().execute<
+                {
+                    income_source_id: string;
+                    amount: string;
+                    effective_on: string;
+                }[]
+            >(
+                `SELECT income_source_id, amount::text, effective_on
+                 FROM money_income_amount_period WHERE household_id = ?`,
+                [householdId]
+            ),
+        ]);
+        const periodsBySource = new Map<string, { amount: number; effectiveOn: string }[]>();
+        for (const row of periodRows) {
+            const list = periodsBySource.get(row.income_source_id) ?? [];
+            list.push({ amount: Number(row.amount), effectiveOn: row.effective_on });
+            periodsBySource.set(row.income_source_id, list);
+        }
         return monthlyNetAsOf(
             rows.map(row => ({
                 amount: Number(row.amount),
@@ -215,8 +269,9 @@ export class JarService {
                 isActive: row.is_active,
                 startedOn: row.started_on,
                 endsOn: row.ends_on,
+                periods: periodsBySource.get(row.id) ?? [],
             })),
-            today
+            asOf
         );
     }
 

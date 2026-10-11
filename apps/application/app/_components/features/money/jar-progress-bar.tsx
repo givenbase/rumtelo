@@ -24,8 +24,10 @@ export function JarProgressBar({
     const coverage = jarCoverage({ allocated, spent, credited, committedOut });
     const pct = usedPctDisplay(coverage);
 
+    // Decorative — amounts next to the bar carry the accessible meaning.
     return (
         <span
+            aria-hidden
             className={cn(
                 'h-1.5 overflow-hidden rounded-full bg-sunken',
                 trackClassName,

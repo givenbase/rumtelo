@@ -146,8 +146,8 @@ export function JarsPageClient({ embed = false }: { embed?: boolean }) {
                                     spent: jar.spent,
                                     credited: jar.credited,
                                     committedOut: jar.committedOut,
+                                    potBalance: jar.potBalance,
                                     overspent: jar.overspent,
-                                    categoryCount: jar.categories?.length ?? 0,
                                     baselineAllocated: stacked
                                         ? (baselineById.get(jar.id) ?? null)
                                         : null,

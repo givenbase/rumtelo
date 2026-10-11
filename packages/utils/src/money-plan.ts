@@ -50,6 +50,25 @@ export function jarCoverage(input: JarCoverageInput): JarCoverage {
     };
 }
 
+/**
+ * Cumulative jar pot through a period:
+ * months × this-month allocation + lifetime credited − lifetime spent.
+ * Allocation uses the current plan (historical income per month not stored yet).
+ */
+export function jarPotBalance(input: {
+    /** This period’s plan deposit (income × %). */
+    allocated: number;
+    /** Inclusive month count from household start through viewed period. */
+    monthCount: number;
+    /** Sorted IN across that range. */
+    lifetimeCredited: number;
+    /** Sorted OUT across that range. */
+    lifetimeSpent: number;
+}): number {
+    const months = Math.max(1, input.monthCount);
+    return months * input.allocated + input.lifetimeCredited - input.lifetimeSpent;
+}
+
 /** 0..100 width for progress bars — overspent jars fill to 100. */
 export function usedPctDisplay(coverage: Pick<JarCoverage, 'usedProgress' | 'overspent'>): number {
     if (coverage.overspent) return 100;

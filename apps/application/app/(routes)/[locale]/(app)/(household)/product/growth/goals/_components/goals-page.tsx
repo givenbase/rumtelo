@@ -62,15 +62,15 @@ function formatMonthYear(iso: string | null | undefined, locale: string): string
     return new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric' }).format(date);
 }
 
-function eta(
-    saved: number,
-    target: number,
-    monthlyContribution: number,
-    locale: string,
-    t: TranslateFn
-): string {
-    if (monthlyContribution <= 0) return t('progress_unknown');
-    const months = Math.ceil((target - saved) / monthlyContribution);
+/** Months left at the planned monthly amount; null when there is no plan. */
+function monthsToGoal(saved: number, target: number, monthlyContribution: number): number | null {
+    if (monthlyContribution <= 0) return null;
+    const remaining = Math.max(0, target - saved);
+    if (remaining === 0) return 0;
+    return Math.ceil(remaining / monthlyContribution);
+}
+
+function etaDate(months: number, locale: string): string {
     const date = new Date();
     date.setMonth(date.getMonth() + months);
     return new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric' }).format(date);
@@ -102,6 +102,8 @@ type GoalProgress = {
     current: number;
     progress: number;
     subline: string;
+    /** Months at current monthly plan — SAVE only when a plan exists. */
+    monthsLeft: number | null;
 };
 
 function formatReachedMonth(iso: string | null, locale: string): string | null {
@@ -130,6 +132,7 @@ function goalProgress(
         return {
             current: earn.current,
             progress: goal.target > 0 ? Math.min(1, earn.current / goal.target) : 0,
+            monthsLeft: null,
             subline:
                 tab === 'REACHED' && goal.fulfilledOn
                     ? t('progress_reached', {
@@ -145,6 +148,7 @@ function goalProgress(
         return {
             current: projection.projectedSaved,
             progress: 1,
+            monthsLeft: 0,
             subline: t('progress_reached_plan', { when: reachedLabel }),
         };
     }
@@ -154,6 +158,7 @@ function goalProgress(
         return {
             current,
             progress: goal.target > 0 ? Math.min(1, current / goal.target) : 0,
+            monthsLeft: null,
             subline:
                 tab === 'REACHED'
                     ? t('progress_pledge_met', {
@@ -171,20 +176,27 @@ function goalProgress(
     }
 
     const current = traveling ? (projection?.projectedSaved ?? goal.saved) : goal.saved;
-    const etaLabel = eta(goal.saved, goal.target, goal.monthlyContribution, locale, t);
+    const monthsLeft = monthsToGoal(goal.saved, goal.target, goal.monthlyContribution);
+    if (monthsLeft === null) {
+        return {
+            current,
+            progress: goal.target > 0 ? Math.min(1, current / goal.target) : 0,
+            monthsLeft: null,
+            subline: t('progress_unknown'),
+        };
+    }
+    const dateLabel = etaDate(monthsLeft, locale);
+    const paceKey = traveling ? 'progress_pace_reaches' : 'progress_pace_by';
 
     return {
         current,
         progress: goal.target > 0 ? Math.min(1, current / goal.target) : 0,
-        subline: traveling
-            ? t('progress_pace_reaches', {
-                  monthly: formatMoney(goal.monthlyContribution),
-                  date: etaLabel,
-              })
-            : t('progress_pace_by', {
-                  monthly: formatMoney(goal.monthlyContribution),
-                  date: etaLabel,
-              }),
+        monthsLeft,
+        subline: t(paceKey, {
+            monthly: formatMoney(goal.monthlyContribution),
+            months: monthsLeft,
+            date: dateLabel,
+        }),
     };
 }
 
@@ -355,6 +367,20 @@ export function GoalsPageClient() {
                             : t('page_lead_past', { label: travelLabels.relativeLabel })
                         : t('page_lead')}
                 </Typography>
+                {(() => {
+                    const saveByJar = new Map<string, number>();
+                    for (const goal of active) {
+                        if (goal.kind !== GoalKind.SAVE || !goal.jarId) continue;
+                        saveByJar.set(goal.jarId, (saveByJar.get(goal.jarId) ?? 0) + 1);
+                    }
+                    const shared = [...saveByJar.values()].some(count => count > 1);
+                    if (!shared) return null;
+                    return (
+                        <p className="mt-2 text-sm text-pretty text-fg-secondary">
+                            {t('share_jar_hint')}
+                        </p>
+                    );
+                })()}
             </div>
 
             <ListToolbar createLabel={t('add_goal')} createHref={CREATE_HREF.goal}>
@@ -408,7 +434,7 @@ export function GoalsPageClient() {
                                             }
                                         }}
                                         className={cn(
-                                            'rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
+                                            'rounded-full border px-3 py-1.5 font-mono text-xs transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent/35',
                                             on
                                                 ? 'border-accent bg-accent-soft text-accent'
                                                 : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
@@ -435,7 +461,7 @@ export function GoalsPageClient() {
                                     aria-pressed={jarFilter === null}
                                     onClick={() => setJarFilter(null)}
                                     className={cn(
-                                        'rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
+                                        'rounded-full border px-3 py-1.5 font-mono text-xs transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent/35',
                                         jarFilter === null
                                             ? 'border-accent bg-accent-soft text-accent'
                                             : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
@@ -460,7 +486,7 @@ export function GoalsPageClient() {
                                                 )
                                             }
                                             className={cn(
-                                                'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors',
+                                                'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent/35',
                                                 on
                                                     ? 'border-accent bg-accent-soft text-accent'
                                                     : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
@@ -566,8 +592,17 @@ export function GoalsPageClient() {
                                             {t('of')} {formatMoney(goal.target)}
                                             {goal.kind === GoalKind.EARN ? t('per_month') : ''}
                                         </span>
-                                        <span className="ml-auto font-mono text-xs text-fg-faint">
+                                        <span className="ml-auto text-right font-mono text-xs text-fg-faint">
                                             {Math.round(stats.progress * 100)}%
+                                            {goal.kind === GoalKind.SAVE ? (
+                                                <span className="mt-0.5 block text-[10px] tracking-wide uppercase">
+                                                    {stats.monthsLeft === null
+                                                        ? t('progress_eta_unknown')
+                                                        : t('progress_eta_short', {
+                                                              months: stats.monthsLeft,
+                                                          })}
+                                                </span>
+                                            ) : null}
                                         </span>
                                     </div>
 
@@ -595,7 +630,7 @@ export function GoalsPageClient() {
                                     })}
                                     aria-expanded={open}
                                     onClick={() => toggleKind(group.kind)}
-                                    className="flex w-full items-center justify-between gap-3 border-b border-line px-5 py-3.5 text-left hover:bg-raised/60">
+                                    className="flex w-full items-center justify-between gap-3 border-b border-line px-5 py-3.5 text-left outline-none hover:bg-raised/60 focus-visible:ring-2 focus-visible:ring-accent/35 focus-visible:ring-inset">
                                     <div>
                                         <Typography as="span" variant="eyebrow" color="primary">
                                             ✦ {kindLabel(group.kind, t).toUpperCase()}
@@ -685,11 +720,10 @@ export function GoalsPageClient() {
                                                                         <p className="mt-0.5 truncate text-xs text-fg-muted italic">
                                                                             {goal.why.trim()}
                                                                         </p>
-                                                                    ) : (
-                                                                        <p className="mt-0.5 truncate font-mono text-[11px] text-fg-faint">
-                                                                            {stats.subline}
-                                                                        </p>
-                                                                    )}
+                                                                    ) : null}
+                                                                    <p className="mt-0.5 truncate font-mono text-[11px] text-fg-faint">
+                                                                        {stats.subline}
+                                                                    </p>
                                                                 </div>
                                                             </div>
                                                             <div className="shrink-0 text-right">
@@ -717,8 +751,22 @@ export function GoalsPageClient() {
                                                                     }}
                                                                 />
                                                             </div>
-                                                            <span className="w-8 shrink-0 text-right font-mono text-[10px] text-fg-faint">
+                                                            <span className="w-14 shrink-0 text-right font-mono text-[10px] leading-tight text-fg-faint">
                                                                 {pct}%
+                                                                {goal.kind === GoalKind.SAVE ? (
+                                                                    <span className="mt-0.5 block tracking-wide uppercase">
+                                                                        {stats.monthsLeft === null
+                                                                            ? t(
+                                                                                  'progress_eta_unknown'
+                                                                              )
+                                                                            : t(
+                                                                                  'progress_eta_short',
+                                                                                  {
+                                                                                      months: stats.monthsLeft,
+                                                                                  }
+                                                                              )}
+                                                                    </span>
+                                                                ) : null}
                                                             </span>
                                                             {jar && goal.kind === GoalKind.SAVE ? (
                                                                 <JarBadge

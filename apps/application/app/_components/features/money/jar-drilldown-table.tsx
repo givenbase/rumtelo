@@ -13,11 +13,13 @@ import type {
     MerchantPreset,
     Transaction,
 } from '@rumtelo/contracts';
-import { FlowDirection, jarCapabilitiesFor } from '@rumtelo/contracts';
-import { isFixedCostCounting } from '@rumtelo/utils';
+import { FlowDirection, FixedCostPeriodStatus, jarCapabilitiesFor } from '@rumtelo/contracts';
+import { describePeriodTravel, endOfPeriodIso, isFixedCostCounting } from '@rumtelo/utils';
 import { Typography } from '@rumtelo/ui';
 
+import { fixedCostStatus, settlementsByFixedCostId } from '@/app/_lib/fixed-cost-match';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
+import { listFixedCostsForPeriodView } from '@/app/_lib/period-plan-list';
 import { JarCategoryBreakdown } from '@/components/features/money/jar-category-breakdown';
 import {
     JarDrilldownTrigger,
@@ -53,6 +55,14 @@ export function JarDrilldownTable({
 }) {
     const t = useTranslations('features.money.jars.drilldown');
     const [openId, setOpenId] = useState<string | null>(null);
+    const settlementById = extras?.settlements
+        ? settlementsByFixedCostId(extras.settlements)
+        : new Map();
+    const periodKey = extras
+        ? `${extras.period.year}-${String(extras.period.month).padStart(2, '0')}`
+        : null;
+    const travel = extras ? describePeriodTravel(extras.period) : null;
+    const asOf = periodKey ? endOfPeriodIso(periodKey) : null;
 
     return (
         <div className="grid">
@@ -60,14 +70,32 @@ export function JarDrilldownTable({
                 const id = jar.id ?? jar.name;
                 const open = openId === id;
                 const href = jarHref(jar);
-                const jarFixed = extras
+                const jarFixedAll = extras
                     ? extras.fixedCosts.filter(
-                          cost =>
-                              cost.jarId === jar.id &&
-                              cost.direction === FlowDirection.OUT &&
-                              isFixedCostCounting(cost)
+                          cost => cost.jarId === jar.id && cost.direction === FlowDirection.OUT
                       )
                     : [];
+                const jarFixed = jarFixedAll.filter(cost => isFixedCostCounting(cost));
+                const applyingFixed =
+                    extras && asOf && travel
+                        ? listFixedCostsForPeriodView(jarFixed, asOf, travel.direction).applying
+                        : jarFixed;
+                let openCount = 0;
+                if (extras) {
+                    for (const cost of applyingFixed) {
+                        const status = fixedCostStatus(
+                            cost,
+                            settlementById.get(cost.id),
+                            extras.period
+                        );
+                        if (
+                            status === FixedCostPeriodStatus.DUE ||
+                            status === FixedCostPeriodStatus.ROLLED
+                        ) {
+                            openCount += 1;
+                        }
+                    }
+                }
                 const jarTxs = extras ? extras.transactions.filter(tx => tx.jarId === jar.id) : [];
                 const allowFixed = jar.key
                     ? jarCapabilitiesFor(jar.key).allowsFixedCosts
@@ -79,6 +107,7 @@ export function JarDrilldownTable({
                             jar={jar}
                             open={open}
                             onToggle={() => setOpenId(open ? null : id)}
+                            meta={extras ? { openCount } : undefined}
                         />
                         {open && (
                             <div className="animate-rise border-t border-line bg-raised/40">
