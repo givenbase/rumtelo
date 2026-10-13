@@ -12,7 +12,7 @@
 
 import { GoalKind, GoalStatus, type JarKey, PayoffStrategy } from '@rumtelo/contracts';
 
-import { allocateByPercentage } from './money-plan';
+import { allocateByPercentage, jarCoverage, projectPotBalanceAhead } from './money-plan';
 import {
     projectBalancesAfterMonths,
     type DebtPayoffInput,
@@ -79,6 +79,72 @@ export function stackPlannedAllocations(input: {
         monthly,
         stacked,
     };
+}
+
+export type JarHorizonScaleOptions = {
+    zeroLedger?: boolean;
+    spentByJar?: ReadonlyMap<string, number>;
+    creditedByJar?: ReadonlyMap<string, number>;
+    spentByCategory?: ReadonlyMap<string, number>;
+};
+
+type JarHorizonRow = {
+    id: string;
+    percentage: number;
+    allocated: number;
+    committedOut: number;
+    potBalance: number;
+    categories: Array<{ id: string; budgeted: number; actual: number }>;
+};
+
+/**
+ * Looking Ahead: stack plan fields × horizon and grow pot by months ahead ×
+ * monthly deposit. Shared by money dashboard and `jars.balances`.
+ */
+export function scaleJarsForHorizon<T extends JarHorizonRow>(
+    baseline: readonly T[],
+    horizon: number,
+    period: string,
+    options: JarHorizonScaleOptions = {}
+): T[] {
+    const shares = baseline.map(jar => ({ id: jar.id, percentage: jar.percentage }));
+    const monthlyNet = baseline.reduce((sum, jar) => sum + jar.allocated, 0);
+    const stacked = stackPlannedAllocations({ monthlyNet, shares, horizon });
+    const allocatedById = new Map(stacked.stacked.map(row => [row.id, row.amount]));
+    // horizon = |Δ| + 1 (includes the live month); pot already has this month’s deposit.
+    const monthsAhead = Math.max(0, horizon - 1);
+
+    return baseline.map(jar => {
+        const allocated = allocatedById.get(jar.id) ?? jar.allocated * horizon;
+        const spent = options.zeroLedger ? 0 : (options.spentByJar?.get(jar.id) ?? 0);
+        const credited = options.zeroLedger ? 0 : (options.creditedByJar?.get(jar.id) ?? 0);
+        const committedOut = jar.committedOut * horizon;
+        const coverage = jarCoverage({ allocated, spent, credited, committedOut });
+        return {
+            ...jar,
+            period,
+            allocated,
+            spent,
+            credited,
+            committedOut,
+            potBalance: projectPotBalanceAhead({
+                potBalance: jar.potBalance,
+                monthlyAllocated: jar.allocated,
+                monthsAhead,
+            }),
+            remaining: coverage.remaining,
+            available: coverage.available,
+            progress: coverage.progress,
+            overspent: coverage.overspent,
+            categories: jar.categories.map(category => ({
+                ...category,
+                budgeted: category.budgeted * horizon,
+                actual: options.zeroLedger
+                    ? 0
+                    : (options.spentByCategory?.get(category.id) ?? category.actual * horizon),
+            })),
+        };
+    });
 }
 
 /** Sum ledger maps across periods (Looking Back). */

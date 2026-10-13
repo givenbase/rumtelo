@@ -13,7 +13,9 @@ import {
     monthlyNetAsOf,
     parsePeriodKey,
     periodKeysInclusive,
+    scaleJarsForHorizon,
     toPeriodKey,
+    travelForPeriod,
 } from '@rumtelo/utils';
 
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
@@ -99,7 +101,30 @@ export class JarService {
         return this.applyJarTranslations(rows.map(toJarDto));
     }
 
+    /**
+     * Jar balances for a period. Looking Ahead stacks plan fields and grows pot;
+     * Looking Back / current are true month snapshots.
+     */
     async balances(period: string) {
+        const meta = travelForPeriod(period);
+        if (meta.travel.direction === 'future') {
+            const currentKey = toPeriodKey(meta.current.year, meta.current.month);
+            const [baseline, range, spentByCategory] = await Promise.all([
+                this.balancesSnapshot(currentKey),
+                this.spentCreditedByJarBetween(period, currentKey),
+                this.spentByCategoryBetween(period, currentKey),
+            ]);
+            return scaleJarsForHorizon(baseline, meta.horizon, period, {
+                spentByJar: range.spent,
+                creditedByJar: range.credited,
+                spentByCategory,
+            });
+        }
+        return this.balancesSnapshot(period);
+    }
+
+    /** Snapshot balances for one calendar month (no Looking Ahead stacking). */
+    private async balancesSnapshot(period: string) {
         const jars = await this.jars.find({}, { orderBy: { sortOrder: 'ASC' } });
         const startPeriod = await this.potStartPeriod(period);
         const [

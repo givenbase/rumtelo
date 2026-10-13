@@ -69,6 +69,20 @@ export function jarPotBalance(input: {
     return months * input.allocated + input.lifetimeCredited - input.lifetimeSpent;
 }
 
+/**
+ * Looking Ahead pot: live cumulative stock + planned deposits for each month ahead.
+ * Assumes no future spends yet (same as `jarPotBalance` with an empty future ledger).
+ */
+export function projectPotBalanceAhead(input: {
+    potBalance: number;
+    /** One month’s jar deposit (not the stacked horizon total). */
+    monthlyAllocated: number;
+    /** |monthsDelta| from now → selected (0 when viewing the live month). */
+    monthsAhead: number;
+}): number {
+    return input.potBalance + Math.max(0, input.monthsAhead) * input.monthlyAllocated;
+}
+
 /** 0..100 width for progress bars — overspent jars fill to 100. */
 export function usedPctDisplay(coverage: Pick<JarCoverage, 'usedProgress' | 'overspent'>): number {
     if (coverage.overspent) return 100;

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { jarCoverage, jarPotBalance } from './money-plan';
+import { jarCoverage, jarPotBalance, projectPotBalanceAhead } from './money-plan';
 
 describe('jarPotBalance', () => {
     it('sums months × allocation plus lifetime credits minus spends', () => {
@@ -25,6 +25,30 @@ describe('jarPotBalance', () => {
                 lifetimeSpent: 20_00,
             }),
             60_00
+        );
+    });
+});
+
+describe('projectPotBalanceAhead', () => {
+    it('adds monthly deposits for each month ahead', () => {
+        assert.equal(
+            projectPotBalanceAhead({
+                potBalance: 440_000,
+                monthlyAllocated: 220_000,
+                monthsAhead: 2,
+            }),
+            880_000
+        );
+    });
+
+    it('leaves pot unchanged when monthsAhead is 0', () => {
+        assert.equal(
+            projectPotBalanceAhead({
+                potBalance: 100_00,
+                monthlyAllocated: 50_00,
+                monthsAhead: 0,
+            }),
+            100_00
         );
     });
 });

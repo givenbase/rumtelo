@@ -11,6 +11,7 @@ import {
     incomeNeededForTarget,
     projectDebtsAtHorizon,
     projectGoalsAtHorizon,
+    scaleJarsForHorizon,
     stackPlannedAllocations,
     travelForPeriod,
 } from './period-stack';
@@ -50,6 +51,26 @@ describe('period-stack', () => {
             const base = monthly.find(entry => entry.id === row.id)!;
             assert.equal(row.amount, base.amount * 4);
         }
+    });
+
+    it('scaleJarsForHorizon grows pot by months ahead × monthly deposit', () => {
+        const scaled = scaleJarsForHorizon(
+            [
+                {
+                    id: 'play',
+                    percentage: 10,
+                    allocated: 75_500,
+                    committedOut: 0,
+                    potBalance: 106_000,
+                    categories: [],
+                },
+            ],
+            3, // Oct → Dec: |Δ|+1
+            '2026-12',
+            { zeroLedger: true }
+        );
+        assert.equal(scaled[0]!.allocated, 75_500 * 3);
+        assert.equal(scaled[0]!.potBalance, 106_000 + 75_500 * 2);
     });
 
     it('projectGoalsAtHorizon adds monthsDelta contributions looking ahead', () => {
