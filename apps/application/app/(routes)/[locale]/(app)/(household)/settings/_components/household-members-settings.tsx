@@ -106,6 +106,7 @@ export function HouseholdSettings() {
     const canInviteMember = planAllowsInviteRole(activePlan, HouseholdRole.MEMBER, seatExtras);
     const canInviteViewer = planAllowsInviteRole(activePlan, HouseholdRole.VIEWER, seatExtras);
     const inviteRole = useWatch({ control: inviteForm.control, name: 'role' });
+    const inviteRelation = useWatch({ control: inviteForm.control, name: 'relation' });
     const seatOpen = canAddHouseholdMember(activePlan, {
         occupiedSeats: memberCount,
         writableCount,
@@ -388,9 +389,17 @@ export function HouseholdSettings() {
                                                 </div>
                                             </Field>
                                             <p className="text-xs text-fg-muted">
-                                                {t(
-                                                    'pages.settings.panels.household.invite_relation_hint'
-                                                )}
+                                                {inviteRelation === HouseholdRelation.CIRCLE
+                                                    ? t(
+                                                          'pages.settings.panels.household.invite_relation_hint_circle'
+                                                      )
+                                                    : inviteRelation === HouseholdRelation.EXTERNAL
+                                                      ? t(
+                                                            'pages.settings.panels.household.invite_relation_hint_external'
+                                                        )
+                                                      : t(
+                                                            'pages.settings.panels.household.invite_relation_hint_family'
+                                                        )}
                                             </p>
                                             <FormMessage />
                                         </FormItem>

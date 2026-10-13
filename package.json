@@ -44,7 +44,7 @@
         "i18n:generate": "pnpm --filter @rumtelo/i18n generate",
         "i18n:translate:locales": "pnpm --filter @rumtelo/i18n translate:locales",
         "db:push": "pnpm --filter @rumtelo/backend run db:push",
-        "db:migrate": "pnpm --filter @rumtelo/backend run db:push",
+        "db:migrate": "pnpm db:push",
         "db:drop": "pnpm --filter @rumtelo/backend run db:drop",
         "db:reset": "pnpm --filter @rumtelo/backend run db:reset",
         "db:fresh": "pnpm --filter @rumtelo/backend run db:fresh",

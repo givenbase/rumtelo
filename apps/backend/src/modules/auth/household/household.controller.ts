@@ -40,14 +40,6 @@ export class HouseholdController {
         );
     }
 
-    /** After BA accept — attach HouseholdRelation from pending invite meta. */
-    @Implement(contract.household.claimInviteRelation)
-    claimInviteRelation() {
-        return implement(contract.household.claimInviteRelation).handler(({ input }) =>
-            this.households.claimInviteRelation(input.invitationId)
-        );
-    }
-
     // ====================================================================
     // ? READ Operations
     // ====================================================================

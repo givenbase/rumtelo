@@ -2,8 +2,7 @@ import type { z } from 'zod';
 
 import {
     Currency,
-    HouseholdKind,
-    type HouseholdRelation,
+    HouseholdRelation,
     HouseholdRole,
     IncomeKind,
     IncomeStability,
@@ -12,7 +11,6 @@ import {
     PayoffStrategy,
     canAddHouseholdMember,
     canInviteOnPlan,
-    canUseHouseholdKind,
     effectiveSeatCaps,
     isWritableHouseholdRole,
     localeToIntl,
@@ -37,13 +35,22 @@ import { AccountSettingsService } from '../user/account/account-settings/account
 import { AccountService } from '../user/account/account.service';
 import { personDisplayName } from '../user/account/person-display-name.util';
 import { HouseholdBillingService } from './household-billing/household-billing.service';
-import { HouseholdInviteMeta } from './household-invite-meta/household-invite-meta.entity';
-import { HouseholdMemberMeta } from './household-member-meta/household-member-meta.entity';
 import { HouseholdSettingsService } from './household-settings/household-settings.service';
 import { AuthHousehold } from './managed/household/auth-household.entity';
 import { AuthInvitation } from './managed/invitation/auth-invitation.entity';
 import { AuthSession } from '../user/managed/session/auth-session.entity';
 import { AuthMember } from './managed/member/auth-member.entity';
+
+function parseHouseholdRelation(raw: string | null | undefined): HouseholdRelation | null {
+    if (
+        raw === HouseholdRelation.FAMILY ||
+        raw === HouseholdRelation.CIRCLE ||
+        raw === HouseholdRelation.EXTERNAL
+    ) {
+        return raw;
+    }
+    return null;
+}
 
 /**
  * Household aggregate — orchestrates Better Auth's organization plugin
@@ -124,17 +131,12 @@ export class HouseholdService {
                 email,
                 role: role.toLowerCase() as 'member' | 'viewer',
                 organizationId: householdId,
+                // BA organization additionalFields — see auth.config schema.invitation
+                relation,
             },
             headers,
         });
         if (!result?.id) throw apiBadRequest('invitation_create_failed');
-
-        this.em.create(HouseholdInviteMeta, {
-            household: householdId,
-            invitationId: result.id,
-            relation,
-        } as never);
-        await this.em.flush();
 
         const org = await this.em.findOne(AuthHousehold, { id: householdId });
         const { account, user } = await this.accounts.ensureCurrentAccount();
@@ -153,38 +155,6 @@ export class HouseholdService {
         });
 
         return { invitationId: result.id };
-    }
-
-    /** After BA acceptInvitation — attach pending relation meta to the new seat. */
-    async claimInviteRelation(invitationId: string) {
-        const userId = currentUserId();
-        const inviteMeta = await this.em.findOne(HouseholdInviteMeta, { invitationId });
-        if (!inviteMeta) return { ok: true as const };
-
-        const membership = await this.em.findOne(AuthMember, {
-            household: inviteMeta.household,
-            user: userId,
-        });
-        if (!membership) {
-            throw apiBadRequest('invitation_accept_failed');
-        }
-
-        const existing = await this.em.findOne(HouseholdMemberMeta, {
-            household: inviteMeta.household,
-            userId,
-        });
-        if (existing) {
-            existing.relation = inviteMeta.relation;
-        } else {
-            this.em.create(HouseholdMemberMeta, {
-                household: inviteMeta.household,
-                userId,
-                relation: inviteMeta.relation,
-            } as never);
-        }
-        this.em.remove(inviteMeta);
-        await this.em.flush();
-        return { ok: true as const };
     }
 
     // ====================================================================
@@ -216,11 +186,6 @@ export class HouseholdService {
         );
         const userIds = memberships.map(member => member.user.id);
         const lastSeenByUserId = await this.lastSeenByUserIds(userIds);
-        const metaRows = await this.em.find(HouseholdMemberMeta, {
-            household: householdId,
-            userId: { $in: userIds },
-        });
-        const relationByUserId = new Map(metaRows.map(row => [row.userId, row.relation] as const));
         return Promise.all(
             memberships.map(async member => {
                 // Application person is Account; display fields come from Account→User.
@@ -232,7 +197,7 @@ export class HouseholdService {
                     accountId: account.id,
                     userId: user.id,
                     role: mapRole(member.role),
-                    relation: relationByUserId.get(user.id) ?? null,
+                    relation: parseHouseholdRelation(member.relation),
                     displayName: user.name,
                     email: user.email,
                     image: user.image ?? null,
@@ -335,7 +300,6 @@ export class HouseholdService {
         }
 
         const planKey = PlanKey.BASIC;
-        const kind = canUseHouseholdKind(planKey, input.kind) ? input.kind : HouseholdKind.SOLO;
 
         const splitTotal = input.split.reduce(
             (sum: number, share: { percentage: number }) => sum + share.percentage,
@@ -393,7 +357,6 @@ export class HouseholdService {
 
         this.householdSettings.create({
             householdId: org.id,
-            kind,
             planKey,
             currency: input.currency,
             why: input.why,

@@ -6,7 +6,6 @@
 import { z } from 'zod';
 
 import { Money } from '../../common/common.schema';
-import { HouseholdKind } from '../../enums';
 import { CAPABILITY_KEYS } from './capabilities';
 import { CapabilityKind, PlanKey } from './enums';
 
@@ -19,7 +18,7 @@ export const PlanLimits = z.object({
     /** Total household seats (owner included). null = unlimited. */
     maxMembers: z.int().positive().nullable(),
     /**
-     * Writable seats: OWNER + ADMIN + MEMBER (not viewer).
+     * Writable seats: OWNER + MEMBER (not viewer).
      * null = unlimited. Distinct from {@link SeatAddonKind} / BA role strings.
      */
     maxWritableMembers: z.int().positive().nullable(),
@@ -36,7 +35,7 @@ export const PlanLimits = z.object({
 export const PlanCapabilities = z.object({
     /** Ceiling on household members (owner included). null = unlimited. */
     maxMembers: z.int().positive().nullable(),
-    /** Writable seats (OWNER + ADMIN + MEMBER). null = unlimited. */
+    /** Writable seats (OWNER + MEMBER). null = unlimited. */
     maxWritableMembers: z.int().positive().nullable(),
     /** Viewer / look-along seats. null = unlimited. */
     maxViewerMembers: z.int().min(0).nullable(),
@@ -50,8 +49,6 @@ export const PlanCapabilities = z.object({
     maxLearnEntries: z.int().positive().nullable(),
     /** Live AIS linked seats ceiling. 0 = none. null = unlimited. */
     maxBankLinks: z.int().min(0).nullable(),
-    /** Household shapes this tier may use. Basic = solo only. */
-    householdKinds: z.array(z.enum(HouseholdKind)).min(1),
     /** Flat capability keys granted on this tier (derived from PLAN_ACCESS). */
     capabilityKeys: z.array(z.enum(CAPABILITY_KEYS)),
     /** Whether invites are allowed (mirrors platform-invite). */

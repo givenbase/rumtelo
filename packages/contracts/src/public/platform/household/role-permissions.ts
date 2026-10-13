@@ -5,8 +5,8 @@
  * - Plan = which features exist on Basic/Plus/Max
  * - Role = what this member may see / mutate inside the household
  *
- * Better-auth roles stay 1:1 with {@link HouseholdRole}:
- * owner (100%) → admin (~80%) → member (day-to-day) → viewer (look-along).
+ * Better-auth roles map to {@link HouseholdRole}:
+ * owner → OWNER, member (and legacy admin) → MEMBER, viewer → VIEWER.
  */
 
 import { HouseholdRole } from '../enums';

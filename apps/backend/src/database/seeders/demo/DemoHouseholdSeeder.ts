@@ -10,7 +10,6 @@ import {
     FlowDirection,
     GoalKind,
     GoalStatus,
-    HouseholdKind,
     IncomeKind,
     IncomeStability,
     JarKey,
@@ -280,12 +279,6 @@ export class DemoHouseholdSeeder extends Seeder {
         }
 
         const householdId = org.id;
-        const householdKind =
-            demo.persona === 'max'
-                ? HouseholdKind.PARTNERS
-                : demo.persona === 'plus'
-                  ? HouseholdKind.SOLO
-                  : HouseholdKind.SOLO;
 
         let settings = await em.findOne(HouseholdSettings, { household: householdId });
         const money = {
@@ -304,7 +297,6 @@ export class DemoHouseholdSeeder extends Seeder {
             settings = em.create(HouseholdSettings, {
                 household: householdId,
                 why: demo.why,
-                kind: householdKind,
                 currency: Currency.EUR,
                 money,
                 features,
@@ -314,7 +306,6 @@ export class DemoHouseholdSeeder extends Seeder {
             em.persist(settings);
         } else {
             settings.why = demo.why;
-            settings.kind = householdKind;
             settings.currency = Currency.EUR;
             settings.money = { ...settings.money, ...money };
             settings.features = { ...settings.features, ...features };

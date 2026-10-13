@@ -10,7 +10,6 @@ export const languageObject: EmailLanguageObject = {
             '{who} invited you to the household {household} as {role}. Open the link and use a one-time email code — no password needed.',
         'email.household.invite.body.role_viewer': 'viewer',
         'email.household.invite.body.role_member': 'member',
-        'email.household.invite.body.role_admin': 'admin',
         'email.household.invite.body.role_owner': 'owner',
         'email.household.invite.body.button': 'Open invitation',
         'email.household.invite.body.link_hint':
@@ -25,7 +24,6 @@ export const languageObject: EmailLanguageObject = {
             '{who} nodigt je uit voor het huishouden {household} als {role}. Open de link en gebruik een eenmalige code uit je mail — geen wachtwoord nodig.',
         'email.household.invite.body.role_viewer': 'kijker',
         'email.household.invite.body.role_member': 'lid',
-        'email.household.invite.body.role_admin': 'beheerder',
         'email.household.invite.body.role_owner': 'eigenaar',
         'email.household.invite.body.button': 'Open uitnodiging',
         'email.household.invite.body.link_hint':

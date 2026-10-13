@@ -7,7 +7,6 @@ import type { EntityManager } from '@mikro-orm/postgresql';
 import { Seeder } from '@mikro-orm/seeder';
 import {
     Currency,
-    HouseholdKind,
     IncomeStability,
     Locale,
     PayoffStrategy,
@@ -127,7 +126,6 @@ export class DemoPracticeSeeder extends Seeder {
             settings = em.create(HouseholdSettings, {
                 household: householdId,
                 why: demo.why,
-                kind: HouseholdKind.SOLO,
                 currency: Currency.EUR,
                 money: {
                     periodStartDay: 1,

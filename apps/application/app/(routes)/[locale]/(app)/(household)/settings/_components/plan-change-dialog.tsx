@@ -173,12 +173,6 @@ export function PlanChangeDialog({
                         </div>
                     ) : null}
 
-                    {diff.kindNotes.map(note => (
-                        <p key={note} className="text-xs leading-snug text-fg-muted">
-                            {note}
-                        </p>
-                    ))}
-
                     {upgrading && stripeCheckout ? (
                         <p className="rounded-md border border-line bg-surface px-2.5 py-2 text-xs leading-snug text-fg-secondary">
                             {tp('after_pay_note', { plan: toLabel })}

@@ -1,7 +1,11 @@
 import { betterAuth } from 'better-auth';
 import { createAuthMiddleware } from 'better-auth/api';
 import { emailOTP, organization, twoFactor } from 'better-auth/plugins';
-import { SignUpAccountProfile, toSignUpAccountProfile } from '@rumtelo/contracts';
+import {
+    HouseholdRelation,
+    SignUpAccountProfile,
+    toSignUpAccountProfile,
+} from '@rumtelo/contracts';
 import { buildBetterAuthTrustedOrigins, resolveCrossSubdomainCookieDomain } from '@rumtelo/utils';
 import { Pool } from 'pg';
 import { v7 as uuidv7 } from 'uuid';
@@ -40,6 +44,13 @@ function authUserFirstName(user: { name?: string | null; email: string }): strin
  * internally, so each model maps its fields explicitly below. Plugin-added
  * columns (activeOrganizationId, twoFactorEnabled, …) are NOT covered by the
  * top-level `fields` — they must be mapped on the plugin's own `schema` option.
+ *
+ * Custom product fields on BA tables use organization `schema.*.additionalFields`
+ * (@see https://www.better-auth.com/docs/plugins/organization — Additional Fields).
+ * Example: `HouseholdRelation` on `member` + `invitation`. Apply with `pn auth:migrate`
+ * only. Mirror entities may map the column for reads; strip any Mikro ADD/DROP
+ * (see household-taxonomy.md + check-ba-migration-ownership lint).
+ * Accept does not auto-copy invite → member extras; `afterAcceptInvitation` does that.
  *
  * The organization plugin *is* our Household: it gives invitations, roles and an
  * active-organization on the session for free, which is precisely what couples
@@ -241,7 +252,35 @@ export function createAuth(env: Env) {
                 creatorRole: 'owner',
                 membershipLimit: 20,
                 organizationHooks: {
-                    afterAcceptInvitation: async ({ invitation, user, organization }) => {
+                    /** Founding owner / addMember — default FAMILY when caller omits relation. */
+                    beforeAddMember: async ({ member }) => ({
+                        data: {
+                            ...member,
+                            relation: member.relation ?? HouseholdRelation.FAMILY,
+                        },
+                    }),
+                    /**
+                     * BA createMember on accept only copies role — copy our additional
+                     * `relation` from invitation → member here.
+                     */
+                    afterAcceptInvitation: async ({ invitation, member, user, organization }) => {
+                        const relation =
+                            typeof invitation.relation === 'string' &&
+                            invitation.relation.length > 0
+                                ? invitation.relation
+                                : HouseholdRelation.FAMILY;
+                        await pool
+                            .query(`UPDATE "auth"."member" SET "relation" = $1 WHERE "id" = $2`, [
+                                relation,
+                                member.id,
+                            ])
+                            .catch(error => {
+                                console.error(
+                                    '[Better Auth] Failed to copy invitation relation to member',
+                                    error
+                                );
+                            });
+
                         void notifyHouseholdInviteAccepted(pool, emailService, {
                             householdId: organization.id,
                             householdName: organization.name ?? 'Rumtelo',
@@ -269,6 +308,17 @@ export function createAuth(env: Env) {
                             userId: 'user_id',
                             createdAt: 'created_at',
                         },
+                        // Rumtelo HouseholdRelation — see file header + BA Additional Fields docs.
+                        // input: false — clients must not set seat relation; hooks / SQL copy it.
+                        additionalFields: {
+                            relation: {
+                                type: 'string',
+                                required: false,
+                                defaultValue: HouseholdRelation.FAMILY,
+                                input: false,
+                                returned: true,
+                            },
+                        },
                     },
                     invitation: {
                         fields: {
@@ -276,6 +326,16 @@ export function createAuth(env: Env) {
                             inviterId: 'inviter_id',
                             expiresAt: 'expires_at',
                             createdAt: 'created_at',
+                        },
+                        // input: true — HouseholdService.createInvitation passes relation.
+                        additionalFields: {
+                            relation: {
+                                type: 'string',
+                                required: false,
+                                defaultValue: HouseholdRelation.FAMILY,
+                                input: true,
+                                returned: true,
+                            },
                         },
                     },
                     // Session column owned by the organization plugin, not core session.fields.

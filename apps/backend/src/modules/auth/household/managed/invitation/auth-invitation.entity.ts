@@ -6,6 +6,9 @@ import { AuthUser } from '../../../user/managed/user/auth-user.entity';
 /**
  * better-auth `invitation` table — pending invites into a household.
  * Written by better-auth's organization plugin (single writer).
+ *
+ * `relation` is a BA `additionalFields` column, copied onto `auth.member` in
+ * `afterAcceptInvitation`. Schema via `pn auth:migrate` (not Mikro ADD/DROP).
  */
 @Entity({ tableName: 'invitation', schema: 'auth' })
 export class AuthInvitation {
@@ -23,6 +26,13 @@ export class AuthInvitation {
 
     @Property({ type: 'text', nullable: true })
     role?: string;
+
+    /**
+     * Who the invitee is to this board (BA additionalField).
+     * FAMILY | CIRCLE | EXTERNAL.
+     */
+    @Property({ type: 'text', nullable: true })
+    relation?: string | null;
 
     @Property({ type: 'text' })
     status!: string;

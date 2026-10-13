@@ -137,7 +137,6 @@ export async function fetchHouseholdExportBundle(
 function portableHouseholdSettings(settings: HouseholdSettings): ArchiveHouseholdSettings {
     return {
         why: settings.why ?? null,
-        kind: settings.kind,
         currency: settings.currency,
         money: settings.money,
         weekCheck: settings.weekCheck,
@@ -251,7 +250,6 @@ export function buildExportSheets(bundle: HouseholdExportBundle): ExportSheet[] 
             rows: [
                 {
                     currency: bundle.settings.currency ?? '',
-                    kind: bundle.settings.kind ?? '',
                     why: bundle.settings.why ?? '',
                     periodStartDay: bundle.settings.money?.periodStartDay ?? '',
                     incomeStability: bundle.settings.money?.incomeStability ?? '',

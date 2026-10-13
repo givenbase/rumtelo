@@ -1,17 +1,6 @@
 /** Platform / household / coach / practice enums. */
 
 /**
- * @deprecated Board composition — superseded by seat caps + {@link HouseholdRelation}.
- * Kept for settings/export rows until removed; new product UI must not set this.
- */
-export enum HouseholdKind {
-    FAMILY = 'FAMILY',
-    PARTNERS = 'PARTNERS',
-    FRIENDS = 'FRIENDS',
-    SOLO = 'SOLO',
-}
-
-/**
  * Access on a household seat — Owner / Member / Viewer.
  * Legacy better-auth `admin` rows map to {@link HouseholdRole.MEMBER} at the service layer.
  */
@@ -126,7 +115,7 @@ export enum PracticeClientInviteStatus {
  * Access granted to the Practice on a linked household (scope of the middle contract).
  *
  * Both VIEW and MANAGE start as INVITED when Practice invites. ACTIVE only after the
- * household OWNER/ADMIN accepts (`householdAcceptedAt`). MANAGE sponsorship applies
+ * household OWNER accepts (`householdAcceptedAt`). MANAGE sponsorship applies
  * on accept — never unilaterally on invite.
  */
 export enum PracticeClientAccess {

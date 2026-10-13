@@ -10,7 +10,6 @@ export const languageObject: EmailLanguageObject = {
             '{who} ({email}) accepted the invite to {household} as {role}. You can see them under Household settings, including when they were last signed in.',
         'email.household.invite_accepted.body.role_viewer': 'viewer',
         'email.household.invite_accepted.body.role_member': 'member',
-        'email.household.invite_accepted.body.role_admin': 'admin',
         'email.household.invite_accepted.body.role_owner': 'owner',
         'email.household.invite_accepted.body.button': 'Open household settings',
         'email.household.invite_accepted.body.link_hint':
@@ -26,7 +25,6 @@ export const languageObject: EmailLanguageObject = {
             '{who} ({email}) heeft de uitnodiging voor {household} geaccepteerd als {role}. Je ziet hen onder Huishouden-instellingen, inclusief wanneer ze voor het laatst waren ingelogd.',
         'email.household.invite_accepted.body.role_viewer': 'kijker',
         'email.household.invite_accepted.body.role_member': 'lid',
-        'email.household.invite_accepted.body.role_admin': 'beheerder',
         'email.household.invite_accepted.body.role_owner': 'eigenaar',
         'email.household.invite_accepted.body.button': 'Open huishouden-instellingen',
         'email.household.invite_accepted.body.link_hint':

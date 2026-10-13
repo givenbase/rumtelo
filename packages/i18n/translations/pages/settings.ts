@@ -89,9 +89,6 @@ const settings = {
         unit_viewer_members: 'viewer seats',
         unit_goals: 'goals',
         unit_bank_links: 'linked accounts',
-        kind_note_basic:
-            'Household type limited to Solo — partners / family / friends need Plus or Max.',
-        kind_note_unlocked: 'Any household type unlocked (solo, partners, family, friends).',
         ceiling_unlimited: 'Unlimited {unit}',
         ceiling_one: '1 {unit}',
         ceiling_n: '{count} {unit}',
@@ -200,12 +197,16 @@ const settings = {
             role_viewer: 'Viewer',
             invite_role_member: 'Member (can edit)',
             invite_role_viewer: 'Viewer (look along)',
-            invite_relation: 'Relation',
+            invite_relation: 'Who are they to this board?',
             invite_relation_family: 'Family',
             invite_relation_circle: 'Trusted circle',
             invite_relation_external: 'Professional / third party',
-            invite_relation_hint:
-                'Family or trusted circle share your board; third parties often need a Practice desk instead.',
+            invite_relation_hint_family:
+                'Partner, parent, child, or other household family — personal money together.',
+            invite_relation_hint_circle:
+                'Friend, roommate, or other trusted person — share the board without a Practice desk.',
+            invite_relation_hint_external:
+                'Coach, advisor, or organisation — often better as a Practice client later.',
             invite_viewer_hint:
                 'Basic includes one viewer seat — add members when your plan allows.',
             relation_founder: 'Founder',
@@ -494,7 +495,7 @@ const settings = {
             card_plus_tag: 'Most chosen',
             card_plus_line:
                 'Share the board with family or friends — debt, energy week, and goals.',
-            card_plus_feats: '{members} · Any household kind · Debt · ENERGY · Goals',
+            card_plus_feats: '{members} · Debt · ENERGY · Goals',
             card_max_tag: 'All four portals',
             card_max_line: 'Unlimited household, income curve, learning, and net worth.',
             card_max_feats: '{members} · MONEY · Masterclass · Net worth',

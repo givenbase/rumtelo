@@ -9,17 +9,10 @@ import { z } from 'zod';
 import { Currency, Locale } from '../../../common/common.enums';
 import { HouseholdId, Id, MemberId, UserId } from '../../../common/common.schema';
 import { PlanKey } from '../../../enums';
-import {
-    HouseholdKind,
-    HouseholdRelation,
-    HouseholdRole,
-    IncomeStability,
-    SpendingStyle,
-} from '../enums';
+import { HouseholdRelation, HouseholdRole, IncomeStability, SpendingStyle } from '../enums';
 import { PayoffStrategy } from '../../product/money/enums';
 
 export {
-    HouseholdKind,
     HouseholdRelation,
     HouseholdRole,
     IncomeStability,
@@ -61,7 +54,8 @@ export const HouseholdMember = z.object({
     userId: UserId,
     role: z.enum(HouseholdRole),
     /**
-     * Who they are to this board — null for owner / legacy seats without meta.
+     * Who they are to this board (`auth.member.relation` BA additionalField).
+     * Null only for legacy seats before the column existed.
      */
     relation: z.enum(HouseholdRelation).nullable(),
     /** Better Auth display name (`user.name`) — mapped via Account→User. */
@@ -123,7 +117,6 @@ export const HouseholdSettings = z.object({
     householdId: HouseholdId,
     /** Surfaced on the dashboard as the "why" line. */
     why: z.string().max(500).nullable().optional(),
-    kind: z.enum(HouseholdKind),
     currency: z.enum(Currency),
     /**
      * Product tier for the board — Basic / Plus / Max.
@@ -150,7 +143,6 @@ export const HouseholdSettings = z.object({
 export const HouseholdSettingsPatch = z.object({
     householdId: HouseholdId,
     why: z.string().max(500).nullable().optional(),
-    kind: z.enum(HouseholdKind).optional(),
     currency: z.enum(Currency).optional(),
     planKey: z.enum(PlanKey).optional(),
     money: HouseholdMoneySettings.partial().optional(),
@@ -164,7 +156,6 @@ export const HouseholdSettingsPatch = z.object({
 /** Onboarding writes income + split + prefs in one transaction. */
 export const OnboardingInput = z.object({
     householdName: z.string().min(1).max(120),
-    kind: z.enum(HouseholdKind).default(HouseholdKind.SOLO),
     currency: z.enum(Currency).default(Currency.EUR),
     /** Creator's language — stored on their AccountSettings, not the board. */
     locale: z.enum(Locale).default(Locale.NL),

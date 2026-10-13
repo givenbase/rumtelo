@@ -1,6 +1,6 @@
 /**
  * Platform contracts — household / coach / person-board enums + schemas.
- * Prefer: `import { HouseholdKind, Currency } from '@rumtelo/contracts/platform'`
+ * Prefer: `import { HouseholdRelation, Currency } from '@rumtelo/contracts/platform'`
  *
  * Currency is stored as platform_currency — re-exported from common.
  *

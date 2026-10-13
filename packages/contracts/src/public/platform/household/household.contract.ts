@@ -36,11 +36,6 @@ export const householdInvite = oc
     )
     .output(z.object({ invitationId: AuthId }));
 
-/** After BA acceptInvitation — copy invite relation meta onto the new member seat. */
-export const householdClaimInviteRelation = oc
-    .input(z.object({ invitationId: AuthId }))
-    .output(z.object({ ok: z.literal(true) }));
-
 // ====================================================================
 // ? READ Operations
 // ====================================================================
@@ -64,17 +59,17 @@ export const householdPracticeLinksList = oc
 
 export const householdUpdateSettings = oc.input(HouseholdSettingsPatch).output(HouseholdSettings);
 
-/** Household OWNER/ADMIN accepts a Practice invite → ACTIVE + timestamps. */
+/** Household OWNER accepts a Practice invite → ACTIVE + timestamps. */
 export const householdPracticeLinksAccept = oc
     .input(HouseholdPracticeLinkInput)
     .output(HouseholdPracticeLink);
 
-/** Household OWNER/ADMIN declines a pending Practice invite. */
+/** Household OWNER declines a pending Practice invite. */
 export const householdPracticeLinksReject = oc
     .input(HouseholdPracticeLinkInput)
     .output(HouseholdPracticeLink);
 
-/** Household OWNER/ADMIN unlinks an ACTIVE Practice contract. */
+/** Household OWNER unlinks an ACTIVE Practice contract. */
 export const householdPracticeLinksUnlink = oc
     .input(HouseholdPracticeLinkInput)
     .output(HouseholdPracticeLink);
@@ -96,6 +91,5 @@ export const householdContract = {
     updateSettings: householdUpdateSettings,
     onboard: householdOnboard,
     invite: householdInvite,
-    claimInviteRelation: householdClaimInviteRelation,
     practiceLinks: householdPracticeLinksContract,
 };

@@ -1,10 +1,8 @@
 import {
-    type HouseholdKind,
     type HouseholdSettings as HouseholdSettingsDto,
     type HouseholdSettingsPatch,
     type PlanKey,
     PLAN_RANK,
-    canUseHouseholdKind,
     capabilitiesFor,
     householdFitsPlan,
 } from '@rumtelo/contracts';
@@ -36,7 +34,6 @@ import {
 /** Fields onboarding fixes at creation; everything else takes entity defaults. */
 export interface CreateHouseholdSettingsInput {
     householdId: string;
-    kind: HouseholdKind;
     planKey: PlanKey;
     currency: HouseholdSettingsDto['currency'];
     why: string | null;
@@ -69,7 +66,6 @@ export class HouseholdSettingsService {
     create(input: CreateHouseholdSettingsInput): HouseholdSettings {
         const settings = this.em.create(HouseholdSettings, {
             household: input.householdId,
-            kind: input.kind,
             currency: input.currency,
             why: input.why,
             money: { ...DEFAULT_MONEY_SETTINGS, ...input.money },
@@ -127,21 +123,13 @@ export class HouseholdSettingsService {
         }
 
         const currentPlan = await this.billing.getPlanKey(householdId);
-        const nextPlan = patch.planKey ?? currentPlan;
-        const nextKind = patch.kind ?? row.kind;
-
-        if (patch.kind !== undefined && !canUseHouseholdKind(nextPlan, patch.kind)) {
-            throw new BadRequestException(
-                `${nextPlan} does not allow household kind ${patch.kind}`
-            );
-        }
 
         if (patch.planKey !== undefined) {
             if (!opts?.allowPaidUpgrade && !opts?.allowStripeBillingSync) {
                 await this.assertNotDemoHousehold(householdId);
                 this.assertClientPlanChangeAllowed(currentPlan, patch.planKey);
             }
-            // Stripe is billing source of truth — skip seat/kind fit on cancel/sync
+            // Stripe is billing source of truth — skip seat fit on cancel/sync
             // so multi-member households can downgrade to Basic without blocking the webhook.
             if (!opts?.allowStripeBillingSync) {
                 const memberships = await this.em.find(AuthMember, { household: householdId });
@@ -159,7 +147,6 @@ export class HouseholdSettingsService {
                         memberCount,
                         writableCount,
                         viewerCount,
-                        kind: nextKind,
                         extras: {
                             extraContributor: snap.extraContributorSeats,
                             extraViewer: snap.extraViewerSeats,
@@ -173,17 +160,13 @@ export class HouseholdSettingsService {
                             : caps.maxWritableMembers !== null &&
                                 writableCount > caps.maxWritableMembers
                               ? `Cannot switch to ${patch.planKey}: household has ${writableCount} writable members (max ${caps.maxWritableMembers})`
-                              : caps.maxViewerMembers !== null &&
-                                  viewerCount > caps.maxViewerMembers
-                                ? `Cannot switch to ${patch.planKey}: household has ${viewerCount} viewers (max ${caps.maxViewerMembers})`
-                                : `Cannot switch to ${patch.planKey}: household kind ${nextKind} is not allowed`
+                              : `Cannot switch to ${patch.planKey}: household has ${viewerCount} viewers (max ${caps.maxViewerMembers})`
                     );
                 }
             }
         }
 
         if (patch.why !== undefined) row.why = patch.why;
-        if (patch.kind !== undefined) row.kind = patch.kind;
         if (patch.currency !== undefined) row.currency = patch.currency;
         if (patch.money) {
             row.money = { ...row.money, ...patch.money };
@@ -280,7 +263,6 @@ function toSettingsDto(
     return {
         householdId: row.household,
         why: row.why,
-        kind: row.kind,
         currency: row.currency,
         planKey,
         money: { ...DEFAULT_MONEY_SETTINGS, ...row.money },

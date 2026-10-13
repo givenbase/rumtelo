@@ -10,7 +10,6 @@ import { HouseholdScoped, Id, IsoDate, Money } from '../../../../common/common.s
 import {
     HouseholdAnswers,
     HouseholdFeatureSettings,
-    HouseholdKind,
     HouseholdMoneySettings,
     HouseholdWeekCheckSettings,
     SpendingStyle,
@@ -33,7 +32,6 @@ import {
  */
 export const ArchiveHouseholdSettings = z.object({
     why: z.string().max(500).nullable().optional(),
-    kind: z.enum(HouseholdKind).optional(),
     currency: z.enum(Currency).optional(),
     money: HouseholdMoneySettings.partial().optional(),
     weekCheck: HouseholdWeekCheckSettings.partial().optional(),
