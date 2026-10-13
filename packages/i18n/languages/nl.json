@@ -1561,12 +1561,7 @@
                     },
                     "pick": {
                         "shelf": "Plank",
-                        "queue": {
-                            "book": "Nog te lezen",
-                            "watch": "Nog te kijken",
-                            "listen": "Nog te beluisteren",
-                            "take": "Nog te volgen"
-                        },
+                        "queue": "Te focussen",
                         "now": {
                             "book": "Aan het lezen",
                             "watch": "Aan het kijken",
@@ -5047,9 +5042,9 @@
                     "invite_email": "Uitnodigen (e-mail)",
                     "invite_placeholder": "partner@example.com",
                     "invite_role": "Toegang",
-                    "role_owner": "Owner",
-                    "role_member": "Member",
-                    "role_viewer": "Viewer",
+                    "role_owner": "Eigenaar",
+                    "role_member": "Lid",
+                    "role_viewer": "Kijker",
                     "invite_role_member": "Member (mag bewerken)",
                     "invite_role_viewer": "Viewer (meekijken)",
                     "invite_relation": "Relatie",

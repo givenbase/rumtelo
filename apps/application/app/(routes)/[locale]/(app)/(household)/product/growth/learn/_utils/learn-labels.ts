@@ -48,8 +48,9 @@ export function useLearnCatalogLabels() {
         },
         pickLabel(format: LearnFormat, status: LearnStatus) {
             if (status === 'SHELF') return t('pick.shelf');
+            if (status === 'QUEUE') return t('pick.queue');
             const kind = pickKind(format);
-            return t(`pick.${status.toLowerCase()}.${kind}` as 'pick.queue.book');
+            return t(`pick.${status.toLowerCase()}.${kind}` as 'pick.now.book');
         },
         aboutLabel(about: string) {
             if (SKILLS.some(skill => skill.key === about)) {
