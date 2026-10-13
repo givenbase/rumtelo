@@ -195,8 +195,7 @@ export function HomeDashboardClient() {
         live
     );
     const myMember = (membersQuery.data ?? []).find(m => m.userId === session?.user?.id);
-    const canManagePractice =
-        myMember?.role === HouseholdRole.OWNER || myMember?.role === HouseholdRole.ADMIN;
+    const canManagePractice = myMember?.role === HouseholdRole.OWNER;
     const practiceLinksQuery = useLiveQuery(
         apiQuery.household.practiceLinks.list.queryOptions({
             input: { householdId: householdId! },

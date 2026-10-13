@@ -12851,6 +12851,23 @@
           "enumItems": [],
           "mappedType": "bigint"
         },
+        "cleared_by_period": {
+          "name": "cleared_by_period",
+          "type": "varchar(7)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 7,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamptz(6)",
@@ -12988,7 +13005,8 @@
             "MATCHED",
             "MARK_PAID",
             "SKIP",
-            "LINKED"
+            "LINKED",
+            "ROLL"
           ],
           "mappedType": "unknown",
           "nativeEnumName": "money_fixed_cost_settlement_source"
@@ -13009,7 +13027,8 @@
           "collation": null,
           "enumItems": [
             "PAID",
-            "SKIPPED"
+            "SKIPPED",
+            "ROLLED"
           ],
           "mappedType": "unknown",
           "nativeEnumName": "money_fixed_cost_settlement_status"
@@ -13050,6 +13069,16 @@
         }
       },
       "indexes": [
+        {
+          "columnNames": [
+            "cleared_by_period"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "money_fixed_cost_settlement_cleared_by_period_index",
+          "primary": false,
+          "unique": false
+        },
         {
           "columnNames": [
             "fixed_cost_id",
@@ -17681,6 +17710,331 @@
       "comment": null
     },
     {
+      "name": "platform_household_invite_meta",
+      "schema": "public",
+      "columns": {
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "household_id": {
+          "name": "household_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "invitation_id": {
+          "name": "invitation_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "relation": {
+          "name": "relation",
+          "type": "platform_household_relation",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [
+            "FAMILY",
+            "CIRCLE",
+            "EXTERNAL"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "platform_household_relation"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "household_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "platform_household_invite_meta_household_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "invitation_id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "platform_household_invite_meta_invitation_id_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "platform_household_invite_meta_pkey",
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "triggers": [],
+      "foreignKeys": {
+        "platform_household_invite_meta_household_id_foreign": {
+          "columnNames": [
+            "household_id"
+          ],
+          "constraintName": "platform_household_invite_meta_household_id_foreign",
+          "localTableName": "public.platform_household_invite_meta",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "auth.household",
+          "deleteRule": "cascade"
+        }
+      },
+      "comment": null
+    },
+    {
+      "name": "platform_household_member_meta",
+      "schema": "public",
+      "columns": {
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "household_id": {
+          "name": "household_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "relation": {
+          "name": "relation",
+          "type": "platform_household_relation",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [
+            "FAMILY",
+            "CIRCLE",
+            "EXTERNAL"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "platform_household_relation"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "household_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "platform_household_member_meta_household_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "household_id",
+            "user_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "keyName": "platform_household_member_meta_household_id_user_id_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "platform_household_member_meta_pkey",
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "triggers": [],
+      "foreignKeys": {
+        "platform_household_member_meta_household_id_foreign": {
+          "columnNames": [
+            "household_id"
+          ],
+          "constraintName": "platform_household_member_meta_household_id_foreign",
+          "localTableName": "public.platform_household_member_meta",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "auth.household",
+          "deleteRule": "cascade"
+        }
+      },
+      "comment": null
+    },
+    {
       "name": "platform_practice",
       "schema": "public",
       "columns": {
@@ -19323,7 +19677,8 @@
         "MATCHED",
         "MARK_PAID",
         "SKIP",
-        "LINKED"
+        "LINKED",
+        "ROLL"
       ]
     },
     "money_fixed_cost_settlement_status": {
@@ -19331,7 +19686,8 @@
       "schema": "public",
       "items": [
         "PAID",
-        "SKIPPED"
+        "SKIPPED",
+        "ROLLED"
       ]
     },
     "money_flow_direction": {
@@ -19526,6 +19882,15 @@
         "PARTNERS",
         "FRIENDS",
         "SOLO"
+      ]
+    },
+    "platform_household_relation": {
+      "name": "platform_household_relation",
+      "schema": "public",
+      "items": [
+        "FAMILY",
+        "CIRCLE",
+        "EXTERNAL"
       ]
     },
     "platform_practice_address_kind": {

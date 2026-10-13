@@ -3,6 +3,7 @@ import type { z } from 'zod';
 import {
     Currency,
     HouseholdKind,
+    type HouseholdRelation,
     HouseholdRole,
     IncomeKind,
     IncomeStability,
@@ -36,6 +37,8 @@ import { AccountSettingsService } from '../user/account/account-settings/account
 import { AccountService } from '../user/account/account.service';
 import { personDisplayName } from '../user/account/person-display-name.util';
 import { HouseholdBillingService } from './household-billing/household-billing.service';
+import { HouseholdInviteMeta } from './household-invite-meta/household-invite-meta.entity';
+import { HouseholdMemberMeta } from './household-member-meta/household-member-meta.entity';
 import { HouseholdSettingsService } from './household-settings/household-settings.service';
 import { AuthHousehold } from './managed/household/auth-household.entity';
 import { AuthInvitation } from './managed/invitation/auth-invitation.entity';
@@ -73,7 +76,12 @@ export class HouseholdService {
         return this.onboardInternal(input, headers);
     }
 
-    async invite(householdId: string, email: string, role: HouseholdRole) {
+    async invite(
+        householdId: string,
+        email: string,
+        role: HouseholdRole.MEMBER | HouseholdRole.VIEWER,
+        relation: HouseholdRelation
+    ) {
         const settings = await this.householdSettings.get(householdId);
         const planKey = settings.planKey;
         if (!canInviteOnPlan(planKey)) {
@@ -114,12 +122,19 @@ export class HouseholdService {
         const result = await this.authService.api.createInvitation({
             body: {
                 email,
-                role: role.toLowerCase() as 'owner' | 'admin' | 'member' | 'viewer',
+                role: role.toLowerCase() as 'member' | 'viewer',
                 organizationId: householdId,
             },
             headers,
         });
         if (!result?.id) throw apiBadRequest('invitation_create_failed');
+
+        this.em.create(HouseholdInviteMeta, {
+            household: householdId,
+            invitationId: result.id,
+            relation,
+        } as never);
+        await this.em.flush();
 
         const org = await this.em.findOne(AuthHousehold, { id: householdId });
         const { account, user } = await this.accounts.ensureCurrentAccount();
@@ -138,6 +153,38 @@ export class HouseholdService {
         });
 
         return { invitationId: result.id };
+    }
+
+    /** After BA acceptInvitation — attach pending relation meta to the new seat. */
+    async claimInviteRelation(invitationId: string) {
+        const userId = currentUserId();
+        const inviteMeta = await this.em.findOne(HouseholdInviteMeta, { invitationId });
+        if (!inviteMeta) return { ok: true as const };
+
+        const membership = await this.em.findOne(AuthMember, {
+            household: inviteMeta.household,
+            user: userId,
+        });
+        if (!membership) {
+            throw apiBadRequest('invitation_accept_failed');
+        }
+
+        const existing = await this.em.findOne(HouseholdMemberMeta, {
+            household: inviteMeta.household,
+            userId,
+        });
+        if (existing) {
+            existing.relation = inviteMeta.relation;
+        } else {
+            this.em.create(HouseholdMemberMeta, {
+                household: inviteMeta.household,
+                userId,
+                relation: inviteMeta.relation,
+            } as never);
+        }
+        this.em.remove(inviteMeta);
+        await this.em.flush();
+        return { ok: true as const };
     }
 
     // ====================================================================
@@ -169,6 +216,11 @@ export class HouseholdService {
         );
         const userIds = memberships.map(member => member.user.id);
         const lastSeenByUserId = await this.lastSeenByUserIds(userIds);
+        const metaRows = await this.em.find(HouseholdMemberMeta, {
+            household: householdId,
+            userId: { $in: userIds },
+        });
+        const relationByUserId = new Map(metaRows.map(row => [row.userId, row.relation] as const));
         return Promise.all(
             memberships.map(async member => {
                 // Application person is Account; display fields come from Account→User.
@@ -180,6 +232,7 @@ export class HouseholdService {
                     accountId: account.id,
                     userId: user.id,
                     role: mapRole(member.role),
+                    relation: relationByUserId.get(user.id) ?? null,
                     displayName: user.name,
                     email: user.email,
                     image: user.image ?? null,
@@ -405,7 +458,8 @@ function mapRole(raw: string): HouseholdRole {
         case 'owner':
             return HouseholdRole.OWNER;
         case 'admin':
-            return HouseholdRole.ADMIN;
+            // Collapsed into MEMBER — Owner / Member / Viewer product ladder.
+            return HouseholdRole.MEMBER;
         case 'member':
             return HouseholdRole.MEMBER;
         case 'viewer':

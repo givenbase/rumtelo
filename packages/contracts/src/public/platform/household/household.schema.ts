@@ -9,11 +9,18 @@ import { z } from 'zod';
 import { Currency, Locale } from '../../../common/common.enums';
 import { HouseholdId, Id, MemberId, UserId } from '../../../common/common.schema';
 import { PlanKey } from '../../../enums';
-import { HouseholdKind, HouseholdRole, IncomeStability, SpendingStyle } from '../enums';
+import {
+    HouseholdKind,
+    HouseholdRelation,
+    HouseholdRole,
+    IncomeStability,
+    SpendingStyle,
+} from '../enums';
 import { PayoffStrategy } from '../../product/money/enums';
 
 export {
     HouseholdKind,
+    HouseholdRelation,
     HouseholdRole,
     IncomeStability,
     JarExperience,
@@ -53,6 +60,10 @@ export const HouseholdMember = z.object({
     /** Better Auth `auth.user.id` — login identity (session / membership). */
     userId: UserId,
     role: z.enum(HouseholdRole),
+    /**
+     * Who they are to this board — null for owner / legacy seats without meta.
+     */
+    relation: z.enum(HouseholdRelation).nullable(),
     /** Better Auth display name (`user.name`) — mapped via Account→User. */
     displayName: z.string(),
     email: z.email(),

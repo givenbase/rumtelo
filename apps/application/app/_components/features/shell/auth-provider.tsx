@@ -93,7 +93,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const isAuthenticated = Boolean(userId);
     /** Soft-upgrade / invite — do not auto-reattach a look-along household. */
     const skipAutoActivate =
-        pathname.includes('/onboarding/create') || pathname.includes('/invite/');
+        pathname.includes('/onboarding/start') ||
+        pathname.includes('/onboarding/create') ||
+        pathname.includes('/invite/');
 
     const householdReady = useMemo(() => {
         if (isPending) return false;

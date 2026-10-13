@@ -123,7 +123,7 @@ export class AccountSettingsService {
      * Uses durable DB state (not a client cookie).
      * `home` tells the proxy where ready users belong (practice desk vs board).
      *
-     * Invitees (VIEWER / MEMBER / ADMIN) must never run creator onboarding.
+     * Invitees (VIEWER / MEMBER) must never run creator onboarding.
      * Personal `onboardedAt` is a pass for them once they have a household seat.
      * Pending email invites route to `/invite/{id}` — never the income/jars questionnaire.
      * Incomplete jar-bank setup only blocks the OWNER.

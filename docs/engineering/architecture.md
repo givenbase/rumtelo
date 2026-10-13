@@ -80,7 +80,7 @@ Money children (same list everywhere): `jar` `income` `fixed-cost` `account` `tr
 | Login UI | `HouseholdShell` (Money / Growth / Energy / Soul) | `PracticeShell` (clients, staff, billing) |
 | Tenancy | better-auth org (`auth.household`) | Own rows under `public.platform_practice*` |
 | Data | All portal rows carry `household_id` | Staff + links only — no duplicate money board |
-| Join | Membership / invite (roles OWNER / ADMIN / MEMBER / VIEWER — 1:1 with better-auth) | **`PracticeClientLink`** hinge (status + access VIEW\|MANAGE + controlFlags) |
+| Join | Membership / invite (`HouseholdRole` OWNER\|MEMBER\|VIEWER + `HouseholdRelation`; see [household-taxonomy.md](./household-taxonomy.md)) | **`PracticeClientLink`** hinge (status + access VIEW\|MANAGE + controlFlags) |
 | Billing | Basic / Plus / Max + optional seat add-ons (€2.50) | **€49 base** + **€2.50 / staff** + **€14 / MANAGE client** (VIEW = invite / household-added only; free) |
 | Settings | `/settings/*` — account + household product prefs | `/practice/settings` — org profile only (not shared) |
 | Authz later | Household membership **or** active Practice link | Practice role + link access |

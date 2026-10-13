@@ -8,7 +8,7 @@ import { AuthUser } from '../../../user/managed/user/auth-user.entity';
  *
  * Written by better-auth's organization plugin (single writer). Read here for
  * role resolution and member listings; the raw role (owner | admin | member |
- * viewer) is mapped to Rumtelo's OWNER | MEMBER | VIEWER at the service layer.
+ * viewer; legacy admin) is mapped to Rumtelo's OWNER | MEMBER | VIEWER at the service layer.
  */
 @Entity({ tableName: 'member', schema: 'auth' })
 export class AuthMember {

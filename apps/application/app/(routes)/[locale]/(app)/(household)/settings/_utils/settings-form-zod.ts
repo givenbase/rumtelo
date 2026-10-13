@@ -1,4 +1,4 @@
-import { AccountKind, HouseholdRole } from '@rumtelo/contracts';
+import { AccountKind, HouseholdRelation, HouseholdRole } from '@rumtelo/contracts';
 import { isValidIban, normalizeIban } from '@rumtelo/utils';
 import { z } from 'zod';
 
@@ -30,7 +30,8 @@ export type PasswordFormValues = z.infer<ReturnType<typeof createPasswordFormSch
 export function createInviteFormSchema(msg: SettingsFormT) {
     return z.object({
         email: z.email(msg('pages.settings.panels.household.invite_email')),
-        role: z.enum([HouseholdRole.ADMIN, HouseholdRole.MEMBER, HouseholdRole.VIEWER]),
+        role: z.enum([HouseholdRole.MEMBER, HouseholdRole.VIEWER]),
+        relation: z.enum(HouseholdRelation),
     });
 }
 

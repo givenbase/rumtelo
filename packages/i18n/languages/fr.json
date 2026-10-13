@@ -5047,10 +5047,18 @@
                     "invite_email": "Inviter (par e-mail)",
                     "invite_placeholder": "partner@example.com",
                     "invite_role": "Fonction",
-                    "invite_role_admin": "Administrateur (droits d'accès élevés)",
+                    "role_owner": "Owner",
+                    "role_member": "Member",
+                    "role_viewer": "Viewer",
                     "invite_role_member": "Full access",
                     "invite_role_viewer": "Viewer (coach / look along)",
-                    "invite_viewer_hint": "La formule « Basic » comprend une place dans les tribunes pour un entraîneur ou un travailleur social."
+                    "invite_relation": "Relation",
+                    "invite_relation_family": "Family",
+                    "invite_relation_circle": "Trusted circle",
+                    "invite_relation_external": "Professional / third party",
+                    "invite_relation_hint": "Family or trusted circle share your board; third parties often need a Practice desk instead.",
+                    "invite_viewer_hint": "La formule « Basic » comprend une place dans les tribunes pour un entraîneur ou un travailleur social.",
+                    "relation_founder": "Founder"
                 },
                 "devices": {
                     "eyebrow": "Appareils",
@@ -5553,7 +5561,26 @@
             "viewer": {
                 "look_along": "Aperçu — lecture seule",
                 "start_own_banner": "Vous souhaitez avoir votre propre tableau Rumtelo ? Créez un foyer quand vous le souhaitez.",
-                "start_own_cta": "Fonder mon foyer"
+                "start_own_cta": "Fonder mon foyer",
+                "chooser_loading": "Loading",
+                "chooser_eyebrow": "Your next step",
+                "chooser_title": "Start something of your own",
+                "chooser_lead": "You’re looking along on someone else’s board. Pick what you need — you can always do both later.",
+                "chooser_household_title": "Household board",
+                "chooser_household_body": "Your own jars and money board for personal or family money.",
+                "chooser_household_bullet_1": "Six jars and a clear month plan",
+                "chooser_household_bullet_2": "Invite family or trusted people later",
+                "chooser_household_bullet_3": "You become the owner of your board",
+                "chooser_household_cta": "Start my household",
+                "chooser_practice_title": "Practice desk",
+                "chooser_practice_body": "For coaches and advisors who help other households.",
+                "chooser_practice_bullet_1": "Invite and manage client households",
+                "chooser_practice_bullet_2": "Staff seats and practice billing",
+                "chooser_practice_bullet_3": "Separate from your look-along seat",
+                "chooser_practice_cta": "Create a practice",
+                "chooser_practice_open_cta": "Open my practice",
+                "chooser_suggested": "Suggested for you",
+                "chooser_back": "Back to the board I’m looking along"
             },
             "period_options": {
                 "this_month": "Ce mois-ci",

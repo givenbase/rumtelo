@@ -35,7 +35,8 @@ export class MembershipService {
             case 'owner':
                 return 'OWNER';
             case 'admin':
-                return 'ADMIN';
+                // Collapsed into MEMBER (Owner / Member / Viewer ladder).
+                return 'MEMBER';
             case 'member':
                 return 'MEMBER';
             case 'viewer':

@@ -14,7 +14,7 @@ import { SettingsInkCard, SettingsRow, SettingsRowLabel } from './settings-chrom
 import { useSettingsMutation } from '../_utils/use-settings-mutation';
 
 /**
- * Dual-consent Practice contracts — household OWNER/ADMIN accept or decline.
+ * Dual-consent Practice contracts — household OWNER accept or decline.
  * Outside household membership seats (VIEWER ≠ Practice staff).
  */
 export function PracticeLinksSettings() {
@@ -36,8 +36,7 @@ export function PracticeLinksSettings() {
     );
 
     const myMember = (membersQuery.data ?? []).find(m => m.userId === session?.user?.id);
-    const canManage =
-        myMember?.role === HouseholdRole.OWNER || myMember?.role === HouseholdRole.ADMIN;
+    const canManage = myMember?.role === HouseholdRole.OWNER;
 
     const accept = useSettingsMutation({
         mutationFn: (linkId: string) =>

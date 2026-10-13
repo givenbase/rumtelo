@@ -1,5 +1,9 @@
 /** Platform / household / coach / practice enums. */
 
+/**
+ * @deprecated Board composition — superseded by seat caps + {@link HouseholdRelation}.
+ * Kept for settings/export rows until removed; new product UI must not set this.
+ */
 export enum HouseholdKind {
     FAMILY = 'FAMILY',
     PARTNERS = 'PARTNERS',
@@ -7,6 +11,10 @@ export enum HouseholdKind {
     SOLO = 'SOLO',
 }
 
+/**
+ * Access on a household seat — Owner / Member / Viewer.
+ * Legacy better-auth `admin` rows map to {@link HouseholdRole.MEMBER} at the service layer.
+ */
 export enum HouseholdRole {
     /**
      * Creator of the household (or Practice) — 100% control.
@@ -14,13 +22,8 @@ export enum HouseholdRole {
      */
     OWNER = 'OWNER',
     /**
-     * High trust (~80% of owner) — org/member/invite mutations without being creator.
-     * Maps to better-auth `admin`.
-     */
-    ADMIN = 'ADMIN',
-    /**
-     * Limited write access — can do day-to-day board work, not org admin.
-     * Maps to better-auth `member`.
+     * Day-to-day write access (and invite when plan allows).
+     * Maps to better-auth `member` (and legacy `admin`).
      */
     MEMBER = 'MEMBER',
     /**
@@ -28,6 +31,19 @@ export enum HouseholdRole {
      * Maps to better-auth `viewer`.
      */
     VIEWER = 'VIEWER',
+}
+
+/**
+ * Who an invitee is to this board — per seat, not board composition.
+ * Soft-upgrade UX: FAMILY/CIRCLE → own household; EXTERNAL → Practice.
+ */
+export enum HouseholdRelation {
+    /** Kin / household family (mother, son, partner, …). */
+    FAMILY = 'FAMILY',
+    /** Friends, roommates, other trusted personal circle. */
+    CIRCLE = 'CIRCLE',
+    /** Third party — coach, government, organisation. */
+    EXTERNAL = 'EXTERNAL',
 }
 
 export enum CoachKind {

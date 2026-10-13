@@ -17,7 +17,20 @@ export function isOnboardingPath(path: string): boolean {
     return path === '/onboarding' || path.startsWith('/onboarding/');
 }
 
-/** Soft upgrade — VIEWER starts their own household while still a look-along elsewhere. */
+/**
+ * Soft upgrade — VIEWER chooser + create-own-household while still a look-along elsewhere.
+ * Includes `/onboarding/start` (chooser) and `/onboarding/create` (household onboard).
+ */
+export function isSoftUpgradePath(path: string): boolean {
+    return (
+        path === '/onboarding/start' ||
+        path.startsWith('/onboarding/start/') ||
+        path === '/onboarding/create' ||
+        path.startsWith('/onboarding/create/')
+    );
+}
+
+/** @deprecated Prefer {@link isSoftUpgradePath} — kept for call-site clarity on create-only checks. */
 export function isCreateOwnHouseholdPath(path: string): boolean {
     return path === '/onboarding/create' || path.startsWith('/onboarding/create/');
 }
@@ -64,8 +77,8 @@ export function resolveBoardRedirect(path: string, gate: BoardGateState): string
         return '/onboarding';
     }
 
-    // Ready users leave /onboarding — except VIEWER soft-upgrade (`/onboarding/create`).
-    if (gate.ready && isOnboardingPath(path) && !isCreateOwnHouseholdPath(path)) {
+    // Ready users leave /onboarding — except VIEWER soft-upgrade (chooser + create).
+    if (gate.ready && isOnboardingPath(path) && !isSoftUpgradePath(path)) {
         return gate.home;
     }
 

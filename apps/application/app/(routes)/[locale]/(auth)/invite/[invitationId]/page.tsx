@@ -8,6 +8,7 @@ import { useTranslations } from '@rumtelo/i18n';
 import { BrandLoader, Button, Input, Typography } from '@rumtelo/ui';
 import { householdInvitePath, writeHouseholdInvite } from '@rumtelo/utils';
 
+import { api } from '@/app/_lib/api';
 import {
     acceptOrganizationInvitation,
     getOrganizationInvitation,
@@ -140,6 +141,11 @@ export default function HouseholdInvitePage() {
             if (organizationId) {
                 await setActiveOrganization(organizationId);
                 await setActiveHousehold(organizationId);
+            }
+            try {
+                await api.household.claimInviteRelation({ invitationId });
+            } catch {
+                // Relation meta is optional for legacy invites — seat still works.
             }
             householdInvite?.clearInvitationId();
             await refreshSession();

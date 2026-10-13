@@ -533,15 +533,11 @@ export function canInviteOnPlan(plan: PlanKey): boolean {
 }
 
 /**
- * OWNER / ADMIN / MEMBER occupy writable seats; VIEWER occupies viewer seats.
+ * OWNER / MEMBER occupy writable seats; VIEWER occupies viewer seats.
  * Distinct from {@link SeatAddonKind} (billing inventory).
  */
 export function isWritableHouseholdRole(role: HouseholdRole): boolean {
-    return (
-        role === HouseholdRole.OWNER ||
-        role === HouseholdRole.ADMIN ||
-        role === HouseholdRole.MEMBER
-    );
+    return role === HouseholdRole.OWNER || role === HouseholdRole.MEMBER;
 }
 
 function addSeatCap(base: number | null, extra: number): number | null {
@@ -617,8 +613,12 @@ export function planAllowsInviteRole(
     return caps.maxViewer === null || caps.maxViewer > 0;
 }
 
-export function canUseHouseholdKind(plan: PlanKey, kind: HouseholdKind): boolean {
-    return capabilitiesFor(plan).householdKinds.includes(kind);
+/**
+ * @deprecated HouseholdKind is retired — seat caps gate who can join, not board type.
+ * Always true so legacy settings patches / onboard rows keep working.
+ */
+export function canUseHouseholdKind(_plan: PlanKey, _kind: HouseholdKind): boolean {
+    return true;
 }
 
 /** True when the household already fits under the target plan's effective caps. */
@@ -632,8 +632,8 @@ export function householdFitsPlan(
         extras?: { extraContributor?: number; extraViewer?: number };
     }
 ): boolean {
-    const capsPlan = capabilitiesFor(plan);
-    if (!capsPlan.householdKinds.includes(opts.kind)) return false;
+    // Kind no longer gates plans — seat caps only.
+    void opts.kind;
     const caps = effectiveSeatCaps(plan, opts.extras);
     if (caps.maxMembers !== null && opts.memberCount > caps.maxMembers) return false;
     if (caps.maxWritable !== null && opts.writableCount > caps.maxWritable) return false;

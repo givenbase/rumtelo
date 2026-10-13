@@ -150,7 +150,7 @@ function filterSettingsSections(
     role: HouseholdRole
 ): SettingsNavSection[] {
     const canSeeBilling = roleCanSee(role, HouseholdPermissionSection.HOUSEHOLD_BILLING);
-    const canManagePractice = role === HouseholdRole.OWNER || role === HouseholdRole.ADMIN;
+    const canManagePractice = role === HouseholdRole.OWNER;
     const isViewer = role === HouseholdRole.VIEWER;
     return sections
         .map(section => ({

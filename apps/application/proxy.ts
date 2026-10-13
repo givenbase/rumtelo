@@ -5,9 +5,9 @@ import { getSessionCookie } from 'better-auth/cookies';
 import {
     type BoardGateState,
     isBoardGatedPath,
-    isCreateOwnHouseholdPath,
     isInvitePath,
     isPracticePath,
+    isSoftUpgradePath,
     resolveBoardRedirect,
 } from './app/_lib/onboarding-gate';
 import { routing } from './i18n/routing';
@@ -145,12 +145,12 @@ export async function proxy(request: NextRequest) {
 
     // Board / onboarding / practice-home gate — single decision via util.
     // `/invite/*` stays open so invitees can accept without creator onboarding.
-    // `/onboarding/create` is the VIEWER soft-upgrade path (own household).
+    // Soft-upgrade (`/onboarding/start` + `/onboarding/create`) stays open for VIEWER.
     if (
         hasSession &&
         !isPracticePath(path) &&
         !isInvitePath(path) &&
-        !isCreateOwnHouseholdPath(path) &&
+        !isSoftUpgradePath(path) &&
         !isPublicAuthRoute(path) &&
         !isSystemRoute &&
         isBoardGatedPath(path)

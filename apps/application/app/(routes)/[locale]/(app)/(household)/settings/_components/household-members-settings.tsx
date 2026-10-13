@@ -6,6 +6,7 @@ import { useMemo } from 'react';
 import { useLocale } from 'next-intl';
 
 import {
+    HouseholdRelation,
     HouseholdRole,
     IncomeStability,
     PlanKey,
@@ -53,7 +54,11 @@ export function HouseholdSettings() {
     const user = session?.user;
 
     const inviteForm = useForm<InviteFormValues>({
-        defaultValues: { email: '', role: HouseholdRole.VIEWER },
+        defaultValues: {
+            email: '',
+            role: HouseholdRole.VIEWER,
+            relation: HouseholdRelation.FAMILY,
+        },
         resolver: zodResolver(createInviteFormSchema(t)),
     });
 
@@ -98,7 +103,6 @@ export function HouseholdSettings() {
     const myRole = myMember?.role ?? HouseholdRole.VIEWER;
     const roleCanInvite = canInviteWithRole(myRole);
     const invitesAllowed = canInviteOnPlan(activePlan);
-    const canInviteAdmin = planAllowsInviteRole(activePlan, HouseholdRole.ADMIN, seatExtras);
     const canInviteMember = planAllowsInviteRole(activePlan, HouseholdRole.MEMBER, seatExtras);
     const canInviteViewer = planAllowsInviteRole(activePlan, HouseholdRole.VIEWER, seatExtras);
     const inviteRole = useWatch({ control: inviteForm.control, name: 'role' });
@@ -118,6 +122,7 @@ export function HouseholdSettings() {
                 householdId,
                 email: values.email.trim(),
                 role: values.role,
+                relation: values.relation,
             });
         },
         invalidateKeys: [apiQuery.household.members.key()],
@@ -125,11 +130,8 @@ export function HouseholdSettings() {
         onSuccess: () =>
             inviteForm.reset({
                 email: '',
-                role: canInviteViewer
-                    ? HouseholdRole.VIEWER
-                    : canInviteMember
-                      ? HouseholdRole.MEMBER
-                      : HouseholdRole.ADMIN,
+                role: canInviteViewer ? HouseholdRole.VIEWER : HouseholdRole.MEMBER,
+                relation: HouseholdRelation.FAMILY,
             }),
     });
 
@@ -199,7 +201,30 @@ export function HouseholdSettings() {
                                                   )}
                                         </p>
                                     </div>
-                                    <Badge>{member.role}</Badge>
+                                    <div className="flex shrink-0 flex-col items-end gap-1">
+                                        <Badge>
+                                            {member.role === HouseholdRole.OWNER
+                                                ? t('pages.settings.panels.household.role_owner')
+                                                : member.role === HouseholdRole.MEMBER
+                                                  ? t('pages.settings.panels.household.role_member')
+                                                  : t(
+                                                        'pages.settings.panels.household.role_viewer'
+                                                    )}
+                                        </Badge>
+                                        {member.role === HouseholdRole.OWNER ? (
+                                            <span className="text-[10px] text-fg-faint">
+                                                {t(
+                                                    'pages.settings.panels.household.relation_founder'
+                                                )}
+                                            </span>
+                                        ) : member.relation ? (
+                                            <span className="text-[10px] text-fg-faint">
+                                                {t(
+                                                    `pages.settings.panels.household.invite_relation_${member.relation.toLowerCase()}`
+                                                )}
+                                            </span>
+                                        ) : null}
+                                    </div>
                                 </li>
                             ))}
                         </ul>
@@ -306,23 +331,6 @@ export function HouseholdSettings() {
                                                             )}
                                                         </button>
                                                     ) : null}
-                                                    {canInviteAdmin ? (
-                                                        <button
-                                                            type="button"
-                                                            onClick={() =>
-                                                                field.onChange(HouseholdRole.ADMIN)
-                                                            }
-                                                            className={cn(
-                                                                'rounded-[10px] border px-3 py-2 text-xs font-medium transition-colors',
-                                                                field.value === HouseholdRole.ADMIN
-                                                                    ? 'border-accent bg-accent-soft text-accent'
-                                                                    : 'border-line text-fg hover:border-accent/50'
-                                                            )}>
-                                                            {t(
-                                                                'pages.settings.panels.household.invite_role_admin'
-                                                            )}
-                                                        </button>
-                                                    ) : null}
                                                 </div>
                                             </Field>
                                             {activePlan === PlanKey.BASIC ? (
@@ -332,6 +340,58 @@ export function HouseholdSettings() {
                                                     )}
                                                 </p>
                                             ) : null}
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={inviteForm.control}
+                                    name="relation"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <Field
+                                                label={t(
+                                                    'pages.settings.panels.household.invite_relation'
+                                                )}>
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {(
+                                                        [
+                                                            [
+                                                                HouseholdRelation.FAMILY,
+                                                                'invite_relation_family',
+                                                            ],
+                                                            [
+                                                                HouseholdRelation.CIRCLE,
+                                                                'invite_relation_circle',
+                                                            ],
+                                                            [
+                                                                HouseholdRelation.EXTERNAL,
+                                                                'invite_relation_external',
+                                                            ],
+                                                        ] as const
+                                                    ).map(([value, key]) => (
+                                                        <button
+                                                            key={value}
+                                                            type="button"
+                                                            onClick={() => field.onChange(value)}
+                                                            className={cn(
+                                                                'rounded-[10px] border px-3 py-2 text-xs font-medium transition-colors',
+                                                                field.value === value
+                                                                    ? 'border-accent bg-accent-soft text-accent'
+                                                                    : 'border-line text-fg hover:border-accent/50'
+                                                            )}>
+                                                            {t(
+                                                                `pages.settings.panels.household.${key}`
+                                                            )}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </Field>
+                                            <p className="text-xs text-fg-muted">
+                                                {t(
+                                                    'pages.settings.panels.household.invite_relation_hint'
+                                                )}
+                                            </p>
                                             <FormMessage />
                                         </FormItem>
                                     )}

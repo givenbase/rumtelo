@@ -84,31 +84,21 @@ function allSections(crud: CrudPermissions): RolePermissionMatrix {
  * | Role   | Org (settings / members / billing)     | Product portals      |
  * |--------|----------------------------------------|----------------------|
  * | OWNER  | Full CRUD                              | Full CRUD            |
- * | ADMIN  | Settings+members full; billing R/U     | Full CRUD            |
- * | MEMBER | Settings/members read; no billing      | Day-to-day CRUD      |
+ * | MEMBER | Day-to-day + invite; no billing destroy | Day-to-day CRUD      |
  * | VIEWER | Settings+members read; no billing      | Read-only portals    |
  */
 export const ROLE_PERMISSIONS: Record<HouseholdRole, RolePermissionMatrix> = {
     [HouseholdRole.OWNER]: allSections(READ_WRITE),
 
-    [HouseholdRole.ADMIN]: {
-        ...allSections(READ_WRITE),
-        // Admin cannot destroy the household / cancel billing alone — owner keeps that.
-        [HouseholdPermissionSection.HOUSEHOLD_SETTINGS]: {
-            ...READ_WRITE,
-            [HouseholdPermissionAction.DELETE]: false,
-        },
-        [HouseholdPermissionSection.HOUSEHOLD_BILLING]: {
+    [HouseholdRole.MEMBER]: {
+        // Day-to-day board + invite (not billing/destroy). Legacy BA admin maps here.
+        [HouseholdPermissionSection.HOUSEHOLD_SETTINGS]: READ_ONLY,
+        [HouseholdPermissionSection.HOUSEHOLD_MEMBERS]: {
             [HouseholdPermissionAction.CREATE]: true,
             [HouseholdPermissionAction.READ]: true,
-            [HouseholdPermissionAction.UPDATE]: true,
+            [HouseholdPermissionAction.UPDATE]: false,
             [HouseholdPermissionAction.DELETE]: false,
         },
-    },
-
-    [HouseholdRole.MEMBER]: {
-        [HouseholdPermissionSection.HOUSEHOLD_SETTINGS]: READ_ONLY,
-        [HouseholdPermissionSection.HOUSEHOLD_MEMBERS]: READ_ONLY,
         [HouseholdPermissionSection.HOUSEHOLD_BILLING]: NONE,
         [HouseholdPermissionSection.HOME]: DAY_TO_DAY,
         [HouseholdPermissionSection.MONEY]: DAY_TO_DAY,

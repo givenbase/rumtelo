@@ -476,7 +476,7 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                                         {isViewer ? (
                                             <div className="grid gap-0.5 border-b border-line p-2">
                                                 <Link
-                                                    href="/onboarding/create"
+                                                    href="/onboarding/start"
                                                     aria-label={t('pages.shell.menu.start_own')}
                                                     onClick={() => setMenuOpen(false)}
                                                     className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-raised">
@@ -727,7 +727,7 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                             </p>
                         </div>
                         <Link
-                            href="/onboarding/create"
+                            href="/onboarding/start"
                             className="focus-visible:ring-offset-canvas inline-flex min-h-10 w-full shrink-0 items-center justify-center rounded-full bg-accent px-4 py-2 text-center text-sm font-semibold text-on-accent transition outline-none hover:brightness-110 focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 sm:w-auto">
                             {t('pages.shell.viewer.start_own_cta')}
                         </Link>
