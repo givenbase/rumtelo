@@ -5,7 +5,7 @@ import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } f
 import { Icon, Typography } from '@rumtelo/ui';
 import { useTranslations } from '@rumtelo/i18n';
 
-import { PORTALS } from '@/lib/landing-content';
+import { isLaunchProductsDeferred, LIVE_PORTALS } from '@/lib/launch-products';
 import { webSignUpPath, appSignInUrl } from '@/lib/portal-urls';
 import { isRegistrationOpen } from '@/lib/maintenance';
 
@@ -37,7 +37,7 @@ export function LandingPortals() {
     const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
     const baseId = useId();
 
-    const portal = PORTALS[index]!;
+    const portal = LIVE_PORTALS[index]!;
 
     useEffect(() => {
         const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -48,7 +48,7 @@ export function LandingPortals() {
     }, []);
 
     const select = useCallback((next: number, focus = false) => {
-        const clamped = (next + PORTALS.length) % PORTALS.length;
+        const clamped = (next + LIVE_PORTALS.length) % LIVE_PORTALS.length;
         setIndex(clamped);
         setCycle(current => current + 1);
         setVideoOpen(false);
@@ -78,7 +78,7 @@ export function LandingPortals() {
             select(0, true);
         } else if (event.key === 'End') {
             event.preventDefault();
-            select(PORTALS.length - 1, true);
+            select(LIVE_PORTALS.length - 1, true);
         }
     };
 
@@ -88,8 +88,16 @@ export function LandingPortals() {
         <section id="portals" className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-20">
             <SectionHeading
                 eyebrow={t('portals_section.eyebrow')}
-                headline={t('portals_section.headline')}
-                lead={t('portals_section.lead')}
+                headline={t(
+                    isLaunchProductsDeferred()
+                        ? 'portals_section.headline_core'
+                        : 'portals_section.headline'
+                )}
+                lead={t(
+                    isLaunchProductsDeferred()
+                        ? 'portals_section.lead_core'
+                        : 'portals_section.lead'
+                )}
                 headlineClassName="max-w-2xl"
             />
 
@@ -103,52 +111,60 @@ export function LandingPortals() {
                     }
                 }}>
                 {/* The switch — the same strip that sits at the top of the app, now live */}
-                <div
-                    role="tablist"
-                    aria-label={t('header.portals')}
-                    tabIndex={-1}
-                    onKeyDown={onKeyDown}
-                    className="mt-8 inline-flex max-w-full flex-wrap gap-1 rounded-full border border-line bg-raised p-1">
-                    {PORTALS.map((item, itemIndex) => {
-                        const active = itemIndex === index;
-                        return (
-                            <button
-                                key={item.key}
-                                ref={node => {
-                                    tabsRef.current[itemIndex] = node;
-                                }}
-                                type="button"
-                                role="tab"
-                                id={`${baseId}-tab-${item.key}`}
-                                aria-selected={active}
-                                aria-controls={`${baseId}-panel`}
-                                tabIndex={active ? 0 : -1}
-                                onClick={() => select(itemIndex)}
-                                className={cn(
-                                    'relative inline-flex items-center gap-2 overflow-hidden rounded-full px-3.5 py-1.5 font-mono text-xs font-semibold tracking-widest uppercase transition-colors',
-                                    active
-                                        ? 'bg-surface text-fg shadow-md'
-                                        : 'text-fg-muted hover:text-fg'
-                                )}>
-                                <span
-                                    className="size-1.5 rounded-full"
-                                    style={{ background: item.colorVar }}
-                                />
-                                {t(`portals.${item.key}.name`)}
-                                {active && showProgress ? (
+                <div className="mt-8 flex flex-wrap items-center gap-2">
+                    <div
+                        role="tablist"
+                        aria-label={t('header.portals')}
+                        tabIndex={-1}
+                        onKeyDown={onKeyDown}
+                        className="inline-flex max-w-full flex-wrap gap-1 rounded-full border border-line bg-raised p-1">
+                        {LIVE_PORTALS.map((item, itemIndex) => {
+                            const active = itemIndex === index;
+                            return (
+                                <button
+                                    key={item.key}
+                                    ref={node => {
+                                        tabsRef.current[itemIndex] = node;
+                                    }}
+                                    type="button"
+                                    role="tab"
+                                    id={`${baseId}-tab-${item.key}`}
+                                    aria-selected={active}
+                                    aria-controls={`${baseId}-panel`}
+                                    tabIndex={active ? 0 : -1}
+                                    onClick={() => select(itemIndex)}
+                                    className={cn(
+                                        'relative inline-flex items-center gap-2 overflow-hidden rounded-full px-3.5 py-1.5 font-mono text-xs font-semibold tracking-widest uppercase transition-colors',
+                                        active
+                                            ? 'bg-surface text-fg shadow-md'
+                                            : 'text-fg-muted hover:text-fg'
+                                    )}>
                                     <span
-                                        key={cycle}
-                                        aria-hidden
-                                        className="absolute inset-x-0 bottom-0 h-0.5 origin-left"
-                                        style={{
-                                            background: item.colorVar,
-                                            animation: `demoProgress ${AUTO_ADVANCE_MS}ms linear both`,
-                                        }}
+                                        className="size-1.5 rounded-full"
+                                        style={{ background: item.colorVar }}
                                     />
-                                ) : null}
-                            </button>
-                        );
-                    })}
+                                    {t(`portals.${item.key}.name`)}
+                                    {active && showProgress ? (
+                                        <span
+                                            key={cycle}
+                                            aria-hidden
+                                            className="absolute inset-x-0 bottom-0 h-0.5 origin-left"
+                                            style={{
+                                                background: item.colorVar,
+                                                animation: `demoProgress ${AUTO_ADVANCE_MS}ms linear both`,
+                                            }}
+                                        />
+                                    ) : null}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    {isLaunchProductsDeferred() ? (
+                        <span className="inline-flex items-center gap-2 rounded-full border border-dashed border-line-strong px-3.5 py-1.5 font-mono text-xs font-semibold tracking-widest text-fg-faint uppercase">
+                            <span aria-hidden>+</span>
+                            {t('portals_section.more_soon')}
+                        </span>
+                    ) : null}
                 </div>
 
                 {/* Stage — detail left, screen right */}
@@ -176,7 +192,7 @@ export function LandingPortals() {
                                 color="muted"
                                 className="text-fg-faint">
                                 {t(`portals.${portal.key}.alt_name`)} · {index + 1} /{' '}
-                                {PORTALS.length}
+                                {LIVE_PORTALS.length}
                             </Typography>
                         </span>
 

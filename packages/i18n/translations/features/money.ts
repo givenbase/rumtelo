@@ -3,7 +3,7 @@ const money = {
     hub: {
         eyebrow: 'Money · this month',
         title: 'How your money moves.',
-        line: 'Assign this month. Run what you already own.',
+        line: 'Grip on your money — six jars, what comes in, what goes out.',
         fallback_coach_kind: 'START HERE',
         fallback_coach_text: 'Start with income and fixed costs.',
         fallback_coach_cta: 'Open income',
@@ -278,8 +278,8 @@ const money = {
         arrears_debt_pending: 'Saving…',
         arrears_debt_toast: 'Debt registered · {name}',
         /** List-row quick settle (short). */
-        mark_paid_short: 'Paid',
-        mark_paid_confirm: 'Mark paid?',
+        mark_paid_short: 'Mark paid',
+        mark_paid_confirm: 'Confirm paid?',
         mark_paid_pending: 'Saving…',
         mark_all_due: 'Mark all due paid',
         mark_all_due_confirm: 'Mark {count} bills paid?',

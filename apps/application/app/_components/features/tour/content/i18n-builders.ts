@@ -1,7 +1,7 @@
 import { moneyPath, growthPath, productPath } from '@/app/_lib/routes';
 import type { TranslateFn } from '@rumtelo/i18n';
 
-import type { FullTourChapter, PageHelpContent, PageTourStep } from '../types';
+import type { FullTourChapter, PageHelpContent, PageHelpVideo, PageTourStep } from '../types';
 
 function step(target: string, title: string, content: string): PageTourStep {
     return { target, title, content };
@@ -16,6 +16,30 @@ function sectionsFrom(
         heading: t(`${base}.${key}.heading`),
         body: t(`${base}.${key}.body`),
     }));
+}
+
+function explainVideo(
+    t: TranslateFn,
+    level: PageHelpVideo['level'],
+    key: 'general' | 'money' | 'growth' | 'energy' | 'soul' | 'jars' | 'fixed' | 'income'
+): PageHelpVideo {
+    return {
+        level,
+        title: t(`explain.${key}.title`),
+        url: t(`explain.${key}.url`),
+    };
+}
+
+function moneyExplainVideos(
+    t: TranslateFn,
+    feature: 'jars' | 'fixed' | 'income' | null
+): PageHelpVideo[] {
+    const videos: PageHelpVideo[] = [
+        explainVideo(t, 'general', 'general'),
+        explainVideo(t, 'product', 'money'),
+    ];
+    if (feature) videos.push(explainVideo(t, 'feature', feature));
+    return videos;
 }
 
 export function buildShellTourSteps(t: TranslateFn): PageTourStep[] {
@@ -70,11 +94,21 @@ export function buildFixedTourSteps(t: TranslateFn): PageTourStep[] {
             t('pages.fixed.steps.list.title'),
             t('pages.fixed.steps.list.content')
         ),
+        step(
+            '[data-tour="fixed-status"]',
+            t('pages.fixed.steps.status.title'),
+            t('pages.fixed.steps.status.content')
+        ),
     ];
 }
 
 export function buildJarsTourSteps(t: TranslateFn): PageTourStep[] {
     return [
+        step(
+            '[data-tour="jars-list"]',
+            t('pages.jars.steps.list.title'),
+            t('pages.jars.steps.list.content')
+        ),
         step(
             '[data-tour="jars-toolbar"]',
             t('pages.jars.steps.toolbar.title'),
@@ -82,8 +116,8 @@ export function buildJarsTourSteps(t: TranslateFn): PageTourStep[] {
         ),
         step(
             '[data-tour="jars-list"]',
-            t('pages.jars.steps.list.title'),
-            t('pages.jars.steps.list.content')
+            t('pages.jars.steps.bank.title'),
+            t('pages.jars.steps.bank.content')
         ),
     ];
 }
@@ -108,12 +142,14 @@ function helpContent(
     titleKey: string,
     sectionBase: string,
     sectionKeys: readonly string[],
-    tour?: { id: PageHelpContent['tourId']; steps: PageTourStep[] }
+    tour?: { id: PageHelpContent['tourId']; steps: PageTourStep[] },
+    videos?: PageHelpVideo[]
 ): PageHelpContent {
     return {
         title: t(titleKey),
         sections: sectionsFrom(t, sectionBase, sectionKeys),
         ...(tour ? { tourId: tour.id, tourSteps: tour.steps } : {}),
+        ...(videos?.length ? { videos } : {}),
     };
 }
 
@@ -130,7 +166,8 @@ export function buildPageHelpForPathname(pathname: string, t: TranslateFn): Page
                 'pages.income.title',
                 'pages.income.sections',
                 ['what_for', 'now_target_gap', 'simulator', 'sources', 'earning_methods'],
-                { id: 'income', steps: incomeSteps }
+                { id: 'income', steps: incomeSteps },
+                moneyExplainVideos(t, 'income')
             ),
         },
         {
@@ -139,8 +176,9 @@ export function buildPageHelpForPathname(pathname: string, t: TranslateFn): Page
                 t,
                 'pages.fixed.title',
                 'pages.fixed.sections',
-                ['what_for', 'out_vs_in', 'jars_use'],
-                { id: 'fixed', steps: fixedSteps }
+                ['what_for', 'out_vs_in', 'jars_use', 'mark_paid'],
+                { id: 'fixed', steps: fixedSteps },
+                moneyExplainVideos(t, 'fixed')
             ),
         },
         {
@@ -151,7 +189,8 @@ export function buildPageHelpForPathname(pathname: string, t: TranslateFn): Page
                 'pages.jars.title',
                 'pages.jars.sections',
                 ['what_for', 'how'],
-                { id: 'jars', steps: jarsSteps }
+                { id: 'jars', steps: jarsSteps },
+                moneyExplainVideos(t, 'jars')
             ),
         },
         {
@@ -161,30 +200,53 @@ export function buildPageHelpForPathname(pathname: string, t: TranslateFn): Page
                 'pages.jars.title',
                 'pages.jars.sections',
                 ['what_for', 'how'],
-                { id: 'jars', steps: jarsSteps }
+                { id: 'jars', steps: jarsSteps },
+                moneyExplainVideos(t, 'jars')
             ),
         },
         {
             prefix: moneyPath('transactions'),
-            content: helpContent(t, 'pages.transactions.title', 'pages.transactions.sections', [
-                'what_for',
-                'how',
-            ]),
+            content: helpContent(
+                t,
+                'pages.transactions.title',
+                'pages.transactions.sections',
+                ['what_for', 'how'],
+                undefined,
+                moneyExplainVideos(t, null)
+            ),
         },
         {
             prefix: moneyPath('debt'),
-            content: helpContent(t, 'pages.debt.title', 'pages.debt.sections', ['what_for', 'how']),
+            content: helpContent(
+                t,
+                'pages.debt.title',
+                'pages.debt.sections',
+                ['what_for', 'how'],
+                undefined,
+                moneyExplainVideos(t, null)
+            ),
         },
         {
             prefix: growthPath('goals'),
-            content: helpContent(t, 'pages.goals.title', 'pages.goals.sections', [
-                'save_vs_earn',
-                'pace',
-            ]),
+            content: helpContent(
+                t,
+                'pages.goals.title',
+                'pages.goals.sections',
+                ['save_vs_earn', 'pace'],
+                undefined,
+                [explainVideo(t, 'general', 'general'), explainVideo(t, 'product', 'growth')]
+            ),
         },
         {
             prefix: productPath('growth'),
-            content: helpContent(t, 'pages.growth.title', 'pages.growth.sections', ['what_for']),
+            content: helpContent(
+                t,
+                'pages.growth.title',
+                'pages.growth.sections',
+                ['what_for'],
+                undefined,
+                [explainVideo(t, 'general', 'general'), explainVideo(t, 'product', 'growth')]
+            ),
         },
     ];
 
@@ -206,6 +268,7 @@ export function buildPageHelpForPathname(pathname: string, t: TranslateFn): Page
         best ?? {
             title: t('pages.fallback.title'),
             sections: sectionsFrom(t, 'pages.fallback.sections', ['looking_at']),
+            videos: [explainVideo(t, 'general', 'general')],
         }
     );
 }

@@ -17,7 +17,7 @@ const nav = {
     children: {
         home_overview: 'Overview',
         coach: 'The Coach',
-        why: 'Why',
+        why: 'Why Rumtelo?',
         money_overview: 'Overview',
         jars: 'Jars',
         transactions: 'Transactions',

@@ -42,6 +42,10 @@ Softer than the money punch — use on about, positioning, closing bands. **Not*
 
 | Line | Best use |
 |---|---|
+| **Rumtelo — grip on life.** | After the slogan decode — not instead of it |
+| **Wondering what? All of it.** | Slogan decode (Why / L1 / landing hero only — don’t overuse) |
+| **Money. Growth. Energy. Soul — tools for grip on life.** | Auth manifesto / portals strip |
+| **The Coach gives a tip. You choose.** | Tech balance — not autopilot |
 | **Built for people who are doing well — and for people who are ready to.** | Audience / about / positioning |
 | **Don’t chase the number. Own the direction.** | Manifesto, closing band, growth portal |
 
@@ -89,7 +93,14 @@ Add to pages when you need more copy. Stay in this voice — don’t drift back 
 
 ## Wider than money — portals & full life
 
-**Strategy:** Lead with money punch (**Stop wondering where it went.**) — that’s the door.  
+**Connected story (use in this order):**  
+1. Slogan — *Stop wondering where it went.*  
+2. Decode once (L1 / Why / landing hero) — *Wondering what? All of it — money, life, energy, time.*  
+3. Vision — *Rumtelo — grip on life.*  
+4. Products — *Grip on your [money / growth / energy / why].*  
+5. Balance — *The Coach tips. You choose.*
+
+**Strategy:** Lead with the slogan (**Stop wondering where it went.**) — that’s the door.  
 Then widen on the site: money is the start; **energy, growth, and soul** complete the picture.  
 Don’t try to say everything in the hero. Say money hard → open the rest below.
 
@@ -127,6 +138,22 @@ Don’t try to say everything in the hero. Say money hard → open the rest belo
 
 ---
 
+## Practices (coaches & advisors)
+
+Same key, decoded for the people who help households. Use on the practice section, sales decks and practice emails, not in the household hero.
+
+| Line | Best use |
+|---|---|
+| **Stop wondering where your clients stand.** | Practice headline |
+| **Sessions on decisions — not on collecting numbers.** | Value line |
+| **The Coach tips between sessions. You guide the decisions.** | Resolves The Coach vs. human coach |
+| **Their board. Your view. Only with their yes.** | Consent / privacy |
+| **One desk. Every client.** | Caseload overview |
+
+See [product/practice.md](../product/practice.md).
+
+---
+
 ## Suggested roles (website)
 
 | Role | Line |
@@ -158,7 +185,8 @@ Don’t try to say everything in the hero. Say money hard → open the rest belo
 
 | EN | NL |
 |---|---|
-| Stop wondering where it went. | Stop met gissen waar het bleef. |
+| Stop wondering where it went. | Niet meer gissen waar het bleef. |
+| Rumtelo — grip on life. | Rumtelo — grip op je leven. |
 | Money leaves. You’ll know why. | Geld gaat. Jij weet waarom. |
 | No more mystery spending. | Geen mysterie-uitgaven meer. |
 | Assign it before you wonder where it went. | Wijs het toe vóór je gissen moet waar het bleef. |
@@ -178,6 +206,11 @@ Don’t try to say everything in the hero. Say money hard → open the rest belo
 | Assign the money. Protect the energy. Keep the why. | Wijs het geld toe. Bescherm de energie. Houd het waarom. |
 | Built for people who are doing well — and for people who are ready to. | Voor wie het goed doet — en voor wie er klaar voor is. |
 | Don’t chase the number. Own the direction. | Jaag niet op het getal. Kies de richting. |
+| Stop wondering where your clients stand. | Niet meer gissen waar je cliënten staan. |
+| Sessions on decisions — not on collecting numbers. | Sessies over keuzes — niet over cijfers verzamelen. |
+| The Coach tips between sessions. You guide the decisions. | De Coach tipt tussen de sessies. Jij begeleidt de keuzes. |
+| Their board. Your view. Only with their yes. | Hun bord. Jouw blik. Alleen met hun ja. |
+| One desk. Every client. | Eén bureau. Elke cliënt. |
 
 ---
 

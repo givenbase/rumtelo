@@ -196,6 +196,16 @@ export {
     subscribeHouseholdInvite,
     writeHouseholdInvite,
 } from './household-invite-intent';
+export {
+    DEFAULT_SIGN_UP_AUDIENCE,
+    SIGN_UP_AUDIENCES,
+    SIGN_UP_AUDIENCE_PARAM,
+    parseSignUpAudience,
+    signUpAudienceFromSearchParams,
+    signUpAudienceQuery,
+    signUpAudienceStartPath,
+    type SignUpAudience,
+} from './signup-audience';
 export { accountThemeFromCss, cssThemeFromAccount, type CssTheme } from './theme';
 export { formatIban, isValidIban, nlIbanBankCode, normalizeIban } from './iban';
 export { containsWord, findByName, findByNameOrAlias, namesMatch } from './text-match';

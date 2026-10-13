@@ -148,17 +148,17 @@ const dashboard = {
             income_month: 'INCOME THIS MONTH',
             income_span: 'INCOME OVER SPAN',
             inbox: 'INBOX',
-            tagline: 'Cutting costs has a floor; raising income does not.',
+            tagline: 'Grip on your growth — skills, goals, income if you want.',
         },
         energy: {
             trained: 'TRAINED THIS WEEK',
             sleep: 'SLEEP SCORE',
-            tagline: 'A tired mind spends; a rested mind directs.',
+            tagline: 'Grip on your energy — the floor under every decision.',
         },
         soul: {
             stillness: 'STILLNESS TODAY',
             why: 'WHY',
-            tagline: 'A calm mind directs money. A restless one spends it.',
+            tagline: 'Grip on your why — calm under the numbers.',
         },
     },
 } as const;

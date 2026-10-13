@@ -386,14 +386,34 @@ export const SEAT_ADDON_CATALOG = {
 } as const;
 
 /**
+ * Household retail per paid plan (eurocents, VAT included) — one source for the Stripe
+ * seed, the website pricing table and the practice client discount.
+ * Yearly = 10× monthly (2 months free).
+ */
+export const PLAN_RETAIL_CENTS = {
+    [PlanKey.PLUS]: { month: 900, year: 9000 },
+    [PlanKey.MAX]: { month: 1900, year: 19000 },
+} as const satisfies Partial<Record<PlanKey, { month: number; year: number }>>;
+
+/**
  * Practice B2B pricing (eurocents / month).
  * Base covers the org; staff + client seats meter every added account.
- * Client seat sits above Plus retail so MANAGE sponsorship still has margin.
  * VIEW links are not metered (free Basic look-along).
  */
 export const PRACTICE_BASE_UNIT_CENTS = 4900;
 export const PRACTICE_STAFF_SEAT_UNIT_CENTS = SEAT_ADDON_UNIT_CENTS;
-export const PRACTICE_CLIENT_SEAT_UNIT_CENTS = 1400;
+
+/**
+ * Discount on a sponsored Plus seat (MANAGE client), in percent of Plus monthly retail.
+ * 25% is the smallest round step that lands below BOTH Plus monthly (€9) and Plus yearly
+ * per month (€7.50): sponsoring through a practice always beats the client buying Plus
+ * alone, while each seat keeps margin — the €49 base already covers the practice's own
+ * overhead, and the practice brings and keeps the client. Guarded in stripe-plans.config.spec.
+ */
+export const PRACTICE_CLIENT_DISCOUNT_PCT = 25;
+export const PRACTICE_CLIENT_SEAT_UNIT_CENTS = Math.round(
+    (PLAN_RETAIL_CENTS[PlanKey.PLUS].month * (100 - PRACTICE_CLIENT_DISCOUNT_PCT)) / 100
+);
 
 export const PRACTICE_PRICING_CATALOG = {
     base: {

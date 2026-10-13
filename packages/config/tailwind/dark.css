@@ -84,6 +84,13 @@
             rgb(46 174 170 / 0.14),
             transparent 72%
         );
+        /* Re-declared so a nested dark surface (e.g. the Max plan card) resolves its own teal. */
+        --gradient-accent: linear-gradient(
+            135deg,
+            #27a19a 0%,
+            var(--color-accent) 58%,
+            var(--color-accent-press) 100%
+        );
     }
 }
 

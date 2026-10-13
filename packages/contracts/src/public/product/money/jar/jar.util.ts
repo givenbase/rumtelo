@@ -16,6 +16,28 @@ export const DEFAULT_JAR_SPLIT: Record<JarKey, number> = {
     [JarKey.GIVE]: 5,
 };
 
+/**
+ * Soft ceilings — going above these triggers a coach tip (defaults are the floor for FF/LTS).
+ * Shared by the in-app split coach and the server money coach so both speak at the same %.
+ */
+export const SPLIT_SOFT_CEILING: Record<JarKey, number> = {
+    [JarKey.NECESSITIES]: 60,
+    [JarKey.FINANCIAL_FREEDOM]: 100,
+    [JarKey.LONG_TERM_SAVINGS]: 100,
+    [JarKey.EDUCATION]: 12,
+    [JarKey.PLAY]: 10,
+    [JarKey.GIVE]: 5,
+};
+
+export const SPLIT_SOFT_FLOOR: Record<JarKey, number> = {
+    [JarKey.NECESSITIES]: 45,
+    [JarKey.FINANCIAL_FREEDOM]: 10,
+    [JarKey.LONG_TERM_SAVINGS]: 10,
+    [JarKey.EDUCATION]: 0,
+    [JarKey.PLAY]: 0,
+    [JarKey.GIVE]: 0,
+};
+
 const SPEND: JarCapabilities = {
     canSpend: true,
     canSave: false,

@@ -18,6 +18,8 @@ const practice = {
     switcher: {
         open_practice: 'Open Practice',
         go_to_practice: 'Go to Practice',
+        start_practice: 'Start a practice',
+        start_practice_sub: 'For coaches and advisors who help clients',
     },
     menu: {
         settings: 'Practice settings',
@@ -47,7 +49,7 @@ const practice = {
         attention_pending: 'Invitation pending',
         attention_view_all: 'All clients',
         open_client: 'Open',
-        health_managed: 'Sponsored — full coaching access',
+        health_managed: 'Sponsored — on Plus',
         health_view: 'View only — invitation accepted',
         health_pending: 'Invitation pending',
         empty_prefix: 'Empty roster',
@@ -72,7 +74,9 @@ const practice = {
         access_view_body: 'Look along on their board — read-only. No sponsorship fee.',
         access_view_badge: 'Free',
         access_manage_title: 'Manage',
-        access_manage_body: 'Coach with full tools. After they accept, you sponsor Plus for them.',
+        /** Manage is read-only in code today — keep “coming next” until write access ships. */
+        access_manage_body:
+            'You sponsor their Plus plan after they accept. Today you see their board read-only; editing their plan with them is coming next.',
         access_manage_badge: 'Sponsored',
         access_view: 'View — send invitation (free)',
         access_manage: 'Manage — invite to sponsor Plus (after they accept)',
@@ -115,7 +119,8 @@ const practice = {
         progress_eyebrow: 'Portal snapshot',
         progress_blurb: 'Live money, growth, energy, and soul metrics for this household.',
         progress_pending: 'Waiting for the household to accept the invitation.',
-        progress_view_only: 'View access — invite accepted. Upgrade to Manage for coaching tools.',
+        progress_view_only:
+            'View access — invite accepted. Switch to Manage to sponsor their Plus plan.',
         portal_money: 'Money',
         portal_growth: 'Growth',
         portal_energy: 'Energy',

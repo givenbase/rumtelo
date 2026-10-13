@@ -1,52 +1,52 @@
-/** In-app Why manifesto — slogan decode and portal widen. */
+/** In-app Why manifesto — L1 grip on life + L2 each product (align with docs/explain/). */
 const why = {
     title: 'Why',
     eyebrow: '✦ Why Rumtelo',
-    stand_on: 'The line we stand on',
-    lead: 'That is not a clever phrase. It is the problem we refuse to leave unsolved — mystery spending, foggy paychecks, and the quiet stress of not knowing. We end the mystery. Then we widen the picture.',
-    meaning_eyebrow: '✦ What we mean',
+    stand_on: 'What we stand on',
+    lead: 'Wondering what? All of it — your money, your life, your energy, your time. Rumtelo helps you see where it went, so nothing stays a mystery. From there you get grip again: control over what matters. Clear tools for that, and we’ll keep adding more. The Coach can give a tip. You choose what to do next.',
+    meaning_eyebrow: '✦ How Rumtelo helps you',
     meaning: {
         money_leaves_body:
-            'Not a spreadsheet after the fact. When an amount leaves, you see the jar it came from — so “where did it go?” has an answer.',
+            'When money leaves, you see which jar it came from — and how much is left for that job. Not a spreadsheet after the fact.',
         assign: {
-            line: 'Assign it before you wonder where it went.',
-            body: 'Income lands and gets a job across six jars the same second. Split first. Spend second. Money with a job does not need defending all month.',
+            line: 'Give money a job before you spend it.',
+            body: 'Income comes in and goes into six jars. Split first. Spend second. Rumtelo never moves money at your bank — you do. We show the overview.',
         },
         direction: {
-            body: 'Looking back without a direction is only half the picture. Goals, debt payoff, and Financial Freedom point the next paycheck forward.',
+            body: 'Looking back is only half the story. Growth helps you move forward — skills, goals, learning, and income if you want.',
         },
     },
-    wider_eyebrow: '✦ Bigger than the balance',
+    wider_eyebrow: '✦ Products. One idea: grip on life.',
     wider_lead_full:
-        'Money is the door. Energy, growth, and soul complete the overview — so you stop wondering where it went, what you’re running on, and why it matters.',
+        'Open a product when you want that tool. Today you can use Money, Growth, Energy, and Soul — and more will come. The Coach gives a tip. You decide.',
     wider_lead_core:
-        'Money is the door. Growth completes the overview — so you stop wondering where it went and where the next paycheck is going.',
+        'Open a product when you want that tool. Money and Growth are ready today — more will come. The Coach gives a tip. You decide.',
     portals: {
         money: {
-            line: 'Money gets a job.',
-            body: 'Six jars. One calm overview. Fixed costs, inbox, net worth, and the week check keep the picture current.',
+            line: 'Grip on your money.',
+            body: 'Six jars. Income, bills, what’s left. You enter what comes in and goes out. Rumtelo shows the plan — not a budget app that only counts afterwards.',
         },
         growth: {
-            line: 'Ambition with a plan — not a guess.',
-            body: 'Income, goals, and learning so “earn more” has a map, not a vibe.',
+            line: 'Grip on your growth.',
+            body: 'Skills, goals, learning — and income, if you want. Money can be one path. The point is that you move forward.',
         },
         energy: {
-            line: 'A tired head spends. A rested head decides.',
-            body: 'Sleep, training, food — the floor under every money choice. Life leaks too, not only the balance.',
+            line: 'Grip on your energy.',
+            body: 'Sleep, hours, training, food — things you can see and change. When you’re tired, money choices get harder. When you’re rested, you decide better.',
         },
         soul: {
-            line: 'Know the why — not only the spend.',
-            body: 'Intention and stillness so the plan survives a hard week. Direction, not only discipline.',
+            line: 'Grip on your why.',
+            body: 'A quiet minute, gratitude, an intention, giving — small habits that keep you clear when life gets hard.',
         },
     },
-    closing_title: 'Don’t chase the number. Own the direction.',
+    closing_title: 'You stay in control.',
     closing_body:
-        'Built for people who are doing well — and for people who are ready to. Six jars. One calm overview. Information, never shame: a jar over its line is a signal with a next move, not a verdict on who you are.',
-    cta_jars: 'Open the jars',
-    cta_week_check: 'Weekly check',
+        'See where it went. Get grip again. New here or already on your way: clear tools, tips you can act on. Information, never shame — spent more than planned is a signal to adjust, not a judgment on you.',
+    cta_jars: 'View my jars',
+    cta_week_check: 'Week check',
     /** One-line Coach whisper above page content — keyed by route slug, not path. */
     routes: {
-        home: 'One look, one question: do I have the reins this month?',
+        home: 'One look: where did it go this month — and do you have grip again?',
         money_jars:
             'This month, divided before it starts. Money with a job never has to be defended.',
         money_transactions:
@@ -78,7 +78,7 @@ const why = {
         energy_food: 'Food is fuel for the week your jars divide. Fuel is bought, not willed.',
         money_week_check:
             'Ten minutes a week — look, redirect, set intention. Beats worrying every day.',
-        why: 'Stop wondering where it went — what that line means, and how the four portals keep the picture clear.',
+        why: 'Rumtelo — grip on life. Clear tools that help you stay in control — product by product.',
     },
 } as const;
 

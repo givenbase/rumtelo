@@ -22,6 +22,11 @@ const tour = {
             'Why-lines and jar cards from The Coach (✦ The Coach). Same as Settings → Preferences. On by default for beginners.',
         helpers_on: 'On',
         helpers_off: 'Off',
+        videos_eyebrow: 'Explain videos',
+        video_watch: 'Watch',
+        video_level_general: 'What is Rumtelo?',
+        video_level_product: 'This product',
+        video_level_feature: 'This feature',
         settings: {
             eyebrow: 'Guided tour',
             blurb: 'Walk through nav, jars, fixed costs, and income again anytime.',
@@ -35,6 +40,41 @@ const tour = {
             last: 'Done',
             next: 'Next',
             skip: 'Skip',
+        },
+    },
+    /** Explain ladder — L1 general, L2 product, L3 feature. Empty URL hides the slot in Help until the video ships. */
+    explain: {
+        general: {
+            title: 'What is Rumtelo?',
+            url: '',
+        },
+        money: {
+            title: 'Money — six jars',
+            url: '',
+        },
+        growth: {
+            title: 'Growth — grow in more than one direction',
+            url: '',
+        },
+        energy: {
+            title: 'Energy — capacity',
+            url: '',
+        },
+        soul: {
+            title: 'Soul — the why',
+            url: '',
+        },
+        jars: {
+            title: 'Jars — how the split works',
+            url: '',
+        },
+        fixed: {
+            title: 'Fixed costs — Planned to Paid',
+            url: '',
+        },
+        income: {
+            title: 'Income — paycheck in',
+            url: '',
         },
     },
     pages: {
@@ -123,6 +163,10 @@ const tour = {
                     heading: 'How jars use this',
                     body: 'Fixed OUT reduces available in that jar. Income is split by percentage into jars when money arrives — this screen is the plan, not the ledger.',
                 },
+                mark_paid: {
+                    heading: 'Planned → Paid',
+                    body: 'Each bill shows Planned or Due for this period. Tap the status chip, then confirm, to mark it Paid. Rumtelo tracks the plan — you pay at the bank.',
+                },
             },
             steps: {
                 tabs: {
@@ -135,30 +179,40 @@ const tour = {
                     content:
                         'Out: fixed costs by jar. In: pay that funds the split. Tap a row to edit.',
                 },
+                status: {
+                    title: 'Mark paid',
+                    content:
+                        'See Planned or Due on a bill? Tap that chip, then confirm — it becomes Paid for this period.',
+                },
             },
         },
         jars: {
-            title: 'Jars',
+            title: 'My money jars',
             sections: {
                 what_for: {
-                    heading: 'What this is for',
-                    body: 'Six jars hold your monthly money by purpose. Percentages must add to 100%. What you set aside, other spends, and fixed costs decide what is still left.',
+                    heading: 'What the jars are for',
+                    body: 'Six jars give your income a destination. Each jar has a job and a set percentage. Together the percentages are 100% of your income.',
                 },
                 how: {
                     heading: 'How it works',
-                    body: 'Left this month = set aside − other spends − fixed costs on that jar. Overspent means bills and spends already ate the envelope. To ask what a raise would do to these jars, use the simulator on Growth → Income.',
+                    body: 'You enter income yourself. From your fixed percentages you see how much belongs in each jar — what you can spend or set aside for that purpose. The jars help you plan. Rumtelo never moves money: you make the split on your own bank account(s).',
                 },
             },
             steps: {
-                toolbar: {
-                    title: 'Add · Move',
-                    content:
-                        'Log a transaction in or out, or move money between jars when a month needs it.',
-                },
                 list: {
                     title: 'Your six jars',
                     content:
-                        'Each row is a job for money. Tap for fixed costs, spends, and what’s left.',
+                        'Each row is one job for money. Tap a jar for fixed costs, spends, and what’s left this month.',
+                },
+                toolbar: {
+                    title: 'Add · Move',
+                    content:
+                        'Log a transaction in or out, or move money between jars when a month needs it. Bank transfers stay at your bank.',
+                },
+                bank: {
+                    title: 'You move the money',
+                    content:
+                        'Rumtelo tracks the picture. Using savings pots or sub-accounts? You move the money at your bank — Rumtelo never moves money for you.',
                 },
             },
         },

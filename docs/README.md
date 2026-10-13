@@ -9,8 +9,10 @@ Start here to understand the whole project — product direction, brand, researc
 | [product/overview.md](./product/overview.md) | What Rumtelo is, the loop, four portals |
 | [product/principles.md](./product/principles.md) | Non-negotiable product principles |
 | [product/audience.md](./product/audience.md) | Who we build for |
+| [product/practice.md](./product/practice.md) | Rumtelo for practices — who, what it does today, pricing, pitch, gaps |
 | [brand/positioning.md](./brand/positioning.md) | Name, voice, visual direction |
 | [brand/quotes.md](./brand/quotes.md) | Approved slogans & quote bank |
+| [explain/README.md](./explain/README.md) | AI-avatar scripts — L1 Rumtelo → L2 products → L3 features |
 | [research/money-awareness.md](./research/money-awareness.md) | Why people lose the money picture — and what we solve |
 | [engineering/architecture.md](./engineering/architecture.md) | Stack, layout, hierarchy, conventions |
 | [engineering/household-taxonomy.md](./engineering/household-taxonomy.md) | HouseholdRole × HouseholdRelation (per seat) |
@@ -31,7 +33,7 @@ Start here to understand the whole project — product direction, brand, researc
 
 ## Read order (new to the project)
 
-1. **Product** — [overview](./product/overview.md) → [audience](./product/audience.md) → [principles](./product/principles.md)
+1. **Product** — [overview](./product/overview.md) → [audience](./product/audience.md) → [practices](./product/practice.md) → [principles](./product/principles.md)
 2. **Why it exists** — [research brief](./research/money-awareness.md)
 3. **How we sound** — [brand positioning](./brand/positioning.md) → [quotes](./brand/quotes.md)
 4. **How it’s built** — [architecture](./engineering/architecture.md)
@@ -42,4 +44,4 @@ Start here to understand the whole project — product direction, brand, researc
 
 ## One-line north star
 
-**Stop wondering where it went.** Money gets a job. Six jars. One calm overview.
+**Stop wondering where it went.** Rumtelo — grip on life. Money · Growth · Energy · Soul — tools for that grip.

@@ -1,17 +1,44 @@
 'use client';
 
-import { PLAN_LIMITS, PlanKey } from '@rumtelo/contracts';
-import { useTranslations } from '@rumtelo/i18n';
+import {
+    PLAN_LIMITS,
+    PRACTICE_BASE_UNIT_CENTS,
+    PRACTICE_CLIENT_SEAT_UNIT_CENTS,
+    PRACTICE_STAFF_SEAT_UNIT_CENTS,
+    PlanKey,
+} from '@rumtelo/contracts';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Typography } from '@rumtelo/ui';
-import { cn } from '@rumtelo/utils';
+import { cn, formatPlanPrice } from '@rumtelo/utils';
+
+import { isProductLive } from '@/lib/launch-products';
 
 import { CARD, SectionHeading } from './landing-primitives';
 
-const FAQ_KEYS = ['budgeting', 'bank', 'sleep', 'coach', 'partner', 'data', 'language'] as const;
+const FAQ_KEYS = [
+    'budgeting',
+    'bank',
+    'sleep',
+    'coach',
+    'partner',
+    'practice',
+    'data',
+    'language',
+] as const;
+
+/** Questions that only make sense while their product is live. */
+const FAQ_PRODUCT: Partial<Record<(typeof FAQ_KEYS)[number], string>> = { sleep: 'energy' };
+
+const LIVE_FAQ_KEYS = FAQ_KEYS.filter(key => {
+    const product = FAQ_PRODUCT[key];
+    return !product || isProductLive(product);
+});
 
 /** Native <details> — no client JS, keyboard-accessible, indexable. */
 export function LandingFaq() {
     const t = useTranslations('pages.landing');
+    const locale = useLocale();
+    const price = (cents: number) => formatPlanPrice(cents, { locale });
 
     return (
         <section id="faq" className="border-t border-line bg-bg-app">
@@ -24,7 +51,7 @@ export function LandingFaq() {
                     />
 
                     <div className="grid gap-2.5">
-                        {FAQ_KEYS.map((key, index) => (
+                        {LIVE_FAQ_KEYS.map((key, index) => (
                             <details
                                 key={key}
                                 open={index === 0}
@@ -46,6 +73,9 @@ export function LandingFaq() {
                                     className="border-t border-line px-5 py-4 text-pretty">
                                     {t(`faq.${key}.answer`, {
                                         maxMembers: PLAN_LIMITS[PlanKey.PLUS].maxMembers ?? 0,
+                                        basePrice: price(PRACTICE_BASE_UNIT_CENTS),
+                                        staffPrice: price(PRACTICE_STAFF_SEAT_UNIT_CENTS),
+                                        clientPrice: price(PRACTICE_CLIENT_SEAT_UNIT_CENTS),
                                     })}
                                 </Typography>
                             </details>

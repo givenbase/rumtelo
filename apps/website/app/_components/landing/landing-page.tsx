@@ -23,8 +23,8 @@ import { LandingWhy } from './landing-why';
  *   hero gradient · portals plain · jars tinted · coach plain · PRINCIPLES DARK
  *   · why tinted · pricing plain · faq tinted · signup plain · footer tinted
  *
- * Cut on purpose (hero already names the problem; Why already carries the founders):
- *   Problem, Loop, Proof.
+ * Cut on purpose (hero already decodes the slogan; Why carries the founders):
+ *   Problem, Loop — proof strip stays light (no product list in the hero).
  */
 export function LandingPage() {
     const rootRef = useRef<HTMLDivElement>(null);

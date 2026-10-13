@@ -14,7 +14,14 @@ import { useOptionalPlanIntent } from '@/app/_components/plan-intent-provider';
 import { useOptionalPracticeInvite } from '@/app/_components/practice-invite-provider';
 import { useOptionalSignUpDraft } from '@/app/_components/sign-up-draft-provider';
 import { useApiErrorMessage } from '@/app/_lib/api-error-messages';
-import { householdInviteQuery, planIntentQuery, practiceInviteQuery } from '@rumtelo/utils';
+import {
+    householdInviteQuery,
+    planIntentQuery,
+    practiceInviteQuery,
+    signUpAudienceFromSearchParams,
+    signUpAudienceQuery,
+    signUpAudienceStartPath,
+} from '@rumtelo/utils';
 
 const RESEND_COOLDOWN_SEC = 60;
 
@@ -37,11 +44,16 @@ export function VerifyPanel() {
     const status = searchParams.get('status');
     const confirmed = status === 'confirmed' || status === 'ok';
     const householdInviteId = householdInvite?.invitationId ?? null;
+    const audience = signUpAudienceFromSearchParams(searchParams);
+    // Household invite wins; otherwise a practice sign-up lands on its desk, not household onboarding.
+    const redirectTo = householdInviteId
+        ? `/invite/${householdInviteId}`
+        : signUpAudienceStartPath(audience);
     const continueQuery = {
-        ...planIntentQuery(planIntent?.intent ?? null),
+        ...planIntentQuery(audience === 'practice' ? null : (planIntent?.intent ?? null)),
         ...practiceInviteQuery(practiceInvite?.token ?? null),
         ...householdInviteQuery(householdInviteId),
-        ...(householdInviteId ? { redirectTo: `/invite/${householdInviteId}` } : {}),
+        ...(redirectTo ? { redirectTo } : {}),
     };
     const [apiError, setApiError] = useState<string | null>(null);
     const [sent, setSent] = useState(false);
@@ -61,7 +73,10 @@ export function VerifyPanel() {
 
         const result = await sendVerificationEmail({
             email: lockedEmail,
-            callbackURL: '/verify?status=confirmed',
+            callbackURL: `/verify?${new URLSearchParams({
+                status: 'confirmed',
+                ...signUpAudienceQuery(audience),
+            }).toString()}`,
         });
 
         setBusy(false);

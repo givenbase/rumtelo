@@ -165,10 +165,10 @@ export const COACH_FEATURES: readonly CoachFeature[] = [
     },
     {
         id: CoachFeatureId.MONEY_TIP_PRODUCERS,
-        status: CoachFeatureStatus.BACKLOG,
+        status: CoachFeatureStatus.SHIP,
         title: 'Money inbox tip producers',
-        where: 'CoachService.registerRefresher',
-        gaps: ['No money domain refresher yet'],
+        where: 'MoneyCoachService → CoachService.registerRefresher',
+        gaps: [],
     },
     {
         id: CoachFeatureId.GROWTH_TIP_PRODUCERS,

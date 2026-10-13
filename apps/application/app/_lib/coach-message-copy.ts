@@ -1,5 +1,5 @@
 import type { CoachMessage } from '@rumtelo/contracts';
-import { TIME_COACH_KEY_PREFIX } from '@rumtelo/contracts';
+import { MONEY_COACH_KEY_PREFIX, TIME_COACH_KEY_PREFIX } from '@rumtelo/contracts';
 import type { TranslateFn } from '@rumtelo/i18n';
 
 import { formatMinutes } from '@/app/_lib/time-meta';
@@ -8,12 +8,23 @@ type CoachCopySource = Pick<CoachMessage, 'key' | 'text' | 'ctaLabel'>;
 
 type TranslateCoach = (key: string, values?: Record<string, string | number | Date>) => string;
 
-function parseTimeCoachKey(key: string): { rule: string; parts: string[] } | null {
-    if (!key.startsWith(TIME_COACH_KEY_PREFIX)) return null;
-    const rest = key.slice(TIME_COACH_KEY_PREFIX.length);
+function parsePrefixedCoachKey(
+    key: string,
+    prefix: string
+): { rule: string; parts: string[] } | null {
+    if (!key.startsWith(prefix)) return null;
+    const rest = key.slice(prefix.length);
     const [rule, ...parts] = rest.split(':');
     if (!rule) return null;
     return { rule, parts };
+}
+
+function parseTimeCoachKey(key: string): { rule: string; parts: string[] } | null {
+    return parsePrefixedCoachKey(key, TIME_COACH_KEY_PREFIX);
+}
+
+function parseMoneyCoachKey(key: string): { rule: string; parts: string[] } | null {
+    return parsePrefixedCoachKey(key, MONEY_COACH_KEY_PREFIX);
 }
 
 function numberAt(parts: string[], index: number): number | null {
@@ -29,6 +40,12 @@ export function resolveCoachMessage(
     tDuration?: TranslateFn
 ): { text: string; ctaLabel: string | null } {
     const formatTime = (minutes: number) => formatMinutes(minutes, tDuration);
+    const moneyParsed = message.key ? parseMoneyCoachKey(message.key) : null;
+    if (moneyParsed) {
+        const localized = resolveMoneyCoachMessage(moneyParsed.rule, moneyParsed.parts, t);
+        if (localized.text) return localized;
+        return { text: message.text, ctaLabel: message.ctaLabel };
+    }
     const parsed = message.key ? parseTimeCoachKey(message.key) : null;
     if (!parsed) {
         return { text: message.text, ctaLabel: message.ctaLabel };
@@ -132,6 +149,41 @@ export function resolveCoachMessage(
             };
         default:
             return { text: message.text, ctaLabel: message.ctaLabel };
+    }
+}
+
+function resolveMoneyCoachMessage(
+    rule: string,
+    parts: string[],
+    t: TranslateCoach
+): { text: string; ctaLabel: string | null } {
+    switch (rule) {
+        case 'due_bills': {
+            const count = numberAt(parts, 1) ?? numberAt(parts, 0) ?? 0;
+            return {
+                text:
+                    count === 1
+                        ? t('money_coach.due_bills.text_one')
+                        : t('money_coach.due_bills.text_other', { count }),
+                ctaLabel: t('money_coach.due_bills.cta'),
+            };
+        }
+        case 'inbox_unsorted': {
+            const count = numberAt(parts, 1) ?? numberAt(parts, 0) ?? 0;
+            return {
+                text: t('money_coach.inbox_unsorted.text', { count }),
+                ctaLabel: t('money_coach.inbox_unsorted.cta'),
+            };
+        }
+        case 'necessities_share': {
+            const pct = numberAt(parts, 1) ?? numberAt(parts, 0) ?? 0;
+            return {
+                text: t('money_coach.necessities_share.text', { pct }),
+                ctaLabel: t('money_coach.necessities_share.cta'),
+            };
+        }
+        default:
+            return { text: '', ctaLabel: null };
     }
 }
 

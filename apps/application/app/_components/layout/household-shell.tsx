@@ -88,16 +88,39 @@ const SUBNAV_TINT: Record<string, string> = {
 // ── Practice menu link ────────────────────────────────────────────────────────
 
 /**
- * Small "Go to Practice" link shown in the user menu when the user has at least one practice.
- * Fetches the practice list silently — renders nothing while loading or when empty.
+ * User-menu entry to the practice desk: "Go to Practice" when the user has one,
+ * otherwise "Start a practice" (viewers get "Start something of my own" instead).
+ * Fetches the practice list silently — renders nothing while loading.
  */
-function PracticeMenuLink({ onClose }: { onClose: () => void }) {
+function PracticeMenuLink({ onClose, offerStart }: { onClose: () => void; offerStart: boolean }) {
     const t = useTranslations();
     const { exitPreview } = usePracticePreview();
     const practiceListQuery = useLiveQuery(apiQuery.practice.list.queryOptions(), [], true);
     const hasPractice = (practiceListQuery.data?.length ?? 0) > 0;
 
-    if (!hasPractice) return null;
+    if (!hasPractice) {
+        if (!offerStart || !practiceListQuery.isSuccess) return null;
+        return (
+            <div className="border-b border-line px-2 pt-1 pb-2">
+                <Link
+                    href={practicePath('create')}
+                    onClick={onClose}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-raised">
+                    <span className="grid size-6 shrink-0 place-items-center rounded-md border border-accent/40 bg-accent-soft font-mono text-[10px] font-bold text-accent">
+                        P
+                    </span>
+                    <span className="grid gap-0.5">
+                        <span className="text-sm text-fg">
+                            {t('pages.practice.switcher.start_practice')}
+                        </span>
+                        <span className="text-xs leading-tight text-fg-faint">
+                            {t('pages.practice.switcher.start_practice_sub')}
+                        </span>
+                    </span>
+                </Link>
+            </div>
+        );
+    }
 
     return (
         <div className="border-b border-line px-2 pt-1 pb-2">
@@ -469,8 +492,11 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                                             </button>
                                         </div>
 
-                                        {/* Practice switcher — shows when user has a practice */}
-                                        <PracticeMenuLink onClose={() => setMenuOpen(false)} />
+                                        {/* Practice switcher — open the desk, or start one */}
+                                        <PracticeMenuLink
+                                            onClose={() => setMenuOpen(false)}
+                                            offerStart={!isViewer}
+                                        />
 
                                         {isViewer ? (
                                             <div className="grid gap-0.5 border-b border-line p-2">

@@ -25,6 +25,7 @@ const auth = {
     sign_up: {
         title: 'Create your account',
         subtitle: 'Six jars. One calm overview.',
+        subtitle_practice: 'One desk for every client.',
         submit: 'Create account',
         have_account: 'Already have an account?',
         password_hint: 'At least {count} characters',
@@ -32,6 +33,13 @@ const auth = {
             'You chose {plan} ({interval}). After setup we’ll take you to Stripe to add payment and finish the upgrade.',
         plan_yearly: 'yearly',
         plan_monthly: 'monthly',
+        /** Sign-up direction — pre-picked from the pricing tab (`?as=`). */
+        audience_label: 'I’m signing up as',
+        audience_individual: 'Individual or household',
+        audience_individual_hint: 'Your own money, growth, energy and soul',
+        audience_practice: 'Practice',
+        audience_practice_hint: 'A coach or advisor helping clients',
+        practice_note: 'After you confirm your email, you’ll set up your practice desk.',
         middle_name: 'Middle name',
         birthday: 'Birthday',
     },

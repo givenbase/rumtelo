@@ -18,11 +18,19 @@ export type PageTourStep = {
 /** Stable id for progress tracking (account settings). */
 export type PageTourId = 'shell' | 'income' | 'fixed' | 'jars';
 
+/** Explain ladder slot — L1 general / L2 product / L3 feature. Empty url = hidden until recorded. */
+export type PageHelpVideo = {
+    level: 'general' | 'product' | 'feature';
+    title: string;
+    url: string;
+};
+
 export type PageHelpContent = {
     title: string;
     sections: PageHelpSection[];
     tourId?: PageTourId;
     tourSteps?: PageTourStep[];
+    videos?: PageHelpVideo[];
 };
 
 export type FullTourChapter = {

@@ -18,8 +18,10 @@ export { CoachKind } from '../enums';
  * Rule identity for producers. Dismissals stick per key; a later refresh
  * updates the text or retracts the row when the rule no longer applies.
  * Time-week rules use {@link TIME_COACH_KEY_PREFIX}.
+ * Money tips use {@link MONEY_COACH_KEY_PREFIX}.
  */
 export const TIME_COACH_KEY_PREFIX = 'energy.time.';
+export const MONEY_COACH_KEY_PREFIX = 'money.';
 
 export const CoachMessage = z.object({
     id: Id,
