@@ -8,6 +8,7 @@
  */
 
 import type { PracticeClientAccess } from '@rumtelo/contracts';
+import { sessionStorageUtil, storageKey } from '@rumtelo/utils';
 
 import { PRACTICE } from '@/app/_lib/routes';
 
@@ -19,24 +20,23 @@ export type PracticePreviewSession = {
     access: PracticeClientAccess | string;
 };
 
-const STORAGE_KEY = 'rumtelo.practicePreview';
+const STORAGE_KEY = storageKey('practice', 'preview');
 
 let preview: PracticePreviewSession | null = null;
 /** While set, PracticeShell must not wipe a freshly entered preview (open-board race). */
 let suppressClearUntilMs = 0;
 const listeners = new Set<() => void>();
 
+function parsePreview(value: unknown): PracticePreviewSession | null {
+    if (!value || typeof value !== 'object') return null;
+    const parsed = value as PracticePreviewSession;
+    if (!parsed?.practiceId || !parsed?.householdId) return null;
+    return parsed;
+}
+
 function readStored(): PracticePreviewSession | null {
     if (typeof window === 'undefined') return null;
-    try {
-        const raw = sessionStorage.getItem(STORAGE_KEY);
-        if (!raw) return null;
-        const parsed = JSON.parse(raw) as PracticePreviewSession;
-        if (!parsed?.practiceId || !parsed?.householdId) return null;
-        return parsed;
-    } catch {
-        return null;
-    }
+    return parsePreview(sessionStorageUtil.getItem<PracticePreviewSession>(STORAGE_KEY));
 }
 
 function emit() {
@@ -83,8 +83,8 @@ export function setPracticePreview(next: PracticePreviewSession | null): void {
         suppressClearUntilMs = 0;
     }
     if (typeof window !== 'undefined') {
-        if (next) sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-        else sessionStorage.removeItem(STORAGE_KEY);
+        if (next) sessionStorageUtil.setItem(STORAGE_KEY, next, { expiryDays: null });
+        else sessionStorageUtil.removeItem(STORAGE_KEY);
     }
     emit();
 }
@@ -97,7 +97,7 @@ export function forceClearPracticePreview(): void {
     suppressClearUntilMs = 0;
     preview = null;
     if (typeof window !== 'undefined') {
-        sessionStorage.removeItem(STORAGE_KEY);
+        sessionStorageUtil.removeItem(STORAGE_KEY);
     }
     emit();
 }

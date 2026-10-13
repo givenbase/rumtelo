@@ -6,9 +6,10 @@
  */
 
 import { resolveCrossSubdomainCookieDomain } from './better-auth-domains';
+import { sessionStorageUtil, storageKey } from './local-storage-util';
 
 export const HOUSEHOLD_INVITE_COOKIE = 'rumtelo_household_invite';
-export const HOUSEHOLD_INVITE_STORAGE_KEY = 'rumtelo.householdInvite';
+export const HOUSEHOLD_INVITE_STORAGE_KEY = storageKey('intent', 'household-invite');
 export const HOUSEHOLD_INVITE_CHANGE_EVENT = 'rumtelo:household-invite';
 
 const ID_RE = /^[0-9a-f-]{8,80}$/i;
@@ -45,11 +46,13 @@ export function householdInvitePath(invitationId: string): string {
     return `/invite/${invitationId}`;
 }
 
+function readHouseholdInviteFromSession(): string | null {
+    return parseHouseholdInviteId(sessionStorageUtil.getItem<string>(HOUSEHOLD_INVITE_STORAGE_KEY));
+}
+
 export function readHouseholdInviteFromDocument(): string | null {
     if (typeof window === 'undefined') return null;
-    const fromStorage = parseHouseholdInviteId(
-        window.sessionStorage.getItem(HOUSEHOLD_INVITE_STORAGE_KEY)
-    );
+    const fromStorage = readHouseholdInviteFromSession();
     if (fromStorage) return fromStorage;
 
     const match = document.cookie
@@ -95,7 +98,7 @@ export function writeHouseholdInvite(
     }
 
     const value = invitationId.trim();
-    window.sessionStorage.setItem(HOUSEHOLD_INVITE_STORAGE_KEY, value);
+    sessionStorageUtil.setItem(HOUSEHOLD_INVITE_STORAGE_KEY, value, { expiryDays: null });
 
     const maxAge = options?.maxAgeSec ?? 60 * 60 * 24 * 14;
     const domain = resolveCrossSubdomainCookieDomain(...(options?.domainUrls ?? []));
@@ -113,7 +116,7 @@ export function writeHouseholdInvite(
 
 export function clearHouseholdInvite(options?: { domainUrls?: (string | undefined)[] }): void {
     if (typeof window === 'undefined') return;
-    window.sessionStorage.removeItem(HOUSEHOLD_INVITE_STORAGE_KEY);
+    sessionStorageUtil.removeItem(HOUSEHOLD_INVITE_STORAGE_KEY);
 
     const domain = resolveCrossSubdomainCookieDomain(...(options?.domainUrls ?? []));
     const parts = [`${HOUSEHOLD_INVITE_COOKIE}=`, 'Path=/', 'Max-Age=0', 'SameSite=Lax'];

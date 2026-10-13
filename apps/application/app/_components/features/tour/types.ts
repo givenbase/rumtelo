@@ -15,7 +15,7 @@ export type PageTourStep = {
     content: string;
 };
 
-/** Stable id for progress tracking (localStorage). */
+/** Stable id for progress tracking (account settings). */
 export type PageTourId = 'shell' | 'income' | 'fixed' | 'jars';
 
 export type PageHelpContent = {

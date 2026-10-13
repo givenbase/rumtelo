@@ -3,7 +3,9 @@
  * Shared across Help, Settings → Account, and page surfaces.
  */
 
-export const HELPERS_STORAGE_KEY = 'rumtelo:helpers-enabled';
+import { localStorageUtil, storageKey } from '@rumtelo/utils';
+
+export const HELPERS_STORAGE_KEY = storageKey('helpers', 'enabled');
 export const HELPERS_CHANGE_EVENT = 'rumtelo:helpers-change';
 
 /** Default on so first-time users see guides; Help/Settings can turn off. */
@@ -11,23 +13,14 @@ export const HELPERS_DEFAULT_ENABLED = true;
 
 export function readHelpersEnabled(): boolean {
     if (typeof window === 'undefined') return HELPERS_DEFAULT_ENABLED;
-    try {
-        const raw = window.localStorage.getItem(HELPERS_STORAGE_KEY);
-        if (raw === null) return HELPERS_DEFAULT_ENABLED;
-        return raw === '1' || raw === 'true';
-    } catch {
-        return HELPERS_DEFAULT_ENABLED;
-    }
+    const stored = localStorageUtil.getItem<boolean>(HELPERS_STORAGE_KEY);
+    if (stored !== null) return stored;
+    return HELPERS_DEFAULT_ENABLED;
 }
 
 export function writeHelpersEnabled(enabled: boolean): void {
     if (typeof window === 'undefined') return;
-    try {
-        window.localStorage.setItem(HELPERS_STORAGE_KEY, enabled ? '1' : '0');
-    } catch {
-        /* ignore quota / private mode */
-    }
-    // Always notify same-tab listeners (even if storage write failed).
+    localStorageUtil.setItem(HELPERS_STORAGE_KEY, enabled, { expiryDays: null });
     try {
         window.dispatchEvent(new CustomEvent(HELPERS_CHANGE_EVENT, { detail: { enabled } }));
     } catch {

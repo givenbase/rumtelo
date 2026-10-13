@@ -1,9 +1,16 @@
-import { isYearMonthBefore, parsePeriodKey, toPeriodKey, type YearMonth } from '@rumtelo/utils';
+import {
+    isYearMonthBefore,
+    parsePeriodKey,
+    sessionStorageUtil,
+    storageKey,
+    toPeriodKey,
+    type YearMonth,
+} from '@rumtelo/utils';
 
 export type BoardPeriod = YearMonth;
 
-function storageKey(householdId: string): string {
-    return `rumtelo:board-period:${householdId}`;
+function boardPeriodKey(householdId: string): string {
+    return storageKey('board-period', householdId);
 }
 
 /** Calendar month “now” — default when nothing is stored. */
@@ -13,24 +20,23 @@ export function currentBoardPeriod(date = new Date()): BoardPeriod {
 
 let memory: { householdId: string; period: BoardPeriod } | null = null;
 
-function readStored(householdId: string): BoardPeriod | null {
-    if (typeof window === 'undefined') return null;
-    try {
-        const raw = sessionStorage.getItem(storageKey(householdId));
-        if (!raw) return null;
-        const parsed = parsePeriodKey(raw);
-        if (
-            !Number.isFinite(parsed.year) ||
-            !Number.isFinite(parsed.month) ||
-            parsed.month < 1 ||
-            parsed.month > 12
-        ) {
-            return null;
-        }
-        return { year: parsed.year, month: parsed.month };
-    } catch {
+function parseStoredPeriod(raw: string | null): BoardPeriod | null {
+    if (!raw) return null;
+    const parsed = parsePeriodKey(raw);
+    if (
+        !Number.isFinite(parsed.year) ||
+        !Number.isFinite(parsed.month) ||
+        parsed.month < 1 ||
+        parsed.month > 12
+    ) {
         return null;
     }
+    return { year: parsed.year, month: parsed.month };
+}
+
+function readStored(householdId: string): BoardPeriod | null {
+    if (typeof window === 'undefined') return null;
+    return parseStoredPeriod(sessionStorageUtil.getItem<string>(boardPeriodKey(householdId)));
 }
 
 /**
@@ -49,11 +55,11 @@ export function setBoardPeriod(householdId: string | null | undefined, period: B
     if (!householdId) return;
     memory = { householdId, period };
     if (typeof window === 'undefined') return;
-    try {
-        sessionStorage.setItem(storageKey(householdId), toPeriodKey(period.year, period.month));
-    } catch {
-        /* private mode / quota — ignore */
-    }
+    sessionStorageUtil.setItem(
+        boardPeriodKey(householdId),
+        toPeriodKey(period.year, period.month),
+        { expiryDays: null }
+    );
 }
 
 /** Clamp below the household travel floor; persists when adjusted. */

@@ -47,6 +47,7 @@ import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { jarPlacementForAccounts, planJarBankSetup } from '@/app/_lib/jar-bank-plan';
+import { markTourOfferPending } from '@/app/_lib/offer-tour-flag';
 import { countryFromCurrency } from '@/app/_lib/resolve-account-bank';
 import { vendorMarkSrc, type PartyMark } from '@/app/_lib/vendor-brands';
 import { JarMark } from '@/components/features/money/jar-badge';
@@ -114,7 +115,7 @@ function bankWithMark(
 }
 
 function finishOnboarding(router: ReturnType<typeof useRouter>) {
-    sessionStorage.setItem('rumtelo:offer-tour', '1');
+    markTourOfferPending();
     router.replace('/');
 }
 

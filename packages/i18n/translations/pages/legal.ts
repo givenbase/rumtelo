@@ -293,7 +293,7 @@ const legal = {
             },
             storage: {
                 title: 'Local and session storage',
-                body: 'On some devices we also use sessionStorage (key rumtelo.pendingPlan) as a fallback for the plan you picked, because the website and app may run on different ports in local development. That value stays in that browser tab and is not sent to advertisers.',
+                body: 'On some devices we also use sessionStorage (key rumtelo:intent:pending-plan) as a fallback for the plan you picked, because the website and app may run on different ports in local development. That value stays in that browser tab and is not sent to advertisers.',
             },
             manage: {
                 title: 'How you can control cookies',

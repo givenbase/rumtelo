@@ -20,6 +20,7 @@ import {
     resolveNavGroupForPath,
 } from '@/app/_lib/nav';
 import { planLabel } from '@/app/_lib/plan';
+import { consumeTourOfferPending } from '@/app/_lib/offer-tour-flag';
 import { forceClearPracticePreview } from '@/app/_lib/practice-preview';
 import { practicePath, productPath } from '@/app/_lib/routes';
 import { settingsHref, settingsHrefForPathname } from '@/app/_lib/settings-tabs';
@@ -174,12 +175,10 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
     }));
     const { requestTourOffer } = usePageTour();
 
-    // After jar-bank setup on the onboarding page, a sessionStorage flag triggers
+    // After jar-bank setup on the onboarding page, a session flag triggers
     // the tour offer once the user lands back in the shell.
     useEffect(() => {
-        const flag = sessionStorage.getItem('rumtelo:offer-tour');
-        if (!flag) return;
-        sessionStorage.removeItem('rumtelo:offer-tour');
+        if (!consumeTourOfferPending()) return;
         requestTourOffer();
     }, [requestTourOffer]);
 

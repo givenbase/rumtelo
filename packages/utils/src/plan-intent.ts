@@ -12,9 +12,10 @@ import {
 } from '@rumtelo/contracts';
 
 import { resolveCrossSubdomainCookieDomain } from './better-auth-domains';
+import { sessionStorageUtil, storageKey } from './local-storage-util';
 
 export const PLAN_INTENT_COOKIE = 'rumtelo_pending_plan';
-export const PLAN_INTENT_STORAGE_KEY = 'rumtelo.pendingPlan';
+export const PLAN_INTENT_STORAGE_KEY = storageKey('intent', 'pending-plan');
 /** Same-tab store updates (sessionStorage `storage` events do not fire in-page). */
 export const PLAN_INTENT_CHANGE_EVENT = 'rumtelo:plan-intent';
 
@@ -90,11 +91,14 @@ export function planIntentFromPlanKey(
     return null;
 }
 
+function readPlanIntentFromSession(): PendingPlanIntentType | null {
+    return parsePlanIntent(sessionStorageUtil.getItem<string>(PLAN_INTENT_STORAGE_KEY));
+}
+
 export function readPlanIntentFromDocument(): PendingPlanIntentType | null {
     if (typeof window === 'undefined') return null;
-    const fromStorage = window.sessionStorage.getItem(PLAN_INTENT_STORAGE_KEY);
-    const fromStorageParsed = parsePlanIntent(fromStorage);
-    if (fromStorageParsed) return fromStorageParsed;
+    const fromStorage = readPlanIntentFromSession();
+    if (fromStorage) return fromStorage;
 
     const match = document.cookie.split('; ').find(row => row.startsWith(`${PLAN_INTENT_COOKIE}=`));
     if (!match) return null;
@@ -140,7 +144,7 @@ export function writePlanIntent(
     }
 
     const value = serializePlanIntent(intent);
-    window.sessionStorage.setItem(PLAN_INTENT_STORAGE_KEY, value);
+    sessionStorageUtil.setItem(PLAN_INTENT_STORAGE_KEY, value, { expiryDays: null });
 
     const maxAge = options?.maxAgeSec ?? 60 * 60 * 24 * 7;
     const domain = resolveCrossSubdomainCookieDomain(...(options?.domainUrls ?? []));
@@ -158,7 +162,7 @@ export function writePlanIntent(
 
 export function clearPlanIntent(options?: { domainUrls?: (string | undefined)[] }): void {
     if (typeof window === 'undefined') return;
-    window.sessionStorage.removeItem(PLAN_INTENT_STORAGE_KEY);
+    sessionStorageUtil.removeItem(PLAN_INTENT_STORAGE_KEY);
 
     const domain = resolveCrossSubdomainCookieDomain(...(options?.domainUrls ?? []));
     const parts = [`${PLAN_INTENT_COOKIE}=`, 'Path=/', 'Max-Age=0', 'SameSite=Lax'];

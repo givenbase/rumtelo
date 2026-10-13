@@ -6,9 +6,10 @@
  */
 
 import { resolveCrossSubdomainCookieDomain } from './better-auth-domains';
+import { sessionStorageUtil, storageKey } from './local-storage-util';
 
 export const PRACTICE_INVITE_COOKIE = 'rumtelo_practice_invite';
-export const PRACTICE_INVITE_STORAGE_KEY = 'rumtelo.practiceInvite';
+export const PRACTICE_INVITE_STORAGE_KEY = storageKey('intent', 'practice-invite');
 export const PRACTICE_INVITE_CHANGE_EVENT = 'rumtelo:practice-invite';
 
 const TOKEN_RE = /^[0-9a-f-]{8,80}$/i;
@@ -31,11 +32,15 @@ export function practiceInviteQuery(token: string | null): Record<string, string
     return { practiceInvite: token };
 }
 
+function readPracticeInviteFromSession(): string | null {
+    return parsePracticeInviteToken(
+        sessionStorageUtil.getItem<string>(PRACTICE_INVITE_STORAGE_KEY)
+    );
+}
+
 export function readPracticeInviteFromDocument(): string | null {
     if (typeof window === 'undefined') return null;
-    const fromStorage = parsePracticeInviteToken(
-        window.sessionStorage.getItem(PRACTICE_INVITE_STORAGE_KEY)
-    );
+    const fromStorage = readPracticeInviteFromSession();
     if (fromStorage) return fromStorage;
 
     const match = document.cookie
@@ -81,7 +86,7 @@ export function writePracticeInvite(
     }
 
     const value = token.trim();
-    window.sessionStorage.setItem(PRACTICE_INVITE_STORAGE_KEY, value);
+    sessionStorageUtil.setItem(PRACTICE_INVITE_STORAGE_KEY, value, { expiryDays: null });
 
     const maxAge = options?.maxAgeSec ?? 60 * 60 * 24 * 14;
     const domain = resolveCrossSubdomainCookieDomain(...(options?.domainUrls ?? []));
@@ -99,7 +104,7 @@ export function writePracticeInvite(
 
 export function clearPracticeInvite(options?: { domainUrls?: (string | undefined)[] }): void {
     if (typeof window === 'undefined') return;
-    window.sessionStorage.removeItem(PRACTICE_INVITE_STORAGE_KEY);
+    sessionStorageUtil.removeItem(PRACTICE_INVITE_STORAGE_KEY);
 
     const domain = resolveCrossSubdomainCookieDomain(...(options?.domainUrls ?? []));
     const parts = [`${PRACTICE_INVITE_COOKIE}=`, 'Path=/', 'Max-Age=0', 'SameSite=Lax'];
