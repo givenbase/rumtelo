@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 import { useTranslations } from '@rumtelo/i18n';
 import { AccentCard, Button, Card, EmptyState, Eyebrow, Section, Typography } from '@rumtelo/ui';
-import { cn } from '@rumtelo/utils';
+import { cn, toPeriodKey } from '@rumtelo/utils';
 
 import { useLiveQuery } from '@rumtelo/hooks';
 import {
@@ -23,6 +23,7 @@ import { CREATE_HREF, assetDetailHref, createAssetHref } from '@/app/_lib/create
 import { isLiveData } from '@/app/_lib/preview';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
 const EMPTY_KINDS: AssetKind[] = [];
@@ -39,6 +40,8 @@ export function NetWorthPageClient() {
     const t = useTranslations('features.growth.net_worth');
     const { formatMoney } = useHouseholdCurrency();
     const { householdId } = useAuth();
+    const { period } = useHouseholdShell();
+    const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);
     const kindsQuery = useLiveQuery(
         apiQuery.growth.catalogs.assetKinds.list.queryOptions({
@@ -63,7 +66,7 @@ export function NetWorthPageClient() {
     );
     const jarsQuery = useLiveQuery(
         apiQuery.money.jars.balances.queryOptions({
-            input: { householdId: householdId! },
+            input: { householdId: householdId!, period: periodKey },
         }),
         EMPTY_JARS,
         live

@@ -8,6 +8,8 @@ import {
     type MonthScoreUnlockKey,
 } from '@rumtelo/contracts';
 
+import { toPeriodKey, travelForPeriod } from '@rumtelo/utils';
+
 import { apiBadRequest } from '../../../../../common/errors/api-user-error';
 import { HouseholdScopedRepository } from '../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../common/household/household.context';
@@ -234,7 +236,13 @@ export class MonthScoreService {
     }
 
     private async buildRecap(period: string, monthScore?: MonthScore | null) {
-        const jarRows = await this.jars.balances(period);
+        // Recap is a single-month picture — don’t use Looking Ahead stacked balances.
+        const meta = travelForPeriod(period);
+        const jarPeriod =
+            meta.travel.direction === 'future'
+                ? toPeriodKey(meta.current.year, meta.current.month)
+                : period;
+        const jarRows = await this.jars.balances(jarPeriod);
         const income = await this.jars.monthlyNetIncome();
         const allocated = sum(jarRows.map(jar => jar.allocated));
         const spent = sum(jarRows.map(jar => jar.spent));

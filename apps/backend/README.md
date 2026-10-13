@@ -121,18 +121,16 @@ There is no scoping middleware: Fastify/Nest middleware runs before the route
 is resolved (`req.url` is `/`), so the interceptor is the intentional and only
 enforcement layer.
 
-### Kind vs role (two different axes)
+### Role × Relation (two per-seat axes)
 
-- **Role** (per member, from better-auth `member.role`): what can this person
-  change? `owner`/`admin` → OWNER, `member` → MEMBER, `viewer` → VIEWER
-  (read-only guest tier, defined in `src/auth/access-control.config.ts`).
-  Role names are capability-neutral on purpose — "Partner", "Kid" or
-  "Housemate" are UI copy driven by the household's kind, never enum values.
+- **Role** (per member, better-auth `member.role`): what can this person
+  change? `owner` → OWNER, `member` (and legacy `admin`) → MEMBER,
+  `viewer` → VIEWER. Defined in `access-control.config.ts`.
   Role *is* the trust level — there is no separate trust-score system.
-- **Kind** (per household, `auth.household_settings.kind`): what is the
-  nature of the group — `family`, `partners`, `friends`, `solo`? Kind only
-  drives copy and defaults (e.g. a friends portfolio may hide energy/soul
-  modules later); it never gates queries.
+- **Relation** (per member, BA `additionalFields.relation` on
+  `auth.member` / `auth.invitation`): who they are to this board —
+  `FAMILY` | `CIRCLE` | `EXTERNAL`. Soft-upgrade UX only; never authz.
+  See `docs/engineering/household-taxonomy.md`.
 
 Households connect to people via membership; households are never linked to
 other households.

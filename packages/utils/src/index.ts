@@ -45,6 +45,7 @@ export {
     monthlyAmount,
     jarCoverage,
     jarPotBalance,
+    projectPotBalanceAhead,
     usedPctDisplay,
     allocateByPercentage,
     categoryEnvelope,
@@ -101,6 +102,7 @@ export {
     parsePeriodKey,
     periodKeysInclusive,
     stackPlannedAllocations,
+    scaleJarsForHorizon,
     stackActualsByJar,
     moneyDelta,
     incomeNeededForTarget,
@@ -112,6 +114,7 @@ export {
     endOfPeriodIso,
     type StackShare,
     type StackedAllocations,
+    type JarHorizonScaleOptions,
     type MoneyDelta,
     type IncomeNeededInput,
     type IncomeNeededResult,
@@ -198,3 +201,11 @@ export { formatIban, isValidIban, nlIbanBankCode, normalizeIban } from './iban';
 export { containsWord, findByName, findByNameOrAlias, namesMatch } from './text-match';
 export { presetForMerchant, resolveVendorPresets, type VendorResolution } from './catalog-link';
 export { shouldShowStagingBanner } from './staging-banner';
+export {
+    localStorageUtil,
+    sessionStorageUtil,
+    storageKey,
+    type BrowserStorageUtil,
+    type BrowserStorageWriteOptions,
+    type StoredItem,
+} from './local-storage-util';

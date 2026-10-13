@@ -3,7 +3,9 @@
  * sessionStorage for same-tab hand-off; `/verify` also accepts `?email=` as fallback.
  */
 
-export const SIGN_UP_DRAFT_STORAGE_KEY = 'rumtelo.signUpDraft';
+import { sessionStorageUtil, storageKey } from '@rumtelo/utils';
+
+export const SIGN_UP_DRAFT_STORAGE_KEY = storageKey('auth', 'sign-up-draft');
 export const SIGN_UP_DRAFT_CHANGE_EVENT = 'rumtelo:sign-up-draft';
 
 export type SignUpDraft = {
@@ -29,31 +31,26 @@ export function parseSignUpDraft(input: unknown): SignUpDraft | null {
 
 export function readSignUpDraft(): SignUpDraft | null {
     if (typeof window === 'undefined') return null;
-    try {
-        const raw = window.sessionStorage.getItem(SIGN_UP_DRAFT_STORAGE_KEY);
-        if (!raw) return null;
-        return parseSignUpDraft(JSON.parse(raw) as unknown);
-    } catch {
-        return null;
-    }
+    return parseSignUpDraft(sessionStorageUtil.getItem<SignUpDraft>(SIGN_UP_DRAFT_STORAGE_KEY));
 }
 
 export function writeSignUpDraft(draft: SignUpDraft): void {
     if (typeof window === 'undefined') return;
-    window.sessionStorage.setItem(
+    sessionStorageUtil.setItem(
         SIGN_UP_DRAFT_STORAGE_KEY,
-        JSON.stringify({
+        {
             firstName: draft.firstName.trim(),
             lastName: draft.lastName.trim(),
             email: draft.email.trim(),
-        })
+        },
+        { expiryDays: null }
     );
     notify();
 }
 
 export function clearSignUpDraft(): void {
     if (typeof window === 'undefined') return;
-    window.sessionStorage.removeItem(SIGN_UP_DRAFT_STORAGE_KEY);
+    sessionStorageUtil.removeItem(SIGN_UP_DRAFT_STORAGE_KEY);
     notify();
 }
 

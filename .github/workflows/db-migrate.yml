@@ -55,7 +55,10 @@ on:
         paths:
             # Pending work lives in committed Migration*.ts — not bare entity edits.
             - 'apps/backend/src/database/migrations/**'
-            - 'apps/backend/src/modules/auth/better-auth/**'
+            # Better Auth schema (additionalFields, model maps) — not Mikro migrations.
+            - 'apps/backend/src/modules/auth/engine/auth.config.ts'
+            - 'apps/backend/src/modules/auth/engine/auth.migrate.ts'
+            - 'apps/backend/src/modules/auth/engine/access-control.config.ts'
             - '.github/workflows/db-migrate.yml'
 
 env:
@@ -94,7 +97,9 @@ jobs:
                         - 'apps/backend/src/database/migrations/**'
                         - '.github/workflows/db-migrate.yml'
                       auth:
-                        - 'apps/backend/src/modules/auth/better-auth/**'
+                        - 'apps/backend/src/modules/auth/engine/auth.config.ts'
+                        - 'apps/backend/src/modules/auth/engine/auth.migrate.ts'
+                        - 'apps/backend/src/modules/auth/engine/access-control.config.ts'
 
             - name: Install pnpm
               uses: pnpm/action-setup@v6

@@ -141,6 +141,7 @@ export default function HouseholdInvitePage() {
                 await setActiveOrganization(organizationId);
                 await setActiveHousehold(organizationId);
             }
+            // HouseholdRelation is copied invite → member in BA afterAcceptInvitation.
             householdInvite?.clearInvitationId();
             await refreshSession();
             setDone(true);

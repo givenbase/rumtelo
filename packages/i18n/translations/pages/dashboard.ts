@@ -81,10 +81,6 @@ const dashboard = {
         },
     },
     recap: {
-        money_what: 'spent this week',
-        growth_what: 'income growth/year',
-        energy_what: 'trained this week',
-        soul_what: 'stillness today',
         surplus: '{amount} left this period',
         overspent: 'One or more jars are overspent',
     },

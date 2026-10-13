@@ -51,6 +51,10 @@ export default defineConfig({
     },
     extensions: [Migrator, SeedManager],
     // Never auto-sync a schema that holds money. Migrations only.
+    // BA additionalFields (e.g. member.relation): `pn auth:migrate` owns DDL.
+    // Mirror entities may map those columns for reads; keep them in the snapshot
+    // and strip any BA ADD/DROP from Mikro migrations — see household-taxonomy.md
+    // + scripts/lint/check-ba-migration-ownership.ts.
     migrations: {
         path: './src/database/migrations',
         pathTs: './src/database/migrations',

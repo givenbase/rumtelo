@@ -25,8 +25,8 @@ export interface HouseholdInviteTemplateProps {
 function roleTranslationKey(role: string): string {
     const normalized = role.trim().toLowerCase();
     if (normalized === 'viewer') return 'email.household.invite.body.role_viewer';
-    if (normalized === 'admin') return 'email.household.invite.body.role_admin';
     if (normalized === 'owner') return 'email.household.invite.body.role_owner';
+    // Legacy BA `admin` collapses to member (same as product HouseholdRole).
     return 'email.household.invite.body.role_member';
 }
 

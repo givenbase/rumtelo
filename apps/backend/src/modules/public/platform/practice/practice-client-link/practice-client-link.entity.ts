@@ -21,7 +21,7 @@ import { Practice } from '../practice/practice.entity';
 export class PracticeClientLink extends BaseEntity {
     // ? PROPERTIES
     /**
-     * When the household OWNER/ADMIN accepted the Practice offer.
+     * When the household OWNER accepted the Practice offer.
      * Null while INVITED; set on accept (dual-consent middle contract).
      * Practice offer time is `createdAt`.
      */

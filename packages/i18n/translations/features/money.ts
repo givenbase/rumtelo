@@ -794,6 +794,12 @@ const money = {
         back: '← Back',
         next: 'Next →',
         complete: 'Complete week check ✓',
+        toast_done: 'Week check done. See you next week.',
+        done_eyebrow: '✦ Done',
+        done_title: 'This week’s check is complete',
+        done_lead: 'One look, one redirect, one intention. Come back next week.',
+        done_intention_label: 'Your intention',
+        done_home: 'Back home',
     },
     giving_finder: {
         title: 'Where do you want to help?',

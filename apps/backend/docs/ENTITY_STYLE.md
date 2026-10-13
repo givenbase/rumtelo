@@ -31,7 +31,7 @@ Enums come from `@rumtelo/contracts` + `NativeEnum({ … })` — never `export e
 | Domain | Example PG type |
 |--------|-----------------|
 | `money` | `money_debt_kind`, `money_cadence`, `money_spending_style`, `money_month_score_event_kind` |
-| `platform` | `platform_household_kind`, `platform_currency` |
+| `platform` | `platform_currency` |
 | `auth` | `auth_locale`, `auth_theme` |
 | `backoffice` | `backoffice_plan_key` |
 | `energy` / `growth` / `soul` | `energy_metric`, … |

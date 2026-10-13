@@ -2,7 +2,6 @@ import { Collection } from '@mikro-orm/core';
 import { Entity, Enum, ManyToMany, Property, Unique } from '@mikro-orm/decorators/legacy';
 import {
     Currency,
-    HouseholdKind,
     IncomeStability,
     PayoffStrategy,
     type HouseholdAnswers,
@@ -89,10 +88,6 @@ export class HouseholdSettings extends HouseholdEntity {
     onboardedAt: Date | null = null;
 
     // ? ENUMS
-    /** Solo / couple / family — drives copy and member expectations. */
-    @Enum(NativeEnum({ HouseholdKind, domain: 'platform', defaultValue: HouseholdKind.SOLO }))
-    kind: HouseholdKind = HouseholdKind.SOLO;
-
     /** One accounting currency for every member's money view. */
     @Enum(NativeEnum({ Currency, domain: 'platform', defaultValue: Currency.EUR }))
     currency: Currency = Currency.EUR;

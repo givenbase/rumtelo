@@ -82,6 +82,8 @@ const form = {
         term_payments: 'Enter how many payments',
         pick_deadline: 'Pick a deadline',
         due_month_required: 'Pick which month you are charged',
+        intention_required: 'Write one sentence for next week',
+        intention_max: 'Keep it under 280 characters',
     },
     aria: {
         pick_mode: 'How do you want to pick?',

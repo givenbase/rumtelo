@@ -3,7 +3,7 @@
  * Capability catalog, plan access tree, grant lists, and helper functions.
  */
 
-import { HouseholdKind, HouseholdRole } from '../../enums';
+import { HouseholdRole } from '../../enums';
 import {
     CAPABILITIES,
     CAPABILITY_PRODUCTS,
@@ -329,13 +329,6 @@ export const PLAN_CAPABILITY_GRANTS: Record<PlanKey, readonly CapabilityKey[]> =
 // Plan limits & capabilities
 // ====================================================================
 
-const ALL_KINDS = [
-    HouseholdKind.SOLO,
-    HouseholdKind.PARTNERS,
-    HouseholdKind.FAMILY,
-    HouseholdKind.FRIENDS,
-] as const;
-
 /** Capacity ceilings per plan — Basic never uses null (unlimited) for seats. */
 export const PLAN_LIMITS: Record<PlanKey, PlanLimits> = {
     [PlanKey.BASIC]: {
@@ -423,15 +416,11 @@ export const PRACTICE_PRICING_CATALOG = {
     },
 } as const;
 
-function buildPlanCapabilities(
-    plan: PlanKey,
-    householdKinds: readonly HouseholdKind[]
-): PlanCapabilities {
+function buildPlanCapabilities(plan: PlanKey): PlanCapabilities {
     const limits = PLAN_LIMITS[plan];
     const capabilityKeys = [...PLAN_CAPABILITY_GRANTS[plan]];
     return {
         ...limits,
-        householdKinds: [...householdKinds],
         capabilityKeys,
         canInvite: capabilityKeys.includes(CAPABILITIES.platformInvite),
     };
@@ -442,9 +431,9 @@ function buildPlanCapabilities(
  * Seed / DB catalog mirrors this; runtime checks import from here.
  */
 export const PLAN_CAPABILITIES: Record<PlanKey, PlanCapabilities> = {
-    [PlanKey.BASIC]: buildPlanCapabilities(PlanKey.BASIC, [HouseholdKind.SOLO]),
-    [PlanKey.PLUS]: buildPlanCapabilities(PlanKey.PLUS, ALL_KINDS),
-    [PlanKey.MAX]: buildPlanCapabilities(PlanKey.MAX, ALL_KINDS),
+    [PlanKey.BASIC]: buildPlanCapabilities(PlanKey.BASIC),
+    [PlanKey.PLUS]: buildPlanCapabilities(PlanKey.PLUS),
+    [PlanKey.MAX]: buildPlanCapabilities(PlanKey.MAX),
 };
 
 /** Tier order for comparisons — mirrors catalog sortOrder (BASIC=0 < PLUS < MAX). */
@@ -533,15 +522,11 @@ export function canInviteOnPlan(plan: PlanKey): boolean {
 }
 
 /**
- * OWNER / ADMIN / MEMBER occupy writable seats; VIEWER occupies viewer seats.
+ * OWNER / MEMBER occupy writable seats; VIEWER occupies viewer seats.
  * Distinct from {@link SeatAddonKind} (billing inventory).
  */
 export function isWritableHouseholdRole(role: HouseholdRole): boolean {
-    return (
-        role === HouseholdRole.OWNER ||
-        role === HouseholdRole.ADMIN ||
-        role === HouseholdRole.MEMBER
-    );
+    return role === HouseholdRole.OWNER || role === HouseholdRole.MEMBER;
 }
 
 function addSeatCap(base: number | null, extra: number): number | null {
@@ -576,7 +561,7 @@ export function effectiveSeatCaps(
 export type CanAddHouseholdMemberOpts = {
     /** Current members + pending invites (owner counts as 1). */
     occupiedSeats: number;
-    /** Current writable roles (OWNER+ADMIN+MEMBER) + pending for those roles. */
+    /** Current writable roles (OWNER + MEMBER) + pending for those roles. */
     writableCount: number;
     /** Current VIEWER members + pending viewer invites. */
     viewerCount: number;
@@ -611,29 +596,22 @@ export function planAllowsInviteRole(
     if (!canInviteOnPlan(plan)) return false;
     const caps = effectiveSeatCaps(plan, extras);
     if (isWritableHouseholdRole(role)) {
-        // Need room beyond the founding owner for admin/member invites.
+        // Need room beyond the founding owner for member invites.
         return caps.maxWritable === null || caps.maxWritable > 1;
     }
     return caps.maxViewer === null || caps.maxViewer > 0;
 }
 
-export function canUseHouseholdKind(plan: PlanKey, kind: HouseholdKind): boolean {
-    return capabilitiesFor(plan).householdKinds.includes(kind);
-}
-
-/** True when the household already fits under the target plan's effective caps. */
+/** True when the household already fits under the target plan's effective seat caps. */
 export function householdFitsPlan(
     plan: PlanKey,
     opts: {
         memberCount: number;
         writableCount: number;
         viewerCount: number;
-        kind: HouseholdKind;
         extras?: { extraContributor?: number; extraViewer?: number };
     }
 ): boolean {
-    const capsPlan = capabilitiesFor(plan);
-    if (!capsPlan.householdKinds.includes(opts.kind)) return false;
     const caps = effectiveSeatCaps(plan, opts.extras);
     if (caps.maxMembers !== null && opts.memberCount > caps.maxMembers) return false;
     if (caps.maxWritable !== null && opts.writableCount > caps.maxWritable) return false;

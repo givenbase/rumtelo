@@ -299,7 +299,9 @@
                 "who_owe_required": "Je moet aangeven aan wie je geld verschuldigd bent",
                 "term_payments": "Voer het aantal betalingen in",
                 "pick_deadline": "Kies een deadline",
-                "due_month_required": "Kies de maand waarvoor de kosten in rekening worden gebracht"
+                "due_month_required": "Kies de maand waarvoor de kosten in rekening worden gebracht",
+                "intention_required": "Schrijf één zin voor volgende week",
+                "intention_max": "Houd het onder de 280 tekens"
             },
             "aria": {
                 "pick_mode": "Hoe wil je kiezen?",
@@ -752,7 +754,12 @@
                 "month_score_badge": "Maandscore",
                 "month_score_slide": "Maandscore-advies",
                 "previous": "Vorige",
-                "next": "Volgende"
+                "next": "Volgende",
+                "collapse": "Samenvouwen",
+                "expand": "Coach weergeven",
+                "collapsed_clear": "Er staat niets op je te wachten — vouw het uit wanneer je de score wilt zien",
+                "collapsed_attention": "Er is iets dat jou nodig heeft",
+                "collapsed_waiting": "{count} wacht"
             },
             "dismiss": "Sluiten",
             "got_it": "Oké, begrepen",
@@ -1561,12 +1568,7 @@
                     },
                     "pick": {
                         "shelf": "Plank",
-                        "queue": {
-                            "book": "Nog te lezen",
-                            "watch": "Nog te kijken",
-                            "listen": "Nog te beluisteren",
-                            "take": "Nog te volgen"
-                        },
+                        "queue": "Te focussen",
                         "now": {
                             "book": "Aan het lezen",
                             "watch": "Aan het kijken",
@@ -2464,7 +2466,13 @@
                 "intend_encourage": "Goed. Onthoud dit als je het deze week even moeilijk hebt.",
                 "back": "← Terug",
                 "next": "Volgende →",
-                "complete": "Weekcontrole voltooid ✓"
+                "complete": "Weekcontrole voltooid ✓",
+                "toast_done": "De wekelijkse controle is afgerond. Tot volgende week.",
+                "done_eyebrow": "✦ Klaar",
+                "done_title": "De controle van deze week is afgerond",
+                "done_lead": "Eén blik, één doorverwijzing, één bedoeling. Kom volgende week weer eens langs.",
+                "done_intention_label": "Je bedoeling",
+                "done_home": "Weer thuis"
             },
             "giving_finder": {
                 "title": "Waar wil je helpen?",
@@ -3292,10 +3300,6 @@
                 }
             },
             "recap": {
-                "money_what": "heb deze week doorgebracht",
-                "growth_what": "inkomensgroei per jaar",
-                "energy_what": "deze week getraind",
-                "soul_what": "stilte vandaag",
                 "surplus": "{amount} heeft deze periode verlaten",
                 "overspent": "Er is te veel uitgegeven aan een of meer potten"
             },
@@ -4640,6 +4644,8 @@
                 "status_active": "Actief",
                 "status_revoked": "Ingetrokken",
                 "revoke": "Intrekken",
+                "confirm_revoke": "Klik nogmaals om in te trekken",
+                "revoking": "Intrekken…",
                 "submit": "Cliënt toevoegen",
                 "added": "Cliënt gekoppeld",
                 "invited": "Uitnodiging verstuurd",
@@ -4952,8 +4958,6 @@
                 "unit_viewer_members": "toeschouwersplaatsen",
                 "unit_goals": "doelstellingen",
                 "unit_bank_links": "gekoppelde accounts",
-                "kind_note_basic": "Het huishoudtype is beperkt tot ‘Solo’ — voor partners, familie of vrienden is een Plus- of Max-abonnement vereist.",
-                "kind_note_unlocked": "Elk type huishouden is toegestaan (alleenstaand, partners, gezin, vrienden).",
                 "ceiling_unlimited": "Onbeperkt {unit}",
                 "ceiling_one": "1 {unit}",
                 "ceiling_n": "{count} {unit}",
@@ -5046,11 +5050,21 @@
                     "seat_limit": "Het maximum aantal leden is bereikt ({limit}). Upgrade naar Max voor een onbeperkt aantal leden.",
                     "invite_email": "Uitnodigen (e-mail)",
                     "invite_placeholder": "partner@example.com",
-                    "invite_role": "Functie",
-                    "invite_role_admin": "Beheerder (uitgebreide toegangsrechten)",
-                    "invite_role_member": "Full access",
-                    "invite_role_viewer": "Viewer (coach / look along)",
-                    "invite_viewer_hint": "Het Basic-pakket omvat één toeschouwersplaats voor een coach of maatschappelijk werker."
+                    "invite_role": "Toegang",
+                    "role_owner": "Eigenaar",
+                    "role_member": "Lid",
+                    "role_viewer": "Kijker",
+                    "invite_role_member": "Member (mag bewerken)",
+                    "invite_role_viewer": "Viewer (meekijken)",
+                    "invite_relation": "Wie zijn ze voor dit bord?",
+                    "invite_relation_family": "Familie",
+                    "invite_relation_circle": "Vertrouwde kring",
+                    "invite_relation_external": "Professional / derde partij",
+                    "invite_relation_hint_family": "Partner, ouder, kind of ander gezin — samen persoonlijk geld.",
+                    "invite_relation_hint_circle": "Vriend, huisgenoot of andere vertrouwde — deel het bord zonder praktijkdesk.",
+                    "invite_relation_hint_external": "Coach, adviseur of organisatie — vaak beter later als praktijkcliënt.",
+                    "invite_viewer_hint": "Basic bevat één viewer-stoel — voeg members toe als je plan dat toelaat.",
+                    "relation_founder": "Oprichter"
                 },
                 "devices": {
                     "eyebrow": "Apparaten",
@@ -5512,6 +5526,10 @@
                 "accept": "Accepteren",
                 "reject": "Afname",
                 "unlink": "Koppeling verwijderen",
+                "confirm_unlink": "Klik nogmaals om te ontkoppelen",
+                "unlinking": "Ontkoppelen…",
+                "confirm_reject": "Klik nogmaals om te weigeren",
+                "rejecting": "Weigeren…",
                 "accepted": "Toegang tot de praktijk wordt geaccepteerd",
                 "rejected": "Uitnodiging voor oefensessie afgewezen",
                 "unlinked": "Oefening zonder koppeling",
@@ -5539,8 +5557,8 @@
                 "settings_sub_viewer": "Account en beveiliging",
                 "my_plan": "Mijn plan",
                 "my_plan_sub": "Wat je gebruikt en betaalt",
-                "start_own": "Start mijn huishouden",
-                "start_own_sub": "Je eigen potjes en bord — optioneel",
+                "start_own": "Start iets van mezelf",
+                "start_own_sub": "Je huishoudbord of een praktijkdesk",
                 "sign_out": "Uitloggen",
                 "sign_out_sub": "Je blijft 30 dagen ingelogd",
                 "language": "Taal",
@@ -5552,8 +5570,27 @@
             },
             "viewer": {
                 "look_along": "Meekijken — alleen lezen",
-                "start_own_banner": "Wil je zelf een Rumtelo-bord? Start wanneer je wilt je eigen huishouden.",
-                "start_own_cta": "Start mijn huishouden"
+                "start_own_banner": "Wil je iets van jezelf? Kies een huishoudbord of een praktijkdesk.",
+                "start_own_cta": "Kies wat je wilt starten",
+                "chooser_loading": "Laden",
+                "chooser_eyebrow": "Jouw volgende stap",
+                "chooser_title": "Start iets van jezelf",
+                "chooser_lead": "Je kijkt mee op het bord van iemand anders. Kies wat je nodig hebt — je kunt later allebei doen.",
+                "chooser_household_title": "Huishoudbord",
+                "chooser_household_body": "Je eigen potjes en geldbord voor persoonlijk of familiemoney.",
+                "chooser_household_bullet_1": "Zes potjes en een duidelijk maandplan",
+                "chooser_household_bullet_2": "Nodig later familie of vertrouwde mensen uit",
+                "chooser_household_bullet_3": "Jij wordt eigenaar van je bord",
+                "chooser_household_cta": "Start mijn huishouden",
+                "chooser_practice_title": "Praktijkdesk",
+                "chooser_practice_body": "Voor coaches en adviseurs die andere huishoudens helpen.",
+                "chooser_practice_bullet_1": "Nodig cliënt-huishoudens uit en beheer ze",
+                "chooser_practice_bullet_2": "Medewerkersplekken en praktijkfacturatie",
+                "chooser_practice_bullet_3": "Apart van je meekijk-stoel",
+                "chooser_practice_cta": "Praktijk aanmaken",
+                "chooser_practice_open_cta": "Open mijn praktijk",
+                "chooser_suggested": "Aangeraden voor jou",
+                "chooser_back": "Terug naar het bord waar ik meekijk"
             },
             "period_options": {
                 "this_month": "Deze maand",

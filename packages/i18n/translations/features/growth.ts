@@ -437,12 +437,8 @@ const growth = {
             },
             pick: {
                 shelf: 'Shelf',
-                queue: {
-                    book: 'Need to read',
-                    watch: 'Need to watch',
-                    listen: 'Need to listen',
-                    take: 'Need to take',
-                },
+                /** Queue chip — one label for books, videos, courses, podcasts. */
+                queue: 'Need to focus',
                 now: {
                     book: 'Reading',
                     watch: 'Watching',

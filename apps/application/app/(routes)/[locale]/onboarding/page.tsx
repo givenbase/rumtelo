@@ -22,7 +22,7 @@ import { JarBankSetupFlow } from './_components/jar-bank-setup-flow';
  *
  * Phase A (no household): questionnaire for new household creators.
  * Phase B (OWNER, setup not done): bank + jar map.
- * Invitees (VIEWER / MEMBER / ADMIN) never see this UI.
+ * Invitees (VIEWER / MEMBER) never see this UI.
  */
 export default function OnboardingPage() {
     const t = useTranslations();

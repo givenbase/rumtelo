@@ -299,7 +299,9 @@
                 "who_owe_required": "Il est obligatoire d'indiquer à qui vous devez de l'argent",
                 "term_payments": "Indiquez le nombre de versements",
                 "pick_deadline": "Choisissez une date limite",
-                "due_month_required": "Choisissez le mois au cours duquel vous serez facturé"
+                "due_month_required": "Choisissez le mois au cours duquel vous serez facturé",
+                "intention_required": "Écris une phrase pour la semaine prochaine",
+                "intention_max": "Ne dépassez pas les 280 caractères"
             },
             "aria": {
                 "pick_mode": "Comment souhaitez-vous choisir ?",
@@ -752,7 +754,12 @@
                 "month_score_badge": "Score mensuel",
                 "month_score_slide": "Conseils pour le score mensuel",
                 "previous": "Précédent",
-                "next": "Suivant"
+                "next": "Suivant",
+                "collapse": "Réduire",
+                "expand": "Afficher l'entraîneur",
+                "collapsed_clear": "Rien à attendre — développez la partition quand vous le souhaitez",
+                "collapsed_attention": "Il y a quelque chose qui a besoin de toi",
+                "collapsed_waiting": "{count} en attente"
             },
             "dismiss": "Ignorer",
             "got_it": "D'accord",
@@ -1561,12 +1568,7 @@
                     },
                     "pick": {
                         "shelf": "Étagère",
-                        "queue": {
-                            "book": "À lire",
-                            "watch": "À regarder",
-                            "listen": "À écouter",
-                            "take": "À suivre"
-                        },
+                        "queue": "À prioriser",
                         "now": {
                             "book": "En cours de lecture",
                             "watch": "En cours de visionnage",
@@ -2464,7 +2466,13 @@
                 "intend_encourage": "Très bien. Garde ça à l'esprit quand la semaine te semblera difficile.",
                 "back": "← Retour",
                 "next": "Suivant →",
-                "complete": "Vérification hebdomadaire terminée ✓"
+                "complete": "Vérification hebdomadaire terminée ✓",
+                "toast_done": "Le bilan hebdomadaire est fait. À la semaine prochaine.",
+                "done_eyebrow": "✦ Terminé",
+                "done_title": "Le contrôle de cette semaine est terminé",
+                "done_lead": "Un regard, une redirection, une intention. Revenez la semaine prochaine.",
+                "done_intention_label": "Votre intention",
+                "done_home": "De retour chez moi"
             },
             "giving_finder": {
                 "title": "Dans quel domaine souhaitez-vous apporter votre aide ?",
@@ -3292,10 +3300,6 @@
                 }
             },
             "recap": {
-                "money_what": "a passé cette semaine",
-                "growth_what": "croissance des revenus par an",
-                "energy_what": "s'est entraîné cette semaine",
-                "soul_what": "le calme aujourd'hui",
                 "surplus": "Il reste {amount} de cette période",
                 "overspent": "Un ou plusieurs postes de budget ont dépassé leur plafond."
             },
@@ -4640,6 +4644,8 @@
                 "status_active": "Actif",
                 "status_revoked": "Révoqué",
                 "revoke": "Révoquer",
+                "confirm_revoke": "Cliquez encore pour révoquer",
+                "revoking": "Révocation…",
                 "submit": "Ajouter un client",
                 "added": "Client ajouté",
                 "invited": "Invitation envoyée",
@@ -4952,8 +4958,6 @@
                 "unit_viewer_members": "places pour les spectateurs",
                 "unit_goals": "objectifs",
                 "unit_bank_links": "comptes associés",
-                "kind_note_basic": "Type de foyer limité à « Solo » — les partenaires, la famille et les amis nécessitent un abonnement Plus ou Max.",
-                "kind_note_unlocked": "Tous les types de ménages sont autorisés (personnes seules, couples, familles, amis).",
                 "ceiling_unlimited": "Illimité {unit}",
                 "ceiling_one": "1 {unit}",
                 "ceiling_n": "{count} {unit}",
@@ -5047,10 +5051,20 @@
                     "invite_email": "Inviter (par e-mail)",
                     "invite_placeholder": "partner@example.com",
                     "invite_role": "Fonction",
-                    "invite_role_admin": "Administrateur (droits d'accès élevés)",
+                    "role_owner": "Propriétaire",
+                    "role_member": "Membre",
+                    "role_viewer": "Visionneuse",
                     "invite_role_member": "Full access",
                     "invite_role_viewer": "Viewer (coach / look along)",
-                    "invite_viewer_hint": "La formule « Basic » comprend une place dans les tribunes pour un entraîneur ou un travailleur social."
+                    "invite_relation": "Qui sont-ils pour ce tableau ?",
+                    "invite_relation_family": "Famille",
+                    "invite_relation_circle": "Cercle de confiance",
+                    "invite_relation_external": "Professionnel / tiers",
+                    "invite_relation_hint_family": "Partenaire, parent, enfant ou autre famille du foyer — argent personnel ensemble.",
+                    "invite_relation_hint_circle": "Ami, colocataire ou autre personne de confiance — partagez le tableau sans bureau Practice.",
+                    "invite_relation_hint_external": "Coach, conseiller ou organisation — souvent mieux plus tard comme client Practice.",
+                    "invite_viewer_hint": "La formule « Basic » comprend une place dans les tribunes pour un entraîneur ou un travailleur social.",
+                    "relation_founder": "Fondateur"
                 },
                 "devices": {
                     "eyebrow": "Appareils",
@@ -5512,6 +5526,10 @@
                 "accept": "Accepter",
                 "reject": "Baisse",
                 "unlink": "Supprimer le lien",
+                "confirm_unlink": "Cliquez encore pour supprimer le lien",
+                "unlinking": "Suppression du lien…",
+                "confirm_reject": "Cliquez encore pour refuser",
+                "rejecting": "Refus…",
                 "accepted": "Accès au cabinet accepté",
                 "rejected": "Invitation à l'entraînement refusée",
                 "unlinked": "Entraînement sans lien",
@@ -5553,7 +5571,26 @@
             "viewer": {
                 "look_along": "Aperçu — lecture seule",
                 "start_own_banner": "Vous souhaitez avoir votre propre tableau Rumtelo ? Créez un foyer quand vous le souhaitez.",
-                "start_own_cta": "Fonder mon foyer"
+                "start_own_cta": "Fonder mon foyer",
+                "chooser_loading": "Chargement en cours",
+                "chooser_eyebrow": "La prochaine étape",
+                "chooser_title": "Lancez votre propre projet",
+                "chooser_lead": "Tu consultes le tableau de quelqu'un d'autre. Choisis ce dont tu as besoin : tu pourras toujours faire les deux plus tard.",
+                "chooser_household_title": "Tableau des ménages",
+                "chooser_household_body": "Vos propres bocaux et votre tableau de gestion financière pour gérer votre argent personnel ou celui de votre famille.",
+                "chooser_household_bullet_1": "Six bocaux et un planning mensuel clair",
+                "chooser_household_bullet_2": "Invitez votre famille ou des personnes de confiance plus tard",
+                "chooser_household_bullet_3": "Vous devenez propriétaire de votre planche",
+                "chooser_household_cta": "Fonder mon foyer",
+                "chooser_practice_title": "Bureau de travail",
+                "chooser_practice_body": "À l'intention des coachs et des conseillers qui accompagnent d'autres familles.",
+                "chooser_practice_bullet_1": "Inviter et gérer les foyers clients",
+                "chooser_practice_bullet_2": "Postes du personnel et facturation des séances d'entraînement",
+                "chooser_practice_bullet_3": "À part de votre place dans les gradins",
+                "chooser_practice_cta": "Créer un exercice",
+                "chooser_practice_open_cta": "Ouvrir mon cabinet",
+                "chooser_suggested": "Suggestions pour vous",
+                "chooser_back": "De retour au tableau, je regarde dans cette direction"
             },
             "period_options": {
                 "this_month": "Ce mois-ci",
@@ -5690,12 +5727,12 @@
                 "locked_body": "Cette partie de Rumtelo se trouve sur un niveau plus élevé.",
                 "locked_plan_title": "Disponible dans la formule {plan}",
                 "locked_plan_title_practice": "Ce client a besoin de {plan}",
-                "locked_plan_title_viewer": "Not included on this household’s plan",
+                "locked_plan_title_viewer": "Non inclus dans le forfait de ce foyer",
                 "locked_plan_body_practice": "Leur forfait familial ne comprend pas cette option. Si vous gérez leur compte, effectuez une mise à niveau à partir de la facturation « Practice ».",
-                "locked_plan_body_viewer": "You’re looking along — only someone who manages this household can open this with a higher plan.",
+                "locked_plan_body_viewer": "Vous regardez ça… Seule la personne qui gère ce foyer peut ouvrir ça avec un forfait supérieur.",
                 "locked_plan_aria": "Mise à niveau du forfait requise",
                 "locked_plan_aria_practice": "Mise à niveau du forfait client requise",
-                "locked_plan_aria_viewer": "Not available on this household’s plan",
+                "locked_plan_aria_viewer": "Non disponible dans le forfait de ce foyer",
                 "upgrade_cta": "Passer à la version {plan}",
                 "upgrade_cta_practice": "Facturation des consultations en cabinet",
                 "back_to_practice": "Retour à la page « Clients de Practice »",

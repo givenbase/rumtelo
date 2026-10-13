@@ -4,21 +4,26 @@ import { api } from '@/app/_lib/api';
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useMemo } from 'react';
-
 import {
     CoachKind,
     HouseholdRole,
     PracticeClientLinkStatus,
+    WeekCheckStage,
     type MonthCloseBillDisposition,
     type MonthScore,
 } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Eyebrow, Typography } from '@rumtelo/ui';
-import { formatPeriod, toPeriodKey, describePeriodTravel, cn } from '@rumtelo/utils';
+import {
+    currentWeekKey,
+    formatPeriod,
+    toPeriodKey,
+    describePeriodTravel,
+    cn,
+} from '@rumtelo/utils';
 
-import type { CoachVerdictMessage, CoachRecapItem } from '@/components/features/home/coach-verdict';
+import type { CoachVerdictMessage } from '@/components/features/home/coach-verdict';
 
 import { resolveJarSubtitle } from '@/app/_lib/jar-copy';
 import { monthScoreRecapHeadline } from '@/app/_lib/month-score-copy';
@@ -60,49 +65,6 @@ export function HomeDashboardClient() {
     const canSeeSoul = roleCanSee(role, HouseholdPermissionSection.SOUL);
     const apiError = useApiError();
     const { formatMoney } = useHouseholdCurrency();
-
-    const fallbackRecap = useMemo((): CoachRecapItem[] => {
-        const items = [
-            {
-                product: 'money',
-                portalKey: 'pages.nav.pills.money',
-                whatKey: 'pages.dashboard.recap.money_what',
-                tint: 'var(--color-jar-give)',
-                href: '/product/money/transactions',
-            },
-            {
-                product: 'growth',
-                portalKey: 'pages.nav.pills.growth',
-                whatKey: 'pages.dashboard.recap.growth_what',
-                tint: 'var(--color-jar-lts)',
-                href: '/product/growth',
-            },
-            {
-                product: 'energy',
-                portalKey: 'pages.nav.pills.energy',
-                whatKey: 'pages.dashboard.recap.energy_what',
-                tint: 'var(--color-jar-play)',
-                href: '/product/energy',
-            },
-            {
-                product: 'soul',
-                portalKey: 'pages.nav.pills.soul',
-                whatKey: 'pages.dashboard.recap.soul_what',
-                tint: 'var(--color-portal-soul)',
-                href: '/product/soul',
-            },
-        ] as const;
-
-        return items
-            .filter(item => isProductEnabled(item.product))
-            .map(item => ({
-                portal: t(item.portalKey),
-                value: '—',
-                what: t(item.whatKey),
-                tint: item.tint,
-                href: item.href,
-            }));
-    }, [t]);
 
     const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);
@@ -195,8 +157,7 @@ export function HomeDashboardClient() {
         live
     );
     const myMember = (membersQuery.data ?? []).find(m => m.userId === session?.user?.id);
-    const canManagePractice =
-        myMember?.role === HouseholdRole.OWNER || myMember?.role === HouseholdRole.ADMIN;
+    const canManagePractice = myMember?.role === HouseholdRole.OWNER;
     const practiceLinksQuery = useLiveQuery(
         apiQuery.household.practiceLinks.list.queryOptions({
             input: { householdId: householdId! },
@@ -207,6 +168,27 @@ export function HomeDashboardClient() {
     const pendingPracticeCount = (practiceLinksQuery.data ?? []).filter(
         link => link.status === PracticeClientLinkStatus.INVITED
     ).length;
+
+    const weekKey = currentWeekKey();
+    const weekCheckQuery = useLiveQuery(
+        apiQuery.money.weekCheck.current.queryOptions({
+            input: { householdId: householdId!, week: weekKey },
+        }),
+        {
+            id: '',
+            householdId: householdId ?? '',
+            week: weekKey,
+            stage: WeekCheckStage.LOOK,
+            surplus: 0,
+            allocations: [],
+            intention: null,
+            completedAt: null,
+        },
+        live
+    );
+    const weekCheckDone =
+        Boolean(weekCheckQuery.data?.completedAt) ||
+        weekCheckQuery.data?.stage === WeekCheckStage.DONE;
 
     const closeMonthScoreMutation = useMutation({
         mutationFn: async (billDispositions?: MonthCloseBillDisposition[]) => {
@@ -300,33 +282,61 @@ export function HomeDashboardClient() {
                   }
                 : null;
 
-        const moneyCoach: readonly CoachVerdictMessage[] =
-            live && liveData?.coach?.length
-                ? liveData.coach
-                : [
-                      {
-                          id: 'fallback',
-                          key: null,
-                          kind: CoachKind.NUDGE,
-                          text: dashboard.inboxCount
-                              ? t(
-                                    dashboard.inboxCount === 1
-                                        ? 'pages.dashboard.coach.inbox_one'
-                                        : 'pages.dashboard.coach.inbox_many',
-                                    { count: dashboard.inboxCount }
-                                )
-                              : t('pages.dashboard.coach.all_sorted'),
-                          ctaLabel: dashboard.inboxCount
-                              ? t('pages.dashboard.coach.sort_inbox')
-                              : t('pages.dashboard.coach.week_check'),
-                          ctaHref: dashboard.inboxCount
-                              ? '/product/money/transactions'
-                              : '/product/money/week-check',
-                      },
-                  ];
+        const moneyCoach: readonly CoachVerdictMessage[] = (() => {
+            if (live && liveData?.coach?.length) return liveData.coach;
+
+            if (dashboard.inboxCount) {
+                return [
+                    {
+                        id: 'fallback-inbox',
+                        key: null,
+                        kind: CoachKind.NUDGE,
+                        text: t(
+                            dashboard.inboxCount === 1
+                                ? 'pages.dashboard.coach.inbox_one'
+                                : 'pages.dashboard.coach.inbox_many',
+                            { count: dashboard.inboxCount }
+                        ),
+                        ctaLabel: t('pages.dashboard.coach.sort_inbox'),
+                        ctaHref: '/product/money/transactions',
+                    },
+                ];
+            }
+
+            // Inbox clear — only nudge the week check when it is still open.
+            // When that is done too, stay quiet (month-score slide still covers close work).
+            if (!weekCheckDone) {
+                return [
+                    {
+                        id: 'fallback-week-check',
+                        key: null,
+                        kind: CoachKind.WEEK_CHECK,
+                        text: t('pages.dashboard.coach.all_sorted'),
+                        ctaLabel: t('pages.dashboard.coach.week_check'),
+                        ctaHref: '/product/money/week-check',
+                    },
+                ];
+            }
+
+            return [];
+        })();
 
         return practiceNudge ? [practiceNudge, ...moneyCoach] : moneyCoach;
     })();
+
+    const monthScoreNeedsAttention =
+        !monthScore.isClosed &&
+        (Boolean(monthScore.priorOpenPeriod) ||
+            (monthScore.closeBlockers?.inboxCount ?? 0) > 0 ||
+            (monthScore.closeBlockers?.dueBillCount ?? 0) > 0);
+
+    const coachHasAttention =
+        coach.some(
+            message =>
+                message.kind === CoachKind.WARNING ||
+                message.kind === CoachKind.NUDGE ||
+                message.kind === CoachKind.WEEK_CHECK
+        ) || monthScoreNeedsAttention;
 
     const horizon = travelMeta.monthsHorizon;
     const baselineTotal = dashboard.baselineAllocatedTotal;
@@ -421,7 +431,7 @@ export function HomeDashboardClient() {
             {/* Coach + month-score advice share one slider when helpers are on. */}
             <CoachVerdict
                 messages={coach}
-                recap={fallbackRecap}
+                hasAttention={coachHasAttention}
                 scoreSlide={
                     <MonthScoreLog
                         embedded

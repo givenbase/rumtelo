@@ -200,7 +200,7 @@ z.enum(DebtKind); // ✅ Zod 4 — not z.nativeEnum
 
 ```ts
 import { DebtKind, JarKey } from '@rumtelo/contracts/money';
-import { HouseholdKind } from '@rumtelo/contracts/platform';
+import { HouseholdRelation } from '@rumtelo/contracts/platform';
 import { PlanKey } from '@rumtelo/contracts/backoffice';
 import { Locale, Money } from '@rumtelo/contracts/common';
 ```

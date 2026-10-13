@@ -14,7 +14,6 @@ import {
     GoalStatus,
     TransactionSource,
     TransactionStatus,
-    canUseHouseholdKind,
     hasCapability,
     type ArchiveRestorePayload,
     type ArchiveRestoreResult,
@@ -90,13 +89,8 @@ export class ArchiveService {
         const accountSettingsCounts = emptySection();
         if (applySettings && payload.settings) {
             const patch = { ...payload.settings };
-            if (patch.kind !== undefined && !canUseHouseholdKind(planKey, patch.kind)) {
-                warnings.push('settings_kind_plan_mismatch');
-                delete patch.kind;
-            }
             const hasPatch =
                 patch.why !== undefined ||
-                patch.kind !== undefined ||
                 patch.currency !== undefined ||
                 patch.money !== undefined ||
                 patch.weekCheck !== undefined ||

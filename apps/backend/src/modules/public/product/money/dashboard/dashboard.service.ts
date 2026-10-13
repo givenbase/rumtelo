@@ -3,10 +3,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import { GoalStatus, JarKey, PayoffStrategy } from '@rumtelo/contracts';
 import {
     endOfPeriodIso,
-    jarCoverage,
     projectDebtsAtHorizon,
     projectGoalsAtHorizon,
-    stackPlannedAllocations,
     toPeriodKey,
     travelForPeriod,
 } from '@rumtelo/utils';
@@ -79,23 +77,9 @@ export class DashboardService {
         const horizon = meta.horizon;
         const stackedMode = meta.mode === 'stacked';
 
-        let jars = baselineJars;
-        if (meta.travel.direction === 'future') {
-            // Looking ahead: plan fields × horizon; ledger sums current↔selected.
-            // Do not zeroLedger — that hid real In credits while allocated still stacked.
-            const [range, spentByCategory] = await Promise.all([
-                this.jars.spentCreditedByJarBetween(period, currentKey),
-                this.jars.spentByCategoryBetween(period, currentKey),
-            ]);
-            jars = scaleJarsForHorizon(baselineJars, horizon, period, {
-                spentByJar: range.spent,
-                creditedByJar: range.credited,
-                spentByCategory,
-            });
-        } else if (meta.travel.direction === 'past') {
-            // Looking back: true snapshot of that month (allocated / spent / pot as-of then).
-            jars = await this.jars.balances(period);
-        }
+        // Looking Ahead / Back: `jars.balances` stacks pot + plan (future) or snapshots (past).
+        const jars =
+            meta.travel.direction === 'current' ? baselineJars : await this.jars.balances(period);
 
         const allocatedTotal = sum(jars.map(jar => jar.allocated));
         const spentTotal = sum(jars.map(jar => jar.spent));
@@ -221,52 +205,6 @@ export class DashboardService {
             travelCoachText: null,
         };
     }
-}
-
-type ScaleOptions = {
-    zeroLedger?: boolean;
-    spentByJar?: Map<string, number>;
-    creditedByJar?: Map<string, number>;
-    spentByCategory?: Map<string, number>;
-};
-
-function scaleJarsForHorizon(
-    baseline: Awaited<ReturnType<JarService['balances']>>,
-    horizon: number,
-    period: string,
-    options: ScaleOptions
-) {
-    const shares = baseline.map(jar => ({ id: jar.id, percentage: jar.percentage }));
-    const monthlyNet = sum(baseline.map(jar => jar.allocated));
-    const stacked = stackPlannedAllocations({ monthlyNet, shares, horizon });
-    const allocatedById = new Map(stacked.stacked.map(row => [row.id, row.amount]));
-
-    return baseline.map(jar => {
-        const allocated = allocatedById.get(jar.id) ?? jar.allocated * horizon;
-        const spent = options.zeroLedger ? 0 : (options.spentByJar?.get(jar.id) ?? 0);
-        const credited = options.zeroLedger ? 0 : (options.creditedByJar?.get(jar.id) ?? 0);
-        const committedOut = jar.committedOut * horizon;
-        const coverage = jarCoverage({ allocated, spent, credited, committedOut });
-        return {
-            ...jar,
-            period,
-            allocated,
-            spent,
-            credited,
-            committedOut,
-            remaining: coverage.remaining,
-            available: coverage.available,
-            progress: coverage.progress,
-            overspent: coverage.overspent,
-            categories: jar.categories.map(category => ({
-                ...category,
-                budgeted: category.budgeted * horizon,
-                actual: options.zeroLedger
-                    ? 0
-                    : (options.spentByCategory?.get(category.id) ?? category.actual * horizon),
-            })),
-        };
-    });
 }
 
 /**

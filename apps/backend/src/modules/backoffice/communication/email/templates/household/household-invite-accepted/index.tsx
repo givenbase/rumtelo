@@ -25,13 +25,13 @@ export interface HouseholdInviteAcceptedTemplateProps {
 function roleTranslationKey(role: string): string {
     const normalized = role.trim().toLowerCase();
     if (normalized === 'viewer') return 'email.household.invite_accepted.body.role_viewer';
-    if (normalized === 'admin') return 'email.household.invite_accepted.body.role_admin';
     if (normalized === 'owner') return 'email.household.invite_accepted.body.role_owner';
+    // Legacy BA `admin` → member label.
     return 'email.household.invite_accepted.body.role_member';
 }
 
 /**
- * Notify household owners/admins when someone accepts an invite.
+ * Notify household owners when someone accepts an invite.
  */
 export const HouseholdInviteAcceptedTemplate: React.FC<HouseholdInviteAcceptedTemplateProps> = ({
     householdName,

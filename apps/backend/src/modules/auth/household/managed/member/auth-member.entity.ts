@@ -8,7 +8,10 @@ import { AuthUser } from '../../../user/managed/user/auth-user.entity';
  *
  * Written by better-auth's organization plugin (single writer). Read here for
  * role resolution and member listings; the raw role (owner | admin | member |
- * viewer) is mapped to Rumtelo's OWNER | MEMBER | VIEWER at the service layer.
+ * viewer; legacy admin) is mapped to Rumtelo's OWNER | MEMBER | VIEWER at the service layer.
+ *
+ * `relation` is a BA `additionalFields` column (FAMILY | CIRCLE | EXTERNAL).
+ * Schema via `pn auth:migrate` — never commit Mikro ADD/DROP for this column.
  */
 @Entity({ tableName: 'member', schema: 'auth' })
 export class AuthMember {
@@ -27,6 +30,13 @@ export class AuthMember {
     /** Raw better-auth role: owner | admin | member | viewer. */
     @Property({ type: 'text' })
     role!: string;
+
+    /**
+     * Who they are to this board (BA additionalField).
+     * FAMILY | CIRCLE | EXTERNAL — null only for legacy rows pre-migration.
+     */
+    @Property({ type: 'text', nullable: true })
+    relation?: string | null;
 
     @Property({ type: 'timestamptz' })
     createdAt!: Date;

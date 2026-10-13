@@ -8,13 +8,14 @@ import { Badge, Button } from '@rumtelo/ui';
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { isLiveData } from '@/app/_lib/preview';
+import { ConfirmActionButton } from '@/components/features/forms/confirm-action-button';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 import { SettingsInkCard, SettingsRow, SettingsRowLabel } from './settings-chrome';
 import { useSettingsMutation } from '../_utils/use-settings-mutation';
 
 /**
- * Dual-consent Practice contracts — household OWNER/ADMIN accept or decline.
+ * Dual-consent Practice contracts — household OWNER accept or decline.
  * Outside household membership seats (VIEWER ≠ Practice staff).
  */
 export function PracticeLinksSettings() {
@@ -36,8 +37,7 @@ export function PracticeLinksSettings() {
     );
 
     const myMember = (membersQuery.data ?? []).find(m => m.userId === session?.user?.id);
-    const canManage =
-        myMember?.role === HouseholdRole.OWNER || myMember?.role === HouseholdRole.ADMIN;
+    const canManage = myMember?.role === HouseholdRole.OWNER;
 
     const accept = useSettingsMutation({
         mutationFn: (linkId: string) =>
@@ -118,22 +118,37 @@ export function PracticeLinksSettings() {
                                                 onClick={() => accept.mutate(link.id)}>
                                                 {t('pages.settings.practice_links.accept')}
                                             </Button>
-                                            <Button
+                                            <ConfirmActionButton
                                                 size="sm"
                                                 variant="secondary"
                                                 disabled={!live || reject.isPending}
-                                                onClick={() => reject.mutate(link.id)}>
-                                                {t('pages.settings.practice_links.reject')}
-                                            </Button>
+                                                pending={reject.isPending}
+                                                label={t('pages.settings.practice_links.reject')}
+                                                confirmLabel={t(
+                                                    'pages.settings.practice_links.confirm_reject'
+                                                )}
+                                                pendingLabel={t(
+                                                    'pages.settings.practice_links.rejecting'
+                                                )}
+                                                onConfirm={() => reject.mutate(link.id)}
+                                            />
                                         </>
                                     ) : (
-                                        <Button
+                                        <ConfirmActionButton
                                             size="sm"
                                             variant="secondary"
+                                            className="text-danger hover:bg-danger/10 hover:text-danger"
                                             disabled={!live || unlink.isPending}
-                                            onClick={() => unlink.mutate(link.id)}>
-                                            {t('pages.settings.practice_links.unlink')}
-                                        </Button>
+                                            pending={unlink.isPending}
+                                            label={t('pages.settings.practice_links.unlink')}
+                                            confirmLabel={t(
+                                                'pages.settings.practice_links.confirm_unlink'
+                                            )}
+                                            pendingLabel={t(
+                                                'pages.settings.practice_links.unlinking'
+                                            )}
+                                            onConfirm={() => unlink.mutate(link.id)}
+                                        />
                                     )}
                                 </div>
                             </SettingsRow>

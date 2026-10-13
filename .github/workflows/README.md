@@ -52,7 +52,7 @@ Templates: `.env.github.secrets.example`, `.env.github.vars.example`. Script: `s
 
 | Workflow | Purpose |
 |----------|---------|
-| `db-migrate.yml` | MikroORM `db:push` + `auth:migrate` on remote DB when migration/auth files push (or manual); then API smoke |
+| `db-migrate.yml` | Applies schema on remote DB when migration/auth files push (or manual); then API smoke. Locally `pn db:push` already chains Mikro + `auth:migrate`. |
 | `api-smoke.yml` | `/health*` must not 5xx (strict ready after migrate) |
 | `e2e-smoke.yml` | Playwright `@smoke` against staging application |
 

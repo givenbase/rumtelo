@@ -36,7 +36,7 @@ export class HouseholdController {
     @Implement(contract.household.invite)
     invite() {
         return implement(contract.household.invite).handler(({ input }) =>
-            this.households.invite(input.householdId, input.email, input.role)
+            this.households.invite(input.householdId, input.email, input.role, input.relation)
         );
     }
 
@@ -78,7 +78,7 @@ export class HouseholdController {
     // ? UPDATE Operations
     // ====================================================================
 
-    /** Accept a Practice invite (OWNER/ADMIN) → ACTIVE dual consent. */
+    /** Accept a Practice invite (household OWNER) → ACTIVE dual consent. */
     @Implement(contract.household.practiceLinks.accept)
     practiceLinksAccept() {
         return implement(contract.household.practiceLinks.accept).handler(({ input }) =>

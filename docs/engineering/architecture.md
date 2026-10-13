@@ -80,7 +80,7 @@ Money children (same list everywhere): `jar` `income` `fixed-cost` `account` `tr
 | Login UI | `HouseholdShell` (Money / Growth / Energy / Soul) | `PracticeShell` (clients, staff, billing) |
 | Tenancy | better-auth org (`auth.household`) | Own rows under `public.platform_practice*` |
 | Data | All portal rows carry `household_id` | Staff + links only — no duplicate money board |
-| Join | Membership / invite (roles OWNER / ADMIN / MEMBER / VIEWER — 1:1 with better-auth) | **`PracticeClientLink`** hinge (status + access VIEW\|MANAGE + controlFlags) |
+| Join | Membership / invite (`HouseholdRole` OWNER\|MEMBER\|VIEWER + `HouseholdRelation`; see [household-taxonomy.md](./household-taxonomy.md)) | **`PracticeClientLink`** hinge (status + access VIEW\|MANAGE + controlFlags) |
 | Billing | Basic / Plus / Max + optional seat add-ons (€2.50) | **€49 base** + **€2.50 / staff** + **€14 / MANAGE client** (VIEW = invite / household-added only; free) |
 | Settings | `/settings/*` — account + household product prefs | `/practice/settings` — org profile only (not shared) |
 | Authz later | Household membership **or** active Practice link | Practice role + link access |
@@ -90,7 +90,7 @@ Money children (same list everywhere): `jar` `income` `fixed-cost` `account` `tr
 - Do not rename Household to “tenant.” Eng docs may say tenancy; product nouns stay Household + Practice.
 - Do not put Practice under `auth/` or reuse BA organization for companies.
 - Grow capabilities on the **link** (flags, access levels), not by inventing a second household type.
-- **Dual consent** — Practice invite (VIEW or MANAGE) always starts **INVITED** (`createdAt` = practice offer). Household OWNER/ADMIN accept sets `householdAcceptedAt` → **ACTIVE**. Data share only then.
+- **Dual consent** — Practice invite (VIEW or MANAGE) always starts **INVITED** (`createdAt` = practice offer). Household OWNER accept sets `householdAcceptedAt` → **ACTIVE**. Data share only then.
 - **MANAGE ⇒ Practice sponsors ⇒ Plus** (`SPONSOR_PLAN` + household ≥ Plus; Max kept) **and** meters the €14 client seat — applied **on household accept**, not on invite.
 - **VIEW** = free Basic look-along after accept (no client seat).
 - App routes (URLs unchanged): `(app)/(household)/*` vs `(app)/practice/*`; `AppBootGate` picks `HouseholdShell` or `PracticeShell`; avatar menu switches when the user has a practice.
@@ -100,9 +100,8 @@ Money children (same list everywhere): `jar` `income` `fixed-cost` `account` `tr
 | Role | Settings | Members / invite | Billing | Money / Growth / Energy / Soul / Home / Coach |
 |------|----------|------------------|---------|-----------------------------------------------|
 | OWNER | CRUD | CRUD | CRUD | CRUD |
-| ADMIN | CRU (no delete household) | CRUD | CRU (no cancel-destroy) | CRUD |
-| MEMBER | Read | Read | — | Day-to-day CRUD |
-| VIEWER | Read (open board) | — | — | Read only |
+| MEMBER | Read + invite | Create/read invite | — | Day-to-day CRUD |
+| VIEWER | Read (open board) | Read (shell) | — | Read only (limited portals) |
 
 Plan capabilities still gate *which features exist* on Basic/Plus/Max. Role matrix gates *what this member may do*. Backend: `RolePermissionInterceptor`.
 

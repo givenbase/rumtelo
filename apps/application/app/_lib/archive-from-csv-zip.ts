@@ -12,7 +12,6 @@ import {
     FlowDirection,
     GoalKind,
     GoalStatus,
-    HouseholdKind,
     IncomeKind,
     IncomeStability,
     JarKey,
@@ -472,9 +471,6 @@ function parseHouseholdSettingsSheet(row: Row | undefined): ArchiveHouseholdSett
 
     const settings: ArchiveHouseholdSettings = {
         ...(row.why !== undefined ? { why: row.why || null } : {}),
-        ...(row.kind && (Object.values(HouseholdKind) as string[]).includes(row.kind)
-            ? { kind: row.kind as HouseholdKind }
-            : {}),
         ...(row.currency && (Object.values(Currency) as string[]).includes(row.currency)
             ? { currency: row.currency as Currency }
             : {}),

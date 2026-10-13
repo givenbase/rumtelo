@@ -299,7 +299,9 @@
                 "who_owe_required": "Who you owe is required",
                 "term_payments": "Enter how many payments",
                 "pick_deadline": "Pick a deadline",
-                "due_month_required": "Pick which month you are charged"
+                "due_month_required": "Pick which month you are charged",
+                "intention_required": "Write one sentence for next week",
+                "intention_max": "Keep it under 280 characters"
             },
             "aria": {
                 "pick_mode": "How do you want to pick?",
@@ -752,7 +754,12 @@
                 "month_score_badge": "Month score",
                 "month_score_slide": "Month score advice",
                 "previous": "Previous",
-                "next": "Next"
+                "next": "Next",
+                "collapse": "Collapse",
+                "expand": "Show coach",
+                "collapsed_clear": "Nothing waiting — expand when you want the score",
+                "collapsed_attention": "Something needs you",
+                "collapsed_waiting": "{count} waiting"
             },
             "dismiss": "Dismiss",
             "got_it": "Got it",
@@ -1561,12 +1568,7 @@
                     },
                     "pick": {
                         "shelf": "Shelf",
-                        "queue": {
-                            "book": "Need to read",
-                            "watch": "Need to watch",
-                            "listen": "Need to listen",
-                            "take": "Need to take"
-                        },
+                        "queue": "Need to focus",
                         "now": {
                             "book": "Reading",
                             "watch": "Watching",
@@ -2464,7 +2466,13 @@
                 "intend_encourage": "Good. Remember this when the week feels hard.",
                 "back": "← Back",
                 "next": "Next →",
-                "complete": "Complete week check ✓"
+                "complete": "Complete week check ✓",
+                "toast_done": "Week check done. See you next week.",
+                "done_eyebrow": "✦ Done",
+                "done_title": "This week’s check is complete",
+                "done_lead": "One look, one redirect, one intention. Come back next week.",
+                "done_intention_label": "Your intention",
+                "done_home": "Back home"
             },
             "giving_finder": {
                 "title": "Where do you want to help?",
@@ -3292,10 +3300,6 @@
                 }
             },
             "recap": {
-                "money_what": "spent this week",
-                "growth_what": "income growth/year",
-                "energy_what": "trained this week",
-                "soul_what": "stillness today",
                 "surplus": "{amount} left this period",
                 "overspent": "One or more jars are overspent"
             },
@@ -4250,7 +4254,7 @@
                     },
                     "storage": {
                         "title": "Local and session storage",
-                        "body": "On some devices we also use sessionStorage (key rumtelo.pendingPlan) as a fallback for the plan you picked, because the website and app may run on different ports in local development. That value stays in that browser tab and is not sent to advertisers."
+                        "body": "On some devices we also use sessionStorage (key rumtelo:intent:pending-plan) as a fallback for the plan you picked, because the website and app may run on different ports in local development. That value stays in that browser tab and is not sent to advertisers."
                     },
                     "manage": {
                         "title": "How you can control cookies",
@@ -4640,6 +4644,8 @@
                 "status_active": "Active",
                 "status_revoked": "Revoked",
                 "revoke": "Revoke",
+                "confirm_revoke": "Click again to revoke",
+                "revoking": "Revoking…",
                 "submit": "Send invitation",
                 "added": "Invitation sent — waiting for household accept",
                 "invited": "Invitation sent — waiting for household accept",
@@ -4952,8 +4958,6 @@
                 "unit_viewer_members": "viewer seats",
                 "unit_goals": "goals",
                 "unit_bank_links": "linked accounts",
-                "kind_note_basic": "Household type limited to Solo — partners / family / friends need Plus or Max.",
-                "kind_note_unlocked": "Any household type unlocked (solo, partners, family, friends).",
                 "ceiling_unlimited": "Unlimited {unit}",
                 "ceiling_one": "1 {unit}",
                 "ceiling_n": "{count} {unit}",
@@ -5046,11 +5050,21 @@
                     "seat_limit": "Seat limit reached ({limit}). Add a seat (€2.50) or upgrade your plan for more room.",
                     "invite_email": "Invite (email)",
                     "invite_placeholder": "partner@example.com",
-                    "invite_role": "Role",
-                    "invite_role_admin": "Admin (high access)",
-                    "invite_role_member": "Member (day-to-day)",
+                    "invite_role": "Access",
+                    "role_owner": "Owner",
+                    "role_member": "Member",
+                    "role_viewer": "Viewer",
+                    "invite_role_member": "Member (can edit)",
                     "invite_role_viewer": "Viewer (look along)",
-                    "invite_viewer_hint": "Basic includes one viewer seat for a coach or social worker."
+                    "invite_relation": "Who are they to this board?",
+                    "invite_relation_family": "Family",
+                    "invite_relation_circle": "Trusted circle",
+                    "invite_relation_external": "Professional / third party",
+                    "invite_relation_hint_family": "Partner, parent, child, or other household family — personal money together.",
+                    "invite_relation_hint_circle": "Friend, roommate, or other trusted person — share the board without a Practice desk.",
+                    "invite_relation_hint_external": "Coach, advisor, or organisation — often better as a Practice client later.",
+                    "invite_viewer_hint": "Basic includes one viewer seat — add members when your plan allows.",
+                    "relation_founder": "Founder"
                 },
                 "devices": {
                     "eyebrow": "Devices",
@@ -5323,7 +5337,7 @@
                     "card_basic_feats": "{members} · Solo only · MONEY jars · Learn · Coach",
                     "card_plus_tag": "Most chosen",
                     "card_plus_line": "Share the board with family or friends — debt, energy week, and goals.",
-                    "card_plus_feats": "{members} · Any household kind · Debt · ENERGY · Goals",
+                    "card_plus_feats": "{members} · Debt · ENERGY · Goals",
                     "card_max_tag": "All four portals",
                     "card_max_line": "Unlimited household, income curve, learning, and net worth.",
                     "card_max_feats": "{members} · MONEY · Masterclass · Net worth",
@@ -5512,6 +5526,10 @@
                 "accept": "Accept",
                 "reject": "Decline",
                 "unlink": "Unlink",
+                "confirm_unlink": "Click again to unlink",
+                "unlinking": "Unlinking…",
+                "confirm_reject": "Click again to decline",
+                "rejecting": "Declining…",
                 "accepted": "Practice access accepted",
                 "rejected": "Practice invite declined",
                 "unlinked": "Practice unlinked",
@@ -5539,8 +5557,8 @@
                 "settings_sub_viewer": "Account and security",
                 "my_plan": "My plan",
                 "my_plan_sub": "What you use and pay",
-                "start_own": "Start my household",
-                "start_own_sub": "Your own jars and board — optional",
+                "start_own": "Start something of my own",
+                "start_own_sub": "Your household board or a practice desk",
                 "sign_out": "Sign out",
                 "sign_out_sub": "You stay signed in for 30 days",
                 "language": "Language",
@@ -5552,8 +5570,27 @@
             },
             "viewer": {
                 "look_along": "Looking along — read only",
-                "start_own_banner": "Want your own Rumtelo board? Start a household anytime.",
-                "start_own_cta": "Start my household"
+                "start_own_banner": "Want something of your own? Choose a household board or a practice desk.",
+                "start_own_cta": "Choose what to start",
+                "chooser_loading": "Loading",
+                "chooser_eyebrow": "Your next step",
+                "chooser_title": "Start something of your own",
+                "chooser_lead": "You’re looking along on someone else’s board. Pick what you need — you can always do both later.",
+                "chooser_household_title": "Household board",
+                "chooser_household_body": "Your own jars and money board for personal or family money.",
+                "chooser_household_bullet_1": "Six jars and a clear month plan",
+                "chooser_household_bullet_2": "Invite family or trusted people later",
+                "chooser_household_bullet_3": "You become the owner of your board",
+                "chooser_household_cta": "Start my household",
+                "chooser_practice_title": "Practice desk",
+                "chooser_practice_body": "For coaches and advisors who help other households.",
+                "chooser_practice_bullet_1": "Invite and manage client households",
+                "chooser_practice_bullet_2": "Staff seats and practice billing",
+                "chooser_practice_bullet_3": "Separate from your look-along seat",
+                "chooser_practice_cta": "Create a practice",
+                "chooser_practice_open_cta": "Open my practice",
+                "chooser_suggested": "Suggested for you",
+                "chooser_back": "Back to the board I’m looking along"
             },
             "period_options": {
                 "this_month": "This month",

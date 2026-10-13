@@ -8,7 +8,7 @@ import { oc } from '@orpc/contract';
 import { z } from 'zod';
 
 import { AuthId, HouseholdId, HouseholdScoped } from '../../../common/common.schema';
-import { HouseholdRole } from '../enums';
+import { HouseholdRelation, HouseholdRole } from '../enums';
 import { HouseholdPracticeLink, HouseholdPracticeLinkInput } from '../practice/practice.schema';
 import {
     Household,
@@ -29,7 +29,9 @@ export const householdInvite = oc
         z.object({
             householdId: HouseholdId,
             email: z.email(),
-            role: z.enum(HouseholdRole),
+            /** Invitees only — never OWNER. */
+            role: z.enum([HouseholdRole.MEMBER, HouseholdRole.VIEWER]),
+            relation: z.enum(HouseholdRelation),
         })
     )
     .output(z.object({ invitationId: AuthId }));
@@ -57,17 +59,17 @@ export const householdPracticeLinksList = oc
 
 export const householdUpdateSettings = oc.input(HouseholdSettingsPatch).output(HouseholdSettings);
 
-/** Household OWNER/ADMIN accepts a Practice invite → ACTIVE + timestamps. */
+/** Household OWNER accepts a Practice invite → ACTIVE + timestamps. */
 export const householdPracticeLinksAccept = oc
     .input(HouseholdPracticeLinkInput)
     .output(HouseholdPracticeLink);
 
-/** Household OWNER/ADMIN declines a pending Practice invite. */
+/** Household OWNER declines a pending Practice invite. */
 export const householdPracticeLinksReject = oc
     .input(HouseholdPracticeLinkInput)
     .output(HouseholdPracticeLink);
 
-/** Household OWNER/ADMIN unlinks an ACTIVE Practice contract. */
+/** Household OWNER unlinks an ACTIVE Practice contract. */
 export const householdPracticeLinksUnlink = oc
     .input(HouseholdPracticeLinkInput)
     .output(HouseholdPracticeLink);

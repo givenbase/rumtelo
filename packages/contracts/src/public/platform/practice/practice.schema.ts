@@ -100,7 +100,7 @@ export const PracticeClientLink = z.object({
     access: z.enum(PracticeClientAccess),
     controlFlags: z.array(z.enum(PracticeClientControlFlag)).default([]),
     addedByAccountId: Id.nullable(),
-    /** When household OWNER/ADMIN accepted; null while INVITED. */
+    /** When household OWNER accepted; null while INVITED. */
     householdAcceptedAt: IsoDateTime.nullable(),
     activatedAt: IsoDateTime.nullable(),
     revokedAt: IsoDateTime.nullable(),
@@ -206,7 +206,7 @@ export const PracticeAddClientInput = z.object({
     email: z.email().optional(),
     /**
      * Both VIEW and MANAGE start INVITED. ACTIVE + MANAGE sponsorship only after
-     * household OWNER/ADMIN accept (`household.practiceLinks.accept`).
+     * household OWNER accept (`household.practiceLinks.accept`).
      */
     access: z.enum(PracticeClientAccess).default(PracticeClientAccess.VIEW),
 });

@@ -2,7 +2,7 @@ import type { z } from 'zod';
 
 import {
     Currency,
-    HouseholdKind,
+    HouseholdRelation,
     HouseholdRole,
     IncomeKind,
     IncomeStability,
@@ -11,7 +11,6 @@ import {
     PayoffStrategy,
     canAddHouseholdMember,
     canInviteOnPlan,
-    canUseHouseholdKind,
     effectiveSeatCaps,
     isWritableHouseholdRole,
     localeToIntl,
@@ -41,6 +40,17 @@ import { AuthHousehold } from './managed/household/auth-household.entity';
 import { AuthInvitation } from './managed/invitation/auth-invitation.entity';
 import { AuthSession } from '../user/managed/session/auth-session.entity';
 import { AuthMember } from './managed/member/auth-member.entity';
+
+function parseHouseholdRelation(raw: string | null | undefined): HouseholdRelation | null {
+    if (
+        raw === HouseholdRelation.FAMILY ||
+        raw === HouseholdRelation.CIRCLE ||
+        raw === HouseholdRelation.EXTERNAL
+    ) {
+        return raw;
+    }
+    return null;
+}
 
 /**
  * Household aggregate — orchestrates Better Auth's organization plugin
@@ -73,7 +83,12 @@ export class HouseholdService {
         return this.onboardInternal(input, headers);
     }
 
-    async invite(householdId: string, email: string, role: HouseholdRole) {
+    async invite(
+        householdId: string,
+        email: string,
+        role: HouseholdRole.MEMBER | HouseholdRole.VIEWER,
+        relation: HouseholdRelation
+    ) {
         const settings = await this.householdSettings.get(householdId);
         const planKey = settings.planKey;
         if (!canInviteOnPlan(planKey)) {
@@ -114,8 +129,10 @@ export class HouseholdService {
         const result = await this.authService.api.createInvitation({
             body: {
                 email,
-                role: role.toLowerCase() as 'owner' | 'admin' | 'member' | 'viewer',
+                role: role.toLowerCase() as 'member' | 'viewer',
                 organizationId: householdId,
+                // BA organization additionalFields — see auth.config schema.invitation
+                relation,
             },
             headers,
         });
@@ -180,6 +197,7 @@ export class HouseholdService {
                     accountId: account.id,
                     userId: user.id,
                     role: mapRole(member.role),
+                    relation: parseHouseholdRelation(member.relation),
                     displayName: user.name,
                     email: user.email,
                     image: user.image ?? null,
@@ -282,7 +300,6 @@ export class HouseholdService {
         }
 
         const planKey = PlanKey.BASIC;
-        const kind = canUseHouseholdKind(planKey, input.kind) ? input.kind : HouseholdKind.SOLO;
 
         const splitTotal = input.split.reduce(
             (sum: number, share: { percentage: number }) => sum + share.percentage,
@@ -340,7 +357,6 @@ export class HouseholdService {
 
         this.householdSettings.create({
             householdId: org.id,
-            kind,
             planKey,
             currency: input.currency,
             why: input.why,
@@ -405,7 +421,8 @@ function mapRole(raw: string): HouseholdRole {
         case 'owner':
             return HouseholdRole.OWNER;
         case 'admin':
-            return HouseholdRole.ADMIN;
+            // Collapsed into MEMBER — Owner / Member / Viewer product ladder.
+            return HouseholdRole.MEMBER;
         case 'member':
             return HouseholdRole.MEMBER;
         case 'viewer':

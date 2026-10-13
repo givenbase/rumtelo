@@ -299,7 +299,9 @@
                 "who_owe_required": "Es obligatorio indicar a quién se le debe el importe",
                 "term_payments": "Introduce el número de pagos",
                 "pick_deadline": "Elige una fecha límite",
-                "due_month_required": "Elige en qué mes se te cobrará"
+                "due_month_required": "Elige en qué mes se te cobrará",
+                "intention_required": "Escribe una frase para la semana que viene",
+                "intention_max": "Que no supere los 280 caracteres"
             },
             "aria": {
                 "pick_mode": "¿Cómo quieres elegir?",
@@ -752,7 +754,12 @@
                 "month_score_badge": "Puntuación mensual",
                 "month_score_slide": "Consejos para la puntuación mensual",
                 "previous": "Anterior",
-                "next": "Siguiente"
+                "next": "Siguiente",
+                "collapse": "Ocultar",
+                "expand": "Mostrar entrenador",
+                "collapsed_clear": "No hay que esperar: amplía la partitura cuando quieras",
+                "collapsed_attention": "Hay algo que te necesita",
+                "collapsed_waiting": "{count} en espera"
             },
             "dismiss": "Descartar",
             "got_it": "Entendido",
@@ -1561,12 +1568,7 @@
                     },
                     "pick": {
                         "shelf": "Estantería",
-                        "queue": {
-                            "book": "Por leer",
-                            "watch": "Por ver",
-                            "listen": "Por escuchar",
-                            "take": "Por hacer"
-                        },
+                        "queue": "Por enfocar",
                         "now": {
                             "book": "Leyendo",
                             "watch": "Viendo",
@@ -2464,7 +2466,13 @@
                 "intend_encourage": "Bien. Recuérdalo cuando la semana se te haga dura.",
                 "back": "← Atrás",
                 "next": "Siguiente →",
-                "complete": "Revisión semanal completa ✓"
+                "complete": "Revisión semanal completa ✓",
+                "toast_done": "Ya he hecho el repaso semanal. Nos vemos la semana que viene.",
+                "done_eyebrow": "✦ Hecho",
+                "done_title": "La comprobación de esta semana ha finalizado",
+                "done_lead": "Una mirada, un desvío, una intención. Vuelve la semana que viene.",
+                "done_intention_label": "Tu intención",
+                "done_home": "De vuelta a casa"
             },
             "giving_finder": {
                 "title": "¿En qué quieres echar una mano?",
@@ -3292,10 +3300,6 @@
                 }
             },
             "recap": {
-                "money_what": "he pasado esta semana",
-                "growth_what": "crecimiento de los ingresos/año",
-                "energy_what": "ha entrenado esta semana",
-                "soul_what": "la quietud de hoy",
                 "surplus": "Quedan {amount} de este periodo",
                 "overspent": "Se ha superado el presupuesto de una o varias partidas"
             },
@@ -4640,6 +4644,8 @@
                 "status_active": "Activo",
                 "status_revoked": "Revocado",
                 "revoke": "Revocar",
+                "confirm_revoke": "Haz clic de nuevo para revocar",
+                "revoking": "Revocando…",
                 "submit": "Añadir cliente",
                 "added": "Se ha añadido un cliente",
                 "invited": "Invitación enviada",
@@ -4952,8 +4958,6 @@
                 "unit_viewer_members": "asientos para espectadores",
                 "unit_goals": "objetivos",
                 "unit_bank_links": "cuentas vinculadas",
-                "kind_note_basic": "El tipo de hogar se limita a «Solo»: para parejas, familiares o amigos se requiere el plan Plus o Max.",
-                "kind_note_unlocked": "Cualquier tipo de hogar (persona sola, pareja, familia, amigos).",
                 "ceiling_unlimited": "Ilimitado {unit}",
                 "ceiling_one": "1 {unit}",
                 "ceiling_n": "{count} {unit}",
@@ -5047,10 +5051,20 @@
                     "invite_email": "Invitar (correo electrónico)",
                     "invite_placeholder": "partner@example.com",
                     "invite_role": "Función",
-                    "invite_role_admin": "Administrador (con acceso de alto nivel)",
+                    "role_owner": "Propietario",
+                    "role_member": "Miembro",
+                    "role_viewer": "Visor",
                     "invite_role_member": "Full access",
                     "invite_role_viewer": "Viewer (coach / look along)",
-                    "invite_viewer_hint": "La tarifa «Básica» incluye una plaza de espectador para un entrenador o un trabajador social."
+                    "invite_relation": "¿Quiénes son para este tablero?",
+                    "invite_relation_family": "Familia",
+                    "invite_relation_circle": "Círculo de confianza",
+                    "invite_relation_external": "Profesional / tercero",
+                    "invite_relation_hint_family": "Pareja, padre, madre, hijo u otra familia del hogar — dinero personal juntos.",
+                    "invite_relation_hint_circle": "Amigo, compañero de piso u otra persona de confianza — compartid el tablero sin un escritorio Practice.",
+                    "invite_relation_hint_external": "Coach, asesor u organización — a menudo mejor más adelante como cliente Practice.",
+                    "invite_viewer_hint": "La tarifa «Básica» incluye una plaza de espectador para un entrenador o un trabajador social.",
+                    "relation_founder": "Fundador"
                 },
                 "devices": {
                     "eyebrow": "Dispositivos",
@@ -5512,6 +5526,10 @@
                 "accept": "Aceptar",
                 "reject": "Descenso",
                 "unlink": "Desvincular",
+                "confirm_unlink": "Haz clic de nuevo para desvincular",
+                "unlinking": "Desvinculando…",
+                "confirm_reject": "Haz clic de nuevo para rechazar",
+                "rejecting": "Rechazando…",
                 "accepted": "Se admite el acceso a la consulta",
                 "rejected": "Se ha rechazado la invitación a la sesión de entrenamiento",
                 "unlinked": "Práctica sin vincular",
@@ -5553,7 +5571,26 @@
             "viewer": {
                 "look_along": "Vista general — solo lectura",
                 "start_own_banner": "¿Quieres tu propio tablero de Rumtelo? Crea un grupo familiar cuando quieras.",
-                "start_own_cta": "Empezar mi vida familiar"
+                "start_own_cta": "Empezar mi vida familiar",
+                "chooser_loading": "Cargando",
+                "chooser_eyebrow": "Tu próximo paso",
+                "chooser_title": "Pon en marcha tu propio proyecto",
+                "chooser_lead": "Estás echando un vistazo al tablero de otra persona. Elige lo que necesites; siempre puedes hacer las dos cosas más tarde.",
+                "chooser_household_title": "Tablón de anuncios del hogar",
+                "chooser_household_body": "Tus propios tarros y tablero de dinero para tus ahorros personales o familiares.",
+                "chooser_household_bullet_1": "Seis tarros y un plan mensual claro",
+                "chooser_household_bullet_2": "Invita más adelante a tu familia o a personas de confianza",
+                "chooser_household_bullet_3": "Te conviertes en el propietario de tu tabla",
+                "chooser_household_cta": "Empezar mi vida familiar",
+                "chooser_practice_title": "Mesa de trabajo",
+                "chooser_practice_body": "Para formadores y asesores que ayudan a otras familias.",
+                "chooser_practice_bullet_1": "Invitar y gestionar los hogares de los clientes",
+                "chooser_practice_bullet_2": "Puestos de personal y facturación de las sesiones de entrenamiento",
+                "chooser_practice_bullet_3": "Aparte de tu asiento para seguir la función",
+                "chooser_practice_cta": "Crear una sesión de entrenamiento",
+                "chooser_practice_open_cta": "Abrir mi consulta",
+                "chooser_suggested": "Recomendaciones para ti",
+                "chooser_back": "Volviendo al tablero, estoy mirando a lo largo de…"
             },
             "period_options": {
                 "this_month": "Este mes",
@@ -5690,12 +5727,12 @@
                 "locked_body": "Esta parte de Rumtelo se encuentra en una cota más elevada.",
                 "locked_plan_title": "Disponible en el plan {plan}",
                 "locked_plan_title_practice": "Este cliente necesita {plan}",
-                "locked_plan_title_viewer": "Not included on this household’s plan",
+                "locked_plan_title_viewer": "No está incluido en el plan de este hogar",
                 "locked_plan_body_practice": "Su plan familiar no incluye esto. Si tú te encargas de gestionarlos, cambia a la opción de facturación «Practice».",
-                "locked_plan_body_viewer": "You’re looking along — only someone who manages this household can open this with a higher plan.",
+                "locked_plan_body_viewer": "Estás mirando… Solo alguien que se encargue de esta casa puede abrir esto con un plan superior.",
                 "locked_plan_aria": "Es necesario actualizar el plan",
                 "locked_plan_aria_practice": "Es necesario actualizar el plan del cliente",
-                "locked_plan_aria_viewer": "Not available on this household’s plan",
+                "locked_plan_aria_viewer": "No está disponible en el plan de este hogar",
                 "upgrade_cta": "Actualizar a {plan}",
                 "upgrade_cta_practice": "Facturación de consultas abiertas",
                 "back_to_practice": "Volver a los clientes de Practice",

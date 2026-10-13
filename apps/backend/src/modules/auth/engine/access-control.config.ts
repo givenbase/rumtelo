@@ -1,16 +1,16 @@
 /**
  * Household roles for the organization plugin.
  *
- * Better-auth roles (keep 1:1 with {@link HouseholdRole} in contracts):
- * - **owner** — creator of the household / company (100% control)
- * - **admin** — high trust (~80%); org/member/invite mutations, not the creator
- * - **member** — limited write; day-to-day board work, no org admin
- * - **viewer** — look-along only; no organization / member / invitation mutations
+ * Product ladder is Owner / Member / Viewer (`HouseholdRole` in contracts).
+ * Better-auth still registers **admin** for legacy rows; new invites only use
+ * member | viewer. Service-layer mapRole collapses BA `admin` → MEMBER.
  *
- * Relationship labels ("Partner", "Kid") are UI copy from household kind — never roles.
+ * - **owner** — creator (100% control)
+ * - **admin** — legacy only; treated as member in the product
+ * - **member** — day-to-day write + invite when plan allows
+ * - **viewer** — look-along only
  *
- * Seat add-ons (`SeatAddonKind`) are billing inventory, not roles: a CONTRIBUTOR
- * seat may be filled by admin or member; a VIEWER seat only by viewer.
+ * Seat add-ons (`SeatAddonKind`) are billing inventory, not roles.
  */
 import { createAccessControl } from 'better-auth/plugins/access';
 import {

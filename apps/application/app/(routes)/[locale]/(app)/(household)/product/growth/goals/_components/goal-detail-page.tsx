@@ -207,13 +207,16 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
         [] as never,
         live
     );
+    const periodKey = toPeriodKey(period.year, period.month);
     const jarsQuery = useLiveQuery(
         apiQuery.money.jars.list.queryOptions({ input: { householdId: householdId! } }),
         [] as never,
         live
     );
     const balancesQuery = useLiveQuery(
-        apiQuery.money.jars.balances.queryOptions({ input: { householdId: householdId! } }),
+        apiQuery.money.jars.balances.queryOptions({
+            input: { householdId: householdId!, period: periodKey },
+        }),
         [] as never,
         live
     );
@@ -288,7 +291,6 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
             })
           : goal.saved;
     const travel = describePeriodTravel(period);
-    const periodKey = toPeriodKey(period.year, period.month);
     const atPeriod =
         travel.direction === 'current' || isEarn
             ? null

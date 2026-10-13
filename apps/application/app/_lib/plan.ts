@@ -174,8 +174,6 @@ export type PlanChangeDiff = {
     /** Features no longer granted — data kept, access disabled until upgrade. */
     lost: PlanChangeItem[];
     limitChanges: PlanLimitChange[];
-    /** Household-kind eligibility notes. */
-    kindNotes: string[];
 };
 
 function capItem(key: CapabilityKey, t?: TranslateFn): PlanChangeItem {
@@ -258,23 +256,6 @@ export function diffPlans(from: PlanKey, to: PlanKey, t?: TranslateFn): PlanChan
         toLimits.maxBankLinks
     );
 
-    const fromKinds = new Set(capabilitiesFor(from).householdKinds);
-    const toKinds = new Set(capabilitiesFor(to).householdKinds);
-    const kindNotes: string[] = [];
-    if (fromKinds.size !== toKinds.size || [...fromKinds].some(k => !toKinds.has(k))) {
-        if (to === PlanKey.BASIC) {
-            kindNotes.push(
-                t?.('pages.settings.plan.kind_note_basic') ??
-                    'Household type limited to Solo — partners / family / friends need Plus or Max.'
-            );
-        } else if (from === PlanKey.BASIC) {
-            kindNotes.push(
-                t?.('pages.settings.plan.kind_note_unlocked') ??
-                    'Any household type unlocked (solo, partners, family, friends).'
-            );
-        }
-    }
-
     return {
         from,
         to,
@@ -282,6 +263,5 @@ export function diffPlans(from: PlanKey, to: PlanKey, t?: TranslateFn): PlanChan
         gained,
         lost,
         limitChanges,
-        kindNotes,
     };
 }

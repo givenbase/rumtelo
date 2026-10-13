@@ -860,7 +860,8 @@ export class PracticeService {
     private async assertHouseholdOwnerOrAdmin(householdId: string): Promise<void> {
         const userId = currentUserId();
         const role = await this.membership.roleFor(userId, householdId);
-        if (role !== 'OWNER' && role !== 'ADMIN') {
+        // Product roles are Owner / Member / Viewer — Practice dual-consent is OWNER-only.
+        if (role !== 'OWNER') {
             throw apiForbidden('practice_household_forbidden');
         }
     }
