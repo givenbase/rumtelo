@@ -87,6 +87,8 @@ const practice = {
         status_active: 'Active',
         status_revoked: 'Revoked',
         revoke: 'Revoke',
+        confirm_revoke: 'Click again to revoke',
+        revoking: 'Revoking…',
         submit: 'Send invitation',
         added: 'Invitation sent — waiting for household accept',
         invited: 'Invitation sent — waiting for household accept',

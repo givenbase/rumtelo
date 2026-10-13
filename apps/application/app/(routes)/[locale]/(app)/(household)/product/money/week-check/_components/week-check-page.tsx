@@ -68,10 +68,13 @@ export function WeekCheckPageClient() {
                 });
             }
         },
-        onSuccess: () => {
+        onSuccess: (_data, payload) => {
             void queryClient.invalidateQueries({
                 queryKey: apiQuery.money.weekCheck.current.key(),
             });
+            if (payload.stage === WeekCheckStage.DONE) {
+                showToast(t('toast_done'), 'success');
+            }
         },
         onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
@@ -103,6 +106,9 @@ export function WeekCheckPageClient() {
                 jars={jars}
                 surplus={surplus}
                 initialStage={weekCheckQuery.data?.stage}
+                completedAt={weekCheckQuery.data?.completedAt}
+                initialIntention={weekCheckQuery.data?.intention ?? ''}
+                busy={advance.isPending}
                 onStepComplete={
                     live
                         ? (stage, payload) =>

@@ -299,7 +299,9 @@
                 "who_owe_required": "Je moet aangeven aan wie je geld verschuldigd bent",
                 "term_payments": "Voer het aantal betalingen in",
                 "pick_deadline": "Kies een deadline",
-                "due_month_required": "Kies de maand waarvoor de kosten in rekening worden gebracht"
+                "due_month_required": "Kies de maand waarvoor de kosten in rekening worden gebracht",
+                "intention_required": "Schrijf één zin voor volgende week",
+                "intention_max": "Houd het onder de 280 tekens"
             },
             "aria": {
                 "pick_mode": "Hoe wil je kiezen?",
@@ -752,7 +754,12 @@
                 "month_score_badge": "Maandscore",
                 "month_score_slide": "Maandscore-advies",
                 "previous": "Vorige",
-                "next": "Volgende"
+                "next": "Volgende",
+                "collapse": "Samenvouwen",
+                "expand": "Coach weergeven",
+                "collapsed_clear": "Er staat niets op je te wachten — vouw het uit wanneer je de score wilt zien",
+                "collapsed_attention": "Er is iets dat jou nodig heeft",
+                "collapsed_waiting": "{count} wacht"
             },
             "dismiss": "Sluiten",
             "got_it": "Oké, begrepen",
@@ -2459,7 +2466,13 @@
                 "intend_encourage": "Goed. Onthoud dit als je het deze week even moeilijk hebt.",
                 "back": "← Terug",
                 "next": "Volgende →",
-                "complete": "Weekcontrole voltooid ✓"
+                "complete": "Weekcontrole voltooid ✓",
+                "toast_done": "De wekelijkse controle is afgerond. Tot volgende week.",
+                "done_eyebrow": "✦ Klaar",
+                "done_title": "De controle van deze week is afgerond",
+                "done_lead": "Eén blik, één doorverwijzing, één bedoeling. Kom volgende week weer eens langs.",
+                "done_intention_label": "Je bedoeling",
+                "done_home": "Weer thuis"
             },
             "giving_finder": {
                 "title": "Waar wil je helpen?",
@@ -3287,10 +3300,6 @@
                 }
             },
             "recap": {
-                "money_what": "heb deze week doorgebracht",
-                "growth_what": "inkomensgroei per jaar",
-                "energy_what": "deze week getraind",
-                "soul_what": "stilte vandaag",
                 "surplus": "{amount} heeft deze periode verlaten",
                 "overspent": "Er is te veel uitgegeven aan een of meer potten"
             },
@@ -4635,6 +4644,8 @@
                 "status_active": "Actief",
                 "status_revoked": "Ingetrokken",
                 "revoke": "Intrekken",
+                "confirm_revoke": "Klik nogmaals om in te trekken",
+                "revoking": "Intrekken…",
                 "submit": "Cliënt toevoegen",
                 "added": "Cliënt gekoppeld",
                 "invited": "Uitnodiging verstuurd",
@@ -5515,6 +5526,10 @@
                 "accept": "Accepteren",
                 "reject": "Afname",
                 "unlink": "Koppeling verwijderen",
+                "confirm_unlink": "Klik nogmaals om te ontkoppelen",
+                "unlinking": "Ontkoppelen…",
+                "confirm_reject": "Klik nogmaals om te weigeren",
+                "rejecting": "Weigeren…",
                 "accepted": "Toegang tot de praktijk wordt geaccepteerd",
                 "rejected": "Uitnodiging voor oefensessie afgewezen",
                 "unlinked": "Oefening zonder koppeling",

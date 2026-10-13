@@ -299,7 +299,9 @@
                 "who_owe_required": "Es obligatorio indicar a quién se le debe el importe",
                 "term_payments": "Introduce el número de pagos",
                 "pick_deadline": "Elige una fecha límite",
-                "due_month_required": "Elige en qué mes se te cobrará"
+                "due_month_required": "Elige en qué mes se te cobrará",
+                "intention_required": "Escribe una frase para la semana que viene",
+                "intention_max": "Que no supere los 280 caracteres"
             },
             "aria": {
                 "pick_mode": "¿Cómo quieres elegir?",
@@ -752,7 +754,12 @@
                 "month_score_badge": "Puntuación mensual",
                 "month_score_slide": "Consejos para la puntuación mensual",
                 "previous": "Anterior",
-                "next": "Siguiente"
+                "next": "Siguiente",
+                "collapse": "Ocultar",
+                "expand": "Mostrar entrenador",
+                "collapsed_clear": "No hay que esperar: amplía la partitura cuando quieras",
+                "collapsed_attention": "Hay algo que te necesita",
+                "collapsed_waiting": "{count} en espera"
             },
             "dismiss": "Descartar",
             "got_it": "Entendido",
@@ -2459,7 +2466,13 @@
                 "intend_encourage": "Bien. Recuérdalo cuando la semana se te haga dura.",
                 "back": "← Atrás",
                 "next": "Siguiente →",
-                "complete": "Revisión semanal completa ✓"
+                "complete": "Revisión semanal completa ✓",
+                "toast_done": "Ya he hecho el repaso semanal. Nos vemos la semana que viene.",
+                "done_eyebrow": "✦ Hecho",
+                "done_title": "La comprobación de esta semana ha finalizado",
+                "done_lead": "Una mirada, un desvío, una intención. Vuelve la semana que viene.",
+                "done_intention_label": "Tu intención",
+                "done_home": "De vuelta a casa"
             },
             "giving_finder": {
                 "title": "¿En qué quieres echar una mano?",
@@ -3287,10 +3300,6 @@
                 }
             },
             "recap": {
-                "money_what": "he pasado esta semana",
-                "growth_what": "crecimiento de los ingresos/año",
-                "energy_what": "ha entrenado esta semana",
-                "soul_what": "la quietud de hoy",
                 "surplus": "Quedan {amount} de este periodo",
                 "overspent": "Se ha superado el presupuesto de una o varias partidas"
             },
@@ -4635,6 +4644,8 @@
                 "status_active": "Activo",
                 "status_revoked": "Revocado",
                 "revoke": "Revocar",
+                "confirm_revoke": "Haz clic de nuevo para revocar",
+                "revoking": "Revocando…",
                 "submit": "Añadir cliente",
                 "added": "Se ha añadido un cliente",
                 "invited": "Invitación enviada",
@@ -5515,6 +5526,10 @@
                 "accept": "Aceptar",
                 "reject": "Descenso",
                 "unlink": "Desvincular",
+                "confirm_unlink": "Haz clic de nuevo para desvincular",
+                "unlinking": "Desvinculando…",
+                "confirm_reject": "Haz clic de nuevo para rechazar",
+                "rejecting": "Rechazando…",
                 "accepted": "Se admite el acceso a la consulta",
                 "rejected": "Se ha rechazado la invitación a la sesión de entrenamiento",
                 "unlinked": "Práctica sin vincular",

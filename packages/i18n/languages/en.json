@@ -299,7 +299,9 @@
                 "who_owe_required": "Who you owe is required",
                 "term_payments": "Enter how many payments",
                 "pick_deadline": "Pick a deadline",
-                "due_month_required": "Pick which month you are charged"
+                "due_month_required": "Pick which month you are charged",
+                "intention_required": "Write one sentence for next week",
+                "intention_max": "Keep it under 280 characters"
             },
             "aria": {
                 "pick_mode": "How do you want to pick?",
@@ -752,7 +754,12 @@
                 "month_score_badge": "Month score",
                 "month_score_slide": "Month score advice",
                 "previous": "Previous",
-                "next": "Next"
+                "next": "Next",
+                "collapse": "Collapse",
+                "expand": "Show coach",
+                "collapsed_clear": "Nothing waiting — expand when you want the score",
+                "collapsed_attention": "Something needs you",
+                "collapsed_waiting": "{count} waiting"
             },
             "dismiss": "Dismiss",
             "got_it": "Got it",
@@ -2459,7 +2466,13 @@
                 "intend_encourage": "Good. Remember this when the week feels hard.",
                 "back": "← Back",
                 "next": "Next →",
-                "complete": "Complete week check ✓"
+                "complete": "Complete week check ✓",
+                "toast_done": "Week check done. See you next week.",
+                "done_eyebrow": "✦ Done",
+                "done_title": "This week’s check is complete",
+                "done_lead": "One look, one redirect, one intention. Come back next week.",
+                "done_intention_label": "Your intention",
+                "done_home": "Back home"
             },
             "giving_finder": {
                 "title": "Where do you want to help?",
@@ -3287,10 +3300,6 @@
                 }
             },
             "recap": {
-                "money_what": "spent this week",
-                "growth_what": "income growth/year",
-                "energy_what": "trained this week",
-                "soul_what": "stillness today",
                 "surplus": "{amount} left this period",
                 "overspent": "One or more jars are overspent"
             },
@@ -4245,7 +4254,7 @@
                     },
                     "storage": {
                         "title": "Local and session storage",
-                        "body": "On some devices we also use sessionStorage (key rumtelo.pendingPlan) as a fallback for the plan you picked, because the website and app may run on different ports in local development. That value stays in that browser tab and is not sent to advertisers."
+                        "body": "On some devices we also use sessionStorage (key rumtelo:intent:pending-plan) as a fallback for the plan you picked, because the website and app may run on different ports in local development. That value stays in that browser tab and is not sent to advertisers."
                     },
                     "manage": {
                         "title": "How you can control cookies",
@@ -4635,6 +4644,8 @@
                 "status_active": "Active",
                 "status_revoked": "Revoked",
                 "revoke": "Revoke",
+                "confirm_revoke": "Click again to revoke",
+                "revoking": "Revoking…",
                 "submit": "Send invitation",
                 "added": "Invitation sent — waiting for household accept",
                 "invited": "Invitation sent — waiting for household accept",
@@ -5515,6 +5526,10 @@
                 "accept": "Accept",
                 "reject": "Decline",
                 "unlink": "Unlink",
+                "confirm_unlink": "Click again to unlink",
+                "unlinking": "Unlinking…",
+                "confirm_reject": "Click again to decline",
+                "rejecting": "Declining…",
                 "accepted": "Practice access accepted",
                 "rejected": "Practice invite declined",
                 "unlinked": "Practice unlinked",

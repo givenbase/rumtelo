@@ -59,6 +59,18 @@ function refineDueMonthRequired(
     }
 }
 
+export function createWeekCheckIntendSchema(msg: FormT) {
+    return z.object({
+        intention: z
+            .string()
+            .trim()
+            .min(1, msg('validation.intention_required'))
+            .max(280, msg('validation.intention_max')),
+    });
+}
+
+export type WeekCheckIntendSchemaValues = z.infer<ReturnType<typeof createWeekCheckIntendSchema>>;
+
 export function createExpenseFormSchema(msg: FormT) {
     return z.object({
         amount: positiveMoneyInput(msg),

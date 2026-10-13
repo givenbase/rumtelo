@@ -24,6 +24,7 @@ import {
 } from '@rumtelo/ui';
 
 import { practicePath } from '@/app/_lib/routes';
+import { ConfirmActionButton } from '@/components/features/forms/confirm-action-button';
 
 function statusTone(
     status: PracticeClientLink['status']
@@ -121,14 +122,17 @@ export function PracticeClientsTable({
                         <TableCell className="text-right">
                             <div className="inline-flex items-center justify-end gap-1">
                                 {onRevoke && client.status !== PracticeClientLinkStatus.REVOKED ? (
-                                    <Button
+                                    <ConfirmActionButton
                                         variant="ghost"
                                         size="sm"
-                                        className="text-danger hover:text-danger"
+                                        className="text-danger hover:bg-danger/10 hover:text-danger"
                                         disabled={revokePending}
-                                        onClick={() => onRevoke(client.id)}>
-                                        {t('pages.practice.clients.revoke')}
-                                    </Button>
+                                        pending={revokePending}
+                                        label={t('pages.practice.clients.revoke')}
+                                        confirmLabel={t('pages.practice.clients.confirm_revoke')}
+                                        pendingLabel={t('pages.practice.clients.revoking')}
+                                        onConfirm={() => onRevoke(client.id)}
+                                    />
                                 ) : null}
                                 <Button
                                     as={Link}

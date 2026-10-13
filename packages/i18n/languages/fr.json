@@ -299,7 +299,9 @@
                 "who_owe_required": "Il est obligatoire d'indiquer à qui vous devez de l'argent",
                 "term_payments": "Indiquez le nombre de versements",
                 "pick_deadline": "Choisissez une date limite",
-                "due_month_required": "Choisissez le mois au cours duquel vous serez facturé"
+                "due_month_required": "Choisissez le mois au cours duquel vous serez facturé",
+                "intention_required": "Écris une phrase pour la semaine prochaine",
+                "intention_max": "Ne dépassez pas les 280 caractères"
             },
             "aria": {
                 "pick_mode": "Comment souhaitez-vous choisir ?",
@@ -752,7 +754,12 @@
                 "month_score_badge": "Score mensuel",
                 "month_score_slide": "Conseils pour le score mensuel",
                 "previous": "Précédent",
-                "next": "Suivant"
+                "next": "Suivant",
+                "collapse": "Réduire",
+                "expand": "Afficher l'entraîneur",
+                "collapsed_clear": "Rien à attendre — développez la partition quand vous le souhaitez",
+                "collapsed_attention": "Il y a quelque chose qui a besoin de toi",
+                "collapsed_waiting": "{count} en attente"
             },
             "dismiss": "Ignorer",
             "got_it": "D'accord",
@@ -2459,7 +2466,13 @@
                 "intend_encourage": "Très bien. Garde ça à l'esprit quand la semaine te semblera difficile.",
                 "back": "← Retour",
                 "next": "Suivant →",
-                "complete": "Vérification hebdomadaire terminée ✓"
+                "complete": "Vérification hebdomadaire terminée ✓",
+                "toast_done": "Le bilan hebdomadaire est fait. À la semaine prochaine.",
+                "done_eyebrow": "✦ Terminé",
+                "done_title": "Le contrôle de cette semaine est terminé",
+                "done_lead": "Un regard, une redirection, une intention. Revenez la semaine prochaine.",
+                "done_intention_label": "Votre intention",
+                "done_home": "De retour chez moi"
             },
             "giving_finder": {
                 "title": "Dans quel domaine souhaitez-vous apporter votre aide ?",
@@ -3287,10 +3300,6 @@
                 }
             },
             "recap": {
-                "money_what": "a passé cette semaine",
-                "growth_what": "croissance des revenus par an",
-                "energy_what": "s'est entraîné cette semaine",
-                "soul_what": "le calme aujourd'hui",
                 "surplus": "Il reste {amount} de cette période",
                 "overspent": "Un ou plusieurs postes de budget ont dépassé leur plafond."
             },
@@ -4635,6 +4644,8 @@
                 "status_active": "Actif",
                 "status_revoked": "Révoqué",
                 "revoke": "Révoquer",
+                "confirm_revoke": "Cliquez encore pour révoquer",
+                "revoking": "Révocation…",
                 "submit": "Ajouter un client",
                 "added": "Client ajouté",
                 "invited": "Invitation envoyée",
@@ -5515,6 +5526,10 @@
                 "accept": "Accepter",
                 "reject": "Baisse",
                 "unlink": "Supprimer le lien",
+                "confirm_unlink": "Cliquez encore pour supprimer le lien",
+                "unlinking": "Suppression du lien…",
+                "confirm_reject": "Cliquez encore pour refuser",
+                "rejecting": "Refus…",
                 "accepted": "Accès au cabinet accepté",
                 "rejected": "Invitation à l'entraînement refusée",
                 "unlinked": "Entraînement sans lien",

@@ -15,6 +15,7 @@ import { Badge, Button, Icon, StubNotice } from '@rumtelo/ui';
 import { cn, formatMoney } from '@rumtelo/utils';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
+import { isProductEnabled } from '@/app/_lib/launch-products';
 import { practicePath } from '@/app/_lib/routes';
 import { usePracticePreview } from '@/components/features/shell/practice-preview';
 
@@ -105,14 +106,13 @@ export function PracticeClientDetailPage({ linkId }: { linkId: string }) {
     }
 
     const isManaged = client.access === PracticeClientAccess.MANAGE && isActive;
-    const progressNote = !isActive
-        ? t('pages.practice.clients.progress_pending')
-        : isManaged
-          ? t('pages.practice.clients.progress_blurb')
-          : t('pages.practice.clients.progress_view_only');
+    const progressNote = isManaged
+        ? t('pages.practice.clients.progress_blurb')
+        : t('pages.practice.clients.progress_view_only');
 
     const snapshotPending = snapshotEnabled && snapshotQuery.isPending;
 
+    // Same launch filter as nav — production shows Money + Growth only.
     const portals = [
         {
             key: 'money',
@@ -154,7 +154,7 @@ export function PracticeClientDetailPage({ linkId }: { linkId: string }) {
                 : null,
             hint: t('pages.practice.clients.portal_soul_hint'),
         },
-    ];
+    ].filter(portal => isProductEnabled(portal.key));
 
     function openHouseholdBoard() {
         if (!isActive || !activePractice) return;
@@ -240,41 +240,43 @@ export function PracticeClientDetailPage({ linkId }: { linkId: string }) {
                 </p>
             </PracticeInkCard>
 
-            <PracticeInkCard
-                eyebrow={t('pages.practice.clients.progress_eyebrow')}
-                blurb={progressNote}>
-                <div className="grid gap-3 py-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {portals.map(portal => (
-                        <div
-                            key={portal.key}
-                            className={cn(
-                                'rounded-xl border border-l-4 border-line px-3.5 py-3',
-                                portal.rail
-                            )}>
-                            <p className="font-mono text-[10px] tracking-[0.12em] text-fg-muted uppercase">
-                                {t(portal.labelKey)}
-                            </p>
-                            <p
+            {isActive ? (
+                <PracticeInkCard
+                    eyebrow={t('pages.practice.clients.progress_eyebrow')}
+                    blurb={progressNote}>
+                    <div
+                        className={cn(
+                            'grid gap-3 py-4 sm:grid-cols-2',
+                            portals.length > 2 && 'lg:grid-cols-4'
+                        )}>
+                        {portals.map(portal => (
+                            <div
+                                key={portal.key}
                                 className={cn(
-                                    'mt-2 font-mono text-2xl font-semibold tabular-nums',
-                                    portal.value ? 'text-fg' : 'text-fg-faint'
+                                    'rounded-xl border border-l-4 border-line px-3.5 py-3',
+                                    portal.rail
                                 )}>
-                                {!isActive
-                                    ? t('pages.practice.clients.portal_placeholder')
-                                    : snapshotPending
-                                      ? '…'
-                                      : (portal.value ??
-                                        t('pages.practice.clients.portal_placeholder'))}
-                            </p>
-                            <p className="mt-1 text-[11px] leading-snug text-fg-faint">
-                                {!isActive
-                                    ? t('pages.practice.clients.portal_coming')
-                                    : portal.hint}
-                            </p>
-                        </div>
-                    ))}
-                </div>
-            </PracticeInkCard>
+                                <p className="font-mono text-[10px] tracking-[0.12em] text-fg-muted uppercase">
+                                    {t(portal.labelKey)}
+                                </p>
+                                <p
+                                    className={cn(
+                                        'mt-2 font-mono text-2xl font-semibold tabular-nums',
+                                        portal.value ? 'text-fg' : 'text-fg-faint'
+                                    )}>
+                                    {snapshotPending
+                                        ? '…'
+                                        : (portal.value ??
+                                          t('pages.practice.clients.portal_placeholder'))}
+                                </p>
+                                <p className="mt-1 text-[11px] leading-snug text-fg-faint">
+                                    {portal.hint}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </PracticeInkCard>
+            ) : null}
         </PracticePanel>
     );
 }
