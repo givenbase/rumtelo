@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import {
+    parsePracticeName,
     parseSignUpAudience,
     signUpAudienceFromSearchParams,
     signUpAudienceQuery,
@@ -34,5 +35,23 @@ describe('sign-up audience', () => {
     it('sends practices to the practice desk and individuals through onboarding', () => {
         assert.equal(signUpAudienceStartPath('practice'), '/practice/create');
         assert.equal(signUpAudienceStartPath('individual'), null);
+    });
+
+    it('carries the practice name through verify into the create form', () => {
+        assert.deepEqual(signUpAudienceQuery('practice', '  Budget  Coaching  '), {
+            as: 'practice',
+            practiceName: 'Budget Coaching',
+        });
+        assert.deepEqual(signUpAudienceQuery('individual', 'Ignored'), {});
+        assert.equal(
+            signUpAudienceStartPath('practice', 'Geld & Co'),
+            '/practice/create?name=Geld%20%26%20Co'
+        );
+    });
+
+    it('cleans practice names to one capped line', () => {
+        assert.equal(parsePracticeName('  '), null);
+        assert.equal(parsePracticeName('A\nB\tC'), 'A B C');
+        assert.equal(parsePracticeName('x'.repeat(200))?.length, 120);
     });
 });

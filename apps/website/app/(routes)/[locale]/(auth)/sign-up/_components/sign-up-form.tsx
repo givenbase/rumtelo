@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -28,12 +28,14 @@ import type { SignUpForm as SignUpFormSchema } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 import {
     cn,
     householdInviteQuery,
     planIntentQuery,
     practiceInviteQuery,
+    PRACTICE_NAME_MAX_LENGTH,
     SIGN_UP_AUDIENCES,
     signUpAudienceFromSearchParams,
     signUpAudienceQuery,
@@ -62,14 +64,18 @@ const AUDIENCE_COPY: Record<SignUpAudience, { label: string; hint: string }> = {
     },
 };
 
+/** Practice sign-ups also name their practice — it prefills the create form after verify. */
+type SignUpValues = SignUpFormSchema & { practiceName: string };
+
 function verifyCallbackUrl(
     intent: PendingPlanIntent | null,
     practiceInviteToken: string | null,
     householdInviteId: string | null,
-    audience: SignUpAudience
+    audience: SignUpAudience,
+    practiceName: string
 ): string {
     const params = new URLSearchParams({ status: 'confirmed' });
-    for (const [key, value] of Object.entries(signUpAudienceQuery(audience))) {
+    for (const [key, value] of Object.entries(signUpAudienceQuery(audience, practiceName))) {
         params.set(key, value);
     }
     const planQuery = planIntentQuery(intent);
@@ -115,7 +121,15 @@ export function SignUpForm() {
     const draft = signUpDraft?.draft ?? null;
     const emailFromInvite = searchParams.get('email')?.trim() ?? '';
 
-    const form = useForm<SignUpFormSchema>({
+    const signUpSchema = useMemo(
+        () =>
+            schemas.signUp.extend({
+                practiceName: z.string().trim().max(PRACTICE_NAME_MAX_LENGTH),
+            }),
+        [schemas]
+    );
+
+    const form = useForm<SignUpValues>({
         defaultValues: {
             firstName: draft?.firstName ?? '',
             middleName: '',
@@ -124,9 +138,10 @@ export function SignUpForm() {
             password: '',
             phone: '',
             dateOfBirth: '',
+            practiceName: '',
         },
         mode: 'onTouched',
-        resolver: zodResolver(schemas.signUp),
+        resolver: zodResolver(signUpSchema),
     });
 
     useEffect(() => {
@@ -146,8 +161,17 @@ export function SignUpForm() {
         description: t('ui.form.incomplete_description'),
     });
 
-    async function onSubmit(values: SignUpFormSchema) {
+    async function onSubmit(values: SignUpValues) {
         setApiError(null);
+
+        // Required only on the Practice path — checked here so one schema serves both paths.
+        if (forPractice && !values.practiceName.trim()) {
+            form.setError('practiceName', {
+                message: t('features.auth.sign_up.practice_name_required'),
+            });
+            form.setFocus('practiceName');
+            return;
+        }
 
         const name = composeDisplayName(values.firstName, values.middleName, values.lastName);
 
@@ -165,7 +189,8 @@ export function SignUpForm() {
                 intent,
                 practiceInviteToken,
                 householdInviteId,
-                audience
+                audience,
+                values.practiceName
             ),
             firstName: values.firstName,
             middleName: values.middleName || undefined,
@@ -196,7 +221,7 @@ export function SignUpForm() {
         const verifyParams = new URLSearchParams({
             ...planIntentQuery(intent),
             ...practiceInviteQuery(practiceInviteToken),
-            ...signUpAudienceQuery(audience),
+            ...signUpAudienceQuery(audience, values.practiceName),
         });
         verifyParams.set('email', values.email);
         router.push(`/verify?${verifyParams.toString()}`);
@@ -289,6 +314,7 @@ export function SignUpForm() {
                             password: t('ui.form.fields.password'),
                             firstName: t('ui.form.fields.first_name'),
                             lastName: t('ui.form.fields.last_name'),
+                            practiceName: t('features.auth.sign_up.practice_name_label'),
                             phone: t('ui.form.fields.phone'),
                             name: t('ui.form.fields.name'),
                             amount: t('ui.form.fields.amount'),
@@ -298,6 +324,35 @@ export function SignUpForm() {
                             newPassword: t('ui.form.fields.new_password'),
                         }}
                     />
+
+                    {forPractice ? (
+                        <FormField
+                            control={form.control}
+                            name="practiceName"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        {t('features.auth.sign_up.practice_name_label')}
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            autoComplete="organization"
+                                            placeholder={t(
+                                                'features.auth.sign_up.practice_name_placeholder'
+                                            )}
+                                            maxLength={PRACTICE_NAME_MAX_LENGTH}
+                                            disabled={busy}
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <p className="text-xs text-fg-muted">
+                                        {t('features.auth.sign_up.practice_name_hint')}
+                                    </p>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    ) : null}
 
                     <div className="grid gap-4 sm:grid-cols-2">
                         <FormField

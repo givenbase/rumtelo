@@ -393,6 +393,10 @@
                 "audience_practice": "Cabinet",
                 "audience_practice_hint": "Un coach ou un conseiller qui accompagne ses clients",
                 "practice_note": "Une fois votre e-mail confirmé, vous configurerez le bureau de votre cabinet.",
+                "practice_name_label": "Nom de votre cabinet ou entreprise",
+                "practice_name_placeholder": "p. ex. Coaching Budget Paris",
+                "practice_name_hint": "Visible par vos clients quand vous les invitez. Les informations légales viennent ensuite.",
+                "practice_name_required": "Indiquez le nom de votre cabinet ou entreprise.",
                 "middle_name": "Deuxième prénom",
                 "birthday": "Anniversaire"
             },

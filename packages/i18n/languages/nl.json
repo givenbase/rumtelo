@@ -393,6 +393,10 @@
                 "audience_practice": "Praktijk",
                 "audience_practice_hint": "Coach of adviseur die cliënten helpt",
                 "practice_note": "Na het bevestigen van je e-mail richt je je praktijkbureau in.",
+                "practice_name_label": "Naam van je praktijk of bedrijf",
+                "practice_name_placeholder": "bijv. Budgetcoaching Amsterdam",
+                "practice_name_hint": "Zien je cliënten als je ze uitnodigt. Juridische gegevens vul je daarna in.",
+                "practice_name_required": "Vul de naam van je praktijk of bedrijf in.",
                 "middle_name": "Tweede voornaam",
                 "birthday": "Geboortedatum"
             },

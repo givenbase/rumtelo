@@ -100,8 +100,9 @@ export function AuthAside() {
         });
     }, [reduceMotion]);
 
+    // Sticky on desktop — the form column scrolls, the manifesto stays in view.
     return (
-        <aside className="relative hidden h-full min-h-dvh overflow-hidden bg-fg lg:block">
+        <aside className="relative hidden h-full min-h-dvh overflow-hidden bg-fg lg:sticky lg:top-0 lg:block lg:h-dvh lg:self-start">
             {!reduceMotion ? (
                 <video
                     ref={videoRef}

@@ -5,6 +5,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations, type BrandQuote } from '@rumtelo/i18n';
 import { AUTH_MANIFESTO_PORTAL_VISUALS, AuthManifesto, type AuthManifestoStrip } from '@rumtelo/ui';
 
+import { isLaunchProductsDeferred, isProductEnabled } from '@/app/_lib/launch-products';
+
 /** Pexels clip (download id 17337078) — dark background. */
 const AUTH_ASIDE_VIDEO =
     'https://videos.pexels.com/video-files/15179376/15179376-uhd_1920_1440_60fps.mp4';
@@ -12,6 +14,11 @@ const AUTH_ASIDE_VIDEO =
 const APP_QUOTE_KEYS = ['money_picture', 'how_it_works', 'energy', 'why'] as const;
 
 const PORTAL_KEYS = ['money', 'growth', 'energy', 'soul'] as const;
+/** Live portals keep their visual tone; the bar splits evenly across what ships today. */
+const LIVE_PORTAL_ITEMS = PORTAL_KEYS.map((key, index) => ({
+    key,
+    tone: AUTH_MANIFESTO_PORTAL_VISUALS[index]!.tone,
+})).filter(item => isProductEnabled(item.key));
 
 /**
  * Desktop auth manifesto — habit quotes to pull them back into the product.
@@ -37,12 +44,16 @@ export function AuthAside() {
     const strip: AuthManifestoStrip = useMemo(
         () => ({
             eyebrow: t('features.brand.auth_manifesto.portals_eyebrow'),
-            line: t('features.brand.auth_manifesto.portals_line'),
-            items: PORTAL_KEYS.map((key, index) => ({
+            line: t(
+                isLaunchProductsDeferred()
+                    ? 'features.brand.auth_manifesto.portals_line_core'
+                    : 'features.brand.auth_manifesto.portals_line'
+            ),
+            items: LIVE_PORTAL_ITEMS.map(({ key, tone }) => ({
                 name: t(`features.brand.auth_manifesto.portals.${key}.name`),
                 short: t(`features.brand.auth_manifesto.portals.${key}.short`),
-                tone: AUTH_MANIFESTO_PORTAL_VISUALS[index]!.tone,
-                share: AUTH_MANIFESTO_PORTAL_VISUALS[index]!.share,
+                tone,
+                share: 100 / LIVE_PORTAL_ITEMS.length,
             })),
         }),
         [t]
@@ -64,8 +75,9 @@ export function AuthAside() {
         });
     }, [reduceMotion]);
 
+    // Sticky on desktop — the form column scrolls, the manifesto stays in view.
     return (
-        <aside className="relative hidden h-full min-h-dvh overflow-hidden bg-fg lg:block">
+        <aside className="relative hidden h-full min-h-dvh overflow-hidden bg-fg lg:sticky lg:top-0 lg:block lg:h-dvh lg:self-start">
             {!reduceMotion ? (
                 <video
                     ref={videoRef}

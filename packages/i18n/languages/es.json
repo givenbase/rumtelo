@@ -393,6 +393,10 @@
                 "audience_practice": "Consulta",
                 "audience_practice_hint": "Un coach o asesor que ayuda a sus clientes",
                 "practice_note": "Cuando confirmes tu correo electrónico, configurarás el escritorio de tu consulta.",
+                "practice_name_label": "Nombre de tu consulta o empresa",
+                "practice_name_placeholder": "p. ej. Coaching Financiero Madrid",
+                "practice_name_hint": "Lo verán tus clientes cuando los invites. Los datos legales vienen después.",
+                "practice_name_required": "Añade el nombre de tu consulta o empresa.",
                 "middle_name": "Segundo nombre",
                 "birthday": "Cumpleaños"
             },

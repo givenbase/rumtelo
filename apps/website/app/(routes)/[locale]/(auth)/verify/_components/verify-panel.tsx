@@ -17,7 +17,9 @@ import { useApiErrorMessage } from '@/app/_lib/api-error-messages';
 import {
     householdInviteQuery,
     planIntentQuery,
+    parsePracticeName,
     practiceInviteQuery,
+    SIGN_UP_PRACTICE_NAME_PARAM,
     signUpAudienceFromSearchParams,
     signUpAudienceQuery,
     signUpAudienceStartPath,
@@ -45,10 +47,12 @@ export function VerifyPanel() {
     const confirmed = status === 'confirmed' || status === 'ok';
     const householdInviteId = householdInvite?.invitationId ?? null;
     const audience = signUpAudienceFromSearchParams(searchParams);
-    // Household invite wins; otherwise a practice sign-up lands on its desk, not household onboarding.
+    const practiceName = parsePracticeName(searchParams.get(SIGN_UP_PRACTICE_NAME_PARAM));
+    // Household invite wins; otherwise a practice sign-up lands on its desk (name prefilled),
+    // not household onboarding.
     const redirectTo = householdInviteId
         ? `/invite/${householdInviteId}`
-        : signUpAudienceStartPath(audience);
+        : signUpAudienceStartPath(audience, practiceName);
     const continueQuery = {
         ...planIntentQuery(audience === 'practice' ? null : (planIntent?.intent ?? null)),
         ...practiceInviteQuery(practiceInvite?.token ?? null),
@@ -75,7 +79,7 @@ export function VerifyPanel() {
             email: lockedEmail,
             callbackURL: `/verify?${new URLSearchParams({
                 status: 'confirmed',
-                ...signUpAudienceQuery(audience),
+                ...signUpAudienceQuery(audience, practiceName),
             }).toString()}`,
         });
 

@@ -198,8 +198,11 @@ export {
 } from './household-invite-intent';
 export {
     DEFAULT_SIGN_UP_AUDIENCE,
+    PRACTICE_NAME_MAX_LENGTH,
     SIGN_UP_AUDIENCES,
     SIGN_UP_AUDIENCE_PARAM,
+    SIGN_UP_PRACTICE_NAME_PARAM,
+    parsePracticeName,
     parseSignUpAudience,
     signUpAudienceFromSearchParams,
     signUpAudienceQuery,
