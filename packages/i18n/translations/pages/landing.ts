@@ -3,11 +3,11 @@ const landing = {
     meta: {
         title: 'Rumtelo — Stop wondering where it went.',
         description:
-            'Money leaves. You’ll know why. Rumtelo gives every amount a job the second it lands, then widens the picture to your energy, growth and why — with a Coach, in ten minutes a week. Built in Amsterdam. Free to start.',
+            'Stop wondering where it went. See where your money, life, energy and time went — then get grip again. Clear tools, a tip from The Coach, you choose. Ten minutes a week. Built in Amsterdam. Free to start.',
         keywords: [
             'money overview',
             'six jars',
-            'jar budgeting',
+            'grip on life',
             'personal finance coach',
             'financial freedom',
             'week check',
@@ -22,6 +22,7 @@ const landing = {
         aria_mobile: 'Mobile',
         how_it_works: 'How it works',
         pricing: 'Pricing',
+        practices: 'For practices',
         questions: 'Questions',
         create_account: 'Create account',
         dashboard: 'Dashboard',
@@ -44,9 +45,9 @@ const landing = {
         staging_banner_aria: 'Staging environment notice',
     },
     hero: {
-        eyebrow: 'MONEY · GROWTH · ENERGY · SOUL',
+        eyebrow: 'RUMTELO — GRIP ON LIFE',
         headline: 'Stop wondering where it went.',
-        lead: 'Money leaves. You’ll know why. Rumtelo gives every amount a job the second it lands — then widens the picture to your energy, your growth and your why. Ten minutes a week. Information, never shame.',
+        lead: 'Wondering what? All of it — your money, your life, your energy, your time. See where it went, then get grip again. The Coach tips. You choose.',
         cta_primary: 'Start free — no card',
         cta_secondary: 'See how it works',
         open_dashboard: 'Open dashboard',
@@ -91,7 +92,6 @@ const landing = {
     proof: {
         time: { value: '10 min', label: 'a week — not daily homework' },
         jars: { value: '6 jars', label: 'filled the second income lands' },
-        portals: { value: '4 portals', label: 'money · growth · energy · soul' },
         free: { value: 'Free', label: 'to start · no card' },
     },
     jars_section: {
@@ -131,43 +131,40 @@ const landing = {
             not: 'Not a tip you already left.',
         },
     },
-    problem: {
-        eyebrow: 'WHY THE PICTURE GOES MISSING',
-        headline: 'It isn’t that you don’t care. It’s that everything keeps moving.',
-        lead: 'Most people don’t lose the plot because they don’t care. They lose the picture because income, expenses and priorities keep moving — and tracking every detail costs attention they need to build the life they want.',
-        kicker: 'Rumtelo is the missing picture. Every amount already has a place — before life decides for you.',
-        sources:
-            'Grounded in Mullainathan & Shafir (Scarcity), CFPB consumer research, US Financial Diaries and the JPMorgan Chase Institute.',
-    },
     portals_section: {
-        eyebrow: 'NOT JUST MONEY. WHERE YOUR LIFE GOES.',
+        eyebrow: 'GRIP ON LIFE — THE PRODUCTS',
         headline: 'Money. Growth. Energy. Soul. One overview.',
-        lead: 'Money is the door. But the picture isn’t only the bank balance. Rumtelo is four portals behind one switch — each answers one question, and a Coach holds them together. You are always inside exactly one.',
+        /** `*_core` while Energy + Soul are held back in production. */
+        headline_core: 'Money. Growth. One overview.',
+        more_soon: 'More soon',
+        lead_core:
+            'Each product helps with one part of your life. Money is often where people start; Growth helps you move forward from there. More products are on the way. The Coach gives a tip. You decide.',
+        lead: 'Each product helps with one part of your life. Money is often where people start. Open Growth, Energy, or Soul when you want that next. The Coach gives a tip. You decide.',
     },
     portals: {
         money: {
             name: 'Money',
             alt_name: 'Geld',
             question: 'Where does this month go?',
-            line: 'Stop wondering where it went.',
+            line: 'Grip on your money — six jars, a clear picture.',
         },
         growth: {
             name: 'Growth',
             alt_name: 'Groei',
-            question: 'How do I earn more?',
-            line: 'Stop wondering how to earn more.',
+            question: 'How do I grow from here?',
+            line: 'Grip on your growth — as a person, in more than one direction.',
         },
         energy: {
             name: 'Energy',
             alt_name: 'Energie',
             question: 'What am I running on?',
-            line: 'Stop wondering what you’re running on.',
+            line: 'Grip on your energy — sleep, hours, body under every decision.',
         },
         soul: {
             name: 'Soul',
             alt_name: 'Ziel',
             question: 'Why am I doing this?',
-            line: 'Stop wondering why you’re doing this.',
+            line: 'Grip on your why — the quiet under the numbers.',
         },
     },
     portal_features: {
@@ -268,11 +265,11 @@ const landing = {
     why: {
         eyebrow: 'WHY RUMTELO EXISTS',
         headline: 'Don’t chase the number. Own the direction.',
-        quote: 'Wealth isn’t a number. It’s the reins in your hands.',
-        body: 'We built Rumtelo for ourselves first. We earned fine and still didn’t know where it went — or what it cost in sleep, focus and direction. Budget apps counted. Nobody coached. So we made the thing we needed: one calm overview and a mentor for the whole picture. Then we saw the opportunity — bring it to market, so others can steer their life the same way.',
+        quote: 'Wealth isn’t a number. It’s grip on your life.',
+        body: 'We built Rumtelo for ourselves first. We earned fine and still wondered where it went — money, life, energy, time. Budget apps counted after the fact. Nobody helped us get grip again. So we made what we needed: clear tools, a tip from The Coach, and you choose. Then we brought it to market so others can do the same.',
         books_eyebrow: 'GROUNDED IN PROVEN BOOKS',
         books_lead:
-            'Rumtelo is not a new theory. It turns ideas from books that have shaped money, mindset and direction for decades into a daily practice you can actually keep.',
+            'Rumtelo is not a new theory. It turns ideas from books that have shaped money, mindset and direction for decades into a daily routine you can actually keep.',
         signature: 'Given Loyiso, founder & CEO · Charissa Peroti, co-founder · Amsterdam',
         manifesto: 'Don’t chase the number. Own the direction.',
         audience: 'Built for people who are doing well — and for people who are ready to.',
@@ -301,7 +298,7 @@ const landing = {
             secret: {
                 title: 'The Secret',
                 author: 'Rhonda Byrne',
-                line: 'Clarity of desire and belief — what you focus on, you move toward.',
+                line: 'Name what you want — attention follows intention.',
             },
         },
     },
@@ -316,7 +313,7 @@ const landing = {
         },
         ten_minutes: {
             title: 'Ten minutes a week.',
-            body: 'A short, repeating practice beats daily worry.',
+            body: 'A short, repeating routine beats daily worry.',
         },
         energy: {
             title: 'Energy carries money.',
@@ -329,18 +326,18 @@ const landing = {
     },
     coach_section: {
         eyebrow: 'THE COACH',
-        headline: 'You’re the aspirant. The Coach is the mentor.',
-        lead: 'Every screen opens with the Coach: one sentence on where you stand, one move to make. Not a wall of charts. Not a lecture. Suggestions from money, growth, energy and soul — one tip at a time, and it never speaks to shame you.',
+        headline: 'The Coach tips. You choose.',
+        lead: 'One tip on where you stand, one move you can make — in each product, and all together on The Coach page. Not a wall of charts. Not a lecture. Never shame. You stay in control.',
         points: {
-            one: 'One verdict, one action — every tip ships a next move',
-            quiet: 'Quiet until there is enough data — six noisy points are not insight',
+            one: 'One tip, one next move — never a pile of charts',
+            quiet: 'Quiet until there is enough data — noise is not insight',
             shame: 'Information, never shame — an over-the-line jar is a signal, not a verdict',
             ten: 'Ten minutes a week with the Coach — not daily homework',
         },
         demo_aria: 'Example of the Coach — one tip per portal',
         demo_feed_eyebrow: 'The Coach · across every portal',
         demo_week: 'week 37',
-        demo_kicker: 'one verdict · one move · never shame',
+        demo_kicker: 'one tip · one move · you choose',
         demo: {
             money: {
                 kind: 'THIS WEEK',
@@ -373,7 +370,7 @@ const landing = {
     footer: {
         aria: 'Footer',
         attribution:
-            'Rumtelo · Amsterdam, the Netherlands. Built by the founders for themselves first — then brought to market so others can use the same practice. Grounded in books like Rich Dad Poor Dad, Think and Grow Rich, Secrets of the Millionaire Mind, The Psychology of Money and The Secret. Independent product — not affiliated with, endorsed by, or licensed from those authors.',
+            'Rumtelo · Amsterdam, the Netherlands. Built by the founders for themselves first — then brought to market so others can use the same routine. Grounded in books like Rich Dad Poor Dad, Think and Grow Rich, Secrets of the Millionaire Mind, The Psychology of Money and The Secret. Independent product — not affiliated with, endorsed by, or licensed from those authors.',
         disclaimer:
             'Rumtelo is a coach and an overview — not a bank and not a licensed financial adviser. Suggestions are education, not personal investment advice.',
         trust: {
@@ -426,6 +423,13 @@ const landing = {
         eyebrow: 'PRICING',
         headline: 'Free where it counts. Paid where it saves you work.',
         headline_auth: 'Your plan and what you can change',
+        /** Audience switch above the plans — one tab per sign-up direction. */
+        audience_aria: 'Who it’s for',
+        audience_individual: 'For you & your household',
+        audience_practice: 'For practices',
+        headline_practice: 'Stop wondering where your clients stand.',
+        lead_practice:
+            'For coaches and advisors who help households. Your clients keep their own board; with their yes, you follow every board from one desk.',
         lead: 'Start on Basic free. Choose Plus or Max and we’ll open Stripe Checkout after your account is set up — only when signup, verify and onboarding succeed.',
         lead_on_plan:
             'You’re on {plan}. Upgrade, switch or manage billing in the app — changes apply to your household.',
@@ -455,25 +459,64 @@ const landing = {
         billed_yearly: '{amount}/month billed yearly',
         cancel_any: 'cancel any month',
         your_plan: 'Your plan',
+        /** Plan card blocks — product coverage is counted from PLAN_ACCESS. */
+        products_title: 'Products included',
+        features_title: 'Highlights',
+        feature_count: '{included}/{total} features',
+        product_none: 'Not included',
+        products_more: 'More products on the way',
         footnote:
             'Prices in euro, VAT included. Basic may stay free or become a small fee later — nothing you enter is ever locked away.',
+    },
+    /** Practice tab of the pricing table — prices come from contracts. */
+    practice_plan: {
+        name: 'Practice',
+        tag: 'Coaches & advisors',
+        sub: 'per practice · cancel any month',
+        line: 'One desk for every client — sessions go to decisions, not to collecting numbers.',
+        f1: 'Invite clients by email — nothing is shared until they accept',
+        f2: 'Every client’s board, read-only, from one desk',
+        f3: 'A snapshot per client: spending, income, energy, stillness',
+        f4: 'Between sessions, The Coach nudges — you guide the decisions',
+        extras_title: 'On top of the base price',
+        extra_staff: 'Staff seat',
+        extra_staff_hint: 'Everyone at your practice who logs in — you count as the first.',
+        extra_view: 'Client who looks along',
+        extra_view_hint: 'They stay on free Basic. You see their board, read-only.',
+        extra_view_price: 'Free',
+        extra_manage: 'Client you sponsor',
+        /** Manage is read-only in code today (membership.service: “MANAGE writes later”) — keep “coming next” until it ships. */
+        extra_manage_hint:
+            'You pay their Plus plan — {discount}% less than the {retail} a month they’d pay themselves. Today: their full board, read-only. Coming next: editing their plan with them.',
+        per_month_each: '{price} / month each',
+        example: 'Example: you + {clients} sponsored clients = {total} / month in total.',
+        cta: 'Start a practice',
+        cta_open: 'Open the practice desk',
+        steps_title: 'How it works',
+        step_1: 'Create your practice',
+        step_2: 'Invite a client by email',
+        step_3: 'They accept — then you see their board',
+        footnote:
+            'Prices in euro, per month. Rumtelo never moves money — clients pay and transfer at their own bank.',
     },
     plans: {
         basic: {
             name: 'Basic',
             tag: 'Start here',
-            line: 'The whole practice, solo. Six jars, the Coach, one goal, your sleep, one minute of stillness. Enough to start — and never a reason to stop.',
+            best_for: 'Getting started, on your own',
+            line: 'You want to see where your money goes and build the ten-minute weekly routine — solo, at no cost. Enough to start, and never a reason to stop.',
             f1: 'MONEY · six jars, transactions, fixed costs',
-            f2: 'GROWTH · income, Learn, and {maxGoals} goals',
+            f2: 'GROWTH · income, Learn and {maxGoals, plural, one {# goal} other {# goals}}',
             f3: 'ENERGY · sleep',
             f4: 'SOUL · stillness, gratitude, one intention a week',
             f5: 'The Coach, the week check, the month score',
-            f6: '1 full + 1 viewer seat (invite a coach)',
+            f6: '1 full + 1 viewer seat (partner, coach or advisor)',
         },
         plus: {
             name: 'Plus',
             tag: 'Most chosen',
-            line: 'For the part that should run without you — and for the people you share it with.',
+            best_for: 'Households, couples, paying off debt',
+            line: 'You share money with a partner or family, are paying off debt, or want your bank statements in. Most people land here.',
             f1: 'Everything in Basic',
             f2: 'MONEY · debt plan with interest and a freedom date',
             f3: 'MONEY · bank statement import — live sync coming',
@@ -484,7 +527,8 @@ const landing = {
         max: {
             name: 'Max',
             tag: 'The whole picture',
-            line: 'Where money starts making money — and learning starts paying back.',
+            best_for: 'Building wealth and freedom',
+            line: 'Your basics run steady and you’re growing wealth: net worth, returns, your freedom number — and every feature in every product.',
             f1: 'Everything in Plus',
             f2: 'MONEY · net worth, returns and your freedom number',
             f3: 'GROWTH · Learn courses on Masterclass, not Udemy',
@@ -501,7 +545,7 @@ const landing = {
     faq: {
         budgeting: {
             question: 'Is Rumtelo a budgeting app?',
-            answer: 'No. Budgeting apps count what happened. Rumtelo gives money a job before it is spent, then coaches the rest — energy, growth, why. Bookkeeping is a side effect, not the point.',
+            answer: 'No. Budget apps count what already happened. Rumtelo helps you see where it went, then get grip again — money first, then growth, energy, why. Bookkeeping is a side effect, not the point.',
         },
         bank: {
             question: 'Do I need to connect my bank?',
@@ -509,11 +553,11 @@ const landing = {
         },
         sleep: {
             question: 'Why are sleep, training and books in a money product?',
-            answer: 'Because a tired head spends and a rested head decides — and because Rumtelo stands on books like Rich Dad Poor Dad, Think and Grow Rich, Secrets of the Millionaire Mind and The Secret, not on spreadsheets alone. Energy is the floor under every financial decision. Learning is the one spend that raises what you earn. Leave them out and an app becomes bookkeeping.',
+            answer: 'Because grip on life is more than money. A tired head spends; a rested head decides. Energy is the floor under every decision. Growth covers learning and moving forward. Soul keeps the why. Leave those out and an app becomes bookkeeping.',
         },
         coach: {
             question: 'What does the Coach actually do?',
-            answer: 'One sentence on where you stand and one move to make — drawn from all four portals. It stays quiet until there is enough data, and it never speaks to shame you. You are the aspirant; the Coach is the mentor.',
+            answer: 'One tip on where you stand and one move you can make — in each product, and all together on The Coach page. It stays quiet until there is enough data, and it never shames you. The Coach tips. You choose.',
         },
         partner: {
             question: 'Can I use it with a partner or my family?',
@@ -526,6 +570,10 @@ const landing = {
         language: {
             question: 'Dutch or English?',
             answer: 'Both. English first, Dutch second. Rumtelo is built for NL and EU life — amounts and dates follow your locale.',
+        },
+        practice: {
+            question: 'I’m a coach or advisor. Can I use Rumtelo with my clients?',
+            answer: 'Yes — with Rumtelo Practice. Invite clients by email; once they accept, you see their board read-only from one desk. Looking along is free for them, and you can sponsor their Plus plan for {clientPrice} a month. A practice costs {basePrice} a month plus {staffPrice} per staff seat.',
         },
     },
     signup_section: {

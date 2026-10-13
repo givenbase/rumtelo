@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
 import { useTranslations } from '@rumtelo/i18n';
@@ -21,6 +21,8 @@ import {
     Typography,
 } from '@rumtelo/ui';
 
+import { parsePracticeName } from '@rumtelo/utils';
+
 import { api } from '@/app/_lib/api';
 import { practicePath } from '@/app/_lib/routes';
 
@@ -30,12 +32,14 @@ import { usePracticeMutation } from './use-practice-mutation';
 export function PracticeCreatePage() {
     const t = useTranslations();
     const router = useRouter();
+    // Name typed at marketing sign-up (`?as=practice`) — the owner still confirms it here.
+    const nameFromSignUp = parsePracticeName(useSearchParams().get('name')) ?? '';
 
     const schema = createPracticeFormSchema(t);
     const form = useForm<PracticeCreateValues>({
         defaultValues: {
-            legalName: '',
-            displayName: '',
+            legalName: nameFromSignUp,
+            displayName: nameFromSignUp,
             billingEmail: '',
             registrationNumber: '',
             vatNumber: '',

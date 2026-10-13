@@ -4,7 +4,7 @@
  * Marketing copy lives in `@rumtelo/i18n` under `pages.landing.*`.
  * Feature claims and plan limits come from `@rumtelo/contracts`.
  */
-import { DEFAULT_JAR_SPLIT, JarKey, PlanKey } from '@rumtelo/contracts';
+import { DEFAULT_JAR_SPLIT, JarKey, PLAN_RETAIL_CENTS, PlanKey } from '@rumtelo/contracts';
 import type { IconName } from '@rumtelo/ui';
 
 export type { IconName };
@@ -174,8 +174,16 @@ export interface Plan {
 
 export const PLANS: Plan[] = [
     { key: PlanKey.BASIC, monthly: 0, yearly: 0 },
-    { key: PlanKey.PLUS, monthly: 9, yearly: 90 },
-    { key: PlanKey.MAX, monthly: 19, yearly: 190 },
+    {
+        key: PlanKey.PLUS,
+        monthly: PLAN_RETAIL_CENTS[PlanKey.PLUS].month / 100,
+        yearly: PLAN_RETAIL_CENTS[PlanKey.PLUS].year / 100,
+    },
+    {
+        key: PlanKey.MAX,
+        monthly: PLAN_RETAIL_CENTS[PlanKey.MAX].month / 100,
+        yearly: PLAN_RETAIL_CENTS[PlanKey.MAX].year / 100,
+    },
 ];
 
 /* ─────────────────────────── footer ─────────────────────────── */

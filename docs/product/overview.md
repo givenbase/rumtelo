@@ -1,11 +1,11 @@
 # Product overview
 
-**Stop wondering where it went.** Six jars, one calm overview.
+**Stop wondering where it went.** → *Wondering what? All of it — money, life, energy, time.* → **Rumtelo — grip on life.**
 
-Rumtelo is not a bookkeeping app. It is a single quiet view of where your money, energy and time go — so intention leads, and life doesn’t decide first.
+Not a budget app. Clear tools so you see where it went and get grip again — with The Coach tipping and you choosing. Today: **Money · Growth · Energy · Soul** (expandable). Money is often the door. Decode the slogan only on L1 / Why. Explain scripts: [`docs/explain/`](../explain/README.md).
 
-> Rijkdom is geen getal. Het zijn de teugels in jouw handen.  
-> *(Wealth isn’t a number. It’s the reins in your hands.)*
+> Rijkdom is geen getal. Het is grip op je leven.  
+> *(Wealth isn’t a number. It’s grip on your life.)*
 
 ---
 
@@ -24,7 +24,7 @@ Rumtelo is not a bookkeeping app. It is a single quiet view of where your money,
 | Product | Dutch | What it answers |
 |---|---|---|
 | **Money** | Geld | Where does this month go? |
-| **Growth** | Groei | How do I earn more? |
+| **Growth** | Groei | How do I grow from here? |
 | **Energy** | Energie | What am I running on? Sleep, training, food, rest — the floor under financial decisions. |
 | **Soul** | Ziel | Why am I doing this? |
 

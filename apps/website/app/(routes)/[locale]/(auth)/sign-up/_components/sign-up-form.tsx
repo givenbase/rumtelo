@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -28,12 +28,19 @@ import type { SignUpForm as SignUpFormSchema } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 import {
+    cn,
     householdInviteQuery,
     planIntentQuery,
     practiceInviteQuery,
+    PRACTICE_NAME_MAX_LENGTH,
+    SIGN_UP_AUDIENCES,
+    signUpAudienceFromSearchParams,
+    signUpAudienceQuery,
     type PendingPlanIntent,
+    type SignUpAudience,
 } from '@rumtelo/utils';
 
 import { useAuthFormSchemas } from '@/app/_lib/auth-form-schemas';
@@ -46,12 +53,31 @@ import { useOptionalPlanIntent } from '@/app/_components/plan-intent-provider';
 import { useOptionalPracticeInvite } from '@/app/_components/practice-invite-provider';
 import { useOptionalSignUpDraft } from '@/app/_components/sign-up-draft-provider';
 
+const AUDIENCE_COPY: Record<SignUpAudience, { label: string; hint: string }> = {
+    individual: {
+        label: 'features.auth.sign_up.audience_individual',
+        hint: 'features.auth.sign_up.audience_individual_hint',
+    },
+    practice: {
+        label: 'features.auth.sign_up.audience_practice',
+        hint: 'features.auth.sign_up.audience_practice_hint',
+    },
+};
+
+/** Practice sign-ups also name their practice — it prefills the create form after verify. */
+type SignUpValues = SignUpFormSchema & { practiceName: string };
+
 function verifyCallbackUrl(
     intent: PendingPlanIntent | null,
     practiceInviteToken: string | null,
-    householdInviteId: string | null
+    householdInviteId: string | null,
+    audience: SignUpAudience,
+    practiceName: string
 ): string {
     const params = new URLSearchParams({ status: 'confirmed' });
+    for (const [key, value] of Object.entries(signUpAudienceQuery(audience, practiceName))) {
+        params.set(key, value);
+    }
     const planQuery = planIntentQuery(intent);
     for (const [key, value] of Object.entries(planQuery)) {
         params.set(key, value);
@@ -80,14 +106,30 @@ export function SignUpForm() {
     const householdInvite = useOptionalHouseholdInvite();
     const signUpDraft = useOptionalSignUpDraft();
     const [apiError, setApiError] = useState<unknown>(null);
+    const [pickedAudience, setPickedAudience] = useState<SignUpAudience>(() =>
+        signUpAudienceFromSearchParams(searchParams)
+    );
 
-    const intent = planIntent?.intent ?? null;
     const practiceInviteToken = practiceInvite?.token ?? null;
     const householdInviteId = householdInvite?.invitationId ?? null;
+    // Invitees join someone else's board — they always sign up as an individual.
+    const joiningSomeone = Boolean(practiceInviteToken || householdInviteId);
+    const audience: SignUpAudience = joiningSomeone ? 'individual' : pickedAudience;
+    const forPractice = audience === 'practice';
+    // A Plus/Max pick is a household plan; a practice pays on its own desk.
+    const intent = forPractice ? null : (planIntent?.intent ?? null);
     const draft = signUpDraft?.draft ?? null;
     const emailFromInvite = searchParams.get('email')?.trim() ?? '';
 
-    const form = useForm<SignUpFormSchema>({
+    const signUpSchema = useMemo(
+        () =>
+            schemas.signUp.extend({
+                practiceName: z.string().trim().max(PRACTICE_NAME_MAX_LENGTH),
+            }),
+        [schemas]
+    );
+
+    const form = useForm<SignUpValues>({
         defaultValues: {
             firstName: draft?.firstName ?? '',
             middleName: '',
@@ -96,9 +138,10 @@ export function SignUpForm() {
             password: '',
             phone: '',
             dateOfBirth: '',
+            practiceName: '',
         },
         mode: 'onTouched',
-        resolver: zodResolver(schemas.signUp),
+        resolver: zodResolver(signUpSchema),
     });
 
     useEffect(() => {
@@ -118,8 +161,17 @@ export function SignUpForm() {
         description: t('ui.form.incomplete_description'),
     });
 
-    async function onSubmit(values: SignUpFormSchema) {
+    async function onSubmit(values: SignUpValues) {
         setApiError(null);
+
+        // Required only on the Practice path — checked here so one schema serves both paths.
+        if (forPractice && !values.practiceName.trim()) {
+            form.setError('practiceName', {
+                message: t('features.auth.sign_up.practice_name_required'),
+            });
+            form.setFocus('practiceName');
+            return;
+        }
 
         const name = composeDisplayName(values.firstName, values.middleName, values.lastName);
 
@@ -133,7 +185,13 @@ export function SignUpForm() {
             name,
             email: values.email,
             password: values.password,
-            callbackURL: verifyCallbackUrl(intent, practiceInviteToken, householdInviteId),
+            callbackURL: verifyCallbackUrl(
+                intent,
+                practiceInviteToken,
+                householdInviteId,
+                audience,
+                values.practiceName
+            ),
             firstName: values.firstName,
             middleName: values.middleName || undefined,
             lastName: values.lastName,
@@ -163,6 +221,7 @@ export function SignUpForm() {
         const verifyParams = new URLSearchParams({
             ...planIntentQuery(intent),
             ...practiceInviteQuery(practiceInviteToken),
+            ...signUpAudienceQuery(audience, values.practiceName),
         });
         verifyParams.set('email', values.email);
         router.push(`/verify?${verifyParams.toString()}`);
@@ -176,7 +235,9 @@ export function SignUpForm() {
             <div>
                 <Typography as="h1">{t('features.auth.sign_up.title')}</Typography>
                 <Typography as="p" size="sm" color="muted" className="mt-1">
-                    {t('features.auth.sign_up.subtitle')}
+                    {forPractice
+                        ? t('features.auth.sign_up.subtitle_practice')
+                        : t('features.auth.sign_up.subtitle')}
                 </Typography>
                 {intent ? (
                     <p className="mt-3 rounded-lg border border-accent bg-accent-soft/40 px-3 py-2 text-sm text-fg-secondary">
@@ -190,6 +251,49 @@ export function SignUpForm() {
                     </p>
                 ) : null}
             </div>
+
+            {joiningSomeone ? null : (
+                <fieldset className="grid gap-2">
+                    <legend className="mb-2 font-mono text-[10px] font-semibold tracking-widest text-fg-faint uppercase">
+                        {t('features.auth.sign_up.audience_label')}
+                    </legend>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                        {SIGN_UP_AUDIENCES.map(option => {
+                            const active = audience === option;
+                            return (
+                                <label
+                                    key={option}
+                                    className={cn(
+                                        'grid cursor-pointer gap-0.5 rounded-xl border px-3.5 py-3 transition-colors has-focus-visible:ring-2 has-focus-visible:ring-accent',
+                                        active
+                                            ? 'border-accent bg-accent-soft/40'
+                                            : 'border-line hover:border-accent/50'
+                                    )}>
+                                    <input
+                                        type="radio"
+                                        name="audience"
+                                        value={option}
+                                        checked={active}
+                                        onChange={() => setPickedAudience(option)}
+                                        className="sr-only"
+                                    />
+                                    <span className="text-sm font-semibold text-fg">
+                                        {t(AUDIENCE_COPY[option].label)}
+                                    </span>
+                                    <span className="text-xs text-fg-muted">
+                                        {t(AUDIENCE_COPY[option].hint)}
+                                    </span>
+                                </label>
+                            );
+                        })}
+                    </div>
+                    {forPractice ? (
+                        <p className="text-xs text-fg-muted">
+                            {t('features.auth.sign_up.practice_note')}
+                        </p>
+                    ) : null}
+                </fieldset>
+            )}
 
             <Form {...form}>
                 <form
@@ -210,6 +314,7 @@ export function SignUpForm() {
                             password: t('ui.form.fields.password'),
                             firstName: t('ui.form.fields.first_name'),
                             lastName: t('ui.form.fields.last_name'),
+                            practiceName: t('features.auth.sign_up.practice_name_label'),
                             phone: t('ui.form.fields.phone'),
                             name: t('ui.form.fields.name'),
                             amount: t('ui.form.fields.amount'),
@@ -219,6 +324,35 @@ export function SignUpForm() {
                             newPassword: t('ui.form.fields.new_password'),
                         }}
                     />
+
+                    {forPractice ? (
+                        <FormField
+                            control={form.control}
+                            name="practiceName"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        {t('features.auth.sign_up.practice_name_label')}
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            autoComplete="organization"
+                                            placeholder={t(
+                                                'features.auth.sign_up.practice_name_placeholder'
+                                            )}
+                                            maxLength={PRACTICE_NAME_MAX_LENGTH}
+                                            disabled={busy}
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <p className="text-xs text-fg-muted">
+                                        {t('features.auth.sign_up.practice_name_hint')}
+                                    </p>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    ) : null}
 
                     <div className="grid gap-4 sm:grid-cols-2">
                         <FormField

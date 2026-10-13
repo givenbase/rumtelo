@@ -9,12 +9,16 @@ import { Eyebrow } from './landing-primitives';
 
 const PRINCIPLE_KEYS = ['split', 'ten_minutes', 'energy', 'information'] as const;
 
-/** Dark band — the four rules the product will not break. Locale owns the title. */
+/**
+ * Dark band — the four rules the product will not break. Locale owns the title.
+ * Scoped `data-theme="dark"` so the band stays navy with readable text in both themes
+ * (an inverted `bg-fg` turned light in dark mode and hid the headline in light mode).
+ */
 export function LandingPrinciples() {
     const t = useTranslations('pages.landing');
 
     return (
-        <section id="principles" className="bg-fg text-bg">
+        <section id="principles" data-theme="dark" className="bg-bg-app text-fg">
             <div className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-20">
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
                     <div>
@@ -33,23 +37,19 @@ export function LandingPrinciples() {
                         return (
                             <li
                                 key={key}
-                                className="grid content-start gap-3 rounded-2xl border border-bg/12 bg-bg/6 p-5 backdrop-blur-sm">
+                                className="grid content-start gap-3 rounded-2xl border border-line bg-surface/60 p-5 backdrop-blur-sm">
                                 <span className="flex items-center justify-between">
-                                    <span className="grid size-9 place-items-center rounded-lg border border-bg/12 bg-bg/6 text-accent-hover">
+                                    <span className="grid size-9 place-items-center rounded-lg border border-line bg-raised text-accent-hover">
                                         <Icon name={principle.icon} size="md" />
                                     </span>
-                                    <span className="font-mono text-xs font-semibold tracking-widest text-bg/45">
+                                    <span className="font-mono text-xs font-semibold tracking-widest text-fg-faint">
                                         0{index + 1}
                                     </span>
                                 </span>
-                                <Typography
-                                    as="h3"
-                                    size="lg"
-                                    color="white"
-                                    className="leading-snug text-balance">
+                                <Typography as="h3" size="lg" className="leading-snug text-balance">
                                     {t(`principles.${key}.title`)}
                                 </Typography>
-                                <span className="text-sm leading-relaxed text-pretty text-bg/70">
+                                <span className="text-sm leading-relaxed text-pretty text-fg-secondary">
                                     {t(`principles.${key}.body`)}
                                 </span>
                             </li>

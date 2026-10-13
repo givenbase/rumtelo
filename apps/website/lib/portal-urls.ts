@@ -42,6 +42,11 @@ export function appHomeUrl(): string {
     return `${appOrigin()}/`;
 }
 
+/** Practice desk — its overview offers “Create a Practice” when there is none yet. */
+export function appPracticeUrl(): string {
+    return `${appOrigin()}/practice`;
+}
+
 /** Plan & billing settings in the product app. */
 export function appPlanSettingsUrl(): string {
     return `${appOrigin()}/settings/general/plan`;

@@ -39,6 +39,9 @@ const onboarding = {
         'A name for your shared money space — e.g. your family name. You can rename it anytime.',
     household_default: 'My household',
     step_of: 'Step {current} of {total}',
+    /** Escape hatch for coaches who signed up without picking Practice. */
+    practice_escape: 'Setting up Rumtelo for clients?',
+    practice_escape_cta: 'Start a practice instead',
     back: 'Back',
     next: 'Next',
     start: 'Start',

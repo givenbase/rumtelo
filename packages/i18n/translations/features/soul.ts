@@ -3,7 +3,7 @@ const soul = {
     hub: {
         eyebrow: 'Soul · the why',
         title: 'The why under the numbers.',
-        line: 'Without this, steering is just bookkeeping.',
+        line: 'Grip on your why — stillness, gratitude, intention.',
         fallback_coach_kind: 'START SMALL',
         fallback_coach_text:
             'One minute of stillness or one line of gratitude — both protect the jars.',

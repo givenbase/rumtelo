@@ -1,4 +1,5 @@
 import {
+    PLAN_RETAIL_CENTS,
     PlanKey,
     PRACTICE_PRICING_CATALOG,
     SEAT_ADDON_CATALOG,
@@ -42,15 +43,15 @@ export const STRIPE_PLAN_CATALOG: Record<
         name: 'Rumtelo Plus',
         description: 'Share the board with family or friends — debt, energy week, and goals.',
         currency: 'eur',
-        month: 9,
-        year: 90,
+        month: PLAN_RETAIL_CENTS[PlanKey.PLUS].month / 100,
+        year: PLAN_RETAIL_CENTS[PlanKey.PLUS].year / 100,
     },
     [PlanKey.MAX]: {
         name: 'Rumtelo Max',
         description: 'Full household seats, income curve, learning, and net worth.',
         currency: 'eur',
-        month: 19,
-        year: 190,
+        month: PLAN_RETAIL_CENTS[PlanKey.MAX].month / 100,
+        year: PLAN_RETAIL_CENTS[PlanKey.MAX].year / 100,
     },
 };
 

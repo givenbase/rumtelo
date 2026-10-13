@@ -14,9 +14,22 @@ Rumtelo is for people who take their life seriously — not only those already �
 
 ---
 
+## And the people who help them: practices
+
+Coaches and advisors who help other households: budget and money coaches, debt-help and social-work teams, financial advisors, life coaches. They buy **Rumtelo Practice**: one desk to follow every client's board, only with the client's consent.
+
+| Audience | What they feel | What they need |
+|---|---|---|
+| **Practices** | Sessions start with collecting numbers; clients lose the thread between sessions; every client lives in a different spreadsheet. | A current picture per client before the session, a routine clients keep alone, consent-first visibility, one caseload overview. |
+
+Full positioning, pricing and what to fix before selling: [practice.md](./practice.md).
+
+---
+
 ## Positioning
 
-**Built for people who are doing well — and for people who are ready to.**
+**Built for people who are doing well — and for people who are ready to.**  
+**For practices:** *Stop wondering where your clients stand.*
 
 We do **not** speak only to “struggling” or only to “elite.”  
 We speak to people who want **direction**.
@@ -46,4 +59,5 @@ See [research/money-awareness.md](../research/money-awareness.md) for why.
 
 - [Product overview](./overview.md)
 - [Principles](./principles.md)
+- [Rumtelo for practices](./practice.md)
 - [Brand positioning](../brand/positioning.md)

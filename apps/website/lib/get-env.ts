@@ -23,6 +23,11 @@ export const env = createEnv({
          * Website-only; backend uses `MAINTENANCE` separately.
          */
         NEXT_PUBLIC_MAINTENANCE: z.enum(['true', 'false']).optional(),
+        /**
+         * Preview unreleased products (Energy, Soul) on the marketing site.
+         * Off by default everywhere — local dev included — so the site only sells what is live.
+         */
+        NEXT_PUBLIC_SHOW_UPCOMING_PRODUCTS: z.enum(['true', 'false']).optional(),
     },
 
     emptyStringAsUndefined: true,
@@ -33,6 +38,7 @@ export const env = createEnv({
         NEXT_PUBLIC_DOMAIN_WEB: process.env.NEXT_PUBLIC_DOMAIN_WEB,
         NEXT_PUBLIC_DOMAIN_BACK: process.env.NEXT_PUBLIC_DOMAIN_BACK,
         NEXT_PUBLIC_MAINTENANCE: process.env.NEXT_PUBLIC_MAINTENANCE,
+        NEXT_PUBLIC_SHOW_UPCOMING_PRODUCTS: process.env.NEXT_PUBLIC_SHOW_UPCOMING_PRODUCTS,
         NODE_ENV: process.env.NODE_ENV,
         SKIP_ENV_VALIDATION: process.env.SKIP_ENV_VALIDATION,
     },

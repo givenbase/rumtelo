@@ -81,7 +81,7 @@ Money children (same list everywhere): `jar` `income` `fixed-cost` `account` `tr
 | Tenancy | better-auth org (`auth.household`) | Own rows under `public.platform_practice*` |
 | Data | All portal rows carry `household_id` | Staff + links only — no duplicate money board |
 | Join | Membership / invite (`HouseholdRole` OWNER\|MEMBER\|VIEWER + `HouseholdRelation`; see [household-taxonomy.md](./household-taxonomy.md)) | **`PracticeClientLink`** hinge (status + access VIEW\|MANAGE + controlFlags) |
-| Billing | Basic / Plus / Max + optional seat add-ons (€2.50) | **€49 base** + **€2.50 / staff** + **€14 / MANAGE client** (VIEW = invite / household-added only; free) |
+| Billing | Basic / Plus / Max + optional seat add-ons (€2.50) | **€49 base** + **€2.50 / staff** + **€6.75 / MANAGE client** (Plus retail − `PRACTICE_CLIENT_DISCOUNT_PCT` 25%) (VIEW = invite / household-added only; free) |
 | Settings | `/settings/*` — account + household product prefs | `/practice/settings` — org profile only (not shared) |
 | Authz later | Household membership **or** active Practice link | Practice role + link access |
 
@@ -91,7 +91,7 @@ Money children (same list everywhere): `jar` `income` `fixed-cost` `account` `tr
 - Do not put Practice under `auth/` or reuse BA organization for companies.
 - Grow capabilities on the **link** (flags, access levels), not by inventing a second household type.
 - **Dual consent** — Practice invite (VIEW or MANAGE) always starts **INVITED** (`createdAt` = practice offer). Household OWNER accept sets `householdAcceptedAt` → **ACTIVE**. Data share only then.
-- **MANAGE ⇒ Practice sponsors ⇒ Plus** (`SPONSOR_PLAN` + household ≥ Plus; Max kept) **and** meters the €14 client seat — applied **on household accept**, not on invite.
+- **MANAGE ⇒ Practice sponsors ⇒ Plus** (`SPONSOR_PLAN` + household ≥ Plus; Max kept) **and** meters the client seat — applied **on household accept**, not on invite.
 - **VIEW** = free Basic look-along after accept (no client seat).
 - App routes (URLs unchanged): `(app)/(household)/*` vs `(app)/practice/*`; `AppBootGate` picks `HouseholdShell` or `PracticeShell`; avatar menu switches when the user has a practice.
 

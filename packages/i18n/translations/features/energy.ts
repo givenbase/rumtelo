@@ -3,7 +3,7 @@ const energy = {
     hub: {
         eyebrow: 'Energy · your capacity',
         title: 'The floor under every decision.',
-        line: 'Hours, sleep, training, food. What makes the money decisions possible.',
+        line: 'Grip on your energy — sleep, hours, training, food.',
         fallback_coach_kind: 'THIS WEEK',
         fallback_coach_text:
             'Log sleep and training — energy is the floor under every money decision.',

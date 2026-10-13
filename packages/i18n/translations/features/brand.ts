@@ -5,6 +5,8 @@
  */
 const brand = {
     tagline: 'Stop wondering where it went.',
+    /** Vision line under the mystery tagline — control without autopilot. */
+    grip: 'Rumtelo — grip on life.',
     core: {
         one: 'Stop wondering where it went.',
         two: 'Money leaves. You’ll know why.',
@@ -20,24 +22,26 @@ const brand = {
         how_it_works: {
             eyebrow: 'How it works',
             headline: 'Split first. Spend second.',
-            support: 'Money. Energy. Growth. Soul. One overview.',
+            support: 'Money. Growth. Energy. Soul — tools for grip on life.',
         },
         who_its_for: {
             eyebrow: 'Who it’s for',
             headline: 'For people doing well — and ready.',
-            support: 'Don’t chase the number. Own the direction.',
+            support: 'The Coach tips. You choose. Own the direction.',
         },
         life_beyond: {
             eyebrow: 'The full picture',
             headline: 'Assign the money. Protect the energy. Keep the why.',
-            support: 'Not just money. Where your life goes.',
+            support: 'Not just money. Grip on where your life goes.',
         },
     },
     /** Auth manifesto chrome — bottom strip + tablist aria (UI stays i18n-agnostic). */
     auth_manifesto: {
         brand_lines_aria: 'Brand lines',
-        portals_eyebrow: 'Four portals',
-        portals_line: 'Money. Growth. Energy. Soul — in balance.',
+        portals_eyebrow: 'Grip on life',
+        portals_line: 'Money. Growth. Energy. Soul — tools for grip on life.',
+        /** While Energy + Soul are held back in production. */
+        portals_line_core: 'Money. Growth — tools for grip on life, with more to come.',
         jars_eyebrow: 'Six jars',
         jars_line: 'Paycheck in. Already assigned.',
         portals: {
@@ -60,7 +64,7 @@ const brand = {
         money_picture: {
             eyebrow: 'Your money',
             headline: 'Know where it went. Know where it’s going.',
-            support: 'Your money, assigned. Not guessed.',
+            support: 'See where it went. Get grip again. Six jars decide.',
         },
         how_it_works: {
             eyebrow: 'Today',

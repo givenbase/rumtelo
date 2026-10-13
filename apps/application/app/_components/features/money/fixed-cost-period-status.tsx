@@ -24,9 +24,62 @@ type Labels = {
     markPaidPending?: string;
 };
 
+function MarkPaidChipButton({
+    idleLabel,
+    idleClassName,
+    labels,
+    pending,
+    onMarkPaid,
+    className,
+}: {
+    idleLabel: string;
+    idleClassName: string;
+    labels: Labels;
+    pending: boolean;
+    onMarkPaid: () => void;
+    className?: string;
+}) {
+    const [armed, setArmed] = useState(false);
+
+    return (
+        <button
+            type="button"
+            data-mutate
+            data-tour="fixed-status"
+            disabled={pending}
+            aria-busy={pending || undefined}
+            title={armed ? labels.markPaidConfirm : labels.markPaidAria}
+            aria-label={armed ? labels.markPaidConfirm : labels.markPaidAria}
+            onBlur={() => setArmed(false)}
+            onClick={() => {
+                if (!armed) {
+                    setArmed(true);
+                    return;
+                }
+                setArmed(false);
+                onMarkPaid();
+            }}
+            className={cn(
+                META_CHIP,
+                CHIP_FOCUS,
+                'cursor-pointer transition-colors active:scale-[0.98] disabled:cursor-wait',
+                armed
+                    ? 'border-accent bg-accent-soft text-accent hover:bg-accent/15'
+                    : idleClassName,
+                className
+            )}>
+            {pending
+                ? (labels.markPaidPending ?? labels.markPaidConfirm)
+                : armed
+                  ? labels.markPaidConfirm
+                  : idleLabel}
+        </button>
+    );
+}
+
 /**
  * Period status pill — same control on the fixed-cost list and detail.
- * Due is a two-tap mark-paid control; other states are read-only chips.
+ * Due and Planned (upcoming) are two-tap mark-paid controls; other states are read-only chips.
  */
 export function FixedCostPeriodStatusControl({
     status,
@@ -43,11 +96,11 @@ export function FixedCostPeriodStatusControl({
     onMarkPaid?: () => void;
     className?: string;
 }) {
-    const [armed, setArmed] = useState(false);
-
     if (status === FixedCostPeriodStatus.TAKEN) {
         return (
-            <span className={cn(META_CHIP, 'border-success bg-success/5 text-success', className)}>
+            <span
+                data-tour="fixed-status"
+                className={cn(META_CHIP, 'border-success bg-success/5 text-success', className)}>
                 {labels.taken}
             </span>
         );
@@ -55,61 +108,59 @@ export function FixedCostPeriodStatusControl({
     if (status === FixedCostPeriodStatus.DUE) {
         if (canMarkPaid && onMarkPaid) {
             return (
-                <button
-                    type="button"
-                    data-mutate
-                    disabled={pending}
-                    aria-busy={pending || undefined}
-                    title={armed ? labels.markPaidConfirm : labels.markPaidAria}
-                    aria-label={armed ? labels.markPaidConfirm : labels.markPaidAria}
-                    onBlur={() => setArmed(false)}
-                    onClick={() => {
-                        if (!armed) {
-                            setArmed(true);
-                            return;
-                        }
-                        setArmed(false);
-                        onMarkPaid();
-                    }}
-                    className={cn(
-                        META_CHIP,
-                        CHIP_FOCUS,
-                        'cursor-pointer transition-colors active:scale-[0.98] disabled:cursor-wait',
-                        armed
-                            ? 'border-accent bg-accent-soft text-accent hover:bg-accent/15'
-                            : 'border-danger bg-danger/5 text-danger hover:bg-danger/15',
-                        className
-                    )}>
-                    {pending
-                        ? (labels.markPaidPending ?? labels.markPaidConfirm)
-                        : armed
-                          ? labels.markPaidConfirm
-                          : labels.due}
-                </button>
+                <MarkPaidChipButton
+                    idleLabel={labels.due}
+                    idleClassName="border-danger bg-danger/5 text-danger hover:bg-danger/15"
+                    labels={labels}
+                    pending={pending}
+                    onMarkPaid={onMarkPaid}
+                    className={className}
+                />
             );
         }
         return (
-            <span className={cn(META_CHIP, 'border-danger bg-danger/5 text-danger', className)}>
+            <span
+                data-tour="fixed-status"
+                className={cn(META_CHIP, 'border-danger bg-danger/5 text-danger', className)}>
                 {labels.due}
             </span>
         );
     }
     if (status === FixedCostPeriodStatus.SKIPPED) {
         return (
-            <span className={cn(META_CHIP, 'border-fg-muted bg-raised text-fg-muted', className)}>
+            <span
+                data-tour="fixed-status"
+                className={cn(META_CHIP, 'border-fg-muted bg-raised text-fg-muted', className)}>
                 {labels.skipped}
             </span>
         );
     }
     if (status === FixedCostPeriodStatus.ROLLED) {
         return (
-            <span className={cn(META_CHIP, 'border-warning bg-warning/8 text-warning', className)}>
+            <span
+                data-tour="fixed-status"
+                className={cn(META_CHIP, 'border-warning bg-warning/8 text-warning', className)}>
                 {labels.rolled ?? labels.skipped}
             </span>
         );
     }
+    // UPCOMING / planned — mark paid when allowed (same path as detail).
+    if (canMarkPaid && onMarkPaid) {
+        return (
+            <MarkPaidChipButton
+                idleLabel={labels.planned}
+                idleClassName="border-line bg-raised text-fg-muted hover:border-accent hover:bg-accent-soft hover:text-accent"
+                labels={labels}
+                pending={pending}
+                onMarkPaid={onMarkPaid}
+                className={className}
+            />
+        );
+    }
     return (
-        <span className={cn(META_CHIP, 'border-line bg-raised text-fg-muted', className)}>
+        <span
+            data-tour="fixed-status"
+            className={cn(META_CHIP, 'border-line bg-raised text-fg-muted', className)}>
             {labels.planned}
         </span>
     );

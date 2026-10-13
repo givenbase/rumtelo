@@ -1,11 +1,11 @@
 # Rumtelo — direction & handoff
 
-**Stop wondering where it went.** Six jars, one calm overview.
+**Stop wondering where it went.** **Rumtelo — grip on life.**
 
-> Rijkdom is geen getal. Het zijn de teugels in jouw handen.
+> Rijkdom is geen getal. Het is grip op je leven.
 
-Rumtelo is not a bookkeeping app. It is a single quiet view of where your money,
-energy and time go — so intention leads, and life doesn’t decide first.
+See where your money, life, energy and time went — then get grip again. Clear tools,
+a tip from The Coach, you choose. Not a budget app.
 
 **Organized docs (product, brand, research, engineering):** [`docs/`](./docs/README.md)
 

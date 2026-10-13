@@ -4,6 +4,7 @@ import { Typography } from '@rumtelo/ui';
 import { useTranslations } from '@rumtelo/i18n';
 
 import { PORTALS } from '@/lib/landing-content';
+import { isProductLive } from '@/lib/launch-products';
 import { cn } from '@rumtelo/utils';
 
 import { CARD, SectionHeading } from './landing-primitives';
@@ -11,9 +12,11 @@ import { CARD, SectionHeading } from './landing-primitives';
 const PORTAL_BY_KEY = Object.fromEntries(PORTALS.map(portal => [portal.key, portal]));
 
 const COACH_POINT_KEYS = ['one', 'quiet', 'shame', 'ten'] as const;
-const COACH_DEMO_PORTALS = ['money', 'growth', 'energy', 'soul'] as const;
+const COACH_DEMO_PORTALS = (['money', 'growth', 'energy', 'soul'] as const).filter(key =>
+    isProductLive(key)
+);
 
-/** Aspirant ↔ mentor. A rendered mock of the in-app Coach — no screenshot placeholder. */
+/** Coach tips · you choose. A rendered mock of the in-app Coach — no screenshot placeholder. */
 export function LandingCoach() {
     const t = useTranslations('pages.landing');
 

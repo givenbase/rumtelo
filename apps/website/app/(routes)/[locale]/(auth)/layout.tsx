@@ -23,10 +23,17 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                 className="relative flex flex-col px-5 py-4 sm:px-8 sm:py-6 lg:px-10"
                 style={{ background: 'var(--gradient-page)' }}>
                 <header className="flex shrink-0 items-start justify-between gap-4">
-                    <Link href="/" className="inline-grid gap-1">
+                    <Link href="/" className="inline-grid gap-0.5">
                         <RumteloLogo variant="wordmark" className="h-8 w-auto max-w-[11rem]" />
                         <Typography as="span" variant="caption" color="muted">
                             {t('features.brand.tagline')}
+                        </Typography>
+                        <Typography
+                            as="span"
+                            variant="caption"
+                            color="muted"
+                            className="text-fg-faint">
+                            {t('features.brand.grip')}
                         </Typography>
                     </Link>
                     <div className="flex items-center gap-1.5 sm:gap-2">

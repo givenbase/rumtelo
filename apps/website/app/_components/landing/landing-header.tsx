@@ -23,6 +23,7 @@ const NAV_LINK_KEYS = [
     { href: '#portals', labelKey: 'portals' },
     { href: '#jars', labelKey: 'how_it_works' },
     { href: '#pricing', labelKey: 'pricing' },
+    { href: '#practices', labelKey: 'practices' },
     { href: '#faq', labelKey: 'questions' },
     { href: '#signup', labelKey: 'create_account' },
 ] as const;

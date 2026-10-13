@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -30,6 +31,7 @@ import { api } from '@/app/_lib/api';
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { writeHelpersEnabled } from '@/app/_lib/feature-helpers';
 import { jarChrome, jarIcon } from '@/app/_lib/jar-meta';
+import { practicePath } from '@/app/_lib/routes';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -224,7 +226,20 @@ export function OnboardingFlow({
                         {currentStep.body}
                     </Typography>
 
-                    {currentStep.key === 'welcome' ? <WelcomeStep /> : null}
+                    {currentStep.key === 'welcome' ? (
+                        <>
+                            <WelcomeStep />
+                            {/* Coaches who skipped the pricing tab still get a way to the practice desk. */}
+                            <p className="mt-5 text-sm text-fg-muted">
+                                {t('practice_escape')}{' '}
+                                <Link
+                                    href={practicePath('create')}
+                                    className="font-semibold text-accent underline-offset-2 hover:underline">
+                                    {t('practice_escape_cta')}
+                                </Link>
+                            </p>
+                        </>
+                    ) : null}
                     {currentStep.key === 'income' ? <IncomeStep /> : null}
                     {currentStep.key === 'jars' ? <JarsStep displayJars={displayJars} /> : null}
                     {currentStep.key === 'why' ? <WhyStep /> : null}

@@ -67,7 +67,7 @@ describe('isCoachFeatureEnabledAtLaunch', () => {
             false
         );
         assert.equal(
-            isCoachFeatureEnabledAtLaunch(CoachFeatureId.MONEY_TIP_PRODUCERS, {
+            isCoachFeatureEnabledAtLaunch(CoachFeatureId.GROWTH_TIP_PRODUCERS, {
                 nodeEnv: 'staging',
             }),
             false

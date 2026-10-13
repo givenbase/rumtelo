@@ -2,8 +2,8 @@
 const growth = {
     hub: {
         eyebrow: 'Growth · long term',
-        title: 'Where the next paycheck is going.',
-        line: 'What you aim for, what you earn, what you learn.',
+        title: 'Grow in more than one direction.',
+        line: 'Grip on your growth — skills, goals, learning; you move forward.',
         fallback_coach_kind: 'THE LEVER',
         fallback_coach_text:
             'Cutting costs has a floor; raising income does not. Income is the faster lever.',

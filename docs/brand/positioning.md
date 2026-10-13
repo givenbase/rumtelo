@@ -11,8 +11,30 @@ Chosen because it means **direction**, which is what the product does.
 
 ## North star
 
-**Stop wondering where it went.**  
-Money gets a job. Six jars. One calm overview.
+**Stop wondering where it went.** ← the key (keep mysterious)
+
+Decode sparingly (Why / L1 / landing hero only): *Wondering what? All of it — money, life, energy, time.*  
+Then clarify: when you know where it went, you get **grip** again (control).  
+
+Products are tools for parts of that grip (they can grow): *Grip on your money / growth / energy / why.* Money and Growth are the most ready today. See [explain scripts](../explain/README.md).
+
+Do **not** repeat the decode on every screen — slogan → decode (once) → grip → product.
+
+### Two front doors
+
+| Door | Decode | Product |
+|---|---|---|
+| **People** | *Wondering what? All of it — money, life, energy, time.* | Household board: Money · Growth · Energy · Soul |
+| **Practices** | *Stop wondering where your clients stand.* | Rumtelo Practice: one desk, every client's board, only with their yes |
+
+Same key, different decode. Details: [product/practice.md](../product/practice.md).
+
+### Naming: The Coach vs. a coach
+
+- **The Coach** (capital T) is the in-app feature: small, rule-based tips with one next move.
+- A **coach / advisor** (lowercase) is a human professional, usually working through a **Practice**.
+- Never write practice copy that suggests The Coach replaces the human. *The Coach tips between sessions. You guide the decisions.*
+- Use **routine** for the weekly habit, never "practice" (NL: *routine*, not *praktijk*).
 
 ---
 

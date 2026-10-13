@@ -111,6 +111,8 @@ async function ensurePrice(
 /**
  * Idempotent: create or skip a recurring per-unit-amount price with a stable lookup_key.
  * Used for seat add-ons and practice staff seats (all monthly, no yearly variant).
+ * When the catalog amount changed, a new price takes over the lookup_key; the old price
+ * stays active so existing subscriptions keep billing until they are migrated.
  */
 async function ensureAddonPrice(
     stripe: Stripe,
@@ -130,20 +132,25 @@ async function ensureAddonPrice(
         active: true,
     });
 
-    if (existing.data.length > 0) {
-        const price = existing.data[0];
-        console.log(`  ⏭  ${opts.lookupKey} → ${price.id} (exists)`);
-        return price;
+    const monthCents = Math.round(opts.monthCents);
+    const current = existing.data[0] ?? null;
+    if (current && current.unit_amount === monthCents) {
+        console.log(`  ⏭  ${opts.lookupKey} → ${current.id} (exists)`);
+        return current;
     }
 
     // Ensure a product for this add-on exists.
-    const products = await stripe.products.search({
-        query: `metadata['addon_kind']:'${opts.metaKind}' AND metadata['product_type']:'${opts.metaType}'`,
-        limit: 1,
-    });
+    const products = current
+        ? null
+        : await stripe.products.search({
+              query: `metadata['addon_kind']:'${opts.metaKind}' AND metadata['product_type']:'${opts.metaType}'`,
+              limit: 1,
+          });
 
     let productId: string;
-    if (products.data.length > 0) {
+    if (current) {
+        productId = typeof current.product === 'string' ? current.product : current.product.id;
+    } else if (products && products.data.length > 0) {
         productId = products.data[0].id;
     } else {
         const product = await stripe.products.create({
@@ -160,10 +167,11 @@ async function ensureAddonPrice(
 
     const price = await stripe.prices.create({
         product: productId,
-        unit_amount: Math.round(opts.monthCents),
+        unit_amount: monthCents,
         currency: opts.currency,
         recurring: { interval: 'month' },
         lookup_key: opts.lookupKey,
+        transfer_lookup_key: current !== null,
         nickname: opts.name,
         metadata: {
             addon_kind: opts.metaKind,
@@ -171,7 +179,14 @@ async function ensureAddonPrice(
         },
     });
 
-    console.log(`  ✓  ${opts.lookupKey} → ${price.id} (€${(opts.monthCents / 100).toFixed(2)}/mo)`);
+    if (current) {
+        console.log(
+            `  ↻  ${opts.lookupKey} → ${price.id} (€${(monthCents / 100).toFixed(2)}/mo, was €${((current.unit_amount ?? 0) / 100).toFixed(2)} on ${current.id} — migrate existing subscriptions)`
+        );
+        return price;
+    }
+
+    console.log(`  ✓  ${opts.lookupKey} → ${price.id} (€${(monthCents / 100).toFixed(2)}/mo)`);
     return price;
 }
 

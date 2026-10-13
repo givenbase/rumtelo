@@ -20,7 +20,7 @@ function ease(value: number) {
     return 1 - Math.pow(1 - clamped, 3);
 }
 
-const PROOF_KEYS = ['time', 'jars', 'portals', 'free'] as const;
+const PROOF_KEYS = ['time', 'jars', 'free'] as const;
 
 export function LandingHero() {
     const t = useTranslations('pages.landing');
@@ -213,7 +213,7 @@ export function LandingHero() {
                                         {t('header.sign_in')}
                                     </Cta>
                                 )}
-                                <Cta href="#jars" variant="ghost" size="lg">
+                                <Cta href="#portals" variant="ghost" size="lg">
                                     {t('hero.cta_secondary')}
                                 </Cta>
                             </>

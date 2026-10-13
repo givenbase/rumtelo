@@ -30,6 +30,8 @@ export function PageHelpButton() {
     const { helpersEnabled, setHelpersEnabled } = useFeatureHelpers();
     const hasTour = Boolean(help.tourId && (help.tourSteps?.length ?? 0) > 0);
     const replay = help.tourId ? isTourDone(help.tourId) : false;
+    // Slots without a recorded video stay hidden — no "coming soon" placeholders for customers.
+    const videos = help.videos?.filter(video => video.url.trim()) ?? [];
 
     return (
         <Sheet open={helpOpen} onOpenChange={setHelpOpen}>
@@ -72,6 +74,43 @@ export function PageHelpButton() {
                             </Typography>
                         </section>
                     ))}
+
+                    {videos.length > 0 ? (
+                        <section className="grid gap-3 border-t border-line pt-5">
+                            <h3 className="font-mono text-[10px] font-semibold tracking-widest text-accent uppercase">
+                                {t('chrome.videos_eyebrow')}
+                            </h3>
+                            <ul className="grid gap-2">
+                                {videos.map(video => {
+                                    const levelLabel =
+                                        video.level === 'general'
+                                            ? t('chrome.video_level_general')
+                                            : video.level === 'product'
+                                              ? t('chrome.video_level_product')
+                                              : t('chrome.video_level_feature');
+                                    return (
+                                        <li
+                                            key={`${video.level}-${video.title}`}
+                                            className="rounded-xl border border-line bg-raised px-3 py-3">
+                                            <p className="font-mono text-[10px] font-medium tracking-wide text-fg-faint uppercase">
+                                                {levelLabel}
+                                            </p>
+                                            <p className="mt-1 text-sm font-medium text-fg">
+                                                {video.title}
+                                            </p>
+                                            <a
+                                                href={video.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="mt-2 inline-flex text-xs font-semibold text-accent underline-offset-2 hover:underline">
+                                                {t('chrome.video_watch')}
+                                            </a>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </section>
+                    ) : null}
                 </div>
 
                 <div className="shrink-0 space-y-3 border-t border-line bg-raised px-5 py-4">

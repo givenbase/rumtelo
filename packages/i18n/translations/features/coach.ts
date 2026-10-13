@@ -2,7 +2,7 @@
 const coach = {
     page_title: 'The Coach',
     eyebrow: 'Across every portal',
-    lead: 'Suggestions and next moves from money, growth, energy, and soul — one tip at a time, never shame.',
+    lead: 'One tip at a time from money, growth, energy, and soul — so you keep grip. Never shame. You choose.',
     empty_title: 'Nothing to coach yet',
     empty_body: 'Log income, jars, or sleep — the Coach speaks when there is enough to see.',
     empty_quiet:
@@ -151,6 +151,24 @@ const coach = {
         split_inside: 'Split inside this jar',
         footer: 'The Coach — tips without shame.',
         turn_off: 'Turn tips off',
+    },
+    /** Rule-based tips from money tip producers (`money.*` keys). */
+    money_coach: {
+        due_bills: {
+            text_one:
+                '1 fixed cost is still due this period. Tap Due, then confirm, to mark it paid.',
+            text_other:
+                '{count} fixed costs are still due this period. Tap Due on each bill, then confirm, to mark it paid.',
+            cta: 'Open fixed costs',
+        },
+        inbox_unsorted: {
+            text: '{count} transactions wait in the inbox. Sort them into jars so the picture stays honest.',
+            cta: 'Open inbox',
+        },
+        necessities_share: {
+            text: 'Necessities is at {pct}% — the goal is 55%. Fine for now; to close the gap, trim fixed costs or raise income and leave Freedom untouched.',
+            cta: 'Review jars',
+        },
     },
     /** Rule-based tips from the energy time-week coach (`energy.time.*` keys). */
     time_coach: {
