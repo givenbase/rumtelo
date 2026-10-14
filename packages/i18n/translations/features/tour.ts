@@ -4,7 +4,7 @@ const tour = {
     offer: {
         eyebrow: 'Quick tour',
         title: 'Want a walkthrough of Rumtelo?',
-        body: 'A short guided tour of nav, jars, fixed costs, and income. You can skip anytime — or open Help later to replay a screen.',
+        body: 'A short guided tour from Home through jars, fixed costs, and income. You can skip anytime — or open Help later to replay.',
         accept: 'Start the tour',
         dismiss: 'Not now',
     },
@@ -16,6 +16,11 @@ const tour = {
         replay_tour_prompt: 'Replay the walkthrough for this screen?',
         take_tour: 'Take a tour',
         replay_tour: 'Replay tour',
+        take_full_tour_prompt:
+            'Want the full walkthrough? Home first, then jars, fixed costs, and income.',
+        replay_full_tour_prompt: 'Replay the full walkthrough from Home?',
+        take_full_tour: 'Start full tour',
+        replay_full_tour: 'Replay full tour',
         no_tour: 'No guided tour on this screen yet — the brief above covers the basics.',
         helpers_label: 'Show The Coach on screens',
         helpers_hint:
@@ -29,9 +34,9 @@ const tour = {
         video_level_feature: 'This feature',
         settings: {
             eyebrow: 'Guided tour',
-            blurb: 'Walk through nav, jars, fixed costs, and income again anytime.',
+            blurb: 'Walk through Home, jars, fixed costs, and income again anytime.',
             row_title: 'Product tour',
-            row_sub: 'Same walkthrough as after setup',
+            row_sub: 'Same walkthrough as after setup — starts on Home',
             restart: 'Start full tour',
         },
         joyride: {
@@ -84,6 +89,36 @@ const tour = {
                 looking_at: {
                     heading: 'What you’re looking at',
                     body: 'This page is part of your household money and growth setup. Use Period (top right) to switch months. Numbers follow the jars split you set in Settings.',
+                },
+            },
+        },
+        home: {
+            title: 'Home',
+            sections: {
+                what_for: {
+                    heading: 'What you’re looking at',
+                    body: 'Your grip snapshot for this month — The Coach, the money picture, and doors into Growth, Energy, and Soul. Start the full tour from Help to walk through Home, then jars, fixed costs, and income.',
+                },
+                how: {
+                    heading: 'How to use it',
+                    body: 'Use Period (top right) to switch months. Open a portal when you want that tool. Tap Help anytime to replay this walkthrough.',
+                },
+            },
+            steps: {
+                coach: {
+                    title: 'The Coach',
+                    content:
+                        'One tip on where you stand and one move you can make. Tips — you choose. Turn the Coach on or off in Help or Settings.',
+                },
+                hero: {
+                    title: 'This month’s money',
+                    content:
+                        'What landed in the jars, what’s left, and safe-to-spend for the period you’re viewing.',
+                },
+                portals: {
+                    title: 'Your products',
+                    content:
+                        'Money lives in the top nav. Growth, Energy, and Soul open from here when you want that next tool — one product at a time.',
                 },
             },
         },

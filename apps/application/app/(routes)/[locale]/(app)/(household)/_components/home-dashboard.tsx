@@ -429,12 +429,39 @@ export function HomeDashboardClient() {
             </div>
 
             {/* Coach + month-score advice share one slider when helpers are on. */}
-            <CoachVerdict
-                messages={coach}
-                hasAttention={coachHasAttention}
-                scoreSlide={
+            <div data-tour="home-coach">
+                <CoachVerdict
+                    messages={coach}
+                    hasAttention={coachHasAttention}
+                    scoreSlide={
+                        <MonthScoreLog
+                            embedded
+                            score={monthScore.score}
+                            daysLeft={monthScore.daysLeft}
+                            level={monthScore.level}
+                            events={monthScore.events}
+                            isClosed={liveData?.monthScore?.isClosed}
+                            closeBlockers={monthScore.closeBlockers}
+                            priorOpenPeriod={monthScore.priorOpenPeriod}
+                            periodNote={periodScoreNote}
+                            canCloseMonth={
+                                live &&
+                                canMutate &&
+                                liveData?.monthScore !== undefined &&
+                                !liveData.monthScore.isClosed
+                            }
+                            closeMonthPending={closeMonthScoreMutation.isPending}
+                            formatMoney={formatMoney}
+                            onCloseMonth={dispositions =>
+                                closeMonthScoreMutation.mutate(dispositions)
+                            }
+                        />
+                    }
+                />
+
+                {/* Helpers off: CoachVerdict is null — keep month-score advice visible. */}
+                {!helpersEnabled ? (
                     <MonthScoreLog
-                        embedded
                         score={monthScore.score}
                         daysLeft={monthScore.daysLeft}
                         level={monthScore.level}
@@ -453,140 +480,129 @@ export function HomeDashboardClient() {
                         formatMoney={formatMoney}
                         onCloseMonth={dispositions => closeMonthScoreMutation.mutate(dispositions)}
                     />
-                }
-            />
+                ) : null}
+            </div>
 
-            {/* Helpers off: CoachVerdict is null — keep month-score advice visible. */}
-            {!helpersEnabled ? (
-                <MonthScoreLog
-                    score={monthScore.score}
-                    daysLeft={monthScore.daysLeft}
-                    level={monthScore.level}
-                    events={monthScore.events}
-                    isClosed={liveData?.monthScore?.isClosed}
-                    closeBlockers={monthScore.closeBlockers}
-                    priorOpenPeriod={monthScore.priorOpenPeriod}
-                    periodNote={periodScoreNote}
-                    canCloseMonth={
-                        live &&
-                        canMutate &&
-                        liveData?.monthScore !== undefined &&
-                        !liveData.monthScore.isClosed
-                    }
-                    closeMonthPending={closeMonthScoreMutation.isPending}
-                    formatMoney={formatMoney}
-                    onCloseMonth={dispositions => closeMonthScoreMutation.mutate(dispositions)}
-                />
-            ) : null}
+            <div data-tour="home-hero">
+                <HeroKluis
+                    eyebrow={heroEyebrow}
+                    total={formatMoney(dashboard.allocatedTotal ?? 0)}
+                    potTotal={formatMoney(jars.reduce((sum, jar) => sum + jar.potBalance, 0))}
+                    totalDelta={totalDelta}
+                    incomeBreakdown={incomeBreakdown}
+                    stats={[
+                        {
+                            label: t('pages.dashboard.stats.avg_left'),
+                            value: formatMoney(dashboard.avgLeftOver ?? 0),
+                            tone: 'accent',
+                        },
+                        {
+                            label: t('pages.dashboard.stats.safe_per_day'),
+                            value: formatMoney(dashboard.safePerDay ?? 0),
+                            tone: 'accent',
+                        },
+                        {
+                            label: t('pages.dashboard.stats.play_left'),
+                            value: formatMoney(dashboard.playLeft ?? 0),
+                            href: `/product/money/jars/${jarKeyToSlug('PLAY')}`,
+                        },
+                    ]}>
+                    <JarDrilldownTable
+                        jars={jars}
+                        extras={
+                            live
+                                ? {
+                                      period,
+                                      fixedCosts: (byJarQuery.data ?? []).flatMap(
+                                          group => group.items
+                                      ),
+                                      transactions: periodTxQuery.data?.items ?? [],
+                                      categoryTemplates: categoryTemplatesQuery.data ?? [],
+                                      merchants: merchantsQuery.data ?? [],
+                                      givingOrgs: givingOrgsQuery.data ?? [],
+                                      jarByKey: catalogByKey,
+                                  }
+                                : undefined
+                        }
+                    />
+                </HeroKluis>
+            </div>
 
-            <HeroKluis
-                eyebrow={heroEyebrow}
-                total={formatMoney(dashboard.allocatedTotal ?? 0)}
-                potTotal={formatMoney(jars.reduce((sum, jar) => sum + jar.potBalance, 0))}
-                totalDelta={totalDelta}
-                incomeBreakdown={incomeBreakdown}
-                stats={[
-                    {
-                        label: t('pages.dashboard.stats.avg_left'),
-                        value: formatMoney(dashboard.avgLeftOver ?? 0),
-                        tone: 'accent',
-                    },
-                    {
-                        label: t('pages.dashboard.stats.safe_per_day'),
-                        value: formatMoney(dashboard.safePerDay ?? 0),
-                        tone: 'accent',
-                    },
-                    {
-                        label: t('pages.dashboard.stats.play_left'),
-                        value: formatMoney(dashboard.playLeft ?? 0),
-                        href: `/product/money/jars/${jarKeyToSlug('PLAY')}`,
-                    },
-                ]}>
-                <JarDrilldownTable
-                    jars={jars}
-                    extras={
-                        live
-                            ? {
-                                  period,
-                                  fixedCosts: (byJarQuery.data ?? []).flatMap(group => group.items),
-                                  transactions: periodTxQuery.data?.items ?? [],
-                                  categoryTemplates: categoryTemplatesQuery.data ?? [],
-                                  merchants: merchantsQuery.data ?? [],
-                                  givingOrgs: givingOrgsQuery.data ?? [],
-                                  jarByKey: catalogByKey,
-                              }
-                            : undefined
-                    }
-                />
-            </HeroKluis>
-
-            {canSeeGrowth || canSeeEnergy || canSeeSoul ? (
-                <div
-                    className={cn(
-                        'grid grid-cols-1 gap-4',
-                        (canSeeEnergy && isProductEnabled('energy')) ||
-                            (canSeeSoul && isProductEnabled('soul'))
+            <div
+                data-tour="home-portals"
+                className={cn(
+                    'grid grid-cols-1 gap-4',
+                    canSeeGrowth || canSeeEnergy || canSeeSoul
+                        ? (canSeeEnergy && isProductEnabled('energy')) ||
+                          (canSeeSoul && isProductEnabled('soul'))
                             ? 'lg:grid-cols-3'
                             : 'lg:grid-cols-1'
-                    )}>
-                    {canSeeGrowth ? (
-                        <PortalWidget
-                            tint="var(--color-jar-lts)"
-                            icon="trending-up"
-                            title={t('pages.nav.pills.growth')}
-                            href="/product/growth"
-                            stats={[
-                                {
-                                    label: stacked
-                                        ? t('pages.dashboard.widgets.growth.income_span')
-                                        : t('pages.dashboard.widgets.growth.income_month'),
-                                    value: formatMoney(dashboard.incomeTotal ?? 0),
-                                },
-                                {
-                                    label: t('pages.dashboard.widgets.growth.inbox'),
-                                    value: String(dashboard.inboxCount ?? 0),
-                                },
-                            ]}
-                            tagline={t('pages.dashboard.widgets.growth.tagline')}
-                        />
-                    ) : null}
-                    {canSeeEnergy && isProductEnabled('energy') ? (
-                        <PortalWidget
-                            tint="var(--color-jar-play)"
-                            icon={'✳\uFE0E'}
-                            title={t('pages.nav.pills.energy')}
-                            href="/product/energy"
-                            stats={[
-                                {
-                                    label: t('pages.dashboard.widgets.energy.trained'),
-                                    value: '—',
-                                },
-                                { label: t('pages.dashboard.widgets.energy.sleep'), value: '—' },
-                            ]}
-                            tagline={t('pages.dashboard.widgets.energy.tagline')}
-                        />
-                    ) : null}
-                    {canSeeSoul && isProductEnabled('soul') ? (
-                        <PortalWidget
-                            tint="var(--color-portal-soul)"
-                            icon="sparkles"
-                            title={t('pages.nav.pills.soul')}
-                            href="/product/soul"
-                            stats={[
-                                {
-                                    label: t('pages.dashboard.widgets.soul.stillness'),
-                                    value: '—',
-                                },
-                                {
-                                    label: t('pages.dashboard.widgets.soul.why'),
-                                    value: dashboard.why ? '✓' : '—',
-                                },
-                            ]}
-                            tagline={t('pages.dashboard.widgets.soul.tagline')}
-                        />
-                    ) : null}
-                </div>
-            ) : null}
+                        : undefined
+                )}>
+                {canSeeGrowth ? (
+                    <PortalWidget
+                        tint="var(--color-jar-lts)"
+                        icon="trending-up"
+                        title={t('pages.nav.pills.growth')}
+                        href="/product/growth"
+                        stats={[
+                            {
+                                label: stacked
+                                    ? t('pages.dashboard.widgets.growth.income_span')
+                                    : t('pages.dashboard.widgets.growth.income_month'),
+                                value: formatMoney(dashboard.incomeTotal ?? 0),
+                            },
+                            {
+                                label: t('pages.dashboard.widgets.growth.inbox'),
+                                value: String(dashboard.inboxCount ?? 0),
+                            },
+                        ]}
+                        tagline={t('pages.dashboard.widgets.growth.tagline')}
+                    />
+                ) : null}
+                {canSeeEnergy && isProductEnabled('energy') ? (
+                    <PortalWidget
+                        tint="var(--color-jar-play)"
+                        icon={'✳\uFE0E'}
+                        title={t('pages.nav.pills.energy')}
+                        href="/product/energy"
+                        stats={[
+                            {
+                                label: t('pages.dashboard.widgets.energy.trained'),
+                                value: '—',
+                            },
+                            { label: t('pages.dashboard.widgets.energy.sleep'), value: '—' },
+                        ]}
+                        tagline={t('pages.dashboard.widgets.energy.tagline')}
+                    />
+                ) : null}
+                {canSeeSoul && isProductEnabled('soul') ? (
+                    <PortalWidget
+                        tint="var(--color-portal-soul)"
+                        icon="sparkles"
+                        title={t('pages.nav.pills.soul')}
+                        href="/product/soul"
+                        stats={[
+                            {
+                                label: t('pages.dashboard.widgets.soul.stillness'),
+                                value: '—',
+                            },
+                            {
+                                label: t('pages.dashboard.widgets.soul.why'),
+                                value: dashboard.why ? '✓' : '—',
+                            },
+                        ]}
+                        tagline={t('pages.dashboard.widgets.soul.tagline')}
+                    />
+                ) : null}
+                {!canSeeGrowth &&
+                !(canSeeEnergy && isProductEnabled('energy')) &&
+                !(canSeeSoul && isProductEnabled('soul')) ? (
+                    <Typography as="p" size="sm" color="muted" className="sr-only">
+                        {t('features.tour.pages.home.steps.portals.content')}
+                    </Typography>
+                ) : null}
+            </div>
         </div>
     );
 }

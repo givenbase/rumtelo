@@ -3063,6 +3063,10 @@
                 "replay_tour_prompt": "Tu veux revoir le guide pas à pas pour cet écran ?",
                 "take_tour": "Faites une visite guidée",
                 "replay_tour": "Revivre le circuit",
+                "take_full_tour_prompt": "Vous voulez un guide complet ? Commençons par le logement, puis les bocaux, les frais fixes et les revenus.",
+                "replay_full_tour_prompt": "Revoir la vidéo complète du guide pas à pas depuis la page d'accueil ?",
+                "take_full_tour": "Commencer la visite complète",
+                "replay_full_tour": "Revivre la visite dans son intégralité",
                 "no_tour": "Il n'y a pas encore de visite guidée sur cet écran — le descriptif ci-dessus présente les éléments essentiels.",
                 "helpers_label": "Diffuser « The Coach » à l'écran",
                 "helpers_hint": "Lignes « Pourquoi » et fiches « jar » de The Coach (✦ The Coach). Identique à Paramètres → Préférences. Activé par défaut pour les débutants.",
@@ -3129,6 +3133,33 @@
                         "looking_at": {
                             "heading": "Ce que vous voyez",
                             "body": "Cette page fait partie de votre configuration « Budget familial et épargne ». Utilisez la rubrique « Période » (en haut à droite) pour changer de mois. Les chiffres correspondent à la répartition entre les « bocaux » que vous avez définie dans les « Paramètres »."
+                        }
+                    }
+                },
+                "home": {
+                    "title": "Accueil",
+                    "sections": {
+                        "what_for": {
+                            "heading": "Ce que vous voyez",
+                            "body": "Votre aperçu financier du mois — Le Coach, la situation financière et les clés de la croissance, de l'énergie et de l'épanouissement spirituel. Commencez la visite complète depuis la rubrique « Aide » pour parcourir la section « Accueil », puis les « Tiers », les « Coûts fixes » et les « Revenus »."
+                        },
+                        "how": {
+                            "heading": "Mode d'emploi",
+                            "body": "Utilisez la rubrique « Période d'utilisation » (en haut à droite) pour changer de mois. Ouvrez un portail lorsque vous souhaitez utiliser cet outil. Appuyez sur « Aide » à tout moment pour revoir ce guide pas à pas."
+                        }
+                    },
+                    "steps": {
+                        "coach": {
+                            "title": "L'entraîneur",
+                            "content": "Un conseil sur votre situation actuelle et une action que vous pouvez entreprendre. Conseils : à vous de choisir. Activez ou désactivez le Coach dans l'aide ou dans les paramètres."
+                        },
+                        "hero": {
+                            "title": "L'argent de ce mois-ci",
+                            "content": "Ce qui a été versé dans les bocaux, ce qu'il reste et le montant que vous pouvez dépenser sans risque pour la période considérée."
+                        },
+                        "portals": {
+                            "title": "Vos produits",
+                            "content": "La rubrique « Argent » se trouve dans la barre de navigation supérieure. Les rubriques « Croissance », « Énergie » et « Âme » s'ouvrent à partir de là lorsque vous souhaitez accéder à l'outil suivant — un produit à la fois."
                         }
                     }
                 },

@@ -3063,6 +3063,10 @@
                 "replay_tour_prompt": "¿Quieres volver a ver el tutorial de esta pantalla?",
                 "take_tour": "Haz un recorrido",
                 "replay_tour": "Recorrido de repetición",
+                "take_full_tour_prompt": "¿Quieres ver el tutorial completo? Primero la vivienda, luego los frascos, los costes fijos y los ingresos.",
+                "replay_full_tour_prompt": "¿Quieres volver a ver el tutorial completo desde la página de inicio?",
+                "take_full_tour": "Iniciar el recorrido completo",
+                "replay_full_tour": "Volver a ver el recorrido completo",
                 "no_tour": "En esta pantalla aún no hay ningún recorrido guiado; la descripción anterior recoge lo esencial.",
                 "helpers_label": "Mostrar «The Coach» en las pantallas",
                 "helpers_hint": "Las «líneas de por qué» y las tarjetas «jar» de The Coach (✦ The Coach). Igual que en Ajustes → Preferencias. Activadas por defecto para los principiantes.",
@@ -3129,6 +3133,33 @@
                         "looking_at": {
                             "heading": "Lo que estás viendo",
                             "body": "Esta página forma parte de la configuración de tus finanzas domésticas y de crecimiento. Utiliza el campo «Período» (arriba a la derecha) para cambiar de mes. Las cifras se ajustan a la distribución entre los «tarros» que hayas establecido en «Configuración»."
+                        }
+                    }
+                },
+                "home": {
+                    "title": "Inicio",
+                    "sections": {
+                        "what_for": {
+                            "heading": "Lo que estás viendo",
+                            "body": "Tu resumen financiero de este mes: el entrenador, la visión general de las finanzas y las puertas hacia el crecimiento, la energía y el alma. Empieza el recorrido completo desde «Ayuda» para pasar por «Inicio», y luego por los frascos, los gastos fijos y los ingresos."
+                        },
+                        "how": {
+                            "heading": "Cómo utilizarlo",
+                            "body": "Utiliza «Período de uso» (arriba a la derecha) para cambiar de mes. Abre un portal cuando necesites esa herramienta. Pulsa en «Ayuda» en cualquier momento para volver a ver este tutorial."
+                        }
+                    },
+                    "steps": {
+                        "coach": {
+                            "title": "El entrenador",
+                            "content": "Un consejo sobre tu situación actual y una acción que puedes llevar a cabo. Consejos: tú eliges. Activa o desactiva el «Coach» en «Ayuda» o en «Ajustes»."
+                        },
+                        "hero": {
+                            "title": "El dinero de este mes",
+                            "content": "Lo que se ha ingresado en las cuentas, lo que queda y el dinero que puedes gastar sin problema durante el periodo que estás consultando."
+                        },
+                        "portals": {
+                            "title": "Vuestros productos",
+                            "content": "La sección «Dinero» se encuentra en la barra de navegación superior. Desde aquí puedes acceder a «Crecimiento», «Energía» y «Alma» cuando necesites la siguiente herramienta, un producto cada vez."
                         }
                     }
                 },

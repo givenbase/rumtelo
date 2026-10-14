@@ -62,6 +62,28 @@ export function buildShellTourSteps(t: TranslateFn): PageTourStep[] {
     ];
 }
 
+/** Home chapter — chrome + dashboard (full tour starts here). */
+export function buildHomeTourSteps(t: TranslateFn): PageTourStep[] {
+    return [
+        ...buildShellTourSteps(t),
+        step(
+            '[data-tour="home-coach"]',
+            t('pages.home.steps.coach.title'),
+            t('pages.home.steps.coach.content')
+        ),
+        step(
+            '[data-tour="home-hero"]',
+            t('pages.home.steps.hero.title'),
+            t('pages.home.steps.hero.content')
+        ),
+        step(
+            '[data-tour="home-portals"]',
+            t('pages.home.steps.portals.title'),
+            t('pages.home.steps.portals.content')
+        ),
+    ];
+}
+
 export function buildIncomeTourSteps(t: TranslateFn): PageTourStep[] {
     return [
         step(
@@ -124,7 +146,7 @@ export function buildJarsTourSteps(t: TranslateFn): PageTourStep[] {
 
 export function buildFullTourChapters(t: TranslateFn): FullTourChapter[] {
     return [
-        { id: 'shell', href: productPath('money'), steps: buildShellTourSteps(t) },
+        { id: 'home', href: '/', steps: buildHomeTourSteps(t) },
         { id: 'jars', href: productPath('money'), steps: buildJarsTourSteps(t) },
         { id: 'fixed', href: moneyPath('fixed-costs'), steps: buildFixedTourSteps(t) },
         { id: 'income', href: growthPath('income'), steps: buildIncomeTourSteps(t) },
@@ -142,13 +164,19 @@ function helpContent(
     titleKey: string,
     sectionBase: string,
     sectionKeys: readonly string[],
-    tour?: { id: PageHelpContent['tourId']; steps: PageTourStep[] },
+    tour?: { id: PageHelpContent['tourId']; steps: PageTourStep[]; fullTour?: boolean },
     videos?: PageHelpVideo[]
 ): PageHelpContent {
     return {
         title: t(titleKey),
         sections: sectionsFrom(t, sectionBase, sectionKeys),
-        ...(tour ? { tourId: tour.id, tourSteps: tour.steps } : {}),
+        ...(tour
+            ? {
+                  tourId: tour.id,
+                  tourSteps: tour.steps,
+                  ...(tour.fullTour ? { fullTour: true } : {}),
+              }
+            : {}),
         ...(videos?.length ? { videos } : {}),
     };
 }
@@ -157,8 +185,21 @@ export function buildPageHelpForPathname(pathname: string, t: TranslateFn): Page
     const incomeSteps = buildIncomeTourSteps(t);
     const fixedSteps = buildFixedTourSteps(t);
     const jarsSteps = buildJarsTourSteps(t);
+    const homeSteps = buildHomeTourSteps(t);
 
     const routes: HelpRoute[] = [
+        {
+            prefix: '/',
+            exact: true,
+            content: helpContent(
+                t,
+                'pages.home.title',
+                'pages.home.sections',
+                ['what_for', 'how'],
+                { id: 'home', steps: homeSteps, fullTour: true },
+                [explainVideo(t, 'general', 'general')]
+            ),
+        },
         {
             prefix: growthPath('income'),
             content: helpContent(
@@ -273,7 +314,8 @@ export function buildPageHelpForPathname(pathname: string, t: TranslateFn): Page
     );
 }
 
-/** Strip locale prefix for comparing chapter hrefs. */
+/** Strip locale prefix for comparing chapter hrefs (`/nl` and `/nl/…` → `/` or `/…`). */
 export function pathWithoutLocale(pathname: string): string {
-    return pathname.replace(/^\/[a-z]{2}(?=\/)/, '') || pathname;
+    const stripped = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '');
+    return stripped === '' ? '/' : stripped;
 }

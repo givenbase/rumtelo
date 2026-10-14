@@ -3051,7 +3051,7 @@
             "offer": {
                 "eyebrow": "Korte rondleiding",
                 "title": "Wil je een rondleiding door Rumtelo?",
-                "body": "Een korte rondleiding langs navigatie, potten, vaste kosten en inkomsten. Je kunt op elk moment overslaan — of later ‘Help’ openen om een scherm opnieuw af te spelen.",
+                "body": "Een korte rondleiding vanaf Home door potjes, vaste kosten en inkomen. Je kunt altijd overslaan — of later Hulp openen om opnieuw te spelen.",
                 "accept": "Begin de rondleiding",
                 "dismiss": "Nu even niet"
             },
@@ -3063,6 +3063,10 @@
                 "replay_tour_prompt": "Wil je de uitleg voor dit scherm nog eens bekijken?",
                 "take_tour": "Volg een rondleiding",
                 "replay_tour": "Tour opnieuw afspelen",
+                "take_full_tour_prompt": "Wil je de volledige rondleiding? Eerst Home, daarna potjes, vaste kosten en inkomen.",
+                "replay_full_tour_prompt": "De volledige rondleiding opnieuw vanaf Home?",
+                "take_full_tour": "Start volledige rondleiding",
+                "replay_full_tour": "Volledige rondleiding opnieuw",
                 "no_tour": "Op dit scherm staat nog geen rondleiding — in de bovenstaande samenvatting worden de basisprincipes behandeld.",
                 "helpers_label": "De Coach op schermen tonen",
                 "helpers_hint": "Waarom-regels en potjeskaarten van De Coach (✦ De Coach). Zelfde als Instellingen → Voorkeuren. Standaard aan voor beginners.",
@@ -3075,9 +3079,9 @@
                 "video_level_feature": "Deze functie",
                 "settings": {
                     "eyebrow": "Rondleiding",
-                    "blurb": "Je kunt op elk moment nog eens de navigatie, de potjes, de vaste kosten en de inkomsten doornemen.",
+                    "blurb": "Loop Home, potjes, vaste kosten en inkomen opnieuw wanneer je wilt.",
                     "row_title": "Productrondleiding",
-                    "row_sub": "Dezelfde stap-voor-stap-handleiding als na de installatie",
+                    "row_sub": "Dezelfde rondleiding als na setup — begint op Home",
                     "restart": "Start de volledige rondleiding"
                 },
                 "joyride": {
@@ -3129,6 +3133,33 @@
                         "looking_at": {
                             "heading": "Wat je hier ziet",
                             "body": "Deze pagina maakt deel uit van je instellingen voor huishoudgeld en vermogensgroei. Gebruik ‘Periode’ (rechtsboven) om van maand te wisselen. De bedragen zijn afgestemd op de verdeling over de potjes die je in ‘Instellingen’ hebt ingesteld."
+                        }
+                    }
+                },
+                "home": {
+                    "title": "Home",
+                    "sections": {
+                        "what_for": {
+                            "heading": "Wat je hier ziet",
+                            "body": "Je grip-snapshot voor deze maand — De Coach, het geldbeeld, en deuren naar Groei, Energie en Ziel. Start de volledige rondleiding via Hulp: eerst Home, daarna potjes, vaste kosten en inkomen."
+                        },
+                        "how": {
+                            "heading": "Hoe je het gebruikt",
+                            "body": "Gebruik Periode (rechtsboven) om van maand te wisselen. Open een product als je die tool wilt. Tik op Hulp om deze rondleiding opnieuw te spelen."
+                        }
+                    },
+                    "steps": {
+                        "coach": {
+                            "title": "De Coach",
+                            "content": "Eén tip over waar je staat en één zet die je kunt doen. Tips — jij kiest. Zet De Coach aan of uit in Hulp of Instellingen."
+                        },
+                        "hero": {
+                            "title": "Het geld van deze maand",
+                            "content": "Wat in de potjes landde, wat er over is, en veilig-te-besteden voor de periode die je bekijkt."
+                        },
+                        "portals": {
+                            "title": "Je producten",
+                            "content": "Geld zit in de bovenste navigatie. Groei, Energie en Ziel open je hier als je die volgende tool wilt — één product tegelijk."
                         }
                     }
                 },

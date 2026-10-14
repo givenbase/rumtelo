@@ -26,10 +26,15 @@ export function PageHelpButton() {
     const t = useTranslations('features.tour');
     const tUi = useTranslations();
     const help = useMemo(() => buildPageHelpForPathname(pathname, t), [pathname, t]);
-    const { startTour, isTourDone, helpOpen, setHelpOpen } = usePageTour();
+    const { startTour, restartFullTour, isTourDone, helpOpen, setHelpOpen } = usePageTour();
     const { helpersEnabled, setHelpersEnabled } = useFeatureHelpers();
-    const hasTour = Boolean(help.tourId && (help.tourSteps?.length ?? 0) > 0);
-    const replay = help.tourId ? isTourDone(help.tourId) : false;
+    const isFullTour = Boolean(help.fullTour);
+    const hasTour = isFullTour || Boolean(help.tourId && (help.tourSteps?.length ?? 0) > 0);
+    const replay = isFullTour
+        ? (['home', 'shell', 'jars', 'fixed', 'income'] as const).some(id => isTourDone(id))
+        : help.tourId
+          ? isTourDone(help.tourId)
+          : false;
     // Slots without a recorded video stay hidden — no "coming soon" placeholders for customers.
     const videos = help.videos?.filter(video => video.url.trim()) ?? [];
 
@@ -148,23 +153,37 @@ export function PageHelpButton() {
                         </span>
                     </button>
 
-                    {hasTour && help.tourId ? (
+                    {hasTour && (isFullTour || help.tourId) ? (
                         <div className="grid gap-2">
                             <Typography as="p" size="sm" color="muted">
-                                {replay
-                                    ? t('chrome.replay_tour_prompt')
-                                    : t('chrome.take_tour_prompt')}
+                                {isFullTour
+                                    ? replay
+                                        ? t('chrome.replay_full_tour_prompt')
+                                        : t('chrome.take_full_tour_prompt')
+                                    : replay
+                                      ? t('chrome.replay_tour_prompt')
+                                      : t('chrome.take_tour_prompt')}
                             </Typography>
                             <Button
                                 type="button"
                                 className="w-full"
                                 onClick={() => {
+                                    setHelpOpen(false);
+                                    if (isFullTour) {
+                                        restartFullTour();
+                                        return;
+                                    }
                                     const steps = help.tourSteps ?? [];
                                     const tourId = help.tourId!;
-                                    setHelpOpen(false);
                                     startTour(tourId, steps);
                                 }}>
-                                {replay ? t('chrome.replay_tour') : t('chrome.take_tour')}
+                                {isFullTour
+                                    ? replay
+                                        ? t('chrome.replay_full_tour')
+                                        : t('chrome.take_full_tour')
+                                    : replay
+                                      ? t('chrome.replay_tour')
+                                      : t('chrome.take_tour')}
                             </Button>
                         </div>
                     ) : (
