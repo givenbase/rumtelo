@@ -16,7 +16,7 @@ export type PageTourStep = {
 };
 
 /** Stable id for progress tracking (account settings). */
-export type PageTourId = 'shell' | 'income' | 'fixed' | 'jars';
+export type PageTourId = 'shell' | 'home' | 'income' | 'fixed' | 'jars';
 
 /** Explain ladder slot — L1 general / L2 product / L3 feature. Empty url = hidden until recorded. */
 export type PageHelpVideo = {
@@ -30,6 +30,8 @@ export type PageHelpContent = {
     sections: PageHelpSection[];
     tourId?: PageTourId;
     tourSteps?: PageTourStep[];
+    /** When true, Help starts the multi-page product series (Home). */
+    fullTour?: boolean;
     videos?: PageHelpVideo[];
 };
 

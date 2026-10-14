@@ -375,9 +375,9 @@ const growth = {
         lead_library:
             'Search, then narrow by what it is and what it is about. Mark a title and it lands on Learn.',
         partner_max:
-            'Courses on Max are on MasterClass. Basic and Plus point at Udemy instead. Books, films, and series open as the plan allows — we recommend them, we do not host them.',
+            'Courses on Max are on MasterClass. Plus points at Udemy instead. Books, films, and series open as the plan allows — we recommend them, we do not host them.',
         partner_default:
-            'Courses on Basic and Plus are on Udemy. Max points at MasterClass instead. Books, films, and series open as the plan allows — we recommend them, we do not host them.',
+            'Learn is on Plus and Max. Courses on Plus are on Udemy; Max points at MasterClass. Books, films, and series open as the plan allows — we recommend them, we do not host them.',
         jar_coach_title: 'Education jar',
         jar_banner:
             'Your Education jar is where this spending lives. What raises your earning power pays itself back into Financial Freedom.',

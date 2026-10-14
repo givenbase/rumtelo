@@ -55,7 +55,7 @@ const capabilities = {
     'growth-learn': {
         name: 'Learn',
         description:
-            'Skills to work, and books, courses, seminars, and events we recommend — not host.',
+            'Skills to work, and books, courses, seminars, and events we recommend — not host. Plus and Max.',
     },
     'growth-net-worth': {
         name: 'Net worth',

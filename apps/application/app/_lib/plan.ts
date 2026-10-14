@@ -27,9 +27,9 @@ import { formatPlanPrice, toMinorUnits } from '@rumtelo/utils';
 /**
  * Plan gating — plan → product → feature (`{product}-{feature}`).
  *
- * Full catalog (26 keys). Basic grants free surfaces + growth goals/income/learn (capped goals).
- * Plus adds debt / bank / import / energy week·train·food / invite.
- * Max adds growth net-worth / soul-centers. Learn courses switch from Udemy to Masterclass.
+ * Full catalog (26 keys). Basic: free surfaces + growth income + 1 goal (taste Growth).
+ * Plus adds Learn + debt / bank / import / energy week·train·food / invite (+ more goals).
+ * Max adds growth net-worth / soul-centers. Learn courses: Udemy on Plus, Masterclass on Max.
  */
 
 export {

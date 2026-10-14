@@ -123,7 +123,7 @@ export const CAPABILITY_CATALOG: Record<CapabilityKey, CapabilityDefinition> = {
         kind: CapabilityKind.SCREEN,
         name: 'Learn',
         description:
-            'Skills to work, and books, courses, seminars, and events we recommend — not host.',
+            'Skills to work, and books, courses, seminars, and events we recommend — not host. Plus and Max.',
         sortOrder: 23,
     },
     [CAPABILITIES.growthNetWorth]: {
@@ -247,7 +247,6 @@ const BASIC_ACCESS: ProductFeatureMap = {
         CAPABILITIES.growthOverview,
         CAPABILITIES.growthGoals,
         CAPABILITIES.growthIncome,
-        CAPABILITIES.growthLearn,
     ],
     [CapabilityProduct.ENERGY]: [CAPABILITIES.energyOverview, CAPABILITIES.energySleep],
     [CapabilityProduct.SOUL]: [
@@ -267,7 +266,7 @@ const PLUS_EXTRA: ProductFeatureMap = {
         CAPABILITIES.moneyBank,
         CAPABILITIES.moneyImport,
     ],
-    [CapabilityProduct.GROWTH]: [],
+    [CapabilityProduct.GROWTH]: [CAPABILITIES.growthLearn],
     [CapabilityProduct.ENERGY]: [
         CAPABILITIES.energyWeek,
         CAPABILITIES.energyTraining,
@@ -338,7 +337,8 @@ export const PLAN_LIMITS: Record<PlanKey, PlanLimits> = {
         maxGoals: 1,
         maxAssets: null,
         maxIncomeStreams: null,
-        maxLearnEntries: null,
+        /** Learn is Plus+ — capacity stays at zero on Basic. */
+        maxLearnEntries: 0,
         maxBankLinks: 0,
     },
     [PlanKey.PLUS]: {

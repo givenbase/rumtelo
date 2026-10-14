@@ -58,6 +58,11 @@ const ALL_NAV_GROUPS = [
                 capabilityKey: CAPABILITIES.moneyOverview,
             },
             {
+                href: productPath('money/fixed-costs'),
+                labelKey: 'pages.nav.children.fixed_costs',
+                capabilityKey: CAPABILITIES.moneyFixedCosts,
+            },
+            {
                 href: productPath('money/transactions'),
                 labelKey: 'pages.nav.children.transactions',
                 capabilityKey: CAPABILITIES.moneySpending,
@@ -71,11 +76,6 @@ const ALL_NAV_GROUPS = [
                 href: productPath('money/net-worth'),
                 labelKey: 'pages.nav.children.net_worth',
                 capabilityKey: CAPABILITIES.growthNetWorth,
-            },
-            {
-                href: productPath('money/fixed-costs'),
-                labelKey: 'pages.nav.children.fixed_costs',
-                capabilityKey: CAPABILITIES.moneyFixedCosts,
             },
         ],
     },
@@ -91,14 +91,14 @@ const ALL_NAV_GROUPS = [
                 capabilityKey: CAPABILITIES.growthOverview,
             },
             {
-                href: productPath('growth/goals'),
-                labelKey: 'pages.nav.children.goals',
-                capabilityKey: CAPABILITIES.growthGoals,
-            },
-            {
                 href: productPath('growth/income'),
                 labelKey: 'pages.nav.children.income',
                 capabilityKey: CAPABILITIES.growthIncome,
+            },
+            {
+                href: productPath('growth/goals'),
+                labelKey: 'pages.nav.children.goals',
+                capabilityKey: CAPABILITIES.growthGoals,
             },
             {
                 href: productPath('growth/learn'),
@@ -120,14 +120,14 @@ const ALL_NAV_GROUPS = [
                 capabilityKey: CAPABILITIES.energyOverview,
             },
             {
-                href: productPath('energy/week'),
-                labelKey: 'pages.nav.children.week',
-                capabilityKey: CAPABILITIES.energyWeek,
-            },
-            {
                 href: productPath('energy/sleep'),
                 labelKey: 'pages.nav.children.sleep',
                 capabilityKey: CAPABILITIES.energySleep,
+            },
+            {
+                href: productPath('energy/week'),
+                labelKey: 'pages.nav.children.week',
+                capabilityKey: CAPABILITIES.energyWeek,
             },
             {
                 href: productPath('energy/training'),
@@ -163,14 +163,14 @@ const ALL_NAV_GROUPS = [
                 capabilityKey: CAPABILITIES.soulGratitude,
             },
             {
-                href: productPath('soul/giving'),
-                labelKey: 'pages.nav.children.giving',
-                capabilityKey: CAPABILITIES.soulGiving,
-            },
-            {
                 href: productPath('soul/intent'),
                 labelKey: 'pages.nav.children.intent',
                 capabilityKey: CAPABILITIES.soulIntent,
+            },
+            {
+                href: productPath('soul/giving'),
+                labelKey: 'pages.nav.children.giving',
+                capabilityKey: CAPABILITIES.soulGiving,
             },
             {
                 href: productPath('soul/centers'),
