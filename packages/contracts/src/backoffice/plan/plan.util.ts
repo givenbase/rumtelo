@@ -513,6 +513,21 @@ export function withinLimit(plan: PlanKey, key: PlanLimitKey, occupied: number):
     return occupied < max;
 }
 
+/**
+ * Next higher plan that raises this limit (or makes it unlimited).
+ * Null when already unlimited or no higher tier opens more room.
+ */
+export function nextPlanForHigherLimit(plan: PlanKey, key: PlanLimitKey): PlanKey | null {
+    const current = limitFor(plan, key);
+    if (current === null) return null;
+    for (const candidate of [PlanKey.PLUS, PlanKey.MAX] as const) {
+        if (PLAN_RANK[candidate] <= PLAN_RANK[plan]) continue;
+        const next = limitFor(candidate, key);
+        if (next === null || next > current) return candidate;
+    }
+    return null;
+}
+
 /** True when `plan` grants this capability key (unknown keys stay open). */
 export function hasCapability(capabilityKey: string | null | undefined, plan: PlanKey): boolean {
     if (!capabilityKey) return true;

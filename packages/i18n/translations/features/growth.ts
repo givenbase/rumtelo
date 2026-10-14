@@ -54,6 +54,11 @@ const growth = {
         kind_earn: 'Earn',
         kind_give: 'Give',
         add_goal: '+ Add goal',
+        /** Active goals vs plan ceiling — mirrors backend `maxGoals` (ACTIVE only). */
+        capacity_usage_aria: '{used} of {max} active goals',
+        capacity_full_title: 'Goal limit reached',
+        capacity_full_body:
+            'Your plan includes {max} active goals. Reach or archive one, or upgrade for more room.',
         preset_group_other: 'Other',
         focus: 'Focus',
         reached_badge: 'Reached {when}',

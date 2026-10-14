@@ -12,6 +12,8 @@ import type { UseFormReturn } from 'react-hook-form';
 import type { BankAccountFormValues } from '../_utils/settings-form-zod';
 import { accountBankMark } from '../_utils/resolve-account-bank';
 import { BankAccountRow } from '@/components/features/money/bank-account-row';
+import { PlanCapacityCreate } from '@/components/features/shell/plan-capacity-create';
+import { usePlanCapacity } from '@/components/features/shell/use-plan-capacity';
 import { BankAccountForm } from './bank-account-form';
 import { SettingsRow, SettingsRowLabel } from './settings-chrome';
 
@@ -41,7 +43,6 @@ export type BankLinkedAccountsProps = {
     formatMoney: (amount: number) => string;
     syncEnabled: boolean;
     wizardOpen: boolean;
-    canConnect: boolean;
     onOpenWizard: () => void;
     onReset: () => void;
     onOpenEdit: (account: Account) => void;
@@ -82,7 +83,6 @@ export function BankLinkedAccounts({
     formatMoney,
     syncEnabled,
     wizardOpen,
-    canConnect,
     onOpenWizard,
     onReset,
     onOpenEdit,
@@ -97,6 +97,7 @@ export function BankLinkedAccounts({
     disconnectPending,
 }: BankLinkedAccountsProps) {
     const t = useTranslations();
+    const bankCapacity = usePlanCapacity('maxBankLinks', linkedCount);
     const [openBankGroups, setOpenBankGroups] = useState<Set<string>>(() => new Set());
     const linkedBankEntries = Array.from(linkedByBankId.entries());
 
@@ -325,21 +326,31 @@ export function BankLinkedAccounts({
 
             {syncEnabled && !wizardOpen ? (
                 <div className="flex justify-end py-2.5">
-                    <Button
-                        type="button"
-                        size="sm"
-                        className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
-                        disabled={!live || !canConnect || Boolean(editingId)}
-                        onClick={onOpenWizard}>
-                        {t('pages.settings.panels.bank.connect_bank')}
-                    </Button>
+                    {live && !editingId ? (
+                        <PlanCapacityCreate
+                            limitKey="maxBankLinks"
+                            occupied={linkedCount}
+                            createLabel={t('pages.settings.panels.bank.connect_bank')}
+                            onCreate={onOpenWizard}
+                            usageAria={
+                                bankCapacity.max === null
+                                    ? undefined
+                                    : t('pages.settings.panels.bank.capacity_usage_aria', {
+                                          used: linkedCount,
+                                          max: bankCapacity.max,
+                                      })
+                            }
+                        />
+                    ) : (
+                        <Button
+                            type="button"
+                            size="sm"
+                            className="rounded-full font-mono text-[10px] tracking-[0.12em] uppercase"
+                            disabled>
+                            {t('pages.settings.panels.bank.connect_bank')}
+                        </Button>
+                    )}
                 </div>
-            ) : null}
-
-            {syncEnabled && !wizardOpen && !canConnect ? (
-                <p className="py-2 text-sm text-fg-muted">
-                    {t('common.message.error.api.plan_limit_reached')}
-                </p>
             ) : null}
         </>
     );
