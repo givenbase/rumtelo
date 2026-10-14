@@ -189,6 +189,9 @@ const settings = {
             last_seen_never: 'Not signed in yet',
             seat_limit:
                 'Seat limit reached ({limit}). Add a seat (€2.50) or upgrade your plan for more room.',
+            capacity_usage_aria: '{used} of {max} seats',
+            capacity_breakdown:
+                '{writableUsed} / {writableMax} writable · {viewerUsed} / {viewerMax} viewers',
             invite_email: 'Invite (email)',
             invite_placeholder: 'partner@example.com',
             invite_role: 'Access',
@@ -345,6 +348,7 @@ const settings = {
             empty_linked_title: 'No live bank links yet.',
             empty_linked_body: 'Connect a bank to pull transactions into the Inbox automatically.',
             connect_bank: 'Connect a bank',
+            capacity_usage_aria: '{used} of {max} bank links',
             wizard_step_institution: '1 · Choose bank',
             wizard_step_seat: '2 · Choose account',
             wizard_step_authorize: '3 · Authorize',

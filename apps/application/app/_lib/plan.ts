@@ -13,12 +13,15 @@ import {
     hasCapability,
     isCapabilityLocked,
     isCapabilityKey,
+    effectiveSeatCaps,
     limitFor,
     limitsFor,
     minPlanForCapability,
+    nextPlanForHigherLimit,
     productsWithGrants,
     withinLimit,
     type CapabilityKey,
+    type EffectiveSeatCaps,
     type PlanLimitKey,
 } from '@rumtelo/contracts';
 import type { TranslateFn } from '@rumtelo/i18n';
@@ -45,12 +48,15 @@ export {
     featuresForProduct,
     hasCapability,
     isCapabilityLocked,
+    effectiveSeatCaps,
     limitFor,
     limitsFor,
     minPlanForCapability,
+    nextPlanForHigherLimit,
     productsWithGrants,
     withinLimit,
     type CapabilityKey,
+    type EffectiveSeatCaps,
     type PlanLimitKey,
 };
 
@@ -121,11 +127,16 @@ export function lockCopyFor(
     };
 }
 
-export function memberLimitLabel(plan: PlanKey, t?: TranslateFn): string {
-    const caps = capabilitiesFor(plan);
+/** Plan seat matrix — includes purchased add-ons when `extras` is passed. */
+export function memberLimitLabel(
+    plan: PlanKey,
+    t?: TranslateFn,
+    extras?: { extraContributor?: number; extraViewer?: number }
+): string {
+    const caps = effectiveSeatCaps(plan, extras);
     const max = caps.maxMembers;
-    const writable = caps.maxWritableMembers;
-    const viewers = caps.maxViewerMembers;
+    const writable = caps.maxWritable;
+    const viewers = caps.maxViewer;
     if (t) {
         if (max === null) return t('pages.settings.plan.members_unlimited');
         return t('pages.settings.plan.members_matrix', {

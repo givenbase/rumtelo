@@ -66,7 +66,7 @@ export function BankSettings() {
     const { householdId } = useAuth();
     const { showToast } = useHouseholdShell();
     const { formatMoney } = useHouseholdCurrency();
-    const { withinLimit, hasCapability } = usePlanCapabilities();
+    const { hasCapability } = usePlanCapabilities();
     const live = isLiveData(householdId);
     const queryClient = useQueryClient();
     const [adding, setAdding] = useState(false);
@@ -402,8 +402,6 @@ export function BankSettings() {
             (row.kind === AccountKind.CHECKING || row.kind === AccountKind.SAVINGS)
     );
     const canSubmit = live && !saving && !ibanError && Boolean(bankId && bankById.get(bankId));
-    const canConnect = withinLimit('maxBankLinks', linkedAccounts.length);
-
     function onSubmit(values: BankAccountFormValues) {
         let name: string;
         try {
@@ -523,7 +521,6 @@ export function BankSettings() {
                     formatMoney={formatMoney}
                     syncEnabled={syncEnabled}
                     wizardOpen={wizardOpen}
-                    canConnect={canConnect}
                     onOpenWizard={() => {
                         resetForm();
                         setWizardOpen(true);

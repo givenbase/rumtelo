@@ -5,9 +5,13 @@ import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
 import { productPath } from '@/app/_lib/routes';
 import { GoalForm } from '@/components/features/forms/goal-form';
 import { useEntityForEdit } from '@/components/features/forms/use-entity-for-edit';
+import { PlanCapacityReached } from '@/components/features/shell/plan-capacity-reached';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { usePlanCapacity } from '@/components/features/shell/use-plan-capacity';
 import type { Goal } from '@rumtelo/contracts';
-import { GoalKind } from '@rumtelo/contracts';
+import { GoalKind, GoalStatus } from '@rumtelo/contracts';
+import { useLiveQuery } from '@rumtelo/hooks';
+import { useTranslations } from '@rumtelo/i18n';
 
 export function GoalCreatePage({
     embedded = false,
@@ -18,6 +22,31 @@ export function GoalCreatePage({
     defaultKind?: GoalKind;
     defaultJarId?: string;
 }) {
+    const t = useTranslations('features.growth.goals');
+    const { householdId } = useAuth();
+    const goalsQuery = useLiveQuery(
+        apiQuery.money.goals.list.queryOptions({ input: { householdId: householdId! } }),
+        [] as never,
+        Boolean(householdId)
+    );
+    const occupied = (goalsQuery.data ?? []).filter(
+        goal => goal.status === GoalStatus.ACTIVE
+    ).length;
+    const capacity = usePlanCapacity('maxGoals', occupied);
+    // Wait for the list before allowing create when the plan has a finite ceiling.
+    if (capacity.planReady && capacity.max !== null && goalsQuery.isPending) return null;
+
+    if (!capacity.canAdd) {
+        return (
+            <PlanCapacityReached
+                limitKey="maxGoals"
+                occupied={occupied}
+                title={t('capacity_full_title')}
+                body={t('capacity_full_body', { max: capacity.max ?? occupied })}
+            />
+        );
+    }
+
     const defaults =
         defaultKind || defaultJarId
             ? {

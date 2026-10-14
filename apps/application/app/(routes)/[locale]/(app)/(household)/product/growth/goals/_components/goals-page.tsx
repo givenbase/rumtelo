@@ -34,8 +34,10 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { GoalKindMark } from '@/components/features/growth/goal-kind-mark';
 import { JarBadge, JarMark } from '@/components/features/money/jar-badge';
+import { PlanCapacityCreate } from '@/components/features/shell/plan-capacity-create';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { usePlanCapacity } from '@/components/features/shell/use-plan-capacity';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 
 type Tab = 'ON_TRACK' | 'REACHED';
@@ -255,6 +257,12 @@ export function GoalsPageClient() {
     }, [jarsQuery.data]);
 
     const goals = useMemo((): ReadonlyArray<Goal> => goalsQuery.data ?? [], [goalsQuery.data]);
+    /** Backend `assertWithinLimit('maxGoals')` counts ACTIVE status only. */
+    const activeGoalCount = useMemo(
+        () => goals.filter(goal => goal.status === GoalStatus.ACTIVE).length,
+        [goals]
+    );
+    const goalsCapacity = usePlanCapacity('maxGoals', activeGoalCount);
 
     const travel = describePeriodTravel(period);
     const travelLabels = formatPeriodTravelLabels(travel, tShell);
@@ -383,7 +391,23 @@ export function GoalsPageClient() {
                 })()}
             </div>
 
-            <ListToolbar createLabel={t('add_goal')} createHref={CREATE_HREF.goal}>
+            <ListToolbar
+                createSlot={
+                    <PlanCapacityCreate
+                        limitKey="maxGoals"
+                        occupied={activeGoalCount}
+                        createHref={CREATE_HREF.goal}
+                        createLabel={t('add_goal')}
+                        usageAria={
+                            goalsCapacity.max === null
+                                ? undefined
+                                : t('capacity_usage_aria', {
+                                      used: activeGoalCount,
+                                      max: goalsCapacity.max,
+                                  })
+                        }
+                    />
+                }>
                 {(['ON_TRACK', 'REACHED'] as const).map(tabKey => {
                     const count = tabKey === 'ON_TRACK' ? active.length : reached.length;
                     return (

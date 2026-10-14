@@ -1,6 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
 import { useForm, useWatch } from 'react-hook-form';
 import { useMemo } from 'react';
 import { useLocale } from 'next-intl';
@@ -34,11 +35,14 @@ import { cn } from '@rumtelo/utils';
 
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
-import { CAPABILITIES, lockCopyFor, memberLimitLabel } from '@/app/_lib/plan';
+import { CAPABILITIES, lockCopyFor, memberLimitLabel, planLabel } from '@/app/_lib/plan';
 import { isLiveData } from '@/app/_lib/preview';
 import { canInviteWithRole } from '@/app/_lib/role-permissions';
+import { settingsHref } from '@/app/_lib/settings-tabs';
+import { SeatCapacitySummary } from '@/components/features/shell/seat-capacity-summary';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
+import { useSeatCapacity } from '@/components/features/shell/use-seat-capacity';
 
 import { createInviteFormSchema, type InviteFormValues } from '../_utils/settings-form-zod';
 import { useSettingsMutation } from '../_utils/use-settings-mutation';
@@ -114,7 +118,14 @@ export function HouseholdSettings() {
         role: inviteRole ?? HouseholdRole.VIEWER,
         extras: seatExtras,
     });
+    const seatCapacity = useSeatCapacity(activePlan, {
+        occupiedSeats: memberCount,
+        writableCount,
+        viewerCount,
+        extras: seatExtras,
+    });
     const inviteCopy = lockCopyFor(CAPABILITIES.platformInvite, PlanKey.BASIC, t);
+    const upgradePlan = seatCapacity.upgradeTo;
 
     const invite = useSettingsMutation({
         mutationFn: async (values: InviteFormValues) => {
@@ -174,8 +185,9 @@ export function HouseholdSettings() {
         <SettingsPanel>
             <SettingsInkCard
                 eyebrow={t('pages.settings.panels.household.eyebrow')}
-                blurb={`${memberLimitLabel(activePlan, t)}. ${t('pages.settings.panels.household.blurb_suffix')}`}>
+                blurb={`${memberLimitLabel(activePlan, t, seatExtras)}. ${t('pages.settings.panels.household.blurb_suffix')}`}>
                 <div className="grid gap-3 py-2.5">
+                    <SeatCapacitySummary capacity={seatCapacity} />
                     {live && members.length > 0 ? (
                         <ul className="divide-y divide-line rounded-lg border border-line">
                             {members.map(member => (
@@ -240,17 +252,26 @@ export function HouseholdSettings() {
                             {t('common.message.error.api.viewer_read_only')}
                         </p>
                     ) : !invitesAllowed ? (
-                        <p className="text-sm text-fg-muted">
-                            {inviteCopy.line}{' '}
-                            <span className="font-medium text-fg">{inviteCopy.cta}</span>
-                        </p>
+                        <div className="grid gap-2">
+                            <p className="text-sm text-fg-muted">{inviteCopy.line}</p>
+                            <Button as={Link} href={settingsHref('plan')} size="sm">
+                                {inviteCopy.cta}
+                            </Button>
+                        </div>
                     ) : !seatOpen ? (
                         <div className="grid gap-2">
                             <p className="text-sm text-fg-muted">
                                 {t('pages.settings.panels.household.seat_limit', {
-                                    limit: memberLimitLabel(activePlan, t),
+                                    limit: memberLimitLabel(activePlan, t, seatExtras),
                                 })}
                             </p>
+                            {upgradePlan ? (
+                                <Button as={Link} href={settingsHref('plan')} size="sm">
+                                    {t('pages.shell.gates.upgrade_cta', {
+                                        plan: planLabel(upgradePlan, t),
+                                    })}
+                                </Button>
+                            ) : null}
                             <p className="text-sm text-fg-muted">
                                 {t('pages.settings.plan.add_seat_stub')}
                             </p>
