@@ -384,19 +384,19 @@
                 "submit": "Crear cuenta",
                 "have_account": "¿Ya tienes una cuenta?",
                 "password_hint": "Al menos {count} caracteres",
-                "plan_intent": "Has elegido {plan} ({interval}). Una vez completada la configuración, te redirigiremos a Stripe para añadir los datos de pago y finalizar la actualización.",
+                "plan_intent": "Has elegido {plan} ({interval}). Una vez completada la configuración, te redirigiremos a Stripe para añadir el método de pago y finalizar la actualización.",
                 "plan_yearly": "anual",
                 "plan_monthly": "mensual",
                 "audience_label": "Me inscribo como",
                 "audience_individual": "Particular o unidad familiar",
                 "audience_individual_hint": "Tu propio dinero, tu crecimiento, tu energía y tu alma",
-                "audience_practice": "Consulta",
+                "audience_practice": "Práctica",
                 "audience_practice_hint": "Un coach o asesor que ayuda a sus clientes",
-                "practice_note": "Cuando confirmes tu correo electrónico, configurarás el escritorio de tu consulta.",
-                "practice_name_label": "Nombre de tu consulta o empresa",
-                "practice_name_placeholder": "p. ej. Coaching Financiero Madrid",
-                "practice_name_hint": "Lo verán tus clientes cuando los invites. Los datos legales vienen después.",
-                "practice_name_required": "Añade el nombre de tu consulta o empresa.",
+                "practice_note": "Una vez que hayas confirmado tu correo electrónico, podrás configurar tu espacio de trabajo.",
+                "practice_name_label": "Nombre del despacho o de la empresa",
+                "practice_name_placeholder": "p. ej., Asesoramiento presupuestario en Ámsterdam",
+                "practice_name_hint": "Se muestra a tus clientes cuando les envías una invitación. A continuación se detallan los aspectos legales.",
+                "practice_name_required": "Introduce el nombre de tu consulta o empresa.",
                 "middle_name": "Segundo nombre",
                 "birthday": "Cumpleaños"
             },
@@ -461,8 +461,8 @@
             }
         },
         "brand": {
-            "tagline": "Deja de preguntarte dónde se ha metido.",
-            "grip": "Rumtelo — las riendas de tu vida.",
+            "tagline": "Deja de preguntarte dónde se ha ido.",
+            "grip": "Rumtelo: un agarre a la vida.",
             "core": {
                 "one": "Deja de preguntarte dónde se ha ido.",
                 "two": "El dinero se va. Ya sabrás por qué.",
@@ -481,19 +481,19 @@
                 },
                 "who_its_for": {
                     "eyebrow": "A quién va dirigido",
-                    "headline": "Para quienes están en buena forma y están preparados.",
+                    "headline": "Para quienes están en buena situación y están preparados.",
                     "support": "Los consejos del entrenador. Tú eliges. Toma las riendas."
                 },
                 "life_beyond": {
                     "eyebrow": "El panorama completo",
-                    "headline": "Asigna los fondos. Protege la energía. Mantén el «porqué».",
+                    "headline": "Asigna el dinero. Protege la energía. Mantén el «porqué».",
                     "support": "No se trata solo de dinero. Toma las riendas de tu vida."
                 }
             },
             "auth_manifesto": {
                 "brand_lines_aria": "Líneas de marca",
                 "portals_eyebrow": "Aferrarse a la vida",
-                "portals_line": "Dinero. Crecimiento. Energía. Alma — herramientas para el grip sobre tu vida.",
+                "portals_line": "Dinero. Crecimiento. Energía. Alma: herramientas para tomar las riendas de la vida.",
                 "portals_line_core": "Dinero. Crecimiento: herramientas para tomar las riendas de la vida, y mucho más por venir.",
                 "jars_eyebrow": "Seis tarros",
                 "jars_line": "Nómina recibida. Ya asignada.",
@@ -551,7 +551,7 @@
                 "how_it_works": {
                     "eyebrow": "Hoy",
                     "headline": "Nómina recibida. Imagen nítida.",
-                    "support": "Asignalo. Luego, gástalo. Seis tarros lo deciden."
+                    "support": "Asigna el dinero. Después, gástalo. Seis tarros lo deciden."
                 },
                 "energy": {
                     "eyebrow": "Tu capacidad",
@@ -620,7 +620,7 @@
             },
             "growth-learn": {
                 "name": "Aprender",
-                "description": "Habilidades para el mundo laboral, así como libros, cursos, seminarios y eventos que recomendamos —no organizamos—."
+                "description": "Habilidades para el mundo laboral, así como libros, cursos, seminarios y eventos que recomendamos —no organizamos—. Plus y Max."
             },
             "growth-net-worth": {
                 "name": "Patrimonio neto",
@@ -1539,8 +1539,8 @@
                 "title_library": "Lo que recomendamos. Nosotros no lo alojamos.",
                 "lead_shelf": "Una habilidad es la decisión. Un libro, una película, una serie, un vídeo, un podcast o un curso son la forma de ponerla en práctica. Te recomendamos qué adquirir y a quién apoyar, pero nunca alojamos el contenido.",
                 "lead_library": "Busca y, a continuación, filtra los resultados por tipo y tema. Si marcas un título, aparecerá en la sección «Aprender».",
-                "partner_max": "Los cursos sobre Max están disponibles en MasterClass. Los de Basic y Plus, en cambio, se encuentran en Udemy. Los libros, las películas y las series se pueden acceder según lo permita el plan; los recomendamos, pero no los alojamos.",
-                "partner_default": "Los cursos de los niveles «Básico» y «Plus» están en Udemy. Los de nivel «Máximo» se encuentran en MasterClass. Los libros, las películas y las series se pueden acceder según lo permita el plan; los recomendamos, pero no los alojamos nosotros.",
+                "partner_max": "Los cursos sobre Max están disponibles en MasterClass. En cambio, en Udemy se obtienen puntos extra. Los libros, las películas y las series se pueden acceder según lo permita el plan; los recomendamos, pero no los alojamos.",
+                "partner_default": "«Learn» está disponible en los planes «Plus» y «Max». Los cursos del plan «Plus» se imparten en Udemy; el plan «Max» se centra en MasterClass. Los libros, las películas y las series se pueden acceder según lo permita el plan; nosotros los recomendamos, pero no los alojamos.",
                 "jar_coach_title": "Bote Educación",
                 "jar_banner": "Tu «hucha de la educación» es donde se destina este gasto. Lo que aumenta tu capacidad de generar ingresos se reinvierte en tu libertad financiera.",
                 "jar_cta": "Ver el bote Educación",
@@ -3051,7 +3051,7 @@
             "offer": {
                 "eyebrow": "Visita rápida",
                 "title": "¿Quieres un tutorial sobre Rumtelo?",
-                "body": "Una breve visita guiada por el menú de navegación, los tarros, los costes fijos y los ingresos. Puedes saltarte cualquier parte cuando quieras, o abrir la sección «Ayuda» más tarde para volver a ver una pantalla.",
+                "body": "Un breve recorrido guiado desde la página de inicio por las categorías, los gastos fijos y los ingresos. Puedes saltarte cualquier parte cuando quieras, o abrir la sección «Ayuda» más tarde para volver a verlo.",
                 "accept": "Comienza la visita guiada",
                 "dismiss": "Ahora no"
             },
@@ -3069,7 +3069,7 @@
                 "replay_full_tour": "Volver a ver el recorrido completo",
                 "no_tour": "En esta pantalla aún no hay ningún recorrido guiado; la descripción anterior recoge lo esencial.",
                 "helpers_label": "Mostrar «The Coach» en las pantallas",
-                "helpers_hint": "Las «líneas de por qué» y las tarjetas «jar» de The Coach (✦ The Coach). Igual que en Ajustes → Preferencias. Activadas por defecto para los principiantes.",
+                "helpers_hint": "Líneas «Why» y tarjetas «jar» de The Coach (✦ The Coach). Igual que en Ajustes → Preferencias. Activadas por defecto para principiantes.",
                 "helpers_on": "El",
                 "helpers_off": "Apagado",
                 "videos_eyebrow": "Vídeos explicativos",
@@ -3079,9 +3079,9 @@
                 "video_level_feature": "Esta función",
                 "settings": {
                     "eyebrow": "Visita guiada",
-                    "blurb": "Repasa la navegación, los frascos, los costes fijos y los ingresos cuando quieras.",
+                    "blurb": "Puedes volver a consultar en cualquier momento las secciones «Inicio», «Frascos», «Costes fijos» e «Ingresos».",
                     "row_title": "Presentación del producto",
-                    "row_sub": "El mismo procedimiento que tras la configuración",
+                    "row_sub": "El mismo proceso que tras la configuración: comienza en la pantalla de inicio",
                     "restart": "Iniciar el recorrido completo"
                 },
                 "joyride": {
@@ -3155,7 +3155,7 @@
                         },
                         "hero": {
                             "title": "El dinero de este mes",
-                            "content": "Lo que se ha ingresado en las cuentas, lo que queda y el dinero que puedes gastar sin problema durante el periodo que estás consultando."
+                            "content": "Lo que se ha ingresado en las huchas, lo que queda y el dinero que puedes gastar sin problema durante el periodo que estás consultando."
                         },
                         "portals": {
                             "title": "Vuestros productos",
@@ -3262,13 +3262,13 @@
                         },
                         "how": {
                             "heading": "Cómo funciona",
-                            "body": "Tú mismo introduces tus ingresos. A partir de tus porcentajes fijos, ves cuánto corresponde a cada «bote»: lo que puedes gastar o apartar para ese fin. Los «botes» te ayudan a planificar. Rumtelo nunca mueve dinero: tú mismo realizas la distribución en tu(s) cuenta(s) bancaria(s)."
+                            "body": "Tú mismo introduces tus ingresos. A partir de tus porcentajes fijos, ves cuánto corresponde a cada «bote»: lo que puedes gastar o apartar para ese fin. A continuación, ve completando las «pastillas de dinero» de izquierda a derecha: Gastos fijos → Transacciones → Deuda → Patrimonio neto. Rumtelo nunca mueve dinero en tu banco."
                         }
                     },
                     "steps": {
                         "list": {
                             "title": "Tus seis tarros",
-                            "content": "Cada fila corresponde a un trabajo por el que se cobra. Toca un tarro para ver los gastos fijos, los gastos corrientes y lo que queda este mes."
+                            "content": "Cada fila corresponde a un trabajo remunerado. Pulsa en un frasco para ver los gastos fijos, los gastos corrientes y lo que queda este mes."
                         },
                         "toolbar": {
                             "title": "Añadir · Mover",
@@ -3285,11 +3285,11 @@
                     "sections": {
                         "what_for": {
                             "heading": "Para qué sirve esto",
-                            "body": "Un resumen del periodo actual: los frascos, la bandeja de entrada y la evolución del mes."
+                            "body": "Un resumen del periodo actual: tarros, bandeja de entrada, lo que ya tienes y cómo va el mes."
                         },
                         "how": {
                             "heading": "Cómo funciona",
-                            "body": "Haz clic en «Cajas», «Transacciones», «Deuda» o «Costes fijos» para ver más detalles. El periodo (arriba a la derecha) permite cambiar de mes."
+                            "body": "Empieza por «Resumen» y luego ve de izquierda a derecha: Costes fijos → Transacciones → Deuda → Patrimonio neto. La opción «Período» (arriba a la derecha) permite cambiar de mes."
                         }
                     }
                 },
@@ -3311,7 +3311,7 @@
                     "sections": {
                         "what_for": {
                             "heading": "Para qué sirve esta sección",
-                            "body": "Objetivos, ingresos y (en los planes superiores) aprendizaje y patrimonio neto. Empieza por los ingresos y los objetivos: están relacionados: aumenta tu patrimonio neto, alimenta tus «huchas» y alcanza tus objetivos de ahorro más rápido."
+                            "body": "Empieza por «Visión general» y luego ve de izquierda a derecha: Ingresos → Objetivos. Aumenta tus ingresos netos y fíjate un objetivo en el plan «Básico». Descubre los contenidos desbloqueables del plan «Plus»: libros, cursos y habilidades."
                         }
                     }
                 },
@@ -3535,7 +3535,7 @@
                 "eyebrow": "RUMTELO — AGARRÁTE A LA VIDA",
                 "headline": "Deja de preguntarte dónde se ha ido.",
                 "lead": "¿Te preguntas qué? Todo: tu dinero, tu vida, tu energía, tu tiempo. Averigua adónde se han ido y vuelve a tomar las riendas. Los consejos del coach. Tú decides.",
-                "cta_primary": "Empieza gratis, sin necesidad de tarjeta",
+                "cta_primary": "Empieza gratis — sin tarjeta",
                 "cta_secondary": "Descubre cómo funciona",
                 "open_dashboard": "Abrir el panel de control",
                 "manage_plan": "Gestionar el plan",
@@ -3630,7 +3630,7 @@
                 "eyebrow": "GRIP ON LIFE — LOS PRODUCTOS",
                 "headline": "Dinero. Crecimiento. Energía. Alma. Una visión general.",
                 "headline_core": "Dinero. Crecimiento. Una visión general.",
-                "more_soon": "Más próximamente",
+                "more_soon": "Más información próximamente",
                 "lead_core": "Cada producto te ayuda en un aspecto concreto de tu vida. El dinero suele ser el punto de partida para mucha gente; «Crecimiento» te ayuda a avanzar a partir de ahí. Próximamente habrá más productos disponibles. El coach te da un consejo. Tú decides.",
                 "lead": "Cada producto te ayuda en un aspecto concreto de tu vida. El dinero suele ser el punto de partida para mucha gente. Elige «Crecimiento», «Energía» o «Alma» cuando quieras dar el siguiente paso. El coach te da un consejo. Tú decides."
             },
@@ -3651,7 +3651,7 @@
                     "name": "Energía",
                     "alt_name": "Energía",
                     "question": "¿En qué sistema operativo estoy?",
-                    "line": "Controla tu energía: el sueño, las horas y tu cuerpo están presentes en cada decisión."
+                    "line": "Controla tu energía: el sueño, las horas y el cuerpo están presentes en cada decisión."
                 },
                 "soul": {
                     "name": "Alma",
@@ -3778,13 +3778,13 @@
             },
             "why": {
                 "eyebrow": "POR QUÉ EXISTE RUMTELO",
-                "headline": "No te obsesiones con las cifras. Marca el rumbo.",
+                "headline": "No te obsesiones con las cifras. Asume el control de la dirección.",
                 "quote": "La riqueza no es una cifra. Es el control que ejerce sobre tu vida.",
                 "body": "Creamos Rumtelo, en primer lugar, para nosotros mismos. Ganábamos bien y, aun así, nos preguntábamos dónde se nos iba todo: el dinero, la vida, la energía, el tiempo. Las aplicaciones de gestión presupuestaria solo servían para hacer cuentas a posteriori. Nadie nos ayudaba a recuperar el control. Así que creamos lo que necesitábamos: herramientas claras, un consejo de «The Coach» y la posibilidad de elegir. Después, lo lanzamos al mercado para que otros pudieran hacer lo mismo.",
-                "books_eyebrow": "BASADO EN LIBROS DE RECONOCIDA QUALIDAD",
+                "books_eyebrow": "BASADO EN LIBROS DE RECONOCIDA VALORACIÓN",
                 "books_lead": "Rumtelo no es una teoría nueva. Convierte las ideas de los libros que han marcado la evolución del dinero, la mentalidad y el rumbo durante décadas en una rutina diaria que realmente puedes mantener.",
                 "signature": "Given Loyiso, fundador y director ejecutivo · Charissa Peroti, cofundadora · Ámsterdam",
-                "manifesto": "No te obsesiones con las cifras. Marca tu propio rumbo.",
+                "manifesto": "No te obsesiones con las cifras. Asume el control de la dirección.",
                 "audience": "Creado para quienes ya tienen éxito… y para quienes están preparados para alcanzarlo.",
                 "more_books": "Más libros",
                 "books": {
@@ -3799,7 +3799,7 @@
                         "line": "La intención, el hábito y un «por qué» claro: la mentalidad que hay detrás de cada cifra."
                     },
                     "millionaire_mind": {
-                        "title": "Los secretos de la mentalidad del millonario",
+                        "title": "Los secretos de la mentalidad millonaria",
                         "author": "T. Harv Eker",
                         "line": "La división en seis frascos: cada cantidad se destina a una tarea en cuanto llega."
                     },
@@ -3845,7 +3845,7 @@
                     "one": "Un consejo, un siguiente paso… nunca un montón de gráficos",
                     "quiet": "Mantén la calma hasta que haya datos suficientes: el ruido no es información.",
                     "shame": "Información, nunca vergüenza: un tarro «fuera de lugar» es una señal, no un veredicto",
-                    "ten": "Diez minutos a la semana con el entrenador, sin deberes diarios"
+                    "ten": "Diez minutos a la semana con el entrenador — sin deberes diarios"
                 },
                 "demo_aria": "Ejemplo del Coach: un consejo por portal",
                 "demo_feed_eyebrow": "El entrenador · en todos los portales",
@@ -3854,7 +3854,7 @@
                 "demo": {
                     "money": {
                         "kind": "ESTA SEMANA",
-                        "text": "La apuesta supera en 38 € el límite establecido. Retírala una vez de los ahorros a largo plazo… o déjala ahí y ahórrate la cena de la semana que viene.",
+                        "text": "La apuesta está 38 € por encima de su línea. Sácala una vez de los ahorros a largo plazo… o déjala ahí y ahórrate la cena de la semana que viene.",
                         "cta": "Tarros abiertos"
                     },
                     "growth": {
@@ -3868,7 +3868,7 @@
                         "cta": "Sueño ligero"
                     },
                     "soul": {
-                        "kind": "EMPIEZA POR LO PEQUEÑO",
+                        "kind": "EMPIEZA POCO A POCO",
                         "text": "La intención de esta semana aún está en blanco. Basta con una sola línea: ¿qué haría que esta fuera una buena semana?",
                         "cta": "Establecer una intención"
                     }
@@ -4006,11 +4006,11 @@
                     "tag": "Empieza por aquí",
                     "best_for": "Primeros pasos, por tu cuenta",
                     "line": "¿Quieres saber en qué te gastas el dinero y crear una rutina semanal de diez minutos, por tu cuenta y sin ningún coste? Es suficiente para empezar, y nunca tendrás motivos para dejarlo.",
-                    "f1": "DINERO · seis tarros, transacciones, gastos fijos",
-                    "f2": "CRECIMIENTO · ingresos, aprendizaje y {maxGoals, plural, one {# objetivo} other {# objetivos}}",
+                    "f1": "DINERO · seis tarros, transacciones, costes fijos",
+                    "f2": "CRECIMIENTO · ingresos y {maxGoals, plural, one {# objetivo} other {# objetivos}} — prueba Growth",
                     "f3": "ENERGÍA · sueño",
                     "f4": "ALMA · tranquilidad, gratitud, una intención a la semana",
-                    "f5": "El entrenador, el balance semanal, la puntuación mensual",
+                    "f5": "El entrenador, el control semanal, la puntuación mensual",
                     "f6": "1 plaza completa + 1 plaza de espectador (pareja, entrenador o asesor)"
                 },
                 "plus": {
@@ -4020,10 +4020,10 @@
                     "line": "Compartes dinero con tu pareja o tu familia, estás pagando una deuda o quieres que te envíen los extractos bancarios. La mayoría de la gente se encuentra en esta situación.",
                     "f1": "Todo en Basic",
                     "f2": "DINERO · Plan de pago de la deuda con intereses y fecha de liquidación",
-                    "f3": "DINERO · Importación de extractos bancarios: próxima sincronización en tiempo real",
-                    "f4": "ENERGÍA · tus 168 horas, entrenamiento, alimentación",
-                    "f5": "Invita a hasta {maxMembers} personas: pareja, familiares, amigos",
-                    "f6": "Hasta {maxGoals} goles"
+                    "f3": "DINERO · Importación de extractos bancarios — Próximamente: sincronización en tiempo real",
+                    "f4": "CRECIMIENTO · Aprender — libros, cursos, habilidades · hasta {maxGoals} objetivos",
+                    "f5": "ENERGÍA · tus 168 horas, entrenamiento, alimentación",
+                    "f6": "Hasta {maxMembers} localidades: mezcla de espectadores y público general"
                 },
                 "max": {
                     "name": "Max",
@@ -4031,8 +4031,8 @@
                     "best_for": "Crear riqueza y libertad",
                     "line": "Tus aspectos básicos se mantienen estables y tu patrimonio crece: tu patrimonio neto, la rentabilidad, tu «número de libertad»… y todas las características de todos los productos.",
                     "f1": "Todo lo que incluye la versión Plus",
-                    "f2": "CRECIMIENTO · patrimonio neto, rentabilidad y tu «número de libertad»",
-                    "f3": "CRECIMIENTO · Apúntate a los cursos de Masterclass, no a los de Udemy",
+                    "f2": "DINERO · patrimonio neto, rentabilidad y tu «número de libertad»",
+                    "f3": "CRECIMIENTO · Descubre las recomendaciones en Masterclass, no en Udemy",
                     "f4": "ALMA · los siete centros",
                     "f5": "Hasta {maxMembers} plazas (más acceso completo)",
                     "f6": "Dispositivos: reloj, báscula, anillo (próximamente)"
@@ -4041,7 +4041,7 @@
             "faq_section": {
                 "eyebrow": "PREGUNTAS",
                 "headline": "Respuestas directas.",
-                "lead": "Las preguntas que la gente suele hacer antes de empezar, respondidas como se lo explicaríamos a un amigo."
+                "lead": "Las preguntas que la gente se hace antes de empezar, respondidas tal y como se lo explicaríamos a un amigo."
             },
             "faq": {
                 "budgeting": {
@@ -4050,23 +4050,23 @@
                 },
                 "bank": {
                     "question": "¿Tengo que vincular mi cuenta bancaria?",
-                    "answer": "No. La versión «Básica» funciona con los datos que introduzcas. La versión «Plus» incluye la importación de extractos bancarios: si vuelves a importar un extracto, no se duplicarán los datos. La sincronización bancaria en tiempo real (PSD2, solo lectura, con licencia de la UE) está prevista, pero solo se activará cuando tú mismo la conectes."
+                    "answer": "No. La versión «Basic» funciona con los datos que introduzcas. La versión «Plus» incluye la importación de extractos bancarios: si vuelves a importar un extracto, no se duplicarán los datos. La sincronización bancaria en tiempo real (PSD2, solo lectura, con licencia de la UE) está prevista para el futuro, y solo se activará una vez que la conectes tú mismo."
                 },
                 "sleep": {
                     "question": "¿Por qué aparecen el sueño, el entrenamiento y los libros en un producto financiero?",
                     "answer": "Porque lo que da sentido a la vida es algo más que el dinero. Una mente cansada gasta; una mente descansada decide. La energía es la base de toda decisión. El crecimiento abarca el aprendizaje y el avance. El alma guarda el «porqué». Si se omiten esos elementos, una aplicación se convierte en una simple herramienta de contabilidad."
                 },
                 "coach": {
-                    "question": "¿En qué consiste realmente el trabajo de un entrenador?",
+                    "question": "¿Qué hace realmente el entrenador?",
                     "answer": "Un consejo sobre tu situación actual y una acción que puedes llevar a cabo: en cada producto y, en conjunto, en la página «The Coach». No te da ninguna indicación hasta que hay datos suficientes y nunca te hace sentir mal. Los consejos de «The Coach». Tú eliges."
                 },
                 "partner": {
                     "question": "¿Puedo utilizarlo con mi pareja o con mi familia?",
-                    "answer": "Sí: el plan «Básico» incluye una plaza de espectador (en la grada o para ver el partido). Los planes «Plus» y «Max» añaden más plazas completas y de espectador. Los miembros de un mismo hogar comparten los tarros. El estilo de gasto sigue siendo personal, ya que cada miembro de la pareja tiene sus propias preferencias. ¿Necesitas más personas? Añade plazas por 2,50 € cada una."
+                    "answer": "Sí: el plan «Básico» incluye una plaza de espectador (en la grada o para ver el partido). Los planes «Plus» y «Max» añaden más plazas completas y de espectador. Los miembros de un mismo hogar comparten los frascos. El estilo de gasto sigue siendo personal, ya que cada miembro de la pareja tiene sus propias preferencias. ¿Necesitas más personas? Añade plazas por 2,50 € cada una."
                 },
                 "data": {
                     "question": "¿Dónde están mis datos?",
-                    "answer": "En servidores de la UE en Ámsterdam, cifrados en reposo. Puedes exportarlos o eliminarlos en cualquier momento. Si cancelas un plan de pago, todos los tarros, transacciones y objetivos seguirán siendo legibles."
+                    "answer": "En servidores de la UE en Ámsterdam, cifrados en reposo. Puedes exportarlos o eliminarlos en cualquier momento. Si cancelas un plan de pago, todos los archivos JAR, transacciones y objetivos seguirán siendo legibles."
                 },
                 "language": {
                     "question": "¿Neerlandés o inglés?",
@@ -4074,7 +4074,7 @@
                 },
                 "practice": {
                     "question": "Soy coach o asesor. ¿Puedo utilizar Rumtelo con mis clientes?",
-                    "answer": "Sí, con Rumtelo Consulta. Invita a tus clientes por correo electrónico; cuando acepten, verás su tablero en modo de solo lectura desde un solo escritorio. Mirar su tablero es gratis para ellos, y puedes patrocinar su plan Plus por {clientPrice} al mes. Una consulta cuesta {basePrice} al mes más {staffPrice} por cada puesto del equipo."
+                    "answer": "Sí, con Rumtelo Practice. Invita a los clientes por correo electrónico; una vez que acepten, podrás ver su tablero en modo de solo lectura desde un puesto de trabajo. Para ellos, consultar el tablero es gratuito, y tú puedes patrocinar su plan Plus por {clientPrice} al mes. Una consulta cuesta {basePrice} al mes más {staffPrice} por cada puesto de personal."
                 }
             },
             "signup_section": {
@@ -5485,13 +5485,13 @@
                     "blurb": "Tres planes: Básico, Plus y Max. Empieza con el plan Básico: nada de lo que hayas introducido quedará bloqueado en ningún momento.",
                     "card_basic_tag": "De {price}",
                     "card_basic_line": "Tabla individual: los seis frascos y el ejercicio que hay debajo. No hace falta banco.",
-                    "card_basic_feats": "{members} · Solo individual · Huchas de DINERO · Aprender · Entrenador",
+                    "card_basic_feats": "{members} · Solo individual · Huchas · 1 objetivo · Entrenador",
                     "card_plus_tag": "Los más elegidos",
-                    "card_plus_line": "Comparte el tablero con tu familia o amigos: deudas, semana de la energía y objetivos.",
-                    "card_plus_feats": "{members} · Cualquier tipo de hogar · Deuda · ENERGÍA · Objetivos",
+                    "card_plus_line": "Comparte el tablero con tu familia o amigos: deudas, aprendizaje, la semana de la energía y otros objetivos.",
+                    "card_plus_feats": "{members} · Deuda · Aprender · ENERGÍA · Objetivos",
                     "card_max_tag": "Los cuatro portales",
-                    "card_max_line": "Número ilimitado de hogares, curva de ingresos, aprendizaje y patrimonio neto.",
-                    "card_max_feats": "{members} · CRECIMIENTO · Clase magistral · Patrimonio neto",
+                    "card_max_line": "Número ilimitado de hogares, curva de ingresos, «Learn» y patrimonio neto.",
+                    "card_max_feats": "{members} · DINERO · Clase magistral · Patrimonio neto",
                     "monthly": "Mensual",
                     "yearly": "Anual · 2 meses gratis",
                     "per_month_suffix": "/mes",
@@ -6051,13 +6051,13 @@
                     "body": "Mirar atrás es solo la mitad de la historia. El crecimiento te ayuda a avanzar: habilidades, objetivos, aprendizaje e ingresos, si así lo deseas."
                 }
             },
-            "wider_eyebrow": "✦ Productos. Una idea: las riendas de tu vida.",
+            "wider_eyebrow": "✦ Productos. Una idea: agarre a la vida.",
             "wider_lead_full": "Abre un producto cuando necesites esa herramienta. Hoy puedes utilizar «Dinero», «Crecimiento», «Energía» y «Alma», y pronto habrá más. El coach te da un consejo. Tú decides.",
             "wider_lead_core": "Abre un producto cuando necesites esa herramienta. «Dinero» y «Crecimiento» ya están disponibles; pronto habrá más. El Coach te da un consejo. Tú decides.",
             "portals": {
                 "money": {
                     "line": "Toma las riendas de tu dinero.",
-                    "body": "Seis tarros. Ingresos, gastos, lo que sobra. Anotas lo que entra y lo que sale. Rumtelo te muestra el plan; no es una aplicación de presupuesto que solo haga cuentas a posteriori."
+                    "body": "Seis tarros: ingresos, gastos y lo que sobra. Anotas lo que entra y lo que sale. Rumtelo te muestra el plan; no es una aplicación de presupuesto que solo haga cuentas a posteriori."
                 },
                 "growth": {
                     "line": "Toma las riendas de tu crecimiento.",
@@ -6073,29 +6073,29 @@
                 }
             },
             "closing_title": "Tú mantienes el control.",
-            "closing_body": "Averigua adónde ha ido a parar el dinero. Recupera el control. Tanto si eres nuevo aquí como si ya estás en ello: herramientas claras y consejos que puedes poner en práctica. Información, nunca vergüenza: gastar más de lo previsto es una señal para hacer ajustes, no un juicio sobre ti.",
+            "closing_body": "Averigua adónde se ha ido el dinero. Recupera el control. Tanto si eres nuevo aquí como si ya estás en ello: herramientas claras y consejos que puedes poner en práctica. Información, nunca vergüenza: gastar más de lo previsto es una señal para hacer ajustes, no un juicio sobre ti.",
             "cta_jars": "Ver mis tarros",
             "cta_week_check": "Resumen semanal",
             "routes": {
                 "home": "De un vistazo: ¿dónde se ha ido este mes? ¿Y has recuperado el control?",
                 "money_jars": "Este mes, ya está dividido antes de empezar. El dinero que se gana trabajando nunca hay que defenderlo.",
-                "money_transactions": "No llevas un control de los gastos para juzgarte a ti mismo, sino para ver dónde se te va el dinero.",
+                "money_transactions": "No llevas un control de tus gastos para juzgarte a ti mismo, sino para ver dónde se te escapa el dinero.",
                 "money_debt": "La deuda es tiempo alquilado. Cada céntimo de interés es una hora de tu vida que otra persona controla.",
                 "money_fixed_costs": "Los costes fijos son decisiones que has tomado una vez y por las que pagas mensualmente. Revísalas como si fueran decisiones.",
-                "growth_goals": "Un objetivo convierte el superávit de este mes en algo duradero. Con una fecha y un tarro, ya tienes un plan.",
-                "growth_net_worth": "El dinero es cosa de este mes. El patrimonio neto es cosa de años. Eres rico el día en que ese patrimonio te permita vivir.",
-                "energy_week": "Tus horas son tu capacidad. Repartidas a propósito, o según quien lo pida con más insistencia.",
+                "growth_goals": "Un objetivo convierte el superávit de este mes en algo duradero. Con una fecha y un tarro, ya es un plan.",
+                "growth_net_worth": "Lo que ya tienes te reporta beneficios —o te supone un gasto— cada mes. Eso no es una simple ilusión.",
+                "energy_week": "Tus horas son tu capacidad. Se reparten a propósito o según quién lo pida con más insistencia.",
                 "energy_sleep": "El sueño es el suelo sobre el que se apoyan los frascos. Si lo cortas, todos los demás números caen en silencio.",
-                "soul_stillness": "Una mente tranquila administra el dinero. Una mente inquieta lo gasta y lo llama «decisión».",
-                "soul_gratitude": "Quien es consciente de lo que ya tiene, compra menos para cubrir una necesidad.",
-                "soul_giving": "Una participación fija que desaparece antes de que puedas conservarla hace que el dinero siga siendo una herramienta, y no un amo.",
+                "soul_stillness": "Una mente serena gestiona el dinero. Una mente inquieta lo gasta y lo llama «decisión».",
+                "soul_gratitude": "Quien es consciente de lo que ya tiene, compra menos para cubrir una carencia.",
+                "soul_giving": "Una participación fija que se esfuma antes de que puedas conservarla hace que el dinero siga siendo una herramienta, y no un amo.",
                 "soul_intent": "Una intención es una indicación que te das a ti mismo. Un propósito es una esperanza.",
                 "soul_centers": "Identifica dónde te sientes atascado y, por lo general, el siguiente paso se presenta por sí solo.",
-                "growth_income": "La reducción de gastos tiene un límite mínimo. El aumento de los ingresos, no.",
+                "growth_income": "La reducción de costes tiene un límite mínimo. El aumento de los ingresos, no.",
                 "growth_learn": "Un libro para el que no se te ocurre ningún uso era un gasto en ocio, no en educación.",
                 "growth_learn_library": "Te recomendamos qué comprar y a quién apoyar. Nunca alojamos el contenido.",
                 "energy_training": "La formación es el único gasto que aumenta el valor de todas las demás horas.",
-                "energy_food": "La comida es el combustible para la semana que te dan tus tarros. El combustible se compra, no se consigue por voluntad propia.",
+                "energy_food": "La comida es el combustible para la semana que duran tus tarros. El combustible se compra, no se consigue por voluntad propia.",
                 "money_week_check": "Diez minutos a la semana: fíjate, cambia de enfoque, marca un objetivo. Es mejor que preocuparse todos los días.",
                 "why": "Rumtelo: control sobre la vida. Herramientas claras que te ayudan a mantener el control, producto a producto."
             }

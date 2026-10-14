@@ -230,7 +230,7 @@ const tour = {
                 },
                 how: {
                     heading: 'How it works',
-                    body: 'You enter income yourself. From your fixed percentages you see how much belongs in each jar — what you can spend or set aside for that purpose. The jars help you plan. Rumtelo never moves money: you make the split on your own bank account(s).',
+                    body: 'You enter income yourself. From your fixed percentages you see how much belongs in each jar — what you can spend or set aside for that purpose. Then work the Money pills left to right: Fixed costs → Transactions → Debt → Net worth. Rumtelo never moves money at your bank.',
                 },
             },
             steps: {
@@ -260,7 +260,7 @@ const tour = {
                 },
                 how: {
                     heading: 'How it works',
-                    body: 'Drill into Jars, Transactions, Debt, Fixed costs, or Net worth. Period (top right) switches months.',
+                    body: 'Start on Overview, then go left to right: Fixed costs → Transactions → Debt → Net worth. Period (top right) switches months.',
                 },
             },
         },
@@ -282,7 +282,7 @@ const tour = {
             sections: {
                 what_for: {
                     heading: 'What this area is for',
-                    body: 'Goals, income, and (on higher plans) learning. Start with income and goals — they connect: raise net, fund jars, hit Save targets faster.',
+                    body: 'Start on Overview, then go left to right: Income → Goals. Raise net, aim with one goal on Basic. Learn unlocks on Plus — books, courses, skills.',
                 },
             },
         },

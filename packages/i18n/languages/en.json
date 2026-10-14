@@ -620,7 +620,7 @@
             },
             "growth-learn": {
                 "name": "Learn",
-                "description": "Skills to work, and books, courses, seminars, and events we recommend — not host."
+                "description": "Skills to work, and books, courses, seminars, and events we recommend — not host. Plus and Max."
             },
             "growth-net-worth": {
                 "name": "Net worth",
@@ -1539,8 +1539,8 @@
                 "title_library": "What we recommend. We do not host it.",
                 "lead_shelf": "A skill is the decision. A book, film, series, video, podcast, or course is how you work it. We recommend what to get and who to support — we never host the work.",
                 "lead_library": "Search, then narrow by what it is and what it is about. Mark a title and it lands on Learn.",
-                "partner_max": "Courses on Max are on MasterClass. Basic and Plus point at Udemy instead. Books, films, and series open as the plan allows — we recommend them, we do not host them.",
-                "partner_default": "Courses on Basic and Plus are on Udemy. Max points at MasterClass instead. Books, films, and series open as the plan allows — we recommend them, we do not host them.",
+                "partner_max": "Courses on Max are on MasterClass. Plus points at Udemy instead. Books, films, and series open as the plan allows — we recommend them, we do not host them.",
+                "partner_default": "Learn is on Plus and Max. Courses on Plus are on Udemy; Max points at MasterClass. Books, films, and series open as the plan allows — we recommend them, we do not host them.",
                 "jar_coach_title": "Education jar",
                 "jar_banner": "Your Education jar is where this spending lives. What raises your earning power pays itself back into Financial Freedom.",
                 "jar_cta": "View Education jar",
@@ -3262,7 +3262,7 @@
                         },
                         "how": {
                             "heading": "How it works",
-                            "body": "You enter income yourself. From your fixed percentages you see how much belongs in each jar — what you can spend or set aside for that purpose. The jars help you plan. Rumtelo never moves money: you make the split on your own bank account(s)."
+                            "body": "You enter income yourself. From your fixed percentages you see how much belongs in each jar — what you can spend or set aside for that purpose. Then work the Money pills left to right: Fixed costs → Transactions → Debt → Net worth. Rumtelo never moves money at your bank."
                         }
                     },
                     "steps": {
@@ -3289,7 +3289,7 @@
                         },
                         "how": {
                             "heading": "How it works",
-                            "body": "Drill into Jars, Transactions, Debt, Fixed costs, or Net worth. Period (top right) switches months."
+                            "body": "Start on Overview, then go left to right: Fixed costs → Transactions → Debt → Net worth. Period (top right) switches months."
                         }
                     }
                 },
@@ -3311,7 +3311,7 @@
                     "sections": {
                         "what_for": {
                             "heading": "What this area is for",
-                            "body": "Goals, income, and (on higher plans) learning. Start with income and goals — they connect: raise net, fund jars, hit Save targets faster."
+                            "body": "Start on Overview, then go left to right: Income → Goals. Raise net, aim with one goal on Basic. Learn unlocks on Plus — books, courses, skills."
                         }
                     }
                 },
@@ -4007,7 +4007,7 @@
                     "best_for": "Getting started, on your own",
                     "line": "You want to see where your money goes and build the ten-minute weekly routine — solo, at no cost. Enough to start, and never a reason to stop.",
                     "f1": "MONEY · six jars, transactions, fixed costs",
-                    "f2": "GROWTH · income, Learn and {maxGoals, plural, one {# goal} other {# goals}}",
+                    "f2": "GROWTH · income and {maxGoals, plural, one {# goal} other {# goals}} — taste Growth",
                     "f3": "ENERGY · sleep",
                     "f4": "SOUL · stillness, gratitude, one intention a week",
                     "f5": "The Coach, the week check, the month score",
@@ -4021,9 +4021,9 @@
                     "f1": "Everything in Basic",
                     "f2": "MONEY · debt plan with interest and a freedom date",
                     "f3": "MONEY · bank statement import — live sync coming",
-                    "f4": "ENERGY · your 168 hours, training, food",
-                    "f5": "Up to {maxMembers} seats — full and viewer mix",
-                    "f6": "Up to {maxGoals} goals"
+                    "f4": "GROWTH · Learn — books, courses, skills · up to {maxGoals} goals",
+                    "f5": "ENERGY · your 168 hours, training, food",
+                    "f6": "Up to {maxMembers} seats — full and viewer mix"
                 },
                 "max": {
                     "name": "Max",
@@ -4032,7 +4032,7 @@
                     "line": "Your basics run steady and you’re growing wealth: net worth, returns, your freedom number — and every feature in every product.",
                     "f1": "Everything in Plus",
                     "f2": "MONEY · net worth, returns and your freedom number",
-                    "f3": "GROWTH · Learn courses on Masterclass, not Udemy",
+                    "f3": "GROWTH · Learn picks on Masterclass, not Udemy",
                     "f4": "SOUL · the seven centers",
                     "f5": "Up to {maxMembers} seats (more full access)",
                     "f6": "Devices — watch, scale, ring (coming)"
@@ -5485,13 +5485,13 @@
                     "blurb": "Three plans: Basic, Plus, and Max. Start on Basic — nothing you have entered is ever locked away.",
                     "card_basic_tag": "From {price}",
                     "card_basic_line": "Solo board — the six jars and the practice underneath. No bank needed.",
-                    "card_basic_feats": "{members} · Solo only · MONEY jars · Learn · Coach",
+                    "card_basic_feats": "{members} · Solo only · MONEY jars · 1 goal · Coach",
                     "card_plus_tag": "Most chosen",
-                    "card_plus_line": "Share the board with family or friends — debt, energy week, and goals.",
-                    "card_plus_feats": "{members} · Debt · ENERGY · Goals",
+                    "card_plus_line": "Share the board with family or friends — debt, Learn, energy week, and more goals.",
+                    "card_plus_feats": "{members} · Debt · Learn · ENERGY · Goals",
                     "card_max_tag": "All four portals",
-                    "card_max_line": "Unlimited household, income curve, learning, and net worth.",
-                    "card_max_feats": "{members} · MONEY · Masterclass · Net worth",
+                    "card_max_line": "Unlimited household, income curve, Learn, and net worth.",
+                    "card_max_feats": "{members} · MONEY · Masterclass Learn · Net worth",
                     "monthly": "Monthly",
                     "yearly": "Yearly · 2 months free",
                     "per_month_suffix": "/month",

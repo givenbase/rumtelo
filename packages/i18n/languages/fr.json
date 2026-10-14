@@ -390,13 +390,13 @@
                 "audience_label": "Je m'inscris en tant que",
                 "audience_individual": "Particulier ou foyer",
                 "audience_individual_hint": "Votre argent, votre épanouissement, votre énergie et votre âme",
-                "audience_practice": "Cabinet",
+                "audience_practice": "Entraînement",
                 "audience_practice_hint": "Un coach ou un conseiller qui accompagne ses clients",
-                "practice_note": "Une fois votre e-mail confirmé, vous configurerez le bureau de votre cabinet.",
-                "practice_name_label": "Nom de votre cabinet ou entreprise",
-                "practice_name_placeholder": "p. ex. Coaching Budget Paris",
-                "practice_name_hint": "Visible par vos clients quand vous les invitez. Les informations légales viennent ensuite.",
-                "practice_name_required": "Indiquez le nom de votre cabinet ou entreprise.",
+                "practice_note": "Une fois votre adresse e-mail validée, vous pourrez configurer votre espace de travail.",
+                "practice_name_label": "Nom du cabinet ou de l'entreprise",
+                "practice_name_placeholder": "par exemple : Accompagnement budgétaire à Amsterdam",
+                "practice_name_hint": "Ce message s'affiche lorsque vous invitez vos clients. Les mentions légales suivent.",
+                "practice_name_required": "Indiquez le nom de votre cabinet ou de votre entreprise.",
                 "middle_name": "Deuxième prénom",
                 "birthday": "Anniversaire"
             },
@@ -462,7 +462,7 @@
         },
         "brand": {
             "tagline": "Arrête de te demander où ça a bien pu passer.",
-            "grip": "Rumtelo — avoir prise sur sa vie.",
+            "grip": "Rumtelo — une prise sur la vie.",
             "core": {
                 "one": "Arrête de te demander où ça a bien pu passer.",
                 "two": "L'argent s'en va. Vous comprendrez pourquoi.",
@@ -476,12 +476,12 @@
                 },
                 "how_it_works": {
                     "eyebrow": "Comment ça marche ?",
-                    "headline": "D'abord, partagez l'addition. Ensuite, dépensez.",
+                    "headline": "Commencez par partager l'addition. Payez ensuite.",
                     "support": "L'argent. La croissance. L'énergie. L'âme : autant d'outils pour prendre sa vie en main."
                 },
                 "who_its_for": {
                     "eyebrow": "À qui s'adresse-t-il ?",
-                    "headline": "Pour ceux qui se portent bien — et qui sont prêts.",
+                    "headline": "Pour ceux qui ont réussi leur vie — et qui sont prêts.",
                     "support": "Les conseils du coach. À vous de choisir. Prenez les rênes."
                 },
                 "life_beyond": {
@@ -493,7 +493,7 @@
             "auth_manifesto": {
                 "brand_lines_aria": "Gammes de marques",
                 "portals_eyebrow": "Prendre la vie à bras-le-corps",
-                "portals_line": "Argent. Croissance. Énergie. Âme — des outils pour le grip sur la vie.",
+                "portals_line": "L'argent. La croissance. L'énergie. L'âme : autant d'outils pour prendre sa vie en main.",
                 "portals_line_core": "L'argent. La croissance : des outils pour prendre sa vie en main, et bien d'autres encore à venir.",
                 "jars_eyebrow": "Six bocaux",
                 "jars_line": "Salaire versé. Déjà attribué.",
@@ -550,13 +550,13 @@
                 },
                 "how_it_works": {
                     "eyebrow": "Aujourd'hui",
-                    "headline": "Salaire versé. Tout est clair.",
+                    "headline": "Le salaire est versé. Tout est clair.",
                     "support": "Répartissez-le. Puis dépensez-le. Six bocaux décident."
                 },
                 "energy": {
                     "eyebrow": "Votre capacité",
                     "headline": "Un esprit fatigué gaspille. Un esprit reposé prend des décisions.",
-                    "support": "Ne vous demandez plus sur quoi tourne votre ordinateur."
+                    "support": "Ne vous demandez plus sur quoi fonctionne votre ordinateur."
                 },
                 "why": {
                     "eyebrow": "Continue comme ça",
@@ -620,7 +620,7 @@
             },
             "growth-learn": {
                 "name": "En savoir plus",
-                "description": "Des compétences professionnelles, ainsi que des livres, des formations, des séminaires et des événements que nous recommandons — sans les organiser nous-mêmes."
+                "description": "Des compétences professionnelles, ainsi que des livres, des formations, des séminaires et des événements que nous recommandons — sans les organiser nous-mêmes. Plus et Max."
             },
             "growth-net-worth": {
                 "name": "Patrimoine net",
@@ -1539,8 +1539,8 @@
                 "title_library": "Ce que nous recommandons. Nous ne l'hébergeons pas.",
                 "lead_shelf": "Une compétence, c'est la décision. Un livre, un film, une série, une vidéo, un podcast ou un cours, c'est la manière de la mettre en pratique. Nous vous recommandons quoi acheter et qui soutenir — nous n'hébergeons jamais les œuvres elles-mêmes.",
                 "lead_library": "Effectuez une recherche, puis affinez les résultats en fonction du type de contenu et du sujet. Sélectionnez un titre pour l'ajouter à la rubrique « Apprendre ».",
-                "partner_max": "Les cours sur Max sont disponibles sur MasterClass. Les formules Basic et Plus sont quant à elles proposées sur Udemy. Les livres, films et séries sont accessibles selon les conditions de l'abonnement — nous les recommandons, mais ne les hébergeons pas.",
-                "partner_default": "Les cours « Basic » et « Plus » sont disponibles sur Udemy. Les cours « Max » sont quant à eux proposés sur MasterClass. Les livres, films et séries sont accessibles selon les conditions de l'abonnement — nous les recommandons, mais nous ne les hébergeons pas.",
+                "partner_max": "Les cours sur Max sont disponibles sur MasterClass. Vous pouvez également gagner des points bonus sur Udemy. Les livres, films et séries sont accessibles selon les conditions de l'abonnement — nous les recommandons, mais nous ne les hébergeons pas.",
+                "partner_default": "La rubrique « Apprendre » est disponible dans les formules Plus et Max. Les cours de la formule Plus se trouvent sur Udemy ; ceux de la formule Max sont hébergés sur MasterClass. Les livres, films et séries sont accessibles selon les conditions de chaque formule — nous les recommandons, mais ne les hébergeons pas nous-mêmes.",
                 "jar_coach_title": "Pot Éducation",
                 "jar_banner": "C'est dans votre « tirelire Éducation » que sont affectées ces dépenses. Tout ce qui augmente votre capacité de gain contribue à vous mener vers la liberté financière.",
                 "jar_cta": "Voir le pot Éducation",
@@ -3049,9 +3049,9 @@
         "tour": {
             "progress_save_failed": "Échec de la sauvegarde de la progression de la visite",
             "offer": {
-                "eyebrow": "Visite rapide",
+                "eyebrow": "Présentation rapide",
                 "title": "Vous souhaitez découvrir Rumtelo ?",
-                "body": "Une brève présentation guidée de la navigation, des pots, des coûts fixes et des revenus. Vous pouvez passer à la suite à tout moment — ou ouvrir l'aide plus tard pour revoir un écran.",
+                "body": "Une brève visite guidée depuis la page d'accueil, qui vous présente les « pots », les coûts fixes et les revenus. Vous pouvez passer d'une section à l'autre à tout moment — ou ouvrir l'aide plus tard pour revoir la visite.",
                 "accept": "Commencer la visite",
                 "dismiss": "Pas maintenant"
             },
@@ -3062,14 +3062,14 @@
                 "take_tour_prompt": "Vous souhaitez un aperçu rapide de cet écran ?",
                 "replay_tour_prompt": "Tu veux revoir le guide pas à pas pour cet écran ?",
                 "take_tour": "Faites une visite guidée",
-                "replay_tour": "Revivre le circuit",
+                "replay_tour": "Revivre la visite",
                 "take_full_tour_prompt": "Vous voulez un guide complet ? Commençons par le logement, puis les bocaux, les frais fixes et les revenus.",
                 "replay_full_tour_prompt": "Revoir la vidéo complète du guide pas à pas depuis la page d'accueil ?",
                 "take_full_tour": "Commencer la visite complète",
                 "replay_full_tour": "Revivre la visite dans son intégralité",
-                "no_tour": "Il n'y a pas encore de visite guidée sur cet écran — le descriptif ci-dessus présente les éléments essentiels.",
+                "no_tour": "Il n'y a pas encore de visite guidée sur cet écran — le document ci-dessus présente les éléments essentiels.",
                 "helpers_label": "Diffuser « The Coach » à l'écran",
-                "helpers_hint": "Lignes « Pourquoi » et fiches « jar » de The Coach (✦ The Coach). Identique à Paramètres → Préférences. Activé par défaut pour les débutants.",
+                "helpers_hint": "Lignes « Why » et cartes « jar » de The Coach (✦ The Coach). Identique à Paramètres → Préférences. Activé par défaut pour les débutants.",
                 "helpers_on": "Le",
                 "helpers_off": "Désactivé",
                 "videos_eyebrow": "Vidéos explicatives",
@@ -3079,9 +3079,9 @@
                 "video_level_feature": "Cette fonctionnalité",
                 "settings": {
                     "eyebrow": "Visite guidée",
-                    "blurb": "Vous pouvez à tout moment revoir les étapes de la navigation, les « jars », les coûts fixes et les revenus.",
+                    "blurb": "Vous pouvez revenir à tout moment sur les rubriques « Accueil », « Tontines », « Coûts fixes » et « Revenus ».",
                     "row_title": "Présentation du produit",
-                    "row_sub": "Même procédure qu’après l’installation",
+                    "row_sub": "Même procédure que celle décrite après l'installation — commence sur l'écran d'accueil",
                     "restart": "Commencer la visite complète"
                 },
                 "joyride": {
@@ -3141,7 +3141,7 @@
                     "sections": {
                         "what_for": {
                             "heading": "Ce que vous voyez",
-                            "body": "Votre aperçu financier du mois — Le Coach, la situation financière et les clés de la croissance, de l'énergie et de l'épanouissement spirituel. Commencez la visite complète depuis la rubrique « Aide » pour parcourir la section « Accueil », puis les « Tiers », les « Coûts fixes » et les « Revenus »."
+                            "body": "Votre aperçu financier du mois — Le Coach, la situation financière et les clés de la croissance, de l'énergie et de l'épanouissement spirituel. Commencez la visite complète depuis la rubrique « Aide » pour parcourir la section « Accueil », puis les « Tonneaux », les « Coûts fixes » et les « Revenus »."
                         },
                         "how": {
                             "heading": "Mode d'emploi",
@@ -3262,7 +3262,7 @@
                         },
                         "how": {
                             "heading": "Comment ça marche ?",
-                            "body": "C'est vous qui saisissez vous-même vos revenus. À partir de vos pourcentages fixes, vous voyez combien doit aller dans chaque « pot » — ce que vous pouvez dépenser ou mettre de côté à cette fin. Les « pots » vous aident à vous organiser. Rumtelo ne transfère jamais d'argent : c'est vous qui effectuez la répartition sur votre ou vos comptes bancaires."
+                            "body": "C'est vous qui saisissez vous-même vos revenus. À partir de vos pourcentages fixes, vous voyez quelle part revient à chaque « pot » : ce que vous pouvez dépenser ou mettre de côté à cette fin. Ensuite, passez en revue les « pilules d'argent » de gauche à droite : Dépenses fixes → Transactions → Dettes → Patrimoine net. Rumtelo n'effectue jamais de mouvements d'argent sur votre compte bancaire."
                         }
                     },
                     "steps": {
@@ -3285,11 +3285,11 @@
                     "sections": {
                         "what_for": {
                             "heading": "À quoi cela sert-il ?",
-                            "body": "Un aperçu de la période en cours : les bocaux, la boîte de réception et l'évolution du mois."
+                            "body": "Un aperçu de la période en cours : les bocaux, la boîte de réception, ce que vous possédez déjà et l'évolution du mois."
                         },
                         "how": {
                             "heading": "Comment ça marche ?",
-                            "body": "Cliquez sur « Compte », « Opérations », « Dettes » ou « Coûts fixes » pour obtenir plus de détails. L'onglet « Période » (en haut à droite) permet de changer de mois."
+                            "body": "Commencez par la page « Aperçu », puis parcourez les rubriques de gauche à droite : Coûts fixes → Transactions → Dettes → Patrimoine net. Le bouton « Période » (en haut à droite) permet de changer de mois."
                         }
                     }
                 },
@@ -3311,7 +3311,7 @@
                     "sections": {
                         "what_for": {
                             "heading": "À quoi sert cette rubrique ?",
-                            "body": "Objectifs, revenus et (pour les formules supérieures) apprentissage et patrimoine. Commencez par vos revenus et vos objectifs : ils sont liés. Augmentez votre patrimoine net, alimentez vos « tirelires » et atteignez plus rapidement vos objectifs d'épargne."
+                            "body": "Commencez par la rubrique « Aperçu », puis suivez l'ordre de gauche à droite : Revenus → Objectifs. Augmentez votre revenu net et fixez-vous un objectif dans la section « Basique ». Découvrez les contenus débloqués dans la section « Plus » : livres, formations, compétences."
                         }
                     }
                 },
@@ -3494,8 +3494,8 @@
                 "keywords": [
                     "aperçu financier",
                     "six bocaux",
-                    "avoir prise sur sa vie",
-                    "coach en gestion financière personnelle",
+                    "prise sur la vie",
+                    "coach en gestion des finances personnelles",
                     "liberté financière",
                     "bilan hebdomadaire",
                     "énergie, sommeil, argent",
@@ -3532,7 +3532,7 @@
                 "staging_banner_aria": "Avis concernant l'environnement de test"
             },
             "hero": {
-                "eyebrow": "RUMTELO — PRENDRE LA VIE À PLEINS COUCHES",
+                "eyebrow": "RUMTELO — PRENDRE LA VIE À PLEINS COUPS DE POING",
                 "headline": "Arrête de te demander où ça a bien pu passer.",
                 "lead": "Vous vous demandez quoi ? Tout : votre argent, votre vie, votre énergie, votre temps. Voyez où tout cela est passé, puis reprenez le contrôle. Les conseils du coach. À vous de choisir.",
                 "cta_primary": "Commencez gratuitement — sans carte bancaire",
@@ -3630,7 +3630,7 @@
                 "eyebrow": "GRIP ON LIFE — LES PRODUITS",
                 "headline": "Argent. Croissance. Énergie. Âme. Une vue d'ensemble.",
                 "headline_core": "Argent. Croissance. Une vue d'ensemble.",
-                "more_soon": "Bientôt plus",
+                "more_soon": "À suivre",
                 "lead_core": "Chaque produit vous aide dans un aspect particulier de votre vie. L'argent est souvent le point de départ ; « Growth » vous aide à aller plus loin à partir de là. D'autres produits sont en préparation. Le Coach vous donne un conseil. C'est à vous de décider.",
                 "lead": "Chaque produit vous aide dans un aspect particulier de votre vie. L'argent est souvent le point de départ. Passez ensuite à « Croissance », « Énergie » ou « Âme » lorsque vous en ressentez le besoin. Le coach vous donne un conseil. C'est vous qui décidez."
             },
@@ -3650,7 +3650,7 @@
                 "energy": {
                     "name": "Énergie",
                     "alt_name": "Énergie",
-                    "question": "Sur quel système d'exploitation est-ce que je travaille ?",
+                    "question": "Sur quoi est-ce que je tourne ?",
                     "line": "Maîtrisez votre énergie : le sommeil, les horaires, votre corps… tout cela influe sur chacune de vos décisions."
                 },
                 "soul": {
@@ -3779,19 +3779,19 @@
             "why": {
                 "eyebrow": "POURQUOI RUMTELO EXISTE-T-IL ?",
                 "headline": "Ne vous focalisez pas sur les chiffres. Prenez les rênes.",
-                "quote": "La richesse n'est pas une question de chiffres. C'est l'emprise qu'elle exerce sur votre vie.",
+                "quote": "La richesse, ce n'est pas une question de chiffres. C'est l'emprise qu'elle exerce sur votre vie.",
                 "body": "Nous avons d'abord créé Rumtelo pour nous-mêmes. Nous gagnions bien notre vie, mais nous nous demandions toujours où tout cela passait : l'argent, la vie, l'énergie, le temps. Les applications de gestion budgétaire ne faisaient que compter a posteriori. Personne ne nous aidait à reprendre le contrôle. Nous avons donc créé ce dont nous avions besoin : des outils clairs, un conseil de « The Coach », et c'est vous qui choisissez. Puis nous l'avons commercialisé pour que d'autres puissent faire de même.",
-                "books_eyebrow": "S'APPUYANT SUR DES OUVRAGES ÉPROUVÉS",
+                "books_eyebrow": "S'APPUYER SUR DES OUVRAGES ÉPROUVÉS",
                 "books_lead": "Rumtelo n'est pas une théorie nouvelle. Elle transforme les idées tirées d'ouvrages qui ont façonné notre rapport à l'argent, notre état d'esprit et notre orientation depuis des décennies en une routine quotidienne que vous pouvez réellement suivre.",
                 "signature": "Given Loyiso, fondateur et PDG · Charissa Peroti, cofondatrice · Amsterdam",
                 "manifesto": "Ne vous focalisez pas sur les chiffres. Prenez les rênes.",
-                "audience": "Conçu pour ceux qui ont déjà réussi — et pour ceux qui sont prêts à réussir.",
+                "audience": "Conçu pour ceux qui réussissent déjà — et pour ceux qui sont prêts à réussir.",
                 "more_books": "Plus de livres",
                 "books": {
                     "rich_dad": {
                         "title": "Père riche, père pauvre",
                         "author": "Robert Kiyosaki",
-                        "line": "Actifs contre passifs — l'argent qui travaille pour vous, et non l'inverse."
+                        "line": "Actifs contre passifs : l'argent qui travaille pour vous, et non l'inverse."
                     },
                     "think_grow": {
                         "title": "Pensez et devenez riche",
@@ -3811,7 +3811,7 @@
                     "secret": {
                         "title": "Le Secret",
                         "author": "Rhonda Byrne",
-                        "line": "Dites ce que vous voulez : l'attention suit l'intention."
+                        "line": "Dites ce que vous voulez : l’attention suit l’intention."
                     }
                 }
             },
@@ -3844,7 +3844,7 @@
                 "points": {
                     "one": "Un conseil, une prochaine étape — jamais une montagne de graphiques",
                     "quiet": "Restez silencieux jusqu’à ce que vous disposiez de suffisamment de données — le bruit n’est pas synonyme de connaissance",
-                    "shame": "De l'information, jamais de honte — un « bocal des excès » est un signal, pas un verdict",
+                    "shame": "De l'information, jamais de la honte — un « bocal des excès » est un signal, pas un verdict",
                     "ten": "Dix minutes par semaine avec le coach — pas de devoirs quotidiens"
                 },
                 "demo_aria": "Exemple tiré de « The Coach » — un conseil par portail",
@@ -3854,7 +3854,7 @@
                 "demo": {
                     "money": {
                         "kind": "CETTE SEMAINE",
-                        "text": "La mise dépasse de 38 € la limite fixée. Retirez-la une fois de votre épargne à long terme — ou laissez-la telle quelle et économisez ainsi le dîner de la semaine prochaine.",
+                        "text": "La mise dépasse de 38 € la limite fixée. Retirez-la une fois de votre épargne à long terme — ou laissez-la telle quelle et faites votre dîner de la semaine prochaine à la maison.",
                         "cta": "Ouvrir les bocaux"
                     },
                     "growth": {
@@ -4007,10 +4007,10 @@
                     "best_for": "Pour commencer, par vous-même",
                     "line": "Vous voulez savoir où va votre argent et mettre en place une routine hebdomadaire de dix minutes — tout seul, sans rien dépenser. C'est suffisant pour commencer, et il n'y a aucune raison d'arrêter.",
                     "f1": "ARGENT · six bocaux, transactions, coûts fixes",
-                    "f2": "DÉVELOPPEMENT · revenus, apprentissage et {maxGoals, plural, one {# objectif} other {# objectifs}}",
+                    "f2": "CROISSANCE · revenus et {maxGoals, plural, one {# objectif} other {# objectifs}} — goûter Growth",
                     "f3": "ÉNERGIE · sommeil",
                     "f4": "SOUL · calme, gratitude, une intention par semaine",
-                    "f5": "Le Coach, le bilan hebdomadaire, le score mensuel",
+                    "f5": "Le coach, le bilan hebdomadaire, le score mensuel",
                     "f6": "1 place complète + 1 place pour un accompagnateur (partenaire, coach ou conseiller)"
                 },
                 "plus": {
@@ -4018,12 +4018,12 @@
                     "tag": "Les plus populaires",
                     "best_for": "Foyers, couples, remboursement de dettes",
                     "line": "Vous partagez vos finances avec un partenaire ou votre famille, vous remboursez des dettes ou vous souhaitez importer vos relevés bancaires. C'est le cas de la plupart des gens.",
-                    "f1": "Tout ce qu'il faut savoir sur le langage Basic",
-                    "f2": "ARGENT · plan de remboursement de la dette avec intérêts et date de libération",
+                    "f1": "Tout ce qu'il faut savoir sur le Basic",
+                    "f2": "ARGENT · Plan de remboursement de la dette avec intérêts et date de libération",
                     "f3": "ARGENT · Importation des relevés bancaires — synchronisation en temps réel à venir",
-                    "f4": "ÉNERGIE · vos 168 heures, entraînement, alimentation",
-                    "f5": "Invitez jusqu'à {maxMembers} personnes — conjoint, famille, amis",
-                    "f6": "Jusqu'à {maxGoals} buts"
+                    "f4": "DÉVELOPPEMENT · Apprendre — livres, formations, compétences · jusqu’à {maxGoals} objectifs",
+                    "f5": "ÉNERGIE · vos 168 heures, entraînement, alimentation",
+                    "f6": "Jusqu'à {maxMembers} places — mélange de spectateurs et de participants"
                 },
                 "max": {
                     "name": "Max",
@@ -4031,8 +4031,8 @@
                     "best_for": "Se constituer un patrimoine et acquérir une certaine liberté",
                     "line": "Vos bases sont solides et votre patrimoine ne cesse de croître : votre patrimoine net, vos rendements, votre « chiffre de liberté »… ainsi que toutes les fonctionnalités de chacun de nos produits.",
                     "f1": "Toutes les fonctionnalités de la version Plus",
-                    "f2": "CROISSANCE · patrimoine net, rendements et « chiffre de liberté »",
-                    "f3": "DÉVELOPPEMENT · Suivez des cours sur Masterclass, pas sur Udemy",
+                    "f2": "ARGENT · patrimoine, rendements et votre « chiffre de liberté »",
+                    "f3": "DÉVELOPPEMENT · Découvrez nos recommandations sur Masterclass, et non sur Udemy",
                     "f4": "SOUL · les sept centres",
                     "f5": "Jusqu'à {maxMembers} places (accès illimité)",
                     "f6": "Appareils — montre, balance, bague (à venir)"
@@ -4040,7 +4040,7 @@
             },
             "faq_section": {
                 "eyebrow": "QUESTIONS",
-                "headline": "Des réponses directes.",
+                "headline": "Des réponses franches.",
                 "lead": "Les questions que les gens se posent avant de se lancer — auxquelles nous répondons comme nous le ferions à un ami."
             },
             "faq": {
@@ -4050,7 +4050,7 @@
                 },
                 "bank": {
                     "question": "Dois-je connecter mon compte bancaire ?",
-                    "answer": "Non. La version « Basic » fonctionne avec les données que vous saisissez. La version « Plus » permet en plus d’importer des relevés bancaires : si vous réimportez un relevé, aucune transaction ne sera comptabilisée deux fois. La synchronisation bancaire en temps réel (PSD2, en lecture seule, sous licence européenne) est prévue dans notre feuille de route, mais ne sera disponible qu’après que vous l’aurez configurée vous-même."
+                    "answer": "Non. La version « Basic » fonctionne avec les données que vous saisissez. La version « Plus » permet en plus d'importer des relevés bancaires : si vous réimportez un relevé, les opérations ne seront pas comptabilisées deux fois. La synchronisation bancaire en temps réel (PSD2, en lecture seule, sous licence européenne) est prévue dans notre feuille de route, mais elle ne sera disponible qu’après que vous l’aurez configurée vous-même."
                 },
                 "sleep": {
                     "question": "Pourquoi le sommeil, l'entraînement et les livres font-ils partie d'un produit financier ?",
@@ -4058,7 +4058,7 @@
                 },
                 "coach": {
                     "question": "En quoi consiste exactement le métier de coach ?",
-                    "answer": "Un conseil sur votre situation actuelle et une action que vous pouvez entreprendre — pour chaque produit, et le tout regroupé sur la page « The Coach ». L'outil reste silencieux jusqu'à ce qu'il dispose de suffisamment de données, et il ne vous fait jamais de remontrances. Les conseils de « The Coach ». À vous de choisir."
+                    "answer": "Un conseil sur votre situation actuelle et une action que vous pouvez entreprendre — pour chaque produit, et le tout regroupé sur la page « The Coach ». L'outil reste silencieux jusqu'à ce qu'il dispose de suffisamment de données, et il ne vous fait jamais de reproches. Les conseils de « The Coach ». À vous de choisir."
                 },
                 "partner": {
                     "question": "Puis-je l'utiliser avec mon partenaire ou ma famille ?",
@@ -4066,7 +4066,7 @@
                 },
                 "data": {
                     "question": "Où se trouvent mes données ?",
-                    "answer": "Hébergées sur des serveurs de l'UE à Amsterdam, les données sont chiffrées au repos. Vous pouvez les exporter ou les supprimer à tout moment. Si vous résiliez un abonnement payant, tous les pots, toutes les transactions et tous les objectifs restent accessibles."
+                    "answer": "Hébergées sur des serveurs de l'UE à Amsterdam, les données sont chiffrées au repos. Vous pouvez les exporter ou les supprimer à tout moment. Si vous résiliez un abonnement payant, tous les fichiers JAR, toutes les transactions et tous les objectifs restent accessibles."
                 },
                 "language": {
                     "question": "Néerlandais ou anglais ?",
@@ -4074,7 +4074,7 @@
                 },
                 "practice": {
                     "question": "Je suis coach ou conseiller. Puis-je utiliser Rumtelo avec mes clients ?",
-                    "answer": "Oui — avec Rumtelo Cabinet. Invitez vos clients par e-mail ; une fois qu'ils ont accepté, vous voyez leur tableau en lecture seule depuis un seul bureau. Suivre leur tableau est gratuit pour eux, et vous pouvez prendre en charge leur abonnement Plus pour {clientPrice} par mois. Un cabinet coûte {basePrice} par mois, plus {staffPrice} par membre de l'équipe."
+                    "answer": "Oui — grâce à Rumtelo Practice. Invitez vos clients par e-mail ; une fois qu'ils ont accepté, vous pouvez consulter leur tableau en lecture seule depuis un seul poste de travail. La consultation est gratuite pour eux, et vous pouvez prendre en charge leur abonnement Plus pour {clientPrice} par mois. Un cabinet coûte {basePrice} par mois, plus {staffPrice} par poste de travail."
                 }
             },
             "signup_section": {
@@ -5485,13 +5485,13 @@
                     "blurb": "Trois formules : Basic, Plus et Max. Commencez par la formule Basic : aucune des données que vous avez saisies ne sera jamais verrouillée.",
                     "card_basic_tag": "De {price}",
                     "card_basic_line": "Planche solo — les six bocaux et l'exercice qui se cache derrière. Pas besoin de banc.",
-                    "card_basic_feats": "{members} · En solo uniquement · Tirelires · Apprendre · Coach",
+                    "card_basic_feats": "{members} · Solo uniquement · Tirelires · 1 objectif · Coach",
                     "card_plus_tag": "Les plus populaires",
-                    "card_plus_line": "Partagez ce tableau avec votre famille ou vos amis : dettes, semaine de l'énergie et objectifs.",
-                    "card_plus_feats": "{members} · Tout type de foyer · Endettement · ÉNERGIE · Objectifs",
+                    "card_plus_line": "Partagez ce tableau avec votre famille ou vos amis : dettes, apprentissage, semaine de l'énergie et bien d'autres objectifs.",
+                    "card_plus_feats": "{members} · Dette · En savoir plus · ÉNERGIE · Objectifs",
                     "card_max_tag": "Les quatre portails",
-                    "card_max_line": "Nombre illimité de ménages, courbe de revenus, apprentissage et patrimoine net.",
-                    "card_max_feats": "{members} · CROISSANCE · Masterclass · Patrimoine net",
+                    "card_max_line": "Nombre illimité de foyers, courbe de revenus, « Learn » et patrimoine net.",
+                    "card_max_feats": "{members} · ARGENT · Masterclass Learn · Patrimoine net",
                     "monthly": "Mensuel",
                     "yearly": "Abonnement annuel · 2 mois gratuits",
                     "per_month_suffix": "/mois",
@@ -6057,7 +6057,7 @@
             "portals": {
                 "money": {
                     "line": "Gardez le contrôle de votre argent.",
-                    "body": "Six bocaux. Revenus, factures, solde. Vous saisissez vos entrées et vos sorties. Rumtelo vous présente votre plan — ce n’est pas une application de gestion budgétaire qui se contente de faire les comptes a posteriori."
+                    "body": "Six bocaux : revenus, factures, solde. Vous saisissez vos entrées et vos sorties. Rumtelo vous présente votre plan — ce n’est pas une application de gestion budgétaire qui se contente de faire les comptes a posteriori."
                 },
                 "growth": {
                     "line": "Maîtrisez votre croissance.",
@@ -6077,27 +6077,27 @@
             "cta_jars": "Voir mes bocaux",
             "cta_week_check": "Bilan hebdomadaire",
             "routes": {
-                "home": "Un coup d'œil : où est passé ce mois-ci… et avez-vous retrouvé votre agilité ?",
-                "money_jars": "Ce mois-ci, déjà divisé avant même d'avoir commencé. L'argent gagné en travaillant n'a jamais besoin d'être justifié.",
+                "home": "Un coup d'œil : où est-il passé ce mois-ci ? Et avez-vous retrouvé votre adhérence ?",
+                "money_jars": "Ce mois-ci, déjà divisé avant même d'avoir commencé. L'argent gagné grâce à un emploi n'a jamais besoin d'être justifié.",
                 "money_transactions": "Vous ne suivez pas vos dépenses pour vous juger, mais pour identifier les fuites dans votre budget.",
                 "money_debt": "La dette, c'est du temps loué. Chaque centime d'intérêt, c'est une heure de votre vie dont quelqu'un d'autre dispose à sa guise.",
-                "money_fixed_costs": "Les coûts fixes correspondent à des choix que vous avez faits une seule fois et que vous payez chaque mois. Considérez-les comme des décisions.",
+                "money_fixed_costs": "Les coûts fixes correspondent à des choix que vous avez faits une seule fois et que vous payez chaque mois. Considérez-les comme de véritables décisions.",
                 "growth_goals": "Un objectif permet de transformer l'excédent de ce mois-ci en quelque chose de durable. Avec une date et un bocal, c'est un projet.",
-                "growth_net_worth": "L'argent, c'est l'affaire d'un mois. La fortune, c'est l'affaire de plusieurs années. Vous êtes riche le jour où elle vous permet de subvenir à vos besoins.",
-                "energy_week": "Vos heures, c'est votre capacité. Réparties selon votre choix, ou par celui qui s'impose le plus.",
+                "growth_net_worth": "Ce que vous possédez déjà fonctionne — ou vous coûte — chaque mois. Ce n'est pas un vœu pieux.",
+                "energy_week": "Vos heures, c'est votre capacité. Réparties selon votre choix, ou en fonction de celui qui s'impose le plus.",
                 "energy_sleep": "Le sommeil, c'est le sol sur lequel reposent les bocaux. Si on le coupe, tous les autres chiffres s'effondrent en silence.",
-                "soul_stillness": "Un esprit serein sait gérer son argent. Un esprit agité le dépense et appelle ça une décision.",
-                "soul_gratitude": "Celui qui prend conscience de ce qu’il possède déjà achète moins pour combler un manque.",
+                "soul_stillness": "Un esprit serein sait gérer son argent. Un esprit agité le dépense et appelle cela une décision.",
+                "soul_gratitude": "Celui qui prend conscience de ce qu'il possède déjà achète moins pour combler un manque.",
                 "soul_giving": "Une part fixe qui disparaît avant que vous n'ayez pu la conserver permet à l'argent de rester un outil, et non un maître.",
                 "soul_intent": "Une intention, c'est une consigne que l'on se donne à soi-même. Une résolution, c'est un espoir.",
-                "soul_centers": "Identifiez où se situe le blocage, et la prochaine étape s'impose généralement d'elle-même.",
-                "growth_income": "La réduction des coûts a une limite minimale. L'augmentation des revenus, non.",
+                "soul_centers": "Identifiez l'endroit où vous vous sentez bloqué, et la prochaine étape s'impose généralement d'elle-même.",
+                "growth_income": "La réduction des coûts a une limite. L'augmentation des revenus, non.",
                 "growth_learn": "Un livre dont on ne voit pas à quoi il pourrait servir relevait des dépenses de loisirs, et non de l'éducation.",
                 "growth_learn_library": "Nous vous conseillons sur les produits à acheter et les créateurs à soutenir. Nous n'hébergeons jamais les œuvres.",
                 "energy_training": "La formation est la seule dépense qui permet d'accroître la valeur de chaque heure de travail.",
                 "energy_food": "La nourriture, c'est le carburant pour la semaine que vos bocaux vous permettent de tenir. Le carburant, ça s'achète, ça ne tombe pas du ciel.",
                 "money_week_check": "Dix minutes par semaine : observer, se recentrer, se fixer un objectif. C'est mieux que de s'inquiéter tous les jours.",
-                "why": "Rumtelo — avoir prise sur sa vie. Des outils clairs qui vous aident à garder le contrôle — produit par produit."
+                "why": "Rumtelo — la maîtrise de la vie. Des outils simples qui vous aident à garder le contrôle — produit par produit."
             }
         }
     }
