@@ -72,7 +72,7 @@ import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
 import { FormDatePicker } from './form-date-picker';
 import { FormInput } from './form-input';
 import { HoldingField } from './holding-field';
-import { PartyField } from './party-field';
+import { existingCounterparty, PartyField } from './party-field';
 import { partiesToNameOptions } from './party-name-options';
 import {
     MERCHANT_OPTION_PREFIX,
@@ -688,17 +688,26 @@ export function FixedCostForm({
                     ? merchants.find(merchant => namesMatch(counterpartyValue, merchant.name))
                     : null) ??
                 null;
-            const merchantKey =
-                formMerchantKey ||
-                (nameLock?.kind === 'vendor'
-                    ? nameLock.merchantKey
-                    : (matchedPayeeMerchant?.key ?? null));
-            const partyId = merchantKey || !counterpartyValue ? null : formPartyId;
-            const saveParty =
-                Boolean(counterpartyValue) &&
-                !merchantKey &&
-                !partyId &&
-                (values.saveParty ?? true);
+            const lockedPayee = counterpartyValue
+                ? existingCounterparty(counterpartyValue, payeeOptions)
+                : null;
+            const merchantKey = lockedPayee
+                ? lockedPayee.merchantKey || null
+                : formMerchantKey ||
+                  (nameLock?.kind === 'vendor'
+                      ? nameLock.merchantKey
+                      : (matchedPayeeMerchant?.key ?? null));
+            const partyId = lockedPayee
+                ? lockedPayee.partyId || null
+                : merchantKey || !counterpartyValue
+                  ? null
+                  : formPartyId;
+            const saveParty = lockedPayee
+                ? false
+                : Boolean(counterpartyValue) &&
+                  !merchantKey &&
+                  !partyId &&
+                  (values.saveParty ?? true);
             const jarBalanceForName = (balancesQuery.data ?? []).find(
                 jar => jar.id === values.jarId
             );

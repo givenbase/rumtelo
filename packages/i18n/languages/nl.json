@@ -2306,8 +2306,9 @@
             },
             "deposit_link": {
                 "bank_label": "Bank (optioneel)",
-                "bank_hint": "Waar dit inkomen binnenkomt — de rekening kun je later kiezen.",
+                "bank_hint": "Alleen banken waar je al een rekening hebt.",
                 "bank_none": "Nog geen bank",
+                "register_bank": "Een bank registreren",
                 "account_label": "Komt binnen op (optioneel)",
                 "account_hint": "Betaal-, spaar- of cashrekening. Als je er een kiest, wordt de bank gezet.",
                 "account_none": "Nog geen rekening",

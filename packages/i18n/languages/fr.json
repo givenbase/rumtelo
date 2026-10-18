@@ -2306,8 +2306,9 @@
             },
             "deposit_link": {
                 "bank_label": "Banque (facultatif)",
-                "bank_hint": "Où ce revenu est-il versé ? Vous pourrez choisir votre place plus tard.",
+                "bank_hint": "Uniquement les banques auprès desquelles vous disposez déjà d'un compte.",
                 "bank_none": "Pas encore de banque",
+                "register_bank": "Enregistrer une banque",
                 "account_label": "Atterrisse à (facultatif)",
                 "account_hint": "Compte courant, compte d'épargne ou compte au comptant. Le choix de l'un d'entre eux détermine la banque.",
                 "account_none": "Vous n'avez pas encore de compte",

@@ -13,7 +13,7 @@ import {
     suggestionMutedClass,
     suggestionOptionClass,
 } from '@rumtelo/ui';
-import { cn } from '@rumtelo/utils';
+import { cn, findByNameOrAlias, namesMatch } from '@rumtelo/utils';
 
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
@@ -293,6 +293,20 @@ export function ExpenseIntentField({
     function commitCustomVendor(name: string) {
         const typed = name.trim();
         if (!typed) return;
+        const party = parties.find(
+            candidate =>
+                namesMatch(candidate.name, typed) ||
+                candidate.aliases.some(alias => namesMatch(alias, typed))
+        );
+        if (party) {
+            selectParty(party);
+            return;
+        }
+        const merchant = findByNameOrAlias(merchants, typed);
+        if (merchant) {
+            selectMerchant(merchant);
+            return;
+        }
         onChange({
             vendor: typed,
             merchantKey: null,
@@ -316,17 +330,11 @@ export function ExpenseIntentField({
     const selectedMerchant =
         (value.merchantKey
             ? merchants.find(merchant => merchant.key === value.merchantKey)
-            : null) ??
-        (value.vendor
-            ? merchants.find(merchant => merchant.name.toLowerCase() === value.vendor.toLowerCase())
-            : null);
+            : null) ?? (value.vendor ? findByNameOrAlias(merchants, value.vendor) : null);
 
     const selectedParty =
         (value.partyId ? parties.find(party => party.id === value.partyId) : null) ??
-        (value.vendor && !value.merchantKey
-            ? (parties.find(party => party.name.toLowerCase() === value.vendor.toLowerCase()) ??
-              null)
-            : null);
+        (value.vendor && !value.merchantKey ? findByNameOrAlias(parties, value.vendor) : null);
 
     const selectedVendorMark = value.vendor
         ? partyMark(
@@ -840,7 +848,11 @@ export function ExpenseIntentField({
                 </Typography>
             ) : null}
 
-            {value.vendor.trim() && !value.merchantKey && !value.partyId ? (
+            {value.vendor.trim() &&
+            !value.merchantKey &&
+            !value.partyId &&
+            !selectedParty &&
+            !selectedMerchant ? (
                 <SavePartyToggle
                     name={value.vendor}
                     checked={value.saveParty}

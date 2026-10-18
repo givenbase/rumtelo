@@ -1,13 +1,11 @@
-# Generated locale files
+# `languages/` — generated locale files
 
-Do not treat these as the source of truth. Do **not** hand-edit JSON for new copy.
+**Do not edit, merge, reorder, or manually add keys in any `*.json` file in this directory.**
 
-Edit `../translations/**/*.ts`, then:
+These files are build output. They are produced from [`../translations/`](../translations/) by `pnpm i18n:gen`.
 
-```bash
-pnpm i18n:gen
-```
+- A changed English string in `translations/*.ts` is translated again.
+- Unchanged English is reused from [`../cache/`](../cache/).
+- A wrong machine translation is corrected in [`../translations/overrides.ts`](../translations/overrides.ts), not here.
 
-That runs `generate` (rebuild `en.json` + fill missing keys for every non-EN locale) then DeepL `translate:locales` for leaves still identical to English. Existing overrides are kept.
-
-JSON-only (no DeepL): `pnpm i18n:generate`.
+Manual edits in this folder are overwritten on the next generation.

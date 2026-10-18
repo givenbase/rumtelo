@@ -2306,8 +2306,9 @@
             },
             "deposit_link": {
                 "bank_label": "Bank (optional)",
-                "bank_hint": "Where this income is paid — you can pick the seat later.",
+                "bank_hint": "Only banks you already have an account at.",
                 "bank_none": "No bank yet",
+                "register_bank": "Register a bank",
                 "account_label": "Lands in (optional)",
                 "account_hint": "Checking, savings, or cash seat. Picking one sets the bank.",
                 "account_none": "No account yet",

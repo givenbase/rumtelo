@@ -51,6 +51,7 @@ import { clampDueDayInput, clampDueMonthInput, DueDayField } from './due-day-fie
 import { FormDatePicker } from './form-date-picker';
 import { FormInput } from './form-input';
 import { merchantsToNameOptions } from './merchant-name-options';
+import { existingCounterparty } from './party-field';
 import { PARTY_OPTION_PREFIX, partiesToNameOptions } from './party-name-options';
 import { PresetNameField, type NamePresetOption } from './preset-name-field';
 import { SavePartyToggle } from './save-party-toggle';
@@ -305,11 +306,22 @@ export function DebtForm({
             const name =
                 presetKey && presetKey !== 'OTHER' && selectedType ? selectedType.name : lenderName;
             const formPartyId = values.partyId?.trim() || null;
-            const matchedLender = formPartyId ? null : findByNameOrAlias(merchants, lenderName);
-            const merchantKey = matchedLender?.key ?? null;
-            const partyId = merchantKey || !lenderName ? null : formPartyId;
-            const saveParty =
-                Boolean(lenderName) && !merchantKey && !partyId && (values.saveParty ?? true);
+            const lockedLender = lenderName
+                ? existingCounterparty(lenderName, lenderOptions)
+                : null;
+            const matchedLender =
+                lockedLender || formPartyId ? null : findByNameOrAlias(merchants, lenderName);
+            const merchantKey = lockedLender
+                ? lockedLender.merchantKey || null
+                : (matchedLender?.key ?? null);
+            const partyId = lockedLender
+                ? lockedLender.partyId || null
+                : merchantKey || !lenderName
+                  ? null
+                  : formPartyId;
+            const saveParty = lockedLender
+                ? false
+                : Boolean(lenderName) && !merchantKey && !partyId && (values.saveParty ?? true);
             const presetKeyToSave = presetKey && presetKey !== 'OTHER' ? presetKey : null;
             const dueDay = normalizeDueDay(
                 values.dueDay?.trim() ? Number(values.dueDay) : null,
@@ -435,6 +447,7 @@ export function DebtForm({
     const freeTypedLender =
         Boolean(selectedLenderName.trim()) &&
         !watchedPartyId &&
+        !findByNameOrAlias(lenderOptions, selectedLenderName) &&
         !findByNameOrAlias(merchants, selectedLenderName);
 
     /** Lender chosen before a type: adopt its debt type when exactly one is linked. */
@@ -512,6 +525,11 @@ export function DebtForm({
                                         value={field.value}
                                         onChange={next => {
                                             field.onChange(next);
+                                            const known = findByNameOrAlias(lenderOptions, next);
+                                            if (known) {
+                                                applyLenderPick(known);
+                                                return;
+                                            }
                                             form.setValue('partyId', '', { shouldDirty: true });
                                         }}
                                         options={lenderOptions}
@@ -707,6 +725,14 @@ export function DebtForm({
                                                     value={field.value}
                                                     onChange={next => {
                                                         field.onChange(next);
+                                                        const known = findByNameOrAlias(
+                                                            lenderOptions,
+                                                            next
+                                                        );
+                                                        if (known) {
+                                                            applyLenderPick(known);
+                                                            return;
+                                                        }
                                                         form.setValue('partyId', '', {
                                                             shouldDirty: true,
                                                         });
