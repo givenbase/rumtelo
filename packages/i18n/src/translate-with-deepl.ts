@@ -9,6 +9,7 @@
  *
  * Run: pnpm i18n:gen
  */
+import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -28,6 +29,8 @@ import { locales } from './next-intl';
 import { planLeaf, translationCacheKey, type LeafPlan } from './translation-cache';
 
 const cacheDir = join(packageRoot, 'cache');
+/** English the locale files were last built from. Not `en.json`, which can be rewritten first. */
+const basisPath = join(cacheDir, 'en.basis.json');
 
 type Job = { path: string[]; english: string; cacheKey: string };
 
@@ -155,14 +158,30 @@ function applyPlan(plan: LeafPlan, cache: Record<string, string>): string {
     return plan.english;
 }
 
+function loadBasis(): Json | undefined {
+    const saved = readJson(basisPath);
+    if (saved) return saved;
+    try {
+        const committed = execFileSync('git', ['show', 'HEAD:packages/i18n/languages/en.json'], {
+            cwd: join(packageRoot, '../..'),
+            encoding: 'utf8',
+        });
+        console.log('No translation basis yet — comparing with the last committed en.json');
+        return JSON.parse(committed) as Json;
+    } catch {
+        return undefined;
+    }
+}
+
 function rebuildLocale(input: {
     english: Json;
     previousEnglish: Json | undefined;
     existing: Json | undefined;
     locale: string;
     cache: Record<string, string>;
-}): { tree: Json; jobs: Job[] } {
+}): { tree: Json; jobs: Job[]; refreshed: string[] } {
     const jobs: Job[] = [];
+    const refreshed: string[] = [];
     const overrides = TRANSLATION_OVERRIDES[input.locale] ?? {};
 
     function walk(node: Json, path: string[]): Json {
@@ -181,6 +200,12 @@ function rebuildLocale(input: {
             });
             if (plan.kind === 'translate') {
                 jobs.push({ path, english: plan.english, cacheKey: plan.cacheKey });
+            } else if (
+                typeof previous === 'string' &&
+                previous !== node &&
+                plan.text !== getAt(input.existing, path)
+            ) {
+                refreshed.push(dotPath);
             }
             return applyPlan(plan, input.cache);
         }
@@ -195,7 +220,7 @@ function rebuildLocale(input: {
         return out;
     }
 
-    return { tree: walk(input.english, []), jobs };
+    return { tree: walk(input.english, []), jobs, refreshed };
 }
 
 async function translateJobs(
@@ -241,7 +266,7 @@ async function main() {
     mkdirSync(languagesDir, { recursive: true });
 
     const enPath = join(languagesDir, `${DEFAULT_INTL_LOCALE}.json`);
-    const previousEnglish = readJson(enPath);
+    const previousEnglish = loadBasis();
     const english = await loadEnglishTranslations();
     writeJsonIfChanged(enPath, english);
 
@@ -252,14 +277,17 @@ async function main() {
         if (locale === DEFAULT_INTL_LOCALE) continue;
         const localePath = join(languagesDir, `${locale}.json`);
         const cache = loadCache(locale);
-        const { tree, jobs } = rebuildLocale({
+        const { tree, jobs, refreshed } = rebuildLocale({
             english,
             previousEnglish,
             existing: readJson(localePath),
             locale,
             cache,
         });
-        console.log(`[${locale}] ${jobs.length} changed or new English leaves`);
+        console.log(
+            `[${locale}] ${jobs.length} to translate, ${refreshed.length} already translated for the new English`
+        );
+        for (const dotPath of refreshed) console.log(`[${locale}] update ${dotPath}`);
         if (jobs.length > 0 && !client) {
             console.error(
                 `[${locale}] Missing DEEPL_API_KEY — left ${jobs.length} leaf(s) in English`
@@ -271,6 +299,9 @@ async function main() {
         writeJsonIfChanged(localePath, next);
         saveCache(locale, cache);
     }
+
+    mkdirSync(cacheDir, { recursive: true });
+    writeJsonIfChanged(basisPath, english, `Wrote ${basisPath}`);
 }
 
 main().catch(error => {
