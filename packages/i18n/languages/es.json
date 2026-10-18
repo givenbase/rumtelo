@@ -2306,8 +2306,9 @@
             },
             "deposit_link": {
                 "bank_label": "Banco (opcional)",
-                "bank_hint": "Dónde se abonan estos ingresos: ya puedes elegir el asiento más adelante.",
+                "bank_hint": "Solo bancos en los que ya tengas una cuenta.",
                 "bank_none": "Aún no hay ningún banco",
+                "register_bank": "Dar de alta un banco",
                 "account_label": "Aterriza en (opcional)",
                 "account_hint": "Cuenta corriente, de ahorro o de efectivo. Al elegir una de ellas, se establece el banco.",
                 "account_none": "Aún no tienes cuenta",

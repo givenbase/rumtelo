@@ -22,9 +22,9 @@
         "./languages/*": "./languages/*"
     },
     "scripts": {
-        "generate": "tsx ./src/generate-languages.ts",
-        "translate:locales": "tsx ./src/translate-locales-deepl.ts",
-        "translate-with-deepl": "tsx ./src/generate-languages.ts && tsx ./src/translate-locales-deepl.ts",
+        "generate": "tsx ./src/translate-with-deepl.ts",
+        "translate:locales": "tsx ./src/translate-with-deepl.ts",
+        "translate-with-deepl": "tsx ./src/translate-with-deepl.ts",
         "check-types": "tsc --pretty --noEmit",
         "test": "node --import tsx --test src/**/*.test.ts",
         "clean": "rm -rf .turbo dist"
