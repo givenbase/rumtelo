@@ -50,17 +50,19 @@ Every domain entity must extend one of:
 | `CatalogEntity` | **Extends** `BaseEntity` + `key`, `name`, `sortOrder`, `isActive`. Every company-authored catalog / preset / template with a free-text key (`CategoryTemplate`, `MerchantPreset`, `PlanFeature`, `WealthStage`, …). Mirrors `CatalogItemBase` in contracts |
 | `HouseholdEntity` | **Extends** `BaseEntity` and adds `household` → `AuthHousehold` via `@ManyToOne({ mapToPk: true })` (money / product / household settings) |
 | `WeekCheckEntity` | **Extends** `HouseholdEntity` + `week`, `completedAt`. The four portal week checks (`MoneyWeekCheck`, `GrowthWeekCheck`, `EnergyWeekCheck`, `SoulWeekCheck`) |
+| `PersonalHouseholdEntity` | **Extends** `HouseholdEntity` + `account` (maker, null = together) and `visibility`. Person-attributed rows read through `PersonalScopedRepository` (`GrowthPlanItem`). Add `@Check(personalRowCheck('<table>'))` on the concrete class. See `docs/engineering/household-visibility-plan.md` |
 
 ```text
 BaseEntity ─┬─ CatalogEntity
-            └─ HouseholdEntity ── WeekCheckEntity
+            └─ HouseholdEntity ─┬─ WeekCheckEntity
+                                └─ PersonalHouseholdEntity
 ```
 
 **1:1 vs 1:N:** both use `HouseholdEntity`. Enforce one row per household with `@Unique({ properties: ['household'] })` (e.g. `HouseholdSettings`). Product rows (jars, goals) stay many-per-household without that unique.
 
 `household` stays a **string** uuid in app code (`mapToPk`); MikroORM still owns the FK to `auth.household`. Do not redeclare it as a plain `@Property` or a full entity relation on subclasses.
 
-Files: `common/database/base.entity.ts`, `catalog.entity.ts`, `household.entity.ts`, `week-check.entity.ts`.
+Files: `common/database/base.entity.ts`, `catalog.entity.ts`, `household.entity.ts`, `week-check.entity.ts`, `personal.entity.ts`.
 Do **not** redeclare `id`, `createdAt`, `updatedAt`, `household`, or the `CatalogEntity` / `WeekCheckEntity` columns on subclasses. `@Unique` on `key` (or `['household', 'week']`) stays on the concrete class.
 
 Not the same as `AuthHousehold` (Better Auth organization plugin table) — that mirror does **not** extend `BaseEntity`.
@@ -230,7 +232,7 @@ pnpm --filter @rumtelo/backend lint:entities
 
 The script `scripts/lint/check-entity-style.ts` enforces:
 
-- `extends BaseEntity` / `CatalogEntity` / `HouseholdEntity` / `WeekCheckEntity` (+ import from `common/database/*`)
+- `extends BaseEntity` / `CatalogEntity` / `HouseholdEntity` / `WeekCheckEntity` / `PersonalHouseholdEntity` (+ import from `common/database/*`)
 - no redeclared inherited fields (`id` / `createdAt` / `updatedAt` / `household` / `key` / `name` / `sortOrder` / `isActive` / `week` / `completedAt`)
 - **1:1 household rows** listed in `HOUSEHOLD_ONE_TO_ONE_ENTITIES` must have `@Unique({ properties: ['household'] })`
 - `@ManyToOne` / `@OneToOne` fields are relation nouns — never `*Id` (API DTOs still map `householdId: row.household`)
@@ -246,7 +248,7 @@ When adding a new **1:1** household-owned entity, add its class name to `HOUSEHO
 
 ## Checklist for new / updated entities
 
-- [ ] `extends BaseEntity` / `CatalogEntity` / `HouseholdEntity` / `WeekCheckEntity` (imported from `common/database`)
+- [ ] `extends BaseEntity` / `CatalogEntity` / `HouseholdEntity` / `WeekCheckEntity` / `PersonalHouseholdEntity` (imported from `common/database`)
 - [ ] Money columns use `MoneyType`; ratios stay `decimal`
 - [ ] Catalog defaults have no `default*` / `suggested*` prefix; text is `name` / `description`
 - [ ] backoffice → backoffice references are relations (id FKs / pivots); household → catalog uses `@ManyToOne(() => Catalog, CatalogKey('x_key'))` (natural-key FK, plain string in code), never a bare `@Property` `*Key`

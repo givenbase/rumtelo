@@ -11,6 +11,7 @@ import { HouseholdId, Id, MemberId, UserId } from '../../../common/common.schema
 import { PlanKey } from '../../../enums';
 import { HouseholdRelation, HouseholdRole, IncomeStability, SpendingStyle } from '../enums';
 import { PayoffStrategy } from '../../product/money/enums';
+import { HouseholdVisibilitySettings } from './visibility';
 
 export {
     HouseholdRelation,
@@ -126,6 +127,8 @@ export const HouseholdSettings = z.object({
     money: HouseholdMoneySettings,
     weekCheck: HouseholdWeekCheckSettings,
     features: HouseholdFeatureSettings,
+    /** Who may see person-attributed rows (OWNER writes; Plus+ applies it). */
+    visibility: HouseholdVisibilitySettings,
     answers: HouseholdAnswers,
     /**
      * Lifestyle tags (student, renter, homeowner, …) — `Audience.key` catalog
@@ -148,6 +151,8 @@ export const HouseholdSettingsPatch = z.object({
     money: HouseholdMoneySettings.partial().optional(),
     weekCheck: HouseholdWeekCheckSettings.partial().optional(),
     features: HouseholdFeatureSettings.partial().optional(),
+    /** `mode` merges; `areas` replaces the whole map so "back to default" can drop keys. */
+    visibility: HouseholdVisibilitySettings.partial().optional(),
     answers: HouseholdAnswers.optional(),
     /** Whole-array replace — the picker always sends the full selection. */
     audienceKeys: z.array(z.string()).optional(),

@@ -7,6 +7,7 @@
 /**
  * Allowed abstract bases.
  *   BaseEntity → HouseholdEntity → WeekCheckEntity
+ *   BaseEntity → HouseholdEntity → PersonalHouseholdEntity
  *   BaseEntity → CatalogEntity
  */
 export const ALLOWED_ENTITY_BASES = [
@@ -14,6 +15,7 @@ export const ALLOWED_ENTITY_BASES = [
     'HouseholdEntity',
     'CatalogEntity',
     'WeekCheckEntity',
+    'PersonalHouseholdEntity',
 ] as const;
 
 /** Fields each base owns — subclasses must not redeclare them. */
@@ -22,6 +24,7 @@ const BASE_OWNED_FIELDS: Record<AllowedEntityBase, readonly string[]> = {
     HouseholdEntity: ['id', 'createdAt', 'updatedAt', 'household'],
     CatalogEntity: ['id', 'createdAt', 'updatedAt', 'key', 'name', 'sortOrder', 'isActive'],
     WeekCheckEntity: ['id', 'createdAt', 'updatedAt', 'household', 'week', 'completedAt'],
+    PersonalHouseholdEntity: ['id', 'createdAt', 'updatedAt', 'household', 'account', 'visibility'],
 };
 
 export type AllowedEntityBase = (typeof ALLOWED_ENTITY_BASES)[number];
@@ -62,10 +65,12 @@ export function findMissingBaseEntity(text: string): string | null {
     }
 
     const importsBase =
-        /from\s+['"][^'"]*common\/database\/(?:base|household|catalog|week-check)\.entity['"]/.test(
+        /from\s+['"][^'"]*common\/database\/(?:base|household|catalog|week-check|personal)\.entity['"]/.test(
             text
         ) ||
-        /from\s+['"][^'"]*\/(?:base|household|catalog|week-check)\.entity['"]/.test(text) ||
+        /from\s+['"][^'"]*\/(?:base|household|catalog|week-check|personal)\.entity['"]/.test(
+            text
+        ) ||
         /from\s+['"][^'"]*common\/database['"]/.test(text);
     if (!importsBase) {
         return `${decl.className} extends ${decl.extendsName} but does not import it from common/database`;
@@ -480,7 +485,7 @@ export const SAME_PRIORITY_ORDER: readonly (readonly string[])[] = [
     ],
     ['score', 'maxScore', 'level'],
     ['isBankSyncEnabled', 'isCoachEnabled'],
-    ['money', 'weekCheck', 'features', 'answers'],
+    ['money', 'weekCheck', 'features', 'visibility', 'answers'],
     ['periodStartDay', 'weekCheckReminderDay', 'weekCheckReminderAt'],
     ['dueMonth', 'dueDay'],
     ['isActive', 'isArchived'],

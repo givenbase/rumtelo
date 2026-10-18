@@ -8,4 +8,5 @@ export * from '../asset';
 export * from '../dashboard';
 export * from '../learn';
 export * from '../milestone';
+export * from '../plan';
 export * from '../week-check';

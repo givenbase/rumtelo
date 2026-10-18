@@ -10,6 +10,21 @@ import {
 } from './role-permissions';
 
 describe('permissionActionFromPath', () => {
+    it('classifies growth plan reads and carry', () => {
+        assert.equal(
+            permissionActionFromPath('/growth/plan/period', 'POST'),
+            HouseholdPermissionAction.READ
+        );
+        assert.equal(
+            permissionActionFromPath('/growth/plan/year', 'POST'),
+            HouseholdPermissionAction.READ
+        );
+        assert.equal(
+            permissionActionFromPath('/growth/plan/carry', 'POST'),
+            HouseholdPermissionAction.UPDATE
+        );
+    });
+
     it('classifies fixed-cost jar/settlement reads as READ despite POST', () => {
         assert.equal(
             permissionActionFromPath('/money/fixedCosts/byJar', 'POST'),

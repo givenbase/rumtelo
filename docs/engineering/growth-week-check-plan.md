@@ -4,6 +4,8 @@
 
 > **Voor Claude Code:** volg `CLAUDE.md`, `HANDOFF.md` en `.cursor/rules/` (vooral `backend-module-shape.mdc` en `react-next-patterns.mdc`). Begin met fase 1. Waar een open vraag nog niet beantwoord is, gebruik het voorstel. Vink de checkboxes af zodra een stap klaar is.
 
+> **Bijgewerkt 18 oktober 2026:** prioriteiten zijn items van de Koers-cascade. Zie [growth-cascade-plan.md](./growth-cascade-plan.md), "Wat dit verandert aan de weekcheck". `growth_week_priority` vervalt: een weekprioriteit is een `growth_plan_item` met `horizon = WEEK` (bestaat al, met zichtbaarheid). `WeekPriorityStatus` heet `PlanItemStatus` (bestaat al in contracts). Entries verwijzen naar `Account`, niet naar `auth.user`. Waar dit plan iets anders zegt, gaat de cascade voor.
+
 ## Doel en uitgangspunten
 
 Bouw de zondagse weekmeeting als de **Groei-weekcheck** in Rumtelo. Iedere partner kijkt terug op de top 3 van vorige week, legt een nieuwe top 3 vast en vraagt de ander om hulp. Dit vervangt het Excel-bestand en de tekst in de agenda.
@@ -66,12 +68,12 @@ Eén bestaande tabel krijgt een kolom erbij en er komen drie tabellen bij. Prior
 | Kolom | Type | Toelichting |
 | --- | --- | --- |
 | `weekCheck` | FK naar `growth_week_check`, cascade | de meeting |
-| `user` | FK naar `auth.user` (mapToPk) | de deelnemer |
+| `account` | FK naar `Account` (mapToPk) | de deelnemer |
 | `reflection` | max. 280, nullable | "Hoe was je week?" |
 | `adjustment` | max. 280, nullable | "Wat doe ik deze week anders?" |
 | `helpRequest` | max. 280, nullable | "Waar heb ik je hulp of aanmoediging bij nodig?" |
 
-**`growth_week_priority`** (nieuw): uniek op (`entry`, `position`), dus de database dwingt maximaal 3 af.
+**`growth_week_priority`** ~~(nieuw)~~ **vervalt**: dit wordt `growth_plan_item` met `horizon = WEEK`. De tabel hieronder blijft staan als referentie voor de velden.
 
 | Kolom | Type | Toelichting |
 | --- | --- | --- |
@@ -160,7 +162,7 @@ Drie fasen. Na fase 1 kunnen jullie de zondagmeeting al volledig in Rumtelo doen
 
 ### Fase 1: één zondag werkt
 
-- [ ] Enum `WeekPriorityStatus` in contracts
+- [x] Enum voor prioriteitstatus in contracts: `PlanItemStatus` (via de cascade)
 - [ ] Entities voor entry en prioriteit, en `notes` op `GrowthWeekCheck`; migratie met `pn db:gen`, nakijken, dan `pn db:push`
 - [ ] Contract-uitbreiding, service en controller
 - [ ] Pagina `/growth/week-check` met de wizard: start, terugblik en vooruitblik per persoon, afsluiten

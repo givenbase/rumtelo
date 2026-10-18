@@ -63,6 +63,7 @@ export const FEATURES = {
         income: capabilityKey(CapabilityProduct.GROWTH, 'income'),
         netWorth: capabilityKey(CapabilityProduct.GROWTH, 'net-worth'),
         learn: capabilityKey(CapabilityProduct.GROWTH, 'learn'),
+        plan: capabilityKey(CapabilityProduct.GROWTH, 'plan'),
     },
     [CapabilityProduct.ENERGY]: {
         overview: capabilityKey(CapabilityProduct.ENERGY, 'overview'),
@@ -81,6 +82,7 @@ export const FEATURES = {
     },
     [CapabilityProduct.PLATFORM]: {
         invite: capabilityKey(CapabilityProduct.PLATFORM, 'invite'),
+        sharing: capabilityKey(CapabilityProduct.PLATFORM, 'sharing'),
     },
 } as const;
 
@@ -101,6 +103,7 @@ export const CAPABILITIES = {
     growthIncome: FEATURES.growth.income,
     growthNetWorth: FEATURES.growth.netWorth,
     growthLearn: FEATURES.growth.learn,
+    growthPlan: FEATURES.growth.plan,
     energyOverview: FEATURES.energy.overview,
     energySleep: FEATURES.energy.sleep,
     energyWeek: FEATURES.energy.week,
@@ -113,6 +116,7 @@ export const CAPABILITIES = {
     soulIntent: FEATURES.soul.intent,
     soulCenters: FEATURES.soul.centers,
     platformInvite: FEATURES.platform.invite,
+    platformSharing: FEATURES.platform.sharing,
 } as const;
 
 /** Union of all registered capability key strings (`money-debt` | …). */

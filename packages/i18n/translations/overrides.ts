@@ -10,4 +10,12 @@
  * This file lives outside `pages/`, `common/`, `ui/` and `features/`, so it
  * is never treated as English source text.
  */
-export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<string, string>>>> = {};
+export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<string, string>>>> = {
+    nl: {
+        // Koers is a planner, not a calendar — never "agendapunt".
+        'common.message.error.api.plan_item_not_found':
+            'Dit onderdeel van je planning bestaat niet meer',
+        'common.message.error.api.plan_period_full':
+            'Drie is hier het maximum. Rond er eerst één af, verplaats er één of laat er één los.',
+    },
+};

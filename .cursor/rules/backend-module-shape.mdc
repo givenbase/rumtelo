@@ -33,7 +33,7 @@ Full rules + linter: `apps/backend/docs/ENTITY_STYLE.md` (`pnpm --filter @rumtel
 - Sections in this order only: `// ? PROPERTIES` → `// ? UI METADATA` → `// ? ENUMS` → `// ? RELATIONSHIPS`
 - Short JSDoc on every property and relation
 - Explicit MikroORM `type` / `Enum` / relation options — never bare `@Property()` on `string | null` unions when Reflect metadata is involved
-- Base class by row kind: `BaseEntity` (account, pivots, enum-keyed catalogs) · `CatalogEntity` (company catalogs with `key/name/sortOrder/isActive`) · `HouseholdEntity` (household rows, via `HouseholdScopedRepository`) · `WeekCheckEntity` (portal week checks)
+- Base class by row kind: `BaseEntity` (account, pivots, enum-keyed catalogs) · `CatalogEntity` (company catalogs with `key/name/sortOrder/isActive`) · `HouseholdEntity` (household rows, via `HouseholdScopedRepository`) · `WeekCheckEntity` (portal week checks) · `PersonalHouseholdEntity` (person-attributed rows: maker + visibility, via `PersonalScopedRepository` with their `VisibilityArea` — never hand-roll `account = me` filters; see `docs/engineering/household-visibility-plan.md`)
 - Money columns use `MoneyType` (bigint eurocents → `number`); ratios stay `decimal` strings
 - Names: `is*/has*/can*` booleans · `*At` instant · `*On` date · `*Day` ordinal · `name`/`description` for text (no `label`/`summary`) · no `default*`/`suggested*` prefixes on catalog rows
 - References: backoffice → backoffice = real relations (id FKs, pivot entities); household → backoffice catalog = natural-key FK `@ManyToOne(() => Catalog, CatalogKey('x_key'))` (plain string in code, FK on `key`); inverse collections use lazy class refs `() => Entity` (MikroORM 7: no string entity names; decorators from `@mikro-orm/decorators/legacy`)

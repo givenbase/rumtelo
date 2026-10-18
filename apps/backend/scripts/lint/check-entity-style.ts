@@ -32,6 +32,7 @@ const EXCLUDED = new Set([
     'common/database/household.entity.ts',
     'common/database/catalog.entity.ts',
     'common/database/week-check.entity.ts',
+    'common/database/personal.entity.ts',
 ]);
 
 /**

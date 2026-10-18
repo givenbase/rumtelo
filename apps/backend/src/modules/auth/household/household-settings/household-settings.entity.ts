@@ -2,11 +2,13 @@ import { Collection } from '@mikro-orm/core';
 import { Entity, Enum, ManyToMany, Property, Unique } from '@mikro-orm/decorators/legacy';
 import {
     Currency,
+    DEFAULT_VISIBILITY_SETTINGS,
     IncomeStability,
     PayoffStrategy,
     type HouseholdAnswers,
     type HouseholdFeatureSettings,
     type HouseholdMoneySettings,
+    type HouseholdVisibilitySettings,
     type HouseholdWeekCheckSettings,
 } from '@rumtelo/contracts';
 
@@ -73,6 +75,13 @@ export class HouseholdSettings extends HouseholdEntity {
     /** Feature toggles for the board (bank sync, coach, …). */
     @Property(Jsonb())
     features: HouseholdFeatureSettings = { ...DEFAULT_FEATURE_SETTINGS };
+
+    /**
+     * Who may see person-attributed rows: household mode + per-area overrides.
+     * OWNER writes; applied only on plans with `platform.sharing`.
+     */
+    @Property(Jsonb())
+    visibility: HouseholdVisibilitySettings = { ...DEFAULT_VISIBILITY_SETTINGS, areas: {} };
 
     /**
      * Extensible household Q&A (onboarding / coach prompts).

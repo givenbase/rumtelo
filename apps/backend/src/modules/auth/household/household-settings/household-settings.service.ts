@@ -1,8 +1,11 @@
 import {
     type HouseholdSettings as HouseholdSettingsDto,
     type HouseholdSettingsPatch,
+    type HouseholdVisibilitySettings,
     type PlanKey,
+    DEFAULT_VISIBILITY_SETTINGS,
     PLAN_RANK,
+    canShareOnPlan,
     capabilitiesFor,
     householdFitsPlan,
 } from '@rumtelo/contracts';
@@ -71,6 +74,7 @@ export class HouseholdSettingsService {
             money: { ...DEFAULT_MONEY_SETTINGS, ...input.money },
             weekCheck: { ...DEFAULT_WEEK_CHECK_SETTINGS },
             features: { ...DEFAULT_FEATURE_SETTINGS },
+            visibility: { ...DEFAULT_VISIBILITY_SETTINGS, areas: {} },
             answers: {},
             onboardedAt: new Date(),
         } as never);
@@ -101,6 +105,12 @@ export class HouseholdSettingsService {
         const planKey = await this.billing.getPlanKey(householdId);
         const createdAt = await this.resolveHouseholdCreatedAt(householdId, row.onboardedAt);
         return toSettingsDto(row, planKey, createdAt);
+    }
+
+    /** Visibility rule only — read per request by `VisibilityService`; no lazy create. */
+    async visibility(householdId: string): Promise<HouseholdVisibilitySettings> {
+        const row = await this.em.findOne(HouseholdSettings, { household: householdId });
+        return row ? visibilitySettingsOf(row) : { ...DEFAULT_VISIBILITY_SETTINGS, areas: {} };
     }
 
     // ====================================================================
@@ -176,6 +186,17 @@ export class HouseholdSettingsService {
         }
         if (patch.features) {
             row.features = { ...row.features, ...patch.features };
+        }
+        if (patch.visibility) {
+            if (!canShareOnPlan(await this.billing.getPlanKey(householdId))) {
+                throw apiForbidden('plan_missing_capability');
+            }
+            row.visibility = {
+                ...DEFAULT_VISIBILITY_SETTINGS,
+                ...row.visibility,
+                ...patch.visibility,
+                areas: patch.visibility.areas ?? row.visibility?.areas ?? {},
+            };
         }
         if (patch.answers) {
             row.answers = { ...row.answers, ...patch.answers };
@@ -268,9 +289,19 @@ function toSettingsDto(
         money: { ...DEFAULT_MONEY_SETTINGS, ...row.money },
         weekCheck: { ...DEFAULT_WEEK_CHECK_SETTINGS, ...row.weekCheck },
         features: { ...DEFAULT_FEATURE_SETTINGS, ...row.features },
+        visibility: visibilitySettingsOf(row),
         answers: row.answers ?? {},
         audienceKeys: row.audiences.getItems().map(audience => audience.key),
         createdAt,
         onboardedAt: row.onboardedAt ? row.onboardedAt.toISOString() : null,
+    };
+}
+
+/** Stored visibility with defaults filled — older rows predate the column. */
+export function visibilitySettingsOf(row: HouseholdSettings): HouseholdVisibilitySettings {
+    return {
+        ...DEFAULT_VISIBILITY_SETTINGS,
+        ...row.visibility,
+        areas: row.visibility?.areas ?? {},
     };
 }

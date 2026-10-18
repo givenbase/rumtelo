@@ -1,6 +1,6 @@
 # Entity inventory
 
-Generated from MikroORM metadata (75 entities, 5 implicit pivot tables). Regenerate after entity changes — do not hand-edit tables.
+Generated from MikroORM metadata (76 entities, 5 implicit pivot tables). Regenerate after entity changes — do not hand-edit tables.
 
 Planes: `auth` = identity (better-auth + Rumtelo person/household rows) · `public` = household-written product data · `backoffice` = Rumtelo-written catalogs. Bases: see `ENTITY_STYLE.md`.
 
@@ -62,7 +62,7 @@ Planes: `auth` = identity (better-auth + Rumtelo person/household rows) · `publ
 | `MoneyWeekCheck` | `WeekCheckEntity` | `public.money_week_check` | `modules/public/product/money/week-check/money-week-check.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`allocations` 1:N → WeekCheckAllocation |
 | `WeekCheckAllocation` | `HouseholdEntity` | `public.money_week_check_allocation` | `modules/public/product/money/week-check/week-check-allocation.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`weekCheck` N:1 → MoneyWeekCheck on delete cascade<br>`jar` N:1 → Jar on delete cascade |
 
-## public · growth (7)
+## public · growth (8)
 
 | Entity | Base | Table | File | Relations |
 |---|---|---|---|---|
@@ -73,6 +73,7 @@ Planes: `auth` = identity (better-auth + Rumtelo person/household rows) · `publ
 | `LearnSkillFocus` | `HouseholdEntity` | `public.growth_learn_focus` | `modules/public/product/growth/learn/focus/focus.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`account` N:1 → Account (mapToPk) on delete cascade |
 | `LearnProgress` | `HouseholdEntity` | `public.growth_learn_progress` | `modules/public/product/growth/learn/progress/progress.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`account` N:1 → Account (mapToPk) on delete cascade |
 | `GrowthWeekCheck` | `WeekCheckEntity` | `public.growth_week_check` | `modules/public/product/growth/week-check/growth-week-check.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade |
+| `GrowthPlanItem` | `PersonalHouseholdEntity` | `public.growth_plan_item` | `modules/public/product/growth/plan/growth-plan-item.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`account` N:1 → Account (mapToPk) on delete cascade<br>`parent` N:1 → GrowthPlanItem (mapToPk) on delete set null<br>`carriedFrom` N:1 → GrowthPlanItem (mapToPk) on delete set null<br>`goal` N:1 → Goal (mapToPk) on delete set null |
 
 ## backoffice · money (16)
 

@@ -6,21 +6,25 @@
 
 ## Doel en uitgangspunten
 
-Groei krijgt een planner die een groot doel stap voor stap kleiner maakt:
+Groei krijgt een planner die een groot doel stap voor stap kleiner maakt. Het model kent vijf lagen; **je ziet er standaard drie** en je begint onderaan:
 
+```text
+Doelen  →  (Kwartaal)  →  Maand   →  Week   →  (Dag)  →  (Uur)
+jaardoel    resultaat      mijlpaal   top 3     top 3     tijdblok
+                                        ▲
+                                  hier begin je
 ```
-Jaar → Kwartaal → Maand → Week → Dag → Uur
-doel    resultaat   mijlpaal  top 3   top 3   tijdblok
-```
 
-Elke laag hangt aan de laag erboven. Een taak van vandaag weet dus altijd *waarom* hij er staat. Dat is precies wat de naam belooft: *rumbo*, koers. Werknaam van de feature: **Koers** (EN: *Course*).
+Een prioriteit van deze week kan laten zien *waarom* hij er staat. Dat is wat de naam belooft: *rumbo*, koers. Werknaam van de feature: **Koers** (EN: *Course*).
 
-- **Van groot naar klein:** je plant van boven naar beneden en de voortgang telt van beneden naar boven op.
-- **Maximaal 3 per laag:** 3 jaardoelen, per jaardoel max. 3 kwartaalresultaten, enzovoort tot de top 3 van de dag. Weinig ruimte dwingt je te kiezen.
-- **De week is het hart:** de zondagse weekcheck is het moment waarop je de week uit de maand haalt. Dag en uur zijn optioneel inzoomen, geen verplichting.
+- **Begin bij de week.** Koers opent op "Jouw 3 voor deze week". Doelen en maand zijn uitzoomen, niet de start. Wie nooit uitzoomt, heeft nog steeds een werkende planner.
+- **Standaard drie lagen:** Doelen (jaar) · Maand · Week. Kwartaal en dag zet een huishouden zelf aan in de Groei-instellingen; uur komt later. De backend kent alle lagen, de UI toont er drie.
+- **Koppelen is een aanbod, geen eis.** Bij elke prioriteit staat "Hoort bij… (optioneel)". Losse items mogen; The Coach stelt later rustig voor om ze ergens onder te hangen. Een item mag aan *elke* hogere laag hangen: een week direct onder een jaardoel is prima.
+- **Maximaal drie, op twee manieren.** Week en dag: drie per week en drie per dag, ongeacht waar ze bij horen. Dat is de top 3. Doelen, kwartaal en maand: drie per doel erboven (drie mijlpalen per jaardoel).
+- **Voortgang telt van beneden naar boven op:** vink je weekprioriteiten af, dan loopt de ring van de maand en het jaar op.
 - **Geen agenda:** zie hieronder.
 
-De feature volgt de vier productprincipes. *Tien minuten per week*: de cascade wordt onderhouden in de rituelen die er al zijn (weekcheck, maandcheck) plus een kwartaal- en jaarcheck. *Informatie, nooit schaamte*: een kwartaaldoel zonder weekprioriteiten is een signaal met één volgende stap, geen rood alarm. *Energie draagt geld*: de dagplanning kent je beschikbare tijd uit Energie, zodat je niet meer plant dan je hebt.
+De feature volgt de vier productprincipes. *Tien minuten per week*: je onderhoudt alleen de week; de maand raak je aan in de maandcheck en de doelen één keer per jaar. *Informatie, nooit schaamte*: een kwartaaldoel zonder weekprioriteiten is een signaal met één volgende stap, geen rood alarm. *Energie draagt geld*: de dagplanning kent je beschikbare tijd uit Energie, zodat je niet meer plant dan je hebt.
 
 ## Is het een agenda?
 
@@ -72,18 +76,19 @@ Eén tabel voor alle doellagen, met een `horizon` en een periodesleutel. Eén ta
 | --- | --- | --- |
 | `horizon` | enum `PlanHorizon` | `YEAR`, `QUARTER`, `MONTH`, `WEEK`, `DAY` |
 | `period` | varchar(10) | `2027`, `2027-Q1`, `2027-03`, `2027-W10`, `2027-03-08` |
-| `parent` | FK naar zichzelf, nullable, set null | het item één laag hoger; `null` = los (toegestaan, maar de Coach benoemt het) |
-| `position` | int, 1 t/m 3 | volgorde binnen (`account`, `horizon`, `period`, `parent`) |
+| `parent` | FK naar zichzelf, nullable, set null | een item hoger in de boom, in de periode die deze bevat; `null` = los (toegestaan, de Coach benoemt het) |
+| `position` | int, 1 t/m 3 | volgorde; week/dag binnen (`account`, `horizon`, `period`), de rest binnen (…, `parent`) |
 | `name` | max. 140 | het doel of de prioriteit |
 | `doneWhen` | max. 280, nullable | "klaar als …", alleen zinvol voor jaar/kwartaal/maand |
-| `status` | enum `PlanItemStatus` | `OPEN`, `DONE`, `PARTIAL`, `MISSED`, `DROPPED` |
+| `status` | enum `PlanItemStatus` | `OPEN`, `DONE`, `PARTIAL`, `MISSED`, `DROPPED`, `DEFERRED` (doorgeschoven) |
 | `reviewNote` | max. 280, nullable | wat hielp, of wat hield je tegen |
-| `carriedFrom` | FK naar zichzelf, nullable, set null | gevuld als hij uit de vorige periode is meegenomen |
+| `carriedFrom` | FK naar zichzelf, nullable, set null | gevuld als hij uit de vorige periode is doorgeschoven |
+| `carryCount` | smallint, standaard 0 | hoe vaak dit item al is doorgeschoven langs zijn keten |
 | `account`, `visibility` | uit `PersonalHouseholdEntity` | van wie en wie het ziet; `account = null` = *samen*. Zie [household-visibility-plan.md](./household-visibility-plan.md) |
 | `goal` | FK naar `Goal`, nullable, set null | koppeling met een Geld-doel (alleen YEAR/QUARTER) |
 | `skill` | varchar(64), nullable | catalogussleutel van een Leer-focus |
 
-Uniek op (`account`, `horizon`, `period`, `parent`, `position`), zodat de database max. 3 afdwingt. Index op (`household`, `horizon`, `period`).
+Twee gedeeltelijke unieke indexen dwingen de maxima af: week en dag op (`account`, `horizon`, `period`, `position`); jaar, kwartaal en maand op (`account`, `horizon`, `period`, `parent`, `position`). Index op (`household`, `horizon`, `period`).
 
 **`growth_time_block`** (nieuw): de uur-laag.
 
@@ -98,8 +103,9 @@ Uniek op (`account`, `horizon`, `period`, `parent`, `position`), zodat de databa
 
 **Regels**
 
-- `parent.horizon` is precies één laag hoger dan `horizon`. Week → maand loopt via de ISO-donderdag van de week (de maand waarin de donderdag valt), net als ISO-weken bij het jaar horen.
-- Voortgang sla je niet op maar bereken je, van beneden naar boven: een item is zo ver als het aandeel `DONE` van zijn kinderen; `DROPPED` telt niet mee. Handmatig `DONE` zetten mag altijd en wint.
+- `parent` ligt hoger in de boom en zijn periode bevat die van het kind (`ancestorPeriodOf`). Een week hoort bij de maand waar de meeste dagen in vallen (de ISO-donderdag); zo zeggen we het ook in de UI.
+- Voortgang sla je niet op maar bereken je, van beneden naar boven: een item is zo ver als het aandeel `DONE` van zijn kinderen; `DROPPED` en `DEFERRED` tellen niet mee. Handmatig `DONE` zetten mag altijd en wint.
+- **Doorschuiven (snoozen).** Is een item aan het einde van de periode nog open of niet gehaald, dan schuif je het met één tik door (`plan.carry`). Het origineel krijgt status `DEFERRED` als het nog niet beoordeeld was (een `PARTIAL` of `MISSED` houdt zijn status); de kopie in de volgende periode krijgt `carryCount + 1` en blijft onder dezelfde ouder hangen. Op de kaart staat `2× DOORGESCHOVEN` in mono. Doorschuiven is een feit, geen mislukking; na drie keer vraagt The Coach: loslaten of kleiner maken?
 - Persoonsattributie via `Account`, zoals `TimeTemplate` en `LearnSkillFocus`. Niet via `auth.user`.
 - Enums komen uit `@rumtelo/contracts` via `NativeEnum`.
 
@@ -111,7 +117,7 @@ De weekcheck is nog niet gebouwd, dus dit kost nu niets:
 - `WeekPriorityStatus` heet `PlanItemStatus` en geldt voor alle lagen.
 - `growth_week_check_entry` blijft (reflectie, aanpassing, hulpvraag) maar verwijst naar `Account` in plaats van `auth.user`.
 - `weekCheck.updatePriorities` wordt een dunne laag over `plan.replace({ horizon: 'WEEK', … })`.
-- De vooruitblik in de wizard toont bovenaan de maandmijlpalen; elke nieuwe weekprioriteit kies je onder een mijlpaal (of "los").
+- De vooruitblik in de wizard toont bovenaan de maandmijlpalen en jaardoelen; een nieuwe weekprioriteit koppel je optioneel aan een daarvan.
 - De maandcheck uit fase 2 van de weekcheck wordt de MONTH-laag van deze boom; `growth_month_review` houdt alleen `onTrack` en `adjustment`.
 
 ## Contracts en backend
@@ -121,12 +127,12 @@ De weekcheck is nog niet gebouwd, dus dit kost nu niets:
 | Procedure | CRUD | Wat het doet |
 | --- | --- | --- |
 | `plan.create({ horizon, period, parentId?, name, doneWhen?, accountId?, goalId?, skill? })` | C | nieuw item; weigert een vierde |
-| `plan.period({ horizon, period, accountId? })` | R | items van deze periode, hun ouderketen (het "waarom") en de kinderen één laag lager, met berekende voortgang |
+| `plan.period({ horizon, period, accountId? })` | R | items van deze periode, hun ouderketen (het "waarom") en alles wat er direct onder hangt (elke lagere laag), met berekende voortgang |
 | `plan.year({ year })` | R | de hele boom van een jaar, voor het jaaroverzicht |
 | `plan.update({ id, name?, doneWhen?, parentId?, position? })` | U | bewerken, verhangen, herordenen |
 | `plan.updateStatus({ id, status, reviewNote? })` | U | terugblik per item |
 | `plan.carry({ id })` | U | kopieert een niet-afgerond item naar de volgende periode met `carriedFrom` |
-| `plan.delete({ id })` | D | kinderen krijgen `parent = null` |
+| `plan.remove({ id })` | D | kinderen krijgen `parent = null` |
 | `timeBlock.list({ date, accountId? })` | R | blokken van de dag plus `availableMinutes` uit `TimeTemplateService` |
 | `timeBlock.create / update / delete` | C/U/D | blokken; weigert overlap voor dezelfde persoon |
 
@@ -142,14 +148,18 @@ De namen passen in `permissionActionFromPath`.
 
 Eén route met inzoomen, in de geest van een hyperlinked papieren planner.
 
-- **Route:** `app/(routes)/[locale]/(app)/(household)/product/growth/plan/[[...period]]/page.tsx`. `/growth/plan` opent de huidige week; `/growth/plan/2027`, `/2027-Q1`, `/2027-03`, `/2027-W10`, `/2027-03-08` zoomen.
-- **Bovenaan:** horizon-tabs (Jaar · Kwartaal · Maand · Week · Dag) en een kruimelpad van de huidige periode, bijv. `2027 › Q1 › Maart › W10 › ma 8`. Pijltjes voor vorige/volgende periode.
+- **Route:** `app/(routes)/[locale]/(app)/(household)/product/growth/plan/[[...period]]/page.tsx`. `/growth/plan` opent de huidige week, met als kop "Jouw 3 voor deze week"; `/growth/plan/2027`, `/2027-03`, `/2027-W10` (en `/2027-Q1`, `/2027-03-08` als die lagen aanstaan) zoomen.
+- **Bovenaan:** drie tabs, **Doelen · Maand · Week**. Staat kwartaal aan, dan komt *Kwartaal* tussen Doelen en Maand; staat dag aan, dan *Dag* na Week. Kruimelpad van de huidige periode: `2027 › Maart › W10`, zonder kwartaal tenzij aan. Pijltjes voor vorige/volgende periode.
+- **Lege staat:** drie gestippelde kaarten "Wat zijn je 3 voor deze week?". Nooit een stap "maak eerst een jaardoel".
 - **Elke weergave heeft drie banden:**
-  1. **Waarom:** de ouderketen als één rustige lijn ("Noodfonds €5.000 → Q1: €1.500 → maart: €500").
+  1. **Waarom:** alleen de directe ouder, als één regel op de kaart (`← Noodfonds €5.000`). De volledige keten staat in het kruimelpad van de detailweergave, niet op elke kaart.
   2. **Deze periode:** max. 3 kaarten met naam, "klaar als", voortgangsring en status.
-  3. **Volgende laag:** per kaart de kinderen (bijv. de weken van deze maand), met lege plekken om toe te voegen.
+  3. **Eronder:** per kaart wat eronder hangt (bij een jaardoel: de maandmijlpalen én de weken die er direct aan hangen), met een lege plek om toe te voegen.
+- **Formulier:** "Hoort bij… (optioneel)" kiest uit zichtbare hogere items in de passende periodes; standaard leeg. Een los item krijgt op de kaart een rustige link "Koppel aan een doel".
+- **Instellingen (Groei):** `HouseholdFeatureSettings.isPlanQuartersEnabled` en `isPlanDaysEnabled`, standaard uit. Uitzetten verbergt alleen; bestaande items blijven staan en hangen in de weergave onder hun dichtstbijzijnde zichtbare ouder.
+- **Weekregel in mensentaal:** één zin bij de maandweergave: "Een week telt mee bij de maand waar de meeste dagen in vallen."
 - **Dagweergave:** top 3 links, tijdlijn rechts (06:00–23:00, blokken van 15 min). Een balk "beschikbaar vandaag" uit Energie loopt leeg terwijl je blokt. Sleep een top-3-item naar de tijdlijn om een blok te maken. Op mobiel onder elkaar.
-- **Groei-hub:** een kaart "Koers" met de lijn jaar → vandaag en de top 3 van vandaag (of van de week als je de daglaag niet gebruikt).
+- **Groei-hub:** een kaart "Koers" met de top 3 van deze week en, als er een doel aan hangt, één regel waarom.
 - **Data:** Provider plus TanStack `apiQuery` voor `plan.period`; formulieren via `useForm`; optimistic updates bij afvinken.
 - **Teksten:** `packages/i18n/translations/features/growth.ts`, Engels eerst, dan Nederlands, daarna `pnpm --filter @rumtelo/i18n generate`.
 - **Navigatie:** `_lib/routes.ts` en `_lib/nav.ts`.
@@ -158,12 +168,12 @@ Eén route met inzoomen, in de geest van een hyperlinked papieren planner.
 
 | Element | Keuze | Waarom |
 | --- | --- | --- |
-| Koerslijn | een dunne teal lijn (`#06656C`) die van het jaardoel door alle lagen naar vandaag loopt | *rumbo* = koers; het merk gaat over richting, niet over grafieken |
+| Koerslijn | een dunne teal lijn (`#06656C`) van de top 3 van deze week omhoog naar het doel, in het kruimelpad en de detailweergave | *rumbo* = koers; het merk gaat over richting, niet over grafieken |
 | Horizon-labels | Plex Mono, kleine kapitalen: `JAAR`, `Q1`, `W10` | mono is in de richtlijnen al de letter voor rituelen en meta |
 | Titels | Archivo Narrow | display-letter |
 | Ondergrond | cool wash `#EEF1F5` met witte kaarten; heel subtiel puntraster in de dagweergave | rustig papiergevoel zoals reMarkable, zonder skeuomorfisme |
 | Voortgang | ring rond het item, teal vulling | geen percentages in grote cijfers, geen staafdiagrammen |
-| Status | gelukt teal, deels zand/geel, niet gelukt en losgelaten neutraal grijs | *informatie, nooit schaamte*: geen rood |
+| Status | gelukt teal, deels zand/geel, niet gelukt, losgelaten en doorgeschoven neutraal grijs | *informatie, nooit schaamte*: geen rood |
 | Lege plek | gestippelde kaart "+ wat is het ene dat dit dichterbij brengt?" | de ONE Thing-vraag als uitnodiging |
 
 Gebruik de bestaande `@theme`-tokens en `@rumtelo/ui`, alleen Tailwind.
@@ -190,37 +200,42 @@ In `OWNER_SEES` met een stel ziet het lid de items van de eigenaar die op *Hele 
 ## Rechten, plan en isolatie
 
 - **Wie doet mee:** OWNER en MEMBER. VIEWER ziet Groei niet.
-- **Plan:** capability `growth-plan` in `FEATURES.growth`; de dag- en uurlaag eventueel als aparte `growth-plan-day` voor een hoger plan.
+- **Plan:** capability `growth.plan` in `FEATURES.growth`, toegekend aan **Plus en Max**. Basic ziet Koers in het menu met een slotje en de upgrade-uitleg, zoals Leren.
 - **Isolatie:** `growth_plan_item` via `PersonalScopedRepository`, de rest via `HouseholdScopedRepository`.
 
 ## Fasering en acceptatiecriteria
 
 ### Fase 0: fundament (vóór weekcheck fase 1)
 
-- [ ] Fase 0 van [household-visibility-plan.md](./household-visibility-plan.md) is af
-- [ ] Enums `PlanHorizon` en `PlanItemStatus` in contracts; periodesleutel-helpers en Zod-schema's
-- [ ] Entity `GrowthPlanItem` op `PersonalHouseholdEntity`, migratie met `pn db:gen`, nakijken, dan `pn db:push`
-- [ ] `plan.create`, `plan.period`, `plan.update`, `plan.updateStatus`, `plan.carry`, `plan.delete`
-- [ ] Weekcheck-plan bijwerken volgens "Wat dit verandert aan de weekcheck"
+- [x] Fase 0 van [household-visibility-plan.md](./household-visibility-plan.md) is af
+- [x] Enums `PlanHorizon` en `PlanItemStatus` in contracts; periodesleutel-helpers en Zod-schema's
+- [x] Entity `GrowthPlanItem` op `PersonalHouseholdEntity`, migratie met `pn db:gen` en nagekeken (`pn db:push` nog niet gedraaid)
+- [x] `plan.create`, `plan.period`, `plan.year`, `plan.update`, `plan.updateStatus`, `plan.carry`, `plan.remove`
+- [x] Weekcheck-plan bijwerken volgens "Wat dit verandert aan de weekcheck"
+- [x] Regels: week en dag drie per periode, de rest drie per ouder; koppelen aan elke hogere laag (`ancestorPeriodOf`)
+- [x] Doorschuiven: `plan.carry` zet een open origineel op `DEFERRED` en telt `carryCount` op
 
-Klaar als: een vierde item in dezelfde periode en ouder wordt geweigerd, een week onder de juiste maand valt rond een maandwissel, en een tweede deelnemer de privé-items van de eerste in geen enkele response terugziet (ook niet als OWNER).
+Klaar als: een vierde weekprioriteit wordt geweigerd ongeacht de ouder, een vierde maandmijlpaal onder hetzelfde jaardoel wordt geweigerd, een week onder de juiste maand valt rond een maandwissel, en een tweede deelnemer de privé-items van de eerste in geen enkele response terugziet (ook niet als OWNER).
 
-### Fase 1: jaar → week
+### Fase 1: week, maand, doelen
 
-- [ ] Route `/growth/plan` met tabs, kruimelpad en de drie banden
+- [ ] Route `/growth/plan` opent op de week, met de tabs Doelen · Maand · Week, kruimelpad en de drie banden
+- [ ] Lege staat zonder verplichte doelen; "Hoort bij… (optioneel)" in het formulier; één "waarom" per kaart
+- [ ] Knop "Doorschuiven" op open items van een afgelopen week (en in de terugblik van de weekcheck); badge `n× doorgeschoven` op de kaart
 - [ ] Voortgang berekend van beneden naar boven
-- [ ] Weekcheck-vooruitblik kiest weekprioriteiten onder maandmijlpalen
+- [ ] Instellingen `isPlanQuartersEnabled` en `isPlanDaysEnabled` (standaard uit); kwartaal-tab verschijnt als hij aanstaat
+- [ ] Weekcheck-vooruitblik biedt maandmijlpalen en jaardoelen aan om aan te koppelen
 - [ ] Koppeling met Geld-doelen op jaar/kwartaal
 - [ ] `VisibilityPicker` in het formulier, `VisibilityBadge` op de kaarten, weergavefilter Ik · Iedereen · partner
 - [ ] Kaart "Koers" op de Groei-hub; capability en navigatie; teksten EN/NL
 
-Klaar als: je op één scherm van een jaardoel naar de top 3 van deze week klikt, en het afvinken van weekprioriteiten de maand-, kwartaal- en jaarring laat oplopen.
+Klaar als: een nieuw huishouden zonder enig doel drie weekprioriteiten zet en afvinkt; wie daarna uitzoomt ziet die week onder de juiste maand; en het afvinken van een gekoppelde weekprioriteit de ring van de maand en het doel laat oplopen.
 
 ### Fase 2: dag
 
 - [ ] Dagweergave met top 3, onder weekprioriteiten
 - [ ] Optionele dagstart ("wat zijn je 3 van vandaag?") en dagafsluiting (afvinken, meenemen)
-- [ ] Instelling in Groei om de daglaag aan of uit te zetten (standaard uit)
+- [ ] Dag-tab en dagweergave achter `isPlanDaysEnabled` (de instelling bestaat sinds fase 1)
 
 Klaar als: wie de daglaag uit heeft niets van dagen merkt, en een niet afgerond dagitem met één tik naar morgen gaat.
 
@@ -234,7 +249,7 @@ Klaar als: de balk vrije minuten correct afleidt uit het sjabloon van die weekda
 
 ### Fase 4: Coach en agenda
 
-- [ ] Coach-regels: kwartaaldoel zonder weekprioriteiten deze maand; meer ingepland dan beschikbaar; drie weken achter elkaar hetzelfde item meegenomen ("loslaten of kleiner maken?")
+- [ ] Coach-regels: los weekitem dat bij een doel lijkt te horen; doel zonder weekprioriteiten deze maand; meer ingepland dan beschikbaar; `carryCount ≥ 3` ("loslaten of kleiner maken?")
 - [ ] Kwartaal- en jaarcheck als korte wizard, zoals de maandcheck
 - [ ] Optioneel: bestaande afspraken alleen-lezen in de dagweergave via ICS-link
 
@@ -243,7 +258,7 @@ Klaar als: de balk vrije minuten correct afleidt uit het sjabloon van die weekda
 - [ ] `pnpm --filter @rumtelo/contracts check-types`
 - [ ] `pnpm --filter @rumtelo/backend lint:entities` en `ENTITY_INVENTORY.md` bijgewerkt
 - [ ] `pnpm lint`
-- [ ] Unit-tests: periodesleutels per horizon, week-naar-maand rond maand- en jaarwissel, roll-up met `DROPPED`, max. 3, overlap van blokken
+- [ ] Unit-tests: periodesleutels per horizon, week-naar-maand rond maand- en jaarwissel, koppelen over lagen heen (`ancestorPeriodOf`), roll-up met `DROPPED`, max. 3 op beide manieren, overlap van blokken
 - [ ] Unit-tests zichtbaarheid (Groei-specifiek): kind niet opener dan ouder; "+1 privé" lekt geen naam of id; onzichtbare ouder in de "waarom"-lijn
 - [ ] Groei-README bijgewerkt
 
@@ -253,7 +268,7 @@ Klaar als: de balk vrije minuten correct afleidt uit het sjabloon van die weekda
 - [ ] Hoort "max. 3" ook bij jaardoelen, of mag een jaar er 5 hebben?
 - [x] Doelen van het huishouden én persoonlijke doelen in één boom? Ja, via de platformlaag zichtbaarheid; open vragen daarover staan in [household-visibility-plan.md](./household-visibility-plan.md).
 - [ ] Aanmoedigen op gedeelde items van de ander in v1, of later?
-- [ ] Daglaag standaard uit (voorstel) of aan?
-- [ ] In welk plan zitten de cascade en de dag/uur-laag?
+- [ ] Kwartaal en dag standaard uit (voorstel), of één van beide aan?
+- [x] In welk plan zit Koers? Plus en Max (`growth.plan`). Dag en uur vallen daar voorlopig onder.
 - [ ] Willen jullie bestaande afspraken uit Google/Apple zien (alleen-lezen ICS), of blijft de tijdlijn leeg?
 - [ ] Worden Leer-focussen (`learn_focus`) automatisch voorgesteld als kwartaaldoel?

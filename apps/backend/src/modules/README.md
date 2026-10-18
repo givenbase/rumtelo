@@ -189,6 +189,7 @@ Every entity, its base, table and relations: `apps/backend/docs/ENTITY_INVENTORY
 | `CatalogEntity` | company catalogs with `key` / `name` / `sortOrder` / `isActive` (templates, presets, catalogs, plan children) |
 | `HouseholdEntity` | household-owned product + settings rows |
 | `WeekCheckEntity` | the four portal week checks (`week`, `completedAt`) |
+| `PersonalHouseholdEntity` | person-attributed rows: maker (`account`, null = together) + `visibility` (`GrowthPlanItem`) |
 
 - Money → `MoneyType` (bigint eurocents, `number` at runtime); ratios stay `decimal`
 - Text → `name` / `description`; catalog defaults are plain nouns (`cadence`, not `defaultCadence`)
@@ -238,6 +239,10 @@ create() {
   see `public/product/money/dashboard`, which composes services rather than joining tables.
 - **Household-owned entities extend `HouseholdEntity`** and are read through
   `HouseholdScopedRepository`, never `em.find` directly on those entities.
+- **Person-attributed entities extend `PersonalHouseholdEntity`** and are read through
+  `PersonalScopedRepository` with their `VisibilityArea`. It filters what the viewer may
+  see; services never add their own `account = me` filter. Rules live in
+  `@rumtelo/contracts` (`visibility.ts`); see `docs/engineering/household-visibility-plan.md`.
 - **Money is integer minor units.** Never a float, never arithmetic on a
   decimal string. Splitting goes through `common/utils/money.util.ts`.
 

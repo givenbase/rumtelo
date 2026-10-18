@@ -35,6 +35,60 @@ export enum HouseholdRelation {
     EXTERNAL = 'EXTERNAL',
 }
 
+/**
+ * Who may see a person-attributed row besides its maker.
+ * Ordered PRIVATE < OWNER < HOUSEHOLD; a row with no maker (`account = null`) is "together".
+ */
+export enum Visibility {
+    /** Only the maker. */
+    PRIVATE = 'PRIVATE',
+    /** The maker and the household OWNER. */
+    OWNER = 'OWNER',
+    /** The maker and every participant (OWNER / MEMBER, never EXTERNAL). */
+    HOUSEHOLD = 'HOUSEHOLD',
+}
+
+/**
+ * The choice offered in forms — {@link Visibility} plus SHARED ("together":
+ * no maker, every participant may edit).
+ */
+export enum VisibilityChoice {
+    PRIVATE = 'PRIVATE',
+    OWNER = 'OWNER',
+    HOUSEHOLD = 'HOUSEHOLD',
+    SHARED = 'SHARED',
+}
+
+/** Household rule (OWNER-set) for what members may share. */
+export enum HouseholdSharingMode {
+    /** Everyone keeps everything to themselves — the owner too. */
+    SEPARATE = 'SEPARATE',
+    /** Members: only me or share with the owner. Owner: every option. */
+    OWNER_SEES = 'OWNER_SEES',
+    /** Everyone has every option. */
+    TOGETHER = 'TOGETHER',
+}
+
+/**
+ * A kind of person-attributed data. Each table with personal rows belongs to
+ * exactly one area; the household may set a {@link HouseholdSharingMode} per area.
+ */
+export enum VisibilityArea {
+    GROWTH_PLAN = 'growth.plan',
+    GROWTH_LEARN = 'growth.learn',
+    ENERGY_LOG = 'energy.log',
+    ENERGY_TIME = 'energy.time',
+    SOUL_GRATITUDE = 'soul.gratitude',
+    MONEY_INCOME = 'money.income',
+    MONEY_PERSONAL = 'money.personal',
+}
+
+/** How the viewer reached the household — a seat, or a Practice coach preview. */
+export enum HouseholdAccessSource {
+    SEAT = 'SEAT',
+    PRACTICE = 'PRACTICE',
+}
+
 export enum CoachKind {
     NUDGE = 'NUDGE',
     WIN = 'WIN',

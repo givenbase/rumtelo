@@ -88,11 +88,18 @@ Potten, vaste lasten en het plan blijven van het huishouden, want "eerst verdele
 | --- | --- | --- | --- |
 | `bank_account` | houder (`account`) | Van [naam] · Gezamenlijk | de basis; een persoonlijke rekening kan privé zijn |
 | `income_source` | verdiener (`account`) | Van [naam] · Van ons beiden | inkomen per persoon, en wie wat bijdraagt |
-| `transaction` | `account` + `visibility`, overgenomen van de rekening | "Betaald door" aan te passen per transactie | uitgaven per persoon |
+| `transaction` | `account` + `visibility`, overgenomen van de rekening; los daarvan `paidBy` | **Betaald door:** [naam] · Gezamenlijk; standaard de houder van de rekening | uitgaven per persoon; wie het deed, ook op een gezamenlijke rekening |
 | `fixed_cost` | voor wie (`account`, optioneel) | Huishouden · Voor [naam] | alleen toerekening; altijd zichtbaar, want het is een vaste verplichting |
 | `jar`, `category`, `goal`, plan | — | — | blijft van het huishouden |
 
 *Gezamenlijk* en *Van ons beiden* zijn *samen* in het model: `account = null`.
+
+**Wanneer "van wie" verschijnt.** Houder, verdiener, "voor wie" en *Betaald door* staan alleen in beeld als het huishouden **Plus of hoger** heeft **én meer dan één deelnemer** (OWNER of MEMBER, geen `EXTERNAL`). Bij één deelnemer is "van wie" altijd dezelfde persoon, dus zijn de velden en filters weg. Eén helper in contracts beslist dit voor UI en backend: `attributionEnabled({ plan, participantCount })`.
+
+- **Verborgen betekent niet weg.** Vertrekt de tweede deelnemer of gaat het huishouden naar Basic, dan blijven de waarden bewaard maar worden ze niet getoond of gefilterd. Komt er weer iemand bij, of gaat het huishouden weer naar Plus, dan zijn ze terug.
+- **Betaald door is toerekening, geen zichtbaarheid.** `paidBy` bepaalt niet wie een transactie ziet; dat doet de rekening (`account` + `visibility`). Zo kan "Sam deed de boodschappen" op een gezamenlijke rekening staan zonder iets privé te maken.
+- **Als de betaler vertrekt,** wordt `paidBy` `null` (*Gezamenlijk*, `deleteRule: 'set null'`). De transactie zelf blijft, want het is huishoudgeld.
+- **De backend weigert** `paidBy`, houder en verdiener in een create of update als `attributionEnabled` onwaar is. Een oude client kan zo niets zetten wat de gebruiker niet ziet.
 
 Er komen twee onderdelen bij (zie ook de tabel bij "Per onderdeel"):
 
@@ -136,7 +143,7 @@ Mag een lid zelf met een externe partij delen? **Ja, maar alleen de eigen data, 
 - Een lid kan niet zelf een praktijk koppelen. Een eigen coach voor jezelf alleen is later een eigen huishouden of een persoonlijke koppeling (buiten dit plan).
 - Opslag: tabel `practice_client_consent` (`link`, `account`, `areas[]`, `grantedAt`), uniek op (`link`, `account`).
 
-**Controleren tijdens fase 0:** de praktijk-snapshot toont nu "training this week" en "stillness streak". Als die uit persoonlijke data van leden komen, ziet een coach nu al data van leden zonder hun eigen toestemming. Dat moet achter `practice_client_consent`.
+**Gecontroleerd in fase 0:** de praktijk-snapshot lekt geen data van leden. De Energie- en Ziel-services filteren op het account van de ingelogde persoon, en in een preview is dat de coach zelf. Daardoor toont de snapshot "training this week" en "stillness streak" altijd 0 of leeg (bug). Oplossen in fase 4, via `PersonalScopedRepository` en `practice_client_consent`.
 
 ## Abonnement: Plus en hoger
 
@@ -218,20 +225,20 @@ Het filter per kijker (vóór regel 3):
 
 ### Fase 0: platform
 
-- [ ] `visibility.ts` in contracts met unit-tests voor elke rol × modus × relatie × bron
-- [ ] `VISIBILITY_AREAS` met standaarden; tests voor `sharingModeFor` (keuze per onderdeel wint, gevoelig blijft dicht bij een open algemene modus, lege `areas` = standaard)
-- [ ] `HouseholdVisibilitySettings` in de settings-DTO's en het jsonb-veld `visibility` op `HouseholdSettings`
-- [ ] `HouseholdContext` uitbreiden; interceptor vult `accountId`, `relation`, `source`
-- [ ] Capability `platform.sharing` in `FEATURES.platform` en `PLUS_EXTRA`, copy in `CAPABILITY_CATALOG`; `VisibilityService` valt zonder terug op `SEPARATE`
-- [ ] `PersonalHouseholdEntity`, `PersonalScopedRepository`, `VisibilityService`
-- [ ] Praktijk-snapshot controleren op persoonlijke data van leden
-- [ ] Regels toevoegen aan `backend-module-shape.mdc`: persoonlijke data → `PersonalHouseholdEntity`; geen eigen `account = ik`-filters meer
+- [x] `visibility.ts` in contracts met unit-tests voor elke rol × modus × relatie × bron
+- [x] `VISIBILITY_AREAS` met standaarden; tests voor `sharingModeFor` (keuze per onderdeel wint, gevoelig blijft dicht bij een open algemene modus, lege `areas` = standaard)
+- [x] `HouseholdVisibilitySettings` in de settings-DTO's en het jsonb-veld `visibility` op `HouseholdSettings`
+- [x] `HouseholdContext` uitbreiden; interceptor vult `accountId`, `relation`, `source`
+- [x] Capability `platform.sharing` in `FEATURES.platform` en `PLUS_EXTRA`, copy in `CAPABILITY_CATALOG`; `VisibilityService` valt zonder terug op `SEPARATE`
+- [x] `PersonalHouseholdEntity`, `PersonalScopedRepository`, `VisibilityService`
+- [x] Praktijk-snapshot controleren op persoonlijke data van leden
+- [x] Regels toevoegen aan `backend-module-shape.mdc`: persoonlijke data → `PersonalHouseholdEntity`; geen eigen `account = ik`-filters meer
 
 Klaar als: in een testhuishouden met OWNER, MEMBER, VIEWER, een `EXTERNAL`-stoel en een praktijk elke kijker precies de rijen uit de tabel hierboven terugkrijgt, ook als OWNER. Na een overstap van Plus naar Basic ziet niemand meer dan daarvoor.
 
 ### Fase 1: Groei-cascade
 
-- [ ] `growth_plan_item` op `PersonalHouseholdEntity`
+- [x] `growth_plan_item` op `PersonalHouseholdEntity`
 - [ ] `VisibilityPicker` en `VisibilityBadge`; instellingen voor de algemene modus, "Per onderdeel" en de eigen standaard
 
 ### Fase 2: bestaande persoonlijke tabellen
@@ -243,7 +250,9 @@ Klaar als: voor bestaande gebruikers niets verandert tot ze zelf iets delen.
 
 ### Fase 3: Geld
 
-- [ ] Houder op `bank_account`, verdiener op `income_source`, `account` + `visibility` op `transaction`; migratie op *gezamenlijk*
+- [ ] `attributionEnabled({ plan, participantCount })` in contracts, met tests (Basic, Plus solo, Plus met twee deelnemers, `EXTERNAL` telt niet mee)
+- [ ] Houder op `bank_account`, verdiener op `income_source`, `account` + `visibility` + `paidBy` op `transaction`; migratie op *gezamenlijk*
+- [ ] *Betaald door* in het transactieformulier en als filter in Uitgaven, alleen als `attributionEnabled`
 - [ ] Onderdelen `money.income` en `money.personal`; transacties volgen de rekening
 - [ ] Potten, maandscore en overzicht rekenen met alle rijen; regel "N privé-uitgaven · € X" per pot
 - [ ] Inbox en The Coach respecteren privé-rekeningen
@@ -259,7 +268,7 @@ Klaar als: een uitgave op een privé-rekening die in een pot is gesorteerd het p
 
 ## Open vragen
 
-- [ ] Standaardmodus voor nieuwe huishoudens: `OWNER_SEES` (voorstel) of `TOGETHER`?
+- [x] Standaardmodus voor nieuwe huishoudens: `OWNER_SEES`.
 - [x] Eén modus of per portaal? Per onderdeel, met standaarden van Rumtelo (zie "Per onderdeel").
 - [ ] `energy_log` als één onderdeel (voorstel voor v1), of per meting (slaap, training, voeding, hoofd apart)? Per meting vraagt een onderdeel dat uit een kolom komt in plaats van uit de tabel.
 - [ ] Welke onderdelen zijn nog meer gevoelig? Voorstel: alleen `energy.log`. Dankbaarheid en tijdsbesteding volgen het huishouden.
@@ -268,6 +277,6 @@ Klaar als: een uitgave op een privé-rekening die in een pot is gesorteerd het p
 - [ ] Ziet een MEMBER de modus alleen, of kan die een verzoek sturen om hem te veranderen?
 - [ ] Praktijktoestemming per portaal (voorstel) of per item?
 - [ ] *Samen*-items bij overstap naar `SEPARATE`: alleen-lezen behouden (voorstel) of archiveren?
-- [ ] Zit `platform.sharing` in Plus (voorstel) of pas in Max?
+- [x] `platform.sharing` zit in Plus en Max.
 - [ ] Persoonlijke rekening: tellen uitgaven daarop alleen mee als ze in een pot zijn gesorteerd (voorstel), of staat zo'n rekening helemaal buiten het plan?
-- [ ] "Betaald door" per transactie al in v1, of eerst alleen de houder van de rekening?
+- [x] *Betaald door*: ja, alleen bij Plus of hoger en meer dan één deelnemer (zie "Wanneer 'van wie' verschijnt").
