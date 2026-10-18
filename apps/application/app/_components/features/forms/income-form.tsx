@@ -47,7 +47,7 @@ import { FormDatePicker } from './form-date-picker';
 import { FormInput } from './form-input';
 import { HoldingField } from './holding-field';
 import { merchantsToNameOptions } from './merchant-name-options';
-import { PartyField } from './party-field';
+import { existingCounterparty, PartyField } from './party-field';
 import { partiesToNameOptions } from './party-name-options';
 import { PresetNameField } from './preset-name-field';
 
@@ -271,10 +271,20 @@ export function IncomeForm({
             if (cents === null || cents <= 0) throw new Error('Invalid amount');
             const name = values.name.trim();
             const counterparty = values.counterparty?.trim() || null;
-            const merchantKey = counterparty ? values.merchantKey?.trim() || null : null;
-            const partyId = counterparty ? values.partyId?.trim() || null : null;
-            const saveParty =
-                Boolean(counterparty) && !merchantKey && !partyId && (values.saveParty ?? true);
+            const locked = counterparty ? existingCounterparty(counterparty, payerOptions) : null;
+            const merchantKey = locked
+                ? locked.merchantKey || null
+                : counterparty
+                  ? values.merchantKey?.trim() || null
+                  : null;
+            const partyId = locked
+                ? locked.partyId || null
+                : counterparty && !merchantKey
+                  ? values.partyId?.trim() || null
+                  : null;
+            const saveParty = locked
+                ? false
+                : Boolean(counterparty) && !merchantKey && !partyId && (values.saveParty ?? true);
             const endsOn = values.endsOn?.trim() ? values.endsOn.slice(0, 10) : null;
             // Resolve presetKey from the locked income preset (by name match).
             const presets = presetsQuery.data ?? [];

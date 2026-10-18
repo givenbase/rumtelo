@@ -1,5 +1,7 @@
 'use client';
 
+import { findByNameOrAlias } from '@rumtelo/utils';
+
 import {
     counterpartyLockFromOptionKey,
     counterpartyLockToOptionKey,
@@ -34,6 +36,33 @@ function lockFromValue(value: PartyFieldValue): CounterpartyLock {
     return { kind: 'free' };
 }
 
+/** Exact name or alias already in the household parties or catalog — not a new payee. */
+export function existingCounterparty(
+    typed: string,
+    options: readonly NamePresetOption[]
+): PartyFieldValue | null {
+    const match = findByNameOrAlias(options, typed);
+    if (!match) return null;
+    const nextLock = counterpartyLockFromOptionKey(match.key);
+    if (nextLock.kind === 'party') {
+        return {
+            counterparty: match.name,
+            merchantKey: '',
+            partyId: nextLock.partyId,
+            saveParty: false,
+        };
+    }
+    if (nextLock.kind === 'merchant') {
+        return {
+            counterparty: match.name,
+            merchantKey: nextLock.merchantKey,
+            partyId: '',
+            saveParty: false,
+        };
+    }
+    return null;
+}
+
 /**
  * Counterparty picker: Rumtelo catalog + household parties + free text.
  * Free text shows an inline “Save for next time?” checkbox (default ON).
@@ -48,11 +77,13 @@ export function PartyField({
     id,
 }: PartyFieldProps) {
     const lock = lockFromValue(value);
+    const known = existingCounterparty(value.counterparty, options);
     const showSave =
         lock.kind === 'free' &&
         Boolean(value.counterparty.trim()) &&
         !value.merchantKey &&
-        !value.partyId;
+        !value.partyId &&
+        !known;
 
     return (
         <div className="space-y-2">
@@ -65,6 +96,11 @@ export function PartyField({
                 lockPresets
                 initialLockedKey={counterpartyLockToOptionKey(lock)}
                 onChange={next => {
+                    const existing = existingCounterparty(next, options);
+                    if (existing) {
+                        onChange(existing);
+                        return;
+                    }
                     onChange({
                         counterparty: next,
                         merchantKey: '',

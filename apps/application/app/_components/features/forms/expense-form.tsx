@@ -27,6 +27,7 @@ import type { CategoryTemplate, MerchantPreset } from '@rumtelo/contracts';
 import { JarKey, defaultGiveCategoryTemplate, jarCapabilitiesFor } from '@rumtelo/contracts';
 
 import { useTranslations } from '@rumtelo/i18n';
+import { findByNameOrAlias } from '@rumtelo/utils';
 
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
@@ -541,8 +542,19 @@ export function ExpenseForm({
 
             const vendor = isIn ? label : intent.vendor.trim();
             const note = values.note.trim();
-            const merchantKey = !isIn ? intent.merchantKey?.trim() || null : null;
-            const partyId = !isIn && !merchantKey ? intent.partyId?.trim() || null : null;
+            const namedParty =
+                !isIn && vendor && !intent.merchantKey?.trim()
+                    ? findByNameOrAlias(parties, vendor)
+                    : null;
+            const namedMerchant =
+                !isIn && vendor && !intent.partyId?.trim() && !namedParty
+                    ? findByNameOrAlias(merchants, vendor)
+                    : null;
+            const merchantKey = !isIn
+                ? intent.merchantKey?.trim() || namedMerchant?.key || null
+                : null;
+            const partyId =
+                !isIn && !merchantKey ? intent.partyId?.trim() || namedParty?.id || null : null;
             const saveParty =
                 Boolean(vendor) &&
                 !merchantKey &&
