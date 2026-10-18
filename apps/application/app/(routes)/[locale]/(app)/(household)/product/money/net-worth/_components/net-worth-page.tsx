@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useDeferredValue, useState } from 'react';
 
 import { useTranslations } from '@rumtelo/i18n';
 import { AccentCard, Button, Card, EmptyState, Eyebrow, Section, Typography } from '@rumtelo/ui';
@@ -21,6 +21,7 @@ import {
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { CREATE_HREF, assetDetailHref, createAssetHref } from '@/app/_lib/create-routes';
 import { isLiveData } from '@/app/_lib/preview';
+import { ListSearchField } from '@/components/layout/list-controls';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -73,6 +74,8 @@ export function NetWorthPageClient() {
     );
     const kinds = kindsQuery.data ?? EMPTY_KINDS;
     const [filter, setFilter] = useState('all');
+    const [search, setSearch] = useState('');
+    const deferredSearch = useDeferredValue(search.trim().toLowerCase());
     const assetRows = assetsQuery.data ?? EMPTY_ASSETS;
     const debtRows = debtsQuery.data ?? EMPTY_DEBTS;
     const jarRows = jarsQuery.data ?? EMPTY_JARS;
@@ -107,7 +110,11 @@ export function NetWorthPageClient() {
 
     for (const meta of kinds) {
         if (filter !== 'all' && filter !== meta.key) continue;
-        const items = holdings.filter(holding => holding.kindKey === meta.key);
+        const items = holdings.filter(holding => {
+            if (holding.kindKey !== meta.key) return false;
+            if (!deferredSearch) return true;
+            return holding.name.toLowerCase().includes(deferredSearch);
+        });
         if (items.length === 0) continue;
         const total = items.reduce((running, holding) => running + holding.value, 0);
         const flow = items.reduce((running, holding) => running + holding.flow, 0);
@@ -225,6 +232,12 @@ export function NetWorthPageClient() {
                 <EmptyState icon="trending-up" title={t('empty_title')} body={t('empty_body')} />
             ) : (
                 <>
+                    <ListSearchField
+                        value={search}
+                        onChange={setSearch}
+                        placeholder={t('search_placeholder')}
+                        ariaLabel={t('search_aria')}
+                    />
                     <div className="flex flex-wrap items-center gap-2">
                         <span className="mr-1 font-mono text-xs font-medium tracking-widest text-fg-muted uppercase">
                             {t('show')}
@@ -256,131 +269,139 @@ export function NetWorthPageClient() {
                         ))}
                     </div>
 
-                    <div className="grid gap-4">
-                        {groups.map(group => (
-                            <Card key={group.key} className="overflow-hidden p-0">
-                                <div className="flex flex-wrap items-start gap-4 border-b border-line px-5 py-4">
-                                    <div className="min-w-0 flex-1">
-                                        <div className="flex flex-wrap items-baseline gap-2.5">
-                                            <Typography as="h3" size="lg">
-                                                {group.name}
+                    {groups.length === 0 ? (
+                        <EmptyState
+                            variant="compact"
+                            title={t('empty_search_title')}
+                            body={t('empty_search_body')}
+                        />
+                    ) : (
+                        <div className="grid gap-4">
+                            {groups.map(group => (
+                                <Card key={group.key} className="overflow-hidden p-0">
+                                    <div className="flex flex-wrap items-start gap-4 border-b border-line px-5 py-4">
+                                        <div className="min-w-0 flex-1">
+                                            <div className="flex flex-wrap items-baseline gap-2.5">
+                                                <Typography as="h3" size="lg">
+                                                    {group.name}
+                                                </Typography>
+                                                <span className="font-mono text-xs tracking-wide text-fg-muted uppercase">
+                                                    {group.items.length === 1
+                                                        ? t('asset_one')
+                                                        : t('asset_many', {
+                                                              count: group.items.length,
+                                                          })}
+                                                </span>
+                                            </div>
+                                            <Typography
+                                                as="p"
+                                                size="sm"
+                                                color="muted"
+                                                className="mt-1 text-pretty">
+                                                {group.description}
                                             </Typography>
-                                            <span className="font-mono text-xs tracking-wide text-fg-muted uppercase">
-                                                {group.items.length === 1
-                                                    ? t('asset_one')
-                                                    : t('asset_many', {
-                                                          count: group.items.length,
-                                                      })}
+                                        </div>
+                                        <div className="grid justify-items-end gap-1">
+                                            <span className="font-display text-2xl leading-none font-semibold tracking-tight text-fg">
+                                                {formatMoney(group.total)}
+                                            </span>
+                                            <span
+                                                className={cn(
+                                                    'font-mono text-xs',
+                                                    !group.canPay || group.flow <= 0
+                                                        ? 'text-fg-muted'
+                                                        : 'text-accent'
+                                                )}>
+                                                {group.flowLabel}
                                             </span>
                                         </div>
-                                        <Typography
-                                            as="p"
+                                        <Button
+                                            as={Link}
+                                            href={createAssetHref(group.key)}
                                             size="sm"
-                                            color="muted"
-                                            className="mt-1 text-pretty">
-                                            {group.description}
-                                        </Typography>
+                                            variant="secondary"
+                                            className="self-center">
+                                            {t('add_kind', { name: group.name })}
+                                        </Button>
                                     </div>
-                                    <div className="grid justify-items-end gap-1">
-                                        <span className="font-display text-2xl leading-none font-semibold tracking-tight text-fg">
-                                            {formatMoney(group.total)}
-                                        </span>
-                                        <span
-                                            className={cn(
-                                                'font-mono text-xs',
-                                                !group.canPay || group.flow <= 0
-                                                    ? 'text-fg-muted'
-                                                    : 'text-accent'
-                                            )}>
-                                            {group.flowLabel}
-                                        </span>
-                                    </div>
-                                    <Button
-                                        as={Link}
-                                        href={createAssetHref(group.key)}
-                                        size="sm"
-                                        variant="secondary"
-                                        className="self-center">
-                                        {t('add_kind', { name: group.name })}
-                                    </Button>
-                                </div>
-                                <div className="grid gap-3.5 p-4 sm:grid-cols-2 lg:grid-cols-3">
-                                    {group.items.map(holding => {
-                                        const pays = !holding.locked && holding.flow > 0;
-                                        return (
-                                            <Link
-                                                key={holding.id}
-                                                href={assetDetailHref(holding.id)}
-                                                aria-label={holding.name}
-                                                className={cn(
-                                                    'grid cursor-pointer gap-0 overflow-hidden rounded-xl border bg-raised text-left transition-colors hover:border-accent-hover',
-                                                    pays
-                                                        ? 'border-accent shadow-glow'
-                                                        : 'border-line'
-                                                )}>
-                                                <div
-                                                    className="h-8.5"
-                                                    style={{
-                                                        background: holding.locked
-                                                            ? 'repeating-linear-gradient(45deg, var(--color-sunken) 0 3px, transparent 3px 9px)'
-                                                            : pays
-                                                              ? 'var(--gradient-accent)'
-                                                              : 'repeating-linear-gradient(45deg, var(--color-sunken) 0 8px, var(--color-raised) 8px 16px)',
-                                                    }}
-                                                />
-                                                <div className="grid gap-2 p-4">
-                                                    <span className="font-mono text-xs font-medium tracking-wide text-fg-muted uppercase">
-                                                        {holding.kindKey === 'PENSION'
-                                                            ? t('holding_pension')
-                                                            : holding.locked
-                                                              ? t('holding_locked')
-                                                              : pays
-                                                                ? t('holding_pays')
-                                                                : t('holding_appreciates')}
-                                                    </span>
-                                                    <Typography
-                                                        as="h3"
-                                                        size="lg"
-                                                        className="leading-snug">
-                                                        {holding.name}
-                                                    </Typography>
-                                                    <div className="flex justify-between font-mono text-xs">
-                                                        <span className="text-fg-muted">
-                                                            {t('value')}
-                                                        </span>
-                                                        <span className="text-fg-secondary">
-                                                            {formatMoney(holding.value)}
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex justify-between font-mono text-xs">
-                                                        <span className="text-fg-muted">
-                                                            {t('monthly_income')}
-                                                        </span>
-                                                        <span
-                                                            className={
-                                                                pays
-                                                                    ? 'text-accent'
-                                                                    : 'text-fg-muted'
-                                                            }>
-                                                            {holding.locked
-                                                                ? t('not_available_yet')
+                                    <div className="grid gap-3.5 p-4 sm:grid-cols-2 lg:grid-cols-3">
+                                        {group.items.map(holding => {
+                                            const pays = !holding.locked && holding.flow > 0;
+                                            return (
+                                                <Link
+                                                    key={holding.id}
+                                                    href={assetDetailHref(holding.id)}
+                                                    aria-label={holding.name}
+                                                    className={cn(
+                                                        'grid cursor-pointer gap-0 overflow-hidden rounded-xl border bg-raised text-left transition-colors hover:border-accent-hover',
+                                                        pays
+                                                            ? 'border-accent shadow-glow'
+                                                            : 'border-line'
+                                                    )}>
+                                                    <div
+                                                        className="h-8.5"
+                                                        style={{
+                                                            background: holding.locked
+                                                                ? 'repeating-linear-gradient(45deg, var(--color-sunken) 0 3px, transparent 3px 9px)'
                                                                 : pays
-                                                                  ? t('flow_per_month', {
-                                                                        amount: formatMoney(
-                                                                            holding.flow
-                                                                        ),
-                                                                    })
-                                                                  : `${formatMoney(0)} ${t('per_month_short')}`}
+                                                                  ? 'var(--gradient-accent)'
+                                                                  : 'repeating-linear-gradient(45deg, var(--color-sunken) 0 8px, var(--color-raised) 8px 16px)',
+                                                        }}
+                                                    />
+                                                    <div className="grid gap-2 p-4">
+                                                        <span className="font-mono text-xs font-medium tracking-wide text-fg-muted uppercase">
+                                                            {holding.kindKey === 'PENSION'
+                                                                ? t('holding_pension')
+                                                                : holding.locked
+                                                                  ? t('holding_locked')
+                                                                  : pays
+                                                                    ? t('holding_pays')
+                                                                    : t('holding_appreciates')}
                                                         </span>
+                                                        <Typography
+                                                            as="h3"
+                                                            size="lg"
+                                                            className="leading-snug">
+                                                            {holding.name}
+                                                        </Typography>
+                                                        <div className="flex justify-between font-mono text-xs">
+                                                            <span className="text-fg-muted">
+                                                                {t('value')}
+                                                            </span>
+                                                            <span className="text-fg-secondary">
+                                                                {formatMoney(holding.value)}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex justify-between font-mono text-xs">
+                                                            <span className="text-fg-muted">
+                                                                {t('monthly_income')}
+                                                            </span>
+                                                            <span
+                                                                className={
+                                                                    pays
+                                                                        ? 'text-accent'
+                                                                        : 'text-fg-muted'
+                                                                }>
+                                                                {holding.locked
+                                                                    ? t('not_available_yet')
+                                                                    : pays
+                                                                      ? t('flow_per_month', {
+                                                                            amount: formatMoney(
+                                                                                holding.flow
+                                                                            ),
+                                                                        })
+                                                                      : `${formatMoney(0)} ${t('per_month_short')}`}
+                                                            </span>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </Link>
-                                        );
-                                    })}
-                                </div>
-                            </Card>
-                        ))}
-                    </div>
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                </Card>
+                            ))}
+                        </div>
+                    )}
                 </>
             )}
 

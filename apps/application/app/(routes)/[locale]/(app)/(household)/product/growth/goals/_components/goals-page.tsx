@@ -2,7 +2,7 @@
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useDeferredValue, useMemo, useState } from 'react';
 import { useLocale } from 'next-intl';
 
 import {
@@ -38,6 +38,7 @@ import { PlanCapacityCreate } from '@/components/features/shell/plan-capacity-cr
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { usePlanCapacity } from '@/components/features/shell/use-plan-capacity';
+import { ListSearchField } from '@/components/layout/list-controls';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 
 type Tab = 'ON_TRACK' | 'REACHED';
@@ -212,6 +213,8 @@ export function GoalsPageClient() {
     const [tab, setTab] = useState<Tab>('ON_TRACK');
     const [kindFilter, setKindFilter] = useState<KindFilter>('ALL');
     const [jarFilter, setJarFilter] = useState<JarKey | null>(null);
+    const [search, setSearch] = useState('');
+    const deferredSearch = useDeferredValue(search.trim().toLowerCase());
     const [openKindKeys, setOpenKindKeys] = useState<Set<string>>(() => new Set());
     const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
@@ -333,7 +336,9 @@ export function GoalsPageClient() {
             const jar = goal.jarId ? jarById.get(goal.jarId) : null;
             if (!jar || jar.key !== jarFilter) return false;
         }
-        return true;
+        if (!deferredSearch) return true;
+        const hay = `${goal.name} ${goal.why ?? ''}`.toLowerCase();
+        return hay.includes(deferredSearch);
     });
 
     const featured = shown.length > 0 && shown.length <= FEATURED_MAX;
@@ -432,6 +437,15 @@ export function GoalsPageClient() {
                 })}
             </ListToolbar>
 
+            {tabGoals.length > 0 ? (
+                <ListSearchField
+                    value={search}
+                    onChange={setSearch}
+                    placeholder={t('search_placeholder')}
+                    ariaLabel={t('search_aria')}
+                />
+            ) : null}
+
             {kindsPresent.length > 1 || saveJarKeys.length > 1 ? (
                 <div className="grid gap-3">
                     {kindsPresent.length > 1 ? (
@@ -529,13 +543,21 @@ export function GoalsPageClient() {
             {shown.length === 0 ? (
                 <EmptyState
                     icon="target"
-                    title={tab === 'REACHED' ? t('reached_empty_title') : t('empty_title')}
+                    title={
+                        deferredSearch
+                            ? t('empty_search_title')
+                            : tab === 'REACHED'
+                              ? t('reached_empty_title')
+                              : t('empty_title')
+                    }
                     body={
-                        tab === 'REACHED'
-                            ? t('reached_empty_body')
-                            : kindFilter !== 'ALL' || jarFilter
-                              ? t('empty_filter_body')
-                              : t('empty_body')
+                        deferredSearch
+                            ? t('empty_search_body')
+                            : tab === 'REACHED'
+                              ? t('reached_empty_body')
+                              : kindFilter !== 'ALL' || jarFilter
+                                ? t('empty_filter_body')
+                                : t('empty_body')
                     }
                 />
             ) : featured ? (

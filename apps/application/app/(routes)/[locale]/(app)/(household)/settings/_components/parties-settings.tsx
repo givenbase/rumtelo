@@ -3,7 +3,7 @@
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useDeferredValue, useState } from 'react';
 
 import type { PartyWithUsage } from '@rumtelo/contracts';
 import { MerchantSuggestionStatus } from '@rumtelo/contracts';
@@ -14,6 +14,7 @@ import { Button, Field, Input, Typography } from '@rumtelo/ui';
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { isLiveData } from '@/app/_lib/preview';
 import { ConfirmActionButton } from '@/components/features/forms/confirm-action-button';
+import { ListSearchField } from '@/components/layout/list-controls';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
@@ -53,6 +54,8 @@ export function PartiesSettings() {
         live
     );
 
+    const [search, setSearch] = useState('');
+    const deferredSearch = useDeferredValue(search.trim().toLowerCase());
     const [editingId, setEditingId] = useState<string | null>(null);
     const [draftName, setDraftName] = useState('');
     const [draftNote, setDraftNote] = useState('');
@@ -123,6 +126,15 @@ export function PartiesSettings() {
     });
 
     const parties = partiesQuery.data ?? [];
+    const visibleParties = deferredSearch
+        ? parties.filter(party => {
+              const hay = [party.name, party.note, ...(party.aliases ?? [])]
+                  .filter(Boolean)
+                  .join(' ')
+                  .toLowerCase();
+              return hay.includes(deferredSearch);
+          })
+        : parties;
 
     return (
         <SettingsPanel>
@@ -130,152 +142,184 @@ export function PartiesSettings() {
                 {parties.length === 0 ? (
                     <p className="text-sm text-fg-muted">{tParty('empty')}</p>
                 ) : (
-                    <ul className="divide-y divide-line">
-                        {parties.map(party => {
-                            const uses = usageTotal(party.usage);
-                            const editing = editingId === party.id;
-                            const badge = statusLabel(party, tParty);
-                            const canSuggest =
-                                live &&
-                                !party.merchantKey &&
-                                party.suggestionStatus === null &&
-                                !suggestMutation.isPending;
-                            return (
-                                <li key={party.id} className="py-4 first:pt-0 last:pb-0">
-                                    {editing ? (
-                                        <div className="space-y-3">
-                                            <Field label={tParty('field_name')}>
-                                                <Input
-                                                    value={draftName}
-                                                    onChange={event =>
-                                                        setDraftName(event.target.value)
-                                                    }
-                                                    disabled={!live || saveMutation.isPending}
-                                                />
-                                            </Field>
-                                            <Field label={tParty('field_note')}>
-                                                <Input
-                                                    value={draftNote}
-                                                    onChange={event =>
-                                                        setDraftNote(event.target.value)
-                                                    }
-                                                    disabled={!live || saveMutation.isPending}
-                                                />
-                                            </Field>
-                                            <div className="grid gap-3 sm:grid-cols-3">
-                                                <Field label={tParty('field_icon')}>
-                                                    <Input
-                                                        value={draftIcon}
-                                                        onChange={event =>
-                                                            setDraftIcon(event.target.value)
-                                                        }
-                                                        disabled={!live || saveMutation.isPending}
-                                                        maxLength={8}
-                                                    />
-                                                </Field>
-                                                <Field label={tParty('field_color')}>
-                                                    <Input
-                                                        value={draftColor}
-                                                        onChange={event =>
-                                                            setDraftColor(event.target.value)
-                                                        }
-                                                        disabled={!live || saveMutation.isPending}
-                                                        placeholder="var(--color-accent)"
-                                                    />
-                                                </Field>
-                                                <Field label={tParty('field_website')}>
-                                                    <Input
-                                                        value={draftWebsite}
-                                                        onChange={event =>
-                                                            setDraftWebsite(event.target.value)
-                                                        }
-                                                        disabled={!live || saveMutation.isPending}
-                                                    />
-                                                </Field>
-                                            </div>
-                                            <div className="flex flex-wrap gap-2">
-                                                <Button
-                                                    type="button"
-                                                    disabled={
-                                                        !live ||
-                                                        !draftName.trim() ||
-                                                        saveMutation.isPending
-                                                    }
-                                                    onClick={() => saveMutation.mutate()}>
-                                                    {t('ui.button.actions.save')}
-                                                </Button>
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    disabled={saveMutation.isPending}
-                                                    onClick={() => setEditingId(null)}>
-                                                    {t('ui.button.actions.cancel')}
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-start justify-between gap-3">
-                                            <div className="min-w-0">
-                                                <p className="truncate text-sm font-medium text-fg">
-                                                    {party.icon ? (
-                                                        <span className="mr-1.5" aria-hidden>
-                                                            {party.icon}
-                                                        </span>
-                                                    ) : null}
-                                                    {party.name}
-                                                    {badge ? (
-                                                        <span className="ml-2 text-xs font-normal text-fg-muted">
-                                                            · {badge}
-                                                        </span>
-                                                    ) : null}
-                                                </p>
-                                                <Typography
-                                                    as="p"
-                                                    variant="caption"
-                                                    className="mt-0.5">
-                                                    {uses === 0
-                                                        ? tParty('usage_none')
-                                                        : tParty('usage_count', { count: uses })}
-                                                    {party.note ? ` · ${party.note}` : null}
-                                                </Typography>
-                                            </div>
-                                            <div className="flex shrink-0 flex-wrap justify-end gap-2">
-                                                {canSuggest ? (
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        disabled={!canSuggest}
-                                                        onClick={() =>
-                                                            suggestMutation.mutate(party.id)
-                                                        }>
-                                                        {tParty('suggest')}
-                                                    </Button>
-                                                ) : null}
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    disabled={!live}
-                                                    onClick={() => startEdit(party)}>
-                                                    {t('ui.button.actions.edit')}
-                                                </Button>
-                                                <ConfirmActionButton
-                                                    label={t('ui.button.actions.delete')}
-                                                    confirmLabel={tParty('confirm_remove')}
-                                                    disabled={!live || removeMutation.isPending}
-                                                    pending={removeMutation.isPending}
-                                                    onConfirm={() =>
-                                                        removeMutation.mutate(party.id)
-                                                    }
-                                                />
-                                            </div>
-                                        </div>
-                                    )}
-                                </li>
-                            );
-                        })}
-                    </ul>
+                    <div className="grid gap-4">
+                        <ListSearchField
+                            value={search}
+                            onChange={setSearch}
+                            placeholder={tParty('search_placeholder')}
+                            ariaLabel={tParty('search_aria')}
+                        />
+                        {visibleParties.length === 0 ? (
+                            <p className="text-sm text-fg-muted">{tParty('empty_search')}</p>
+                        ) : (
+                            <ul className="divide-y divide-line">
+                                {visibleParties.map(party => {
+                                    const uses = usageTotal(party.usage);
+                                    const editing = editingId === party.id;
+                                    const badge = statusLabel(party, tParty);
+                                    const canSuggest =
+                                        live &&
+                                        !party.merchantKey &&
+                                        party.suggestionStatus === null &&
+                                        !suggestMutation.isPending;
+                                    return (
+                                        <li key={party.id} className="py-4 first:pt-0 last:pb-0">
+                                            {editing ? (
+                                                <div className="space-y-3">
+                                                    <Field label={tParty('field_name')}>
+                                                        <Input
+                                                            value={draftName}
+                                                            onChange={event =>
+                                                                setDraftName(event.target.value)
+                                                            }
+                                                            disabled={
+                                                                !live || saveMutation.isPending
+                                                            }
+                                                        />
+                                                    </Field>
+                                                    <Field label={tParty('field_note')}>
+                                                        <Input
+                                                            value={draftNote}
+                                                            onChange={event =>
+                                                                setDraftNote(event.target.value)
+                                                            }
+                                                            disabled={
+                                                                !live || saveMutation.isPending
+                                                            }
+                                                        />
+                                                    </Field>
+                                                    <div className="grid gap-3 sm:grid-cols-3">
+                                                        <Field label={tParty('field_icon')}>
+                                                            <Input
+                                                                value={draftIcon}
+                                                                onChange={event =>
+                                                                    setDraftIcon(event.target.value)
+                                                                }
+                                                                disabled={
+                                                                    !live || saveMutation.isPending
+                                                                }
+                                                                maxLength={8}
+                                                            />
+                                                        </Field>
+                                                        <Field label={tParty('field_color')}>
+                                                            <Input
+                                                                value={draftColor}
+                                                                onChange={event =>
+                                                                    setDraftColor(
+                                                                        event.target.value
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    !live || saveMutation.isPending
+                                                                }
+                                                                placeholder="var(--color-accent)"
+                                                            />
+                                                        </Field>
+                                                        <Field label={tParty('field_website')}>
+                                                            <Input
+                                                                value={draftWebsite}
+                                                                onChange={event =>
+                                                                    setDraftWebsite(
+                                                                        event.target.value
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    !live || saveMutation.isPending
+                                                                }
+                                                            />
+                                                        </Field>
+                                                    </div>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        <Button
+                                                            type="button"
+                                                            disabled={
+                                                                !live ||
+                                                                !draftName.trim() ||
+                                                                saveMutation.isPending
+                                                            }
+                                                            onClick={() => saveMutation.mutate()}>
+                                                            {t('ui.button.actions.save')}
+                                                        </Button>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            disabled={saveMutation.isPending}
+                                                            onClick={() => setEditingId(null)}>
+                                                            {t('ui.button.actions.cancel')}
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-start justify-between gap-3">
+                                                    <div className="min-w-0">
+                                                        <p className="truncate text-sm font-medium text-fg">
+                                                            {party.icon ? (
+                                                                <span
+                                                                    className="mr-1.5"
+                                                                    aria-hidden>
+                                                                    {party.icon}
+                                                                </span>
+                                                            ) : null}
+                                                            {party.name}
+                                                            {badge ? (
+                                                                <span className="ml-2 text-xs font-normal text-fg-muted">
+                                                                    · {badge}
+                                                                </span>
+                                                            ) : null}
+                                                        </p>
+                                                        <Typography
+                                                            as="p"
+                                                            variant="caption"
+                                                            className="mt-0.5">
+                                                            {uses === 0
+                                                                ? tParty('usage_none')
+                                                                : tParty('usage_count', {
+                                                                      count: uses,
+                                                                  })}
+                                                            {party.note ? ` · ${party.note}` : null}
+                                                        </Typography>
+                                                    </div>
+                                                    <div className="flex shrink-0 flex-wrap justify-end gap-2">
+                                                        {canSuggest ? (
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                disabled={!canSuggest}
+                                                                onClick={() =>
+                                                                    suggestMutation.mutate(party.id)
+                                                                }>
+                                                                {tParty('suggest')}
+                                                            </Button>
+                                                        ) : null}
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            disabled={!live}
+                                                            onClick={() => startEdit(party)}>
+                                                            {t('ui.button.actions.edit')}
+                                                        </Button>
+                                                        <ConfirmActionButton
+                                                            label={t('ui.button.actions.delete')}
+                                                            confirmLabel={tParty('confirm_remove')}
+                                                            disabled={
+                                                                !live || removeMutation.isPending
+                                                            }
+                                                            pending={removeMutation.isPending}
+                                                            onConfirm={() =>
+                                                                removeMutation.mutate(party.id)
+                                                            }
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        )}
+                    </div>
                 )}
                 <Typography as="p" variant="caption" className="mt-4 text-fg-muted">
                     {tParty('remove_hint')}
