@@ -235,7 +235,7 @@ export function permissionActionFromPath(
 
     if (
         /^(list|get|find)/.test(leaf) ||
-        /^(status|current|feed|session|summary|history|balances|members|settings|profile|inbox|plan|projections|byjar|levels|recap|forweek|logs)$/.test(
+        /^(status|current|feed|session|summary|history|balances|members|settings|profile|inbox|plan|period|year|projections|byjar|levels|recap|forweek|logs|suggestions)$/.test(
             leaf
         )
     ) {
@@ -244,7 +244,11 @@ export function permissionActionFromPath(
     if (/^(create|add|invite|import|onboard|complete|checkout|portal)/.test(leaf)) {
         return HouseholdPermissionAction.CREATE;
     }
-    if (/^(update|apply|dismiss|sort|schedule|change|set)/.test(leaf)) {
+    if (
+        /^(update|apply|dismiss|sort|schedule|change|set|carry|tick|untick|pause|resume|confirm|renew|snooze|enable|rotate|disable)/.test(
+            leaf
+        )
+    ) {
         return HouseholdPermissionAction.UPDATE;
     }
     if (/^(delete|remove|revoke|cancel|unlink)/.test(leaf)) {

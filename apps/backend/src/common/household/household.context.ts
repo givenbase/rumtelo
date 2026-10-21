@@ -1,10 +1,16 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
+import type { HouseholdAccessSource, HouseholdRelation } from '@rumtelo/contracts';
+
 export interface HouseholdContext {
     userId: string;
     /** Null only during household.onboard (user authenticated, org not yet created). */
     householdId: string | null;
     role: 'OWNER' | 'MEMBER' | 'VIEWER';
+    /** A seat in this household, or a Practice coach preview (never a participant). */
+    source: HouseholdAccessSource;
+    /** Seat relation (FAMILY / CIRCLE / EXTERNAL); null for previews and system jobs. */
+    relation: HouseholdRelation | null;
 }
 
 /**

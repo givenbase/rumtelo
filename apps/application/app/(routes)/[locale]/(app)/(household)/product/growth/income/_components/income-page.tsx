@@ -2,7 +2,7 @@
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { useDeferredValue, useMemo, useState } from 'react';
 
 import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
@@ -29,6 +29,7 @@ import { MetricStrip } from '@/components/features/money/metric-strip';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { ListSearchField } from '@/components/layout/list-controls';
 
 /** Demo fallback when no ACTIVE EARN goal is set. */
 const FALLBACK_TARGET = 600_000;
@@ -55,6 +56,8 @@ export function IncomePageClient() {
     const horizon = horizonMonths(travel);
     const traveling = travel.direction !== 'current';
     const live = isLiveData(householdId);
+    const [search, setSearch] = useState('');
+    const deferredSearch = useDeferredValue(search.trim().toLowerCase());
 
     const incomeQuery = useLiveQuery(
         apiQuery.money.income.list.queryOptions({ input: { householdId: householdId! } }),
@@ -244,10 +247,18 @@ export function IncomePageClient() {
 
             <div data-tour="income-sources">
                 <Card className="p-0">
-                    <div className="border-b border-line px-4 py-2.5 sm:px-5">
+                    <div className="grid gap-3 border-b border-line px-4 py-2.5 sm:px-5">
                         <Typography as="span" variant="eyebrow" color="primary">
                             {t('sources_heading')}
                         </Typography>
+                        {sources.length > 0 ? (
+                            <ListSearchField
+                                value={search}
+                                onChange={setSearch}
+                                placeholder={t('search_placeholder')}
+                                ariaLabel={t('search_aria')}
+                            />
+                        ) : null}
                     </div>
                     {sources.length === 0 ? (
                         <EmptyState
@@ -258,39 +269,59 @@ export function IncomePageClient() {
                         />
                     ) : (
                         <div className="grid gap-px">
-                            {sources.map(source => {
-                                const applies = applyingIds.has(source.id);
-                                const amountAsOf = applies
-                                    ? (incomeAmountAsOf(source, asOf) ?? source.amount)
-                                    : source.amount;
-                                return (
-                                    <Link
-                                        key={source.id}
-                                        href={updateHref('income', source.id)}
-                                        className="flex w-full items-center justify-between gap-3 border-b border-line px-4 py-2.5 text-left last:border-b-0 hover:bg-raised sm:px-5 sm:py-3">
-                                        <div>
-                                            <div className="text-sm text-fg">
-                                                {source.counterparty?.trim() || source.name}
+                            {sources
+                                .filter(source => {
+                                    if (!deferredSearch) return true;
+                                    const hay =
+                                        `${source.counterparty ?? ''} ${source.name}`.toLowerCase();
+                                    return hay.includes(deferredSearch);
+                                })
+                                .map(source => {
+                                    const applies = applyingIds.has(source.id);
+                                    const amountAsOf = applies
+                                        ? (incomeAmountAsOf(source, asOf) ?? source.amount)
+                                        : source.amount;
+                                    return (
+                                        <Link
+                                            key={source.id}
+                                            href={updateHref('income', source.id)}
+                                            className="flex w-full items-center justify-between gap-3 border-b border-line px-4 py-2.5 text-left last:border-b-0 hover:bg-raised sm:px-5 sm:py-3">
+                                            <div>
+                                                <div className="text-sm text-fg">
+                                                    {source.counterparty?.trim() || source.name}
+                                                </div>
+                                                <div className="mt-0.5 font-mono text-xs tracking-normal text-fg-faint">
+                                                    {applies
+                                                        ? source.counterparty?.trim()
+                                                            ? source.name
+                                                            : source.kind
+                                                        : tFixed('status_planned')}
+                                                </div>
                                             </div>
-                                            <div className="mt-0.5 font-mono text-xs tracking-normal text-fg-faint">
-                                                {applies
-                                                    ? source.counterparty?.trim()
-                                                        ? source.name
-                                                        : source.kind
-                                                    : tFixed('status_planned')}
-                                            </div>
-                                        </div>
-                                        <span
-                                            className={
-                                                applies
-                                                    ? 'font-mono text-sm text-success'
-                                                    : 'font-mono text-sm text-fg-muted'
-                                            }>
-                                            {formatMoney(amountAsOf)}
-                                        </span>
-                                    </Link>
-                                );
-                            })}
+                                            <span
+                                                className={
+                                                    applies
+                                                        ? 'font-mono text-sm text-success'
+                                                        : 'font-mono text-sm text-fg-muted'
+                                                }>
+                                                {formatMoney(amountAsOf)}
+                                            </span>
+                                        </Link>
+                                    );
+                                })}
+                            {deferredSearch &&
+                            !sources.some(source =>
+                                `${source.counterparty ?? ''} ${source.name}`
+                                    .toLowerCase()
+                                    .includes(deferredSearch)
+                            ) ? (
+                                <EmptyState
+                                    variant="compact"
+                                    className="border-0 bg-transparent"
+                                    title={t('empty_search_title')}
+                                    body={t('empty_search_body')}
+                                />
+                            ) : null}
                         </div>
                     )}
                 </Card>

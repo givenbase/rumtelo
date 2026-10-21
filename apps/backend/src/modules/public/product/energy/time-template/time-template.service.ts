@@ -92,6 +92,25 @@ export class TimeTemplateService {
         return this.withLearned(account.id, rows);
     }
 
+    /**
+     * Planned sleep minutes per ISO weekday (1–7) from the person's two templates.
+     * Weekdays without a template are absent. Feeds the sleep advice in Course › Schedule.
+     */
+    async sleepMinutesByWeekday(): Promise<Map<number, number>> {
+        // Energy entities stay out of MikroORM until they are redesigned (see
+        // mikro-orm.config.ts); until then there is no template to read.
+        if (!this.em.getMetadata().find(TimeTemplate)) return new Map();
+        const { account } = await this.accounts.ensureCurrentAccount();
+        const rows: TimeTemplate[] = await this.repo.find({ account: account.id });
+        const byWeekday = new Map<number, number>();
+        for (const row of rows) {
+            const minutes = row.minutes[TimeCategory.SLEEP] ?? 0;
+            if (minutes <= 0) continue;
+            for (const weekday of row.weekdays) byWeekday.set(weekday, minutes);
+        }
+        return byWeekday;
+    }
+
     // Private
 
     /**

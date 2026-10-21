@@ -13,6 +13,7 @@ import {
     PracticeClientLinkStatus,
     PracticeRole,
     PracticeSubscriptionStatus,
+    HouseholdAccessSource,
     type Address as AddressDto,
     type AddressInput,
     type HouseholdPracticeLink as HouseholdPracticeLinkDto,
@@ -382,7 +383,13 @@ export class PracticeService {
         const userId = currentUserId();
 
         return householdStorage.run(
-            { userId, householdId: link.household, role: 'VIEWER' },
+            {
+                userId,
+                householdId: link.household,
+                role: 'VIEWER',
+                source: HouseholdAccessSource.PRACTICE,
+                relation: null,
+            },
             async () => {
                 const [money, growth, energy, soul] = await Promise.all([
                     this.moneyDashboard.get(link.household, period),

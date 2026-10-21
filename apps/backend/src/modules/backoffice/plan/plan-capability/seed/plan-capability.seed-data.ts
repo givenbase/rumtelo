@@ -6,7 +6,7 @@ import {
 } from '@rumtelo/contracts';
 
 /**
- * PlanCapability seed — readable mirror of contracts (all 26 featureKeys).
+ * PlanCapability seed — readable mirror of contracts (all 29 featureKeys).
  *
  *   featureKey            BASIC  PLUS  MAX
  *   ────────────────────────────────────────
@@ -15,6 +15,8 @@ import {
  *   money-debt / bank / import    ✓     ✓
  *   energy-week/training/food        ✓     ✓
  *   platform-invite               ✓     ✓
+ *   platform-sharing                    ✓     ✓
+ *   growth-course                         ✓     ✓
  *   growth-income/net-worth/learn           ✓
  *   soul-centers                         ✓
  *

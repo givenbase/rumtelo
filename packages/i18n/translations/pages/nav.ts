@@ -24,6 +24,7 @@ const nav = {
         debt: 'Debt',
         fixed_costs: 'Fixed costs',
         growth_overview: 'Overview',
+        course: 'Course',
         goals: 'Goals',
         income: 'Income',
         learn: 'Learn',

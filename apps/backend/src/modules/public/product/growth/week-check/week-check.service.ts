@@ -30,6 +30,13 @@ export class GrowthWeekCheckService {
         return this.toDto(weekCheck);
     }
 
+    /** Weeks among `weeks` whose check is complete. Read-only: never creates a row. */
+    async completedWeeks(weeks: readonly string[]): Promise<Set<string>> {
+        if (weeks.length === 0) return new Set();
+        const rows = await this.weekChecks.find({ week: { $in: [...weeks] } });
+        return new Set(rows.filter(row => row.completedAt).map(row => row.week));
+    }
+
     async history() {
         const rows = await this.weekChecks.find({}, { orderBy: { week: 'DESC' }, limit: 26 });
         return rows.map(weekCheck => this.toDto(weekCheck));

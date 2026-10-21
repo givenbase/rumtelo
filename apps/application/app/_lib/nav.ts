@@ -91,6 +91,11 @@ const ALL_NAV_GROUPS = [
                 capabilityKey: CAPABILITIES.growthOverview,
             },
             {
+                href: productPath('growth/course'),
+                labelKey: 'pages.nav.children.course',
+                capabilityKey: CAPABILITIES.growthCourse,
+            },
+            {
                 href: productPath('growth/income'),
                 labelKey: 'pages.nav.children.income',
                 capabilityKey: CAPABILITIES.growthIncome,

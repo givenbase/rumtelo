@@ -40,6 +40,7 @@ import { useCategoryTemplates } from '@/components/features/forms/catalog-helper
 import { CoachVerdict } from '@/components/features/home/coach-verdict';
 import { HeroKluis } from '@/components/features/home/hero-kluis';
 import { PortalWidget } from '@/components/features/home/portal-widget';
+import { TodayCard } from '@/components/features/home/today-card';
 import { MonthScoreLog } from '@/components/features/home/month-score-log';
 import { JarDrilldownTable } from '@/components/features/money/jar-drilldown-table';
 import type { JarDrilldownItem } from '@/components/features/money/jar-drilldown-parts';
@@ -60,6 +61,7 @@ export function HomeDashboardClient() {
     const { period, showToast } = useHouseholdShell();
     const { canMutate, role } = useBoardWriteAccess();
     const helpersEnabled = useHelpersEnabled();
+    const canSeeHome = roleCanSee(role, HouseholdPermissionSection.HOME);
     const canSeeGrowth = roleCanSee(role, HouseholdPermissionSection.GROWTH);
     const canSeeEnergy = roleCanSee(role, HouseholdPermissionSection.ENERGY);
     const canSeeSoul = roleCanSee(role, HouseholdPermissionSection.SOUL);
@@ -527,6 +529,8 @@ export function HomeDashboardClient() {
                     />
                 </HeroKluis>
             </div>
+
+            {canSeeHome ? <TodayCard /> : null}
 
             <div
                 data-tour="home-portals"

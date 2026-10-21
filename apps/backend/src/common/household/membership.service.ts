@@ -1,6 +1,6 @@
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable } from '@nestjs/common';
-import { PracticeClientLinkStatus } from '@rumtelo/contracts';
+import { HouseholdRelation, PracticeClientLinkStatus } from '@rumtelo/contracts';
 
 import type { HouseholdContext } from './household.context';
 
@@ -25,24 +25,23 @@ export class MembershipService {
     // ====================================================================
 
     async roleFor(userId: string, householdId: string): Promise<HouseholdContext['role'] | null> {
+        return (await this.seatFor(userId, householdId))?.role ?? null;
+    }
+
+    /** Role + relation of the user's seat; null when they hold none. */
+    async seatFor(
+        userId: string,
+        householdId: string
+    ): Promise<Pick<HouseholdContext, 'role' | 'relation'> | null> {
         const membership = await this.em.findOne(AuthMember, {
             user: userId,
             household: householdId,
         });
         if (!membership) return null;
-
-        switch (membership.role.toLowerCase()) {
-            case 'owner':
-                return 'OWNER';
-            case 'admin':
-                // Collapsed into MEMBER (Owner / Member / Viewer ladder).
-                return 'MEMBER';
-            case 'member':
-                return 'MEMBER';
-            case 'viewer':
-            default:
-                return 'VIEWER';
-        }
+        return {
+            role: householdRoleOf(membership.role),
+            relation: householdRelationOf(membership.relation),
+        };
     }
 
     /**
@@ -72,4 +71,25 @@ export class MembershipService {
 
         return 'VIEWER';
     }
+}
+
+/** Better Auth role → product ladder; legacy `admin` collapses into MEMBER. */
+export function householdRoleOf(raw: string): HouseholdContext['role'] {
+    switch (raw.toLowerCase()) {
+        case 'owner':
+            return 'OWNER';
+        case 'admin':
+        case 'member':
+            return 'MEMBER';
+        case 'viewer':
+        default:
+            return 'VIEWER';
+    }
+}
+
+/** Seat relation column → enum; unknown or missing = FAMILY (the invite default). */
+export function householdRelationOf(raw: string | null | undefined): HouseholdRelation {
+    return Object.values(HouseholdRelation).includes(raw as HouseholdRelation)
+        ? (raw as HouseholdRelation)
+        : HouseholdRelation.FAMILY;
 }

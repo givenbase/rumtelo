@@ -126,6 +126,14 @@ export const CAPABILITY_CATALOG: Record<CapabilityKey, CapabilityDefinition> = {
             'Skills to work, and books, courses, seminars, and events we recommend — not host. Plus and Max.',
         sortOrder: 23,
     },
+    [CAPABILITIES.growthCourse]: {
+        key: CAPABILITIES.growthCourse,
+        kind: CapabilityKind.SCREEN,
+        name: 'Course',
+        description:
+            'Today, this week and your goals: your 3, your routines and the checks around them.',
+        sortOrder: 25,
+    },
     [CAPABILITIES.growthNetWorth]: {
         key: CAPABILITIES.growthNetWorth,
         kind: CapabilityKind.SCREEN,
@@ -217,6 +225,14 @@ export const CAPABILITY_CATALOG: Record<CapabilityKey, CapabilityDefinition> = {
         description: 'Invite a partner, family, friend, or coach (viewer) to the household.',
         sortOrder: 50,
     },
+    [CAPABILITIES.platformSharing]: {
+        key: CAPABILITIES.platformSharing,
+        kind: CapabilityKind.ACTION,
+        name: 'Sharing',
+        description:
+            'Choose per item who sees it (only me, the owner, the household, together), set what members may share, and see whose money is whose.',
+        sortOrder: 51,
+    },
 };
 
 /** Ordered list for seed / admin UIs. */
@@ -266,14 +282,14 @@ const PLUS_EXTRA: ProductFeatureMap = {
         CAPABILITIES.moneyBank,
         CAPABILITIES.moneyImport,
     ],
-    [CapabilityProduct.GROWTH]: [CAPABILITIES.growthLearn],
+    [CapabilityProduct.GROWTH]: [CAPABILITIES.growthLearn, CAPABILITIES.growthCourse],
     [CapabilityProduct.ENERGY]: [
         CAPABILITIES.energyWeek,
         CAPABILITIES.energyTraining,
         CAPABILITIES.energyFood,
     ],
     [CapabilityProduct.SOUL]: [],
-    [CapabilityProduct.PLATFORM]: [],
+    [CapabilityProduct.PLATFORM]: [CAPABILITIES.platformSharing],
 };
 
 const MAX_EXTRA: ProductFeatureMap = {
@@ -554,6 +570,11 @@ export function minPlanForCapability(capabilityKey: string): PlanKey | null {
 
 export function canInviteOnPlan(plan: PlanKey): boolean {
     return hasCapability(CAPABILITIES.platformInvite, plan);
+}
+
+/** Per-item visibility, sharing modes and money attribution (Plus+). */
+export function canShareOnPlan(plan: PlanKey): boolean {
+    return hasCapability(CAPABILITIES.platformSharing, plan);
 }
 
 /**

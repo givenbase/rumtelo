@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useDeferredValue, useState } from 'react';
 
 import {
     DEFAULT_JAR_SPLIT,
@@ -86,6 +86,7 @@ import { NecessitiesPressureCard } from '@/components/features/money/necessities
 import { BusinessHouseholdLeakCard } from '@/components/features/money/business-household-leak-card';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { ListSearchField } from '@/components/layout/list-controls';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
@@ -129,6 +130,8 @@ export function FixedCostsPageClient() {
     const filteredHolding = assetFilter ? holdingById.get(assetFilter) : undefined;
     const [tab, setTab] = useState<Tab>(searchParams.get('tab') === 'in' ? 'ERIN' : 'ERUIT');
     const [jarFilter, setJarFilter] = useState<JarKey | null>(null);
+    const [search, setSearch] = useState('');
+    const deferredSearch = useDeferredValue(search.trim().toLowerCase());
     const [openJarKeys, setOpenJarKeys] = useState<Set<string>>(() => new Set());
     const [selectMode, setSelectMode] = useState(false);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
@@ -249,6 +252,7 @@ export function FixedCostsPageClient() {
                   return {
                       id: source.id,
                       label: source.name,
+                      counterparty: source.counterparty,
                       amount,
                       monthly: monthlyAmount(amount, source.cadence),
                       cadence: source.cadence,
@@ -276,12 +280,24 @@ export function FixedCostsPageClient() {
     const holdingFixedCosts = assetFilter
         ? fixedCosts.filter(fixedCost => fixedCost.assetId === assetFilter)
         : fixedCosts;
-    const visibleFixedCosts = jarFilter
+    const jarScopedFixedCosts = jarFilter
         ? holdingFixedCosts.filter(fixedCost => fixedCost.jarKey === jarFilter)
         : holdingFixedCosts;
-    const visibleIncomeSources = assetFilter
+    const visibleFixedCosts = deferredSearch
+        ? jarScopedFixedCosts.filter(fixedCost =>
+              `${fixedCost.counterparty ?? ''} ${fixedCost.name}`
+                  .toLowerCase()
+                  .includes(deferredSearch)
+          )
+        : jarScopedFixedCosts;
+    const holdingIncomeSources = assetFilter
         ? incomeSources.filter(source => source.assetId === assetFilter)
         : incomeSources;
+    const visibleIncomeSources = deferredSearch
+        ? holdingIncomeSources.filter(source =>
+              `${source.counterparty ?? ''} ${source.label}`.toLowerCase().includes(deferredSearch)
+          )
+        : holdingIncomeSources;
 
     const groupedFixedCosts = splitJars
         .filter(jar => visibleFixedCosts.some(item => item.jarKey === jar.key))
@@ -672,6 +688,15 @@ export function FixedCostsPageClient() {
                                 </div>
                             </div>
 
+                            <div className="border-b border-line px-5 py-3">
+                                <ListSearchField
+                                    value={search}
+                                    onChange={setSearch}
+                                    placeholder={t('search_placeholder')}
+                                    ariaLabel={t('search_aria')}
+                                />
+                            </div>
+
                             {jarFilterJars.length > 0 ? (
                                 <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-line px-5 py-3">
                                     <span className="font-mono text-[10px] leading-none tracking-widest text-fg-muted uppercase">
@@ -726,9 +751,19 @@ export function FixedCostsPageClient() {
                                         variant="compact"
                                         className="border-0 bg-transparent"
                                         title={
-                                            jarFilter ? t('empty_jar_title') : t('empty_all_title')
+                                            deferredSearch
+                                                ? t('empty_search_title')
+                                                : jarFilter
+                                                  ? t('empty_jar_title')
+                                                  : t('empty_all_title')
                                         }
-                                        body={jarFilter ? t('empty_jar_body') : t('empty_all_body')}
+                                        body={
+                                            deferredSearch
+                                                ? t('empty_search_body')
+                                                : jarFilter
+                                                  ? t('empty_jar_body')
+                                                  : t('empty_all_body')
+                                        }
                                     />
                                 ) : (
                                     groupedFixedCosts.map(group => {
@@ -1172,84 +1207,108 @@ export function FixedCostsPageClient() {
                             </span>
                         </div>
 
+                        <div className="border-b border-line px-5 py-3">
+                            <ListSearchField
+                                value={search}
+                                onChange={setSearch}
+                                placeholder={t('search_placeholder')}
+                                ariaLabel={t('search_aria')}
+                            />
+                        </div>
+
                         <div className="grid">
-                            {visibleIncomeSources
-                                .slice()
-                                .sort((left, right) => {
-                                    const leftApplies = left.applies ? 0 : 1;
-                                    const rightApplies = right.applies ? 0 : 1;
-                                    if (leftApplies !== rightApplies) {
-                                        return leftApplies - rightApplies;
-                                    }
-                                    const byHolding = compareByHoldingLast(
-                                        left.assetId,
-                                        right.assetId,
-                                        id => holdingById.get(id)?.name ?? id
-                                    );
-                                    if (byHolding !== 0) return byHolding;
-                                    return left.label.localeCompare(right.label);
-                                })
-                                .map((source, i) => {
-                                    const due = formatDueDay(source.dueDay, tChips);
-                                    return (
-                                        <MoneyPartyRow
-                                            key={source.id ?? i}
-                                            title={source.label}
-                                            mark={partyMark(
-                                                { name: source.label },
-                                                catalogMarkChrome({
-                                                    billName: source.label,
-                                                    categoryTemplates,
-                                                })
-                                            )}
-                                            amount={formatMoney(source.monthly)}
-                                            amountClassName={
-                                                source.applies ? 'text-success' : 'text-fg-muted'
-                                            }
-                                            badges={
-                                                <>
-                                                    {due ? <MetaChip>{due}</MetaChip> : null}
-                                                    <MetaChip>
-                                                        {cadenceLabel(source.cadence, tChips)}
-                                                    </MetaChip>
-                                                    {source.cadence !== Cadence.MONTHLY ? (
+                            {deferredSearch && visibleIncomeSources.length === 0 ? (
+                                <EmptyState
+                                    variant="compact"
+                                    className="border-0 bg-transparent"
+                                    title={t('empty_search_title')}
+                                    body={t('empty_search_body')}
+                                />
+                            ) : (
+                                visibleIncomeSources
+                                    .slice()
+                                    .sort((left, right) => {
+                                        const leftApplies = left.applies ? 0 : 1;
+                                        const rightApplies = right.applies ? 0 : 1;
+                                        if (leftApplies !== rightApplies) {
+                                            return leftApplies - rightApplies;
+                                        }
+                                        const byHolding = compareByHoldingLast(
+                                            left.assetId,
+                                            right.assetId,
+                                            id => holdingById.get(id)?.name ?? id
+                                        );
+                                        if (byHolding !== 0) return byHolding;
+                                        return left.label.localeCompare(right.label);
+                                    })
+                                    .map((source, i) => {
+                                        const due = formatDueDay(source.dueDay, tChips);
+                                        return (
+                                            <MoneyPartyRow
+                                                key={source.id ?? i}
+                                                title={source.label}
+                                                mark={partyMark(
+                                                    { name: source.label },
+                                                    catalogMarkChrome({
+                                                        billName: source.label,
+                                                        categoryTemplates,
+                                                    })
+                                                )}
+                                                amount={formatMoney(source.monthly)}
+                                                amountClassName={
+                                                    source.applies
+                                                        ? 'text-success'
+                                                        : 'text-fg-muted'
+                                                }
+                                                badges={
+                                                    <>
+                                                        {due ? <MetaChip>{due}</MetaChip> : null}
                                                         <MetaChip>
-                                                            {tChips('amount_per_month', {
-                                                                amount: formatMoney(source.monthly),
-                                                            })}
+                                                            {cadenceLabel(source.cadence, tChips)}
                                                         </MetaChip>
-                                                    ) : null}
-                                                    <HoldingChip assetId={source.assetId} />
-                                                    <DepositBankChip
-                                                        bankId={source.bankId}
-                                                        accountId={source.accountId}
-                                                    />
-                                                </>
-                                            }
-                                            href={
-                                                source.id
-                                                    ? updateHref('income', source.id)
-                                                    : CREATE_HREF.income
-                                            }
-                                            status={
-                                                source.applies ? null : (
-                                                    <FixedCostPeriodStatusControl
-                                                        status={FixedCostPeriodStatus.UPCOMING}
-                                                        labels={{
-                                                            taken: t('status_taken'),
-                                                            due: t('status_due'),
-                                                            skipped: t('status_skipped'),
-                                                            planned: t('status_planned'),
-                                                            markPaidAria: t('mark_paid_short'),
-                                                            markPaidConfirm: t('mark_paid_confirm'),
-                                                            markPaidPending: t('mark_paid_pending'),
-                                                        }}
-                                                    />
-                                                )
-                                            }
-                                        />
-                                    );
-                                })}
+                                                        {source.cadence !== Cadence.MONTHLY ? (
+                                                            <MetaChip>
+                                                                {tChips('amount_per_month', {
+                                                                    amount: formatMoney(
+                                                                        source.monthly
+                                                                    ),
+                                                                })}
+                                                            </MetaChip>
+                                                        ) : null}
+                                                        <HoldingChip assetId={source.assetId} />
+                                                        <DepositBankChip
+                                                            bankId={source.bankId}
+                                                            accountId={source.accountId}
+                                                        />
+                                                    </>
+                                                }
+                                                href={
+                                                    source.id
+                                                        ? updateHref('income', source.id)
+                                                        : CREATE_HREF.income
+                                                }
+                                                status={
+                                                    source.applies ? null : (
+                                                        <FixedCostPeriodStatusControl
+                                                            status={FixedCostPeriodStatus.UPCOMING}
+                                                            labels={{
+                                                                taken: t('status_taken'),
+                                                                due: t('status_due'),
+                                                                skipped: t('status_skipped'),
+                                                                planned: t('status_planned'),
+                                                                markPaidAria: t('mark_paid_short'),
+                                                                markPaidConfirm:
+                                                                    t('mark_paid_confirm'),
+                                                                markPaidPending:
+                                                                    t('mark_paid_pending'),
+                                                            }}
+                                                        />
+                                                    )
+                                                }
+                                            />
+                                        );
+                                    })
+                            )}
                         </div>
 
                         <div className="border-t border-line px-5 py-4">

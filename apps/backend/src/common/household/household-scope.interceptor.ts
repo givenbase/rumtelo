@@ -7,6 +7,7 @@ import {
     type ExecutionContext,
     type NestInterceptor,
 } from '@nestjs/common';
+import { HouseholdAccessSource } from '@rumtelo/contracts';
 import { AuthService } from '@thallesp/nestjs-better-auth';
 import { fromNodeHeaders } from 'better-auth/node';
 import { Observable } from 'rxjs';
@@ -88,17 +89,23 @@ export class HouseholdScopeInterceptor implements NestInterceptor {
         // never 403 practice routes for a missing / foreign household.
         if (isPractice) {
             if (householdId) {
-                const role = await this.membership.roleFor(userId, householdId);
-                if (role) {
+                const seat = await this.membership.seatFor(userId, householdId);
+                if (seat) {
                     return {
-                        ctx: { userId, householdId, role },
+                        ctx: { userId, householdId, ...seat, source: HouseholdAccessSource.SEAT },
                         headers,
                         practiceCtx,
                     };
                 }
             }
             return {
-                ctx: { userId, householdId: null, role: 'OWNER' },
+                ctx: {
+                    userId,
+                    householdId: null,
+                    role: 'OWNER',
+                    source: HouseholdAccessSource.SEAT,
+                    relation: null,
+                },
                 headers,
                 practiceCtx,
             };
@@ -106,7 +113,13 @@ export class HouseholdScopeInterceptor implements NestInterceptor {
 
         if (!householdId && (isOnboard || isAccountPersonal)) {
             return {
-                ctx: { userId, householdId: null, role: 'OWNER' },
+                ctx: {
+                    userId,
+                    householdId: null,
+                    role: 'OWNER',
+                    source: HouseholdAccessSource.SEAT,
+                    relation: null,
+                },
                 headers,
                 practiceCtx,
             };
@@ -114,9 +127,13 @@ export class HouseholdScopeInterceptor implements NestInterceptor {
 
         if (!householdId) throw apiForbidden('no_household_selected');
 
-        const role = await this.membership.roleFor(userId, householdId);
-        if (role) {
-            return { ctx: { userId, householdId, role }, headers, practiceCtx };
+        const seat = await this.membership.seatFor(userId, householdId);
+        if (seat) {
+            return {
+                ctx: { userId, householdId, ...seat, source: HouseholdAccessSource.SEAT },
+                headers,
+                practiceCtx,
+            };
         }
 
         // Practice coach preview: not a household member, but linked via PracticeClientLink.
@@ -129,7 +146,13 @@ export class HouseholdScopeInterceptor implements NestInterceptor {
             );
             if (previewRole) {
                 return {
-                    ctx: { userId, householdId, role: previewRole },
+                    ctx: {
+                        userId,
+                        householdId,
+                        role: previewRole,
+                        source: HouseholdAccessSource.PRACTICE,
+                        relation: null,
+                    },
                     headers,
                     practiceCtx,
                 };
@@ -148,6 +171,8 @@ function isSystemPublicPath(pathname: string): boolean {
         pathname.startsWith('/api/docs') ||
         pathname.startsWith('/health') ||
         pathname.startsWith('/webhooks/') ||
+        // Course calendar feed: secret token, scope set by CourseFeedService.
+        pathname.startsWith('/calendar/') ||
         pathname.startsWith('/access-denied') ||
         pathname.startsWith('/email-preview')
     );
