@@ -72,7 +72,7 @@ describe('sharingModeFor', () => {
     it('forces SEPARATE without the sharing capability', () => {
         const settings = { mode: HouseholdSharingMode.TOGETHER, areas: {} };
         assert.equal(
-            sharingModeFor(VisibilityArea.GROWTH_PLAN, settings, false),
+            sharingModeFor(VisibilityArea.GROWTH_COURSE, settings, false),
             HouseholdSharingMode.SEPARATE
         );
     });
@@ -97,7 +97,7 @@ describe('sharingModeFor', () => {
 
     it('falls back to the household mode (default OWNER_SEES)', () => {
         assert.equal(
-            sharingModeFor(VisibilityArea.GROWTH_PLAN, DEFAULT_VISIBILITY_SETTINGS, true),
+            sharingModeFor(VisibilityArea.GROWTH_COURSE, DEFAULT_VISIBILITY_SETTINGS, true),
             HouseholdSharingMode.OWNER_SEES
         );
     });

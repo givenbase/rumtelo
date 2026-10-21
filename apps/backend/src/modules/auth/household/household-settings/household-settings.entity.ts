@@ -32,6 +32,8 @@ export const DEFAULT_WEEK_CHECK_SETTINGS: HouseholdWeekCheckSettings = {
 export const DEFAULT_FEATURE_SETTINGS: HouseholdFeatureSettings = {
     isBankSyncEnabled: false,
     isCoachEnabled: true,
+    isCourseQuartersEnabled: false,
+    isCourseDaysEnabled: false,
 };
 
 /**

@@ -12,7 +12,7 @@ import { NativeEnum } from './native-enum.util';
  * ```
  * HouseholdEntity              id, createdAt, updatedAt, household
  *   └─ PersonalHouseholdEntity   + account (maker, null = together), visibility
- *         ├─ GrowthPlanItem
+ *         ├─ GrowthCourseItem
  *         └─ … Learn, Energy, Soul, personal money (see visibility plan)
  * ```
  *

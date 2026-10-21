@@ -109,6 +109,16 @@ const capabilities = {
         name: 'Invite',
         description: 'Invite a partner, family, friend, or coach (viewer) to the household.',
     },
+    'platform-sharing': {
+        name: 'Sharing',
+        description:
+            'Choose per item who sees it, set what members may share, and see whose money is whose. Plus and Max.',
+    },
+    'growth-course': {
+        name: 'Course',
+        description:
+            'Your 3 for this week, linked to the month and the goal they serve. Plus and Max.',
+    },
 } as const;
 
 export default capabilities;

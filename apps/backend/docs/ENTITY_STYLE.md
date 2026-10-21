@@ -50,7 +50,7 @@ Every domain entity must extend one of:
 | `CatalogEntity` | **Extends** `BaseEntity` + `key`, `name`, `sortOrder`, `isActive`. Every company-authored catalog / preset / template with a free-text key (`CategoryTemplate`, `MerchantPreset`, `PlanFeature`, `WealthStage`, …). Mirrors `CatalogItemBase` in contracts |
 | `HouseholdEntity` | **Extends** `BaseEntity` and adds `household` → `AuthHousehold` via `@ManyToOne({ mapToPk: true })` (money / product / household settings) |
 | `WeekCheckEntity` | **Extends** `HouseholdEntity` + `week`, `completedAt`. The four portal week checks (`MoneyWeekCheck`, `GrowthWeekCheck`, `EnergyWeekCheck`, `SoulWeekCheck`) |
-| `PersonalHouseholdEntity` | **Extends** `HouseholdEntity` + `account` (maker, null = together) and `visibility`. Person-attributed rows read through `PersonalScopedRepository` (`GrowthPlanItem`). Add `@Check(personalRowCheck('<table>'))` on the concrete class. See `docs/engineering/household-visibility-plan.md` |
+| `PersonalHouseholdEntity` | **Extends** `HouseholdEntity` + `account` (maker, null = together) and `visibility`. Person-attributed rows read through `PersonalScopedRepository` (`GrowthCourseItem`). Add `@Check(personalRowCheck('<table>'))` on the concrete class. See `docs/engineering/household-visibility-plan.md` |
 
 ```text
 BaseEntity ─┬─ CatalogEntity

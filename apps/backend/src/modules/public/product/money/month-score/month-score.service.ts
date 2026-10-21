@@ -55,6 +55,13 @@ export class MonthScoreService {
     // ? READ Operations
     // ====================================================================
 
+    /** Months among `periods` that are closed. Read-only. */
+    async closedPeriods(periods: readonly string[]): Promise<Set<string>> {
+        if (periods.length === 0) return new Set();
+        const rows = await this.scores.find({ period: { $in: [...periods] }, isClosed: true });
+        return new Set(rows.map(row => row.period));
+    }
+
     async current(period: string) {
         const monthScore = await this.scores.findOne({ period });
         const events = monthScore

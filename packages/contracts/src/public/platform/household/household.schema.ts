@@ -96,6 +96,10 @@ export const HouseholdWeekCheckSettings = z.object({
 export const HouseholdFeatureSettings = z.object({
     isBankSyncEnabled: z.boolean(),
     isCoachEnabled: z.boolean(),
+    /** Growth Course: show the quarter layer between goals and month. */
+    isCourseQuartersEnabled: z.boolean(),
+    /** Growth Course: show the day layer under the week. */
+    isCourseDaysEnabled: z.boolean(),
 });
 
 /**

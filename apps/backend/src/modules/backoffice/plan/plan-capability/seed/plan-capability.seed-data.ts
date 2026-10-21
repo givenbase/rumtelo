@@ -16,7 +16,7 @@ import {
  *   energy-week/training/food        ✓     ✓
  *   platform-invite               ✓     ✓
  *   platform-sharing                    ✓     ✓
- *   growth-plan                         ✓     ✓
+ *   growth-course                         ✓     ✓
  *   growth-income/net-worth/learn           ✓
  *   soul-centers                         ✓
  *

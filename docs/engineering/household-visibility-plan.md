@@ -58,7 +58,7 @@ Een **onderdeel** (`VisibilityArea`) is een soort persoonlijke data. De catalogu
 
 | Onderdeel | Portaal | Tabellen | Standaard | Waarom |
 | --- | --- | --- | --- | --- |
-| `growth.plan`: Koers-doelen | Groei | `growth_plan_item`, `growth_week_check_entry` | volgt het huishouden | samen plannen is het doel |
+| `growth.course`: Koers-doelen | Groei | `growth_course_item`, `growth_week_check_entry` | volgt het huishouden | samen plannen is het doel |
 | `growth.learn`: Leren | Groei | `learn_focus`, `learn_progress`, `learn_book` | volgt het huishouden | |
 | `energy.log`: Energiemetingen (slaap, training, voeding, hoofd) | Energie | `energy_log` | **`SEPARATE`**, gevoelig | gezondheidsgegevens (AVG art. 9): delen alleen als het huishouden het zelf aanzet |
 | `energy.time`: Tijdsbesteding | Energie | `time_entry`, `time_template` | volgt het huishouden | |
@@ -186,7 +186,7 @@ Net als `role-permissions.ts` is dit de bron van waarheid voor UI en backend:
 
 - **`database/personal.entity.ts`**: `PersonalHouseholdEntity extends HouseholdEntity` met `account` (nullable, cascade), `visibility` (`NativeEnum`, standaard `PRIVATE`), index op (`household`, `account`) en de check-constraint `account IS NOT NULL OR visibility = 'HOUSEHOLD'`.
 - **`household/household.context.ts`**: `HouseholdContext` krijgt `accountId`, `relation` en `source: 'SEAT' | 'PRACTICE'` (plus `practiceId`). De `household-scope.interceptor` vult ze al bij het oplossen van de rol. Een coach-preview is dan niet meer te verwarren met een VIEWER-stoel.
-- **`household/personal-scoped.repository.ts`**: `PersonalScopedRepository<T extends PersonalHouseholdEntity> extends HouseholdScopedRepository<T>`, gemaakt met het onderdeel erbij: `new PersonalScopedRepository(em, GrowthPlanItem, VisibilityArea.GROWTH_PLAN)`. Het voegt bij `find`, `findOne` en `count` het zichtbaarheidsfilter toe uit de context (`scope()` wordt daarvoor `protected`). `create` zet `account` op de huidige persoon en weigert opties die `visibilityOptionsFor` niet toestaat. `assertCanEdit(entity)` is er voor updates en deletes. Daarnaast is er `countHidden(where)` voor "+1 privé".
+- **`household/personal-scoped.repository.ts`**: `PersonalScopedRepository<T extends PersonalHouseholdEntity> extends HouseholdScopedRepository<T>`, gemaakt met het onderdeel erbij: `new PersonalScopedRepository(em, GrowthCourseItem, VisibilityArea.GROWTH_COURSE)`. Het voegt bij `find`, `findOne` en `count` het zichtbaarheidsfilter toe uit de context (`scope()` wordt daarvoor `protected`). `create` zet `account` op de huidige persoon en weigert opties die `visibilityOptionsFor` niet toestaat. `assertCanEdit(entity)` is er voor updates en deletes. Daarnaast is er `countHidden(where)` voor "+1 privé".
 - **`household/visibility.service.ts`**: laadt de zichtbaarheidsinstellingen één keer per request (uit `HouseholdSettings`) en de praktijktoestemmingen. `modeFor(area)` gebruikt `sharingModeFor` uit contracts. Hij bouwt het filter met dezelfde regels als `canSee`.
 
 Het filter per kijker (vóór regel 3):
@@ -211,7 +211,7 @@ Het filter per kijker (vóór regel 3):
 
 | Tabel | Nu | Wordt |
 | --- | --- | --- |
-| `growth_plan_item` (nieuw) | — | eerste gebruiker; *Samen* toegestaan |
+| `growth_course_item` (nieuw) | — | eerste gebruiker; *Samen* toegestaan |
 | `growth_week_check_entry` (nieuw) | — | persoonlijk; in de weekcheck zichtbaar volgens dezelfde regels |
 | `learn_focus`, `learn_progress`, `learn_book` | filter `account = ik` | persoonlijk, migratie op `PRIVATE` |
 | `energy_log`, `time_entry`, `time_template` | eigen rijen; de weeksamenvatting telt per lid | persoonlijk, migratie op `PRIVATE`; de samenvatting toont per lid alleen zichtbare rijen, de rest als "privé" |
@@ -238,8 +238,9 @@ Klaar als: in een testhuishouden met OWNER, MEMBER, VIEWER, een `EXTERNAL`-stoel
 
 ### Fase 1: Groei-cascade
 
-- [x] `growth_plan_item` op `PersonalHouseholdEntity`
-- [ ] `VisibilityPicker` en `VisibilityBadge`; instellingen voor de algemene modus, "Per onderdeel" en de eigen standaard
+- [x] `growth_course_item` op `PersonalHouseholdEntity`
+- [x] `VisibilityPicker` en `VisibilityBadge`; instellingen voor de algemene modus en "Per onderdeel"
+- [ ] Eigen standaard per persoon (`AccountSettings.visibility.defaultPrivate`)
 
 ### Fase 2: bestaande persoonlijke tabellen
 

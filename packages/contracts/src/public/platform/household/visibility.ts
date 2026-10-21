@@ -39,7 +39,7 @@ export interface VisibilityAreaDefinition {
 }
 
 export const VISIBILITY_AREAS: Record<VisibilityArea, VisibilityAreaDefinition> = {
-    [VisibilityArea.GROWTH_PLAN]: { portal: 'growth', isSensitive: false, mode: null },
+    [VisibilityArea.GROWTH_COURSE]: { portal: 'growth', isSensitive: false, mode: null },
     [VisibilityArea.GROWTH_LEARN]: { portal: 'growth', isSensitive: false, mode: null },
     [VisibilityArea.ENERGY_LOG]: {
         portal: 'energy',

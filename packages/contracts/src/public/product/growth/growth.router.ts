@@ -12,7 +12,7 @@ import { growthDashboardContract } from './dashboard/dashboard.contract';
 import { learnContract } from './learn/learn.contract';
 import { leverContract } from './lever/lever.contract';
 import { milestoneContract } from './milestone/milestone.contract';
-import { planContract } from './plan/plan.contract';
+import { courseContract } from './course/course.contract';
 import { growthWeekCheckContract } from './week-check/week-check.contract';
 
 export const contract = {
@@ -23,5 +23,5 @@ export const contract = {
     catalogs: growthCatalogsContract,
     learn: learnContract,
     assets: assetContract,
-    plan: planContract,
+    course: courseContract,
 };

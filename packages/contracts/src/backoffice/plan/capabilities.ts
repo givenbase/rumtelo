@@ -63,7 +63,7 @@ export const FEATURES = {
         income: capabilityKey(CapabilityProduct.GROWTH, 'income'),
         netWorth: capabilityKey(CapabilityProduct.GROWTH, 'net-worth'),
         learn: capabilityKey(CapabilityProduct.GROWTH, 'learn'),
-        plan: capabilityKey(CapabilityProduct.GROWTH, 'plan'),
+        course: capabilityKey(CapabilityProduct.GROWTH, 'course'),
     },
     [CapabilityProduct.ENERGY]: {
         overview: capabilityKey(CapabilityProduct.ENERGY, 'overview'),
@@ -103,7 +103,7 @@ export const CAPABILITIES = {
     growthIncome: FEATURES.growth.income,
     growthNetWorth: FEATURES.growth.netWorth,
     growthLearn: FEATURES.growth.learn,
-    growthPlan: FEATURES.growth.plan,
+    growthCourse: FEATURES.growth.course,
     energyOverview: FEATURES.energy.overview,
     energySleep: FEATURES.energy.sleep,
     energyWeek: FEATURES.energy.week,

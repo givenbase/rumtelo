@@ -14,31 +14,31 @@
  * A week belongs to the month (and year) its Thursday falls in — the ISO rule.
  */
 
-import { PlanHorizon } from '../enums';
+import { CourseHorizon } from '../enums';
 
-const PATTERNS: Record<PlanHorizon, RegExp> = {
-    [PlanHorizon.YEAR]: /^\d{4}$/,
-    [PlanHorizon.QUARTER]: /^\d{4}-Q[1-4]$/,
-    [PlanHorizon.MONTH]: /^\d{4}-(0[1-9]|1[0-2])$/,
-    [PlanHorizon.WEEK]: /^\d{4}-W(0[1-9]|[1-4]\d|5[0-3])$/,
-    [PlanHorizon.DAY]: /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/,
+const PATTERNS: Record<CourseHorizon, RegExp> = {
+    [CourseHorizon.YEAR]: /^\d{4}$/,
+    [CourseHorizon.QUARTER]: /^\d{4}-Q[1-4]$/,
+    [CourseHorizon.MONTH]: /^\d{4}-(0[1-9]|1[0-2])$/,
+    [CourseHorizon.WEEK]: /^\d{4}-W(0[1-9]|[1-4]\d|5[0-3])$/,
+    [CourseHorizon.DAY]: /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/,
 };
 
 const ORDER = [
-    PlanHorizon.YEAR,
-    PlanHorizon.QUARTER,
-    PlanHorizon.MONTH,
-    PlanHorizon.WEEK,
-    PlanHorizon.DAY,
+    CourseHorizon.YEAR,
+    CourseHorizon.QUARTER,
+    CourseHorizon.MONTH,
+    CourseHorizon.WEEK,
+    CourseHorizon.DAY,
 ] as const;
 
 const DAY_MS = 86_400_000;
 
 /** True when `period` is a well-formed key for `horizon` (and a real date / ISO week). */
-export function isPlanPeriod(horizon: PlanHorizon, period: string): boolean {
+export function isCoursePeriod(horizon: CourseHorizon, period: string): boolean {
     if (!PATTERNS[horizon].test(period)) return false;
-    if (horizon === PlanHorizon.DAY) return toIsoDate(dateOfDay(period)) === period;
-    if (horizon === PlanHorizon.WEEK) {
+    if (horizon === CourseHorizon.DAY) return toIsoDate(dateOfDay(period)) === period;
+    if (horizon === CourseHorizon.WEEK) {
         const [year, week] = splitWeek(period);
         return week <= isoWeeksInYear(year);
     }
@@ -46,111 +46,111 @@ export function isPlanPeriod(horizon: PlanHorizon, period: string): boolean {
 }
 
 /** One layer up; null for YEAR. */
-export function parentHorizon(horizon: PlanHorizon): PlanHorizon | null {
+export function parentHorizon(horizon: CourseHorizon): CourseHorizon | null {
     return ORDER[ORDER.indexOf(horizon) - 1] ?? null;
 }
 
 /** One layer down; null for DAY. */
-export function childHorizon(horizon: PlanHorizon): PlanHorizon | null {
+export function childHorizon(horizon: CourseHorizon): CourseHorizon | null {
     return ORDER[ORDER.indexOf(horizon) + 1] ?? null;
 }
 
 /** Key of the containing period one layer up; null for YEAR. */
-export function parentPeriodOf(horizon: PlanHorizon, period: string): string | null {
+export function parentPeriodOf(horizon: CourseHorizon, period: string): string | null {
     switch (horizon) {
-        case PlanHorizon.YEAR:
+        case CourseHorizon.YEAR:
             return null;
-        case PlanHorizon.QUARTER:
+        case CourseHorizon.QUARTER:
             return period.slice(0, 4);
-        case PlanHorizon.MONTH: {
+        case CourseHorizon.MONTH: {
             const month = Number(period.slice(5, 7));
             return `${period.slice(0, 4)}-Q${Math.ceil(month / 3)}`;
         }
-        case PlanHorizon.WEEK:
+        case CourseHorizon.WEEK:
             return toIsoDate(thursdayOfWeek(period)).slice(0, 7);
-        case PlanHorizon.DAY:
+        case CourseHorizon.DAY:
             return weekKeyOf(dateOfDay(period));
     }
 }
 
 /** Key of the period containing `date` (UTC calendar). */
-export function planPeriodOf(horizon: PlanHorizon, date: Date): string {
+export function coursePeriodOf(horizon: CourseHorizon, date: Date): string {
     const day = toIsoDate(date);
     switch (horizon) {
-        case PlanHorizon.YEAR:
+        case CourseHorizon.YEAR:
             return day.slice(0, 4);
-        case PlanHorizon.QUARTER:
+        case CourseHorizon.QUARTER:
             return `${day.slice(0, 4)}-Q${Math.ceil(Number(day.slice(5, 7)) / 3)}`;
-        case PlanHorizon.MONTH:
+        case CourseHorizon.MONTH:
             return day.slice(0, 7);
-        case PlanHorizon.WEEK:
+        case CourseHorizon.WEEK:
             return weekKeyOf(date);
-        case PlanHorizon.DAY:
+        case CourseHorizon.DAY:
             return day;
     }
 }
 
 /** The period right after `period` (carry forward). */
-export function nextPlanPeriod(horizon: PlanHorizon, period: string): string {
-    return shiftPlanPeriod(horizon, period, 1);
+export function nextCoursePeriod(horizon: CourseHorizon, period: string): string {
+    return shiftCoursePeriod(horizon, period, 1);
 }
 
 /** Move `steps` periods forward (negative = back). */
-export function shiftPlanPeriod(horizon: PlanHorizon, period: string, steps: number): string {
+export function shiftCoursePeriod(horizon: CourseHorizon, period: string, steps: number): string {
     switch (horizon) {
-        case PlanHorizon.YEAR:
+        case CourseHorizon.YEAR:
             return String(Number(period) + steps);
-        case PlanHorizon.QUARTER: {
+        case CourseHorizon.QUARTER: {
             const index = Number(period.slice(0, 4)) * 4 + Number(period.slice(6)) - 1 + steps;
             return `${Math.floor(index / 4)}-Q${(index % 4) + 1}`;
         }
-        case PlanHorizon.MONTH: {
+        case CourseHorizon.MONTH: {
             const index = Number(period.slice(0, 4)) * 12 + Number(period.slice(5, 7)) - 1 + steps;
             return `${Math.floor(index / 12)}-${String((index % 12) + 1).padStart(2, '0')}`;
         }
-        case PlanHorizon.WEEK:
+        case CourseHorizon.WEEK:
             return weekKeyOf(new Date(mondayOfWeek(period).getTime() + steps * 7 * DAY_MS));
-        case PlanHorizon.DAY:
+        case CourseHorizon.DAY:
             return toIsoDate(new Date(dateOfDay(period).getTime() + steps * DAY_MS));
     }
 }
 
 /** Child period keys one layer down, in order (a month lists the weeks whose Thursday it holds). */
-export function childPeriodsOf(horizon: PlanHorizon, period: string): string[] {
+export function childPeriodsOf(horizon: CourseHorizon, period: string): string[] {
     switch (horizon) {
-        case PlanHorizon.YEAR:
+        case CourseHorizon.YEAR:
             return [1, 2, 3, 4].map(quarter => `${period}-Q${quarter}`);
-        case PlanHorizon.QUARTER: {
+        case CourseHorizon.QUARTER: {
             const first = (Number(period.slice(6)) - 1) * 3 + 1;
             return [first, first + 1, first + 2].map(
                 month => `${period.slice(0, 4)}-${String(month).padStart(2, '0')}`
             );
         }
-        case PlanHorizon.MONTH: {
+        case CourseHorizon.MONTH: {
             const weeks: string[] = [];
             let week = weekKeyOf(new Date(`${period}-01T00:00:00Z`));
-            if (parentPeriodOf(PlanHorizon.WEEK, week) !== period) {
-                week = shiftPlanPeriod(PlanHorizon.WEEK, week, 1);
+            if (parentPeriodOf(CourseHorizon.WEEK, week) !== period) {
+                week = shiftCoursePeriod(CourseHorizon.WEEK, week, 1);
             }
-            while (parentPeriodOf(PlanHorizon.WEEK, week) === period) {
+            while (parentPeriodOf(CourseHorizon.WEEK, week) === period) {
                 weeks.push(week);
-                week = shiftPlanPeriod(PlanHorizon.WEEK, week, 1);
+                week = shiftCoursePeriod(CourseHorizon.WEEK, week, 1);
             }
             return weeks;
         }
-        case PlanHorizon.WEEK: {
+        case CourseHorizon.WEEK: {
             const monday = mondayOfWeek(period).getTime();
             return [0, 1, 2, 3, 4, 5, 6].map(offset =>
                 toIsoDate(new Date(monday + offset * DAY_MS))
             );
         }
-        case PlanHorizon.DAY:
+        case CourseHorizon.DAY:
             return [];
     }
 }
 
 /** True when `above` is a larger layer than `horizon` (year above quarter, …). */
-export function isHorizonAbove(above: PlanHorizon, horizon: PlanHorizon): boolean {
+export function isHorizonAbove(above: CourseHorizon, horizon: CourseHorizon): boolean {
     return ORDER.indexOf(above) < ORDER.indexOf(horizon);
 }
 
@@ -160,9 +160,9 @@ export function isHorizonAbove(above: PlanHorizon, horizon: PlanHorizon): boolea
  * under a year goal when the layers between are switched off or simply skipped.
  */
 export function ancestorPeriodOf(
-    horizon: PlanHorizon,
+    horizon: CourseHorizon,
     period: string,
-    ancestorHorizon: PlanHorizon
+    ancestorHorizon: CourseHorizon
 ): string | null {
     if (!isHorizonAbove(ancestorHorizon, horizon)) return null;
     let current = { horizon, period };

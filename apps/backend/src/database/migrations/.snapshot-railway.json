@@ -278,7 +278,7 @@
         },
         "kind": {
           "name": "kind",
-          "type": "public.auth_account_address_kind",
+          "type": "auth_account_address_kind",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -295,8 +295,8 @@
             "HOME",
             "MAILING"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.auth_account_address_kind"
+          "mappedType": "unknown",
+          "nativeEnumName": "auth_account_address_kind"
         },
         "updated_at": {
           "name": "updated_at",
@@ -426,7 +426,7 @@
         },
         "locale": {
           "name": "locale",
-          "type": "public.auth_locale",
+          "type": "auth_locale",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -444,8 +444,8 @@
             "ES",
             "FR"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.auth_locale"
+          "mappedType": "unknown",
+          "nativeEnumName": "auth_locale"
         },
         "onboarded_at": {
           "name": "onboarded_at",
@@ -466,7 +466,7 @@
         },
         "spending_style": {
           "name": "spending_style",
-          "type": "public.money_spending_style",
+          "type": "money_spending_style",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -484,12 +484,12 @@
             "BALANCED",
             "UNKNOWN"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_spending_style"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_spending_style"
         },
         "theme": {
           "name": "theme",
-          "type": "public.auth_theme",
+          "type": "auth_theme",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -506,8 +506,8 @@
             "DARK",
             "SYSTEM"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.auth_theme"
+          "mappedType": "unknown",
+          "nativeEnumName": "auth_theme"
         },
         "tour": {
           "name": "tour",
@@ -843,7 +843,7 @@
         },
         "plan_key": {
           "name": "plan_key",
-          "type": "public.backoffice_plan_key",
+          "type": "backoffice_plan_key",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -860,12 +860,12 @@
             "PLUS",
             "MAX"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.backoffice_plan_key"
+          "mappedType": "unknown",
+          "nativeEnumName": "backoffice_plan_key"
         },
         "scheduled_plan_key": {
           "name": "scheduled_plan_key",
-          "type": "public.backoffice_plan_key",
+          "type": "backoffice_plan_key",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -882,8 +882,8 @@
             "PLUS",
             "MAX"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.backoffice_plan_key"
+          "mappedType": "unknown",
+          "nativeEnumName": "backoffice_plan_key"
         },
         "stripe_customer_id": {
           "name": "stripe_customer_id",
@@ -1081,7 +1081,7 @@
         },
         "currency": {
           "name": "currency",
-          "type": "public.platform_currency",
+          "type": "platform_currency",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -1098,8 +1098,8 @@
             "USD",
             "GBP"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.platform_currency"
+          "mappedType": "unknown",
+          "nativeEnumName": "platform_currency"
         },
         "features": {
           "name": "features",
@@ -1422,7 +1422,7 @@
           "length": null,
           "precision": null,
           "scale": null,
-          "default": null,
+          "default": "'FAMILY'",
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -1571,7 +1571,7 @@
           "length": null,
           "precision": null,
           "scale": null,
-          "default": null,
+          "default": "'FAMILY'",
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -1767,7 +1767,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "unique": false,
+          "unique": true,
           "length": null,
           "precision": null,
           "scale": null,
@@ -1898,6 +1898,17 @@
         }
       },
       "indexes": [
+        {
+          "columnNames": [
+            "issuer",
+            "account_id"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "provider_issuer_account_id_uidx",
+          "primary": false,
+          "unique": true
+        },
         {
           "columnNames": [
             "id"
@@ -2712,7 +2723,7 @@
         },
         "key": {
           "name": "key",
-          "type": "public.backoffice_plan_key",
+          "type": "backoffice_plan_key",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -2729,8 +2740,8 @@
             "PLUS",
             "MAX"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.backoffice_plan_key"
+          "mappedType": "unknown",
+          "nativeEnumName": "backoffice_plan_key"
         },
         "name": {
           "name": "name",
@@ -2936,7 +2947,7 @@
         },
         "kind": {
           "name": "kind",
-          "type": "public.backoffice_capability_kind",
+          "type": "backoffice_capability_kind",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -2952,8 +2963,8 @@
             "screen",
             "action"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.backoffice_capability_kind"
+          "mappedType": "unknown",
+          "nativeEnumName": "backoffice_capability_kind"
         },
         "name": {
           "name": "name",
@@ -4122,7 +4133,7 @@
         },
         "min_plan": {
           "name": "min_plan",
-          "type": "public.backoffice_plan_key",
+          "type": "backoffice_plan_key",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -4139,8 +4150,8 @@
             "PLUS",
             "MAX"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.backoffice_plan_key"
+          "mappedType": "unknown",
+          "nativeEnumName": "backoffice_plan_key"
         },
         "name": {
           "name": "name",
@@ -4207,12 +4218,7 @@
           "default": "'[]'",
           "comment": null,
           "collation": null,
-          "enumItems": [
-            "SPENDER",
-            "SAVER",
-            "BALANCED",
-            "UNKNOWN"
-          ],
+          "enumItems": [],
           "mappedType": "json"
         },
         "topic": {
@@ -4633,12 +4639,7 @@
           "default": "'[]'",
           "comment": null,
           "collation": null,
-          "enumItems": [
-            "SPENDER",
-            "SAVER",
-            "BALANCED",
-            "UNKNOWN"
-          ],
+          "enumItems": [],
           "mappedType": "json"
         },
         "updated_at": {
@@ -4850,7 +4851,7 @@
         },
         "format": {
           "name": "format",
-          "type": "public.growth_learn_watch_kind",
+          "type": "growth_learn_watch_kind",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -4869,8 +4870,8 @@
             "PODCAST",
             "COURSE"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.growth_learn_watch_kind"
+          "mappedType": "unknown",
+          "nativeEnumName": "growth_learn_watch_kind"
         },
         "id": {
           "name": "id",
@@ -4942,7 +4943,7 @@
         },
         "min_plan": {
           "name": "min_plan",
-          "type": "public.backoffice_plan_key",
+          "type": "backoffice_plan_key",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -4959,8 +4960,8 @@
             "PLUS",
             "MAX"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.backoffice_plan_key"
+          "mappedType": "unknown",
+          "nativeEnumName": "backoffice_plan_key"
         },
         "name": {
           "name": "name",
@@ -5027,12 +5028,7 @@
           "default": "'[]'",
           "comment": null,
           "collation": null,
-          "enumItems": [
-            "SPENDER",
-            "SAVER",
-            "BALANCED",
-            "UNKNOWN"
-          ],
+          "enumItems": [],
           "mappedType": "json"
         },
         "topic": {
@@ -6278,7 +6274,7 @@
         },
         "kind": {
           "name": "kind",
-          "type": "public.money_debt_kind",
+          "type": "money_debt_kind",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -6298,8 +6294,8 @@
             "FAMILY",
             "OTHER"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_debt_kind"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_debt_kind"
         },
         "name": {
           "name": "name",
@@ -6556,7 +6552,7 @@
       "columns": {
         "cadence": {
           "name": "cadence",
-          "type": "public.money_cadence",
+          "type": "money_cadence",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -6575,8 +6571,8 @@
             "YEARLY",
             "ONCE"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_cadence"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_cadence"
         },
         "category_template_id": {
           "name": "category_template_id",
@@ -6614,7 +6610,7 @@
         },
         "direction": {
           "name": "direction",
-          "type": "public.money_flow_direction",
+          "type": "money_flow_direction",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -6630,8 +6626,8 @@
             "IN",
             "OUT"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_flow_direction"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_flow_direction"
         },
         "due_day": {
           "name": "due_day",
@@ -7114,16 +7110,7 @@
           "default": "'[]'",
           "comment": null,
           "collation": null,
-          "enumItems": [
-            "GLOBAL_HEALTH",
-            "POVERTY",
-            "EDUCATION",
-            "CLIMATE",
-            "ANIMALS",
-            "COMMUNITY",
-            "EMERGENCY",
-            "WATER"
-          ],
+          "enumItems": [],
           "mappedType": "json"
         },
         "country": {
@@ -7628,7 +7615,7 @@
       "columns": {
         "cadence": {
           "name": "cadence",
-          "type": "public.money_cadence",
+          "type": "money_cadence",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -7647,8 +7634,8 @@
             "YEARLY",
             "ONCE"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_cadence"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_cadence"
         },
         "created_at": {
           "name": "created_at",
@@ -7737,7 +7724,7 @@
         },
         "kind": {
           "name": "kind",
-          "type": "public.money_income_kind",
+          "type": "money_income_kind",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -7757,8 +7744,8 @@
             "DIVIDEND",
             "OTHER"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_income_kind"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_income_kind"
         },
         "name": {
           "name": "name",
@@ -7947,7 +7934,7 @@
         },
         "key": {
           "name": "key",
-          "type": "public.money_jar_key",
+          "type": "money_jar_key",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -7967,8 +7954,8 @@
             "PLAY",
             "GIVE"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_jar_key"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_jar_key"
         },
         "name": {
           "name": "name",
@@ -8636,7 +8623,7 @@
         },
         "highlight": {
           "name": "highlight",
-          "type": "public.money_merchant_highlight",
+          "type": "money_merchant_highlight",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -8653,8 +8640,8 @@
             "NEW",
             "POPULAR"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_merchant_highlight"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_merchant_highlight"
         },
         "id": {
           "name": "id",
@@ -9096,7 +9083,7 @@
         },
         "status": {
           "name": "status",
-          "type": "public.money_merchant_suggestion_status",
+          "type": "money_merchant_suggestion_status",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -9113,8 +9100,8 @@
             "ACCEPTED",
             "REJECTED"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_merchant_suggestion_status"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_merchant_suggestion_status"
         },
         "updated_at": {
           "name": "updated_at",
@@ -9269,7 +9256,7 @@
         },
         "jar_key": {
           "name": "jar_key",
-          "type": "public.money_jar_key",
+          "type": "money_jar_key",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -9289,8 +9276,8 @@
             "PLAY",
             "GIVE"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_jar_key"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_jar_key"
         },
         "key": {
           "name": "key",
@@ -9428,7 +9415,7 @@
         },
         "default_connection": {
           "name": "default_connection",
-          "type": "public.platform_device_connection",
+          "type": "platform_device_connection",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -9445,8 +9432,8 @@
             "WIFI",
             "CLOUD"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.platform_device_connection"
+          "mappedType": "unknown",
+          "nativeEnumName": "platform_device_connection"
         },
         "icon": {
           "name": "icon",
@@ -10007,6 +9994,1650 @@
           "referencedTableName": "backoffice.reference_growth_asset_preset",
           "updateRule": "cascade",
           "deleteRule": "set null"
+        }
+      },
+      "comment": null
+    },
+    {
+      "name": "growth_course_feed",
+      "schema": "public",
+      "columns": {
+        "account_id": {
+          "name": "account_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "household_id": {
+          "name": "household_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "is_enabled": {
+          "name": "is_enabled",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "true",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "is_focus_day_shown": {
+          "name": "is_focus_day_shown",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "true",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "is_focus_week_shown": {
+          "name": "is_focus_week_shown",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "true",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "is_partner_shown": {
+          "name": "is_partner_shown",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "false",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "is_rhythm_shown": {
+          "name": "is_rhythm_shown",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "false",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "is_rituals_shown": {
+          "name": "is_rituals_shown",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "true",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "is_sleep_shown": {
+          "name": "is_sleep_shown",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "false",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "last_fetched_at": {
+          "name": "last_fetched_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "month_close_lead_days": {
+          "name": "month_close_lead_days",
+          "type": "smallint",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "3",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "smallint"
+        },
+        "token_hash": {
+          "name": "token_hash",
+          "type": "varchar(64)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": 64,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "version": {
+          "name": "version",
+          "type": "smallint",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "1",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "smallint"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "household_id",
+            "account_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "keyName": "growth_course_feed_household_id_account_id_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "household_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "growth_course_feed_household_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "growth_course_feed_pkey",
+          "primary": true,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "token_hash"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "growth_course_feed_token_hash_unique",
+          "primary": false,
+          "unique": true
+        }
+      ],
+      "checks": [
+        {
+          "name": "growth_course_feed_lead_days",
+          "expression": "month_close_lead_days = ANY (ARRAY[0, 3, 7])",
+          "definition": "CHECK ((month_close_lead_days = ANY (ARRAY[0, 3, 7])))",
+          "columnName": "month_close_lead_days"
+        }
+      ],
+      "triggers": [],
+      "foreignKeys": {
+        "growth_course_feed_account_id_foreign": {
+          "columnNames": [
+            "account_id"
+          ],
+          "constraintName": "growth_course_feed_account_id_foreign",
+          "localTableName": "public.growth_course_feed",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "auth.account",
+          "deleteRule": "cascade"
+        },
+        "growth_course_feed_household_id_foreign": {
+          "columnNames": [
+            "household_id"
+          ],
+          "constraintName": "growth_course_feed_household_id_foreign",
+          "localTableName": "public.growth_course_feed",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "auth.household",
+          "deleteRule": "cascade"
+        }
+      },
+      "comment": null
+    },
+    {
+      "name": "growth_course_item",
+      "schema": "public",
+      "columns": {
+        "account_id": {
+          "name": "account_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "carried_from_id": {
+          "name": "carried_from_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "carry_count": {
+          "name": "carry_count",
+          "type": "smallint",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "0",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "smallint"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "done_when": {
+          "name": "done_when",
+          "type": "varchar(280)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 280,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "goal_id": {
+          "name": "goal_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "horizon": {
+          "name": "horizon",
+          "type": "growth_course_horizon",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [
+            "YEAR",
+            "QUARTER",
+            "MONTH",
+            "WEEK",
+            "DAY"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "growth_course_horizon"
+        },
+        "household_id": {
+          "name": "household_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(140)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 140,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "period": {
+          "name": "period",
+          "type": "varchar(10)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 10,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "position": {
+          "name": "position",
+          "type": "smallint",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "smallint"
+        },
+        "review_note": {
+          "name": "review_note",
+          "type": "varchar(280)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 280,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "skill": {
+          "name": "skill",
+          "type": "varchar(64)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 64,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "status": {
+          "name": "status",
+          "type": "growth_course_item_status",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "'OPEN'",
+          "comment": null,
+          "collation": null,
+          "enumItems": [
+            "OPEN",
+            "DONE",
+            "PARTIAL",
+            "MISSED",
+            "DROPPED",
+            "DEFERRED"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "growth_course_item_status"
+        },
+        "target_count": {
+          "name": "target_count",
+          "type": "smallint",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "smallint"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "visibility": {
+          "name": "visibility",
+          "type": "platform_visibility",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "'PRIVATE'",
+          "comment": null,
+          "collation": null,
+          "enumItems": [
+            "PRIVATE",
+            "OWNER",
+            "HOUSEHOLD"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "platform_visibility"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "household_id",
+            "account_id",
+            "horizon",
+            "period",
+            "parent_id",
+            "position"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "growth_course_item_goal_slot_unique",
+          "primary": false,
+          "unique": true,
+          "expression": "CREATE UNIQUE INDEX growth_course_item_goal_slot_unique ON public.growth_course_item USING btree (household_id, account_id, horizon, period, parent_id, \"position\") NULLS NOT DISTINCT WHERE (horizon = ANY (ARRAY['YEAR'::growth_course_horizon, 'QUARTER'::growth_course_horizon, 'MONTH'::growth_course_horizon]))"
+        },
+        {
+          "columnNames": [
+            "household_id",
+            "account_id"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "growth_course_item_household_id_account_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "household_id",
+            "horizon",
+            "period"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "growth_course_item_household_id_horizon_period_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "household_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "growth_course_item_household_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "parent_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "growth_course_item_parent_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "household_id",
+            "account_id",
+            "horizon",
+            "period",
+            "position"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "growth_course_item_period_slot_unique",
+          "primary": false,
+          "unique": true,
+          "expression": "CREATE UNIQUE INDEX growth_course_item_period_slot_unique ON public.growth_course_item USING btree (household_id, account_id, horizon, period, \"position\") NULLS NOT DISTINCT WHERE (horizon = ANY (ARRAY['WEEK'::growth_course_horizon, 'DAY'::growth_course_horizon]))"
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "growth_course_item_pkey",
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [
+        {
+          "name": "growth_course_item_position_range",
+          "expression": "(\"position\" >= 0) AND (\"position\" <= 3)",
+          "definition": "CHECK (((\"position\" >= 0) AND (\"position\" <= 3)))",
+          "columnName": "position"
+        },
+        {
+          "name": "growth_course_item_target_count_range",
+          "expression": "(target_count IS NULL) OR ((target_count >= 1) AND (target_count <= 99))",
+          "definition": "CHECK (((target_count IS NULL) OR ((target_count >= 1) AND (target_count <= 99))))",
+          "columnName": "target_count"
+        },
+        {
+          "name": "growth_course_item_together_is_household",
+          "expression": "(account_id IS NOT NULL) OR (visibility = 'HOUSEHOLD'::platform_visibility)",
+          "definition": "CHECK (((account_id IS NOT NULL) OR (visibility = 'HOUSEHOLD'::platform_visibility)))",
+          "columnName": "account_id"
+        }
+      ],
+      "triggers": [],
+      "foreignKeys": {
+        "growth_course_item_account_id_foreign": {
+          "columnNames": [
+            "account_id"
+          ],
+          "constraintName": "growth_course_item_account_id_foreign",
+          "localTableName": "public.growth_course_item",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "auth.account",
+          "deleteRule": "cascade"
+        },
+        "growth_course_item_carried_from_id_foreign": {
+          "columnNames": [
+            "carried_from_id"
+          ],
+          "constraintName": "growth_course_item_carried_from_id_foreign",
+          "localTableName": "public.growth_course_item",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.growth_course_item",
+          "deleteRule": "set null"
+        },
+        "growth_course_item_goal_id_foreign": {
+          "columnNames": [
+            "goal_id"
+          ],
+          "constraintName": "growth_course_item_goal_id_foreign",
+          "localTableName": "public.growth_course_item",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.money_goal",
+          "deleteRule": "set null"
+        },
+        "growth_course_item_household_id_foreign": {
+          "columnNames": [
+            "household_id"
+          ],
+          "constraintName": "growth_course_item_household_id_foreign",
+          "localTableName": "public.growth_course_item",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "auth.household",
+          "deleteRule": "cascade"
+        },
+        "growth_course_item_parent_id_foreign": {
+          "columnNames": [
+            "parent_id"
+          ],
+          "constraintName": "growth_course_item_parent_id_foreign",
+          "localTableName": "public.growth_course_item",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.growth_course_item",
+          "deleteRule": "set null"
+        }
+      },
+      "comment": null
+    },
+    {
+      "name": "growth_course_rhythm",
+      "schema": "public",
+      "columns": {
+        "account_id": {
+          "name": "account_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "area": {
+          "name": "area",
+          "type": "growth_course_area",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [
+            "MONEY",
+            "GROWTH",
+            "ENERGY",
+            "SOUL"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "growth_course_area"
+        },
+        "cadence": {
+          "name": "cadence",
+          "type": "growth_course_rhythm_cadence",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [
+            "DAILY",
+            "WEEKLY",
+            "MONTHLY"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "growth_course_rhythm_cadence"
+        },
+        "confirmed_week": {
+          "name": "confirmed_week",
+          "type": "varchar(8)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 8,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "ended_at": {
+          "name": "ended_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "household_id": {
+          "name": "household_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "kind": {
+          "name": "kind",
+          "type": "growth_course_rhythm_kind",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [
+            "HABIT",
+            "DISCIPLINE"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "growth_course_rhythm_kind"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(140)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 140,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "paused_at": {
+          "name": "paused_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "target": {
+          "name": "target",
+          "type": "smallint",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "smallint"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "visibility": {
+          "name": "visibility",
+          "type": "platform_visibility",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "'PRIVATE'",
+          "comment": null,
+          "collation": null,
+          "enumItems": [
+            "PRIVATE",
+            "OWNER",
+            "HOUSEHOLD"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "platform_visibility"
+        },
+        "weekdays": {
+          "name": "weekdays",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "json"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "household_id",
+            "account_id"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "growth_course_rhythm_household_id_account_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "household_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "growth_course_rhythm_household_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "parent_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "growth_course_rhythm_parent_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "growth_course_rhythm_pkey",
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [
+        {
+          "name": "growth_course_rhythm_target_range",
+          "expression": "(target >= 1) AND (target <= 31)",
+          "definition": "CHECK (((target >= 1) AND (target <= 31)))",
+          "columnName": "target"
+        },
+        {
+          "name": "growth_course_rhythm_together_is_household",
+          "expression": "(account_id IS NOT NULL) OR (visibility = 'HOUSEHOLD'::platform_visibility)",
+          "definition": "CHECK (((account_id IS NOT NULL) OR (visibility = 'HOUSEHOLD'::platform_visibility)))",
+          "columnName": "account_id"
+        }
+      ],
+      "triggers": [],
+      "foreignKeys": {
+        "growth_course_rhythm_account_id_foreign": {
+          "columnNames": [
+            "account_id"
+          ],
+          "constraintName": "growth_course_rhythm_account_id_foreign",
+          "localTableName": "public.growth_course_rhythm",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "auth.account",
+          "deleteRule": "cascade"
+        },
+        "growth_course_rhythm_household_id_foreign": {
+          "columnNames": [
+            "household_id"
+          ],
+          "constraintName": "growth_course_rhythm_household_id_foreign",
+          "localTableName": "public.growth_course_rhythm",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "auth.household",
+          "deleteRule": "cascade"
+        },
+        "growth_course_rhythm_parent_id_foreign": {
+          "columnNames": [
+            "parent_id"
+          ],
+          "constraintName": "growth_course_rhythm_parent_id_foreign",
+          "localTableName": "public.growth_course_rhythm",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.growth_course_item",
+          "deleteRule": "set null"
+        }
+      },
+      "comment": null
+    },
+    {
+      "name": "growth_course_rhythm_tick",
+      "schema": "public",
+      "columns": {
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "household_id": {
+          "name": "household_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "rhythm_id": {
+          "name": "rhythm_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "ticked_on": {
+          "name": "ticked_on",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "date"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "household_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "growth_course_rhythm_tick_household_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "household_id",
+            "ticked_on"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "growth_course_rhythm_tick_household_id_ticked_on_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "growth_course_rhythm_tick_pkey",
+          "primary": true,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "rhythm_id",
+            "ticked_on"
+          ],
+          "composite": true,
+          "constraint": true,
+          "keyName": "growth_course_rhythm_tick_rhythm_id_ticked_on_unique",
+          "primary": false,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "triggers": [],
+      "foreignKeys": {
+        "growth_course_rhythm_tick_household_id_foreign": {
+          "columnNames": [
+            "household_id"
+          ],
+          "constraintName": "growth_course_rhythm_tick_household_id_foreign",
+          "localTableName": "public.growth_course_rhythm_tick",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "auth.household",
+          "deleteRule": "cascade"
+        },
+        "growth_course_rhythm_tick_rhythm_id_foreign": {
+          "columnNames": [
+            "rhythm_id"
+          ],
+          "constraintName": "growth_course_rhythm_tick_rhythm_id_foreign",
+          "localTableName": "public.growth_course_rhythm_tick",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.growth_course_rhythm",
+          "deleteRule": "cascade"
+        }
+      },
+      "comment": null
+    },
+    {
+      "name": "growth_course_ritual_snooze",
+      "schema": "public",
+      "columns": {
+        "account_id": {
+          "name": "account_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "household_id": {
+          "name": "household_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "period": {
+          "name": "period",
+          "type": "varchar(10)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 10,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "ritual": {
+          "name": "ritual",
+          "type": "growth_course_ritual",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [
+            "MONTH_CLOSE"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "growth_course_ritual"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "now()",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "household_id",
+            "account_id",
+            "ritual",
+            "period"
+          ],
+          "composite": true,
+          "constraint": true,
+          "keyName": "growth_course_ritual_snooze_household_id_account__98948_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "household_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "growth_course_ritual_snooze_household_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "growth_course_ritual_snooze_pkey",
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "triggers": [],
+      "foreignKeys": {
+        "growth_course_ritual_snooze_account_id_foreign": {
+          "columnNames": [
+            "account_id"
+          ],
+          "constraintName": "growth_course_ritual_snooze_account_id_foreign",
+          "localTableName": "public.growth_course_ritual_snooze",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "auth.account",
+          "deleteRule": "cascade"
+        },
+        "growth_course_ritual_snooze_household_id_foreign": {
+          "columnNames": [
+            "household_id"
+          ],
+          "constraintName": "growth_course_ritual_snooze_household_id_foreign",
+          "localTableName": "public.growth_course_ritual_snooze",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "auth.household",
+          "deleteRule": "cascade"
         }
       },
       "comment": null
@@ -10975,7 +12606,7 @@
         },
         "status": {
           "name": "status",
-          "type": "public.growth_learn_progress_status",
+          "type": "growth_learn_progress_status",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -10992,8 +12623,8 @@
             "NOW",
             "DONE"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.growth_learn_progress_status"
+          "mappedType": "unknown",
+          "nativeEnumName": "growth_learn_progress_status"
         },
         "updated_at": {
           "name": "updated_at",
@@ -11073,487 +12704,6 @@
           ],
           "referencedTableName": "auth.household",
           "deleteRule": "cascade"
-        }
-      },
-      "comment": null
-    },
-    {
-      "name": "growth_plan_item",
-      "schema": "public",
-      "columns": {
-        "account_id": {
-          "name": "account_id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        },
-        "carried_from_id": {
-          "name": "carried_from_id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        },
-        "carry_count": {
-          "name": "carry_count",
-          "type": "smallint",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": "0",
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "smallint"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamptz(6)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": 6,
-          "precision": null,
-          "scale": null,
-          "default": "now()",
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "datetime"
-        },
-        "done_when": {
-          "name": "done_when",
-          "type": "varchar(280)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "unique": false,
-          "length": 280,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "string"
-        },
-        "goal_id": {
-          "name": "goal_id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        },
-        "horizon": {
-          "name": "horizon",
-          "type": "public.growth_plan_horizon",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [
-            "YEAR",
-            "QUARTER",
-            "MONTH",
-            "WEEK",
-            "DAY"
-          ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.growth_plan_horizon"
-        },
-        "household_id": {
-          "name": "household_id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        },
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": true,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(140)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": 140,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "string"
-        },
-        "parent_id": {
-          "name": "parent_id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        },
-        "period": {
-          "name": "period",
-          "type": "varchar(10)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": 10,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "string"
-        },
-        "position": {
-          "name": "position",
-          "type": "smallint",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "smallint"
-        },
-        "review_note": {
-          "name": "review_note",
-          "type": "varchar(280)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "unique": false,
-          "length": 280,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "string"
-        },
-        "skill": {
-          "name": "skill",
-          "type": "varchar(64)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "unique": false,
-          "length": 64,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "string"
-        },
-        "status": {
-          "name": "status",
-          "type": "public.growth_plan_item_status",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": "'OPEN'",
-          "comment": null,
-          "collation": null,
-          "enumItems": [
-            "OPEN",
-            "DONE",
-            "PARTIAL",
-            "MISSED",
-            "DROPPED",
-            "DEFERRED"
-          ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.growth_plan_item_status"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamptz(6)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": 6,
-          "precision": null,
-          "scale": null,
-          "default": "now()",
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "datetime"
-        },
-        "visibility": {
-          "name": "visibility",
-          "type": "public.platform_visibility",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": "'PRIVATE'",
-          "comment": null,
-          "collation": null,
-          "enumItems": [
-            "PRIVATE",
-            "OWNER",
-            "HOUSEHOLD"
-          ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.platform_visibility"
-        }
-      },
-      "indexes": [
-        {
-          "columnNames": [],
-          "composite": false,
-          "constraint": true,
-          "keyName": "growth_plan_item_goal_slot_unique",
-          "primary": false,
-          "unique": true,
-          "expression": "create unique index \"growth_plan_item_goal_slot_unique\" on \"public\".\"growth_plan_item\" (\"household_id\", \"account_id\", \"horizon\", \"period\", \"parent_id\", \"position\") nulls not distinct where \"horizon\" in ('YEAR', 'QUARTER', 'MONTH')"
-        },
-        {
-          "columnNames": [
-            "household_id",
-            "account_id"
-          ],
-          "composite": true,
-          "constraint": false,
-          "keyName": "growth_plan_item_household_id_account_id_index",
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
-            "household_id",
-            "horizon",
-            "period"
-          ],
-          "composite": true,
-          "constraint": false,
-          "keyName": "growth_plan_item_household_id_horizon_period_index",
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
-            "household_id"
-          ],
-          "composite": false,
-          "constraint": false,
-          "keyName": "growth_plan_item_household_id_index",
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
-            "parent_id"
-          ],
-          "composite": false,
-          "constraint": false,
-          "keyName": "growth_plan_item_parent_id_index",
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [],
-          "composite": false,
-          "constraint": true,
-          "keyName": "growth_plan_item_period_slot_unique",
-          "primary": false,
-          "unique": true,
-          "expression": "create unique index \"growth_plan_item_period_slot_unique\" on \"public\".\"growth_plan_item\" (\"household_id\", \"account_id\", \"horizon\", \"period\", \"position\") nulls not distinct where \"horizon\" in ('WEEK', 'DAY')"
-        },
-        {
-          "columnNames": [
-            "id"
-          ],
-          "composite": false,
-          "constraint": true,
-          "keyName": "growth_plan_item_pkey",
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [
-        {
-          "name": "growth_plan_item_position_range",
-          "expression": "(position BETWEEN 0 AND 3)",
-          "definition": "check ((position BETWEEN 0 AND 3))"
-        },
-        {
-          "name": "growth_plan_item_together_is_household",
-          "expression": "(account_id IS NOT NULL) OR (visibility = 'HOUSEHOLD')",
-          "definition": "check ((account_id IS NOT NULL) OR (visibility = 'HOUSEHOLD'))"
-        }
-      ],
-      "triggers": [],
-      "foreignKeys": {
-        "growth_plan_item_account_id_foreign": {
-          "columnNames": [
-            "account_id"
-          ],
-          "constraintName": "growth_plan_item_account_id_foreign",
-          "localTableName": "public.growth_plan_item",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "auth.account",
-          "deleteRule": "cascade"
-        },
-        "growth_plan_item_carried_from_id_foreign": {
-          "columnNames": [
-            "carried_from_id"
-          ],
-          "constraintName": "growth_plan_item_carried_from_id_foreign",
-          "localTableName": "public.growth_plan_item",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.growth_plan_item",
-          "deleteRule": "set null"
-        },
-        "growth_plan_item_goal_id_foreign": {
-          "columnNames": [
-            "goal_id"
-          ],
-          "constraintName": "growth_plan_item_goal_id_foreign",
-          "localTableName": "public.growth_plan_item",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.money_goal",
-          "deleteRule": "set null"
-        },
-        "growth_plan_item_household_id_foreign": {
-          "columnNames": [
-            "household_id"
-          ],
-          "constraintName": "growth_plan_item_household_id_foreign",
-          "localTableName": "public.growth_plan_item",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "auth.household",
-          "deleteRule": "cascade"
-        },
-        "growth_plan_item_parent_id_foreign": {
-          "columnNames": [
-            "parent_id"
-          ],
-          "constraintName": "growth_plan_item_parent_id_foreign",
-          "localTableName": "public.growth_plan_item",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.growth_plan_item",
-          "deleteRule": "set null"
         }
       },
       "comment": null
@@ -11858,7 +13008,7 @@
         },
         "kind": {
           "name": "kind",
-          "type": "public.money_account_kind",
+          "type": "money_account_kind",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -11877,8 +13027,8 @@
             "CASH",
             "INVESTMENT"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_account_kind"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_account_kind"
         },
         "last_synced_at": {
           "name": "last_synced_at",
@@ -12432,7 +13582,7 @@
         },
         "kind": {
           "name": "kind",
-          "type": "public.money_debt_kind",
+          "type": "money_debt_kind",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -12452,8 +13602,8 @@
             "FAMILY",
             "OTHER"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_debt_kind"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_debt_kind"
         },
         "maturity_on": {
           "name": "maturity_on",
@@ -12559,7 +13709,7 @@
         },
         "payment_cadence": {
           "name": "payment_cadence",
-          "type": "public.money_cadence",
+          "type": "money_cadence",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -12578,8 +13728,8 @@
             "YEARLY",
             "ONCE"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_cadence"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_cadence"
         },
         "preset_key": {
           "name": "preset_key",
@@ -12600,7 +13750,7 @@
         },
         "schedule_kind": {
           "name": "schedule_kind",
-          "type": "public.money_debt_schedule_kind",
+          "type": "money_debt_schedule_kind",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -12617,8 +13767,8 @@
             "TERM",
             "DEADLINE"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_debt_schedule_kind"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_debt_schedule_kind"
         },
         "started_on": {
           "name": "started_on",
@@ -12708,12 +13858,14 @@
         {
           "name": "money_debt_counterparty_when_linked",
           "expression": "((merchant_key IS NULL) AND (party_id IS NULL)) OR (counterparty IS NOT NULL)",
-          "definition": "check (((merchant_key IS NULL) AND (party_id IS NULL)) OR (counterparty IS NOT NULL))"
+          "definition": "CHECK ((((merchant_key IS NULL) AND (party_id IS NULL)) OR (counterparty IS NOT NULL)))",
+          "columnName": "counterparty"
         },
         {
           "name": "money_debt_merchant_xor_party",
           "expression": "(merchant_key IS NULL) OR (party_id IS NULL)",
-          "definition": "check ((merchant_key IS NULL) OR (party_id IS NULL))"
+          "definition": "CHECK (((merchant_key IS NULL) OR (party_id IS NULL)))",
+          "columnName": "merchant_key"
         }
       ],
       "triggers": [],
@@ -12811,7 +13963,7 @@
         },
         "cadence": {
           "name": "cadence",
-          "type": "public.money_cadence",
+          "type": "money_cadence",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -12830,8 +13982,8 @@
             "YEARLY",
             "ONCE"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_cadence"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_cadence"
         },
         "category_id": {
           "name": "category_id",
@@ -12903,7 +14055,7 @@
         },
         "direction": {
           "name": "direction",
-          "type": "public.money_flow_direction",
+          "type": "money_flow_direction",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -12919,8 +14071,8 @@
             "IN",
             "OUT"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_flow_direction"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_flow_direction"
         },
         "due_day": {
           "name": "due_day",
@@ -13237,12 +14389,14 @@
         {
           "name": "money_fixed_cost_counterparty_when_linked",
           "expression": "((merchant_key IS NULL) AND (party_id IS NULL)) OR (counterparty IS NOT NULL)",
-          "definition": "check (((merchant_key IS NULL) AND (party_id IS NULL)) OR (counterparty IS NOT NULL))"
+          "definition": "CHECK ((((merchant_key IS NULL) AND (party_id IS NULL)) OR (counterparty IS NOT NULL)))",
+          "columnName": "counterparty"
         },
         {
           "name": "money_fixed_cost_merchant_xor_party",
           "expression": "(merchant_key IS NULL) OR (party_id IS NULL)",
-          "definition": "check ((merchant_key IS NULL) OR (party_id IS NULL))"
+          "definition": "CHECK (((merchant_key IS NULL) OR (party_id IS NULL)))",
+          "columnName": "merchant_key"
         }
       ],
       "triggers": [],
@@ -13507,7 +14661,7 @@
         },
         "source": {
           "name": "source",
-          "type": "public.money_fixed_cost_settlement_source",
+          "type": "money_fixed_cost_settlement_source",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -13526,12 +14680,12 @@
             "LINKED",
             "ROLL"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_fixed_cost_settlement_source"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_fixed_cost_settlement_source"
         },
         "status": {
           "name": "status",
-          "type": "public.money_fixed_cost_settlement_status",
+          "type": "money_fixed_cost_settlement_status",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -13548,8 +14702,8 @@
             "SKIPPED",
             "ROLLED"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_fixed_cost_settlement_status"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_fixed_cost_settlement_status"
         },
         "transaction_id": {
           "name": "transaction_id",
@@ -13687,7 +14841,7 @@
       "columns": {
         "cause": {
           "name": "cause",
-          "type": "public.money_giving_cause",
+          "type": "money_giving_cause",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -13709,8 +14863,8 @@
             "EMERGENCY",
             "WATER"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_giving_cause"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_giving_cause"
         },
         "created_at": {
           "name": "created_at",
@@ -13833,7 +14987,7 @@
         },
         "kind": {
           "name": "kind",
-          "type": "public.money_goal_kind",
+          "type": "money_goal_kind",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -13850,8 +15004,8 @@
             "EARN",
             "GIVE"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_goal_kind"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_goal_kind"
         },
         "monthly_contribution": {
           "name": "monthly_contribution",
@@ -13923,7 +15077,7 @@
         },
         "status": {
           "name": "status",
-          "type": "public.money_goal_status",
+          "type": "money_goal_status",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -13941,8 +15095,8 @@
             "PAUSED",
             "ARCHIVED"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_goal_status"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_goal_status"
         },
         "target": {
           "name": "target",
@@ -14349,7 +15503,7 @@
         },
         "cadence": {
           "name": "cadence",
-          "type": "public.money_cadence",
+          "type": "money_cadence",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -14368,8 +15522,8 @@
             "YEARLY",
             "ONCE"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_cadence"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_cadence"
         },
         "counterparty": {
           "name": "counterparty",
@@ -14492,7 +15646,7 @@
         },
         "kind": {
           "name": "kind",
-          "type": "public.money_income_kind",
+          "type": "money_income_kind",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -14512,8 +15666,8 @@
             "DIVIDEND",
             "OTHER"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_income_kind"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_income_kind"
         },
         "merchant_key": {
           "name": "merchant_key",
@@ -14684,12 +15838,14 @@
         {
           "name": "money_income_source_counterparty_when_linked",
           "expression": "((merchant_key IS NULL) AND (party_id IS NULL)) OR (counterparty IS NOT NULL)",
-          "definition": "check (((merchant_key IS NULL) AND (party_id IS NULL)) OR (counterparty IS NOT NULL))"
+          "definition": "CHECK ((((merchant_key IS NULL) AND (party_id IS NULL)) OR (counterparty IS NOT NULL)))",
+          "columnName": "counterparty"
         },
         {
           "name": "money_income_source_merchant_xor_party",
           "expression": "(merchant_key IS NULL) OR (party_id IS NULL)",
-          "definition": "check ((merchant_key IS NULL) OR (party_id IS NULL))"
+          "definition": "CHECK (((merchant_key IS NULL) OR (party_id IS NULL)))",
+          "columnName": "merchant_key"
         }
       ],
       "triggers": [],
@@ -14891,7 +16047,7 @@
         },
         "key": {
           "name": "key",
-          "type": "public.money_jar_key",
+          "type": "money_jar_key",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -14911,8 +16067,8 @@
             "PLAY",
             "GIVE"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_jar_key"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_jar_key"
         },
         "name": {
           "name": "name",
@@ -15346,7 +16502,7 @@
         },
         "kind": {
           "name": "kind",
-          "type": "public.money_month_score_event_kind",
+          "type": "money_month_score_event_kind",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -15368,8 +16524,8 @@
             "INCOME_LOGGED",
             "STREAK_KEPT"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_month_score_event_kind"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_month_score_event_kind"
         },
         "month_score_id": {
           "name": "month_score_id",
@@ -16035,7 +17191,7 @@
         },
         "field": {
           "name": "field",
-          "type": "public.money_rule_field",
+          "type": "money_rule_field",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -16052,8 +17208,8 @@
             "COUNTERPARTY",
             "AMOUNT"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_rule_field"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_rule_field"
         },
         "hit_count": {
           "name": "hit_count",
@@ -16159,7 +17315,7 @@
         },
         "matcher": {
           "name": "matcher",
-          "type": "public.money_rule_matcher",
+          "type": "money_rule_matcher",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -16177,8 +17333,8 @@
             "STARTS_WITH",
             "REGEX"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_rule_matcher"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_rule_matcher"
         },
         "priority": {
           "name": "priority",
@@ -16645,7 +17801,7 @@
         },
         "source": {
           "name": "source",
-          "type": "public.money_transaction_source",
+          "type": "money_transaction_source",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -16663,12 +17819,12 @@
             "BANK",
             "RECURRING"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_transaction_source"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_transaction_source"
         },
         "status": {
           "name": "status",
-          "type": "public.money_transaction_status",
+          "type": "money_transaction_status",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -16685,8 +17841,8 @@
             "SORTED",
             "IGNORED"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_transaction_status"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_transaction_status"
         },
         "updated_at": {
           "name": "updated_at",
@@ -16845,12 +18001,14 @@
         {
           "name": "money_transaction_counterparty_when_linked",
           "expression": "((merchant_key IS NULL) AND (party_id IS NULL)) OR (counterparty IS NOT NULL)",
-          "definition": "check (((merchant_key IS NULL) AND (party_id IS NULL)) OR (counterparty IS NOT NULL))"
+          "definition": "CHECK ((((merchant_key IS NULL) AND (party_id IS NULL)) OR (counterparty IS NOT NULL)))",
+          "columnName": "counterparty"
         },
         {
           "name": "money_transaction_merchant_xor_party",
           "expression": "(merchant_key IS NULL) OR (party_id IS NULL)",
-          "definition": "check ((merchant_key IS NULL) OR (party_id IS NULL))"
+          "definition": "CHECK (((merchant_key IS NULL) OR (party_id IS NULL)))",
+          "columnName": "merchant_key"
         }
       ],
       "triggers": [],
@@ -17096,7 +18254,7 @@
         },
         "stage": {
           "name": "stage",
-          "type": "public.money_week_check_stage",
+          "type": "money_week_check_stage",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -17114,8 +18272,8 @@
             "INTEND",
             "DONE"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.money_week_check_stage"
+          "mappedType": "unknown",
+          "nativeEnumName": "money_week_check_stage"
         },
         "surplus": {
           "name": "surplus",
@@ -17729,7 +18887,7 @@
         },
         "kind": {
           "name": "kind",
-          "type": "public.platform_coach_kind",
+          "type": "platform_coach_kind",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -17748,8 +18906,8 @@
             "INSIGHT",
             "WEEK_CHECK"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.platform_coach_kind"
+          "mappedType": "unknown",
+          "nativeEnumName": "platform_coach_kind"
         },
         "period": {
           "name": "period",
@@ -17918,7 +19076,7 @@
         },
         "connection": {
           "name": "connection",
-          "type": "public.platform_device_connection",
+          "type": "platform_device_connection",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -17935,8 +19093,8 @@
             "WIFI",
             "CLOUD"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.platform_device_connection"
+          "mappedType": "unknown",
+          "nativeEnumName": "platform_device_connection"
         },
         "created_at": {
           "name": "created_at",
@@ -18506,7 +19664,7 @@
         },
         "kind": {
           "name": "kind",
-          "type": "public.platform_practice_address_kind",
+          "type": "platform_practice_address_kind",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -18522,8 +19680,8 @@
             "BILLING",
             "REGISTERED"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.platform_practice_address_kind"
+          "mappedType": "unknown",
+          "nativeEnumName": "platform_practice_address_kind"
         },
         "practice_id": {
           "name": "practice_id",
@@ -18738,7 +19896,7 @@
         },
         "status": {
           "name": "status",
-          "type": "public.platform_practice_subscription_status",
+          "type": "platform_practice_subscription_status",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -18759,8 +19917,8 @@
             "CANCELED",
             "INCOMPLETE"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.platform_practice_subscription_status"
+          "mappedType": "unknown",
+          "nativeEnumName": "platform_practice_subscription_status"
         },
         "stripe_customer_id": {
           "name": "stripe_customer_id",
@@ -18897,7 +20055,7 @@
         },
         "access": {
           "name": "access",
-          "type": "public.platform_practice_client_access",
+          "type": "platform_practice_client_access",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -18913,8 +20071,8 @@
             "VIEW",
             "MANAGE"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.platform_practice_client_access"
+          "mappedType": "unknown",
+          "nativeEnumName": "platform_practice_client_access"
         },
         "added_by_account_id": {
           "name": "added_by_account_id",
@@ -19020,7 +20178,7 @@
         },
         "status": {
           "name": "status",
-          "type": "public.platform_practice_client_invite_status",
+          "type": "platform_practice_client_invite_status",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -19037,8 +20195,8 @@
             "ACCEPTED",
             "REVOKED"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.platform_practice_client_invite_status"
+          "mappedType": "unknown",
+          "nativeEnumName": "platform_practice_client_invite_status"
         },
         "token": {
           "name": "token",
@@ -19144,7 +20302,7 @@
       "columns": {
         "access": {
           "name": "access",
-          "type": "public.platform_practice_client_access",
+          "type": "platform_practice_client_access",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -19160,8 +20318,8 @@
             "VIEW",
             "MANAGE"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.platform_practice_client_access"
+          "mappedType": "unknown",
+          "nativeEnumName": "platform_practice_client_access"
         },
         "activated_at": {
           "name": "activated_at",
@@ -19301,7 +20459,7 @@
         },
         "status": {
           "name": "status",
-          "type": "public.platform_practice_client_link_status",
+          "type": "platform_practice_client_link_status",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -19318,8 +20476,8 @@
             "ACTIVE",
             "REVOKED"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.platform_practice_client_link_status"
+          "mappedType": "unknown",
+          "nativeEnumName": "platform_practice_client_link_status"
         },
         "updated_at": {
           "name": "updated_at",
@@ -19427,7 +20585,7 @@
         },
         "flag": {
           "name": "flag",
-          "type": "public.platform_practice_client_control_flag",
+          "type": "platform_practice_client_control_flag",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -19443,8 +20601,8 @@
             "SPONSOR_PLAN",
             "CAN_UNLINK"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.platform_practice_client_control_flag"
+          "mappedType": "unknown",
+          "nativeEnumName": "platform_practice_client_control_flag"
         },
         "id": {
           "name": "id",
@@ -19647,7 +20805,7 @@
         },
         "role": {
           "name": "role",
-          "type": "public.platform_practice_role",
+          "type": "platform_practice_role",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -19664,8 +20822,8 @@
             "ADMIN",
             "COACH"
           ],
-          "mappedType": "enum",
-          "nativeEnumName": "public.platform_practice_role"
+          "mappedType": "unknown",
+          "nativeEnumName": "platform_practice_role"
         },
         "updated_at": {
           "name": "updated_at",
@@ -19786,6 +20944,63 @@
         "MAX"
       ]
     },
+    "growth_course_area": {
+      "name": "growth_course_area",
+      "schema": "public",
+      "items": [
+        "MONEY",
+        "GROWTH",
+        "ENERGY",
+        "SOUL"
+      ]
+    },
+    "growth_course_horizon": {
+      "name": "growth_course_horizon",
+      "schema": "public",
+      "items": [
+        "YEAR",
+        "QUARTER",
+        "MONTH",
+        "WEEK",
+        "DAY"
+      ]
+    },
+    "growth_course_item_status": {
+      "name": "growth_course_item_status",
+      "schema": "public",
+      "items": [
+        "OPEN",
+        "DONE",
+        "PARTIAL",
+        "MISSED",
+        "DROPPED",
+        "DEFERRED"
+      ]
+    },
+    "growth_course_rhythm_cadence": {
+      "name": "growth_course_rhythm_cadence",
+      "schema": "public",
+      "items": [
+        "DAILY",
+        "WEEKLY",
+        "MONTHLY"
+      ]
+    },
+    "growth_course_rhythm_kind": {
+      "name": "growth_course_rhythm_kind",
+      "schema": "public",
+      "items": [
+        "HABIT",
+        "DISCIPLINE"
+      ]
+    },
+    "growth_course_ritual": {
+      "name": "growth_course_ritual",
+      "schema": "public",
+      "items": [
+        "MONTH_CLOSE"
+      ]
+    },
     "growth_learn_progress_status": {
       "name": "growth_learn_progress_status",
       "schema": "public",
@@ -19804,29 +21019,6 @@
         "SERIES",
         "PODCAST",
         "COURSE"
-      ]
-    },
-    "growth_plan_horizon": {
-      "name": "growth_plan_horizon",
-      "schema": "public",
-      "items": [
-        "YEAR",
-        "QUARTER",
-        "MONTH",
-        "WEEK",
-        "DAY"
-      ]
-    },
-    "growth_plan_item_status": {
-      "name": "growth_plan_item_status",
-      "schema": "public",
-      "items": [
-        "OPEN",
-        "DONE",
-        "PARTIAL",
-        "MISSED",
-        "DROPPED",
-        "DEFERRED"
       ]
     },
     "money_account_kind": {

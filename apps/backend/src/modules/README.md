@@ -189,7 +189,7 @@ Every entity, its base, table and relations: `apps/backend/docs/ENTITY_INVENTORY
 | `CatalogEntity` | company catalogs with `key` / `name` / `sortOrder` / `isActive` (templates, presets, catalogs, plan children) |
 | `HouseholdEntity` | household-owned product + settings rows |
 | `WeekCheckEntity` | the four portal week checks (`week`, `completedAt`) |
-| `PersonalHouseholdEntity` | person-attributed rows: maker (`account`, null = together) + `visibility` (`GrowthPlanItem`) |
+| `PersonalHouseholdEntity` | person-attributed rows: maker (`account`, null = together) + `visibility` (`GrowthCourseItem`) |
 
 - Money → `MoneyType` (bigint eurocents, `number` at runtime); ratios stay `decimal`
 - Text → `name` / `description`; catalog defaults are plain nouns (`cadence`, not `defaultCadence`)

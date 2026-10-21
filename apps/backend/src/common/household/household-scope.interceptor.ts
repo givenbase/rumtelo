@@ -171,6 +171,8 @@ function isSystemPublicPath(pathname: string): boolean {
         pathname.startsWith('/api/docs') ||
         pathname.startsWith('/health') ||
         pathname.startsWith('/webhooks/') ||
+        // Course calendar feed: secret token, scope set by CourseFeedService.
+        pathname.startsWith('/calendar/') ||
         pathname.startsWith('/access-denied') ||
         pathname.startsWith('/email-preview')
     );

@@ -1,5 +1,5 @@
 /**
- * Plan Contract (Growth)
+ * Course Contract (Growth · Koers)
  * oRPC procedures for the cascade year → quarter → month → week → day.
  * Reads only return items the viewer may see (household visibility).
  */
@@ -8,15 +8,19 @@ import { oc } from '@orpc/contract';
 import { z } from 'zod';
 
 import {
-    PlanItem,
-    PlanItemCreateInput,
-    PlanItemRef,
-    PlanItemStatusInput,
-    PlanItemUpdateInput,
-    PlanPeriodInput,
-    PlanPeriodView,
-    PlanYearInput,
-} from './plan.schema';
+    CourseItem,
+    CourseItemCreateInput,
+    CourseItemRef,
+    CourseItemStatusInput,
+    CourseItemUpdateInput,
+    CoursePeriodInput,
+    CoursePeriodView,
+    CourseYearInput,
+} from './course.schema';
+
+import { courseFeedContract } from './feed.contract';
+import { courseRhythmContract } from './rhythm.contract';
+import { courseScheduleContract } from './schedule.contract';
 
 const ok = z.object({ ok: z.literal(true) });
 
@@ -25,45 +29,48 @@ const ok = z.object({ ok: z.literal(true) });
 // ====================================================================
 
 /** New item; refuses a fourth in the same slot. */
-export const planCreate = oc.input(PlanItemCreateInput).output(PlanItem);
+export const courseCreate = oc.input(CourseItemCreateInput).output(CourseItem);
 
 // ====================================================================
 // ? READ Operations
 // ====================================================================
 
 /** One period: items, their "why" chain and the layer below. */
-export const planPeriod = oc.input(PlanPeriodInput).output(PlanPeriodView);
+export const coursePeriod = oc.input(CoursePeriodInput).output(CoursePeriodView);
 
 /** Year, quarter and month items of one year — the year overview. */
-export const planYear = oc.input(PlanYearInput).output(z.array(PlanItem));
+export const courseYear = oc.input(CourseYearInput).output(z.array(CourseItem));
 
 // ====================================================================
 // ? UPDATE Operations
 // ====================================================================
 
 /** Edit, re-parent, reorder or change who sees it. */
-export const planUpdate = oc.input(PlanItemUpdateInput).output(PlanItem);
+export const courseUpdate = oc.input(CourseItemUpdateInput).output(CourseItem);
 
 /** Review: done, partial, missed or let go. */
-export const planUpdateStatus = oc.input(PlanItemStatusInput).output(PlanItem);
+export const courseUpdateStatus = oc.input(CourseItemStatusInput).output(CourseItem);
 
 /** Snooze: copy an unfinished item into the next period; the source becomes DEFERRED. */
-export const planCarry = oc.input(PlanItemRef).output(PlanItem);
+export const courseCarry = oc.input(CourseItemRef).output(CourseItem);
 
 // ====================================================================
 // ? DELETE Operations
 // ====================================================================
 
 /** Children stay and become loose (`parentId = null`). */
-export const planRemove = oc.input(PlanItemRef).output(ok);
+export const courseRemove = oc.input(CourseItemRef).output(ok);
 
-/** Nested contract object mounted at `contract.growth.plan`. */
-export const planContract = {
-    create: planCreate,
-    period: planPeriod,
-    year: planYear,
-    update: planUpdate,
-    updateStatus: planUpdateStatus,
-    carry: planCarry,
-    remove: planRemove,
+/** Nested contract object mounted at `contract.growth.course` (items + rhythm, schedule, feed). */
+export const courseContract = {
+    create: courseCreate,
+    period: coursePeriod,
+    year: courseYear,
+    update: courseUpdate,
+    updateStatus: courseUpdateStatus,
+    carry: courseCarry,
+    remove: courseRemove,
+    rhythm: courseRhythmContract,
+    schedule: courseScheduleContract,
+    feed: courseFeedContract,
 };

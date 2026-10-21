@@ -74,7 +74,7 @@ export enum HouseholdSharingMode {
  * exactly one area; the household may set a {@link HouseholdSharingMode} per area.
  */
 export enum VisibilityArea {
-    GROWTH_PLAN = 'growth.plan',
+    GROWTH_COURSE = 'growth.course',
     GROWTH_LEARN = 'growth.learn',
     ENERGY_LOG = 'energy.log',
     ENERGY_TIME = 'energy.time',

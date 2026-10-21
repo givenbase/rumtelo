@@ -22,6 +22,8 @@ export { CoachKind } from '../enums';
  */
 export const TIME_COACH_KEY_PREFIX = 'energy.time.';
 export const MONEY_COACH_KEY_PREFIX = 'money.';
+/** Course tips (`growth.course.rhythm_quiet:<rhythmId>`); copy lives in client i18n. */
+export const COURSE_COACH_KEY_PREFIX = 'growth.course.';
 
 export const CoachMessage = z.object({
     id: Id,

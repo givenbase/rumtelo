@@ -4,7 +4,9 @@
 
 > **Voor Claude Code:** volg `CLAUDE.md`, `HANDOFF.md` en `.cursor/rules/` (vooral `backend-module-shape.mdc` en `react-next-patterns.mdc`). Begin met fase 1. Waar een open vraag nog niet beantwoord is, gebruik het voorstel. Vink de checkboxes af zodra een stap klaar is.
 
-> **Bijgewerkt 18 oktober 2026:** prioriteiten zijn items van de Koers-cascade. Zie [growth-cascade-plan.md](./growth-cascade-plan.md), "Wat dit verandert aan de weekcheck". `growth_week_priority` vervalt: een weekprioriteit is een `growth_plan_item` met `horizon = WEEK` (bestaat al, met zichtbaarheid). `WeekPriorityStatus` heet `PlanItemStatus` (bestaat al in contracts). Entries verwijzen naar `Account`, niet naar `auth.user`. Waar dit plan iets anders zegt, gaat de cascade voor.
+> **Bijgewerkt 18 oktober 2026:** prioriteiten zijn items van de Koers-cascade. Zie [growth-cascade-plan.md](./growth-cascade-plan.md), "Wat dit verandert aan de weekcheck". `growth_week_priority` vervalt: een weekprioriteit is een `growth_course_item` met `horizon = WEEK` (bestaat al, met zichtbaarheid). `WeekPriorityStatus` heet `CourseItemStatus` (bestaat al in contracts). Entries verwijzen naar `Account`, niet naar `auth.user`. Waar dit plan iets anders zegt, gaat de cascade voor.
+
+> **Bijgewerkt 20 oktober 2026:** de feature heet nu Koers / `course` (zie [growth-cascade-plan.md](./growth-cascade-plan.md)). Er staat een **weekcheck MVP** op `/product/growth/course/week-check`: terugblik op vorige week, Ritme-voorstellen, de nieuwe drie en afronden via `growth.weekCheck.complete`. Op zondag plant hij de week erna. Wat dit plan verder beschrijft (partnerwissel, hulpvraag, gedeelde notitie, maandcheck, entries) is nog niet gebouwd.
 
 ## Doel en uitgangspunten
 
@@ -73,7 +75,7 @@ Eén bestaande tabel krijgt een kolom erbij en er komen drie tabellen bij. Prior
 | `adjustment` | max. 280, nullable | "Wat doe ik deze week anders?" |
 | `helpRequest` | max. 280, nullable | "Waar heb ik je hulp of aanmoediging bij nodig?" |
 
-**`growth_week_priority`** ~~(nieuw)~~ **vervalt**: dit wordt `growth_plan_item` met `horizon = WEEK`. De tabel hieronder blijft staan als referentie voor de velden.
+**`growth_week_priority`** ~~(nieuw)~~ **vervalt**: dit wordt `growth_course_item` met `horizon = WEEK`. De tabel hieronder blijft staan als referentie voor de velden.
 
 | Kolom | Type | Toelichting |
 | --- | --- | --- |
@@ -162,7 +164,7 @@ Drie fasen. Na fase 1 kunnen jullie de zondagmeeting al volledig in Rumtelo doen
 
 ### Fase 1: één zondag werkt
 
-- [x] Enum voor prioriteitstatus in contracts: `PlanItemStatus` (via de cascade)
+- [x] Enum voor prioriteitstatus in contracts: `CourseItemStatus` (via de cascade)
 - [ ] Entities voor entry en prioriteit, en `notes` op `GrowthWeekCheck`; migratie met `pn db:gen`, nakijken, dan `pn db:push`
 - [ ] Contract-uitbreiding, service en controller
 - [ ] Pagina `/growth/week-check` met de wizard: start, terugblik en vooruitblik per persoon, afsluiten

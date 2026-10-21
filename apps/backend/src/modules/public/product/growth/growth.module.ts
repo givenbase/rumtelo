@@ -6,7 +6,7 @@ import { GrowthDashboardModule } from './dashboard/dashboard.module';
 import { IncomeLeverModule } from './income-lever/income-lever.module';
 import { IncomeMilestoneModule } from './income-milestone/income-milestone.module';
 import { LearnModule } from './learn/learn.module';
-import { PlanModule } from './plan/plan.module';
+import { CourseModule } from './course/course.module';
 import { GrowthWeekCheckModule } from './week-check/week-check.module';
 
 /**
@@ -22,7 +22,7 @@ import { GrowthWeekCheckModule } from './week-check/week-check.module';
         LearnModule,
         GrowthWeekCheckModule,
         GrowthDashboardModule,
-        PlanModule,
+        CourseModule,
     ],
     exports: [
         IncomeLeverModule,
@@ -32,7 +32,7 @@ import { GrowthWeekCheckModule } from './week-check/week-check.module';
         LearnModule,
         GrowthWeekCheckModule,
         GrowthDashboardModule,
-        PlanModule,
+        CourseModule,
     ],
 })
 export class GrowthModule {}

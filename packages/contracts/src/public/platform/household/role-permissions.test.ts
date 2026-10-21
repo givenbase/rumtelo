@@ -10,19 +10,41 @@ import {
 } from './role-permissions';
 
 describe('permissionActionFromPath', () => {
-    it('classifies growth plan reads and carry', () => {
+    it('classifies growth course reads and carry', () => {
         assert.equal(
-            permissionActionFromPath('/growth/plan/period', 'POST'),
+            permissionActionFromPath('/growth/course/period', 'POST'),
             HouseholdPermissionAction.READ
         );
         assert.equal(
-            permissionActionFromPath('/growth/plan/year', 'POST'),
+            permissionActionFromPath('/growth/course/year', 'POST'),
             HouseholdPermissionAction.READ
         );
         assert.equal(
-            permissionActionFromPath('/growth/plan/carry', 'POST'),
+            permissionActionFromPath('/growth/course/carry', 'POST'),
             HouseholdPermissionAction.UPDATE
         );
+    });
+
+    it('classifies course rhythm, schedule and feed procedures', () => {
+        for (const path of [
+            '/growth/course/rhythm/list',
+            '/growth/course/rhythm/suggestions',
+            '/growth/course/schedule/list',
+            '/growth/course/feed/get',
+        ]) {
+            assert.equal(permissionActionFromPath(path, 'POST'), HouseholdPermissionAction.READ);
+        }
+        for (const path of [
+            '/growth/course/rhythm/tick',
+            '/growth/course/rhythm/untick',
+            '/growth/course/rhythm/pause',
+            '/growth/course/rhythm/confirm',
+            '/growth/course/rhythm/renew',
+            '/growth/course/schedule/snooze',
+            '/growth/course/feed/rotate',
+        ]) {
+            assert.equal(permissionActionFromPath(path, 'POST'), HouseholdPermissionAction.UPDATE);
+        }
     });
 
     it('classifies fixed-cost jar/settlement reads as READ despite POST', () => {

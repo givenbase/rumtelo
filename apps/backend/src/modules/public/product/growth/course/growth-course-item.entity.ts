@@ -7,7 +7,7 @@ import {
     Property,
     Unique,
 } from '@mikro-orm/decorators/legacy';
-import { PlanHorizon, PlanItemStatus } from '@rumtelo/contracts';
+import { CourseHorizon, CourseItemStatus } from '@rumtelo/contracts';
 
 import { entityConfig } from '../../../../../common/database/entity-config.util';
 import { NativeEnum } from '../../../../../common/database/native-enum.util';
@@ -18,37 +18,41 @@ import {
 import { Goal } from '../../money/targets/goal/goal.entity';
 
 /**
- * Growth Plan Item Entity
+ * Growth Course Item Entity (Koers)
  *
  * One step of the cascade year → quarter → month → week → day. An item may hang
  * under any higher item whose period contains its own (`parent`, optional). Week and
  * day hold a top 3 per period; year, quarter and month hold 3 per parent goal.
  * Progress is computed from the children, never stored. Household writes, through
- * `PersonalScopedRepository` (area `growth.plan`).
+ * `PersonalScopedRepository` (area `growth.course`).
  *
  * @see PersonalHouseholdEntity — maker + visibility
  * @see docs/engineering/growth-cascade-plan.md
  * @see https://mikro-orm.io/docs/defining-entities
  */
-@Entity(entityConfig({ schema: 'public', domain: 'growth', tableName: 'plan_item' }))
+@Entity(entityConfig({ schema: 'public', domain: 'growth', tableName: 'course_item' }))
 @Index({ properties: ['household', 'horizon', 'period'] })
 @Index({ properties: ['parent'] })
 // Year, quarter and month: three steps per parent goal.
 @Unique({
-    name: 'growth_plan_item_goal_slot_unique',
+    name: 'growth_course_item_goal_slot_unique',
     expression:
-        'create unique index "growth_plan_item_goal_slot_unique" on "public"."growth_plan_item" ("household_id", "account_id", "horizon", "period", "parent_id", "position") nulls not distinct where "horizon" in (\'YEAR\', \'QUARTER\', \'MONTH\')',
+        'create unique index "growth_course_item_goal_slot_unique" on "public"."growth_course_item" ("household_id", "account_id", "horizon", "period", "parent_id", "position") nulls not distinct where "horizon" in (\'YEAR\', \'QUARTER\', \'MONTH\')',
 })
 // Week and day: a top 3 per period, whatever each item hangs under.
 @Unique({
-    name: 'growth_plan_item_period_slot_unique',
+    name: 'growth_course_item_period_slot_unique',
     expression:
-        'create unique index "growth_plan_item_period_slot_unique" on "public"."growth_plan_item" ("household_id", "account_id", "horizon", "period", "position") nulls not distinct where "horizon" in (\'WEEK\', \'DAY\')',
+        'create unique index "growth_course_item_period_slot_unique" on "public"."growth_course_item" ("household_id", "account_id", "horizon", "period", "position") nulls not distinct where "horizon" in (\'WEEK\', \'DAY\')',
 })
-@Check(personalRowCheck('growth_plan_item'))
+@Check(personalRowCheck('growth_course_item'))
 // 0 only while two items swap positions: the unique slot index checks every row at once.
-@Check({ name: 'growth_plan_item_position_range', expression: '(position BETWEEN 0 AND 3)' })
-export class GrowthPlanItem extends PersonalHouseholdEntity {
+@Check({ name: 'growth_course_item_position_range', expression: '(position BETWEEN 0 AND 3)' })
+@Check({
+    name: 'growth_course_item_target_count_range',
+    expression: '(target_count IS NULL) OR (target_count BETWEEN 1 AND 99)',
+})
+export class GrowthCourseItem extends PersonalHouseholdEntity {
     // ? PROPERTIES
     /** Period key for `horizon`: `2027`, `2027-Q1`, `2027-03`, `2027-W10`, `2027-03-08`. */
     @Property({ length: 10 })
@@ -78,22 +82,29 @@ export class GrowthPlanItem extends PersonalHouseholdEntity {
     @Property({ type: 'smallint', default: 0 })
     carryCount = 0;
 
+    /**
+     * Month / quarter counter ("12 trainings"). Set: progress is the ticks of the
+     * rhythms under this item in its period, out of this number.
+     */
+    @Property({ type: 'smallint', nullable: true })
+    targetCount: number | null = null;
+
     // ? ENUMS
     /** Layer of the cascade. */
-    @Enum(NativeEnum({ PlanHorizon, domain: 'growth' }))
-    horizon!: PlanHorizon;
+    @Enum(NativeEnum({ CourseHorizon, domain: 'growth' }))
+    horizon!: CourseHorizon;
 
     /** Review state; DROPPED leaves the progress maths. */
-    @Enum(NativeEnum({ PlanItemStatus, domain: 'growth', defaultValue: PlanItemStatus.OPEN }))
-    status: PlanItemStatus = PlanItemStatus.OPEN;
+    @Enum(NativeEnum({ CourseItemStatus, domain: 'growth', defaultValue: CourseItemStatus.OPEN }))
+    status: CourseItemStatus = CourseItemStatus.OPEN;
 
     // ? RELATIONSHIPS
     /** Item one layer up. Null = loose; deleting the parent leaves children loose. */
-    @ManyToOne(() => GrowthPlanItem, { mapToPk: true, nullable: true, deleteRule: 'set null' })
+    @ManyToOne(() => GrowthCourseItem, { mapToPk: true, nullable: true, deleteRule: 'set null' })
     parent: string | null = null;
 
     /** The unfinished item this one was carried forward from. */
-    @ManyToOne(() => GrowthPlanItem, { mapToPk: true, nullable: true, deleteRule: 'set null' })
+    @ManyToOne(() => GrowthCourseItem, { mapToPk: true, nullable: true, deleteRule: 'set null' })
     carriedFrom: string | null = null;
 
     /** Money goal this year / quarter item is about. Cleared if the goal goes. */
