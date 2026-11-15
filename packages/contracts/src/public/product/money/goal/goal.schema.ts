@@ -7,7 +7,7 @@
 import { z } from 'zod';
 
 import { HouseholdId, Id, IsoDate, Money } from '../../../../common/common.schema';
-import { GivingCause, GoalKind, GoalStatus } from '../enums';
+import { GivingCause, GoalKind, GoalStatus, JarKey } from '../enums';
 
 export const Goal = z.object({
     id: Id,
@@ -57,6 +57,29 @@ export const GoalProjection = z.object({
     shortfallPerMonth: Money,
 });
 
+/**
+ * A goal in one line for other products (Growth · Koers shows it next to a course
+ * item, or on its own while nothing links to it): the goal, its jar and the landing date.
+ */
+export const GoalSummary = z.object({
+    id: Id,
+    kind: z.enum(GoalKind),
+    name: z.string().min(1).max(120),
+    icon: z.string().max(8).nullable(),
+    status: z.enum(GoalStatus),
+    target: Money,
+    /** Same meaning as {@link Goal} `saved`. */
+    saved: Money,
+    targetOn: IsoDate.nullable(),
+    /** Jar the goal draws on; null for EARN goals. */
+    jarId: Id.nullable(),
+    jarKey: z.enum(JarKey).nullable(),
+    jarName: z.string().min(1).max(80).nullable(),
+    /** Month the goal lands at the current contribution rate; null if never / EARN. */
+    projectedDate: IsoDate.nullable(),
+});
+
 // Inferred types (same-module merge for consumers)
 export type Goal = z.infer<typeof Goal>;
 export type GoalProjection = z.infer<typeof GoalProjection>;
+export type GoalSummary = z.infer<typeof GoalSummary>;

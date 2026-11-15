@@ -28,14 +28,14 @@ const ok = z.object({ ok: z.literal(true) });
 // ? CREATE Operations
 // ====================================================================
 
-/** New item; refuses a fourth in the same slot. */
+/** New item; a week or day refuses a sixth (3 recommended, 5 at most). */
 export const courseCreate = oc.input(CourseItemCreateInput).output(CourseItem);
 
 // ====================================================================
 // ? READ Operations
 // ====================================================================
 
-/** One period: items, their "why" chain and the layer below. */
+/** One period: items, their "why" chain and the layer below; year also lists unlinked Money goals. */
 export const coursePeriod = oc.input(CoursePeriodInput).output(CoursePeriodView);
 
 /** Year, quarter and month items of one year — the year overview. */

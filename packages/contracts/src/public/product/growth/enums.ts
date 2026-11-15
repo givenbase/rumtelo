@@ -37,6 +37,15 @@ export enum CourseItemStatus {
 }
 
 /**
+ * Whose life a goal belongs to: the person's own, or their business. Only a label
+ * for grouping year goals (also allowed on quarter and month); null = not set.
+ */
+export enum CourseScope {
+    PERSONAL = 'PERSONAL',
+    BUSINESS = 'BUSINESS',
+}
+
+/**
  * Kind of routine. Both are patterns you keep, not choices you make: a routine never
  * takes one of the three Focus slots. Only a DISCIPLINE counts; a HABIT asks one thing,
  * "done today?", without a number.

@@ -42,6 +42,7 @@ function emptyView(horizon: CourseHorizon, period: string): CoursePeriodView {
         ancestors: [],
         children: [],
         hiddenCount: 0,
+        unlinkedMoneyGoals: [],
         visibilityOptions: [],
         defaultVisibility: VisibilityChoice.PRIVATE,
         isVisibilityPickerShown: false,

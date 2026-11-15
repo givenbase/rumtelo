@@ -16,7 +16,9 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'common.message.error.api.course_item_not_found':
             'Dit onderdeel van je planning bestaat niet meer',
         'common.message.error.api.course_period_full':
-            'Drie is hier het maximum. Rond er eerst één af, verplaats er één of laat er één los.',
+            'Vijf is hier het maximum. Rond er eerst één af, verplaats er één of laat er één los.',
+        'common.message.error.api.course_scope_invalid':
+            'Alleen een jaar-, kwartaal- of maanddoel kan persoonlijk of zakelijk zijn',
         // Course = "Koers" (rumbo), never "Cursus".
         'pages.nav.children.course': 'Koers',
         'pages.meta.course': 'Koers',

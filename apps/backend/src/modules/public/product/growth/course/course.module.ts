@@ -6,6 +6,8 @@ import { AccountModule } from '../../../../auth/user/account/account.module';
 import { CoachModule } from '../../../platform/coach/coach.module';
 import { TimeTemplateModule } from '../../energy/time-template/time-template.module';
 import { MonthScoreModule } from '../../money/month-score/month-score.module';
+import { JarModule } from '../../money/plan/jar/jar.module';
+import { GoalModule } from '../../money/targets/goal/goal.module';
 import { WeekCheckModule as MoneyWeekCheckModule } from '../../money/week-check/week-check.module';
 import { GrowthWeekCheckModule } from '../week-check/week-check.module';
 import { CourseCalendarController } from './course-calendar.controller';
@@ -26,8 +28,8 @@ import { RhythmService } from './rhythm.service';
 
 /**
  * Course (Koers): the Growth cascade (year → day), Rhythm (routines), Schedule (one
- * read over Course and the rituals) and the calendar mirror. Schedule reads other
- * products through their services only. Visibility comes from the global module.
+ * read over Course and the rituals) and the calendar mirror. Schedule and the year view
+ * read other products (rituals, Money goals and jars) through their services only. Visibility comes from the global module.
  */
 @Module({
     imports: [
@@ -40,7 +42,9 @@ import { RhythmService } from './rhythm.service';
         ]),
         AccountModule,
         CoachModule,
+        GoalModule,
         HouseholdSettingsModule,
+        JarModule,
         GrowthWeekCheckModule,
         MoneyWeekCheckModule,
         MonthScoreModule,
