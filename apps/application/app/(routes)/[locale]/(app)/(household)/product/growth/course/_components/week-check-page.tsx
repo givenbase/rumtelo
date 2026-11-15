@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 import {
-    COURSE_SLOT_SIZE,
+    COURSE_FOCUS_MAX,
+    COURSE_FOCUS_RECOMMENDED,
     CourseHorizon,
     HouseholdRole,
     VisibilityChoice,
@@ -28,6 +29,7 @@ import { growthPath } from '@/app/_lib/routes';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 
+import { focusSlotsOf } from '../_utils/course-goals';
 import { periodLabel } from '../_utils/course-route';
 import { useCourseActions } from '../_utils/use-course-actions';
 import { useRhythmActions } from '../_utils/use-rhythm-actions';
@@ -155,8 +157,10 @@ export function WeekCheckPage() {
     const previous = previousQuery.data.items.filter(item => item.isMine);
     const ahead = aheadQuery.data;
     const aheadMine = ahead.items.filter(item => item.isMine);
-    const openSlots =
-        ahead.visibilityOptions.length > 0 ? Math.max(0, COURSE_SLOT_SIZE - aheadMine.length) : 0;
+    const slots = focusSlotsOf(COURSE_FOCUS_RECOMMENDED, COURSE_FOCUS_MAX, aheadMine.length);
+    const canCreate = ahead.visibilityOptions.length > 0;
+    const openSlots = canCreate ? slots.emptySlots : 0;
+    const canAddMore = canCreate && slots.emptySlots === 0 && slots.canAddMore;
     const isCompleted = Boolean(checkQuery.data?.completedAt) || step === 'done';
     const stepIndex = STEPS.indexOf(step);
     const goTo = (next: Step) => setStep(next);
@@ -276,6 +280,27 @@ export function WeekCheckPage() {
                             {tCourse('empty_slot_week')}
                         </button>
                     ))}
+                    {canAddMore ? (
+                        <button
+                            type="button"
+                            onClick={() =>
+                                setDialog({
+                                    mode: 'create',
+                                    horizon: CourseHorizon.WEEK,
+                                    period: week,
+                                })
+                            }
+                            className="flex min-h-12 items-center gap-3 rounded-2xl border-2 border-dashed border-line-strong px-4 text-left text-sm text-fg-muted transition-colors hover:border-accent hover:text-accent">
+                            <Icon name="plus" aria-hidden />
+                            {tCourse('add')}
+                        </button>
+                    ) : null}
+                    {canCreate && slots.isBeyondRecommended ? (
+                        <p className="text-sm text-fg-muted">
+                            {tCourse('focus_beyond', { count: aheadMine.length })}
+                            {slots.isFull ? ` ${tCourse('focus_full')}` : ''}
+                        </p>
+                    ) : null}
                     <StepNav
                         onBack={() => goTo('rhythm')}
                         backLabel={t('back')}

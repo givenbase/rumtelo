@@ -3,9 +3,11 @@ import {
     CourseLane,
     CourseRhythmKind,
     CourseScheduleKind,
+    VisibilityChoice,
     addDays,
     ancestorPeriodOf,
     type CourseItem,
+    type CoursePeriodView,
     type CourseScheduleEntry,
 } from '@rumtelo/contracts';
 
@@ -92,4 +94,20 @@ export function isCurrentStep(
     if (item.horizon === CourseHorizon.MONTH) return item.period === month;
     if (item.horizon === CourseHorizon.QUARTER) return quarter !== null && item.period === quarter;
     return false;
+}
+
+/** Placeholder view while a period loads (or without a household): nothing in it, nothing to create. */
+export function emptyPeriodView(horizon: CourseHorizon, period: string): CoursePeriodView {
+    return {
+        horizon,
+        period,
+        items: [],
+        ancestors: [],
+        children: [],
+        hiddenCount: 0,
+        unlinkedMoneyGoals: [],
+        visibilityOptions: [],
+        defaultVisibility: VisibilityChoice.PRIVATE,
+        isVisibilityPickerShown: false,
+    };
 }

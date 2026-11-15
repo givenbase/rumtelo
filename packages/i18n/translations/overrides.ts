@@ -34,17 +34,13 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Wat er vandaag staat: je 3, je routines en de checks.',
         'features.growth.course.title_week': 'Deze week',
         'features.growth.course.lead_week': 'Je 3, je routines en de checks van deze week.',
-        'features.growth.course.title_goals': 'Doelen',
-        'features.growth.course.lead_goals':
-            'Waar de weken heen leiden: je doelen en de mijlpalen van deze maand.',
+        'features.growth.course.title_goals': 'Jouw {year}',
         'features.growth.course.section_checks': 'Checks',
         'features.growth.course.section_focus_week': 'Jouw 3 voor deze week',
         'features.growth.course.section_focus_day': 'Jouw 3 voor vandaag',
         'features.growth.course.section_routines': 'Je routines',
         'features.growth.course.section_routines_today': 'Routines vandaag',
         'features.growth.course.section_advice': 'Advies',
-        'features.growth.course.goals_year': 'Doelen {year}',
-        'features.growth.course.goals_month': '{month}: mijlpalen',
         'features.growth.course.today_empty_focus': 'Nog niets gekozen voor deze week.',
         'features.growth.course.today_choose_3': 'Kies je 3',
         'features.growth.course.day_prev': 'Vorige dag',
@@ -200,8 +196,6 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.growth.course.link_to_goal': 'Koppel aan een doel',
         'features.growth.course.private_parent': 'Privé doel',
         'features.growth.course.children_title': 'Hieronder',
-        'features.growth.course.lead_quarter':
-            'Resultaten voor dit kwartaal, tussen je doelen en de maand.',
         'features.growth.course.status.OPEN': 'Open',
         'features.growth.course.status.MISSED': 'Niet gelukt',
         'features.growth.course.status.DROPPED': 'Losgelaten',
@@ -211,6 +205,47 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.growth.course.action_drop': 'Loslaten',
         'features.growth.course.empty_slot_week': 'Wat is een van je 3 voor deze week?',
         'features.growth.course.empty_slot_day': 'Wat is een van je 3 voor vandaag?',
+        'features.growth.course.focus_beyond':
+            'Drie is de ideale hoeveelheid, maar {count} is prima.',
+        'features.growth.course.focus_full':
+            'Meer past er niet. Rond er eerst één af of laat er één los.',
+        'features.growth.course.money_shared_note':
+            'Een gekoppeld Geld-doel wordt gedeeld met het huishouden.',
+        'features.growth.course.form.title_create_goal': 'Nieuw doel',
+        'features.growth.course.form.scope': 'Persoonlijk of zakelijk?',
+        'features.growth.course.form.scope_none': 'Niet ingesteld',
+        'features.growth.course.goal.count': '{count, plural, one {# doel} other {# doelen}}',
+        'features.growth.course.goal.add_goal': 'Doel',
+        'features.growth.course.goal.add_goal_aria': 'Een doel toevoegen',
+        'features.growth.course.goal.add_goal_amount': 'Doel met een bedrag',
+        'features.growth.course.goal.list_aria': 'Doelen voor {year}',
+        'features.growth.course.goal.empty_title': 'Nog geen doelen',
+        'features.growth.course.goal.empty_body':
+            'Begin met één ding dat je dit jaar wilt. De stappen en weken volgen.',
+        'features.growth.course.goal.loose_title': 'Losse stappen · {month}',
+        'features.growth.course.goal.summary_steps': 'Stappen deze maand',
+        'features.growth.course.goal.summary_focus': 'Focus deze week',
+        'features.growth.course.goal.summary_needing': 'Doelen die een stap nodig hebben',
+        'features.growth.course.goal.ring_aria': '{name}: {percent}% klaar',
+        'features.growth.course.goal.no_step_yet': 'Nog geen stap in {month}',
+        'features.growth.course.goal.step_more': '+{count} meer',
+        'features.growth.course.goal.money_no_steps': 'Nog geen stappen',
+        'features.growth.course.goal.add_step': 'Stap',
+        'features.growth.course.goal.scope_PERSONAL': 'Persoonlijk',
+        'features.growth.course.goal.scope_BUSINESS': 'Zakelijk',
+        'features.growth.course.goal.done_when': 'Klaar als',
+        'features.growth.course.goal.timeline_aria': 'Maanden van {year}: waar een stap gepland is',
+        'features.growth.course.goal.timeline_step': 'stap gepland',
+        'features.growth.course.goal.timeline_no_step': 'nog geen stap',
+        'features.growth.course.goal.steps_title': 'Stappen in {month}',
+        'features.growth.course.goal.week_title': 'Deze week',
+        'features.growth.course.goal.routines_title': 'Routines',
+        'features.growth.course.goal.plan_steps': 'Stappen plannen',
+        'features.growth.course.goal.add_to_week': 'Toevoegen aan deze week',
+        'features.growth.course.goal.step_for': 'Stap voor {month}',
+        'features.growth.course.goal.money_title': 'Geld-doel',
+        'features.growth.course.goal.money_saved': '{saved} van {target}',
+        'features.growth.course.goal.money_lands': 'Rond {date} gehaald, in het huidige tempo.',
         'features.growth.course.form.parent': 'Hoort bij',
         'features.growth.course.form.parent_none': 'Nergens bij, staat op zichzelf',
         'features.growth.course.form.money_goal_none': 'Geen Geld-doel',
@@ -234,5 +269,19 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Jouw 3 voor deze week, gekoppeld aan de maand en het doel waar ze bij horen. Plus en Max.',
         'features.capabilities.platform-sharing.description':
             'Kies per item wie het ziet, bepaal wat leden mogen delen en zie van wie welk geld is. Plus en Max.',
+    },
+    es: {
+        // Kept as translated before: the generator without a DeepL key would drop them to English.
+        'common.message.error.api.course_period_full':
+            'Aquí el límite es cinco. Termina uno, muévelo o déjalo ir primero.',
+        'common.message.error.api.course_scope_invalid':
+            'Solo un objetivo anual, trimestral o mensual puede ser personal o profesional',
+    },
+    fr: {
+        // Kept as translated before: the generator without a DeepL key would drop them to English.
+        'common.message.error.api.course_period_full':
+            'Ici, on ne peut pas en avoir plus de cinq. Finis-en un, déplace-en un ou laisse-en un.',
+        'common.message.error.api.course_scope_invalid':
+            'Seul un objectif annuel, trimestriel ou mensuel peut être personnel ou professionnel',
     },
 };
