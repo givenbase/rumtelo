@@ -12,7 +12,7 @@ Snapshot of how the system is built. For status, next steps, and full narrative,
 | Frontend | Next.js 16, React 19, **Tailwind v4 only** | one styling system |
 | API | NestJS 11 + **Fastify** + **oRPC** | contracts-first, end-to-end types |
 | Contracts | `@rumtelo/contracts` (Zod + procedures) | wire source of truth |
-| ORM | **MikroORM 6** + PostgreSQL | unit-of-work for money rows |
+| ORM | **MikroORM 7** + PostgreSQL | unit-of-work for money rows |
 | Isolation | Row-level `household_id` | never schema-per-tenant |
 | Auth | better-auth (`organization` + `twoFactor`) | Household *is* the org plugin |
 | Lint | **oxlint + oxfmt** | `pnpm lint` |
