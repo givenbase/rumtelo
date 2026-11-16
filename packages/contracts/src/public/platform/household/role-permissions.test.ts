@@ -10,6 +10,13 @@ import {
 } from './role-permissions';
 
 describe('permissionActionFromPath', () => {
+    it('classifies household removeMember as DELETE', () => {
+        assert.equal(
+            permissionActionFromPath('/household/removeMember', 'POST'),
+            HouseholdPermissionAction.DELETE
+        );
+    });
+
     it('classifies growth course reads and carry', () => {
         assert.equal(
             permissionActionFromPath('/growth/course/period', 'POST'),

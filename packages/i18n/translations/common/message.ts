@@ -79,6 +79,9 @@ const message = {
             invitation_not_found: 'This invitation is missing, expired, or already used.',
             invitation_accept_failed:
                 'Could not accept the invitation. Try again or ask for a new one.',
+            member_not_found: 'That household member is no longer here',
+            cannot_remove_owner: 'The household owner cannot be removed',
+            member_remove_failed: 'Could not remove that member. Try again.',
             jar_split_total: 'Jar split must total 100%, received {total}%',
             jar_placement_account_invalid: 'That bank account is not in this household.',
             book_catalog_unavailable: 'The book catalog did not answer.',

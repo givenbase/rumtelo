@@ -158,6 +158,37 @@ export class HouseholdService {
     }
 
     // ====================================================================
+    // ? DELETE Operations
+    // ====================================================================
+
+    /** Owner removes a MEMBER or VIEWER. The owner seat stays. */
+    async removeMember(householdId: string, memberId: string) {
+        const target = await this.em.findOne(AuthMember, {
+            id: memberId,
+            household: householdId,
+        });
+        if (!target) throw apiBadRequest('member_not_found');
+        if (mapRole(target.role) === HouseholdRole.OWNER) {
+            throw apiBadRequest('cannot_remove_owner');
+        }
+
+        const headers = currentAuthHeaders();
+        try {
+            await this.authService.api.removeMember({
+                body: {
+                    memberIdOrEmail: memberId,
+                    organizationId: householdId,
+                },
+                headers,
+            });
+        } catch (error) {
+            throw mapToOrpcClientError(error);
+        }
+
+        return { ok: true as const };
+    }
+
+    // ====================================================================
     // ? READ Operations
     // ====================================================================
 

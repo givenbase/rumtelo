@@ -7,7 +7,7 @@
 import { oc } from '@orpc/contract';
 import { z } from 'zod';
 
-import { AuthId, HouseholdId, HouseholdScoped } from '../../../common/common.schema';
+import { AuthId, HouseholdId, HouseholdScoped, MemberId } from '../../../common/common.schema';
 import { HouseholdRelation, HouseholdRole } from '../enums';
 import { HouseholdPracticeLink, HouseholdPracticeLinkInput } from '../practice/practice.schema';
 import {
@@ -74,6 +74,20 @@ export const householdPracticeLinksUnlink = oc
     .input(HouseholdPracticeLinkInput)
     .output(HouseholdPracticeLink);
 
+// ====================================================================
+// ? DELETE Operations
+// ====================================================================
+
+/** Owner removes a MEMBER or VIEWER seat (not the owner). */
+export const householdRemoveMember = oc
+    .input(
+        z.object({
+            householdId: HouseholdId,
+            memberId: MemberId,
+        })
+    )
+    .output(z.object({ ok: z.literal(true) }));
+
 /** Nested Practice dual-consent APIs under `contract.household.practiceLinks`. */
 export const householdPracticeLinksContract = {
     list: householdPracticeLinksList,
@@ -91,5 +105,6 @@ export const householdContract = {
     updateSettings: householdUpdateSettings,
     onboard: householdOnboard,
     invite: householdInvite,
+    removeMember: householdRemoveMember,
     practiceLinks: householdPracticeLinksContract,
 };

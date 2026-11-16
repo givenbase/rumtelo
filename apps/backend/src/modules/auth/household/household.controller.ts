@@ -101,4 +101,16 @@ export class HouseholdController {
             this.practice.unlinkHouseholdPracticeLink(input.householdId, input.linkId)
         );
     }
+
+    // ====================================================================
+    // ? DELETE Operations
+    // ====================================================================
+
+    /** Owner removes a MEMBER or VIEWER from the household. */
+    @Implement(contract.household.removeMember)
+    removeMember() {
+        return implement(contract.household.removeMember).handler(({ input }) =>
+            this.households.removeMember(input.householdId, input.memberId)
+        );
+    }
 }

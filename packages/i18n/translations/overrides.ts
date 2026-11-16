@@ -217,6 +217,16 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.growth.course.form.done_when': 'Hoe weet je dat het klaar is?',
         'features.growth.course.form.done_when_hint':
             'Het resultaat of bewijs. De deadline is de periode hierboven — geen aparte datum.',
+        'pages.settings.panels.household.remove_member': 'Verwijderen',
+        'pages.settings.panels.household.remove_member_confirm':
+            'Nogmaals klikken om te verwijderen',
+        'pages.settings.toasts.member_removed': 'Lid verwijderd',
+        'pages.settings.toasts.member_remove_failed': 'Lid verwijderen lukte niet',
+        'common.message.error.api.member_not_found': 'Dit lid hoort niet meer bij dit huishouden',
+        'common.message.error.api.cannot_remove_owner':
+            'De eigenaar van het huishouden kun je niet verwijderen',
+        'common.message.error.api.member_remove_failed':
+            'Dit lid kon niet worden verwijderd. Probeer het opnieuw.',
         'pages.settings.panels.sharing.owner_only':
             'Alleen de eigenaar van het huishouden kan dit wijzigen.',
         'pages.settings.panels.sharing.areas.growth_course': 'Doelen in Koers',

@@ -183,6 +183,7 @@ export function permissionSectionFromPath(pathname: string): HouseholdPermission
     if (
         path.includes('/household/invite') ||
         path.includes('/household/members') ||
+        path.includes('/household/removemember') ||
         path.endsWith('/members')
     ) {
         return HouseholdPermissionSection.HOUSEHOLD_MEMBERS;

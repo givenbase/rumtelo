@@ -46,3 +46,12 @@ export function canInviteWithRole(actor: HouseholdRole): boolean {
         HouseholdPermissionAction.CREATE
     );
 }
+
+/** Owner (and roles with DELETE on members) may remove MEMBER / VIEWER seats. */
+export function canRemoveMemberWithRole(actor: HouseholdRole): boolean {
+    return roleCan(
+        actor,
+        HouseholdPermissionSection.HOUSEHOLD_MEMBERS,
+        HouseholdPermissionAction.DELETE
+    );
+}
