@@ -250,7 +250,7 @@ create() {
 
 No single-letter locals (`g`, `d`, `j`). Prefer domain words: `goal`, `debt`, `jar`, `row`, `preset`, `transaction` — not jargon shorthand (`tx`, `alloc`). Accumulators: `sum` / `total`. Enforced by Oxlint `id-length` in root `.oxlintrc.json` (min 2; only `_` excepted).
 
-### Persistence (MikroORM 6)
+### Persistence (MikroORM 7)
 
 Never use deprecated `persistAndFlush` / `removeAndFlush`:
 
