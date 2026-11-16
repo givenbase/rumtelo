@@ -36,7 +36,9 @@ export class PersonalScopedRepository<
     ): Promise<T> {
         await this.visibility.assertChoiceAllowed(this.area, choice);
         const makerAccountId = await this.visibility.requireViewerAccountId();
-        return super.create({ ...data, ...fromChoice(choice, makerAccountId) } as never);
+        // fromChoice speaks DTO (`accountId`); the entity column is `account`.
+        const { accountId, visibility } = fromChoice(choice, makerAccountId);
+        return super.create({ ...data, account: accountId, visibility } as never);
     }
 
     // ====================================================================
@@ -82,7 +84,9 @@ export class PersonalScopedRepository<
         await this.visibility.assertCanDelete(this.area, rowOf(entity));
         await this.visibility.assertChoiceAllowed(this.area, choice);
         const makerAccountId = entity.account ?? (await this.visibility.requireViewerAccountId());
-        Object.assign(entity, fromChoice(choice, makerAccountId));
+        const { accountId, visibility } = fromChoice(choice, makerAccountId);
+        entity.account = accountId;
+        entity.visibility = visibility;
     }
 
     // ====================================================================

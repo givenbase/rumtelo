@@ -154,8 +154,12 @@ export function WeekCheckPage() {
     const previous = previousQuery.data.items.filter(item => item.isMine);
     const ahead = aheadQuery.data;
     const aheadMine = ahead.items.filter(item => item.isMine);
+    const aheadTogether = ahead.items.filter(item => item.accountId === null);
+    const aheadFilled = aheadMine.length + aheadTogether.length;
     const openSlots =
-        ahead.visibilityOptions.length > 0 ? Math.max(0, COURSE_SLOT_SIZE - aheadMine.length) : 0;
+        ahead.visibilityOptions.length > 0
+            ? Math.min(1, Math.max(0, COURSE_SLOT_SIZE - aheadFilled))
+            : 0;
     const isCompleted = Boolean(checkQuery.data?.completedAt) || step === 'done';
     const stepIndex = STEPS.indexOf(step);
     const goTo = (next: Step) => setStep(next);

@@ -165,18 +165,29 @@ export function CourseLayerSection({
     }
 
     const canCreate = view.visibilityOptions.length > 0;
+    // One empty row at a time — filled cards (mine + together) already take slots.
+    const filledSlots = isPeriodCapped(horizon)
+        ? mine.length + together.length
+        : horizon === CourseHorizon.YEAR
+          ? mine.filter(item => !item.parentId).length +
+            together.filter(item => !item.parentId).length
+          : 0;
     const openSlots =
         !canCreate || !isSlotShown
             ? 0
-            : isPeriodCapped(horizon)
-              ? Math.max(0, COURSE_SLOT_SIZE - mine.length)
-              : horizon === CourseHorizon.YEAR
-                ? Math.max(0, COURSE_SLOT_SIZE - mine.filter(item => !item.parentId).length)
-                : 1;
+            : isPeriodCapped(horizon) || horizon === CourseHorizon.YEAR
+              ? Math.min(1, Math.max(0, COURSE_SLOT_SIZE - filledSlots))
+              : 1;
     const emptySlotLabel = isPeriodCapped(horizon)
         ? t(horizon === CourseHorizon.DAY ? 'empty_slot_day' : 'empty_slot_week')
         : t(horizon === CourseHorizon.YEAR ? 'empty_slot_goal' : 'empty_slot_step');
     const isEmpty = view.items.length === 0;
+    const isFull =
+        canCreate &&
+        isSlotShown &&
+        openSlots === 0 &&
+        (isPeriodCapped(horizon) || horizon === CourseHorizon.YEAR) &&
+        filledSlots >= COURSE_SLOT_SIZE;
 
     const cardProps = (item: CourseItem) => ({
         item,
@@ -217,22 +228,6 @@ export function CourseLayerSection({
             {mine.map(item => (
                 <CourseItemCard key={item.id} {...cardProps(item)} />
             ))}
-            {Array.from({ length: openSlots }, (_unused, index) => (
-                <button
-                    // Empty slots are interchangeable placeholders, not items.
-                    key={`slot-${index}`}
-                    type="button"
-                    onClick={() => setDialog({ mode: 'create', horizon, period })}
-                    aria-label={emptySlotLabel}
-                    className="flex min-h-16 items-center gap-3 rounded-2xl border-2 border-dashed border-line-strong px-4 text-left text-sm text-fg-muted transition-colors hover:border-accent hover:text-accent">
-                    <Icon name="plus" aria-hidden />
-                    {emptySlotLabel}
-                </button>
-            ))}
-            {canCreate && isSlotShown && openSlots === 0 && isPeriodCapped(horizon) ? (
-                <p className="text-sm text-fg-muted">{t('full')}</p>
-            ) : null}
-            {isEmpty && openSlots === 0 ? emptyState : null}
 
             {together.length > 0 ? (
                 <>
@@ -255,6 +250,21 @@ export function CourseLayerSection({
                     ))}
                 </div>
             ))}
+
+            {Array.from({ length: openSlots }, (_unused, index) => (
+                <button
+                    // Empty slots are interchangeable placeholders, not items.
+                    key={`slot-${index}`}
+                    type="button"
+                    onClick={() => setDialog({ mode: 'create', horizon, period })}
+                    aria-label={emptySlotLabel}
+                    className="flex min-h-16 items-center gap-3 rounded-2xl border-2 border-dashed border-line-strong px-4 text-left text-sm text-fg-muted transition-colors hover:border-accent hover:text-accent">
+                    <Icon name="plus" aria-hidden />
+                    {emptySlotLabel}
+                </button>
+            ))}
+            {isFull ? <p className="text-sm text-fg-muted">{t('full')}</p> : null}
+            {isEmpty && openSlots === 0 ? emptyState : null}
 
             {view.hiddenCount > 0 ? (
                 <p className="font-mono text-xs tracking-wide text-fg-muted uppercase">
