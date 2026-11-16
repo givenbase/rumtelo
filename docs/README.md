@@ -10,6 +10,7 @@ Start here to understand the whole project — product direction, brand, researc
 | [product/principles.md](./product/principles.md) | Non-negotiable product principles |
 | [product/audience.md](./product/audience.md) | Who we build for |
 | [product/practice.md](./product/practice.md) | Rumtelo for practices — who, what it does today, pricing, pitch, gaps |
+| [product/coach-readiness.md](./product/coach-readiness.md) | The Coach surfaces — ship / preview / backlog per row |
 | [brand/positioning.md](./brand/positioning.md) | Name, voice, visual direction |
 | [brand/quotes.md](./brand/quotes.md) | Approved slogans & quote bank |
 | [explain/README.md](./explain/README.md) | AI-avatar scripts — L1 Rumtelo → L2 products → L3 features |
@@ -19,7 +20,12 @@ Start here to understand the whole project — product direction, brand, researc
 | [engineering/banking.md](./engineering/banking.md) | CSV import, Enable Banking / PSD2, pricing, moving money (PIS, bunq vs Revolut) |
 | [engineering/outreach-pis.md](./engineering/outreach-pis.md) | Draft mails to Enable Banking and Flow/FlowOS for PIS access without own license |
 | [engineering/traps.md](./engineering/traps.md) | Traps already hit — do not re-learn |
-| [design/README.md](./design/README.md) | Design source of truth and rebuild rules |
+| [engineering/pr-gates.md](./engineering/pr-gates.md) | PR gate checklist for agents |
+| [engineering/household-visibility-plan.md](./engineering/household-visibility-plan.md) | Personal rows + visibility (`PersonalHouseholdEntity`) — NL |
+| [engineering/growth-cascade-plan.md](./engineering/growth-cascade-plan.md) | Growth Course (Koers): year goal → this hour; built-status notes — NL |
+| [engineering/growth-week-check-plan.md](./engineering/growth-week-check-plan.md) | Growth week check with your partner (MVP built, rest planned) — NL |
+| [engineering/adr-course-calendar-push.md](./engineering/adr-course-calendar-push.md) | ADR (proposed): push Course to Google Calendar / Outlook — NL |
+| [design/README.md](./design/README.md) | Design source, honest port status, porting rules |
 
 **Also at repo root**
 

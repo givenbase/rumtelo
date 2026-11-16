@@ -10,7 +10,7 @@ Follow project Cursor rules in `.cursor/rules/` (especially `react-next-patterns
 | Apps | `application` :3000 · `website` :3001 · `backend` :3002 |
 | Frontend | Next.js 16 App Router, React 19, **Tailwind v4 only** |
 | UI | `@rumtelo/ui` + `cn` from `@rumtelo/utils` — tokens/overlays: `packages/ui/README.md` + `react-next-patterns.mdc` |
-| i18n | `@rumtelo/i18n` + next-intl — **EN first, NL second** |
+| i18n | `@rumtelo/i18n` + next-intl — **EN first, NL second**; ES/FR generated (DeepL) |
 | API | NestJS 11 + **Fastify** + **oRPC** |
 | Contracts | `@rumtelo/contracts` (Zod + procedures) — wire source of truth |
 | ORM | **MikroORM 6** + PostgreSQL |
