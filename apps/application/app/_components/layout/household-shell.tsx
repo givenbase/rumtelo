@@ -19,7 +19,7 @@ import {
     resolveNavChildForPath,
     resolveNavGroupForPath,
 } from '@/app/_lib/nav';
-import { planLabel } from '@/app/_lib/plan';
+import { CAPABILITIES, planLabel } from '@/app/_lib/plan';
 import { consumeTourOfferPending } from '@/app/_lib/offer-tour-flag';
 import { forceClearPracticePreview } from '@/app/_lib/practice-preview';
 import { practicePath, productPath } from '@/app/_lib/routes';
@@ -185,7 +185,7 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
     const { plan, showToast } = useHouseholdShell();
     const { setAccountTheme } = useAccountTheme();
     const { resolvedTheme } = useTheme();
-    const { isCapabilityLocked, accessForPath } = usePlanCapabilities();
+    const { isCapabilityLocked, accessForPath, planReady } = usePlanCapabilities();
     const { session } = useAuth();
     const { capabilities } = usePracticePreview();
     const { canMutate, role, canSeeCoach } = useBoardWriteAccess();
@@ -278,6 +278,14 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
             if (isCoach && (!canSeeCoach || !capabilities.showCoachNav)) return false;
             // Why stays for look-along; only Practice preview can hide it.
             if (isWhy && !capabilities.showCoachNav && capabilities.active) return false;
+            // Money goals live in Course › Goals once Course is open; Basic keeps this tab.
+            if (
+                child.href === productPath('growth/goals') &&
+                planReady &&
+                !isCapabilityLocked(CAPABILITIES.growthCourse)
+            ) {
+                return false;
+            }
             return true;
         }) ?? [];
 

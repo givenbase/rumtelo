@@ -109,6 +109,35 @@ export enum SpendingStyle {
 }
 
 /**
+ * How a person earns their living right now — person-scoped, self-declared and optional.
+ * Used only to order goal presets (see `presetsFor` in the Growth Course leaf).
+ */
+export enum WorkSituation {
+    EMPLOYED = 'EMPLOYED',
+    SELF_EMPLOYED = 'SELF_EMPLOYED',
+    /** A job and a business side by side. */
+    BOTH = 'BOTH',
+    STUDENT = 'STUDENT',
+    /** Looking for work or a next step. */
+    SEEKING = 'SEEKING',
+}
+
+/**
+ * What a person wants from the coming year — person-scoped, self-declared and optional.
+ * Sets the tone of the "Plan your year" intake, never a rule.
+ */
+export enum YearIntention {
+    /** Keep things steady, protect what works. */
+    CALM = 'CALM',
+    /** Stretch a little further in what is already running. */
+    GROW = 'GROW',
+    /** Start something new. */
+    BUILD = 'BUILD',
+    /** Catch their breath after a hard stretch. */
+    RECOVER = 'RECOVER',
+}
+
+/**
  * Board-level income volatility — shared cash-flow picture for coaching.
  * NONE = no recurring inflow right now (same coaching case as ~€0 net).
  */

@@ -3,16 +3,14 @@
 import { useState } from 'react';
 
 import {
-    COURSE_SLOT_SIZE,
+    COURSE_FOCUS_RECOMMENDED,
     CourseHorizon,
-    CourseRhythmKind,
     HouseholdRole,
-    VisibilityChoice,
     coursePeriodOf,
+    courseSlotLimit,
     isPeriodCapped,
     shiftCoursePeriod,
     type CourseItem,
-    type CoursePeriodView,
     type HouseholdMember,
 } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
@@ -21,11 +19,12 @@ import { Icon, Typography } from '@rumtelo/ui';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { leftoverItems } from '@/app/_lib/course-leftovers';
-import { rhythmPatternLabel } from '@/app/_lib/course-rhythm';
 import { isLiveData } from '@/app/_lib/preview';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
 import { periodLabel } from '../_utils/course-route';
+import { emptyPeriodView } from '../_utils/course-view';
+import { focusSlotsOf } from '../_utils/course-goals';
 import { useCourseActions } from '../_utils/use-course-actions';
 import { CourseItemCard } from './course-item-card';
 import { CourseItemDialog, type CourseDialogState } from './course-item-dialog';
@@ -34,23 +33,10 @@ import { CourseSection } from './course-section';
 
 const EMPTY_MEMBERS: HouseholdMember[] = [];
 
-function emptyView(horizon: CourseHorizon, period: string): CoursePeriodView {
-    return {
-        horizon,
-        period,
-        items: [],
-        ancestors: [],
-        children: [],
-        hiddenCount: 0,
-        visibilityOptions: [],
-        defaultVisibility: VisibilityChoice.PRIVATE,
-        isVisibilityPickerShown: false,
-    };
-}
-
 /**
- * One Course layer for one period — the cards, the empty slots (max 3), what is still
- * open from the period before, and the dialog. Today, Week and Goals stack these.
+ * One Course layer for one period — the cards, the empty slots (3 invited, 5 at most),
+ * what is still open from the period before, and the dialog. Today and Week stack these.
+ * Year, quarter and month live in the Goals list instead.
  */
 export function CourseLayerSection({
     horizon,
@@ -61,7 +47,6 @@ export function CourseLayerSection({
     isLeftoverShown = true,
     isSlotShown = true,
     emptyState,
-    childFilter,
 }: {
     horizon: CourseHorizon;
     period: string;
@@ -73,11 +58,8 @@ export function CourseLayerSection({
     isSlotShown?: boolean;
     /** Shown instead of slots when the layer is empty and slots are hidden. */
     emptyState?: React.ReactNode;
-    /** Which children show under a card (Goals: only this month and quarter). */
-    childFilter?: (child: CourseItem) => boolean;
 }) {
     const t = useTranslations('features.growth.course');
-    const tRhythm = useTranslations('features.growth.course.rhythm');
     const locale = useLocale();
     const { householdId, userId } = useAuth();
     const live = isLiveData(householdId);
@@ -97,7 +79,7 @@ export function CourseLayerSection({
         apiQuery.growth.course.period.queryOptions({
             input: { householdId: householdId!, horizon, period, accountId },
         }),
-        emptyView(horizon, period),
+        emptyPeriodView(horizon, period),
         live
     );
     const view = viewQuery.data;
@@ -112,34 +94,13 @@ export function CourseLayerSection({
         apiQuery.growth.course.period.queryOptions({
             input: { householdId: householdId!, horizon, period: previousPeriod, accountId },
         }),
-        emptyView(horizon, previousPeriod),
+        emptyPeriodView(horizon, previousPeriod),
         live && isLeftoverShown && isLeftoverPeriod
     );
     const leftovers =
         isLeftoverShown && isLeftoverPeriod
             ? leftoverItems(previousQuery.data.items, view.items)
             : [];
-
-    // Routines that feed goals and steps — one line per routine on the card.
-    const isRhythmFed = !isPeriodCapped(horizon);
-    const rhythmQuery = useLiveQuery(
-        apiQuery.growth.course.rhythm.list.queryOptions({
-            input: { householdId: householdId!, accountId },
-        }),
-        null,
-        live && isRhythmFed
-    );
-    const rhythmLinesOf = (item: CourseItem) =>
-        (rhythmQuery.data?.rhythms ?? [])
-            .filter(rhythm => rhythm.parentId === item.id)
-            .map(rhythm => ({
-                key: rhythm.id,
-                kind:
-                    rhythm.kind === CourseRhythmKind.HABIT
-                        ? ('HABIT' as const)
-                        : ('DISCIPLINE' as const),
-                label: `${rhythm.name} · ${rhythmPatternLabel(rhythm, locale, tRhythm)}`,
-            }));
 
     const layerName = (layer: CourseHorizon) => t(`layer_${layer.toLowerCase()}` as 'layer_week');
     const [dialog, setDialog] = useState<CourseDialogState | null>(null);
@@ -164,43 +125,26 @@ export function CourseLayerSection({
         othersByMaker.set(item.accountId, [...(othersByMaker.get(item.accountId) ?? []), item]);
     }
 
-    const canCreate = view.visibilityOptions.length > 0;
-    // One empty row at a time — filled cards (mine + together) already take slots.
-    const filledSlots = isPeriodCapped(horizon)
-        ? mine.length + together.length
-        : horizon === CourseHorizon.YEAR
-          ? mine.filter(item => !item.parentId).length +
-            together.filter(item => !item.parentId).length
-          : 0;
-    const openSlots =
-        !canCreate || !isSlotShown
-            ? 0
-            : isPeriodCapped(horizon) || horizon === CourseHorizon.YEAR
-              ? Math.min(1, Math.max(0, COURSE_SLOT_SIZE - filledSlots))
-              : 1;
-    const emptySlotLabel = isPeriodCapped(horizon)
-        ? t(horizon === CourseHorizon.DAY ? 'empty_slot_day' : 'empty_slot_week')
-        : t(horizon === CourseHorizon.YEAR ? 'empty_slot_goal' : 'empty_slot_step');
+    // Week and day: one empty row at a time up to three, then a plain "add" up to five.
+    // Filled cards (mine + together) already take places. Nothing shames a fourth.
+    const canCreate = view.visibilityOptions.length > 0 && isSlotShown;
+    const limit = courseSlotLimit(horizon);
+    const filledSlots = mine.length + together.length;
+    const slots = focusSlotsOf(COURSE_FOCUS_RECOMMENDED, limit ?? Infinity, filledSlots);
+    const openSlots = canCreate ? Math.min(1, slots.emptySlots) : 0;
+    const canAddMore = canCreate && slots.emptySlots === 0 && slots.canAddMore;
+    const emptySlotLabel = t(horizon === CourseHorizon.DAY ? 'empty_slot_day' : 'empty_slot_week');
     const isEmpty = view.items.length === 0;
-    const isFull =
-        canCreate &&
-        isSlotShown &&
-        openSlots === 0 &&
-        (isPeriodCapped(horizon) || horizon === CourseHorizon.YEAR) &&
-        filledSlots >= COURSE_SLOT_SIZE;
 
     const cardProps = (item: CourseItem) => ({
         item,
         why: whyOf(item),
         makerName: nameOf(item.accountId),
         isPickerShown: view.isVisibilityPickerShown,
-        children: view.children.filter(
-            child => child.parentId === item.id && (childFilter ? childFilter(child) : true)
-        ),
+        children: view.children.filter(child => child.parentId === item.id),
         layerName,
         actions,
         isBusy,
-        rhythmLines: isRhythmFed ? rhythmLinesOf(item) : [],
     });
     const labelOf = (key: string) =>
         periodLabel(horizon, key, locale, {
@@ -263,7 +207,21 @@ export function CourseLayerSection({
                     {emptySlotLabel}
                 </button>
             ))}
-            {isFull ? <p className="text-sm text-fg-muted">{t('full')}</p> : null}
+            {canAddMore ? (
+                <button
+                    type="button"
+                    onClick={() => setDialog({ mode: 'create', horizon, period })}
+                    className="flex min-h-12 items-center gap-3 rounded-2xl border-2 border-dashed border-line-strong px-4 text-left text-sm text-fg-muted transition-colors hover:border-accent hover:text-accent">
+                    <Icon name="plus" aria-hidden />
+                    {t('add')}
+                </button>
+            ) : null}
+            {canCreate && slots.isBeyondRecommended ? (
+                <p className="text-sm text-fg-muted">
+                    {t('focus_beyond', { count: filledSlots })}
+                    {slots.isFull ? ` ${t('focus_full')}` : ''}
+                </p>
+            ) : null}
             {isEmpty && openSlots === 0 ? emptyState : null}
 
             {view.hiddenCount > 0 ? (

@@ -542,6 +542,53 @@
           "collation": null,
           "enumItems": [],
           "mappedType": "datetime"
+        },
+        "work_situation": {
+          "name": "work_situation",
+          "type": "auth_work_situation",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [
+            "EMPLOYED",
+            "SELF_EMPLOYED",
+            "BOTH",
+            "STUDENT",
+            "SEEKING"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "auth_work_situation"
+        },
+        "year_intention": {
+          "name": "year_intention",
+          "type": "auth_year_intention",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [
+            "CALM",
+            "GROW",
+            "BUILD",
+            "RECOVER"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "auth_year_intention"
         }
       },
       "indexes": [
@@ -10604,6 +10651,27 @@
           "enumItems": [],
           "mappedType": "string"
         },
+        "scope": {
+          "name": "scope",
+          "type": "growth_course_scope",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [
+            "PERSONAL",
+            "BUSINESS"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "growth_course_scope"
+        },
         "skill": {
           "name": "skill",
           "type": "varchar(64)",
@@ -10707,22 +10775,6 @@
         {
           "columnNames": [
             "household_id",
-            "account_id",
-            "horizon",
-            "period",
-            "parent_id",
-            "position"
-          ],
-          "composite": true,
-          "constraint": false,
-          "keyName": "growth_course_item_goal_slot_unique",
-          "primary": false,
-          "unique": true,
-          "expression": "CREATE UNIQUE INDEX growth_course_item_goal_slot_unique ON public.growth_course_item USING btree (household_id, account_id, horizon, period, parent_id, \"position\") NULLS NOT DISTINCT WHERE (horizon = ANY (ARRAY['YEAR'::growth_course_horizon, 'QUARTER'::growth_course_horizon, 'MONTH'::growth_course_horizon]))"
-        },
-        {
-          "columnNames": [
-            "household_id",
             "account_id"
           ],
           "composite": true,
@@ -10792,8 +10844,8 @@
       "checks": [
         {
           "name": "growth_course_item_position_range",
-          "expression": "(\"position\" >= 0) AND (\"position\" <= 3)",
-          "definition": "CHECK (((\"position\" >= 0) AND (\"position\" <= 3)))",
+          "expression": "((\"position\" >= 0) AND (\"position\" <= 999)) AND ((\"position\" <= 5) OR (horizon = ANY (ARRAY['YEAR'::growth_course_horizon, 'QUARTER'::growth_course_horizon, 'MONTH'::growth_course_horizon])))",
+          "definition": "CHECK ((((\"position\" >= 0) AND (\"position\" <= 999)) AND ((\"position\" <= 5) OR (horizon = ANY (ARRAY['YEAR'::growth_course_horizon, 'QUARTER'::growth_course_horizon, 'MONTH'::growth_course_horizon])))))",
           "columnName": "position"
         },
         {
@@ -20927,6 +20979,27 @@
         "SYSTEM"
       ]
     },
+    "auth_work_situation": {
+      "name": "auth_work_situation",
+      "schema": "public",
+      "items": [
+        "EMPLOYED",
+        "SELF_EMPLOYED",
+        "BOTH",
+        "STUDENT",
+        "SEEKING"
+      ]
+    },
+    "auth_year_intention": {
+      "name": "auth_year_intention",
+      "schema": "public",
+      "items": [
+        "CALM",
+        "GROW",
+        "BUILD",
+        "RECOVER"
+      ]
+    },
     "backoffice_capability_kind": {
       "name": "backoffice_capability_kind",
       "schema": "public",
@@ -20999,6 +21072,14 @@
       "schema": "public",
       "items": [
         "MONTH_CLOSE"
+      ]
+    },
+    "growth_course_scope": {
+      "name": "growth_course_scope",
+      "schema": "public",
+      "items": [
+        "PERSONAL",
+        "BUSINESS"
       ]
     },
     "growth_learn_progress_status": {

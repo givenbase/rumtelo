@@ -1,7 +1,7 @@
 /**
  * Course Schemas (Growth · Koers)
- * The cascade year → quarter → month → week → day. Max 3 items per slot;
- * every item hangs under one item a layer up. Progress is computed, never stored.
+ * The cascade year → quarter → month → week → day. Week and day: 3 recommended,
+ * 5 at most; year, quarter and month: no limit. Items hang under one item a layer up. Progress is computed, never stored.
  * Zod only — no `export type`.
  */
 
@@ -10,9 +10,15 @@ import { z } from 'zod';
 import { HouseholdId, HouseholdScoped, Id } from '../../../../common/common.schema';
 import { VisibilityChoice } from '../../../platform/enums';
 import { PersonalFields } from '../../../platform/household/visibility';
-import { CourseHorizon, CourseItemStatus } from '../enums';
+import { GoalSummary } from '../../money/goal/goal.schema';
+import { CourseHorizon, CourseItemStatus, CourseScope } from '../enums';
 import { isCoursePeriod } from './course-period';
-import { COURSE_SLOT_SIZE, COURSE_TARGET_COUNT_MAX, isCountableLayer } from './course-rules';
+import {
+    COURSE_POSITION_MAX,
+    COURSE_TARGET_COUNT_MAX,
+    canHaveScope,
+    isCountableLayer,
+} from './course-rules';
 
 /** Period key for any horizon; pair with {@link isCoursePeriod} for the exact format. */
 export const CoursePeriodKey = z.string().min(4).max(10);
@@ -33,10 +39,13 @@ export const CourseItem = z.object({
     period: CoursePeriodKey,
     /** Item one layer up; null = loose (allowed, The Coach names it). */
     parentId: Id.nullable(),
-    position: z.int().min(1).max(COURSE_SLOT_SIZE),
+    /** Order in the slot, from 1; week and day stop at 5, the rest has no limit. */
+    position: z.int().min(1).max(COURSE_POSITION_MAX),
     name: z.string().min(1).max(140),
     /** "Done when …" — meaningful for year / quarter / month. */
     doneWhen: z.string().max(280).nullable(),
+    /** Personal or business; null = not set. Year / quarter / month only. */
+    scope: z.enum(CourseScope).nullable(),
     status: z.enum(CourseItemStatus),
     reviewNote: z.string().max(280).nullable(),
     /** Set when carried forward from the previous period. */
@@ -45,6 +54,12 @@ export const CourseItem = z.object({
     carryCount: z.int().min(0),
     /** Linked Money goal (year / quarter only). */
     goalId: Id.nullable(),
+    /**
+     * The linked Money goal in one line. The goal is household data: whoever sees this
+     * item sees the goal, however private the item is. Null when nothing is linked or
+     * the plan has no Money goals.
+     */
+    moneyGoal: GoalSummary.nullable(),
     /** Learn skill catalog key. */
     skill: z.string().max(64).nullable(),
     /** Month / quarter counter ("12×"), filled by ticks of rhythms hanging under it. */
@@ -67,6 +82,12 @@ export const CoursePeriodView = z.object({
     children: z.array(CourseItem),
     /** Items in this period hidden from the viewer. */
     hiddenCount: z.int().min(0),
+    /**
+     * Horizon YEAR only: the household's active Money goals that no course item links
+     * to (hidden items count as links), so the Goals tab lists both kinds side by side.
+     * Empty for other horizons, or when the plan has no Money goals.
+     */
+    unlinkedMoneyGoals: z.array(GoalSummary),
     /** Visibility choices the viewer may pick here (empty = cannot create). */
     visibilityOptions: z.array(z.enum(VisibilityChoice)),
     /** Preselected choice for a new item. */
@@ -88,6 +109,8 @@ export const CourseItemCreateInput = HouseholdScoped.extend({
     parentId: Id.nullish(),
     name: z.string().trim().min(1).max(140),
     doneWhen: z.string().trim().max(280).nullish(),
+    /** Personal or business; omitted = not set. Year / quarter / month only. */
+    scope: z.enum(CourseScope).nullish(),
     /** Omitted = the viewer's default choice. */
     visibility: z.enum(VisibilityChoice).nullish(),
     goalId: Id.nullish(),
@@ -98,6 +121,10 @@ export const CourseItemCreateInput = HouseholdScoped.extend({
     .refine(input => !input.targetCount || isCountableLayer(input.horizon), {
         message: 'Only a month or quarter takes a counter',
         path: ['targetCount'],
+    })
+    .refine(input => !input.scope || canHaveScope(input.horizon), {
+        message: 'Only a year, quarter or month takes a scope',
+        path: ['scope'],
     });
 
 export const CoursePeriodInput = HouseholdScoped.extend({
@@ -116,8 +143,10 @@ export const CourseItemUpdateInput = HouseholdScoped.extend({
     id: Id,
     name: z.string().trim().min(1).max(140).optional(),
     doneWhen: z.string().trim().max(280).nullable().optional(),
+    scope: z.enum(CourseScope).nullable().optional(),
     parentId: Id.nullable().optional(),
-    position: z.int().min(1).max(COURSE_SLOT_SIZE).optional(),
+    /** Week and day: 1–5 (3 recommended); other layers: any place from 1. */
+    position: z.int().min(1).max(COURSE_POSITION_MAX).optional(),
     visibility: z.enum(VisibilityChoice).optional(),
     goalId: Id.nullable().optional(),
     skill: z.string().max(64).nullable().optional(),

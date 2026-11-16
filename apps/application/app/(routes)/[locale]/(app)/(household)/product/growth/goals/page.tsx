@@ -1,5 +1,5 @@
 import { getTranslations } from '@rumtelo/i18n';
-import { GoalsPageClient } from './_components/goals-page';
+import { GoalsEntry } from './_components/goals-entry';
 
 export async function generateMetadata() {
     const t = await getTranslations('pages.meta');
@@ -7,5 +7,5 @@ export async function generateMetadata() {
 }
 
 export default function GoalsPage() {
-    return <GoalsPageClient />;
+    return <GoalsEntry />;
 }

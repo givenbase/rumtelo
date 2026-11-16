@@ -41,7 +41,7 @@ type Who = string;
 
 /**
  * Course: three questions, one tab each — Today (what now), Week (what this week),
- * Goals (where it leads). Opens on Today. Focus, routines and checks share the screen;
+ * Goals (where it leads: your year as one list, money goals included). Opens on Today. Focus, routines and checks share the screen;
  * each row says what it is with a badge.
  */
 export function CoursePage({ segment }: { segment: string | undefined }) {
@@ -108,10 +108,16 @@ export function CoursePage({ segment }: { segment: string | undefined }) {
                     <Typography as="p" variant="eyebrow" color="primary">
                         {t('eyebrow')}
                     </Typography>
-                    <Typography as="h1">{t(`title_${view.tab}`)}</Typography>
-                    <Typography as="p" size="sm" color="muted">
-                        {t(`lead_${view.tab}`)}
+                    <Typography as="h1">
+                        {view.tab === 'goals'
+                            ? t('title_goals', { year: boardMonth.slice(0, 4) })
+                            : t(`title_${view.tab}`)}
                     </Typography>
+                    {view.tab === 'goals' ? null : (
+                        <Typography as="p" size="sm" color="muted">
+                            {t(`lead_${view.tab}`)}
+                        </Typography>
+                    )}
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                     <CourseTabs

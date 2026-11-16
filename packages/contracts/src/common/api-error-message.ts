@@ -72,6 +72,7 @@ export const API_ERROR_MESSAGES = [
     'course_carry_done',
     'course_goal_invalid',
     'course_target_invalid',
+    'course_scope_invalid',
     'course_rhythm_not_found',
     'course_rhythm_parent_invalid',
     'course_rhythm_target_invalid',

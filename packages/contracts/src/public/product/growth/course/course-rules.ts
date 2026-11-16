@@ -7,10 +7,28 @@
 
 import { CourseHorizon, CourseItemStatus, CourseRhythmCadence, CourseRhythmKind } from '../enums';
 
-/** Items per slot. Constraint creates focus. */
-export const COURSE_SLOT_SIZE = 3;
+/**
+ * Week and day: the recommended number of items ("your 3"). A nudge, not a limit —
+ * the UI invites three and the Coach talks about it, nothing refuses a fourth or fifth.
+ */
+export const COURSE_FOCUS_RECOMMENDED = 3;
 
-/** Week and day are a top 3 per period; larger layers allow 3 per goal above. */
+/** Week and day: the hard maximum per maker and period. Year, quarter and month have none. */
+export const COURSE_FOCUS_MAX = 5;
+
+/**
+ * Items per slot before soft limits.
+ * @deprecated Use {@link COURSE_FOCUS_RECOMMENDED} (the nudge) or {@link COURSE_FOCUS_MAX} (the limit).
+ */
+export const COURSE_SLOT_SIZE = COURSE_FOCUS_RECOMMENDED;
+
+/**
+ * Technical ceiling of `position` for layers without a limit (year, quarter, month).
+ * Not a product rule: it keeps the smallint column and the input sane.
+ */
+export const COURSE_POSITION_MAX = 999;
+
+/** Week and day are capped per period; larger layers order items per goal above, uncapped. */
 const PERIOD_CAPPED = new Set<CourseHorizon>([CourseHorizon.WEEK, CourseHorizon.DAY]);
 
 /** Layers that describe an outcome ("done when …"). */
@@ -34,8 +52,40 @@ export function isPeriodCapped(horizon: CourseHorizon): boolean {
     return PERIOD_CAPPED.has(horizon);
 }
 
+/** Hard maximum of items in a slot; null = no limit (year, quarter, month). */
+export function courseSlotLimit(horizon: CourseHorizon): number | null {
+    return isPeriodCapped(horizon) ? COURSE_FOCUS_MAX : null;
+}
+
+/** True when `position` is a valid place in the slot of `horizon`. */
+export function isCoursePositionValid(horizon: CourseHorizon, position: number): boolean {
+    if (!Number.isInteger(position) || position < 1) return false;
+    return position <= (courseSlotLimit(horizon) ?? COURSE_POSITION_MAX);
+}
+
+/**
+ * Lowest free position (1, 2, …) among the `taken` ones, or null when the slot is
+ * full: only week and day have a limit ({@link COURSE_FOCUS_MAX}).
+ */
+export function nextFreeCoursePosition(
+    horizon: CourseHorizon,
+    taken: Iterable<number>
+): number | null {
+    const used = new Set(taken);
+    const limit = courseSlotLimit(horizon) ?? COURSE_POSITION_MAX;
+    for (let position = 1; position <= limit; position += 1) {
+        if (!used.has(position)) return position;
+    }
+    return null;
+}
+
 export function isOutcomeLayer(horizon: CourseHorizon): boolean {
     return OUTCOME_LAYERS.has(horizon);
+}
+
+/** Scope (personal / business) labels outcomes: year goals first, also quarter and month. */
+export function canHaveScope(horizon: CourseHorizon): boolean {
+    return isOutcomeLayer(horizon);
 }
 
 export function canLinkMoneyGoal(horizon: CourseHorizon): boolean {

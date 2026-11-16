@@ -1,18 +1,18 @@
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
-import type {
-    AccountSettings as AccountSettingsDto,
-    AccountTourProgress,
-} from '@rumtelo/contracts';
-
 import {
+    type AccountSettings as AccountSettingsDto,
+    type AccountTourProgress,
     DEFAULT_ACCOUNT_TOUR_PROGRESS,
     HouseholdAnswerKey,
     Locale,
     SpendingStyle,
     Theme,
+    type WorkSituation,
+    type YearIntention,
 } from '@rumtelo/contracts';
+
 import { apiNotFound } from '../../../../../common/errors/api-user-error';
 import { currentUserId, householdStorage } from '../../../../../common/household/household.context';
 import { PracticeMember } from '../../../../public/platform/practice/practice-member/practice-member.entity';
@@ -27,6 +27,10 @@ export type AccountSettingsPatch = {
     locale?: Locale;
     theme?: Theme;
     spendingStyle?: SpendingStyle;
+    /** `null` clears the answer. */
+    workSituation?: WorkSituation | null;
+    /** `null` clears the answer. */
+    yearIntention?: YearIntention | null;
     tour?: AccountTourProgress;
 };
 
@@ -75,6 +79,12 @@ export class AccountSettingsService {
             if (defaults.theme !== undefined) existing.theme = defaults.theme;
             if (defaults.spendingStyle !== undefined) {
                 existing.spendingStyle = defaults.spendingStyle;
+            }
+            if (defaults.workSituation !== undefined) {
+                existing.workSituation = defaults.workSituation;
+            }
+            if (defaults.yearIntention !== undefined) {
+                existing.yearIntention = defaults.yearIntention;
             }
             if (defaults.tour !== undefined) existing.tour = normalizeTour(defaults.tour);
             await this.em.flush();
@@ -223,6 +233,8 @@ export class AccountSettingsService {
         if (patch.locale !== undefined) row.locale = patch.locale;
         if (patch.theme !== undefined) row.theme = patch.theme;
         if (patch.spendingStyle !== undefined) row.spendingStyle = patch.spendingStyle;
+        if (patch.workSituation !== undefined) row.workSituation = patch.workSituation;
+        if (patch.yearIntention !== undefined) row.yearIntention = patch.yearIntention;
         if (patch.tour !== undefined) row.tour = normalizeTour(patch.tour);
         await this.em.flush();
         this.logger.debug(`Updated account settings ${row.id}`);
@@ -271,6 +283,8 @@ export class AccountSettingsService {
             locale: defaults.locale ?? Locale.NL,
             theme: defaults.theme ?? Theme.LIGHT,
             spendingStyle: defaults.spendingStyle ?? SpendingStyle.UNKNOWN,
+            workSituation: defaults.workSituation ?? null,
+            yearIntention: defaults.yearIntention ?? null,
             tour: normalizeTour(defaults.tour ?? DEFAULT_ACCOUNT_TOUR_PROGRESS),
         } as never);
         await this.em.persist(settings).flush();
@@ -293,6 +307,8 @@ function toDto(row: AccountSettings): AccountSettingsDto {
         locale: row.locale,
         theme: row.theme,
         spendingStyle: row.spendingStyle,
+        workSituation: row.workSituation,
+        yearIntention: row.yearIntention,
         tour: normalizeTour(row.tour ?? DEFAULT_ACCOUNT_TOUR_PROGRESS),
         onboardedAt: row.onboardedAt ? row.onboardedAt.toISOString() : null,
     };

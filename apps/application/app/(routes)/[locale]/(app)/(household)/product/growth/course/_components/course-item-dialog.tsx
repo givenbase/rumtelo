@@ -7,8 +7,10 @@ import { useForm, useWatch } from 'react-hook-form';
 import {
     GoalStatus,
     CourseHorizon,
+    CourseScope,
     VisibilityChoice,
     ancestorPeriodOf,
+    canHaveScope,
     canLinkMoneyGoal,
     childVisibilityOptions,
     isCountableLayer,
@@ -52,12 +54,21 @@ import {
     courseItemFormSchema,
     optionalCount,
     optionalId,
+    optionalScope,
     type CourseItemFormValues,
 } from '../_utils/course-form';
 
 export type CourseDialogState =
-    | { mode: 'create'; horizon: CourseHorizon; period: string }
+    | {
+          mode: 'create';
+          horizon: CourseHorizon;
+          period: string;
+          /** Fixed parent ("Add to this week", "Step for …"): shown read-only, no picker. */
+          parent?: CourseItem;
+      }
     | { mode: 'edit'; item: CourseItem };
+
+const SCOPES = [CourseScope.PERSONAL, CourseScope.BUSINESS] as const;
 
 /** Create or edit one Course item. */
 export function CourseItemDialog({
@@ -90,7 +101,9 @@ export function CourseItemDialog({
                     <DialogTitle>
                         {state?.mode === 'edit'
                             ? t('title_edit')
-                            : t('title_create', { layer: horizon ? layerName(horizon) : '' })}
+                            : horizon === CourseHorizon.YEAR
+                              ? t('title_create_goal')
+                              : t('title_create', { layer: horizon ? layerName(horizon) : '' })}
                     </DialogTitle>
                     <DialogDescription>{t('description')}</DialogDescription>
                 </DialogHeader>
@@ -99,7 +112,7 @@ export function CourseItemDialog({
                         key={
                             state.mode === 'edit'
                                 ? state.item.id
-                                : `${state.horizon}:${state.period}`
+                                : `${state.horizon}:${state.period}:${state.parent?.id ?? ''}`
                         }
                         state={state}
                         householdId={householdId}
@@ -137,6 +150,7 @@ function CourseItemForm({
 }) {
     const t = useTranslations('features.growth.course.form');
     const tCourse = useTranslations('features.growth.course');
+    const tGoal = useTranslations('features.growth.course.goal');
     const locale = useLocale();
     const queryClient = useQueryClient();
     const { showToast } = useHouseholdShell();
@@ -146,18 +160,19 @@ function CourseItemForm({
     const horizon = item?.horizon ?? (state.mode === 'create' ? state.horizon : CourseHorizon.WEEK);
     const period = item?.period ?? (state.mode === 'create' ? state.period : '');
     const year = period.slice(0, 4);
+    const fixedParent = state.mode === 'create' ? (state.parent ?? null) : null;
 
     // Possible parents: goals, quarters and months of this year (and the week, for a day).
     const yearQuery = useQuery({
         ...apiQuery.growth.course.year.queryOptions({ input: { householdId, year } }),
-        enabled: horizon !== CourseHorizon.YEAR,
+        enabled: horizon !== CourseHorizon.YEAR && !fixedParent,
     });
     const weekPeriod = ancestorPeriodOf(horizon, period, CourseHorizon.WEEK);
     const weekQuery = useQuery({
         ...apiQuery.growth.course.period.queryOptions({
             input: { householdId, horizon: CourseHorizon.WEEK, period: weekPeriod ?? undefined },
         }),
-        enabled: weekPeriod !== null,
+        enabled: weekPeriod !== null && !fixedParent,
     });
     const goalsQuery = useQuery({
         ...apiQuery.money.goals.list.queryOptions({ input: { householdId } }),
@@ -176,14 +191,15 @@ function CourseItemForm({
         defaultValues: {
             name: item?.name ?? '',
             doneWhen: item?.doneWhen ?? '',
-            parentId: item?.parentId ?? NONE,
+            parentId: item?.parentId ?? fixedParent?.id ?? NONE,
             visibility: item ? choiceOf(item) : defaultVisibility,
             goalId: item?.goalId ?? NONE,
+            scope: item?.scope ?? NONE,
             targetCount: item?.targetCount ? String(item.targetCount) : '',
         },
     });
     const parentId = useWatch({ control: form.control, name: 'parentId' });
-    const parent = parents.find(candidate => candidate.id === parentId) ?? null;
+    const parent = fixedParent ?? parents.find(candidate => candidate.id === parentId) ?? null;
     const currentChoice = item ? choiceOf(item) : null;
     const allowed = childVisibilityOptions(
         // Editing keeps the current choice selectable even when it is no longer offered.
@@ -205,6 +221,7 @@ function CourseItemForm({
                 parentId: optionalId(values.parentId),
                 goalId: canLinkMoneyGoal(horizon) ? optionalId(values.goalId) : null,
                 targetCount: isCountableLayer(horizon) ? optionalCount(values.targetCount) : null,
+                ...(canHaveScope(horizon) ? { scope: optionalScope(values.scope) } : {}),
             };
             if (item) {
                 return api.growth.course.update({
@@ -313,7 +330,14 @@ function CourseItemForm({
                     />
                 ) : null}
 
-                {horizon !== CourseHorizon.YEAR ? (
+                {fixedParent ? (
+                    <p className="font-mono text-xs tracking-wide text-fg-muted uppercase">
+                        {t('parent')}
+                        <span className="mt-1 block font-sans text-sm font-medium tracking-normal text-fg normal-case">
+                            {`${layerName(fixedParent.horizon)} · ${fixedParent.name}`}
+                        </span>
+                    </p>
+                ) : horizon !== CourseHorizon.YEAR ? (
                     <FormField
                         control={form.control}
                         name="parentId"
@@ -341,13 +365,41 @@ function CourseItemForm({
                     />
                 ) : null}
 
+                {canHaveScope(horizon) ? (
+                    <FormField
+                        control={form.control}
+                        name="scope"
+                        render={({ field }) => (
+                            <FormItem>
+                                <Field label={`${t('scope')} ${t('parent_optional')}`}>
+                                    <Select value={field.value} onValueChange={field.onChange}>
+                                        <FormControl>
+                                            <SelectTrigger aria-label={t('scope')}>
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent position="popper">
+                                            <SelectItem value={NONE}>{t('scope_none')}</SelectItem>
+                                            {SCOPES.map(scope => (
+                                                <SelectItem key={scope} value={scope}>
+                                                    {tGoal(`scope_${scope}`)}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </Field>
+                            </FormItem>
+                        )}
+                    />
+                ) : null}
+
                 {canLinkMoneyGoal(horizon) && moneyGoals.length > 0 ? (
                     <FormField
                         control={form.control}
                         name="goalId"
                         render={({ field }) => (
                             <FormItem>
-                                <Field label={t('money_goal')}>
+                                <Field label={t('money_goal')} hint={tCourse('money_shared_note')}>
                                     <Select value={field.value} onValueChange={field.onChange}>
                                         <FormControl>
                                             <SelectTrigger aria-label={t('money_goal')}>

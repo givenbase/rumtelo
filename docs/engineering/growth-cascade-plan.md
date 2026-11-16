@@ -81,7 +81,7 @@ Eén tabel voor alle doellagen, met een `horizon` en een periodesleutel. Eén ta
 | `horizon` | enum `CourseHorizon` | `YEAR`, `QUARTER`, `MONTH`, `WEEK`, `DAY` |
 | `period` | varchar(10) | `2027`, `2027-Q1`, `2027-03`, `2027-W10`, `2027-03-08` |
 | `parent` | FK naar zichzelf, nullable, set null | een item hoger in de boom, in de periode die deze bevat; `null` = los (toegestaan, de Coach benoemt het) |
-| `position` | int, 1 t/m 3 | volgorde; week/dag binnen (`account`, `horizon`, `period`), de rest binnen (…, `parent`) |
+| `position` | int, vanaf 1 | volgorde; week/dag 1 t/m 5 binnen (`account`, `horizon`, `period`), de rest zonder maximum binnen (…, `parent`) |
 | `name` | max. 140 | het doel of de prioriteit |
 | `doneWhen` | max. 280, nullable | "klaar als …", alleen zinvol voor jaar/kwartaal/maand |
 | `status` | enum `CourseItemStatus` | `OPEN`, `DONE`, `PARTIAL`, `MISSED`, `DROPPED`, `DEFERRED` (doorgeschoven) |
@@ -93,7 +93,7 @@ Eén tabel voor alle doellagen, met een `horizon` en een periodesleutel. Eén ta
 | `skill` | varchar(64), nullable | catalogussleutel van een Leer-focus |
 | `dayPart` | enum `CourseDayPart`, nullable | alleen `DAY`: `MORNING` · `AFTERNOON` · `EVENING`, "wanneer ongeveer"; zie [Van week naar uur](#van-week-naar-uur-eerst-wat-dan-wanneer) |
 
-Twee gedeeltelijke unieke indexen dwingen de maxima af: week en dag op (`account`, `horizon`, `period`, `position`); jaar, kwartaal en maand op (`account`, `horizon`, `period`, `parent`, `position`). Index op (`household`, `horizon`, `period`).
+Zachte limieten (15 november 2026): week en dag raden 3 aan (`COURSE_FOCUS_RECOMMENDED`) en weigeren een zesde (`COURSE_FOCUS_MAX` = 5); jaar, kwartaal en maand hebben geen maximum. Eén gedeeltelijke unieke index houdt week en dag op (`account`, `horizon`, `period`, `position`) en een check houdt `position` voor die lagen op 5; voor jaar, kwartaal en maand is `position` alleen volgorde (geen unieke index meer). `scope` (`CourseScope`: `PERSONAL` · `BUSINESS`, nullable) labelt jaar-, kwartaal- en maanddoelen. Index op (`household`, `horizon`, `period`). Migratie `Migration20261115120000_CourseSoftLimits`.
 
 **`growth_time_block`** (nieuw): de uur-laag.
 

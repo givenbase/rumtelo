@@ -1,17 +1,22 @@
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable } from '@nestjs/common';
 import {
-    COURSE_SLOT_SIZE,
+    CAPABILITIES,
     CourseHorizon,
     CourseItemStatus,
     CourseRhythmKind,
+    type CourseScope,
     VisibilityArea,
     VisibilityChoice,
     ancestorPeriodOf,
+    canHaveScope,
     canLinkMoneyGoal,
     countsInProgress,
+    hasCapability,
+    isCoursePositionValid,
     isCountableLayer,
     isPeriodCapped,
+    nextFreeCoursePosition,
     periodRange,
     childVisibilityOptions,
     choiceOf,
@@ -25,14 +30,22 @@ import {
     type CourseItemUpdateInput,
     type CoursePeriodInput,
     type CoursePeriodView,
+    type Goal as GoalDto,
+    type GoalProjection,
+    type GoalSummary,
+    type Jar as JarDto,
     type VisibilityRow,
 } from '@rumtelo/contracts';
 
+import { PlanAccessService } from '../../../../../common/capability';
 import { apiBadRequest, apiNotFound } from '../../../../../common/errors/api-user-error';
 import { HouseholdScopedRepository } from '../../../../../common/household/household-scoped.repository';
 import { PersonalScopedRepository } from '../../../../../common/household/personal-scoped.repository';
 import { VisibilityService } from '../../../../../common/household/visibility.service';
+import { JarService } from '../../money/plan/jar/jar.service';
 import { Goal } from '../../money/targets/goal/goal.entity';
+import { GoalService } from '../../money/targets/goal/goal.service';
+import { toGoalSummary, unlinkedGoals } from './course-goal-summary.util';
 import { GrowthCourseItem } from './growth-course-item.entity';
 import { GrowthCourseRhythm } from './growth-course-rhythm.entity';
 import { GrowthCourseRhythmTick } from './growth-course-rhythm-tick.entity';
@@ -45,12 +58,15 @@ const MAX_ANCESTOR_DEPTH = 4;
 /**
  * The Growth cascade: year → quarter → month → week → day.
  *
- * Rules: max {@link COURSE_SLOT_SIZE} items per slot (week / day: per maker and period;
- * larger layers: per maker, period and parent); a parent sits anywhere higher in the
- * tree, in the period containing the child's; linking is optional; a child is never more
- * open than its parent; progress rolls up from the children (DROPPED leaves the total,
- * private children count but stay nameless). A month or quarter with a counter
- * (`targetCount`) counts the ticks of the rhythms under it instead.
+ * Rules: soft limits. Week and day recommend 3 items (`COURSE_FOCUS_RECOMMENDED`) and
+ * refuse a sixth (`COURSE_FOCUS_MAX` = 5), per maker and period; year, quarter and
+ * month have no limit and `position` only orders them per parent goal. A parent sits
+ * anywhere higher in the tree, in the period containing the child's; linking is
+ * optional; a child is never more open than its parent; progress rolls up from the
+ * children (DROPPED leaves the total, private children count but stay nameless). A month
+ * or quarter with a counter (`targetCount`) counts the ticks of the rhythms under it
+ * instead. A linked Money goal is household data: the item shows its summary to anyone
+ * who sees the item, however private the item is.
  */
 @Injectable()
 export class CourseService {
@@ -62,7 +78,10 @@ export class CourseService {
 
     constructor(
         @Inject(EntityManager) private readonly em: EntityManager,
-        @Inject(VisibilityService) private readonly visibility: VisibilityService
+        @Inject(VisibilityService) private readonly visibility: VisibilityService,
+        @Inject(PlanAccessService) private readonly planAccess: PlanAccessService,
+        @Inject(GoalService) private readonly moneyGoals: GoalService,
+        @Inject(JarService) private readonly jars: JarService
     ) {
         this.items = new PersonalScopedRepository(em, GrowthCourseItem, AREA, visibility);
         this.goals = new HouseholdScopedRepository(em, Goal);
@@ -79,6 +98,7 @@ export class CourseService {
         const choice = await this.allowedChoice(parent, input.visibility ?? null);
         await this.assertGoal(input.horizon, input.goalId ?? null);
         assertTarget(input.horizon, input.targetCount ?? null);
+        assertScope(input.horizon, input.scope ?? null);
 
         const makerAccountId =
             choice === VisibilityChoice.SHARED
@@ -99,6 +119,7 @@ export class CourseService {
                 position,
                 name: input.name,
                 doneWhen: input.doneWhen ?? null,
+                scope: input.scope ?? null,
                 reviewNote: null,
                 skill: input.skill ?? null,
                 status: CourseItemStatus.OPEN,
@@ -142,6 +163,8 @@ export class CourseService {
         const dtos = await this.toDtos([...items, ...children, ...ancestors]);
         const byId = new Map(dtos.map(dto => [dto.id, dto]));
         const pick = (rows: GrowthCourseItem[]) => rows.map(row => byId.get(row.id)!);
+        const unlinkedMoneyGoals =
+            horizon === CourseHorizon.YEAR ? await this.unlinkedMoneyGoals() : [];
 
         return {
             horizon,
@@ -150,6 +173,7 @@ export class CourseService {
             ancestors: pick(ancestors),
             children: pick(children),
             hiddenCount,
+            unlinkedMoneyGoals,
             visibilityOptions: options,
             defaultVisibility: defaultVisibilityChoice(options, false),
             isVisibilityPickerShown: isVisibilityPickerShown(snapshot.participantCount),
@@ -194,6 +218,10 @@ export class CourseService {
 
         if (input.name !== undefined) item.name = input.name;
         if (input.doneWhen !== undefined) item.doneWhen = input.doneWhen;
+        if (input.scope !== undefined) {
+            assertScope(item.horizon, input.scope);
+            item.scope = input.scope;
+        }
         if (input.skill !== undefined) item.skill = input.skill;
         if (input.targetCount !== undefined) {
             assertTarget(item.horizon, input.targetCount);
@@ -218,6 +246,9 @@ export class CourseService {
         }
 
         if (input.position !== undefined) {
+            if (!isCoursePositionValid(item.horizon, input.position)) {
+                throw apiBadRequest('course_period_full');
+            }
             await this.moveToPosition(item, input.position);
         } else if (slotKeyOf(item) !== slotBefore) {
             item.position = await this.freePosition(slotOf(item), item.id);
@@ -271,6 +302,7 @@ export class CourseService {
                 position,
                 name: item.name,
                 doneWhen: item.doneWhen,
+                scope: item.scope,
                 reviewNote: null,
                 skill: item.skill,
                 status: CourseItemStatus.OPEN,
@@ -344,15 +376,15 @@ export class CourseService {
         }
     }
 
-    /** First free position in a slot; refuses a fourth item. */
+    /** First free position in a slot; a week or day refuses a sixth item, the rest never fills. */
     private async freePosition(slot: CourseSlot, ignoreId?: string): Promise<number> {
-        const taken = new Set(
-            (await this.slotRows(slot)).filter(row => row.id !== ignoreId).map(row => row.position)
+        const rows = await this.slotRows(slot);
+        const position = nextFreeCoursePosition(
+            slot.horizon,
+            rows.filter(row => row.id !== ignoreId).map(row => row.position)
         );
-        for (let position = 1; position <= COURSE_SLOT_SIZE; position += 1) {
-            if (!taken.has(position)) return position;
-        }
-        throw apiBadRequest('course_period_full');
+        if (position === null) throw apiBadRequest('course_period_full');
+        return position;
     }
 
     /** Swap with whoever holds `position` in the item's slot. */
@@ -361,10 +393,13 @@ export class CourseService {
             row => row.position === position && row.id !== item.id
         );
         if (holder) {
-            // Park the item first so the unique slot index never sees two rows on one position.
             const previous = item.position;
-            item.position = 0;
-            await this.em.flush();
+            if (isPeriodCapped(item.horizon)) {
+                // Park the item first so the unique slot index (week / day) never sees two
+                // rows on one position. Year, quarter and month have no unique index.
+                item.position = 0;
+                await this.em.flush();
+            }
             holder.position = previous;
             await this.em.flush();
         }
@@ -440,6 +475,56 @@ export class CourseService {
         return counts;
     }
 
+    /**
+     * Summaries of the household's active / reached Money goals by id; empty when the
+     * plan has no Money goals. Goes through `GoalService` (never the goal table), which
+     * also settles EARN / GIVE goals first.
+     */
+    private async moneyGoalSummaries(): Promise<Map<string, GoalSummary>> {
+        const book = await this.moneyGoalBook();
+        if (!book) return new Map();
+        return new Map(
+            book.goals.map(goal => [
+                goal.id,
+                toGoalSummary(
+                    goal,
+                    goal.jarId ? book.jars.get(goal.jarId) : undefined,
+                    book.projections.get(goal.id)
+                ),
+            ])
+        );
+    }
+
+    /** Active Money goals no course item links to — hidden items count as links. */
+    private async unlinkedMoneyGoals(): Promise<GoalSummary[]> {
+        const book = await this.moneyGoalBook();
+        if (!book) return [];
+        const linked = await this.items.findForCounts({ goal: { $ne: null } }, ['id', 'goal']);
+        const linkedGoalIds = new Set(linked.map(row => row.goal).filter(isPresent));
+        return unlinkedGoals(book.goals, linkedGoalIds).map(goal =>
+            toGoalSummary(
+                goal,
+                goal.jarId ? book.jars.get(goal.jarId) : undefined,
+                book.projections.get(goal.id)
+            )
+        );
+    }
+
+    /** Goals, jars and projections from the Money services; null without the Money goals capability. */
+    private async moneyGoalBook(): Promise<MoneyGoalBook | null> {
+        const planKey = await this.planAccess.planKeyForCurrentHousehold();
+        if (!hasCapability(CAPABILITIES.growthGoals, planKey)) return null;
+        // One after the other: both goal reads settle goals and flush on the shared entity manager.
+        const goals = await this.moneyGoals.list();
+        const projections = await this.moneyGoals.projections();
+        const jars = await this.jars.list();
+        return {
+            goals,
+            jars: new Map(jars.map(jar => [jar.id, jar])),
+            projections: new Map(projections.map(projection => [projection.goalId, projection])),
+        };
+    }
+
     /** DTOs with roll-up progress and hidden-child counts. */
     private async toDtos(rows: GrowthCourseItem[]): Promise<CourseItemDto[]> {
         if (rows.length === 0) return [];
@@ -452,6 +537,10 @@ export class CourseService {
             this.tickCountsFor(rows.filter(row => row.targetCount !== null)),
         ]);
         const visibleIds = new Set(visibleChildren.map(child => child.id));
+        // After the reads above: the goal list may flush while it re-evaluates goals.
+        const moneyGoals = rows.some(row => row.goal !== null)
+            ? await this.moneyGoalSummaries()
+            : new Map<string, GoalSummary>();
 
         return rows.map(row => {
             const children = allChildren.filter(child => child.parent === row.id);
@@ -465,11 +554,13 @@ export class CourseService {
                 position: row.position,
                 name: row.name,
                 doneWhen: row.doneWhen,
+                scope: row.scope,
                 status: row.status,
                 reviewNote: row.reviewNote,
                 carriedFromId: row.carriedFrom,
                 carryCount: row.carryCount,
                 goalId: row.goal,
+                moneyGoal: row.goal ? (moneyGoals.get(row.goal) ?? null) : null,
                 skill: row.skill,
                 targetCount: row.targetCount,
                 progress:
@@ -491,6 +582,18 @@ export class CourseService {
             };
         });
     }
+}
+
+/** Money goals with their jars and projections, read once per request. */
+interface MoneyGoalBook {
+    goals: GoalDto[];
+    jars: Map<string, JarDto>;
+    projections: Map<string, GoalProjection>;
+}
+
+/** A scope (personal / business) only fits a year, quarter or month. */
+function assertScope(horizon: CourseHorizon, scope: CourseScope | null): void {
+    if (scope !== null && !canHaveScope(horizon)) throw apiBadRequest('course_scope_invalid');
 }
 
 /** A counter only fits a month or a quarter. */

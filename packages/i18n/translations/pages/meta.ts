@@ -19,6 +19,7 @@ const meta = {
     learn: 'Learn',
     course: 'Course',
     course_week_check: 'Week check',
+    course_plan: 'Plan your year',
     library: 'Library',
     net_worth: 'Net worth',
     asset: 'Asset',
