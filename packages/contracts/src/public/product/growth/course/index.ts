@@ -3,6 +3,7 @@
  */
 export * from './course-period';
 export * from './course-rules';
+export * from './course-presets';
 export * from './schedule-rules';
 export * from './course.schema';
 export * from './rhythm.schema';

@@ -3,4 +3,4 @@
  */
 export * from './account.schema';
 export * from './account.contract';
-export { SpendingStyle } from '../enums';
+export { SpendingStyle, WorkSituation, YearIntention } from '../enums';

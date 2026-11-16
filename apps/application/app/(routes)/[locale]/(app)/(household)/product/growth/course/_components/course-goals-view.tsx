@@ -24,6 +24,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { rhythmPatternLabel } from '@/app/_lib/course-rhythm';
 import { CREATE_HREF } from '@/app/_lib/create-routes';
 import { CAPABILITIES } from '@/app/_lib/plan';
+import { growthPath } from '@/app/_lib/routes';
 import { isLiveData } from '@/app/_lib/preview';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -63,6 +64,7 @@ export function CourseGoalsView({
 }) {
     const t = useTranslations('features.growth.course');
     const tGoal = useTranslations('features.growth.course.goal');
+    const tPlan = useTranslations('features.growth.course.plan');
     const tLoading = useTranslations('ui.statusPage');
     const tRhythm = useTranslations('features.growth.course.rhythm');
     const locale = useLocale();
@@ -196,6 +198,7 @@ export function CourseGoalsView({
         return <BrandLoader label={tLoading('loading')} />;
     }
 
+    const planHref = growthPath('course', 'plan');
     const openCreateGoal = () =>
         setDialog({ mode: 'create', horizon: CourseHorizon.YEAR, period: year });
 
@@ -207,6 +210,16 @@ export function CourseGoalsView({
                     {hasCapability(CAPABILITIES.growthGoals) ? (
                         <Button as={Link} href={CREATE_HREF.goal} size="sm" variant="ghost">
                             {tGoal('add_goal_amount')}
+                        </Button>
+                    ) : null}
+                    {canCreate ? (
+                        <Button
+                            as={Link}
+                            href={planHref}
+                            size="sm"
+                            variant="secondary"
+                            iconLeft={<Icon name="sparkles" size="sm" aria-hidden />}>
+                            {tPlan('cta')}
                         </Button>
                     ) : null}
                     {canCreate ? (
@@ -258,9 +271,14 @@ export function CourseGoalsView({
                     body={tGoal('empty_body')}
                     action={
                         canCreate ? (
-                            <Button size="sm" onClick={openCreateGoal}>
-                                {tGoal('add_goal')}
-                            </Button>
+                            <div className="flex flex-wrap items-center justify-center gap-2">
+                                <Button as={Link} href={planHref} size="sm">
+                                    {tPlan('cta')}
+                                </Button>
+                                <Button size="sm" variant="secondary" onClick={openCreateGoal}>
+                                    {tGoal('add_goal')}
+                                </Button>
+                            </div>
                         ) : undefined
                     }
                 />

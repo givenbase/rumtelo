@@ -542,6 +542,53 @@
           "collation": null,
           "enumItems": [],
           "mappedType": "datetime"
+        },
+        "work_situation": {
+          "name": "work_situation",
+          "type": "auth_work_situation",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [
+            "EMPLOYED",
+            "SELF_EMPLOYED",
+            "BOTH",
+            "STUDENT",
+            "SEEKING"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "auth_work_situation"
+        },
+        "year_intention": {
+          "name": "year_intention",
+          "type": "auth_year_intention",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [
+            "CALM",
+            "GROW",
+            "BUILD",
+            "RECOVER"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "auth_year_intention"
         }
       },
       "indexes": [
@@ -20930,6 +20977,27 @@
         "LIGHT",
         "DARK",
         "SYSTEM"
+      ]
+    },
+    "auth_work_situation": {
+      "name": "auth_work_situation",
+      "schema": "public",
+      "items": [
+        "EMPLOYED",
+        "SELF_EMPLOYED",
+        "BOTH",
+        "STUDENT",
+        "SEEKING"
+      ]
+    },
+    "auth_year_intention": {
+      "name": "auth_year_intention",
+      "schema": "public",
+      "items": [
+        "CALM",
+        "GROW",
+        "BUILD",
+        "RECOVER"
       ]
     },
     "backoffice_capability_kind": {

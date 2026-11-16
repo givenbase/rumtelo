@@ -4,6 +4,8 @@ import {
     Locale,
     SpendingStyle,
     Theme,
+    WorkSituation,
+    YearIntention,
     type AccountTourProgress,
 } from '@rumtelo/contracts';
 
@@ -16,7 +18,8 @@ import { Account } from '../account.entity';
 /**
  * Account Settings Entity
  *
- * Person-scoped UI prefs — language, appearance, spending style, and tour progress.
+ * Person-scoped UI prefs — language, appearance, spending style, work situation, year intention,
+ * and tour progress.
  * One row per account.
  *
  * Currency and board debt strategy stay on auth.household_settings.
@@ -56,6 +59,14 @@ export class AccountSettings extends BaseEntity {
         })
     )
     spendingStyle: SpendingStyle = SpendingStyle.UNKNOWN;
+
+    /** How the person earns a living — orders goal presets in "Plan your year". Null = not told. */
+    @Enum(NativeEnum({ WorkSituation, domain: 'auth', nullable: true }))
+    workSituation: WorkSituation | null = null;
+
+    /** What the person wants from the year — sets the tone of "Plan your year". Null = not told. */
+    @Enum(NativeEnum({ YearIntention, domain: 'auth', nullable: true }))
+    yearIntention: YearIntention | null = null;
 
     // ? RELATIONSHIPS
     /**
