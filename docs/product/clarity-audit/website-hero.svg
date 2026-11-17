@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 860" width="375" height="860" font-family="Archivo, Helvetica, Arial, sans-serif">
+  <title>Mockup — Website hero + how it works (375 px)</title>
+  <!-- Proposal only. Brand tokens: surface #EEF1F5, raised #FFFFFF, fg #1A202D, accent #06656C, accent-soft #DDEFEF, line #D5DBE3 -->
+  <rect width="375" height="860" fill="#EEF1F5"/>
+  <rect width="375" height="56" fill="#FFFFFF"/><line x1="0" y1="56" x2="375" y2="56" stroke="#D5DBE3"/>
+  <text x="16" y="35" font-size="17" font-weight="700" fill="#06656C">R</text><text x="29" y="35" font-size="15" fill="#1A202D">umtelo</text>
+  <rect x="270" y="16" width="89" height="26" rx="13" fill="#06656C"/><text x="314" y="33" font-size="11" font-weight="600" fill="#FFFFFF" text-anchor="middle">Start free</text>
+  <text x="16" y="92" font-size="10" letter-spacing="1.4" fill="#5B6472">RUMTELO — GRIP ON LIFE</text>
+  <text x="16" y="128" font-size="30" font-weight="700" fill="#1A202D">Stop wondering</text>
+  <text x="16" y="162" font-size="30" font-weight="700" fill="#1A202D">where it went.</text>
+  <text x="16" y="192" font-size="14" fill="#5B6472">Your income splits into six jars the second it</text>
+  <text x="16" y="211" font-size="14" fill="#5B6472">lands — bills, saving, freedom, fun. Ten minutes</text>
+  <text x="16" y="230" font-size="14" fill="#5B6472">a week shows where it went and what to move.</text>
+  <rect x="16" y="252" width="343" height="48" rx="12" fill="#06656C"/>
+  <text x="187" y="282" font-size="15" font-weight="600" fill="#FFFFFF" text-anchor="middle">Split my income — free</text>
+  <text x="187" y="320" font-size="11" fill="#5B6472" text-anchor="middle">No card. No bank link needed.</text>
+  <text x="187" y="344" font-size="13" fill="#06656C" text-anchor="middle">See it in 3 steps ↓</text>
+  <!-- demo -->
+  <rect x="16" y="364" width="343" height="120" rx="14" fill="#FFFFFF" stroke="#D5DBE3"/>
+  <text x="32" y="390" font-size="10" letter-spacing="1.2" fill="#5B6472">SALARY IN</text>
+  <text x="32" y="414" font-size="20" font-weight="700" fill="#1A202D">€3,450  →</text>
+  <g fill="#06656C">
+    <rect x="150" y="398" width="50" height="22" rx="4"/><rect x="204" y="408" width="24" height="12" rx="3" fill="#2EAEAA"/>
+    <rect x="232" y="408" width="24" height="12" rx="3" fill="#4ED9D2"/><rect x="260" y="408" width="24" height="12" rx="3" fill="#00777F"/>
+    <rect x="288" y="408" width="24" height="12" rx="3" fill="#9ADBD6"/><rect x="316" y="413" width="24" height="7" rx="3" fill="#1A202D"/>
+  </g>
+  <text x="32" y="446" font-size="12" fill="#1A202D">Every amount has a job. Safe to spend today: €64.</text>
+  <text x="32" y="466" font-size="10" fill="#5B6472">THE COACH · ONE TIP, ONE MOVE</text>
+  <!-- how it works -->
+  <text x="16" y="526" font-size="10" letter-spacing="1.4" fill="#5B6472">HOW IT WORKS</text>
+  <g>
+    <circle cx="32" cy="560" r="14" fill="#DDEFEF"/><text x="32" y="565" font-size="13" font-weight="700" fill="#06656C" text-anchor="middle">1</text>
+    <text x="58" y="557" font-size="15" font-weight="700" fill="#1A202D">Income lands, money splits.</text>
+    <text x="58" y="577" font-size="12" fill="#5B6472">Enter your net income once. Six jars fill,</text>
+    <text x="58" y="593" font-size="12" fill="#5B6472">so every amount has a job before you spend.</text>
+    <circle cx="32" cy="636" r="14" fill="#DDEFEF"/><text x="32" y="641" font-size="13" font-weight="700" fill="#06656C" text-anchor="middle">2</text>
+    <text x="58" y="633" font-size="15" font-weight="700" fill="#1A202D">Spending finds its jar.</text>
+    <text x="58" y="653" font-size="12" fill="#5B6472">Bills draw from the right jar. Purchases land</text>
+    <text x="58" y="669" font-size="12" fill="#5B6472">in your Inbox — sort by hand or by rule.</text>
+    <circle cx="32" cy="712" r="14" fill="#DDEFEF"/><text x="32" y="717" font-size="13" font-weight="700" fill="#06656C" text-anchor="middle">3</text>
+    <text x="58" y="709" font-size="15" font-weight="700" fill="#1A202D">Ten minutes a week.</text>
+    <text x="58" y="729" font-size="12" fill="#5B6472">The week check shows where it went. Move one</text>
+    <text x="58" y="745" font-size="12" fill="#5B6472">amount, pick next week's focus, done.</text>
+  </g>
+  <rect x="16" y="774" width="343" height="44" rx="12" fill="#06656C"/>
+  <text x="187" y="801" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">Split my income — free</text>
+  <text x="187" y="846" font-size="10" fill="#8A93A0" text-anchor="middle">Next: Jars · The Coach · Pricing · Growth teaser · For practices · FAQ</text>
+</svg>
