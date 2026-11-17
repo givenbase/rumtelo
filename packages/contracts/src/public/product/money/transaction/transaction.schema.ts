@@ -130,10 +130,11 @@ export const Account = z.object({
     kind: z.enum(AccountKind),
     balance: Money,
     /**
-     * Catalog bank id (backoffice Bank) — always required.
-     * Manual vs Open Banking is `connectionId` (null = manual entry at this bank).
+     * Catalog bank id (backoffice Bank). Null only for the onboarding "Main account"
+     * until the household picks its bank. Manual vs Open Banking is `connectionId`
+     * (null = manual entry).
      */
-    bankId: Id,
+    bankId: Id.nullable(),
     /**
      * Checking/savings account that pays this seat’s bill (credit cards).
      * Null until set. Connecting sync later does not change this link.

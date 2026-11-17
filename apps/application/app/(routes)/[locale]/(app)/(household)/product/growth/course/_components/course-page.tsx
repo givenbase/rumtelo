@@ -18,7 +18,7 @@ import { cn } from '@rumtelo/utils';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { isLiveData } from '@/app/_lib/preview';
-import { growthPath } from '@/app/_lib/routes';
+import { moneyPath } from '@/app/_lib/routes';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 
@@ -130,7 +130,7 @@ export function CoursePage({ segment }: { segment: string | undefined }) {
                         }))}
                     />
                     <Link
-                        href={growthPath('course', 'week-check')}
+                        href={`${moneyPath('week-check')}?from=course`}
                         className="inline-flex h-10 items-center gap-1.5 rounded-full border border-line bg-card px-4 text-sm font-medium text-fg hover:bg-raised">
                         <Icon name="calendar-check" size="sm" aria-hidden />
                         {t('week_check_cta')}

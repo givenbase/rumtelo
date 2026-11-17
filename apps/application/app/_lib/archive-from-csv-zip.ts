@@ -231,7 +231,7 @@ export function archivePayloadFromCsvSheets(files: Map<string, string>): Payload
 
     const accounts = sheet(files, 'accounts.csv')
         .map(row => {
-            if (!row.name || !row.bankKey || !row.kind) return null;
+            if (!row.name || !row.kind) return null;
             if (!(Object.values(AccountKind) as string[]).includes(row.kind)) return null;
             const balance =
                 row.balanceCents !== undefined && row.balanceCents !== ''
@@ -242,7 +242,7 @@ export function archivePayloadFromCsvSheets(files: Map<string, string>): Payload
             return {
                 name: row.name,
                 kind: row.kind as AccountKind,
-                bankKey: row.bankKey,
+                bankKey: row.bankKey || null,
                 iban: row.iban || null,
                 balance: balance ?? 0,
                 isPrimary: asBool(row.isPrimary, false),

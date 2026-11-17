@@ -62,6 +62,12 @@ export class MonthScoreService {
         return new Set(rows.map(row => row.period));
     }
 
+    /** Whether any month of this household has been closed. One row at most is read. */
+    async hasClosedMonth(): Promise<boolean> {
+        const rows = await this.scores.find({ isClosed: true }, { limit: 1 });
+        return rows.length > 0;
+    }
+
     async current(period: string) {
         const monthScore = await this.scores.findOne({ period });
         const events = monthScore

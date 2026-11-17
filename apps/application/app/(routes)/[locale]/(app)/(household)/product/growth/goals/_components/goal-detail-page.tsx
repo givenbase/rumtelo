@@ -400,7 +400,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
         related.push({
             title: td('income'),
             subtitle: td('income_sub'),
-            href: productPath('growth/income'),
+            href: productPath('money/income'),
         });
     }
     if (jar && goal.kind === GoalKind.SAVE) {

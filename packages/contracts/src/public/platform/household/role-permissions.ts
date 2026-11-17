@@ -173,7 +173,9 @@ export function permissionSectionFromPath(pathname: string): HouseholdPermission
         path.startsWith('/auth') ||
         path.startsWith('/api/auth') ||
         path.startsWith('/contact') ||
-        path.startsWith('/plans')
+        path.startsWith('/plans') ||
+        // Pure onboarding preview: a signed-in person, no household, nothing stored.
+        path.endsWith('/household/previewsplit')
     ) {
         return null;
     }

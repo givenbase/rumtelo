@@ -59,10 +59,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Klein en vaak. Geen teller: gedaan of niet.',
         'features.growth.course.rhythm.form.kind_DISCIPLINE_hint':
             'Telbaar, zoals 3× per week. Vult de stap erboven.',
-        'features.growth.course.week_check.open_today': 'Open Vandaag',
         'features.growth.course.week_check.rhythm_open': 'Open de week',
-        'features.growth.course.week_check.done_lead':
-            'Je 3 voor {week} staan. Vandaag laat zien wat er elke dag staat.',
         'features.growth.course.home_card.open': 'Open Koers',
         'features.growth.course.home_card.next_check': 'Volgende: {check} · {when}',
         'features.growth.course.week_check_cta': 'Weekcheck',
@@ -111,21 +108,11 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.growth.course.rhythm.form.cadence_WEEKLY': 'Week',
         'features.growth.course.rhythm.form.cadence_MONTHLY': 'Maand',
         'features.growth.course.rhythm.form.target': 'Keer',
-        'features.growth.course.week_check.title': 'Weekcheck',
-        'features.growth.course.week_check.lead':
-            'Tien minuten: terugkijken, je routines vasthouden, je 3 zetten voor {week}.',
-        'features.growth.course.week_check.step_back': 'Terugblik',
-        'features.growth.course.week_check.step_rhythm': 'Routines',
-        'features.growth.course.week_check.step_ahead': 'Jouw 3',
-        'features.growth.course.week_check.step_done': 'Klaar',
         'features.growth.course.week_check.back_lead':
             'Markeer ze één voor één. Niet gelukt is een feit: schuif door of laat los.',
         'features.growth.course.week_check.rhythm_lead':
             'Doorgaan, kleiner maken of pauzeren. Niets herhaalt zonder jouw ja.',
         'features.growth.course.week_check.ahead_title': 'Jouw 3 voor {week}',
-        'features.growth.course.week_check.finish': 'Weekcheck afronden',
-        'features.growth.course.week_check.done_toast': 'Weekcheck klaar',
-        'features.growth.course.week_check.done_title': 'Klaar. Tot volgende week zondag.',
         'features.growth.course.entry.growth_week_check': 'Groei-weekcheck',
         'features.growth.course.entry.money_week_check': 'Geld-weekcheck',
         'features.growth.course.entry.month_close': 'Maand afsluiten: {month}',
@@ -728,10 +715,6 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.landing.plans.max.f4': 'ZIEL · de zeven centra',
         'pages.landing.plans.max.f5': 'Tot {maxMembers} plekken (meer volledige toegang)',
         // App: onboarding, Home dream, tour, Coach, Why, Practice, Settings (core launch copy).
-        'pages.onboarding.why_body':
-            'In één korte zin: waarom wil je Rumtelo gebruiken — of naar welke droom werk je toe? We tonen die zin bovenaan je Home, als kleine herinnering waarvoor je het doet.',
-        'pages.onboarding.why_hint': 'Staat bovenaan je Home als herinnering.',
-        'pages.onboarding.creating': 'Aanmaken…',
         'pages.dashboard.why.label': 'Jouw droom',
         'features.tour.pages.home.sections.what_for_core.heading': 'Wat je hier ziet',
         'features.tour.pages.home.sections.what_for_core.body':
@@ -787,11 +770,206 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.meta.week_check': 'Weekcheck',
         'pages.why.cta_week_check': 'Weekcheck',
         'features.coach.verdict.kind_week_check': 'Weekcheck',
-        'features.money.week_check.complete': 'Weekcheck voltooid ✓',
         'features.money.week_check.toast_done': 'De weekcheck is afgerond. Tot volgende week.',
-        'features.growth.course.week_check.steps_aria': 'Stappen van de weekcheck',
         'features.capabilities.home-coach.description':
             'Tips over alle producten — weekcheck, maandscore en volgende stappen.',
+        // ── Clarity 2 (week check, Home week 1, onboarding, nav, locks) ───────────────────
+        // Week check: one product noun, "weekcheck"; Course = Koers.
+        'features.money.week_check.page_title': 'Weekcheck',
+        'features.money.week_check.page_lead':
+            'Tien minuten. Zie waar het naartoe ging, geef de rest een taak en zet één intentie.',
+        'features.money.week_check.grace_note':
+            'De weekcheck van vorige week staat nog open. Rond die eerst af — deze week volgt daarna.',
+        'features.money.week_check.progress': 'Stap {current} van {total} · ongeveer tien minuten',
+        'features.money.week_check.group_money': 'Geld · week {week}',
+        'features.money.week_check.group_course': 'Koers · week {week}',
+        'features.money.week_check.steps_aria': 'Stappen van de weekcheck',
+        'features.money.week_check.step_go_back': 'Terug naar {step}',
+        'features.money.week_check.step_course_back': 'De drie van vorige week',
+        'features.money.week_check.step_course_ahead': 'De drie voor volgende week',
+        'features.money.week_check.look_over_by': '{amount} overschreden',
+        'features.money.week_check.look_move': 'Geld verplaatsen',
+        'features.money.week_check.look_no_income': 'Deze maand nog geen inkomen.',
+        'features.money.week_check.look_add_income': 'Inkomen toevoegen',
+        'features.money.week_check.intend_saved': 'Je intentie: {intention}',
+        'features.money.week_check.finish': 'Weekcheck afronden',
+        'features.money.week_check.skip_course': 'Koers deze week overslaan',
+        'features.money.week_check.skip_course_toast':
+            'Weekcheck klaar. Koers blijft deze week open.',
+        'features.money.week_check.course_load_failed':
+            'We kunnen dit deel van Koers niet laden. Probeer het opnieuw of sla het deze week over.',
+        'features.money.week_check.save_failed': 'Niet opgeslagen. Je antwoorden staan er nog.',
+        'features.money.week_check.error_no_jars':
+            'We kunnen je potjes niet laden. Probeer het opnieuw.',
+        'features.money.week_check.done_title': 'Klaar voor week {week}.',
+        'features.money.week_check.done_lead': 'Eén blik, één stap, één intentie.',
+        'features.money.week_check.done_allocations_label': 'Deze week verplaatst',
+        'features.money.week_check.done_next_three_label': 'De drie voor volgende week',
+        'features.money.week_check.done_course_open': 'Koers voor volgende week staat nog open.',
+        'features.money.week_check.done_course_open_cta': 'Plan Koers toch',
+        'features.money.week_check.look_again': 'Nog eens kijken',
+        'features.money.week_check.look_again_note':
+            'Alleen lezen — dit verandert je weekcheck niet.',
+        'features.money.week_check.back_to_summary': 'Terug naar het overzicht',
+        'features.money.week_check.summary_status_done': 'Klaar op {day}',
+        'features.money.week_check.summary_status_open': 'Nog niet gedaan',
+        'features.money.week_check.summary_read_only':
+            'Alleen lezen. Het huishouden doet de weekcheck.',
+        'features.money.week_check.entry': 'Weekcheck',
+        'features.money.week_check.entry_done': 'Weekcheck',
+        'features.money.week_check.entry_done_sr': 'deze week gedaan',
+        'features.money.week_check.entry_view': 'Weekcheck bekijken',
+        'features.money.week_check.entry_status_open': 'Deze week: nog niet gedaan',
+        'features.money.week_check.entry_status_done': 'Deze week: gedaan',
+        // Home: one next move, week-1 checklist. Plurals are ICU, so DeepL skips them.
+        'pages.dashboard.next_move.eyebrow': 'Volgende stap',
+        'pages.dashboard.next_move.close_month.title':
+            'Sluit {month} af: zie je score en neem mee wat over is.',
+        'pages.dashboard.next_move.close_month.cta': 'Maand afsluiten',
+        'pages.dashboard.next_move.no_transactions.title':
+            'Je potjes zijn gevuld. Kijk nu waar het heen gaat.',
+        'pages.dashboard.next_move.no_transactions.body':
+            'Voeg de uitgaven van deze week toe — zelf of importeer een bankafschrift. Volgende week duurt je eerste weekcheck tien minuten.',
+        'pages.dashboard.next_move.no_transactions.body_basic':
+            'Voeg de uitgaven van deze week toe zodra ze er zijn. Volgende week duurt je eerste weekcheck tien minuten.',
+        'pages.dashboard.next_move.no_transactions.cta': 'Transactie toevoegen',
+        'pages.dashboard.next_move.no_transactions.import': 'Bankafschrift importeren',
+        'pages.dashboard.next_move.zero_income.title':
+            'Nog geen inkomen? Voeg het toe zodra het binnenkomt — je potjes verdelen het meteen.',
+        'pages.dashboard.next_move.zero_income.cta': 'Inkomen toevoegen',
+        'pages.dashboard.next_move.inbox.title':
+            '{count, plural, one {# regel in je Inbox — ongeveer {minutes, plural, one {# minuut} other {# minuten}}.} other {# regels in je Inbox — ongeveer {minutes, plural, one {# minuut} other {# minuten}}.}}',
+        'pages.dashboard.next_move.inbox.cta': 'Inbox sorteren',
+        'pages.dashboard.next_move.week_check.title':
+            'Inbox leeg. Je weekcheck staat klaar — tien minuten.',
+        'pages.dashboard.next_move.week_check.cta': 'Weekcheck starten',
+        // Pinned in the Clarity 2 design: "bedrag" in both (the euro line has no NL twin).
+        'pages.dashboard.next_move.calm.title':
+            'Elk bedrag heeft een taak. Volgende weekcheck: {weekday}.',
+        'pages.dashboard.next_move.calm.title_other_currency':
+            'Elk bedrag heeft een taak. Volgende weekcheck: {weekday}.',
+        'pages.dashboard.next_move.calm.link': 'Bekijk je potjes',
+        'pages.dashboard.next_move.viewer.close_prior': '{month} staat klaar om af te sluiten.',
+        'pages.dashboard.next_move.viewer.no_transactions': 'Nog geen uitgaven toegevoegd.',
+        'pages.dashboard.next_move.viewer.inbox':
+            '{count, plural, one {# regel wacht in de Inbox.} other {# regels wachten in de Inbox.}}',
+        'pages.dashboard.next_move.viewer.week_check': 'De weekcheck van deze week staat nog open.',
+        'pages.dashboard.next_move.viewer.close_month':
+            '{month} wordt over {days, plural, one {# dag} other {# dagen}} afgesloten.',
+        'pages.dashboard.next_move.travel_note': 'Over vandaag, niet over {period}.',
+        'pages.dashboard.next_move.error': 'We kunnen je volgende stap niet laden.',
+        'pages.dashboard.checklist.eyebrow': 'Instellen · {done} van {total} klaar',
+        'pages.dashboard.checklist.title':
+            '{count, plural, one {Eén klein ding, wanneer het jou uitkomt.} other {# kleine dingen, wanneer het jou uitkomt.}}',
+        'pages.dashboard.checklist.hide': 'Verbergen',
+        'pages.dashboard.checklist.hide_aria':
+            'Verberg de instellijst voor iedereen in dit huishouden',
+        'pages.dashboard.checklist.done': 'Klaar',
+        'pages.dashboard.checklist.items.bank': 'Voeg je bank toe aan je hoofdrekening',
+        'pages.dashboard.checklist.items.dream': 'Schrijf je droom op',
+        'pages.dashboard.checklist.items.invite': 'Nodig je partner uit',
+        'pages.dashboard.coach.all_tips': 'Alle tips ({count})',
+        // Onboarding: two screens (income, split).
+        'pages.onboarding.income_lead':
+            'Vul in wat je elke maand op je rekening krijgt. Daarna zie je het verdeeld over zes potjes.',
+        'pages.onboarding.net_income_label': 'Netto maandinkomen',
+        'pages.onboarding.net_income_hint': 'Na belasting — wat er op je rekening binnenkomt.',
+        'pages.onboarding.net_income_placeholder': 'Bedrag per maand',
+        'pages.onboarding.income_echo': 'Dat is {amount} per maand.',
+        'pages.onboarding.income_error_empty': 'Vul je maandinkomen in. Nul mag ook.',
+        'pages.onboarding.income_error_nan':
+            'Gebruik alleen cijfers, zoals je een bedrag opschrijft.',
+        'pages.onboarding.income_error_negative': 'Inkomen kan niet onder nul zijn.',
+        'pages.onboarding.income_error_decimals': 'Gebruik maximaal twee decimalen.',
+        'pages.onboarding.income_error_large':
+            'Dat is meer dan Rumtelo per maand aankan. Controleer het bedrag.',
+        'pages.onboarding.split_title': 'Hier gaat je {amount} naartoe.',
+        'pages.onboarding.split_lead':
+            'Elk potje heeft één taak. Pas de percentages aan wanneer je wilt — de gewoonte telt meer dan de getallen.',
+        'pages.onboarding.split_list_aria': 'Je verdeling',
+        'pages.onboarding.split_row_aria': '{jar}, {percent} procent, {amount}',
+        // "vaste kosten", not "vaste lasten": the locale normaliser rewrites it anyway.
+        'pages.onboarding.split_jobs.NECESSITIES': 'huur, vaste kosten, boodschappen',
+        'pages.onboarding.split_jobs.FINANCIAL_FREEDOM': 'geld dat voor je werkt — nooit uitgeven',
+        'pages.onboarding.split_jobs.EDUCATION': 'lessen, boeken, een nieuwe vaardigheid',
+        'pages.onboarding.split_jobs.LONG_TERM_SAVINGS': 'grote aankopen en een veiligheidsbuffer',
+        'pages.onboarding.split_jobs.PLAY': 'plezier zonder schuldgevoel — geef het helemaal uit',
+        'pages.onboarding.split_jobs.GIVE': 'cadeaus en goede doelen waar je om geeft',
+        'pages.onboarding.split_main_account':
+            'Alle zes potjes staan voor nu op één hoofdrekening. Voeg je bank toe wanneer het jou uitkomt.',
+        'pages.onboarding.split_note':
+            'Rumtelo verplaatst nooit geld. Spaarpotjes bij je bank? Zet het daar zelf over — wij laten de verdeling zien.',
+        'pages.onboarding.split_change_later':
+            'Je past de percentages altijd aan via Geld › Potjes.',
+        'pages.onboarding.split_zero':
+            'Nog geen inkomen? Je potjes wachten — ze verdelen het zodra het binnenkomt.',
+        'pages.onboarding.split_cta': 'Klopt — open mijn overzicht',
+        'pages.onboarding.split_cta_pending': 'Je overzicht wordt geopend…',
+        'pages.onboarding.split_error': 'We kunnen de potjes niet laden — probeer het opnieuw.',
+        'pages.onboarding.onboard_error':
+            'Je overzicht is nog niet aangemaakt. Probeer het opnieuw.',
+        'pages.onboarding.household_default_named': 'Huishouden van {name}',
+        'pages.onboarding.step_of': '{current} van {total}',
+        'pages.onboarding.banks_setup.read_only_link': 'Bankinstellingen openen',
+        // Navigation: Meer tab and sheet.
+        'pages.nav.pills.more': 'Meer',
+        'pages.nav.children.why': 'Waarom Rumtelo',
+        'pages.nav.children.jars': 'Potjes',
+        'pages.nav.children.net_worth': 'Nettovermogen',
+        'pages.nav.more.title': 'Meer',
+        'pages.nav.more.close': 'Sluiten',
+        'pages.nav.more.settings': 'Instellingen',
+        'pages.nav.more.help': 'Hulp',
+        'pages.nav.more.go_to_practice': 'Naar je praktijk',
+        'pages.nav.more.back_to_practice': 'Terug naar je praktijk',
+        'pages.nav.more.preview_badge': 'Preview',
+        'pages.nav.more.with_plan': 'Meer met {plan}',
+        'pages.nav.more.with_plan_price': '{plan} · {price}/maand',
+        'pages.nav.more.with_plus_line':
+            'Koers, je schuldenvrij-datum en bankafschriften importeren',
+        'pages.nav.more.with_max_line': 'Nettovermogen en ruimte voor meer mensen',
+        'pages.nav.search.course_today': 'Koers · Vandaag',
+        'pages.nav.search.course_week': 'Koers · Week',
+        'pages.nav.search.course_goals': 'Koers · Doelen',
+        'pages.nav.inbox_badge_sr':
+            '{count, plural, one {# om te sorteren} other {# om te sorteren}}',
+        'pages.nav.aria.mobile_tabs': 'Hoofdmenu',
+        'pages.nav.aria.money_sections': 'Onderdelen van Geld',
+        // Locks that explain the gain. "Overstappen", never "Probeer" (no trial).
+        'pages.shell.plan_gains.title': 'Meer met {plan}',
+        'pages.shell.plan_gains.price': '{plan} · {price}/maand',
+        'pages.shell.plan_gains.close': 'Sluiten',
+        'pages.shell.plan_gains.members': 'Tot {count} mensen in je huishouden',
+        'pages.shell.plan_gains.goals': 'Tot {count} doelen',
+        'pages.shell.plan_gains.goals_unlimited': 'Zoveel doelen als je nodig hebt',
+        'pages.shell.plan_gains.bank_links':
+            '{count, plural, one {# bankkoppeling} other {# bankkoppelingen}}',
+        'pages.shell.gates.lock.badge': 'Vergrendeld · in {plan}',
+        'pages.shell.gates.lock.badge_sr': 'Vergrendeld: zit in {plan}',
+        'pages.shell.gates.lock.title': '{feature} zit in {plan} · {price}/maand',
+        'pages.shell.gates.lock.feature_fallback': 'Deze pagina',
+        'pages.shell.gates.lock.body_tail':
+            'Alles wat je invult blijft van jou, op elk abonnement.',
+        'pages.shell.gates.lock.example': 'Voorbeeld',
+        'pages.shell.gates.lock.switch_cta': 'Overstappen naar {plan}',
+        'pages.shell.gates.lock.not_now': 'Nu niet',
+        'pages.shell.gates.lock.back': 'Terug',
+        'pages.shell.gates.lock.ask_owner': 'Vraag {owner} om over te stappen naar {plan}.',
+        'pages.shell.gates.lock.ask_owner_unknown':
+            'Vraag de eigenaar van dit huishouden om over te stappen naar {plan}.',
+        'pages.shell.gates.lock.region_aria': 'Vergrendeld: {feature} zit in {plan}',
+        'features.capabilities.money-debt.gain':
+            'Zie wanneer je schuldenvrij bent en wat één extra aflossing verandert.',
+        'features.capabilities.money-import.gain':
+            'Importeer een bankafschrift in plaats van elk bedrag in te typen.',
+        'features.capabilities.growth-learn.gain':
+            'Kies elk kwartaal één vaardigheid en houd bij wat je leert.',
+        'features.capabilities.growth-net-worth.gain':
+            'Zie wat je bezit min wat je schuldig bent, in één getal, elke maand.',
+        'features.capabilities.growth-course.gain':
+            'Zet je week rond de drie dingen die je doelen vooruit helpen.',
+        'common.message.error.api.jar_split_keys':
+            'De verdeling moet elk van de zes potjes precies één keer bevatten',
     },
     es: {
         // Kept as translated before: the generator without a DeepL key would drop them to English.
@@ -799,6 +977,18 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Aquí el límite es cinco. Termina uno, muévelo o déjalo ir primero.',
         'common.message.error.api.course_scope_invalid':
             'Solo un objetivo anual, trimestral o mensual puede ser personal o profesional',
+        // ICU plurals are skipped by DeepL; pinned so they do not stay English.
+        'pages.dashboard.next_move.inbox.title':
+            '{count, plural, one {# línea en tu Inbox — unos {minutes, plural, one {# minuto} other {# minutos}}.} other {# líneas en tu Inbox — unos {minutes, plural, one {# minuto} other {# minutos}}.}}',
+        'pages.dashboard.next_move.viewer.inbox':
+            '{count, plural, one {# línea esperando en el Inbox.} other {# líneas esperando en el Inbox.}}',
+        'pages.dashboard.next_move.viewer.close_month':
+            '{month} se cierra en {days, plural, one {# día} other {# días}}.',
+        'pages.dashboard.checklist.title':
+            '{count, plural, one {Una cosa pequeña, cuando te venga bien.} other {# cosas pequeñas, cuando te vengan bien.}}',
+        'pages.nav.inbox_badge_sr': '{count, plural, one {# por ordenar} other {# por ordenar}}',
+        'pages.shell.plan_gains.bank_links':
+            '{count, plural, one {# conexión bancaria} other {# conexiones bancarias}}',
     },
     fr: {
         // Kept as translated before: the generator without a DeepL key would drop them to English.
@@ -806,5 +996,17 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Ici, on ne peut pas en avoir plus de cinq. Finis-en un, déplace-en un ou laisse-en un.',
         'common.message.error.api.course_scope_invalid':
             'Seul un objectif annuel, trimestriel ou mensuel peut être personnel ou professionnel',
+        // ICU plurals are skipped by DeepL; pinned so they do not stay English.
+        'pages.dashboard.next_move.inbox.title':
+            '{count, plural, one {# ligne dans ton Inbox — environ {minutes, plural, one {# minute} other {# minutes}}.} other {# lignes dans ton Inbox — environ {minutes, plural, one {# minute} other {# minutes}}.}}',
+        'pages.dashboard.next_move.viewer.inbox':
+            '{count, plural, one {# ligne en attente dans l’Inbox.} other {# lignes en attente dans l’Inbox.}}',
+        'pages.dashboard.next_move.viewer.close_month':
+            '{month} se clôture dans {days, plural, one {# jour} other {# jours}}.',
+        'pages.dashboard.checklist.title':
+            '{count, plural, one {Une petite chose, quand ça t’arrange.} other {# petites choses, quand ça t’arrange.}}',
+        'pages.nav.inbox_badge_sr': '{count, plural, one {# à trier} other {# à trier}}',
+        'pages.shell.plan_gains.bank_links':
+            '{count, plural, one {# connexion bancaire} other {# connexions bancaires}}',
     },
 };

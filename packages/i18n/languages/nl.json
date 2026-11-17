@@ -98,6 +98,7 @@
                     "cannot_remove_owner": "De eigenaar van het huishouden kun je niet verwijderen",
                     "member_remove_failed": "Dit lid kon niet worden verwijderd. Probeer het opnieuw.",
                     "jar_split_total": "De potverdeling moet samen 100% zijn; ontvangen: {total}%",
+                    "jar_split_keys": "De verdeling moet elk van de zes potjes precies één keer bevatten",
                     "jar_placement_account_invalid": "Die bankrekening hoort niet bij dit huishouden.",
                     "book_catalog_unavailable": "De boekencatalogus gaf geen antwoord.",
                     "contact_send_failed": "Je bericht kon niet worden verzonden. Probeer het nog eens of stuur ons rechtstreeks een e-mail.",
@@ -614,7 +615,8 @@
             },
             "money-debt": {
                 "name": "Schuld",
-                "description": "Aflossingsplan met rente, volgorde van aflossing en datum waarop de schuld is afgelost."
+                "description": "Aflossingsplan met rente, volgorde van aflossing en datum waarop de schuld is afgelost.",
+                "gain": "Zie wanneer je schuldenvrij bent en wat één extra aflossing verandert."
             },
             "money-bank": {
                 "name": "Bank",
@@ -622,7 +624,8 @@
             },
             "money-import": {
                 "name": "Importeren",
-                "description": "Bankafschriften uploaden (CSV-import)."
+                "description": "Bankafschriften uploaden (CSV-import).",
+                "gain": "Importeer een bankafschrift in plaats van elk bedrag in te typen."
             },
             "growth-overview": {
                 "name": "Overzicht",
@@ -638,11 +641,13 @@
             },
             "growth-learn": {
                 "name": "Meer informatie",
-                "description": "Vaardigheden voor je werk, en boeken, cursussen, seminars en evenementen die we aanbevelen — maar niet zelf organiseren. Plus en Max."
+                "description": "Vaardigheden voor je werk, en boeken, cursussen, seminars en evenementen die we aanbevelen — maar niet zelf organiseren. Plus en Max.",
+                "gain": "Kies elk kwartaal één vaardigheid en houd bij wat je leert."
             },
             "growth-net-worth": {
                 "name": "Nettovermogen",
-                "description": "Vermogen, rendement en je vrijheidscijfer."
+                "description": "Vermogen, rendement en je vrijheidscijfer.",
+                "gain": "Zie wat je bezit min wat je schuldig bent, in één getal, elke maand."
             },
             "energy-overview": {
                 "name": "Overzicht",
@@ -698,7 +703,8 @@
             },
             "growth-course": {
                 "name": "Koers",
-                "description": "Jouw 3 voor deze week, gekoppeld aan de maand en het doel waar ze bij horen. Plus en Max."
+                "description": "Jouw 3 voor deze week, gekoppeld aan de maand en het doel waar ze bij horen. Plus en Max.",
+                "gain": "Zet je week rond de drie dingen die je doelen vooruit helpen."
             }
         },
         "coach": {
@@ -2211,13 +2217,6 @@
                     }
                 },
                 "week_check": {
-                    "title": "Weekcheck",
-                    "lead": "Tien minuten: terugkijken, je routines vasthouden, je 3 zetten voor {week}.",
-                    "steps_aria": "Stappen van de weekcheck",
-                    "step_back": "Terugblik",
-                    "step_rhythm": "Routines",
-                    "step_ahead": "Jouw 3",
-                    "step_done": "Klaar",
                     "back_title": "Hoe is het met {week} gegaan?",
                     "back_lead": "Markeer ze één voor één. Niet gelukt is een feit: schuif door of laat los.",
                     "back_empty": "Er is vorige week niets vastgesteld. Dat is prima. Begin met de drie die voorliggen.",
@@ -2226,16 +2225,7 @@
                     "rhythm_empty": "Deze week zijn er geen voorstellen.",
                     "rhythm_open": "Open de week",
                     "ahead_title": "Jouw 3 voor {week}",
-                    "ahead_lead": "Wat is het belangrijkst? Koppel er desgewenst een doel aan.",
-                    "next": "Volgende",
-                    "back": "Terug",
-                    "finish": "Weekcheck afronden",
-                    "done_toast": "Weekcheck klaar",
-                    "done_title": "Klaar. Tot volgende week zondag.",
-                    "done_lead": "Je 3 voor {week} staan. Vandaag laat zien wat er elke dag staat.",
-                    "open_today": "Open Vandaag",
-                    "open_week": "De week beginnen",
-                    "already_done": "De controle van deze week is afgerond. Je kunt nog steeds dingen aanpassen."
+                    "ahead_lead": "Wat is het belangrijkst? Koppel er desgewenst een doel aan."
                 },
                 "entry": {
                     "growth_week_check": "Groei-weekcheck",
@@ -3028,38 +3018,69 @@
             },
             "week_check": {
                 "page_eyebrow": "Tien minuten per week",
-                "page_title": "De weekoverzicht",
-                "page_lead": "Rumtelo vraagt geen tijd van je avonden op. Eén keer per week even checken — kijken, direct handelen, een doel stellen — is beter dan je elke dag zorgen maken.",
-                "step": "Stap {n}",
+                "page_title": "Weekcheck",
+                "page_lead": "Tien minuten. Zie waar het naartoe ging, geef de rest een taak en zet één intentie.",
+                "week_label": "Week {week} · {range}",
+                "grace_note": "De weekcheck van vorige week staat nog open. Rond die eerst af — deze week volgt daarna.",
+                "progress": "Stap {current} van {total} · ongeveer tien minuten",
+                "group_money": "Geld · week {week}",
+                "group_course": "Koers · week {week}",
+                "steps_aria": "Stappen van de weekcheck",
+                "step_go_back": "Terug naar {step}",
+                "step_course_back": "De drie van vorige week",
+                "step_course_routines": "Routines",
+                "step_course_ahead": "De drie voor volgende week",
                 "look_label": "Kijk eens",
-                "look_sub": "Wat is er deze week gebeurd?",
                 "look_eyebrow": "✦ Kijk",
                 "look_title": "Wat heb je deze week gedaan?",
                 "look_lead": "Geen oordeel. Informatie is alles wat we nodig hebben.",
+                "look_over_by": "{amount} overschreden",
+                "look_move": "Geld verplaatsen",
+                "look_no_income": "Deze maand nog geen inkomen.",
+                "look_add_income": "Inkomen toevoegen",
                 "direct_label": "Direct",
-                "direct_sub": "Waar gaat het overschot naartoe?",
                 "direct_eyebrow": "✦ Direct",
                 "direct_title": "Overschot verdelen",
                 "direct_surplus": "{amount} heeft nog geen bestemming. Stuur het maar naar een plek waar het van pas komt.",
-                "direct_none": "Deze week geen overschot — er valt niets om te herverdelen. Ga verder als je er klaar voor bent.",
                 "send_here": "Hier verzenden",
                 "intend_label": "Van plan zijn",
-                "intend_sub": "Wat zijn je plannen voor volgende week?",
                 "intend_eyebrow": "✦ Van plan zijn",
                 "intend_title": "Mijn voornemen voor volgende week",
                 "intend_lead": "Eén zin. Wat ga je anders doen?",
                 "intend_placeholder": "Schrijf hier je voornemen op...",
                 "intend_aria": "Doel voor volgende week",
                 "intend_encourage": "Goed. Onthoud dit als je het deze week even moeilijk hebt.",
+                "intend_saved": "Je intentie: {intention}",
                 "back": "← Terug",
                 "next": "Volgende →",
-                "complete": "Weekcheck voltooid ✓",
+                "finish": "Weekcheck afronden",
+                "skip_course": "Koers deze week overslaan",
+                "skip_course_toast": "Weekcheck klaar. Koers blijft deze week open.",
+                "course_load_failed": "We kunnen dit deel van Koers niet laden. Probeer het opnieuw of sla het deze week over.",
                 "toast_done": "De weekcheck is afgerond. Tot volgende week.",
+                "save_failed": "Niet opgeslagen. Je antwoorden staan er nog.",
+                "error_no_jars": "We kunnen je potjes niet laden. Probeer het opnieuw.",
                 "done_eyebrow": "✦ Klaar",
-                "done_title": "De controle van deze week is afgerond",
-                "done_lead": "Eén blik, één doorverwijzing, één bedoeling. Kom volgende week weer eens langs.",
+                "done_title": "Klaar voor week {week}.",
+                "done_lead": "Eén blik, één stap, één intentie.",
+                "done_allocations_label": "Deze week verplaatst",
                 "done_intention_label": "Je bedoeling",
-                "done_home": "Weer thuis"
+                "done_next_three_label": "De drie voor volgende week",
+                "done_course_open": "Koers voor volgende week staat nog open.",
+                "done_course_open_cta": "Plan Koers toch",
+                "done_home": "Weer thuis",
+                "look_again": "Nog eens kijken",
+                "look_again_note": "Alleen lezen — dit verandert je weekcheck niet.",
+                "back_to_summary": "Terug naar het overzicht",
+                "summary_status_done": "Klaar op {day}",
+                "summary_status_open": "Nog niet gedaan",
+                "summary_read_only": "Alleen lezen. Het huishouden doet de weekcheck.",
+                "entry": "Weekcheck",
+                "entry_done": "Weekcheck",
+                "entry_done_sr": "deze week gedaan",
+                "entry_view": "Weekcheck bekijken",
+                "entry_status_open": "Deze week: nog niet gedaan",
+                "entry_status_done": "Deze week: gedaan"
             },
             "giving_finder": {
                 "title": "Waar wil je helpen?",
@@ -3999,7 +4020,60 @@
                 "attention_eyebrow": "Jouw akkoord nodig",
                 "attention_blurb": "Een Practice vroeg om dit bord te bekijken of te beheren. Accepteer alleen als je ze kent."
             },
+            "next_move": {
+                "eyebrow": "Volgende stap",
+                "close_month": {
+                    "title": "Sluit {month} af: zie je score en neem mee wat over is.",
+                    "cta": "Maand afsluiten"
+                },
+                "no_transactions": {
+                    "title": "Je potjes zijn gevuld. Kijk nu waar het heen gaat.",
+                    "body": "Voeg de uitgaven van deze week toe — zelf of importeer een bankafschrift. Volgende week duurt je eerste weekcheck tien minuten.",
+                    "body_basic": "Voeg de uitgaven van deze week toe zodra ze er zijn. Volgende week duurt je eerste weekcheck tien minuten.",
+                    "cta": "Transactie toevoegen",
+                    "import": "Bankafschrift importeren"
+                },
+                "zero_income": {
+                    "title": "Nog geen inkomen? Voeg het toe zodra het binnenkomt — je potjes verdelen het meteen.",
+                    "cta": "Inkomen toevoegen"
+                },
+                "inbox": {
+                    "title": "{count, plural, one {# regel in je Inbox — ongeveer {minutes, plural, one {# minuut} other {# minuten}}.} other {# regels in je Inbox — ongeveer {minutes, plural, one {# minuut} other {# minuten}}.}}",
+                    "cta": "Inbox sorteren"
+                },
+                "week_check": {
+                    "title": "Inbox leeg. Je weekcheck staat klaar — tien minuten.",
+                    "cta": "Weekcheck starten"
+                },
+                "calm": {
+                    "title": "Elk bedrag heeft een taak. Volgende weekcheck: {weekday}.",
+                    "title_other_currency": "Elk bedrag heeft een taak. Volgende weekcheck: {weekday}.",
+                    "link": "Bekijk je potjes"
+                },
+                "viewer": {
+                    "close_prior": "{month} staat klaar om af te sluiten.",
+                    "no_transactions": "Nog geen uitgaven toegevoegd.",
+                    "inbox": "{count, plural, one {# regel wacht in de Inbox.} other {# regels wachten in de Inbox.}}",
+                    "week_check": "De weekcheck van deze week staat nog open.",
+                    "close_month": "{month} wordt over {days, plural, one {# dag} other {# dagen}} afgesloten."
+                },
+                "travel_note": "Over vandaag, niet over {period}.",
+                "error": "We kunnen je volgende stap niet laden."
+            },
+            "checklist": {
+                "eyebrow": "Instellen · {done} van {total} klaar",
+                "title": "{count, plural, one {Eén klein ding, wanneer het jou uitkomt.} other {# kleine dingen, wanneer het jou uitkomt.}}",
+                "hide": "Verbergen",
+                "hide_aria": "Verberg de instellijst voor iedereen in dit huishouden",
+                "done": "Klaar",
+                "items": {
+                    "bank": "Voeg je bank toe aan je hoofdrekening",
+                    "dream": "Schrijf je droom op",
+                    "invite": "Nodig je partner uit"
+                }
+            },
             "coach": {
+                "all_tips": "Alle tips ({count})",
                 "inbox_one": "{count} transactie wacht op een potje.",
                 "inbox_many": "{count} transacties wachten op een potje.",
                 "all_sorted": "Alles gesorteerd — tijd voor een intentie.",
@@ -5204,23 +5278,21 @@
                 "money": "Geld",
                 "growth": "Groei",
                 "energy": "Energie",
-                "soul": "Ziel"
+                "soul": "Ziel",
+                "more": "Meer"
             },
             "children": {
-                "home_overview": "Overzicht",
                 "coach": "De Coach",
-                "why": "Waarom Rumtelo?",
-                "money_overview": "Overzicht",
-                "jars": "Potten",
-                "transactions": "Transacties",
+                "why": "Waarom Rumtelo",
+                "jars": "Potjes",
+                "inbox": "Inbox",
                 "debt": "Schulden",
                 "fixed_costs": "Vaste kosten",
-                "growth_overview": "Overzicht",
                 "course": "Koers",
                 "goals": "Doelen",
                 "income": "Inkomen",
                 "learn": "Leren",
-                "net_worth": "Netto vermogen",
+                "net_worth": "Nettovermogen",
                 "energy_overview": "Overzicht",
                 "week": "Week",
                 "sleep": "Slaap",
@@ -5232,60 +5304,78 @@
                 "giving": "Geven",
                 "intent": "Intentie",
                 "centers": "Centra"
+            },
+            "more": {
+                "title": "Meer",
+                "close": "Sluiten",
+                "settings": "Instellingen",
+                "help": "Hulp",
+                "go_to_practice": "Naar je praktijk",
+                "back_to_practice": "Terug naar je praktijk",
+                "preview_badge": "Preview",
+                "with_plan": "Meer met {plan}",
+                "with_plan_price": "{plan} · {price}/maand",
+                "with_plus_line": "Koers, je schuldenvrij-datum en bankafschriften importeren",
+                "with_max_line": "Nettovermogen en ruimte voor meer mensen"
+            },
+            "search": {
+                "course_today": "Koers · Vandaag",
+                "course_week": "Koers · Week",
+                "course_goals": "Koers · Doelen"
+            },
+            "inbox_badge_sr": "{count, plural, one {# om te sorteren} other {# om te sorteren}}",
+            "aria": {
+                "mobile_tabs": "Hoofdmenu",
+                "money_sections": "Onderdelen van Geld"
             }
         },
         "onboarding": {
-            "welcome": "Welkom bij Rumtelo",
-            "welcome_body": "Rumtelo helpt je rustig te zien waar je geld naartoe gaat. We verdelen je inkomen over zes potjes, zodat je altijd weet wat er is voor rekeningen, sparen en leven. Geen financiële opleiding nodig.",
-            "welcome_points": {
-                "jars": "Zes potjes met een taak",
-                "overview": "Eén rustig overzicht",
-                "coach": "Tips zonder schaamte"
-            },
             "income": "Jouw inkomen",
-            "income_body": "Dit is jouw persoonlijke inkomen — van jou als de persoon die dit account voor jezelf aanmaakt. Een schatting is genoeg. Daarna geef je de bankrekening een naam waar het binnenkomt.",
-            "jars": "De zes potjes",
-            "jars_body": "Zes potjes, elk met één taak. Geld komt meestal binnen op Noodzakelijk — je hoofdrekening voor huur en rekeningen. De andere potjes zijn waar de rest van de verdeling naartoe gaat, vaak als spaarpotjes bij dezelfde bank. Startverdeling 55 / 10 / 10 / 10 / 10 / 5; later aanpasbaar.",
-            "jars_tap_hint": "Tik op een potje om te zien wat het doet. Daarna geef je de rekening een naam waar geld landt — begin met één hoofdrekening; voeg later meer toe als dat nodig is.",
-            "jars_read_more": "Lees meer over de zes-potjesmethode",
-            "jars_spaarpotjes_help": "Wat zijn spaarpotjes?",
-            "why": "Jouw droom",
-            "why_body": "In één korte zin: waarom wil je Rumtelo gebruiken — of naar welke droom werk je toe? We tonen die zin bovenaan je Home, als kleine herinnering waarvoor je het doet.",
-            "why_tip": "Schrijf een droom of een reden — geen getal. Houd het simpel.",
-            "why_label": "Jouw droom of reden",
-            "why_hint": "Staat bovenaan je Home als herinnering.",
-            "why_placeholder": "bijv. Huis in de zon, zee & vers fruit",
-            "why_examples": {
-                "house": "Een huis in de zon",
-                "calm": "Meer rust rondom geld",
-                "free": "Vrijheid om mijn eigen pad te kiezen"
-            },
+            "income_lead": "Vul in wat je elke maand op je rekening krijgt. Daarna zie je het verdeeld over zes potjes.",
             "currency": "Valuta",
-            "currency_hint": "Bedragen en potjes gebruiken deze valuta voor dit huishouden.",
-            "net_income_label": "Jouw netto maandelijks inkomen ({symbol})",
-            "net_income_hint": "Wat er na belasting meestal op jouw rekening binnenkomt — bij benadering is genoeg. Daarmee vullen we je potjes, en we koppelen het aan de bankrekening die je hierna instelt.",
-            "household_name": "Naam huishouden",
-            "household_name_hint": "Een naam voor je gedeelde geldruimte — bijvoorbeeld je achternaam. Je kunt dit later altijd wijzigen.",
+            "net_income_label": "Netto maandinkomen",
+            "net_income_hint": "Na belasting — wat er op je rekening binnenkomt.",
+            "net_income_placeholder": "Bedrag per maand",
+            "income_echo": "Dat is {amount} per maand.",
+            "income_error_empty": "Vul je maandinkomen in. Nul mag ook.",
+            "income_error_nan": "Gebruik alleen cijfers, zoals je een bedrag opschrijft.",
+            "income_error_negative": "Inkomen kan niet onder nul zijn.",
+            "income_error_decimals": "Gebruik maximaal twee decimalen.",
+            "income_error_large": "Dat is meer dan Rumtelo per maand aankan. Controleer het bedrag.",
+            "split_title": "Hier gaat je {amount} naartoe.",
+            "split_lead": "Elk potje heeft één taak. Pas de percentages aan wanneer je wilt — de gewoonte telt meer dan de getallen.",
+            "split_list_aria": "Je verdeling",
+            "split_row_aria": "{jar}, {percent} procent, {amount}",
+            "split_jobs": {
+                "NECESSITIES": "huur, vaste kosten, boodschappen",
+                "FINANCIAL_FREEDOM": "geld dat voor je werkt — nooit uitgeven",
+                "EDUCATION": "lessen, boeken, een nieuwe vaardigheid",
+                "LONG_TERM_SAVINGS": "grote aankopen en een veiligheidsbuffer",
+                "PLAY": "plezier zonder schuldgevoel — geef het helemaal uit",
+                "GIVE": "cadeaus en goede doelen waar je om geeft"
+            },
+            "split_main_account": "Alle zes potjes staan voor nu op één hoofdrekening. Voeg je bank toe wanneer het jou uitkomt.",
+            "split_note": "Rumtelo verplaatst nooit geld. Spaarpotjes bij je bank? Zet het daar zelf over — wij laten de verdeling zien.",
+            "split_change_later": "Je past de percentages altijd aan via Geld › Potjes.",
+            "split_zero": "Nog geen inkomen? Je potjes wachten — ze verdelen het zodra het binnenkomt.",
+            "split_cta": "Klopt — open mijn overzicht",
+            "split_cta_pending": "Je overzicht wordt geopend…",
+            "split_error": "We kunnen de potjes niet laden — probeer het opnieuw.",
+            "onboard_error": "Je overzicht is nog niet aangemaakt. Probeer het opnieuw.",
+            "household_default_named": "Huishouden van {name}",
             "household_default": "Mijn huishouden",
-            "step_of": "Stap {current} van {total}",
-            "practice_escape": "Richt je Rumtelo in voor cliënten?",
-            "practice_escape_cta": "Start in plaats daarvan een praktijk",
+            "step_of": "{current} van {total}",
             "back": "Terug",
             "next": "Volgende",
-            "start": "Start",
-            "creating": "Aanmaken…",
-            "setup_failed": "Installatie is mislukt — probeer het opnieuw",
-            "dialog_label": "Welkom bij Rumtelo",
             "household_created": "Huishouden aangemaakt",
             "continue": "Doorgaan",
-            "finish": "Rumtelo openen",
-            "skip": "Voorlopig overslaan",
             "banks_setup": {
                 "accounts_title": "Geef je rekeningen een naam",
                 "accounts_body": "Geef de hoofdrekening een naam waar geld binnenkomt (Noodzakelijk). Heb je meer rekeningen? Voeg ze hier toe — daarna koppel je de potjes. Hernoemen kan later in Instellingen.",
                 "map_title": "Koppel potjes aan rekeningen",
                 "map_body": "Noodzakelijk blijft op je hoofdrekening. Zet de andere potjes op de juiste spaarrekening. Aanpassen kan altijd via Instellingen → Potjes.",
                 "map_body_one": "Je hebt één rekening — alle potjes staan er al op. Later kun je dit aanpassen via Instellingen → Potjes als je meer rekeningen toevoegt.",
+                "read_only_link": "Bankinstellingen openen",
                 "map_required": "Kies voor elk potje een rekening voordat je afrondt.",
                 "bank_label": "Bank",
                 "account_name_label": "Rekeningnaam",
@@ -6580,6 +6670,15 @@
                 "close_menu": "Menu sluiten",
                 "mobile_nav": "Mobiele navigatie"
             },
+            "plan_gains": {
+                "title": "Meer met {plan}",
+                "price": "{plan} · {price}/maand",
+                "close": "Sluiten",
+                "members": "Tot {count} mensen in je huishouden",
+                "goals": "Tot {count} doelen",
+                "goals_unlimited": "Zoveel doelen als je nodig hebt",
+                "bank_links": "{count, plural, one {# bankkoppeling} other {# bankkoppelingen}}"
+            },
             "gates": {
                 "maintenance_title": "Even offline",
                 "maintenance_body": "We voeren momenteel een korte update uit. Probeer het over een paar minuten nog eens.",
@@ -6589,16 +6688,28 @@
                 "maintenance_update_body": "We zijn bezig met het afronden van een korte update. Voorlopig kan alleen het Rumtelo-team inloggen.",
                 "locked_title": "Upgrade om dit te openen",
                 "locked_body": "Dit deel van Rumtelo ligt op een hoger niveau.",
-                "locked_plan_title": "Beschikbaar in het {plan}-abonnement",
                 "locked_plan_title_practice": "Deze klant heeft {plan} nodig",
                 "locked_plan_title_viewer": "Niet inbegrepen in het abonnement van dit huishouden",
                 "locked_plan_body_practice": "Dit is niet inbegrepen in hun gezinsabonnement. Als u hun account beheert, schakel dan over van de ‘Practice’-facturering.",
                 "locked_plan_body_viewer": "Je kijkt mee — alleen iemand die dit huishouden beheert kan dit openen met een hoger abonnement.",
-                "locked_plan_aria": "Upgrade van het plan vereist",
                 "locked_plan_aria_practice": "Upgrade van het klantabonnement vereist",
                 "locked_plan_aria_viewer": "Niet beschikbaar in het abonnement van dit huishouden",
                 "upgrade_cta": "Upgrade naar {plan}",
                 "upgrade_cta_practice": "Facturering van open trainingen",
+                "lock": {
+                    "badge": "Vergrendeld · in {plan}",
+                    "badge_sr": "Vergrendeld: zit in {plan}",
+                    "title": "{feature} zit in {plan} · {price}/maand",
+                    "feature_fallback": "Deze pagina",
+                    "body_tail": "Alles wat je invult blijft van jou, op elk abonnement.",
+                    "example": "Voorbeeld",
+                    "switch_cta": "Overstappen naar {plan}",
+                    "not_now": "Nu niet",
+                    "back": "Terug",
+                    "ask_owner": "Vraag {owner} om over te stappen naar {plan}.",
+                    "ask_owner_unknown": "Vraag de eigenaar van dit huishouden om over te stappen naar {plan}.",
+                    "region_aria": "Vergrendeld: {feature} zit in {plan}"
+                },
                 "back_to_practice": "Terug naar de klanten van Practice",
                 "back_to_dashboard": "Terug naar het dashboard",
                 "back_to_website": "Terug naar de website",

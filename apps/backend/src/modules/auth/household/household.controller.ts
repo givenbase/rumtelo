@@ -23,7 +23,7 @@ export class HouseholdController {
     // ? CREATE Operations
     // ====================================================================
 
-    /** Provision a new household and seed jars + settings. */
+    /** Provision a new household: jars, settings, income and one "Main account" in one call. */
     @Implement(contract.household.onboard)
     onboard() {
         return implement(contract.household.onboard).handler(({ input }) =>
@@ -43,6 +43,14 @@ export class HouseholdController {
     // ====================================================================
     // ? READ Operations
     // ====================================================================
+
+    /** Split preview for onboarding: signed-in only, no household, nothing written. */
+    @Implement(contract.household.previewSplit)
+    previewSplit() {
+        return implement(contract.household.previewSplit).handler(({ input }) =>
+            this.households.previewSplit(input)
+        );
+    }
 
     /** List all households the current user belongs to. */
     @Implement(contract.household.list)

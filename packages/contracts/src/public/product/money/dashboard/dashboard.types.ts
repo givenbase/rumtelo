@@ -5,6 +5,7 @@
 
 export type {
     Dashboard,
+    DashboardProgress,
     DashboardTravel,
     DashboardGoalAtPeriod,
     DashboardDebtsAtPeriod,

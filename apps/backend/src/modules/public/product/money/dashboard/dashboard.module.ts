@@ -9,6 +9,7 @@ import { JarModule } from '../plan/jar/jar.module';
 import { DebtModule } from '../targets/debt/debt.module';
 import { GoalModule } from '../targets/goal/goal.module';
 import { MonthScoreModule } from '../month-score/month-score.module';
+import { WeekCheckModule } from '../week-check/week-check.module';
 import { DashboardController } from './dashboard.controller';
 import { DashboardService } from './dashboard.service';
 import { MoneyCoachService } from './money-coach.service';
@@ -25,6 +26,7 @@ import { MoneyCoachService } from './money-coach.service';
         FixedCostModule,
         DebtModule,
         GoalModule,
+        WeekCheckModule,
     ],
     controllers: [DashboardController],
     providers: [DashboardService, MoneyCoachService],

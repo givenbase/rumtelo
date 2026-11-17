@@ -31,6 +31,7 @@ const capabilities = {
     'money-debt': {
         name: 'Debt',
         description: 'Debt plan with interest, payoff order, and freedom date.',
+        gain: 'See the date you’re debt-free and what one extra payment changes.',
     },
     'money-bank': {
         name: 'Bank',
@@ -39,6 +40,7 @@ const capabilities = {
     'money-import': {
         name: 'Import',
         description: 'Upload bank statements (CSV import).',
+        gain: 'Bring in a bank statement instead of typing every amount.',
     },
     'growth-overview': {
         name: 'Overview',
@@ -56,10 +58,12 @@ const capabilities = {
         name: 'Learn',
         description:
             'Skills to work, and books, courses, seminars, and events we recommend — not host. Plus and Max.',
+        gain: 'Pick one skill a quarter and keep track of what you learn.',
     },
     'growth-net-worth': {
         name: 'Net worth',
         description: 'Net worth, returns, and your freedom number.',
+        gain: 'See what you own minus what you owe, in one number, every month.',
     },
     'energy-overview': {
         name: 'Overview',
@@ -118,6 +122,7 @@ const capabilities = {
         name: 'Course',
         description:
             'Your 3 for this week, linked to the month and the goal they serve. Plus and Max.',
+        gain: 'Plan your week around the three things that move your goals.',
     },
 } as const;
 

@@ -11,9 +11,10 @@ import { cn } from '@rumtelo/utils';
 
 import { CREATE_HREF, type CreateKind } from '@/app/_lib/create-routes';
 import { apiQuery } from '@/app/_lib/api-hooks';
-import { NAV_GROUPS } from '@/app/_lib/nav';
+import { minPlanForCapability, planLabel } from '@/app/_lib/plan';
 import { isLiveData } from '@/app/_lib/preview';
 import { productPath } from '@/app/_lib/routes';
+import { useShellNav } from '@/app/_lib/use-shell-nav';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import {
@@ -77,6 +78,7 @@ export function QuickAddFab() {
     const { quickOpen, toggleQuick, setQuickOpen } = useHouseholdShell();
     const { isCapabilityLocked } = usePlanCapabilities();
     const { householdId } = useAuth();
+    const { nav } = useShellNav();
     const live = isLiveData(householdId);
     const [mode, setMode] = useState<PaletteMode>('ask');
     const [query, setQuery] = useState('');
@@ -104,15 +106,15 @@ export function QuickAddFab() {
     const navHits = useMemo(() => {
         if (mode !== 'ask' || !queryText) return [];
         const hits: { href: string; label: string }[] = [];
-        for (const group of NAV_GROUPS) {
-            for (const child of group.children) {
-                const label = t(child.labelKey);
-                const hay = `${label} ${child.href}`.toLowerCase();
-                if (hay.includes(queryText)) hits.push({ href: child.href, label });
-            }
+        // Same list the shell builds (tabs, Money sections, Course tabs, More rows), so a
+        // page the person cannot open, or that production hides, is never offered.
+        for (const item of nav.searchable) {
+            const label = t(item.labelKey);
+            const hay = `${label} ${item.href}`.toLowerCase();
+            if (hay.includes(queryText)) hits.push({ href: item.href, label });
         }
         return hits.slice(0, 8);
-    }, [mode, queryText, t]);
+    }, [mode, queryText, t, nav.searchable]);
 
     const coachHits = useMemo(() => {
         if (mode !== 'ask' || !queryText) return [];
@@ -252,6 +254,9 @@ export function QuickAddFab() {
                                 const locked = capabilityKey
                                     ? isCapabilityLocked(capabilityKey)
                                     : false;
+                                const requiredPlan = capabilityKey
+                                    ? minPlanForCapability(capabilityKey)
+                                    : null;
                                 return (
                                     <Link
                                         key={item.kind}
@@ -259,7 +264,7 @@ export function QuickAddFab() {
                                         onClick={() => setQuickOpen(false)}
                                         className={cn(
                                             'flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm transition-colors hover:bg-raised',
-                                            locked ? 'text-fg-muted opacity-55' : 'text-fg'
+                                            locked ? 'text-fg-muted' : 'text-fg'
                                         )}>
                                         <span
                                             className={cn(
@@ -272,13 +277,17 @@ export function QuickAddFab() {
                                         <span className="min-w-0 flex-1 truncate">
                                             {t(item.labelKey)}
                                         </span>
-                                        {locked ? (
-                                            <Icon
-                                                name="lock"
-                                                size="sm"
-                                                className="shrink-0 text-fg-faint"
-                                                aria-hidden
-                                            />
+                                        {locked && requiredPlan ? (
+                                            <span className="shrink-0 rounded-full border border-line px-2 py-0.5 font-mono text-[10px] font-semibold tracking-wide text-fg-muted uppercase">
+                                                <span aria-hidden>
+                                                    {planLabel(requiredPlan, t)}
+                                                </span>
+                                                <span className="sr-only">
+                                                    {t('pages.shell.gates.lock.badge_sr', {
+                                                        plan: planLabel(requiredPlan, t),
+                                                    })}
+                                                </span>
+                                            </span>
                                         ) : null}
                                     </Link>
                                 );

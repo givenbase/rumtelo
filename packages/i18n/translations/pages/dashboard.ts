@@ -100,7 +100,63 @@ const dashboard = {
         attention_blurb:
             'A Practice asked to view or manage this board. Accept only if you know them.',
     },
+    /** Home's one next move (product state, not a Coach tip). */
+    next_move: {
+        eyebrow: 'Next move',
+        close_month: {
+            title: "Close {month}: see your score and carry what's left.",
+            cta: 'Close month',
+        },
+        no_transactions: {
+            title: 'Your jars are filled. Now see where it goes.',
+            body: "Add this week's spending — by hand or import a bank statement. Next week, your first week check takes ten minutes.",
+            body_basic:
+                "Add this week's spending as it happens. Next week, your first week check takes ten minutes.",
+            cta: 'Add a transaction',
+            import: 'Import a statement',
+        },
+        zero_income: {
+            title: 'No income yet? Add it when it lands — your jars split it the same second.',
+            cta: 'Add income',
+        },
+        inbox: {
+            title: '{count, plural, one {# line in your Inbox — about {minutes, plural, one {# minute} other {# minutes}}.} other {# lines in your Inbox — about {minutes, plural, one {# minute} other {# minutes}}.}}',
+            cta: 'Sort the Inbox',
+        },
+        week_check: {
+            title: 'Inbox clear. Your week check is ready — ten minutes.',
+            cta: 'Start week check',
+        },
+        calm: {
+            title: 'Every euro has a job. Next week check: {weekday}.',
+            title_other_currency: 'Every amount has a job. Next week check: {weekday}.',
+            link: 'See your jars',
+        },
+        viewer: {
+            close_prior: '{month} is ready to close.',
+            no_transactions: 'No spending added yet.',
+            inbox: '{count, plural, one {# line waiting in the Inbox.} other {# lines waiting in the Inbox.}}',
+            week_check: "This week's check is still open.",
+            close_month: '{month} closes in {days, plural, one {# day} other {# days}}.',
+        },
+        travel_note: 'About today, not {period}.',
+        error: "Couldn't load your next move.",
+    },
+    /** Week-1 setup list on Home (links only, hide is OWNER only). */
+    checklist: {
+        eyebrow: 'Setting up · {done} of {total} done',
+        title: '{count, plural, one {One small thing, when it suits you.} other {# small things, when it suits you.}}',
+        hide: 'Hide',
+        hide_aria: 'Hide the setup list for everyone in this household',
+        done: 'Done',
+        items: {
+            bank: 'Add your bank to your main account',
+            dream: 'Write down your dream',
+            invite: 'Invite your partner',
+        },
+    },
     coach: {
+        all_tips: 'All tips ({count})',
         inbox_one: '{count} transaction waiting for a jar.',
         inbox_many: '{count} transactions waiting for a jar.',
         all_sorted: 'All sorted — time for intention.',

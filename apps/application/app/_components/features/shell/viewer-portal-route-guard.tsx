@@ -5,24 +5,21 @@ import { usePathname, useRouter } from 'next/navigation';
 
 import { HouseholdPermissionSection, HouseholdRole, roleCanSee } from '@rumtelo/contracts';
 
+import { normalizeAppPathname } from '@/app/_lib/path';
+import { routeAccessForPath } from '@/app/_lib/route-capabilities';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 
 function sectionFromPath(pathname: string): HouseholdPermissionSection {
-    const path = pathname.replace(/^\/(en|nl|es|fr)(?=\/|$)/, '') || '/';
-    if (path.includes('/product/growth')) return HouseholdPermissionSection.GROWTH;
-    if (path.includes('/product/energy')) return HouseholdPermissionSection.ENERGY;
-    if (path.includes('/product/soul')) return HouseholdPermissionSection.SOUL;
-    // Coach product only — Why stays under HOME (VIEWER may open it).
-    if (path.includes('/product/coach')) return HouseholdPermissionSection.COACH;
-    if (path.includes('/product/why')) return HouseholdPermissionSection.HOME;
-    if (path.includes('/product/money')) return HouseholdPermissionSection.MONEY;
-    if (path.includes('/settings')) return HouseholdPermissionSection.HOUSEHOLD_SETTINGS;
+    const routeSection = routeAccessForPath(pathname)?.section;
+    if (routeSection) return routeSection;
+    const path = normalizeAppPathname(pathname);
+    if (path.startsWith('/settings')) return HouseholdPermissionSection.HOUSEHOLD_SETTINGS;
     return HouseholdPermissionSection.HOME;
 }
 
 /**
- * VIEWER look-along — bounce off portals they cannot read (growth/energy/soul/coach).
- * Why (`/product/why`) stays allowed.
+ * VIEWER look-along — bounce off routes they cannot read (growth, income, energy, soul, coach).
+ * The section comes from the route table, not the nav. Why (`/product/why`) stays allowed.
  */
 export function ViewerPortalRouteGuard({ children }: { children: ReactNode }) {
     const router = useRouter();

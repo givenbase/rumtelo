@@ -11,12 +11,13 @@ import { useHouseholdShell } from '@/components/features/shell/household-shell-c
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
 import { courseHref } from '@/product/growth/course/_utils/course-route';
 
+import { CoursePreviewCard } from './course-preview-card';
 import { GoalsPageClient } from './goals-page';
 
 /**
  * `/growth/goals`: money goals live in Course › Goals now, so with Course open this
  * moves there (old links, the Growth hub and closed goal forms still land well). Basic has
- * no Course, so it keeps the standalone money-goals list.
+ * no Course, so it keeps the standalone money-goals list with a Course preview card on top.
  */
 export function GoalsEntry() {
     const t = useTranslations('ui.statusPage');
@@ -31,5 +32,10 @@ export function GoalsEntry() {
     }, [hasCourse, goalsHref, router]);
 
     if (!planReady || hasCourse) return <BrandLoader label={t('loading')} />;
-    return <GoalsPageClient />;
+    return (
+        <>
+            <CoursePreviewCard />
+            <GoalsPageClient />
+        </>
+    );
 }

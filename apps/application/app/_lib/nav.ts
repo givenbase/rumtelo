@@ -1,288 +1,376 @@
 /**
- * Navigation model — mirrors design `GROUPS` (Kluis Finance App.dc.html:2942).
+ * Navigation model: Home · Money · Growth · More.
  *
- * Product routes live under `/product/…` (visible slug).
- * Platform settings stay at `/settings/…`. Auth stays unprefixed.
+ * Labels, hrefs, ordering and active-state matching only. Plan and role GATING lives in
+ * `route-capabilities.ts` and never reads this file, so moving a page into or out of the
+ * nav cannot open or close a paid page.
  *
- * `capabilityKey`: always a catalog key from CAPABILITIES (`{product}-{feature}`).
- * Labels are i18n keys under `pages.nav.*` — resolve with `t(labelKey)` in the shell.
+ * Product routes live under `/product/…`; settings under `/settings/…`.
+ * Labels are i18n keys under `pages.nav.*`, resolved with `t(labelKey)` in the shell.
  */
-import { HouseholdPermissionSection, type HouseholdRole, roleCanSee } from '@rumtelo/contracts';
+import {
+    CAPABILITIES,
+    CourseHorizon,
+    coursePeriodOf,
+    HouseholdPermissionSection,
+    HouseholdRole,
+    PlanKey,
+    roleCanSee,
+} from '@rumtelo/contracts';
+import type { IconName } from '@rumtelo/ui';
 
 import { isProductEnabled } from './launch-products';
-import { CAPABILITIES } from './plan';
-import { productPath } from './routes';
+import { normalizeAppPathname, pathMatchesHref } from './path';
+import { practicePath, productPath } from './routes';
 
-const NAV_GROUP_SECTION: Record<string, HouseholdPermissionSection> = {
-    home: HouseholdPermissionSection.HOME,
-    money: HouseholdPermissionSection.MONEY,
-    growth: HouseholdPermissionSection.GROWTH,
-    energy: HouseholdPermissionSection.ENERGY,
-    soul: HouseholdPermissionSection.SOUL,
-};
+export { normalizeAppPathname };
 
-/** Full portal IA — filtered by launch surface for `NAV_GROUPS` / `BOTTOM_TABS`. */
-const ALL_NAV_GROUPS = [
-    {
-        key: 'home',
-        labelKey: 'pages.nav.groups.home',
-        icon: '◇',
-        href: '/',
-        children: [
-            {
-                href: '/',
-                labelKey: 'pages.nav.children.home_overview',
-                capabilityKey: CAPABILITIES.homeOverview,
-            },
-            {
-                href: productPath('coach'),
-                labelKey: 'pages.nav.children.coach',
-                capabilityKey: CAPABILITIES.homeCoach,
-            },
-            {
-                href: productPath('why'),
-                labelKey: 'pages.nav.children.why',
-                capabilityKey: CAPABILITIES.homeWhy,
-            },
-        ],
-    },
-    {
-        key: 'money',
-        labelKey: 'pages.nav.groups.money',
-        icon: '◈',
-        href: productPath('money'),
-        children: [
-            {
-                href: productPath('money'),
-                labelKey: 'pages.nav.children.money_overview',
-                capabilityKey: CAPABILITIES.moneyOverview,
-            },
-            {
-                href: productPath('money/fixed-costs'),
-                labelKey: 'pages.nav.children.fixed_costs',
-                capabilityKey: CAPABILITIES.moneyFixedCosts,
-            },
-            {
-                href: productPath('money/transactions'),
-                labelKey: 'pages.nav.children.transactions',
-                capabilityKey: CAPABILITIES.moneySpending,
-            },
-            {
-                href: productPath('money/debt'),
-                labelKey: 'pages.nav.children.debt',
-                capabilityKey: CAPABILITIES.moneyDebt,
-            },
-            {
-                href: productPath('money/net-worth'),
-                labelKey: 'pages.nav.children.net_worth',
-                capabilityKey: CAPABILITIES.growthNetWorth,
-            },
-        ],
-    },
-    {
-        key: 'growth',
-        labelKey: 'pages.nav.groups.growth',
-        icon: '↗',
-        href: productPath('growth'),
-        children: [
-            {
-                href: productPath('growth'),
-                labelKey: 'pages.nav.children.growth_overview',
-                capabilityKey: CAPABILITIES.growthOverview,
-            },
-            {
-                href: productPath('growth/course'),
-                labelKey: 'pages.nav.children.course',
-                capabilityKey: CAPABILITIES.growthCourse,
-            },
-            {
-                href: productPath('growth/income'),
-                labelKey: 'pages.nav.children.income',
-                capabilityKey: CAPABILITIES.growthIncome,
-            },
-            {
-                href: productPath('growth/goals'),
-                labelKey: 'pages.nav.children.goals',
-                capabilityKey: CAPABILITIES.growthGoals,
-            },
-            {
-                href: productPath('growth/learn'),
-                labelKey: 'pages.nav.children.learn',
-                capabilityKey: CAPABILITIES.growthLearn,
-            },
-        ],
-    },
-    {
-        key: 'energy',
-        labelKey: 'pages.nav.groups.energy',
-        // U+2733 + VS15 (text) — bare ✳ becomes the green ❇️ emoji on Apple fonts
-        icon: '✳\uFE0E',
-        href: productPath('energy'),
-        children: [
-            {
-                href: productPath('energy'),
-                labelKey: 'pages.nav.children.energy_overview',
-                capabilityKey: CAPABILITIES.energyOverview,
-            },
-            {
-                href: productPath('energy/sleep'),
-                labelKey: 'pages.nav.children.sleep',
-                capabilityKey: CAPABILITIES.energySleep,
-            },
-            {
-                href: productPath('energy/week'),
-                labelKey: 'pages.nav.children.week',
-                capabilityKey: CAPABILITIES.energyWeek,
-            },
-            {
-                href: productPath('energy/training'),
-                labelKey: 'pages.nav.children.training',
-                capabilityKey: CAPABILITIES.energyTraining,
-            },
-            {
-                href: productPath('energy/food'),
-                labelKey: 'pages.nav.children.food',
-                capabilityKey: CAPABILITIES.energyFood,
-            },
-        ],
-    },
-    {
-        key: 'soul',
-        labelKey: 'pages.nav.groups.soul',
-        icon: '✦',
-        href: productPath('soul'),
-        children: [
-            {
-                href: productPath('soul'),
-                labelKey: 'pages.nav.children.soul_overview',
-                capabilityKey: CAPABILITIES.soulOverview,
-            },
-            {
-                href: productPath('soul/stillness'),
-                labelKey: 'pages.nav.children.stillness',
-                capabilityKey: CAPABILITIES.soulStillness,
-            },
-            {
-                href: productPath('soul/gratitude'),
-                labelKey: 'pages.nav.children.gratitude',
-                capabilityKey: CAPABILITIES.soulGratitude,
-            },
-            {
-                href: productPath('soul/intent'),
-                labelKey: 'pages.nav.children.intent',
-                capabilityKey: CAPABILITIES.soulIntent,
-            },
-            {
-                href: productPath('soul/giving'),
-                labelKey: 'pages.nav.children.giving',
-                capabilityKey: CAPABILITIES.soulGiving,
-            },
-            {
-                href: productPath('soul/centers'),
-                labelKey: 'pages.nav.children.centers',
-                capabilityKey: CAPABILITIES.soulCenters,
-            },
-        ],
-    },
-] as const;
+/** Same as `pathMatchesHref`; kept under its original name for existing importers. */
+export const pathMatchesNavHref = pathMatchesHref;
 
-/** Compact labels for the desktop portal pill bar (design SHORT map). */
+export type NavTabKey = 'home' | 'money' | 'growth' | 'more';
+
+/** Compact labels for the desktop pill bar and bottom tabs. */
 export const TOP_PILL_LABEL_KEYS: Record<string, string> = {
     home: 'pages.nav.pills.home',
     money: 'pages.nav.pills.money',
     growth: 'pages.nav.pills.growth',
+    more: 'pages.nav.pills.more',
     energy: 'pages.nav.pills.energy',
     soul: 'pages.nav.pills.soul',
 };
 
-export type NavGroup = (typeof ALL_NAV_GROUPS)[number];
-export type NavChild = NavGroup['children'][number];
+export interface NavTab {
+    key: NavTabKey;
+    /** `null` for More, which opens a menu or sheet instead of navigating. */
+    href: string | null;
+    labelKey: string;
+    glyph: string;
+}
 
-/** Role-filtered nav — children may be a subset (VIEWER drops Coach / Why). */
-export type ShellNavGroup = {
-    key: NavGroup['key'];
-    labelKey: NavGroup['labelKey'];
-    icon: NavGroup['icon'];
-    href: NavGroup['href'];
-    children: readonly NavChild[];
+export type MoneySubnavKey = 'jars' | 'inbox' | 'fixed_costs' | 'income';
+
+export interface MoneySubnavItem {
+    key: MoneySubnavKey;
+    href: string;
+    labelKey: string;
+    /** `inbox` shows the count of items still to sort. */
+    badge?: 'inbox';
+}
+
+export type MoreRowKey =
+    | 'debt'
+    | 'net_worth'
+    | 'learn'
+    | 'coach'
+    | 'why'
+    | 'settings'
+    | 'energy'
+    | 'soul';
+
+export type MoreRow =
+    | {
+          kind: 'link';
+          key: MoreRowKey;
+          href: string;
+          labelKey: string;
+          icon: IconName;
+          /** `preview` marks staging-only portals. */
+          badgeKey?: 'preview';
+      }
+    | { kind: 'plan_gains'; plan: PlanKey.PLUS | PlanKey.MAX }
+    | { kind: 'help' }
+    | { kind: 'practice'; href: string }
+    | { kind: 'exit_preview'; href: string };
+
+export interface SearchableNavItem {
+    href: string;
+    labelKey: string;
+}
+
+/** Everything `buildNav` needs. Pure data, so the model is testable without React. */
+export interface NavContext {
+    /** Role used for section visibility. Fail-open OWNER while membership loads. */
+    role: HouseholdRole;
+    /** True once the real membership role is known (gates upgrade rows, fail closed). */
+    membershipKnown: boolean;
+    plan: PlanKey;
+    planReady: boolean;
+    /** Plan + launch check for a capability (`usePlanCapabilities().hasCapability`). */
+    has: (capabilityKey: string) => boolean;
+    preview: {
+        active: boolean;
+        showCoachNav: boolean;
+        showSettings: boolean;
+        showPageHelp: boolean;
+    };
+    /** True when the person is staff of at least one practice. */
+    isPracticeStaff: boolean;
+    /** Resolved Settings entry for this person and page (account tab for a VIEWER). */
+    settingsHref: string;
+    now?: Date;
+}
+
+export interface ShellNav {
+    tabs: NavTab[];
+    moneySubnav: MoneySubnavItem[];
+    moreRows: MoreRow[];
+    searchable: SearchableNavItem[];
+}
+
+const HOME_TAB: NavTab = {
+    key: 'home',
+    href: '/',
+    labelKey: TOP_PILL_LABEL_KEYS.home!,
+    glyph: '◇',
+};
+const MONEY_TAB: NavTab = {
+    key: 'money',
+    href: productPath('money'),
+    labelKey: TOP_PILL_LABEL_KEYS.money!,
+    glyph: '◈',
+};
+const MORE_TAB: NavTab = {
+    key: 'more',
+    href: null,
+    labelKey: TOP_PILL_LABEL_KEYS.more!,
+    glyph: '≡',
 };
 
-/** Launch-filtered portals — production hides Energy/Soul. */
-export const NAV_GROUPS: readonly NavGroup[] = ALL_NAV_GROUPS.filter(group =>
-    isProductEnabled(group.key)
-);
-
-/** Portals this household role may open (VIEWER = home + money only). */
-export function navGroupsForRole(role: HouseholdRole): ShellNavGroup[] {
-    const canSeeCoach = roleCanSee(role, HouseholdPermissionSection.COACH);
-    return NAV_GROUPS.filter(group => {
-        const section = NAV_GROUP_SECTION[group.key];
-        if (!section) return true;
-        return roleCanSee(role, section);
-    }).map(group => {
-        // VIEWER may open Why; Coach stays hidden.
-        if (group.key !== 'home' || canSeeCoach) return group;
-        return {
-            ...group,
-            children: group.children.filter(child => !child.href.includes('/coach')),
-        };
-    });
+/** Where the Growth tab lands: Course with Plus and Max, the 1-goal list on Basic. */
+export function growthTabHref(ctx: Pick<NavContext, 'has' | 'planReady'>): string {
+    if (!ctx.planReady) return productPath('growth');
+    return ctx.has(CAPABILITIES.growthCourse)
+        ? productPath('growth/course')
+        : productPath('growth/goals');
 }
 
-/** Bottom tabs — design `SHORT` map (same launch filter as nav). */
-export const BOTTOM_TABS = NAV_GROUPS.map(group => ({
-    href: group.href,
-    labelKey: TOP_PILL_LABEL_KEYS[group.key] ?? group.labelKey,
-    glyph: group.icon,
-}));
-
-/** True when `pathname` is exactly `href` or a nested route under it. */
-export function pathMatchesNavHref(pathname: string, href: string): boolean {
-    const path = normalizeAppPathname(pathname);
-    if (href === '/') return path === '/';
-    return path === href || path.startsWith(`${href}/`);
+function buildMoneySubnav(ctx: NavContext): MoneySubnavItem[] {
+    const items: MoneySubnavItem[] = [
+        { key: 'jars', href: productPath('money'), labelKey: 'pages.nav.children.jars' },
+        {
+            key: 'inbox',
+            href: productPath('money/transactions'),
+            labelKey: 'pages.nav.children.inbox',
+            badge: 'inbox',
+        },
+        {
+            key: 'fixed_costs',
+            href: productPath('money/fixed-costs'),
+            labelKey: 'pages.nav.children.fixed_costs',
+        },
+    ];
+    // Income keeps its Growth role section, so a VIEWER (Growth = none) does not see it.
+    if (roleCanSee(ctx.role, HouseholdPermissionSection.GROWTH)) {
+        items.push({
+            key: 'income',
+            href: productPath('money/income'),
+            labelKey: 'pages.nav.children.income',
+        });
+    }
+    return items;
 }
 
-/**
- * Strip locale prefix / trailing slash so gating matches nav hrefs.
- * Defensive: next/navigation can occasionally disagree with next-intl.
- */
-export function normalizeAppPathname(pathname: string): string {
-    let path = pathname.split(/[?#]/)[0] || '/';
-    path = path.replace(/^\/(en|nl)(?=\/|$)/, '') || '/';
-    if (path.length > 1 && path.endsWith('/')) path = path.slice(0, -1);
-    return path || '/';
+function buildMoreRows(ctx: NavContext): MoreRow[] {
+    const { role, preview } = ctx;
+    // Plan rows appear once the plan is known; never flash Debt or Net worth while loading.
+    const has = (capabilityKey: string) => ctx.planReady && ctx.has(capabilityKey);
+    const rows: MoreRow[] = [];
+    const sees = (section: HouseholdPermissionSection) => roleCanSee(role, section);
+    const writer = ctx.membershipKnown && role !== HouseholdRole.VIEWER && !preview.active;
+
+    if (preview.active) rows.push({ kind: 'exit_preview', href: practicePath('clients') });
+
+    if (has(CAPABILITIES.moneyDebt) && sees(HouseholdPermissionSection.MONEY)) {
+        rows.push({
+            kind: 'link',
+            key: 'debt',
+            href: productPath('money/debt'),
+            labelKey: 'pages.nav.children.debt',
+            icon: 'credit-card',
+        });
+    }
+    if (has(CAPABILITIES.growthNetWorth) && sees(HouseholdPermissionSection.MONEY)) {
+        rows.push({
+            kind: 'link',
+            key: 'net_worth',
+            href: productPath('money/net-worth'),
+            labelKey: 'pages.nav.children.net_worth',
+            icon: 'landmark',
+        });
+    }
+    if (has(CAPABILITIES.growthLearn) && sees(HouseholdPermissionSection.GROWTH)) {
+        rows.push({
+            kind: 'link',
+            key: 'learn',
+            href: productPath('growth/learn'),
+            labelKey: 'pages.nav.children.learn',
+            icon: 'book-open',
+        });
+    }
+
+    // One row for what the plan does not include, never a faded row per locked page.
+    if (ctx.planReady && writer) {
+        if (ctx.plan === PlanKey.BASIC) rows.push({ kind: 'plan_gains', plan: PlanKey.PLUS });
+        if (ctx.plan === PlanKey.PLUS) rows.push({ kind: 'plan_gains', plan: PlanKey.MAX });
+    }
+
+    if (sees(HouseholdPermissionSection.COACH) && preview.showCoachNav) {
+        rows.push({
+            kind: 'link',
+            key: 'coach',
+            href: productPath('coach'),
+            labelKey: 'pages.nav.children.coach',
+            icon: 'sparkles',
+        });
+    }
+    if (!preview.active || preview.showCoachNav) {
+        rows.push({
+            kind: 'link',
+            key: 'why',
+            href: productPath('why'),
+            labelKey: 'pages.nav.children.why',
+            icon: 'compass',
+        });
+    }
+    if (preview.showSettings) {
+        rows.push({
+            kind: 'link',
+            key: 'settings',
+            href: ctx.settingsHref,
+            labelKey: 'pages.nav.more.settings',
+            icon: 'settings',
+        });
+    }
+    if (preview.showPageHelp && sees(HouseholdPermissionSection.COACH)) {
+        rows.push({ kind: 'help' });
+    }
+    if (ctx.isPracticeStaff && !preview.active) {
+        rows.push({ kind: 'practice', href: practicePath() });
+    }
+
+    // Staging only: production never lists Energy or Soul (launch surface is Money + Growth).
+    if (isProductEnabled('energy') && sees(HouseholdPermissionSection.ENERGY)) {
+        rows.push({
+            kind: 'link',
+            key: 'energy',
+            href: productPath('energy'),
+            labelKey: 'pages.nav.pills.energy',
+            icon: 'zap',
+            badgeKey: 'preview',
+        });
+    }
+    if (isProductEnabled('soul') && sees(HouseholdPermissionSection.SOUL)) {
+        rows.push({
+            kind: 'link',
+            key: 'soul',
+            href: productPath('soul'),
+            labelKey: 'pages.nav.pills.soul',
+            icon: 'sparkle',
+            badgeKey: 'preview',
+        });
+    }
+
+    return rows;
 }
 
-/**
- * Longest-prefix nav child for the current path.
- * Critical for plan gating: `/product/growth/income` → `growth-income`,
- * not the shorter Overview hub (`growth-overview`).
- */
-export function resolveNavChildForPath(pathname: string): NavChild | null {
-    const path = normalizeAppPathname(pathname);
-    const matches: NavChild[] = [];
-    for (const group of NAV_GROUPS) {
-        for (const child of group.children) {
-            if (pathMatchesNavHref(path, child.href)) matches.push(child);
+function buildSearchable(
+    ctx: NavContext,
+    tabs: NavTab[],
+    moneySubnav: MoneySubnavItem[],
+    moreRows: MoreRow[]
+): SearchableNavItem[] {
+    const items: SearchableNavItem[] = [];
+    const seen = new Set<string>();
+    const add = (href: string, labelKey: string) => {
+        if (seen.has(href)) return;
+        seen.add(href);
+        items.push({ href, labelKey });
+    };
+
+    add('/', 'pages.nav.pills.home');
+    for (const item of moneySubnav) add(item.href, item.labelKey);
+    if (tabs.some(tab => tab.key === 'growth')) {
+        if (ctx.planReady && ctx.has(CAPABILITIES.growthCourse)) {
+            const now = ctx.now ?? new Date();
+            add(productPath('growth/course'), 'pages.nav.search.course_today');
+            add(
+                productPath('growth/course', coursePeriodOf(CourseHorizon.WEEK, now)),
+                'pages.nav.search.course_week'
+            );
+            add(
+                productPath('growth/course', coursePeriodOf(CourseHorizon.MONTH, now)),
+                'pages.nav.search.course_goals'
+            );
+        } else if (ctx.planReady && ctx.has(CAPABILITIES.growthGoals)) {
+            add(productPath('growth/goals'), 'pages.nav.children.goals');
         }
     }
-    if (matches.length === 0) return null;
-    return matches.reduce((best, child) => (child.href.length > best.href.length ? child : best));
+    for (const row of moreRows) {
+        if (row.kind === 'link') add(row.href, row.labelKey);
+    }
+    return items;
 }
 
-export function resolveNavGroupForPath(pathname: string): NavGroup | null {
-    const child = resolveNavChildForPath(pathname);
-    if (child) {
-        return (
-            NAV_GROUPS.find(group =>
-                group.children.some(navChild => navChild.href === child.href)
-            ) ?? null
-        );
+/** The whole shell nav for one render, already filtered by role, plan, preview and launch. */
+export function buildNav(ctx: NavContext): ShellNav {
+    const tabs: NavTab[] = [HOME_TAB, MONEY_TAB];
+    if (isProductEnabled('growth') && roleCanSee(ctx.role, HouseholdPermissionSection.GROWTH)) {
+        tabs.push({
+            key: 'growth',
+            href: growthTabHref(ctx),
+            labelKey: TOP_PILL_LABEL_KEYS.growth!,
+            glyph: '↗',
+        });
     }
-    return (
-        NAV_GROUPS.find(group =>
-            group.children.some(navChild => pathMatchesNavHref(pathname, navChild.href))
-        ) ?? null
-    );
+    tabs.push(MORE_TAB);
+
+    const moneySubnav = buildMoneySubnav(ctx);
+    const moreRows = buildMoreRows(ctx);
+    return {
+        tabs,
+        moneySubnav,
+        moreRows,
+        searchable: buildSearchable(ctx, tabs, moneySubnav, moreRows),
+    };
+}
+
+const MORE_PATHS: ReadonlyArray<{ prefix: string; key: MoreRowKey }> = [
+    { prefix: productPath('money/debt'), key: 'debt' },
+    { prefix: productPath('money/net-worth'), key: 'net_worth' },
+    { prefix: productPath('growth/net-worth'), key: 'net_worth' },
+    { prefix: productPath('growth/learn'), key: 'learn' },
+    { prefix: productPath('coach'), key: 'coach' },
+    { prefix: productPath('why'), key: 'why' },
+    { prefix: '/settings', key: 'settings' },
+    { prefix: productPath('energy'), key: 'energy' },
+    { prefix: productPath('soul'), key: 'soul' },
+];
+
+/** The More row that owns this path, if any. */
+export function activeMoreRowKey(pathname: string): MoreRowKey | null {
+    const path = normalizeAppPathname(pathname);
+    return MORE_PATHS.find(entry => pathMatchesHref(path, entry.prefix))?.key ?? null;
+}
+
+/**
+ * Which top tab is active. A page that lives in More (Debt, Net worth, Learn, Coach, Why,
+ * Settings) highlights More: the place the user came from.
+ */
+export function activeTabForPath(pathname: string): NavTabKey | null {
+    const path = normalizeAppPathname(pathname);
+    if (path === '/') return 'home';
+    if (activeMoreRowKey(path)) return 'more';
+    if (pathMatchesHref(path, productPath('money'))) return 'money';
+    if (pathMatchesHref(path, productPath('growth'))) return 'growth';
+    return null;
+}
+
+/** Which Money sub-item is active (Jars is the default for the Money root and week check). */
+export function activeMoneySubnavKey(pathname: string): MoneySubnavKey {
+    const path = normalizeAppPathname(pathname);
+    if (pathMatchesHref(path, productPath('money/transactions'))) return 'inbox';
+    if (pathMatchesHref(path, productPath('money/fixed-costs'))) return 'fixed_costs';
+    if (pathMatchesHref(path, productPath('money/income'))) return 'income';
+    return 'jars';
 }

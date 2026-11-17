@@ -134,7 +134,8 @@ export class TransactionService {
             format: resolvedFormat,
             csvDialect,
         } = parseStatement(content, format, fileName);
-        const accountMismatch = csvDialectMismatchesBank(csvDialect, account.bank.key);
+        // A bankless account (onboarding "Main account") has nothing to compare against yet.
+        const accountMismatch = csvDialectMismatchesBank(csvDialect, account.bank?.key);
         if (accountMismatch && !dryRun) {
             throw apiBadRequest('statement_bank_mismatch');
         }
@@ -347,6 +348,12 @@ export class TransactionService {
 
     async countInbox() {
         return this.transactions.count({ status: TransactionStatus.INBOX });
+    }
+
+    /** Whether this household has any transaction at all. One row at most is read. */
+    async hasAny(): Promise<boolean> {
+        const rows = await this.transactions.find({}, { limit: 1 });
+        return rows.length > 0;
     }
 
     // ====================================================================

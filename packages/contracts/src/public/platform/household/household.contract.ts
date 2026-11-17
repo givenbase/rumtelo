@@ -16,12 +16,19 @@ import {
     HouseholdSettings,
     HouseholdSettingsPatch,
     OnboardingInput,
+    OnboardingSplitPreview,
+    OnboardingSplitPreviewInput,
 } from './household.schema';
 
 // ====================================================================
 // ? CREATE Operations
 // ====================================================================
 
+/**
+ * Provision a household in one call: organization, six jars, settings, the
+ * creator's account settings, income (when > 0) and one "Main account" with
+ * every jar placed on it.
+ */
 export const householdOnboard = oc.input(OnboardingInput).output(Household);
 
 export const householdInvite = oc
@@ -39,6 +46,14 @@ export const householdInvite = oc
 // ====================================================================
 // ? READ Operations
 // ====================================================================
+
+/**
+ * Split preview for onboarding: income into six jars in minor units. Needs a
+ * signed-in session but no household; nothing is written.
+ */
+export const householdPreviewSplit = oc
+    .input(OnboardingSplitPreviewInput)
+    .output(OnboardingSplitPreview);
 
 export const householdList = oc.output(z.array(Household));
 
@@ -104,6 +119,7 @@ export const householdContract = {
     settings: householdSettings,
     updateSettings: householdUpdateSettings,
     onboard: householdOnboard,
+    previewSplit: householdPreviewSplit,
     invite: householdInvite,
     removeMember: householdRemoveMember,
     practiceLinks: householdPracticeLinksContract,

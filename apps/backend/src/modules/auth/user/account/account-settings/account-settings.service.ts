@@ -5,7 +5,6 @@ import {
     type AccountSettings as AccountSettingsDto,
     type AccountTourProgress,
     DEFAULT_ACCOUNT_TOUR_PROGRESS,
-    HouseholdAnswerKey,
     Locale,
     SpendingStyle,
     Theme,
@@ -18,7 +17,6 @@ import { currentUserId, householdStorage } from '../../../../../common/household
 import { PracticeMember } from '../../../../public/platform/practice/practice-member/practice-member.entity';
 import { AuthInvitation } from '../../../household/managed/invitation/auth-invitation.entity';
 import { AuthMember } from '../../../household/managed/member/auth-member.entity';
-import { HouseholdSettings } from '../../../household/household-settings/household-settings.entity';
 import { AuthUser } from '../../../user/managed/user/auth-user.entity';
 import { Account } from '../account.entity';
 import { AccountSettings } from './account-settings.entity';
@@ -136,7 +134,8 @@ export class AccountSettingsService {
      * Invitees (VIEWER / MEMBER) must never run creator onboarding.
      * Personal `onboardedAt` is a pass for them once they have a household seat.
      * Pending email invites route to `/invite/{id}` — never the income/jars questionnaire.
-     * Incomplete jar-bank setup only blocks the OWNER.
+     * Bank and jar placement no longer block anyone: onboarding creates a Main account with every
+     * jar on it, and the bank is named later in Settings.
      */
     async boardReady(): Promise<{
         ready: boolean;
@@ -188,12 +187,6 @@ export class AccountSettingsService {
             return { ready: true, home: '/', invitePath: null };
         }
 
-        const board = await this.em.findOne(HouseholdSettings, { household: householdId });
-        if (board?.answers?.[HouseholdAnswerKey.JAR_BANK_SETUP_DONE] === false) {
-            // Only the founding OWNER finishes bank ↔ jar setup for the board.
-            const role = ctx?.role ?? null;
-            if (role === 'OWNER') return { ready: false, home: '/', invitePath: null };
-        }
         return { ready: true, home: '/', invitePath: null };
     }
 

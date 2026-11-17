@@ -25,7 +25,7 @@ export function HeroCard({
     incomeBreakdown,
     stats,
     children,
-    incomeHref = '/product/growth/income',
+    incomeHref = '/product/money/income',
     jarsHref = '/product/money',
     eyebrow,
 }: {

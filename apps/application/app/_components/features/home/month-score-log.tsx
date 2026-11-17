@@ -51,6 +51,8 @@ export function MonthScoreLog({
     compact = false,
     /** Inside CoachVerdict — no outer card chrome / duplicate eyebrow. */
     embedded = false,
+    /** Level names show only once a month has been closed (Home, week 1). */
+    showLevel = true,
 }: {
     score: number;
     /** Signed: positive left · 0 last day · negative overdue. */
@@ -70,6 +72,7 @@ export function MonthScoreLog({
     formatMoney?: (cents: number) => string;
     compact?: boolean;
     embedded?: boolean;
+    showLevel?: boolean;
 }) {
     const t = useTranslations('pages.dashboard.month_score');
     const tDashboard = useTranslations('pages.dashboard');
@@ -172,9 +175,11 @@ export function MonthScoreLog({
                         <span className="font-display text-2xl font-semibold tracking-tight text-accent">
                             {score}
                         </span>
-                        <span className="font-mono text-xs font-medium tracking-wide text-fg-muted uppercase">
-                            {levelLabel}
-                        </span>
+                        {showLevel ? (
+                            <span className="font-mono text-xs font-medium tracking-wide text-fg-muted uppercase">
+                                {levelLabel}
+                            </span>
+                        ) : null}
                         {isClosed ? (
                             <span className="rounded-full bg-success/15 px-2.5 py-0.5 font-mono text-[10px] font-bold tracking-[0.12em] text-success uppercase">
                                 {t('closed_badge')}

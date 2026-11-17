@@ -1,19 +1,12 @@
-import { Suspense } from 'react';
+import { permanentRedirect } from 'next/navigation';
 
-import { getTranslations } from '@rumtelo/i18n';
+import { productPath } from '@/app/_lib/routes';
 
-import { WeekCheckPage } from '../_components/week-check-page';
-
-export async function generateMetadata() {
-    const t = await getTranslations('pages.meta');
-    return { title: t('course_week_check') };
-}
-
-/** COURSE › WEEK CHECK — look back, routines, the next 3. On Sunday it plans next week. */
+/**
+ * The Course week check is part of the one week check now (Money stages, then Course).
+ * Old links and calendar events land on the Money week check, opened at the Course stages.
+ * The locale is a cookie, not a path prefix (`localePrefix: 'never'`), so it is kept as is.
+ */
 export default function Page() {
-    return (
-        <Suspense>
-            <WeekCheckPage />
-        </Suspense>
-    );
+    permanentRedirect(`${productPath('money/week-check')}?from=course`);
 }

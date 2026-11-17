@@ -41,7 +41,6 @@ import { HouseholdSettingsService } from '../../../../auth/household/household-s
 import { TimeTemplateService } from '../../energy/time-template/time-template.service';
 import { MonthScoreService } from '../../money/month-score/month-score.service';
 import { WeekCheckService as MoneyWeekCheckService } from '../../money/week-check/week-check.service';
-import { GrowthWeekCheckService } from '../week-check/week-check.service';
 import { CourseService } from './course.service';
 import { GrowthCourseFeed } from './growth-course-feed.entity';
 import { GrowthCourseRitualSnooze } from './growth-course-ritual-snooze.entity';
@@ -73,7 +72,6 @@ export class CourseScheduleService {
         @Inject(HouseholdSettingsService) private readonly settings: HouseholdSettingsService,
         @Inject(CourseService) private readonly course: CourseService,
         @Inject(RhythmService) private readonly rhythms: RhythmService,
-        @Inject(GrowthWeekCheckService) private readonly growthWeekChecks: GrowthWeekCheckService,
         @Inject(MoneyWeekCheckService) private readonly moneyWeekChecks: MoneyWeekCheckService,
         @Inject(MonthScoreService) private readonly monthScores: MonthScoreService,
         @Inject(TimeTemplateService) private readonly timeTemplates: TimeTemplateService
@@ -97,7 +95,6 @@ export class CourseScheduleService {
         const lanes = await Promise.all([
             this.focusEntries(from, to, settings.features.isCourseDaysEnabled, viewerAccountId),
             this.rhythmEntries(from, to, viewerAccountId),
-            this.growthWeekCheckEntries(from, to),
             can(CAPABILITIES.moneyOverview) ? this.moneyWeekCheckEntries(from, to) : [],
             can(CAPABILITIES.moneyOverview)
                 ? this.monthCloseEntries(from, to, today, settings.createdAt, viewerAccountId)
@@ -242,29 +239,11 @@ export class CourseScheduleService {
         return entries;
     }
 
-    /** Every Sunday: the check that plans the week after it. */
-    private async growthWeekCheckEntries(from: string, to: string): Promise<CourseScheduleEntry[]> {
-        const sundays = datesBetween(from, to).filter(date => isoWeekdayOf(date) === 7);
-        const weeks = sundays.map(weekCheckWeekFor);
-        const done = await this.growthWeekChecks.completedWeeks(weeks);
-        return sundays.map((sunday, index) => {
-            const week = weeks[index]!;
-            return {
-                ...blankEntry(),
-                key: `growth-week-check:${week}`,
-                lane: CourseLane.CHECK,
-                kind: CourseScheduleKind.GROWTH_WEEK_CHECK,
-                area: CourseArea.GROWTH,
-                date: sunday,
-                endDate: sunday,
-                isDone: done.has(week),
-                period: week,
-                href: `${COURSE_PATH}/week-check`,
-            };
-        });
-    }
-
-    /** Every Sunday: the money check of the week that ends that day. */
+    /**
+     * Every Sunday: the one week check (Money stages first, then Course on Plus and Max),
+     * keyed on the week that ends that day. It is done when the Money check is DONE; the
+     * old separate Course entry is no longer emitted.
+     */
     private async moneyWeekCheckEntries(from: string, to: string): Promise<CourseScheduleEntry[]> {
         const sundays = datesBetween(from, to).filter(date => isoWeekdayOf(date) === 7);
         const weeks = sundays.map(weekOf);

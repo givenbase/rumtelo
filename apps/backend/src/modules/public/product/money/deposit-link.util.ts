@@ -67,7 +67,8 @@ async function assertBankExists(em: EntityManager, bankId: string): Promise<void
     if (!bank) throw apiNotFound('bank_not_found');
 }
 
-function bankIdOf(account: BankAccount): string {
+function bankIdOf(account: BankAccount): string | null {
     const bank = account.bank;
+    if (!bank) return null;
     return typeof bank === 'string' ? bank : bank.id;
 }

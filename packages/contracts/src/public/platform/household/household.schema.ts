@@ -7,10 +7,10 @@
 import { z } from 'zod';
 
 import { Currency, Locale } from '../../../common/common.enums';
-import { HouseholdId, Id, MemberId, UserId } from '../../../common/common.schema';
+import { HouseholdId, Id, Money, MemberId, UserId } from '../../../common/common.schema';
 import { PlanKey } from '../../../enums';
 import { HouseholdRelation, HouseholdRole, IncomeStability, SpendingStyle } from '../enums';
-import { PayoffStrategy } from '../../product/money/enums';
+import { JarKey, PayoffStrategy } from '../../product/money/enums';
 import { HouseholdVisibilitySettings } from './visibility';
 
 export {
@@ -29,6 +29,8 @@ export const HouseholdAnswerKey = {
     JAR_EXPERIENCE: 'jar_experience',
     /** True when the post-onboard bank + jar placement wizard finished or was skipped. */
     JAR_BANK_SETUP_DONE: 'jar_bank_setup_done',
+    /** True once an OWNER hid the week-1 checklist on Home (hidden for every member). */
+    WEEK1_CHECKLIST_DISMISSED: 'week1_checklist_dismissed',
 } as const;
 
 export type HouseholdAnswerKey = (typeof HouseholdAnswerKey)[keyof typeof HouseholdAnswerKey];
@@ -162,9 +164,20 @@ export const HouseholdSettingsPatch = z.object({
     audienceKeys: z.array(z.string()).optional(),
 });
 
-/** Onboarding writes income + split + prefs in one transaction. */
+/** One jar's share in a custom split (percent, at most 2 decimals). */
+export const JarSplitShare = z.object({
+    key: z.enum(JarKey),
+    /** Percent with at most 2 decimals (e.g. 55, 12.5). */
+    percentage: z.number().min(0).max(100).multipleOf(0.01),
+});
+
+/**
+ * Onboarding writes household + income + six jars + prefs + one "Main account"
+ * (no bank, no IBAN, every jar placed on it) in one transaction.
+ */
 export const OnboardingInput = z.object({
-    householdName: z.string().min(1).max(120),
+    /** Optional: blank / omitted falls back to a localized "My household" on the server. */
+    householdName: z.string().max(120).optional(),
     currency: z.enum(Currency).default(Currency.EUR),
     /** Creator's language — stored on their AccountSettings, not the board. */
     locale: z.enum(Locale).default(Locale.NL),
@@ -174,9 +187,33 @@ export const OnboardingInput = z.object({
     incomeStability: z.enum(IncomeStability).default(IncomeStability.STABLE),
     /** Board debt payoff default (optional at onboard). */
     payoffStrategy: z.enum(PayoffStrategy).default(PayoffStrategy.AVALANCHE),
-    monthlyNetIncome: z.int().min(0),
-    split: z.array(z.object({ key: z.string(), percentage: z.number().min(0).max(100) })),
+    /** Net monthly income in integer minor units; 0 = no income yet (no income source is made). */
+    monthlyNetIncome: z.int().min(0).max(100_000_000),
+    /**
+     * Optional custom split: every JarKey exactly once, total exactly 100.00.
+     * Omitted = the jar template defaults, the same split `previewSplit` shows.
+     */
+    split: z.array(JarSplitShare).length(6).optional(),
     why: z.string().max(500).nullable().default(null),
+});
+
+/** Input for the onboarding split preview — nothing is written, no household needed. */
+export const OnboardingSplitPreviewInput = z.object({
+    currency: z.enum(Currency),
+    /** Net monthly income in integer minor units. 0 is allowed (no income yet). */
+    monthlyNetIncome: z.int().min(0).max(100_000_000),
+    /** Optional custom split: every JarKey exactly once, total exactly 100. Omitted = jar template defaults. */
+    split: z.array(JarSplitShare).length(6).optional(),
+});
+
+/** Income split into the six jars, in jar template `sortOrder`. */
+export const OnboardingSplitPreview = z.object({
+    currency: z.enum(Currency),
+    monthlyNetIncome: Money,
+    /** The sum of `amount` always equals `monthlyNetIncome`. */
+    jars: z
+        .array(z.object({ key: z.enum(JarKey), percentage: z.number(), amount: Money }))
+        .length(6),
 });
 
 // Inferred types (same-module merge for consumers)
@@ -188,4 +225,7 @@ export type HouseholdFeatureSettings = z.infer<typeof HouseholdFeatureSettings>;
 export type HouseholdAnswers = z.infer<typeof HouseholdAnswers>;
 export type HouseholdSettings = z.infer<typeof HouseholdSettings>;
 export type HouseholdSettingsPatch = z.infer<typeof HouseholdSettingsPatch>;
+export type JarSplitShare = z.infer<typeof JarSplitShare>;
 export type OnboardingInput = z.infer<typeof OnboardingInput>;
+export type OnboardingSplitPreviewInput = z.infer<typeof OnboardingSplitPreviewInput>;
+export type OnboardingSplitPreview = z.infer<typeof OnboardingSplitPreview>;

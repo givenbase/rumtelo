@@ -55,7 +55,8 @@ export class GrowthWeekCheckService {
             } as never);
             await this.em.persist(weekCheck).flush();
         }
-        weekCheck.completedAt = new Date();
+        // Idempotent: completing twice keeps the first completion time.
+        if (!weekCheck.completedAt) weekCheck.completedAt = new Date();
         await this.em.flush();
         return this.toDto(weekCheck);
     }

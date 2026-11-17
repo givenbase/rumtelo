@@ -45,6 +45,21 @@ export const DashboardBaselineJar = z.object({
     allocated: Money,
 });
 
+/**
+ * Plain data facts for Home's first-run layout, always "as of now" (never the selected
+ * period). Not an unlock system: nothing is stored, each fact is an existence check.
+ */
+export const DashboardProgress = z.object({
+    /** Any transaction on the board, all time. */
+    hasTransactions: z.boolean(),
+    /** Any money week check with a completion time, all time. */
+    hasCompletedWeekCheck: z.boolean(),
+    /** The money check for the current ISO week is done. */
+    weekCheckDoneThisWeek: z.boolean(),
+    /** Any month score closed, all time. */
+    hasClosedMonth: z.boolean(),
+});
+
 /** One aggregated read for the dashboard — avoids a waterfall of round trips. */
 export const Dashboard = z.object({
     period: PeriodKey,
@@ -69,6 +84,8 @@ export const Dashboard = z.object({
     coach: z.array(CoachMessage),
     monthScore: MonthScore,
     why: z.string().nullable(),
+    /** First-run facts for Home — independent of period travel. */
+    progress: DashboardProgress,
     /** Period-travel chrome — snapshot when viewing the live month. */
     travel: DashboardTravel,
     /** Open goals projected to the selected period (fulfillment / shortfalls). */
@@ -88,6 +105,7 @@ export const Dashboard = z.object({
 
 // Inferred types (same-module merge for consumers)
 export type Dashboard = z.infer<typeof Dashboard>;
+export type DashboardProgress = z.infer<typeof DashboardProgress>;
 export type DashboardTravel = z.infer<typeof DashboardTravel>;
 export type DashboardGoalAtPeriod = z.infer<typeof DashboardGoalAtPeriod>;
 export type DashboardDebtsAtPeriod = z.infer<typeof DashboardDebtsAtPeriod>;

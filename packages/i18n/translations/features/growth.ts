@@ -1052,14 +1052,8 @@ const growth = {
                 parent_hint: 'A year goal or a month step. A discipline fills its counter.',
             },
         },
+        /** Course stages of the week check (the stepper lives under features.money.week_check). */
         week_check: {
-            title: 'Week check',
-            lead: 'Ten minutes: look back, keep your routines, set the 3 for {week}.',
-            steps_aria: 'Steps of the week check',
-            step_back: 'Look back',
-            step_rhythm: 'Routines',
-            step_ahead: 'Your 3',
-            step_done: 'Done',
             back_title: 'How did {week} go?',
             back_lead: 'Mark each one. Not done is a fact: move it on or let it go.',
             back_empty: 'Nothing was set last week. That is fine. Start with the 3 ahead.',
@@ -1069,15 +1063,6 @@ const growth = {
             rhythm_open: 'Open the week',
             ahead_title: 'Your 3 for {week}',
             ahead_lead: 'What matters most? Link one to a goal if you like.',
-            next: 'Next',
-            back: 'Back',
-            finish: 'Finish the week check',
-            done_toast: 'Week check done',
-            done_title: 'Done. See you next Sunday.',
-            done_lead: 'Your 3 for {week} are set. Today shows what is on each day.',
-            open_today: 'Open Today',
-            open_week: 'Open the week',
-            already_done: 'This week check is done. You can still change things.',
         },
         /** Check and advice rows on Today and Week. */
         entry: {

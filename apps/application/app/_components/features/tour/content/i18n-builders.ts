@@ -159,7 +159,7 @@ export function buildFullTourChapters(t: TranslateFn): FullTourChapter[] {
         { id: 'home', href: '/', steps: buildHomeTourSteps(t) },
         { id: 'jars', href: productPath('money'), steps: buildJarsTourSteps(t) },
         { id: 'fixed', href: moneyPath('fixed-costs'), steps: buildFixedTourSteps(t) },
-        { id: 'income', href: growthPath('income'), steps: buildIncomeTourSteps(t) },
+        { id: 'income', href: moneyPath('income'), steps: buildIncomeTourSteps(t) },
     ];
 }
 
@@ -211,7 +211,7 @@ export function buildPageHelpForPathname(pathname: string, t: TranslateFn): Page
             ),
         },
         {
-            prefix: growthPath('income'),
+            prefix: moneyPath('income'),
             content: helpContent(
                 t,
                 'pages.income.title',

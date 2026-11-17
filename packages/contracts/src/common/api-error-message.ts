@@ -50,6 +50,7 @@ export const API_ERROR_MESSAGES = [
     'cannot_remove_owner',
     'member_remove_failed',
     'jar_split_total',
+    'jar_split_keys',
     'jar_placement_account_invalid',
     'book_catalog_unavailable',
     'contact_send_failed',

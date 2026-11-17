@@ -35,7 +35,7 @@ const WIDER_PORTALS = [
         portalKey: 'pages.nav.pills.growth',
         lineKey: 'pages.why.portals.growth.line',
         bodyKey: 'pages.why.portals.growth.body',
-        href: productPath('growth/income'),
+        href: productPath('money/income'),
     },
     {
         product: 'energy',

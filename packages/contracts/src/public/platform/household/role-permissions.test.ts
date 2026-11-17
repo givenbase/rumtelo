@@ -6,6 +6,7 @@ import {
     HouseholdPermissionAction,
     HouseholdPermissionSection,
     permissionActionFromPath,
+    permissionSectionFromPath,
     roleCan,
 } from './role-permissions';
 
@@ -137,5 +138,18 @@ describe('roleCan VIEWER members', () => {
                 action
             );
         }
+    });
+});
+
+describe('permissionSectionFromPath', () => {
+    it('leaves the onboarding split preview ungated (signed-in only, no household)', () => {
+        assert.equal(permissionSectionFromPath('/household/previewSplit'), null);
+    });
+
+    it('still gates onboard on the settings section', () => {
+        assert.equal(
+            permissionSectionFromPath('/household/onboard'),
+            HouseholdPermissionSection.HOUSEHOLD_SETTINGS
+        );
     });
 });

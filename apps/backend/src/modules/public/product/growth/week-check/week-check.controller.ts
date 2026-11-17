@@ -1,14 +1,19 @@
-import { contract } from '@rumtelo/contracts';
+import { CAPABILITIES, contract } from '@rumtelo/contracts';
 
 import { Inject } from '@nestjs/common';
 import { Implement, implement } from '@orpc/nest';
 
+import { RequireCapability } from '../../../../../common/capability';
 import { ControllerSwagger } from '../../../../../common/decorators/controller-swagger.decorators';
 import { currentWeek } from '../../../../../common/utils/period.util';
 import { GrowthWeekCheckService } from './week-check.service';
 
-/** Transport only. Handler order is always CRUD. */
+/**
+ * Course part of the one week check (Plus and Max). Transport only. Handler order is
+ * always CRUD. Gated like the rest of Course; Basic households get `plan_missing_capability`.
+ */
 @ControllerSwagger('growth/week-check', 'public')
+@RequireCapability(CAPABILITIES.growthCourse)
 export class GrowthWeekCheckController {
     constructor(
         @Inject(GrowthWeekCheckService) private readonly weekChecks: GrowthWeekCheckService

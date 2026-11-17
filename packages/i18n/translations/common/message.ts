@@ -83,6 +83,7 @@ const message = {
             cannot_remove_owner: 'The household owner cannot be removed',
             member_remove_failed: 'Could not remove that member. Try again.',
             jar_split_total: 'Jar split must total 100%, received {total}%',
+            jar_split_keys: 'Jar split must list each of the six jars exactly once',
             jar_placement_account_invalid: 'That bank account is not in this household.',
             book_catalog_unavailable: 'The book catalog did not answer.',
             contact_send_failed:

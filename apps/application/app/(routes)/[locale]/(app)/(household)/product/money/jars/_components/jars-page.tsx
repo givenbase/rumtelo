@@ -168,7 +168,7 @@ export function JarsPageClient({ embed = false }: { embed?: boolean }) {
                             : t('footer_period', { on: onTarget, total: jars.length })}
                     </span>
                     <Link
-                        href={productPath('growth/income')}
+                        href={productPath('money/income')}
                         className="text-accent underline-offset-2 hover:underline">
                         {t('income_link')}
                     </Link>

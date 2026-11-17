@@ -52,11 +52,11 @@ export const FORM_ROUTE = {
     incomeCreate: {
         titleKey: 'pages.shell.forms.income_create.title',
         descriptionKey: 'pages.shell.forms.income_create.description',
-        closeHref: productPath('growth/income'),
+        closeHref: productPath('money/income'),
     },
     incomeUpdate: {
         titleKey: 'pages.shell.forms.income_update.title',
-        closeHref: productPath('growth/income'),
+        closeHref: productPath('money/income'),
     },
     goalCreate: {
         titleKey: 'pages.shell.forms.goal_create.title',

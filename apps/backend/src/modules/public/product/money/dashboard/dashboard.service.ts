@@ -10,7 +10,11 @@ import {
 } from '@rumtelo/utils';
 
 import { sum } from '../../../../../common/utils/money.util';
-import { daysInPeriod, daysUntilPeriodEnd } from '../../../../../common/utils/period.util';
+import {
+    currentWeek,
+    daysInPeriod,
+    daysUntilPeriodEnd,
+} from '../../../../../common/utils/period.util';
 import { CoachService } from '../../../platform/coach/coach.service';
 import { HouseholdSettingsService } from '../../../../auth/household/household-settings/household-settings.service';
 import { TransactionService } from '../ledger/transaction/transaction.service';
@@ -19,6 +23,7 @@ import { JarService } from '../plan/jar/jar.service';
 import { DebtService } from '../targets/debt/debt.service';
 import { GoalService } from '../targets/goal/goal.service';
 import { MonthScoreService } from '../month-score/month-score.service';
+import { WeekCheckService } from '../week-check/week-check.service';
 
 /**
  * Composition root for the dashboard. The design puts jars, coach, month score and four
@@ -39,12 +44,32 @@ export class DashboardService {
         private readonly householdSettings: HouseholdSettingsService,
         @Inject(FixedCostService) private readonly fixedCosts: FixedCostService,
         @Inject(DebtService) private readonly debts: DebtService,
-        @Inject(GoalService) private readonly goals: GoalService
+        @Inject(GoalService) private readonly goals: GoalService,
+        @Inject(WeekCheckService) private readonly weekChecks: WeekCheckService
     ) {}
 
     // ====================================================================
     // ? READ Operations
     // ====================================================================
+
+    /**
+     * Plain facts for Home's first-run layout, as of now (never the selected period).
+     * Each comes from the owning service, scoped to the request's household, and reads
+     * at most one row.
+     */
+    async progress(now = new Date()) {
+        const [hasTransactions, weekCheck, hasClosedMonth] = await Promise.all([
+            this.transactions.hasAny(),
+            this.weekChecks.completionFacts(currentWeek(now)),
+            this.monthScores.hasClosedMonth(),
+        ]);
+        return {
+            hasTransactions,
+            hasCompletedWeekCheck: weekCheck.hasCompleted,
+            weekCheckDoneThisWeek: weekCheck.doneThisWeek,
+            hasClosedMonth,
+        };
+    }
 
     async get(householdId: string, period: string) {
         const meta = travelForPeriod(period);
@@ -61,6 +86,7 @@ export class DashboardService {
             debtPlan,
             debtList,
             goalList,
+            progress,
         ] = await Promise.all([
             this.jars.balances(currentKey),
             this.monthScores.current(period),
@@ -72,6 +98,7 @@ export class DashboardService {
             this.debts.plan(),
             this.debts.list(),
             this.goals.list(),
+            this.progress(),
         ]);
 
         const horizon = meta.horizon;
@@ -188,6 +215,7 @@ export class DashboardService {
             coach,
             monthScore,
             why: settings.why ?? null,
+            progress,
             travel: {
                 direction: meta.travel.direction,
                 monthsHorizon: horizon,
