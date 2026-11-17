@@ -5,7 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useMarketingSession } from '@/app/_components/marketing-session-provider';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 
-import { DEMO_INCOME_DEFAULT, FLOATERS, HERO_VIDEO, JARS, TICKER } from '@/lib/landing-content';
+import { DEMO_INCOME_DEFAULT, HERO_VIDEO, JARS } from '@/lib/landing-content';
+import { LIVE_FLOATERS, LIVE_TICKER } from '@/lib/launch-products';
 import { planSlug } from '@/lib/landing-plans';
 import { appHomeUrl, appPlanSettingsUrl, appSignInUrl, webSignUpPath } from '@/lib/portal-urls';
 import { isRegistrationOpen } from '@/lib/maintenance';
@@ -123,7 +124,7 @@ export function LandingHero() {
             <div
                 className="pointer-events-none absolute inset-0 hidden overflow-hidden md:block"
                 aria-hidden>
-                {FLOATERS.map(fl => (
+                {LIVE_FLOATERS.map(fl => (
                     <span
                         key={fl.key}
                         data-float
@@ -145,7 +146,7 @@ export function LandingHero() {
                     <div
                         data-ticker
                         className="inline-flex animate-[tickerX_52s_linear_infinite] gap-10 pr-10 whitespace-nowrap">
-                        {TICKER.map(tk => (
+                        {LIVE_TICKER.map(tk => (
                             <span
                                 key={tk.id}
                                 className="inline-flex items-center gap-2 font-mono text-xs font-medium tracking-widest text-fg-faint opacity-55">
@@ -213,12 +214,15 @@ export function LandingHero() {
                                         {t('header.sign_in')}
                                     </Cta>
                                 )}
-                                <Cta href="#portals" variant="ghost" size="lg">
+                                <Cta href="#how" variant="ghost" size="lg">
                                     {t('hero.cta_secondary')}
                                 </Cta>
                             </>
                         )}
                     </div>
+                    {isAuthenticated || !isRegistrationOpen() ? null : (
+                        <p className="mt-3 text-sm text-fg-muted">{t('hero.cta_microline')}</p>
+                    )}
 
                     {/* Proof stats */}
                     <div className="mt-9 grid grid-cols-2 gap-x-6 gap-y-5 sm:flex sm:flex-wrap">

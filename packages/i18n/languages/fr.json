@@ -714,6 +714,7 @@
                 "lead": "Une étape à la fois. Répondez ici — ne partez que lorsque la charge de travail est importante.",
                 "quiet_title": "Tu es à jour pour l'instant",
                 "quiet_body": "Il n'y a rien d'urgent. Clôture le mois quand tu es prêt, ou consulte « Ma semaine ».",
+                "quiet_body_core": "Nothing urgent is waiting. Close the month when you are ready, or open the week check.",
                 "progress": "{done} of ~{total} this visit",
                 "card_eyebrow": "Suivant",
                 "answer_label": "Votre réponse",
@@ -3705,6 +3706,10 @@
                             "heading": "Ce que vous voyez",
                             "body": "Votre aperçu financier du mois — Le Coach, la situation financière et les clés de la croissance, de l'énergie et de l'épanouissement spirituel. Commencez la visite complète depuis la rubrique « Aide » pour parcourir la section « Accueil », puis les « Tonneaux », les « Coûts fixes » et les « Revenus »."
                         },
+                        "what_for_core": {
+                            "heading": "What you’re looking at",
+                            "body": "Your grip snapshot for this month — The Coach, the money picture, and the door into Growth. Start the full tour from Help to walk through Home, then jars, fixed costs, and income."
+                        },
                         "how": {
                             "heading": "Mode d'emploi",
                             "body": "Utilisez la rubrique « Période d'utilisation » (en haut à droite) pour changer de mois. Ouvrez un portail lorsque vous souhaitez utiliser cet outil. Appuyez sur « Aide » à tout moment pour revoir ce guide pas à pas."
@@ -3722,6 +3727,10 @@
                         "portals": {
                             "title": "Vos produits",
                             "content": "La rubrique « Argent » se trouve dans la barre de navigation supérieure. Les rubriques « Croissance », « Énergie » et « Âme » s'ouvrent à partir de là lorsque vous souhaitez accéder à l'outil suivant — un produit à la fois."
+                        },
+                        "portals_core": {
+                            "title": "Your products",
+                            "content": "Money lives in the top nav. Growth opens from here when you want that next tool."
                         }
                     }
                 },
@@ -4030,6 +4039,9 @@
                 "play_left": "En jeu"
             },
             "open_portal": "Ouvrir ▸",
+            "why": {
+                "label": "Your dream"
+            },
             "widgets": {
                 "growth": {
                     "income_month": "REVENUS DE CE MOIS-CI",
@@ -4052,7 +4064,7 @@
         "landing": {
             "meta": {
                 "title": "Rumtelo — Ne te demande plus où il est passé.",
-                "description": "Cessez de vous demander où tout cela est passé. Découvrez où sont passés votre argent, votre vie, votre énergie et votre temps — puis reprenez le contrôle. Des outils simples, un conseil de The Coach : à vous de choisir. Dix minutes par semaine. Développé à Amsterdam. Gratuit pour commencer.",
+                "description": "Stop wondering where it went. Your income splits into six jars the second it lands. Ten minutes a week shows where it went and what to move. The Coach tips, you choose. Built in Amsterdam. Free to start.",
                 "keywords": [
                     "aperçu financier",
                     "six bocaux",
@@ -4060,9 +4072,8 @@
                     "coach en gestion des finances personnelles",
                     "liberté financière",
                     "bilan hebdomadaire",
-                    "énergie, sommeil, argent",
-                    "aperçu des paiements",
-                    "méthode des petits pots"
+                    "geld overzicht",
+                    "potjes methode"
                 ]
             },
             "header": {
@@ -4096,9 +4107,10 @@
             "hero": {
                 "eyebrow": "RUMTELO — PRENDRE LA VIE À PLEINS COUPS DE POING",
                 "headline": "Arrête de te demander où ça a bien pu passer.",
-                "lead": "Vous vous demandez quoi ? Tout : votre argent, votre vie, votre énergie, votre temps. Voyez où tout cela est passé, puis reprenez le contrôle. Les conseils du coach. À vous de choisir.",
-                "cta_primary": "Commencez gratuitement — sans carte bancaire",
-                "cta_secondary": "Découvrez comment ça marche",
+                "lead": "Your income splits into six jars the second it lands — bills, saving, freedom, fun. Ten minutes a week shows where it went and what to move.",
+                "cta_primary": "Split my income — free",
+                "cta_microline": "No card. No bank link needed.",
+                "cta_secondary": "See it in 3 steps",
                 "open_dashboard": "Ouvrir le tableau de bord",
                 "manage_plan": "Gérer le forfait",
                 "manage_plan_named": "Gérer {plan}",
@@ -4107,7 +4119,26 @@
                 "demo_stage_complete": "CE MOIS-CI · CHAQUE SOMME A SON UTILITÉ",
                 "demo_income_line": "Salaire : 3 450 € · En freelance : 850 €",
                 "demo_coach_eyebrow": "L'entraîneur · cette semaine",
-                "demo_coach_line": "Chaque somme a son utilité. Montant à dépenser sans crainte aujourd’hui : 64 €. J’ai dormi 7 h 20 — une bonne semaine pour prendre des décisions."
+                "demo_coach_line": "Every amount has a job. Safe to spend today: €64."
+            },
+            "how_section": {
+                "eyebrow": "HOW IT WORKS",
+                "headline": "Six jars. Ten minutes a week.",
+                "steps_aria": "How Rumtelo works in three steps",
+                "steps": {
+                    "split": {
+                        "title": "Income lands, money splits.",
+                        "body": "Enter your net income once. Rumtelo splits it over six jars, so every amount has a job before you spend."
+                    },
+                    "spend": {
+                        "title": "Spending finds its jar.",
+                        "body": "Bills draw from the right jar. Purchases land in your Inbox; sort them by hand or let a rule do it."
+                    },
+                    "week": {
+                        "title": "Ten minutes a week.",
+                        "body": "The week check shows where it went and what’s left. Move one amount, pick next week’s focus, done."
+                    }
+                }
             },
             "floaters": {
                 "f1": "+3 450 € · accélération en 0,4 s",
@@ -4379,6 +4410,7 @@
             },
             "principles_section": {
                 "eyebrow": "QUATRE PRINCIPES AUXQUELS NOUS NE DÉROGONS JAMAIS",
+                "eyebrow_core": "THREE PRINCIPLES WE DON’T BREAK",
                 "headline": "Si une fonctionnalité va à l'encontre d'un principe, c'est la fonctionnalité qui cède le pas."
             },
             "principles": {
@@ -4501,7 +4533,7 @@
                 "audience_practice": "Pour les cabinets",
                 "headline_practice": "Ne vous demandez plus où en sont vos clients.",
                 "lead_practice": "Destiné aux coachs et conseillers qui accompagnent les ménages. Vos clients gèrent eux-mêmes leur tableau ; avec leur accord, vous suivez tous les tableaux depuis un seul et même bureau.",
-                "lead": "Commencez par la formule Basic gratuite. Optez pour la formule Plus ou Max et nous activerons Stripe Checkout une fois votre compte configuré — à condition que votre inscription, la vérification de votre identité et la procédure d'intégration se soient déroulées avec succès.",
+                "lead": "Start free with your jars. Pay when it saves you work: your bank statements in, your debt-free date, your Course.",
                 "lead_on_plan": "Vous êtes sur {plan}. Passez à un forfait supérieur, changez de forfait ou gérez votre facturation depuis l'application : les modifications s'appliquent à l'ensemble de votre foyer.",
                 "lead_loading": "Chargement de votre forfait…",
                 "lead_manage": "Accédez à la rubrique « Formules et facturation » dans l'application pour passer à une formule supérieure ou modifier votre formule.",
@@ -4530,8 +4562,6 @@
                 "your_plan": "Votre projet",
                 "products_title": "Produits inclus",
                 "features_title": "Points forts",
-                "feature_count": "{included}/{total} fonctionnalités",
-                "product_none": "Non inclus",
                 "products_more": "D’autres produits arrivent",
                 "footnote": "Prix en euros, TVA comprise. La version de base peut rester gratuite ou devenir payante à l'avenir — aucune des données que vous saisissez n'est jamais bloquée."
             },
@@ -4542,7 +4572,7 @@
                 "line": "Un bureau par client — les séances visent à prendre des décisions, et non à accumuler des chiffres.",
                 "f1": "Invitez vos clients par e-mail : aucune information n'est partagée tant qu'ils n'ont pas accepté l'invitation",
                 "f2": "L'espace client de chaque client, en lecture seule, accessible depuis un seul poste de travail",
-                "f3": "Un aperçu par client : dépenses, revenus, énergie, sérénité",
+                "f3": "A snapshot per client: income, jars, spending, week check",
                 "f4": "Entre deux séances, le coach vous donne des conseils — c'est vous qui prenez les décisions",
                 "extras_title": "En plus du prix de base",
                 "extra_staff": "Siège du personnel",
@@ -4551,7 +4581,7 @@
                 "extra_view_hint": "Ils restent sur la version Basic gratuite. Vous pouvez consulter leur tableau, en lecture seule.",
                 "extra_view_price": "Gratuit",
                 "extra_manage": "Client que vous parrainez",
-                "extra_manage_hint": "Vous payez leur abonnement Plus — {discount} % de moins que les {retail} par mois qu'ils paieraient eux-mêmes. Aujourd'hui : leur tableau complet, en lecture seule. Bientôt : modifier leur plan avec eux.",
+                "extra_manage_hint": "You pay for their Plus — {discount}% less than the {retail} a month they’d pay themselves. You see their full board, read-only.",
                 "per_month_each": "{price} / mois chacun",
                 "example": "Exemple : vous + {clients} clients parrainés = {total} par mois au total.",
                 "cta": "Créer un cabinet",
@@ -4573,19 +4603,31 @@
                     "f3": "ÉNERGIE · sommeil",
                     "f4": "SOUL · calme, gratitude, une intention par semaine",
                     "f5": "Le coach, le bilan hebdomadaire, le score mensuel",
-                    "f6": "1 place complète + 1 place pour un accompagnateur (partenaire, coach ou conseiller)"
+                    "f6": "1 place complète + 1 place pour un accompagnateur (partenaire, coach ou conseiller)",
+                    "outcome": {
+                        "money": "Six jars, your Inbox and fixed costs",
+                        "growth": "{maxGoals, plural, one {# goal} other {# goals}} and your income curve",
+                        "energy": "Sleep, the floor under every decision",
+                        "soul": "Stillness, gratitude, one intention a week"
+                    }
                 },
                 "plus": {
                     "name": "Plus",
                     "tag": "Les plus populaires",
                     "best_for": "Foyers, couples, remboursement de dettes",
-                    "line": "Vous partagez vos finances avec un partenaire ou votre famille, vous remboursez des dettes ou vous souhaitez importer vos relevés bancaires. C'est le cas de la plupart des gens.",
+                    "line": "You share money with a partner or family, want your week planned around your goals, are paying off debt, or want your bank statements in. Most people land here.",
                     "f1": "Tout ce qu'il faut savoir sur le Basic",
-                    "f2": "ARGENT · Plan de remboursement de la dette avec intérêts et date de libération",
-                    "f3": "ARGENT · Importation des relevés bancaires — synchronisation en temps réel à venir",
+                    "f2": "GROWTH · Course — plan your week around the three things that move your goals",
+                    "f3": "MONEY · debt plan with a freedom date, and bank statement import",
                     "f4": "DÉVELOPPEMENT · Apprendre — livres, formations, compétences · jusqu’à {maxGoals} objectifs",
                     "f5": "ÉNERGIE · vos 168 heures, entraînement, alimentation",
-                    "f6": "Jusqu'à {maxMembers} places — mélange de spectateurs et de participants"
+                    "f6": "Jusqu'à {maxMembers} places — mélange de spectateurs et de participants",
+                    "outcome": {
+                        "money": "Your debt-free date and bank statement import",
+                        "growth": "Your Course, Learn and up to {maxGoals} goals",
+                        "energy": "Your 168 hours, training and food",
+                        "soul": "Everything in Basic"
+                    }
                 },
                 "max": {
                     "name": "Max",
@@ -4597,7 +4639,12 @@
                     "f3": "DÉVELOPPEMENT · Découvrez nos recommandations sur Masterclass, et non sur Udemy",
                     "f4": "SOUL · les sept centres",
                     "f5": "Jusqu'à {maxMembers} places (accès illimité)",
-                    "f6": "Appareils — montre, balance, bague (à venir)"
+                    "outcome": {
+                        "money": "Everything in Plus",
+                        "growth": "Net worth, returns, your freedom number and every goal",
+                        "energy": "Everything in Plus",
+                        "soul": "Plus the seven centers"
+                    }
                 }
             },
             "faq_section": {
@@ -5203,10 +5250,10 @@
             "jars_read_more": "En savoir plus sur la méthode des six bocaux",
             "jars_spaarpotjes_help": "Que sont les spaarpotjes ?",
             "why": "Ton rêve",
-            "why_body": "En une phrase : pourquoi voulez-vous Rumtelo — ou quel rêve cherchez-vous à réaliser ? Nous l'affichons sur votre tableau de bord pour vous rappeler brièvement ce vers quoi vous tendez.",
+            "why_body": "In one short sentence: why do you want Rumtelo — or what dream are you working toward? We show it at the top of your Home as a small reminder of what you are working for.",
             "why_tip": "Écrivez un rêve ou une motivation — pas un chiffre. Restez simple.",
             "why_label": "Ton rêve ou ta raison",
-            "why_hint": "Affiché sur votre tableau de bord à titre de rappel. Vous pouvez le modifier ultérieurement.",
+            "why_hint": "Shown at the top of your Home as a reminder.",
             "why_placeholder": "Par exemple : une maison au soleil, près de la mer et avec des fruits frais",
             "why_examples": {
                 "house": "Une maison au soleil",
@@ -5388,6 +5435,7 @@
                 "access_eyebrow": "Accès",
                 "progress_eyebrow": "Aperçu du portail",
                 "progress_blurb": "Live money, growth, energy, and soul metrics will appear here for managed clients.",
+                "progress_blurb_core": "Live money and growth metrics for this household.",
                 "progress_pending": "Waiting for the client to accept the invitation.",
                 "progress_view_only": "Accès en lecture — invitation acceptée. Passez à Gérer pour prendre en charge leur abonnement Plus.",
                 "portal_money": "Argent",
@@ -5853,6 +5901,7 @@
                 "coach": {
                     "eyebrow": "L'entraîneur",
                     "blurb": "Le Coach ne vous réprimande jamais : il se contente de vous indiquer clairement les prochaines étapes. Les conseils à l'écran (lignes explicatives, cartes « jar ») restent affichés pendant que vous apprenez ; la boîte de réception, accessible via Accueil → Le Coach, contient des fiches de conseils sur l'argent, le développement personnel, l'énergie et l'esprit.",
+                    "blurb_core": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the inbox at Home → The Coach holds tip cards across money and growth.",
                     "toggle": "Diffuser « The Coach » à la télévision",
                     "hint_on": "Sur — repérez le symbole ✦ « The Coach ». La boîte de réception reste dans la rubrique Accueil → The Coach.",
                     "hint_off": "Désactivé — les conseils à l'écran sont masqués. La boîte de réception du Coach reste accessible à tout moment."
@@ -6065,6 +6114,7 @@
                 "sharing": {
                     "eyebrow": "Confidentialité et partage",
                     "blurb": "Ce que les membres peuvent partager dans les rubriques « Croissance », « Énergie », « Âme » et « Argent ». Seul le propriétaire peut modifier ces paramètres. Il est toujours possible de garder certaines informations pour soi.",
+                    "blurb_core": "What members may share in Growth and Money. Only the owner changes this. Keeping something to yourself is always possible.",
                     "owner_only": "Seul le chef de famille peut modifier ce paramètre.",
                     "mode_label": "Que peuvent partager les membres ?",
                     "modes": {
@@ -6147,7 +6197,10 @@
                     "card_plus_tag": "Les plus populaires",
                     "card_plus_line": "Partagez ce tableau avec votre famille ou vos amis : dettes, apprentissage, semaine de l'énergie et bien d'autres objectifs.",
                     "card_plus_feats": "{members} · Dette · En savoir plus · ÉNERGIE · Objectifs",
+                    "card_plus_line_core": "Share the board with family or friends — debt, Learn, Course, and more goals.",
+                    "card_plus_feats_core": "{members} · Debt · Learn · Course · Goals",
                     "card_max_tag": "Les quatre portails",
+                    "card_max_tag_core": "Everything, no limits",
                     "card_max_line": "Nombre illimité de foyers, courbe de revenus, « Learn » et patrimoine net.",
                     "card_max_feats": "{members} · ARGENT · Masterclass Learn · Patrimoine net",
                     "monthly": "Mensuel",
@@ -6700,6 +6753,7 @@
             "eyebrow": "✦ Pourquoi Rumtelo ?",
             "stand_on": "Nos principes",
             "lead": "Vous vous demandez quoi ? Tout : votre argent, votre vie, votre énergie, votre temps. Rumtelo vous aide à voir où tout cela est passé, pour que rien ne reste un mystère. À partir de là, vous reprenez le dessus : vous reprenez le contrôle de ce qui compte vraiment. Des outils clairs pour cela, et nous en ajouterons d’autres au fur et à mesure. Le Coach peut vous donner un conseil. C’est vous qui choisissez la suite.",
+            "lead_core": "Wondering what? Where your money went. Rumtelo helps you see it, so nothing stays a mystery. From there you get grip again: control over what matters. Clear tools for that, and we’ll keep adding more. The Coach can give a tip. You choose what to do next.",
             "meaning_eyebrow": "✦ Comment Rumtelo peut vous aider",
             "meaning": {
                 "money_leaves_body": "Quand de l'argent sort, vous voyez immédiatement de quel pot il provient — et combien il reste pour cette tâche. Pas besoin de faire un tableau Excel après coup.",

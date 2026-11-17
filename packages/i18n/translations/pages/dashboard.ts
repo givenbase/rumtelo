@@ -143,6 +143,9 @@ const dashboard = {
         play_left: 'In Play',
     },
     open_portal: 'Open ▸',
+    why: {
+        label: 'Your dream',
+    },
     widgets: {
         growth: {
             income_month: 'INCOME THIS MONTH',

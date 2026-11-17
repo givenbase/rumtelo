@@ -3,7 +3,7 @@ const landing = {
     meta: {
         title: 'Rumtelo — Stop wondering where it went.',
         description:
-            'Stop wondering where it went. See where your money, life, energy and time went — then get grip again. Clear tools, a tip from The Coach, you choose. Ten minutes a week. Built in Amsterdam. Free to start.',
+            'Stop wondering where it went. Your income splits into six jars the second it lands. Ten minutes a week shows where it went and what to move. The Coach tips, you choose. Built in Amsterdam. Free to start.',
         keywords: [
             'money overview',
             'six jars',
@@ -11,7 +11,6 @@ const landing = {
             'personal finance coach',
             'financial freedom',
             'week check',
-            'energy sleep money',
             'geld overzicht',
             'potjes methode',
         ],
@@ -47,9 +46,10 @@ const landing = {
     hero: {
         eyebrow: 'RUMTELO — GRIP ON LIFE',
         headline: 'Stop wondering where it went.',
-        lead: 'Wondering what? All of it — your money, your life, your energy, your time. See where it went, then get grip again. The Coach tips. You choose.',
-        cta_primary: 'Start free — no card',
-        cta_secondary: 'See how it works',
+        lead: 'Your income splits into six jars the second it lands — bills, saving, freedom, fun. Ten minutes a week shows where it went and what to move.',
+        cta_primary: 'Split my income — free',
+        cta_microline: 'No card. No bank link needed.',
+        cta_secondary: 'See it in 3 steps',
         open_dashboard: 'Open dashboard',
         manage_plan: 'Manage plan',
         manage_plan_named: 'Manage {plan}',
@@ -58,8 +58,26 @@ const landing = {
         demo_stage_complete: 'THIS MONTH · EVERY AMOUNT HAS A JOB',
         demo_income_line: 'Salary €3,450 · Freelance €850',
         demo_coach_eyebrow: 'The Coach · this week',
-        demo_coach_line:
-            'Every amount has a job. Safe to spend today: €64. Sleep was 7h20 — a good week to decide things.',
+        demo_coach_line: 'Every amount has a job. Safe to spend today: €64.',
+    },
+    how_section: {
+        eyebrow: 'HOW IT WORKS',
+        headline: 'Six jars. Ten minutes a week.',
+        steps_aria: 'How Rumtelo works in three steps',
+        steps: {
+            split: {
+                title: 'Income lands, money splits.',
+                body: 'Enter your net income once. Rumtelo splits it over six jars, so every amount has a job before you spend.',
+            },
+            spend: {
+                title: 'Spending finds its jar.',
+                body: 'Bills draw from the right jar. Purchases land in your Inbox; sort them by hand or let a rule do it.',
+            },
+            week: {
+                title: 'Ten minutes a week.',
+                body: 'The week check shows where it went and what’s left. Move one amount, pick next week’s focus, done.',
+            },
+        },
     },
     floaters: {
         f1: '+€3,450 · split in 0.4s',
@@ -304,6 +322,8 @@ const landing = {
     },
     principles_section: {
         eyebrow: 'FOUR PRINCIPLES WE DON’T BREAK',
+        /** Used while Energy + Soul are held back in production (principle 3 is hidden). */
+        eyebrow_core: 'THREE PRINCIPLES WE DON’T BREAK',
         headline: 'If a feature fights a principle, the feature loses.',
     },
     principles: {
@@ -430,7 +450,7 @@ const landing = {
         headline_practice: 'Stop wondering where your clients stand.',
         lead_practice:
             'For coaches and advisors who help households. Your clients keep their own board; with their yes, you follow every board from one desk.',
-        lead: 'Start on Basic free. Choose Plus or Max and we’ll open Stripe Checkout after your account is set up — only when signup, verify and onboarding succeed.',
+        lead: 'Start free with your jars. Pay when it saves you work: your bank statements in, your debt-free date, your Course.',
         lead_on_plan:
             'You’re on {plan}. Upgrade, switch or manage billing in the app — changes apply to your household.',
         lead_loading: 'Loading your plan…',
@@ -459,11 +479,9 @@ const landing = {
         billed_yearly: '{amount}/month billed yearly',
         cancel_any: 'cancel any month',
         your_plan: 'Your plan',
-        /** Plan card blocks — product coverage is counted from PLAN_ACCESS. */
+        /** Plan card blocks — one outcome line per live product (`plans.<plan>.outcome.*`). */
         products_title: 'Products included',
         features_title: 'Highlights',
-        feature_count: '{included}/{total} features',
-        product_none: 'Not included',
         products_more: 'More products on the way',
         footnote:
             'Prices in euro, VAT included. Basic may stay free or become a small fee later — nothing you enter is ever locked away.',
@@ -476,7 +494,7 @@ const landing = {
         line: 'One desk for every client — sessions go to decisions, not to collecting numbers.',
         f1: 'Invite clients by email — nothing is shared until they accept',
         f2: 'Every client’s board, read-only, from one desk',
-        f3: 'A snapshot per client: spending, income, energy, stillness',
+        f3: 'A snapshot per client: income, jars, spending, week check',
         f4: 'Between sessions, The Coach nudges — you guide the decisions',
         extras_title: 'On top of the base price',
         extra_staff: 'Staff seat',
@@ -485,9 +503,9 @@ const landing = {
         extra_view_hint: 'They stay on free Basic. You see their board, read-only.',
         extra_view_price: 'Free',
         extra_manage: 'Client you sponsor',
-        /** Manage is read-only in code today (membership.service: “MANAGE writes later”) — keep “coming next” until it ships. */
+        /** MANAGE is read-only in code (membership.service: “MANAGE writes later”) — sell only what is true: sponsoring Plus. */
         extra_manage_hint:
-            'You pay their Plus plan — {discount}% less than the {retail} a month they’d pay themselves. Today: their full board, read-only. Coming next: editing their plan with them.',
+            'You pay for their Plus — {discount}% less than the {retail} a month they’d pay themselves. You see their full board, read-only.',
         per_month_each: '{price} / month each',
         example: 'Example: you + {clients} sponsored clients = {total} / month in total.',
         cta: 'Start a practice',
@@ -511,18 +529,30 @@ const landing = {
             f4: 'SOUL · stillness, gratitude, one intention a week',
             f5: 'The Coach, the week check, the month score',
             f6: '1 full + 1 viewer seat (partner, coach or advisor)',
+            outcome: {
+                money: 'Six jars, your Inbox and fixed costs',
+                growth: '{maxGoals, plural, one {# goal} other {# goals}} and your income curve',
+                energy: 'Sleep, the floor under every decision',
+                soul: 'Stillness, gratitude, one intention a week',
+            },
         },
         plus: {
             name: 'Plus',
             tag: 'Most chosen',
             best_for: 'Households, couples, paying off debt',
-            line: 'You share money with a partner or family, are paying off debt, or want your bank statements in. Most people land here.',
+            line: 'You share money with a partner or family, want your week planned around your goals, are paying off debt, or want your bank statements in. Most people land here.',
             f1: 'Everything in Basic',
-            f2: 'MONEY · debt plan with interest and a freedom date',
-            f3: 'MONEY · bank statement import — live sync coming',
+            f2: 'GROWTH · Course — plan your week around the three things that move your goals',
+            f3: 'MONEY · debt plan with a freedom date, and bank statement import',
             f4: 'GROWTH · Learn — books, courses, skills · up to {maxGoals} goals',
             f5: 'ENERGY · your 168 hours, training, food',
             f6: 'Up to {maxMembers} seats — full and viewer mix',
+            outcome: {
+                money: 'Your debt-free date and bank statement import',
+                growth: 'Your Course, Learn and up to {maxGoals} goals',
+                energy: 'Your 168 hours, training and food',
+                soul: 'Everything in Basic',
+            },
         },
         max: {
             name: 'Max',
@@ -534,7 +564,12 @@ const landing = {
             f3: 'GROWTH · Learn picks on Masterclass, not Udemy',
             f4: 'SOUL · the seven centers',
             f5: 'Up to {maxMembers} seats (more full access)',
-            f6: 'Devices — watch, scale, ring (coming)',
+            outcome: {
+                money: 'Everything in Plus',
+                growth: 'Net worth, returns, your freedom number and every goal',
+                energy: 'Everything in Plus',
+                soul: 'Plus the seven centers',
+            },
         },
     },
     faq_section: {

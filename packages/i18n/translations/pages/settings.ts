@@ -284,6 +284,8 @@ const settings = {
         coach: {
             eyebrow: 'The Coach',
             blurb: 'The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the inbox at Home → The Coach holds tip cards across money, growth, energy, and soul.',
+            blurb_core:
+                'The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the inbox at Home → The Coach holds tip cards across money and growth.',
             toggle: 'Show The Coach on screens',
             hint_on: 'On — look for the ✦ The Coach mark. Inbox stays at Home → The Coach.',
             hint_off: 'Off — on-screen tips hidden. The Coach inbox still available anytime.',
@@ -508,6 +510,8 @@ const settings = {
         sharing: {
             eyebrow: 'Privacy and sharing',
             blurb: 'What members may share in Growth, Energy, Soul and Money. Only the owner changes this. Keeping something to yourself is always possible.',
+            blurb_core:
+                'What members may share in Growth and Money. Only the owner changes this. Keeping something to yourself is always possible.',
             owner_only: 'Only the owner of the household can change this.',
             mode_label: 'What may members share?',
             modes: {
@@ -593,7 +597,11 @@ const settings = {
             card_plus_line:
                 'Share the board with family or friends — debt, Learn, energy week, and more goals.',
             card_plus_feats: '{members} · Debt · Learn · ENERGY · Goals',
+            card_plus_line_core:
+                'Share the board with family or friends — debt, Learn, Course, and more goals.',
+            card_plus_feats_core: '{members} · Debt · Learn · Course · Goals',
             card_max_tag: 'All four portals',
+            card_max_tag_core: 'Everything, no limits',
             card_max_line: 'Unlimited household, income curve, Learn, and net worth.',
             card_max_feats: '{members} · MONEY · Masterclass Learn · Net worth',
             monthly: 'Monthly',

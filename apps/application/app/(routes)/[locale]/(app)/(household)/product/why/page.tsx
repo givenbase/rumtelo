@@ -80,7 +80,7 @@ export default async function WhyFoundationPage() {
                     {t('features.brand.tagline')}
                 </Typography>
                 <Typography as="p" variant="lead" size="lg" className="mt-5">
-                    {t('pages.why.lead')}
+                    {t(launchWide ? 'pages.why.lead' : 'pages.why.lead_core')}
                 </Typography>
             </Section>
 

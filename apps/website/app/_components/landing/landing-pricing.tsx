@@ -29,7 +29,7 @@ import { useMarketingSession } from '@/app/_components/marketing-session-provide
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 
 import { PLANS, PORTALS } from '@/lib/landing-content';
-import { livePlanFeatureKeys, planProductCoverage, planSlug } from '@/lib/landing-plans';
+import { livePlanFeatureKeys, livePlanProducts, planSlug } from '@/lib/landing-plans';
 import {
     appHomeUrl,
     appPlanSettingsUrl,
@@ -164,40 +164,42 @@ export function LandingPricing() {
     }, []);
 
     return (
-        <section id="pricing" className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-20">
-            <span id="practices" aria-hidden className="block scroll-mt-24" />
+        <section id="pricing" className="border-y border-line bg-bg-app">
+            <div className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-20">
+                <span id="practices" aria-hidden className="block scroll-mt-24" />
 
-            {/* Audience switch — who is signing up decides the table below */}
-            <div
-                role="tablist"
-                aria-label={t('audience_aria')}
-                className="mb-8 flex w-full gap-1 rounded-full border border-line bg-raised p-1 sm:w-fit">
-                {SIGN_UP_AUDIENCES.map(option => {
-                    const active = audience === option;
-                    return (
-                        <button
-                            key={option}
-                            type="button"
-                            role="tab"
-                            aria-selected={active}
-                            onClick={() => setAudience(option)}
-                            className={cn(
-                                'flex-1 rounded-full px-3 py-2 text-sm font-semibold transition-colors sm:flex-none sm:px-5',
-                                active
-                                    ? 'bg-(image:--gradient-accent) text-on-accent'
-                                    : 'text-fg-muted hover:text-fg'
-                            )}>
-                            {t(AUDIENCE_LABEL_KEY[option])}
-                        </button>
-                    );
-                })}
+                {/* Audience switch — who is signing up decides the table below */}
+                <div
+                    role="tablist"
+                    aria-label={t('audience_aria')}
+                    className="mb-8 flex w-full gap-1 rounded-full border border-line bg-raised p-1 sm:w-fit">
+                    {SIGN_UP_AUDIENCES.map(option => {
+                        const active = audience === option;
+                        return (
+                            <button
+                                key={option}
+                                type="button"
+                                role="tab"
+                                aria-selected={active}
+                                onClick={() => setAudience(option)}
+                                className={cn(
+                                    'flex-1 rounded-full px-3 py-2 text-sm font-semibold transition-colors sm:flex-none sm:px-5',
+                                    active
+                                        ? 'bg-(image:--gradient-accent) text-on-accent'
+                                        : 'text-fg-muted hover:text-fg'
+                                )}>
+                                {t(AUDIENCE_LABEL_KEY[option])}
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {forPractice ? (
+                    <PracticePricing />
+                ) : (
+                    <HouseholdPricing lead={lead} billing={billing} onBillingChange={setBilling} />
+                )}
             </div>
-
-            {forPractice ? (
-                <PracticePricing />
-            ) : (
-                <HouseholdPricing lead={lead} billing={billing} onBillingChange={setBilling} />
-            )}
         </section>
     );
 }
@@ -341,8 +343,6 @@ const TONE_CLASSES: Record<
         tag: string;
         mark: string;
         iconWrap: string;
-        meterOn: string;
-        meterOff: string;
     }
 > = {
     plain: {
@@ -356,8 +356,6 @@ const TONE_CLASSES: Record<
         tag: 'border-line text-fg-faint',
         mark: 'text-accent',
         iconWrap: 'border-line bg-raised',
-        meterOn: 'bg-accent',
-        meterOff: 'bg-sunken',
     },
     featured: {
         card: 'border-accent/50 bg-surface shadow-glow lg:-translate-y-3',
@@ -370,8 +368,6 @@ const TONE_CLASSES: Record<
         tag: 'border-transparent bg-(image:--gradient-accent) text-on-accent',
         mark: 'text-accent',
         iconWrap: 'border-line bg-raised',
-        meterOn: 'bg-accent',
-        meterOff: 'bg-sunken',
     },
     // Rendered inside `data-theme="dark"`, so these tokens resolve to the dark palette in both themes.
     premium: {
@@ -385,8 +381,6 @@ const TONE_CLASSES: Record<
         tag: 'border-accent/50 text-accent-hover',
         mark: 'text-accent-hover',
         iconWrap: 'border-line bg-raised',
-        meterOn: 'bg-accent-hover',
-        meterOff: 'bg-sunken',
     },
 };
 
@@ -418,7 +412,7 @@ function PlanCard({
     const tPortals = useTranslations('pages.landing.portals');
     const slug = planSlug(planKey);
     const tone = TONE_CLASSES[PLAN_TONE[planKey]];
-    const coverage = planProductCoverage(planKey);
+    const products = livePlanProducts();
     const premium = PLAN_TONE[planKey] === 'premium';
 
     return (
@@ -497,17 +491,14 @@ function PlanCard({
                     {t('products_title')}
                 </p>
                 <ul className="mt-3 grid gap-3">
-                    {coverage.map(({ product, included, total }) => {
+                    {products.map(product => {
                         const portal = PORTAL_BY_PRODUCT[product];
-                        const none = included === 0;
-                        const full = included === total;
                         return (
                             <li key={product} className="flex min-w-0 items-center gap-3">
                                 <span
                                     className={cn(
                                         'grid size-8 shrink-0 place-items-center rounded-lg border',
-                                        tone.iconWrap,
-                                        none && 'opacity-50'
+                                        tone.iconWrap
                                     )}>
                                     {portal ? (
                                         <Icon
@@ -517,50 +508,14 @@ function PlanCard({
                                         />
                                     ) : null}
                                 </span>
-                                <span className="grid min-w-0 flex-1 gap-1.5">
-                                    <span className="flex items-baseline justify-between gap-2">
-                                        <span
-                                            className={cn(
-                                                'text-sm font-semibold',
-                                                tone.name,
-                                                none && 'opacity-60'
-                                            )}>
-                                            {tPortals(`${product}.name`)}
-                                        </span>
-                                        <span
-                                            className={cn(
-                                                'flex shrink-0 items-center gap-1 font-mono text-xs font-semibold',
-                                                full ? tone.mark : tone.meta
-                                            )}>
-                                            {none ? (
-                                                <>
-                                                    <Icon name="x" size="sm" color="inherit" />
-                                                    {t('product_none')}
-                                                </>
-                                            ) : (
-                                                <>
-                                                    {full ? (
-                                                        <Icon
-                                                            name="check"
-                                                            size="sm"
-                                                            color="inherit"
-                                                        />
-                                                    ) : null}
-                                                    {t('feature_count', { included, total })}
-                                                </>
-                                            )}
-                                        </span>
+                                <span className="grid min-w-0 flex-1 gap-0.5">
+                                    <span className={cn('text-sm font-semibold', tone.name)}>
+                                        {tPortals(`${product}.name`)}
                                     </span>
-                                    <span className="flex gap-1" aria-hidden>
-                                        {Array.from({ length: total }, (_, index) => (
-                                            <span
-                                                key={index}
-                                                className={cn(
-                                                    'h-1 flex-1 rounded-full',
-                                                    index < included ? tone.meterOn : tone.meterOff
-                                                )}
-                                            />
-                                        ))}
+                                    <span className={cn('text-xs leading-snug', tone.body)}>
+                                        {tPlans(`${slug}.outcome.${product}`, {
+                                            maxGoals: PLAN_LIMITS[planKey].maxGoals ?? 0,
+                                        })}
                                     </span>
                                 </span>
                             </li>

@@ -17,6 +17,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { coachKindDisplay } from '@/app/_lib/coach-kind-label';
 import { resolveCoachMessage } from '@/app/_lib/coach-message-copy';
 import { monthScoreRecapHeadline } from '@/app/_lib/month-score-copy';
+import { isProductEnabled } from '@/app/_lib/launch-products';
 import { isLiveData } from '@/app/_lib/preview';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -147,6 +148,7 @@ export function CoachPageClient() {
         return steps[0] ?? null;
     }, [session?.steps, stepParam]);
 
+    const energyEnabled = isProductEnabled('energy');
     const quiet = session?.quiet || !activeStep;
     const totalAvailable = session?.totalAvailable ?? 0;
     const progressLabel =
@@ -177,14 +179,17 @@ export function CoachPageClient() {
                 <EmptyState
                     icon="diamond"
                     title={tSession('quiet_title')}
-                    body={tSession('quiet_body')}
+                    body={tSession(energyEnabled ? 'quiet_body' : 'quiet_body_core')}
                     action={
                         <div className="flex flex-col items-center gap-2">
-                            <Link
-                                href="/product/energy/week"
-                                className="text-sm font-medium text-accent hover:underline">
-                                {t('open_week')}
-                            </Link>
+                            {/* Energy › My week is deferred in production; the week check stays. */}
+                            {energyEnabled ? (
+                                <Link
+                                    href="/product/energy/week"
+                                    className="text-sm font-medium text-accent hover:underline">
+                                    {t('open_week')}
+                                </Link>
+                            ) : null}
                             <Link
                                 href="/product/money/week-check"
                                 className="text-sm font-medium text-accent hover:underline">

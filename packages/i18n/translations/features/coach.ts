@@ -14,6 +14,8 @@ const coach = {
         quiet_title: "You're caught up for now",
         quiet_body:
             'Nothing urgent is waiting. Close the month when you are ready, or check My week.',
+        quiet_body_core:
+            'Nothing urgent is waiting. Close the month when you are ready, or open the week check.',
         progress: '{done} of ~{total}',
         card_eyebrow: 'Next',
         answer_label: 'Your answer',

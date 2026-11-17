@@ -7,6 +7,7 @@ import { LandingFaq } from './landing-faq';
 import { LandingFooter } from './landing-footer';
 import { LandingHeader } from './landing-header';
 import { LandingHero } from './landing-hero';
+import { LandingHow } from './landing-how';
 import { LandingJars } from './landing-jars';
 import { LandingPortals } from './landing-portals';
 import { LandingPricing } from './landing-pricing';
@@ -15,16 +16,15 @@ import { LandingSignupForm } from './landing-signup-form';
 import { LandingWhy } from './landing-why';
 
 /**
- * Narrative order — what → how → trust → price:
- *   hook (hero) → what it is (portals) → the core mechanic (jars) → how it feels daily (coach)
- *   → the rules we keep (principles, dark band) → why we exist (trust) → pricing → FAQ → sign-up.
+ * Narrative order — promise → mechanism → proof → price → the wider picture:
+ *   hook (hero) → how it works (3 steps) → the six jars → how it feels daily (coach) → pricing
+ *   → "grip on life" band (portals, principles, why we exist) → FAQ → sign-up.
  *
  * Background rhythm alternates plain / tinted, with Principles as the single dark pivot:
- *   hero gradient · portals plain · jars tinted · coach plain · PRINCIPLES DARK
- *   · why tinted · pricing plain · faq tinted · signup plain · footer tinted
+ *   hero gradient · how plain · jars tinted · coach plain · pricing tinted · portals plain
+ *   · PRINCIPLES DARK · why tinted · faq plain · signup plain · footer tinted
  *
- * Cut on purpose (hero already decodes the slogan; Why carries the founders):
- *   Problem, Loop — proof strip stays light (no product list in the hero).
+ * Cut on purpose: Problem, Loop — the hero names the problem, How it works is the loop.
  */
 export function LandingPage() {
     const rootRef = useRef<HTMLDivElement>(null);
@@ -68,12 +68,13 @@ export function LandingPage() {
             <LandingHeader />
             <main>
                 <LandingHero />
-                <LandingPortals />
+                <LandingHow />
                 <LandingJars />
                 <LandingCoach />
+                <LandingPricing />
+                <LandingPortals />
                 <LandingPrinciples />
                 <LandingWhy />
-                <LandingPricing />
                 <LandingFaq />
                 <LandingSignupForm />
             </main>

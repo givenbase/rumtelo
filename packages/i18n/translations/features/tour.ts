@@ -99,6 +99,10 @@ const tour = {
                     heading: 'What you’re looking at',
                     body: 'Your grip snapshot for this month — The Coach, the money picture, and doors into Growth, Energy, and Soul. Start the full tour from Help to walk through Home, then jars, fixed costs, and income.',
                 },
+                what_for_core: {
+                    heading: 'What you’re looking at',
+                    body: 'Your grip snapshot for this month — The Coach, the money picture, and the door into Growth. Start the full tour from Help to walk through Home, then jars, fixed costs, and income.',
+                },
                 how: {
                     heading: 'How to use it',
                     body: 'Use Period (top right) to switch months. Open a portal when you want that tool. Tap Help anytime to replay this walkthrough.',
@@ -119,6 +123,11 @@ const tour = {
                     title: 'Your products',
                     content:
                         'Money lives in the top nav. Growth, Energy, and Soul open from here when you want that next tool — one product at a time.',
+                },
+                portals_core: {
+                    title: 'Your products',
+                    content:
+                        'Money lives in the top nav. Growth opens from here when you want that next tool.',
                 },
             },
         },

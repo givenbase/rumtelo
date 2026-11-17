@@ -243,6 +243,8 @@ export function HomeDashboardClient() {
             baselineAllocated: baselineById.get(jar.id) ?? null,
         };
     });
+    // The dream from onboarding; shown on every launch surface (Soul is hidden in production).
+    const dreamLine = dashboard.why?.trim() || null;
     const monthScore = liveData?.monthScore ?? emptyMonthScore;
     const periodLabel = formatPeriod(dashboard.period ?? periodKey, locale);
     const travelMeta = liveData?.travel ?? emptyDashboard.travel;
@@ -428,6 +430,16 @@ export function HomeDashboardClient() {
                         {travelStrip}
                     </Typography>
                 ) : null}
+                {dreamLine ? (
+                    <p className="mt-3 flex min-w-0 flex-wrap items-baseline gap-x-2.5 gap-y-0.5 text-sm text-fg-secondary">
+                        <span className="font-mono text-[10px] font-medium tracking-[0.14em] text-accent uppercase">
+                            {tDashboard('why.label')}
+                        </span>
+                        <span className="min-w-0 text-pretty wrap-anywhere italic">
+                            {dreamLine}
+                        </span>
+                    </p>
+                ) : null}
             </div>
 
             {/* Coach + month-score advice share one slider when helpers are on. */}
@@ -603,7 +615,11 @@ export function HomeDashboardClient() {
                 !(canSeeEnergy && isProductEnabled('energy')) &&
                 !(canSeeSoul && isProductEnabled('soul')) ? (
                     <Typography as="p" size="sm" color="muted" className="sr-only">
-                        {t('features.tour.pages.home.steps.portals.content')}
+                        {t(
+                            isProductEnabled('energy') || isProductEnabled('soul')
+                                ? 'features.tour.pages.home.steps.portals.content'
+                                : 'features.tour.pages.home.steps.portals_core.content'
+                        )}
                     </Typography>
                 ) : null}
             </div>

@@ -1,3 +1,4 @@
+import { isProductEnabled } from '@/app/_lib/launch-products';
 import { moneyPath, growthPath, productPath } from '@/app/_lib/routes';
 import type { TranslateFn } from '@rumtelo/i18n';
 
@@ -62,6 +63,11 @@ export function buildShellTourSteps(t: TranslateFn): PageTourStep[] {
     ];
 }
 
+/** Energy/Soul help copy only while those portals are on (not in production). */
+function homeShowsWiderPortals(): boolean {
+    return isProductEnabled('energy') || isProductEnabled('soul');
+}
+
 /** Home chapter — chrome + dashboard (full tour starts here). */
 export function buildHomeTourSteps(t: TranslateFn): PageTourStep[] {
     return [
@@ -79,7 +85,11 @@ export function buildHomeTourSteps(t: TranslateFn): PageTourStep[] {
         step(
             '[data-tour="home-portals"]',
             t('pages.home.steps.portals.title'),
-            t('pages.home.steps.portals.content')
+            t(
+                homeShowsWiderPortals()
+                    ? 'pages.home.steps.portals.content'
+                    : 'pages.home.steps.portals_core.content'
+            )
         ),
     ];
 }
@@ -195,7 +205,7 @@ export function buildPageHelpForPathname(pathname: string, t: TranslateFn): Page
                 t,
                 'pages.home.title',
                 'pages.home.sections',
-                ['what_for', 'how'],
+                [homeShowsWiderPortals() ? 'what_for' : 'what_for_core', 'how'],
                 { id: 'home', steps: homeSteps, fullTour: true },
                 [explainVideo(t, 'general', 'general')]
             ),

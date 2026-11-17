@@ -7,7 +7,7 @@
 import { isProductEnabledAtLaunch, shouldDeferLaunchProducts } from '@rumtelo/contracts';
 
 import { env } from './get-env';
-import { PORTALS, type Portal } from './landing-content';
+import { FLOATERS, PORTALS, TICKER, type Portal } from './landing-content';
 
 export type LaunchOpts = { nodeEnv?: string | null };
 
@@ -28,3 +28,9 @@ export function isProductLive(product: string, opts: LaunchOpts = launchEnvOpts(
 
 /** Portals a visitor can use today, in landing order. */
 export const LIVE_PORTALS: Portal[] = PORTALS.filter(portal => isProductLive(portal.key));
+
+/** Hero floaters that only show live products (no sleep / stillness / intention in production). */
+export const LIVE_FLOATERS = FLOATERS.filter(item => !item.product || isProductLive(item.product));
+
+/** Hero ticker lines that only show live products. */
+export const LIVE_TICKER = TICKER.filter(item => !item.product || isProductLive(item.product));

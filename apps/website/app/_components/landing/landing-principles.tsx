@@ -4,10 +4,18 @@ import { Icon, Typography } from '@rumtelo/ui';
 import { useTranslations } from '@rumtelo/i18n';
 
 import { PRINCIPLES } from '@/lib/landing-content';
+import { isLaunchProductsDeferred } from '@/lib/launch-products';
+import { cn } from '@rumtelo/utils';
 
 import { Eyebrow } from './landing-primitives';
 
 const PRINCIPLE_KEYS = ['split', 'ten_minutes', 'energy', 'information'] as const;
+
+/** "Energy carries money" stays on Why and in the docs, but is not sold while Energy is held back. */
+const LIVE_PRINCIPLES = PRINCIPLES.map((principle, index) => ({
+    ...principle,
+    key: PRINCIPLE_KEYS[index]!,
+})).filter(principle => principle.key !== 'energy' || !isLaunchProductsDeferred());
 
 /**
  * Dark band — the four rules the product will not break. Locale owns the title.
@@ -16,6 +24,7 @@ const PRINCIPLE_KEYS = ['split', 'ten_minutes', 'energy', 'information'] as cons
  */
 export function LandingPrinciples() {
     const t = useTranslations('pages.landing');
+    const three = LIVE_PRINCIPLES.length === 3;
 
     return (
         <section id="principles" data-theme="dark" className="bg-bg-app text-fg">
@@ -23,7 +32,11 @@ export function LandingPrinciples() {
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
                     <div>
                         <Eyebrow className="text-accent-hover">
-                            {t('principles_section.eyebrow')}
+                            {t(
+                                three
+                                    ? 'principles_section.eyebrow_core'
+                                    : 'principles_section.eyebrow'
+                            )}
                         </Eyebrow>
                         <Typography as="h2" size="lg" className="mt-3.5 max-w-xl leading-[1.08]">
                             {t('principles_section.headline')}
@@ -31,9 +44,13 @@ export function LandingPrinciples() {
                     </div>
                 </div>
 
-                <ol className="mt-9 grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
-                    {PRINCIPLES.map((principle, index) => {
-                        const key = PRINCIPLE_KEYS[index]!;
+                <ol
+                    className={cn(
+                        'mt-9 grid grid-cols-1 gap-3.5 sm:grid-cols-2',
+                        three ? 'lg:grid-cols-3' : 'lg:grid-cols-4'
+                    )}>
+                    {LIVE_PRINCIPLES.map((principle, index) => {
+                        const { key } = principle;
                         return (
                             <li
                                 key={key}

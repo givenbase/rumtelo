@@ -41,7 +41,7 @@ export function LandingFaq() {
     const price = (cents: number) => formatPlanPrice(cents, { locale });
 
     return (
-        <section id="faq" className="border-t border-line bg-bg-app">
+        <section id="faq">
             <div className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-20">
                 <div className="grid gap-8 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-14">
                     <SectionHeading

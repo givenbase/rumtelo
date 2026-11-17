@@ -714,6 +714,7 @@
                 "lead": "One next move at a time. Answer here — leave only when the work is heavy.",
                 "quiet_title": "You're caught up for now",
                 "quiet_body": "Nothing urgent is waiting. Close the month when you are ready, or check My week.",
+                "quiet_body_core": "Nothing urgent is waiting. Close the month when you are ready, or open the week check.",
                 "progress": "{done} of ~{total}",
                 "card_eyebrow": "Next",
                 "answer_label": "Your answer",
@@ -3705,6 +3706,10 @@
                             "heading": "What you’re looking at",
                             "body": "Your grip snapshot for this month — The Coach, the money picture, and doors into Growth, Energy, and Soul. Start the full tour from Help to walk through Home, then jars, fixed costs, and income."
                         },
+                        "what_for_core": {
+                            "heading": "What you’re looking at",
+                            "body": "Your grip snapshot for this month — The Coach, the money picture, and the door into Growth. Start the full tour from Help to walk through Home, then jars, fixed costs, and income."
+                        },
                         "how": {
                             "heading": "How to use it",
                             "body": "Use Period (top right) to switch months. Open a portal when you want that tool. Tap Help anytime to replay this walkthrough."
@@ -3722,6 +3727,10 @@
                         "portals": {
                             "title": "Your products",
                             "content": "Money lives in the top nav. Growth, Energy, and Soul open from here when you want that next tool — one product at a time."
+                        },
+                        "portals_core": {
+                            "title": "Your products",
+                            "content": "Money lives in the top nav. Growth opens from here when you want that next tool."
                         }
                     }
                 },
@@ -4030,6 +4039,9 @@
                 "play_left": "In Play"
             },
             "open_portal": "Open ▸",
+            "why": {
+                "label": "Your dream"
+            },
             "widgets": {
                 "growth": {
                     "income_month": "INCOME THIS MONTH",
@@ -4052,7 +4064,7 @@
         "landing": {
             "meta": {
                 "title": "Rumtelo — Stop wondering where it went.",
-                "description": "Stop wondering where it went. See where your money, life, energy and time went — then get grip again. Clear tools, a tip from The Coach, you choose. Ten minutes a week. Built in Amsterdam. Free to start.",
+                "description": "Stop wondering where it went. Your income splits into six jars the second it lands. Ten minutes a week shows where it went and what to move. The Coach tips, you choose. Built in Amsterdam. Free to start.",
                 "keywords": [
                     "money overview",
                     "six jars",
@@ -4060,7 +4072,6 @@
                     "personal finance coach",
                     "financial freedom",
                     "week check",
-                    "energy sleep money",
                     "geld overzicht",
                     "potjes methode"
                 ]
@@ -4096,9 +4107,10 @@
             "hero": {
                 "eyebrow": "RUMTELO — GRIP ON LIFE",
                 "headline": "Stop wondering where it went.",
-                "lead": "Wondering what? All of it — your money, your life, your energy, your time. See where it went, then get grip again. The Coach tips. You choose.",
-                "cta_primary": "Start free — no card",
-                "cta_secondary": "See how it works",
+                "lead": "Your income splits into six jars the second it lands — bills, saving, freedom, fun. Ten minutes a week shows where it went and what to move.",
+                "cta_primary": "Split my income — free",
+                "cta_microline": "No card. No bank link needed.",
+                "cta_secondary": "See it in 3 steps",
                 "open_dashboard": "Open dashboard",
                 "manage_plan": "Manage plan",
                 "manage_plan_named": "Manage {plan}",
@@ -4107,7 +4119,26 @@
                 "demo_stage_complete": "THIS MONTH · EVERY AMOUNT HAS A JOB",
                 "demo_income_line": "Salary €3,450 · Freelance €850",
                 "demo_coach_eyebrow": "The Coach · this week",
-                "demo_coach_line": "Every amount has a job. Safe to spend today: €64. Sleep was 7h20 — a good week to decide things."
+                "demo_coach_line": "Every amount has a job. Safe to spend today: €64."
+            },
+            "how_section": {
+                "eyebrow": "HOW IT WORKS",
+                "headline": "Six jars. Ten minutes a week.",
+                "steps_aria": "How Rumtelo works in three steps",
+                "steps": {
+                    "split": {
+                        "title": "Income lands, money splits.",
+                        "body": "Enter your net income once. Rumtelo splits it over six jars, so every amount has a job before you spend."
+                    },
+                    "spend": {
+                        "title": "Spending finds its jar.",
+                        "body": "Bills draw from the right jar. Purchases land in your Inbox; sort them by hand or let a rule do it."
+                    },
+                    "week": {
+                        "title": "Ten minutes a week.",
+                        "body": "The week check shows where it went and what’s left. Move one amount, pick next week’s focus, done."
+                    }
+                }
             },
             "floaters": {
                 "f1": "+€3,450 · split in 0.4s",
@@ -4379,6 +4410,7 @@
             },
             "principles_section": {
                 "eyebrow": "FOUR PRINCIPLES WE DON’T BREAK",
+                "eyebrow_core": "THREE PRINCIPLES WE DON’T BREAK",
                 "headline": "If a feature fights a principle, the feature loses."
             },
             "principles": {
@@ -4501,7 +4533,7 @@
                 "audience_practice": "For practices",
                 "headline_practice": "Stop wondering where your clients stand.",
                 "lead_practice": "For coaches and advisors who help households. Your clients keep their own board; with their yes, you follow every board from one desk.",
-                "lead": "Start on Basic free. Choose Plus or Max and we’ll open Stripe Checkout after your account is set up — only when signup, verify and onboarding succeed.",
+                "lead": "Start free with your jars. Pay when it saves you work: your bank statements in, your debt-free date, your Course.",
                 "lead_on_plan": "You’re on {plan}. Upgrade, switch or manage billing in the app — changes apply to your household.",
                 "lead_loading": "Loading your plan…",
                 "lead_manage": "Open Plan & billing in the app to upgrade or change your package.",
@@ -4530,8 +4562,6 @@
                 "your_plan": "Your plan",
                 "products_title": "Products included",
                 "features_title": "Highlights",
-                "feature_count": "{included}/{total} features",
-                "product_none": "Not included",
                 "products_more": "More products on the way",
                 "footnote": "Prices in euro, VAT included. Basic may stay free or become a small fee later — nothing you enter is ever locked away."
             },
@@ -4542,7 +4572,7 @@
                 "line": "One desk for every client — sessions go to decisions, not to collecting numbers.",
                 "f1": "Invite clients by email — nothing is shared until they accept",
                 "f2": "Every client’s board, read-only, from one desk",
-                "f3": "A snapshot per client: spending, income, energy, stillness",
+                "f3": "A snapshot per client: income, jars, spending, week check",
                 "f4": "Between sessions, The Coach nudges — you guide the decisions",
                 "extras_title": "On top of the base price",
                 "extra_staff": "Staff seat",
@@ -4551,7 +4581,7 @@
                 "extra_view_hint": "They stay on free Basic. You see their board, read-only.",
                 "extra_view_price": "Free",
                 "extra_manage": "Client you sponsor",
-                "extra_manage_hint": "You pay their Plus plan — {discount}% less than the {retail} a month they’d pay themselves. Today: their full board, read-only. Coming next: editing their plan with them.",
+                "extra_manage_hint": "You pay for their Plus — {discount}% less than the {retail} a month they’d pay themselves. You see their full board, read-only.",
                 "per_month_each": "{price} / month each",
                 "example": "Example: you + {clients} sponsored clients = {total} / month in total.",
                 "cta": "Start a practice",
@@ -4573,19 +4603,31 @@
                     "f3": "ENERGY · sleep",
                     "f4": "SOUL · stillness, gratitude, one intention a week",
                     "f5": "The Coach, the week check, the month score",
-                    "f6": "1 full + 1 viewer seat (partner, coach or advisor)"
+                    "f6": "1 full + 1 viewer seat (partner, coach or advisor)",
+                    "outcome": {
+                        "money": "Six jars, your Inbox and fixed costs",
+                        "growth": "{maxGoals, plural, one {# goal} other {# goals}} and your income curve",
+                        "energy": "Sleep, the floor under every decision",
+                        "soul": "Stillness, gratitude, one intention a week"
+                    }
                 },
                 "plus": {
                     "name": "Plus",
                     "tag": "Most chosen",
                     "best_for": "Households, couples, paying off debt",
-                    "line": "You share money with a partner or family, are paying off debt, or want your bank statements in. Most people land here.",
+                    "line": "You share money with a partner or family, want your week planned around your goals, are paying off debt, or want your bank statements in. Most people land here.",
                     "f1": "Everything in Basic",
-                    "f2": "MONEY · debt plan with interest and a freedom date",
-                    "f3": "MONEY · bank statement import — live sync coming",
+                    "f2": "GROWTH · Course — plan your week around the three things that move your goals",
+                    "f3": "MONEY · debt plan with a freedom date, and bank statement import",
                     "f4": "GROWTH · Learn — books, courses, skills · up to {maxGoals} goals",
                     "f5": "ENERGY · your 168 hours, training, food",
-                    "f6": "Up to {maxMembers} seats — full and viewer mix"
+                    "f6": "Up to {maxMembers} seats — full and viewer mix",
+                    "outcome": {
+                        "money": "Your debt-free date and bank statement import",
+                        "growth": "Your Course, Learn and up to {maxGoals} goals",
+                        "energy": "Your 168 hours, training and food",
+                        "soul": "Everything in Basic"
+                    }
                 },
                 "max": {
                     "name": "Max",
@@ -4597,7 +4639,12 @@
                     "f3": "GROWTH · Learn picks on Masterclass, not Udemy",
                     "f4": "SOUL · the seven centers",
                     "f5": "Up to {maxMembers} seats (more full access)",
-                    "f6": "Devices — watch, scale, ring (coming)"
+                    "outcome": {
+                        "money": "Everything in Plus",
+                        "growth": "Net worth, returns, your freedom number and every goal",
+                        "energy": "Everything in Plus",
+                        "soul": "Plus the seven centers"
+                    }
                 }
             },
             "faq_section": {
@@ -5203,10 +5250,10 @@
             "jars_read_more": "Read more about the six jars method",
             "jars_spaarpotjes_help": "What are spaarpotjes?",
             "why": "Your dream",
-            "why_body": "In one short sentence: why do you want Rumtelo — or what dream are you working toward? We put it on your dashboard as a small reminder of what you are working for.",
+            "why_body": "In one short sentence: why do you want Rumtelo — or what dream are you working toward? We show it at the top of your Home as a small reminder of what you are working for.",
             "why_tip": "Write a dream or a reason — not a number. Keep it simple.",
             "why_label": "Your dream or reason",
-            "why_hint": "Shown on your dashboard as a reminder. You can change it later.",
+            "why_hint": "Shown at the top of your Home as a reminder.",
             "why_placeholder": "e.g. A house in the sun, sea & fresh fruit",
             "why_examples": {
                 "house": "A house in the sun",
@@ -5388,6 +5435,7 @@
                 "access_eyebrow": "Access",
                 "progress_eyebrow": "Portal snapshot",
                 "progress_blurb": "Live money, growth, energy, and soul metrics for this household.",
+                "progress_blurb_core": "Live money and growth metrics for this household.",
                 "progress_pending": "Waiting for the household to accept the invitation.",
                 "progress_view_only": "View access — invite accepted. Switch to Manage to sponsor their Plus plan.",
                 "portal_money": "Money",
@@ -5853,6 +5901,7 @@
                 "coach": {
                     "eyebrow": "The Coach",
                     "blurb": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the inbox at Home → The Coach holds tip cards across money, growth, energy, and soul.",
+                    "blurb_core": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the inbox at Home → The Coach holds tip cards across money and growth.",
                     "toggle": "Show The Coach on screens",
                     "hint_on": "On — look for the ✦ The Coach mark. Inbox stays at Home → The Coach.",
                     "hint_off": "Off — on-screen tips hidden. The Coach inbox still available anytime."
@@ -6065,6 +6114,7 @@
                 "sharing": {
                     "eyebrow": "Privacy and sharing",
                     "blurb": "What members may share in Growth, Energy, Soul and Money. Only the owner changes this. Keeping something to yourself is always possible.",
+                    "blurb_core": "What members may share in Growth and Money. Only the owner changes this. Keeping something to yourself is always possible.",
                     "owner_only": "Only the owner of the household can change this.",
                     "mode_label": "What may members share?",
                     "modes": {
@@ -6147,7 +6197,10 @@
                     "card_plus_tag": "Most chosen",
                     "card_plus_line": "Share the board with family or friends — debt, Learn, energy week, and more goals.",
                     "card_plus_feats": "{members} · Debt · Learn · ENERGY · Goals",
+                    "card_plus_line_core": "Share the board with family or friends — debt, Learn, Course, and more goals.",
+                    "card_plus_feats_core": "{members} · Debt · Learn · Course · Goals",
                     "card_max_tag": "All four portals",
+                    "card_max_tag_core": "Everything, no limits",
                     "card_max_line": "Unlimited household, income curve, Learn, and net worth.",
                     "card_max_feats": "{members} · MONEY · Masterclass Learn · Net worth",
                     "monthly": "Monthly",
@@ -6700,6 +6753,7 @@
             "eyebrow": "✦ Why Rumtelo",
             "stand_on": "What we stand on",
             "lead": "Wondering what? All of it — your money, your life, your energy, your time. Rumtelo helps you see where it went, so nothing stays a mystery. From there you get grip again: control over what matters. Clear tools for that, and we’ll keep adding more. The Coach can give a tip. You choose what to do next.",
+            "lead_core": "Wondering what? Where your money went. Rumtelo helps you see it, so nothing stays a mystery. From there you get grip again: control over what matters. Clear tools for that, and we’ll keep adding more. The Coach can give a tip. You choose what to do next.",
             "meaning_eyebrow": "✦ How Rumtelo helps you",
             "meaning": {
                 "money_leaves_body": "When money leaves, you see which jar it came from — and how much is left for that job. Not a spreadsheet after the fact.",

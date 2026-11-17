@@ -19,10 +19,10 @@ const onboarding = {
     jars_spaarpotjes_help: 'What are spaarpotjes?',
     why: 'Your dream',
     why_body:
-        'In one short sentence: why do you want Rumtelo — or what dream are you working toward? We put it on your dashboard as a small reminder of what you are working for.',
+        'In one short sentence: why do you want Rumtelo — or what dream are you working toward? We show it at the top of your Home as a small reminder of what you are working for.',
     why_tip: 'Write a dream or a reason — not a number. Keep it simple.',
     why_label: 'Your dream or reason',
-    why_hint: 'Shown on your dashboard as a reminder. You can change it later.',
+    why_hint: 'Shown at the top of your Home as a reminder.',
     why_placeholder: 'e.g. A house in the sun, sea & fresh fruit',
     why_examples: {
         house: 'A house in the sun',

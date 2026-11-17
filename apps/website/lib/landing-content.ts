@@ -208,8 +208,16 @@ const FLOATER_SLOTS = [
     ['f12', 10, 72, 10, 10.6, 0.08],
 ] as const;
 
+/** Labels that show a product's data — dropped with it while that product is not live (`LIVE_FLOATERS`). */
+const FLOATER_PRODUCT: Partial<Record<string, Portal['key']>> = {
+    f2: 'energy',
+    f5: 'soul',
+    f9: 'soul',
+};
+
 export const FLOATERS = FLOATER_SLOTS.map(([key, left, top, size, delay, opacity], i) => ({
     key,
+    product: FLOATER_PRODUCT[key],
     left: `${left}%`,
     top: `${top}%`,
     size: `${size}px`,
@@ -234,8 +242,16 @@ const TICKER_SLOTS = [
     ['t12', 'var(--color-warning)'],
 ] as const;
 
+/** Ticker lines tied to one product — dropped with it while that product is not live (`LIVE_TICKER`). */
+const TICKER_PRODUCT: Partial<Record<string, Portal['key']>> = {
+    t3: 'energy',
+    t5: 'soul',
+    t10: 'soul',
+};
+
 export const TICKER = [...TICKER_SLOTS, ...TICKER_SLOTS].map(([key, dot], index) => ({
     key,
+    product: TICKER_PRODUCT[key],
     dot,
     id: `${index}-${key}`,
 }));

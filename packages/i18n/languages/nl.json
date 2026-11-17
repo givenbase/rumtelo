@@ -590,7 +590,7 @@
             },
             "home-coach": {
                 "name": "Coach",
-                "description": "Suggesties voor verschillende producten — wekelijkse controle, maandelijkse score en volgende stappen."
+                "description": "Tips over alle producten — weekcheck, maandscore en volgende stappen."
             },
             "home-why": {
                 "name": "Waarom",
@@ -714,6 +714,7 @@
                 "lead": "Eén volgende zet tegelijk. Antwoord hier — ga alleen weg als het werk zwaar is.",
                 "quiet_title": "Je bent bij voor nu",
                 "quiet_body": "Niets dringends wacht. Sluit de maand af als je er klaar voor bent, of bekijk Mijn week.",
+                "quiet_body_core": "Niets dringends wacht. Sluit de maand af als je er klaar voor bent, of open de weekcheck.",
                 "progress": "{done} van ~{total}",
                 "card_eyebrow": "Volgende",
                 "answer_label": "Jouw antwoord",
@@ -783,7 +784,7 @@
                 "kind_win": "Winnen",
                 "kind_warning": "Waarschuwing",
                 "kind_insight": "Inzicht",
-                "kind_week_check": "Wekelijkse controle",
+                "kind_week_check": "Weekcheck",
                 "kind_on_track": "Op schema",
                 "kind_alert": "Waarschuwing",
                 "share": "Delen",
@@ -2212,7 +2213,7 @@
                 "week_check": {
                     "title": "Weekcheck",
                     "lead": "Tien minuten: terugkijken, je routines vasthouden, je 3 zetten voor {week}.",
-                    "steps_aria": "Stappen van de wekelijkse controle",
+                    "steps_aria": "Stappen van de weekcheck",
                     "step_back": "Terugblik",
                     "step_rhythm": "Routines",
                     "step_ahead": "Jouw 3",
@@ -3052,8 +3053,8 @@
                 "intend_encourage": "Goed. Onthoud dit als je het deze week even moeilijk hebt.",
                 "back": "← Terug",
                 "next": "Volgende →",
-                "complete": "Weekcontrole voltooid ✓",
-                "toast_done": "De wekelijkse controle is afgerond. Tot volgende week.",
+                "complete": "Weekcheck voltooid ✓",
+                "toast_done": "De weekcheck is afgerond. Tot volgende week.",
                 "done_eyebrow": "✦ Klaar",
                 "done_title": "De controle van deze week is afgerond",
                 "done_lead": "Eén blik, één doorverwijzing, één bedoeling. Kom volgende week weer eens langs.",
@@ -3705,6 +3706,10 @@
                             "heading": "Wat je hier ziet",
                             "body": "Je grip-overzicht voor deze maand — De Coach, het geldbeeld en de deuren naar Groei, Energie en Ziel. Begin de volledige rondleiding bij ‘Help’ en loop vervolgens door ‘Thuis’, daarna ‘Potten’, ‘Vaste kosten’ en ‘Inkomsten’."
                         },
+                        "what_for_core": {
+                            "heading": "Wat je hier ziet",
+                            "body": "Je grip-overzicht voor deze maand — De Coach, het geldbeeld en de deur naar Groei. Start de volledige rondleiding via Help: eerst Home, dan potjes, vaste kosten en inkomen."
+                        },
                         "how": {
                             "heading": "Hoe gebruik je het?",
                             "body": "Gebruik ‘Periode’ (rechtsboven) om van maand te wisselen. Open een portaal wanneer je dat gereedschap nodig hebt. Tik op elk moment op ‘Help’ om deze uitleg opnieuw af te spelen."
@@ -3722,6 +3727,10 @@
                         "portals": {
                             "title": "Uw producten",
                             "content": "Money staat in de bovenste navigatiebalk. Vanuit hier kun je ‘Growth’, ‘Energy’ en ‘Soul’ openen wanneer je het volgende hulpmiddel nodig hebt — één product tegelijk."
+                        },
+                        "portals_core": {
+                            "title": "Jouw producten",
+                            "content": "Geld staat in de bovenste navigatie. Groei open je vanaf hier, wanneer je dat volgende hulpmiddel wilt."
                         }
                     }
                 },
@@ -3910,7 +3919,7 @@
         "dashboard": {
             "month_score": {
                 "eyebrow": "✦ Maandscore",
-                "label": "Uitslag",
+                "label": "Score",
                 "days_left_one": "Nog 1 dag te gaan",
                 "days_left_other": "{count} dagen te gaan",
                 "last_day": "Laatste dag om af te sluiten",
@@ -3963,17 +3972,17 @@
                 "unlocks": {
                     "six_jars": "Zes potjes",
                     "inbox": "Inbox",
-                    "week_check": "Wekelijkse controle",
+                    "week_check": "Weekcheck",
                     "goals": "Doelstellingen",
                     "debts": "Schulden",
                     "energy_layer": "Energielaag",
-                    "coach": "Coach",
+                    "coach": "De Coach",
                     "export": "Exporteren"
                 }
             },
             "recap": {
-                "surplus": "{amount} heeft deze periode verlaten",
-                "overspent": "Er is te veel uitgegeven aan een of meer potten"
+                "surplus": "{amount} over deze periode",
+                "overspent": "Eén of meer potjes zijn overschreden"
             },
             "household": {
                 "eyebrow": "Jullie huishouden",
@@ -3987,32 +3996,32 @@
                 "practice_none": "Geen coach gekoppeld",
                 "practice_pending": "{count, plural, one {# uitnodiging open} other {# uitnodigingen open}}",
                 "practice_active": "{count, plural, one {Gekoppeld · {name}} other {# Practices gekoppeld}}",
-                "attention_eyebrow": "Jouw OK nodig",
+                "attention_eyebrow": "Jouw akkoord nodig",
                 "attention_blurb": "Een Practice vroeg om dit bord te bekijken of te beheren. Accepteer alleen als je ze kent."
             },
             "coach": {
-                "inbox_one": "{count}-transactie wacht op een pot.",
-                "inbox_many": "{count} transacties die wachten op een pot.",
-                "all_sorted": "Alles geregeld — tijd om intenties te formuleren.",
+                "inbox_one": "{count} transactie wacht op een potje.",
+                "inbox_many": "{count} transacties wachten op een potje.",
+                "all_sorted": "Alles gesorteerd — tijd voor een intentie.",
                 "sort_inbox": "Inbox sorteren",
-                "week_check": "Wekelijkse controle",
-                "see_jars": "Zie potten",
-                "practice_pending_one": "Er staat een uitnodiging voor een oefening op je wachten — accepteer deze in de instellingen als je ze op je bord wilt hebben.",
-                "practice_pending_many": "{count} Er staan uitnodigingen voor oefeningen klaar — accepteer ze in de instellingen als je ze op je bord wilt hebben.",
-                "practice_pending_cta": "Uitnodiging voor een recensie"
+                "week_check": "Weekcheck",
+                "see_jars": "Bekijk potjes",
+                "practice_pending_one": "Er wacht een uitnodiging van een Practice — accepteer die in Instellingen als je ze op je bord wilt.",
+                "practice_pending_many": "{count} uitnodigingen van een Practice wachten — accepteer ze in Instellingen als je ze op je bord wilt.",
+                "practice_pending_cta": "Uitnodiging bekijken"
             },
             "hero": {
                 "money_accumulated": "Geld · {period}",
-                "money_put_through": "Geld · Verspreid over {months} maanden",
-                "money_put_through_one": "Geld · Over een periode van meer dan 1 maand gestort",
-                "money_distributed": "Geld · Deze maand uitgekeerd",
+                "money_put_through": "Geld · Verwerkt over {months} maanden",
+                "money_put_through_one": "Geld · Verwerkt over 1 maand",
+                "money_distributed": "Geld · Deze maand verdeeld",
                 "money_allocated_month": "Geld · Deze maand toegewezen",
-                "income_span": "Gedurende {months} maanden · {jars} potten",
-                "income_span_one_jar": "Gedurende {months} maanden · 1 pot",
-                "income_month": "Verspreid over {jars} potten",
-                "income_month_one_jar": "Verdeeld over 1 pot",
+                "income_span": "Over {months} maanden · {jars} potjes",
+                "income_span_one_jar": "Over {months} maanden · 1 potje",
+                "income_month": "Verdeeld over {jars} potjes",
+                "income_month_one_jar": "Verdeeld over 1 potje",
                 "see_income": "Zie inkomsten ▸",
-                "in_pots_label": "In de potten",
+                "in_pots_label": "In de potjes",
                 "in_pots_hint": "Opgebouwd over de maanden",
                 "six_jars": "✦ De zes potjes",
                 "see_all_jars": "Alles bekijken ▸"
@@ -4027,9 +4036,12 @@
             "stats": {
                 "avg_left": "Gem. rest",
                 "safe_per_day": "Veilig / dag",
-                "play_left": "In het spel"
+                "play_left": "In Plezier"
             },
             "open_portal": "Openen ▸",
+            "why": {
+                "label": "Jouw droom"
+            },
             "widgets": {
                 "growth": {
                     "income_month": "INKOMSTEN DEZE MAAND",
@@ -4051,23 +4063,22 @@
         },
         "landing": {
             "meta": {
-                "title": "Rumtelo — Je hoeft je niet meer af te vragen waar het gebleven is.",
-                "description": "Vraag je niet langer af waar het gebleven is. Ontdek waar je geld, je leven, je energie en je tijd naartoe zijn gegaan — en krijg weer grip op de situatie. Handige tools, een tip van The Coach: jij kiest. Tien minuten per week. Ontwikkeld in Amsterdam. Gratis om mee te beginnen.",
+                "title": "Rumtelo — Niet meer gissen waar het bleef.",
+                "description": "Niet meer gissen waar het bleef. Je inkomen gaat zodra het binnenkomt over zes potjes. Tien minuten per week laat zien waar het bleef en wat je verschuift. De Coach tipt, jij kiest. Gemaakt in Amsterdam. Gratis om te beginnen.",
                 "keywords": [
                     "geldoverzicht",
-                    "zes potten",
-                    "greep op het leven",
-                    "coach op het gebied van persoonlijke financiën",
+                    "zes potjes",
+                    "grip op je leven",
+                    "coach voor persoonlijke financiën",
                     "financiële vrijheid",
-                    "wekelijkse controle",
-                    "energie, slaap, geld",
-                    "geldoverzicht",
-                    "de potjesmethode"
+                    "weekcheck",
+                    "overzicht van je geld",
+                    "potjesmethode"
                 ]
             },
             "header": {
                 "portals": "Portalen",
-                "aria_primary": "Basisonderwijs",
+                "aria_primary": "Hoofdmenu",
                 "aria_mobile": "Mobiel",
                 "how_it_works": "Hoe het werkt",
                 "pricing": "Prijzen",
@@ -4089,38 +4100,58 @@
                 "manage_plan": "Upgraden, downgraden of beheren",
                 "plan_named": "{plan}-plan",
                 "sign_out_sub": "Deze browsersessie afsluiten",
-                "staging_banner_badge": "Enscenering",
-                "staging_banner": "Staging — not live production. Data here may be reset.",
-                "staging_banner_aria": "Mededeling over de testomgeving"
+                "staging_banner_badge": "Staging",
+                "staging_banner": "Niet de live omgeving — gegevens hier kunnen worden gereset.",
+                "staging_banner_aria": "Melding over de staging-omgeving"
             },
             "hero": {
-                "eyebrow": "RUMTELO — HET LEVEN IN DE GREEP",
-                "headline": "Vraag je niet langer af waar het gebleven is.",
-                "lead": "Vraag je je af wat? Alles: je geld, je leven, je energie, je tijd. Kijk eens waar het allemaal gebleven is, en krijg er weer grip op. De Coach geeft tips. Jij kiest.",
-                "cta_primary": "Begin gratis — geen creditcard nodig",
-                "cta_secondary": "Bekijk hoe het werkt",
+                "eyebrow": "RUMTELO — GRIP OP JE LEVEN",
+                "headline": "Niet meer gissen waar het bleef.",
+                "lead": "Je inkomen gaat zodra het binnenkomt over zes potjes — vaste kosten, sparen, vrijheid, plezier. Tien minuten per week laat zien waar het bleef en wat je verschuift.",
+                "cta_primary": "Verdeel mijn inkomen — gratis",
+                "cta_microline": "Geen kaart. Geen bankkoppeling nodig.",
+                "cta_secondary": "Bekijk het in 3 stappen",
                 "open_dashboard": "Dashboard openen",
                 "manage_plan": "Abonnement beheren",
                 "manage_plan_named": "{plan} beheren",
-                "demo_stage_landing": "INKOMSTEN KOMEN ERAAN…",
-                "demo_stage_splitting": "VERDEELD OVER ZES POTTEN…",
-                "demo_stage_complete": "DEZE MAAND · ELK BEDRAG HEEFT EEN DOEL",
+                "demo_stage_landing": "INKOMEN KOMT BINNEN…",
+                "demo_stage_splitting": "VERDEELD OVER ZES POTJES…",
+                "demo_stage_complete": "DEZE MAAND · ELK BEDRAG HEEFT EEN TAAK",
                 "demo_income_line": "Salaris € 3.450 · Freelance € 850",
                 "demo_coach_eyebrow": "De Coach · deze week",
-                "demo_coach_line": "Elk bedrag heeft een bestemming. Vandaag kan ik gerust €64 uitgeven. Ik heb 7 uur en 20 minuten geslapen — een goede week om beslissingen te nemen."
+                "demo_coach_line": "Elk bedrag heeft een taak. Vandaag veilig uit te geven: €64."
+            },
+            "how_section": {
+                "eyebrow": "HOE HET WERKT",
+                "headline": "Zes potjes. Tien minuten per week.",
+                "steps_aria": "Zo werkt Rumtelo in drie stappen",
+                "steps": {
+                    "split": {
+                        "title": "Inkomen binnen, geld verdeeld.",
+                        "body": "Vul één keer je netto-inkomen in. Rumtelo verdeelt het over zes potjes, zodat elk bedrag een taak heeft vóór je uitgeeft."
+                    },
+                    "spend": {
+                        "title": "Uitgaven vinden hun potje.",
+                        "body": "Vaste kosten gaan van het juiste potje af. Aankopen komen in je Inbox; sorteer ze zelf of laat een regel het doen."
+                    },
+                    "week": {
+                        "title": "Tien minuten per week.",
+                        "body": "De weekcheck laat zien waar het bleef en wat er over is. Verschuif één bedrag, kies je focus voor volgende week, klaar."
+                    }
+                }
             },
             "floaters": {
                 "f1": "+€ 3.450 · in 0,4 s verdeeld",
                 "f2": "Slaap 7 uur en 20 minuten ↑",
-                "f3": "+850 € als freelancer",
-                "f4": "NEC → 2.365 euro",
-                "f5": "Doelstelling vastgesteld",
+                "f3": "+€ 850 freelance",
+                "f4": "Noodzakelijk → € 2.365",
+                "f5": "Intentie gezet",
                 "f6": "−€38,65 → Noodzakelijk",
-                "f7": "1 boek · Onderwijs",
-                "f8": "FF → 430 € · geïnvesteerd",
+                "f7": "1 boek · Opleiding",
+                "f8": "FF → € 430 · geïnvesteerd",
                 "f9": "Stilte · dag 6",
                 "f10": "55 / 10 / 10 / 10 / 10 / 5",
-                "f11": "Wekelijkse controle · 9 min",
+                "f11": "Weekcheck · 9 min",
                 "f12": "Maandscore 82"
             },
             "ticker": {
@@ -4128,13 +4159,13 @@
                 "t2": "Boodschappen −38,65 € → Noodzakelijk",
                 "t3": "Slaap 7 uur en 20 minuten · trend ↑",
                 "t4": "€ 430 → wereldwijd indexfonds",
-                "t5": "Doel gesteld: „één eerlijke week“",
+                "t5": "Intentie gezet: “één eerlijke week”",
                 "t6": "Koffie −€5,20 → Plezier",
-                "t7": "Boek uitgelezen · Onderwijspot",
+                "t7": "Boek uitgelezen · potje Opleiding",
                 "t8": "Schuldenvrij: februari 2035 · ligt op schema",
-                "t9": "Wekelijkse controle voltooid · 9 min",
+                "t9": "Weekcheck klaar · 9 min",
                 "t10": "Stilte · dag 6",
-                "t11": "Vandaag te besteden: 64 euro",
+                "t11": "Vandaag veilig uit te geven: € 64",
                 "t12": "Sportschool −€32 → Plezier · gemarkeerd, één zet"
             },
             "proof": {
@@ -4143,8 +4174,8 @@
                     "label": "per week — geen dagelijks huiswerk"
                 },
                 "jars": {
-                    "value": "6 potten",
-                    "label": "de gronden die extra inkomsten opleverden, in gebruik genomen"
+                    "value": "6 potjes",
+                    "label": "gevuld zodra je inkomen binnenkomt"
                 },
                 "free": {
                     "value": "Gratis",
@@ -4152,40 +4183,40 @@
                 }
             },
             "jars_section": {
-                "eyebrow": "DE ZES KRUIKEN",
-                "headline": "Zes banen, dus er hoeft geen enkel bedrag op zichzelf te worden beoordeeld.",
-                "lead": "Op elke pot staat een regel die je in één regel kunt lezen: wat er wel in hoort en wat niet. De percentages kun je naar eigen inzicht aanpassen. Het gaat om de gewoonte."
+                "eyebrow": "DE ZES POTJES",
+                "headline": "Zes taken, zodat geen enkel bedrag zelf hoeft te beslissen.",
+                "lead": "Elk potje heeft een regel die je in één zin leest: wat erin hoort en wat niet. De percentages kun je zelf aanpassen. Het gaat om de gewoonte."
             },
             "jars": {
                 "nec": {
-                    "name": "Noodzaak",
-                    "line": "Huur, energiekosten, verzekeringen, boodschappen, vervoer. De dingen die je nu eenmaal moet betalen, of je dat nu leuk vindt of niet.",
-                    "not": "Niet voor uit eten gaan of kleding — dat is Play."
+                    "name": "Noodzakelijk",
+                    "line": "Huur, energie, verzekeringen, boodschappen, vervoer. De dingen die komen, of je het nu leuk vindt of niet.",
+                    "not": "Niet voor uit eten of kleding — dat is Plezier."
                 },
                 "ff": {
                     "name": "Financiële vrijheid",
-                    "line": "Indexfondsen, een waarborgsom voor onroerend goed, je eigen bedrijf. Met dit spaarpotje koop je dingen die je geld opleveren.",
-                    "not": "Nooit uitgegeven. Alleen maar geïnvesteerd."
+                    "line": "Indexfondsen, een aanbetaling voor een huis, je eigen bedrijf. Met dit potje koop je dingen die je iets opleveren.",
+                    "not": "Nooit uitgegeven. Alleen geïnvesteerd."
                 },
                 "edu": {
-                    "name": "Onderwijs",
-                    "line": "Boeken, cursussen, een mentor, een hulpmiddel dat je beter maakt. De enige pot waarin je uitgaven je waarde verhogen.",
-                    "not": "Dat noem je geen onderzoek, maar gewoon gadgets."
+                    "name": "Opleiding",
+                    "line": "Boeken, cursussen, een mentor, een hulpmiddel waar je beter van wordt. Het enige potje waar uitgeven je meer waard maakt.",
+                    "not": "Niet voor gadgets die je onderzoek noemt."
                 },
                 "lts": {
-                    "name": "Besparingen op de lange termijn",
-                    "line": "Eerst het noodfonds, daarna de auto, de borgsom en de belastingaanslag waarvan je weet dat die eraan komt.",
-                    "not": "Niet voor iets wat je deze maand wilt hebben."
+                    "name": "Langetermijn sparen",
+                    "line": "Eerst een noodfonds, dan de auto, de borg en de belastingaanslag waarvan je weet dat die eraan komt.",
+                    "not": "Niet voor iets wat je deze maand wilt."
                 },
                 "play": {
                     "name": "Plezier",
-                    "line": "Uit eten gaan, naar een concert, iets spontaans. Doe het gewoon, zonder toestemming te vragen.",
-                    "not": "Het moet aan het einde van de maand leeg zijn. Dat is het punt."
+                    "line": "Uit eten, een concert, iets spontaans. Geef het uit zonder toestemming te vragen.",
+                    "not": "Moet aan het eind van de maand leeg zijn. Dat is de bedoeling."
                 },
                 "give": {
-                    "name": "Geef",
-                    "line": "Een goed doel, een vriend die hulp nodig heeft, ooit je eigen stichting. Vrijgevigheid als gewoonte, niet als opwelling.",
-                    "not": "Geen fooi die je al hebt gegeven."
+                    "name": "Geven",
+                    "line": "Een goed doel, een vriend die het nodig heeft, ooit je eigen stichting. Vrijgevigheid als gewoonte, niet als bui.",
+                    "not": "Niet voor een fooi die je al hebt gegeven."
                 }
             },
             "portals_section": {
@@ -4278,10 +4309,10 @@
                     "soul": "Stilte · dag 6"
                 },
                 "coach_lines": {
-                    "money": "Het spel staat €38 boven de lijn. Eén optie: het overboeken naar de langetermijnspaarrekening — of het gewoon zo laten.",
-                    "growth": "Aan kostenbesparingen zit een ondergrens. Aan inkomstenverhoging niet. Een bijverdienste is al 20% van de weg.",
-                    "energy": "Drie nachten van minder dan 6,5 uur — en Play ging op die dagen omhoog. Eerst slapen. Dan beslissen.",
-                    "soul": "Het doel is gesteld. Eén zin is genoeg — de week heeft nu een richting."
+                    "money": "Plezier zit €38 boven de lijn. Eén stap: haal het uit Langetermijn sparen — of laat het staan.",
+                    "growth": "Kosten besparen heeft een bodem. Meer verdienen niet. Je bijverdienste is al 20% op weg.",
+                    "energy": "Drie nachten onder de 6,5 uur — en Plezier ging omhoog op die dagen. Eerst slapen. Dan beslissen.",
+                    "soul": "Intentie gezet. Eén zin is genoeg — de week heeft nu een richting."
                 },
                 "money_rows": {
                     "salary": {
@@ -4290,7 +4321,7 @@
                     },
                     "groceries": {
                         "label": "Albert Heijn",
-                        "jar": "Noodzaak"
+                        "jar": "Noodzakelijk"
                     },
                     "coffee": {
                         "label": "Koffiebar",
@@ -4312,15 +4343,15 @@
                     },
                     "course": {
                         "name": "Cursus · gegevensanalyse",
-                        "meta": "Leerpot"
+                        "meta": "Potje Opleiding"
                     }
                 },
                 "growth_income_label": "+14% in zes maanden",
                 "energy_days": {
                     "mo": "Ma",
-                    "tu": "Tu",
-                    "we": "Wij",
-                    "th": "De",
+                    "tu": "Di",
+                    "we": "Wo",
+                    "th": "Do",
                     "fr": "Vr",
                     "sa": "Za",
                     "su": "Zo"
@@ -4340,14 +4371,14 @@
             },
             "why": {
                 "eyebrow": "WAAROM RUMTELO BESTAAT",
-                "headline": "Ga niet achter cijfers aan. Bepaal zelf de koers.",
-                "quote": "Rijkdom is geen getal. Het is de invloed die het op je leven heeft.",
-                "body": "We hebben Rumtelo in de eerste plaats voor onszelf ontwikkeld. We verdienden goed, maar vroegen ons toch af waar het allemaal bleef: geld, leven, energie, tijd. Budgetapps hielden pas achteraf de balans bij. Niemand hielp ons om weer grip op de zaken te krijgen. Dus hebben we gemaakt wat we nodig hadden: duidelijke hulpmiddelen, een tip van The Coach, en jij kiest. Vervolgens hebben we het op de markt gebracht, zodat anderen hetzelfde kunnen doen.",
+                "headline": "Jaag niet op het getal. Kies de richting.",
+                "quote": "Rijkdom is geen getal. Het is grip op je leven.",
+                "body": "We bouwden Rumtelo eerst voor onszelf. We verdienden prima en vroegen ons toch af waar het bleef: geld, leven, energie, tijd. Budgetapps telden achteraf. Niemand hielp ons weer grip te krijgen. Dus maakten we wat we nodig hadden: duidelijke tools, een tip van De Coach, en jij kiest. Daarna brachten we het op de markt, zodat anderen hetzelfde kunnen doen.",
                 "books_eyebrow": "GEBASEERD OP BEWEZEN BOEKEN",
                 "books_lead": "Rumtelo is geen nieuwe theorie. Het zet ideeën uit boeken die al decennialang bepalend zijn geweest voor geld, denkwijzen en richting, om in een dagelijkse routine die je ook echt kunt volhouden.",
                 "signature": "Given Loyiso, oprichter en CEO · Charissa Peroti, medeoprichtster · Amsterdam",
-                "manifesto": "Ga niet achter cijfers aan. Bepaal zelf de koers.",
-                "audience": "Gemaakt voor mensen die het goed doen — en voor mensen die er klaar voor zijn.",
+                "manifesto": "Jaag niet op het getal. Kies de richting.",
+                "audience": "Voor wie het goed doet — en voor wie er klaar voor is.",
                 "more_books": "Meer boeken",
                 "books": {
                     "rich_dad": {
@@ -4363,12 +4394,12 @@
                     "millionaire_mind": {
                         "title": "De geheimen van de miljonairsmentaliteit",
                         "author": "T. Harv Eker",
-                        "line": "De verdeling over zes potten — elk bedrag wordt meteen ingezet zodra het binnenkomt."
+                        "line": "De verdeling over zes potjes — elk bedrag krijgt een taak zodra het binnenkomt."
                     },
                     "psychology": {
                         "title": "De psychologie van geld",
                         "author": "Morgan Housel",
-                        "line": "Gedrag is belangrijker dan slimheid — kalmte wint het van paniek en schaamte."
+                        "line": "Gedrag wint van slimheid — rustige systemen boven paniek en schaamte."
                     },
                     "secret": {
                         "title": "Het geheim",
@@ -4379,11 +4410,12 @@
             },
             "principles_section": {
                 "eyebrow": "VIER PRINCIPES WAAR WE ONS AAN HOUDEN",
-                "headline": "Als een functie in strijd is met een principe, dan krijgt de functie het onderspit."
+                "eyebrow_core": "DRIE PRINCIPES WAAR WE ONS AAN HOUDEN",
+                "headline": "Als een functie een principe in de weg zit, verliest de functie."
             },
             "principles": {
                 "split": {
-                    "title": "Eerst verdelen. Pas daarna uitgeven.",
+                    "title": "Eerst verdelen. Dan uitgeven.",
                     "body": "Geld moet eerst een bestemming krijgen voordat het wordt uitgegeven."
                 },
                 "ten_minutes": {
@@ -4391,54 +4423,54 @@
                     "body": "Een korte, terugkerende routine is beter dan elke dag zorgen maken."
                 },
                 "energy": {
-                    "title": "Energie levert geld op.",
+                    "title": "Energie draagt geld.",
                     "body": "Een vermoeid hoofd geeft geld uit. Een uitgerust hoofd neemt beslissingen."
                 },
                 "information": {
                     "title": "Informatie, nooit schaamte.",
-                    "body": "Een ‘over-the-line’-waarschuwing is een signaal, geen oordeel. Bij elke waarschuwing hoort precies die ene maatregel waarmee het probleem kan worden opgelost."
+                    "body": "Een potje dat over de streep gaat is een signaal, geen oordeel. Bij elke waarschuwing hoort de ene stap die het oplost."
                 }
             },
             "coach_section": {
                 "eyebrow": "DE COACH",
-                "headline": "De tips van de coach. Jij kiest.",
-                "lead": "Eén tip over waar je staat, één stap die je kunt zetten — per product, en allemaal bij elkaar op de Coach-pagina. Geen wirwar van grafieken. Geen preek. Nooit iemand in verlegenheid brengen. Jij houdt de touwtjes in handen.",
+                "headline": "De Coach tipt. Jij kiest.",
+                "lead": "Eén tip over waar je staat, één stap die je kunt zetten — in elk product, en samen op de pagina van De Coach. Geen muur van grafieken. Geen preek. Nooit schaamte. Jij houdt de regie.",
                 "points": {
                     "one": "Eén tip, één volgende stap — nooit een stapel grafieken",
-                    "quiet": "Rustig blijven totdat er voldoende gegevens zijn — ruis is geen inzicht",
-                    "shame": "Informatie, nooit beschaming — een ‘over-the-line’-potje is een signaal, geen oordeel",
-                    "ten": "Tien minuten per week met de coach — geen dagelijkse huiswerkopdrachten"
+                    "quiet": "Stil totdat er genoeg gegevens zijn — ruis is geen inzicht",
+                    "shame": "Informatie, nooit schaamte — een potje over de streep is een signaal, geen oordeel",
+                    "ten": "Tien minuten per week met De Coach — geen dagelijks huiswerk"
                 },
-                "demo_aria": "Voorbeeld van de Coach — één tip per portaal",
-                "demo_feed_eyebrow": "De Coach · op elk portaal",
+                "demo_aria": "Voorbeeld van De Coach — één tip per portaal",
+                "demo_feed_eyebrow": "De Coach · in elk portaal",
                 "demo_week": "week 37",
-                "demo_kicker": "één tip · één beweging · jij kiest",
+                "demo_kicker": "één tip · één stap · jij kiest",
                 "demo": {
                     "money": {
                         "kind": "DEZE WEEK",
-                        "text": "De inzet ligt €38 boven de limiet. Haal het één keer uit je langetermijnspaarpot — of laat het staan en bespaar zo op het avondeten van volgende week.",
-                        "cta": "Open potten"
+                        "text": "Plezier zit €38 boven de lijn. Haal het één keer uit Langetermijn sparen — of laat het staan en houd het diner van volgende week erin.",
+                        "cta": "Open potjes"
                     },
                     "growth": {
-                        "kind": "DE HENDEL",
-                        "text": "Kostenbesparingen hebben een ondergrens. Inkomstenverhogingen niet. Je bijverdienste is al 20% van de weg naar het doel dat je jezelf hebt gesteld.",
+                        "kind": "DE HEFBOOM",
+                        "text": "Kosten besparen heeft een bodem. Meer verdienen niet. Je bijverdienste is al 20% op weg naar het doel dat je stelde.",
                         "cta": "Open inkomen"
                     },
                     "energy": {
-                        "kind": "UW VLOER",
-                        "text": "Drie nachten van minder dan 6,5 uur — en de uitgaven voor Play stegen op diezelfde dagen. Eerst slapen. Dan beslissen.",
+                        "kind": "JE ONDERGRENS",
+                        "text": "Drie nachten onder de 6,5 uur — en de uitgaven bij Plezier stegen op diezelfde dagen. Eerst slapen. Dan beslissen.",
                         "cta": "Open slaap"
                     },
                     "soul": {
                         "kind": "BEGIN KLEIN",
-                        "text": "Het doel voor deze week staat nog leeg. Eén zin is genoeg: wat zou deze week tot een goede week maken?",
-                        "cta": "Stel een intentie vast"
+                        "text": "De intentie van deze week is nog leeg. Eén zin is genoeg: wat maakt dit een goede week?",
+                        "cta": "Intentie kiezen"
                     }
                 }
             },
             "assurances": {
-                "bank": "Bankgegevens zijn alleen-lezen — en pas nadat je de verbinding hebt gemaakt",
-                "eu": "Georganiseerd door de EU in Amsterdam · AVG",
+                "bank": "Bankgegevens zijn alleen-lezen — en pas nadat je ze zelf koppelt",
+                "eu": "EU-hosting in Amsterdam · AVG",
                 "export": "Je gegevens op elk moment exporteren of verwijderen",
                 "free": "Begin gratis — geen creditcard nodig"
             },
@@ -4457,7 +4489,7 @@
                     },
                     "yours": {
                         "head": "Van jou, altijd",
-                        "line": "Als je annuleert, blijven alle potten, transacties en doelen leesbaar. Geen lock-in, geen gegevens die als gijzelaars worden vastgehouden."
+                        "line": "Zeg je op, dan blijven al je potjes, transacties en doelen leesbaar. Geen lock-in, geen gegevens als gijzelaar."
                     },
                     "coach": {
                         "head": "Een coach, geen bank",
@@ -4471,7 +4503,7 @@
                     "contact": "Contact",
                     "portals": "De portalen",
                     "jars": "De potjes",
-                    "coach": "De coach",
+                    "coach": "De Coach",
                     "pricing": "Prijzen",
                     "why": "Waarom Rumtelo?",
                     "principles": "Uitgangspunten",
@@ -4486,10 +4518,10 @@
                 },
                 "copyright": "© {year} Rumtelo",
                 "badges": {
-                    "eu_hosted": "GEORGANISEERD DOOR DE EU · AMSTERDAM",
-                    "readonly": "BANKGEGEVENS DIE ALLEEN VOOR LEZEN ZIJN",
+                    "eu_hosted": "EU-HOSTING · AMSTERDAM",
+                    "readonly": "ALLEEN-LEZEN BANKGEGEVENS",
                     "gdpr": "AVG",
-                    "tls": "TLS-gecodeerd"
+                    "tls": "TLS-VERSLEUTELD"
                 }
             },
             "pricing_section": {
@@ -4501,7 +4533,7 @@
                 "audience_practice": "Voor praktijken",
                 "headline_practice": "Niet meer gissen waar je cliënten staan.",
                 "lead_practice": "Voor coaches en adviseurs die huishoudens helpen. Je cliënten houden hun eigen bord bij; met hun ja volg je elk bord vanuit één bureau.",
-                "lead": "Begin met het gratis Basic-pakket. Kies voor Plus of Max en wij activeren Stripe Checkout zodra je account is aangemaakt — maar alleen als de aanmelding, verificatie en onboarding succesvol zijn verlopen.",
+                "lead": "Begin gratis met je potjes. Betaal pas als het je werk scheelt: je bankafschriften erin, je schuldenvrije datum, je Koers.",
                 "lead_on_plan": "Je bevindt je op {plan}. Upgrade, wissel van abonnement of beheer je facturering via de app — wijzigingen gelden voor je huishouden.",
                 "lead_loading": "Je abonnement wordt geladen…",
                 "lead_manage": "Ga naar ‘Open Plan’ en ‘Facturering’ in de app om je abonnement te upgraden of te wijzigen.",
@@ -4530,8 +4562,6 @@
                 "your_plan": "Je plan",
                 "products_title": "Producten inbegrepen",
                 "features_title": "Hoogtepunten",
-                "feature_count": "{included}/{total} functies",
-                "product_none": "Niet inbegrepen",
                 "products_more": "Meer producten op komst",
                 "footnote": "Prijzen in euro, inclusief btw. Het basisabonnement blijft mogelijk gratis of er wordt later een kleine vergoeding voor gevraagd — wat je ook invoert, het blijft altijd toegankelijk."
             },
@@ -4539,11 +4569,11 @@
                 "name": "Praktijk",
                 "tag": "Coaches & adviseurs",
                 "sub": "per praktijk · maandelijks opzegbaar",
-                "line": "Eén bureau voor al je cliënten — sessies gaan over keuzes, niet over cijfers verzamelen.",
+                "line": "Eén bureau voor elke cliënt — sessies gaan over keuzes, niet over cijfers verzamelen.",
                 "f1": "Nodig cliënten uit per e-mail — er wordt niets gedeeld tot ze accepteren",
                 "f2": "Het bord van elke cliënt, alleen-lezen, vanuit één bureau",
-                "f3": "Een momentopname per cliënt: uitgaven, inkomen, energie, stilte",
-                "f4": "Tussen de sessies tipt De Coach — jij begeleidt de keuzes",
+                "f3": "Per cliënt een momentopname: inkomen, potjes, uitgaven, weekcheck.",
+                "f4": "Tussen de sessies tipt De Coach — jij begeleidt de keuzes.",
                 "extras_title": "Bovenop de basisprijs",
                 "extra_staff": "Medewerkersplek",
                 "extra_staff_hint": "Iedereen in je praktijk die inlogt — jij telt als eerste.",
@@ -4551,7 +4581,7 @@
                 "extra_view_hint": "Blijft op gratis Basic. Jij ziet hun bord, alleen-lezen.",
                 "extra_view_price": "Gratis",
                 "extra_manage": "Cliënt die jij sponsort",
-                "extra_manage_hint": "Jij betaalt hun Plus — {discount}% minder dan de {retail} per maand die ze zelf zouden betalen. Nu: hun volledige bord, alleen-lezen. Binnenkort: samen met hen hun plan aanpassen.",
+                "extra_manage_hint": "Jij betaalt hun Plus — {discount}% minder dan de {retail} per maand die ze zelf zouden betalen. Je ziet hun volledige bord, alleen-lezen.",
                 "per_month_each": "{price} / maand per plek",
                 "example": "Voorbeeld: jij + {clients} gesponsorde cliënten = {total} per maand in totaal.",
                 "cta": "Start een praktijk",
@@ -4571,21 +4601,33 @@
                     "f1": "GELD · zes potjes, transacties, vaste kosten",
                     "f2": "GROEI · inkomen en {maxGoals, plural, one {# doel} other {# doelen}} — proef van Groei",
                     "f3": "ENERGIE · slaap",
-                    "f4": "SOUL · stilte, dankbaarheid, één voornemen per week",
-                    "f5": "De Coach, de weekcontrole, de maandscore",
-                    "f6": "1 volledige plaats + 1 plaats voor een toeschouwer (partner, coach of adviseur)"
+                    "f4": "ZIEL · stilte, dankbaarheid, één intentie per week",
+                    "f5": "De Coach, de weekcheck, de maandscore",
+                    "f6": "1 volledige plek + 1 kijkplek (partner, coach of adviseur)",
+                    "outcome": {
+                        "money": "Zes potjes, je Inbox en vaste kosten",
+                        "growth": "{maxGoals, plural, one {# doel} other {# doelen}} en je inkomenscurve",
+                        "energy": "Slaap, de basis onder elke beslissing",
+                        "soul": "Stilte, dankbaarheid, één intentie per week"
+                    }
                 },
                 "plus": {
                     "name": "Plus",
                     "tag": "Meest gekozen",
                     "best_for": "Huishoudens, stellen, schulden aflossen",
-                    "line": "Je deelt geld met een partner of je gezin, bent bezig met het aflossen van schulden, of je wilt je bankafschriften inleveren. De meeste mensen komen hier terecht.",
+                    "line": "Je deelt geld met een partner of gezin, wilt je week plannen rond je doelen, lost schulden af of wilt je bankafschriften erin. De meeste mensen komen hier uit.",
                     "f1": "Alles in Basic",
-                    "f2": "GELD · aflossingsplan met rente en een datum waarop de schuld is afgelost",
-                    "f3": "GELD · bankafschriften importeren — live synchronisatie komt eraan",
+                    "f2": "GROEI · Koers — plan je week rond de drie dingen die je doelen vooruit helpen",
+                    "f3": "GELD · aflosplan met een schuldenvrije datum, en import van bankafschriften",
                     "f4": "GROEI · Leren — boeken, cursussen, vaardigheden · tot {maxGoals} doelen",
                     "f5": "ENERGIE · je 168 uur, training, voeding",
-                    "f6": "Maximaal {maxMembers} zitplaatsen — een mix van volgeboekte en toeschouwersplaatsen"
+                    "f6": "Tot {maxMembers} plekken — mix van volledige en kijkplekken",
+                    "outcome": {
+                        "money": "Je schuldenvrije datum en import van bankafschriften",
+                        "growth": "Je Koers, Leren en tot {maxGoals} doelen",
+                        "energy": "Je 168 uur, training en voeding",
+                        "soul": "Alles uit Basic"
+                    }
                 },
                 "max": {
                     "name": "Max",
@@ -4595,9 +4637,14 @@
                     "f1": "Alles in Plus",
                     "f2": "GELD · vermogen, rendement en je vrijheidscijfer",
                     "f3": "GROEI · Ontdek aanbevelingen op Masterclass, niet op Udemy",
-                    "f4": "SOUL · de zeven centra",
-                    "f5": "Maximaal {maxMembers} zitplaatsen (meer volledige toegang)",
-                    "f6": "Apparaten — horloge, weegschaal, ring (binnenkort beschikbaar)"
+                    "f4": "ZIEL · de zeven centra",
+                    "f5": "Tot {maxMembers} plekken (meer volledige toegang)",
+                    "outcome": {
+                        "money": "Alles uit Plus",
+                        "growth": "Nettovermogen, rendement, je vrijheidsgetal en elk doel",
+                        "energy": "Alles uit Plus",
+                        "soul": "Plus de zeven centra"
+                    }
                 }
             },
             "faq_section": {
@@ -4620,15 +4667,15 @@
                 },
                 "coach": {
                     "question": "Wat doet de coach eigenlijk?",
-                    "answer": "Eén tip over waar je staat en één stap die je kunt zetten — per product, en allemaal bij elkaar op de Coach-pagina. Het blijft stil totdat er genoeg gegevens zijn, en het stelt je nooit aan de schandpaal. De tips van de Coach. Jij kiest."
+                    "answer": "Eén tip over waar je staat en één stap die je kunt zetten — in elk product, en samen op de pagina van De Coach. Het blijft stil totdat er genoeg gegevens zijn, en je wordt er nooit op aangekeken. De Coach tipt. Jij kiest."
                 },
                 "partner": {
                     "question": "Kan ik het samen met mijn partner of mijn gezin gebruiken?",
-                    "answer": "Ja — bij het Basic-pakket is één kijkersplaats inbegrepen (coach of meekijken). Bij de Plus- en Max-pakketten komen daar nog meer volledige plaatsen en kijkersplaatsen bij. De potten worden binnen het huishouden gedeeld. De bestedingsstijl blijft persoonlijk, omdat partners verschillen. Heb je meer mensen nodig? Voeg dan plaatsen toe voor € 2,50 per stuk."
+                    "answer": "Ja — Basic bevat één kijkplek (coach of meekijker). Plus en Max voegen meer volledige plekken en kijkplekken toe. Een huishouden deelt de potjes. Uitgavenstijl blijft persoonlijk, want partners verschillen. Meer mensen nodig? Voeg plekken toe voor € 2,50 per stuk."
                 },
                 "data": {
                     "question": "Waar zijn mijn gegevens?",
-                    "answer": "Op EU-servers in Amsterdam, versleuteld in opslag. Je kunt het op elk moment exporteren of verwijderen. Als je een betaald abonnement opzegt, blijven alle jar-bestanden, transacties en doelen toegankelijk."
+                    "answer": "Op EU-servers in Amsterdam, versleuteld opgeslagen. Exporteer of verwijder je gegevens wanneer je wilt. Zeg je een betaald abonnement op, dan blijven al je potjes, transacties en doelen leesbaar."
                 },
                 "language": {
                     "question": "Nederlands of Engels?",
@@ -4636,12 +4683,12 @@
                 },
                 "practice": {
                     "question": "Ik ben coach of adviseur. Kan ik Rumtelo gebruiken voor mijn cliënten?",
-                    "answer": "Ja — met Rumtelo Practice. Nodig klanten uit via e-mail; zodra ze de uitnodiging accepteren, kunt u hun bord vanaf één werkplek in alleen-lezenmodus bekijken. Meekijken is voor hen gratis, en u kunt hun Plus-abonnement sponsoren voor {clientPrice} per maand. Een praktijk kost {basePrice} per maand plus {staffPrice} per werkplek."
+                    "answer": "Ja — met Rumtelo Practice. Nodig cliënten uit per e-mail; zodra ze accepteren, zie je hun bord alleen-lezen vanaf één bureau. Meekijken is gratis voor hen, en je kunt hun Plus-abonnement sponsoren voor {clientPrice} per maand. Een praktijk kost {basePrice} per maand plus {staffPrice} per medewerkersplek."
                 }
             },
             "signup_section": {
                 "eyebrow": "MAAK JE ACCOUNT AAN",
-                "headline": "Eerst verdelen. Pas daarna uitgeven.",
+                "headline": "Eerst verdelen. Dan uitgeven.",
                 "lead": "Ontworpen voor mensen die het goed doen — en voor mensen die er klaar voor zijn. Begin hier — en rond het proces vervolgens af op de pagina ‘Account aanmaken’ met je wachtwoord.",
                 "submit": "Ga verder met het aanmaken van een account",
                 "terms_before": "Ik ga akkoord met de ",
@@ -5091,7 +5138,7 @@
             "debt": "Schuld",
             "fixed_costs": "Vaste kosten",
             "fixed_cost": "Vaste kosten",
-            "week_check": "Wekelijkse controle",
+            "week_check": "Weekcheck",
             "growth": "Groei · overzicht",
             "goals": "Doelstellingen",
             "goal": "Doel",
@@ -5203,10 +5250,10 @@
             "jars_read_more": "Lees meer over de zes-potjesmethode",
             "jars_spaarpotjes_help": "Wat zijn spaarpotjes?",
             "why": "Jouw droom",
-            "why_body": "In één korte zin: waarom wil je Rumtelo gebruiken — of welke droom werk je naartoe? Die zin komt op je dashboard als een kleine herinnering waar je het voor doet.",
+            "why_body": "In één korte zin: waarom wil je Rumtelo gebruiken — of naar welke droom werk je toe? We tonen die zin bovenaan je Home, als kleine herinnering waarvoor je het doet.",
             "why_tip": "Schrijf een droom of een reden — geen getal. Houd het simpel.",
             "why_label": "Jouw droom of reden",
-            "why_hint": "Staat op je dashboard als herinnering. Je kunt het later wijzigen.",
+            "why_hint": "Staat bovenaan je Home als herinnering.",
             "why_placeholder": "bijv. Huis in de zon, zee & vers fruit",
             "why_examples": {
                 "house": "Een huis in de zon",
@@ -5226,7 +5273,7 @@
             "back": "Terug",
             "next": "Volgende",
             "start": "Start",
-            "creating": "Laden…",
+            "creating": "Aanmaken…",
             "setup_failed": "Installatie is mislukt — probeer het opnieuw",
             "dialog_label": "Welkom bij Rumtelo",
             "household_created": "Huishouden aangemaakt",
@@ -5387,7 +5434,8 @@
                 "household_label": "Huishouden",
                 "access_eyebrow": "Toegang",
                 "progress_eyebrow": "Overzicht van het portaal",
-                "progress_blurb": "Live money, growth, energy, and soul metrics will appear here for managed clients.",
+                "progress_blurb": "Live cijfers over geld, groei, energie en ziel voor dit huishouden.",
+                "progress_blurb_core": "Live cijfers over geld en groei voor dit huishouden.",
                 "progress_pending": "Waiting for the client to accept the invitation.",
                 "progress_view_only": "Meekijken — uitnodiging geaccepteerd. Kies Beheren om hun Plus te sponsoren.",
                 "portal_money": "Geld",
@@ -5853,6 +5901,7 @@
                 "coach": {
                     "eyebrow": "De coach",
                     "blurb": "De Coach geeft nooit een standje — hij geeft alleen duidelijk aan wat de volgende stappen zijn. Tips op het scherm (waarom-regels, kaartjes) blijven zichtbaar terwijl je leert; de inbox onder Home → De Coach bevat tipkaartjes over geld, groei, energie en zielsgroei.",
+                    "blurb_core": "De Coach geeft nooit een standje — alleen duidelijke volgende stappen. Tips op het scherm (waarom-regels, potjeskaarten) blijven aan terwijl je leert; de inbox onder Home → De Coach bevat tipkaarten over geld en groei.",
                     "toggle": "De Coach op de schermen weergeven",
                     "hint_on": "Zoek naar het ✦ De Coach-symbool. De inbox blijft onder Home → De Coach.",
                     "hint_off": "Uit — tips op het scherm verborgen. De Coach-inbox blijft te allen tijde beschikbaar."
@@ -6065,6 +6114,7 @@
                 "sharing": {
                     "eyebrow": "Privacy en delen",
                     "blurb": "Wat leden mogen delen op het gebied van Groei, Energie, Ziel en Geld. Alleen de eigenaar kan dit wijzigen. Je kunt altijd iets voor jezelf houden.",
+                    "blurb_core": "Wat leden mogen delen bij Groei en Geld. Alleen de eigenaar kan dit wijzigen. Iets voor jezelf houden kan altijd.",
                     "owner_only": "Alleen de eigenaar van het huishouden kan dit wijzigen.",
                     "mode_label": "Wat mogen leden delen?",
                     "modes": {
@@ -6142,12 +6192,15 @@
                     "eyebrow": "Wat je gebruikt en betaalt",
                     "blurb": "Drie abonnementen: Basic, Plus en Max. Begin met Basic — niets wat je hebt ingevoerd, wordt ooit vergrendeld.",
                     "card_basic_tag": "Van {price}",
-                    "card_basic_line": "Solo-bord — de zes potten en de oefening die erachter schuilgaat. Je hebt geen bank nodig.",
+                    "card_basic_line": "Solo-bord — de zes potjes en de routine eronder. Geen bank nodig.",
                     "card_basic_feats": "{members} · Alleen solo · Spaarpotten · 1 doel · Coach",
                     "card_plus_tag": "Meest gekozen",
                     "card_plus_line": "Deel het bord met familie of vrienden — schulden, Leren, energieweken en nog meer doelen.",
                     "card_plus_feats": "{members} · Schulden · Leren · ENERGIE · Doelen",
+                    "card_plus_line_core": "Deel het bord met familie of vrienden — schulden, Leren, Koers en meer doelen.",
+                    "card_plus_feats_core": "{members} · Schulden · Leren · Koers · Doelen",
                     "card_max_tag": "Alle vier de portalen",
+                    "card_max_tag_core": "Alles, zonder limieten",
                     "card_max_line": "Onbeperkt aantal huishoudens, inkomenscurve, ‘Leren’ en nettovermogen.",
                     "card_max_feats": "{members} · GELD · Masterclass Leren · Nettovermogen",
                     "monthly": "Maandelijks",
@@ -6700,6 +6753,7 @@
             "eyebrow": "✦ Waarom Rumtelo?",
             "stand_on": "Waar we op staan",
             "lead": "Vraag je je af wat? Alles: je geld, je leven, je energie, je tijd. Rumtelo helpt je te zien waar het gebleven is, zodat niets een mysterie blijft. Van daaruit krijg je weer grip: controle over wat ertoe doet. Duidelijke tools daarvoor, en we blijven er meer toevoegen. De Coach kan je een tip geven. Jij kiest wat je vervolgens gaat doen.",
+            "lead_core": "Je afvragen wat? Waar je geld bleef. Rumtelo helpt je dat te zien, zodat niets een mysterie blijft. Zo krijg je weer grip: controle over wat ertoe doet. Duidelijke tools daarvoor, en we blijven er meer toevoegen. De Coach kan een tip geven. Jij kiest wat je daarna doet.",
             "meaning_eyebrow": "✦ Hoe Rumtelo je helpt",
             "meaning": {
                 "money_leaves_body": "Als er geld wordt opgenomen, zie je meteen uit welke pot het komt — en hoeveel er nog over is voor die klus. Geen spreadsheet achteraf.",
@@ -6735,7 +6789,7 @@
             "closing_title": "Jij houdt de touwtjes in handen.",
             "closing_body": "Kijk waar het naartoe is gegaan. Krijg weer grip op de situatie. Of je nu nieuw bent of al op de goede weg bent: duidelijke hulpmiddelen en tips waarmee je aan de slag kunt. Informatie, nooit een verwijt — meer uitgeven dan gepland is een signaal om bij te sturen, geen oordeel over jou.",
             "cta_jars": "Bekijk mijn potten",
-            "cta_week_check": "Wekelijkse controle",
+            "cta_week_check": "Weekcheck",
             "routes": {
                 "home": "Eén blik: waar is het deze maand gebleven — en heb je weer grip?",
                 "money_jars": "Deze maand is al verdeeld voordat hij begint. Geld dat je met een baan verdient, hoef je nooit te verdedigen.",

@@ -17,6 +17,7 @@ import { cn } from '@rumtelo/utils';
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { CAPABILITIES, lockCopyFor, PlanKey } from '@/app/_lib/plan';
+import { isProductEnabled } from '@/app/_lib/launch-products';
 import { isLiveData } from '@/app/_lib/preview';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -26,7 +27,10 @@ import { useSettingsMutation } from '../_utils/use-settings-mutation';
 import { SettingsInkCard, SettingsRowLabel } from './settings-chrome';
 
 const MODES = Object.values(HouseholdSharingMode);
-const AREAS = Object.values(VisibilityArea);
+// Area keys read `product.part`; production hides the deferred Energy/Soul parts.
+const AREAS = Object.values(VisibilityArea).filter(area =>
+    isProductEnabled(area.split('.')[0] ?? area)
+);
 
 /** Copy key per area — next-intl reads dots as nesting, so `growth.course` → `growth_course`. */
 const areaKey = (area: VisibilityArea) => `areas.${area.replace('.', '_')}` as const;
@@ -75,7 +79,11 @@ export function SharingSettings() {
     }
 
     return (
-        <SettingsInkCard eyebrow={t('eyebrow')} blurb={t('blurb')}>
+        <SettingsInkCard
+            eyebrow={t('eyebrow')}
+            blurb={t(
+                isProductEnabled('energy') || isProductEnabled('soul') ? 'blurb' : 'blurb_core'
+            )}>
             <fieldset className="grid gap-2 py-3" disabled={!canEdit || save.isPending}>
                 <legend className="mb-2 text-sm font-medium text-fg">{t('mode_label')}</legend>
                 {MODES.map(mode => (

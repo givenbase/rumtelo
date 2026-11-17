@@ -33,6 +33,7 @@ import {
 
 import { GIVING_CAUSE_CATALOG, givingCauseCopy, givingCauseMeta } from '@/app/_lib/giving';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
+import { isProductEnabled } from '@/app/_lib/launch-products';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { CAR_BRAND_PREVIEW, carBrandMark, filterCarBrands } from '@/app/_lib/car-brands';
@@ -487,9 +488,12 @@ export function GoalForm({
                     <CoachTipCard
                         title={tForm('pledge_tip_title')}
                         meta={
-                            <a href={soulPath('giving')} className="hover:text-accent">
-                                {tForm('pledge_tip_link')}
-                            </a>
+                            // Soul is deferred in production — don't link to a route that redirects.
+                            isProductEnabled('soul') ? (
+                                <a href={soulPath('giving')} className="hover:text-accent">
+                                    {tForm('pledge_tip_link')}
+                                </a>
+                            ) : undefined
                         }>
                         {t('features.soul.giving.coach_tip_1')} {tForm('pledge_tip_body')}
                     </CoachTipCard>
