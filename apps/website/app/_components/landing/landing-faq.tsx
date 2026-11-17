@@ -1,15 +1,11 @@
 'use client';
 
-import {
-    PLAN_LIMITS,
-    PRACTICE_BASE_UNIT_CENTS,
-    PRACTICE_CLIENT_SEAT_UNIT_CENTS,
-    PRACTICE_STAFF_SEAT_UNIT_CENTS,
-    PlanKey,
-} from '@rumtelo/contracts';
-import { useLocale, useTranslations } from '@rumtelo/i18n';
+import Link from 'next/link';
+
+import { PLAN_LIMITS, PlanKey } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
 import { Typography } from '@rumtelo/ui';
-import { cn, formatPlanPrice } from '@rumtelo/utils';
+import { cn } from '@rumtelo/utils';
 
 import { isProductLive } from '@/lib/launch-products';
 
@@ -37,8 +33,6 @@ const LIVE_FAQ_KEYS = FAQ_KEYS.filter(key => {
 /** Native <details> — no client JS, keyboard-accessible, indexable. */
 export function LandingFaq() {
     const t = useTranslations('pages.landing');
-    const locale = useLocale();
-    const price = (cents: number) => formatPlanPrice(cents, { locale });
 
     return (
         <section id="faq">
@@ -66,18 +60,25 @@ export function LandingFaq() {
                                         +
                                     </span>
                                 </summary>
-                                <Typography
-                                    as="p"
-                                    size="sm"
-                                    color="muted"
-                                    className="border-t border-line px-5 py-4 text-pretty">
-                                    {t(`faq.${key}.answer`, {
-                                        maxMembers: PLAN_LIMITS[PlanKey.PLUS].maxMembers ?? 0,
-                                        basePrice: price(PRACTICE_BASE_UNIT_CENTS),
-                                        staffPrice: price(PRACTICE_STAFF_SEAT_UNIT_CENTS),
-                                        clientPrice: price(PRACTICE_CLIENT_SEAT_UNIT_CENTS),
-                                    })}
-                                </Typography>
+                                <div className="border-t border-line px-5 py-4">
+                                    <Typography
+                                        as="p"
+                                        size="sm"
+                                        color="muted"
+                                        className="text-pretty">
+                                        {t(`faq.${key}.answer`, {
+                                            maxMembers: PLAN_LIMITS[PlanKey.PLUS].maxMembers ?? 0,
+                                        })}
+                                    </Typography>
+                                    {key === 'practice' ? (
+                                        <Link
+                                            href="/practices"
+                                            className="mt-2 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+                                            {t('practice_band.cta')}
+                                            <span aria-hidden>→</span>
+                                        </Link>
+                                    ) : null}
+                                </div>
                             </details>
                         ))}
                     </div>

@@ -107,6 +107,10 @@ const tour = {
                     heading: 'How to use it',
                     body: 'Use Period (top right) to switch months. Open a portal when you want that tool. Tap Help anytime to replay this walkthrough.',
                 },
+                score: {
+                    heading: 'Your month score and level',
+                    body: 'Each month you close adds to your score. Your level grows with it: a record of your routine, not a key. Nothing opens or closes with a level.',
+                },
             },
             steps: {
                 coach: {
@@ -291,7 +295,7 @@ const tour = {
             sections: {
                 what_for: {
                     heading: 'What this area is for',
-                    body: 'Start on Overview, then go left to right: Income → Goals. Raise net, aim with one goal on Basic. Learn unlocks on Plus — books, courses, skills.',
+                    body: 'Course is your week: the three things that move your goals, set in your week check. On Basic you keep one goal; Course and Learn are in Plus.',
                 },
             },
         },

@@ -8,7 +8,8 @@ import { cn } from '@rumtelo/utils';
 import type { NavTab, NavTabKey } from '@/app/_lib/nav';
 
 /**
- * Phone bottom tabs: Home · Money · Growth · More (three for a VIEWER, who has no Growth).
+ * Phone bottom tabs: Home · Money · Growth · More. Growth joins after the first week check
+ * and a VIEWER never has it, so the bar is three cells until then.
  * The active tab is text-accent plus a 2 px top bar, so the state is never colour alone,
  * and links carry `aria-current="page"`. More is a button that opens the sheet.
  */
@@ -33,6 +34,10 @@ export function BottomTabs({
             )}
             aria-label={t('pages.nav.aria.mobile_tabs')}>
             {tabs.map(tab => {
+                // The Growth slot while the stage loads: keeps the grid still, offers nothing.
+                if (tab.pending) {
+                    return <span key={tab.key} aria-hidden className="min-h-14" />;
+                }
                 const active = tab.key === activeTab;
                 const className = cn(
                     'relative flex min-h-14 min-w-0 flex-col items-center justify-center gap-0.5 px-1 text-xs font-medium transition-colors outline-none focus-visible:bg-raised focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-inset',

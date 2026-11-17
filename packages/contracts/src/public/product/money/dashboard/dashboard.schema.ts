@@ -11,6 +11,7 @@ import { CoachMessage } from '../../../platform/coach/coach.schema';
 import { JarKey } from '../enums';
 import { JarBalance } from '../jar/jar.schema';
 import { MonthScore } from '../month-score/month-score.schema';
+import { MoneyProgress } from '../progress/progress.schema';
 
 export const DashboardTravel = z.object({
     direction: z.enum(['current', 'past', 'future']),
@@ -46,19 +47,10 @@ export const DashboardBaselineJar = z.object({
 });
 
 /**
- * Plain data facts for Home's first-run layout, always "as of now" (never the selected
- * period). Not an unlock system: nothing is stored, each fact is an existence check.
+ * First-run facts + board stage for Home — same shape as `money.progress.get`, so Home needs
+ * no second request. Kept as an alias for one release; prefer {@link MoneyProgress}.
  */
-export const DashboardProgress = z.object({
-    /** Any transaction on the board, all time. */
-    hasTransactions: z.boolean(),
-    /** Any money week check with a completion time, all time. */
-    hasCompletedWeekCheck: z.boolean(),
-    /** The money check for the current ISO week is done. */
-    weekCheckDoneThisWeek: z.boolean(),
-    /** Any month score closed, all time. */
-    hasClosedMonth: z.boolean(),
-});
+export const DashboardProgress = MoneyProgress;
 
 /** One aggregated read for the dashboard — avoids a waterfall of round trips. */
 export const Dashboard = z.object({
@@ -84,7 +76,7 @@ export const Dashboard = z.object({
     coach: z.array(CoachMessage),
     monthScore: MonthScore,
     why: z.string().nullable(),
-    /** First-run facts for Home — independent of period travel. */
+    /** First-run facts and board stage for Home — independent of period travel. */
     progress: DashboardProgress,
     /** Period-travel chrome — snapshot when viewing the live month. */
     travel: DashboardTravel,

@@ -57,6 +57,53 @@ describe('TransactionService.hasAny', () => {
     });
 });
 
+describe('TransactionService.sortedCount', () => {
+    const rows = [
+        ...Array.from({ length: 7 }, (_, index) => ({
+            household: 'household-a',
+            id: `a-${index}`,
+            status: 'SORTED',
+        })),
+        { household: 'household-a', id: 'a-inbox', status: 'INBOX' },
+        { household: 'household-a', id: 'a-ignored', status: 'IGNORED' },
+        { household: 'household-b', id: 'b-0', status: 'SORTED' },
+        { household: 'household-b', id: 'b-1', status: 'SORTED' },
+    ];
+    const serviceFor = () =>
+        new TransactionService(
+            fakeEm(rows) as never,
+            {} as never,
+            {} as never,
+            {} as never,
+            {} as never
+        );
+
+    it('stops at the limit instead of counting everything', async () => {
+        expect(await asHousehold('household-a', () => serviceFor().sortedCount(5))).toBe(5);
+    });
+
+    it('counts only SORTED lines (INBOX and IGNORED do not)', async () => {
+        const few = [
+            { household: 'household-c', status: 'SORTED' },
+            { household: 'household-c', status: 'INBOX' },
+            { household: 'household-c', status: 'IGNORED' },
+        ];
+        const service = new TransactionService(
+            fakeEm(few) as never,
+            {} as never,
+            {} as never,
+            {} as never,
+            {} as never
+        );
+        expect(await asHousehold('household-c', () => service.sortedCount(5))).toBe(1);
+    });
+
+    it('never reads another household’s lines', async () => {
+        expect(await asHousehold('household-b', () => serviceFor().sortedCount(5))).toBe(2);
+        expect(await asHousehold('household-z', () => serviceFor().sortedCount(5))).toBe(0);
+    });
+});
+
 describe('MonthScoreService.hasClosedMonth', () => {
     const rows = [
         { household: 'household-a', period: '2026-10', isClosed: true },

@@ -5,7 +5,6 @@ import {
     FixedCostSettlementSource,
     FixedCostSettlementStatus,
     type MonthCloseBillDisposition,
-    type MonthScoreUnlockKey,
 } from '@rumtelo/contracts';
 
 import { toPeriodKey, travelForPeriod } from '@rumtelo/utils';
@@ -23,17 +22,16 @@ import { MonthScore } from './month-score.entity';
 import { MonthScoreEvent } from './month-score-event.entity';
 import { findPriorOpenPeriod } from './prior-open-period.util';
 
-/** Level thresholds are cumulative score. Display labels and unlock copy live in client i18n. */
-export const LEVELS: {
-    index: number;
-    threshold: number;
-    unlocks: MonthScoreUnlockKey[];
-}[] = [
-    { index: 1, threshold: 0, unlocks: ['six_jars', 'inbox'] },
-    { index: 2, threshold: 120, unlocks: ['week_check'] },
-    { index: 3, threshold: 320, unlocks: ['goals', 'debts'] },
-    { index: 4, threshold: 640, unlocks: ['energy_layer'] },
-    { index: 5, threshold: 1080, unlocks: ['coach', 'export'] },
+/**
+ * Level thresholds are cumulative score. Display labels live in client i18n. Levels are
+ * progress only: they unlock nothing (the board ladder is the separate `BoardStage`).
+ */
+export const LEVELS: { index: number; threshold: number }[] = [
+    { index: 1, threshold: 0 },
+    { index: 2, threshold: 120 },
+    { index: 3, threshold: 320 },
+    { index: 4, threshold: 640 },
+    { index: 5, threshold: 1080 },
 ];
 
 @Injectable()

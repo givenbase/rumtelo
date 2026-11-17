@@ -110,3 +110,10 @@ test('every prefix is unique', () => {
     const prefixes = ROUTE_CAPABILITIES.map(entry => entry.prefix);
     assert.equal(new Set(prefixes).size, prefixes.length);
 });
+
+test('route access is plan and role only: a deferred page opens at any board stage', () => {
+    // The ladder (CL-12) decides what the menu shows up front, never what may be opened.
+    assert.equal(routeAccessForPath.length, 1);
+    assert.ok(routeAccessForPath('/product/money/debt'));
+    assert.ok(routeAccessForPath('/product/coach'));
+});

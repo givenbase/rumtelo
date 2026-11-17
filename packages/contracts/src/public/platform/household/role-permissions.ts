@@ -185,6 +185,8 @@ export function permissionSectionFromPath(pathname: string): HouseholdPermission
     if (
         path.includes('/household/invite') ||
         path.includes('/household/members') ||
+        // Seat usage answers "may I invite?": oRPC posts it, so it maps to the invite action.
+        path.includes('/household/seats') ||
         path.includes('/household/removemember') ||
         path.endsWith('/members')
     ) {

@@ -9,6 +9,9 @@ import {
     IncomeKind,
     IncomeStability,
     JarExperience,
+    type HouseholdSeatUsage,
+    HouseholdPermissionAction,
+    HouseholdPermissionSection,
     type JarKey,
     type Locale,
     PlanKey,
@@ -22,6 +25,7 @@ import {
     isWritableHouseholdRole,
     localeToIntl,
     planAllowsInviteRole,
+    roleCan,
 } from '@rumtelo/contracts';
 
 import { EntityManager } from '@mikro-orm/postgresql';
@@ -30,8 +34,12 @@ import { AuthService } from '@thallesp/nestjs-better-auth';
 
 import type { Auth } from '../engine/auth.config';
 
-import { apiBadRequest } from '../../../common/errors/api-user-error';
-import { currentUserId, currentAuthHeaders } from '../../../common/household/household.context';
+import { apiBadRequest, apiForbidden } from '../../../common/errors/api-user-error';
+import {
+    currentAuthHeaders,
+    currentHouseholdContext,
+    currentUserId,
+} from '../../../common/household/household.context';
 import {
     mapToOrpcClientError,
     parseUniqueConstraint,
@@ -122,10 +130,10 @@ export class HouseholdService {
             );
         }
 
-        const seats = await this.seatOccupation(householdId);
+        const seats = await this.seatOccupation(householdId, new Date());
         if (
             !canAddHouseholdMember(planKey, {
-                occupiedSeats: seats.occupied,
+                occupiedSeats: seats.members + seats.pendingInvites,
                 writableCount: seats.writableCount,
                 viewerCount: seats.viewerCount,
                 role,
@@ -268,6 +276,43 @@ export class HouseholdService {
         );
     }
 
+    /**
+     * Seat use as `invite` counts it: members plus pending, unexpired invitations, against
+     * the plan's effective caps. Counts only (no e-mails). Inviting is what this answers, so
+     * it follows the invite permission: OWNER and MEMBER, never VIEWER.
+     */
+    async seats(householdId: string, now = new Date()): Promise<HouseholdSeatUsage> {
+        const role = HouseholdRole[currentHouseholdContext().role];
+        if (
+            !roleCan(
+                role,
+                HouseholdPermissionSection.HOUSEHOLD_MEMBERS,
+                HouseholdPermissionAction.CREATE
+            )
+        ) {
+            throw apiForbidden('role_permission_denied');
+        }
+
+        const [settings, snap, seats] = await Promise.all([
+            this.householdSettings.get(householdId),
+            this.householdBilling.getSnapshot(householdId),
+            this.seatOccupation(householdId, now),
+        ]);
+        const caps = effectiveSeatCaps(settings.planKey, {
+            extraContributor: snap.extraContributorSeats,
+            extraViewer: snap.extraViewerSeats,
+        });
+        return {
+            members: seats.members,
+            pendingInvites: seats.pendingInvites,
+            writableUsed: seats.writableCount,
+            viewerUsed: seats.viewerCount,
+            maxMembers: caps.maxMembers,
+            maxWritable: caps.maxWritable,
+            maxViewer: caps.maxViewer,
+        };
+    }
+
     /** Max `session.updated_at` per user — proxy for last signed-in activity. */
     private async lastSeenByUserIds(userIds: string[]): Promise<Map<string, Date>> {
         const map = new Map<string, Date>();
@@ -303,9 +348,17 @@ export class HouseholdService {
     // Private helpers
     // ====================================================================
 
-    /** Members + pending invites by role bucket against effective seat caps. */
-    private async seatOccupation(householdId: string): Promise<{
-        occupied: number;
+    /**
+     * Members + pending invites by role bucket: the single source for `invite` and `seats`.
+     * An invitation past `expiresAt` holds no seat (better-auth keeps the row as 'pending'
+     * until someone cancels it).
+     */
+    private async seatOccupation(
+        householdId: string,
+        now: Date
+    ): Promise<{
+        members: number;
+        pendingInvites: number;
         writableCount: number;
         viewerCount: number;
     }> {
@@ -313,6 +366,7 @@ export class HouseholdService {
         const pending = await this.em.find(AuthInvitation, {
             household: householdId,
             status: 'pending',
+            expiresAt: { $gt: now },
         });
 
         let writableCount = 0;
@@ -328,7 +382,8 @@ export class HouseholdService {
         }
 
         return {
-            occupied: memberships.length + pending.length,
+            members: memberships.length,
+            pendingInvites: pending.length,
             writableCount,
             viewerCount,
         };

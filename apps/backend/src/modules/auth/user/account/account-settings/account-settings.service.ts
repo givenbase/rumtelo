@@ -30,6 +30,7 @@ export type AccountSettingsPatch = {
     /** `null` clears the answer. */
     yearIntention?: YearIntention | null;
     tour?: AccountTourProgress;
+    showAllSurfaces?: boolean;
 };
 
 /**
@@ -85,6 +86,9 @@ export class AccountSettingsService {
                 existing.yearIntention = defaults.yearIntention;
             }
             if (defaults.tour !== undefined) existing.tour = normalizeTour(defaults.tour);
+            if (defaults.showAllSurfaces !== undefined) {
+                existing.isShowingAllSurfaces = defaults.showAllSurfaces;
+            }
             await this.em.flush();
             return existing;
         }
@@ -229,6 +233,7 @@ export class AccountSettingsService {
         if (patch.workSituation !== undefined) row.workSituation = patch.workSituation;
         if (patch.yearIntention !== undefined) row.yearIntention = patch.yearIntention;
         if (patch.tour !== undefined) row.tour = normalizeTour(patch.tour);
+        if (patch.showAllSurfaces !== undefined) row.isShowingAllSurfaces = patch.showAllSurfaces;
         await this.em.flush();
         this.logger.debug(`Updated account settings ${row.id}`);
         return toDto(row);
@@ -279,6 +284,7 @@ export class AccountSettingsService {
             workSituation: defaults.workSituation ?? null,
             yearIntention: defaults.yearIntention ?? null,
             tour: normalizeTour(defaults.tour ?? DEFAULT_ACCOUNT_TOUR_PROGRESS),
+            isShowingAllSurfaces: defaults.showAllSurfaces ?? false,
         } as never);
         await this.em.persist(settings).flush();
         return settings;
@@ -303,6 +309,7 @@ function toDto(row: AccountSettings): AccountSettingsDto {
         workSituation: row.workSituation,
         yearIntention: row.yearIntention,
         tour: normalizeTour(row.tour ?? DEFAULT_ACCOUNT_TOUR_PROGRESS),
+        showAllSurfaces: row.isShowingAllSurfaces,
         onboardedAt: row.onboardedAt ? row.onboardedAt.toISOString() : null,
     };
 }

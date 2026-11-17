@@ -205,7 +205,7 @@ export function buildPageHelpForPathname(pathname: string, t: TranslateFn): Page
                 t,
                 'pages.home.title',
                 'pages.home.sections',
-                [homeShowsWiderPortals() ? 'what_for' : 'what_for_core', 'how'],
+                [homeShowsWiderPortals() ? 'what_for' : 'what_for_core', 'how', 'score'],
                 { id: 'home', steps: homeSteps, fullTour: true },
                 [explainVideo(t, 'general', 'general')]
             ),

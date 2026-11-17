@@ -479,6 +479,11 @@ export const PLAN_RANK: Record<PlanKey, number> = {
     [PlanKey.MAX]: 2,
 };
 
+/** Plus and Max: a plan the household pays for. */
+export function isPaidPlan(plan: PlanKey): boolean {
+    return PLAN_RANK[plan] > PLAN_RANK[PlanKey.BASIC];
+}
+
 // ====================================================================
 // Helper functions
 // ====================================================================

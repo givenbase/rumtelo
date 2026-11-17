@@ -464,6 +464,23 @@
           "enumItems": [],
           "mappedType": "datetime"
         },
+        "is_showing_all_surfaces": {
+          "name": "is_showing_all_surfaces",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "false",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
         "spending_style": {
           "name": "spending_style",
           "type": "money_spending_style",
@@ -1108,6 +1125,29 @@
           "collation": null,
           "enumItems": [],
           "mappedType": "json"
+        },
+        "board_stage_floor": {
+          "name": "board_stage_floor",
+          "type": "platform_board_stage",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [
+            "SPLIT",
+            "SORTING",
+            "ROUTINE",
+            "MONTH"
+          ],
+          "mappedType": "unknown",
+          "nativeEnumName": "platform_board_stage"
         },
         "created_at": {
           "name": "created_at",
@@ -21318,6 +21358,16 @@
         "REDIRECT",
         "INTEND",
         "DONE"
+      ]
+    },
+    "platform_board_stage": {
+      "name": "platform_board_stage",
+      "schema": "public",
+      "items": [
+        "SPLIT",
+        "SORTING",
+        "ROUTINE",
+        "MONTH"
       ]
     },
     "platform_coach_kind": {

@@ -12,6 +12,7 @@ export type {
     HouseholdAnswers,
     HouseholdSettings,
     HouseholdSettingsPatch,
+    HouseholdSeatUsage,
     JarSplitShare,
     OnboardingInput,
     OnboardingSplitPreview,

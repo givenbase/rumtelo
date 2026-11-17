@@ -4,6 +4,7 @@ import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { signOutToSignIn } from '@/app/_lib/auth';
 import { forceClearPracticePreview } from '@/app/_lib/practice-preview';
+import { useShowAllSurfaces } from '@/app/_lib/use-show-all-surfaces';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,6 +21,7 @@ import {
     FormMessage,
     Input,
     Phone,
+    Toggle,
 } from '@rumtelo/ui';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -41,6 +43,7 @@ export function AccountSettings() {
     const profileQuery = useLiveQuery(apiQuery.account.profile.queryOptions(), null, Boolean(user));
     const [editingName, setEditingName] = useState(false);
     const [signingOut, setSigningOut] = useState(false);
+    const showAll = useShowAllSurfaces({ successMessage: t('pages.settings.saved') });
 
     const profileForm = useForm<ProfileFormValues>({
         defaultValues: {
@@ -323,6 +326,27 @@ export function AccountSettings() {
                     </SettingsRow>
                 </SettingsInkCard>
             </Form>
+
+            <SettingsInkCard
+                eyebrow={t('pages.settings.panels.start.eyebrow')}
+                blurb={t('pages.settings.panels.start.blurb')}>
+                <Toggle
+                    checked={showAll.checked}
+                    disabled={showAll.loading || showAll.pending}
+                    label={t('pages.nav.show_all.label')}
+                    hint={t(
+                        showAll.checked
+                            ? 'pages.nav.show_all.hint_on'
+                            : 'pages.nav.show_all.hint_off'
+                    )}
+                    onCheckedChange={showAll.set}
+                />
+                {showAll.error ? (
+                    <p role="alert" className="text-sm text-pretty text-danger">
+                        {showAll.error}
+                    </p>
+                ) : null}
+            </SettingsInkCard>
 
             <DangerZone
                 title={t('pages.settings.account.delete_account')}

@@ -18,6 +18,7 @@ import { incomeContract } from './income/income.contract';
 import { jarContract } from './jar/jar.contract';
 import { monthScoreContract } from './month-score/month-score.contract';
 import { partyContract } from './party/party.contract';
+import { progressContract } from './progress/progress.contract';
 import { ruleContract } from './rule/rule.contract';
 import { weekCheckContract } from './week-check/week-check.contract';
 
@@ -36,6 +37,8 @@ export const contract = {
     monthScore: monthScoreContract,
     weekCheck: weekCheckContract,
     dashboard: dashboardContract,
+    /** Board stage (SPLIT → MONTH) for the shell and Home. */
+    progress: progressContract,
     /** Backoffice company catalogs — read-only suggestions for create forms. */
     catalogs: catalogsContract,
     /** Rumtelo JSON archive restore (settings export → another household). */

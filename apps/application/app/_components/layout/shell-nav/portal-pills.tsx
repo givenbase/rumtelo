@@ -39,6 +39,7 @@ export function PortalPills({
             aria-label={t('pages.shell.aria.main_nav')}>
             <div className="flex items-center gap-0.5 rounded-full border border-line bg-sunken p-1 shadow-md">
                 {tabs.map(tab => {
+                    if (tab.pending) return null;
                     const active = tab.key === activeTab;
                     const pillClass = cn(
                         PILL,

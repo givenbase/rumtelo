@@ -632,6 +632,7 @@ export function ExpenseForm({
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.parties.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.progress.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.key() });
             showToast(
                 mode === 'edit'
@@ -660,6 +661,7 @@ export function ExpenseForm({
             });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.progress.key() });
             showToast(t('common.message.entity.transaction_deleted'), 'success');
             dismissAfterRemove();
         },

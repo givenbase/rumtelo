@@ -1,6 +1,7 @@
 import { Collection } from '@mikro-orm/core';
 import { Entity, Enum, ManyToMany, Property, Unique } from '@mikro-orm/decorators/legacy';
 import {
+    BoardStage,
     Currency,
     DEFAULT_VISIBILITY_SETTINGS,
     IncomeStability,
@@ -102,6 +103,14 @@ export class HouseholdSettings extends HouseholdEntity {
     /** One accounting currency for every member's money view. */
     @Enum(NativeEnum({ Currency, domain: 'platform', defaultValue: Currency.EUR }))
     currency: Currency = Currency.EUR;
+
+    /**
+     * Lowest board stage this household shows, whatever its data says. Server-written only
+     * (never patched by clients): the Clarity 3 migration sets every existing household to
+     * MONTH so an update never hides a surface. Null = derived from board data only.
+     */
+    @Enum(NativeEnum({ BoardStage, domain: 'platform', nullable: true }))
+    boardStageFloor: BoardStage | null = null;
 
     // ? RELATIONSHIPS
     /**

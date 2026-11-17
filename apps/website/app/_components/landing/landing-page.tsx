@@ -10,6 +10,7 @@ import { LandingHero } from './landing-hero';
 import { LandingHow } from './landing-how';
 import { LandingJars } from './landing-jars';
 import { LandingPortals } from './landing-portals';
+import { LandingPracticeBand } from './landing-practice-band';
 import { LandingPricing } from './landing-pricing';
 import { LandingPrinciples } from './landing-principles';
 import { LandingSignupForm } from './landing-signup-form';
@@ -18,10 +19,10 @@ import { LandingWhy } from './landing-why';
 /**
  * Narrative order — promise → mechanism → proof → price → the wider picture:
  *   hook (hero) → how it works (3 steps) → the six jars → how it feels daily (coach) → pricing
- *   → "grip on life" band (portals, principles, why we exist) → FAQ → sign-up.
+ *   → for practices (short band, links to /practices) → "grip on life" band (portals, principles, why we exist) → FAQ → sign-up.
  *
  * Background rhythm alternates plain / tinted, with Principles as the single dark pivot:
- *   hero gradient · how plain · jars tinted · coach plain · pricing tinted · portals plain
+ *   hero gradient · how plain · jars tinted · coach plain · pricing tinted · practices band plain · portals plain
  *   · PRINCIPLES DARK · why tinted · faq plain · signup plain · footer tinted
  *
  * Cut on purpose: Problem, Loop — the hero names the problem, How it works is the loop.
@@ -72,6 +73,7 @@ export function LandingPage() {
                 <LandingJars />
                 <LandingCoach />
                 <LandingPricing />
+                <LandingPracticeBand />
                 <LandingPortals />
                 <LandingPrinciples />
                 <LandingWhy />

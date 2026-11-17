@@ -16,3 +16,4 @@ export * from '../rule';
 export * from '../transaction';
 export * from '../bank-sync';
 export * from '../month-score';
+export * from '../progress';

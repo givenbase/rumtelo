@@ -317,6 +317,8 @@ export function TransactionsPageClient() {
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.fixedCosts.key() });
             // Juist also upserts soft payee memory into rules.
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.rules.list.key() });
+            // Five sorted lines move the board along the ladder.
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.progress.key() });
             if (vars.createRule) {
                 showToast(t('toast_sorted'), 'success');
             } else {
@@ -347,6 +349,7 @@ export function TransactionsPageClient() {
             });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.rules.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.progress.key() });
             showToast(
                 result.sorted > 0
                     ? t(

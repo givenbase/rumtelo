@@ -13,6 +13,7 @@ import { cn } from '@rumtelo/utils';
 import { activeTabForPath } from '@/app/_lib/nav';
 import { consumeTourOfferPending } from '@/app/_lib/offer-tour-flag';
 import { PlanKey } from '@/app/_lib/plan';
+import { useAuth } from '@/components/features/shell/auth-provider';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useShellNav } from '@/app/_lib/use-shell-nav';
 import { BoardMutateRouteGuard } from '@/components/features/shell/board-mutate-route-guard';
@@ -34,10 +35,12 @@ import { PracticePreviewBanner } from './practice-preview-banner';
 import { QuickAddFab } from './quick-add';
 import { AvatarMenu } from './shell-nav/avatar-menu';
 import { BottomTabs } from './shell-nav/bottom-tabs';
+import { ComingUpSheet } from './shell-nav/coming-up-sheet';
 import { MoneySubnav } from './shell-nav/money-subnav';
 import type { MoreRowActions } from './shell-nav/more-rows';
 import { MoreSheet } from './shell-nav/more-sheet';
 import { PortalPills } from './shell-nav/portal-pills';
+import { StageNote } from './shell-nav/stage-note';
 
 // ── Public export ─────────────────────────────────────────────────────────────
 
@@ -67,6 +70,8 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
     const t = useTranslations();
     const pathname = usePathname() ?? '/';
     const [moreOpen, setMoreOpen] = useState(false);
+    const [comingUpOpen, setComingUpOpen] = useState(false);
+    const { householdId } = useAuth();
     const [gains, setGains] = useState<{ plan: LockPlan; open: boolean }>({
         plan: PlanKey.PLUS,
         open: false,
@@ -74,7 +79,19 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
     const { accessForPath } = usePlanCapabilities();
     const { capabilities, exitPreview } = usePracticePreview();
     const { canMutate, canSeeCoach } = useBoardWriteAccess();
-    const { nav, isViewer, isPracticeStaff, practiceName } = useShellNav();
+    const {
+        nav,
+        isViewer,
+        isPracticeStaff,
+        practiceName,
+        stage,
+        stageReady,
+        stageFromServer,
+        showAll,
+        additionsSince,
+        progress,
+    } = useShellNav();
+    const comingUp = nav.moreRows.find(row => row.kind === 'coming_up') ?? null;
     const { requestTourOffer, setHelpOpen } = usePageTour();
     const activeTab = activeTabForPath(pathname);
     const access = accessForPath(pathname);
@@ -94,6 +111,10 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
             setGains({ plan, open: true });
         },
         onExitPreview: exitPreview,
+        onComingUp: () => {
+            setMoreOpen(false);
+            setComingUpOpen(true);
+        },
     };
 
     return (
@@ -200,6 +221,14 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                     <WhyCaption pathname={pathname} locked={access.locked} />
                 ) : null}
                 <main className="min-w-0">
+                    <StageNote
+                        householdId={householdId}
+                        stage={stage}
+                        ready={stageReady && stageFromServer}
+                        suppressed={capabilities.active || showAll}
+                        additionsSince={additionsSince}
+                        dismissSignal={moreOpen}
+                    />
                     <CapabilityGate>
                         <ViewerPortalRouteGuard>
                             <BoardMutateRouteGuard>{children}</BoardMutateRouteGuard>
@@ -221,6 +250,12 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                 rows={nav.moreRows}
                 pathname={pathname}
                 actions={moreActions}
+            />
+            <ComingUpSheet
+                open={comingUpOpen}
+                onOpenChange={setComingUpOpen}
+                data={comingUp?.kind === 'coming_up' ? comingUp : null}
+                progress={progress}
             />
             <PlanGainsSheet
                 plan={gains.plan}

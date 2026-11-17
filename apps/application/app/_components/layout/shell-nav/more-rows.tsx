@@ -8,6 +8,7 @@ import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { DropdownMenuItem, Icon, type IconName } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
+import { stageTrigger } from '@/app/_lib/board-stage';
 import { activeMoreRowKey, type MoreRow } from '@/app/_lib/nav';
 import { PlanKey, planAmountLabel, planLabel } from '@/app/_lib/plan';
 import type { LockPlan } from '@/components/features/shell/lock-card';
@@ -20,6 +21,8 @@ export type MoreRowActions = {
     onHelp: () => void;
     onPlanGains: (plan: LockPlan) => void;
     onExitPreview: () => void;
+    /** Opens the Coming up sheet (the menu or More sheet closes first). */
+    onComingUp: () => void;
 };
 
 const ROW_BASE =
@@ -165,6 +168,41 @@ export function MoreRows({
                                 </button>
                             </RowShell>
                         );
+                    case 'coming_up': {
+                        const trigger = stageTrigger(row.stage) ?? 'week_check';
+                        const next = t(`pages.nav.coming_up.row_next.${trigger}`);
+                        const nextLower = next.charAt(0).toLocaleLowerCase(locale) + next.slice(1);
+                        return (
+                            <RowShell key="coming_up" variant={variant}>
+                                <button
+                                    type="button"
+                                    aria-haspopup="dialog"
+                                    aria-label={t('pages.nav.coming_up.row_aria', {
+                                        next: nextLower,
+                                    })}
+                                    onClick={() => {
+                                        actions.onNavigate();
+                                        actions.onComingUp();
+                                    }}
+                                    className={cn(
+                                        ROW_BASE,
+                                        variant === 'sheet' ? 'min-h-14' : 'min-h-11',
+                                        'py-2'
+                                    )}>
+                                    <RowIcon name="calendar-clock" />
+                                    <span className="grid min-w-0 flex-1 gap-0.5">
+                                        <span className="font-semibold">
+                                            {t('pages.nav.coming_up.row')}
+                                        </span>
+                                        <span className="text-xs text-pretty text-fg-muted">
+                                            {next}
+                                        </span>
+                                    </span>
+                                    <Chevron />
+                                </button>
+                            </RowShell>
+                        );
+                    }
                     case 'practice':
                         return (
                             <RowShell key="practice" variant={variant}>

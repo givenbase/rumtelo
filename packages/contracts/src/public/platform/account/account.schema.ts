@@ -87,6 +87,11 @@ export const AccountSettings = z.object({
     yearIntention: z.enum(YearIntention).nullable(),
     /** Guided tour / Help walkthrough progress. */
     tour: AccountTourProgress,
+    /**
+     * Skip the board ladder for this person (every household they are in). Default false.
+     * Guidance only: plan and role still decide what exists.
+     */
+    showAllSurfaces: z.boolean(),
     /** When personal onboarding completed; null = still new. */
     onboardedAt: z.iso.datetime().nullable(),
 });

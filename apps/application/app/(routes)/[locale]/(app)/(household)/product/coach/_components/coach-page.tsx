@@ -3,9 +3,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
-import type { MonthCloseBillDisposition } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Button, EmptyState, Eyebrow, Typography } from '@rumtelo/ui';
@@ -16,11 +15,10 @@ import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { coachKindDisplay } from '@/app/_lib/coach-kind-label';
 import { resolveCoachMessage } from '@/app/_lib/coach-message-copy';
-import { monthScoreRecapHeadline } from '@/app/_lib/month-score-copy';
 import { isProductEnabled } from '@/app/_lib/launch-products';
 import { isLiveData } from '@/app/_lib/preview';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
-import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { CloseMonthFlow } from '@/components/features/home/close-month-flow';
 import { MonthScoreLog } from '@/components/features/home/month-score-log';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -38,7 +36,6 @@ export function CoachPageClient() {
     const t = useTranslations('features.coach');
     const tSession = useTranslations('features.coach.session');
     const tKind = useTranslations('features.coach.verdict');
-    const tDashboard = useTranslations('pages.dashboard');
     const tRoot = useTranslations();
     const queryClient = useQueryClient();
     const searchParams = useSearchParams();
@@ -46,7 +43,6 @@ export function CoachPageClient() {
     const { householdId } = useAuth();
     const { period, showToast } = useHouseholdShell();
     const { canMutate } = useBoardWriteAccess();
-    const { formatMoney } = useHouseholdCurrency();
     const apiError = useApiError();
     const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);
@@ -105,34 +101,8 @@ export function CoachPageClient() {
         onError: (error: unknown) => showToast(apiError(error), 'error'),
     });
 
-    const closeMonth = useMutation({
-        mutationFn: async (billDispositions?: MonthCloseBillDisposition[]) => {
-            if (!householdId) throw new Error('No household');
-            return api.money.monthScore.close({
-                householdId,
-                period: periodKey,
-                billDispositions,
-            });
-        },
-        onSuccess: recap => {
-            void queryClient.invalidateQueries({
-                queryKey: apiQuery.money.monthScore.current.key(),
-            });
-            void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
-            void queryClient.invalidateQueries({
-                queryKey: apiQuery.money.fixedCosts.listSettlements.key(),
-            });
-            void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.list.key() });
-            const recapLine = monthScoreRecapHeadline(
-                tDashboard,
-                recap.headlineKey,
-                formatMoney,
-                recap.leftOver
-            );
-            showToast(tDashboard('month_closed_toast', { recap: recapLine }), 'success');
-        },
-        onError: (error: unknown) => showToast(apiError(error), 'error'),
-    });
+    // The same close flow as Home: it owns the request, the blockers and the recap toast.
+    const [closeFlow, setCloseFlow] = useState(false);
 
     const session = sessionQuery.data;
     const messages = feedQuery.data ?? EMPTY_MESSAGES;
@@ -222,11 +192,11 @@ export function CoachPageClient() {
                     closeBlockers={monthScore.closeBlockers}
                     priorOpenPeriod={monthScore.priorOpenPeriod}
                     canCloseMonth={canCloseMonth}
-                    closeMonthPending={closeMonth.isPending}
-                    formatMoney={formatMoney}
-                    onCloseMonth={dispositions => closeMonth.mutate(dispositions)}
+                    period={monthScore.period}
+                    onStartClose={() => setCloseFlow(true)}
                 />
             ) : null}
+            <CloseMonthFlow open={closeFlow} onOpenChange={setCloseFlow} target={periodKey} />
 
             {messages.length > 0 ? (
                 <section className="grid gap-4 border-t border-line pt-8">

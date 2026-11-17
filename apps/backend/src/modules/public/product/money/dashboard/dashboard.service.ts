@@ -10,11 +10,7 @@ import {
 } from '@rumtelo/utils';
 
 import { sum } from '../../../../../common/utils/money.util';
-import {
-    currentWeek,
-    daysInPeriod,
-    daysUntilPeriodEnd,
-} from '../../../../../common/utils/period.util';
+import { daysInPeriod, daysUntilPeriodEnd } from '../../../../../common/utils/period.util';
 import { CoachService } from '../../../platform/coach/coach.service';
 import { HouseholdSettingsService } from '../../../../auth/household/household-settings/household-settings.service';
 import { TransactionService } from '../ledger/transaction/transaction.service';
@@ -23,7 +19,7 @@ import { JarService } from '../plan/jar/jar.service';
 import { DebtService } from '../targets/debt/debt.service';
 import { GoalService } from '../targets/goal/goal.service';
 import { MonthScoreService } from '../month-score/month-score.service';
-import { WeekCheckService } from '../week-check/week-check.service';
+import { ProgressService } from '../progress/progress.service';
 
 /**
  * Composition root for the dashboard. The design puts jars, coach, month score and four
@@ -45,7 +41,7 @@ export class DashboardService {
         @Inject(FixedCostService) private readonly fixedCosts: FixedCostService,
         @Inject(DebtService) private readonly debts: DebtService,
         @Inject(GoalService) private readonly goals: GoalService,
-        @Inject(WeekCheckService) private readonly weekChecks: WeekCheckService
+        @Inject(ProgressService) private readonly progressFacts: ProgressService
     ) {}
 
     // ====================================================================
@@ -53,22 +49,11 @@ export class DashboardService {
     // ====================================================================
 
     /**
-     * Plain facts for Home's first-run layout, as of now (never the selected period).
-     * Each comes from the owning service, scoped to the request's household, and reads
-     * at most one row.
+     * First-run facts and the board stage for Home, as of now (never the selected period).
+     * Delegates to {@link ProgressService}: same shape as `money.progress.get`.
      */
-    async progress(now = new Date()) {
-        const [hasTransactions, weekCheck, hasClosedMonth] = await Promise.all([
-            this.transactions.hasAny(),
-            this.weekChecks.completionFacts(currentWeek(now)),
-            this.monthScores.hasClosedMonth(),
-        ]);
-        return {
-            hasTransactions,
-            hasCompletedWeekCheck: weekCheck.hasCompleted,
-            weekCheckDoneThisWeek: weekCheck.doneThisWeek,
-            hasClosedMonth,
-        };
+    progress(now = new Date()) {
+        return this.progressFacts.get(now);
     }
 
     async get(householdId: string, period: string) {

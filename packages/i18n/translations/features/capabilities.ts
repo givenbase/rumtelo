@@ -10,7 +10,7 @@ const capabilities = {
     },
     'home-why': {
         name: 'Why',
-        description: 'Why this practice matters.',
+        description: 'Why this routine matters.',
     },
     'money-overview': {
         name: 'Overview',
@@ -91,11 +91,11 @@ const capabilities = {
     },
     'soul-stillness': {
         name: 'Stillness',
-        description: 'Stillness practice and presence.',
+        description: 'Stillness routine and presence.',
     },
     'soul-gratitude': {
         name: 'Gratitude',
-        description: 'Gratitude practice.',
+        description: 'Gratitude routine.',
     },
     'soul-giving': {
         name: 'Giving',

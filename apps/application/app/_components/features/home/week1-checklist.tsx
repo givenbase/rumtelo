@@ -18,11 +18,16 @@ import { settingsPath } from '@/app/_lib/routes';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
-import { usePlanCapacity } from '@/components/features/shell/use-plan-capacity';
 
 type ChecklistKey = 'bank' | 'dream' | 'invite';
 
-type ChecklistItem = { key: ChecklistKey; done: boolean; href: string };
+type ChecklistItem = {
+    key: ChecklistKey;
+    done: boolean;
+    href: string;
+    /** Done, but waiting on someone else (a pending invitation). */
+    invited?: boolean;
+};
 
 const ROW = 'flex min-h-12 min-w-0 items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm';
 
@@ -55,12 +60,12 @@ export function Week1Checklist() {
         [],
         enabled
     );
-    const membersQuery = useLiveQuery(
-        apiQuery.household.members.queryOptions({ input: { householdId: householdId! } }),
-        [],
+    // Seats as the server counts them: members plus pending, unexpired invitations.
+    const seatsQuery = useLiveQuery(
+        apiQuery.household.seats.queryOptions({ input: { householdId: householdId! } }),
+        null,
         enabled
     );
-    const seats = usePlanCapacity('maxMembers', membersQuery.data.length);
 
     const dismiss = useMutation({
         mutationFn: () =>
@@ -73,8 +78,9 @@ export function Week1Checklist() {
         onError: error => showToast(apiError(error), 'error'),
     });
 
-    const loading = settingsQuery.isPending || accountsQuery.isPending || membersQuery.isPending;
-    const failed = settingsQuery.isError || accountsQuery.isError || membersQuery.isError;
+    // A failed seats read only drops the invite item; bank and dream still help.
+    const loading = settingsQuery.isPending || accountsQuery.isPending || seatsQuery.isPending;
+    const failed = settingsQuery.isError || accountsQuery.isError;
     const settings = settingsQuery.data;
     if (!enabled || loading || failed || !settings) return null;
     if (settings.answers?.[HouseholdAnswerKey.WEEK1_CHECKLIST_DISMISSED] === true) return null;
@@ -93,13 +99,20 @@ export function Week1Checklist() {
             href: settingsPath('general/household'),
         });
     }
-    // Hidden (never shown as locked) when the plan has no seat left.
-    if (seats.canAdd) {
-        items.push({
-            key: 'invite',
-            done: membersQuery.data.length > 1,
-            href: settingsPath('general/household'),
-        });
+    const seats = seatsQuery.isError ? null : seatsQuery.data;
+    if (seats) {
+        const invitePath = settingsPath('general/household');
+        const seatLeft =
+            seats.maxMembers === null || seats.members + seats.pendingInvites < seats.maxMembers;
+        if (seats.members > 1) {
+            items.push({ key: 'invite', done: true, href: invitePath });
+        } else if (seats.pendingInvites > 0) {
+            // Counts as done: they have done their part.
+            items.push({ key: 'invite', done: true, invited: true, href: invitePath });
+        } else if (seatLeft) {
+            items.push({ key: 'invite', done: false, href: invitePath });
+        }
+        // Otherwise hidden (never shown as locked): the plan has no seat left.
     }
 
     const doneCount = items.filter(item => item.done).length;
@@ -141,9 +154,18 @@ export function Week1Checklist() {
                                             aria-hidden="true"
                                             className="size-4 shrink-0 rounded-full bg-accent"
                                         />
-                                        <span className="min-w-0 text-pretty">{label}</span>
+                                        <span className="grid min-w-0">
+                                            <span className="text-pretty">{label}</span>
+                                            {item.invited ? (
+                                                <span className="text-xs text-pretty text-fg-muted">
+                                                    {t('invited')}
+                                                </span>
+                                            ) : null}
+                                        </span>
                                     </span>
-                                    <span className="shrink-0 text-xs">{t('done')}</span>
+                                    {item.invited ? null : (
+                                        <span className="shrink-0 text-xs">{t('done')}</span>
+                                    )}
                                 </div>
                             ) : (
                                 <Link

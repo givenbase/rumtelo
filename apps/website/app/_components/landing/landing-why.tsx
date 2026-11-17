@@ -7,7 +7,7 @@ import { cn } from '@rumtelo/utils';
 import { CARD, Eyebrow } from './landing-primitives';
 
 const PRIMARY_BOOK_KEYS = ['rich_dad', 'think_grow', 'millionaire_mind'] as const;
-const MORE_BOOK_KEYS = ['psychology', 'secret'] as const;
+const MORE_BOOK_KEYS = ['psychology'] as const;
 
 /**
  * Why we exist — one spine:

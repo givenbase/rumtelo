@@ -29,12 +29,10 @@ const dashboard = {
         travel_ahead_one: 'By {stamp} · about {money} through jars over {horizon} month',
         travel_ahead_other: 'By {stamp} · about {money} through jars over {horizon} months',
         travel_jar: '{name} {from} → {to}',
+        /** Screen-reader prefix for the level name next to the score. */
+        level_sr: 'Level: {level}',
     },
     close_month: 'Close month',
-    /** Second click on ConfirmActionButton / coach close CTA. */
-    close_month_confirm: 'Are you sure? Close this month',
-    /** Second click when unpaid bills need skip/carry choices. */
-    close_month_review_bills: 'Review unpaid bills',
     close_bills_title: 'Unpaid bills this month',
     close_bills_body:
         'Choose for each bill: carry it into next month (you’ll owe more then), or skip it for this period.',
@@ -44,7 +42,6 @@ const dashboard = {
     close_bills_roll_debt_hint:
         'After this carry ({count} months open), register it as a debt on Fixed costs — with collection fees and a payment plan if needed.',
     close_bills_skip_hint: 'This month won’t count — next month starts fresh at 1×.',
-    close_bills_confirm: 'Close month',
     /** Shown above Close when inbox / bills still open. */
     close_blocked_title: 'Finish these before closing this month',
     close_blocked_inbox_one: '1 unsorted transaction in the inbox',
@@ -52,33 +49,41 @@ const dashboard = {
     close_blocked_bills_one: '1 unpaid bill — choose carry or skip when you close{names}',
     close_blocked_bills_other: '{count} unpaid bills — choose carry or skip when you close{names}',
     close_blocked_bill_names: ' ({list})',
-    close_blocked_open_bills: 'Open bills ▸',
     /** Soft sequential-close: finish an earlier month before locking this one. */
     prior_open_title: 'Finish the earlier month first',
     prior_open_body:
         '{period} is still open. Close months in order so the score and log stay consistent.',
-    prior_open_cta: 'Go to {period} ▸',
     closing: 'Closing…',
     month_closed: 'Month closed',
     /** Toast after close — recap is the surplus/overspent line. */
     month_closed_toast: 'Month closed · {recap}',
     close_failed: 'Could not close month',
+    /** Close-month sheet opened from the Home next move (prior month first, then Inbox, then bills). */
+    close_flow: {
+        title: 'Close {month}',
+        prior_first: 'Close {prior} first — months close in order.',
+        prior_first_cta: 'Close {prior}',
+        prior_done: '{month} closed.',
+        inbox_first:
+            '{count, plural, one {# line from {month} is still in your Inbox.} other {# lines from {month} are still in your Inbox.}}',
+        inbox_first_cta: 'Sort them',
+        inbox_first_reason: 'Sort the Inbox first, then close.',
+        confirm_body:
+            'You’ll see your score and carry what’s left into next month. A closed month can’t be changed.',
+        bills_tail: 'A closed month can’t be changed.',
+        close_cta: 'Close {month}',
+        already_closed: '{month} is already closed.',
+        done: 'Done',
+        not_now: 'Not now',
+        load_error: 'Couldn’t load {month}.',
+        close_error_fallback: 'Couldn’t close {month}. Check your connection and try again.',
+    },
     levels: {
         '1': 'Beginner',
         '2': 'Navigator',
         '3': 'Steersman',
         '4': 'Captain',
         '5': 'Compass',
-        unlocks: {
-            six_jars: 'Six jars',
-            inbox: 'Inbox',
-            week_check: 'Week check',
-            goals: 'Goals',
-            debts: 'Debts',
-            energy_layer: 'Energy layer',
-            coach: 'Coach',
-            export: 'Export',
-        },
     },
     recap: {
         surplus: '{amount} left this period',
@@ -149,6 +154,7 @@ const dashboard = {
         hide: 'Hide',
         hide_aria: 'Hide the setup list for everyone in this household',
         done: 'Done',
+        invited: 'Invited — waiting for them',
         items: {
             bank: 'Add your bank to your main account',
             dream: 'Write down your dream',
@@ -160,7 +166,6 @@ const dashboard = {
         inbox_one: '{count} transaction waiting for a jar.',
         inbox_many: '{count} transactions waiting for a jar.',
         all_sorted: 'All sorted — time for intention.',
-        sort_inbox: 'Sort inbox',
         week_check: 'Week check',
         see_jars: 'See jars',
         practice_pending_one:

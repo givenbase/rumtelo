@@ -146,6 +146,11 @@ const settings = {
     legal_name: 'Legal name',
     born: 'Born {date}',
     panels: {
+        /** Account tab: the "Show everything now" switch (labels reuse `pages.nav.show_all.*`). */
+        start: {
+            eyebrow: 'Your start',
+            blurb: 'New boards start with jars, the Inbox and the week check. The rest joins your menu after your first week check and your first closed month.',
+        },
         profile: {
             eyebrow: 'Profile',
             blurb: 'Greeting name starts from your legal name at signup — change it anytime. Legal name, phone, and birthday live on your account.',
@@ -559,7 +564,7 @@ const settings = {
         },
         stillness: {
             eyebrow: 'Your daily stillness',
-            blurb: 'How long you sit. Short and daily beats long and occasional — this is the one practice that costs nothing and protects every jar.',
+            blurb: 'How long you sit. Short and daily beats long and occasional — this is the one routine that costs nothing and protects every jar.',
             minutes_aria: 'Daily stillness minutes',
             minutes: '{count} min',
             stub: 'Intention templates and reminders — coming soon.',
@@ -591,7 +596,7 @@ const settings = {
             blurb: 'Three plans: Basic, Plus, and Max. Start on Basic — nothing you have entered is ever locked away.',
             card_basic_tag: 'From {price}',
             card_basic_line:
-                'Solo board — the six jars and the practice underneath. No bank needed.',
+                'Solo board — the six jars and the routine underneath. No bank needed.',
             card_basic_feats: '{members} · Solo only · MONEY jars · 1 goal · Coach',
             card_plus_tag: 'Most chosen',
             card_plus_line:

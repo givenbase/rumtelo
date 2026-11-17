@@ -2,6 +2,7 @@ import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import {
     PlanKey,
+    BoardStage,
     PLAN_RANK,
     PRACTICE_BASE_UNIT_CENTS,
     PRACTICE_CLIENT_SEAT_UNIT_CENTS,
@@ -840,6 +841,7 @@ export class PracticeService {
             const snap = await this.householdBilling.getSnapshot(householdId);
             if (PLAN_RANK[snap.planKey] < PLAN_RANK[SPONSORED_MANAGE_PLAN]) {
                 await this.householdBilling.setPlanKey(householdId, SPONSORED_MANAGE_PLAN);
+                await this.householdSettings.raiseBoardStageFloor(householdId, BoardStage.MONTH);
                 this.logger.log(
                     `Practice-sponsored household ${householdId} → ${SPONSORED_MANAGE_PLAN}`
                 );

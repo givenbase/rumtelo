@@ -5,12 +5,15 @@ import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
 import { useLiveQuery } from '@rumtelo/hooks';
-import { Icon, Typography, type IconName } from '@rumtelo/ui';
+import { Icon, Typography } from '@rumtelo/ui';
 import { useTranslations } from '@rumtelo/i18n';
 import { cn } from '@rumtelo/utils';
 
-import { CREATE_HREF, type CreateKind } from '@/app/_lib/create-routes';
+import { CREATE_HREF } from '@/app/_lib/create-routes';
+import { isProductEnabled } from '@/app/_lib/launch-products';
+import { quickAddHits } from '@/app/_lib/quick-add-kinds';
 import { apiQuery } from '@/app/_lib/api-hooks';
+import type { DeferredUntil } from '@/app/_lib/nav';
 import { minPlanForCapability, planLabel } from '@/app/_lib/plan';
 import { isLiveData } from '@/app/_lib/preview';
 import { productPath } from '@/app/_lib/routes';
@@ -22,53 +25,6 @@ import {
     usePlanCapabilities,
 } from '@/components/features/shell/use-plan-capabilities';
 
-const QUICK_ITEMS: {
-    labelKey: string;
-    kind: CreateKind;
-    search: string;
-    icon: IconName;
-}[] = [
-    {
-        labelKey: 'pages.shell.quick_add.transaction',
-        kind: 'tx',
-        search: 'transaction expense',
-        icon: 'receipt',
-    },
-    {
-        labelKey: 'pages.shell.quick_add.import_statement',
-        kind: 'importStatement',
-        search: 'import statement bank camt mt940 csv afschrift',
-        icon: 'upload',
-    },
-    {
-        labelKey: 'pages.shell.quick_add.fixed_cost',
-        kind: 'fixed',
-        search: 'fixed cost bill rent huur',
-        icon: 'calendar-clock',
-    },
-    { labelKey: 'pages.shell.quick_add.debt', kind: 'debt', search: 'debt', icon: 'credit-card' },
-    { labelKey: 'pages.shell.quick_add.goal', kind: 'goal', search: 'goal', icon: 'target' },
-    {
-        labelKey: 'pages.shell.quick_add.income',
-        kind: 'income',
-        search: 'income',
-        icon: 'wallet',
-    },
-    {
-        labelKey: 'pages.shell.quick_add.training',
-        kind: 'session',
-        search: 'training sport',
-        icon: 'dumbbell',
-    },
-    { labelKey: 'pages.shell.quick_add.asset', kind: 'asset', search: 'asset', icon: 'landmark' },
-    {
-        labelKey: 'pages.shell.quick_add.move_money',
-        kind: 'move',
-        search: 'move jar',
-        icon: 'arrow-left-right',
-    },
-];
-
 type PaletteMode = 'ask' | 'add';
 
 export function QuickAddFab() {
@@ -78,7 +34,7 @@ export function QuickAddFab() {
     const { quickOpen, toggleQuick, setQuickOpen } = useHouseholdShell();
     const { isCapabilityLocked } = usePlanCapabilities();
     const { householdId } = useAuth();
-    const { nav } = useShellNav();
+    const { nav, stage, stageReady } = useShellNav();
     const live = isLiveData(householdId);
     const [mode, setMode] = useState<PaletteMode>('ask');
     const [query, setQuery] = useState('');
@@ -105,13 +61,15 @@ export function QuickAddFab() {
 
     const navHits = useMemo(() => {
         if (mode !== 'ask' || !queryText) return [];
-        const hits: { href: string; label: string }[] = [];
+        const hits: { href: string; label: string; deferredUntil?: DeferredUntil }[] = [];
         // Same list the shell builds (tabs, Money sections, Course tabs, More rows), so a
         // page the person cannot open, or that production hides, is never offered.
         for (const item of nav.searchable) {
             const label = t(item.labelKey);
             const hay = `${label} ${item.href}`.toLowerCase();
-            if (hay.includes(queryText)) hits.push({ href: item.href, label });
+            if (hay.includes(queryText)) {
+                hits.push({ href: item.href, label, deferredUntil: item.deferredUntil });
+            }
         }
         return hits.slice(0, 8);
     }, [mode, queryText, t, nav.searchable]);
@@ -139,12 +97,18 @@ export function QuickAddFab() {
 
     const addHits = useMemo(() => {
         if (mode !== 'add') return [];
-        if (!queryText) return QUICK_ITEMS;
-        return QUICK_ITEMS.filter(item => {
-            const label = t(item.labelKey).toLowerCase();
-            return label.includes(queryText) || item.search.includes(queryText);
+        return quickAddHits({
+            stage,
+            stageReady,
+            query: queryText,
+            productEnabled: isProductEnabled,
+            isLocked: kind => {
+                const capabilityKey = CREATE_KIND_CAPABILITY[kind];
+                return capabilityKey ? isCapabilityLocked(capabilityKey) : false;
+            },
+            labelOf: item => t(item.labelKey),
         });
-    }, [mode, queryText, t]);
+    }, [mode, queryText, stage, stageReady, isCapabilityLocked, t]);
     const openCoachStep = (stepId?: string) => {
         setQuickOpen(false);
         setQuery('');
@@ -163,9 +127,10 @@ export function QuickAddFab() {
                     <div className="mb-1 flex gap-1 rounded-xl bg-raised p-1">
                         <button
                             type="button"
+                            aria-pressed={mode === 'ask'}
                             onClick={() => setMode('ask')}
                             className={cn(
-                                'flex-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold tracking-wide uppercase transition-colors',
+                                'min-h-11 flex-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold tracking-wide uppercase transition-colors',
                                 mode === 'ask'
                                     ? 'bg-surface text-fg shadow-sm'
                                     : 'text-fg-muted hover:text-fg'
@@ -174,9 +139,10 @@ export function QuickAddFab() {
                         </button>
                         <button
                             type="button"
+                            aria-pressed={mode === 'add'}
                             onClick={() => setMode('add')}
                             className={cn(
-                                'flex-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold tracking-wide uppercase transition-colors',
+                                'min-h-11 flex-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold tracking-wide uppercase transition-colors',
                                 mode === 'add'
                                     ? 'bg-surface text-fg shadow-sm'
                                     : 'text-fg-muted hover:text-fg'
@@ -188,19 +154,22 @@ export function QuickAddFab() {
                     <input
                         value={query}
                         onChange={event => setQuery(event.target.value)}
+                        aria-label={
+                            mode === 'ask' ? tQuick('search_label_ask') : tQuick('search_label_add')
+                        }
                         placeholder={
                             mode === 'ask' ? tQuick('ask_placeholder') : tQuick('add_placeholder')
                         }
-                        className="w-full rounded-xl border border-line bg-raised px-3 py-2 text-sm outline-none focus:border-accent"
+                        className="min-h-11 w-full rounded-xl border border-line bg-raised px-3 py-2 text-sm outline-none focus:border-accent"
                     />
 
                     {mode === 'ask' ? (
-                        <div className="grid gap-1">
+                        <div className="grid max-h-[min(60dvh,28rem)] gap-1 overflow-y-auto">
                             {!queryText && nextStep ? (
                                 <button
                                     type="button"
                                     onClick={() => openCoachStep(nextStep.id)}
-                                    className="rounded-lg px-3 py-2.5 text-left text-sm text-fg transition-colors hover:bg-raised">
+                                    className="min-h-11 rounded-lg px-3 py-2.5 text-left text-sm text-fg transition-colors hover:bg-raised">
                                     <span className="block text-[0.65rem] font-semibold tracking-wide text-fg-faint uppercase">
                                         {tQuick('next_step')}
                                     </span>
@@ -211,7 +180,7 @@ export function QuickAddFab() {
                                 <button
                                     type="button"
                                     onClick={() => openCoachStep()}
-                                    className="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-accent transition-colors hover:bg-raised">
+                                    className="min-h-11 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-accent transition-colors hover:bg-raised">
                                     {tQuick('open_coach')}
                                 </button>
                             ) : null}
@@ -220,7 +189,7 @@ export function QuickAddFab() {
                                     key={step.id}
                                     type="button"
                                     onClick={() => openCoachStep(step.id)}
-                                    className="rounded-lg px-3 py-2.5 text-left text-sm text-fg transition-colors hover:bg-raised">
+                                    className="min-h-11 rounded-lg px-3 py-2.5 text-left text-sm text-fg transition-colors hover:bg-raised">
                                     {step.prompt}
                                 </button>
                             ))}
@@ -229,8 +198,13 @@ export function QuickAddFab() {
                                     key={hit.href}
                                     href={hit.href}
                                     onClick={() => setQuickOpen(false)}
-                                    className="rounded-lg px-3 py-2.5 text-left text-sm text-fg transition-colors hover:bg-raised">
+                                    className="min-h-11 rounded-lg px-3 py-2.5 text-left text-sm text-fg transition-colors hover:bg-raised">
                                     {hit.label}
+                                    {hit.deferredUntil ? (
+                                        <span className="block text-xs text-pretty text-fg-muted">
+                                            {t(`pages.nav.search.deferred.${hit.deferredUntil}`)}
+                                        </span>
+                                    ) : null}
                                 </Link>
                             ))}
                             {queryText && coachHits.length === 0 && navHits.length === 0 ? (
@@ -240,7 +214,7 @@ export function QuickAddFab() {
                             ) : null}
                         </div>
                     ) : (
-                        <div className="grid gap-1">
+                        <div className="grid max-h-[min(60dvh,28rem)] gap-1 overflow-y-auto">
                             <Typography
                                 as="p"
                                 variant="eyebrow"
@@ -249,7 +223,7 @@ export function QuickAddFab() {
                                 className="mb-1 text-fg-faint">
                                 {tQuick('title')}
                             </Typography>
-                            {addHits.map(item => {
+                            {addHits.map(({ item, deferredUntil }) => {
                                 const capabilityKey = CREATE_KIND_CAPABILITY[item.kind];
                                 const locked = capabilityKey
                                     ? isCapabilityLocked(capabilityKey)
@@ -263,7 +237,7 @@ export function QuickAddFab() {
                                         href={CREATE_HREF[item.kind]}
                                         onClick={() => setQuickOpen(false)}
                                         className={cn(
-                                            'flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm transition-colors hover:bg-raised',
+                                            'flex min-h-11 items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm transition-colors hover:bg-raised',
                                             locked ? 'text-fg-muted' : 'text-fg'
                                         )}>
                                         <span
@@ -274,8 +248,13 @@ export function QuickAddFab() {
                                             aria-hidden>
                                             <Icon name={item.icon} size="sm" />
                                         </span>
-                                        <span className="min-w-0 flex-1 truncate">
-                                            {t(item.labelKey)}
+                                        <span className="grid min-w-0 flex-1">
+                                            <span className="truncate">{t(item.labelKey)}</span>
+                                            {deferredUntil ? (
+                                                <span className="text-xs text-pretty text-fg-muted">
+                                                    {tQuick(`deferred.${deferredUntil}`)}
+                                                </span>
+                                            ) : null}
                                         </span>
                                         {locked && requiredPlan ? (
                                             <span className="shrink-0 rounded-full border border-line px-2 py-0.5 font-mono text-[10px] font-semibold tracking-wide text-fg-muted uppercase">

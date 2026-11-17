@@ -1,11 +1,14 @@
 import {
+    BoardStage,
     type HouseholdSettings as HouseholdSettingsDto,
     type HouseholdSettingsPatch,
     type HouseholdVisibilitySettings,
     type PlanKey,
     DEFAULT_VISIBILITY_SETTINGS,
     PLAN_RANK,
+    boardStageAtLeast,
     canShareOnPlan,
+    isPaidPlan,
     capabilitiesFor,
     householdFitsPlan,
 } from '@rumtelo/contracts';
@@ -77,6 +80,8 @@ export class HouseholdSettingsService {
             visibility: { ...DEFAULT_VISIBILITY_SETTINGS, areas: {} },
             answers: {},
             onboardedAt: new Date(),
+            // A household that starts on a paid plan sees the full board from day one.
+            boardStageFloor: isPaidPlan(input.planKey) ? BoardStage.MONTH : null,
         } as never);
         this.em.persist(
             this.em.create(HouseholdBilling, {
@@ -116,6 +121,23 @@ export class HouseholdSettingsService {
     // ====================================================================
     // ? UPDATE Operations
     // ====================================================================
+
+    /**
+     * Raise (never lower) the stored board stage floor. Server-only: called when a household
+     * starts on or upgrades to a paid plan, so a later downgrade keeps the full menu.
+     * Idempotent; a missing settings row is created like `get` does.
+     */
+    async raiseBoardStageFloor(householdId: string, stage: BoardStage): Promise<void> {
+        let row: HouseholdSettings | null = await this.em.findOne(HouseholdSettings, {
+            household: householdId,
+        });
+        if (!row) {
+            row = this.em.create(HouseholdSettings, { household: householdId } as never);
+        }
+        if (row.boardStageFloor && boardStageAtLeast(row.boardStageFloor, stage)) return;
+        row.boardStageFloor = stage;
+        await this.em.persist(row).flush();
+    }
 
     async update(
         householdId: string,
@@ -213,6 +235,9 @@ export class HouseholdSettingsService {
 
         if (patch.planKey !== undefined) {
             await this.billing.setPlanKey(householdId, patch.planKey);
+            if (isPaidPlan(patch.planKey)) {
+                await this.raiseBoardStageFloor(householdId, BoardStage.MONTH);
+            }
         }
 
         const planKey = await this.billing.getPlanKey(householdId);
@@ -294,6 +319,7 @@ function toSettingsDto(
         audienceKeys: row.audiences.getItems().map(audience => audience.key),
         createdAt,
         onboardedAt: row.onboardedAt ? row.onboardedAt.toISOString() : null,
+        boardStageFloor: row.boardStageFloor,
     };
 }
 

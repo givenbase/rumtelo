@@ -9,7 +9,13 @@ import { z } from 'zod';
 import { Currency, Locale } from '../../../common/common.enums';
 import { HouseholdId, Id, Money, MemberId, UserId } from '../../../common/common.schema';
 import { PlanKey } from '../../../enums';
-import { HouseholdRelation, HouseholdRole, IncomeStability, SpendingStyle } from '../enums';
+import {
+    BoardStage,
+    HouseholdRelation,
+    HouseholdRole,
+    IncomeStability,
+    SpendingStyle,
+} from '../enums';
 import { JarKey, PayoffStrategy } from '../../product/money/enums';
 import { HouseholdVisibilitySettings } from './visibility';
 
@@ -146,6 +152,11 @@ export const HouseholdSettings = z.object({
     createdAt: z.iso.datetime(),
     /** When household board setup completed; null = incomplete. */
     onboardedAt: z.iso.datetime().nullable(),
+    /**
+     * Lowest board stage this household shows, whatever its data says. Server-written only
+     * (never in {@link HouseholdSettingsPatch}); null = derived from board data only.
+     */
+    boardStageFloor: z.enum(BoardStage).nullable(),
 });
 
 /** Partial nested patch for updateSettings (deep-merge on the server). */
@@ -162,6 +173,25 @@ export const HouseholdSettingsPatch = z.object({
     answers: HouseholdAnswers.optional(),
     /** Whole-array replace — the picker always sends the full selection. */
     audienceKeys: z.array(z.string()).optional(),
+});
+
+/**
+ * Seat use as the server counts it for invites: members plus pending, unexpired invitations.
+ * Counts only: no e-mails, no names.
+ */
+export const HouseholdSeatUsage = z.object({
+    /** Seats held by members (the owner counts as one). */
+    members: z.int().min(1),
+    /** Pending invitations that have not expired. */
+    pendingInvites: z.int().min(0),
+    /** Members plus pending invites in OWNER / MEMBER roles. */
+    writableUsed: z.int().min(0),
+    /** Members plus pending invites in the VIEWER role. */
+    viewerUsed: z.int().min(0),
+    /** Effective caps after seat add-ons; null = unlimited. */
+    maxMembers: z.int().nullable(),
+    maxWritable: z.int().nullable(),
+    maxViewer: z.int().nullable(),
 });
 
 /** One jar's share in a custom split (percent, at most 2 decimals). */
@@ -225,6 +255,7 @@ export type HouseholdFeatureSettings = z.infer<typeof HouseholdFeatureSettings>;
 export type HouseholdAnswers = z.infer<typeof HouseholdAnswers>;
 export type HouseholdSettings = z.infer<typeof HouseholdSettings>;
 export type HouseholdSettingsPatch = z.infer<typeof HouseholdSettingsPatch>;
+export type HouseholdSeatUsage = z.infer<typeof HouseholdSeatUsage>;
 export type JarSplitShare = z.infer<typeof JarSplitShare>;
 export type OnboardingInput = z.infer<typeof OnboardingInput>;
 export type OnboardingSplitPreviewInput = z.infer<typeof OnboardingSplitPreviewInput>;

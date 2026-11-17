@@ -70,7 +70,14 @@ const shell = {
         close_aria: 'Close palette',
         mode_ask: 'Ask',
         mode_add: 'Add',
-        ask_placeholder: 'Ask Coach or search…',
+        ask_placeholder: 'Search The Coach or a page…',
+        search_label_ask: 'Search pages and The Coach',
+        search_label_add: 'Filter what to add',
+        /** Muted line under a kind the ladder keeps out of the default list. */
+        deferred: {
+            week_check: 'Shows here after your first week check.',
+            month_close: 'Shows here after you close your first month.',
+        },
         add_placeholder: 'Filter what to add…',
         next_step: 'Next with Coach',
         open_coach: 'Open Coach',

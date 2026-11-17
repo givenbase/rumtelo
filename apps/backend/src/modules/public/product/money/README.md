@@ -64,6 +64,7 @@ User-facing jar copy (allowed / not allowed) lives in the app: `apps/application
 | `debt/` | balances plus avalanche/snowball ordering |
 | `month-score/` | the monthly score — points, level, event log |
 | `week-check/` | the ten-minute weekly week check and its surplus allocations |
+| `progress/` | board stage (`SPLIT` → `SORTING` → `ROUTINE` → `MONTH`) derived on every read; `contract.money.progress.get`, also the `progress` field of `contract.money.dashboard.get`. Paid plans (Plus/Max) are at `MONTH`: the floor `HouseholdSettings.boardStageFloor` is written on a paid start or upgrade and kept on downgrade (also the migration backfill). Guidance for the shell only, never an access gate |
 | `dashboard/` | composition root; one aggregated read for the main screen |
 
 `dashboard` depends on the others through their services. It exists so the most

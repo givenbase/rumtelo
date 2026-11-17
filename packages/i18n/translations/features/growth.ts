@@ -377,7 +377,7 @@ const growth = {
         catalog_matches: 'Wider catalog',
         pick_about_to_add: 'Pick what it is about, then add.',
         search_catalog_aria: 'Search the public catalog',
-        search_catalog_placeholder: 'The Secret, Atomic Habits…',
+        search_catalog_placeholder: 'Atomic Habits, Deep Work…',
         back: '← Learn',
         eyebrow_shelf: '✦ WHAT I LEARN',
         eyebrow_library: '✦ THE LIBRARY',

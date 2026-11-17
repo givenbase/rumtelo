@@ -153,3 +153,25 @@ describe('permissionSectionFromPath', () => {
         );
     });
 });
+
+describe('household seats (invite UIs)', () => {
+    const path = '/household/seats';
+
+    it('maps to the members section and the invite action', () => {
+        assert.equal(permissionSectionFromPath(path), HouseholdPermissionSection.HOUSEHOLD_MEMBERS);
+        assert.equal(permissionActionFromPath(path, 'POST'), HouseholdPermissionAction.CREATE);
+    });
+
+    it('is open to OWNER and MEMBER and closed to VIEWER', () => {
+        const section = HouseholdPermissionSection.HOUSEHOLD_MEMBERS;
+        assert.equal(roleCan(HouseholdRole.OWNER, section, HouseholdPermissionAction.CREATE), true);
+        assert.equal(
+            roleCan(HouseholdRole.MEMBER, section, HouseholdPermissionAction.CREATE),
+            true
+        );
+        assert.equal(
+            roleCan(HouseholdRole.VIEWER, section, HouseholdPermissionAction.CREATE),
+            false
+        );
+    });
+});

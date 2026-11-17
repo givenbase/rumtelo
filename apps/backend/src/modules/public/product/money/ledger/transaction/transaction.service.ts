@@ -356,6 +356,15 @@ export class TransactionService {
         return rows.length > 0;
     }
 
+    /**
+     * SORTED transactions of this household (by hand or by rule), counted up to `limit`.
+     * A bounded read, never a full count: the board ladder only needs "at least five".
+     */
+    async sortedCount(limit: number): Promise<number> {
+        const rows = await this.transactions.find({ status: TransactionStatus.SORTED }, { limit });
+        return rows.length;
+    }
+
     // ====================================================================
     // ? UPDATE Operations
     // ====================================================================

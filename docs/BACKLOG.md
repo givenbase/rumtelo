@@ -52,6 +52,10 @@ Source and copy: [`docs/product/clarity-audit.md`](/docs/product/clarity-audit.m
 
 | # | Item | Priority | Size | Details |
 | --- | --- | --- | --- | --- |
+| N1 | **`periodStartDay` is stored but unused server-side.** Jars, month scores and month close all use calendar months, but Settings lets people pick a start day. Decide: hide the setting, or build a real period-window model. | High | M–L | Found in Clarity 3 (G-1). Spec pins calendar months today. Needs a decision from Given |
+| N2 | **D7 Course-lite for Basic** (1 goal) and **D11 read-only debt list on Basic.** | Medium | M | Accepted decisions from the clarity audit, not built yet |
+| N3 | **CL-16 website round 2** ("grip on your life", money as the engine, audience band). | Medium | M | Spec on `claude/product-audit-bd73fa` (`012ec44e`), not yet merged |
+| N4 | **`BILLING_PREVIEW_BYPASS` must be off in production.** If it's on, a client can upgrade for free, and now that also unlocks the full board. | High | S | Check Railway env (security review, Clarity 3) |
 | 7 | **Energy food / training / sleep** — real APIs behind the empty-state pages. | Medium | L | `apps/backend/src/modules/public/product/energy/`, [`docs/explain/02-energy.md`](/docs/explain/02-energy.md) |
 | 8 | **Soul aggregates** — centers, intent, stillness as their own aggregate (stillness writes an `energy.logs` entry today). | Medium | L | `modules/public/product/soul/`, [`docs/explain/02-soul.md`](/docs/explain/02-soul.md) |
 | 9 | **Non-money week checks** — stages for Growth, Energy and Soul (only `current()` + `complete()` today; compare Money `advance()`). | Medium | L | [`docs/engineering/growth-week-check-plan.md`](/docs/engineering/growth-week-check-plan.md) |

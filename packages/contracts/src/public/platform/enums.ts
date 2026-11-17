@@ -248,3 +248,20 @@ export enum DeviceCapability {
     ALARM = 'ALARM',
     MIND = 'MIND',
 }
+
+/**
+ * How far a household board has come, in the order it is walked (a higher stage includes
+ * everything below). Guidance for what the shell shows first — never an access control:
+ * plan decides whether a surface exists, role decides who may use it. Compare with
+ * `BOARD_STAGE_ORDER`.
+ */
+export enum BoardStage {
+    /** Onboarded: the split exists. Day 1. */
+    SPLIT = 'SPLIT',
+    /** Five lines sorted, or five days old. Week 1. */
+    SORTING = 'SORTING',
+    /** A money week check was completed (or the plan is paid). Weeks 2-4. */
+    ROUTINE = 'ROUTINE',
+    /** A month was closed. */
+    MONTH = 'MONTH',
+}

@@ -13,6 +13,7 @@ import { HouseholdPracticeLink, HouseholdPracticeLinkInput } from '../practice/p
 import {
     Household,
     HouseholdMember,
+    HouseholdSeatUsage,
     HouseholdSettings,
     HouseholdSettingsPatch,
     OnboardingInput,
@@ -60,6 +61,12 @@ export const householdList = oc.output(z.array(Household));
 export const householdCurrent = oc.input(z.object({ householdId: HouseholdId })).output(Household);
 
 export const householdMembers = oc.input(HouseholdScoped).output(z.array(HouseholdMember));
+
+/**
+ * Seat usage for invite UIs (week-1 checklist, members settings): members plus pending,
+ * unexpired invitations against the plan's effective caps. OWNER and MEMBER only.
+ */
+export const householdSeats = oc.input(HouseholdScoped).output(HouseholdSeatUsage);
 
 export const householdSettings = oc.input(HouseholdScoped).output(HouseholdSettings);
 
@@ -116,6 +123,7 @@ export const householdContract = {
     list: householdList,
     current: householdCurrent,
     members: householdMembers,
+    seats: householdSeats,
     settings: householdSettings,
     updateSettings: householdUpdateSettings,
     onboard: householdOnboard,

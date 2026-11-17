@@ -528,8 +528,6 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.landing.why.audience': 'Voor wie het goed doet — en voor wie er klaar voor is.',
         'pages.landing.why.quote': 'Rijkdom is geen getal. Het is grip op je leven.',
         'pages.landing.coach_section.headline': 'De Coach tipt. Jij kiest.',
-        'pages.landing.pricing_section.headline_practice':
-            'Niet meer gissen waar je cliënten staan.',
         'pages.landing.practice_plan.line':
             'Eén bureau voor elke cliënt — sessies gaan over keuzes, niet over cijfers verzamelen.',
         'pages.landing.practice_plan.f4':
@@ -653,7 +651,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.landing.faq.data.answer':
             'Op EU-servers in Amsterdam, versleuteld opgeslagen. Exporteer of verwijder je gegevens wanneer je wilt. Zeg je een betaald abonnement op, dan blijven al je potjes, transacties en doelen leesbaar.',
         'pages.landing.faq.practice.answer':
-            'Ja — met Rumtelo Practice. Nodig cliënten uit per e-mail; zodra ze accepteren, zie je hun bord alleen-lezen vanaf één bureau. Meekijken is gratis voor hen, en je kunt hun Plus-abonnement sponsoren voor {clientPrice} per maand. Een praktijk kost {basePrice} per maand plus {staffPrice} per medewerkersplek.',
+            'Ja — met Rumtelo Praktijk. Nodig cliënten uit per e-mail; zodra ze accepteren, zie je hun bord alleen-lezen vanuit één bureau. Meekijken is gratis voor hen.',
         'pages.landing.footer.cols.coach': 'De Coach',
         'pages.landing.footer.trust.yours.line':
             'Zeg je op, dan blijven al je potjes, transacties en doelen leesbaar. Geen lock-in, geen gegevens als gijzelaar.',
@@ -742,8 +740,6 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             '{members} · Schulden · Leren · Koers · Doelen',
         'pages.settings.panels.plan.card_max_tag_core': 'Alles, zonder limieten',
         // Dashboard: naming drift (potjes, weekcheck, De Coach) and wrong-sense words.
-        'pages.dashboard.levels.unlocks.week_check': 'Weekcheck',
-        'pages.dashboard.levels.unlocks.coach': 'De Coach',
         'pages.dashboard.coach.week_check': 'Weekcheck',
         'pages.dashboard.coach.see_jars': 'Bekijk potjes',
         'pages.dashboard.coach.inbox_one': '{count} transactie wacht op een potje.',
@@ -970,6 +966,532 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Zet je week rond de drie dingen die je doelen vooruit helpen.',
         'common.message.error.api.jar_split_keys':
             'De verdeling moet elk van de zes potjes precies één keer bevatten',
+        // Terminology (CL-14): jars = potjes (not pot/potten/spaarpot), with het/dit/elk agreement.
+        'common.message.error.api.goal_save_only_jar_focus':
+            'Alleen SAVE-doelen kunnen focus op een potje hebben',
+        'common.message.error.api.goal_save_needs_jar_focus':
+            'Het SAVE-doel heeft een potje nodig voordat het focus kan zijn',
+        'common.message.error.api.goal_no_jar_spend': 'Het doel heeft geen potje om uit te geven',
+        'common.message.error.api.jar_split_total':
+            'De potjesverdeling moet samen 100% zijn; ontvangen: {total}%',
+        'ui.form.jar': 'Potje',
+        'ui.form.validation.choose_jar': 'Kies een potje',
+        'ui.form.validation.choose_from_jar': 'Kies een potje om uit te nemen',
+        'ui.form.validation.choose_to_jar': 'Kies een potje om naar te sturen',
+        'ui.form.validation.different_jars': 'Kies twee verschillende potjes',
+        'ui.statusPage.maintenance.description':
+            'We doen een korte update. Je potjes en gegevens blijven veilig — probeer het over een paar minuten opnieuw.',
+        'features.auth.sign_up.subtitle': 'Zes potjes. Eén overzichtelijk geheel.',
+        'features.brand.auth_manifesto.jars_eyebrow': 'Zes potjes',
+        'features.brand.auth_quotes_app.money_picture.support':
+            'Kijk waar het heen is gegaan. Krijg weer grip. Zes potjes beslissen.',
+        'features.capabilities.money-overview.description': 'Geldoverzicht en potjespuls.',
+        'features.capabilities.money-jars.name': 'Potjes',
+        'features.capabilities.growth-goals.description':
+            'Doelen met een datum, een potje en voortgang.',
+        'features.capabilities.soul-giving.description':
+            'Waarom het ‘Give’-potje bestaat, waar de opbrengst naartoe gaat en hoe je een goede keuze maakt.',
+        'features.coach.jar_guide.aria': 'De Coach voor dit potje',
+        'features.coach.jar_guide.learn_nudge':
+            'Zet titels op je Leren-plank, blader door de bibliotheek voor inspiratie, en voeg een doel toe op dit potje als je klaar bent om de uitgave te claimen.',
+        'features.coach.jar_guide.split_inside': 'Verdeeld in dit potje',
+        'features.growth.goals.filter_jar_aria': 'Filteren op potje',
+        'features.growth.goals.share_jar_hint':
+            'Doelen in hetzelfde potje delen de maandelijkse ruimte. Meer doelen daar betekent meestal dat elk doel langer duurt — tenzij er één Focus is.',
+        'features.growth.goals.form.kind_save_line': 'Leg geld opzij in een potje',
+        'features.growth.goals.form.pledge_tip_title': 'Een belofte, geen potje',
+        'features.growth.goals.form.pledge_tip_body':
+            'Elk gesorteerd bedrag dat dit jaar uit je ‘Give’-potje komt, telt mee — je hoeft niets met de hand te verplaatsen.',
+        'features.growth.goals.form.cause_open_hint':
+            'Open toezegging — elke bijdrage uit het ‘Give’-potje telt mee.',
+        'features.growth.goals.toast_achieve_spend':
+            'Doel geclaimd — geld uit het potje uitgegeven',
+        'features.growth.goals.toast_achieve_keep': 'Doel bereikt — het geld blijft in het potje',
+        'features.growth.goals.jar_accordion.empty': 'Er zijn nog geen doelen op dit potje.',
+        'features.growth.goals.jar_accordion.jar_available':
+            'Er is een potje beschikbaar voor dit doel.',
+        'features.growth.goals.jar_accordion.fill_jar_first':
+            'Vul eerst dit potje — en bereik dan je doel zodra je er klaar voor bent.',
+        'features.growth.goals.claim_enough': 'Het potje bevat {available} — genoeg voor {target}.',
+        'features.growth.goals.claim_short':
+            'Het potje bevat {available}; het streefbedrag is {target}. Je kunt het geld in het potje nog steeds opeisen en houden, of later uitgeven wat je kunt.',
+        'features.growth.goals.claim_default':
+            'Markeer dit doel als bereikt. Bepaal of het geld nu uit het potje gaat.',
+        'features.growth.goals.achieve_keep': 'Bereid — in een potje bewaren',
+        'features.growth.goals.achieve_spend_blocked':
+            'Uitgeven (volledige doelbedrag moet in het potje zitten)',
+        'features.growth.goals.detail.jar_toward_focus': 'Potje richting focus',
+        'features.growth.goals.detail.jar_context': 'Potjescontext',
+        'features.growth.goals.detail.other_goals': 'Andere doelen op dit potje',
+        'features.growth.goals.detail.open_jar': 'Potje openen',
+        'features.growth.goals.detail.advice_save_amount_body':
+            'Een doel zonder tempo is slechts een wens. Bepaal hoeveel je elke maand van dit potje kunt missen — dan verschijnt de einddatum.',
+        'features.growth.goals.detail.advice_save_room_title': 'Ruimte in het potje',
+        'features.growth.goals.detail.advice_siblings_body':
+            'Ze delen dezelfde maandelijkse ruimte in het potje na vaste kosten. Elke euro voor een ander doel verlengt deze einddatum — kies één Focus zodat de rest wacht.',
+        'features.growth.goals.detail.this_jar': 'Dit potje',
+        'features.growth.net_worth.detail.money_note':
+            'Rekeningen en inkomsten blijven in hun eigen potje. Deze pagina laat alleen zien wat bij dit bezit hoort.',
+        'features.growth.net_worth.detail.coach_business_title': 'Zakelijke kosten in je potjes',
+        'features.growth.net_worth.detail.coach_business_body':
+            '{amount} p/m voor dit bezit loopt via je huishouden. Betaal ze vanuit het bedrijf of verhoog je onttrekking — dan blijft alleen de onttrekking in de potjes.',
+        'features.growth.net_worth.setup.step_in_body':
+            'Voeg de inkomsten toe die je eruit haalt — salaris, dividend, huur. Het komt net als elk ander inkomen in je potjes terecht; dit bezit krijgt alleen de credits.',
+        'features.growth.net_worth.setup.step_out_body':
+            'Hosting, verzekering, software — voeg de rekeningen toe die je ervoor betaalt. Elke rekening houdt zijn eigen potje.',
+        'features.growth.learn.jar_coach_title': 'Opleiding-potje',
+        'features.growth.learn.jar_banner':
+            'In je ‘Opleiding’-potje worden deze uitgaven ondergebracht. Wat je verdiencapaciteit vergroot, draagt bij aan je financiële vrijheid.',
+        'features.growth.learn.jar_cta': 'Bekijk het ‘Opleiding’-potje',
+        'features.growth.income_simulator.intro':
+            'Sleep het maandbedrag. De verdeling blijft behouden; elk potje wordt mee verplaatst.',
+        'features.growth.income_simulator.no_jar': 'Geen potje',
+        'features.growth.income_simulator.not_funded_from_jar':
+            'Dit wordt niet uit een potje gefinancierd, dus het inkomen verandert op deze datum niet.',
+        'features.growth.income_simulator.tip_no_plan':
+            'Geen maandelijks bedrag, dus nog geen eindmaand. Stel in hoeveel er elke maand naartoe gaat — dan tonen we hoeveel maanden en in welke maand je landt. Andere doelen in hetzelfde potje delen die ruimte, dus meer doelen rekken meestal elke einddatum uit.',
+        'features.growth.income_simulator.tip_behind_room':
+            '{need} per maand zou dit in {months} maanden afronden. Er is nog ruimte in het potje.',
+        'features.money.hub.cards.jars.name': 'Potjes',
+        'features.money.hub.cards.jars.note_period': 'potjes liggen deze maand op schema',
+        'features.money.jars.eyebrow': 'DE ZES POTJES',
+        'features.money.jars.move_between': 'Van potje naar potje gaan',
+        'features.money.jars.allocated': '{count} potjes · {pct}% opzijgezet',
+        'features.money.jars.in_pot': 'In het potje',
+        'features.money.jars.in_pot_short': 'Potje',
+        'features.money.jars.in_pot_amount': 'In het potje {amount}',
+        'features.money.jars.summary_open_aria':
+            '{name}: {available} deze maand, {pot} in het potje',
+        'features.money.jars.footer_stacked':
+            '{on} / {total} potjes op schema · opgestapeld gedurende {months} maanden',
+        'features.money.jars.footer_period': '{on} / {total}-potjes liggen deze periode op schema',
+        'features.money.jars.drilldown.open_jar_link': 'Potje openen ▸',
+        'features.money.jars.guides.FINANCIAL_FREEDOM.note':
+            'Met dit potje koop je activa. Geld gaat erin en komt er nooit meer uit — alleen het rendement komt eruit.',
+        'features.money.jars.guides.EDUCATION.note':
+            'Boeken, cursussen, mentoren, hulpmiddelen. De enige uitgaven die je verdiencapaciteit vergroten. Gebruik Leren voor wat je doorwerkt, blader door de bibliotheek voor inspiratie, en zet een doel op dit potje als je klaar bent om het te claimen.',
+        'features.money.jars.guides.PLAY.not_allowed':
+            'Geen remmen, geen schuldgevoel — maar ook geen bijvullen uit een ander potje als dat leeg is.',
+        'features.money.jars.detail.goals_on_jar': '✦ Doelen op dit potje',
+        'features.money.jars.detail.fill_jar_first':
+            'Vul eerst dit potje — en bereik dan je doel zodra je er klaar voor bent.',
+        'features.money.jars.detail.no_tx_month_body': 'Er is nog niets in dit potje gestopt.',
+        'features.money.jars.detail.loading_jar': 'Potje wordt geladen…',
+        'features.money.jars.detail.back_jars': '← Potjes',
+        'features.money.jars.detail.open_jar_link': 'Potje openen ▸',
+        'features.money.fixed.filter_jar_aria': 'Filteren op potje',
+        'features.money.fixed.empty_jar_title': 'Er zit niets in dit potje.',
+        'features.money.fixed.select_group_due': 'Selecteer alle openstaande in dit potje',
+        'features.money.fixed.confirm_pause_body':
+            'Hij blijft op je lijst, maar telt niet mee voor druk op de potjes of “nog te betalen” tot je hem weer aanzet.',
+        'features.money.transactions.out_lead':
+            'Geld dat uit een potje is verdwenen. Tik op een rij om deze te bewerken of te verwijderen.',
+        'features.money.transactions.layout_by_jar': 'Per potje',
+        'features.money.transactions.empty_out_body':
+            'In deze periode bleef er niets in het potje achter.',
+        'features.money.transactions.filter_jar_aria': 'Filteren op potje',
+        'features.money.transactions.jar_fallback': 'Potje',
+        'features.money.transactions.statement_import.after_import':
+            'Regels landen bij Te sorteren. Koppel aan potjes — en aan vaste kosten als de tegenpartij matcht.',
+        'features.money.transactions.rules_sign_in_body':
+            'Regels sorteren transacties in de inbox automatisch in het juiste potje.',
+        'features.money.transactions.detail.status_sorted': 'In een potje gedaan',
+        'features.money.transactions.detail.rule_to_jar': '"{value}" → potje',
+        'features.money.holding_link.hint':
+            'Optioneel. Tel dit mee voor je bedrijf, een pand of een ander bezit. Het potje blijft hetzelfde.',
+        'features.money.expense_form.into_jar': 'In het potje',
+        'features.money.expense_form.this_jar': 'Dit potje',
+        'features.money.expense_form.no_jars': 'Geen potjes — eerst de installatie voltooien',
+        'features.money.move.toast_moved': 'Geld dat tussen potjes is overgeheveld',
+        'features.money.move.choose_source_first': 'Kies eerst een bronpotje.',
+        'features.money.move.source_blocked':
+            'Kies een ander bronpotje — dit kan geen geld versturen.',
+        'features.money.move.aria_from': 'Potje om uit te nemen',
+        'features.money.move.aria_to': 'Potje om naar te sturen',
+        'features.money.move.eligibility.cannot_send': 'Met dit potje kun je geen geld overmaken',
+        'features.money.expense_intent.catalog_hint':
+            'Kies uit de catalogus van dit potje als je de winkel of het type kent — of typ een eigen naam in.',
+        'features.money.expense_intent.no_types_custom':
+            'Er zijn nog geen typen voor dit potje — voer in plaats daarvan een eigen naam in.',
+        'features.money.expense_intent.custom_jar_hint':
+            'Kies hieronder een potje — of pas je keuze aan en selecteer een type, zodat we het kunnen indelen.',
+        'features.money.jar_coverage.in_pot_label': 'In het potje',
+        'features.money.jar_coverage.in_pot': 'In het potje {amount} · opgebouwd over de maanden',
+        'features.money.fixed_form.no_jars':
+            'Geen potjes — eerst de volledige installatie voltooien',
+        'features.money.necessities_pressure.open_jar': 'Open het potje met basisbenodigdheden',
+        'features.money.business_household_leak.title': 'Zakelijke kosten in je potjes',
+        'features.money.business_household_leak.body':
+            '{amount} p/m aan bedrijfskosten lopen via je huishouden. Betaal ze vanuit het bedrijf of verhoog je onttrekking — dan blijft alleen de onttrekking in de potjes.',
+        'features.money.business_household_leak.body_named':
+            '{amount} p/m voor {name} loopt via je huishouden. Betaal ze vanuit het bedrijf of verhoog je onttrekking — dan blijft alleen de onttrekking in de potjes.',
+        'features.soul.giving.lead':
+            'Het ‘Give’-potje is de kleinste van de zes en heeft de grootste invloed op je relatie met geld. Wanneer een vast deel al weg is voordat je het kunt uitgeven, is geld niet langer iets om aan vast te houden.',
+        'features.soul.giving.open_jar': 'Open het ‘Give’-potje',
+        'features.soul.giving.reached_by':
+            '{when} bereikt. Het potje blijft stromen — daar ging het om.',
+        'features.soul.giving.pledge_met':
+            'De belofte is nagekomen. Het potje blijft vollopen — daar ging het om.',
+        'features.soul.giving.pledge_pitch':
+            'Een toezegging geeft het potje een einddoel voor het jaar. Elk gesorteerd bedrag dat Give verlaat, telt mee voor dat doel — je hoeft niets handmatig te verplaatsen.',
+        'features.soul.giving.empty_auto_body':
+            'Voeg vaste kosten toe aan het ‘Give’-potje om maandelijkse donaties te plannen.',
+        'features.tour.explain.money.title': 'Geld — zes potjes',
+        'features.tour.explain.jars.title': 'Potjes — hoe de verdeling werkt',
+        'features.tour.pages.home.sections.what_for.body':
+            'Je grip-overzicht voor deze maand — De Coach, het geldbeeld en de deuren naar Groei, Energie en Ziel. Begin de volledige rondleiding bij ‘Help’ en loop vervolgens door ‘Thuis’, daarna ‘Potjes’, ‘Vaste kosten’ en ‘Inkomsten’.',
+        'features.tour.pages.shell.steps.period.content':
+            'Wijzig de maand die je bekijkt. De totaalbedragen en uitgaven in het potje worden op basis van deze periode bijgehouden.',
+        'features.tour.pages.income.sections.simulator.body':
+            'Sleep de maandelijkse netto-opbrengst. De verdeling over de potjes blijft behouden; het bedrag in elk potje verschuift mee. Kies een doel om de bijbehorende datum te zien. Dit is een prognose — het geld is nog niet overgemaakt.',
+        'features.tour.pages.fixed.sections.jars_use.heading': 'Hoe potjes hiervan gebruikmaken',
+        'features.tour.pages.fixed.sections.jars_use.body':
+            'Een vast bedrag aan OUT vermindert het beschikbare saldo in dat potje. Zodra er geld binnenkomt, wordt het inkomen procentueel over de potjes verdeeld — dit scherm geeft het plan weer, niet de boekhouding.',
+        'features.tour.pages.fixed.steps.list.content':
+            'Uit: vaste kosten per potje. In: bedrag waarmee de verdeling wordt gefinancierd. Tik op een rij om deze te bewerken.',
+        'features.tour.pages.jars.sections.what_for.heading': 'Waar de potjes voor dienen',
+        'features.tour.pages.jars.sections.how.body':
+            'Je voert je inkomsten zelf in. Aan de hand van je vaste percentages zie je hoeveel er in elk potje hoort — wat je kunt uitgeven of voor dat doel opzij kunt zetten. Werk vervolgens de ‘Money pills’ van links naar rechts af: Vaste kosten → Transacties → Schulden → Nettovermogen. Rumtelo verplaatst nooit geld op je bankrekening.',
+        'features.tour.pages.jars.steps.list.title': 'Je zes potjes',
+        'features.tour.pages.goals.sections.save_vs_earn.body':
+            'Spaardoelen vullen een potje dat uiteindelijk een berg geld oplevert. Verdiensten houden het maandelijkse netto-inkomen van het huishouden bij — zodra het netto-inkomen het streefbedrag bereikt, wordt het doel automatisch als bereikt gemarkeerd.',
+        'features.tour.pages.transactions.sections.what_for.body':
+            'Het overzicht van het geld dat al is uitgegeven — Uitgegeven, Ontvangen (cadeaus, terugbetalingen en aanvullingen in de potjes). Door dit hier bij te houden, blijft elk potje op orde.',
+        'features.tour.pages.debt.sections.how.body':
+            'Voeg elke schuld toe, inclusief het saldo en de aflossing. Bekijk ze als vaste kosten: als de aflossing een gat in het potje slaat, moet het potjesplan worden herzien.',
+        'pages.meta.jars': 'Potjes',
+        'pages.meta.jar': 'Potje',
+        'pages.meta.settings_jars': 'Potjes — Instellingen',
+        'pages.settings.tabs.jars.label': 'Potjes',
+        'pages.settings.panels.household.blurb_suffix':
+            'Leden delen potjes, regels en transactiegeschiedenis.',
+        'pages.settings.panels.jars_placement.eyebrow': 'Waar elk potje staat',
+        'pages.settings.panels.bank.account_label_hint':
+            'Zichtbaar bij potjes en CSV — bijv. Betaalrekening, of Creditcard · t.n.v. Avery Chen.',
+        'pages.settings.panels.automation.rules.guard.name': 'Potjesbeschermer',
+        'pages.settings.panels.automation.rules.guard.desc':
+            'Geef een waarschuwing zodra een potje meer dan 90% van zijn toewijzing heeft verbruikt.',
+        'pages.settings.panels.export.sheet_jars': 'Potjes',
+        'pages.settings.panels.export.sheet_fixed_cols': 'naam · bedrag · potje',
+        'pages.settings.panels.export.sheet_transactions_cols': 'datum · omschr · bedrag · potje',
+        'pages.settings.panels.export.sheet_goals_cols': 'naam · doel · potje',
+        'pages.settings.panels.export.sheet_rules_cols': 'voorwaarde · potje · prioriteit',
+        'pages.settings.panels.import.found_jars_one': '{count} potje',
+        'pages.settings.panels.import.found_jars_other': '{count} potjes',
+        'pages.settings.panels.import.split_ok': 'Er wordt een verdeling van het potje toegepast',
+        'pages.settings.panels.import.split_skip': 'De verdeling van het potje blijft ongewijzigd',
+        'pages.shell.forms.tx_update.description':
+            'Pas de richting, het bedrag, het potje of de notitie aan.',
+        'pages.shell.forms.fixed_create.description': 'Wat verdwijnt er elke maand uit het potje?',
+        'pages.shell.forms.move_create.description_from_jar':
+            'Kies zelf waar het naartoe gaat — dit potje is al de bron.',
+        'pages.shell.gates.maintenance_api_down_body':
+            'We kunnen de API momenteel niet bereiken. Je potjes en gegevens zijn veilig — probeer het straks nog eens.',
+        'pages.why.meaning.money_leaves_body':
+            'Als er geld wordt opgenomen, zie je meteen uit welk potje het komt — en hoeveel er nog over is voor die klus. Geen spreadsheet achteraf.',
+        'pages.why.cta_jars': 'Bekijk mijn potjes',
+        'pages.why.routes.energy_sleep':
+            'Slaap is de vloer waarop de potjes staan. Haal die weg en alle andere getallen vallen stilletjes naar beneden.',
+        'pages.why.routes.energy_food':
+            'Eten is brandstof voor de week die jullie potjes verdelen. Brandstof koop je, die krijg je niet zomaar.',
+        'features.growth.goals.detail.kind_save': 'Sparen · in een spaarpotje',
+        'features.growth.income_simulator.tip_behind_income_no_jar':
+            '{need} per maand zou dit in {months} maanden afbetalen. Leg het geld in een spaarpotje om te zien of je inkomen daarvoor voldoende is.',
+        'features.money.transactions.lead':
+            'Uitgaven zijn geld dat je uitgeeft. Inkomsten zijn een cadeau, belastingteruggave, terugbetaling of geld dat je in een spaarpotje stopt. Een bankrekening koppelen is een instelling.',
+        'features.money.transactions.in_lead':
+            'Cadeaus, terugbetalingen, belastingteruggaven en aanvullingen op het spaarpotje. Tik op een rij om deze te bewerken.',
+        'features.money.debt.form.link_fixed_body':
+            'Hiermee houd je de geplande aflossing in je potjesbudget volgens dit ritme aan.',
+        'features.money.necessities_pressure.body':
+            'Dat komt in het begin vaak voor — {pct}% is een doel om naartoe te werken. Vereenvoudig je rekeningen en/of zorg voor meer inkomen. Haal geen geld uit je spaarpotje voor financiële vrijheid om de huur te kunnen betalen.',
+        'features.tour.pages.jars.title': 'Mijn spaarpotjes',
+        'pages.settings.panels.plan.card_basic_feats':
+            '{members} · Alleen solo · Spaarpotjes · 1 doel · Coach',
+        'pages.shell.forms.tx_create.description':
+            'Uitgeven: eruit; cadeaus, terugbetalingen en bijvullen van het spaarpotje: erin.',
+        // Necessity jar = Noodzakelijk (not Noodzaak / Necessities); jar names match the landing page.
+        'features.coach.split_tips.nec-high':
+            'Een Noodzakelijk-aandeel van meer dan 60% zet alle andere potjes onder druk. Het verlagen van vaste kosten helpt meestal meer dan het inperken van vrijheid.',
+        'features.brand.auth_manifesto.jars.necessity.name': 'Noodzakelijk',
+        'features.brand.auth_manifesto.jars.education.name': 'Opleiding',
+        'features.brand.auth_manifesto.jars.savings.name': 'Sparen',
+        'features.brand.auth_manifesto.jars.play.name': 'Plezier',
+        'features.brand.auth_manifesto.jars.give.name': 'Geven',
+        'features.coach.money_coach.necessities_share.text':
+            'Noodzakelijk staat op {pct}% — het doel is 55%. Prima voor nu; om het gat te dichten, schrap je vaste kosten of verhoog je je inkomen, en laat je Vrijheid met rust.',
+        'features.growth.goals.detail.advice_give_gap_body':
+            'Als er ongeveer {amount} meer per maand wordt gedoneerd, wordt de toezegging op tijd nagekomen. Een vast bedrag bij Noodzakelijk of ‘Give’ maakt het saai — op een positieve manier.',
+        'features.money.fixed.coach_enough_edge': 'op de rand van het doel van Noodzakelijk',
+        'features.money.debt.detail.no_fixed_linked':
+            'Er is nog geen doorlopende betaling gekoppeld. Voeg er een toe, zodat Noodzakelijk deze betaling kan zien.',
+        'features.money.debt.form.link_fixed_title':
+            'Voeg dit ook toe als vaste kosten in Noodzakelijk',
+        'features.money.debt.toast_monthly_added':
+            'Maandelijkse betaling toegevoegd aan Noodzakelijk',
+        'features.tour.pages.debt.sections.what_for.body':
+            'Houd bij wat je nog verschuldigd bent en hoeveel dat maandelijks van je inkomen opslokt. Aflossingen van schulden horen meestal bij Noodzakelijk — op deze pagina houd je het saldo in de gaten.',
+        'pages.settings.panels.automation.rules.sweep.desc':
+            'Wat er op de 1e nog overblijft in de categorie ‘Noodzakelijk’, wordt overgeheveld naar ‘Financiële vrijheid’.',
+        // CL-15: The Secret dropped from the book list (decision D10).
+        'pages.landing.footer.attribution':
+            'Rumtelo · Amsterdam, Nederland. Eerst door de oprichters voor zichzelf ontwikkeld — en vervolgens op de markt gebracht zodat ook anderen er gebruik van kunnen maken. Gebaseerd op boeken als ‘Rich Dad Poor Dad’, ‘Think and Grow Rich’, ‘Secrets of the Millionaire Mind’ en ‘The Psychology of Money’. Onafhankelijk product — niet gelieerd aan, goedgekeurd door of in licentie gegeven door deze auteurs.',
+        // Weekly habit = routine, never praktijk/oefening/methode. EN source now says routine, so NL is pinned.
+        'features.soul.stillness.mind_tie':
+            'Een onrustige geest stuurt geld niet aan — hij geeft het uit en noemt dat een beslissing. Rust is geen meditatie, maar een strategie: de enige routine die niets kost en al het andere beschermt. Elke munt die je niet impulsief uitgeeft, is een munt die voor een potje kiest.',
+        'pages.settings.panels.stillness.blurb':
+            'Hoe lang je zit. Kort en dagelijks is beter dan lang en af en toe — dit is de enige routine die niets kost en elk potje beschermt.',
+        'features.capabilities.home-why.description': 'Waarom deze routine ertoe doet.',
+        'features.capabilities.soul-stillness.description': 'Routine voor stilte en aanwezigheid.',
+        'features.capabilities.soul-gratitude.description': 'Routine voor dankbaarheid.',
+        'features.soul.stillness.lead':
+            'De enige routine hier die niets kost en al het andere beschermt.',
+        // Informal je/jouw (not u/uw) outside pages.legal.*.
+        'common.message.error.api.party_or_merchant':
+            'Kies ofwel een catalogusverkoper ofwel een van je opgeslagen contacten, maar niet beide.',
+        'features.auth.sign_up.practice_name_required':
+            'Vul de naam van je praktijk of bedrijf in.',
+        'features.brand.auth_quotes_app.money_picture.eyebrow': 'Je geld',
+        'features.brand.auth_quotes_app.energy.eyebrow': 'Je capaciteit',
+        'features.tour.pages.home.steps.portals.title': 'Je producten',
+        'pages.practice.clients.not_found_body':
+            'Deze link ontbreekt of is niet langer beschikbaar op je praktijkwebsite.',
+        'pages.settings.panels.bank.wizard_authorize_mismatch':
+            'De bank die je autoriseert ({aspsp}) kan afwijken van de bank van het Rumtelo-label ({catalog}). Voor testdoeleinden is dat geen probleem; in het dagelijks gebruik komen ze meestal overeen.',
+        'pages.support.hub.cards.legal.body':
+            'Privacy, gebruiksvoorwaarden, cookies en hoe wij je gegevens verwerken.',
+        'pages.support.contact.form.message_placeholder': 'Hoe kunnen we je helpen?',
+        'pages.support.contact.channels.support.body':
+            'Vragen over je account, huishouden, facturering of producten.',
+        'pages.shell.gates.locked_plan_body_practice':
+            'Dit zit niet in hun huishoudabonnement. Beheer je hun account, upgrade dan via de Practice-facturering.',
+        // Practice clients = cliënten (not klanten).
+        'features.auth.sign_up.subtitle_practice': 'Eén bureau voor elke cliënt.',
+        'features.auth.sign_up.practice_name_hint':
+            'Dit wordt aan je cliënten getoond wanneer je ze uitnodigt. De juridische details volgen hierna.',
+        'pages.practice.overview.insight_people_hint': 'Leden in huishoudens met actieve cliënten',
+        'pages.practice.overview.insight_cost_hint':
+            'Basis + stoelen voor het personeel + beheerde cliënten',
+        'pages.practice.overview.attention_blurb':
+            'Er zijn nog uitstaande uitnodigingen — neem contact op of open het cliëntdossier.',
+        'pages.practice.overview.attention_view_all': 'Alle cliënten',
+        'pages.practice.clients.not_found_title': 'Cliënt niet gevonden',
+        'pages.practice.clients.back_to_roster': 'Terug naar cliënten',
+        'pages.practice.clients.detail_title': 'Voortgang van de cliënt',
+        'pages.practice.settings.chrome.lead':
+            'Facturering, bedrijfsprofiel en de gegevens die cliënten op facturen te zien krijgen.',
+        'pages.shell.gates.locked_plan_title_practice': 'Deze cliënt heeft {plan} nodig',
+        'pages.shell.gates.locked_plan_aria_practice': 'Upgrade van het cliëntabonnement vereist',
+        'pages.shell.gates.back_to_practice': 'Terug naar de cliënten van Practice',
+        // Practice desk = praktijkbureau (as on the landing page).
+        'pages.settings.panels.household.invite_relation_hint_circle':
+            'Vriend, huisgenoot of andere vertrouwde — deel het bord zonder praktijkbureau.',
+        'pages.shell.menu.start_own_sub': 'Je huishoudbord of een praktijkbureau',
+        'pages.shell.viewer.start_own_banner':
+            'Wil je iets van jezelf? Kies een huishoudbord of een praktijkbureau.',
+        'pages.shell.viewer.chooser_practice_title': 'Praktijkbureau',
+        // The Coach (feature) = De Coach, capitalised as a product name.
+        'features.brand.auth_quotes_web.who_its_for.support':
+            'De tips van De Coach. Jij kiest. Bepaal zelf de richting.',
+        'features.coach.page_title': 'De Coach',
+        'features.coach.verdict.eyebrow': '✦ De Coach',
+        'features.coach.verdict.expand': 'De Coach weergeven',
+        'features.coach.helpers.mark_label': 'De Coach',
+        'features.coach.helpers.tip_aria': 'De Coach: {title}',
+        'features.coach.helpers.why_aria': 'De Coach',
+        'features.coach.jar_guide.give_hint':
+            'Kies een goed doel en vervolgens een organisatie die onafhankelijk wordt gecontroleerd — dezelfde shortlist van De Coach als op Waarom en waar.',
+        'features.money.fixed_form.give_hint':
+            'Ik weet wie — vul hier de naam in van de organisatie waaraan je al doneert. Help me kiezen — een shortlist van De Coach met onafhankelijke beoordelingen (Doneer Effectief, GiveWell, ACE, CBF).',
+        'features.soul.giving.pick_hint':
+            'Ik weet wel aan wie — vul hier de naam in van de organisatie waaraan je al doneert. Help me kiezen — een shortlist van De Coach met onafhankelijke beoordelingen (Doneer Effectief, GiveWell, ACE, CBF).',
+        'features.growth.goals.form.give_mode_hint':
+            'Ik weet wie — vul de naam in van degene aan wie je al doneert. Help me kiezen — een shortlist van De Coach met onafhankelijke beoordelingen. Houd het open — noem alleen het goede doel, nog geen organisatie.',
+        'features.money.debt.strategy_coach.badge_coach_pick':
+            'Tip van De Coach · beste prijs-kwaliteitverhouding',
+        'features.tour.chrome.helpers_hint':
+            'Waarom-regels en potjeskaarten van De Coach (✦ De Coach). Hetzelfde als Instellingen → Voorkeuren. Standaard ingeschakeld voor beginners.',
+        'features.tour.pages.home.steps.coach.title': 'De Coach',
+        'pages.landing.faq.coach.question': 'Wat doet De Coach eigenlijk?',
+        'pages.meta.coach': 'De Coach',
+        'pages.settings.panels.coach.eyebrow': 'De Coach',
+        'pages.settings.panels.debt_payoff.blurb':
+            'Eén keuze per huishouden voor het scherm ‘Schulden’. Lawine, Sneeuwbal of Minimaal — je kunt op elk moment wisselen; de lijst met schulden en de vergelijking van De Coach volgen daarna.',
+        'pages.shell.quick_add.next_step': 'Vervolg met De Coach',
+        'pages.shell.quick_add.open_coach': 'Open De Coach',
+        'features.coach.empty_body':
+            'Registreer inkomsten, potjes of slaap — De Coach spreekt wanneer er genoeg te zien is.',
+        'features.coach.helpers.mark_title':
+            'Van De Coach — schakel tips op het scherm in of uit via Instellingen → Voorkeuren',
+        'features.coach.helpers.open_coach': 'Open De Coach',
+        'features.money.jars.guides.GIVE.note':
+            'Door te geven blijft geld een hulpmiddel en geen meester. Het wordt automatisch overgemaakt — De Coach helpt je te kiezen waarheen.',
+        'features.tour.pages.home.steps.coach.content':
+            'Eén tip over je huidige situatie en één actie die je kunt ondernemen. Tips — je kiest zelf. Schakel De Coach in of uit via ‘Help’ of ‘Instellingen’.',
+        'pages.settings.panels.automation.blurb':
+            'Drie regels. Als alles is uitgeschakeld, geeft Rumtelo alleen weer, maar voert nooit acties uit. De instellingen voor De Coach vind je onder ‘Account’.',
+        // Week check = weekcheck (not wekelijkse controle).
+        'features.energy.hub.cards.week.note': 'weekcheck',
+        'features.soul.gratitude.empty_body': 'De weekcheck vraagt je hier later naar.',
+        'features.soul.gratitude.this_week_body':
+            'Eén regel per week tijdens de weekcheck. Niet meer dan dat — het is een check-in, geen dagboek.',
+        'pages.landing.portal_features.money.f5': 'De weekcheck · de maandscore',
+        // Clarity 3: the ladder (Coming up, Show everything now, stage note), Quick add by stage.
+        'pages.nav.search.deferred.week_check': 'Komt in je menu na je eerste weekcheck.',
+        'pages.nav.search.deferred.month_close':
+            'Komt in je menu nadat je je eerste maand afsluit.',
+        'pages.nav.coming_up.row': 'Binnenkort',
+        'pages.nav.coming_up.row_next.week_check': 'Na je eerste weekcheck',
+        'pages.nav.coming_up.row_next.month_close': 'Nadat je je eerste maand afsluit',
+        'pages.nav.coming_up.row_next.sorting': 'Nadat je een paar regels sorteert',
+        'pages.nav.coming_up.row_aria': 'Binnenkort: {next}',
+        'pages.nav.coming_up.title': 'Binnenkort',
+        'pages.nav.coming_up.lead':
+            'Rumtelo begint met je potjes, Inbox en weekcheck. De rest komt in je menu naarmate je overzicht zich vult.',
+        'pages.nav.coming_up.next_eyebrow': 'Hierna',
+        'pages.nav.coming_up.trigger.week_check': 'Doe je eerste weekcheck — tien minuten.',
+        'pages.nav.coming_up.trigger.month_close': 'Sluit je eerste maand af.',
+        'pages.nav.coming_up.trigger.sorting':
+            'Sorteer nog {sorted, plural, one {# regel} other {# regels}} of wacht {days, plural, one {# dag} other {# dagen}}.',
+        'pages.nav.coming_up.adds_eyebrow': 'Daarna staat in je menu',
+        'pages.nav.coming_up.adds.levels': 'Je niveau bij de maandscore',
+        'pages.nav.coming_up.search_hint':
+            'Elke pagina is al open: zoek hem op via Snel toevoegen.',
+        'pages.nav.coming_up.close': 'Sluiten',
+        'pages.nav.show_all.label': 'Laat alles meteen zien',
+        'pages.nav.show_all.hint_off': 'Sla de stap-voor-stap-start over. Je kunt altijd terug.',
+        'pages.nav.show_all.hint_on':
+            'Aan — je ziet elke pagina die je abonnement en rol bevatten, in elk huishouden.',
+        'pages.nav.show_all.done':
+            'Alles staat nu in je menu. Zet het terug via Instellingen › Account.',
+        'pages.nav.stage_items.course': 'Koers',
+        'pages.nav.stage_items.goals': 'Doelen',
+        'pages.nav.stage_note.text':
+            '{count, plural, one {Nieuw: {items} staat nu in je menu.} other {Nieuw: {items} staan nu in je menu.}}',
+        'pages.nav.stage_note.dismiss': 'Begrepen',
+        'pages.settings.panels.start.eyebrow': 'Je start',
+        'pages.settings.panels.start.blurb':
+            'Nieuwe borden beginnen met potjes, de Inbox en de weekcheck. De rest komt in je menu na je eerste weekcheck en je eerste afgesloten maand.',
+        'pages.shell.quick_add.ask_placeholder': 'Zoek in De Coach of naar een pagina…',
+        'pages.shell.quick_add.search_label_ask': 'Zoek pagina’s en De Coach',
+        'pages.shell.quick_add.search_label_add': 'Filter wat je wilt toevoegen',
+        'pages.shell.quick_add.deferred.week_check': 'Komt hier na je eerste weekcheck.',
+        'pages.shell.quick_add.deferred.month_close': 'Komt hier nadat je je eerste maand afsluit.',
+        'pages.settings.panels.bank.group_accounts': '{count} rekeningen',
+        // Settings tabs: "Practice coaches" is the coaches who look along, not trainers; devices machine output was off.
+        'pages.settings.tabs.practice.label': 'Coaches',
+        'pages.settings.tabs.devices.sub': 'Bandjes, hubs en gekoppelde apparaten',
+        // Home: close-month sheet, level for screen readers, invited checklist item, Help score section.
+        'pages.dashboard.month_score.level_sr': 'Niveau: {level}',
+        'pages.dashboard.checklist.invited': 'Uitgenodigd — wacht op hen',
+        'pages.dashboard.close_flow.title': '{month} afsluiten',
+        'pages.dashboard.close_flow.prior_first':
+            'Sluit eerst {prior} af — maanden sluiten op volgorde.',
+        'pages.dashboard.close_flow.prior_first_cta': '{prior} afsluiten',
+        'pages.dashboard.close_flow.prior_done': '{month} is afgesloten.',
+        'pages.dashboard.close_flow.inbox_first':
+            '{count, plural, one {# regel uit {month} staat nog in je Inbox.} other {# regels uit {month} staan nog in je Inbox.}}',
+        'pages.dashboard.close_flow.inbox_first_cta': 'Sorteer ze',
+        'pages.dashboard.close_flow.inbox_first_reason':
+            'Sorteer eerst de Inbox en sluit daarna af.',
+        'pages.dashboard.close_flow.confirm_body':
+            'Je ziet je score en neemt wat over is mee naar volgende maand. Een afgesloten maand kun je niet meer wijzigen.',
+        'pages.dashboard.close_flow.bills_tail': 'Een afgesloten maand kun je niet meer wijzigen.',
+        'pages.dashboard.close_flow.close_cta': '{month} afsluiten',
+        'pages.dashboard.close_flow.already_closed': '{month} is al afgesloten.',
+        'pages.dashboard.close_flow.done': 'Klaar',
+        'pages.dashboard.close_flow.not_now': 'Nu niet',
+        'pages.dashboard.close_flow.load_error': 'Kon {month} niet laden.',
+        'pages.dashboard.close_flow.close_error_fallback':
+            'Kon {month} niet afsluiten. Controleer je verbinding en probeer het opnieuw.',
+        'features.tour.pages.home.sections.score.heading': 'Je maandscore en niveau',
+        'features.tour.pages.home.sections.score.body':
+            'Elke maand die je afsluit telt mee voor je score. Je niveau groeit mee: een afspiegeling van je routine, geen sleutel. Er gaat niets open of dicht door een niveau.',
+        'features.tour.pages.growth.sections.what_for.body':
+            'Koers is je week: de drie dingen die je doelen vooruit helpen, gekozen in je weekcheck. Op Basic heb je één doel; Koers en Leren zitten in Plus.',
+        'features.growth.learn.search_catalog_placeholder': 'Atomic Habits, Deep Work…',
+        // Practice door (CL-11): Practice = Praktijk, clients = cliënten, docs/product/practice.md.
+        'pages.landing.footer.cols.practices': 'Voor praktijken',
+        'pages.landing.pricing_section.practice_link':
+            'Coach of adviseur? Bekijk de prijzen voor Praktijk',
+        'pages.landing.practice_band.eyebrow': 'VOOR COACHES & ADVISEURS',
+        'pages.landing.practice_band.headline': 'Niet meer gissen waar je cliënten staan.',
+        'pages.landing.practice_band.lead':
+            'Eén bureau voor de potjes en weekcheck van elke cliënt — pas als ze ja zeggen. Rumtelo verplaatst nooit geld.',
+        'pages.landing.practice_band.cta': 'Zo werkt het voor praktijken',
+        'pages.practices.meta.title': 'Rumtelo voor praktijken',
+        'pages.practices.meta.description':
+            'Eén bureau voor de potjes en weekcheck van elke cliënt — pas als ze ja zeggen. Rumtelo verplaatst nooit geld.',
+        'pages.practices.hero.eyebrow': 'VOOR COACHES & ADVISEURS',
+        'pages.practices.hero.headline': 'Niet meer gissen waar je cliënten staan.',
+        'pages.practices.hero.lead':
+            'Eén bureau voor de potjes en weekcheck van elke cliënt — pas als ze ja zeggen. Rumtelo verplaatst nooit geld.',
+        'pages.practices.hero.microline': 'Meekijken is gratis voor je cliënten.',
+        'pages.practices.how.eyebrow': 'ZO WERKT HET',
+        'pages.practices.how.headline': 'Nodig uit. Zij zeggen ja. Eén bureau.',
+        'pages.practices.how.steps_aria': 'Zo werkt een praktijk',
+        'pages.practices.how.steps.invite.title': 'Nodig een cliënt uit',
+        'pages.practices.how.steps.invite.body':
+            'Maak je praktijk aan en nodig een cliënt uit per e-mail. Nieuw bij Rumtelo? Dan krijgt de cliënt een aanmeldlink. Al aangemeld? Dan accepteert de cliënt in Instellingen.',
+        'pages.practices.how.steps.yes.title': 'Zij zeggen ja',
+        'pages.practices.how.steps.yes.body':
+            'Elke koppeling begint als uitnodiging. Er wordt niets gedeeld tot de eigenaar van het huishouden accepteert.',
+        'pages.practices.how.steps.desk.title': 'Eén bureau',
+        'pages.practices.how.steps.desk.body':
+            'Bekijk het bord van elke geaccepteerde cliënt, alleen-lezen, met een momentopname per cliënt: inkomen, potjes, uitgaven, weekcheck.',
+        'pages.practices.proof.eyebrow': 'WAAROM PRAKTIJKEN HET GEBRUIKEN',
+        'pages.practices.proof.headline': 'Sessies over keuzes, niet over cijfers verzamelen.',
+        'pages.practices.proof.points.picture.title': 'Een actueel beeld vóór elke sessie',
+        'pages.practices.proof.points.picture.body':
+            'Je cliënten houden zes potjes, hun vaste kosten en een weekcheck van tien minuten bij. Jij opent hun bord en begint waar zij staan.',
+        'pages.practices.proof.points.between.title': 'De voortgang gaat door tussen sessies',
+        'pages.practices.proof.points.between.body':
+            'De weekcheck en de kleine tips van De Coach, zoals een rekening die nog openstaat of een Inbox om te sorteren, houden cliënten in beweging zonder dat jij erachteraan hoeft. De Coach tipt. Jij begeleidt de keuzes.',
+        'pages.practices.proof.points.yes.title': 'Hun ja komt eerst',
+        'pages.practices.proof.points.yes.body':
+            'Er wordt niets gedeeld tot de cliënt accepteert, en beide kanten kunnen het beëindigen. Rustig voor hen, helder voor jou.',
+        'pages.practices.detail.desk_title': 'Wat je bureau je geeft',
+        'pages.practices.detail.consent_title': 'Waar je cliënten mee instemmen',
+        'pages.practices.detail.consent.c1':
+            'Elke koppeling begint als uitnodiging. Er wordt niets gedeeld tot de eigenaar van het huishouden accepteert.',
+        'pages.practices.detail.consent.c2':
+            'Jij ziet hun bord alleen-lezen. Hun cijfers blijven van hen.',
+        'pages.practices.detail.consent.c3':
+            'Beide kanten kunnen de koppeling op elk moment beëindigen. De cliënt houdt het eigen bord en de eigen gegevens.',
+        'pages.practices.detail.consent.c4':
+            'Rumtelo verplaatst nooit geld. Gegevens blijven in de EU, gehost in Amsterdam.',
+        'pages.practices.pricing.eyebrow': 'PRIJZEN',
+        'pages.practices.pricing.headline':
+            'Eén prijs voor je praktijk. Cliënten die meekijken zijn gratis.',
+        'pages.practices.pricing.lead':
+            'Per praktijk per maand gefactureerd. Voeg collega’s toe als medewerkersplek. Jij bepaalt welke cliënten je op Plus sponsort.',
+        'pages.practices.pricing.example':
+            'Voorbeeld: jij als eerste medewerkersplek + {clients} cliënten die meekijken = {total} per maand in totaal.',
+        'pages.practices.pricing.example_sponsor':
+            'Sponsor er {sponsored} op Plus: + {amount} per maand.',
+        'pages.practices.faq.eyebrow': 'VRAGEN',
+        'pages.practices.faq.headline': 'Wat praktijken ons vragen.',
+        'pages.practices.faq.replace.question': 'Vervangt dit mij?',
+        'pages.practices.faq.replace.answer':
+            'Nee. De Coach geeft kleine, regelgestuurde tips tussen sessies. Jij brengt het oordeel en de relatie.',
+        'pages.practices.faq.privacy.question': 'Wie kan de gegevens van mijn cliënt zien?',
+        'pages.practices.faq.privacy.answer':
+            'Alleen jij en je medewerkers, en pas nadat de cliënt je uitnodiging accepteert. De toegang is alleen-lezen, beide kanten kunnen het op elk moment beëindigen en de gegevens blijven in de EU, gehost in Amsterdam.',
+        'pages.practices.faq.bank.question': 'Moeten cliënten hun bank koppelen?',
+        'pages.practices.faq.bank.answer':
+            'Nee. Bedragen met de hand invoeren werkt. Plus, dat je kunt sponsoren, voegt het importeren van bankafschriften toe.',
+        'pages.practices.faq.edit.question': 'Kan ik het bord van een cliënt aanpassen?',
+        'pages.practices.faq.edit.answer':
+            'Nee. De toegang is nu alleen-lezen. Jij begeleidt; de cliënt voert de wijziging door.',
+        'pages.practices.faq.money.question': 'Verplaatst Rumtelo geld?',
+        'pages.practices.faq.money.answer':
+            'Nooit. Cliënten betalen en boeken over bij hun eigen bank, en Rumtelo is geen hulpmiddel om het geld van een cliënt voor hen te beheren.',
+        'pages.practices.faq.cost.question': 'Wat kost het?',
+        'pages.practices.faq.cost.answer':
+            'Een praktijk kost {basePrice} per maand plus {staffPrice} per medewerkersplek, en jij telt als de eerste. Cliënten die meekijken zijn gratis. Het Plus-abonnement van een cliënt sponsoren kost {clientPrice} per maand per cliënt, {discount}% minder dan de {retail} per maand die ze zelf zouden betalen.',
+        'pages.practices.closing.headline': 'Klaar om te zien waar je cliënten staan?',
+        'pages.practices.closing.lead':
+            'Start een praktijk, nodig je eerste cliënt uit en open hun bord zodra ze ja zeggen.',
     },
     es: {
         // Kept as translated before: the generator without a DeepL key would drop them to English.

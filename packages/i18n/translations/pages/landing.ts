@@ -313,11 +313,6 @@ const landing = {
                 author: 'Morgan Housel',
                 line: 'Behavior beats cleverness — calm systems over panic and shame.',
             },
-            secret: {
-                title: 'The Secret',
-                author: 'Rhonda Byrne',
-                line: 'Name what you want — attention follows intention.',
-            },
         },
     },
     principles_section: {
@@ -390,7 +385,7 @@ const landing = {
     footer: {
         aria: 'Footer',
         attribution:
-            'Rumtelo · Amsterdam, the Netherlands. Built by the founders for themselves first — then brought to market so others can use the same routine. Grounded in books like Rich Dad Poor Dad, Think and Grow Rich, Secrets of the Millionaire Mind, The Psychology of Money and The Secret. Independent product — not affiliated with, endorsed by, or licensed from those authors.',
+            'Rumtelo · Amsterdam, the Netherlands. Built by the founders for themselves first — then brought to market so others can use the same routine. Grounded in books like Rich Dad Poor Dad, Think and Grow Rich, Secrets of the Millionaire Mind and The Psychology of Money. Independent product — not affiliated with, endorsed by, or licensed from those authors.',
         disclaimer:
             'Rumtelo is a coach and an overview — not a bank and not a licensed financial adviser. Suggestions are education, not personal investment advice.',
         trust: {
@@ -420,6 +415,7 @@ const landing = {
             jars: 'The jars',
             coach: 'The Coach',
             pricing: 'Pricing',
+            practices: 'For practices',
             why: 'Why Rumtelo',
             principles: 'Principles',
             questions: 'Questions',
@@ -443,13 +439,6 @@ const landing = {
         eyebrow: 'PRICING',
         headline: 'Free where it counts. Paid where it saves you work.',
         headline_auth: 'Your plan and what you can change',
-        /** Audience switch above the plans — one tab per sign-up direction. */
-        audience_aria: 'Who it’s for',
-        audience_individual: 'For you & your household',
-        audience_practice: 'For practices',
-        headline_practice: 'Stop wondering where your clients stand.',
-        lead_practice:
-            'For coaches and advisors who help households. Your clients keep their own board; with their yes, you follow every board from one desk.',
         lead: 'Start free with your jars. Pay when it saves you work: your bank statements in, your debt-free date, your Course.',
         lead_on_plan:
             'You’re on {plan}. Upgrade, switch or manage billing in the app — changes apply to your household.',
@@ -457,6 +446,8 @@ const landing = {
         lead_manage: 'Open Plan & billing in the app to upgrade or change your package.',
         lead_setup:
             'Finish household setup in the app, then you can upgrade or change your plan here.',
+        /** Text link under the household plans — the Practice door lives on `/practices`. */
+        practice_link: 'Coach or advisor? See Practice pricing',
         cta_free: 'Start free',
         cta_choose: 'Choose {plan} · pay after setup',
         cta_current: 'Current plan',
@@ -486,7 +477,14 @@ const landing = {
         footnote:
             'Prices in euro, VAT included. Basic may stay free or become a small fee later — nothing you enter is ever locked away.',
     },
-    /** Practice tab of the pricing table — prices come from contracts. */
+    /** Short band on the landing (`#practices`) — the full story and prices live on `/practices`. */
+    practice_band: {
+        eyebrow: 'FOR COACHES & ADVISORS',
+        headline: 'Stop wondering where your clients stand.',
+        lead: 'One desk for every client’s jars and week check — only after they say yes. Rumtelo never moves money.',
+        cta: 'See how it works for practices',
+    },
+    /** Practice plan lines — shown on `/practices`; prices come from contracts. */
     practice_plan: {
         name: 'Practice',
         tag: 'Coaches & advisors',
@@ -507,13 +505,8 @@ const landing = {
         extra_manage_hint:
             'You pay for their Plus — {discount}% less than the {retail} a month they’d pay themselves. You see their full board, read-only.',
         per_month_each: '{price} / month each',
-        example: 'Example: you + {clients} sponsored clients = {total} / month in total.',
         cta: 'Start a practice',
         cta_open: 'Open the practice desk',
-        steps_title: 'How it works',
-        step_1: 'Create your practice',
-        step_2: 'Invite a client by email',
-        step_3: 'They accept — then you see their board',
         footnote:
             'Prices in euro, per month. Rumtelo never moves money — clients pay and transfer at their own bank.',
     },
@@ -608,7 +601,7 @@ const landing = {
         },
         practice: {
             question: 'I’m a coach or advisor. Can I use Rumtelo with my clients?',
-            answer: 'Yes — with Rumtelo Practice. Invite clients by email; once they accept, you see their board read-only from one desk. Looking along is free for them, and you can sponsor their Plus plan for {clientPrice} a month. A practice costs {basePrice} a month plus {staffPrice} per staff seat.',
+            answer: 'Yes — with Rumtelo Practice. Invite clients by email; once they accept, you see their board read-only from one desk. Looking along is free for them.',
         },
     },
     signup_section: {

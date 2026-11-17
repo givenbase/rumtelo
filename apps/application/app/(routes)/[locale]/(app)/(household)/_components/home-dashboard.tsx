@@ -1,34 +1,32 @@
 'use client';
 
-import { api } from '@/app/_lib/api';
-import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
+import { useState } from 'react';
 import Link from 'next/link';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     CAPABILITIES,
     CoachKind,
     HouseholdRole,
     MONEY_COACH_KEY_PREFIX,
     PracticeClientLinkStatus,
-    type MonthCloseBillDisposition,
     type MonthScore,
 } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Eyebrow, Typography } from '@rumtelo/ui';
-import { formatPeriod, parsePeriodKey, toPeriodKey, describePeriodTravel } from '@rumtelo/utils';
+import { formatPeriod, toPeriodKey, describePeriodTravel } from '@rumtelo/utils';
 
 import type { CoachVerdictMessage } from '@/components/features/home/coach-verdict';
 
 import { resolveJarSubtitle } from '@/app/_lib/jar-copy';
-import { monthScoreRecapHeadline } from '@/app/_lib/month-score-copy';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { buildPeriodTravelScoreNote } from '@/app/_lib/period-travel-score-note';
 import { formatPeriodTravelLabels } from '@/app/_lib/period-travel-i18n';
 import { isProductEnabled } from '@/app/_lib/launch-products';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
+import { BoardStage, stageAtLeast } from '@/app/_lib/board-stage';
+import { useShellNav } from '@/app/_lib/use-shell-nav';
 import { resolveNextMove, type Weekday } from '@/app/_lib/next-move';
 import { moneyPath } from '@/app/_lib/routes';
 import { settingsHref } from '@/app/_lib/settings-tabs';
@@ -41,6 +39,7 @@ import { CoachVerdict } from '@/components/features/home/coach-verdict';
 import { HeroKluis } from '@/components/features/home/hero-kluis';
 import { PortalWidget } from '@/components/features/home/portal-widget';
 import { TodayCard } from '@/components/features/home/today-card';
+import { CloseMonthFlow } from '@/components/features/home/close-month-flow';
 import { MonthScoreLog } from '@/components/features/home/month-score-log';
 import {
     NextMoveCard,
@@ -63,9 +62,8 @@ export function HomeDashboardClient() {
     const tJars = useTranslations('features.money.jars');
     const tShell = useTranslations('pages.shell');
     const locale = useLocale();
-    const queryClient = useQueryClient();
     const { householdId, session } = useAuth();
-    const { period, setPeriod, showToast } = useHouseholdShell();
+    const { period } = useHouseholdShell();
     const { canMutate, role, practicePreview, canSeeCoach } = useBoardWriteAccess();
     const { hasCapability } = usePlanCapabilities();
     const helpersEnabled = useHelpersEnabled();
@@ -73,7 +71,6 @@ export function HomeDashboardClient() {
     const canSeeGrowth = roleCanSee(role, HouseholdPermissionSection.GROWTH);
     const canSeeEnergy = roleCanSee(role, HouseholdPermissionSection.ENERGY);
     const canSeeSoul = roleCanSee(role, HouseholdPermissionSection.SOUL);
-    const apiError = useApiError();
     const { currency, formatMoney } = useHouseholdCurrency();
 
     const periodKey = toPeriodKey(period.year, period.month);
@@ -186,31 +183,12 @@ export function HomeDashboardClient() {
         live
     );
 
-    const closeMonthScoreMutation = useMutation({
-        mutationFn: async (billDispositions?: MonthCloseBillDisposition[]) => {
-            if (!householdId) throw new Error('No household');
-            return api.money.monthScore.close({
-                householdId,
-                period: periodKey,
-                billDispositions,
-            });
-        },
-        onSuccess: recap => {
-            void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
-            void queryClient.invalidateQueries({
-                queryKey: apiQuery.money.fixedCosts.listSettlements.key(),
-            });
-            void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.list.key() });
-            const recapLine = monthScoreRecapHeadline(
-                tDashboard,
-                recap.headlineKey,
-                formatMoney,
-                recap.leftOver
-            );
-            showToast(tDashboard('month_closed_toast', { recap: recapLine }), 'success');
-        },
-        onError: (error: unknown) => showToast(apiError(error), 'error'),
+    // One close flow, two doors: the next-move card and the month score.
+    const [closeFlow, setCloseFlow] = useState<{ open: boolean; target: string | null }>({
+        open: false,
+        target: null,
     });
+    const startClose = (target: string) => setCloseFlow({ open: true, target });
 
     const liveData = dashboardQuery.data;
     const dashboard = liveData ?? emptyDashboard;
@@ -307,7 +285,10 @@ export function HomeDashboardClient() {
             monthScore.priorOpenPeriod ||
             progress.hasClosedMonth)
     );
-    const afterFirstCheck = Boolean(progress?.hasCompletedWeekCheck);
+    // The board ladder: Growth, Today and the full tips list wait for the first week check.
+    // While the stage loads nothing appears, so a new board never sees a card come and go.
+    const { stage, stageReady } = useShellNav();
+    const fromRoutine = stageReady && stageAtLeast(stage, BoardStage.ROUTINE);
 
     // The next-move card is about now, whatever period Home is showing.
     const nowDashboard = weekCheck.dashboard;
@@ -334,18 +315,6 @@ export function HomeDashboardClient() {
         new Intl.DateTimeFormat(locale, { weekday: 'long', timeZone: 'UTC' }).format(
             new Date(Date.UTC(2024, 0, weekday))
         );
-    // Closing is done where its blockers live: the month score of that month.
-    const goToMonthScore = (target: string) => {
-        setPeriod(parsePeriodKey(target));
-        window.setTimeout(
-            () =>
-                document
-                    .getElementById('month-score')
-                    ?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
-            0
-        );
-    };
-
     const horizon = travelMeta.monthsHorizon;
     const baselineTotal = dashboard.baselineAllocatedTotal;
     const selectedTotal = dashboard.allocatedTotal ?? 0;
@@ -419,7 +388,7 @@ export function HomeDashboardClient() {
           ? t('pages.dashboard.hero.income_month_one_jar')
           : t('pages.dashboard.hero.income_month', { jars: jars.length });
 
-    const showGrowthWidget = canSeeGrowth && afterFirstCheck;
+    const showGrowthWidget = canSeeGrowth && fromRoutine;
     const showEnergyWidget = canSeeEnergy && isProductEnabled('energy');
     const showSoulWidget = canSeeSoul && isProductEnabled('soul');
     const showPortals = showGrowthWidget || showEnergyWidget || showSoulWidget;
@@ -460,7 +429,7 @@ export function HomeDashboardClient() {
                         isEuro={currency === 'EUR'}
                         formatMonth={formatMonth}
                         formatWeekday={formatWeekday}
-                        onCloseMonth={goToMonthScore}
+                        onCloseMonth={startClose}
                         travelNote={
                             travel.direction !== 'current'
                                 ? tDashboard('next_move.travel_note', {
@@ -489,7 +458,7 @@ export function HomeDashboardClient() {
                             messages={coachTips.slice(0, 1)}
                             hasAttention={coachHasAttention}
                         />
-                        {coachTips.length > 1 ? (
+                        {coachTips.length > 1 && fromRoutine ? (
                             <Link
                                 href="/product/coach"
                                 className="inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
@@ -499,7 +468,7 @@ export function HomeDashboardClient() {
                     </div>
                 ) : null}
 
-                {canSeeHome && afterFirstCheck ? (
+                {canSeeHome && fromRoutine ? (
                     <div className="order-7 lg:order-none">
                         <TodayCard />
                     </div>
@@ -652,12 +621,17 @@ export function HomeDashboardClient() {
                             liveData?.monthScore !== undefined &&
                             !liveData.monthScore.isClosed
                         }
-                        closeMonthPending={closeMonthScoreMutation.isPending}
-                        formatMoney={formatMoney}
-                        onCloseMonth={dispositions => closeMonthScoreMutation.mutate(dispositions)}
+                        period={monthScore.period}
+                        onStartClose={startClose}
                     />
                 </div>
             ) : null}
+
+            <CloseMonthFlow
+                open={closeFlow.open}
+                onOpenChange={open => setCloseFlow(previous => ({ ...previous, open }))}
+                target={closeFlow.target}
+            />
         </div>
     );
 }

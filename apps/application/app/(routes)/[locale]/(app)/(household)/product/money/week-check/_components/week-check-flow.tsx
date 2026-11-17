@@ -296,6 +296,7 @@ function WeekCheckRun({
         void queryClient.invalidateQueries({ queryKey: apiQuery.money.weekCheck.current.key() });
         void queryClient.invalidateQueries({ queryKey: apiQuery.money.weekCheck.history.key() });
         void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
+        void queryClient.invalidateQueries({ queryKey: apiQuery.money.progress.key() });
         void queryClient.invalidateQueries({ queryKey: apiQuery.growth.key() });
     }
 

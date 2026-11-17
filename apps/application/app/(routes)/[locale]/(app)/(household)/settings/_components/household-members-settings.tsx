@@ -107,6 +107,16 @@ export function HouseholdSettings() {
     const myMember = members.find(member => member.userId === user?.id);
     const myRole = myMember?.role ?? HouseholdRole.VIEWER;
     const roleCanInvite = canInviteWithRole(myRole);
+    // Seats as the server counts them: pending invitations hold a seat too.
+    const seatsQuery = useLiveQuery(
+        apiQuery.household.seats.queryOptions({ input: { householdId: householdId! } }),
+        null,
+        live && roleCanInvite
+    );
+    const seatUsage = seatsQuery.isError ? null : seatsQuery.data;
+    const seatWritable = seatUsage?.writableUsed ?? writableCount;
+    const seatViewers = seatUsage?.viewerUsed ?? viewerCount;
+    const seatOccupied = seatUsage ? seatWritable + seatViewers : memberCount;
     const roleCanRemove = canRemoveMemberWithRole(myRole);
     const invitesAllowed = canInviteOnPlan(activePlan);
     const canInviteMember = planAllowsInviteRole(activePlan, HouseholdRole.MEMBER, seatExtras);
@@ -114,16 +124,16 @@ export function HouseholdSettings() {
     const inviteRole = useWatch({ control: inviteForm.control, name: 'role' });
     const inviteRelation = useWatch({ control: inviteForm.control, name: 'relation' });
     const seatOpen = canAddHouseholdMember(activePlan, {
-        occupiedSeats: memberCount,
-        writableCount,
-        viewerCount,
+        occupiedSeats: seatOccupied,
+        writableCount: seatWritable,
+        viewerCount: seatViewers,
         role: inviteRole ?? HouseholdRole.VIEWER,
         extras: seatExtras,
     });
     const seatCapacity = useSeatCapacity(activePlan, {
-        occupiedSeats: memberCount,
-        writableCount,
-        viewerCount,
+        occupiedSeats: seatOccupied,
+        writableCount: seatWritable,
+        viewerCount: seatViewers,
         extras: seatExtras,
     });
     const inviteCopy = lockCopyFor(CAPABILITIES.platformInvite, PlanKey.BASIC, t);
@@ -139,7 +149,7 @@ export function HouseholdSettings() {
                 relation: values.relation,
             });
         },
-        invalidateKeys: [apiQuery.household.members.key()],
+        invalidateKeys: [apiQuery.household.members.key(), apiQuery.household.seats.key()],
         successMessage: t('pages.settings.toasts.invitation_sent'),
         onSuccess: () =>
             inviteForm.reset({
@@ -154,7 +164,7 @@ export function HouseholdSettings() {
             if (!householdId) throw new Error('No household');
             return api.household.removeMember({ householdId, memberId });
         },
-        invalidateKeys: [apiQuery.household.members.key()],
+        invalidateKeys: [apiQuery.household.members.key(), apiQuery.household.seats.key()],
         successMessage: t('pages.settings.toasts.member_removed'),
     });
 

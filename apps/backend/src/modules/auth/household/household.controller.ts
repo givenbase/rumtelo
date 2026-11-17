@@ -66,6 +66,14 @@ export class HouseholdController {
         );
     }
 
+    /** Seat use (members + pending invites vs the plan's caps) for invite UIs. Counts only. */
+    @Implement(contract.household.seats)
+    seats() {
+        return implement(contract.household.seats).handler(({ input }) =>
+            this.households.seats(input.householdId)
+        );
+    }
+
     /** Return the active household summary. */
     @Implement(contract.household.current)
     current() {

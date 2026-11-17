@@ -595,7 +595,7 @@
             },
             "home-why": {
                 "name": "¿Por qué?",
-                "description": "Por qué es importante esta práctica."
+                "description": "Why this routine matters."
             },
             "money-overview": {
                 "name": "Resumen",
@@ -675,11 +675,11 @@
             },
             "soul-stillness": {
                 "name": "Silencio",
-                "description": "La práctica de la quietud y la presencia."
+                "description": "Stillness routine and presence."
             },
             "soul-gratitude": {
                 "name": "Agradecimiento",
-                "description": "La práctica de la gratitud."
+                "description": "Gratitude routine."
             },
             "soul-giving": {
                 "name": "Dar",
@@ -1575,7 +1575,7 @@
                 "catalog_matches": "Catálogo más amplio",
                 "pick_about_to_add": "Elige de qué trata y luego añádelo.",
                 "search_catalog_aria": "Buscar en el catálogo público",
-                "search_catalog_placeholder": "El secreto, Hábitos atómicos…",
+                "search_catalog_placeholder": "Atomic Habits, Deep Work…",
                 "back": "← Aprender",
                 "eyebrow_shelf": "✦ LO QUE APRENDO",
                 "eyebrow_library": "✦ LA BIBLIOTECA",
@@ -3448,7 +3448,7 @@
             "stillness": {
                 "eyebrow": "Silencio",
                 "title": "El control es un ritmo, no un estado de ánimo.",
-                "lead": "La única práctica que aquí no cuesta nada y protege todo lo demás.",
+                "lead": "The only routine here that costs nothing and protects everything else.",
                 "minutes_per_day": "Minutos al día",
                 "streak_label": "De forma consecutiva",
                 "mark_done": "Marcar como completado",
@@ -3457,7 +3457,7 @@
                 "toast_logged": "La quietud se registra como puntuación mental",
                 "mind_note": "{minutes} minutos de silencio",
                 "why_title": "✦ ¿Por qué aparece esto en una aplicación de finanzas?",
-                "mind_tie": "Una mente inquieta no gestiona el dinero, sino que lo gasta y lo llama «decisión». La quietud no es meditativa, es estratégica: la única práctica que no cuesta nada y que protege todo lo demás. Cada moneda que no gastas por impulso es una moneda que elige un tarro.",
+                "mind_tie": "A restless mind does not steer money — it spends it and calls that a decision. Stillness is not meditative, it is strategic: the only routine here that costs nothing and protects everything else. Every coin you do not spend impulsively is a coin that chooses a jar.",
                 "practices": {
                     "breathing": {
                         "meta": "2-5 min",
@@ -3734,6 +3734,10 @@
                         "how": {
                             "heading": "Cómo utilizarlo",
                             "body": "Utiliza «Período de uso» (arriba a la derecha) para cambiar de mes. Abre un portal cuando necesites esa herramienta. Pulsa en «Ayuda» en cualquier momento para volver a ver este tutorial."
+                        },
+                        "score": {
+                            "heading": "Your month score and level",
+                            "body": "Each month you close adds to your score. Your level grows with it: a record of your routine, not a key. Nothing opens or closes with a level."
                         }
                     },
                     "steps": {
@@ -3903,7 +3907,7 @@
                     "sections": {
                         "what_for": {
                             "heading": "Para qué sirve esta sección",
-                            "body": "Empieza por «Visión general» y luego ve de izquierda a derecha: Ingresos → Objetivos. Aumenta tus ingresos netos y fíjate un objetivo en el plan «Básico». Descubre los contenidos desbloqueables del plan «Plus»: libros, cursos y habilidades."
+                            "body": "Course is your week: the three things that move your goals, set in your week check. On Basic you keep one goal; Course and Learn are in Plus."
                         }
                     }
                 },
@@ -3957,11 +3961,10 @@
                 "travel_past_other": "{stamp} · sobre {money} en tarros a lo largo de {horizon} meses",
                 "travel_ahead_one": "Por {stamp} · sobre {money} a través de tarros durante más de {horizon} meses",
                 "travel_ahead_other": "Por {stamp} · sobre {money} en tarros a lo largo de {horizon} meses",
-                "travel_jar": "{name} {from} → {to}"
+                "travel_jar": "{name} {from} → {to}",
+                "level_sr": "Level: {level}"
             },
             "close_month": "Cerrar mes",
-            "close_month_confirm": "¿Estás seguro? Cierra este mes",
-            "close_month_review_bills": "Revisar las facturas pendientes de pago",
             "close_bills_title": "Facturas pendientes de pago de este mes",
             "close_bills_body": "Elige para cada factura: pasarla al mes siguiente (entonces deberás más) o omitirla este periodo.",
             "close_bills_roll": "Trasladar",
@@ -3969,37 +3972,41 @@
             "close_bills_roll_hint": "El mes que viene tendrás que pagar {due} ({count} × esta factura).",
             "close_bills_roll_debt_hint": "Tras este aplazamiento ({count} meses de plazo), contabilízalo como deuda en «Gastos fijos», incluyendo los gastos de cobro y un plan de pago si fuera necesario.",
             "close_bills_skip_hint": "Este mes no contará; el mes que viene se empieza de cero, con 1×.",
-            "close_bills_confirm": "Cerrar mes",
             "close_blocked_title": "Termina esto antes de que termine el mes.",
             "close_blocked_inbox_one": "1 transacción sin clasificar en la bandeja de entrada",
             "close_blocked_inbox_other": "{count} transacciones sin clasificar en la bandeja de entrada",
             "close_blocked_bills_one": "1 factura aún pendiente de pago o no pagada{names}",
             "close_blocked_bills_other": "{count} facturas aún pendientes de pago o no pagadas{names}",
             "close_blocked_bill_names": " ({list})",
-            "close_blocked_open_bills": "Facturas pendientes ▸",
             "prior_open_title": "Termina primero el mes anterior",
             "prior_open_body": "{period} sigue abierto. Cierra los meses por orden para que la puntuación y el registro se mantengan coherentes.",
-            "prior_open_cta": "Ir a {period} ▸",
             "closing": "Cerrando…",
             "month_closed": "Mes cerrado",
             "month_closed_toast": "Mes cerrado · {recap}",
             "close_failed": "No se ha podido cerrar el mes",
+            "close_flow": {
+                "title": "Close {month}",
+                "prior_first": "Close {prior} first — months close in order.",
+                "prior_first_cta": "Close {prior}",
+                "prior_done": "{month} closed.",
+                "inbox_first": "{count, plural, one {# line from {month} is still in your Inbox.} other {# lines from {month} are still in your Inbox.}}",
+                "inbox_first_cta": "Sort them",
+                "inbox_first_reason": "Sort the Inbox first, then close.",
+                "confirm_body": "You’ll see your score and carry what’s left into next month. A closed month can’t be changed.",
+                "bills_tail": "A closed month can’t be changed.",
+                "close_cta": "Close {month}",
+                "already_closed": "{month} is already closed.",
+                "done": "Done",
+                "not_now": "Not now",
+                "load_error": "Couldn’t load {month}.",
+                "close_error_fallback": "Couldn’t close {month}. Check your connection and try again."
+            },
             "levels": {
                 "1": "Principiante",
                 "2": "Navegador",
                 "3": "Timonel",
                 "4": "Capitán",
-                "5": "Brújula",
-                "unlocks": {
-                    "six_jars": "Seis tarros",
-                    "inbox": "Bandeja de entrada",
-                    "week_check": "Resumen semanal",
-                    "goals": "Objetivos",
-                    "debts": "Deudas",
-                    "energy_layer": "Capa energética",
-                    "coach": "Entrenador",
-                    "export": "Exportar"
-                }
+                "5": "Brújula"
             },
             "recap": {
                 "surplus": "Quedan {amount} de este periodo",
@@ -4066,6 +4073,7 @@
                 "hide": "Hide",
                 "hide_aria": "Hide the setup list for everyone in this household",
                 "done": "Done",
+                "invited": "Invited — waiting for them",
                 "items": {
                     "bank": "Add your bank to your main account",
                     "dream": "Write down your dream",
@@ -4077,7 +4085,6 @@
                 "inbox_one": "{count} transacción a la espera de un tarro.",
                 "inbox_many": "{count} transacciones a la espera de un tarro.",
                 "all_sorted": "Ya está todo listo: es hora de fijarse un objetivo.",
-                "sort_inbox": "Ordenar la bandeja de entrada",
                 "week_check": "Resumen semanal",
                 "see_jars": "Ver tarros",
                 "practice_pending_one": "Hay una invitación de una consulta pendiente: acéptala en Ajustes si quieres darle acceso a tu tablero.",
@@ -4474,11 +4481,6 @@
                         "title": "La psicología del dinero",
                         "author": "Morgan Housel",
                         "line": "El comportamiento es más importante que la inteligencia: la serenidad prevalece sobre el pánico y la vergüenza."
-                    },
-                    "secret": {
-                        "title": "El secreto",
-                        "author": "Rhonda Byrne",
-                        "line": "Nombra lo que quieras: la atención sigue a la intención."
                     }
                 }
             },
@@ -4550,7 +4552,7 @@
             },
             "footer": {
                 "aria": "Pie de página",
-                "attribution": "Rumtelo · Ámsterdam, Países Bajos. Creado por los fundadores, en primer lugar, para ellos mismos; posteriormente, se lanzó al mercado para que otros pudieran seguir la misma rutina. Basado en libros como «Padre rico, padre pobre», «Piensa y hágase rico», «Los secretos de la mente millonaria», «La psicología del dinero» y «El secreto». Producto independiente: no está afiliado a dichos autores, ni cuenta con su respaldo ni con licencia de los mismos.",
+                "attribution": "Rumtelo · Amsterdam, the Netherlands. Built by the founders for themselves first — then brought to market so others can use the same routine. Grounded in books like Rich Dad Poor Dad, Think and Grow Rich, Secrets of the Millionaire Mind and The Psychology of Money. Independent product — not affiliated with, endorsed by, or licensed from those authors.",
                 "disclaimer": "Rumtelo es un servicio de orientación y una fuente de información general; no es un banco ni un asesor financiero autorizado. Las sugerencias tienen carácter informativo y no constituyen asesoramiento de inversión personalizado.",
                 "trust": {
                     "readonly": {
@@ -4579,6 +4581,7 @@
                     "jars": "Los tarros",
                     "coach": "El entrenador",
                     "pricing": "Precios",
+                    "practices": "For practices",
                     "why": "¿Por qué Rumtelo?",
                     "principles": "Principios",
                     "questions": "Preguntas",
@@ -4602,16 +4605,12 @@
                 "eyebrow": "PRECIOS",
                 "headline": "Gratis cuando realmente importa. De pago cuando te ahorra trabajo.",
                 "headline_auth": "Tu plan y lo que puedes cambiar",
-                "audience_aria": "A quién va dirigido",
-                "audience_individual": "Para ti y tu familia",
-                "audience_practice": "Para coaches y asesores",
-                "headline_practice": "Deja de preguntarte cuál es la situación de tus clientes.",
-                "lead_practice": "Para formadores y asesores que ayudan a las familias. Tus clientes gestionan su propio panel; con su autorización, tú puedes hacer un seguimiento de todos los paneles desde un único ordenador.",
                 "lead": "Start free with your jars. Pay when it saves you work: your bank statements in, your debt-free date, your Course.",
                 "lead_on_plan": "Estás en {plan}. Actualiza tu plan, cambia de plan o gestiona la facturación desde la aplicación; los cambios se aplicarán a tu hogar.",
                 "lead_loading": "Cargando tu plan…",
                 "lead_manage": "Accede a «Open Plan» y a la sección de facturación de la aplicación para ampliar o cambiar tu paquete.",
                 "lead_setup": "Completa la configuración del hogar en la aplicación; después, podrás ampliar o cambiar tu plan aquí.",
+                "practice_link": "Coach or advisor? See Practice pricing",
                 "cta_free": "Empieza gratis",
                 "cta_choose": "Elige {plan} · paga tras la instalación",
                 "cta_current": "Plan actual",
@@ -4639,6 +4638,12 @@
                 "products_more": "Más productos en camino",
                 "footnote": "Los precios están en euros, IVA incluido. El plan básico puede seguir siendo gratuito o pasar a tener una pequeña cuota más adelante; nada de lo que introduzcas quedará bloqueado en ningún momento."
             },
+            "practice_band": {
+                "eyebrow": "FOR COACHES & ADVISORS",
+                "headline": "Stop wondering where your clients stand.",
+                "lead": "One desk for every client’s jars and week check — only after they say yes. Rumtelo never moves money.",
+                "cta": "See how it works for practices"
+            },
             "practice_plan": {
                 "name": "Consulta",
                 "tag": "Entrenadores y asesores",
@@ -4657,13 +4662,8 @@
                 "extra_manage": "Cliente que apadrinas",
                 "extra_manage_hint": "You pay for their Plus — {discount}% less than the {retail} a month they’d pay themselves. You see their full board, read-only.",
                 "per_month_each": "{price} al mes cada uno",
-                "example": "Ejemplo: tú + {clients} clientes patrocinados = {total} al mes en total.",
                 "cta": "Crea tu consulta",
                 "cta_open": "Abrir el escritorio de la consulta",
-                "steps_title": "Cómo funciona",
-                "step_1": "Crea tu consulta",
-                "step_2": "Invita a un cliente por correo electrónico",
-                "step_3": "Lo aceptan… y entonces ves su tablero",
                 "footnote": "Precios en euros, al mes. Rumtelo nunca realiza transferencias de dinero: los clientes pagan y realizan las transferencias desde su propio banco."
             },
             "plans": {
@@ -4757,7 +4757,7 @@
                 },
                 "practice": {
                     "question": "Soy coach o asesor. ¿Puedo utilizar Rumtelo con mis clientes?",
-                    "answer": "Sí, con Rumtelo Practice. Invita a los clientes por correo electrónico; una vez que acepten, podrás ver su tablero en modo de solo lectura desde un puesto de trabajo. Para ellos, consultar el tablero es gratuito, y tú puedes patrocinar su plan Plus por {clientPrice} al mes. Una consulta cuesta {basePrice} al mes más {staffPrice} por cada puesto de personal."
+                    "answer": "Yes — with Rumtelo Practice. Invite clients by email; once they accept, you see their board read-only from one desk. Looking along is free for them."
                 }
             },
             "signup_section": {
@@ -5321,7 +5321,48 @@
             "search": {
                 "course_today": "Course · Today",
                 "course_week": "Course · Week",
-                "course_goals": "Course · Goals"
+                "course_goals": "Course · Goals",
+                "deferred": {
+                    "week_check": "Shows in your menu after your first week check.",
+                    "month_close": "Shows in your menu after you close your first month."
+                }
+            },
+            "coming_up": {
+                "row": "Coming up",
+                "row_next": {
+                    "week_check": "After your first week check",
+                    "month_close": "After you close your first month",
+                    "sorting": "After you sort a few lines"
+                },
+                "row_aria": "Coming up: {next}",
+                "title": "Coming up",
+                "lead": "Rumtelo starts with your jars, Inbox and week check. More joins your menu as your board fills in.",
+                "next_eyebrow": "Next",
+                "trigger": {
+                    "week_check": "Do your first week check — ten minutes.",
+                    "month_close": "Close your first month.",
+                    "sorting": "Sort {sorted, plural, one {# more line} other {# more lines}} or wait {days, plural, one {# day} other {# days}}."
+                },
+                "adds_eyebrow": "Then your menu shows",
+                "adds": {
+                    "levels": "Your level on the month score"
+                },
+                "search_hint": "Every page is already open: search for it in Quick add.",
+                "close": "Close"
+            },
+            "show_all": {
+                "label": "Show everything now",
+                "hint_off": "Skip the step-by-step start. You can switch back any time.",
+                "hint_on": "On — you see every page your plan and role include, in every household.",
+                "done": "Everything is in your menu now. Switch back in Settings › Account."
+            },
+            "stage_items": {
+                "course": "Course",
+                "goals": "Goals"
+            },
+            "stage_note": {
+                "text": "{count, plural, one {New: {items} is now in your menu.} other {New: {items} are now in your menu.}}",
+                "dismiss": "Got it"
             },
             "inbox_badge_sr": "{count, plural, one {# por ordenar} other {# por ordenar}}",
             "aria": {
@@ -5672,6 +5713,104 @@
                 "go_to_practice": "Ir al panel de control"
             }
         },
+        "practices": {
+            "meta": {
+                "title": "Rumtelo for practices",
+                "description": "One desk for every client’s jars and week check — only after they say yes. Rumtelo never moves money."
+            },
+            "hero": {
+                "eyebrow": "FOR COACHES & ADVISORS",
+                "headline": "Stop wondering where your clients stand.",
+                "lead": "One desk for every client’s jars and week check — only after they say yes. Rumtelo never moves money.",
+                "microline": "Looking along is free for your clients."
+            },
+            "how": {
+                "eyebrow": "HOW IT WORKS",
+                "headline": "Invite. They say yes. One desk.",
+                "steps_aria": "How a practice works",
+                "steps": {
+                    "invite": {
+                        "title": "Invite a client",
+                        "body": "Create your practice and invite a client by email. New to Rumtelo? They get a sign-up link. Already here? They accept in Settings."
+                    },
+                    "yes": {
+                        "title": "They say yes",
+                        "body": "Every link starts as an invite. Nothing is shared until the household owner accepts."
+                    },
+                    "desk": {
+                        "title": "One desk",
+                        "body": "See every accepted client’s board, read-only, with a snapshot per client: income, jars, spending, week check."
+                    }
+                }
+            },
+            "proof": {
+                "eyebrow": "WHY PRACTICES USE IT",
+                "headline": "Sessions on decisions, not on collecting numbers.",
+                "points": {
+                    "picture": {
+                        "title": "A current picture before every session",
+                        "body": "Your clients keep six jars, their fixed costs and a ten-minute week check. You open their board and start where they are."
+                    },
+                    "between": {
+                        "title": "Progress continues between sessions",
+                        "body": "The week check and The Coach’s small tips, like a bill still due or an Inbox to sort, keep clients moving without you chasing them. The Coach nudges. You guide the decisions."
+                    },
+                    "yes": {
+                        "title": "Their yes comes first",
+                        "body": "Nothing is shared until the client accepts, and either side can end it. Calm for them, clear for you."
+                    }
+                }
+            },
+            "detail": {
+                "desk_title": "What your desk gives you",
+                "consent_title": "What your clients agree to",
+                "consent": {
+                    "c1": "Every link starts as an invite. Nothing is shared until the household owner accepts.",
+                    "c2": "You see their board read-only. Their numbers stay theirs.",
+                    "c3": "Either side can end the link at any time. The client keeps their own board and data.",
+                    "c4": "Rumtelo never moves money. Data stays in the EU, hosted in Amsterdam."
+                }
+            },
+            "pricing": {
+                "eyebrow": "PRICING",
+                "headline": "One price for your practice. Clients who look along are free.",
+                "lead": "Billed per practice, per month. Add colleagues as staff seats. You decide which clients you sponsor on Plus.",
+                "example": "Example: you as the first staff seat + {clients} clients who look along = {total} / month in total.",
+                "example_sponsor": "Sponsor {sponsored} of them on Plus: + {amount} / month."
+            },
+            "faq": {
+                "eyebrow": "QUESTIONS",
+                "headline": "What practices ask us.",
+                "replace": {
+                    "question": "Does this replace me?",
+                    "answer": "No. The Coach gives small, rule-based nudges between sessions. You bring the judgement and the relationship."
+                },
+                "privacy": {
+                    "question": "Who can see my client’s data?",
+                    "answer": "Only you and your staff, and only after the client accepts your invite. Access is read-only, either side can end it at any time, and data stays in the EU, hosted in Amsterdam."
+                },
+                "bank": {
+                    "question": "Do clients have to connect their bank?",
+                    "answer": "No. Entering amounts by hand works. Plus, which you can sponsor, adds bank-statement import."
+                },
+                "edit": {
+                    "question": "Can I change a client’s board?",
+                    "answer": "No. Access is read-only today. You guide; the client makes the change."
+                },
+                "money": {
+                    "question": "Does Rumtelo move money?",
+                    "answer": "Never. Clients pay and transfer at their own bank, and Rumtelo is not a tool for managing a client’s money for them."
+                },
+                "cost": {
+                    "question": "What does it cost?",
+                    "answer": "A practice costs {basePrice} a month plus {staffPrice} per staff seat, and you count as the first. Clients who look along are free. Sponsoring a client’s Plus is {clientPrice} a month each, {discount}% less than the {retail} a month they would pay themselves."
+                }
+            },
+            "closing": {
+                "headline": "Ready to see where your clients stand?",
+                "lead": "Start a practice, invite your first client and open their board once they say yes."
+            }
+        },
         "settings": {
             "chrome": {
                 "title": "Todo lo que configuras una sola vez.",
@@ -5861,6 +6000,10 @@
             "legal_name": "Denominación social",
             "born": "Nacido en {date}",
             "panels": {
+                "start": {
+                    "eyebrow": "Your start",
+                    "blurb": "New boards start with jars, the Inbox and the week check. The rest joins your menu after your first week check and your first closed month."
+                },
                 "profile": {
                     "eyebrow": "Perfil",
                     "blurb": "El nombre de usuario se basa en tu nombre legal al registrarte; puedes cambiarlo en cualquier momento. Tu nombre legal, tu número de teléfono y tu fecha de nacimiento se guardan en tu cuenta.",
@@ -6251,7 +6394,7 @@
                 },
                 "stillness": {
                     "eyebrow": "Tu momento de tranquilidad diario",
-                    "blurb": "El tiempo que dediques a ello. Es mejor hacerlo poco tiempo cada día que mucho tiempo de vez en cuando: esta es la única práctica que no cuesta nada y protege todos los tarros.",
+                    "blurb": "How long you sit. Short and daily beats long and occasional — this is the one routine that costs nothing and protects every jar.",
                     "minutes_aria": "Minutos diarios de quietud",
                     "minutes": "{count} min",
                     "stub": "Plantillas de intenciones y recordatorios: próximamente."
@@ -6282,7 +6425,7 @@
                     "eyebrow": "Lo que consumes y lo que pagas",
                     "blurb": "Tres planes: Básico, Plus y Max. Empieza con el plan Básico: nada de lo que hayas introducido quedará bloqueado en ningún momento.",
                     "card_basic_tag": "De {price}",
-                    "card_basic_line": "Tabla individual: los seis frascos y el ejercicio que hay debajo. No hace falta banco.",
+                    "card_basic_line": "Solo board — the six jars and the routine underneath. No bank needed.",
                     "card_basic_feats": "{members} · Solo individual · Huchas · 1 objetivo · Entrenador",
                     "card_plus_tag": "Los más elegidos",
                     "card_plus_line": "Comparte el tablero con tu familia o amigos: deudas, aprendizaje, la semana de la energía y otros objetivos.",
@@ -6559,7 +6702,13 @@
                 "close_aria": "Cerrar «Añadir rápidamente»",
                 "mode_ask": "Preguntar",
                 "mode_add": "Añadir",
-                "ask_placeholder": "Pregunta al entrenador o busca…",
+                "ask_placeholder": "Search The Coach or a page…",
+                "search_label_ask": "Search pages and The Coach",
+                "search_label_add": "Filter what to add",
+                "deferred": {
+                    "week_check": "Shows here after your first week check.",
+                    "month_close": "Shows here after you close your first month."
+                },
                 "add_placeholder": "Filtra lo que quieres añadir…",
                 "next_step": "Próximamente con el entrenador",
                 "open_coach": "Open Coach",

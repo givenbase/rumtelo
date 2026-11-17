@@ -35,6 +35,13 @@ export class AccountSettings extends BaseEntity {
     tour: AccountTourProgress = { ...DEFAULT_ACCOUNT_TOUR_PROGRESS, tours: {} };
 
     /**
+     * Skip the board ladder for this person (every household): the shell shows the full board.
+     * A guidance preference like theme — never changes what the plan or role allow.
+     */
+    @Property({ type: 'boolean', default: false })
+    isShowingAllSurfaces: boolean = false;
+
+    /**
      * When personal onboarding finished. Null = still new at person level.
      * Separate from Better Auth `email_verified`.
      */
