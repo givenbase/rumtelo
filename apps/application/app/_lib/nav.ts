@@ -318,9 +318,26 @@ function buildMoneySubnav(ctx: NavContext): MoneySubnavItem[] {
     return MONEY_DEFINITIONS.flatMap(definition => resolveSubnavItem(ctx, definition) ?? []);
 }
 
+/**
+ * Growth shows ONE planner item, always named Course: Goals is a tab inside Course, so a
+ * separate "Goals" item would be the same page twice. Plus/Max open Course itself; Basic (no
+ * Course) gets the same label pointing at its goals list, which carries the Course preview.
+ */
 function buildGrowthSubnav(ctx: NavContext): GrowthSubnavItem[] {
     if (!growthAvailable(ctx)) return [];
-    return GROWTH_DEFINITIONS.flatMap(definition => resolveSubnavItem(ctx, definition) ?? []);
+    const hasCourse = ctx.planReady && ctx.has(CAPABILITIES.growthCourse);
+    return GROWTH_DEFINITIONS.flatMap(definition => {
+        if (definition.key === 'course' && !hasCourse) return [];
+        if (definition.key === 'goals') {
+            if (hasCourse) return [];
+            const item = resolveSubnavItem(ctx, {
+                ...definition,
+                labelKey: 'pages.nav.children.course',
+            });
+            return item ?? [];
+        }
+        return resolveSubnavItem(ctx, definition) ?? [];
+    });
 }
 
 /** Cross-product rows (The Coach, Why Rumtelo, Settings, Help, Practice) and staging previews. */

@@ -79,7 +79,7 @@ test('Plus OWNER: Home · Money · Growth · You; Money and Growth carry their o
         'net_worth:locked',
     ]);
     assert.equal(nav.moneySubnav.find(item => item.key === 'transactions')?.badge, 'to_sort');
-    assert.deepEqual(describeSubnav(nav.growthSubnav), ['course', 'goals', 'learn']);
+    assert.deepEqual(describeSubnav(nav.growthSubnav), ['course', 'learn']);
     // No product feature and no upgrade row in You.
     assert.deepEqual(describeYou(nav), ['coach', 'why', 'settings', 'help']);
 });
@@ -105,7 +105,7 @@ test('Basic OWNER: Course and the paid Money pages show a lock; Goals is the lan
         'debt:locked',
         'net_worth:locked',
     ]);
-    assert.deepEqual(describeSubnav(nav.growthSubnav), ['course:locked', 'goals', 'learn:locked']);
+    assert.deepEqual(describeSubnav(nav.growthSubnav), ['goals', 'learn:locked']);
     // Locks still link to the page, which renders the LockCard.
     assert.equal(nav.moneySubnav.find(item => item.key === 'debt')?.href, '/product/money/debt');
     assert.deepEqual(describeYou(nav), ['coach', 'why', 'settings', 'help']);
@@ -122,7 +122,7 @@ test('Max OWNER: every Money and Growth page is open, no locks', () => {
         'debt',
         'net_worth',
     ]);
-    assert.deepEqual(describeSubnav(nav.growthSubnav), ['course', 'goals', 'learn']);
+    assert.deepEqual(describeSubnav(nav.growthSubnav), ['course', 'learn']);
 });
 
 test('locks are an upgrade path: MEMBER sees them, an unknown membership and a VIEWER do not', () => {
@@ -319,7 +319,7 @@ test('Basic OWNER at ROUTINE: Growth, The Coach and the locks arrive; Coming up 
     env.NODE_ENV = 'production';
     const nav = buildNav(ctx({ plan: PlanKey.BASIC, stage: BoardStage.ROUTINE }));
     assert.deepEqual(tabKeys(nav), ['home', 'money', 'growth', 'you']);
-    assert.deepEqual(describeSubnav(nav.growthSubnav), ['course:locked', 'goals', 'learn:locked']);
+    assert.deepEqual(describeSubnav(nav.growthSubnav), ['goals', 'learn:locked']);
     assert.deepEqual(describeYou(nav), ['coach', 'why', 'settings', 'help', 'coming_up:month']);
 });
 
@@ -334,11 +334,7 @@ test('Plus OWNER at ROUTINE: Debt and Learn are muted until the month closes; Co
         'debt:later:month_close',
         'net_worth:locked',
     ]);
-    assert.deepEqual(describeSubnav(nav.growthSubnav), [
-        'course',
-        'goals',
-        'learn:later:month_close',
-    ]);
+    assert.deepEqual(describeSubnav(nav.growthSubnav), ['course', 'learn:later:month_close']);
     assert.equal(nav.tabs.find(tab => tab.key === 'growth')?.href, '/product/growth/course');
     assert.deepEqual(describeYou(nav), ['coach', 'why', 'settings', 'help', 'coming_up:month']);
 });
@@ -347,7 +343,7 @@ test('Plus OWNER at MONTH: everything open, no Coming up', () => {
     env.NODE_ENV = 'production';
     const nav = buildNav(ctx({ plan: PlanKey.PLUS, stage: BoardStage.MONTH }));
     assert.ok(!describeSubnav(nav.moneySubnav).some(item => item.includes(':later')));
-    assert.deepEqual(describeSubnav(nav.growthSubnav), ['course', 'goals', 'learn']);
+    assert.deepEqual(describeSubnav(nav.growthSubnav), ['course', 'learn']);
     assert.deepEqual(describeYou(nav), ['coach', 'why', 'settings', 'help']);
 });
 
@@ -473,4 +469,17 @@ test('production never lists Energy or Soul at any stage', () => {
         assert.ok(!describeYou(nav).includes('energy'));
         assert.ok(!describeYou(nav).includes('soul'));
     }
+});
+
+test('Growth shows one planner item named Course: Plus opens Course, Basic opens its goals list', () => {
+    const plus = buildNav(ctx({ plan: PlanKey.PLUS }));
+    const basic = buildNav(ctx({ plan: PlanKey.BASIC }));
+    const labelOf = (nav: ReturnType<typeof buildNav>) =>
+        nav.growthSubnav.filter(item => item.key === 'course' || item.key === 'goals');
+    assert.equal(labelOf(plus).length, 1);
+    assert.equal(labelOf(plus)[0]?.labelKey, 'pages.nav.children.course');
+    assert.equal(labelOf(plus)[0]?.href, '/product/growth/course');
+    assert.equal(labelOf(basic).length, 1);
+    assert.equal(labelOf(basic)[0]?.labelKey, 'pages.nav.children.course');
+    assert.equal(labelOf(basic)[0]?.href, '/product/growth/goals');
 });
