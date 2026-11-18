@@ -100,7 +100,7 @@ const shell = {
         tx_import: {
             title: 'Import bank statement',
             description:
-                'Prefer CAMT.053 from your bank. Rows land in the Inbox — sort them and link fixed costs when they match.',
+                'Prefer CAMT.053 from your bank. Rows land in Transactions under To sort — sort them and link fixed costs when they match.',
         },
         tx_update: {
             title: 'Edit transaction',

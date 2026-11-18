@@ -68,7 +68,7 @@
                     "party_already_suggested": "Je hebt dit feestje al aan Rumtelo aanbevolen.",
                     "party_already_in_catalog": "Dit feest is al gekoppeld aan de Rumtelo-catalogus.",
                     "period_closed": "Deze maand is afgesloten — je kunt niets toevoegen of wijzigen voor die periode.",
-                    "month_close_incomplete": "Rond openstaande zaken af vóór je deze maand afsluit ({inbox} ongeordend in de inbox, {bills} rekeningen onbetaald of niet overgeslagen).",
+                    "month_close_incomplete": "Rond eerst het openstaande werk af voordat je deze maand afsluit ({inbox} transacties om te sorteren, {bills} rekeningen onbetaald of niet overgeslagen).",
                     "month_close_prior_open": "Sluit eerst {period} — de maanden moeten in volgorde worden afgerond, zodat het logboek een getrouw beeld blijft geven.",
                     "month_close_bill_disposition": "Kies meenemen of overslaan voor elke openstaande vaste kost voordat je afsluit ({name}).",
                     "bill_arrears_threshold": "Registreer pas als schuld na {count} meegenomen maanden — neem eerst verder mee of betaal.",
@@ -851,8 +851,8 @@
                     "cta": "Open vaste kosten"
                 },
                 "inbox_unsorted": {
-                    "text": "{count} transacties wachten in de inbox. Sorteer ze in potjes zodat het beeld eerlijk blijft.",
-                    "cta": "Inbox openen"
+                    "text": "{count} transacties wachten om gesorteerd te worden. Sorteer ze in potjes, dan blijft het beeld eerlijk.",
+                    "cta": "Transacties sorteren"
                 },
                 "necessities_share": {
                     "text": "Noodzakelijk staat op {pct}% — het doel is 55%. Prima voor nu; om het gat te dichten, schrap je vaste kosten of verhoog je je inkomen, en laat je Vrijheid met rust.",
@@ -2633,7 +2633,7 @@
                 "add_out": "+ Toevoegen",
                 "apply_rules": "Regels toepassen",
                 "working": "Bezig…",
-                "tab_inbox": "Sorteren",
+                "tab_inbox": "Te sorteren",
                 "tab_out": "Uit",
                 "tab_in": "In",
                 "tab_rules": "Regels",
@@ -2664,7 +2664,7 @@
                 "sort_amount_high": "Hoogste bedrag",
                 "sort_amount_low": "Laagste bedrag",
                 "unassigned": "Niet toegewezen",
-                "inbox_chip": "Inbox",
+                "inbox_chip": "Te sorteren",
                 "rules_help": "De eerste treffers winnen, op basis van prioriteit. Oude regels (0 treffers) kunnen gerust worden verwijderd.",
                 "rule_if": "Als {field} {matcher} “{value}”",
                 "rule_meta": "→ {jar} · prioriteit {priority} · {hits}",
@@ -2725,9 +2725,9 @@
                     "toast_bank_mismatch": "Verkeerde rekening voor dit bestand — import geblokkeerd."
                 },
                 "rules_sign_in_title": "Log in om regels te beheren.",
-                "rules_sign_in_body": "Regels sorteren transacties in de inbox automatisch in het juiste potje.",
+                "rules_sign_in_body": "Regels sorteren nieuwe transacties automatisch in het juiste potje.",
                 "rules_empty_title": "Er zijn nog geen regels.",
-                "rules_empty_body": "Kies ‘Altijd dit’ bij een item in je inbox om een regel in te stellen. Je kunt deze regels daarna hier beheren.",
+                "rules_empty_body": "Kies “Altijd dit” bij een transactie die je nog moet sorteren om een regel aan te leren. Daarna beheer je ze hier.",
                 "toast_sorted": "Gesorteerd en regel opgeslagen",
                 "toast_sorted_tx": "Transactie gesorteerd",
                 "toast_sorted_fixed": "Gesorteerd en gekoppeld aan vaste kosten",
@@ -2736,7 +2736,7 @@
                 "toast_rules_failed": "Het toepassen van regels is mislukt",
                 "toast_rules_sorted_one": "{count} transactie gesorteerd",
                 "toast_rules_sorted_other": "{count} transacties gesorteerd",
-                "toast_rules_no_match": "Geen treffers — inbox blijft ongewijzigd",
+                "toast_rules_no_match": "Geen overeenkomsten — niets gewijzigd",
                 "toast_rule_deleted": "Regel verwijderd",
                 "toast_delete_failed": "Verwijderen is mislukt",
                 "inbox_sort": {
@@ -2765,7 +2765,7 @@
                     "source_csv": "Afschrift-import",
                     "source_bank": "Bankfeed",
                     "source_recurring": "Vanuit een doorlopend abonnement",
-                    "status_inbox": "In de inbox in de wachtrij",
+                    "status_inbox": "Wacht om gesorteerd te worden",
                     "status_sorted": "In een potje gedaan",
                     "status_ignored": "Niet meegerekend (niet opgenomen in de begrotingsberekeningen)",
                     "hint_linked_settlement": "Gekoppelde afrekening voor deze periode",
@@ -2776,7 +2776,7 @@
                     "hint_applied_debt": "Toegepast op een schuldsaldo",
                     "hint_manage_rules": "Regels beheren op de pagina ‘Transacties’",
                     "hint_catalog_sorted": "Er werd geen huishoudregel gevonden — dit stond in de catalogus van de handelaar",
-                    "inbox_still": "Nog steeds in de inbox",
+                    "inbox_still": "Nog te sorteren",
                     "inbox_assign_jar": "Wijs een potje toe om het in de begroting op te nemen",
                     "linked_debt_fallback": "Gekoppelde schuld",
                     "hint_on_jar_planned": "Op {jar} · gepland op {amount}",
@@ -3881,7 +3881,7 @@
                     "sections": {
                         "what_for": {
                             "heading": "Waar dit voor dient",
-                            "body": "Een momentopname van de huidige periode: potjes, inbox, wat je al hebt, en hoe de maand tot nu toe verloopt."
+                            "body": "Een momentopname van de huidige periode: potjes, transacties om te sorteren, wat je al bezit en hoe de maand verloopt."
                         },
                         "how": {
                             "heading": "Hoe het werkt",
@@ -3920,7 +3920,7 @@
                         },
                         "how": {
                             "heading": "Hoe het werkt",
-                            "body": "Kies ‘Uit’ of ‘In’, geef aan wat het was, kies een potje en spaar. Berichten in de inbox blijven staan totdat je ze sorteert. Wijzigingen worden direct verwerkt in het beschikbare saldo van diezelfde periode."
+                            "body": "Kies Uit of In, zeg wat het was, kies een potje en bewaar. Transacties om te sorteren blijven wachten tot je ze sorteert. Wijzigingen werken het beschikbare saldo van dezelfde periode bij."
                         }
                     }
                 },
@@ -3953,10 +3953,10 @@
                 "overdue_days_other": "{count} dagen te laat",
                 "closed_badge": "Afgesloten",
                 "closed_hint": "Deze maand is afgesloten — de score blijft zoals die was, en er kan niets meer worden toegevoegd of gewijzigd voor deze periode.",
-                "close_explain": "Afsluiten vergrendelt deze score en bevriest de maand. Ruim eerst de inbox op; openstaande vaste kosten kun je meenemen of overslaan bij afsluiten.",
-                "close_explain_soon": "De maand loopt bijna ten einde — ruim de inbox op, en kies meenemen of overslaan voor openstaande vaste kosten.",
-                "close_explain_today": "Vandaag is de laatste dag. Rond de inbox af, kies meenemen of overslaan voor openstaande vaste kosten, en sluit af.",
-                "close_explain_overdue": "Deze maand had al afgesloten moeten zijn. Rond de inbox af, kies meenemen of overslaan voor openstaande vaste kosten, en sluit af.",
+                "close_explain": "Afsluiten vergrendelt deze score en bevriest de maand. Sorteer eerst je transacties; onbetaalde rekeningen kun je bij het afsluiten doorschuiven of overslaan.",
+                "close_explain_soon": "De maand eindigt binnenkort — sorteer je transacties en schuif onbetaalde rekeningen daarna door of sla ze over, zodat je kunt afsluiten.",
+                "close_explain_today": "Vandaag is de laatste dag. Sorteer je transacties, schuif onbetaalde rekeningen door of sla ze over en sluit af.",
+                "close_explain_overdue": "Deze maand had al afgesloten moeten zijn. Sorteer je transacties, schuif onbetaalde rekeningen door of sla ze over en sluit af.",
                 "travel_past_one": "{stamp} · ongeveer {money} door je potjes in {horizon} maand",
                 "travel_past_other": "{stamp} · ongeveer {money} door je potjes over {horizon} maanden",
                 "travel_ahead_one": "Tot {stamp} · ongeveer {money} door je potjes in {horizon} maand",
@@ -3973,8 +3973,8 @@
             "close_bills_roll_debt_hint": "Na dit meenemen ({count} maanden open) kun je het op Vaste kosten als schuld registreren — met eventuele incassokosten en een betalingsplan.",
             "close_bills_skip_hint": "Deze maand telt niet mee — volgende maand start weer bij 1×.",
             "close_blocked_title": "Rond dit eerst af vóór je de maand afsluit",
-            "close_blocked_inbox_one": "1 ongeordende transactie in de inbox",
-            "close_blocked_inbox_other": "{count} ongeordende transacties in de inbox",
+            "close_blocked_inbox_one": "1 transactie nog te sorteren",
+            "close_blocked_inbox_other": "{count} transacties nog te sorteren",
             "close_blocked_bills_one": "1 openstaande rekening — kies meenemen of overslaan bij afsluiten{names}",
             "close_blocked_bills_other": "{count} openstaande rekeningen — kies meenemen of overslaan bij afsluiten{names}",
             "close_blocked_bill_names": " ({list})",
@@ -3989,9 +3989,9 @@
                 "prior_first": "Sluit eerst {prior} af — maanden sluiten op volgorde.",
                 "prior_first_cta": "{prior} afsluiten",
                 "prior_done": "{month} is afgesloten.",
-                "inbox_first": "{count, plural, one {# regel uit {month} staat nog in je Inbox.} other {# regels uit {month} staan nog in je Inbox.}}",
+                "inbox_first": "{count, plural, one {# transactie uit {month} is nog te sorteren.} other {# transacties uit {month} zijn nog te sorteren.}}",
                 "inbox_first_cta": "Sorteer ze",
-                "inbox_first_reason": "Sorteer eerst de Inbox en sluit daarna af.",
+                "inbox_first_reason": "Sorteer eerst je transacties en sluit daarna af.",
                 "confirm_body": "Je ziet je score en neemt wat over is mee naar volgende maand. Een afgesloten maand kun je niet meer wijzigen.",
                 "bills_tail": "Een afgesloten maand kun je niet meer wijzigen.",
                 "close_cta": "{month} afsluiten",
@@ -4045,11 +4045,11 @@
                     "cta": "Inkomen toevoegen"
                 },
                 "inbox": {
-                    "title": "{count, plural, one {# regel in je Inbox — ongeveer {minutes, plural, one {# minuut} other {# minuten}}.} other {# regels in je Inbox — ongeveer {minutes, plural, one {# minuut} other {# minuten}}.}}",
-                    "cta": "Inbox sorteren"
+                    "title": "{count, plural, one {# transactie te sorteren — ongeveer {minutes, plural, one {# minuut} other {# minuten}}.} other {# transacties te sorteren — ongeveer {minutes, plural, one {# minuut} other {# minuten}}.}}",
+                    "cta": "Transacties sorteren"
                 },
                 "week_check": {
-                    "title": "Inbox leeg. Je weekcheck staat klaar — tien minuten.",
+                    "title": "Alles gesorteerd. Je weekcheck staat klaar — tien minuten.",
                     "cta": "Weekcheck starten"
                 },
                 "calm": {
@@ -4060,7 +4060,7 @@
                 "viewer": {
                     "close_prior": "{month} staat klaar om af te sluiten.",
                     "no_transactions": "Nog geen uitgaven toegevoegd.",
-                    "inbox": "{count, plural, one {# regel wacht in de Inbox.} other {# regels wachten in de Inbox.}}",
+                    "inbox": "{count, plural, one {# transactie wacht om gesorteerd te worden.} other {# transacties wachten om gesorteerd te worden.}}",
                     "week_check": "De weekcheck van deze week staat nog open.",
                     "close_month": "{month} wordt over {days, plural, one {# dag} other {# dagen}} afgesloten."
                 },
@@ -4127,7 +4127,7 @@
                 "growth": {
                     "income_month": "INKOMSTEN DEZE MAAND",
                     "income_span": "INKOMSTEN OVER DE LOOPTIJD",
-                    "inbox": "INBOX",
+                    "inbox": "TE SORTEREN",
                     "tagline": "Houd grip op je ontwikkeling — vaardigheden, doelen, inkomen, als je dat wilt."
                 },
                 "energy": {
@@ -4213,7 +4213,7 @@
                     },
                     "spend": {
                         "title": "Uitgaven vinden hun potje.",
-                        "body": "Vaste kosten gaan van het juiste potje af. Aankopen komen in je Inbox; sorteer ze zelf of laat een regel het doen."
+                        "body": "Vaste kosten gaan van het juiste potje af. Aankopen komen in Transacties; sorteer ze zelf of laat een regel het doen."
                     },
                     "week": {
                         "title": "Tien minuten per week.",
@@ -4337,7 +4337,7 @@
             "portal_features": {
                 "money": {
                     "f1": "Zes potjes, je percentages",
-                    "f2": "Inbox — gesorteerd volgens regel of handmatig",
+                    "f2": "Transacties — gesorteerd door een regel of met de hand",
                     "f3": "Vaste kosten die je van tevoren kunt inschatten",
                     "f4": "Aflossingsplan met een einddatum",
                     "f5": "De weekcheck · de maandscore"
@@ -4384,7 +4384,7 @@
                 "soul_gratitude_label": "Dankbaarheid · vandaag",
                 "soul_intention_label": "Voornemen · deze week",
                 "screens": {
-                    "money": "Inbox · deze week",
+                    "money": "Transacties · deze week",
                     "growth": "Doelstellingen · inkomsten",
                     "energy": "Slaap · de afgelopen 7 nachten",
                     "soul": "Stilte · dag 6"
@@ -4679,7 +4679,7 @@
                     "f5": "De Coach, de weekcheck, de maandscore",
                     "f6": "1 volledige plek + 1 kijkplek (partner, coach of adviseur)",
                     "outcome": {
-                        "money": "Zes potjes, je Inbox en vaste kosten",
+                        "money": "Zes potjes, je transacties en vaste kosten",
                         "growth": "{maxGoals, plural, one {# doel} other {# doelen}} en je inkomenscurve",
                         "energy": "Slaap, de basis onder elke beslissing",
                         "soul": "Stilte, dankbaarheid, één intentie per week"
@@ -5279,13 +5279,13 @@
                 "growth": "Groei",
                 "energy": "Energie",
                 "soul": "Ziel",
-                "more": "Meer"
+                "you": "Jij"
             },
             "children": {
                 "coach": "De Coach",
                 "why": "Waarom Rumtelo",
                 "jars": "Potjes",
-                "inbox": "Inbox",
+                "transactions": "Transacties",
                 "debt": "Schulden",
                 "fixed_costs": "Vaste kosten",
                 "course": "Koers",
@@ -5305,19 +5305,20 @@
                 "intent": "Intentie",
                 "centers": "Centra"
             },
-            "more": {
-                "title": "Meer",
+            "you": {
+                "title": "Jij",
                 "close": "Sluiten",
                 "settings": "Instellingen",
                 "help": "Hulp",
                 "go_to_practice": "Naar je praktijk",
                 "back_to_practice": "Terug naar je praktijk",
-                "preview_badge": "Preview",
-                "with_plan": "Meer met {plan}",
-                "with_plan_price": "{plan} · {price}/maand",
-                "with_plus_line": "Koers, je schuldenvrij-datum en bankafschriften importeren",
-                "with_max_line": "Nettovermogen en ruimte voor meer mensen"
+                "preview_group": "Preview"
             },
+            "later_hint": {
+                "week_check": "Komt na je eerste weekcheck.",
+                "month_close": "Komt na je eerste afgesloten maand."
+            },
+            "locked_hint": "Niet in je abonnement. Opent de upgradepagina.",
             "search": {
                 "course_today": "Koers · Vandaag",
                 "course_week": "Koers · Week",
@@ -5336,7 +5337,7 @@
                 },
                 "row_aria": "Binnenkort: {next}",
                 "title": "Binnenkort",
-                "lead": "Rumtelo begint met je potjes, Inbox en weekcheck. De rest komt in je menu naarmate je overzicht zich vult.",
+                "lead": "Rumtelo begint met je potjes, transacties en weekcheck. De rest komt erbij naarmate je overzicht zich vult.",
                 "next_eyebrow": "Hierna",
                 "trigger": {
                     "week_check": "Doe je eerste weekcheck — tien minuten.",
@@ -5364,10 +5365,11 @@
                 "text": "{count, plural, one {Nieuw: {items} staat nu in je menu.} other {Nieuw: {items} staan nu in je menu.}}",
                 "dismiss": "Begrepen"
             },
-            "inbox_badge_sr": "{count, plural, one {# om te sorteren} other {# om te sorteren}}",
+            "to_sort_badge_sr": "{count} te sorteren",
             "aria": {
                 "mobile_tabs": "Hoofdmenu",
-                "money_sections": "Onderdelen van Geld"
+                "money_sections": "Onderdelen van Geld",
+                "growth_sections": "Onderdelen van Groei"
             }
         },
         "onboarding": {
@@ -5753,7 +5755,7 @@
                     },
                     "between": {
                         "title": "De voortgang gaat door tussen sessies",
-                        "body": "De weekcheck en de kleine tips van De Coach, zoals een rekening die nog openstaat of een Inbox om te sorteren, houden cliënten in beweging zonder dat jij erachteraan hoeft. De Coach tipt. Jij begeleidt de keuzes."
+                        "body": "De weekcheck en de kleine tips van De Coach, zoals een rekening die nog openstaat of transacties om te sorteren, houden cliënten in beweging zonder dat jij erachteraan hoeft. De Coach tipt. Jij begeleidt de keuzes."
                     },
                     "yes": {
                         "title": "Hun ja komt eerst",
@@ -6002,7 +6004,7 @@
             "panels": {
                 "start": {
                     "eyebrow": "Je start",
-                    "blurb": "Nieuwe borden beginnen met potjes, de Inbox en de weekcheck. De rest komt in je menu na je eerste weekcheck en je eerste afgesloten maand."
+                    "blurb": "Nieuwe borden beginnen met potjes, transacties en de weekcheck. De rest komt in je menu na je eerste weekcheck en je eerste afgesloten maand."
                 },
                 "profile": {
                     "eyebrow": "Profiel",
@@ -6133,11 +6135,11 @@
                 },
                 "coach": {
                     "eyebrow": "De Coach",
-                    "blurb": "De Coach geeft nooit een standje — hij geeft alleen duidelijk aan wat de volgende stappen zijn. Tips op het scherm (waarom-regels, kaartjes) blijven zichtbaar terwijl je leert; de inbox onder Home → De Coach bevat tipkaartjes over geld, groei, energie en zielsgroei.",
-                    "blurb_core": "De Coach geeft nooit een standje — alleen duidelijke volgende stappen. Tips op het scherm (waarom-regels, potjeskaarten) blijven aan terwijl je leert; de inbox onder Home → De Coach bevat tipkaarten over geld en groei.",
+                    "blurb": "De Coach geeft nooit een standje — alleen duidelijke volgende stappen. Tips op het scherm (waarom-regels, potjeskaarten) blijven aan terwijl je leert; de tiplijst onder Home → De Coach bevat tipkaarten over geld, groei, energie en ziel.",
+                    "blurb_core": "De Coach geeft nooit een standje — alleen duidelijke volgende stappen. Tips op het scherm (waarom-regels, potjeskaarten) blijven aan terwijl je leert; de tiplijst onder Home → De Coach bevat tipkaarten over geld en groei.",
                     "toggle": "De Coach op de schermen weergeven",
-                    "hint_on": "Zoek naar het ✦ De Coach-symbool. De inbox blijft onder Home → De Coach.",
-                    "hint_off": "Uit — tips op het scherm verborgen. De Coach-inbox blijft te allen tijde beschikbaar."
+                    "hint_on": "Aan — zoek het ✦ De Coach-teken. Je tips staan onder Home → De Coach.",
+                    "hint_off": "Uit — tips op het scherm verborgen. Je tips staan altijd onder Home → De Coach."
                 },
                 "jars_placement": {
                     "eyebrow": "Waar elk potje staat",
@@ -6201,7 +6203,7 @@
                     "linked_count": "{count} gelinkt",
                     "none_linked": "Geen links",
                     "empty_linked_title": "Er zijn nog geen live bankkoppelingen.",
-                    "empty_linked_body": "Koppel een bank om transacties automatisch naar de Inbox te halen.",
+                    "empty_linked_body": "Koppel een bank om transacties automatisch binnen te halen.",
                     "connect_bank": "Een bank koppelen",
                     "capacity_usage_aria": "{used} van {max} bankkoppelingen",
                     "wizard_step_institution": "1 · Kies een bank",
@@ -6219,7 +6221,7 @@
                     "wizard_pick_seat_bank": "Welk {bank}-account moeten we koppelen?",
                     "wizard_no_matching_seats": "Er zijn nog geen {bank}-accounts. Maak hieronder een account aan — deze wordt dan aan die bank gekoppeld.",
                     "wizard_authorize": "Ga verder naar de bank",
-                    "wizard_authorize_hint": "Je verlaat Rumtelo even om bij de bank de toegang met alleen-lezen-rechten goed te keuren, en keert daarna hier weer terug.",
+                    "wizard_authorize_hint": "Straks verlaat je Rumtelo even, log je in bij de bank en geef je alleen-lezen toegang. We verplaatsen nooit geld. Als je terugkomt, worden je transacties gesynchroniseerd en wachten ze onder Te sorteren.",
                     "wizard_authorize_what_1": "Alleen-lezen: uitsluitend saldi en transacties.",
                     "wizard_authorize_what_2": "Je kunt deze koppeling op elk moment in de instellingen ongedaan maken.",
                     "wizard_authorize_what_3": "Na goedkeuring voeren we één keer een synchronisatie uit, waarna we je weer hierheen sturen.",
@@ -6228,7 +6230,7 @@
                     "wizard_authorize_seat_new": "Nieuw account · {bank}",
                     "wizard_authorize_mismatch": "De bank die je autoriseert ({aspsp}) kan afwijken van de bank van het Rumtelo-label ({catalog}). Voor testdoeleinden is dat geen probleem; in het dagelijks gebruik komen ze meestal overeen.",
                     "wizard_cancel": "Annuleren",
-                    "group_accounts": "{count} accounts",
+                    "group_accounts": "{count} rekeningen",
                     "not_connected": "Geen verbinding",
                     "loading_banks": "Banken worden geladen…",
                     "no_accounts_yet_title": "Er zijn nog geen accounts.",
@@ -6253,7 +6255,7 @@
                     "manual_eyebrow": "Handmatige boekingen",
                     "manual_blurb": "CSV-import en zitplaatsen zonder live-synchronisatie. Dit staat los van de hierboven genoemde Open Banking-koppelingen.",
                     "import_eyebrow": "Afschrift importeren",
-                    "import_blurb": "Kies bij voorkeur CAMT.053. MT940 of CSV werkt ook. Na import sorteer je de Inbox en koppel je vaste kosten.",
+                    "import_blurb": "Liever CAMT.053 van je bank. MT940 of CSV werkt ook. Sorteer na het importeren wat onder Te sorteren wacht en koppel passende vaste kosten.",
                     "account_label": "Accountnaam",
                     "account_label_hint": "Zichtbaar bij potjes en CSV — bijv. Betaalrekening, of Creditcard · t.n.v. Avery Chen.",
                     "type": "Type",
@@ -6730,7 +6732,7 @@
                 },
                 "tx_import": {
                     "title": "Bankafschrift importeren",
-                    "description": "Kies bij voorkeur CAMT.053 bij je bank. Regels landen in Te sorteren — koppel vaste kosten als ze matchen."
+                    "description": "Liever CAMT.053 van je bank. Rijen komen in Transacties onder Te sorteren — sorteer ze en koppel vaste kosten als ze overeenkomen."
                 },
                 "tx_update": {
                     "title": "Transactie bewerken",

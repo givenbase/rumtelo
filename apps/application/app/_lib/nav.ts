@@ -1,5 +1,6 @@
 /**
- * Navigation model: Home · Money · Growth · More.
+ * Navigation model: products as pills and tabs (Home · Money · Growth), each with its own
+ * subnav, plus You (The Coach, Why, Settings, Help, Practice, staging previews).
  *
  * Labels, hrefs, ordering and active-state matching only. Plan and role GATING lives in
  * `route-capabilities.ts` and never reads this file, so moving a page into or out of the
@@ -16,8 +17,8 @@ import {
     coursePeriodOf,
     HouseholdPermissionSection,
     HouseholdRole,
-    PlanKey,
     roleCanSee,
+    type PlanKey,
 } from '@rumtelo/contracts';
 import type { IconName } from '@rumtelo/ui';
 
@@ -31,21 +32,21 @@ export { normalizeAppPathname };
 /** Same as `pathMatchesHref`; kept under its original name for existing importers. */
 export const pathMatchesNavHref = pathMatchesHref;
 
-export type NavTabKey = 'home' | 'money' | 'growth' | 'more';
+export type NavTabKey = 'home' | 'money' | 'growth' | 'you';
 
 /** Compact labels for the desktop pill bar and bottom tabs. */
 export const TOP_PILL_LABEL_KEYS: Record<string, string> = {
     home: 'pages.nav.pills.home',
     money: 'pages.nav.pills.money',
     growth: 'pages.nav.pills.growth',
-    more: 'pages.nav.pills.more',
+    you: 'pages.nav.pills.you',
     energy: 'pages.nav.pills.energy',
     soul: 'pages.nav.pills.soul',
 };
 
 export interface NavTab {
     key: NavTabKey;
-    /** `null` for More, which opens a menu or sheet instead of navigating. */
+    /** `null` for You, which opens the avatar menu (desktop) or a sheet (phone) instead of navigating. */
     href: string | null;
     labelKey: string;
     glyph: string;
@@ -56,50 +57,63 @@ export interface NavTab {
     pending?: boolean;
 }
 
-export type MoneySubnavKey = 'jars' | 'inbox' | 'fixed_costs' | 'income';
+export type MoneySubnavKey =
+    | 'jars'
+    | 'transactions'
+    | 'fixed_costs'
+    | 'income'
+    | 'debt'
+    | 'net_worth';
+export type GrowthSubnavKey = 'course' | 'goals' | 'learn';
+export type SubnavKey = MoneySubnavKey | GrowthSubnavKey;
 
-export interface MoneySubnavItem {
-    key: MoneySubnavKey;
+/**
+ * How a product page shows in its subnav.
+ * - `open`: a normal link.
+ * - `later`: the ladder keeps it quiet for now (muted, clock). It still opens.
+ * - `locked`: the plan does not include it (lock). The link leads to the LockCard page.
+ */
+export type SubnavState = 'open' | 'later' | 'locked';
+
+/** What brings a deferred page to the front (search hits and muted items carry the hint). */
+export type DeferredUntil = 'week_check' | 'month_close';
+
+export interface SubnavItem<Key extends SubnavKey = SubnavKey> {
+    key: Key;
     href: string;
     labelKey: string;
-    /** `inbox` shows the count of items still to sort. */
-    badge?: 'inbox';
+    state: SubnavState;
+    /** Set when `state` is `later`. */
+    laterUntil?: DeferredUntil;
+    /** `transactions` shows the count of items still to sort. */
+    badge?: 'to_sort';
 }
 
-export type MoreRowKey =
-    | 'debt'
-    | 'net_worth'
-    | 'learn'
-    | 'coach'
-    | 'why'
-    | 'settings'
-    | 'energy'
-    | 'soul';
+export type MoneySubnavItem = SubnavItem<MoneySubnavKey>;
+export type GrowthSubnavItem = SubnavItem<GrowthSubnavKey>;
 
-export type MoreRow =
+export type YouRowKey = 'coach' | 'why' | 'settings' | 'energy' | 'soul';
+
+export type YouRow =
     | {
           kind: 'link';
-          key: MoreRowKey;
+          key: YouRowKey;
           href: string;
           labelKey: string;
           icon: IconName;
-          /** `preview` marks staging-only portals. */
+          /** `preview` marks staging-only products; the menu groups them under "Preview". */
           badgeKey?: 'preview';
       }
-    | { kind: 'plan_gains'; plan: PlanKey.PLUS | PlanKey.MAX }
     | { kind: 'help' }
     | { kind: 'practice'; href: string }
     | { kind: 'exit_preview'; href: string }
     /** One row for what the board ladder has not shown yet. `stage` is the next stage that adds something. */
     | { kind: 'coming_up'; stage: BoardStage; items: StageItem[] };
 
-/** What brings a deferred page into the menu (search hits carry a muted line). */
-export type DeferredUntil = 'week_check' | 'month_close';
-
 export interface SearchableNavItem {
     href: string;
     labelKey: string;
-    /** Set when the ladder keeps this page out of the menu for now. It still opens. */
+    /** Set when the ladder keeps this page quiet for now. It still opens. */
     deferredUntil?: DeferredUntil;
 }
 
@@ -107,7 +121,7 @@ export interface SearchableNavItem {
 export interface NavContext {
     /** Role used for section visibility. Fail-open OWNER while membership loads. */
     role: HouseholdRole;
-    /** True once the real membership role is known (gates upgrade rows, fail closed). */
+    /** True once the real membership role is known (gates lock rows, fail closed). */
     membershipKnown: boolean;
     plan: PlanKey;
     planReady: boolean;
@@ -138,7 +152,8 @@ export interface NavContext {
 export interface ShellNav {
     tabs: NavTab[];
     moneySubnav: MoneySubnavItem[];
-    moreRows: MoreRow[];
+    growthSubnav: GrowthSubnavItem[];
+    youRows: YouRow[];
     searchable: SearchableNavItem[];
 }
 
@@ -154,11 +169,11 @@ const MONEY_TAB: NavTab = {
     labelKey: TOP_PILL_LABEL_KEYS.money!,
     glyph: '◈',
 };
-const MORE_TAB: NavTab = {
-    key: 'more',
+const YOU_TAB: NavTab = {
+    key: 'you',
     href: null,
-    labelKey: TOP_PILL_LABEL_KEYS.more!,
-    glyph: '≡',
+    labelKey: TOP_PILL_LABEL_KEYS.you!,
+    glyph: '☺',
 };
 
 /** Where the Growth tab lands: Course with Plus and Max, the 1-goal list on Basic. */
@@ -169,89 +184,153 @@ export function growthTabHref(ctx: Pick<NavContext, 'has' | 'planReady'>): strin
         : productPath('growth/goals');
 }
 
-function buildMoneySubnav(ctx: NavContext): MoneySubnavItem[] {
-    const items: MoneySubnavItem[] = [
-        { key: 'jars', href: productPath('money'), labelKey: 'pages.nav.children.jars' },
-        {
-            key: 'inbox',
-            href: productPath('money/transactions'),
-            labelKey: 'pages.nav.children.inbox',
-            badge: 'inbox',
-        },
-        {
-            key: 'fixed_costs',
-            href: productPath('money/fixed-costs'),
-            labelKey: 'pages.nav.children.fixed_costs',
-        },
-    ];
-    // Income keeps its Growth role section, so a VIEWER (Growth = none) does not see it.
-    if (roleCanSee(ctx.role, HouseholdPermissionSection.GROWTH)) {
-        items.push({
-            key: 'income',
-            href: productPath('money/income'),
-            labelKey: 'pages.nav.children.income',
-        });
-    }
-    return items;
+/** A person who can change the plan: lock rows are an upgrade path, so only for them. */
+function isWriter(ctx: NavContext): boolean {
+    return ctx.membershipKnown && ctx.role !== HouseholdRole.VIEWER && !ctx.preview.active;
 }
 
-function buildMoreRows(ctx: NavContext, comingUp: MoreRow | null): MoreRow[] {
+function growthAvailable(ctx: NavContext): boolean {
+    return isProductEnabled('growth') && roleCanSee(ctx.role, HouseholdPermissionSection.GROWTH);
+}
+
+interface SubnavDefinition<Key extends SubnavKey> {
+    key: Key;
+    href: string;
+    labelKey: string;
+    section: HouseholdPermissionSection;
+    /** Plan capability; without it the page is in every plan. */
+    capability?: string;
+    /** The ladder stage that brings this page to the front. */
+    fromStage?: BoardStage.ROUTINE | BoardStage.MONTH;
+    badge?: 'to_sort';
+}
+
+const { MONEY, GROWTH } = HouseholdPermissionSection;
+
+const MONEY_DEFINITIONS: SubnavDefinition<MoneySubnavKey>[] = [
+    {
+        key: 'jars',
+        href: productPath('money'),
+        labelKey: 'pages.nav.children.jars',
+        section: MONEY,
+    },
+    {
+        key: 'transactions',
+        href: productPath('money/transactions'),
+        labelKey: 'pages.nav.children.transactions',
+        section: MONEY,
+        badge: 'to_sort',
+    },
+    {
+        key: 'fixed_costs',
+        href: productPath('money/fixed-costs'),
+        labelKey: 'pages.nav.children.fixed_costs',
+        section: MONEY,
+    },
+    // Income keeps its Growth role section, so a VIEWER (Growth = none) does not see it.
+    {
+        key: 'income',
+        href: productPath('money/income'),
+        labelKey: 'pages.nav.children.income',
+        section: GROWTH,
+    },
+    {
+        key: 'debt',
+        href: productPath('money/debt'),
+        labelKey: 'pages.nav.children.debt',
+        section: MONEY,
+        capability: CAPABILITIES.moneyDebt,
+        fromStage: BoardStage.MONTH,
+    },
+    {
+        key: 'net_worth',
+        href: productPath('money/net-worth'),
+        labelKey: 'pages.nav.children.net_worth',
+        section: MONEY,
+        capability: CAPABILITIES.growthNetWorth,
+        fromStage: BoardStage.MONTH,
+    },
+];
+
+const GROWTH_DEFINITIONS: SubnavDefinition<GrowthSubnavKey>[] = [
+    {
+        key: 'course',
+        href: productPath('growth/course'),
+        labelKey: 'pages.nav.children.course',
+        section: GROWTH,
+        capability: CAPABILITIES.growthCourse,
+        fromStage: BoardStage.ROUTINE,
+    },
+    {
+        key: 'goals',
+        href: productPath('growth/goals'),
+        labelKey: 'pages.nav.children.goals',
+        section: GROWTH,
+        capability: CAPABILITIES.growthGoals,
+        fromStage: BoardStage.ROUTINE,
+    },
+    {
+        key: 'learn',
+        href: productPath('growth/learn'),
+        labelKey: 'pages.nav.children.learn',
+        section: GROWTH,
+        capability: CAPABILITIES.growthLearn,
+        fromStage: BoardStage.MONTH,
+    },
+];
+
+function deferredUntilFor(stage: BoardStage): DeferredUntil {
+    return stage === BoardStage.ROUTINE ? 'week_check' : 'month_close';
+}
+
+/**
+ * One product page in its subnav, or null when this person never sees it. Hidden is not
+ * removed: a `later` item still opens. A plan lock only shows to a writer once the first
+ * week check is done, so week 1 never turns into an upsell countdown.
+ */
+function resolveSubnavItem<Key extends SubnavKey>(
+    ctx: NavContext,
+    definition: SubnavDefinition<Key>
+): SubnavItem<Key> | null {
+    if (!roleCanSee(ctx.role, definition.section)) return null;
+    const base = {
+        key: definition.key,
+        href: definition.href,
+        labelKey: definition.labelKey,
+        ...(definition.badge ? { badge: definition.badge } : {}),
+    };
+    if (definition.capability) {
+        // Never flash a plan-dependent item (or a lock) while the plan loads.
+        if (!ctx.planReady) return null;
+        if (!ctx.has(definition.capability)) {
+            return isWriter(ctx) && stageAtLeast(ctx.stage, BoardStage.ROUTINE)
+                ? { ...base, state: 'locked' }
+                : null;
+        }
+    }
+    if (definition.fromStage && !stageAtLeast(ctx.stage, definition.fromStage)) {
+        return { ...base, state: 'later', laterUntil: deferredUntilFor(definition.fromStage) };
+    }
+    return { ...base, state: 'open' };
+}
+
+function buildMoneySubnav(ctx: NavContext): MoneySubnavItem[] {
+    return MONEY_DEFINITIONS.flatMap(definition => resolveSubnavItem(ctx, definition) ?? []);
+}
+
+function buildGrowthSubnav(ctx: NavContext): GrowthSubnavItem[] {
+    if (!growthAvailable(ctx)) return [];
+    return GROWTH_DEFINITIONS.flatMap(definition => resolveSubnavItem(ctx, definition) ?? []);
+}
+
+/** Cross-product rows (The Coach, Why Rumtelo, Settings, Help, Practice) and staging previews. */
+function buildYouRows(ctx: NavContext, comingUp: YouRow | null): YouRow[] {
     const { role, preview } = ctx;
-    const atLeast = (minimum: BoardStage) => stageAtLeast(ctx.stage, minimum);
-    // Plan rows appear once the plan is known; never flash Debt or Net worth while loading.
-    const has = (capabilityKey: string) => ctx.planReady && ctx.has(capabilityKey);
-    const rows: MoreRow[] = [];
+    const rows: YouRow[] = [];
     const sees = (section: HouseholdPermissionSection) => roleCanSee(role, section);
-    const writer = ctx.membershipKnown && role !== HouseholdRole.VIEWER && !preview.active;
+    const atLeast = (minimum: BoardStage) => stageAtLeast(ctx.stage, minimum);
 
     if (preview.active) rows.push({ kind: 'exit_preview', href: practicePath('clients') });
-
-    if (
-        atLeast(BoardStage.MONTH) &&
-        has(CAPABILITIES.moneyDebt) &&
-        sees(HouseholdPermissionSection.MONEY)
-    ) {
-        rows.push({
-            kind: 'link',
-            key: 'debt',
-            href: productPath('money/debt'),
-            labelKey: 'pages.nav.children.debt',
-            icon: 'credit-card',
-        });
-    }
-    if (
-        atLeast(BoardStage.MONTH) &&
-        has(CAPABILITIES.growthNetWorth) &&
-        sees(HouseholdPermissionSection.MONEY)
-    ) {
-        rows.push({
-            kind: 'link',
-            key: 'net_worth',
-            href: productPath('money/net-worth'),
-            labelKey: 'pages.nav.children.net_worth',
-            icon: 'landmark',
-        });
-    }
-    if (
-        atLeast(BoardStage.MONTH) &&
-        has(CAPABILITIES.growthLearn) &&
-        sees(HouseholdPermissionSection.GROWTH)
-    ) {
-        rows.push({
-            kind: 'link',
-            key: 'learn',
-            href: productPath('growth/learn'),
-            labelKey: 'pages.nav.children.learn',
-            icon: 'book-open',
-        });
-    }
-
-    // One row for what the plan does not include, never a faded row per locked page.
-    // Never in week 1: an upgrade row would turn the first week into an upsell countdown.
-    if (ctx.planReady && writer && atLeast(BoardStage.ROUTINE)) {
-        if (ctx.plan === PlanKey.BASIC) rows.push({ kind: 'plan_gains', plan: PlanKey.PLUS });
-        if (ctx.plan === PlanKey.PLUS) rows.push({ kind: 'plan_gains', plan: PlanKey.MAX });
-    }
 
     if (
         atLeast(BoardStage.ROUTINE) &&
@@ -280,7 +359,7 @@ function buildMoreRows(ctx: NavContext, comingUp: MoreRow | null): MoreRow[] {
             kind: 'link',
             key: 'settings',
             href: ctx.settingsHref,
-            labelKey: 'pages.nav.more.settings',
+            labelKey: 'pages.nav.you.settings',
             icon: 'settings',
         });
     }
@@ -293,6 +372,7 @@ function buildMoreRows(ctx: NavContext, comingUp: MoreRow | null): MoreRow[] {
     if (comingUp) rows.push(comingUp);
 
     // Staging only: production never lists Energy or Soul (launch surface is Money + Growth).
+    // They sit in You under "Preview" so the phone tab bar stays at four cells.
     if (
         atLeast(BoardStage.MONTH) &&
         isProductEnabled('energy') &&
@@ -329,18 +409,23 @@ function buildSearchable(
     ctx: NavContext,
     tabs: NavTab[],
     moneySubnav: MoneySubnavItem[],
-    moreRows: MoreRow[]
+    growthSubnav: GrowthSubnavItem[],
+    youRows: YouRow[]
 ): SearchableNavItem[] {
     const items: SearchableNavItem[] = [];
     const seen = new Set<string>();
-    const add = (href: string, labelKey: string) => {
+    const add = (href: string, labelKey: string, deferredUntil?: DeferredUntil) => {
         if (seen.has(href)) return;
         seen.add(href);
-        items.push({ href, labelKey });
+        items.push({ href, labelKey, ...(deferredUntil ? { deferredUntil } : {}) });
+    };
+    // A plan-locked page is never offered in search.
+    const offer = (item: SubnavItem) => {
+        if (item.state !== 'locked') add(item.href, item.labelKey, item.laterUntil);
     };
 
     add('/', 'pages.nav.pills.home');
-    for (const item of moneySubnav) add(item.href, item.labelKey);
+    for (const item of moneySubnav) offer(item);
     if (tabs.some(tab => tab.key === 'growth')) {
         if (ctx.planReady && ctx.has(CAPABILITIES.growthCourse)) {
             const now = ctx.now ?? new Date();
@@ -356,8 +441,11 @@ function buildSearchable(
         } else if (ctx.planReady && ctx.has(CAPABILITIES.growthGoals)) {
             add(productPath('growth/goals'), 'pages.nav.children.goals');
         }
+        for (const item of growthSubnav) {
+            if (item.key === 'learn') offer(item);
+        }
     }
-    for (const row of moreRows) {
+    for (const row of youRows) {
         if (row.kind === 'link') add(row.href, row.labelKey);
     }
     return items;
@@ -365,11 +453,7 @@ function buildSearchable(
 
 function buildTabs(ctx: NavContext): NavTab[] {
     const tabs: NavTab[] = [HOME_TAB, MONEY_TAB];
-    if (
-        isProductEnabled('growth') &&
-        roleCanSee(ctx.role, HouseholdPermissionSection.GROWTH) &&
-        stageAtLeast(ctx.stage, BoardStage.ROUTINE)
-    ) {
+    if (growthAvailable(ctx) && stageAtLeast(ctx.stage, BoardStage.ROUTINE)) {
         tabs.push({
             key: 'growth',
             href: growthTabHref(ctx),
@@ -378,20 +462,22 @@ function buildTabs(ctx: NavContext): NavTab[] {
             ...(ctx.stageReady ? {} : { pending: true }),
         });
     }
-    tabs.push(MORE_TAB);
+    tabs.push(YOU_TAB);
     return tabs;
 }
 
-/** Tabs, Money sections, More rows and search for one context, without the Coming up row. */
-function buildParts(ctx: NavContext, comingUp: MoreRow | null) {
+/** Tabs, product subnavs, You rows and search for one context, without the Coming up row. */
+function buildParts(ctx: NavContext, comingUp: YouRow | null) {
     const tabs = buildTabs(ctx);
     const moneySubnav = buildMoneySubnav(ctx);
-    const moreRows = buildMoreRows(ctx, comingUp);
+    const growthSubnav = buildGrowthSubnav(ctx);
+    const youRows = buildYouRows(ctx, comingUp);
     return {
         tabs,
         moneySubnav,
-        moreRows,
-        searchable: buildSearchable(ctx, tabs, moneySubnav, moreRows),
+        growthSubnav,
+        youRows,
+        searchable: buildSearchable(ctx, tabs, moneySubnav, growthSubnav, youRows),
     };
 }
 
@@ -401,21 +487,27 @@ export type StageItemKey = 'course' | 'goals' | 'coach' | 'debt' | 'net_worth' |
 
 export type StageItem = { kind: 'nav'; key: StageItemKey } | { kind: 'levels' };
 
-const STAGE_ITEM_KEYS: ReadonlySet<string> = new Set(['coach', 'debt', 'net_worth', 'learn']);
-
-/** Menu items of one stage, in menu order (Growth first, then the More rows). */
-function stageItemKeys(ctx: NavContext): StageItemKey[] {
-    const parts = buildParts(ctx, null);
-    const keys: StageItemKey[] = [];
-    if (parts.tabs.some(tab => tab.key === 'growth')) {
-        keys.push(ctx.planReady && ctx.has(CAPABILITIES.growthCourse) ? 'course' : 'goals');
+/** Items the ladder brings to the front, in menu order, with the stage that does it. */
+function ladderItems(ctx: NavContext): { key: StageItemKey; from: BoardStage }[] {
+    // Resolve at the full board so a plan-locked page (never part of the ladder) drops out.
+    const full: NavContext = { ...ctx, stage: BoardStage.MONTH, stageReady: true };
+    const growth = buildGrowthSubnav(full);
+    const money = buildMoneySubnav(full);
+    const open = (items: readonly SubnavItem[], key: SubnavKey) =>
+        items.find(item => item.key === key && item.state === 'open');
+    const items: { key: StageItemKey; from: BoardStage }[] = [];
+    if (growthAvailable(ctx)) {
+        // Plus and Max land on Course, Basic on the 1-goal list: announce one of them.
+        if (open(growth, 'course')) items.push({ key: 'course', from: BoardStage.ROUTINE });
+        else if (open(growth, 'goals')) items.push({ key: 'goals', from: BoardStage.ROUTINE });
     }
-    for (const row of parts.moreRows) {
-        if (row.kind === 'link' && STAGE_ITEM_KEYS.has(row.key)) {
-            keys.push(row.key as StageItemKey);
-        }
+    if (open(money, 'debt')) items.push({ key: 'debt', from: BoardStage.MONTH });
+    if (open(money, 'net_worth')) items.push({ key: 'net_worth', from: BoardStage.MONTH });
+    if (open(growth, 'learn')) items.push({ key: 'learn', from: BoardStage.MONTH });
+    if (buildYouRows(full, null).some(row => row.kind === 'link' && row.key === 'coach')) {
+        items.push({ key: 'coach', from: BoardStage.ROUTINE });
     }
-    return keys;
+    return items;
 }
 
 const STAGE_ITEM_LABEL_KEYS: Record<StageItemKey, string> = {
@@ -435,22 +527,21 @@ export function stageItemLabelKey(item: StageItem): string {
 }
 
 /**
- * What `to` shows in the menu that `from` does not, for this plan and role. Built by
- * diffing two `buildNav` passes, so Coming up and the "New" note can never disagree with
- * the menu. Upgrade rows are never listed; `levels` is what a first closed month adds.
+ * What `to` brings to the front that `from` did not, for this plan and role. Built from the
+ * same definitions as the subnavs, so Coming up and the "New" note can never disagree with
+ * them. Plan locks are never listed; `levels` is what a first closed month adds.
  */
 export function stageAdditions(ctx: NavContext, from: BoardStage, to: BoardStage): StageItem[] {
-    const before = new Set(stageItemKeys({ ...ctx, stage: from, stageReady: true }));
-    const items: StageItem[] = stageItemKeys({ ...ctx, stage: to, stageReady: true })
-        .filter(key => !before.has(key))
-        .map(key => ({ kind: 'nav', key }));
+    const items: StageItem[] = ladderItems(ctx)
+        .filter(item => !stageAtLeast(from, item.from) && stageAtLeast(to, item.from))
+        .map(item => ({ kind: 'nav', key: item.key }));
     if (to === BoardStage.MONTH && from !== BoardStage.MONTH && !ctx.hasClosedMonth) {
         items.push({ kind: 'levels' });
     }
     return items;
 }
 
-/** The first stage above the current one that adds something to this menu, or null. */
+/** The first stage above the current one that adds something, or null. */
 export function nextVisibleStage(
     ctx: NavContext
 ): { stage: BoardStage; items: StageItem[] } | null {
@@ -462,7 +553,7 @@ export function nextVisibleStage(
     return null;
 }
 
-/** Pages the ladder keeps out of the menu, still findable in Quick add. */
+/** Pages the ladder keeps out of the nav entirely (The Coach, the Growth tab), still findable in Quick add. */
 function deferredSearchable(
     ctx: NavContext,
     current: readonly SearchableNavItem[]
@@ -483,9 +574,8 @@ function deferredSearchable(
 
 /** The whole shell nav for one render, already filtered by stage, role, plan, preview and launch. */
 export function buildNav(ctx: NavContext): ShellNav {
-    const writer = ctx.membershipKnown && ctx.role !== HouseholdRole.VIEWER && !ctx.preview.active;
     const next =
-        writer && ctx.stageReady && !stageAtLeast(ctx.stage, BoardStage.MONTH)
+        isWriter(ctx) && ctx.stageReady && !stageAtLeast(ctx.stage, BoardStage.MONTH)
             ? nextVisibleStage(ctx)
             : null;
     const parts = buildParts(
@@ -495,18 +585,15 @@ export function buildNav(ctx: NavContext): ShellNav {
     return {
         tabs: parts.tabs,
         moneySubnav: parts.moneySubnav,
-        moreRows: parts.moreRows,
+        growthSubnav: parts.growthSubnav,
+        youRows: parts.youRows,
         searchable: ctx.stageReady
             ? [...parts.searchable, ...deferredSearchable(ctx, parts.searchable)]
             : parts.searchable,
     };
 }
 
-const MORE_PATHS: ReadonlyArray<{ prefix: string; key: MoreRowKey }> = [
-    { prefix: productPath('money/debt'), key: 'debt' },
-    { prefix: productPath('money/net-worth'), key: 'net_worth' },
-    { prefix: productPath('growth/net-worth'), key: 'net_worth' },
-    { prefix: productPath('growth/learn'), key: 'learn' },
+const YOU_PATHS: ReadonlyArray<{ prefix: string; key: YouRowKey }> = [
     { prefix: productPath('coach'), key: 'coach' },
     { prefix: productPath('why'), key: 'why' },
     { prefix: '/settings', key: 'settings' },
@@ -514,21 +601,27 @@ const MORE_PATHS: ReadonlyArray<{ prefix: string; key: MoreRowKey }> = [
     { prefix: productPath('soul'), key: 'soul' },
 ];
 
-/** The More row that owns this path, if any. */
-export function activeMoreRowKey(pathname: string): MoreRowKey | null {
+/** The You row that owns this path, if any. */
+export function activeYouRowKey(pathname: string): YouRowKey | null {
     const path = normalizeAppPathname(pathname);
-    return MORE_PATHS.find(entry => pathMatchesHref(path, entry.prefix))?.key ?? null;
+    return YOU_PATHS.find(entry => pathMatchesHref(path, entry.prefix))?.key ?? null;
 }
 
+/** The legacy Net worth route under Growth still belongs to Money. */
+const GROWTH_NET_WORTH = productPath('growth/net-worth');
+
 /**
- * Which top tab is active. A page that lives in More (Debt, Net worth, Learn, Coach, Why,
- * Settings) highlights More: the place the user came from.
+ * Which top tab is active. A page that belongs to a product highlights that product
+ * (Debt and Net worth are Money, Learn is Growth); The Coach, Why, Settings and the
+ * staging previews highlight You.
  */
 export function activeTabForPath(pathname: string): NavTabKey | null {
     const path = normalizeAppPathname(pathname);
     if (path === '/') return 'home';
-    if (activeMoreRowKey(path)) return 'more';
-    if (pathMatchesHref(path, productPath('money'))) return 'money';
+    if (activeYouRowKey(path)) return 'you';
+    if (pathMatchesHref(path, productPath('money')) || pathMatchesHref(path, GROWTH_NET_WORTH)) {
+        return 'money';
+    }
     if (pathMatchesHref(path, productPath('growth'))) return 'growth';
     return null;
 }
@@ -536,8 +629,26 @@ export function activeTabForPath(pathname: string): NavTabKey | null {
 /** Which Money sub-item is active (Jars is the default for the Money root and week check). */
 export function activeMoneySubnavKey(pathname: string): MoneySubnavKey {
     const path = normalizeAppPathname(pathname);
-    if (pathMatchesHref(path, productPath('money/transactions'))) return 'inbox';
+    if (pathMatchesHref(path, productPath('money/transactions'))) return 'transactions';
     if (pathMatchesHref(path, productPath('money/fixed-costs'))) return 'fixed_costs';
     if (pathMatchesHref(path, productPath('money/income'))) return 'income';
+    if (pathMatchesHref(path, productPath('money/debt'))) return 'debt';
+    if (
+        pathMatchesHref(path, productPath('money/net-worth')) ||
+        pathMatchesHref(path, GROWTH_NET_WORTH)
+    ) {
+        return 'net_worth';
+    }
     return 'jars';
+}
+
+/** Which Growth sub-item is active; the Growth root opens Course. Null for other Growth pages. */
+export function activeGrowthSubnavKey(pathname: string): GrowthSubnavKey | null {
+    const path = normalizeAppPathname(pathname);
+    if (pathMatchesHref(path, productPath('growth/goals'))) return 'goals';
+    if (pathMatchesHref(path, productPath('growth/learn'))) return 'learn';
+    if (path === productPath('growth') || pathMatchesHref(path, productPath('growth/course'))) {
+        return 'course';
+    }
+    return null;
 }

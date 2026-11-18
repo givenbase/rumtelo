@@ -164,8 +164,8 @@ const coach = {
             cta: 'Open fixed costs',
         },
         inbox_unsorted: {
-            text: '{count} transactions wait in the inbox. Sort them into jars so the picture stays honest.',
-            cta: 'Open inbox',
+            text: '{count} transactions are waiting to be sorted. Sort them into jars so the picture stays honest.',
+            cta: 'Sort transactions',
         },
         necessities_share: {
             text: 'Necessities is at {pct}% — the goal is 55%. Fine for now; to close the gap, trim fixed costs or raise income and leave Freedom untouched.',

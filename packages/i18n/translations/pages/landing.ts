@@ -71,7 +71,7 @@ const landing = {
             },
             spend: {
                 title: 'Spending finds its jar.',
-                body: 'Bills draw from the right jar. Purchases land in your Inbox; sort them by hand or let a rule do it.',
+                body: 'Bills draw from the right jar. Purchases land in Transactions. Sort them by hand or let a rule do it.',
             },
             week: {
                 title: 'Ten minutes a week.',
@@ -188,7 +188,7 @@ const landing = {
     portal_features: {
         money: {
             f1: 'Six jars, your percentages',
-            f2: 'Inbox — sorted by rule or by hand',
+            f2: 'Transactions — sorted by rule or by hand',
             f3: 'Fixed costs you see coming',
             f4: 'Debt plan with an end date',
             f5: 'The week check · the month score',
@@ -235,7 +235,7 @@ const landing = {
         soul_gratitude_label: 'Gratitude · today',
         soul_intention_label: 'Intention · this week',
         screens: {
-            money: 'Inbox · this week',
+            money: 'Transactions · this week',
             growth: 'Goals · income',
             energy: 'Sleep · last 7 nights',
             soul: 'Stillness · day 6',
@@ -523,7 +523,7 @@ const landing = {
             f5: 'The Coach, the week check, the month score',
             f6: '1 full + 1 viewer seat (partner, coach or advisor)',
             outcome: {
-                money: 'Six jars, your Inbox and fixed costs',
+                money: 'Six jars, your transactions and fixed costs',
                 growth: '{maxGoals, plural, one {# goal} other {# goals}} and your income curve',
                 energy: 'Sleep, the floor under every decision',
                 soul: 'Stillness, gratitude, one intention a week',

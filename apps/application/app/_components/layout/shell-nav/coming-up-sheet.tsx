@@ -34,7 +34,7 @@ const ITEM_ICON: Record<string, IconName> = {
 export type ComingUpData = { stage: BoardStage; items: StageItem[] };
 
 /**
- * More › Coming up: the next trigger in plain words, what it adds to this menu, and the
+ * You › Coming up: the next trigger in plain words, what it adds to the nav, and the
  * "Show everything now" switch. Bottom sheet on phones, side panel from `md`. Only for
  * writers below the full board; Practice preview and a VIEWER never open it.
  */
@@ -46,7 +46,7 @@ export function ComingUpSheet({
 }: {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    /** The `coming_up` More row, or null once the board is fully shown. */
+    /** The `coming_up` You row, or null once the board is fully shown. */
     data: ComingUpData | null;
     /** Only read for the SORTING trigger (numbers from the server). */
     progress: MoneyProgress | null;
@@ -115,7 +115,7 @@ export function ComingUpSheet({
                                     <WeekCheckAction onDone={() => handleOpenChange(false)} />
                                 ) : null}
                                 {trigger === 'sorting' ? (
-                                    <InboxAction onDone={() => handleOpenChange(false)} />
+                                    <TransactionsAction onDone={() => handleOpenChange(false)} />
                                 ) : null}
 
                                 <div className="grid gap-2">
@@ -203,7 +203,7 @@ function WeekCheckAction({ onDone }: { onDone: () => void }) {
     );
 }
 
-function InboxAction({ onDone }: { onDone: () => void }) {
+function TransactionsAction({ onDone }: { onDone: () => void }) {
     const t = useTranslations('pages.dashboard.next_move');
     return (
         <Button

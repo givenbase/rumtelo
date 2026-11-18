@@ -13,13 +13,13 @@ const nav = {
         growth: 'Growth',
         energy: 'Energy',
         soul: 'Soul',
-        more: 'More',
+        you: 'You',
     },
     children: {
         coach: 'The Coach',
         why: 'Why Rumtelo',
         jars: 'Jars',
-        inbox: 'Inbox',
+        transactions: 'Transactions',
         debt: 'Debt',
         fixed_costs: 'Fixed costs',
         course: 'Course',
@@ -39,19 +39,23 @@ const nav = {
         intent: 'Intent',
         centers: 'Centers',
     },
-    more: {
-        title: 'More',
+    /** You: the avatar menu on desktop, the fourth tab (a sheet) on phones. */
+    you: {
+        title: 'You',
         close: 'Close',
         settings: 'Settings',
         help: 'Help',
         go_to_practice: 'Go to practice',
         back_to_practice: 'Back to practice',
-        preview_badge: 'Preview',
-        with_plan: 'More with {plan}',
-        with_plan_price: '{plan} · {price}/month',
-        with_plus_line: 'Course, your debt-free date, statement import',
-        with_max_line: 'Net worth and room for more people',
+        preview_group: 'Preview',
     },
+    /** Muted product page in its subnav: what brings it to the front. */
+    later_hint: {
+        week_check: 'Shows after your first week check.',
+        month_close: 'Shows after your first closed month.',
+    },
+    /** Plan-locked product page in its subnav (screen readers; the lock icon is decorative). */
+    locked_hint: 'Not in your plan. Opens the upgrade page.',
     search: {
         course_today: 'Course · Today',
         course_week: 'Course · Week',
@@ -62,7 +66,7 @@ const nav = {
             month_close: 'Shows in your menu after you close your first month.',
         },
     },
-    /** More › Coming up: what the next stage adds and what brings it. */
+    /** You › Coming up: what the next stage adds and what brings it. */
     coming_up: {
         row: 'Coming up',
         row_next: {
@@ -72,7 +76,7 @@ const nav = {
         },
         row_aria: 'Coming up: {next}',
         title: 'Coming up',
-        lead: 'Rumtelo starts with your jars, Inbox and week check. More joins your menu as your board fills in.',
+        lead: 'Rumtelo starts with your jars, transactions and week check. More joins as your board fills in.',
         next_eyebrow: 'Next',
         trigger: {
             week_check: 'Do your first week check — ten minutes.',
@@ -103,10 +107,11 @@ const nav = {
         text: '{count, plural, one {New: {items} is now in your menu.} other {New: {items} are now in your menu.}}',
         dismiss: 'Got it',
     },
-    inbox_badge_sr: '{count, plural, one {# to sort} other {# to sort}}',
+    to_sort_badge_sr: '{count} to sort',
     aria: {
         mobile_tabs: 'Main',
         money_sections: 'Money sections',
+        growth_sections: 'Growth sections',
     },
 } as const;
 

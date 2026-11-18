@@ -68,7 +68,7 @@
                     "party_already_suggested": "Ya le has recomendado esta fiesta a Rumtelo.",
                     "party_already_in_catalog": "Esta fiesta ya está vinculada al catálogo de Rumtelo.",
                     "period_closed": "Este mes está cerrado; no se puede añadir ni modificar nada correspondiente a ese periodo.",
-                    "month_close_incomplete": "Termina las tareas pendientes antes de que termine el mes ({inbox} sin clasificar en la bandeja de entrada, {bills} facturas pendientes de pago o que no se han saltado).",
+                    "month_close_incomplete": "Finish open work before closing this month ({inbox} transactions to sort, {bills} bills unpaid or unskipped).",
                     "month_close_prior_open": "Cierra primero {period}: hay que completar los meses en orden para que el registro sea fiel a la realidad.",
                     "month_close_bill_disposition": "Elige entre «aplazar» u «omitir» cada factura pendiente de pago antes de cerrar ({name}).",
                     "bill_arrears_threshold": "Regístralo como deuda solo después de {count} meses de aplazamiento; sigue aplazándolo o págalo primero.",
@@ -851,8 +851,8 @@
                     "cta": "Costes fijos abiertos"
                 },
                 "inbox_unsorted": {
-                    "text": "Hay {count} transacciones pendientes en la bandeja de entrada. Clasifícalas en grupos para que el panorama siga siendo fiel a la realidad.",
-                    "cta": "Abrir bandeja de entrada"
+                    "text": "{count} transactions are waiting to be sorted. Sort them into jars so the picture stays honest.",
+                    "cta": "Sort transactions"
                 },
                 "necessities_share": {
                     "text": "El porcentaje de «Necesidades» es del {pct} %; el objetivo es el 55 %. Por ahora está bien; para reducir la diferencia, recorta los gastos fijos o aumenta los ingresos y no toques la categoría «Libertad».",
@@ -2664,7 +2664,7 @@
                 "sort_amount_high": "Importe máximo",
                 "sort_amount_low": "Importe mínimo",
                 "unassigned": "Sin asignar",
-                "inbox_chip": "Bandeja de entrada",
+                "inbox_chip": "To sort",
                 "rules_help": "Se dan prioridad a las coincidencias de la primera búsqueda. Las reglas inactivas (0 coincidencias) se pueden eliminar sin problema.",
                 "rule_if": "Si {field} {matcher} «{value}»",
                 "rule_meta": "→ {jar} · prioridad {priority} · {hits}",
@@ -2725,9 +2725,9 @@
                     "toast_bank_mismatch": "Cuenta incorrecta para este archivo: importación bloqueada."
                 },
                 "rules_sign_in_title": "Inicia sesión para gestionar las reglas.",
-                "rules_sign_in_body": "Las reglas clasifican automáticamente las transacciones de la bandeja de entrada en el tarro correspondiente.",
+                "rules_sign_in_body": "Rules automatically sort new transactions into the right jar.",
                 "rules_empty_title": "Aún no hay normas.",
-                "rules_empty_body": "Selecciona «Siempre esto» en un mensaje de la bandeja de entrada para configurar una regla. Después, podrás gestionarlas aquí.",
+                "rules_empty_body": "Choose “Always this” on a transaction to sort to teach a rule. Manage them here afterwards.",
                 "toast_sorted": "Clasificado y regla guardada",
                 "toast_sorted_tx": "Transacción resuelta",
                 "toast_sorted_fixed": "Clasificados y vinculados a los costes fijos",
@@ -2736,7 +2736,7 @@
                 "toast_rules_failed": "No se han podido aplicar las reglas",
                 "toast_rules_sorted_one": "{count} transacciones ordenadas",
                 "toast_rules_sorted_other": "{count} transacciones ordenadas",
-                "toast_rules_no_match": "No hay resultados — la bandeja de entrada no ha cambiado",
+                "toast_rules_no_match": "No matches — nothing changed",
                 "toast_rule_deleted": "Regla eliminada",
                 "toast_delete_failed": "Error al eliminar",
                 "inbox_sort": {
@@ -2765,7 +2765,7 @@
                     "source_csv": "Importación de CSV",
                     "source_bank": "Extracto bancario",
                     "source_recurring": "Desde un plan recurrente",
-                    "status_inbox": "Pendiente en la bandeja de entrada",
+                    "status_inbox": "Waiting to be sorted",
                     "status_sorted": "Clasificados en un tarro",
                     "status_ignored": "No se ha tenido en cuenta (no se ha incluido en los cálculos presupuestarios)",
                     "hint_linked_settlement": "Liquidación vinculada para este periodo",
@@ -2776,7 +2776,7 @@
                     "hint_applied_debt": "Aplicado al saldo de la deuda",
                     "hint_manage_rules": "Gestionar las reglas en la página «Transacciones»",
                     "hint_catalog_sorted": "No se ha encontrado ninguna regla doméstica que coincida: el catálogo comercial lo clasificó así",
-                    "inbox_still": "Todavía en la bandeja de entrada",
+                    "inbox_still": "Still to sort",
                     "inbox_assign_jar": "Asigna un bote para incluirlo en el presupuesto",
                     "linked_debt_fallback": "Deuda vinculada",
                     "hint_on_jar_planned": "El {jar} · previsto para el {amount}",
@@ -3881,7 +3881,7 @@
                     "sections": {
                         "what_for": {
                             "heading": "Para qué sirve esto",
-                            "body": "Un resumen del periodo actual: tarros, bandeja de entrada, lo que ya tienes y cómo va el mes."
+                            "body": "A snapshot of the current period: jars, transactions to sort, what you already own, and how the month is tracking."
                         },
                         "how": {
                             "heading": "Cómo funciona",
@@ -3920,7 +3920,7 @@
                         },
                         "how": {
                             "heading": "Cómo funciona",
-                            "body": "Elige «Sacar» o «Guardar», indica de qué se trata, selecciona un tarro y guárdalo. Los elementos de la bandeja de entrada esperan a que los clasifiques. Las modificaciones se reflejan en el saldo disponible de ese mismo periodo."
+                            "body": "Pick Out or In, say what it was, choose a jar, and save. Transactions to sort wait until you sort them. Edits update the same period’s available balance."
                         }
                     }
                 },
@@ -3953,10 +3953,10 @@
                 "overdue_days_other": "{count} días de retraso",
                 "closed_badge": "Cerrado",
                 "closed_hint": "Este mes ya está cerrado: la puntuación se mantiene tal y como estaba, y no se puede añadir ni modificar nada para este periodo.",
-                "close_explain": "Al cerrar, se bloquea este saldo y se congela el mes. Vacía primero la bandeja de entrada y las facturas para que el registro sea fiel a la realidad.",
-                "close_explain_soon": "El mes termina pronto: pon al día tu bandeja de entrada y paga las facturas para que puedas cerrarlo con éxito.",
-                "close_explain_today": "Hoy es el último día. Termina todo lo que tengas pendiente y cierra todo para que el mes que viene empecemos con buen pie.",
-                "close_explain_overdue": "Ya se ha pasado el plazo para cerrar este mes. Termina las tareas pendientes y ciérralo; te recomendamos que cierres cada mes correctamente.",
+                "close_explain": "Closing locks this score and freezes the month. Sort your transactions first; unpaid bills can be carried or skipped when you close.",
+                "close_explain_soon": "The month ends soon — sort your transactions, then carry or skip unpaid bills so you can close.",
+                "close_explain_today": "Today is the last day. Sort your transactions, then carry or skip unpaid bills and close.",
+                "close_explain_overdue": "This month is overdue to close. Sort your transactions, then carry or skip unpaid bills and close it.",
                 "travel_past_one": "{stamp} · sobre {money} a través de tarros durante {horizon} meses",
                 "travel_past_other": "{stamp} · sobre {money} en tarros a lo largo de {horizon} meses",
                 "travel_ahead_one": "Por {stamp} · sobre {money} a través de tarros durante más de {horizon} meses",
@@ -3973,8 +3973,8 @@
             "close_bills_roll_debt_hint": "Tras este aplazamiento ({count} meses de plazo), contabilízalo como deuda en «Gastos fijos», incluyendo los gastos de cobro y un plan de pago si fuera necesario.",
             "close_bills_skip_hint": "Este mes no contará; el mes que viene se empieza de cero, con 1×.",
             "close_blocked_title": "Termina esto antes de que termine el mes.",
-            "close_blocked_inbox_one": "1 transacción sin clasificar en la bandeja de entrada",
-            "close_blocked_inbox_other": "{count} transacciones sin clasificar en la bandeja de entrada",
+            "close_blocked_inbox_one": "1 transaction still to sort",
+            "close_blocked_inbox_other": "{count} transactions still to sort",
             "close_blocked_bills_one": "1 factura aún pendiente de pago o no pagada{names}",
             "close_blocked_bills_other": "{count} facturas aún pendientes de pago o no pagadas{names}",
             "close_blocked_bill_names": " ({list})",
@@ -3989,9 +3989,9 @@
                 "prior_first": "Close {prior} first — months close in order.",
                 "prior_first_cta": "Close {prior}",
                 "prior_done": "{month} closed.",
-                "inbox_first": "{count, plural, one {# line from {month} is still in your Inbox.} other {# lines from {month} are still in your Inbox.}}",
+                "inbox_first": "{count, plural, one {# transaction from {month} is still to sort.} other {# transactions from {month} are still to sort.}}",
                 "inbox_first_cta": "Sort them",
-                "inbox_first_reason": "Sort the Inbox first, then close.",
+                "inbox_first_reason": "Sort your transactions first, then close.",
                 "confirm_body": "You’ll see your score and carry what’s left into next month. A closed month can’t be changed.",
                 "bills_tail": "A closed month can’t be changed.",
                 "close_cta": "Close {month}",
@@ -4045,11 +4045,11 @@
                     "cta": "Add income"
                 },
                 "inbox": {
-                    "title": "{count, plural, one {# línea en tu Inbox — unos {minutes, plural, one {# minuto} other {# minutos}}.} other {# líneas en tu Inbox — unos {minutes, plural, one {# minuto} other {# minutos}}.}}",
-                    "cta": "Sort the Inbox"
+                    "title": "{count, plural, one {# transacción por ordenar — unos {minutes, plural, one {# minuto} other {# minutos}}.} other {# transacciones por ordenar — unos {minutes, plural, one {# minuto} other {# minutos}}.}}",
+                    "cta": "Sort transactions"
                 },
                 "week_check": {
-                    "title": "Inbox clear. Your week check is ready — ten minutes.",
+                    "title": "Everything is sorted. Your week check is ready — ten minutes.",
                     "cta": "Start week check"
                 },
                 "calm": {
@@ -4060,7 +4060,7 @@
                 "viewer": {
                     "close_prior": "{month} is ready to close.",
                     "no_transactions": "No spending added yet.",
-                    "inbox": "{count, plural, one {# línea esperando en el Inbox.} other {# líneas esperando en el Inbox.}}",
+                    "inbox": "{count, plural, one {# transacción esperando a ser ordenada.} other {# transacciones esperando a ser ordenadas.}}",
                     "week_check": "This week's check is still open.",
                     "close_month": "{month} se cierra en {days, plural, one {# día} other {# días}}."
                 },
@@ -4127,7 +4127,7 @@
                 "growth": {
                     "income_month": "INGRESOS DE ESTE MES",
                     "income_span": "INGRESOS A LO LARGO DEL PERÍODO",
-                    "inbox": "BANDEJA DE ENTRADA",
+                    "inbox": "TO SORT",
                     "tagline": "Toma las riendas de tu crecimiento: habilidades, objetivos e ingresos, si así lo deseas."
                 },
                 "energy": {
@@ -4213,7 +4213,7 @@
                     },
                     "spend": {
                         "title": "Spending finds its jar.",
-                        "body": "Bills draw from the right jar. Purchases land in your Inbox; sort them by hand or let a rule do it."
+                        "body": "Bills draw from the right jar. Purchases land in Transactions. Sort them by hand or let a rule do it."
                     },
                     "week": {
                         "title": "Ten minutes a week.",
@@ -4337,7 +4337,7 @@
             "portal_features": {
                 "money": {
                     "f1": "Seis tarros, tus porcentajes",
-                    "f2": "Bandeja de entrada: ordenada según reglas o manualmente",
+                    "f2": "Transactions — sorted by rule or by hand",
                     "f3": "Costes fijos que ya sabes que vas a tener",
                     "f4": "Plan de pago de la deuda con fecha de finalización",
                     "f5": "El resumen semanal · el balance mensual"
@@ -4384,7 +4384,7 @@
                 "soul_gratitude_label": "Gratitud · hoy",
                 "soul_intention_label": "Propósito · esta semana",
                 "screens": {
-                    "money": "Bandeja de entrada · esta semana",
+                    "money": "Transactions · this week",
                     "growth": "Objetivos · ingresos",
                     "energy": "Sueño · últimas 7 noches",
                     "soul": "Silencio · día 6"
@@ -4679,7 +4679,7 @@
                     "f5": "El entrenador, el control semanal, la puntuación mensual",
                     "f6": "1 plaza completa + 1 plaza de espectador (pareja, entrenador o asesor)",
                     "outcome": {
-                        "money": "Six jars, your Inbox and fixed costs",
+                        "money": "Six jars, your transactions and fixed costs",
                         "growth": "{maxGoals, plural, one {# goal} other {# goals}} and your income curve",
                         "energy": "Sleep, the floor under every decision",
                         "soul": "Stillness, gratitude, one intention a week"
@@ -5279,13 +5279,13 @@
                 "growth": "Crecimiento",
                 "energy": "Energía",
                 "soul": "Alma",
-                "more": "More"
+                "you": "You"
             },
             "children": {
                 "coach": "El entrenador",
                 "why": "Why Rumtelo",
                 "jars": "Tarros",
-                "inbox": "Inbox",
+                "transactions": "Transacciones",
                 "debt": "Deuda",
                 "fixed_costs": "Costes fijos",
                 "course": "Curso",
@@ -5305,19 +5305,20 @@
                 "intent": "Propósito",
                 "centers": "Centros"
             },
-            "more": {
-                "title": "More",
+            "you": {
+                "title": "You",
                 "close": "Close",
                 "settings": "Settings",
                 "help": "Help",
                 "go_to_practice": "Go to practice",
                 "back_to_practice": "Back to practice",
-                "preview_badge": "Preview",
-                "with_plan": "More with {plan}",
-                "with_plan_price": "{plan} · {price}/month",
-                "with_plus_line": "Course, your debt-free date, statement import",
-                "with_max_line": "Net worth and room for more people"
+                "preview_group": "Preview"
             },
+            "later_hint": {
+                "week_check": "Shows after your first week check.",
+                "month_close": "Shows after your first closed month."
+            },
+            "locked_hint": "Not in your plan. Opens the upgrade page.",
             "search": {
                 "course_today": "Course · Today",
                 "course_week": "Course · Week",
@@ -5336,7 +5337,7 @@
                 },
                 "row_aria": "Coming up: {next}",
                 "title": "Coming up",
-                "lead": "Rumtelo starts with your jars, Inbox and week check. More joins your menu as your board fills in.",
+                "lead": "Rumtelo starts with your jars, transactions and week check. More joins as your board fills in.",
                 "next_eyebrow": "Next",
                 "trigger": {
                     "week_check": "Do your first week check — ten minutes.",
@@ -5364,10 +5365,11 @@
                 "text": "{count, plural, one {New: {items} is now in your menu.} other {New: {items} are now in your menu.}}",
                 "dismiss": "Got it"
             },
-            "inbox_badge_sr": "{count, plural, one {# por ordenar} other {# por ordenar}}",
+            "to_sort_badge_sr": "{count} por ordenar",
             "aria": {
                 "mobile_tabs": "Main",
-                "money_sections": "Money sections"
+                "money_sections": "Money sections",
+                "growth_sections": "Growth sections"
             }
         },
         "onboarding": {
@@ -5753,7 +5755,7 @@
                     },
                     "between": {
                         "title": "Progress continues between sessions",
-                        "body": "The week check and The Coach’s small tips, like a bill still due or an Inbox to sort, keep clients moving without you chasing them. The Coach nudges. You guide the decisions."
+                        "body": "The week check and The Coach’s small tips, like a bill still due or transactions to sort, keep clients moving without you chasing them. The Coach nudges. You guide the decisions."
                     },
                     "yes": {
                         "title": "Their yes comes first",
@@ -6002,7 +6004,7 @@
             "panels": {
                 "start": {
                     "eyebrow": "Your start",
-                    "blurb": "New boards start with jars, the Inbox and the week check. The rest joins your menu after your first week check and your first closed month."
+                    "blurb": "New boards start with jars, transactions and the week check. The rest joins your menu after your first week check and your first closed month."
                 },
                 "profile": {
                     "eyebrow": "Perfil",
@@ -6133,11 +6135,11 @@
                 },
                 "coach": {
                     "eyebrow": "El entrenador",
-                    "blurb": "El Coach nunca regaña, solo aclara los siguientes pasos a seguir. Los consejos que aparecen en pantalla (líneas explicativas, tarjetas de inspiración) permanecen visibles mientras aprendes; la bandeja de entrada en Inicio → El Coach contiene tarjetas con consejos sobre dinero, crecimiento, energía y el alma.",
-                    "blurb_core": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the inbox at Home → The Coach holds tip cards across money and growth.",
+                    "blurb": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money, growth, energy, and soul.",
+                    "blurb_core": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money and growth.",
                     "toggle": "Mostrar «The Coach» en las pantallas",
-                    "hint_on": "En… busca el símbolo ✦ de «The Coach». La bandeja de entrada se encuentra en Inicio → The Coach.",
-                    "hint_off": "Desactivado: los consejos en pantalla están ocultos. La bandeja de entrada de Coach sigue estando disponible en cualquier momento."
+                    "hint_on": "On — look for the ✦ The Coach mark. Your tips stay at Home → The Coach.",
+                    "hint_off": "Off — on-screen tips hidden. Your tips are still at Home → The Coach anytime."
                 },
                 "jars_placement": {
                     "eyebrow": "Dónde se coloca cada tarro",
@@ -6201,7 +6203,7 @@
                     "linked_count": "{count} enlazado",
                     "none_linked": "Ninguno vinculado",
                     "empty_linked_title": "Aún no hay enlaces activos a entidades bancarias.",
-                    "empty_linked_body": "Conecta una entidad bancaria para que las transacciones se importen automáticamente a la bandeja de entrada.",
+                    "empty_linked_body": "Connect a bank to pull transactions in automatically.",
                     "connect_bank": "Conectar una entidad bancaria",
                     "capacity_usage_aria": "{used} de {max} enlaces a bancos",
                     "wizard_step_institution": "1 · Elige un banco",
@@ -6219,7 +6221,7 @@
                     "wizard_pick_seat_bank": "¿Qué cuenta {bank} debemos vincular?",
                     "wizard_no_matching_seats": "Aún no hay ninguna cuenta {bank}. Crea una a continuación: se asociará a ese banco.",
                     "wizard_authorize": "Continuar hacia la banca",
-                    "wizard_authorize_hint": "Saldrás de Rumtelo un momento para autorizar el acceso de solo lectura en el banco y, a continuación, volverás aquí.",
+                    "wizard_authorize_hint": "Next you leave Rumtelo briefly, sign in at the bank, and approve read-only access. We never move money. When you return, your transactions sync and wait under To sort.",
                     "wizard_authorize_what_1": "Solo lectura: únicamente saldos y movimientos.",
                     "wizard_authorize_what_2": "Puedes desactivar este enlace en cualquier momento en «Configuración».",
                     "wizard_authorize_what_3": "Una vez aprobada, realizaremos una sincronización y, a continuación, te redirigiremos aquí.",
@@ -6253,7 +6255,7 @@
                     "manual_eyebrow": "Cuentas manuales",
                     "manual_blurb": "La importación de archivos CSV siempre funciona. Elige un banco de la lista y, a continuación, añade la cuenta para que se reconozca durante la importación.",
                     "import_eyebrow": "Importar extracto",
-                    "import_blurb": "Prefiere CAMT.053 de tu banco. También MT940 o CSV. Tras importar, clasifica la bandeja y vincula costes fijos coincidentes.",
+                    "import_blurb": "Prefer CAMT.053 from your bank. MT940 or CSV work too. After import, sort what waits under To sort and link matching fixed costs.",
                     "account_label": "Etiqueta de la cuenta",
                     "account_label_hint": "Se muestra en los campos «Jar Seats» y en la importación CSV —por ejemplo, en la comprobación de operaciones—.",
                     "type": "Tipo",
@@ -6730,7 +6732,7 @@
                 },
                 "tx_import": {
                     "title": "Importar extracto bancario",
-                    "description": "Prefiere CAMT.053 de tu banco. Las filas llegan a Por clasificar — clasifícalas y vincula costes fijos cuando coincidan."
+                    "description": "Prefer CAMT.053 from your bank. Rows land in Transactions under To sort — sort them and link fixed costs when they match."
                 },
                 "tx_update": {
                     "title": "Editar transacción",

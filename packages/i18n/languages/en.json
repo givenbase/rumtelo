@@ -68,7 +68,7 @@
                     "party_already_suggested": "You already suggested this party to Rumtelo.",
                     "party_already_in_catalog": "This party is already linked to the Rumtelo catalog.",
                     "period_closed": "This month is closed — you cannot add or change anything for that period.",
-                    "month_close_incomplete": "Finish open work before closing this month ({inbox} unsorted in inbox, {bills} bills unpaid or unskipped).",
+                    "month_close_incomplete": "Finish open work before closing this month ({inbox} transactions to sort, {bills} bills unpaid or unskipped).",
                     "month_close_prior_open": "Close {period} first — months must be finished in order so the log stays honest.",
                     "month_close_bill_disposition": "Choose carry forward or skip for every unpaid bill before closing ({name}).",
                     "bill_arrears_threshold": "Register as debt only after {count} carried months — keep carrying or pay first.",
@@ -851,8 +851,8 @@
                     "cta": "Open fixed costs"
                 },
                 "inbox_unsorted": {
-                    "text": "{count} transactions wait in the inbox. Sort them into jars so the picture stays honest.",
-                    "cta": "Open inbox"
+                    "text": "{count} transactions are waiting to be sorted. Sort them into jars so the picture stays honest.",
+                    "cta": "Sort transactions"
                 },
                 "necessities_share": {
                     "text": "Necessities is at {pct}% — the goal is 55%. Fine for now; to close the gap, trim fixed costs or raise income and leave Freedom untouched.",
@@ -2664,7 +2664,7 @@
                 "sort_amount_high": "Highest amount",
                 "sort_amount_low": "Lowest amount",
                 "unassigned": "Unassigned",
-                "inbox_chip": "Inbox",
+                "inbox_chip": "To sort",
                 "rules_help": "First match wins, by priority. Dead rules (0 hits) can safely be deleted.",
                 "rule_if": "If {field} {matcher} “{value}”",
                 "rule_meta": "→ {jar} · prio {priority} · {hits}",
@@ -2725,9 +2725,9 @@
                     "toast_bank_mismatch": "Wrong account for this file — import blocked."
                 },
                 "rules_sign_in_title": "Sign in to manage rules.",
-                "rules_sign_in_body": "Rules automatically sort inbox transactions into the right jar.",
+                "rules_sign_in_body": "Rules automatically sort new transactions into the right jar.",
                 "rules_empty_title": "No rules yet.",
-                "rules_empty_body": "Choose “Always this” on an inbox item to teach a rule. Manage them here afterwards.",
+                "rules_empty_body": "Choose “Always this” on a transaction to sort to teach a rule. Manage them here afterwards.",
                 "toast_sorted": "Sorted and rule saved",
                 "toast_sorted_tx": "Transaction sorted",
                 "toast_sorted_fixed": "Sorted and linked to fixed cost",
@@ -2736,7 +2736,7 @@
                 "toast_rules_failed": "Apply rules failed",
                 "toast_rules_sorted_one": "{count} transaction sorted",
                 "toast_rules_sorted_other": "{count} transactions sorted",
-                "toast_rules_no_match": "No matches — inbox unchanged",
+                "toast_rules_no_match": "No matches — nothing changed",
                 "toast_rule_deleted": "Rule deleted",
                 "toast_delete_failed": "Delete failed",
                 "inbox_sort": {
@@ -2765,7 +2765,7 @@
                     "source_csv": "Statement import",
                     "source_bank": "Bank feed",
                     "source_recurring": "From a recurring plan",
-                    "status_inbox": "Waiting in inbox",
+                    "status_inbox": "Waiting to be sorted",
                     "status_sorted": "Sorted into a jar",
                     "status_ignored": "Ignored (not in budget maths)",
                     "hint_linked_settlement": "Linked settlement for this period",
@@ -2776,7 +2776,7 @@
                     "hint_applied_debt": "Applied to a debt balance",
                     "hint_manage_rules": "Manage rules on the Transactions page",
                     "hint_catalog_sorted": "No household rule matched — the merchant catalog placed this",
-                    "inbox_still": "Still in the inbox",
+                    "inbox_still": "Still to sort",
                     "inbox_assign_jar": "Assign a jar to include it in the budget",
                     "linked_debt_fallback": "Linked debt",
                     "hint_on_jar_planned": "On {jar} · planned {amount}",
@@ -3881,7 +3881,7 @@
                     "sections": {
                         "what_for": {
                             "heading": "What this is for",
-                            "body": "A snapshot of the current period: jars, inbox, what you already own, and how the month is tracking."
+                            "body": "A snapshot of the current period: jars, transactions to sort, what you already own, and how the month is tracking."
                         },
                         "how": {
                             "heading": "How it works",
@@ -3920,7 +3920,7 @@
                         },
                         "how": {
                             "heading": "How it works",
-                            "body": "Pick Out or In, say what it was, choose a jar, and save. Inbox items wait until you sort them. Edits update the same period’s available balance."
+                            "body": "Pick Out or In, say what it was, choose a jar, and save. Transactions to sort wait until you sort them. Edits update the same period’s available balance."
                         }
                     }
                 },
@@ -3953,10 +3953,10 @@
                 "overdue_days_other": "{count} days overdue",
                 "closed_badge": "Closed",
                 "closed_hint": "This month is closed — the score stays as it was, and nothing can be added or changed for this period.",
-                "close_explain": "Closing locks this score and freezes the month. Clear the inbox first; unpaid bills can be carried or skipped when you close.",
-                "close_explain_soon": "The month ends soon — clear the inbox, then carry or skip unpaid bills so you can close.",
-                "close_explain_today": "Today is the last day. Finish the inbox, then carry or skip unpaid bills and close.",
-                "close_explain_overdue": "This month is overdue to close. Finish the inbox, then carry or skip unpaid bills and close it.",
+                "close_explain": "Closing locks this score and freezes the month. Sort your transactions first; unpaid bills can be carried or skipped when you close.",
+                "close_explain_soon": "The month ends soon — sort your transactions, then carry or skip unpaid bills so you can close.",
+                "close_explain_today": "Today is the last day. Sort your transactions, then carry or skip unpaid bills and close.",
+                "close_explain_overdue": "This month is overdue to close. Sort your transactions, then carry or skip unpaid bills and close it.",
                 "travel_past_one": "{stamp} · about {money} through jars over {horizon} month",
                 "travel_past_other": "{stamp} · about {money} through jars over {horizon} months",
                 "travel_ahead_one": "By {stamp} · about {money} through jars over {horizon} month",
@@ -3973,8 +3973,8 @@
             "close_bills_roll_debt_hint": "After this carry ({count} months open), register it as a debt on Fixed costs — with collection fees and a payment plan if needed.",
             "close_bills_skip_hint": "This month won’t count — next month starts fresh at 1×.",
             "close_blocked_title": "Finish these before closing this month",
-            "close_blocked_inbox_one": "1 unsorted transaction in the inbox",
-            "close_blocked_inbox_other": "{count} unsorted transactions in the inbox",
+            "close_blocked_inbox_one": "1 transaction still to sort",
+            "close_blocked_inbox_other": "{count} transactions still to sort",
             "close_blocked_bills_one": "1 unpaid bill — choose carry or skip when you close{names}",
             "close_blocked_bills_other": "{count} unpaid bills — choose carry or skip when you close{names}",
             "close_blocked_bill_names": " ({list})",
@@ -3989,9 +3989,9 @@
                 "prior_first": "Close {prior} first — months close in order.",
                 "prior_first_cta": "Close {prior}",
                 "prior_done": "{month} closed.",
-                "inbox_first": "{count, plural, one {# line from {month} is still in your Inbox.} other {# lines from {month} are still in your Inbox.}}",
+                "inbox_first": "{count, plural, one {# transaction from {month} is still to sort.} other {# transactions from {month} are still to sort.}}",
                 "inbox_first_cta": "Sort them",
-                "inbox_first_reason": "Sort the Inbox first, then close.",
+                "inbox_first_reason": "Sort your transactions first, then close.",
                 "confirm_body": "You’ll see your score and carry what’s left into next month. A closed month can’t be changed.",
                 "bills_tail": "A closed month can’t be changed.",
                 "close_cta": "Close {month}",
@@ -4045,11 +4045,11 @@
                     "cta": "Add income"
                 },
                 "inbox": {
-                    "title": "{count, plural, one {# line in your Inbox — about {minutes, plural, one {# minute} other {# minutes}}.} other {# lines in your Inbox — about {minutes, plural, one {# minute} other {# minutes}}.}}",
-                    "cta": "Sort the Inbox"
+                    "title": "{count, plural, one {# transaction to sort — about {minutes, plural, one {# minute} other {# minutes}}.} other {# transactions to sort — about {minutes, plural, one {# minute} other {# minutes}}.}}",
+                    "cta": "Sort transactions"
                 },
                 "week_check": {
-                    "title": "Inbox clear. Your week check is ready — ten minutes.",
+                    "title": "Everything is sorted. Your week check is ready — ten minutes.",
                     "cta": "Start week check"
                 },
                 "calm": {
@@ -4060,7 +4060,7 @@
                 "viewer": {
                     "close_prior": "{month} is ready to close.",
                     "no_transactions": "No spending added yet.",
-                    "inbox": "{count, plural, one {# line waiting in the Inbox.} other {# lines waiting in the Inbox.}}",
+                    "inbox": "{count, plural, one {# transaction waiting to be sorted.} other {# transactions waiting to be sorted.}}",
                     "week_check": "This week's check is still open.",
                     "close_month": "{month} closes in {days, plural, one {# day} other {# days}}."
                 },
@@ -4127,7 +4127,7 @@
                 "growth": {
                     "income_month": "INCOME THIS MONTH",
                     "income_span": "INCOME OVER SPAN",
-                    "inbox": "INBOX",
+                    "inbox": "TO SORT",
                     "tagline": "Grip on your growth — skills, goals, income if you want."
                 },
                 "energy": {
@@ -4213,7 +4213,7 @@
                     },
                     "spend": {
                         "title": "Spending finds its jar.",
-                        "body": "Bills draw from the right jar. Purchases land in your Inbox; sort them by hand or let a rule do it."
+                        "body": "Bills draw from the right jar. Purchases land in Transactions. Sort them by hand or let a rule do it."
                     },
                     "week": {
                         "title": "Ten minutes a week.",
@@ -4337,7 +4337,7 @@
             "portal_features": {
                 "money": {
                     "f1": "Six jars, your percentages",
-                    "f2": "Inbox — sorted by rule or by hand",
+                    "f2": "Transactions — sorted by rule or by hand",
                     "f3": "Fixed costs you see coming",
                     "f4": "Debt plan with an end date",
                     "f5": "The week check · the month score"
@@ -4384,7 +4384,7 @@
                 "soul_gratitude_label": "Gratitude · today",
                 "soul_intention_label": "Intention · this week",
                 "screens": {
-                    "money": "Inbox · this week",
+                    "money": "Transactions · this week",
                     "growth": "Goals · income",
                     "energy": "Sleep · last 7 nights",
                     "soul": "Stillness · day 6"
@@ -4679,7 +4679,7 @@
                     "f5": "The Coach, the week check, the month score",
                     "f6": "1 full + 1 viewer seat (partner, coach or advisor)",
                     "outcome": {
-                        "money": "Six jars, your Inbox and fixed costs",
+                        "money": "Six jars, your transactions and fixed costs",
                         "growth": "{maxGoals, plural, one {# goal} other {# goals}} and your income curve",
                         "energy": "Sleep, the floor under every decision",
                         "soul": "Stillness, gratitude, one intention a week"
@@ -5279,13 +5279,13 @@
                 "growth": "Growth",
                 "energy": "Energy",
                 "soul": "Soul",
-                "more": "More"
+                "you": "You"
             },
             "children": {
                 "coach": "The Coach",
                 "why": "Why Rumtelo",
                 "jars": "Jars",
-                "inbox": "Inbox",
+                "transactions": "Transactions",
                 "debt": "Debt",
                 "fixed_costs": "Fixed costs",
                 "course": "Course",
@@ -5305,19 +5305,20 @@
                 "intent": "Intent",
                 "centers": "Centers"
             },
-            "more": {
-                "title": "More",
+            "you": {
+                "title": "You",
                 "close": "Close",
                 "settings": "Settings",
                 "help": "Help",
                 "go_to_practice": "Go to practice",
                 "back_to_practice": "Back to practice",
-                "preview_badge": "Preview",
-                "with_plan": "More with {plan}",
-                "with_plan_price": "{plan} · {price}/month",
-                "with_plus_line": "Course, your debt-free date, statement import",
-                "with_max_line": "Net worth and room for more people"
+                "preview_group": "Preview"
             },
+            "later_hint": {
+                "week_check": "Shows after your first week check.",
+                "month_close": "Shows after your first closed month."
+            },
+            "locked_hint": "Not in your plan. Opens the upgrade page.",
             "search": {
                 "course_today": "Course · Today",
                 "course_week": "Course · Week",
@@ -5336,7 +5337,7 @@
                 },
                 "row_aria": "Coming up: {next}",
                 "title": "Coming up",
-                "lead": "Rumtelo starts with your jars, Inbox and week check. More joins your menu as your board fills in.",
+                "lead": "Rumtelo starts with your jars, transactions and week check. More joins as your board fills in.",
                 "next_eyebrow": "Next",
                 "trigger": {
                     "week_check": "Do your first week check — ten minutes.",
@@ -5364,10 +5365,11 @@
                 "text": "{count, plural, one {New: {items} is now in your menu.} other {New: {items} are now in your menu.}}",
                 "dismiss": "Got it"
             },
-            "inbox_badge_sr": "{count, plural, one {# to sort} other {# to sort}}",
+            "to_sort_badge_sr": "{count} to sort",
             "aria": {
                 "mobile_tabs": "Main",
-                "money_sections": "Money sections"
+                "money_sections": "Money sections",
+                "growth_sections": "Growth sections"
             }
         },
         "onboarding": {
@@ -5753,7 +5755,7 @@
                     },
                     "between": {
                         "title": "Progress continues between sessions",
-                        "body": "The week check and The Coach’s small tips, like a bill still due or an Inbox to sort, keep clients moving without you chasing them. The Coach nudges. You guide the decisions."
+                        "body": "The week check and The Coach’s small tips, like a bill still due or transactions to sort, keep clients moving without you chasing them. The Coach nudges. You guide the decisions."
                     },
                     "yes": {
                         "title": "Their yes comes first",
@@ -6002,7 +6004,7 @@
             "panels": {
                 "start": {
                     "eyebrow": "Your start",
-                    "blurb": "New boards start with jars, the Inbox and the week check. The rest joins your menu after your first week check and your first closed month."
+                    "blurb": "New boards start with jars, transactions and the week check. The rest joins your menu after your first week check and your first closed month."
                 },
                 "profile": {
                     "eyebrow": "Profile",
@@ -6133,11 +6135,11 @@
                 },
                 "coach": {
                     "eyebrow": "The Coach",
-                    "blurb": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the inbox at Home → The Coach holds tip cards across money, growth, energy, and soul.",
-                    "blurb_core": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the inbox at Home → The Coach holds tip cards across money and growth.",
+                    "blurb": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money, growth, energy, and soul.",
+                    "blurb_core": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money and growth.",
                     "toggle": "Show The Coach on screens",
-                    "hint_on": "On — look for the ✦ The Coach mark. Inbox stays at Home → The Coach.",
-                    "hint_off": "Off — on-screen tips hidden. The Coach inbox still available anytime."
+                    "hint_on": "On — look for the ✦ The Coach mark. Your tips stay at Home → The Coach.",
+                    "hint_off": "Off — on-screen tips hidden. Your tips are still at Home → The Coach anytime."
                 },
                 "jars_placement": {
                     "eyebrow": "Where each jar sits",
@@ -6201,7 +6203,7 @@
                     "linked_count": "{count} linked",
                     "none_linked": "None linked",
                     "empty_linked_title": "No live bank links yet.",
-                    "empty_linked_body": "Connect a bank to pull transactions into the Inbox automatically.",
+                    "empty_linked_body": "Connect a bank to pull transactions in automatically.",
                     "connect_bank": "Connect a bank",
                     "capacity_usage_aria": "{used} of {max} bank links",
                     "wizard_step_institution": "1 · Choose bank",
@@ -6219,7 +6221,7 @@
                     "wizard_pick_seat_bank": "Which {bank} account should we link?",
                     "wizard_no_matching_seats": "No {bank} accounts yet. Create one below — it will be labelled for that bank.",
                     "wizard_authorize": "Continue to bank",
-                    "wizard_authorize_hint": "Next you leave Rumtelo briefly, sign in at the bank, and approve read-only access. We never move money. When you return, transactions sync into your Inbox.",
+                    "wizard_authorize_hint": "Next you leave Rumtelo briefly, sign in at the bank, and approve read-only access. We never move money. When you return, your transactions sync and wait under To sort.",
                     "wizard_authorize_what_1": "Read-only: balances and transactions only.",
                     "wizard_authorize_what_2": "You can disconnect this link any time in Settings.",
                     "wizard_authorize_what_3": "After approval we sync once, then return you here.",
@@ -6253,7 +6255,7 @@
                     "manual_eyebrow": "Manual accounts",
                     "manual_blurb": "CSV import and seats without live sync. These are separate from Open Banking links above.",
                     "import_eyebrow": "Statement file import",
-                    "import_blurb": "Prefer CAMT.053 from your bank. MT940 or CSV work too. After import, sort the Inbox and link matching fixed costs.",
+                    "import_blurb": "Prefer CAMT.053 from your bank. MT940 or CSV work too. After import, sort what waits under To sort and link matching fixed costs.",
                     "account_label": "Account label",
                     "account_label_hint": "Shown in jars and CSV — e.g. Operating checking, or Creditcard · t.n.v. Avery Chen.",
                     "type": "Type",
@@ -6730,7 +6732,7 @@
                 },
                 "tx_import": {
                     "title": "Import bank statement",
-                    "description": "Prefer CAMT.053 from your bank. Rows land in the Inbox — sort them and link fixed costs when they match."
+                    "description": "Prefer CAMT.053 from your bank. Rows land in Transactions under To sort — sort them and link fixed costs when they match."
                 },
                 "tx_update": {
                     "title": "Edit transaction",

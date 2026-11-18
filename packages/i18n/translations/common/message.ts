@@ -46,7 +46,7 @@ const message = {
             period_closed:
                 'This month is closed — you cannot add or change anything for that period.',
             month_close_incomplete:
-                'Finish open work before closing this month ({inbox} unsorted in inbox, {bills} bills unpaid or unskipped).',
+                'Finish open work before closing this month ({inbox} transactions to sort, {bills} bills unpaid or unskipped).',
             month_close_prior_open:
                 'Close {period} first — months must be finished in order so the log stays honest.',
             month_close_bill_disposition:

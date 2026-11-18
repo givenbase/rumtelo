@@ -8,21 +8,21 @@ import { cn } from '@rumtelo/utils';
 import type { NavTab, NavTabKey } from '@/app/_lib/nav';
 
 /**
- * Phone bottom tabs: Home · Money · Growth · More. Growth joins after the first week check
+ * Phone bottom tabs: Home · Money · Growth · You. Growth joins after the first week check
  * and a VIEWER never has it, so the bar is three cells until then.
  * The active tab is text-accent plus a 2 px top bar, so the state is never colour alone,
- * and links carry `aria-current="page"`. More is a button that opens the sheet.
+ * and links carry `aria-current="page"`. You is a button that opens the sheet (the phone version of the avatar menu).
  */
 export function BottomTabs({
     tabs,
     activeTab,
-    moreOpen,
-    onOpenMore,
+    youOpen,
+    onOpenYou,
 }: {
     tabs: readonly NavTab[];
     activeTab: NavTabKey | null;
-    moreOpen: boolean;
-    onOpenMore: () => void;
+    youOpen: boolean;
+    onOpenYou: () => void;
 }) {
     const t = useTranslations();
 
@@ -63,8 +63,8 @@ export function BottomTabs({
                             key={tab.key}
                             type="button"
                             aria-haspopup="dialog"
-                            aria-expanded={moreOpen}
-                            onClick={onOpenMore}
+                            aria-expanded={youOpen}
+                            onClick={onOpenYou}
                             className={className}>
                             {content}
                         </button>

@@ -269,7 +269,7 @@ const tour = {
             sections: {
                 what_for: {
                     heading: 'What this is for',
-                    body: 'A snapshot of the current period: jars, inbox, what you already own, and how the month is tracking.',
+                    body: 'A snapshot of the current period: jars, transactions to sort, what you already own, and how the month is tracking.',
                 },
                 how: {
                     heading: 'How it works',
@@ -308,7 +308,7 @@ const tour = {
                 },
                 how: {
                     heading: 'How it works',
-                    body: 'Pick Out or In, say what it was, choose a jar, and save. Inbox items wait until you sort them. Edits update the same period’s available balance.',
+                    body: 'Pick Out or In, say what it was, choose a jar, and save. Transactions to sort wait until you sort them. Edits update the same period’s available balance.',
                 },
             },
         },

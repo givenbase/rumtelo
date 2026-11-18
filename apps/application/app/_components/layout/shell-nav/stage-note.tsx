@@ -54,7 +54,7 @@ export function StageNote({
     /** Practice preview or "Show everything now": the whole board is already there. */
     suppressed: boolean;
     additionsSince: (from: BoardStage) => StageItem[];
-    /** Flips to true when the person opens More: they have seen the menu. */
+    /** Flips to true when the person opens You on a phone: they have looked at the menu. */
     dismissSignal: boolean;
 }) {
     const t = useTranslations();

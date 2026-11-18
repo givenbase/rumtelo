@@ -149,7 +149,7 @@ const settings = {
         /** Account tab: the "Show everything now" switch (labels reuse `pages.nav.show_all.*`). */
         start: {
             eyebrow: 'Your start',
-            blurb: 'New boards start with jars, the Inbox and the week check. The rest joins your menu after your first week check and your first closed month.',
+            blurb: 'New boards start with jars, transactions and the week check. The rest joins your menu after your first week check and your first closed month.',
         },
         profile: {
             eyebrow: 'Profile',
@@ -288,12 +288,13 @@ const settings = {
         },
         coach: {
             eyebrow: 'The Coach',
-            blurb: 'The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the inbox at Home → The Coach holds tip cards across money, growth, energy, and soul.',
+            blurb: 'The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money, growth, energy, and soul.',
             blurb_core:
-                'The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the inbox at Home → The Coach holds tip cards across money and growth.',
+                'The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money and growth.',
             toggle: 'Show The Coach on screens',
-            hint_on: 'On — look for the ✦ The Coach mark. Inbox stays at Home → The Coach.',
-            hint_off: 'Off — on-screen tips hidden. The Coach inbox still available anytime.',
+            hint_on: 'On — look for the ✦ The Coach mark. Your tips stay at Home → The Coach.',
+            hint_off:
+                'Off — on-screen tips hidden. Your tips are still at Home → The Coach anytime.',
         },
         jars_placement: {
             eyebrow: 'Where each jar sits',
@@ -358,7 +359,7 @@ const settings = {
             linked_count: '{count} linked',
             none_linked: 'None linked',
             empty_linked_title: 'No live bank links yet.',
-            empty_linked_body: 'Connect a bank to pull transactions into the Inbox automatically.',
+            empty_linked_body: 'Connect a bank to pull transactions in automatically.',
             connect_bank: 'Connect a bank',
             capacity_usage_aria: '{used} of {max} bank links',
             wizard_step_institution: '1 · Choose bank',
@@ -380,7 +381,7 @@ const settings = {
                 'No {bank} accounts yet. Create one below — it will be labelled for that bank.',
             wizard_authorize: 'Continue to bank',
             wizard_authorize_hint:
-                'Next you leave Rumtelo briefly, sign in at the bank, and approve read-only access. We never move money. When you return, transactions sync into your Inbox.',
+                'Next you leave Rumtelo briefly, sign in at the bank, and approve read-only access. We never move money. When you return, your transactions sync and wait under To sort.',
             wizard_authorize_what_1: 'Read-only: balances and transactions only.',
             wizard_authorize_what_2: 'You can disconnect this link any time in Settings.',
             wizard_authorize_what_3: 'After approval we sync once, then return you here.',
@@ -417,7 +418,7 @@ const settings = {
                 'CSV import and seats without live sync. These are separate from Open Banking links above.',
             import_eyebrow: 'Statement file import',
             import_blurb:
-                'Prefer CAMT.053 from your bank. MT940 or CSV work too. After import, sort the Inbox and link matching fixed costs.',
+                'Prefer CAMT.053 from your bank. MT940 or CSV work too. After import, sort what waits under To sort and link matching fixed costs.',
             account_label: 'Account label',
             account_label_hint:
                 'Shown in jars and CSV — e.g. Operating checking, or Creditcard · t.n.v. Avery Chen.',

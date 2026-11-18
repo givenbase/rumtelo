@@ -16,13 +16,13 @@ const dashboard = {
             'This month is closed — the score stays as it was, and nothing can be added or changed for this period.',
         /** Why close matters — shown while the period is still open. */
         close_explain:
-            'Closing locks this score and freezes the month. Clear the inbox first; unpaid bills can be carried or skipped when you close.',
+            'Closing locks this score and freezes the month. Sort your transactions first; unpaid bills can be carried or skipped when you close.',
         close_explain_soon:
-            'The month ends soon — clear the inbox, then carry or skip unpaid bills so you can close.',
+            'The month ends soon — sort your transactions, then carry or skip unpaid bills so you can close.',
         close_explain_today:
-            'Today is the last day. Finish the inbox, then carry or skip unpaid bills and close.',
+            'Today is the last day. Sort your transactions, then carry or skip unpaid bills and close.',
         close_explain_overdue:
-            'This month is overdue to close. Finish the inbox, then carry or skip unpaid bills and close it.',
+            'This month is overdue to close. Sort your transactions, then carry or skip unpaid bills and close it.',
         /** Compact period-travel note (lives here instead of a Coach slide). */
         travel_past_one: '{stamp} · about {money} through jars over {horizon} month',
         travel_past_other: '{stamp} · about {money} through jars over {horizon} months',
@@ -42,10 +42,10 @@ const dashboard = {
     close_bills_roll_debt_hint:
         'After this carry ({count} months open), register it as a debt on Fixed costs — with collection fees and a payment plan if needed.',
     close_bills_skip_hint: 'This month won’t count — next month starts fresh at 1×.',
-    /** Shown above Close when inbox / bills still open. */
+    /** Shown above Close when transactions / bills are still open. */
     close_blocked_title: 'Finish these before closing this month',
-    close_blocked_inbox_one: '1 unsorted transaction in the inbox',
-    close_blocked_inbox_other: '{count} unsorted transactions in the inbox',
+    close_blocked_inbox_one: '1 transaction still to sort',
+    close_blocked_inbox_other: '{count} transactions still to sort',
     close_blocked_bills_one: '1 unpaid bill — choose carry or skip when you close{names}',
     close_blocked_bills_other: '{count} unpaid bills — choose carry or skip when you close{names}',
     close_blocked_bill_names: ' ({list})',
@@ -58,16 +58,16 @@ const dashboard = {
     /** Toast after close — recap is the surplus/overspent line. */
     month_closed_toast: 'Month closed · {recap}',
     close_failed: 'Could not close month',
-    /** Close-month sheet opened from the Home next move (prior month first, then Inbox, then bills). */
+    /** Close-month sheet opened from the Home next move (prior month first, then transactions to sort, then bills). */
     close_flow: {
         title: 'Close {month}',
         prior_first: 'Close {prior} first — months close in order.',
         prior_first_cta: 'Close {prior}',
         prior_done: '{month} closed.',
         inbox_first:
-            '{count, plural, one {# line from {month} is still in your Inbox.} other {# lines from {month} are still in your Inbox.}}',
+            '{count, plural, one {# transaction from {month} is still to sort.} other {# transactions from {month} are still to sort.}}',
         inbox_first_cta: 'Sort them',
-        inbox_first_reason: 'Sort the Inbox first, then close.',
+        inbox_first_reason: 'Sort your transactions first, then close.',
         confirm_body:
             'You’ll see your score and carry what’s left into next month. A closed month can’t be changed.',
         bills_tail: 'A closed month can’t be changed.',
@@ -125,11 +125,11 @@ const dashboard = {
             cta: 'Add income',
         },
         inbox: {
-            title: '{count, plural, one {# line in your Inbox — about {minutes, plural, one {# minute} other {# minutes}}.} other {# lines in your Inbox — about {minutes, plural, one {# minute} other {# minutes}}.}}',
-            cta: 'Sort the Inbox',
+            title: '{count, plural, one {# transaction to sort — about {minutes, plural, one {# minute} other {# minutes}}.} other {# transactions to sort — about {minutes, plural, one {# minute} other {# minutes}}.}}',
+            cta: 'Sort transactions',
         },
         week_check: {
-            title: 'Inbox clear. Your week check is ready — ten minutes.',
+            title: 'Everything is sorted. Your week check is ready — ten minutes.',
             cta: 'Start week check',
         },
         calm: {
@@ -140,7 +140,7 @@ const dashboard = {
         viewer: {
             close_prior: '{month} is ready to close.',
             no_transactions: 'No spending added yet.',
-            inbox: '{count, plural, one {# line waiting in the Inbox.} other {# lines waiting in the Inbox.}}',
+            inbox: '{count, plural, one {# transaction waiting to be sorted.} other {# transactions waiting to be sorted.}}',
             week_check: "This week's check is still open.",
             close_month: '{month} closes in {days, plural, one {# day} other {# days}}.',
         },
@@ -211,7 +211,7 @@ const dashboard = {
         growth: {
             income_month: 'INCOME THIS MONTH',
             income_span: 'INCOME OVER SPAN',
-            inbox: 'INBOX',
+            inbox: 'TO SORT',
             tagline: 'Grip on your growth — skills, goals, income if you want.',
         },
         energy: {

@@ -566,7 +566,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Vul één keer je netto-inkomen in. Rumtelo verdeelt het over zes potjes, zodat elk bedrag een taak heeft vóór je uitgeeft.',
         'pages.landing.how_section.steps.spend.title': 'Uitgaven vinden hun potje.',
         'pages.landing.how_section.steps.spend.body':
-            'Vaste kosten gaan van het juiste potje af. Aankopen komen in je Inbox; sorteer ze zelf of laat een regel het doen.',
+            'Vaste kosten gaan van het juiste potje af. Aankopen komen in Transacties; sorteer ze zelf of laat een regel het doen.',
         'pages.landing.how_section.steps.week.title': 'Tien minuten per week.',
         'pages.landing.how_section.steps.week.body':
             'De weekcheck laat zien waar het bleef en wat er over is. Verschuif één bedrag, kies je focus voor volgende week, klaar.',
@@ -685,7 +685,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.landing.plans.basic.f5': 'De Coach, de weekcheck, de maandscore',
         'pages.landing.plans.basic.f6':
             '1 volledige plek + 1 kijkplek (partner, coach of adviseur)',
-        'pages.landing.plans.basic.outcome.money': 'Zes potjes, je Inbox en vaste kosten',
+        'pages.landing.plans.basic.outcome.money': 'Zes potjes, je transacties en vaste kosten',
         'pages.landing.plans.basic.outcome.growth':
             '{maxGoals, plural, one {# doel} other {# doelen}} en je inkomenscurve',
         'pages.landing.plans.basic.outcome.energy': 'Slaap, de basis onder elke beslissing',
@@ -729,7 +729,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.practice.clients.progress_blurb_core':
             'Live cijfers over geld en groei voor dit huishouden.',
         'pages.settings.panels.coach.blurb_core':
-            'De Coach geeft nooit een standje — alleen duidelijke volgende stappen. Tips op het scherm (waarom-regels, potjeskaarten) blijven aan terwijl je leert; de inbox onder Home → De Coach bevat tipkaarten over geld en groei.',
+            'De Coach geeft nooit een standje — alleen duidelijke volgende stappen. Tips op het scherm (waarom-regels, potjeskaarten) blijven aan terwijl je leert; de tiplijst onder Home → De Coach bevat tipkaarten over geld en groei.',
         'pages.settings.panels.sharing.blurb_core':
             'Wat leden mogen delen bij Groei en Geld. Alleen de eigenaar kan dit wijzigen. Iets voor jezelf houden kan altijd.',
         'pages.settings.panels.plan.card_basic_line':
@@ -834,10 +834,10 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Nog geen inkomen? Voeg het toe zodra het binnenkomt — je potjes verdelen het meteen.',
         'pages.dashboard.next_move.zero_income.cta': 'Inkomen toevoegen',
         'pages.dashboard.next_move.inbox.title':
-            '{count, plural, one {# regel in je Inbox — ongeveer {minutes, plural, one {# minuut} other {# minuten}}.} other {# regels in je Inbox — ongeveer {minutes, plural, one {# minuut} other {# minuten}}.}}',
-        'pages.dashboard.next_move.inbox.cta': 'Inbox sorteren',
+            '{count, plural, one {# transactie te sorteren — ongeveer {minutes, plural, one {# minuut} other {# minuten}}.} other {# transacties te sorteren — ongeveer {minutes, plural, one {# minuut} other {# minuten}}.}}',
+        'pages.dashboard.next_move.inbox.cta': 'Transacties sorteren',
         'pages.dashboard.next_move.week_check.title':
-            'Inbox leeg. Je weekcheck staat klaar — tien minuten.',
+            'Alles gesorteerd. Je weekcheck staat klaar — tien minuten.',
         'pages.dashboard.next_move.week_check.cta': 'Weekcheck starten',
         // Pinned in the Clarity 2 design: "bedrag" in both (the euro line has no NL twin).
         'pages.dashboard.next_move.calm.title':
@@ -848,7 +848,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.dashboard.next_move.viewer.close_prior': '{month} staat klaar om af te sluiten.',
         'pages.dashboard.next_move.viewer.no_transactions': 'Nog geen uitgaven toegevoegd.',
         'pages.dashboard.next_move.viewer.inbox':
-            '{count, plural, one {# regel wacht in de Inbox.} other {# regels wachten in de Inbox.}}',
+            '{count, plural, one {# transactie wacht om gesorteerd te worden.} other {# transacties wachten om gesorteerd te worden.}}',
         'pages.dashboard.next_move.viewer.week_check': 'De weekcheck van deze week staat nog open.',
         'pages.dashboard.next_move.viewer.close_month':
             '{month} wordt over {days, plural, one {# dag} other {# dagen}} afgesloten.',
@@ -908,27 +908,12 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.onboarding.step_of': '{current} van {total}',
         'pages.onboarding.banks_setup.read_only_link': 'Bankinstellingen openen',
         // Navigation: Meer tab and sheet.
-        'pages.nav.pills.more': 'Meer',
         'pages.nav.children.why': 'Waarom Rumtelo',
         'pages.nav.children.jars': 'Potjes',
         'pages.nav.children.net_worth': 'Nettovermogen',
-        'pages.nav.more.title': 'Meer',
-        'pages.nav.more.close': 'Sluiten',
-        'pages.nav.more.settings': 'Instellingen',
-        'pages.nav.more.help': 'Hulp',
-        'pages.nav.more.go_to_practice': 'Naar je praktijk',
-        'pages.nav.more.back_to_practice': 'Terug naar je praktijk',
-        'pages.nav.more.preview_badge': 'Preview',
-        'pages.nav.more.with_plan': 'Meer met {plan}',
-        'pages.nav.more.with_plan_price': '{plan} · {price}/maand',
-        'pages.nav.more.with_plus_line':
-            'Koers, je schuldenvrij-datum en bankafschriften importeren',
-        'pages.nav.more.with_max_line': 'Nettovermogen en ruimte voor meer mensen',
         'pages.nav.search.course_today': 'Koers · Vandaag',
         'pages.nav.search.course_week': 'Koers · Week',
         'pages.nav.search.course_goals': 'Koers · Doelen',
-        'pages.nav.inbox_badge_sr':
-            '{count, plural, one {# om te sorteren} other {# om te sorteren}}',
         'pages.nav.aria.mobile_tabs': 'Hoofdmenu',
         'pages.nav.aria.money_sections': 'Onderdelen van Geld',
         // Locks that explain the gain. "Overstappen", never "Probeer" (no trial).
@@ -1094,7 +1079,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.money.transactions.statement_import.after_import':
             'Regels landen bij Te sorteren. Koppel aan potjes — en aan vaste kosten als de tegenpartij matcht.',
         'features.money.transactions.rules_sign_in_body':
-            'Regels sorteren transacties in de inbox automatisch in het juiste potje.',
+            'Regels sorteren nieuwe transacties automatisch in het juiste potje.',
         'features.money.transactions.detail.status_sorted': 'In een potje gedaan',
         'features.money.transactions.detail.rule_to_jar': '"{value}" → potje',
         'features.money.holding_link.hint':
@@ -1347,7 +1332,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.nav.coming_up.row_aria': 'Binnenkort: {next}',
         'pages.nav.coming_up.title': 'Binnenkort',
         'pages.nav.coming_up.lead':
-            'Rumtelo begint met je potjes, Inbox en weekcheck. De rest komt in je menu naarmate je overzicht zich vult.',
+            'Rumtelo begint met je potjes, transacties en weekcheck. De rest komt erbij naarmate je overzicht zich vult.',
         'pages.nav.coming_up.next_eyebrow': 'Hierna',
         'pages.nav.coming_up.trigger.week_check': 'Doe je eerste weekcheck — tien minuten.',
         'pages.nav.coming_up.trigger.month_close': 'Sluit je eerste maand af.',
@@ -1371,7 +1356,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.nav.stage_note.dismiss': 'Begrepen',
         'pages.settings.panels.start.eyebrow': 'Je start',
         'pages.settings.panels.start.blurb':
-            'Nieuwe borden beginnen met potjes, de Inbox en de weekcheck. De rest komt in je menu na je eerste weekcheck en je eerste afgesloten maand.',
+            'Nieuwe borden beginnen met potjes, transacties en de weekcheck. De rest komt in je menu na je eerste weekcheck en je eerste afgesloten maand.',
         'pages.shell.quick_add.ask_placeholder': 'Zoek in De Coach of naar een pagina…',
         'pages.shell.quick_add.search_label_ask': 'Zoek pagina’s en De Coach',
         'pages.shell.quick_add.search_label_add': 'Filter wat je wilt toevoegen',
@@ -1390,10 +1375,10 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.dashboard.close_flow.prior_first_cta': '{prior} afsluiten',
         'pages.dashboard.close_flow.prior_done': '{month} is afgesloten.',
         'pages.dashboard.close_flow.inbox_first':
-            '{count, plural, one {# regel uit {month} staat nog in je Inbox.} other {# regels uit {month} staan nog in je Inbox.}}',
+            '{count, plural, one {# transactie uit {month} is nog te sorteren.} other {# transacties uit {month} zijn nog te sorteren.}}',
         'pages.dashboard.close_flow.inbox_first_cta': 'Sorteer ze',
         'pages.dashboard.close_flow.inbox_first_reason':
-            'Sorteer eerst de Inbox en sluit daarna af.',
+            'Sorteer eerst je transacties en sluit daarna af.',
         'pages.dashboard.close_flow.confirm_body':
             'Je ziet je score en neemt wat over is mee naar volgende maand. Een afgesloten maand kun je niet meer wijzigen.',
         'pages.dashboard.close_flow.bills_tail': 'Een afgesloten maand kun je niet meer wijzigen.',
@@ -1446,7 +1431,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Je cliënten houden zes potjes, hun vaste kosten en een weekcheck van tien minuten bij. Jij opent hun bord en begint waar zij staan.',
         'pages.practices.proof.points.between.title': 'De voortgang gaat door tussen sessies',
         'pages.practices.proof.points.between.body':
-            'De weekcheck en de kleine tips van De Coach, zoals een rekening die nog openstaat of een Inbox om te sorteren, houden cliënten in beweging zonder dat jij erachteraan hoeft. De Coach tipt. Jij begeleidt de keuzes.',
+            'De weekcheck en de kleine tips van De Coach, zoals een rekening die nog openstaat of transacties om te sorteren, houden cliënten in beweging zonder dat jij erachteraan hoeft. De Coach tipt. Jij begeleidt de keuzes.',
         'pages.practices.proof.points.yes.title': 'Hun ja komt eerst',
         'pages.practices.proof.points.yes.body':
             'Er wordt niets gedeeld tot de cliënt accepteert, en beide kanten kunnen het beëindigen. Rustig voor hen, helder voor jou.',
@@ -1492,6 +1477,65 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.practices.closing.headline': 'Klaar om te zien waar je cliënten staan?',
         'pages.practices.closing.lead':
             'Start een praktijk, nodig je eerste cliënt uit en open hun bord zodra ze ja zeggen.',
+        // Inbox reads as email: the list is Transactions, the count is "Te sorteren"; You = Jij.
+        'common.message.error.api.month_close_incomplete':
+            'Rond eerst het openstaande werk af voordat je deze maand afsluit ({inbox} transacties om te sorteren, {bills} rekeningen onbetaald of niet overgeslagen).',
+        'features.coach.money_coach.inbox_unsorted.text':
+            '{count} transacties wachten om gesorteerd te worden. Sorteer ze in potjes, dan blijft het beeld eerlijk.',
+        'features.coach.money_coach.inbox_unsorted.cta': 'Transacties sorteren',
+        'features.money.transactions.tab_inbox': 'Te sorteren',
+        'features.money.transactions.inbox_chip': 'Te sorteren',
+        'features.money.transactions.rules_empty_body':
+            'Kies “Altijd dit” bij een transactie die je nog moet sorteren om een regel aan te leren. Daarna beheer je ze hier.',
+        'features.money.transactions.toast_rules_no_match': 'Geen overeenkomsten — niets gewijzigd',
+        'features.money.transactions.detail.status_inbox': 'Wacht om gesorteerd te worden',
+        'features.money.transactions.detail.inbox_still': 'Nog te sorteren',
+        'features.tour.pages.overview.sections.what_for.body':
+            'Een momentopname van de huidige periode: potjes, transacties om te sorteren, wat je al bezit en hoe de maand verloopt.',
+        'features.tour.pages.transactions.sections.how.body':
+            'Kies Uit of In, zeg wat het was, kies een potje en bewaar. Transacties om te sorteren blijven wachten tot je ze sorteert. Wijzigingen werken het beschikbare saldo van dezelfde periode bij.',
+        'pages.dashboard.month_score.close_explain':
+            'Afsluiten vergrendelt deze score en bevriest de maand. Sorteer eerst je transacties; onbetaalde rekeningen kun je bij het afsluiten doorschuiven of overslaan.',
+        'pages.dashboard.month_score.close_explain_soon':
+            'De maand eindigt binnenkort — sorteer je transacties en schuif onbetaalde rekeningen daarna door of sla ze over, zodat je kunt afsluiten.',
+        'pages.dashboard.month_score.close_explain_today':
+            'Vandaag is de laatste dag. Sorteer je transacties, schuif onbetaalde rekeningen door of sla ze over en sluit af.',
+        'pages.dashboard.month_score.close_explain_overdue':
+            'Deze maand had al afgesloten moeten zijn. Sorteer je transacties, schuif onbetaalde rekeningen door of sla ze over en sluit af.',
+        'pages.dashboard.close_blocked_inbox_one': '1 transactie nog te sorteren',
+        'pages.dashboard.close_blocked_inbox_other': '{count} transacties nog te sorteren',
+        'pages.dashboard.widgets.growth.inbox': 'TE SORTEREN',
+        'pages.landing.portal_features.money.f2':
+            'Transacties — gesorteerd door een regel of met de hand',
+        'pages.landing.portal_demo.screens.money': 'Transacties · deze week',
+        'pages.nav.pills.you': 'Jij',
+        'pages.nav.children.transactions': 'Transacties',
+        'pages.nav.you.title': 'Jij',
+        'pages.nav.you.close': 'Sluiten',
+        'pages.nav.you.settings': 'Instellingen',
+        'pages.nav.you.help': 'Hulp',
+        'pages.nav.you.go_to_practice': 'Naar je praktijk',
+        'pages.nav.you.back_to_practice': 'Terug naar je praktijk',
+        'pages.nav.you.preview_group': 'Preview',
+        'pages.nav.later_hint.week_check': 'Komt na je eerste weekcheck.',
+        'pages.nav.later_hint.month_close': 'Komt na je eerste afgesloten maand.',
+        'pages.nav.locked_hint': 'Niet in je abonnement. Opent de upgradepagina.',
+        'pages.nav.to_sort_badge_sr': '{count} te sorteren',
+        'pages.nav.aria.growth_sections': 'Onderdelen van Groei',
+        'pages.settings.panels.coach.blurb':
+            'De Coach geeft nooit een standje — alleen duidelijke volgende stappen. Tips op het scherm (waarom-regels, potjeskaarten) blijven aan terwijl je leert; de tiplijst onder Home → De Coach bevat tipkaarten over geld, groei, energie en ziel.',
+        'pages.settings.panels.coach.hint_on':
+            'Aan — zoek het ✦ De Coach-teken. Je tips staan onder Home → De Coach.',
+        'pages.settings.panels.coach.hint_off':
+            'Uit — tips op het scherm verborgen. Je tips staan altijd onder Home → De Coach.',
+        'pages.settings.panels.bank.empty_linked_body':
+            'Koppel een bank om transacties automatisch binnen te halen.',
+        'pages.settings.panels.bank.wizard_authorize_hint':
+            'Straks verlaat je Rumtelo even, log je in bij de bank en geef je alleen-lezen toegang. We verplaatsen nooit geld. Als je terugkomt, worden je transacties gesynchroniseerd en wachten ze onder Te sorteren.',
+        'pages.settings.panels.bank.import_blurb':
+            'Liever CAMT.053 van je bank. MT940 of CSV werkt ook. Sorteer na het importeren wat onder Te sorteren wacht en koppel passende vaste kosten.',
+        'pages.shell.forms.tx_import.description':
+            'Liever CAMT.053 van je bank. Rijen komen in Transacties onder Te sorteren — sorteer ze en koppel vaste kosten als ze overeenkomen.',
     },
     es: {
         // Kept as translated before: the generator without a DeepL key would drop them to English.
@@ -1501,16 +1545,16 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Solo un objetivo anual, trimestral o mensual puede ser personal o profesional',
         // ICU plurals are skipped by DeepL; pinned so they do not stay English.
         'pages.dashboard.next_move.inbox.title':
-            '{count, plural, one {# línea en tu Inbox — unos {minutes, plural, one {# minuto} other {# minutos}}.} other {# líneas en tu Inbox — unos {minutes, plural, one {# minuto} other {# minutos}}.}}',
+            '{count, plural, one {# transacción por ordenar — unos {minutes, plural, one {# minuto} other {# minutos}}.} other {# transacciones por ordenar — unos {minutes, plural, one {# minuto} other {# minutos}}.}}',
         'pages.dashboard.next_move.viewer.inbox':
-            '{count, plural, one {# línea esperando en el Inbox.} other {# líneas esperando en el Inbox.}}',
+            '{count, plural, one {# transacción esperando a ser ordenada.} other {# transacciones esperando a ser ordenadas.}}',
         'pages.dashboard.next_move.viewer.close_month':
             '{month} se cierra en {days, plural, one {# día} other {# días}}.',
         'pages.dashboard.checklist.title':
             '{count, plural, one {Una cosa pequeña, cuando te venga bien.} other {# cosas pequeñas, cuando te vengan bien.}}',
-        'pages.nav.inbox_badge_sr': '{count, plural, one {# por ordenar} other {# por ordenar}}',
         'pages.shell.plan_gains.bank_links':
             '{count, plural, one {# conexión bancaria} other {# conexiones bancarias}}',
+        'pages.nav.to_sort_badge_sr': '{count} por ordenar',
     },
     fr: {
         // Kept as translated before: the generator without a DeepL key would drop them to English.
@@ -1520,15 +1564,15 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Seul un objectif annuel, trimestriel ou mensuel peut être personnel ou professionnel',
         // ICU plurals are skipped by DeepL; pinned so they do not stay English.
         'pages.dashboard.next_move.inbox.title':
-            '{count, plural, one {# ligne dans ton Inbox — environ {minutes, plural, one {# minute} other {# minutes}}.} other {# lignes dans ton Inbox — environ {minutes, plural, one {# minute} other {# minutes}}.}}',
+            '{count, plural, one {# transaction à trier — environ {minutes, plural, one {# minute} other {# minutes}}.} other {# transactions à trier — environ {minutes, plural, one {# minute} other {# minutes}}.}}',
         'pages.dashboard.next_move.viewer.inbox':
-            '{count, plural, one {# ligne en attente dans l’Inbox.} other {# lignes en attente dans l’Inbox.}}',
+            '{count, plural, one {# transaction en attente de tri.} other {# transactions en attente de tri.}}',
         'pages.dashboard.next_move.viewer.close_month':
             '{month} se clôture dans {days, plural, one {# jour} other {# jours}}.',
         'pages.dashboard.checklist.title':
             '{count, plural, one {Une petite chose, quand ça t’arrange.} other {# petites choses, quand ça t’arrange.}}',
-        'pages.nav.inbox_badge_sr': '{count, plural, one {# à trier} other {# à trier}}',
         'pages.shell.plan_gains.bank_links':
             '{count, plural, one {# connexion bancaire} other {# connexions bancaires}}',
+        'pages.nav.to_sort_badge_sr': '{count} à trier',
     },
 };

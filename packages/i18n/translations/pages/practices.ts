@@ -44,7 +44,7 @@ const practices = {
             },
             between: {
                 title: 'Progress continues between sessions',
-                body: 'The week check and The Coach’s small tips, like a bill still due or an Inbox to sort, keep clients moving without you chasing them. The Coach nudges. You guide the decisions.',
+                body: 'The week check and The Coach’s small tips, like a bill still due or transactions to sort, keep clients moving without you chasing them. The Coach nudges. You guide the decisions.',
             },
             yes: {
                 title: 'Their yes comes first',
