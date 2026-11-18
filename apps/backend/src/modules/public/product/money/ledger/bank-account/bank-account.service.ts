@@ -9,13 +9,26 @@ import { isValidIban, normalizeIban } from '@rumtelo/utils';
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { Bank } from '../../../../../backoffice/product/money/catalog/bank/bank.entity';
+import { IncomeService } from '../../plan/income/income.service';
+import { JarService } from '../../plan/jar/jar.service';
 
 import { BankAccount } from './bank-account.entity';
+
+/** Account kinds that can carry jars and income (a credit card cannot be the main seat). */
+const PLACEMENT_KINDS = new Set<AccountKind>([
+    AccountKind.CHECKING,
+    AccountKind.SAVINGS,
+    AccountKind.CASH,
+]);
 
 @Injectable()
 export class BankAccountService {
     private readonly repo: HouseholdScopedRepository<BankAccount>;
-    constructor(@Inject(EntityManager) private readonly em: EntityManager) {
+    constructor(
+        @Inject(EntityManager) private readonly em: EntityManager,
+        @Inject(JarService) private readonly jars: JarService,
+        @Inject(IncomeService) private readonly incomes: IncomeService
+    ) {
         this.repo = new HouseholdScopedRepository(em, BankAccount);
     }
 
@@ -28,7 +41,7 @@ export class BankAccountService {
         iban?: string | null;
         kind: AccountKind;
         balance: number;
-        bankId: string;
+        bankId?: string | null;
         settlementAccountId?: string | null;
         isPrimary?: boolean;
     }) {
@@ -39,7 +52,7 @@ export class BankAccountService {
         if (iban && (await this.repo.findOne({ iban }))) {
             throw apiConflict('iban_already_linked');
         }
-        const bank = await this.requireBank(input.bankId);
+        const bank = input.bankId ? await this.requireBank(input.bankId) : null;
         const settlementAccount =
             input.kind === AccountKind.CREDIT
                 ? await this.resolveSettlement(input.settlementAccountId)
@@ -58,6 +71,14 @@ export class BankAccountService {
             isPrimary: makePrimary,
         } as never);
         await this.em.persist(account).flush();
+        // The household's first spendable account becomes its one main account: every jar
+        // and income source that has no seat yet moves onto it. Later accounts never
+        // re-place anything. A second "first" account at the same moment loses on the
+        // one-primary unique index instead of placing twice.
+        if (existing.length === 0 && PLACEMENT_KINDS.has(input.kind)) {
+            await this.jars.placeUnplaced(account.id);
+            await this.incomes.linkUnlinkedTo(account.id, account.bank?.id ?? null);
+        }
         return toDto(account);
     }
 
@@ -80,7 +101,7 @@ export class BankAccountService {
         name?: string;
         iban?: string | null;
         kind?: AccountKind;
-        bankId?: string;
+        bankId?: string | null;
         settlementAccountId?: string | null;
         isPrimary?: boolean;
     }) {
@@ -95,7 +116,14 @@ export class BankAccountService {
             account.kind = input.kind;
             if (account.kind !== AccountKind.CREDIT) account.settlementAccount = null;
         }
-        if (input.bankId !== undefined) account.bank = await this.requireBank(input.bankId);
+        if (input.bankId !== undefined) {
+            // Null is only for creating the bankless Main account. Clearing the bank of an
+            // account that has one (or is linked) would blind the statement-bank guard.
+            if (!input.bankId && (account.bank || account.connectionId)) {
+                throw apiBadRequest('bank_required');
+            }
+            account.bank = input.bankId ? await this.requireBank(input.bankId) : null;
+        }
         if (input.settlementAccountId !== undefined) {
             account.settlementAccount = await this.resolveSettlement(
                 input.settlementAccountId,
@@ -216,7 +244,7 @@ export function toDto(account: BankAccount) {
         iban: account.iban,
         kind: account.kind,
         balance: account.balance,
-        bankId: account.bank.id,
+        bankId: account.bank?.id ?? null,
         settlementAccountId: account.settlementAccount?.id ?? null,
         connectionId: account.connectionId,
         lastSyncedAt: account.lastSyncedAt?.toISOString() ?? null,

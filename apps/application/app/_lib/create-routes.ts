@@ -6,7 +6,7 @@ export const CREATE_HREF = {
     importStatement: productPath('money/transactions/import'),
     fixed: productPath('money/fixed-costs/create'),
     debt: productPath('money/debt/create'),
-    income: productPath('growth/income/create'),
+    income: productPath('money/income/create'),
     goal: productPath('growth/goals/create'),
     session: productPath('energy/training/create'),
     asset: productPath('money/net-worth/create'),
@@ -143,7 +143,7 @@ export function updateHref(
         case 'debt':
             return productPath(`money/debt/update/${id}`);
         case 'income':
-            return productPath(`growth/income/update/${id}`);
+            return productPath(`money/income/update/${id}`);
         case 'goal':
             return productPath(`growth/goals/update/${id}`);
         case 'asset':

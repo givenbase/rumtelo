@@ -37,8 +37,9 @@ import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { CAPABILITIES, lockCopyFor, memberLimitLabel, planLabel } from '@/app/_lib/plan';
 import { isLiveData } from '@/app/_lib/preview';
-import { canInviteWithRole } from '@/app/_lib/role-permissions';
+import { canInviteWithRole, canRemoveMemberWithRole } from '@/app/_lib/role-permissions';
 import { settingsHref } from '@/app/_lib/settings-tabs';
+import { ConfirmActionButton } from '@/components/features/forms/confirm-action-button';
 import { SeatCapacitySummary } from '@/components/features/shell/seat-capacity-summary';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -106,22 +107,33 @@ export function HouseholdSettings() {
     const myMember = members.find(member => member.userId === user?.id);
     const myRole = myMember?.role ?? HouseholdRole.VIEWER;
     const roleCanInvite = canInviteWithRole(myRole);
+    // Seats as the server counts them: pending invitations hold a seat too.
+    const seatsQuery = useLiveQuery(
+        apiQuery.household.seats.queryOptions({ input: { householdId: householdId! } }),
+        null,
+        live && roleCanInvite
+    );
+    const seatUsage = seatsQuery.isError ? null : seatsQuery.data;
+    const seatWritable = seatUsage?.writableUsed ?? writableCount;
+    const seatViewers = seatUsage?.viewerUsed ?? viewerCount;
+    const seatOccupied = seatUsage ? seatWritable + seatViewers : memberCount;
+    const roleCanRemove = canRemoveMemberWithRole(myRole);
     const invitesAllowed = canInviteOnPlan(activePlan);
     const canInviteMember = planAllowsInviteRole(activePlan, HouseholdRole.MEMBER, seatExtras);
     const canInviteViewer = planAllowsInviteRole(activePlan, HouseholdRole.VIEWER, seatExtras);
     const inviteRole = useWatch({ control: inviteForm.control, name: 'role' });
     const inviteRelation = useWatch({ control: inviteForm.control, name: 'relation' });
     const seatOpen = canAddHouseholdMember(activePlan, {
-        occupiedSeats: memberCount,
-        writableCount,
-        viewerCount,
+        occupiedSeats: seatOccupied,
+        writableCount: seatWritable,
+        viewerCount: seatViewers,
         role: inviteRole ?? HouseholdRole.VIEWER,
         extras: seatExtras,
     });
     const seatCapacity = useSeatCapacity(activePlan, {
-        occupiedSeats: memberCount,
-        writableCount,
-        viewerCount,
+        occupiedSeats: seatOccupied,
+        writableCount: seatWritable,
+        viewerCount: seatViewers,
         extras: seatExtras,
     });
     const inviteCopy = lockCopyFor(CAPABILITIES.platformInvite, PlanKey.BASIC, t);
@@ -137,7 +149,7 @@ export function HouseholdSettings() {
                 relation: values.relation,
             });
         },
-        invalidateKeys: [apiQuery.household.members.key()],
+        invalidateKeys: [apiQuery.household.members.key(), apiQuery.household.seats.key()],
         successMessage: t('pages.settings.toasts.invitation_sent'),
         onSuccess: () =>
             inviteForm.reset({
@@ -145,6 +157,15 @@ export function HouseholdSettings() {
                 role: canInviteViewer ? HouseholdRole.VIEWER : HouseholdRole.MEMBER,
                 relation: HouseholdRelation.FAMILY,
             }),
+    });
+
+    const removeMember = useSettingsMutation({
+        mutationFn: async (memberId: string) => {
+            if (!householdId) throw new Error('No household');
+            return api.household.removeMember({ householdId, memberId });
+        },
+        invalidateKeys: [apiQuery.household.members.key(), apiQuery.household.seats.key()],
+        successMessage: t('pages.settings.toasts.member_removed'),
     });
 
     const saveSpendingStyle = useSettingsMutation({
@@ -236,6 +257,28 @@ export function HouseholdSettings() {
                                                     `pages.settings.panels.household.invite_relation_${member.relation.toLowerCase()}`
                                                 )}
                                             </span>
+                                        ) : null}
+                                        {roleCanRemove &&
+                                        live &&
+                                        member.role !== HouseholdRole.OWNER &&
+                                        member.userId !== user?.id ? (
+                                            <ConfirmActionButton
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-7 px-2 text-xs text-danger hover:bg-danger/10 hover:text-danger"
+                                                disabled={removeMember.isPending}
+                                                pending={
+                                                    removeMember.isPending &&
+                                                    removeMember.variables === member.id
+                                                }
+                                                label={t(
+                                                    'pages.settings.panels.household.remove_member'
+                                                )}
+                                                confirmLabel={t(
+                                                    'pages.settings.panels.household.remove_member_confirm'
+                                                )}
+                                                onConfirm={() => removeMember.mutate(member.id)}
+                                            />
                                         ) : null}
                                     </div>
                                 </li>

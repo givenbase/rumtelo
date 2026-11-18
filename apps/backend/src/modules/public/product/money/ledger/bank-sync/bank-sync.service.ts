@@ -2,6 +2,7 @@ import { RequestContext } from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
+import { HouseholdAccessSource } from '@rumtelo/contracts';
 import { BANK_SYNC_OAUTH_CALLBACK_PATH } from '@rumtelo/contracts/money';
 import { normalizeIban } from '@rumtelo/utils';
 
@@ -174,6 +175,8 @@ export class BankSyncService {
                         userId: 'system:bank-sync',
                         householdId: account.household,
                         role: 'OWNER',
+                        source: HouseholdAccessSource.SEAT,
+                        relation: null,
                     },
                     async () => {
                         try {

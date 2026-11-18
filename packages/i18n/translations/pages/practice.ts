@@ -118,6 +118,7 @@ const practice = {
         access_eyebrow: 'Access',
         progress_eyebrow: 'Portal snapshot',
         progress_blurb: 'Live money, growth, energy, and soul metrics for this household.',
+        progress_blurb_core: 'Live money and growth metrics for this household.',
         progress_pending: 'Waiting for the household to accept the invitation.',
         progress_view_only:
             'View access — invite accepted. Switch to Manage to sponsor their Plus plan.',

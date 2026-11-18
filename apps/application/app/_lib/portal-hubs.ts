@@ -22,24 +22,7 @@ export function moneyPortalShell(t: TranslateFn): PortalShell {
             kind: t('features.money.hub.fallback_coach_kind'),
             text: t('features.money.hub.fallback_coach_text'),
             cta: t('features.money.hub.fallback_coach_cta'),
-            href: '/product/growth/income',
-        },
-    };
-}
-
-export function growthPortalShell(t: TranslateFn): PortalShell {
-    return {
-        tint: 'var(--color-jar-lts)',
-        icon: '↗',
-        eyebrow: t('features.growth.hub.eyebrow'),
-        title: t('features.growth.hub.title'),
-        line: t('features.growth.hub.line'),
-        fallbackCoach: {
-            dot: 'var(--color-accent)',
-            kind: t('features.growth.hub.fallback_coach_kind'),
-            text: t('features.growth.hub.fallback_coach_text'),
-            cta: t('features.growth.hub.fallback_coach_cta'),
-            href: '/product/growth/income',
+            href: '/product/money/income',
         },
     };
 }

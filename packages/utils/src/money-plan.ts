@@ -91,8 +91,23 @@ export function usedPctDisplay(coverage: Pick<JarCoverage, 'usedProgress' | 'ove
 }
 
 /**
+ * Floor of `total × percentage / 100`. Percentages with at most 2 decimals (every stored
+ * jar split) are multiplied in integer basis points: float maths can land one unit low
+ * (`0.29 × 100` is `28.999…`), which would move a cent between jars. Finer percentages
+ * fall back to float maths.
+ */
+function floorShare(total: number, percentage: number): number {
+    const basisPoints = Math.round(percentage * 100);
+    if (Math.abs(percentage * 100 - basisPoints) < 1e-7) {
+        return Math.floor((total * basisPoints) / 10_000);
+    }
+    return Math.floor((total * percentage) / 100);
+}
+
+/**
  * Split an amount across weighted shares without losing or inventing a cent.
- * Remainder from floor-rounding goes to the largest share.
+ * Remainder from floor-rounding goes to the largest share; on a tie, the first of them
+ * in `shares` order, so the result is deterministic.
  */
 export function allocateByPercentage(
     total: number,
@@ -102,7 +117,7 @@ export function allocateByPercentage(
 
     const allocated = shares.map(share => ({
         id: share.id,
-        amount: Math.floor((total * share.percentage) / 100),
+        amount: floorShare(total, share.percentage),
         percentage: share.percentage,
     }));
 

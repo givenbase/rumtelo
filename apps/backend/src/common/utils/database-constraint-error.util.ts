@@ -125,6 +125,18 @@ export function parseUniqueConstraint(error: unknown): null | ParsedUniqueConstr
     const value = detailMatch?.[2]?.trim() ?? '';
     const field = columns.length === 1 ? toFormFieldName(columns[0] ?? '') : '';
 
+    if (
+        /growth_course_item_(period|goal)_slot_unique/.test(constraint) ||
+        /growth_course_item_(period|goal)_slot_unique/.test(blob)
+    ) {
+        return {
+            constraint: constraint || undefined,
+            message:
+                'That slot is already taken. Refresh and try again, or remove an existing item first.',
+            value: value || undefined,
+        };
+    }
+
     if (field) {
         return {
             constraint: constraint || undefined,

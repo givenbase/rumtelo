@@ -16,25 +16,23 @@ const dashboard = {
             'This month is closed — the score stays as it was, and nothing can be added or changed for this period.',
         /** Why close matters — shown while the period is still open. */
         close_explain:
-            'Closing locks this score and freezes the month. Clear the inbox first; unpaid bills can be carried or skipped when you close.',
+            'Closing locks this score and freezes the month. Sort your transactions first; unpaid bills can be carried or skipped when you close.',
         close_explain_soon:
-            'The month ends soon — clear the inbox, then carry or skip unpaid bills so you can close.',
+            'The month ends soon — sort your transactions, then carry or skip unpaid bills so you can close.',
         close_explain_today:
-            'Today is the last day. Finish the inbox, then carry or skip unpaid bills and close.',
+            'Today is the last day. Sort your transactions, then carry or skip unpaid bills and close.',
         close_explain_overdue:
-            'This month is overdue to close. Finish the inbox, then carry or skip unpaid bills and close it.',
+            'This month is overdue to close. Sort your transactions, then carry or skip unpaid bills and close it.',
         /** Compact period-travel note (lives here instead of a Coach slide). */
         travel_past_one: '{stamp} · about {money} through jars over {horizon} month',
         travel_past_other: '{stamp} · about {money} through jars over {horizon} months',
         travel_ahead_one: 'By {stamp} · about {money} through jars over {horizon} month',
         travel_ahead_other: 'By {stamp} · about {money} through jars over {horizon} months',
         travel_jar: '{name} {from} → {to}',
+        /** Screen-reader prefix for the level name next to the score. */
+        level_sr: 'Level: {level}',
     },
     close_month: 'Close month',
-    /** Second click on ConfirmActionButton / coach close CTA. */
-    close_month_confirm: 'Are you sure? Close this month',
-    /** Second click when unpaid bills need skip/carry choices. */
-    close_month_review_bills: 'Review unpaid bills',
     close_bills_title: 'Unpaid bills this month',
     close_bills_body:
         'Choose for each bill: carry it into next month (you’ll owe more then), or skip it for this period.',
@@ -44,41 +42,48 @@ const dashboard = {
     close_bills_roll_debt_hint:
         'After this carry ({count} months open), register it as a debt on Fixed costs — with collection fees and a payment plan if needed.',
     close_bills_skip_hint: 'This month won’t count — next month starts fresh at 1×.',
-    close_bills_confirm: 'Close month',
-    /** Shown above Close when inbox / bills still open. */
+    /** Shown above Close when transactions / bills are still open. */
     close_blocked_title: 'Finish these before closing this month',
-    close_blocked_inbox_one: '1 unsorted transaction in the inbox',
-    close_blocked_inbox_other: '{count} unsorted transactions in the inbox',
+    close_blocked_inbox_one: '1 transaction still to sort',
+    close_blocked_inbox_other: '{count} transactions still to sort',
     close_blocked_bills_one: '1 unpaid bill — choose carry or skip when you close{names}',
     close_blocked_bills_other: '{count} unpaid bills — choose carry or skip when you close{names}',
     close_blocked_bill_names: ' ({list})',
-    close_blocked_open_bills: 'Open bills ▸',
     /** Soft sequential-close: finish an earlier month before locking this one. */
     prior_open_title: 'Finish the earlier month first',
     prior_open_body:
         '{period} is still open. Close months in order so the score and log stay consistent.',
-    prior_open_cta: 'Go to {period} ▸',
     closing: 'Closing…',
     month_closed: 'Month closed',
     /** Toast after close — recap is the surplus/overspent line. */
     month_closed_toast: 'Month closed · {recap}',
     close_failed: 'Could not close month',
+    /** Close-month sheet opened from the Home next move (prior month first, then transactions to sort, then bills). */
+    close_flow: {
+        title: 'Close {month}',
+        prior_first: 'Close {prior} first — months close in order.',
+        prior_first_cta: 'Close {prior}',
+        prior_done: '{month} closed.',
+        inbox_first:
+            '{count, plural, one {# transaction from {month} is still to sort.} other {# transactions from {month} are still to sort.}}',
+        inbox_first_cta: 'Sort them',
+        inbox_first_reason: 'Sort your transactions first, then close.',
+        confirm_body:
+            'You’ll see your score and carry what’s left into next month. A closed month can’t be changed.',
+        bills_tail: 'A closed month can’t be changed.',
+        close_cta: 'Close {month}',
+        already_closed: '{month} is already closed.',
+        done: 'Done',
+        not_now: 'Not now',
+        load_error: 'Couldn’t load {month}.',
+        close_error_fallback: 'Couldn’t close {month}. Check your connection and try again.',
+    },
     levels: {
         '1': 'Beginner',
         '2': 'Navigator',
         '3': 'Steersman',
         '4': 'Captain',
         '5': 'Compass',
-        unlocks: {
-            six_jars: 'Six jars',
-            inbox: 'Inbox',
-            week_check: 'Week check',
-            goals: 'Goals',
-            debts: 'Debts',
-            energy_layer: 'Energy layer',
-            coach: 'Coach',
-            export: 'Export',
-        },
     },
     recap: {
         surplus: '{amount} left this period',
@@ -100,11 +105,67 @@ const dashboard = {
         attention_blurb:
             'A Practice asked to view or manage this board. Accept only if you know them.',
     },
+    /** Home's one next move (product state, not a Coach tip). */
+    next_move: {
+        eyebrow: 'Next move',
+        close_month: {
+            title: "Close {month}: see your score and carry what's left.",
+            cta: 'Close month',
+        },
+        no_transactions: {
+            title: 'Your jars are filled. Now see where it goes.',
+            body: "Add this week's spending — by hand or import a bank statement. Next week, your first week check takes ten minutes.",
+            body_basic:
+                "Add this week's spending as it happens. Next week, your first week check takes ten minutes.",
+            cta: 'Add a transaction',
+            import: 'Import a statement',
+        },
+        zero_income: {
+            title: 'No income yet? Add it when it lands — your jars split it the same second.',
+            cta: 'Add income',
+        },
+        inbox: {
+            title: '{count, plural, one {# transaction to sort — about {minutes, plural, one {# minute} other {# minutes}}.} other {# transactions to sort — about {minutes, plural, one {# minute} other {# minutes}}.}}',
+            cta: 'Sort transactions',
+        },
+        week_check: {
+            title: 'Everything is sorted. Your week check is ready — ten minutes.',
+            cta: 'Start week check',
+        },
+        calm: {
+            title: 'Every euro has a job. Next week check: {weekday}.',
+            title_other_currency: 'Every amount has a job. Next week check: {weekday}.',
+            link: 'See your jars',
+        },
+        viewer: {
+            close_prior: '{month} is ready to close.',
+            no_transactions: 'No spending added yet.',
+            inbox: '{count, plural, one {# transaction waiting to be sorted.} other {# transactions waiting to be sorted.}}',
+            week_check: "This week's check is still open.",
+            close_month: '{month} closes in {days, plural, one {# day} other {# days}}.',
+        },
+        travel_note: 'About today, not {period}.',
+        error: "Couldn't load your next move.",
+    },
+    /** Week-1 setup list on Home (links only, hide is OWNER only). */
+    checklist: {
+        eyebrow: 'Setting up · {done} of {total} done',
+        title: '{count, plural, one {One small thing, when it suits you.} other {# small things, when it suits you.}}',
+        hide: 'Hide',
+        hide_aria: 'Hide the setup list for everyone in this household',
+        done: 'Done',
+        invited: 'Invited — waiting for them',
+        items: {
+            bank: 'Add your bank to your main account',
+            dream: 'Write down your dream',
+            invite: 'Invite your partner',
+        },
+    },
     coach: {
+        all_tips: 'All tips ({count})',
         inbox_one: '{count} transaction waiting for a jar.',
         inbox_many: '{count} transactions waiting for a jar.',
         all_sorted: 'All sorted — time for intention.',
-        sort_inbox: 'Sort inbox',
         week_check: 'Week check',
         see_jars: 'See jars',
         practice_pending_one:
@@ -143,11 +204,14 @@ const dashboard = {
         play_left: 'In Play',
     },
     open_portal: 'Open ▸',
+    why: {
+        label: 'Your dream',
+    },
     widgets: {
         growth: {
             income_month: 'INCOME THIS MONTH',
             income_span: 'INCOME OVER SPAN',
-            inbox: 'INBOX',
+            inbox: 'TO SORT',
             tagline: 'Grip on your growth — skills, goals, income if you want.',
         },
         energy: {

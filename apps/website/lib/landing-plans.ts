@@ -1,4 +1,4 @@
-import { CapabilityProduct, FEATURES, PLAN_ACCESS, PlanKey } from '@rumtelo/contracts';
+import { CapabilityProduct, PlanKey } from '@rumtelo/contracts';
 
 import { isProductLive, type LaunchOpts } from './launch-products';
 
@@ -20,12 +20,6 @@ export const PLAN_PRODUCTS = [
 
 export type PlanProduct = (typeof PLAN_PRODUCTS)[number];
 
-export type PlanProductCoverage = {
-    product: PlanProduct;
-    included: number;
-    total: number;
-};
-
 /** Products a visitor can actually use today — the cards never advertise the rest. */
 export function livePlanProducts(opts?: LaunchOpts): PlanProduct[] {
     return PLAN_PRODUCTS.filter(product => isProductLive(product, opts));
@@ -35,46 +29,43 @@ export const PLAN_FEATURE_KEYS = ['f1', 'f2', 'f3', 'f4', 'f5', 'f6'] as const;
 
 export type PlanFeatureKey = (typeof PLAN_FEATURE_KEYS)[number];
 
-/** Highlight lines tied to one product — dropped with it while that product is not live. */
-const PLAN_FEATURE_PRODUCT: Record<PlanSlug, Partial<Record<PlanFeatureKey, PlanProduct>>> = {
+/**
+ * Highlight lines per plan (a key missing here has no copy) and the product each one is about.
+ * `null` = always shown; a product = dropped with it while that product is not live.
+ * Keep in step with `pages.landing.plans.<plan>.f*`.
+ */
+const PLAN_FEATURES: Record<PlanSlug, Partial<Record<PlanFeatureKey, PlanProduct | null>>> = {
     basic: {
         f1: CapabilityProduct.MONEY,
         f2: CapabilityProduct.GROWTH,
         f3: CapabilityProduct.ENERGY,
         f4: CapabilityProduct.SOUL,
+        f5: null,
+        f6: null,
     },
     plus: {
-        f2: CapabilityProduct.MONEY,
+        f1: null,
+        f2: CapabilityProduct.GROWTH,
         f3: CapabilityProduct.MONEY,
-        f4: CapabilityProduct.ENERGY,
+        f4: CapabilityProduct.GROWTH,
+        f5: CapabilityProduct.ENERGY,
+        f6: null,
     },
     max: {
+        f1: null,
         f2: CapabilityProduct.MONEY,
         f3: CapabilityProduct.GROWTH,
         f4: CapabilityProduct.SOUL,
-        f6: CapabilityProduct.ENERGY,
+        f5: null,
     },
 };
 
 export function livePlanFeatureKeys(plan: PlanKey, opts?: LaunchOpts): PlanFeatureKey[] {
     const live = new Set<string>(livePlanProducts(opts));
-    const tagged = PLAN_FEATURE_PRODUCT[planSlug(plan)];
+    const lines = PLAN_FEATURES[planSlug(plan)];
     return PLAN_FEATURE_KEYS.filter(key => {
-        const product = tagged[key];
-        return !product || live.has(product);
+        const product = lines[key];
+        if (product === undefined) return false;
+        return product === null || live.has(product);
     });
-}
-
-/** A product's `overview` is its hub page, not a feature — never counted. */
-function countedFeatures(keys: readonly string[]): string[] {
-    return keys.filter(key => !key.endsWith('-overview'));
-}
-
-/** "Money 3/6" per plan — derived from PLAN_ACCESS so the cards follow real gating. */
-export function planProductCoverage(plan: PlanKey, opts?: LaunchOpts): PlanProductCoverage[] {
-    return livePlanProducts(opts).map(product => ({
-        product,
-        included: countedFeatures(PLAN_ACCESS[plan][product]).length,
-        total: countedFeatures(Object.values(FEATURES[product])).length,
-    }));
 }

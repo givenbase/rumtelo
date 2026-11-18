@@ -2,6 +2,7 @@ import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import {
     PlanKey,
+    BoardStage,
     PLAN_RANK,
     PRACTICE_BASE_UNIT_CENTS,
     PRACTICE_CLIENT_SEAT_UNIT_CENTS,
@@ -13,6 +14,7 @@ import {
     PracticeClientLinkStatus,
     PracticeRole,
     PracticeSubscriptionStatus,
+    HouseholdAccessSource,
     type Address as AddressDto,
     type AddressInput,
     type HouseholdPracticeLink as HouseholdPracticeLinkDto,
@@ -382,7 +384,13 @@ export class PracticeService {
         const userId = currentUserId();
 
         return householdStorage.run(
-            { userId, householdId: link.household, role: 'VIEWER' },
+            {
+                userId,
+                householdId: link.household,
+                role: 'VIEWER',
+                source: HouseholdAccessSource.PRACTICE,
+                relation: null,
+            },
             async () => {
                 const [money, growth, energy, soul] = await Promise.all([
                     this.moneyDashboard.get(link.household, period),
@@ -833,6 +841,7 @@ export class PracticeService {
             const snap = await this.householdBilling.getSnapshot(householdId);
             if (PLAN_RANK[snap.planKey] < PLAN_RANK[SPONSORED_MANAGE_PLAN]) {
                 await this.householdBilling.setPlanKey(householdId, SPONSORED_MANAGE_PLAN);
+                await this.householdSettings.raiseBoardStageFloor(householdId, BoardStage.MONTH);
                 this.logger.log(
                     `Practice-sponsored household ${householdId} → ${SPONSORED_MANAGE_PLAN}`
                 );

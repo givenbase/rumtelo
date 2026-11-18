@@ -173,7 +173,9 @@ export function permissionSectionFromPath(pathname: string): HouseholdPermission
         path.startsWith('/auth') ||
         path.startsWith('/api/auth') ||
         path.startsWith('/contact') ||
-        path.startsWith('/plans')
+        path.startsWith('/plans') ||
+        // Pure onboarding preview: a signed-in person, no household, nothing stored.
+        path.endsWith('/household/previewsplit')
     ) {
         return null;
     }
@@ -183,6 +185,9 @@ export function permissionSectionFromPath(pathname: string): HouseholdPermission
     if (
         path.includes('/household/invite') ||
         path.includes('/household/members') ||
+        // Seat usage answers "may I invite?": oRPC posts it, so it maps to the invite action.
+        path.includes('/household/seats') ||
+        path.includes('/household/removemember') ||
         path.endsWith('/members')
     ) {
         return HouseholdPermissionSection.HOUSEHOLD_MEMBERS;
@@ -235,7 +240,7 @@ export function permissionActionFromPath(
 
     if (
         /^(list|get|find)/.test(leaf) ||
-        /^(status|current|feed|session|summary|history|balances|members|settings|profile|inbox|plan|projections|byjar|levels|recap|forweek|logs)$/.test(
+        /^(status|current|feed|session|summary|history|balances|members|settings|profile|inbox|plan|period|year|projections|byjar|levels|recap|forweek|logs|suggestions)$/.test(
             leaf
         )
     ) {
@@ -244,7 +249,11 @@ export function permissionActionFromPath(
     if (/^(create|add|invite|import|onboard|complete|checkout|portal)/.test(leaf)) {
         return HouseholdPermissionAction.CREATE;
     }
-    if (/^(update|apply|dismiss|sort|schedule|change|set)/.test(leaf)) {
+    if (
+        /^(update|apply|dismiss|sort|schedule|change|set|carry|tick|untick|pause|resume|confirm|renew|snooze|enable|rotate|disable)/.test(
+            leaf
+        )
+    ) {
         return HouseholdPermissionAction.UPDATE;
     }
     if (/^(delete|remove|revoke|cancel|unlink)/.test(leaf)) {

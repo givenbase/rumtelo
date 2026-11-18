@@ -24,7 +24,7 @@ export class MonthScoreController {
         );
     }
 
-    /** Static level definitions with thresholds and unlocks. */
+    /** Static level definitions with thresholds. */
     @Implement(contract.money.monthScore.levels)
     levels() {
         return implement(contract.money.monthScore.levels).handler(async () =>

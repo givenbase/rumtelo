@@ -172,10 +172,10 @@ export const COACH_FEATURES: readonly CoachFeature[] = [
     },
     {
         id: CoachFeatureId.GROWTH_TIP_PRODUCERS,
-        status: CoachFeatureStatus.BACKLOG,
+        status: CoachFeatureStatus.SHIP,
         title: 'Growth inbox tip producers',
-        where: 'CoachService.registerRefresher',
-        gaps: ['No growth domain refresher yet'],
+        where: 'CourseCoachService → CoachService.registerRefresher (Course › Rhythm)',
+        gaps: [],
     },
     {
         id: CoachFeatureId.SOUL_TIP_PRODUCERS,

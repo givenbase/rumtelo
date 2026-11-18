@@ -444,6 +444,18 @@ export class JarService {
         return this.list();
     }
 
+    /**
+     * Put every jar that has no seat yet on `accountId`. Called when the household's
+     * first bank account is created, so one main account carries all six jars. Jars the
+     * household already placed are never moved. Caller guarantees the account is this
+     * household's; the caller flushes nothing else, this flushes its own change.
+     */
+    async placeUnplaced(accountId: string): Promise<void> {
+        const unplaced = await this.jars.find({ defaultAccount: null });
+        for (const jar of unplaced) jar.defaultAccount = accountId;
+        if (unplaced.length > 0) await this.em.flush();
+    }
+
     async update(
         id: string,
         patch: Partial<Pick<Jar, 'name' | 'subtitle' | 'icon'>>

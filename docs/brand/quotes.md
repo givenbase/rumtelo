@@ -33,6 +33,7 @@ Keep the same punch: *where it went / no mystery / clear picture*.
 | **No more “where did it go?”** | Short social, eyebrow, CTA support |
 | **Know where it went. Know where it’s going.** | Money portal, overview, manifesto pair |
 | **Paycheck in. Picture clear.** | Income split, hero secondary, demo caption |
+| **Six jars. Ten minutes a week.** | Short form of the positioning line — chips, ads, app-store subtitle |
 
 ---
 
@@ -197,6 +198,7 @@ See [product/practice.md](../product/practice.md).
 | Every amount gets a job. | Elk bedrag krijgt een job. |
 | Split first. Spend second. | Eerst verdelen. Dan uitgeven. |
 | Six jars. One calm overview. | Zes potjes. Één rustig overzicht. |
+| Six jars. Ten minutes a week. | Zes potjes. Tien minuten per week. |
 | Not just money. Where your life goes. | Niet alleen geld. Waar je leven naartoe gaat. |
 | Money. Energy. Growth. Soul. One overview. | Geld. Energie. Groei. Ziel. Één overzicht. |
 | Stop wondering what you’re running on. | Stop met gissen waar je op draait. |

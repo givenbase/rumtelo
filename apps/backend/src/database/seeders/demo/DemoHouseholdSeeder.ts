@@ -291,6 +291,8 @@ export class DemoHouseholdSeeder extends Seeder {
         const features = {
             isBankSyncEnabled: demo.persona !== 'basic',
             isCoachEnabled: true,
+            isCourseQuartersEnabled: false,
+            isCourseDaysEnabled: false,
         };
 
         if (!settings) {

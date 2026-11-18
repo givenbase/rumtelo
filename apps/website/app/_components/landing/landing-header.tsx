@@ -20,12 +20,12 @@ import { Cta } from './landing-primitives';
 import { cn } from '@rumtelo/utils';
 
 const NAV_LINK_KEYS = [
-    { href: '#portals', labelKey: 'portals' },
-    { href: '#jars', labelKey: 'how_it_works' },
-    { href: '#pricing', labelKey: 'pricing' },
-    { href: '#practices', labelKey: 'practices' },
-    { href: '#faq', labelKey: 'questions' },
-    { href: '#signup', labelKey: 'create_account' },
+    { href: '/#how', labelKey: 'how_it_works' },
+    { href: '/#pricing', labelKey: 'pricing' },
+    { href: '/practices', labelKey: 'practices' },
+    { href: '/#portals', labelKey: 'portals' },
+    { href: '/#faq', labelKey: 'questions' },
+    { href: '/#signup', labelKey: 'create_account' },
 ] as const;
 
 export function LandingHeader() {
@@ -70,9 +70,9 @@ export function LandingHeader() {
 
     const close = () => setOpen(false);
     const registrationOpen = isRegistrationOpen();
-    const navLinks = NAV_LINK_KEYS.filter(link => registrationOpen || link.href !== '#signup').map(
+    const navLinks = NAV_LINK_KEYS.filter(link => registrationOpen || link.href !== '/#signup').map(
         link =>
-            link.href === '#signup' && isAuthenticated
+            link.href === '/#signup' && isAuthenticated
                 ? { href: appHomeUrl(), label: t('dashboard'), labelKey: 'dashboard' as const }
                 : { href: link.href, label: t(link.labelKey), labelKey: link.labelKey }
     );
@@ -96,7 +96,7 @@ export function LandingHeader() {
                     aria-label={t('aria_primary')}
                     className="ml-auto hidden items-center gap-5 lg:flex xl:gap-6">
                     {navLinks
-                        .filter(link => link.href !== '#signup' && !link.href.startsWith('http'))
+                        .filter(link => link.href !== '/#signup' && !link.href.startsWith('http'))
                         .map(link => (
                             <Link
                                 key={link.href}

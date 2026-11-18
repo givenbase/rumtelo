@@ -46,7 +46,7 @@ const message = {
             period_closed:
                 'This month is closed — you cannot add or change anything for that period.',
             month_close_incomplete:
-                'Finish open work before closing this month ({inbox} unsorted in inbox, {bills} bills unpaid or unskipped).',
+                'Finish open work before closing this month ({inbox} transactions to sort, {bills} bills unpaid or unskipped).',
             month_close_prior_open:
                 'Close {period} first — months must be finished in order so the log stays honest.',
             month_close_bill_disposition:
@@ -79,7 +79,11 @@ const message = {
             invitation_not_found: 'This invitation is missing, expired, or already used.',
             invitation_accept_failed:
                 'Could not accept the invitation. Try again or ask for a new one.',
+            member_not_found: 'That household member is no longer here',
+            cannot_remove_owner: 'The household owner cannot be removed',
+            member_remove_failed: 'Could not remove that member. Try again.',
             jar_split_total: 'Jar split must total 100%, received {total}%',
+            jar_split_keys: 'Jar split must list each of the six jars exactly once',
             jar_placement_account_invalid: 'That bank account is not in this household.',
             book_catalog_unavailable: 'The book catalog did not answer.',
             contact_send_failed:
@@ -95,6 +99,21 @@ const message = {
             capability_unavailable: 'This feature is not available yet',
             feature_not_implemented: 'This feature is not available yet',
             viewer_read_only: 'Viewers can look along but cannot change household data',
+            visibility_choice_not_allowed: 'That sharing option is not available here',
+            visibility_edit_forbidden: 'Only the person who made this can change it',
+            course_item_not_found: 'That Course item no longer exists',
+            course_period_full: 'Five is the limit here. Finish, move or let one go first.',
+            course_parent_invalid: 'Pick a goal from the layer above, in the matching period',
+            course_carry_done: 'Done items stay where they are',
+            course_goal_invalid: 'Only year and quarter goals can link a money goal',
+            course_target_invalid: 'Only a month or quarter step can count times',
+            course_scope_invalid: 'Only a year, quarter or month goal can be personal or business',
+            course_rhythm_not_found: 'That routine no longer exists',
+            course_rhythm_parent_invalid: 'A routine hangs under a year, quarter or month step',
+            course_rhythm_target_invalid: 'That many times does not fit this rhythm',
+            course_rhythm_tick_future: 'You can tick today or earlier',
+            course_rhythm_renew_invalid: 'This routine has no past month step to renew',
+            course_feed_not_found: 'Switch the calendar feed on first',
             role_permission_denied: 'Your role cannot do that in this household',
             practice_not_found: 'Practice not found',
             practice_not_member: 'You are not a member of this practice',

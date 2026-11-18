@@ -11,7 +11,8 @@ import { Bank } from '../../../../../backoffice/product/money/catalog/bank/bank.
  * Bank Account Entity
  *
  * A household's real-world account (checking, savings, …) that transactions land
- * on. Every account picks a catalog {@link Bank}. Open Banking sync is optional:
+ * on. An account normally has a catalog {@link Bank}; onboarding creates one "Main
+ * account" without a bank or IBAN that the household fills in later. Open Banking sync is optional:
  * `connectionId` null = manual entry; set = linked to a provider. Connecting
  * later upgrades the same row (no duplicate IBAN / bank seat).
  *
@@ -56,11 +57,12 @@ export class BankAccount extends HouseholdEntity {
 
     // ? RELATIONSHIPS
     /**
-     * Catalog institution — always set (manual or synced). Soft-disable banks
-     * in the catalog; hard delete is blocked while accounts reference them.
+     * Catalog institution. Null only for the onboarding "Main account" until the
+     * household picks its bank (statement-bank guard is skipped while null). Soft-disable
+     * banks in the catalog; hard delete is blocked while accounts reference them.
      */
-    @ManyToOne(() => Bank, { deleteRule: 'restrict' })
-    bank!: Bank;
+    @ManyToOne(() => Bank, { nullable: true, deleteRule: 'restrict' })
+    bank: Bank | null = null;
 
     /**
      * Optional checking/savings seat that pays this account’s bill (credit cards).

@@ -125,6 +125,8 @@ export function BankSettings() {
     const linkedByBankId = (() => {
         const map = new Map<string, Account[]>();
         for (const row of linkedAccounts) {
+            // A linked account always has a bank; only the onboarding Main account has none.
+            if (!row.bankId) continue;
             const list = map.get(row.bankId) ?? [];
             list.push(row);
             map.set(row.bankId, list);
@@ -171,7 +173,7 @@ export function BankSettings() {
             label: stripBankPrefixFromLabel(account.name, bankList),
             iban: account.iban ? formatIban(account.iban) : '',
             kind: account.kind,
-            bankId: bank?.id ?? account.bankId,
+            bankId: bank?.id ?? account.bankId ?? '',
             settlementAccountId: account.settlementAccountId,
         });
         setIbanError(null);

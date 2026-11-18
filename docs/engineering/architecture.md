@@ -12,7 +12,7 @@ Snapshot of how the system is built. For status, next steps, and full narrative,
 | Frontend | Next.js 16, React 19, **Tailwind v4 only** | one styling system |
 | API | NestJS 11 + **Fastify** + **oRPC** | contracts-first, end-to-end types |
 | Contracts | `@rumtelo/contracts` (Zod + procedures) | wire source of truth |
-| ORM | **MikroORM 6** + PostgreSQL | unit-of-work for money rows |
+| ORM | **MikroORM 7** + PostgreSQL | unit-of-work for money rows |
 | Isolation | Row-level `household_id` | never schema-per-tenant |
 | Auth | better-auth (`organization` + `twoFactor`) | Household *is* the org plugin |
 | Lint | **oxlint + oxfmt** | `pnpm lint` |
@@ -47,16 +47,16 @@ The same product tree governs modules, API, routes, and database.
 | Product | Backend | Contract | Route | DB schema |
 |---|---|---|---|---|
 | — | `modules/auth/household` | `contract.household` | `/settings` | `auth` + `public` |
-| — | `modules/public/platform/coach` | `contract.coach` | — | `public` |
+| — | `modules/public/platform/coach` | `contract.coach` | `/product/coach` | `public` |
 | — | `modules/public/platform/practice` | `contract.practice` | `/practice/*` | `public` (+ `auth.account_address`) |
-| **Money** | `modules/public/product/money/*` | `contract.money.*` | `/money/*` | `public` |
-| **Growth** | `modules/public/product/growth/*` | `contract.growth.*` | `/growth/*` | `public` |
-| **Energy** | `modules/public/product/energy/*` | `contract.energy.*` | `/energy/*` | `public` |
-| **Soul** | `modules/public/product/soul/*` | `contract.soul.*` | `/soul/*` | `public` |
+| **Money** | `modules/public/product/money/*` | `contract.money.*` | `/product/money/*` | `public` |
+| **Growth** | `modules/public/product/growth/*` | `contract.growth.*` | `/product/growth/*` | `public` |
+| **Energy** | `modules/public/product/energy/*` | `contract.energy.*` | `/product/energy/*` | `public` |
+| **Soul** | `modules/public/product/soul/*` | `contract.soul.*` | `/product/soul/*` | `public` |
 
 **Add anything in all four places or not at all.**
 
-Money children (same list everywhere): `jar` `income` `fixed-cost` `account` `transaction` `rule` `goal` `debt` `month-score` `week-check` `dashboard`.
+Routes live under `app/(routes)/[locale]/(app)/(household)/product/…` (`localePrefix: 'never'`, so no locale in URLs). Backend children are grouped by role (money: `plan/`, `ledger/`, `targets/`), so names are not 1:1 per layer — see [`HANDOFF.md`](../../HANDOFF.md) §5. Growth Course (Koers): `growth/course/`, `contract.growth.course.*`, `/product/growth/course/…`.
 
 ---
 

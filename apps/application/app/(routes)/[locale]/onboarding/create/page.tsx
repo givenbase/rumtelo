@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -86,10 +86,8 @@ export default function CreateOwnHouseholdPage() {
     }
 
     return (
-        <OnboardingFlow
-            onHouseholdReady={() => {
-                router.replace('/onboarding');
-            }}
-        />
+        <Suspense>
+            <OnboardingFlow />
+        </Suspense>
     );
 }

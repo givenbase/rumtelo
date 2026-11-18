@@ -99,9 +99,17 @@ const tour = {
                     heading: 'What you’re looking at',
                     body: 'Your grip snapshot for this month — The Coach, the money picture, and doors into Growth, Energy, and Soul. Start the full tour from Help to walk through Home, then jars, fixed costs, and income.',
                 },
+                what_for_core: {
+                    heading: 'What you’re looking at',
+                    body: 'Your grip snapshot for this month — The Coach, the money picture, and the door into Growth. Start the full tour from Help to walk through Home, then jars, fixed costs, and income.',
+                },
                 how: {
                     heading: 'How to use it',
                     body: 'Use Period (top right) to switch months. Open a portal when you want that tool. Tap Help anytime to replay this walkthrough.',
+                },
+                score: {
+                    heading: 'Your month score and level',
+                    body: 'Each month you close adds to your score. Your level grows with it: a record of your routine, not a key. Nothing opens or closes with a level.',
                 },
             },
             steps: {
@@ -119,6 +127,11 @@ const tour = {
                     title: 'Your products',
                     content:
                         'Money lives in the top nav. Growth, Energy, and Soul open from here when you want that next tool — one product at a time.',
+                },
+                portals_core: {
+                    title: 'Your products',
+                    content:
+                        'Money lives in the top nav. Growth opens from here when you want that next tool.',
                 },
             },
         },
@@ -256,7 +269,7 @@ const tour = {
             sections: {
                 what_for: {
                     heading: 'What this is for',
-                    body: 'A snapshot of the current period: jars, inbox, what you already own, and how the month is tracking.',
+                    body: 'A snapshot of the current period: jars, transactions to sort, what you already own, and how the month is tracking.',
                 },
                 how: {
                     heading: 'How it works',
@@ -282,7 +295,7 @@ const tour = {
             sections: {
                 what_for: {
                     heading: 'What this area is for',
-                    body: 'Start on Overview, then go left to right: Income → Goals. Raise net, aim with one goal on Basic. Learn unlocks on Plus — books, courses, skills.',
+                    body: 'Course is your week: the three things that move your goals, set in your week check. On Basic you keep one goal; Course and Learn are in Plus.',
                 },
             },
         },
@@ -295,7 +308,7 @@ const tour = {
                 },
                 how: {
                     heading: 'How it works',
-                    body: 'Pick Out or In, say what it was, choose a jar, and save. Inbox items wait until you sort them. Edits update the same period’s available balance.',
+                    body: 'Pick Out or In, say what it was, choose a jar, and save. Transactions to sort wait until you sort them. Edits update the same period’s available balance.',
                 },
             },
         },

@@ -4,6 +4,8 @@ const why = {
     eyebrow: '✦ Why Rumtelo',
     stand_on: 'What we stand on',
     lead: 'Wondering what? All of it — your money, your life, your energy, your time. Rumtelo helps you see where it went, so nothing stays a mystery. From there you get grip again: control over what matters. Clear tools for that, and we’ll keep adding more. The Coach can give a tip. You choose what to do next.',
+    lead_core:
+        'Wondering what? Where your money went. Rumtelo helps you see it, so nothing stays a mystery. From there you get grip again: control over what matters. Clear tools for that, and we’ll keep adding more. The Coach can give a tip. You choose what to do next.',
     meaning_eyebrow: '✦ How Rumtelo helps you',
     meaning: {
         money_leaves_body:

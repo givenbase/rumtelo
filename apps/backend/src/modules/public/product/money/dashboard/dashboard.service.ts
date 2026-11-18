@@ -19,6 +19,7 @@ import { JarService } from '../plan/jar/jar.service';
 import { DebtService } from '../targets/debt/debt.service';
 import { GoalService } from '../targets/goal/goal.service';
 import { MonthScoreService } from '../month-score/month-score.service';
+import { ProgressService } from '../progress/progress.service';
 
 /**
  * Composition root for the dashboard. The design puts jars, coach, month score and four
@@ -39,12 +40,21 @@ export class DashboardService {
         private readonly householdSettings: HouseholdSettingsService,
         @Inject(FixedCostService) private readonly fixedCosts: FixedCostService,
         @Inject(DebtService) private readonly debts: DebtService,
-        @Inject(GoalService) private readonly goals: GoalService
+        @Inject(GoalService) private readonly goals: GoalService,
+        @Inject(ProgressService) private readonly progressFacts: ProgressService
     ) {}
 
     // ====================================================================
     // ? READ Operations
     // ====================================================================
+
+    /**
+     * First-run facts and the board stage for Home, as of now (never the selected period).
+     * Delegates to {@link ProgressService}: same shape as `money.progress.get`.
+     */
+    progress(now = new Date()) {
+        return this.progressFacts.get(now);
+    }
 
     async get(householdId: string, period: string) {
         const meta = travelForPeriod(period);
@@ -61,6 +71,7 @@ export class DashboardService {
             debtPlan,
             debtList,
             goalList,
+            progress,
         ] = await Promise.all([
             this.jars.balances(currentKey),
             this.monthScores.current(period),
@@ -72,6 +83,7 @@ export class DashboardService {
             this.debts.plan(),
             this.debts.list(),
             this.goals.list(),
+            this.progress(),
         ]);
 
         const horizon = meta.horizon;
@@ -188,6 +200,7 @@ export class DashboardService {
             coach,
             monthScore,
             why: settings.why ?? null,
+            progress,
             travel: {
                 direction: meta.travel.direction,
                 monthsHorizon: horizon,

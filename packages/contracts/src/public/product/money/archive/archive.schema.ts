@@ -68,8 +68,11 @@ export const ArchiveParty = z.looseObject({
 export const ArchiveBankAccount = z.looseObject({
     name: z.string().min(1).max(120),
     kind: z.enum(AccountKind),
-    /** Catalog Bank.key — remapped to local bankId on restore. */
-    bankKey: z.string().min(1).max(64),
+    /**
+     * Catalog Bank.key — remapped to local bankId on restore. Null/absent for an
+     * account without a bank (the onboarding "Main account"); it restores bankless.
+     */
+    bankKey: z.string().min(1).max(64).nullish(),
     /** Full electronic IBAN when known. */
     iban: z.string().max(42).nullish(),
     balance: Money.optional(),

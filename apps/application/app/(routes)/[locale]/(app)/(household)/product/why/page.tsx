@@ -35,7 +35,7 @@ const WIDER_PORTALS = [
         portalKey: 'pages.nav.pills.growth',
         lineKey: 'pages.why.portals.growth.line',
         bodyKey: 'pages.why.portals.growth.body',
-        href: productPath('growth/income'),
+        href: productPath('money/income'),
     },
     {
         product: 'energy',
@@ -80,7 +80,7 @@ export default async function WhyFoundationPage() {
                     {t('features.brand.tagline')}
                 </Typography>
                 <Typography as="p" variant="lead" size="lg" className="mt-5">
-                    {t('pages.why.lead')}
+                    {t(launchWide ? 'pages.why.lead' : 'pages.why.lead_core')}
                 </Typography>
             </Section>
 

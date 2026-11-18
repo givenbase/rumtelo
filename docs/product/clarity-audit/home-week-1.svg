@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 760" width="375" height="760" font-family="Archivo, Helvetica, Arial, sans-serif">
+  <title>Mockup — Home, week 1 (375 px)</title>
+  <!-- Proposal only. Colours are brand tokens: surface #EEF1F5, raised #FFFFFF, fg #1A202D, accent #06656C, accent-soft #DDEFEF, line #D5DBE3, danger #B42318 -->
+  <rect width="375" height="760" fill="#EEF1F5"/>
+  <!-- top bar -->
+  <rect width="375" height="52" fill="#FFFFFF"/>
+  <line x1="0" y1="52" x2="375" y2="52" stroke="#D5DBE3"/>
+  <text x="16" y="32" font-size="17" font-weight="700" fill="#06656C">R</text><text x="29" y="32" font-size="15" fill="#1A202D">umtelo</text>
+  <rect x="236" y="16" width="78" height="22" rx="11" fill="#EEF1F5"/><text x="275" y="31" font-size="11" fill="#5B6472" text-anchor="middle">November ▾</text>
+  <circle cx="342" cy="27" r="13" fill="#DDEFEF"/><text x="342" y="31" font-size="10" fill="#06656C" text-anchor="middle">GL</text>
+  <!-- promise -->
+  <text x="16" y="84" font-size="10" letter-spacing="1.2" fill="#5B6472">NOVEMBER · WEEK 1</text>
+  <text x="16" y="112" font-size="22" font-weight="700" fill="#1A202D">Your €2,850 already</text>
+  <text x="16" y="138" font-size="22" font-weight="700" fill="#1A202D">has a job.</text>
+  <text x="16" y="160" font-size="12" fill="#5B6472">Split over six jars the second it landed.</text>
+  <!-- next move card -->
+  <rect x="16" y="176" width="343" height="148" rx="14" fill="#FFFFFF" stroke="#D5DBE3"/>
+  <text x="32" y="202" font-size="10" letter-spacing="1.2" fill="#06656C">NEXT MOVE</text>
+  <text x="32" y="226" font-size="15" font-weight="600" fill="#1A202D">Add this week's spending.</text>
+  <text x="32" y="246" font-size="12" fill="#5B6472">By hand or from a bank statement — next week</text>
+  <text x="32" y="262" font-size="12" fill="#5B6472">your first week check takes ten minutes.</text>
+  <rect x="32" y="274" width="311" height="38" rx="10" fill="#06656C"/>
+  <text x="187" y="298" font-size="13" font-weight="600" fill="#FFFFFF" text-anchor="middle">Add a transaction  →</text>
+  <!-- jars -->
+  <text x="16" y="352" font-size="10" letter-spacing="1.2" fill="#5B6472">SIX JARS</text>
+  <text x="359" y="352" font-size="11" fill="#06656C" text-anchor="end">See all ›</text>
+  <g font-size="12" fill="#1A202D">
+    <text x="16" y="380">Necessities</text><rect x="146" y="371" width="124" height="8" rx="4" fill="#D5DBE3"/><rect x="146" y="371" width="124" height="8" rx="4" fill="#06656C"/><text x="359" y="380" text-anchor="end">€1,567.50</text>
+    <text x="16" y="406">Financial Freedom</text><rect x="146" y="397" width="124" height="8" rx="4" fill="#D5DBE3"/><rect x="146" y="397" width="124" height="8" rx="4" fill="#06656C"/><text x="359" y="406" text-anchor="end">€285.00</text>
+    <text x="16" y="432">Education</text><rect x="146" y="423" width="124" height="8" rx="4" fill="#D5DBE3"/><rect x="146" y="423" width="124" height="8" rx="4" fill="#06656C"/><text x="359" y="432" text-anchor="end">€285.00</text>
+    <text x="16" y="458">Long Term Savings</text><rect x="146" y="449" width="124" height="8" rx="4" fill="#D5DBE3"/><rect x="146" y="449" width="124" height="8" rx="4" fill="#06656C"/><text x="359" y="458" text-anchor="end">€285.00</text>
+    <text x="16" y="484">Play</text><rect x="146" y="475" width="124" height="8" rx="4" fill="#D5DBE3"/><rect x="146" y="475" width="124" height="8" rx="4" fill="#06656C"/><text x="359" y="484" text-anchor="end">€285.00</text>
+    <text x="16" y="510">Give</text><rect x="146" y="501" width="124" height="8" rx="4" fill="#D5DBE3"/><rect x="146" y="501" width="124" height="8" rx="4" fill="#06656C"/><text x="359" y="510" text-anchor="end">€142.50</text>
+  </g>
+  <text x="16" y="532" font-size="11" fill="#5B6472">Later, an over-the-line jar shows a full red meter + one move.</text>
+  <!-- week check -->
+  <rect x="16" y="548" width="343" height="78" rx="14" fill="#DDEFEF"/>
+  <text x="32" y="574" font-size="10" letter-spacing="1.2" fill="#06656C">WEEK CHECK · OPENS SUNDAY</text>
+  <g font-size="11" fill="#1A202D">
+    <circle cx="38" cy="600" r="5" fill="none" stroke="#06656C"/><text x="48" y="604">Look</text>
+    <circle cx="110" cy="600" r="5" fill="none" stroke="#06656C"/><text x="120" y="604">Redirect</text>
+    <circle cx="194" cy="600" r="5" fill="none" stroke="#06656C"/><text x="204" y="604">Intend</text>
+    <circle cx="268" cy="600" r="5" fill="none" stroke="#06656C"/><text x="278" y="604">Done</text>
+  </g>
+  <text x="16" y="652" font-size="10" fill="#8A93A0">Hidden in week 1: month score + levels, 3-stat row, Growth widget, period travel, Coach slider (1 tip only).</text>
+  <!-- bottom tabs -->
+  <rect y="690" width="375" height="70" fill="#FFFFFF"/>
+  <line x1="0" y1="690" x2="375" y2="690" stroke="#D5DBE3"/>
+  <g font-size="11" text-anchor="middle">
+    <text x="45" y="728" fill="#06656C" font-weight="700">◇ Home</text>
+    <text x="120" y="728" fill="#5B6472">◈ Money</text>
+    <text x="198" y="728" fill="#5B6472">↗ Growth</text>
+    <text x="272" y="728" fill="#5B6472">≡ More</text>
+  </g>
+  <circle cx="338" cy="722" r="20" fill="#06656C"/><text x="338" y="729" font-size="20" fill="#FFFFFF" text-anchor="middle">+</text>
+</svg>

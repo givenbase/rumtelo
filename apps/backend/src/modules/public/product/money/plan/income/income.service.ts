@@ -123,6 +123,20 @@ export class IncomeService {
     // ? UPDATE Operations
     // ====================================================================
 
+    /**
+     * Link every income source without a deposit seat to `accountId` (and its bank, when
+     * it has one). Called when the household's first bank account is created. Sources
+     * the household already linked are never moved.
+     */
+    async linkUnlinkedTo(accountId: string, bankId: string | null): Promise<void> {
+        const unlinked = await this.sources.find({ account: null });
+        for (const source of unlinked) {
+            source.account = accountId;
+            source.bank = bankId;
+        }
+        if (unlinked.length > 0) await this.em.flush();
+    }
+
     async update(
         id: string,
         patch: CounterpartyPatch &

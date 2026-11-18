@@ -6,15 +6,6 @@ alwaysApply: false
 
 # Auth aside — Setup 1
 
-Locked (do not regress unless the user asks):
+Single source: [`.claude/rules/frontend.md`](../../.claude/rules/frontend.md) — "Auth aside — Setup 1". Read and edit that file; this pointer only keeps Cursor's globs.
 
-- Full-bleed background video. Do not cover it with a card or wash the whole panel black.
-- Slim bottom strip: **four portals** (Money / Growth / Energy / Soul) by default; **six jars** on website sign-up.
-
-Still iterating:
-
-- Title + description quotes above that strip. They should feel like a manifesto headline (teal eyebrow, hairline, large display type), not caption bars or an opaque plate.
-- Website quotes = marketing door (`AUTH_QUOTES_WEB`). Sign-up leads with how-it-works + jars strip.
-- Application quotes = habit / keep using (`AUTH_QUOTES_APP`).
-
-If the user says “go back to setup 1”, restore this split: video + quote block above + strip below.
+Also: `CLAUDE.md`, `.claude/rules/workflow.md`, `.claude/rules/rumtelo-context.md`.

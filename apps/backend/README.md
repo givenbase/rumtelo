@@ -1,6 +1,6 @@
 # @rumtelo/backend
 
-NestJS 11 + Fastify + oRPC + MikroORM 6 + better-auth. **ESM** — every `@orpc/*`
+NestJS 11 + Fastify + oRPC + MikroORM 7 + better-auth. **ESM** — every `@orpc/*`
 package ships ESM only, so CommonJS is not an option here.
 
 ```bash
@@ -46,7 +46,7 @@ Also avoid cryptic abbreviations that pass the rule (`tx`, `alloc`, `str`) — p
 
 ### MikroORM persistence — no `*AndFlush`
 
-MikroORM 6 deprecates `em.persistAndFlush` / `em.removeAndFlush`. Always chain:
+MikroORM 7 deprecates `em.persistAndFlush` / `em.removeAndFlush`. Always chain:
 
 ```ts
 // ✅

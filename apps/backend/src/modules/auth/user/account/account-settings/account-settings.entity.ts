@@ -4,6 +4,8 @@ import {
     Locale,
     SpendingStyle,
     Theme,
+    WorkSituation,
+    YearIntention,
     type AccountTourProgress,
 } from '@rumtelo/contracts';
 
@@ -16,7 +18,8 @@ import { Account } from '../account.entity';
 /**
  * Account Settings Entity
  *
- * Person-scoped UI prefs — language, appearance, spending style, and tour progress.
+ * Person-scoped UI prefs — language, appearance, spending style, work situation, year intention,
+ * and tour progress.
  * One row per account.
  *
  * Currency and board debt strategy stay on auth.household_settings.
@@ -30,6 +33,13 @@ export class AccountSettings extends BaseEntity {
     /** Guided tour / Help walkthrough progress (offer + per-chapter status). */
     @Property(Jsonb())
     tour: AccountTourProgress = { ...DEFAULT_ACCOUNT_TOUR_PROGRESS, tours: {} };
+
+    /**
+     * Skip the board ladder for this person (every household): the shell shows the full board.
+     * A guidance preference like theme — never changes what the plan or role allow.
+     */
+    @Property({ type: 'boolean', default: false })
+    isShowingAllSurfaces: boolean = false;
 
     /**
      * When personal onboarding finished. Null = still new at person level.
@@ -56,6 +66,14 @@ export class AccountSettings extends BaseEntity {
         })
     )
     spendingStyle: SpendingStyle = SpendingStyle.UNKNOWN;
+
+    /** How the person earns a living — orders goal presets in "Plan your year". Null = not told. */
+    @Enum(NativeEnum({ WorkSituation, domain: 'auth', nullable: true }))
+    workSituation: WorkSituation | null = null;
+
+    /** What the person wants from the year — sets the tone of "Plan your year". Null = not told. */
+    @Enum(NativeEnum({ YearIntention, domain: 'auth', nullable: true }))
+    yearIntention: YearIntention | null = null;
 
     // ? RELATIONSHIPS
     /**

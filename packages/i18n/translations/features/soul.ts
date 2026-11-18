@@ -38,7 +38,7 @@ const soul = {
     stillness: {
         eyebrow: 'Stillness',
         title: 'Control is a rhythm, not a mood.',
-        lead: 'The only practice here that costs nothing and protects everything else.',
+        lead: 'The only routine here that costs nothing and protects everything else.',
         minutes_per_day: 'Minutes per day',
         streak_label: 'In a row',
         mark_done: 'Mark as done',
@@ -49,7 +49,7 @@ const soul = {
         why_title: '✦ Why this is in a money app',
         mind_tie:
             'A restless mind does not steer money — it spends it and calls that a decision. Stillness ' +
-            'is not meditative, it is strategic: the only practice here that costs nothing and protects ' +
+            'is not meditative, it is strategic: the only routine here that costs nothing and protects ' +
             'everything else. Every coin you do not spend impulsively is a coin that chooses a jar.',
         practices: {
             breathing: {

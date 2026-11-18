@@ -1,5 +1,7 @@
 # Rumtelo — direction & handoff
 
+_Last verified: 2026-11-15 against `28506136`._
+
 **Stop wondering where it went.** **Rumtelo — grip on life.**
 
 > Rijkdom is geen getal. Het is grip op je leven.
@@ -18,9 +20,11 @@ This document carries the **direction**, the **decisions and why**, and the
 research briefs live under [`docs/`](./docs/README.md); this file remains the
 living engineering handoff.
 
-**State in one line:** the platform is built and green (`pnpm build` and
-`pnpm check-types` both pass); the ~32 screens are a *reconstruction* and must be
-rebuilt against the real design — see §8, the most important section here.
+**State in one line:** Money is the deepest product (jars → inbox → week check →
+month close, CSV + optional Enable Banking sync); Growth has Course (Koers), goals,
+income, net worth and learn; Energy and Soul are thinner. Billing (Stripe), i18n
+(EN/NL/ES/FR) and Practice (B2B) are live code. Screens are a *partial* port of the
+design — see §8. Status detail: §7; priorities: §9.
 
 ---
 
@@ -36,16 +40,18 @@ Four products, which are also the navigation:
 
 | Product | What it answers |
 |---|---|
-| **Geld** | Where does this month go? |
-| **Groei** | How do I earn more? |
-| **Energie** | What am I running on? Sleep, training, food, rest — the floor under financial decisions, not lifestyle extras. |
-| **Ziel** | Why am I doing this? |
+| **Money** (Geld) | Where does this month go? |
+| **Growth** (Groei) | How do I grow from here? |
+| **Energy** (Energie) | What am I running on? Sleep, training, food, rest — the floor under financial decisions, not lifestyle extras. |
+| **Soul** (Ziel) | Why am I doing this? |
+
+Canonical portal table: [`docs/product/overview.md`](./docs/product/overview.md).
 
 **Audience:** successful people, people who want change, and people who want to
 be successful but don’t yet know the exact next move — see
 [`docs/product/audience.md`](./docs/product/audience.md). Start with the owner
 and friends; a subscription product if it works.
-**Language:** English first, Dutch second.
+**Language:** English first, Dutch second; Spanish and French are generated (§7).
 
 ### Principles the product must not violate
 
@@ -70,7 +76,7 @@ insight.
 | Frontend | Next.js 16, React 19, **Tailwind v4 only** | see §6 |
 | API | NestJS 11 + **Fastify** + **oRPC** | contracts-first, end-to-end types |
 | Contracts | `@rumtelo/contracts` (Zod + procedures) | wire source of truth |
-| ORM | **MikroORM 6** + PostgreSQL | unit-of-work for money rows |
+| ORM | **MikroORM 7** + PostgreSQL | unit-of-work for money rows |
 | Isolation | Row-level `household_id` | never schema-per-tenant |
 | Auth | better-auth (`organization` + `twoFactor`) | Household *is* the org plugin |
 | Lint | **oxlint + oxfmt** | `pnpm lint` |
@@ -111,10 +117,13 @@ apps/
   backend/       NestJS + Fastify + oRPC + MikroORM   :3002
   application/   the authenticated product   :3000
   website/       marketing site              :3001
+  e2e/           Playwright specs (smoke, plan gating, practice invite)
 packages/
   contracts/     oRPC contracts + Zod schemas + typed client (dual CJS/ESM)
-  ui/            shared React primitives
-  typescript-config/
+  i18n/          next-intl catalogs, DeepL generation + cache (EN/NL/ES/FR)
+  ui/            shared React primitives + product widgets
+  config/        Tailwind theme (`tailwind/theme.css`) + shared config
+  hooks/ utils/ brand/ typescript-config/
 docs/            product, brand, research, engineering direction
 devops/          docker-compose (local), Railway notes
 design/          the Claude Design export — see §8
@@ -128,20 +137,30 @@ The same product tree governs modules, API, routes and database. Learn it once.
 
 | Product | Backend module | Contract | Route | DB schema |
 |---|---|---|---|---|
-| — | `modules/auth/household` | `contract.household` | `/settings` | `auth` + `public` |
-| — | `modules/public/platform/coach` | `contract.coach` | — | `public` |
-| **Geld** | `modules/public/product/money/*` | `contract.money.*` | `/money/*` | `public` |
-| **Groei** | `modules/public/product/growth/*` | `contract.growth.*` | `/growth/*` | `public` |
-| **Energie** | `modules/public/product/energy/*` | `contract.energy.*` | `/energy/*` | `public` |
-| **Ziel** | `modules/public/product/soul/*` | `contract.soul.*` | `/soul/*` | `public` |
+| — | `modules/auth/household` | `contract.household` | `/settings/*` | `auth` + `public` |
+| — | `modules/public/platform/coach` | `contract.coach` | `/product/coach` | `public` |
+| — | `modules/public/platform/practice` | `contract.practice` | `/practice/*` | `public` (+ `auth.account_address`) |
+| — | `modules/public/platform/billing` | `contract.billing` | `/settings` (plan), `/practice/billing` | `public` |
+| **Money** | `modules/public/product/money/*` | `contract.money.*` | `/product/money/*` | `public` |
+| **Growth** | `modules/public/product/growth/*` | `contract.growth.*` | `/product/growth/*` | `public` |
+| **Energy** | `modules/public/product/energy/*` | `contract.energy.*` | `/product/energy/*` | `public` |
+| **Soul** | `modules/public/product/soul/*` | `contract.soul.*` | `/product/soul/*` | `public` |
 
-Money's children are the same list in all four places: `jar` `income`
-`fixed-cost` `account` `transaction` `rule` `goal` `debt` `month-score` `week-check`
-`dashboard`.
+App routes live in `apps/application/app/(routes)/[locale]/(app)/(household)/product/…`;
+next-intl runs with `localePrefix: 'never'`, so URLs carry no locale segment.
 
-So `contract.money.jars.list` is served by `modules/public/product/money/plan/jar/jar.controller.ts`,
-reads `public.jar`, and backs `/money/jars`. **Add anything in all four places or
-not at all.**
+Backend folders group children by role, so names are not 1:1 everywhere. Money:
+`plan/{jar,income,fixed-cost,party}`, `ledger/{transaction,bank-account,bank-sync,sort-rule}`,
+`targets/{goal,debt}`, `month-score`, `week-check`, `dashboard`, `archive`. Income and
+goals are served by `contract.money.*` but their screens live under `/product/growth/…`.
+Growth **Course (Koers)**: `modules/public/product/growth/course/`, `contract.growth.course.*`
+(items, `rhythm`, `schedule`, `feed`), routes `/product/growth/course/[[...period]]` and
+`/product/growth/course/week-check`, tables `public.growth_course_*`. Use `course`,
+never `plan`, for its keys.
+
+Example: `contract.money.jars.list` → `modules/public/product/money/plan/jar/jar.controller.ts`
+→ `public.money_jar` (`entityConfig` prefixes the domain) → `/product/money/jars`.
+**Keep the product tree aligned across module, contract, route and table.**
 
 ---
 
@@ -206,86 +225,103 @@ aggregates.
 
 ## 7. What is real and what is not
 
-**Backed by the database and working:** jar balances (one grouped query, not
-N+1); transactions and inbox; CSV import with SHA-256 dedupe so re-importing a
-statement cannot duplicate rows; Dutch decimal parsing (`EUR 1.234,56` breaks a
-naive parser); debt avalanche/snowball ordering; goal projections; energy rolling
-averages; household settings with **Basic / Plus / Max** (`plan_key`); three
-demo personas seeded for live login and Playwright (`apps/e2e`).
+**Backed by the database and working:**
 
-**Screens** use live oRPC queries via `useLiveQuery` / `useQuery` when a
-household is active. Surfaces without APIs yet show empty / “binnenkort”.
+- **Money:** jar balances (one grouped query, not N+1); transactions and inbox;
+  CSV import with SHA-256 dedupe; Dutch decimal parsing (`EUR 1.234,56`); rule
+  replay (`ledger/sort-rule/sort-rule.service.ts` `replay()`); week check with
+  stages (`week-check.service.ts` `advance()`); month-score close
+  (`month-score.service.ts` `close()`); debt avalanche/snowball; goal projections;
+  JSON archive restore.
+- **Growth:** Course (Koers) items, rhythms, schedule, ICS calendar feed
+  (`course-feed.controller.ts`); goals/income screens; net worth (assets); learn
+  (books, focus, progress); levers and milestones as list/CRUD.
+- **Energy:** logs, time + time templates, dashboard rolling averages.
+- **Soul:** gratitude and dashboard.
+- **Platform:** onboarding create-household (`auth/household/household.service.ts`
+  `onboard()`); household settings with **Basic / Plus / Max** (`plan_key`);
+  personal rows with visibility (`common/database/personal.entity.ts`,
+  `PersonalScopedRepository`; used by Course items and rhythms so far); Practice
+  (B2B) clients/staff/invites/billing.
+- **Stripe billing** (`modules/public/platform/billing/billing.service.ts`):
+  checkout, customer portal, plan change and scheduled downgrade, webhooks,
+  practice seat sync, household seat add-ons.
+- **i18n:** `packages/i18n` + next-intl; EN source in `translations/`, NL/ES/FR
+  generated via DeepL with a cache and `translations/overrides.ts`
+  (`pnpm i18n:generate`).
+- **Bank sync:** Enable Banking adapter fully implemented behind
+  `FEATURE_BANK_SYNC` (default `false`; null adapter otherwise), 6-hourly pull
+  (`bank-sync.constants.ts` `BANK_SYNC_CRON`). See `docs/engineering/banking.md`.
+- Three demo personas seeded for live login and Playwright (`apps/e2e`).
 
-**Typed stubs / incomplete:** full onboarding create-household flow; rule replay;
-month-score close; week-check stage transitions; Stripe billing.
+**Screens** use live oRPC queries (`useLiveQuery` / `useQuery`); no mock fixtures.
 
-**Not built:** i18n (copy is hardcoded); holdings / stillness / centers / detailed
-energy APIs; full CRUD e2e suite.
+**Shells / incomplete:**
+
+- Energy, Growth and Soul week checks are `current()` + `complete()` only — no
+  stages (compare Money's `advance()`).
+- **Practice MANAGE writes are not built:** VIEW and MANAGE both map to a
+  read-only VIEWER role (`common/household/membership.service.ts` ~L48), yet
+  MANAGE already sponsors Plus and bills a client seat.
+- Energy food / sleep / training pages render empty states; no dedicated APIs.
+- Soul centers / intent / stillness have no own aggregate (stillness writes an
+  `energy.logs` entry).
+
+**Known issue — launch gating on staging:** `packages/contracts/src/backoffice/plan/launch-products.ts`
+defers Energy and Soul when `NODE_ENV === 'production'`. Staging's backend also
+runs `NODE_ENV=production` (`.github/workflows/README.md`), so Energy and Soul are
+very likely hidden on staging too, despite the file's comment saying otherwise.
+
+**Tests and CI:** three Playwright specs (smoke login, plan gating, practice
+client invite); ~27 Vitest unit files (`*.spec.ts` / `*.test.ts`). GitHub workflows are
+`db-migrate`, `api-smoke`, `e2e-smoke` only — no lint, typecheck, unit test or
+build gate in CI (Husky runs `pnpm lint` locally).
 
 ---
 
-## 8. The design import — START HERE
+## 8. The design
 
-**The ~32 screens in `apps/application` are a reconstruction, not the design.**
+`design/` holds the Claude Design export (`Kluis Finance App.dc.html`,
+`Kluis Landing.dc.html`, `_ds/`). It is readable now.
 
-What happened: `DesignSync.get_file` caps at 256 KiB and returned
-`truncated: true` for `Kluis Finance App.dc.html`. The screens were rebuilt from
-`grep` output — `sc-if` conditions, `sc-for` collection names, extracted strings.
-That produced the **domain** correctly (six jars, inbox, week check, month score, four
-portals) but the layouts, components and visual language are invented.
+**Honest state:** the screens are a **partial port**, not a full rebuild. Some
+components cite `.dc.html` line ranges in their doc comments (jars, net worth,
+nav, portal hub/widget); most others were built from the domain without an
+artboard. The app has also outgrown the design: Kluis is money-only, while the
+app now has Growth (Course, learn, net worth), Energy, Soul, Practice, billing
+and i18n with no artboard at all.
 
-`design/` currently cannot be read: it carries a **`com.apple.macl`** extended
-attribute inherited from `Downloads`, so macOS returns `EPERM` for every syscall —
-Bash *and* the Read tool, sandboxed or not. Note `drwx------@`; the `@` is the
-tell.
+**Rules when porting or extending:**
 
-**Unblock it, in your own terminal:**
+1. Screenshot the artboard and build against what is on screen, not tag names.
+2. Transform inline styles into Tailwind (4px scale, `rounded-*`, `ease-*` /
+   `duration-*`, `@theme` tokens). Never copy inline styles.
+3. Tokens live only in `packages/config/tailwind/theme.css`; apps import
+   `@rumtelo/config/tailwind/globals.css`. No second palette.
+4. Cite the source range (`Kluis Finance App.dc.html:<from>-<to>`) in the
+   component doc comment when a screen follows an artboard.
+5. Surfaces without an artboard follow existing ported screens and `@rumtelo/ui`.
 
-```bash
-xattr -cr "/Users/givenloyiso/Desktop/DEV/rumtelo/design" && ls rumtelo/design
-```
-
-If it still errors, re-copy without the attributes:
-
-```bash
-ditto --norsrc --noextattr --noacl \
-  "/Users/givenloyiso/Downloads/Finance app with Monopoly concept" \
-  "/Users/givenloyiso/Desktop/DEV/rumtelo/design"
-```
-
-**Then, in order:**
-
-1. Read the complete `.dc.html` — all 22 sections, including the truncated tail.
-2. Serve `design/` locally and **screenshot every artboard.** Build against what
-   is on screen, not what tag names imply. Not optional — skipping it is exactly
-   how the current screens went wrong.
-3. Transform each screen's inline styles into Tailwind: spacing onto the 4px
-   scale, `--radius-*` to `rounded-*`, `--ease-out` / `--dur-base` to `ease-*` /
-   `duration-*`, colours onto the `@theme` tokens already in `globals.css`.
-4. Port `Button` from `_ds_bundle.js` as a Tailwind component. It is the **only**
-   component the design imports from the design system — everything else is
-   custom inline-styled markup, so the port is mostly mechanical.
-5. Rebuild the screens against the real layouts.
-
-The design overrides the base design system: the DS is gold-on-obsidian, the app
-re-declares it as **indigo-on-white with a dark mode**. Those overrides are
-already extracted into `apps/application/app/globals.css` and are correct — the
-token layer does not need redoing, only the layouts.
-
-**Everything outside `apps/application/app` and `components/` is
-design-independent and stays:** monorepo, contracts, backend hierarchy,
-household scoping, DB schema, build pipeline.
+Everything outside the screens — monorepo, contracts, backend hierarchy,
+household scoping, DB schema, build pipeline — is design-independent.
 
 ---
 
 ## 9. Next steps, in priority order
 
-1. **Rebuild the screens from the real design** (§8).
-2. **Stripe billing** for Basic/Plus/Max (gates already use `household_settings.plan_key`).
-3. **i18n with `next-intl`,** before there is more hardcoded copy.
-4. **Expand E2E** beyond smoke/plan gating (`apps/e2e`).
-5. **Month-score close and rule replay** — remaining domain logic.
-6. **Holdings / mind / chakra / detailed energy APIs** — screens show empty states until then.
+1. **Practice MANAGE writes** — MANAGE bills a seat but grants read-only access
+   (`common/household/membership.service.ts`). Build writes or stop billing it.
+2. **CI gates** — add lint, typecheck, unit tests and build to GitHub Actions.
+3. **Launch gating on staging** — decide whether staging should show Energy/Soul
+   and fix the `NODE_ENV`-only check (§7 known issue).
+4. **Energy food / training / sleep** — real APIs behind the empty-state pages.
+5. **Soul centers / intent / stillness** — own aggregate instead of energy logs.
+6. **Non-money week checks** — stages for Growth (see
+   `docs/engineering/growth-week-check-plan.md`), Energy and Soul.
+7. **Growth levers and milestones** beyond list/CRUD.
+8. **Expand E2E** beyond the three specs (`apps/e2e`).
+9. **Design** — finish porting Money screens against artboards; design the
+   surfaces Kluis never covered (§8).
 
 ---
 
@@ -313,6 +349,7 @@ Demo sign-in (`telo{Persona}1!`):
 ```bash
 pnpm test:e2e:smoke
 pnpm test:e2e:plan
+pnpm test:e2e:practice
 ```
 
 Env files use sectioned templates (root + `apps/*/`.env.example`).
@@ -355,11 +392,14 @@ node scripts/rename-project.mjs <new-name>
   limited to accounts you link yourself, which fits the owner-plus-friends phase
   exactly. **Full production** (any customer connects a bank) is sales-quote only —
   no public price list. Bank sync sits behind a port with a **null adapter** by
-  default; the Enable Banking adapter throws rather than returning `[]`, because a
+  default; the null adapter throws rather than returning `[]`, because a
   banking adapter that silently returns nothing looks like "your bank has no
-  transactions". CSV import is the always-on path. Canonical write-up:
+  transactions". The Enable Banking adapter is built and binds only when
+  `FEATURE_BANK_SYNC` + credentials are set. CSV import is the always-on path. Canonical write-up:
   [`docs/engineering/banking.md`](docs/engineering/banking.md).
-- **`Downloads` is TCC-protected on macOS** and the attribute follows a copy. §8.
+- **`Downloads` is TCC-protected on macOS** and the `com.apple.macl` attribute
+  follows a copy (historical: `design/` once returned `EPERM` everywhere). Fix
+  with `xattr -cr design` or re-copy with `ditto --norsrc --noextattr --noacl`.
 
 ---
 

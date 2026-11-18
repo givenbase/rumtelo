@@ -1,8 +1,9 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 
-import { useTranslations } from '@rumtelo/i18n';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import {
     Field,
     FormControl,
@@ -12,17 +13,35 @@ import {
     Input,
     Typography,
 } from '@rumtelo/ui';
-import { cn, currencySymbol } from '@rumtelo/utils';
+import { cn, currencySymbol, formatMoney } from '@rumtelo/utils';
+
+import { parseLocaleAmount } from '@/app/_lib/money-input';
 
 import { ONBOARDING_CURRENCIES, type OnboardingValues } from '../onboarding-shared';
 
+/** The live echo trails typing by this long, so a screen reader isn't read every keystroke. */
+const ECHO_DELAY_MS = 400;
+
 export function IncomeStep() {
     const t = useTranslations('pages.onboarding');
+    const locale = useLocale();
     const { control } = useFormContext<OnboardingValues>();
     const currency = useWatch({ control, name: 'currency' });
+    const income = useWatch({ control, name: 'monthlyIncome' });
+
+    const [settledIncome, setSettledIncome] = useState(income);
+    useEffect(() => {
+        const timer = window.setTimeout(() => setSettledIncome(income), ECHO_DELAY_MS);
+        return () => window.clearTimeout(timer);
+    }, [income]);
+
+    const parsed = parseLocaleAmount(settledIncome, locale);
+    const echo = parsed.ok
+        ? t('income_echo', { amount: formatMoney(parsed.minor, { currency, locale }) })
+        : '';
 
     return (
-        <div className="mt-5 grid gap-4">
+        <div className="mt-5 grid gap-5">
             <FormField
                 control={control}
                 name="currency"
@@ -34,7 +53,7 @@ export function IncomeStep() {
                             </Typography>
                             <div
                                 className="grid grid-cols-3 gap-2"
-                                role="group"
+                                role="radiogroup"
                                 aria-labelledby="onboarding-currency-label">
                                 {ONBOARDING_CURRENCIES.map(option => {
                                     const on = field.value === option.code;
@@ -42,10 +61,11 @@ export function IncomeStep() {
                                         <button
                                             key={option.code}
                                             type="button"
-                                            aria-pressed={on}
+                                            role="radio"
+                                            aria-checked={on}
                                             onClick={() => field.onChange(option.code)}
                                             className={cn(
-                                                'grid gap-0.5 rounded-xl border px-2.5 py-3 text-center transition-all',
+                                                'grid min-h-12 content-center gap-0.5 rounded-xl border px-2.5 py-2.5 text-center transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
                                                 on
                                                     ? 'border-accent bg-accent-soft shadow-[inset_0_0_0_1px] shadow-accent/30'
                                                     : 'border-line bg-raised hover:border-accent'
@@ -64,9 +84,6 @@ export function IncomeStep() {
                                     );
                                 })}
                             </div>
-                            <Typography as="p" variant="caption">
-                                {t('currency_hint')}
-                            </Typography>
                         </div>
                         <FormMessage />
                     </FormItem>
@@ -78,32 +95,32 @@ export function IncomeStep() {
                 render={({ field }) => (
                     <FormItem>
                         <Field
-                            label={t('net_income_label', {
-                                symbol: currencySymbol(currency),
-                            })}
+                            label={t('net_income_label')}
                             hint={t('net_income_hint')}
                             htmlFor="income">
-                            <FormControl>
-                                <Input id="income" inputMode="decimal" {...field} />
-                            </FormControl>
+                            <div className="relative">
+                                <span
+                                    aria-hidden="true"
+                                    className="pointer-events-none absolute inset-y-0 left-3 grid place-items-center font-mono text-sm text-fg-muted">
+                                    {currencySymbol(currency)}
+                                </span>
+                                <FormControl>
+                                    <Input
+                                        id="income"
+                                        inputMode="decimal"
+                                        autoComplete="off"
+                                        placeholder={t('net_income_placeholder')}
+                                        className="pl-9"
+                                        {...field}
+                                    />
+                                </FormControl>
+                            </div>
                         </Field>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-            <FormField
-                control={control}
-                name="householdName"
-                render={({ field }) => (
-                    <FormItem>
-                        <Field
-                            label={t('household_name')}
-                            hint={t('household_name_hint')}
-                            htmlFor="hh-name">
-                            <FormControl>
-                                <Input id="hh-name" {...field} />
-                            </FormControl>
-                        </Field>
+                        <p
+                            aria-live="polite"
+                            className={cn('min-h-5 text-sm text-fg-secondary', !echo && 'sr-only')}>
+                            {echo}
+                        </p>
                         <FormMessage />
                     </FormItem>
                 )}

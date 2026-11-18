@@ -21,6 +21,7 @@ import { useForm } from 'react-hook-form';
 
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
+import { isProductEnabled } from '@/app/_lib/launch-products';
 import { isLiveData } from '@/app/_lib/preview';
 import { useAccountTheme } from '@/components/features/shell/account-theme-sync';
 import { useFeatureHelpers } from '@/components/features/helpers';
@@ -300,7 +301,11 @@ export function PreferencesSettings() {
 
             <SettingsInkCard
                 eyebrow={t('pages.settings.panels.coach.eyebrow')}
-                blurb={t('pages.settings.panels.coach.blurb')}>
+                blurb={t(
+                    isProductEnabled('energy') || isProductEnabled('soul')
+                        ? 'pages.settings.panels.coach.blurb'
+                        : 'pages.settings.panels.coach.blurb_core'
+                )}>
                 <Toggle
                     checked={helpersEnabled}
                     label={t('pages.settings.panels.coach.toggle')}

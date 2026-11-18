@@ -68,7 +68,7 @@
                     "party_already_suggested": "Ya le has recomendado esta fiesta a Rumtelo.",
                     "party_already_in_catalog": "Esta fiesta ya está vinculada al catálogo de Rumtelo.",
                     "period_closed": "Este mes está cerrado; no se puede añadir ni modificar nada correspondiente a ese periodo.",
-                    "month_close_incomplete": "Termina las tareas pendientes antes de que termine el mes ({inbox} sin clasificar en la bandeja de entrada, {bills} facturas pendientes de pago o que no se han saltado).",
+                    "month_close_incomplete": "Finish open work before closing this month ({inbox} transactions to sort, {bills} bills unpaid or unskipped).",
                     "month_close_prior_open": "Cierra primero {period}: hay que completar los meses en orden para que el registro sea fiel a la realidad.",
                     "month_close_bill_disposition": "Elige entre «aplazar» u «omitir» cada factura pendiente de pago antes de cerrar ({name}).",
                     "bill_arrears_threshold": "Regístralo como deuda solo después de {count} meses de aplazamiento; sigue aplazándolo o págalo primero.",
@@ -94,7 +94,11 @@
                     "already_household_member": "You already belong to a household. Open Rumtelo instead of creating another one.",
                     "invitation_not_found": "Esta invitación no existe, ha caducado o ya se ha utilizado.",
                     "invitation_accept_failed": "No se ha podido aceptar la invitación. Inténtalo de nuevo o solicita una nueva.",
+                    "member_not_found": "Ese miembro de la familia ya no está aquí",
+                    "cannot_remove_owner": "No se puede desalojar al titular del hogar.",
+                    "member_remove_failed": "No se ha podido eliminar a ese miembro. Inténtalo de nuevo.",
                     "jar_split_total": "El reparto del bote debe sumar el 100 %; recibido {total} %",
+                    "jar_split_keys": "Jar split must list each of the six jars exactly once",
                     "jar_placement_account_invalid": "Esa cuenta bancaria no pertenece a este hogar.",
                     "book_catalog_unavailable": "El catálogo de libros no me dio respuesta.",
                     "contact_send_failed": "No se ha podido enviar tu mensaje. Inténtalo de nuevo o envíanos un correo electrónico directamente.",
@@ -108,6 +112,21 @@
                     "capability_unavailable": "Esta función aún no está disponible",
                     "feature_not_implemented": "Esta función aún no está disponible",
                     "viewer_read_only": "Los usuarios pueden consultar los datos del hogar, pero no pueden modificarlos.",
+                    "visibility_choice_not_allowed": "Esa opción para compartir no está disponible aquí",
+                    "visibility_edit_forbidden": "Solo la persona que lo ha creado puede modificarlo",
+                    "course_item_not_found": "Ese elemento del curso ya no existe",
+                    "course_period_full": "Aquí el límite es cinco. Termina uno, muévelo o déjalo ir primero.",
+                    "course_parent_invalid": "Elige un objetivo de la capa superior, correspondiente al mismo periodo",
+                    "course_carry_done": "Las tareas completadas se quedan donde están",
+                    "course_goal_invalid": "Solo los objetivos anuales y trimestrales pueden vincularse a un objetivo financiero",
+                    "course_target_invalid": "Solo se pueden contar los tiempos de un mes o de un cuarto de paso",
+                    "course_scope_invalid": "Solo un objetivo anual, trimestral o mensual puede ser personal o profesional",
+                    "course_rhythm_not_found": "Esa rutina ya no existe",
+                    "course_rhythm_parent_invalid": "Una rutina se ejecuta cada año, trimestre o mes.",
+                    "course_rhythm_target_invalid": "Muchas veces eso no encaja con este ritmo",
+                    "course_rhythm_tick_future": "Puedes marcar «hoy» o una fecha anterior",
+                    "course_rhythm_renew_invalid": "Esta rutina no incluye ningún paso correspondiente al mes anterior que haya que renovar",
+                    "course_feed_not_found": "Activa primero la fuente del calendario",
                     "role_permission_denied": "Tu personaje no puede hacer eso en esta casa.",
                     "practice_not_found": "Consulta no encontrada",
                     "practice_not_member": "No eres miembro de esta consulta",
@@ -576,7 +595,7 @@
             },
             "home-why": {
                 "name": "¿Por qué?",
-                "description": "Por qué es importante esta práctica."
+                "description": "Why this routine matters."
             },
             "money-overview": {
                 "name": "Resumen",
@@ -596,7 +615,8 @@
             },
             "money-debt": {
                 "name": "Deuda",
-                "description": "Plan de pago de deudas con intereses, orden de liquidación y fecha de liquidación total."
+                "description": "Plan de pago de deudas con intereses, orden de liquidación y fecha de liquidación total.",
+                "gain": "See the date you’re debt-free and what one extra payment changes."
             },
             "money-bank": {
                 "name": "Banco",
@@ -604,7 +624,8 @@
             },
             "money-import": {
                 "name": "Importar",
-                "description": "Subir extractos bancarios (importación en formato CSV)."
+                "description": "Subir extractos bancarios (importación en formato CSV).",
+                "gain": "Bring in a bank statement instead of typing every amount."
             },
             "growth-overview": {
                 "name": "Resumen",
@@ -620,11 +641,13 @@
             },
             "growth-learn": {
                 "name": "Aprender",
-                "description": "Habilidades para el mundo laboral, así como libros, cursos, seminarios y eventos que recomendamos —no organizamos—. Plus y Max."
+                "description": "Habilidades para el mundo laboral, así como libros, cursos, seminarios y eventos que recomendamos —no organizamos—. Plus y Max.",
+                "gain": "Pick one skill a quarter and keep track of what you learn."
             },
             "growth-net-worth": {
                 "name": "Patrimonio neto",
-                "description": "Patrimonio neto, rentabilidad y tu «número de libertad»."
+                "description": "Patrimonio neto, rentabilidad y tu «número de libertad».",
+                "gain": "See what you own minus what you owe, in one number, every month."
             },
             "energy-overview": {
                 "name": "Resumen general",
@@ -652,11 +675,11 @@
             },
             "soul-stillness": {
                 "name": "Silencio",
-                "description": "La práctica de la quietud y la presencia."
+                "description": "Stillness routine and presence."
             },
             "soul-gratitude": {
                 "name": "Agradecimiento",
-                "description": "La práctica de la gratitud."
+                "description": "Gratitude routine."
             },
             "soul-giving": {
                 "name": "Dar",
@@ -673,6 +696,15 @@
             "platform-invite": {
                 "name": "Invitar",
                 "description": "Invita a tu pareja, a un familiar o a un amigo a tu casa."
+            },
+            "platform-sharing": {
+                "name": "Compartir",
+                "description": "Elige quién puede ver cada elemento, configura qué miembros pueden compartirlo y comprueba de quién es cada cantidad de dinero. Plus y Max."
+            },
+            "growth-course": {
+                "name": "Curso",
+                "description": "Tus tres objetivos de esta semana, relacionados con el mes y con el objetivo general al que contribuyen. Plus y Max.",
+                "gain": "Plan your week around the three things that move your goals."
             }
         },
         "coach": {
@@ -688,6 +720,7 @@
                 "lead": "Un paso tras otro. Responde aquí; vete solo cuando haya mucho trabajo.",
                 "quiet_title": "Por ahora ya estás al día",
                 "quiet_body": "No hay nada urgente pendiente. Cierra el mes cuando estés listo, o consulta «Mi semana».",
+                "quiet_body_core": "Nothing urgent is waiting. Close the month when you are ready, or open the week check.",
                 "progress": "{done} of ~{total} this visit",
                 "card_eyebrow": "Siguiente",
                 "answer_label": "Tu respuesta",
@@ -818,8 +851,8 @@
                     "cta": "Costes fijos abiertos"
                 },
                 "inbox_unsorted": {
-                    "text": "Hay {count} transacciones pendientes en la bandeja de entrada. Clasifícalas en grupos para que el panorama siga siendo fiel a la realidad.",
-                    "cta": "Abrir bandeja de entrada"
+                    "text": "{count} transactions are waiting to be sorted. Sort them into jars so the picture stays honest.",
+                    "cta": "Sort transactions"
                 },
                 "necessities_share": {
                     "text": "El porcentaje de «Necesidades» es del {pct} %; el objetivo es el 55 %. Por ahora está bien; para reducir la diferencia, recorta los gastos fijos o aumenta los ingresos y no toques la categoría «Libertad».",
@@ -1249,6 +1282,10 @@
                 "filter_label": "Filtro",
                 "filter_kind_aria": "Filtrar por tipo",
                 "filter_jar_aria": "Filtrar por tarro",
+                "search_placeholder": "Buscar nombre de gol…",
+                "search_aria": "Objetivos de búsqueda",
+                "empty_search_title": "No se han encontrado resultados.",
+                "empty_search_body": "Prueba con otro nombre o borra la búsqueda para ver todos los goles.",
                 "kind_save": "Guardar",
                 "kind_earn": "Ganar",
                 "kind_give": "Dar",
@@ -1449,6 +1486,10 @@
                 "summary": "Tu patrimonio neto es {net} — {owned} en activos menos {owed} en pasivos. Invierte tus ahorros en LTS/Freedom o como activos en efectivo, pero no en ambos.",
                 "show": "Mostrar",
                 "filter_all": "Todos",
+                "search_placeholder": "Buscando resultados…",
+                "search_aria": "Buscar fondos documentales",
+                "empty_search_title": "No se han encontrado resultados.",
+                "empty_search_body": "Prueba con otro nombre o borra la búsqueda para ver todos los ejemplares disponibles.",
                 "asset_one": "1 activo",
                 "asset_many": "{count} activos",
                 "add_kind": "+ Añadir {name}",
@@ -1534,7 +1575,7 @@
                 "catalog_matches": "Catálogo más amplio",
                 "pick_about_to_add": "Elige de qué trata y luego añádelo.",
                 "search_catalog_aria": "Buscar en el catálogo público",
-                "search_catalog_placeholder": "El secreto, Hábitos atómicos…",
+                "search_catalog_placeholder": "Atomic Habits, Deep Work…",
                 "back": "← Aprender",
                 "eyebrow_shelf": "✦ LO QUE APRENDO",
                 "eyebrow_library": "✦ LA BIBLIOTECA",
@@ -1673,6 +1714,10 @@
                 "not_found": "No se ha encontrado la fuente de ingresos.",
                 "back": "← Ingresos",
                 "sources_heading": "✦ Fuentes de ingresos",
+                "search_placeholder": "Buscar fuente de ingresos…",
+                "search_aria": "Buscar fuentes de ingresos",
+                "empty_search_title": "No se han encontrado resultados.",
+                "empty_search_body": "Prueba con otro nombre o borra la búsqueda para ver todas las fuentes.",
                 "empty_live_title": "Aún no hay fuentes de ingresos.",
                 "empty_live_body": "Añade uno para llenar tus tarros.",
                 "empty_guest_title": "Inicia sesión para gestionar tus ingresos.",
@@ -1719,6 +1764,502 @@
                 "tip_raise_monthly_amount": "Aumentar la cuota mensual",
                 "tip_behind_income_no_jar": "{need} al mes permitiría terminar esto en {months} meses. Ponlo en un bote para ver si tus ingresos lo cubren.",
                 "tip_behind_income": "{need} al mes permitiría terminar esto en {months} meses. {jar} no puede cubrir eso aquí."
+            },
+            "course": {
+                "eyebrow": "Crecimiento · Curso",
+                "tabs_aria": "Vista del curso",
+                "tab_today": "Hoy",
+                "tab_week": "Semana",
+                "tab_goals": "Objetivos",
+                "title_today": "Hoy",
+                "lead_today": "Lo que hay hoy: tus 3, tus rutinas y las comprobaciones.",
+                "title_week": "Esta semana",
+                "lead_week": "Tus tres, tus rutinas y las revisiones de la semana.",
+                "title_goals": "Your {year}",
+                "lead_focus_week": "Las tres cosas más importantes. Si quieres, relaciona cada una de ellas con un objetivo.",
+                "section_checks": "Cheques",
+                "section_focus_week": "Tus 3 de esta semana",
+                "section_focus_day": "Tus 3 de hoy",
+                "section_routines": "Tus rutinas",
+                "section_routines_today": "Las rutinas de hoy",
+                "section_advice": "Consejos",
+                "today_empty_focus": "Aún no se ha elegido nada para esta semana.",
+                "today_choose_3": "Elige tus 3",
+                "day_prev": "El día anterior",
+                "day_next": "Al día siguiente",
+                "week_prev": "La semana pasada",
+                "week_next": "La semana que viene",
+                "back_to_today": "Hoy",
+                "back_to_this_week": "Esta semana",
+                "calendar_hint": "¿Quieres esto en Google, Apple o Outlook?",
+                "calendar_link": "Sincronízalo con tu calendario",
+                "quarter_short": "Q{quarter}",
+                "week_short": "W{week}",
+                "who_aria": "Mostrar",
+                "who_me": "Yo",
+                "who_all": "Todos",
+                "section_mine": "Atentamente",
+                "section_shared": "Juntos",
+                "section_of": "De {name}",
+                "empty_slot_week": "¿Cuál es una de tus tres cosas de esta semana?",
+                "empty_slot_day": "¿Cuál es una de tus tres cosas de hoy?",
+                "add": "Añadir",
+                "focus_beyond": "Three is the sweet spot, but {count} is fine.",
+                "focus_full": "That is the most there is room for. Finish or let one go to add another.",
+                "money_shared_note": "A linked money goal is shared with the household.",
+                "hidden_count": "+{count} privado",
+                "private_parent": "Objetivo personal",
+                "link_to_goal": "Enlace a un gol",
+                "carried": "{count}× se marchó",
+                "leftover_eyebrow": "Aún abierto",
+                "leftover_title": "No se ha terminado en {period}",
+                "leftover_lead": "{count, plural, one {# item from the previous {layer} is still open.} other {# items from the previous {layer} are still open.}} Check them off, move them here, or let them go.",
+                "leftover_carry": "Múdate aquí",
+                "leftover_drop": "Déjalo ir",
+                "progress_aria": "{done} de {total} completado",
+                "children_title": "En virtud de esto",
+                "menu_aria": "Acciones para {name}",
+                "mark_done": "Hecho",
+                "mark_open": "Aún no he terminado",
+                "status": {
+                    "OPEN": "Abrir",
+                    "DONE": "Hecho",
+                    "PARTIAL": "En parte",
+                    "MISSED": "No ocurrió",
+                    "DROPPED": "Déjalo ir",
+                    "DEFERRED": "He seguido adelante"
+                },
+                "action_partial": "A medio hacer",
+                "action_missed": "No ocurrió",
+                "action_drop": "Déjalo ir",
+                "action_carry": "Pasar a la siguiente {layer}",
+                "action_edit": "Editar",
+                "action_delete": "Eliminar",
+                "layer_week": "semana",
+                "layer_day": "día",
+                "layer_month": "mes",
+                "layer_quarter": "trimestre",
+                "layer_year": "año",
+                "carried_toast": "Se ha pasado a la siguiente página {layer}",
+                "deleted_toast": "Eliminado",
+                "saved_toast": "Guardado",
+                "form": {
+                    "title_create": "Novedades para este {layer}",
+                    "title_create_goal": "New goal",
+                    "title_edit": "Editar",
+                    "description": "Que sea lo suficientemente pequeño como para poder terminarlo.",
+                    "name": "¿Qué vas a hacer?",
+                    "name_hint": "Título abreviado: es lo que aparece en la tarjeta.",
+                    "deadline": "Fecha límite",
+                    "done_when": "¿Cómo sabrás que ya está listo?",
+                    "done_when_hint": "El resultado o la prueba. El plazo es el período mencionado anteriormente, no una fecha concreta.",
+                    "parent": "Pertenece a",
+                    "parent_optional": "(opcional)",
+                    "parent_none": "Nada existe por sí solo",
+                    "scope": "Personal or business?",
+                    "scope_none": "Not set",
+                    "money_goal": "Objetivo financiero",
+                    "money_goal_none": "Sin objetivo económico",
+                    "target_count": "¿Cuántas veces?",
+                    "target_count_hint": "Para un paso cuantificable, como «12 sesiones de entrenamiento». Las marcas de las rutinas que lo componen llenan el anillo.",
+                    "save": "Guardar",
+                    "cancel": "Cancelar"
+                },
+                "goal": {
+                    "count": "{count, plural, one {# goal} other {# goals}}",
+                    "add_goal": "Goal",
+                    "add_goal_aria": "Add a goal",
+                    "add_goal_amount": "Goal with an amount",
+                    "list_aria": "Goals for {year}",
+                    "empty_title": "No goals yet",
+                    "empty_body": "Start with one thing you want this year. Steps and weeks follow.",
+                    "loose_title": "Loose steps · {month}",
+                    "summary_steps": "Steps this month",
+                    "summary_focus": "Focus this week",
+                    "summary_needing": "Goals needing a step",
+                    "ring_aria": "{name}: {percent}% done",
+                    "no_step_yet": "No step in {month} yet",
+                    "step_line": "{month}: {step}",
+                    "step_more": "+{count} more",
+                    "money_no_steps": "No steps yet",
+                    "add_step": "Step",
+                    "scope_PERSONAL": "Personal",
+                    "scope_BUSINESS": "Business",
+                    "done_when": "Done when",
+                    "timeline_aria": "Months of {year}: where a step is planned",
+                    "timeline_step": "step planned",
+                    "timeline_no_step": "no step yet",
+                    "steps_title": "Steps in {month}",
+                    "week_title": "This week",
+                    "routines_title": "Routines",
+                    "plan_steps": "Plan steps",
+                    "add_to_week": "Add to this week",
+                    "step_for": "Step for {month}",
+                    "money_title": "Money goal",
+                    "money_saved": "{saved} of {target}",
+                    "money_lands": "Lands around {date} at the current pace."
+                },
+                "preset": {
+                    "run_10k": {
+                        "name": "Run a 10k",
+                        "doneWhen": "I have run 10 km without stopping",
+                        "firstStep": "Run an easy 3 km, twice",
+                        "rhythm": "Run 3× a week"
+                    },
+                    "sleep_7h": {
+                        "name": "Sleep 7 hours or more",
+                        "doneWhen": "Most nights I sleep at least 7 hours",
+                        "firstStep": "Pick a fixed bedtime and try it for a week",
+                        "rhythm": "Lights out on time"
+                    },
+                    "weekly_date": {
+                        "name": "A weekly date",
+                        "doneWhen": "We have a date every week",
+                        "firstStep": "Plan the first two dates in your calendar",
+                        "rhythm": "Date night"
+                    },
+                    "family_time": {
+                        "name": "Protect family time",
+                        "doneWhen": "Family time is a fixed part of my week",
+                        "firstStep": "Choose one fixed moment for family this month",
+                        "rhythm": "Family time"
+                    },
+                    "read_12_books": {
+                        "name": "Read 12 books",
+                        "doneWhen": "I have finished 12 books",
+                        "firstStep": "Pick your first book and read the first chapter",
+                        "rhythm": "Read 10 minutes"
+                    },
+                    "learn_language": {
+                        "name": "Learn a language",
+                        "doneWhen": "I can hold a 10 minute conversation",
+                        "firstStep": "Choose a language, a method and a first lesson",
+                        "rhythm": "Practise 3× a week"
+                    },
+                    "emergency_buffer": {
+                        "name": "Build an emergency buffer",
+                        "doneWhen": "The buffer is in my Long Term Savings jar",
+                        "firstStep": "Decide the amount and set up the monthly transfer"
+                    },
+                    "pay_off_debt": {
+                        "name": "Pay off a debt",
+                        "doneWhen": "The debt is paid off",
+                        "firstStep": "List the debt, the rate and the monthly payment"
+                    },
+                    "holiday": {
+                        "name": "Save for a holiday",
+                        "doneWhen": "The holiday is paid for before I go",
+                        "firstStep": "Pick where and when, then set the amount"
+                    },
+                    "gratitude_routine": {
+                        "name": "A daily moment of gratitude",
+                        "doneWhen": "I take a moment of gratitude on most days",
+                        "firstStep": "Write down three things you are grateful for tonight",
+                        "rhythm": "Gratitude moment"
+                    },
+                    "raise_income": {
+                        "name": "Raise my income",
+                        "doneWhen": "My monthly net income has reached the target",
+                        "firstStep": "Write down your current income and the target"
+                    },
+                    "new_clients": {
+                        "name": "Win new clients",
+                        "doneWhen": "I have signed the number of new clients I aimed for",
+                        "firstStep": "List 10 people or companies you would like to work with",
+                        "rhythm": "Reach out to 2 prospects"
+                    },
+                    "promotion_raise": {
+                        "name": "Go for a promotion or raise",
+                        "doneWhen": "I have had the conversation and know the outcome",
+                        "firstStep": "Write down your results of the past year",
+                        "rhythm": "Check in with your manager"
+                    },
+                    "find_work": {
+                        "name": "Find work",
+                        "doneWhen": "I have started a job or assignment that fits",
+                        "firstStep": "Update your CV and list 10 places to apply",
+                        "rhythm": "Apply or reach out 3× a week"
+                    },
+                    "learn_work_skill": {
+                        "name": "Learn a skill for work",
+                        "doneWhen": "I can use the skill in my work",
+                        "firstStep": "Choose the skill and a first course or mentor",
+                        "rhythm": "Study 2× a week"
+                    },
+                    "stop_at_18": {
+                        "name": "Stop work at 18:00",
+                        "doneWhen": "Most days I am done with work at 18:00",
+                        "firstStep": "Choose a shutdown moment and tell the people around you",
+                        "rhythm": "Done by 18:00"
+                    }
+                },
+                "plan": {
+                    "cta": "Plan your year",
+                    "close": "Back to goals",
+                    "title": "Plan {year}",
+                    "steps_aria": "Progress",
+                    "progress": "Step {current} of {total}",
+                    "nav_aria": "Previous and next step",
+                    "step_now": "You now",
+                    "step_areas": "Areas",
+                    "step_goals": "Goals",
+                    "step_break": "Break it down",
+                    "step_save": "Save",
+                    "now_title": "Where are you now?",
+                    "now_lead": "Two quick questions so the ideas that follow fit your life. You can skip this.",
+                    "areas_title": "What would you like to look at?",
+                    "areas_lead": "Pick as many areas as you like. They only decide which ideas you see next.",
+                    "goals_title": "Your goals for {year}",
+                    "goals_lead": "Pick an idea or write your own. Change every word, nothing is saved yet.",
+                    "break_title": "Break it down",
+                    "break_lead": "One small first step for {month} and, if you like, a routine that keeps it going. Both are optional.",
+                    "save_title": "Ready to save?",
+                    "save_lead": "This is what will be created. If something goes wrong, what is saved stays and you can try again.",
+                    "back": "Back",
+                    "next": "Next",
+                    "skip": "Skip",
+                    "save": "Save my plan",
+                    "saving": "Saving…",
+                    "retry": "Try again",
+                    "done_toast": "Your plan is saved",
+                    "done_amount_missed": "Your plan is saved. Not every amount could be saved; add those later under Money goals.",
+                    "work_title": "How do you earn a living?",
+                    "work_hint": "Pick the closest one.",
+                    "work_EMPLOYED": "Employed",
+                    "work_EMPLOYED_hint": "A job with an employer",
+                    "work_SELF_EMPLOYED": "Self-employed",
+                    "work_SELF_EMPLOYED_hint": "My own business or freelance work",
+                    "work_BOTH": "Both",
+                    "work_BOTH_hint": "A job and a business side by side",
+                    "work_STUDENT": "Studying",
+                    "work_STUDENT_hint": "Learning is my main job right now",
+                    "work_SEEKING": "Looking for work",
+                    "work_SEEKING_hint": "Looking for a job or a next step",
+                    "intention_title": "What do you want from {year}?",
+                    "intention_hint": "This sets the tone, not a rule.",
+                    "intention_CALM": "A calm year",
+                    "intention_CALM_hint": "Keep things steady and protect what works",
+                    "intention_GROW": "Grow",
+                    "intention_GROW_hint": "Stretch a little further in what is already running",
+                    "intention_BUILD": "Build something new",
+                    "intention_BUILD_hint": "Start something I have not done before",
+                    "intention_RECOVER": "Catch my breath",
+                    "intention_RECOVER_hint": "Rest after a hard stretch",
+                    "intention_CALM_goals": "A calm year: one or two goals are plenty.",
+                    "intention_GROW_goals": "A year of growth: pick what you already believe in.",
+                    "intention_BUILD_goals": "A year of building: start small and make the first step easy.",
+                    "intention_RECOVER_goals": "A year to recover: keep it light, rest is a goal too.",
+                    "group_PERSONAL": "Personal",
+                    "group_PERSONAL_hint": "Just for you",
+                    "group_BUSINESS": "Business",
+                    "group_BUSINESS_hint": "Your work, job or business",
+                    "area_health": "Health & energy",
+                    "area_relationships": "Relationships",
+                    "area_learning": "Growth & learning",
+                    "area_freedom": "Money & freedom",
+                    "area_meaning": "Meaning",
+                    "area_income": "Income",
+                    "area_clients": "Clients & network",
+                    "area_career": "Career or business",
+                    "area_skills": "Skills",
+                    "area_balance": "Work-life balance",
+                    "areas_none": "Pick at least one area to continue.",
+                    "goals_prompt": "What do you want to see different by the end of {year}?",
+                    "goals_none": "Pick an idea or write your own to continue.",
+                    "own": "Write my own",
+                    "own_hint": "Start from a blank goal",
+                    "editor_name": "Goal",
+                    "editor_done_when": "Done when",
+                    "editor_done_when_hint": "How will you know it is done?",
+                    "editor_scope": "This goal is",
+                    "amount_toggle": "Is there an amount attached?",
+                    "amount_toggle_hint": "It becomes a money goal in Money.",
+                    "amount_kind_aria": "What kind of amount",
+                    "amount_kind_SAVE": "An amount to save",
+                    "amount_kind_EARN": "A monthly income",
+                    "amount_save": "Amount to save by the end of the year",
+                    "amount_save_hint": "The total you want to have put aside.",
+                    "amount_earn": "Monthly income to reach",
+                    "amount_earn_hint": "Your net income per month. It does not come out of a jar.",
+                    "per_month": "≈ {amount} per month until December",
+                    "jar": "Which jar?",
+                    "jar_hint": "Planned spends live in Long Term Savings.",
+                    "jar_placeholder": "Choose a jar",
+                    "shared_note": "A goal with an amount is shared with your household in Money.",
+                    "amount_locked": "Amounts on goals come with a plan that includes money goals. The goal itself is saved.",
+                    "remove_goal": "Remove this goal",
+                    "step_label": "First step in {month}",
+                    "step_hint": "Small enough to start this month. Leave it empty to add one later.",
+                    "routine_toggle": "Keep a routine",
+                    "routine_hint": "A pattern that keeps the goal alive.",
+                    "routine_name": "Routine",
+                    "routine_daily": "Every day",
+                    "routine_target_WEEKLY": "Times a week",
+                    "routine_target_MONTHLY": "Times a month",
+                    "balance_only_BUSINESS": "{count, plural, one {# business goal} other {# business goals}}, none just for you. Add one?",
+                    "balance_only_PERSONAL": "{count, plural, one {# personal goal} other {# personal goals}}, none for your work. Add one?",
+                    "balance_add": "Back to the areas",
+                    "save_list_aria": "What will be created",
+                    "summary_save": "Money goal {amount}",
+                    "summary_earn": "Income goal {amount} a month",
+                    "summary_step": "First step",
+                    "summary_routine": "Routine",
+                    "progress_line": "{saved} of {total} goals saved…",
+                    "partial": "{saved} of {total} goals saved. What is saved stays; try again for the rest.",
+                    "amount_missed": "The goal is saved, the amount is not ({reason}). You can add it later under Money goals.",
+                    "stage_money": "Money goal",
+                    "stage_year": "Goal",
+                    "stage_step": "First step",
+                    "stage_routine": "Routine",
+                    "status_pending": "waiting",
+                    "status_working": "saving",
+                    "status_done": "saved",
+                    "status_failed": "not saved",
+                    "status_skipped": "skipped",
+                    "error": {
+                        "name_required": "Give the goal a name",
+                        "amount_invalid": "Enter an amount above zero",
+                        "jar_required": "Choose a jar",
+                        "target_invalid": "Enter a number that fits",
+                        "routine_name_required": "Give the routine a name"
+                    }
+                },
+                "visibility": {
+                    "label": "¿Quién ve esto?",
+                    "PRIVATE": "Solo yo",
+                    "OWNER": "Compartir con {owner}",
+                    "HOUSEHOLD": "Todo el hogar",
+                    "SHARED": "Juntos",
+                    "hint_PRIVATE": "Solo tú ves esto.",
+                    "hint_OWNER": "{owner} puede verlo. Nadie más. Solo tú puedes editarlo.",
+                    "hint_HOUSEHOLD": "Todos los miembros de la familia lo ven. Pero solo tú lo editas.",
+                    "hint_SHARED": "Vuestro objetivo común. Todos pueden verlo y actualizarlo.",
+                    "badge_PRIVATE": "Solo yo",
+                    "badge_OWNER": "Compartido",
+                    "badge_HOUSEHOLD": "Compartido",
+                    "badge_SHARED": "Juntos",
+                    "owner_fallback": "el propietario"
+                },
+                "hub_card": "Curso",
+                "hub_note": "hecho esta semana",
+                "week_check_cta": "Resumen semanal",
+                "counter": "{done} / {total}",
+                "lane": {
+                    "FOCUS": "Enfoque",
+                    "HABIT": "Hábito",
+                    "DISCIPLINE": "Disciplina",
+                    "CHECK": "Comprobar",
+                    "ADVICE": "Consejos"
+                },
+                "rhythm": {
+                    "empty_body": "Añade una que quieras mantener, como «Entrenar 3 veces a la semana» debajo de «12 entrenamientos este mes».",
+                    "add": "Establece una rutina",
+                    "rule": "Una rutina nunca te quita uno de tus tres. La disciplina cuenta y ocupa el escalón superior; un hábito solo te pregunta: «¿Ya está?».",
+                    "kind_HABIT": "Hábito",
+                    "kind_DISCIPLINE": "Disciplina",
+                    "pattern_daily": "Todos los días",
+                    "pattern_weekly": "{count}× a la semana",
+                    "pattern_monthly": "{count}× al mes",
+                    "paused": "En pausa",
+                    "private_parent": "Objetivo personal",
+                    "menu_aria": "Acciones para {name}",
+                    "action_edit": "Editar",
+                    "action_focus": "Que sea uno de mis tres de esta semana",
+                    "action_pause": "Pausa",
+                    "action_resume": "Currículum",
+                    "action_stop": "Alto",
+                    "days_aria": "Días para {name}",
+                    "tick_day": "Marca {day}",
+                    "untick_day": "Desmarca {day}",
+                    "tick_today": "Marca {name} para hoy",
+                    "untick_today": "Desmarca {name} para hoy",
+                    "count_week": "{done} de {total} esta semana",
+                    "count_month": "{done} de {total} este mes",
+                    "renew_inline": "Vuelve a establecer «{name}» para este periodo",
+                    "suggest_eyebrow": "Nueva semana",
+                    "suggest_title": "¿Seguimos con esto?",
+                    "suggest_lead": "No se copia nada sin tu consentimiento.",
+                    "suggest_keep": "{name}: {done} de {total} en {period}. ¿Quieres seguir con {pattern}?",
+                    "suggest_renew": "«{name}» pertenecía a {from}. ¿Quieres volver a asignarlo a {to}?",
+                    "keep_going": "Sigue adelante",
+                    "smaller": "Más pequeño ({count}×)",
+                    "renew": "Vuelve a configurarlo",
+                    "renew_with_count": "Vuelve a configurarlo ({count}×)",
+                    "not_now": "Ahora no",
+                    "paused_toast": "En pausa",
+                    "resumed_toast": "Vuelvo a correr",
+                    "stopped_toast": "Se ha detenido. Las marcas anteriores siguen contando.",
+                    "confirmed_toast": "No se rinde",
+                    "smaller_toast": "Reducido de tamaño",
+                    "renewed_toast": "Vuelve a configurarlo para este periodo",
+                    "focus_toast": "Añadido a tus 3 de esta semana",
+                    "hub_card": "Ritmo",
+                    "hub_note": "rutinas de hoy",
+                    "form": {
+                        "title_create": "Nueva rutina",
+                        "title_edit": "Editar rutina",
+                        "description": "Un patrón que mantienes. Nunca llega a ocupar uno de tus tres.",
+                        "name": "¿Qué sigues haciendo?",
+                        "name_hint": "Corto, como «Entrenar» o «Leer 20 minutos».",
+                        "kind": "Tipo",
+                        "kind_HABIT_hint": "Poco a poco y con frecuencia. Sin contar: o se hace o no se hace.",
+                        "kind_DISCIPLINE_hint": "Cuantificable, como 3 veces a la semana. Cumple con el requisito del nivel superior.",
+                        "cadence": "Recuento por",
+                        "cadence_DAILY": "Día",
+                        "cadence_WEEKLY": "Semana",
+                        "cadence_MONTHLY": "Mes",
+                        "target": "Tiempos",
+                        "target_week_range": "De 1 a 7 veces por semana",
+                        "target_month_range": "De 1 a 31 veces al mes",
+                        "weekdays": "¿Qué días?",
+                        "weekdays_hint": "Délo en blanco para poder elegir los días libremente.",
+                        "parent_hint": "Un objetivo anual o un paso mensual. Cada disciplina va llenando su contador."
+                    }
+                },
+                "week_check": {
+                    "back_title": "¿Qué tal te ha ido con {week}?",
+                    "back_lead": "Marca cada uno. Lo que no se ha hecho es un hecho: sigue adelante o déjalo estar.",
+                    "back_empty": "La semana pasada no se decidió nada. No pasa nada. Empieza con los tres que hay por delante.",
+                    "rhythm_title": "Tus rutinas",
+                    "rhythm_lead": "Sigue adelante, hazlo más pequeño o haz una pausa. Nada se repite sin tu consentimiento.",
+                    "rhythm_empty": "Esta semana no hay propuestas.",
+                    "rhythm_open": "Inicio de la semana",
+                    "ahead_title": "Tus 3 por {week}",
+                    "ahead_lead": "¿Qué es lo más importante? Si quieres, relaciona cada uno con un objetivo."
+                },
+                "entry": {
+                    "growth_week_check": "Revisión semanal del crecimiento",
+                    "growth_week_check_lead": "Echa la vista atrás, mantén tus rutinas y fija los tres siguientes.",
+                    "money_week_check": "Revisión de la «Semana del dinero»",
+                    "money_week_check_lead": "Excedente y un propósito para la semana.",
+                    "month_close": "Cerrar {month}",
+                    "month_close_reminder": "Planifica el cierre mensual: {month}",
+                    "month_close_reminder_lead": "Vence el {date}. Elige un momento para hacerlo.",
+                    "month_close_due_lead": "Hoy es el último día.",
+                    "month_close_overdue": "{month} sigue abierto",
+                    "month_close_overdue_lead": "Se queda aquí hasta que lo cierres.",
+                    "sleep": "Sueño: {hours} h previstas",
+                    "sleep_advice": "Recomendación: {low}–{high} h.",
+                    "sleep_under": "Un poco menos de las {low}–{high} h recomendadas.",
+                    "snooze": "Ahora no",
+                    "snoozed_toast": "El recordatorio se ha trasladado al último día",
+                    "open": "Abrir",
+                    "done": "Hecho"
+                },
+                "home_card": {
+                    "eyebrow": "Hoy",
+                    "empty": "Aún no he elegido nada. ¿Cuál es una de tus tres opciones de esta semana?",
+                    "focus_aria": "Tu 3",
+                    "rhythm_aria": "Las rutinas de hoy",
+                    "done": "{done} de {total} completado",
+                    "next_check": "Siguiente: {check} · {when}",
+                    "today": "hoy",
+                    "sleep": "Dormir {hours} h",
+                    "check_GROWTH_WEEK_CHECK": "Resumen semanal",
+                    "check_MONEY_WEEK_CHECK": "Comprobación de fondos",
+                    "check_MONTH_CLOSE": "Cierre mensual",
+                    "open": "Curso abierto"
+                }
             },
             "asset_form": {
                 "save": "Guardar activo",
@@ -1965,6 +2506,10 @@
                 "filter_label": "Filtro",
                 "filter_all": "Todos",
                 "filter_jar_aria": "Filtrar por tarro",
+                "search_placeholder": "Buscar nombre o beneficiario…",
+                "search_aria": "Buscar costes fijos e ingresos",
+                "empty_search_title": "No se han encontrado resultados.",
+                "empty_search_body": "Prueba con otro nombre o borra la búsqueda para ver la lista completa.",
                 "empty_jar_title": "No hay nada en este frasco.",
                 "empty_jar_body": "Aquí no se asignan costes fijos.",
                 "empty_all_title": "Aún no hay gastos fijos.",
@@ -2119,7 +2664,7 @@
                 "sort_amount_high": "Importe máximo",
                 "sort_amount_low": "Importe mínimo",
                 "unassigned": "Sin asignar",
-                "inbox_chip": "Bandeja de entrada",
+                "inbox_chip": "To sort",
                 "rules_help": "Se dan prioridad a las coincidencias de la primera búsqueda. Las reglas inactivas (0 coincidencias) se pueden eliminar sin problema.",
                 "rule_if": "Si {field} {matcher} «{value}»",
                 "rule_meta": "→ {jar} · prioridad {priority} · {hits}",
@@ -2180,9 +2725,9 @@
                     "toast_bank_mismatch": "Cuenta incorrecta para este archivo: importación bloqueada."
                 },
                 "rules_sign_in_title": "Inicia sesión para gestionar las reglas.",
-                "rules_sign_in_body": "Las reglas clasifican automáticamente las transacciones de la bandeja de entrada en el tarro correspondiente.",
+                "rules_sign_in_body": "Rules automatically sort new transactions into the right jar.",
                 "rules_empty_title": "Aún no hay normas.",
-                "rules_empty_body": "Selecciona «Siempre esto» en un mensaje de la bandeja de entrada para configurar una regla. Después, podrás gestionarlas aquí.",
+                "rules_empty_body": "Choose “Always this” on a transaction to sort to teach a rule. Manage them here afterwards.",
                 "toast_sorted": "Clasificado y regla guardada",
                 "toast_sorted_tx": "Transacción resuelta",
                 "toast_sorted_fixed": "Clasificados y vinculados a los costes fijos",
@@ -2191,7 +2736,7 @@
                 "toast_rules_failed": "No se han podido aplicar las reglas",
                 "toast_rules_sorted_one": "{count} transacciones ordenadas",
                 "toast_rules_sorted_other": "{count} transacciones ordenadas",
-                "toast_rules_no_match": "No hay resultados — la bandeja de entrada no ha cambiado",
+                "toast_rules_no_match": "No matches — nothing changed",
                 "toast_rule_deleted": "Regla eliminada",
                 "toast_delete_failed": "Error al eliminar",
                 "inbox_sort": {
@@ -2220,7 +2765,7 @@
                     "source_csv": "Importación de CSV",
                     "source_bank": "Extracto bancario",
                     "source_recurring": "Desde un plan recurrente",
-                    "status_inbox": "Pendiente en la bandeja de entrada",
+                    "status_inbox": "Waiting to be sorted",
                     "status_sorted": "Clasificados en un tarro",
                     "status_ignored": "No se ha tenido en cuenta (no se ha incluido en los cálculos presupuestarios)",
                     "hint_linked_settlement": "Liquidación vinculada para este periodo",
@@ -2231,7 +2776,7 @@
                     "hint_applied_debt": "Aplicado al saldo de la deuda",
                     "hint_manage_rules": "Gestionar las reglas en la página «Transacciones»",
                     "hint_catalog_sorted": "No se ha encontrado ninguna regla doméstica que coincida: el catálogo comercial lo clasificó así",
-                    "inbox_still": "Todavía en la bandeja de entrada",
+                    "inbox_still": "Still to sort",
                     "inbox_assign_jar": "Asigna un bote para incluirlo en el presupuesto",
                     "linked_debt_fallback": "Deuda vinculada",
                     "hint_on_jar_planned": "El {jar} · previsto para el {amount}",
@@ -2473,38 +3018,69 @@
             },
             "week_check": {
                 "page_eyebrow": "Diez minutos a la semana",
-                "page_title": "El resumen semanal",
-                "page_lead": "Rumtelo no te quita las tardes. Una revisión semanal —observar, analizar, fijar un objetivo— es mejor que preocuparse todos los días.",
-                "step": "Paso {n}",
+                "page_title": "Week check",
+                "page_lead": "Ten minutes. See where it went, give the rest a job, set one intention.",
+                "week_label": "Week {week} · {range}",
+                "grace_note": "Last week's check is still open. Close it first — this week's opens after.",
+                "progress": "Step {current} of {total} · about ten minutes",
+                "group_money": "Money · week {week}",
+                "group_course": "Course · week {week}",
+                "steps_aria": "Steps of the week check",
+                "step_go_back": "Go back to {step}",
+                "step_course_back": "Last week's three",
+                "step_course_routines": "Routines",
+                "step_course_ahead": "Next week's three",
                 "look_label": "Mira",
-                "look_sub": "¿Qué ha pasado esta semana?",
                 "look_eyebrow": "✦ Mira",
                 "look_title": "¿Qué has hecho esta semana?",
                 "look_lead": "Sin juzgar. Solo necesitamos información.",
+                "look_over_by": "Over by {amount}",
+                "look_move": "Move money",
+                "look_no_income": "No income this month yet.",
+                "look_add_income": "Add income",
                 "direct_label": "Directo",
-                "direct_sub": "¿A dónde va a parar el superávit?",
                 "direct_eyebrow": "✦ Directo",
                 "direct_title": "Distribuir el excedente",
                 "direct_surplus": "{amount} aún no tiene destino. Envíalo a donde sea que funcione.",
-                "direct_none": "Esta semana no hay excedente, así que no hay nada que reasignar. Sigue cuando estés listo.",
                 "send_here": "Envía aquí",
                 "intend_label": "Pretender",
-                "intend_sub": "¿Qué te propones hacer la semana que viene?",
                 "intend_eyebrow": "✦ Pretender",
                 "intend_title": "Mi intención para la semana que viene",
                 "intend_lead": "Una sola frase. ¿Qué harás de forma diferente?",
                 "intend_placeholder": "Escribe aquí tu intención...",
                 "intend_aria": "Propósito para la próxima semana",
                 "intend_encourage": "Bien. Recuérdalo cuando la semana se te haga dura.",
+                "intend_saved": "Your intention: {intention}",
                 "back": "← Atrás",
                 "next": "Siguiente →",
-                "complete": "Revisión semanal completa ✓",
+                "finish": "Finish week check",
+                "skip_course": "Skip Course this week",
+                "skip_course_toast": "Week check done. Course stays open for this week.",
+                "course_load_failed": "We couldn't load this part of Course. Try again, or skip it this week.",
                 "toast_done": "Ya he hecho el repaso semanal. Nos vemos la semana que viene.",
+                "save_failed": "Not saved. Your answers are still here.",
+                "error_no_jars": "We couldn't load your jars. Try again.",
                 "done_eyebrow": "✦ Hecho",
-                "done_title": "La comprobación de esta semana ha finalizado",
-                "done_lead": "Una mirada, un desvío, una intención. Vuelve la semana que viene.",
+                "done_title": "Done for week {week}.",
+                "done_lead": "One look, one move, one intention.",
+                "done_allocations_label": "Moved this week",
                 "done_intention_label": "Tu intención",
-                "done_home": "De vuelta a casa"
+                "done_next_three_label": "Next week's three",
+                "done_course_open": "Course for next week is still open.",
+                "done_course_open_cta": "Plan Course anyway",
+                "done_home": "De vuelta a casa",
+                "look_again": "Look again",
+                "look_again_note": "Read only — this doesn't change your check.",
+                "back_to_summary": "Back to summary",
+                "summary_status_done": "Done on {day}",
+                "summary_status_open": "Not done yet",
+                "summary_read_only": "Read only. The household does the week check.",
+                "entry": "Week check",
+                "entry_done": "Week check",
+                "entry_done_sr": "done this week",
+                "entry_view": "View week check",
+                "entry_status_open": "This week: not done yet",
+                "entry_status_done": "This week: done"
             },
             "giving_finder": {
                 "title": "¿En qué quieres echar una mano?",
@@ -2595,6 +3171,8 @@
                 "sort_label": "Ordenar",
                 "sort_aria": "Clasificar las deudas",
                 "filter_aria": "Filtrar deudas",
+                "search_placeholder": "Buscar entidad crediticia o deuda…",
+                "search_aria": "Buscar deudas",
                 "filter_all": "Todos",
                 "filter_expensive": "Caro",
                 "filter_lower": "Tasa más baja",
@@ -2626,6 +3204,8 @@
                 "empty_body": "Añade una deuda para llevar un control de su liquidación y de la fecha de finalización.",
                 "empty_filter": "No hay deudas que se ajusten a este filtro.",
                 "empty_filter_body": "Prueba con otro filtro o desactívalo para ver todas las deudas.",
+                "empty_search_title": "No se han encontrado resultados.",
+                "empty_search_body": "Prueba con otro nombre o borra la búsqueda para ver todas las deudas.",
                 "pick_type_first": "Elige primero un tipo de deuda",
                 "form": {
                     "save": "Guardar deuda",
@@ -2868,7 +3448,7 @@
             "stillness": {
                 "eyebrow": "Silencio",
                 "title": "El control es un ritmo, no un estado de ánimo.",
-                "lead": "La única práctica que aquí no cuesta nada y protege todo lo demás.",
+                "lead": "The only routine here that costs nothing and protects everything else.",
                 "minutes_per_day": "Minutos al día",
                 "streak_label": "De forma consecutiva",
                 "mark_done": "Marcar como completado",
@@ -2877,7 +3457,7 @@
                 "toast_logged": "La quietud se registra como puntuación mental",
                 "mind_note": "{minutes} minutos de silencio",
                 "why_title": "✦ ¿Por qué aparece esto en una aplicación de finanzas?",
-                "mind_tie": "Una mente inquieta no gestiona el dinero, sino que lo gasta y lo llama «decisión». La quietud no es meditativa, es estratégica: la única práctica que no cuesta nada y que protege todo lo demás. Cada moneda que no gastas por impulso es una moneda que elige un tarro.",
+                "mind_tie": "A restless mind does not steer money — it spends it and calls that a decision. Stillness is not meditative, it is strategic: the only routine here that costs nothing and protects everything else. Every coin you do not spend impulsively is a coin that chooses a jar.",
                 "practices": {
                     "breathing": {
                         "meta": "2-5 min",
@@ -3147,9 +3727,17 @@
                             "heading": "Lo que estás viendo",
                             "body": "Tu resumen financiero de este mes: el entrenador, la visión general de las finanzas y las puertas hacia el crecimiento, la energía y el alma. Empieza el recorrido completo desde «Ayuda» para pasar por «Inicio», y luego por los frascos, los gastos fijos y los ingresos."
                         },
+                        "what_for_core": {
+                            "heading": "What you’re looking at",
+                            "body": "Your grip snapshot for this month — The Coach, the money picture, and the door into Growth. Start the full tour from Help to walk through Home, then jars, fixed costs, and income."
+                        },
                         "how": {
                             "heading": "Cómo utilizarlo",
                             "body": "Utiliza «Período de uso» (arriba a la derecha) para cambiar de mes. Abre un portal cuando necesites esa herramienta. Pulsa en «Ayuda» en cualquier momento para volver a ver este tutorial."
+                        },
+                        "score": {
+                            "heading": "Your month score and level",
+                            "body": "Each month you close adds to your score. Your level grows with it: a record of your routine, not a key. Nothing opens or closes with a level."
                         }
                     },
                     "steps": {
@@ -3164,6 +3752,10 @@
                         "portals": {
                             "title": "Vuestros productos",
                             "content": "La sección «Dinero» se encuentra en la barra de navegación superior. Desde aquí puedes acceder a «Crecimiento», «Energía» y «Alma» cuando necesites la siguiente herramienta, un producto cada vez."
+                        },
+                        "portals_core": {
+                            "title": "Your products",
+                            "content": "Money lives in the top nav. Growth opens from here when you want that next tool."
                         }
                     }
                 },
@@ -3289,7 +3881,7 @@
                     "sections": {
                         "what_for": {
                             "heading": "Para qué sirve esto",
-                            "body": "Un resumen del periodo actual: tarros, bandeja de entrada, lo que ya tienes y cómo va el mes."
+                            "body": "A snapshot of the current period: jars, transactions to sort, what you already own, and how the month is tracking."
                         },
                         "how": {
                             "heading": "Cómo funciona",
@@ -3315,7 +3907,7 @@
                     "sections": {
                         "what_for": {
                             "heading": "Para qué sirve esta sección",
-                            "body": "Empieza por «Visión general» y luego ve de izquierda a derecha: Ingresos → Objetivos. Aumenta tus ingresos netos y fíjate un objetivo en el plan «Básico». Descubre los contenidos desbloqueables del plan «Plus»: libros, cursos y habilidades."
+                            "body": "Course is your week: the three things that move your goals, set in your week check. On Basic you keep one goal; Course and Learn are in Plus."
                         }
                     }
                 },
@@ -3328,7 +3920,7 @@
                         },
                         "how": {
                             "heading": "Cómo funciona",
-                            "body": "Elige «Sacar» o «Guardar», indica de qué se trata, selecciona un tarro y guárdalo. Los elementos de la bandeja de entrada esperan a que los clasifiques. Las modificaciones se reflejan en el saldo disponible de ese mismo periodo."
+                            "body": "Pick Out or In, say what it was, choose a jar, and save. Transactions to sort wait until you sort them. Edits update the same period’s available balance."
                         }
                     }
                 },
@@ -3361,19 +3953,18 @@
                 "overdue_days_other": "{count} días de retraso",
                 "closed_badge": "Cerrado",
                 "closed_hint": "Este mes ya está cerrado: la puntuación se mantiene tal y como estaba, y no se puede añadir ni modificar nada para este periodo.",
-                "close_explain": "Al cerrar, se bloquea este saldo y se congela el mes. Vacía primero la bandeja de entrada y las facturas para que el registro sea fiel a la realidad.",
-                "close_explain_soon": "El mes termina pronto: pon al día tu bandeja de entrada y paga las facturas para que puedas cerrarlo con éxito.",
-                "close_explain_today": "Hoy es el último día. Termina todo lo que tengas pendiente y cierra todo para que el mes que viene empecemos con buen pie.",
-                "close_explain_overdue": "Ya se ha pasado el plazo para cerrar este mes. Termina las tareas pendientes y ciérralo; te recomendamos que cierres cada mes correctamente.",
+                "close_explain": "Closing locks this score and freezes the month. Sort your transactions first; unpaid bills can be carried or skipped when you close.",
+                "close_explain_soon": "The month ends soon — sort your transactions, then carry or skip unpaid bills so you can close.",
+                "close_explain_today": "Today is the last day. Sort your transactions, then carry or skip unpaid bills and close.",
+                "close_explain_overdue": "This month is overdue to close. Sort your transactions, then carry or skip unpaid bills and close it.",
                 "travel_past_one": "{stamp} · sobre {money} a través de tarros durante {horizon} meses",
                 "travel_past_other": "{stamp} · sobre {money} en tarros a lo largo de {horizon} meses",
                 "travel_ahead_one": "Por {stamp} · sobre {money} a través de tarros durante más de {horizon} meses",
                 "travel_ahead_other": "Por {stamp} · sobre {money} en tarros a lo largo de {horizon} meses",
-                "travel_jar": "{name} {from} → {to}"
+                "travel_jar": "{name} {from} → {to}",
+                "level_sr": "Level: {level}"
             },
             "close_month": "Cerrar mes",
-            "close_month_confirm": "¿Estás seguro? Cierra este mes",
-            "close_month_review_bills": "Revisar las facturas pendientes de pago",
             "close_bills_title": "Facturas pendientes de pago de este mes",
             "close_bills_body": "Elige para cada factura: pasarla al mes siguiente (entonces deberás más) o omitirla este periodo.",
             "close_bills_roll": "Trasladar",
@@ -3381,37 +3972,41 @@
             "close_bills_roll_hint": "El mes que viene tendrás que pagar {due} ({count} × esta factura).",
             "close_bills_roll_debt_hint": "Tras este aplazamiento ({count} meses de plazo), contabilízalo como deuda en «Gastos fijos», incluyendo los gastos de cobro y un plan de pago si fuera necesario.",
             "close_bills_skip_hint": "Este mes no contará; el mes que viene se empieza de cero, con 1×.",
-            "close_bills_confirm": "Cerrar mes",
             "close_blocked_title": "Termina esto antes de que termine el mes.",
-            "close_blocked_inbox_one": "1 transacción sin clasificar en la bandeja de entrada",
-            "close_blocked_inbox_other": "{count} transacciones sin clasificar en la bandeja de entrada",
+            "close_blocked_inbox_one": "1 transaction still to sort",
+            "close_blocked_inbox_other": "{count} transactions still to sort",
             "close_blocked_bills_one": "1 factura aún pendiente de pago o no pagada{names}",
             "close_blocked_bills_other": "{count} facturas aún pendientes de pago o no pagadas{names}",
             "close_blocked_bill_names": " ({list})",
-            "close_blocked_open_bills": "Facturas pendientes ▸",
             "prior_open_title": "Termina primero el mes anterior",
             "prior_open_body": "{period} sigue abierto. Cierra los meses por orden para que la puntuación y el registro se mantengan coherentes.",
-            "prior_open_cta": "Ir a {period} ▸",
             "closing": "Cerrando…",
             "month_closed": "Mes cerrado",
             "month_closed_toast": "Mes cerrado · {recap}",
             "close_failed": "No se ha podido cerrar el mes",
+            "close_flow": {
+                "title": "Close {month}",
+                "prior_first": "Close {prior} first — months close in order.",
+                "prior_first_cta": "Close {prior}",
+                "prior_done": "{month} closed.",
+                "inbox_first": "{count, plural, one {# transaction from {month} is still to sort.} other {# transactions from {month} are still to sort.}}",
+                "inbox_first_cta": "Sort them",
+                "inbox_first_reason": "Sort your transactions first, then close.",
+                "confirm_body": "You’ll see your score and carry what’s left into next month. A closed month can’t be changed.",
+                "bills_tail": "A closed month can’t be changed.",
+                "close_cta": "Close {month}",
+                "already_closed": "{month} is already closed.",
+                "done": "Done",
+                "not_now": "Not now",
+                "load_error": "Couldn’t load {month}.",
+                "close_error_fallback": "Couldn’t close {month}. Check your connection and try again."
+            },
             "levels": {
                 "1": "Principiante",
                 "2": "Navegador",
                 "3": "Timonel",
                 "4": "Capitán",
-                "5": "Brújula",
-                "unlocks": {
-                    "six_jars": "Seis tarros",
-                    "inbox": "Bandeja de entrada",
-                    "week_check": "Resumen semanal",
-                    "goals": "Objetivos",
-                    "debts": "Deudas",
-                    "energy_layer": "Capa energética",
-                    "coach": "Entrenador",
-                    "export": "Exportar"
-                }
+                "5": "Brújula"
             },
             "recap": {
                 "surplus": "Quedan {amount} de este periodo",
@@ -3432,11 +4027,64 @@
                 "attention_eyebrow": "Necesita tu aprobación",
                 "attention_blurb": "Una consulta ha solicitado ver o gestionar este foro. Acepta solo si los conoces."
             },
+            "next_move": {
+                "eyebrow": "Next move",
+                "close_month": {
+                    "title": "Close {month}: see your score and carry what's left.",
+                    "cta": "Close month"
+                },
+                "no_transactions": {
+                    "title": "Your jars are filled. Now see where it goes.",
+                    "body": "Add this week's spending — by hand or import a bank statement. Next week, your first week check takes ten minutes.",
+                    "body_basic": "Add this week's spending as it happens. Next week, your first week check takes ten minutes.",
+                    "cta": "Add a transaction",
+                    "import": "Import a statement"
+                },
+                "zero_income": {
+                    "title": "No income yet? Add it when it lands — your jars split it the same second.",
+                    "cta": "Add income"
+                },
+                "inbox": {
+                    "title": "{count, plural, one {# transacción por ordenar — unos {minutes, plural, one {# minuto} other {# minutos}}.} other {# transacciones por ordenar — unos {minutes, plural, one {# minuto} other {# minutos}}.}}",
+                    "cta": "Sort transactions"
+                },
+                "week_check": {
+                    "title": "Everything is sorted. Your week check is ready — ten minutes.",
+                    "cta": "Start week check"
+                },
+                "calm": {
+                    "title": "Every euro has a job. Next week check: {weekday}.",
+                    "title_other_currency": "Every amount has a job. Next week check: {weekday}.",
+                    "link": "See your jars"
+                },
+                "viewer": {
+                    "close_prior": "{month} is ready to close.",
+                    "no_transactions": "No spending added yet.",
+                    "inbox": "{count, plural, one {# transacción esperando a ser ordenada.} other {# transacciones esperando a ser ordenadas.}}",
+                    "week_check": "This week's check is still open.",
+                    "close_month": "{month} se cierra en {days, plural, one {# día} other {# días}}."
+                },
+                "travel_note": "About today, not {period}.",
+                "error": "Couldn't load your next move."
+            },
+            "checklist": {
+                "eyebrow": "Setting up · {done} of {total} done",
+                "title": "{count, plural, one {Una cosa pequeña, cuando te venga bien.} other {# cosas pequeñas, cuando te vengan bien.}}",
+                "hide": "Hide",
+                "hide_aria": "Hide the setup list for everyone in this household",
+                "done": "Done",
+                "invited": "Invited — waiting for them",
+                "items": {
+                    "bank": "Add your bank to your main account",
+                    "dream": "Write down your dream",
+                    "invite": "Invite your partner"
+                }
+            },
             "coach": {
+                "all_tips": "All tips ({count})",
                 "inbox_one": "{count} transacción a la espera de un tarro.",
                 "inbox_many": "{count} transacciones a la espera de un tarro.",
                 "all_sorted": "Ya está todo listo: es hora de fijarse un objetivo.",
-                "sort_inbox": "Ordenar la bandeja de entrada",
                 "week_check": "Resumen semanal",
                 "see_jars": "Ver tarros",
                 "practice_pending_one": "Hay una invitación de una consulta pendiente: acéptala en Ajustes si quieres darle acceso a tu tablero.",
@@ -3472,11 +4120,14 @@
                 "play_left": "Se mantiene en juego"
             },
             "open_portal": "Abrir ▸",
+            "why": {
+                "label": "Your dream"
+            },
             "widgets": {
                 "growth": {
                     "income_month": "INGRESOS DE ESTE MES",
                     "income_span": "INGRESOS A LO LARGO DEL PERÍODO",
-                    "inbox": "BANDEJA DE ENTRADA",
+                    "inbox": "TO SORT",
                     "tagline": "Toma las riendas de tu crecimiento: habilidades, objetivos e ingresos, si así lo deseas."
                 },
                 "energy": {
@@ -3494,7 +4145,7 @@
         "landing": {
             "meta": {
                 "title": "Rumtelo — Deja de preguntarte dónde se ha metido.",
-                "description": "Deja de preguntarte dónde se ha ido todo. Descubre adónde se han ido tu dinero, tu vida, tu energía y tu tiempo… y vuelve a tomar las riendas. Herramientas claras, un consejo de «The Coach»: tú eliges. Diez minutos a la semana. Desarrollado en Ámsterdam. Gratis al principio.",
+                "description": "Stop wondering where it went. Your income splits into six jars the second it lands. Ten minutes a week shows where it went and what to move. The Coach tips, you choose. Built in Amsterdam. Free to start.",
                 "keywords": [
                     "Resumen financiero",
                     "seis tarros",
@@ -3502,9 +4153,8 @@
                     "asesor de finanzas personales",
                     "libertad financiera",
                     "revisión semanal",
-                    "energía, sueño, dinero",
-                    "resumen de pagos",
-                    "método de los botes"
+                    "geld overzicht",
+                    "potjes methode"
                 ]
             },
             "header": {
@@ -3538,9 +4188,10 @@
             "hero": {
                 "eyebrow": "RUMTELO — AGARRÁTE A LA VIDA",
                 "headline": "Deja de preguntarte dónde se ha ido.",
-                "lead": "¿Te preguntas qué? Todo: tu dinero, tu vida, tu energía, tu tiempo. Averigua adónde se han ido y vuelve a tomar las riendas. Los consejos del coach. Tú decides.",
-                "cta_primary": "Empieza gratis — sin tarjeta",
-                "cta_secondary": "Descubre cómo funciona",
+                "lead": "Your income splits into six jars the second it lands — bills, saving, freedom, fun. Ten minutes a week shows where it went and what to move.",
+                "cta_primary": "Split my income — free",
+                "cta_microline": "No card. No bank link needed.",
+                "cta_secondary": "See it in 3 steps",
                 "open_dashboard": "Abrir el panel de control",
                 "manage_plan": "Gestionar el plan",
                 "manage_plan_named": "Gestionar {plan}",
@@ -3549,7 +4200,26 @@
                 "demo_stage_complete": "ESTE MES · CADA IMPORTE TIENE UNA FUNCIÓN",
                 "demo_income_line": "Salario: 3.450 € · Por cuenta propia: 850 €",
                 "demo_coach_eyebrow": "El entrenador · esta semana",
-                "demo_coach_line": "Cada cantidad tiene su función. Puedo gastar sin problema hoy: 64 €. He dormido 7 h 20 min; una buena semana para tomar decisiones."
+                "demo_coach_line": "Every amount has a job. Safe to spend today: €64."
+            },
+            "how_section": {
+                "eyebrow": "HOW IT WORKS",
+                "headline": "Six jars. Ten minutes a week.",
+                "steps_aria": "How Rumtelo works in three steps",
+                "steps": {
+                    "split": {
+                        "title": "Income lands, money splits.",
+                        "body": "Enter your net income once. Rumtelo splits it over six jars, so every amount has a job before you spend."
+                    },
+                    "spend": {
+                        "title": "Spending finds its jar.",
+                        "body": "Bills draw from the right jar. Purchases land in Transactions. Sort them by hand or let a rule do it."
+                    },
+                    "week": {
+                        "title": "Ten minutes a week.",
+                        "body": "The week check shows where it went and what’s left. Move one amount, pick next week’s focus, done."
+                    }
+                }
             },
             "floaters": {
                 "f1": "+3.450 € · aceleración en 0,4 s",
@@ -3667,7 +4337,7 @@
             "portal_features": {
                 "money": {
                     "f1": "Seis tarros, tus porcentajes",
-                    "f2": "Bandeja de entrada: ordenada según reglas o manualmente",
+                    "f2": "Transactions — sorted by rule or by hand",
                     "f3": "Costes fijos que ya sabes que vas a tener",
                     "f4": "Plan de pago de la deuda con fecha de finalización",
                     "f5": "El resumen semanal · el balance mensual"
@@ -3714,7 +4384,7 @@
                 "soul_gratitude_label": "Gratitud · hoy",
                 "soul_intention_label": "Propósito · esta semana",
                 "screens": {
-                    "money": "Bandeja de entrada · esta semana",
+                    "money": "Transactions · this week",
                     "growth": "Objetivos · ingresos",
                     "energy": "Sueño · últimas 7 noches",
                     "soul": "Silencio · día 6"
@@ -3811,16 +4481,12 @@
                         "title": "La psicología del dinero",
                         "author": "Morgan Housel",
                         "line": "El comportamiento es más importante que la inteligencia: la serenidad prevalece sobre el pánico y la vergüenza."
-                    },
-                    "secret": {
-                        "title": "El secreto",
-                        "author": "Rhonda Byrne",
-                        "line": "Nombra lo que quieras: la atención sigue a la intención."
                     }
                 }
             },
             "principles_section": {
                 "eyebrow": "CUATRO PRINCIPIOS QUE NUNCA INFRINGIMOS",
+                "eyebrow_core": "THREE PRINCIPLES WE DON’T BREAK",
                 "headline": "Si una característica entra en conflicto con un principio, la característica cede."
             },
             "principles": {
@@ -3886,7 +4552,7 @@
             },
             "footer": {
                 "aria": "Pie de página",
-                "attribution": "Rumtelo · Ámsterdam, Países Bajos. Creado por los fundadores, en primer lugar, para ellos mismos; posteriormente, se lanzó al mercado para que otros pudieran seguir la misma rutina. Basado en libros como «Padre rico, padre pobre», «Piensa y hágase rico», «Los secretos de la mente millonaria», «La psicología del dinero» y «El secreto». Producto independiente: no está afiliado a dichos autores, ni cuenta con su respaldo ni con licencia de los mismos.",
+                "attribution": "Rumtelo · Amsterdam, the Netherlands. Built by the founders for themselves first — then brought to market so others can use the same routine. Grounded in books like Rich Dad Poor Dad, Think and Grow Rich, Secrets of the Millionaire Mind and The Psychology of Money. Independent product — not affiliated with, endorsed by, or licensed from those authors.",
                 "disclaimer": "Rumtelo es un servicio de orientación y una fuente de información general; no es un banco ni un asesor financiero autorizado. Las sugerencias tienen carácter informativo y no constituyen asesoramiento de inversión personalizado.",
                 "trust": {
                     "readonly": {
@@ -3915,6 +4581,7 @@
                     "jars": "Los tarros",
                     "coach": "El entrenador",
                     "pricing": "Precios",
+                    "practices": "For practices",
                     "why": "¿Por qué Rumtelo?",
                     "principles": "Principios",
                     "questions": "Preguntas",
@@ -3938,16 +4605,12 @@
                 "eyebrow": "PRECIOS",
                 "headline": "Gratis cuando realmente importa. De pago cuando te ahorra trabajo.",
                 "headline_auth": "Tu plan y lo que puedes cambiar",
-                "audience_aria": "A quién va dirigido",
-                "audience_individual": "Para ti y tu familia",
-                "audience_practice": "Para coaches y asesores",
-                "headline_practice": "Deja de preguntarte cuál es la situación de tus clientes.",
-                "lead_practice": "Para formadores y asesores que ayudan a las familias. Tus clientes gestionan su propio panel; con su autorización, tú puedes hacer un seguimiento de todos los paneles desde un único ordenador.",
-                "lead": "Empieza con el plan Basic gratuito. Elige Plus o Max y activaremos Stripe Checkout una vez que tu cuenta esté configurada —solo si el registro, la verificación y el proceso de incorporación se completan con éxito—.",
+                "lead": "Start free with your jars. Pay when it saves you work: your bank statements in, your debt-free date, your Course.",
                 "lead_on_plan": "Estás en {plan}. Actualiza tu plan, cambia de plan o gestiona la facturación desde la aplicación; los cambios se aplicarán a tu hogar.",
                 "lead_loading": "Cargando tu plan…",
                 "lead_manage": "Accede a «Open Plan» y a la sección de facturación de la aplicación para ampliar o cambiar tu paquete.",
                 "lead_setup": "Completa la configuración del hogar en la aplicación; después, podrás ampliar o cambiar tu plan aquí.",
+                "practice_link": "Coach or advisor? See Practice pricing",
                 "cta_free": "Empieza gratis",
                 "cta_choose": "Elige {plan} · paga tras la instalación",
                 "cta_current": "Plan actual",
@@ -3972,10 +4635,14 @@
                 "your_plan": "Tu plan",
                 "products_title": "Productos incluidos",
                 "features_title": "Aspectos destacados",
-                "feature_count": "{included}/{total} características",
-                "product_none": "No incluido",
                 "products_more": "Más productos en camino",
                 "footnote": "Los precios están en euros, IVA incluido. El plan básico puede seguir siendo gratuito o pasar a tener una pequeña cuota más adelante; nada de lo que introduzcas quedará bloqueado en ningún momento."
+            },
+            "practice_band": {
+                "eyebrow": "FOR COACHES & ADVISORS",
+                "headline": "Stop wondering where your clients stand.",
+                "lead": "One desk for every client’s jars and week check — only after they say yes. Rumtelo never moves money.",
+                "cta": "See how it works for practices"
             },
             "practice_plan": {
                 "name": "Consulta",
@@ -3984,7 +4651,7 @@
                 "line": "Un escritorio para cada cliente: las sesiones se centran en tomar decisiones, no en acumular cifras.",
                 "f1": "Invita a los clientes por correo electrónico: no se comparte nada hasta que acepten la invitación",
                 "f2": "El panel de cada cliente, de solo lectura, desde un único puesto de trabajo",
-                "f3": "Una visión general por cliente: gastos, ingresos, energía, tranquilidad",
+                "f3": "A snapshot per client: income, jars, spending, week check",
                 "f4": "Entre una sesión y otra, el entrenador te da un empujoncito; tú tomas las decisiones.",
                 "extras_title": "Además del precio base",
                 "extra_staff": "Asiento para el personal",
@@ -3993,15 +4660,10 @@
                 "extra_view_hint": "Siguen con la versión básica gratuita. Puedes ver su tablero, pero solo en modo de lectura.",
                 "extra_view_price": "Gratis",
                 "extra_manage": "Cliente que apadrinas",
-                "extra_manage_hint": "Pagas su plan Plus: un {discount} % menos que los {retail} al mes que pagarían ellos mismos. Hoy: su tablero completo, en solo lectura. Próximamente: editar su plan junto con ellos.",
+                "extra_manage_hint": "You pay for their Plus — {discount}% less than the {retail} a month they’d pay themselves. You see their full board, read-only.",
                 "per_month_each": "{price} al mes cada uno",
-                "example": "Ejemplo: tú + {clients} clientes patrocinados = {total} al mes en total.",
                 "cta": "Crea tu consulta",
                 "cta_open": "Abrir el escritorio de la consulta",
-                "steps_title": "Cómo funciona",
-                "step_1": "Crea tu consulta",
-                "step_2": "Invita a un cliente por correo electrónico",
-                "step_3": "Lo aceptan… y entonces ves su tablero",
                 "footnote": "Precios en euros, al mes. Rumtelo nunca realiza transferencias de dinero: los clientes pagan y realizan las transferencias desde su propio banco."
             },
             "plans": {
@@ -4015,19 +4677,31 @@
                     "f3": "ENERGÍA · sueño",
                     "f4": "ALMA · tranquilidad, gratitud, una intención a la semana",
                     "f5": "El entrenador, el control semanal, la puntuación mensual",
-                    "f6": "1 plaza completa + 1 plaza de espectador (pareja, entrenador o asesor)"
+                    "f6": "1 plaza completa + 1 plaza de espectador (pareja, entrenador o asesor)",
+                    "outcome": {
+                        "money": "Six jars, your transactions and fixed costs",
+                        "growth": "{maxGoals, plural, one {# goal} other {# goals}} and your income curve",
+                        "energy": "Sleep, the floor under every decision",
+                        "soul": "Stillness, gratitude, one intention a week"
+                    }
                 },
                 "plus": {
                     "name": "Plus",
                     "tag": "Los más elegidos",
                     "best_for": "Hogares, parejas, liquidación de deudas",
-                    "line": "Compartes dinero con tu pareja o tu familia, estás pagando una deuda o quieres que te envíen los extractos bancarios. La mayoría de la gente se encuentra en esta situación.",
+                    "line": "You share money with a partner or family, want your week planned around your goals, are paying off debt, or want your bank statements in. Most people land here.",
                     "f1": "Todo en Basic",
-                    "f2": "DINERO · Plan de pago de la deuda con intereses y fecha de liquidación",
-                    "f3": "DINERO · Importación de extractos bancarios — Próximamente: sincronización en tiempo real",
+                    "f2": "GROWTH · Course — plan your week around the three things that move your goals",
+                    "f3": "MONEY · debt plan with a freedom date, and bank statement import",
                     "f4": "CRECIMIENTO · Aprender — libros, cursos, habilidades · hasta {maxGoals} objetivos",
                     "f5": "ENERGÍA · tus 168 horas, entrenamiento, alimentación",
-                    "f6": "Hasta {maxMembers} localidades: mezcla de espectadores y público general"
+                    "f6": "Hasta {maxMembers} localidades: mezcla de espectadores y público general",
+                    "outcome": {
+                        "money": "Your debt-free date and bank statement import",
+                        "growth": "Your Course, Learn and up to {maxGoals} goals",
+                        "energy": "Your 168 hours, training and food",
+                        "soul": "Everything in Basic"
+                    }
                 },
                 "max": {
                     "name": "Max",
@@ -4039,7 +4713,12 @@
                     "f3": "CRECIMIENTO · Descubre las recomendaciones en Masterclass, no en Udemy",
                     "f4": "ALMA · los siete centros",
                     "f5": "Hasta {maxMembers} plazas (más acceso completo)",
-                    "f6": "Dispositivos: reloj, báscula, anillo (próximamente)"
+                    "outcome": {
+                        "money": "Everything in Plus",
+                        "growth": "Net worth, returns, your freedom number and every goal",
+                        "energy": "Everything in Plus",
+                        "soul": "Plus the seven centers"
+                    }
                 }
             },
             "faq_section": {
@@ -4078,7 +4757,7 @@
                 },
                 "practice": {
                     "question": "Soy coach o asesor. ¿Puedo utilizar Rumtelo con mis clientes?",
-                    "answer": "Sí, con Rumtelo Practice. Invita a los clientes por correo electrónico; una vez que acepten, podrás ver su tablero en modo de solo lectura desde un puesto de trabajo. Para ellos, consultar el tablero es gratuito, y tú puedes patrocinar su plan Plus por {clientPrice} al mes. Una consulta cuesta {basePrice} al mes más {staffPrice} por cada puesto de personal."
+                    "answer": "Yes — with Rumtelo Practice. Invite clients by email; once they accept, you see their board read-only from one desk. Looking along is free for them."
                 }
             },
             "signup_section": {
@@ -4539,6 +5218,9 @@
             "goal": "Objetivo",
             "income": "Mis ingresos",
             "learn": "Aprender",
+            "course": "Curso",
+            "course_week_check": "Resumen semanal",
+            "course_plan": "Plan your year",
             "library": "Biblioteca",
             "net_worth": "Patrimonio neto",
             "asset": "Activo",
@@ -4596,18 +5278,17 @@
                 "money": "Dinero",
                 "growth": "Crecimiento",
                 "energy": "Energía",
-                "soul": "Alma"
+                "soul": "Alma",
+                "you": "You"
             },
             "children": {
-                "home_overview": "Resumen",
                 "coach": "El entrenador",
-                "why": "¿Por qué Rumtelo?",
-                "money_overview": "Resumen",
+                "why": "Why Rumtelo",
                 "jars": "Tarros",
                 "transactions": "Transacciones",
                 "debt": "Deuda",
                 "fixed_costs": "Costes fijos",
-                "growth_overview": "Resumen",
+                "course": "Curso",
                 "goals": "Objetivos",
                 "income": "Ingresos",
                 "learn": "Aprender",
@@ -4623,60 +5304,121 @@
                 "giving": "Dar",
                 "intent": "Propósito",
                 "centers": "Centros"
+            },
+            "you": {
+                "title": "You",
+                "close": "Close",
+                "settings": "Settings",
+                "help": "Help",
+                "go_to_practice": "Go to practice",
+                "back_to_practice": "Back to practice",
+                "preview_group": "Preview"
+            },
+            "later_hint": {
+                "week_check": "Shows after your first week check.",
+                "month_close": "Shows after your first closed month."
+            },
+            "locked_hint": "Not in your plan. Opens the upgrade page.",
+            "search": {
+                "course_today": "Course · Today",
+                "course_week": "Course · Week",
+                "course_goals": "Course · Goals",
+                "deferred": {
+                    "week_check": "Shows in your menu after your first week check.",
+                    "month_close": "Shows in your menu after you close your first month."
+                }
+            },
+            "coming_up": {
+                "row": "Coming up",
+                "row_next": {
+                    "week_check": "After your first week check",
+                    "month_close": "After you close your first month",
+                    "sorting": "After you sort a few lines"
+                },
+                "row_aria": "Coming up: {next}",
+                "title": "Coming up",
+                "lead": "Rumtelo starts with your jars, transactions and week check. More joins as your board fills in.",
+                "next_eyebrow": "Next",
+                "trigger": {
+                    "week_check": "Do your first week check — ten minutes.",
+                    "month_close": "Close your first month.",
+                    "sorting": "Sort {sorted, plural, one {# more line} other {# more lines}} or wait {days, plural, one {# day} other {# days}}."
+                },
+                "adds_eyebrow": "Then your menu shows",
+                "adds": {
+                    "levels": "Your level on the month score"
+                },
+                "search_hint": "Every page is already open: search for it in Quick add.",
+                "close": "Close"
+            },
+            "show_all": {
+                "label": "Show everything now",
+                "hint_off": "Skip the step-by-step start. You can switch back any time.",
+                "hint_on": "On — you see every page your plan and role include, in every household.",
+                "done": "Everything is in your menu now. Switch back in Settings › Account."
+            },
+            "stage_items": {
+                "course": "Course",
+                "goals": "Goals"
+            },
+            "stage_note": {
+                "text": "{count, plural, one {New: {items} is now in your menu.} other {New: {items} are now in your menu.}}",
+                "dismiss": "Got it"
+            },
+            "to_sort_badge_sr": "{count} por ordenar",
+            "aria": {
+                "mobile_tabs": "Main",
+                "money_sections": "Money sections",
+                "growth_sections": "Growth sections"
             }
         },
         "onboarding": {
-            "welcome": "Bienvenidos a Rumtelo",
-            "welcome_body": "Rumtelo te ayuda a ver adónde va tu dinero, sin agobios. Dividimos los ingresos en seis «tarros» para que siempre sepas qué parte se destina a los gastos fijos, al ahorro y a los gastos corrientes. No hace falta tener un título en finanzas.",
-            "welcome_points": {
-                "jars": "Seis tarros con una función",
-                "overview": "Una visión general serena",
-                "coach": "Consejos sin complejos"
-            },
             "income": "Tus ingresos",
-            "income_body": "Estos son tus ingresos personales — los tuyos como la persona que crea esta cuenta para ti. Una estimación basta. Después nombrarás la cuenta bancaria donde llegan.",
-            "jars": "Las seis jarras",
-            "jars_body": "Seis tarros, cada uno con una función. El dinero suele llegar a Necesidad: tu cuenta principal para el alquiler y las facturas. Los demás tarros son donde va el resto del reparto, a menudo como ahorros auxiliares en el mismo banco. Reparto inicial 55 / 10 / 10 / 10 / 10 / 5; se puede cambiar después.",
-            "jars_tap_hint": "Toca un frasco para ver su función. Luego nombra la cuenta donde llega el dinero: empieza con una cuenta principal; añade más después si las necesitas.",
-            "jars_read_more": "Más información sobre el método de los seis frascos",
-            "jars_spaarpotjes_help": "¿Qué son los spaarpotjes?",
-            "why": "Tu sueño",
-            "why_body": "En una frase breve: ¿por qué quieres Rumtelo, o qué sueño estás persiguiendo? Lo ponemos en tu panel de control como un pequeño recordatorio de aquello por lo que estás trabajando.",
-            "why_tip": "Escribe un sueño o un motivo, no un número. Que sea sencillo.",
-            "why_label": "Tu sueño o tu motivo",
-            "why_hint": "Aparece en tu panel de control como recordatorio. Puedes cambiarlo más adelante.",
-            "why_placeholder": "Por ejemplo: Una casa con sol, mar y fruta fresca",
-            "why_examples": {
-                "house": "Una casa al sol",
-                "calm": "Más tranquilidad en lo que respecta al dinero",
-                "free": "Libertad para elegir mi camino"
-            },
+            "income_lead": "Type what lands in your account each month. Next you'll see it split into six jars.",
             "currency": "Moneda",
-            "currency_hint": "Las cantidades y los tarros se expresan en esta moneda para este hogar.",
-            "net_income_label": "Tus ingresos netos mensuales ({symbol})",
-            "net_income_hint": "Lo que suele llegar a tu cuenta después de impuestos — una aproximación basta. Lo usamos para llenar tus tarros y lo vinculamos a la cuenta bancaria que configures a continuación.",
-            "household_name": "Un nombre muy conocido",
-            "household_name_hint": "Un nombre para tu espacio de dinero compartido —por ejemplo, el apellido de tu familia—. Puedes cambiarlo cuando quieras.",
+            "net_income_label": "Net monthly income",
+            "net_income_hint": "After tax — what lands in your account.",
+            "net_income_placeholder": "Amount per month",
+            "income_echo": "That's {amount} a month.",
+            "income_error_empty": "Type your monthly income. Zero is fine.",
+            "income_error_nan": "Use numbers only, like you'd write an amount.",
+            "income_error_negative": "Income can't be below zero.",
+            "income_error_decimals": "Use at most two decimals.",
+            "income_error_large": "That's above what Rumtelo handles per month. Check the amount.",
+            "split_title": "Here's where your {amount} goes.",
+            "split_lead": "Each jar has one job. Change the percentages any time — the habit matters more than the numbers.",
+            "split_list_aria": "Your split",
+            "split_row_aria": "{jar}, {percent} percent, {amount}",
+            "split_jobs": {
+                "NECESSITIES": "rent, bills, groceries",
+                "FINANCIAL_FREEDOM": "money that works for you — never spent",
+                "EDUCATION": "courses, books, a new skill",
+                "LONG_TERM_SAVINGS": "big buys and a safety buffer",
+                "PLAY": "fun without guilt — spend it all",
+                "GIVE": "gifts and causes you care about"
+            },
+            "split_main_account": "All six jars sit on one main account for now. Add your bank when it suits you.",
+            "split_note": "Rumtelo never moves money. Savings pots at your bank? Move it there yourself — we show the split.",
+            "split_change_later": "Change the percentages any time in Money › Jars.",
+            "split_zero": "No income yet? Your jars wait — they split it the second it lands.",
+            "split_cta": "Looks right — open my board",
+            "split_cta_pending": "Opening your board…",
+            "split_error": "We couldn't load the jars — try again.",
+            "onboard_error": "Your board wasn't created yet. Try again.",
+            "household_default_named": "{name}'s household",
             "household_default": "Mi familia",
-            "step_of": "Paso {current} de {total}",
-            "practice_escape": "¿Configurar Rumtelo para los clientes?",
-            "practice_escape_cta": "Crea una consulta en su lugar",
+            "step_of": "{current} of {total}",
             "back": "Atrás",
             "next": "Siguiente",
-            "start": "Inicio",
-            "creating": "Creando…",
-            "setup_failed": "Error en la configuración. Inténtalo de nuevo.",
-            "dialog_label": "Bienvenidos a Rumtelo",
             "household_created": "Se ha creado un hogar",
             "continue": "Continuar",
-            "finish": "Abrir Rumtelo",
-            "skip": "Dejarlo para más adelante",
             "banks_setup": {
                 "accounts_title": "Pon nombre a tus cuentas",
                 "accounts_body": "Nombra la cuenta principal donde llega el dinero (Necessity). ¿Necesitas más? Añádelas aquí y luego vincula los frascos. Puedes renombrarlas después en Ajustes.",
                 "map_title": "Vincular tarros a cuentas",
                 "map_body": "Necesidad se queda en tu cuenta principal. Pon los demás tarros en la cuenta de ahorro correcta. Cámbialo cuando quieras en Ajustes → Tarros.",
                 "map_body_one": "Tienes una cuenta: todos los frascos ya están vinculados a ella. Puedes cambiarlo más tarde en Ajustes → Frascos si añades más cuentas.",
+                "read_only_link": "Open bank settings",
                 "map_required": "Elige una cuenta para cada frasco antes de terminar.",
                 "bank_label": "Banco",
                 "account_name_label": "Nombre de la cuenta",
@@ -4826,6 +5568,7 @@
                 "access_eyebrow": "Acceso",
                 "progress_eyebrow": "Instantánea del portal",
                 "progress_blurb": "Live money, growth, energy, and soul metrics will appear here for managed clients.",
+                "progress_blurb_core": "Live money and growth metrics for this household.",
                 "progress_pending": "Waiting for the client to accept the invitation.",
                 "progress_view_only": "Acceso de lectura: invitación aceptada. Cambia a Gestionar para patrocinar su plan Plus.",
                 "portal_money": "Dinero",
@@ -4970,6 +5713,104 @@
                 "created": "Se ha creado el ejercicio",
                 "already_have": "¿Ya tienes una consulta?",
                 "go_to_practice": "Ir al panel de control"
+            }
+        },
+        "practices": {
+            "meta": {
+                "title": "Rumtelo for practices",
+                "description": "One desk for every client’s jars and week check — only after they say yes. Rumtelo never moves money."
+            },
+            "hero": {
+                "eyebrow": "FOR COACHES & ADVISORS",
+                "headline": "Stop wondering where your clients stand.",
+                "lead": "One desk for every client’s jars and week check — only after they say yes. Rumtelo never moves money.",
+                "microline": "Looking along is free for your clients."
+            },
+            "how": {
+                "eyebrow": "HOW IT WORKS",
+                "headline": "Invite. They say yes. One desk.",
+                "steps_aria": "How a practice works",
+                "steps": {
+                    "invite": {
+                        "title": "Invite a client",
+                        "body": "Create your practice and invite a client by email. New to Rumtelo? They get a sign-up link. Already here? They accept in Settings."
+                    },
+                    "yes": {
+                        "title": "They say yes",
+                        "body": "Every link starts as an invite. Nothing is shared until the household owner accepts."
+                    },
+                    "desk": {
+                        "title": "One desk",
+                        "body": "See every accepted client’s board, read-only, with a snapshot per client: income, jars, spending, week check."
+                    }
+                }
+            },
+            "proof": {
+                "eyebrow": "WHY PRACTICES USE IT",
+                "headline": "Sessions on decisions, not on collecting numbers.",
+                "points": {
+                    "picture": {
+                        "title": "A current picture before every session",
+                        "body": "Your clients keep six jars, their fixed costs and a ten-minute week check. You open their board and start where they are."
+                    },
+                    "between": {
+                        "title": "Progress continues between sessions",
+                        "body": "The week check and The Coach’s small tips, like a bill still due or transactions to sort, keep clients moving without you chasing them. The Coach nudges. You guide the decisions."
+                    },
+                    "yes": {
+                        "title": "Their yes comes first",
+                        "body": "Nothing is shared until the client accepts, and either side can end it. Calm for them, clear for you."
+                    }
+                }
+            },
+            "detail": {
+                "desk_title": "What your desk gives you",
+                "consent_title": "What your clients agree to",
+                "consent": {
+                    "c1": "Every link starts as an invite. Nothing is shared until the household owner accepts.",
+                    "c2": "You see their board read-only. Their numbers stay theirs.",
+                    "c3": "Either side can end the link at any time. The client keeps their own board and data.",
+                    "c4": "Rumtelo never moves money. Data stays in the EU, hosted in Amsterdam."
+                }
+            },
+            "pricing": {
+                "eyebrow": "PRICING",
+                "headline": "One price for your practice. Clients who look along are free.",
+                "lead": "Billed per practice, per month. Add colleagues as staff seats. You decide which clients you sponsor on Plus.",
+                "example": "Example: you as the first staff seat + {clients} clients who look along = {total} / month in total.",
+                "example_sponsor": "Sponsor {sponsored} of them on Plus: + {amount} / month."
+            },
+            "faq": {
+                "eyebrow": "QUESTIONS",
+                "headline": "What practices ask us.",
+                "replace": {
+                    "question": "Does this replace me?",
+                    "answer": "No. The Coach gives small, rule-based nudges between sessions. You bring the judgement and the relationship."
+                },
+                "privacy": {
+                    "question": "Who can see my client’s data?",
+                    "answer": "Only you and your staff, and only after the client accepts your invite. Access is read-only, either side can end it at any time, and data stays in the EU, hosted in Amsterdam."
+                },
+                "bank": {
+                    "question": "Do clients have to connect their bank?",
+                    "answer": "No. Entering amounts by hand works. Plus, which you can sponsor, adds bank-statement import."
+                },
+                "edit": {
+                    "question": "Can I change a client’s board?",
+                    "answer": "No. Access is read-only today. You guide; the client makes the change."
+                },
+                "money": {
+                    "question": "Does Rumtelo move money?",
+                    "answer": "Never. Clients pay and transfer at their own bank, and Rumtelo is not a tool for managing a client’s money for them."
+                },
+                "cost": {
+                    "question": "What does it cost?",
+                    "answer": "A practice costs {basePrice} a month plus {staffPrice} per staff seat, and you count as the first. Clients who look along are free. Sponsoring a client’s Plus is {clientPrice} a month each, {discount}% less than the {retail} a month they would pay themselves."
+                }
+            },
+            "closing": {
+                "headline": "Ready to see where your clients stand?",
+                "lead": "Start a practice, invite your first client and open their board once they say yes."
             }
         },
         "settings": {
@@ -5161,6 +6002,10 @@
             "legal_name": "Denominación social",
             "born": "Nacido en {date}",
             "panels": {
+                "start": {
+                    "eyebrow": "Your start",
+                    "blurb": "New boards start with jars, transactions and the week check. The rest joins your menu after your first week check and your first closed month."
+                },
                 "profile": {
                     "eyebrow": "Perfil",
                     "blurb": "El nombre de usuario se basa en tu nombre legal al registrarte; puedes cambiarlo en cualquier momento. Tu nombre legal, tu número de teléfono y tu fecha de nacimiento se guardan en tu cuenta.",
@@ -5208,6 +6053,8 @@
                     "invite_email": "Invitar (correo electrónico)",
                     "invite_placeholder": "partner@example.com",
                     "invite_role": "Función",
+                    "remove_member": "Eliminar",
+                    "remove_member_confirm": "Haz clic de nuevo para eliminarlo",
                     "role_owner": "Propietario",
                     "role_member": "Miembro",
                     "role_viewer": "Visor",
@@ -5288,10 +6135,11 @@
                 },
                 "coach": {
                     "eyebrow": "El entrenador",
-                    "blurb": "El Coach nunca regaña, solo aclara los siguientes pasos a seguir. Los consejos que aparecen en pantalla (líneas explicativas, tarjetas de inspiración) permanecen visibles mientras aprendes; la bandeja de entrada en Inicio → El Coach contiene tarjetas con consejos sobre dinero, crecimiento, energía y el alma.",
+                    "blurb": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money, growth, energy, and soul.",
+                    "blurb_core": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money and growth.",
                     "toggle": "Mostrar «The Coach» en las pantallas",
-                    "hint_on": "En… busca el símbolo ✦ de «The Coach». La bandeja de entrada se encuentra en Inicio → The Coach.",
-                    "hint_off": "Desactivado: los consejos en pantalla están ocultos. La bandeja de entrada de Coach sigue estando disponible en cualquier momento."
+                    "hint_on": "On — look for the ✦ The Coach mark. Your tips stay at Home → The Coach.",
+                    "hint_off": "Off — on-screen tips hidden. Your tips are still at Home → The Coach anytime."
                 },
                 "jars_placement": {
                     "eyebrow": "Dónde se coloca cada tarro",
@@ -5330,6 +6178,9 @@
                     "eyebrow": "Tus fiestas",
                     "blurb": "Nombres que has guardado para la próxima vez: empresas, propietarios, entidades crediticias, tiendas. Edita el estilo aquí; al borrar, el texto de las filas anteriores se mantiene.",
                     "empty": "Aún no hay datos guardados. Marca la casilla «Guardar para la próxima vez» cuando introduzcas un nombre libre en «Ingresos», «Facturas» o «Préstamos».",
+                    "search_placeholder": "Buscar grupos guardados…",
+                    "search_aria": "Equipos de búsqueda",
+                    "empty_search": "No hay ningún partido que se ajuste a esa búsqueda.",
                     "field_name": "Nombre",
                     "field_note": "Nota",
                     "field_icon": "Icono",
@@ -5352,7 +6203,7 @@
                     "linked_count": "{count} enlazado",
                     "none_linked": "Ninguno vinculado",
                     "empty_linked_title": "Aún no hay enlaces activos a entidades bancarias.",
-                    "empty_linked_body": "Conecta una entidad bancaria para que las transacciones se importen automáticamente a la bandeja de entrada.",
+                    "empty_linked_body": "Connect a bank to pull transactions in automatically.",
                     "connect_bank": "Conectar una entidad bancaria",
                     "capacity_usage_aria": "{used} de {max} enlaces a bancos",
                     "wizard_step_institution": "1 · Elige un banco",
@@ -5370,7 +6221,7 @@
                     "wizard_pick_seat_bank": "¿Qué cuenta {bank} debemos vincular?",
                     "wizard_no_matching_seats": "Aún no hay ninguna cuenta {bank}. Crea una a continuación: se asociará a ese banco.",
                     "wizard_authorize": "Continuar hacia la banca",
-                    "wizard_authorize_hint": "Saldrás de Rumtelo un momento para autorizar el acceso de solo lectura en el banco y, a continuación, volverás aquí.",
+                    "wizard_authorize_hint": "Next you leave Rumtelo briefly, sign in at the bank, and approve read-only access. We never move money. When you return, your transactions sync and wait under To sort.",
                     "wizard_authorize_what_1": "Solo lectura: únicamente saldos y movimientos.",
                     "wizard_authorize_what_2": "Puedes desactivar este enlace en cualquier momento en «Configuración».",
                     "wizard_authorize_what_3": "Una vez aprobada, realizaremos una sincronización y, a continuación, te redirigiremos aquí.",
@@ -5404,7 +6255,7 @@
                     "manual_eyebrow": "Cuentas manuales",
                     "manual_blurb": "La importación de archivos CSV siempre funciona. Elige un banco de la lista y, a continuación, añade la cuenta para que se reconozca durante la importación.",
                     "import_eyebrow": "Importar extracto",
-                    "import_blurb": "Prefiere CAMT.053 de tu banco. También MT940 o CSV. Tras importar, clasifica la bandeja y vincula costes fijos coincidentes.",
+                    "import_blurb": "Prefer CAMT.053 from your bank. MT940 or CSV work too. After import, sort what waits under To sort and link matching fixed costs.",
                     "account_label": "Etiqueta de la cuenta",
                     "account_label_hint": "Se muestra en los campos «Jar Seats» y en la importación CSV —por ejemplo, en la comprobación de operaciones—.",
                     "type": "Tipo",
@@ -5447,6 +6298,91 @@
                     "months": "{count} meses",
                     "stub": "Horizon conserva la configuración de crecimiento cuando se implementa esa API."
                 },
+                "course_calendar": {
+                    "eyebrow": "Tu calendario",
+                    "blurb": "Sincroniza tu calendario con Google, Apple o Outlook. Es muy sencillo: solo tienes que marcarlo en Rumtelo y aparecerá en tu calendario.",
+                    "off_lead": "Desactivado. Actívalo para obtener tu propia dirección secreta del calendario.",
+                    "enable": "Encender",
+                    "enabled": "Fuente del calendario en",
+                    "saved": "Calendario guardado",
+                    "rotated": "Se ha creado una nueva dirección. La antigua ha dejado de funcionar.",
+                    "disabled": "Desactivar la fuente del calendario",
+                    "url_label": "Tu dirección secreta",
+                    "copy": "Copiar",
+                    "copied": "Dirección copiada",
+                    "copied_short": "Copiado",
+                    "copy_failed": "No se ha podido copiar. Selecciona la dirección y cópiala tú mismo.",
+                    "url_secret": "Cualquiera que tenga esta dirección verá lo que muestra. Crea una nueva si la has compartido por error.",
+                    "add_google": "Añadir a Google",
+                    "add_apple": "Añadir al Calendario de Apple",
+                    "add_outlook": "Añadir a Outlook",
+                    "refresh_note": "Google actualiza los calendarios a los que estás suscrito con lentitud (en cuestión de horas, a veces incluso un día) y omite los recordatorios. Apple y Outlook los actualizan antes y los muestran.",
+                    "source_focus_week_title": "Tus 3 de la semana",
+                    "source_focus_week_sub": "Una sesión de remo de todo el día, de lunes a domingo.",
+                    "source_focus_day_title": "Tus 3 de hoy",
+                    "source_focus_day_sub": "Solo cuando la capa diurna está activada.",
+                    "source_rhythm_title": "Rutinas",
+                    "source_rhythm_sub": "En los días de su ciclo.",
+                    "source_rituals_title": "Revisiones semanales y cierre mensual",
+                    "source_rituals_sub": "Con recordatorios.",
+                    "source_sleep_title": "Consejos para dormir",
+                    "source_sleep_sub": "De tu plantilla «Energía».",
+                    "source_partner_title": "Otros miembros del hogar",
+                    "source_partner_sub": "Solo lo que te cuentan.",
+                    "lead_label": "Recordatorio de cierre de mes",
+                    "lead_same_day": "El último día",
+                    "lead_days": "{count} días antes",
+                    "lead_hint": "«Ahora no» lo traslada al último día. A partir de ahí, permanece ahí hasta que se cierre el mes.",
+                    "last_fetched": "Última consulta {cuándo, fecha, breve} {cuándo, hora, breve}",
+                    "rotate": "Nueva dirección",
+                    "disable": "Apagar"
+                },
+                "course_layers": {
+                    "eyebrow": "Capas del recorrido",
+                    "blurb": "El curso muestra los objetivos, el mes y la semana. Activa la opción de «más pasos» si te gusta planificar de esa forma. Al desactivarla, solo se ocultan; no se borra nada.",
+                    "quarters_title": "Cuarto de paso",
+                    "quarters_sub": "Un paso entre tus objetivos y el mes.",
+                    "days_title": "Planificación diaria",
+                    "days_sub": "Los tres mejores de cada día de tu semana.",
+                    "saved": "Capas del recorrido guardadas"
+                },
+                "sharing": {
+                    "eyebrow": "Privacidad y uso compartido",
+                    "blurb": "Lo que los miembros pueden compartir en las secciones «Crecimiento», «Energía», «Alma» y «Dinero». Solo el propietario puede modificar esto. Siempre es posible guardarse algo para uno mismo.",
+                    "blurb_core": "What members may share in Growth and Money. Only the owner changes this. Keeping something to yourself is always possible.",
+                    "owner_only": "Solo el titular del hogar puede modificarlo.",
+                    "mode_label": "¿Qué pueden compartir los socios?",
+                    "modes": {
+                        "SEPARATE": {
+                            "name": "Cada uno por su cuenta",
+                            "desc": "Todo el mundo se guarda todo para sí mismo, tú también. No hay objetivos comunes."
+                        },
+                        "OWNER_SEES": {
+                            "name": "El propietario observa",
+                            "desc": "Los miembros eligen: solo yo, o compartir contigo. Puedes compartirlo con todo el mundo y establecer objetivos comunes."
+                        },
+                        "TOGETHER": {
+                            "name": "Juntos",
+                            "desc": "Todo el mundo tiene las mismas opciones que tú, incluidos los objetivos comunes."
+                        }
+                    },
+                    "areas_title": "Por parte",
+                    "areas_reset": "Volver a la configuración predeterminada",
+                    "area_default": "Por defecto",
+                    "area_sensitive": "Sensible",
+                    "area_custom": "Personalizado",
+                    "areas": {
+                        "growth_course": "Objetivos del curso",
+                        "growth_learn": "Aprendizaje",
+                        "energy_log": "Datos sobre el gasto energético (sueño, entrenamiento, alimentación)",
+                        "energy_time": "Uso del tiempo",
+                        "soul_gratitude": "Agradecimiento",
+                        "money_income": "Renta por persona",
+                        "money_personal": "Cuentas personales y gastos"
+                    },
+                    "private_always": "Solo yo siempre es posible. Lo que alguien se guarda para sí mismo, nunca lo ves, ni siquiera siendo el propietario.",
+                    "saved": "Compartir guardado"
+                },
                 "energy": {
                     "eyebrow": "Tu punto de referencia",
                     "blurb": "Tres cifras en las que se basa el portal Energy. Todo lo demás —sesiones, objetivos, consejos— se deriva de ellas.",
@@ -5460,7 +6396,7 @@
                 },
                 "stillness": {
                     "eyebrow": "Tu momento de tranquilidad diario",
-                    "blurb": "El tiempo que dediques a ello. Es mejor hacerlo poco tiempo cada día que mucho tiempo de vez en cuando: esta es la única práctica que no cuesta nada y protege todos los tarros.",
+                    "blurb": "How long you sit. Short and daily beats long and occasional — this is the one routine that costs nothing and protects every jar.",
                     "minutes_aria": "Minutos diarios de quietud",
                     "minutes": "{count} min",
                     "stub": "Plantillas de intenciones y recordatorios: próximamente."
@@ -5491,12 +6427,15 @@
                     "eyebrow": "Lo que consumes y lo que pagas",
                     "blurb": "Tres planes: Básico, Plus y Max. Empieza con el plan Básico: nada de lo que hayas introducido quedará bloqueado en ningún momento.",
                     "card_basic_tag": "De {price}",
-                    "card_basic_line": "Tabla individual: los seis frascos y el ejercicio que hay debajo. No hace falta banco.",
+                    "card_basic_line": "Solo board — the six jars and the routine underneath. No bank needed.",
                     "card_basic_feats": "{members} · Solo individual · Huchas · 1 objetivo · Entrenador",
                     "card_plus_tag": "Los más elegidos",
                     "card_plus_line": "Comparte el tablero con tu familia o amigos: deudas, aprendizaje, la semana de la energía y otros objetivos.",
                     "card_plus_feats": "{members} · Deuda · Aprender · ENERGÍA · Objetivos",
+                    "card_plus_line_core": "Share the board with family or friends — debt, Learn, Course, and more goals.",
+                    "card_plus_feats_core": "{members} · Debt · Learn · Course · Goals",
                     "card_max_tag": "Los cuatro portales",
+                    "card_max_tag_core": "Everything, no limits",
                     "card_max_line": "Número ilimitado de hogares, curva de ingresos, «Learn» y patrimonio neto.",
                     "card_max_feats": "{members} · DINERO · Clase magistral · Patrimonio neto",
                     "monthly": "Mensual",
@@ -5615,6 +6554,8 @@
                 "password_failed": "No se ha podido cambiar la contraseña",
                 "invitation_sent": "Invitación enviada",
                 "invitation_failed": "Error al enviar la invitación",
+                "member_removed": "Miembro eliminado",
+                "member_remove_failed": "No se ha podido eliminar al miembro",
                 "language_saved": "Idioma guardado",
                 "language_failed": "No se ha podido guardar el idioma",
                 "currency_saved": "Moneda guardada",
@@ -5763,7 +6704,13 @@
                 "close_aria": "Cerrar «Añadir rápidamente»",
                 "mode_ask": "Preguntar",
                 "mode_add": "Añadir",
-                "ask_placeholder": "Pregunta al entrenador o busca…",
+                "ask_placeholder": "Search The Coach or a page…",
+                "search_label_ask": "Search pages and The Coach",
+                "search_label_add": "Filter what to add",
+                "deferred": {
+                    "week_check": "Shows here after your first week check.",
+                    "month_close": "Shows here after you close your first month."
+                },
                 "add_placeholder": "Filtra lo que quieres añadir…",
                 "next_step": "Próximamente con el entrenador",
                 "open_coach": "Open Coach",
@@ -5785,7 +6732,7 @@
                 },
                 "tx_import": {
                     "title": "Importar extracto bancario",
-                    "description": "Prefiere CAMT.053 de tu banco. Las filas llegan a Por clasificar — clasifícalas y vincula costes fijos cuando coincidan."
+                    "description": "Prefer CAMT.053 from your bank. Rows land in Transactions under To sort — sort them and link fixed costs when they match."
                 },
                 "tx_update": {
                     "title": "Editar transacción",
@@ -5874,6 +6821,15 @@
                 "close_menu": "Cerrar menú",
                 "mobile_nav": "Navegación móvil"
             },
+            "plan_gains": {
+                "title": "More with {plan}",
+                "price": "{plan} · {price}/month",
+                "close": "Close",
+                "members": "Up to {count} people on the board",
+                "goals": "Up to {count} goals",
+                "goals_unlimited": "As many goals as you need",
+                "bank_links": "{count, plural, one {# conexión bancaria} other {# conexiones bancarias}}"
+            },
             "gates": {
                 "maintenance_title": "Fuera de línea por un rato",
                 "maintenance_body": "Estamos realizando una breve actualización. Inténtalo de nuevo dentro de unos minutos.",
@@ -5883,16 +6839,28 @@
                 "maintenance_update_body": "Estamos terminando una pequeña actualización. Por ahora, solo el equipo de Rumtelo puede iniciar sesión.",
                 "locked_title": "Actualiza para abrir esto",
                 "locked_body": "Esta parte de Rumtelo se encuentra en una cota más elevada.",
-                "locked_plan_title": "Disponible en el plan {plan}",
                 "locked_plan_title_practice": "Este cliente necesita {plan}",
                 "locked_plan_title_viewer": "No está incluido en el plan de este hogar",
                 "locked_plan_body_practice": "Su plan del hogar no incluye esto. Si gestionas a este cliente, mejora su plan desde la facturación de la consulta.",
                 "locked_plan_body_viewer": "Estás mirando… Solo alguien que se encargue de esta casa puede abrir esto con un plan superior.",
-                "locked_plan_aria": "Es necesario actualizar el plan",
                 "locked_plan_aria_practice": "Es necesario actualizar el plan del cliente",
                 "locked_plan_aria_viewer": "No está disponible en el plan de este hogar",
                 "upgrade_cta": "Actualizar a {plan}",
                 "upgrade_cta_practice": "Facturación de consultas abiertas",
+                "lock": {
+                    "badge": "Locked · in {plan}",
+                    "badge_sr": "Locked: in {plan}",
+                    "title": "{feature} is in {plan} · {price}/month",
+                    "feature_fallback": "This page",
+                    "body_tail": "Everything you’ve entered stays yours on every plan.",
+                    "example": "Example",
+                    "switch_cta": "Switch to {plan}",
+                    "not_now": "Not now",
+                    "back": "Back",
+                    "ask_owner": "Ask {owner} to switch to {plan}.",
+                    "ask_owner_unknown": "Ask the owner of this household to switch to {plan}.",
+                    "region_aria": "Locked: {feature} is in {plan}"
+                },
                 "back_to_practice": "Volver a los clientes de la consulta",
                 "back_to_dashboard": "Volver al panel de control",
                 "back_to_website": "Volver a la página web",
@@ -6047,6 +7015,7 @@
             "eyebrow": "✦ ¿Por qué Rumtelo?",
             "stand_on": "En qué nos apoyamos",
             "lead": "¿Te preguntas qué? Todo: tu dinero, tu vida, tu energía, tu tiempo. Rumtelo te ayuda a ver dónde se han ido, para que nada siga siendo un misterio. A partir de ahí, recuperas el control sobre lo que realmente importa. Contamos con herramientas claras para ello, y seguiremos añadiendo más. El Coach puede darte un consejo. Tú eliges qué hacer a continuación.",
+            "lead_core": "Wondering what? Where your money went. Rumtelo helps you see it, so nothing stays a mystery. From there you get grip again: control over what matters. Clear tools for that, and we’ll keep adding more. The Coach can give a tip. You choose what to do next.",
             "meaning_eyebrow": "✦ Cómo te ayuda Rumtelo",
             "meaning": {
                 "money_leaves_body": "Cuando sale dinero, ves de qué hucha procede y cuánto queda para ese trabajo. No es una hoja de cálculo que se hace a posteriori.",

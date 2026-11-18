@@ -7,11 +7,12 @@ import {
     type ExecutionContext,
     type NestInterceptor,
 } from '@nestjs/common';
+import { HouseholdAccessSource } from '@rumtelo/contracts';
 import { AuthService } from '@thallesp/nestjs-better-auth';
 import { fromNodeHeaders } from 'better-auth/node';
 import { Observable } from 'rxjs';
 
-import { apiForbidden } from '../errors/api-user-error';
+import { apiForbidden, apiUnauthorized } from '../errors/api-user-error';
 import { toAuthHeaders } from './auth-headers.util';
 import { authHeadersStorage, householdStorage, type HouseholdContext } from './household.context';
 import { MembershipService } from './membership.service';
@@ -70,35 +71,60 @@ export class HouseholdScopeInterceptor implements NestInterceptor {
         }
 
         const userId = req.user?.id;
-        if (!userId) throw apiForbidden('not_authenticated');
+        if (!userId) throw apiUnauthorized('not_authenticated');
 
         const pathname = (req.url ?? '').split('?')[0] ?? '';
-        const isOnboard = pathname.endsWith('/household/onboard');
+        // oRPC wire paths are camelCase (`/household/previewSplit`); compare lower-cased.
+        const routePath = pathname.toLowerCase();
+        const isOnboard = routePath.endsWith('/household/onboard');
         // Person-scoped account APIs (theme, locale, board gate) — no household required.
         const isAccountPersonal = isAccountPersonalPath(pathname);
         // Practice control plane only — not household.practiceLinks (dual-consent on the board).
         const isPractice = isPracticeControlPlanePath(pathname);
 
-        const householdId = resolveHouseholdId(req);
         const headers = toAuthHeaders(req);
         const practiceCtx = resolvePracticeContext(req);
+
+        // Onboarding split preview is pure maths over the jar catalog: it never reads a
+        // household, so a stray `x-household-id` / body id is ignored (not verified, not used).
+        if (routePath.endsWith('/household/previewsplit')) {
+            return {
+                ctx: {
+                    userId,
+                    householdId: null,
+                    role: 'OWNER',
+                    source: HouseholdAccessSource.SEAT,
+                    relation: null,
+                },
+                headers,
+                practiceCtx,
+            };
+        }
+
+        const householdId = resolveHouseholdId(req);
 
         // Practice control plane is authz'd via PracticeMember — not household membership.
         // Soft-attach a household when the user is a member (client drill-down later);
         // never 403 practice routes for a missing / foreign household.
         if (isPractice) {
             if (householdId) {
-                const role = await this.membership.roleFor(userId, householdId);
-                if (role) {
+                const seat = await this.membership.seatFor(userId, householdId);
+                if (seat) {
                     return {
-                        ctx: { userId, householdId, role },
+                        ctx: { userId, householdId, ...seat, source: HouseholdAccessSource.SEAT },
                         headers,
                         practiceCtx,
                     };
                 }
             }
             return {
-                ctx: { userId, householdId: null, role: 'OWNER' },
+                ctx: {
+                    userId,
+                    householdId: null,
+                    role: 'OWNER',
+                    source: HouseholdAccessSource.SEAT,
+                    relation: null,
+                },
                 headers,
                 practiceCtx,
             };
@@ -106,7 +132,13 @@ export class HouseholdScopeInterceptor implements NestInterceptor {
 
         if (!householdId && (isOnboard || isAccountPersonal)) {
             return {
-                ctx: { userId, householdId: null, role: 'OWNER' },
+                ctx: {
+                    userId,
+                    householdId: null,
+                    role: 'OWNER',
+                    source: HouseholdAccessSource.SEAT,
+                    relation: null,
+                },
                 headers,
                 practiceCtx,
             };
@@ -114,9 +146,13 @@ export class HouseholdScopeInterceptor implements NestInterceptor {
 
         if (!householdId) throw apiForbidden('no_household_selected');
 
-        const role = await this.membership.roleFor(userId, householdId);
-        if (role) {
-            return { ctx: { userId, householdId, role }, headers, practiceCtx };
+        const seat = await this.membership.seatFor(userId, householdId);
+        if (seat) {
+            return {
+                ctx: { userId, householdId, ...seat, source: HouseholdAccessSource.SEAT },
+                headers,
+                practiceCtx,
+            };
         }
 
         // Practice coach preview: not a household member, but linked via PracticeClientLink.
@@ -129,7 +165,13 @@ export class HouseholdScopeInterceptor implements NestInterceptor {
             );
             if (previewRole) {
                 return {
-                    ctx: { userId, householdId, role: previewRole },
+                    ctx: {
+                        userId,
+                        householdId,
+                        role: previewRole,
+                        source: HouseholdAccessSource.PRACTICE,
+                        relation: null,
+                    },
                     headers,
                     practiceCtx,
                 };
@@ -148,6 +190,8 @@ function isSystemPublicPath(pathname: string): boolean {
         pathname.startsWith('/api/docs') ||
         pathname.startsWith('/health') ||
         pathname.startsWith('/webhooks/') ||
+        // Course calendar feed: secret token, scope set by CourseFeedService.
+        pathname.startsWith('/calendar/') ||
         pathname.startsWith('/access-denied') ||
         pathname.startsWith('/email-preview')
     );

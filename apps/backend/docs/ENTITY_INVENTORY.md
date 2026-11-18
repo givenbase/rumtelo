@@ -1,6 +1,6 @@
 # Entity inventory
 
-Generated from MikroORM metadata (75 entities, 5 implicit pivot tables). Regenerate after entity changes — do not hand-edit tables.
+Generated from MikroORM metadata (83 entities, 6 implicit pivot tables). Regenerate after entity changes — do not hand-edit tables.
 
 Planes: `auth` = identity (better-auth + Rumtelo person/household rows) · `public` = household-written product data · `backoffice` = Rumtelo-written catalogs. Bases: see `ENTITY_STYLE.md`.
 
@@ -25,7 +25,7 @@ Planes: `auth` = identity (better-auth + Rumtelo person/household rows) · `publ
 | `HouseholdSettings` | `HouseholdEntity` | `auth.household_settings` | `modules/auth/household/household-settings/household-settings.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`audiences` N:M → Audience |
 | `AccountAddress` | `BaseEntity` | `auth.account_address` | `modules/auth/user/account/account-address/account-address.entity.ts` | `account` N:1 → Account (mapToPk) on delete cascade<br>`address` N:1 → Address (mapToPk) on delete restrict |
 | `AccountSettings` | `BaseEntity` | `auth.account_settings` | `modules/auth/user/account/account-settings/account-settings.entity.ts` | `account` 1:1 → Account on delete cascade |
-| `Account` | `BaseEntity` | `auth.account` | `modules/auth/user/account/account.entity.ts` | `user` 1:1 → AuthUser on delete cascade<br>`settings` 1:1 → AccountSettings |
+| `Account` | `BaseEntity` | `auth.account` | `modules/auth/user/account/account.entity.ts` | `user` N:1 → AuthUser on delete cascade<br>`settings` 1:1 → AccountSettings on delete set null |
 
 ## public · platform (10)
 
@@ -33,7 +33,7 @@ Planes: `auth` = identity (better-auth + Rumtelo person/household rows) · `publ
 |---|---|---|---|---|
 | `Address` | `BaseEntity` | `public.platform_address` | `modules/public/platform/address/address.entity.ts` | — |
 | `CoachMessage` | `HouseholdEntity` | `public.platform_coach_message` | `modules/public/platform/coach/coach-message.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`account` N:1 → Account (mapToPk) on delete cascade |
-| `Device` | `HouseholdEntity` | `public.platform_device` | `modules/public/platform/device/device.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`account` N:1 → Account (mapToPk) on delete set null |
+| `Device` | `HouseholdEntity` | `public.platform_device` | `modules/public/platform/device/device.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`account` N:1 → Account (mapToPk) on delete set null<br>`kindKey` N:1 → DeviceKindCatalog (mapToPk) on delete restrict |
 | `PracticeAddress` | `BaseEntity` | `public.platform_practice_address` | `modules/public/platform/practice/practice-address/practice-address.entity.ts` | `practice` N:1 → Practice (mapToPk) on delete cascade<br>`address` N:1 → Address (mapToPk) on delete restrict |
 | `PracticeBilling` | `BaseEntity` | `public.platform_practice_billing` | `modules/public/platform/practice/practice-billing/practice-billing.entity.ts` | `practice` N:1 → Practice (mapToPk) on delete cascade |
 | `PracticeClientInvite` | `BaseEntity` | `public.platform_practice_client_invite` | `modules/public/platform/practice/practice-client-invite/practice-client-invite.entity.ts` | `practice` N:1 → Practice (mapToPk) on delete cascade<br>`addedByAccount` N:1 → Account (mapToPk) on delete set null |
@@ -42,31 +42,38 @@ Planes: `auth` = identity (better-auth + Rumtelo person/household rows) · `publ
 | `PracticeMember` | `BaseEntity` | `public.platform_practice_member` | `modules/public/platform/practice/practice-member/practice-member.entity.ts` | `practice` N:1 → Practice (mapToPk) on delete cascade<br>`account` N:1 → Account (mapToPk) on delete cascade |
 | `Practice` | `BaseEntity` | `public.platform_practice` | `modules/public/platform/practice/practice/practice.entity.ts` | — |
 
-## public · money (15)
+## public · money (17)
 
 | Entity | Base | Table | File | Relations |
 |---|---|---|---|---|
 | `BankAccount` | `HouseholdEntity` | `public.money_bank_account` | `modules/public/product/money/ledger/bank-account/bank-account.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`bank` N:1 → Bank on delete restrict<br>`settlementAccount` N:1 → BankAccount on delete set null |
 | `SortRule` | `HouseholdEntity` | `public.money_sort_rule` | `modules/public/product/money/ledger/sort-rule/sort-rule.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`jar` N:1 → Jar on delete cascade<br>`category` N:1 → Category on delete set null |
-| `Transaction` | `HouseholdEntity` | `public.money_transaction` | `modules/public/product/money/ledger/transaction/transaction.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`account` N:1 → BankAccount on delete set null<br>`jar` N:1 → Jar on delete set null<br>`category` N:1 → Category on delete set null<br>`debt` N:1 → Debt on delete set null<br>`fixedCost` N:1 → FixedCost on delete set null<br>`appliedRule` N:1 → SortRule (mapToPk) on delete set null |
+| `Transaction` | `HouseholdEntity` | `public.money_transaction` | `modules/public/product/money/ledger/transaction/transaction.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`account` N:1 → BankAccount on delete set null<br>`jar` N:1 → Jar on delete set null<br>`category` N:1 → Category on delete set null<br>`debt` N:1 → Debt on delete set null<br>`fixedCost` N:1 → FixedCost on delete set null<br>`asset` N:1 → Asset (mapToPk) on delete set null<br>`appliedRule` N:1 → SortRule (mapToPk) on delete set null<br>`party` N:1 → Party (mapToPk) on delete set null<br>`merchantKey` N:1 → MerchantPreset (mapToPk) on delete set null<br>`inflowKey` N:1 → TransactionInPreset (mapToPk) on delete set null<br>`appliedMerchantKey` N:1 → MerchantPreset (mapToPk) on delete set null |
 | `MonthScoreEvent` | `HouseholdEntity` | `public.money_month_score_event` | `modules/public/product/money/month-score/month-score-event.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`monthScore` N:1 → MonthScore on delete cascade |
 | `MonthScore` | `HouseholdEntity` | `public.money_month_score` | `modules/public/product/money/month-score/month-score.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`events` 1:N → MonthScoreEvent |
 | `FixedCostSettlement` | `HouseholdEntity` | `public.money_fixed_cost_settlement` | `modules/public/product/money/plan/fixed-cost/fixed-cost-settlement.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`fixedCost` N:1 → FixedCost on delete cascade<br>`transaction` N:1 → Transaction on delete set null |
-| `FixedCost` | `HouseholdEntity` | `public.money_fixed_cost` | `modules/public/product/money/plan/fixed-cost/fixed-cost.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`jar` N:1 → Jar on delete cascade<br>`category` N:1 → Category on delete set null<br>`debt` N:1 → Debt on delete set null |
+| `FixedCost` | `HouseholdEntity` | `public.money_fixed_cost` | `modules/public/product/money/plan/fixed-cost/fixed-cost.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`jar` N:1 → Jar on delete cascade<br>`category` N:1 → Category on delete set null<br>`debt` N:1 → Debt on delete set null<br>`asset` N:1 → Asset (mapToPk) on delete set null<br>`party` N:1 → Party (mapToPk) on delete set null<br>`presetKey` N:1 → FixedCostPreset (mapToPk) on delete set null<br>`merchantKey` N:1 → MerchantPreset (mapToPk) on delete set null |
 | `IncomeAmountPeriod` | `HouseholdEntity` | `public.money_income_amount_period` | `modules/public/product/money/plan/income/income-amount-period.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`incomeSource` N:1 → IncomeSource on delete cascade |
-| `IncomeSource` | `HouseholdEntity` | `public.money_income_source` | `modules/public/product/money/plan/income/income-source.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade |
+| `IncomeSource` | `HouseholdEntity` | `public.money_income_source` | `modules/public/product/money/plan/income/income-source.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`party` N:1 → Party (mapToPk) on delete set null<br>`asset` N:1 → Asset (mapToPk) on delete set null<br>`bank` N:1 → Bank (mapToPk) on delete set null<br>`account` N:1 → BankAccount (mapToPk) on delete set null<br>`presetKey` N:1 → IncomeSourcePreset (mapToPk) on delete set null<br>`merchantKey` N:1 → MerchantPreset (mapToPk) on delete set null |
 | `Category` | `HouseholdEntity` | `public.money_category` | `modules/public/product/money/plan/jar/category.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`jar` N:1 → Jar on delete cascade |
 | `Jar` | `HouseholdEntity` | `public.money_jar` | `modules/public/product/money/plan/jar/jar.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`defaultAccount` N:1 → BankAccount (mapToPk) on delete set null<br>`categories` 1:N → Category |
-| `Debt` | `HouseholdEntity` | `public.money_debt` | `modules/public/product/money/targets/debt/debt.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade |
-| `Goal` | `HouseholdEntity` | `public.money_goal` | `modules/public/product/money/targets/goal/goal.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`jar` N:1 → Jar on delete set null |
+| `PartySuggestion` | `HouseholdEntity` | `public.money_party_suggestion` | `modules/public/product/money/plan/party/party-suggestion.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`party` N:1 → Party on delete cascade<br>`suggestion` N:1 → MerchantSuggestion on delete restrict |
+| `Party` | `HouseholdEntity` | `public.money_party` | `modules/public/product/money/plan/party/party.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`merchantKey` N:1 → MerchantPreset (mapToPk) on delete set null |
+| `Debt` | `HouseholdEntity` | `public.money_debt` | `modules/public/product/money/targets/debt/debt.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`party` N:1 → Party (mapToPk) on delete set null<br>`presetKey` N:1 → DebtPreset (mapToPk) on delete set null<br>`merchantKey` N:1 → MerchantPreset (mapToPk) on delete set null |
+| `Goal` | `HouseholdEntity` | `public.money_goal` | `modules/public/product/money/targets/goal/goal.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`jar` N:1 → Jar on delete set null<br>`givingOrganizationKey` N:1 → GivingOrganization (mapToPk) on delete set null |
 | `MoneyWeekCheck` | `WeekCheckEntity` | `public.money_week_check` | `modules/public/product/money/week-check/money-week-check.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`allocations` 1:N → WeekCheckAllocation |
 | `WeekCheckAllocation` | `HouseholdEntity` | `public.money_week_check_allocation` | `modules/public/product/money/week-check/week-check-allocation.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`weekCheck` N:1 → MoneyWeekCheck on delete cascade<br>`jar` N:1 → Jar on delete cascade |
 
-## public · growth (7)
+## public · growth (12)
 
 | Entity | Base | Table | File | Relations |
 |---|---|---|---|---|
-| `Asset` | `HouseholdEntity` | `public.growth_asset` | `modules/public/product/growth/asset/asset.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade |
+| `Asset` | `HouseholdEntity` | `public.growth_asset` | `modules/public/product/growth/asset/asset.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`kindKey` N:1 → AssetKind (mapToPk) on delete restrict<br>`presetKey` N:1 → AssetPreset (mapToPk) on delete set null |
+| `GrowthCourseFeed` | `HouseholdEntity` | `public.growth_course_feed` | `modules/public/product/growth/course/growth-course-feed.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`account` N:1 → Account (mapToPk) on delete cascade |
+| `GrowthCourseItem` | `PersonalHouseholdEntity` | `public.growth_course_item` | `modules/public/product/growth/course/growth-course-item.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`account` N:1 → Account (mapToPk) on delete cascade<br>`parent` N:1 → GrowthCourseItem (mapToPk) on delete set null<br>`carriedFrom` N:1 → GrowthCourseItem (mapToPk) on delete set null<br>`goal` N:1 → Goal (mapToPk) on delete set null |
+| `GrowthCourseRhythmTick` | `HouseholdEntity` | `public.growth_course_rhythm_tick` | `modules/public/product/growth/course/growth-course-rhythm-tick.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`rhythm` N:1 → GrowthCourseRhythm (mapToPk) on delete cascade |
+| `GrowthCourseRhythm` | `PersonalHouseholdEntity` | `public.growth_course_rhythm` | `modules/public/product/growth/course/growth-course-rhythm.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`account` N:1 → Account (mapToPk) on delete cascade<br>`parent` N:1 → GrowthCourseItem (mapToPk) on delete set null |
+| `GrowthCourseRitualSnooze` | `HouseholdEntity` | `public.growth_course_ritual_snooze` | `modules/public/product/growth/course/growth-course-ritual-snooze.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`account` N:1 → Account (mapToPk) on delete cascade |
 | `IncomeLever` | `HouseholdEntity` | `public.growth_income_lever` | `modules/public/product/growth/income-lever/income-lever.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade |
 | `IncomeMilestone` | `HouseholdEntity` | `public.growth_income_milestone` | `modules/public/product/growth/income-milestone/income-milestone.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade |
 | `LearnBook` | `HouseholdEntity` | `public.growth_learn_book` | `modules/public/product/growth/learn/book/book.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`account` N:1 → Account (mapToPk) on delete cascade |
@@ -74,7 +81,7 @@ Planes: `auth` = identity (better-auth + Rumtelo person/household rows) · `publ
 | `LearnProgress` | `HouseholdEntity` | `public.growth_learn_progress` | `modules/public/product/growth/learn/progress/progress.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`account` N:1 → Account (mapToPk) on delete cascade |
 | `GrowthWeekCheck` | `WeekCheckEntity` | `public.growth_week_check` | `modules/public/product/growth/week-check/growth-week-check.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade |
 
-## backoffice · money (16)
+## backoffice · money (17)
 
 | Entity | Base | Table | File | Relations |
 |---|---|---|---|---|
@@ -88,11 +95,12 @@ Planes: `auth` = identity (better-auth + Rumtelo person/household rows) · `publ
 | `FixedCostPreset` | `CatalogEntity` | `backoffice.reference_money_fixed_cost_preset` | `modules/backoffice/product/money/preset/fixed-cost/fixed-cost.entity.ts` | `jarTemplate` N:1 → JarTemplate on delete restrict<br>`categoryTemplate` N:1 → CategoryTemplate on delete restrict<br>`audiences` N:M → Audience<br>`merchantLinks` 1:N → FixedCostPresetMerchant |
 | `GoalPreset` | `CatalogEntity` | `backoffice.reference_money_goal_preset` | `modules/backoffice/product/money/preset/goal/goal.entity.ts` | `jarTemplate` N:1 → JarTemplate on delete restrict<br>`categoryTemplate` N:1 → CategoryTemplate on delete set null |
 | `IncomeSourcePreset` | `CatalogEntity` | `backoffice.reference_money_income_source_preset` | `modules/backoffice/product/money/preset/income/income.entity.ts` | — |
+| `MerchantSuggestion` | `BaseEntity` | `backoffice.reference_money_merchant_suggestion` | `modules/backoffice/product/money/preset/merchant-suggestion/merchant-suggestion.entity.ts` | — |
 | `MerchantBranding` | `BaseEntity` | `backoffice.reference_money_merchant_branding` | `modules/backoffice/product/money/preset/merchant/merchant-branding.entity.ts` | `preset` 1:1 → MerchantPreset on delete cascade |
 | `MerchantMatching` | `BaseEntity` | `backoffice.reference_money_merchant_matching` | `modules/backoffice/product/money/preset/merchant/merchant-matching.entity.ts` | `preset` 1:1 → MerchantPreset on delete cascade |
-| `MerchantPreset` | `CatalogEntity` | `backoffice.reference_money_merchant_preset` | `modules/backoffice/product/money/preset/merchant/merchant.entity.ts` | `jarTemplate` N:1 → JarTemplate on delete restrict<br>`categoryTemplate` N:1 → CategoryTemplate on delete restrict<br>`givingOrganization` N:1 → GivingOrganization on delete set null<br>`markets` N:M → Market<br>`matching` 1:1 → MerchantMatching<br>`branding` 1:1 → MerchantBranding |
+| `MerchantPreset` | `CatalogEntity` | `backoffice.reference_money_merchant_preset` | `modules/backoffice/product/money/preset/merchant/merchant.entity.ts` | `jarTemplate` N:1 → JarTemplate on delete restrict<br>`categoryTemplate` N:1 → CategoryTemplate on delete restrict<br>`givingOrganization` N:1 → GivingOrganization on delete set null<br>`markets` N:M → Market<br>`matching` 1:1 → MerchantMatching on delete set null<br>`branding` 1:1 → MerchantBranding on delete set null |
 | `TransactionInPreset` | `CatalogEntity` | `backoffice.reference_money_transaction_in_preset` | `modules/backoffice/product/money/preset/transaction-in/transaction-in.entity.ts` | — |
-| `CategoryTemplate` | `CatalogEntity` | `backoffice.reference_money_category_template` | `modules/backoffice/product/money/template/category/category.entity.ts` | `jarTemplate` N:1 → JarTemplate on delete restrict |
+| `CategoryTemplate` | `CatalogEntity` | `backoffice.reference_money_category_template` | `modules/backoffice/product/money/template/category/category.entity.ts` | `jarTemplates` N:M → JarTemplate |
 | `JarTemplate` | `BaseEntity` | `backoffice.reference_money_jar_template` | `modules/backoffice/product/money/template/jar/jar.entity.ts` | — |
 
 ## backoffice · growth (7)
@@ -129,6 +137,7 @@ Planes: `auth` = identity (better-auth + Rumtelo person/household rows) · `publ
 - `backoffice.household_settings_audience`
 - `backoffice.reference_growth_lever_preset_income_posture`
 - `backoffice.reference_money_bank_partner`
+- `backoffice.reference_money_category_template_jar_template`
 - `backoffice.reference_money_fixed_cost_preset_audience`
 - `backoffice.reference_money_merchant_preset_market`
 

@@ -37,18 +37,18 @@ export function composeAccountBankName(
     return nickname ? `${bankName} · ${nickname}` : bankName;
 }
 
-/** Resolve catalog bank from the stored FK (always set on accounts). */
+/** Resolve catalog bank from the stored FK (null on the onboarding "Main account" until a bank is picked). */
 export function resolveAccountBank(
-    account: { bankId: string },
+    account: { bankId: string | null },
     banks: readonly Bank[]
 ): Bank | null {
-    const id = account.bankId.trim();
+    const id = account.bankId?.trim();
     if (!id) return null;
     return banks.find(bank => bank.id === id) ?? null;
 }
 
 export function accountBankMark(
-    account: { bankId: string },
+    account: { bankId: string | null },
     banks: readonly Bank[]
 ): PartyMark | null {
     const bank = resolveAccountBank(account, banks);

@@ -9,8 +9,10 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { EntityManager } from '@mikro-orm/postgresql';
 import {
+    BoardStage,
     PlanKey,
     PLAN_RANK,
+    isPaidPlan,
     PracticeSubscriptionStatus,
     SEAT_ADDON_UNIT_CENTS,
     SeatAddonKind,
@@ -22,6 +24,7 @@ import { apiBadRequest } from '../../../../common/errors/api-user-error';
 import { isDemoHouseholdSlug } from '@rumtelo/contracts/platform';
 import { AuthHousehold } from '../../../auth/household/managed/household/auth-household.entity';
 import { HouseholdBillingService } from '../../../auth/household/household-billing/household-billing.service';
+import { HouseholdSettingsService } from '../../../auth/household/household-settings/household-settings.service';
 import { AccountService } from '../../../auth/user/account/account.service';
 import { PracticeBilling } from '../practice/practice-billing/practice-billing.entity';
 import {
@@ -72,6 +75,8 @@ export class BillingService {
         @Inject(ConfigService) private readonly config: ConfigService<Env, true>,
         @Inject(EntityManager) private readonly em: EntityManager,
         @Inject(HouseholdBillingService) private readonly billing: HouseholdBillingService,
+        @Inject(HouseholdSettingsService)
+        private readonly householdSettings: HouseholdSettingsService,
         @Inject(AccountService) private readonly accounts: AccountService
     ) {
         const key = this.config.get('STRIPE_SECRET_KEY', { infer: true });
@@ -639,6 +644,7 @@ export class BillingService {
             scheduledPlanKey: null,
             willCancelAtPeriodEnd: false,
         });
+        await this.keepFullBoardOnPaid(input.householdId, input.planKey);
         this.logger.log(
             `Plan ${input.planKey} applied in-place for household ${input.householdId}`
         );
@@ -821,7 +827,18 @@ export class BillingService {
             ...period,
             scheduledPlanKey: null,
         });
+        await this.keepFullBoardOnPaid(householdId, planKey);
         this.logger.log(`Plan ${planKey} applied for household ${householdId} via Checkout`);
+    }
+
+    /**
+     * A household that upgrades to a paid plan sees the full board at once: the stored board
+     * stage floor is raised to MONTH and stays there after a later downgrade.
+     */
+    private async keepFullBoardOnPaid(householdId: string, planKey: PlanKey): Promise<void> {
+        if (isPaidPlan(planKey)) {
+            await this.householdSettings.raiseBoardStageFloor(householdId, BoardStage.MONTH);
+        }
     }
 
     private async onSubscriptionUpdated(subscription: Stripe.Subscription): Promise<void> {
@@ -868,6 +885,7 @@ export class BillingService {
             ...period,
             scheduledPlanKey,
         });
+        await this.keepFullBoardOnPaid(householdId, planKey);
         this.logger.log(
             `Plan ${planKey} synced for household ${householdId} via subscription.updated`
         );

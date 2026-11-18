@@ -14,7 +14,7 @@ Do not re-learn these. Full context: [`HANDOFF.md`](../../HANDOFF.md) §11.
 | String-enum members are nominal | They don’t satisfy contract literal unions — derive DTOs from the contract. |
 | Overspent jar UI | Full red meter, **not** empty — empty reads as “no data.” |
 | Free open banking | GoCardless Bank Account Data closed to new signups. Prefer **Enable Banking** (restricted production) behind a port; null adapter by default; CSV always-on. Banking adapter must not silently return `[]`. Full detail + pricing: [banking.md](./banking.md). |
-| macOS `Downloads` TCC / `com.apple.macl` | Attributes follow copies into `design/`. Clear with `xattr -cr` or `ditto --norsrc`. See [design/README](../design/README.md). |
+| macOS `Downloads` TCC / `com.apple.macl` | Attributes follow copies into `design/`. Clear with `xattr -cr` or `ditto --norsrc`. Historical — `design/` is readable now. |
 
 ---
 

@@ -157,7 +157,11 @@ export class ArchiveService {
                     .filter((iban): iban is string => Boolean(iban))
             );
             const bankKeys = [
-                ...new Set(payload.accounts.map(row => row.bankKey.trim()).filter(Boolean)),
+                ...new Set(
+                    payload.accounts
+                        .map(row => row.bankKey?.trim())
+                        .filter((key): key is string => Boolean(key))
+                ),
             ];
             const banks = bankKeys.length
                 ? await this.em.find(Bank, { key: { $in: bankKeys }, isActive: true })
@@ -166,8 +170,10 @@ export class ArchiveService {
 
             for (const row of payload.accounts) {
                 const name = row.name.trim();
-                const bankId = bankIdByKey.get(row.bankKey.trim());
-                if (!bankId) {
+                const bankKey = row.bankKey?.trim() || null;
+                // No key = a bankless account (Main account): restore it as is.
+                const bankId = bankKey ? (bankIdByKey.get(bankKey) ?? null) : null;
+                if (bankKey && !bankId) {
                     accountCounts.skipped += 1;
                     warnings.push(`bank_unknown_key:${row.bankKey}`);
                     continue;

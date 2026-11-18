@@ -6,10 +6,55 @@ import {
     HouseholdPermissionAction,
     HouseholdPermissionSection,
     permissionActionFromPath,
+    permissionSectionFromPath,
     roleCan,
 } from './role-permissions';
 
 describe('permissionActionFromPath', () => {
+    it('classifies household removeMember as DELETE', () => {
+        assert.equal(
+            permissionActionFromPath('/household/removeMember', 'POST'),
+            HouseholdPermissionAction.DELETE
+        );
+    });
+
+    it('classifies growth course reads and carry', () => {
+        assert.equal(
+            permissionActionFromPath('/growth/course/period', 'POST'),
+            HouseholdPermissionAction.READ
+        );
+        assert.equal(
+            permissionActionFromPath('/growth/course/year', 'POST'),
+            HouseholdPermissionAction.READ
+        );
+        assert.equal(
+            permissionActionFromPath('/growth/course/carry', 'POST'),
+            HouseholdPermissionAction.UPDATE
+        );
+    });
+
+    it('classifies course rhythm, schedule and feed procedures', () => {
+        for (const path of [
+            '/growth/course/rhythm/list',
+            '/growth/course/rhythm/suggestions',
+            '/growth/course/schedule/list',
+            '/growth/course/feed/get',
+        ]) {
+            assert.equal(permissionActionFromPath(path, 'POST'), HouseholdPermissionAction.READ);
+        }
+        for (const path of [
+            '/growth/course/rhythm/tick',
+            '/growth/course/rhythm/untick',
+            '/growth/course/rhythm/pause',
+            '/growth/course/rhythm/confirm',
+            '/growth/course/rhythm/renew',
+            '/growth/course/schedule/snooze',
+            '/growth/course/feed/rotate',
+        ]) {
+            assert.equal(permissionActionFromPath(path, 'POST'), HouseholdPermissionAction.UPDATE);
+        }
+    });
+
     it('classifies fixed-cost jar/settlement reads as READ despite POST', () => {
         assert.equal(
             permissionActionFromPath('/money/fixedCosts/byJar', 'POST'),
@@ -93,5 +138,40 @@ describe('roleCan VIEWER members', () => {
                 action
             );
         }
+    });
+});
+
+describe('permissionSectionFromPath', () => {
+    it('leaves the onboarding split preview ungated (signed-in only, no household)', () => {
+        assert.equal(permissionSectionFromPath('/household/previewSplit'), null);
+    });
+
+    it('still gates onboard on the settings section', () => {
+        assert.equal(
+            permissionSectionFromPath('/household/onboard'),
+            HouseholdPermissionSection.HOUSEHOLD_SETTINGS
+        );
+    });
+});
+
+describe('household seats (invite UIs)', () => {
+    const path = '/household/seats';
+
+    it('maps to the members section and the invite action', () => {
+        assert.equal(permissionSectionFromPath(path), HouseholdPermissionSection.HOUSEHOLD_MEMBERS);
+        assert.equal(permissionActionFromPath(path, 'POST'), HouseholdPermissionAction.CREATE);
+    });
+
+    it('is open to OWNER and MEMBER and closed to VIEWER', () => {
+        const section = HouseholdPermissionSection.HOUSEHOLD_MEMBERS;
+        assert.equal(roleCan(HouseholdRole.OWNER, section, HouseholdPermissionAction.CREATE), true);
+        assert.equal(
+            roleCan(HouseholdRole.MEMBER, section, HouseholdPermissionAction.CREATE),
+            true
+        );
+        assert.equal(
+            roleCan(HouseholdRole.VIEWER, section, HouseholdPermissionAction.CREATE),
+            false
+        );
     });
 });

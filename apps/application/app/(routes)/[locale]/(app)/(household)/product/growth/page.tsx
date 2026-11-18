@@ -1,20 +1,13 @@
 import { getTranslations } from '@rumtelo/i18n';
 
-import { GrowthPortalHubClient } from '@/components/features/home/growth-portal-hub';
-
-import { GrowthGoalsStatus } from './_components/growth-goals-status';
+import { GrowthEntry } from './_components/growth-entry';
 
 export async function generateMetadata() {
     const t = await getTranslations('pages.meta');
     return { title: t('growth') };
 }
 
-/** Overview = status. Goals pill = add and edit. */
+/** Growth has no hub of its own: it opens on Course (Plus, Max) or Goals (Basic). */
 export default function GrowthPage() {
-    return (
-        <div className="grid gap-8">
-            <GrowthPortalHubClient />
-            <GrowthGoalsStatus />
-        </div>
-    );
+    return <GrowthEntry />;
 }

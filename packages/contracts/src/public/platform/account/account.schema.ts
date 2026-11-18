@@ -10,7 +10,7 @@ import { z } from 'zod';
 import { Locale, Theme } from '../../../common/common.enums';
 import { Id, UserId } from '../../../common/common.schema';
 import { OptionalNullableE164Phone } from '../../../common/phone.schema';
-import { SpendingStyle } from '../enums';
+import { SpendingStyle, WorkSituation, YearIntention } from '../enums';
 
 const PersonName = z.string().trim().min(1).max(80);
 const OptionalPersonName = PersonName.nullable().optional();
@@ -73,7 +73,7 @@ export const DEFAULT_ACCOUNT_TOUR_PROGRESS = {
 
 /**
  * Person UI prefs. Currency is NOT here — the household board has one accounting
- * currency. Theme, locale, and spending style can differ between members.
+ * currency. Theme, locale, spending style, work situation and year intention can differ between members.
  */
 export const AccountSettings = z.object({
     accountId: Id,
@@ -81,8 +81,17 @@ export const AccountSettings = z.object({
     theme: z.enum(Theme),
     /** Soft spending style — personalises coach tips for who is looking. */
     spendingStyle: z.enum(SpendingStyle),
+    /** How the person earns a living; null = not told. Orders goal presets in "Plan your year". */
+    workSituation: z.enum(WorkSituation).nullable(),
+    /** What the person wants from the year; null = not told. Sets the tone of "Plan your year". */
+    yearIntention: z.enum(YearIntention).nullable(),
     /** Guided tour / Help walkthrough progress. */
     tour: AccountTourProgress,
+    /**
+     * Skip the board ladder for this person (every household they are in). Default false.
+     * Guidance only: plan and role still decide what exists.
+     */
+    showAllSurfaces: z.boolean(),
     /** When personal onboarding completed; null = still new. */
     onboardedAt: z.iso.datetime().nullable(),
 });
