@@ -40,7 +40,6 @@ import { CAR_BRAND_PREVIEW, carBrandMark, filterCarBrands } from '@/app/_lib/car
 import { soulPath } from '@/app/_lib/routes';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { formRoute } from '@/app/_lib/form-route-meta';
-import { CoachTipCard } from '@/components/features/helpers';
 import { GivingFinder } from '@/components/features/money/giving-finder';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -485,18 +484,20 @@ export function GoalForm({
 
             {isGive ? (
                 <>
-                    <CoachTipCard
-                        title={tForm('pledge_tip_title')}
-                        meta={
-                            // Soul is deferred in production — don't link to a route that redirects.
-                            isProductEnabled('soul') ? (
-                                <a href={soulPath('giving')} className="hover:text-accent">
+                    <p className="text-xs leading-relaxed text-pretty text-fg-muted">
+                        {t('features.soul.giving.coach_tip_1')} {tForm('pledge_tip_body')}
+                        {/* Soul is deferred in production — don't link to a route that redirects. */}
+                        {isProductEnabled('soul') ? (
+                            <>
+                                {' '}
+                                <a
+                                    href={soulPath('giving')}
+                                    className="font-semibold text-accent underline-offset-2 hover:underline">
                                     {tForm('pledge_tip_link')}
                                 </a>
-                            ) : undefined
-                        }>
-                        {t('features.soul.giving.coach_tip_1')} {tForm('pledge_tip_body')}
-                    </CoachTipCard>
+                            </>
+                        ) : null}
+                    </p>
 
                     <FormField
                         control={form.control}

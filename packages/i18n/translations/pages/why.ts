@@ -47,41 +47,6 @@ const why = {
     cta_jars: 'View my jars',
     cta_week_check: 'Week check',
     /** One-line Coach whisper above page content — keyed by route slug, not path. */
-    routes: {
-        home: 'One look: where did it go this month — and do you have grip again?',
-        money_jars:
-            'This month, divided before it starts. Money with a job never has to be defended.',
-        money_transactions:
-            'You do not track spending to judge yourself — you track it to see where your life leaks.',
-        money_debt:
-            'Debt is rented time. Every coin of interest is an hour of your life someone else directs.',
-        money_fixed_costs:
-            'Fixed costs are decisions you made once and pay for monthly. Review them like decisions.',
-        growth_goals:
-            "A goal turns this month's surplus into something that lasts. With a date and a jar it is a plan.",
-        growth_net_worth:
-            'What you already own is working — or costing — every month. That is not a wish.',
-        energy_week:
-            'Your hours are your capacity. Divided on purpose, or by whoever asks loudest.',
-        energy_sleep:
-            'Sleep is the floor the jars stand on. Cut it and every other number quietly drops.',
-        soul_stillness:
-            'A calm mind directs money. A restless one spends it and calls that a decision.',
-        soul_gratitude: 'Someone who sees what he already has buys less to fill a hole.',
-        soul_giving:
-            'A fixed share that leaves before you can hold it keeps money a tool, not a master.',
-        soul_intent: 'An intention is an instruction to yourself. A resolution is a hope.',
-        soul_centers: 'Name where it feels stuck, and the next step usually names itself.',
-        growth_income: 'Cutting costs has a floor. Raising income does not.',
-        growth_learn: 'A book you cannot name a use for was Play spending, not Education.',
-        growth_learn_library:
-            'We recommend what to get and who to support. We never host the work.',
-        energy_training: 'Training is the only spend that raises the value of every other hour.',
-        energy_food: 'Food is fuel for the week your jars divide. Fuel is bought, not willed.',
-        money_week_check:
-            'Ten minutes a week — look, redirect, set intention. Beats worrying every day.',
-        why: 'Rumtelo — grip on life. Clear tools that help you stay in control — product by product.',
-    },
 } as const;
 
 export default why;

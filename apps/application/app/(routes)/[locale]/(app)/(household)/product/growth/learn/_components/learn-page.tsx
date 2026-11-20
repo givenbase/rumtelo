@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
 
-import { CoachFeatureId, JarKey, SpendingStyle } from '@rumtelo/contracts';
+import { CoachFeatureId, SpendingStyle } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { Icon, Button, Card, EmptyState, Typography } from '@rumtelo/ui';
@@ -12,12 +12,10 @@ import { cn } from '@rumtelo/utils';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { isCoachFeatureEnabled } from '@/app/_lib/coach-readiness';
-import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { isLiveData } from '@/app/_lib/preview';
 import { PlanKey } from '@/app/_lib/plan';
-import { productPath } from '@/app/_lib/routes';
 import { env } from '@/app/_utils/get-env';
-import { CoachMark, CoachTipCard, useHelpersEnabled } from '@/components/features/helpers';
+import { CoachMark, useHelpersEnabled } from '@/components/features/helpers';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
@@ -517,22 +515,6 @@ export function LearnPage({ view }: { view: 'shelf' | 'library' }) {
                     {plan === PlanKey.MAX ? tLearn('partner_max') : tLearn('partner_default')}
                 </p>
             </div>
-
-            {browsing ? null : (
-                <CoachTipCard
-                    title={tLearn('jar_coach_title')}
-                    actions={
-                        <Button
-                            as={Link}
-                            href={productPath(`money/jars/${jarKeyToSlug(JarKey.EDUCATION)}`)}
-                            size="sm"
-                            variant="secondary">
-                            {tLearn('jar_cta')}
-                        </Button>
-                    }>
-                    {tLearn('jar_banner')}
-                </CoachTipCard>
-            )}
 
             {browsing ? null : (
                 <ListToolbar

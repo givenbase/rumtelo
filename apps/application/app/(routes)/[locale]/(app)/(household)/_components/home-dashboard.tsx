@@ -16,7 +16,9 @@ import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Eyebrow, Typography } from '@rumtelo/ui';
 import { formatPeriod, toPeriodKey, describePeriodTravel } from '@rumtelo/utils';
 
-import type { CoachVerdictMessage } from '@/components/features/home/coach-verdict';
+import type { CoachLineCandidate } from '@/app/_lib/coach-line';
+import { feedLineCandidate } from '@/app/_lib/coach-line-feed';
+import { useCoachCopyContext } from '@/app/_lib/use-coach-copy-context';
 
 import { resolveJarSubtitle } from '@/app/_lib/jar-copy';
 import { jarChrome } from '@/app/_lib/jar-meta';
@@ -35,7 +37,6 @@ import { todayIso } from '@/app/_lib/week-key';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
-import { CoachVerdict } from '@/components/features/home/coach-verdict';
 import { HeroKluis } from '@/components/features/home/hero-kluis';
 import { PortalWidget } from '@/components/features/home/portal-widget';
 import { TodayCard } from '@/components/features/home/today-card';
@@ -49,7 +50,7 @@ import {
 import { Week1Checklist } from '@/components/features/home/week1-checklist';
 import { JarDrilldownTable } from '@/components/features/money/jar-drilldown-table';
 import type { JarDrilldownItem } from '@/components/features/money/jar-drilldown-parts';
-import { useHelpersEnabled } from '@/components/features/helpers';
+import { CoachLine } from '@/components/features/helpers';
 import { HouseholdPermissionSection, roleCanSee } from '@/app/_lib/role-permissions';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -61,12 +62,13 @@ export function HomeDashboardClient() {
     const tDashboard = useTranslations('pages.dashboard');
     const tJars = useTranslations('features.money.jars');
     const tShell = useTranslations('pages.shell');
+    const tCoach = useTranslations('features.coach');
+    const copyContext = useCoachCopyContext();
     const locale = useLocale();
     const { householdId, session } = useAuth();
     const { period } = useHouseholdShell();
-    const { canMutate, role, practicePreview, canSeeCoach } = useBoardWriteAccess();
+    const { canMutate, role, practicePreview } = useBoardWriteAccess();
     const { hasCapability } = usePlanCapabilities();
-    const helpersEnabled = useHelpersEnabled();
     const canSeeHome = roleCanSee(role, HouseholdPermissionSection.HOME);
     const canSeeGrowth = roleCanSee(role, HouseholdPermissionSection.GROWTH);
     const canSeeEnergy = roleCanSee(role, HouseholdPermissionSection.ENERGY);
@@ -177,11 +179,6 @@ export function HomeDashboardClient() {
     ).length;
 
     const weekCheck = useWeekCheckStatus();
-    const settingsQuery = useLiveQuery(
-        apiQuery.household.settings.queryOptions({ input: { householdId: householdId! } }),
-        null,
-        live
-    );
 
     // One close flow, two doors: the next-move card and the month score.
     const [closeFlow, setCloseFlow] = useState<{ open: boolean; target: string | null }>({
@@ -240,41 +237,40 @@ export function HomeDashboardClient() {
               tDashboard,
           })
         : null;
-    // At most one Coach tip, and never one that repeats the next-move card (inbox, bills,
-    // week check). Practice invites stay: they are not something the card covers.
-    const coachTips: readonly CoachVerdictMessage[] = (() => {
-        const practiceNudge: CoachVerdictMessage | null =
+    // The Coach line sits after the jars and the month score. It never repeats the next-move
+    // card (inbox, bills, week check); Practice invites stay, because the card does not cover
+    // them. `CoachLine` itself drops everything when tips are off.
+    const coachCandidates: CoachLineCandidate[] = (() => {
+        const practiceNudge: CoachLineCandidate | null =
             live && canManagePractice && pendingPracticeCount > 0
                 ? {
                       id: 'practice-pending',
-                      key: null,
-                      kind: CoachKind.NUDGE,
                       text:
                           pendingPracticeCount === 1
                               ? tDashboard('coach.practice_pending_one')
                               : tDashboard('coach.practice_pending_many', {
                                     count: pendingPracticeCount,
                                 }),
-                      ctaLabel: tDashboard('coach.practice_pending_cta'),
-                      ctaHref: settingsHref('practice'),
+                      cta: {
+                          label: tDashboard('coach.practice_pending_cta'),
+                          href: settingsHref('practice'),
+                      },
+                      dismiss: { kind: 'local', fingerprint: String(pendingPracticeCount) },
                   }
                 : null;
-        const repeatsCard = (message: CoachVerdictMessage) =>
+        const repeatsCard = (message: { key: string | null; kind: CoachKind }) =>
             message.kind === CoachKind.WEEK_CHECK ||
             (message.key !== null &&
                 (message.key.startsWith(`${MONEY_COACH_KEY_PREFIX}inbox_unsorted`) ||
                     message.key.startsWith(`${MONEY_COACH_KEY_PREFIX}due_bills`)));
-        const rest = (live ? (liveData?.coach ?? []) : []).filter(message => !repeatsCard(message));
-        return practiceNudge ? [practiceNudge, ...rest] : rest;
+        const feedCandidates = (live ? (liveData?.coach ?? []) : [])
+            .filter(message => !repeatsCard(message))
+            .flatMap(message => {
+                const candidate = feedLineCandidate(message, tCoach, t, copyContext);
+                return candidate ? [candidate] : [];
+            });
+        return practiceNudge ? [practiceNudge, ...feedCandidates] : feedCandidates;
     })();
-    const coachOn =
-        helpersEnabled &&
-        canSeeCoach &&
-        !practicePreview &&
-        settingsQuery.data?.features.isCoachEnabled !== false;
-    const coachHasAttention = coachTips
-        .slice(0, 1)
-        .some(message => message.kind === CoachKind.WARNING || message.kind === CoachKind.NUDGE);
 
     // The month score waits until there is something to score (S-5.3 #1); levels wait for a close.
     const progress = liveData?.progress;
@@ -452,22 +448,6 @@ export function HomeDashboardClient() {
                     <Week1Checklist />
                 </div>
 
-                {coachOn && coachTips.length > 0 ? (
-                    <div className="order-6 grid gap-2 lg:order-none" data-tour="home-coach">
-                        <CoachVerdict
-                            messages={coachTips.slice(0, 1)}
-                            hasAttention={coachHasAttention}
-                        />
-                        {coachTips.length > 1 && fromRoutine ? (
-                            <Link
-                                href="/product/coach"
-                                className="inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
-                                {tDashboard('coach.all_tips', { count: coachTips.length })}
-                            </Link>
-                        ) : null}
-                    </div>
-                ) : null}
-
                 {canSeeHome && fromRoutine ? (
                     <div className="order-7 lg:order-none">
                         <TodayCard />
@@ -626,6 +606,21 @@ export function HomeDashboardClient() {
                     />
                 </div>
             ) : null}
+
+            <div className="order-6 min-w-0 empty:hidden lg:col-start-1" data-tour="home-coach">
+                <CoachLine
+                    candidates={coachCandidates}
+                    footer={
+                        coachCandidates.length > 1 && fromRoutine ? (
+                            <Link
+                                href="/product/coach"
+                                className="inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+                                {tDashboard('coach.all_tips', { count: coachCandidates.length })}
+                            </Link>
+                        ) : null
+                    }
+                />
+            </div>
 
             <CloseMonthFlow
                 open={closeFlow.open}

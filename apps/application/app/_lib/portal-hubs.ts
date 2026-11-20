@@ -6,9 +6,7 @@ import type { TranslateFn } from '@rumtelo/i18n';
 
 import type { PortalHubProps } from '@/components/features/home/portal-hub';
 
-type PortalShell = Omit<PortalHubProps, 'coach' | 'cards'> & {
-    fallbackCoach: PortalHubProps['coach'];
-};
+type PortalShell = Omit<PortalHubProps, 'cards'>;
 
 export function moneyPortalShell(t: TranslateFn): PortalShell {
     return {
@@ -17,13 +15,6 @@ export function moneyPortalShell(t: TranslateFn): PortalShell {
         eyebrow: t('features.money.hub.eyebrow'),
         title: t('features.money.hub.title'),
         line: t('features.money.hub.line'),
-        fallbackCoach: {
-            dot: 'var(--color-accent)',
-            kind: t('features.money.hub.fallback_coach_kind'),
-            text: t('features.money.hub.fallback_coach_text'),
-            cta: t('features.money.hub.fallback_coach_cta'),
-            href: '/product/money/income',
-        },
     };
 }
 
@@ -34,13 +25,6 @@ export function energyPortalShell(t: TranslateFn): PortalShell {
         eyebrow: t('features.energy.hub.eyebrow'),
         title: t('features.energy.hub.title'),
         line: t('features.energy.hub.line'),
-        fallbackCoach: {
-            dot: 'var(--color-accent)',
-            kind: t('features.energy.hub.fallback_coach_kind'),
-            text: t('features.energy.hub.fallback_coach_text'),
-            cta: t('features.energy.hub.fallback_coach_cta'),
-            href: '/product/energy/week',
-        },
     };
 }
 
@@ -51,12 +35,5 @@ export function soulPortalShell(t: TranslateFn): PortalShell {
         eyebrow: t('features.soul.hub.eyebrow'),
         title: t('features.soul.hub.title'),
         line: t('features.soul.hub.line'),
-        fallbackCoach: {
-            dot: 'var(--color-accent)',
-            kind: t('features.soul.hub.fallback_coach_kind'),
-            text: t('features.soul.hub.fallback_coach_text'),
-            cta: t('features.soul.hub.fallback_coach_cta'),
-            href: '/product/soul/stillness',
-        },
     };
 }

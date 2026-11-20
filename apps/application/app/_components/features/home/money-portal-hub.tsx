@@ -1,14 +1,11 @@
 'use client';
 
-import { CoachKind } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { describePeriodTravel, toPeriodKey } from '@rumtelo/utils';
+import { toPeriodKey } from '@rumtelo/utils';
 import { useLocale } from 'next-intl';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
-import { buildPeriodTravelCoachText } from '@/app/_lib/period-travel-coach-copy';
-import { pickPortalCoach } from '@/app/_lib/portal-coach';
 import { isLiveData } from '@/app/_lib/preview';
 import { moneyPortalShell } from '@/app/_lib/portal-hubs';
 import { PortalHub, type PortalHubProps } from '@/components/features/home/portal-hub';
@@ -30,9 +27,6 @@ function formatDebtFree(on: string | null, locale: string): string {
 
 export function MoneyPortalHubClient() {
     const t = useTranslations();
-    const tCoach = useTranslations('features.coach');
-    const tShell = useTranslations('pages.shell');
-    const th = useTranslations('features.money.hub');
     const tc = useTranslations('features.money.hub.cards');
     const locale = useLocale();
     const shell = moneyPortalShell(t);
@@ -94,54 +88,6 @@ export function MoneyPortalHubClient() {
               ? tc('debt.months_to_free', { months: String(data.debtMonthsRemaining) })
               : tc('debt.month_you_are_free');
 
-    const baselineById = new Map(
-        (data?.baselineJars ?? []).map(jar => [jar.id, jar.allocated] as const)
-    );
-    const periodTravelCoachText =
-        stacked && data
-            ? buildPeriodTravelCoachText({
-                  period: periodKey,
-                  locale,
-                  travel: describePeriodTravel(period),
-                  monthsHorizon: data.travel.monthsHorizon,
-                  stackedTotal: data.allocatedTotal,
-                  formatMoney,
-                  goalsAtPeriod: data.goalsAtPeriod,
-                  jarHighlights: data.jars.slice(0, 2).map(jar => ({
-                      name: jar.name,
-                      from: baselineById.get(jar.id) ?? jar.allocated,
-                      to: jar.allocated,
-                  })),
-                  tCoach,
-                  tShell,
-              })
-            : null;
-
-    const coachMessages = periodTravelCoachText
-        ? [
-              {
-                  key: null,
-                  kind: CoachKind.WIN,
-                  text: periodTravelCoachText,
-                  ctaLabel: th('see_overview'),
-                  ctaHref: '/',
-              },
-              ...(data?.coach ?? []).map(message => ({
-                  key: message.key,
-                  kind: message.kind,
-                  text: message.text,
-                  ctaLabel: message.ctaLabel,
-                  ctaHref: message.ctaHref,
-              })),
-          ]
-        : (data?.coach ?? []).map(message => ({
-              key: message.key,
-              kind: message.kind,
-              text: message.text,
-              ctaLabel: message.ctaLabel,
-              ctaHref: message.ctaHref,
-          }));
-
     const jarsCard = {
         name: tc('jars.name'),
         value: `${onTrack} / ${total}`,
@@ -163,7 +109,6 @@ export function MoneyPortalHubClient() {
     const props: PortalHubProps = {
         ...shell,
         compact: true,
-        coach: pickPortalCoach(coachMessages, shell.fallbackCoach, tCoach, t),
         cards: [
             canNetWorth ? netWorthCard : jarsCard,
             {

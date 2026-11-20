@@ -7,7 +7,7 @@ import { useDeferredValue, useMemo, useState } from 'react';
 
 import { FlowDirection, GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { AccentCard, Button, Card, EmptyState, Typography } from '@rumtelo/ui';
+import { Button, Card, EmptyState, Typography } from '@rumtelo/ui';
 import {
     incomeAmountAsOf,
     incomeDelta,
@@ -31,7 +31,6 @@ import { isLiveData } from '@/app/_lib/preview';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { IncomeSimulator } from '@/components/features/growth/income-simulator';
 import { HoldingChip } from '@/components/features/money/holding-chip';
-import { MetricStrip } from '@/components/features/money/metric-strip';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -406,37 +405,7 @@ export function IncomePageClient() {
                 ) : null}
             </div>
 
-            {/* 3. Targets and what-ifs come after what the household entered. */}
-            <AccentCard tint="var(--color-accent)" className="overflow-hidden p-0">
-                <MetricStrip
-                    size="lg"
-                    className="border-t-0"
-                    items={[
-                        {
-                            label: t('target'),
-                            value: (
-                                <span
-                                    style={{
-                                        background: 'var(--gradient-accent)',
-                                        WebkitBackgroundClip: 'text',
-                                        WebkitTextFillColor: 'transparent',
-                                    }}>
-                                    {formatMoney(target)}
-                                </span>
-                            ),
-                            hint: t('mo_net'),
-                        },
-                        {
-                            label: t('gap'),
-                            value: gap < 0 ? `+${formatMoney(-gap)}` : formatMoney(gap),
-                            tone: gap < 0 ? 'success' : gap === 0 ? 'success' : 'danger',
-                            hint:
-                                gap < 0 ? t('gap_over') : gap === 0 ? t('gap_met') : t('gap_to_go'),
-                        },
-                    ]}
-                />
-            </AccentCard>
-
+            {/* 3. One "Your target" section (target, gap, what-if, jars, goals) after what was entered. */}
             <div data-tour="income-simulator" className="min-w-0">
                 <IncomeSimulator
                     netCents={monthlyNet}

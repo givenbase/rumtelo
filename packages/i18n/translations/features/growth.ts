@@ -4,10 +4,6 @@ const growth = {
         eyebrow: 'Growth · long term',
         title: 'Grow in more than one direction.',
         line: 'Grip on your growth — skills, goals, learning; you move forward.',
-        fallback_coach_kind: 'THE LEVER',
-        fallback_coach_text:
-            'Cutting costs has a floor; raising income does not. Income is the faster lever.',
-        fallback_coach_cta: 'Open income',
         cards: {
             goals: {
                 name: 'Goals',
@@ -100,7 +96,6 @@ const growth = {
             give_mode_manual: 'I know who',
             give_mode_org: 'Help me choose',
             give_mode_open: 'Keep it open',
-            pledge_tip_title: 'A pledge, not a pot',
             pledge_tip_link: 'Why giving is in a money app → Soul',
             pledge_tip_body:
                 'Every sorted amount that leaves your Give jar this year counts toward it — nothing to move by hand.',
@@ -334,9 +329,6 @@ const growth = {
                 'Bills and income keep their jar. This page only shows what belongs to this holding.',
             delete_linked_warning:
                 'Deleting unlinks {income} income, {bills} bills and {transactions} transactions. They stay in Money.',
-            coach_business_title: 'Business costs in your jars',
-            coach_business_body:
-                '{amount} p/m for this holding runs through your household. Pay them from the business or raise your draw — then only the draw stays in the jars.',
         },
         setup: {
             eyebrow: 'Register the flow',
@@ -391,10 +383,6 @@ const growth = {
             'Courses on Max are on MasterClass. Plus points at Udemy instead. Books, films, and series open as the plan allows — we recommend them, we do not host them.',
         partner_default:
             'Learn is on Plus and Max. Courses on Plus are on Udemy; Max points at MasterClass. Books, films, and series open as the plan allows — we recommend them, we do not host them.',
-        jar_coach_title: 'Education jar',
-        jar_banner:
-            'Your Education jar is where this spending lives. What raises your earning power pays itself back into Financial Freedom.',
-        jar_cta: 'View Education jar',
         browse_library: 'Browse library',
         show_more: 'Show more',
         show_more_remaining: 'Show more · {remaining} left',
@@ -516,12 +504,6 @@ const growth = {
         through_then: 'Through then',
         then_label: 'Then',
         now: 'Now',
-        target: 'Target',
-        gap: 'Gap',
-        gap_over: 'over',
-        gap_met: 'met',
-        gap_to_go: 'to go',
-        mo_net: '/mo net',
         subline_travel: '{amount}/mo · {months} months',
         subline_annual: '{amount}/yr',
         loading: 'Loading…',
@@ -538,8 +520,11 @@ const growth = {
         empty_guest_body: 'Income sources show up here once you are signed in.',
     },
     income_simulator: {
-        eyebrow: 'What a raise does',
-        eyebrow_with_mark: '✦ What a raise does',
+        eyebrow: '✦ Your target',
+        target_line: '{amount} a month net',
+        gap_to_go: '{amount} to go',
+        gap_met: 'Target reached',
+        gap_over: '{amount} above your target',
         intro: 'Drag the monthly net. The split stays; each jar moves with it.',
         cleared_intro: "{name} is reached. I won't pick a higher number.",
         set_next_target: 'Set the next target',

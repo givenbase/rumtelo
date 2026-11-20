@@ -784,15 +784,22 @@
                 "voice_discard": "Ignorer",
                 "voice_unavailable": "La fonction vocale n'est pas disponible dans ce navigateur"
             },
+            "line": {
+                "label": "The Coach",
+                "hide": "Hide this tip",
+                "hidden": "Tip hidden.",
+                "undo": "Undo",
+                "locked_suffix": "Plus"
+            },
             "verdict": {
                 "eyebrow": "✦ L'entraîneur",
-                "kind_nudge": "Attention",
+                "kind_nudge": "Next move",
                 "kind_win": "Gagner",
-                "kind_warning": "Avertissement",
+                "kind_warning": "Worth a look",
                 "kind_insight": "Analyse",
                 "kind_week_check": "Bilan hebdomadaire",
                 "kind_on_track": "En bonne voie",
-                "kind_alert": "Alerte",
+                "kind_alert": "Act this week",
                 "share": "Partager",
                 "open": "Ouvrir",
                 "detail": "Détails",
@@ -831,6 +838,7 @@
                 "why_aria": "L'entraîneur"
             },
             "jar_guide": {
+                "summary": "What is {jar} for?",
                 "aria": "Le sac « Coach » de ce bocal",
                 "heading": "À quoi cela peut-il me servir ?",
                 "allowed": "Cela pourrait concerner",
@@ -854,9 +862,35 @@
                     "text": "{count} transactions are waiting to be sorted. Sort them into jars so the picture stays honest.",
                     "cta": "Sort transactions"
                 },
+                "fixed_costs": {
+                    "over_necessities": {
+                        "cta": "Add income",
+                        "cta_secondary": "Open the biggest fixed cost"
+                    },
+                    "business_leak": {
+                        "cta": "See linked bills"
+                    },
+                    "subscription_review": {
+                        "cta": "Review subscriptions"
+                    }
+                },
                 "necessities_share": {
                     "text": "Le taux de « Necessities » est de {pct} % — l'objectif est de 55 %. Ça va pour l'instant ; pour combler l'écart, réduisez les coûts fixes ou augmentez vos revenus, sans toucher à la catégorie « Freedom ».",
                     "cta": "Avis sur les bocaux"
+                },
+                "over_necessities": {
+                    "text": "{jar} bills come to {amount} a month more than the jar gets.",
+                    "cta": "Add income",
+                    "cta_secondary": "Open the biggest fixed cost"
+                },
+                "business_leak": {
+                    "text": "{amount} a month in business costs is paid from your household.",
+                    "cta": "Review these bills"
+                },
+                "subscription_review": {
+                    "text_one": "1 subscription costs {amount} a month. Still using it?",
+                    "text_other": "{count} subscriptions cost {amount} a month. Still using all of them?",
+                    "cta": "Review subscriptions"
                 }
             },
             "time_coach": {
@@ -1536,9 +1570,7 @@
                     "add_expense": "+ Ponctuel",
                     "open_in_money": "Ouvrir dans Money →",
                     "money_note": "Les factures et les revenus restent dans leur bocal. Cette page ne présente que ce qui appartient à ce fonds.",
-                    "delete_linked_warning": "La suppression des liens entraîne la suppression des liens vers {income} revenus, {bills} factures et {transactions} opérations. Ceux-ci restent enregistrés dans Money.",
-                    "coach_business_title": "Les coûts d'exploitation dans vos bocaux",
-                    "coach_business_body": "{amount} par mois pour cette participation est prélevé sur le budget de votre foyer. Versez-le depuis l'entreprise ou augmentez votre prélèvement — ainsi, seul ce prélèvement restera dans les bocaux."
+                    "delete_linked_warning": "La suppression des liens entraîne la suppression des liens vers {income} revenus, {bills} factures et {transactions} opérations. Ceux-ci restent enregistrés dans Money."
                 },
                 "setup": {
                     "eyebrow": "Enregistrer le flux",
@@ -2320,6 +2352,10 @@
                 }
             },
             "jars": {
+                "coach_line": {
+                    "necessities_over": "{jar} needs {amount} more than it gets this month.",
+                    "open_fixed": "Open fixed costs"
+                },
                 "eyebrow": "LES SIX BOÎTES",
                 "title": "Chaque pièce a une fonction qui lui est attribuée avant même son arrivée.",
                 "lead": "Avec les biens immobiliers générateurs de revenus, la répartition s'effectue instantanément. La liberté financière ne se dépense jamais : elle ne fait l'objet que d'investissements.",
@@ -2562,15 +2598,7 @@
                 "detail_status_skipped": "J'ai sauté cette période",
                 "detail_status_rolled": "Reporté au mois suivant",
                 "detail_status_planned": "Prévu",
-                "coach_subscription_title": "Vérification de l'abonnement",
-                "coach_subscription_body": "Vérifiez chaque trimestre si tout ce qui est indiqué ici est toujours d'actualité. Les petites sommes finissent par s'accumuler : un abonnement que vous n'utilisez pas, c'est de l'argent que vous jetez par les fenêtres chaque mois. Idéal : moins de 20 % de vos dépenses de première nécessité sont consacrées à des services récurrents.",
-                "coach_enough_title": "Est-ce suffisant ?",
-                "coach_enough_ratio_line": "Les coûts fixes représentent {ratio} % — soit",
-                "coach_enough_comfortable": "confortable",
-                "coach_enough_edge": "à deux doigts de l'objectif des Necessities",
-                "coach_enough_above": "au-delà de l'objectif de 55 % fixé pour les produits de première nécessité",
-                "coach_enough_simplify": "Réduisez vos dépenses et/ou augmentez vos revenus — ne puisez pas dans votre « liberté financière ».",
-                "coach_enough_room": "En dessous de 55 %, il y a une marge de progression. Le véritable frein, ce sont les revenus, et pas seulement la réduction des coûts.",
+                "could_cancel": "Could cancel?",
                 "toast_active": "Bill est de nouveau actif",
                 "toast_ended": "Fin du projet de loi",
                 "toast_paused": "Bill fit une pause",
@@ -3383,22 +3411,8 @@
                     "interest_left": "{rate} % d'intérêt · Il en reste {balance}"
                 }
             },
-            "necessities_pressure": {
-                "title": "Les produits de première nécessité sous pression",
-                "shortfall_line": "Les dépenses de première nécessité s'élèvent à {amount} par mois, soit un montant inférieur à l'enveloppe budgétaire de {pct} %.",
-                "commitment_line": "Les coûts fixes représentent {ratio} % des revenus, soit un pourcentage supérieur à l'objectif de {pct} % fixé pour les dépenses indispensables.",
-                "meta": "Budget mensuel de {envelope} · dépenses fixes représentant {ratio} % des revenus",
-                "body": "C'est courant au début : {pct} % est un objectif à atteindre. Réduisez vos dépenses et/ou augmentez vos revenus. Ne puisez pas dans votre épargne destinée à la liberté financière pour combler votre loyer.",
-                "review_fixed": "Examiner les coûts fixes",
-                "open_jar": "Ouvrir le pot « Necessities »",
-                "raise_income": "+ Augmenter les revenus"
-            },
             "business_household_leak": {
-                "title": "Les coûts d'exploitation dans vos bocaux",
-                "body": "{amount} p/m de frais professionnels sont imputés à votre budget familial. Réglez-les à partir de l'entreprise ou augmentez votre prélèvement — ainsi, seul ce prélèvement restera dans les bocaux.",
-                "body_named": "{amount} p/m pour {name} passe par votre foyer. Versez-leur cette somme depuis l'entreprise ou augmentez votre prélèvement — ainsi, seul ce prélèvement restera dans les bocaux.",
-                "meta": "{count, plural, =1 {1 linked bill} other {{count} linked bills}}",
-                "open_holding": "Position ouverte",
+                "line": "{amount} a month in business costs is paid from your household.",
                 "review_bills": "Voir les projets de loi en lien"
             },
             "household_profile": {

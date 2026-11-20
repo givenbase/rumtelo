@@ -1,6 +1,4 @@
 'use client';
-import { JarKey } from '@rumtelo/contracts';
-
 import { apiQuery } from '@/app/_lib/api-hooks';
 
 import Link from 'next/link';
@@ -11,14 +9,12 @@ import { Button, Typography } from '@rumtelo/ui';
 import { toPeriodKey } from '@rumtelo/utils';
 
 import { CREATE_HREF, createTxHref } from '@/app/_lib/create-routes';
-import { necessitiesPressureFromJar } from '@/app/_lib/necessities-pressure';
 import { isLiveData } from '@/app/_lib/preview';
 import { resolveJarSubtitle } from '@/app/_lib/jar-copy';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { productPath } from '@/app/_lib/routes';
 import { JarSummaryRow } from '@/components/features/money/jar-summary-row';
-import { NecessitiesPressureCard } from '@/components/features/money/necessities-pressure-card';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar } from '@/components/layout/list-toolbar';
@@ -26,9 +22,8 @@ import { ListToolbar } from '@/components/layout/list-toolbar';
 /**
  * Jars screen — design Kluis Finance App.dc.html :689-839.
  * ListToolbar: + Add transaction (Out/In) · Move between jars secondary.
- * Necessities overspent → NecessitiesPressureCard; doctrine in
- * apps/backend/src/modules/public/product/money/README.md
- * → “When Necessities can’t fit in 55%”.
+ * An overspent Necessities is a full red meter in its row; the one Coach line that says what
+ * to do lives on the Money overview (`MoneyCoachLine`), after these rows.
  * Income what-ifs live on Growth → Income (`IncomeSimulator`) — the lever there is income.
  */
 export function JarsPageClient({ embed = false }: { embed?: boolean }) {
@@ -54,8 +49,6 @@ export function JarsPageClient({ embed = false }: { embed?: boolean }) {
     const stacked = dashboardQuery.data?.travel?.mode === 'stacked';
     const totalPct = jars.reduce((total, j) => total + j.percentage, 0);
     const onTarget = jars.filter(j => !j.overspent).length;
-    const necJar = jars.find(jar => jar.key === JarKey.NECESSITIES);
-    const necessitiesPressure = necJar ? necessitiesPressureFromJar(necJar) : null;
 
     return (
         <div className={embed ? 'grid gap-5' : 'grid animate-rise gap-8'}>
@@ -115,13 +108,6 @@ export function JarsPageClient({ embed = false }: { embed?: boolean }) {
             </div>
 
             <div id="jars-list" data-tour="jars-list">
-                {/* Doctrine: money README → “When Necessities can’t fit in 55%” */}
-                {necessitiesPressure?.active ? (
-                    <div className="mb-4">
-                        <NecessitiesPressureCard pressure={necessitiesPressure} variant="jar" />
-                    </div>
-                ) : null}
-
                 <div className="grid gap-2">
                     {jars.map(jar => {
                         const catalog = catalogByKey.get(jar.key);

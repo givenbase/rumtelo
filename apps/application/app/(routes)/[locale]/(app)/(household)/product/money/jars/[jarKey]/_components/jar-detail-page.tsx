@@ -426,7 +426,12 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                 </Card>
             </section>
 
-            <JarGuideCard jarKey={jarKey} jarId={jar.id} allocatedCents={jar.allocated} />
+            <JarGuideCard
+                jarKey={jarKey}
+                jarId={jar.id}
+                allocatedCents={jar.allocated}
+                jarName={jar.name}
+            />
         </div>
     );
 }

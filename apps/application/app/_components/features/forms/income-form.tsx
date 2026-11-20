@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { api } from '@/app/_lib/api';
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
@@ -29,14 +28,12 @@ import { Cadence, IncomeKind } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import { findByNameOrAlias } from '@rumtelo/utils';
 
-import { CREATE_HREF } from '@/app/_lib/create-routes';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { formRoute } from '@/app/_lib/form-route-meta';
 import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
-import { CoachTipCard } from '@/components/features/helpers';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
@@ -436,18 +433,6 @@ export function IncomeForm({
                     ) : null}
                 </div>
             }>
-            {mode === 'edit' ? (
-                <CoachTipCard
-                    title={tIncome('raise_tip_title')}
-                    meta={
-                        <Link href={CREATE_HREF.income} className="hover:text-accent">
-                            {tIncome('raise_tip_link')}
-                        </Link>
-                    }>
-                    {tIncome('raise_tip_body')}
-                </CoachTipCard>
-            ) : null}
-
             <FormField
                 control={form.control}
                 name="name"

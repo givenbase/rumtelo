@@ -80,31 +80,26 @@ const coach = {
         voice_discard: 'Discard',
         voice_unavailable: 'Voice is not available in this browser',
     },
+    /** The one Coach line per page (`CoachLine`): after the household's own data. */
+    line: {
+        label: 'The Coach',
+        hide: 'Hide this tip',
+        hidden: 'Tip hidden.',
+        undo: 'Undo',
+        locked_suffix: 'Plus',
+    },
     verdict: {
-        eyebrow: '✦ The Coach',
-        kind_nudge: 'Attention',
+        kind_nudge: 'Next move',
         kind_win: 'Win',
-        kind_warning: 'Warning',
+        kind_warning: 'Worth a look',
         kind_insight: 'Insight',
         kind_week_check: 'Week check',
         kind_on_track: 'On track',
-        kind_alert: 'Alert',
-        share: 'Share',
-        open: 'Open',
-        detail: 'Detail',
-        message_n: 'Message {n}',
-        month_score_badge: 'Month score',
-        month_score_slide: 'Month score advice',
-        previous: 'Previous',
-        next: 'Next',
-        collapse: 'Collapse',
-        expand: 'Show coach',
-        collapsed_clear: 'Nothing waiting — expand when you want the score',
-        collapsed_attention: 'Something needs you',
-        collapsed_waiting: '{count} waiting',
+        kind_alert: 'Act this week',
     },
     dismiss: 'Dismiss',
     got_it: 'Got it',
+    split_more: '{count, plural, =1 {1 more tip} other {# more tips}}',
     split_tips: {
         'play-above-default':
             'Play above 10% usually comes from Financial Freedom or Long Term Savings. Those two buy your future; Play spends this month.',
@@ -132,14 +127,10 @@ const coach = {
     helpers: {
         mark_title: 'From The Coach — turn on-screen tips on or off in Settings → Preferences',
         mark_label: 'The Coach',
-        tip_aria: 'The Coach: {title}',
-        locked_cta: '🔒 {cta}',
         open_coach: 'Open The Coach',
-        why_aria: 'The Coach',
     },
     jar_guide: {
-        aria: 'The Coach for this jar',
-        heading: 'What can I use this for?',
+        summary: 'What is {jar} for?',
         allowed: 'This may go to',
         give_who: 'Who should receive it?',
         give_hint:
@@ -151,8 +142,6 @@ const coach = {
         learn_nudge:
             'Put titles on your Learn shelf, browse the library for inspiration, and add a goal on this jar when you are ready to claim the spend.',
         split_inside: 'Split inside this jar',
-        footer: 'The Coach — tips without shame.',
-        turn_off: 'Turn tips off',
     },
     /** Rule-based tips from money tip producers (`money.*` keys). */
     money_coach: {
@@ -167,9 +156,40 @@ const coach = {
             text: '{count} transactions are waiting to be sorted. Sort them into jars so the picture stays honest.',
             cta: 'Sort transactions',
         },
+        fixed_costs: {
+            over_necessities: {
+                text: '{jar} bills come to {amount} a month more than the jar gets.',
+                cta: 'Add income',
+                cta_secondary: 'Open the biggest fixed cost',
+            },
+            business_leak: {
+                text: '{amount} a month in business costs is paid from your household.',
+                cta: 'See linked bills',
+            },
+            subscription_review: {
+                text_one: '1 subscription costs {amount} a month. Still using it?',
+                text_other: '{count} subscriptions cost {amount} a month. Still using all of them?',
+                cta: 'Review subscriptions',
+            },
+        },
         necessities_share: {
             text: 'Necessities is at {pct}% — the goal is 55%. Fine for now; to close the gap, trim fixed costs or raise income and leave Freedom untouched.',
             cta: 'Review jars',
+        },
+        /** Household-wide fixed-cost tips (`money.fixed_costs.*` keys). */
+        over_necessities: {
+            text: '{jar} bills come to {amount} a month more than the jar gets.',
+            cta: 'Add income',
+            cta_secondary: 'Open the biggest fixed cost',
+        },
+        business_leak: {
+            text: '{amount} a month in business costs is paid from your household.',
+            cta: 'Review these bills',
+        },
+        subscription_review: {
+            text_one: '1 subscription costs {amount} a month. Still using it?',
+            text_other: '{count} subscriptions cost {amount} a month. Still using all of them?',
+            cta: 'Review subscriptions',
         },
     },
     /** Rule-based tips from the energy time-week coach (`energy.time.*` keys). */
@@ -207,19 +227,6 @@ const coach = {
         },
     },
     /** Looking Ahead / Looking Back coach line on money dashboard & portal hub. */
-    period_travel: {
-        looking_back_one:
-            'Looking back at {stamp} ({relativeLabel}): about {money} moved through your jars that month.',
-        looking_back_other:
-            'Looking back at {stamp} ({relativeLabel}): about {money} moved through your jars that month.',
-        looking_ahead_one:
-            'By {stamp}, if you keep this plan, about {money} will have moved through your jars across {horizon} month.',
-        looking_ahead_other:
-            'By {stamp}, if you keep this plan, about {money} will have moved through your jars across {horizon} months.',
-        pace_needed: '{name} still needs pace — roughly {money}/mo net to make the date.',
-        past_note: 'Lifetime goal saved and live debt are not rewound for past months.',
-        jar_highlight: '{name} {from} → {to}',
-    },
 } as const;
 
 export default coach;

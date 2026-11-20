@@ -12,8 +12,8 @@ type PageContentWidthContextValue = {
 const PageContentWidthContext = createContext<PageContentWidthContextValue | null>(null);
 
 /**
- * Lets `PageContent` publish its column width so shell chrome (WhyCaption)
- * can align to the same measure — avoids left-aligned helper vs centered prose.
+ * Lets `PageContent` publish its column width so shell chrome can align to the
+ * same measure.
  */
 export function PageContentWidthProvider({ children }: { children: ReactNode }) {
     const [width, setWidth] = useState<PageContentWidth>('full');

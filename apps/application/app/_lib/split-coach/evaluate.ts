@@ -145,3 +145,9 @@ export function pctByJarKey(
     }
     return out;
 }
+
+/** Warnings before information, then the order the rules fire in (stable sort). */
+export function orderSplitTips(tips: readonly SplitTip[]): SplitTip[] {
+    const rank = (tip: SplitTip) => (tip.severity === 'warn' ? 0 : 1);
+    return tips.slice().sort((left, right) => rank(left) - rank(right));
+}

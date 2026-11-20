@@ -4,13 +4,10 @@ import type { ReactNode } from 'react';
 
 import Link from 'next/link';
 
-import { useTranslations } from '@rumtelo/i18n';
-import { Button, Typography } from '@rumtelo/ui';
+import { Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { capabilityKeyForPathname } from '@/app/_lib/capability-access';
-import { coachKindDisplay } from '@/app/_lib/coach-kind-label';
-import { useHelpersEnabled } from '@/components/features/helpers';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
 
 interface HubCard {
@@ -33,7 +30,6 @@ export interface PortalHubProps {
     eyebrow: string;
     title: string;
     line: string;
-    coach: { dot: string; kind: string; text: string; cta: string; href: string };
     cards: HubCard[];
     /** Tighter cards — Money overview sits above the jars list. */
     compact?: boolean;
@@ -50,15 +46,10 @@ export function PortalHub({
     eyebrow,
     title,
     line,
-    coach,
     cards,
     compact = false,
 }: PortalHubProps) {
-    const t = useTranslations('features.coach');
-    const tKind = useTranslations('features.coach.verdict');
     const { isCapabilityLocked } = usePlanCapabilities();
-    const showCoach = useHelpersEnabled();
-    const coachLocked = isCapabilityLocked(capabilityKeyForPathname(coach.href));
 
     return (
         <div className="grid animate-rise gap-5">
@@ -76,42 +67,6 @@ export function PortalHub({
                     {line}
                 </Typography>
             </div>
-
-            {showCoach ? (
-                <div
-                    className={cn(
-                        'flex flex-wrap items-center gap-3 rounded-2xl border border-l-4 border-line bg-surface shadow-md',
-                        compact ? 'p-3 sm:p-3.5' : 'gap-4 p-4 sm:p-5'
-                    )}
-                    style={{ borderLeftColor: tint }}>
-                    <div className="grid min-w-0 flex-1 gap-1">
-                        <span className="flex items-center gap-2">
-                            <span
-                                className="size-1.75 rounded-full"
-                                style={{ background: coach.dot }}
-                            />
-                            <Typography as="span" variant="eyebrow" color="primary">
-                                {t('page_title')}
-                            </Typography>
-                            <span
-                                className="font-mono text-xs font-medium tracking-widest uppercase"
-                                style={{ color: coach.dot }}>
-                                · {coachKindDisplay(coach.kind, tKind)}
-                            </span>
-                        </span>
-                        <Typography
-                            as="p"
-                            weight="medium"
-                            size={compact ? 'sm' : 'default'}
-                            className={cn('leading-snug text-pretty', !compact && 'lg:text-lg')}>
-                            {coach.text}
-                        </Typography>
-                    </div>
-                    <Button as={Link} href={coach.href} size="sm">
-                        {coachLocked ? t('helpers.locked_cta', { cta: coach.cta }) : coach.cta}
-                    </Button>
-                </div>
-            ) : null}
 
             <div
                 className={cn(

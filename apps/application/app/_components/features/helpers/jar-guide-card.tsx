@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import { JarKey } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
+import { Icon } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { createFixedHref, createTxHref } from '@/app/_lib/create-routes';
@@ -16,63 +17,68 @@ import {
     jarGuideSubLabel,
     jarGuideSubNote,
 } from '@/app/_lib/jar-copy';
-import { productPath } from '@/app/_lib/routes';
-import { settingsHref } from '@/app/_lib/settings-tabs';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { GivingFinder } from '@/components/features/money/giving-finder';
-
-import { CoachMark } from './helper-mark';
-import { useHelpersEnabled } from './provider';
 
 type JarGuideCardProps = {
     jarKey: JarKey;
     /** Household jar id — needed so Give can open a form with the org prefilled. */
     jarId?: string;
     allocatedCents?: number;
+    /** The household's own name for the jar (it may be renamed); falls back to the catalog name. */
+    jarName?: string;
     className?: string;
 };
 
 /**
- * Coach guide for a jar — what it is for, with icons and next moves.
- * Give also embeds the organization finder (same Coach path as Soul → Giving).
- * Hidden when Coach guides are off (Help or Settings → Account).
+ * Reference help for a jar: a closed "What is {jar} for?" disclosure after the jar's lists.
+ * It is reference, not a tip, so it shows whether The Coach is on or off. Native `<details>`:
+ * keyboard operable and announced as expandable. Give also embeds the organization finder.
  */
-export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: JarGuideCardProps) {
+export function JarGuideCard({
+    jarKey,
+    jarId,
+    allocatedCents = 0,
+    jarName,
+    className,
+}: JarGuideCardProps) {
     const t = useTranslations('features.coach.jar_guide');
     const tJars = useTranslations('features.money.jars');
-    const tCoach = useTranslations('features.coach.helpers');
     const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
-    const coachGuidesEnabled = useHelpersEnabled();
     const { guideFor, byKey } = useJarCatalog();
     const guide = guideFor(jarKey);
     const catalog = byKey.get(jarKey);
     const isGive = jarKey === JarKey.GIVE;
 
-    if (!coachGuidesEnabled || !guide) return null;
+    if (!guide) return null;
 
     return (
-        <section
-            className={cn('grid gap-2.5', className)}
-            data-feature-helper="jar-guide"
-            data-coach-guide="jar"
-            aria-label={t('aria')}>
-            <div className="flex flex-wrap items-center gap-2">
-                <span
-                    className="grid size-7 place-items-center rounded-lg bg-accent/12 text-sm"
-                    aria-hidden>
-                    {catalog?.icon ?? '✦'}
+        <details
+            className={cn(
+                'group overflow-hidden rounded-2xl border border-line bg-surface',
+                className
+            )}
+            data-feature-helper="jar-guide">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-fg outline-none marker:hidden hover:bg-raised focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-inset [&::-webkit-details-marker]:hidden">
+                <span className="grid size-7 shrink-0 place-items-center text-sm" aria-hidden>
+                    {catalog?.icon ?? '◇'}
                 </span>
-                <h2 className="font-mono text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
-                    {t('heading')}
-                </h2>
-                <CoachMark size="sm" />
-            </div>
+                <span className="min-w-0 flex-1 text-pretty wrap-anywhere">
+                    {t('summary', { jar: jarName ?? catalog?.name ?? jarKey })}
+                </span>
+                <Icon
+                    name="chevron-down"
+                    size="sm"
+                    aria-hidden
+                    className="shrink-0 text-fg-muted transition-transform group-open:rotate-180"
+                />
+            </summary>
 
-            <div className="overflow-hidden rounded-2xl border border-accent/20 bg-surface shadow-sm ring-1 ring-accent/10">
-                <div className="border-b border-line bg-gradient-to-br from-accent/8 via-raised to-surface px-4 py-3.5">
-                    <p className="text-sm leading-relaxed text-pretty text-fg">
+            <div className="border-t border-line">
+                <div className="px-4 py-3.5">
+                    <p className="text-sm leading-relaxed text-pretty text-fg-secondary">
                         {jarGuideNote(tJars, jarKey, guide.note)}
                     </p>
                 </div>
@@ -217,24 +223,8 @@ export function JarGuideCard({ jarKey, jarId, allocatedCents = 0, className }: J
                             ))}
                         </div>
                     ) : null}
-
-                    <p className="text-[11px] leading-relaxed text-fg-faint">
-                        {t('footer')}{' '}
-                        <Link
-                            href={productPath('coach')}
-                            className="font-medium text-accent underline-offset-2 hover:underline">
-                            {tCoach('open_coach')}
-                        </Link>
-                        {' · '}
-                        <Link
-                            href={settingsHref('preferences')}
-                            className="font-medium text-accent underline-offset-2 hover:underline">
-                            {t('turn_off')}
-                        </Link>
-                        .
-                    </p>
                 </div>
             </div>
-        </section>
+        </details>
     );
 }

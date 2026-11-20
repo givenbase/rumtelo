@@ -23,9 +23,10 @@ function isHidden(pathname: string): boolean {
 }
 
 /**
- * The week check's door on every Money page. Primary when it is due and not done, secondary
- * otherwise; "View week check" for a VIEWER or a Practice preview. It does not depend on the
- * Coach: nothing here reads the Coach settings.
+ * The week check's door on every Money page: a compact button at the right edge, not a bar
+ * across the page. Primary when it is due and not done, secondary otherwise; "View week check"
+ * for a VIEWER or a Practice preview. The status line shows from `sm` up and is read out on
+ * phones. It does not depend on the Coach: nothing here reads the Coach settings.
  */
 export function WeekCheckEntry() {
     const t = useTranslations('features.money.week_check');
@@ -41,19 +42,20 @@ export function WeekCheckEntry() {
     const statusText = !status.ready ? '' : done ? t('entry_status_done') : t('entry_status_open');
 
     return (
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 sm:justify-end">
+        <div className="mb-3 flex items-center justify-end gap-3">
             <p
                 className={cn(
-                    'min-w-0 text-sm text-fg-muted sm:order-first sm:mr-auto',
-                    !statusText && 'sr-only'
+                    'sr-only min-w-0 text-sm text-fg-muted sm:not-sr-only',
+                    !statusText && 'sm:sr-only'
                 )}>
                 {statusText}
             </p>
             <Button
                 as={Link}
                 href={moneyPath('week-check')}
+                size="sm"
                 variant={primary ? 'primary' : 'secondary'}
-                className="h-12 w-full sm:h-10 sm:w-auto">
+                className="min-h-11 shrink-0 sm:min-h-10">
                 {readOnly ? (
                     t('entry_view')
                 ) : done ? (

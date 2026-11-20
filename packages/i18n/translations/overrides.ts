@@ -976,7 +976,6 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Doelen met een datum, een potje en voortgang.',
         'features.capabilities.soul-giving.description':
             'Waarom het ‘Give’-potje bestaat, waar de opbrengst naartoe gaat en hoe je een goede keuze maakt.',
-        'features.coach.jar_guide.aria': 'De Coach voor dit potje',
         'features.coach.jar_guide.learn_nudge':
             'Zet titels op je Leren-plank, blader door de bibliotheek voor inspiratie, en voeg een doel toe op dit potje als je klaar bent om de uitgave te claimen.',
         'features.coach.jar_guide.split_inside': 'Verdeeld in dit potje',
@@ -984,7 +983,6 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.growth.goals.share_jar_hint':
             'Doelen in hetzelfde potje delen de maandelijkse ruimte. Meer doelen daar betekent meestal dat elk doel langer duurt — tenzij er één Focus is.',
         'features.growth.goals.form.kind_save_line': 'Leg geld opzij in een potje',
-        'features.growth.goals.form.pledge_tip_title': 'Een belofte, geen potje',
         'features.growth.goals.form.pledge_tip_body':
             'Elk gesorteerd bedrag dat dit jaar uit je ‘Give’-potje komt, telt mee — je hoeft niets met de hand te verplaatsen.',
         'features.growth.goals.form.cause_open_hint':
@@ -1017,17 +1015,10 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.growth.goals.detail.this_jar': 'Dit potje',
         'features.growth.net_worth.detail.money_note':
             'Rekeningen en inkomsten blijven in hun eigen potje. Deze pagina laat alleen zien wat bij dit bezit hoort.',
-        'features.growth.net_worth.detail.coach_business_title': 'Zakelijke kosten in je potjes',
-        'features.growth.net_worth.detail.coach_business_body':
-            '{amount} p/m voor dit bezit loopt via je huishouden. Betaal ze vanuit het bedrijf of verhoog je onttrekking — dan blijft alleen de onttrekking in de potjes.',
         'features.growth.net_worth.setup.step_in_body':
             'Voeg de inkomsten toe die je eruit haalt — salaris, dividend, huur. Het komt net als elk ander inkomen in je potjes terecht; dit bezit krijgt alleen de credits.',
         'features.growth.net_worth.setup.step_out_body':
             'Hosting, verzekering, software — voeg de rekeningen toe die je ervoor betaalt. Elke rekening houdt zijn eigen potje.',
-        'features.growth.learn.jar_coach_title': 'Opleiding-potje',
-        'features.growth.learn.jar_banner':
-            'In je ‘Opleiding’-potje worden deze uitgaven ondergebracht. Wat je verdiencapaciteit vergroot, draagt bij aan je financiële vrijheid.',
-        'features.growth.learn.jar_cta': 'Bekijk het ‘Opleiding’-potje',
         'features.growth.income_simulator.intro':
             'Sleep het maandbedrag. De verdeling blijft behouden; elk potje wordt mee verplaatst.',
         'features.growth.income_simulator.no_jar': 'Geen potje',
@@ -1104,12 +1095,6 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.money.jar_coverage.in_pot': 'In het potje {amount} · opgebouwd over de maanden',
         'features.money.fixed_form.no_jars':
             'Geen potjes — eerst de volledige installatie voltooien',
-        'features.money.necessities_pressure.open_jar': 'Open het potje met basisbenodigdheden',
-        'features.money.business_household_leak.title': 'Zakelijke kosten in je potjes',
-        'features.money.business_household_leak.body':
-            '{amount} p/m aan bedrijfskosten lopen via je huishouden. Betaal ze vanuit het bedrijf of verhoog je onttrekking — dan blijft alleen de onttrekking in de potjes.',
-        'features.money.business_household_leak.body_named':
-            '{amount} p/m voor {name} loopt via je huishouden. Betaal ze vanuit het bedrijf of verhoog je onttrekking — dan blijft alleen de onttrekking in de potjes.',
         'features.soul.giving.lead':
             'Het ‘Give’-potje is de kleinste van de zes en heeft de grootste invloed op je relatie met geld. Wanneer een vast deel al weg is voordat je het kunt uitgeven, is geld niet langer iets om aan vast te houden.',
         'features.soul.giving.open_jar': 'Open het ‘Give’-potje',
@@ -1193,10 +1178,6 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.why.meaning.money_leaves_body':
             'Als er geld wordt opgenomen, zie je meteen uit welk potje het komt — en hoeveel er nog over is voor die klus. Geen spreadsheet achteraf.',
         'pages.why.cta_jars': 'Bekijk mijn potjes',
-        'pages.why.routes.energy_sleep':
-            'Slaap is de vloer waarop de potjes staan. Haal die weg en alle andere getallen vallen stilletjes naar beneden.',
-        'pages.why.routes.energy_food':
-            'Eten is brandstof voor de week die jullie potjes verdelen. Brandstof koop je, die krijg je niet zomaar.',
         'features.growth.goals.detail.kind_save': 'Sparen · in een spaarpotje',
         'features.growth.income_simulator.tip_behind_income_no_jar':
             '{need} per maand zou dit in {months} maanden afbetalen. Leg het geld in een spaarpotje om te zien of je inkomen daarvoor voldoende is.',
@@ -1206,8 +1187,6 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Cadeaus, terugbetalingen, belastingteruggaven en aanvullingen op het spaarpotje. Tik op een rij om deze te bewerken.',
         'features.money.debt.form.link_fixed_body':
             'Hiermee houd je de geplande aflossing in je potjesbudget volgens dit ritme aan.',
-        'features.money.necessities_pressure.body':
-            'Dat komt in het begin vaak voor — {pct}% is een doel om naartoe te werken. Vereenvoudig je rekeningen en/of zorg voor meer inkomen. Haal geen geld uit je spaarpotje voor financiële vrijheid om de huur te kunnen betalen.',
         'features.tour.pages.jars.title': 'Mijn spaarpotjes',
         'pages.settings.panels.plan.card_basic_feats':
             '{members} · Alleen solo · Spaarpotjes · 1 doel · Coach',
@@ -1225,7 +1204,6 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Noodzakelijk staat op {pct}% — het doel is 55%. Prima voor nu; om het gat te dichten, schrap je vaste kosten of verhoog je je inkomen, en laat je Vrijheid met rust.',
         'features.growth.goals.detail.advice_give_gap_body':
             'Als er ongeveer {amount} meer per maand wordt gedoneerd, wordt de toezegging op tijd nagekomen. Een vast bedrag bij Noodzakelijk of ‘Give’ maakt het saai — op een positieve manier.',
-        'features.money.fixed.coach_enough_edge': 'op de rand van het doel van Noodzakelijk',
         'features.money.debt.detail.no_fixed_linked':
             'Er is nog geen doorlopende betaling gekoppeld. Voeg er een toe, zodat Noodzakelijk deze betaling kan zien.',
         'features.money.debt.form.link_fixed_title':
@@ -1297,11 +1275,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.brand.auth_quotes_web.who_its_for.support':
             'De tips van De Coach. Jij kiest. Bepaal zelf de richting.',
         'features.coach.page_title': 'De Coach',
-        'features.coach.verdict.eyebrow': '✦ De Coach',
-        'features.coach.verdict.expand': 'De Coach weergeven',
         'features.coach.helpers.mark_label': 'De Coach',
-        'features.coach.helpers.tip_aria': 'De Coach: {title}',
-        'features.coach.helpers.why_aria': 'De Coach',
         'features.coach.jar_guide.give_hint':
             'Kies een goed doel en vervolgens een organisatie die onafhankelijk wordt gecontroleerd — dezelfde shortlist van De Coach als op Waarom en waar.',
         'features.money.fixed_form.give_hint':
@@ -1501,6 +1475,20 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.coach.money_coach.inbox_unsorted.text':
             '{count} transacties wachten om gesorteerd te worden. Sorteer ze in potjes, dan blijft het beeld eerlijk.',
         'features.coach.money_coach.inbox_unsorted.cta': 'Transacties sorteren',
+        // Fixed-cost tips in the household Coach feed: literal, positive, no shame.
+        'features.coach.money_coach.over_necessities.text':
+            'Rekeningen uit {jar} zijn {amount} per maand meer dan het potje krijgt.',
+        'features.coach.money_coach.over_necessities.cta': 'Inkomen toevoegen',
+        'features.coach.money_coach.over_necessities.cta_secondary':
+            'Open de grootste vaste kosten',
+        'features.coach.money_coach.business_leak.text':
+            '{amount} per maand aan zakelijke kosten betaal je vanuit je huishouden.',
+        'features.coach.money_coach.business_leak.cta': 'Bekijk deze rekeningen',
+        'features.coach.money_coach.subscription_review.text_one':
+            '1 abonnement kost {amount} per maand. Gebruik je het nog?',
+        'features.coach.money_coach.subscription_review.text_other':
+            '{count} abonnementen kosten {amount} per maand. Gebruik je ze nog allemaal?',
+        'features.coach.money_coach.subscription_review.cta': 'Abonnementen bekijken',
         'features.money.transactions.tab_inbox': 'Te sorteren',
         'features.money.transactions.inbox_chip': 'Te sorteren',
         'features.money.transactions.rules_empty_body':
@@ -1554,6 +1542,43 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Liever CAMT.053 van je bank. MT940 of CSV werkt ook. Sorteer na het importeren wat onder Te sorteren wacht en koppel passende vaste kosten.',
         'pages.shell.forms.tx_import.description':
             'Liever CAMT.053 van je bank. Rijen komen in Transacties onder Te sorteren — sorteer ze en koppel vaste kosten als ze overeenkomen.',
+        // Coach redesign: one Coach line per page, literal and positive (docs/product/coach-redesign.md).
+        'features.coach.line.label': 'De Coach',
+        'features.coach.line.hide': 'Verberg deze tip',
+        'features.coach.line.hidden': 'Tip verborgen.',
+        'features.coach.line.undo': 'Ongedaan maken',
+        'features.coach.line.locked_suffix': 'Plus',
+        'features.coach.verdict.kind_nudge': 'Volgende stap',
+        'features.coach.verdict.kind_warning': 'Even naar kijken',
+        'features.coach.verdict.kind_alert': 'Deze week doen',
+        'features.coach.money_coach.fixed_costs.over_necessities.text':
+            'Rekeningen uit {jar} zijn {amount} per maand meer dan het potje krijgt.',
+        'features.coach.money_coach.fixed_costs.business_leak.text':
+            '{amount} per maand aan zakelijke kosten betaal je vanuit je huishouden.',
+        'features.coach.money_coach.fixed_costs.subscription_review.text_one':
+            '1 abonnement kost {amount} per maand. Gebruik je het nog?',
+        'features.coach.money_coach.fixed_costs.subscription_review.text_other':
+            '{count} abonnementen kosten {amount} per maand. Gebruik je ze nog allemaal?',
+        'features.coach.money_coach.fixed_costs.over_necessities.cta': 'Inkomen toevoegen',
+        'features.coach.money_coach.fixed_costs.over_necessities.cta_secondary':
+            'Open de grootste vaste kosten',
+        'features.coach.money_coach.fixed_costs.business_leak.cta': 'Bekijk gekoppelde rekeningen',
+        'features.coach.money_coach.fixed_costs.subscription_review.cta': 'Abonnementen bekijken',
+        'features.coach.jar_guide.summary': 'Waar is {jar} voor?',
+        'features.coach.split_more': '{count, plural, =1 {Nog 1 tip} other {Nog # tips}}',
+        'features.money.jars.coach_line.necessities_over':
+            '{jar} heeft deze maand {amount} meer nodig dan het krijgt.',
+        'features.money.jars.coach_line.open_fixed': 'Open vaste kosten',
+        'features.money.business_household_leak.line':
+            '{amount} per maand aan zakelijke kosten betaal je vanuit je huishouden.',
+        'features.money.household_profile.filter_hint':
+            'Sommige soorten rekeningen zijn verborgen door je huishoudprofiel.',
+        'features.money.fixed.could_cancel': 'Kun je opzeggen?',
+        'features.growth.income_simulator.eyebrow': '✦ Jouw doel',
+        'features.growth.income_simulator.target_line': '{amount} per maand netto',
+        'features.growth.income_simulator.gap_to_go': 'nog {amount}',
+        'features.growth.income_simulator.gap_met': 'Doel bereikt',
+        'features.growth.income_simulator.gap_over': '{amount} boven je doel',
     },
     es: {
         // Kept as translated before: the generator without a DeepL key would drop them to English.

@@ -14,12 +14,10 @@ export type PracticePreviewCapabilities = {
     /** True when a Practice coach preview session is active. */
     active: boolean;
     access: PracticeClientAccess | null;
-    /** On-screen Coach tips, WhyCaption, jar guides. */
+    /** On-screen Coach tips (the Coach line, split tips). */
     showHelpers: boolean;
     /** Shell Help sheet / page tours. */
     showPageHelp: boolean;
-    /** Soft WhyCaption under the header. */
-    showWhyCaption: boolean;
     /** Household settings chrome + menu links. */
     showSettings: boolean;
     /** Quick-add FAB. */
@@ -43,7 +41,6 @@ const MEMBER_DEFAULTS: PracticePreviewCapabilities = {
     access: null,
     showHelpers: true,
     showPageHelp: true,
-    showWhyCaption: true,
     showSettings: true,
     showQuickAdd: true,
     showPlanCheckout: true,
@@ -60,7 +57,6 @@ const PREVIEW_BASE: Omit<PracticePreviewCapabilities, 'access'> = {
     active: true,
     showHelpers: false,
     showPageHelp: false,
-    showWhyCaption: false,
     showSettings: false,
     showQuickAdd: false,
     showPlanCheckout: false,

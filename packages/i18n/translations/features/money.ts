@@ -4,10 +4,6 @@ const money = {
         eyebrow: 'Money · this month',
         title: 'How your money moves.',
         line: 'Grip on your money — six jars, what comes in, what goes out.',
-        fallback_coach_kind: 'START HERE',
-        fallback_coach_text: 'Start with income and fixed costs.',
-        fallback_coach_cta: 'Open income',
-        see_overview: 'See overview',
         cards: {
             jars: {
                 name: 'Jars',
@@ -40,6 +36,11 @@ const money = {
         },
     },
     jars: {
+        /** The one Coach line after the jar rows on the Money overview. */
+        coach_line: {
+            necessities_over: '{jar} needs {amount} more than it gets this month.',
+            open_fixed: 'Open fixed costs',
+        },
         eyebrow: 'THE SIX JARS',
         title: 'Every coin gets a job before it arrives.',
         lead: 'Income lands, the split happens the same second. Financial Freedom is never spent — only invested.',
@@ -295,18 +296,7 @@ const money = {
         detail_status_skipped: 'Skipped this period',
         detail_status_rolled: 'Carried to a later month',
         detail_status_planned: 'Planned',
-        coach_subscription_title: 'Subscription check',
-        coach_subscription_body:
-            "Check every quarter that everything here still applies. Small amounts add up — a subscription you don't use is money you throw away monthly. Healthy: less than 20% of Necessity goes to recurring services.",
-        coach_enough_title: 'Is this enough?',
-        coach_enough_ratio_line: "Fixed costs take {ratio}% — that's",
-        coach_enough_comfortable: 'comfortable',
-        coach_enough_edge: 'on the edge of the Necessities goal',
-        coach_enough_above: 'above the 55% Necessities goal',
-        coach_enough_simplify:
-            'Simplify bills and/or raise income — do not raid Financial Freedom.',
-        coach_enough_room:
-            'Under 55% there is room to build. The real ceiling is income, not only cutting costs.',
+        could_cancel: 'Could cancel?',
         toast_active: 'Bill is active again',
         toast_ended: 'Bill ended',
         toast_paused: 'Bill put on hold',
@@ -640,10 +630,6 @@ const money = {
         amount_history: 'Amount history',
         start_date: 'Start date',
         end_date: 'End date (optional)',
-        raise_tip_title: 'Got a raise or new job?',
-        raise_tip_body:
-            'End this income and add a new one with the new amount and start date. That keeps history honest when you travel months.',
-        raise_tip_link: 'Add new income →',
         end_income: 'End income',
         confirm_end: 'Click again to end',
         toast_ended: 'Income ended',
@@ -1151,37 +1137,19 @@ const money = {
             interest_left: '{rate}% interest · {balance} left',
         },
     },
-    necessities_pressure: {
-        title: 'Necessities under pressure',
-        shortfall_line: 'Necessities is short {amount}/mo against its {pct}% envelope.',
-        commitment_line: 'Fixed costs take {ratio}% of income — above the {pct}% Necessities goal.',
-        meta: 'Envelope {envelope}/mo · fixed OUT {ratio}% of income',
-        body: 'That is common at the start — {pct}% is a goal to work toward. Simplify bills and/or raise income. Do not raid Financial Freedom to paper over rent.',
-        review_fixed: 'Review fixed costs',
-        open_jar: 'Open Necessities jar',
-        raise_income: '+ Raise income',
-    },
     /**
      * BUSINESS holding bills still paid from the private account.
      * Attribution only — jars stay private; Coach steers toward paying from the business.
      */
     business_household_leak: {
-        title: 'Business costs in your jars',
-        body: '{amount} p/m of business costs run through your household. Pay them from the business or raise your draw — then only the draw stays in the jars.',
-        body_named:
-            '{amount} p/m for {name} runs through your household. Pay them from the business or raise your draw — then only the draw stays in the jars.',
-        meta: '{count, plural, =1 {1 linked bill} other {{count} linked bills}}',
-        open_holding: 'Open holding',
+        line: '{amount} a month in business costs is paid from your household.',
         review_bills: 'See linked bills',
     },
     /** Fixed-cost picker filter notice + smart Huishoudprofiel enable toasts. */
     household_profile: {
-        filter_tip_title: 'Bill list is tailored',
-        filter_tip_body:
-            'Some bill types stay hidden based on your household profile. Change it in Settings → Household, or show every type for this form.',
+        filter_hint: 'Some bill types are hidden by your household profile.',
         show_all: 'Show all',
         use_filter: 'Use profile filter',
-        open_settings: 'Household profile',
         showing_all:
             'Showing every bill type for this form. Turn the profile filter back on anytime.',
         toast_added:

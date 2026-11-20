@@ -1,4 +1,4 @@
-export { evaluateSplitCoach, pctByJarKey } from './evaluate';
+export { evaluateSplitCoach, orderSplitTips, pctByJarKey } from './evaluate';
 export {
     DEFAULT_JAR_SPLIT,
     SpendingStyle,

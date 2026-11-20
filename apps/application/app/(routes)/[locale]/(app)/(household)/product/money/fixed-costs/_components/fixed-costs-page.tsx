@@ -13,6 +13,7 @@ import {
     type Cadence,
     FixedCostPeriodStatus,
     FIXED_COST_ARREARS_DEBT_THRESHOLD,
+    FIXED_COSTS_COACH_KEY_PREFIX,
 } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
@@ -28,7 +29,6 @@ import {
     monthlyNetAsOf,
     toMinorUnits,
     toPeriodKey,
-    evaluateBusinessHouseholdLeak,
 } from '@rumtelo/utils';
 
 import { api } from '@/app/_lib/api';
@@ -45,7 +45,7 @@ import {
     lifecycleLabel,
     settlementsByFixedCostId,
 } from '@/app/_lib/fixed-cost-match';
-import { evaluateNecessitiesPressure } from '@/app/_lib/necessities-pressure';
+import { useCoachFeedCandidates } from '@/app/_lib/coach-line-feed';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isScheduledLater, listFixedCostsForPeriodView } from '@/app/_lib/period-plan-list';
@@ -55,7 +55,7 @@ import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { ConfirmActionButton } from '@/components/features/forms/confirm-action-button';
-import { CoachTipCard } from '@/components/features/helpers';
+import { CoachLine } from '@/components/features/helpers';
 import {
     JarBadge,
     JarMark,
@@ -70,8 +70,6 @@ import {
     type ArrearsDebtTarget,
 } from '@/components/features/money/arrears-debt-dialog';
 import { FixedCostPeriodStatusControl } from '@/components/features/money/fixed-cost-period-status';
-import { NecessitiesPressureCard } from '@/components/features/money/necessities-pressure-card';
-import { BusinessHouseholdLeakCard } from '@/components/features/money/business-household-leak-card';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListSearchField } from '@/components/layout/list-controls';
@@ -92,11 +90,17 @@ function compareByHoldingLast(
     return 0;
 }
 
+/** Coach feed rules this page owns, in priority order (backend: `money.fixed_costs.<rule>`). */
+const FEED_KEYS = [
+    `${FIXED_COSTS_COACH_KEY_PREFIX}over_necessities`,
+    `${FIXED_COSTS_COACH_KEY_PREFIX}business_leak`,
+    `${FIXED_COSTS_COACH_KEY_PREFIX}subscription_review`,
+];
+
 /**
- * Fixed costs & income.
- * When fixed OUT blows past the Necessities envelope, see NecessitiesPressureCard
- * and doctrine in apps/backend/src/modules/public/product/money/README.md
- * → “When Necessities can’t fit in 55%”.
+ * Fixed costs: your bills first, the one Coach line after them. When fixed costs outgrow the
+ * Necessities split, the backend feed says so (doctrine: apps/backend/src/modules/public/
+ * product/money/README.md → “When Necessities can’t fit in 55%”); this page only renders it.
  */
 export function FixedCostsPageClient() {
     const t = useTranslations('features.money.fixed');
@@ -112,7 +116,8 @@ export function FixedCostsPageClient() {
     const searchParams = useSearchParams();
     // `?assetId=` from a holding's detail page: show only what belongs to it.
     const assetFilter = assetIdFromParams(searchParams) ?? null;
-    const { byId: holdingById, holdings } = useHoldings();
+    const { byId: holdingById } = useHoldings();
+    const coachCandidates = useCoachFeedCandidates(FEED_KEYS);
     const filteredHolding = assetFilter ? holdingById.get(assetFilter) : undefined;
     const [jarFilter, setJarFilter] = useState<JarKey | null>(null);
     const [search, setSearch] = useState('');
@@ -232,7 +237,6 @@ export function FixedCostsPageClient() {
         return total + monthlyAmount(Math.abs(item.amount), item.cadence) * multiplier;
     }, 0);
     const leftover = NET - outTotal;
-    const commitmentRatio = NET > 0 ? Math.round((outTotal / NET) * 100) : 0;
     // Holding filter narrows the lists only — totals above stay the household's.
     const holdingFixedCosts = assetFilter
         ? fixedCosts.filter(fixedCost => fixedCost.assetId === assetFilter)
@@ -287,20 +291,6 @@ export function FixedCostsPageClient() {
             jarCapabilitiesFor(jar.key).allowsFixedCosts &&
             holdingFixedCosts.some(fixedCost => fixedCost.jarKey === jar.key)
     );
-
-    const necessitiesFixedMonthly = applyingFixedCosts
-        .filter(item => item.jarKey === JarKey.NECESSITIES)
-        .reduce((total, item) => total + item.monthly, 0);
-    const necessitiesPressure = evaluateNecessitiesPressure({
-        netMonthlyCents: NET,
-        fixedOutMonthlyCents: outTotal,
-        necessitiesFixedMonthlyCents: necessitiesFixedMonthly,
-    });
-    const businessLeak = evaluateBusinessHouseholdLeak({
-        assets: holdings,
-        bills: applyingFixedCosts,
-        asOf,
-    });
 
     const dueIds = applyingFixedCosts
         .filter(
@@ -481,7 +471,7 @@ export function FixedCostsPageClient() {
             </div>
 
             <div data-tour="fixed-list" className="grid gap-5">
-                <div className="grid items-start gap-5 sm:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+                <div className="grid gap-5">
                     <Card className="p-0">
                         <div
                             className={cn(
@@ -836,6 +826,11 @@ export function FixedCostsPageClient() {
                                                                                     )}
                                                                           </MetaChip>
                                                                       ) : null}
+                                                                      {fixedCost.isCancellable ? (
+                                                                          <MetaChip>
+                                                                              {t('could_cancel')}
+                                                                          </MetaChip>
+                                                                      ) : null}
                                                                       {linkedTx ? (
                                                                           <MetaChip>
                                                                               {formatBookedDate(
@@ -959,26 +954,6 @@ export function FixedCostsPageClient() {
                             )}
                         </div>
                     </Card>
-
-                    <div className="grid gap-5">
-                        <CoachTipCard title={t('coach_subscription_title')}>
-                            {t('coach_subscription_body')}
-                        </CoachTipCard>
-                        {NET > 0 ? (
-                            <CoachTipCard title={t('coach_enough_title')}>
-                                {t('coach_enough_ratio_line', { ratio: commitmentRatio })}{' '}
-                                {commitmentRatio < 50
-                                    ? t('coach_enough_comfortable')
-                                    : commitmentRatio <= 55
-                                      ? t('coach_enough_edge')
-                                      : t('coach_enough_above')}
-                                .{' '}
-                                {commitmentRatio > 55
-                                    ? t('coach_enough_simplify')
-                                    : t('coach_enough_room')}
-                            </CoachTipCard>
-                        ) : null}
-                    </div>
                 </div>
 
                 {travel.direction === 'current' && inactiveFixedCosts.length > 0 ? (
@@ -1094,10 +1069,7 @@ export function FixedCostsPageClient() {
                 </div>
             ) : null}
 
-            {/* Doctrine: money README → “When Necessities can’t fit in 55%” */}
-            {/* Doctrine: money README → “When Necessities can’t fit in 55%” */}
-            <NecessitiesPressureCard pressure={necessitiesPressure} variant="plan" compact />
-            <BusinessHouseholdLeakCard leak={businessLeak} compact />
+            <CoachLine candidates={coachCandidates} />
 
             <ArrearsDebtDialog
                 open={Boolean(arrearsTarget)}

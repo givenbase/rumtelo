@@ -5,17 +5,15 @@ import { useLocale } from 'next-intl';
 import { useState } from 'react';
 
 import type { Goal, JarBalance } from '@rumtelo/contracts';
-import { CoachFeatureId, GoalKind, GoalStatus } from '@rumtelo/contracts';
+import { GoalKind, GoalStatus } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import { Card, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { CREATE_HREF, createGoalHref, goalDetailHref } from '@/app/_lib/create-routes';
-import { isCoachFeatureEnabled } from '@/app/_lib/coach-readiness';
 import { evaluateGoalPace } from '@/app/_lib/goal-pace';
 import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
 import { jarChrome } from '@/app/_lib/jar-meta';
-import { CoachMark, useHelpersEnabled } from '@/components/features/helpers';
 import { JarMark } from '@/components/features/money/jar-badge';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
@@ -86,11 +84,14 @@ function isGoalOpen(goal: Pick<Goal, 'saved' | 'target' | 'status'>) {
 }
 
 /**
- * Income what-if — Growth → Income.
+ * "Your target" — Growth → Income, below the sources.
  *
+ * One section: the target per month with the gap as information (accent, not red), the
+ * what-if slider that starts at the target, the jar split it implies, then the goal pace.
  * Lever: monthly net. Mechanism: the jar split (percentages never change here).
- * Outcome: room in each jar and what that does for a goal's pace.
- * Goal math lives in `_lib/goal-pace.ts` and matches the Goals page + backend projection.
+ * Outcome: room in each jar and what that does for a goal's pace. It is a tool, not a tip, so
+ * it carries no Coach mark. Goal math lives in `_lib/goal-pace.ts` and matches the Goals page
+ * and the backend projection.
  */
 export function IncomeSimulator({
     netCents,
@@ -102,9 +103,6 @@ export function IncomeSimulator({
 }: IncomeSimulatorProps) {
     const t = useTranslations('features.growth.income_simulator');
     const locale = useLocale();
-    const helpersEnabled = useHelpersEnabled();
-    const coachGuidesEnabled =
-        helpersEnabled && isCoachFeatureEnabled(CoachFeatureId.INCOME_SIMULATOR);
     const { formatMoney } = useHouseholdCurrency();
 
     /** User override only — `null` means "follow the target (or current income)". */
@@ -124,6 +122,8 @@ export function IncomeSimulator({
     const simDeltaPct = netCents > 0 ? Math.round(((simCents - netCents) / netCents) * 100) : 0;
     const atCurrent = range.current !== null && simMajor === range.current;
     const atTarget = targetMajor !== null && simMajor === targetMajor;
+    // Integer cents: what is left to reach the target from today's monthly net.
+    const gapCents = targetCents !== null && targetCents > 0 ? targetCents - netCents : null;
 
     const openGoals = goals.filter(isGoalOpen);
     const picked = goals.find(candidate => candidate.id === goalId);
@@ -247,20 +247,25 @@ export function IncomeSimulator({
     );
 
     return (
-        <div
-            data-coach-guide={coachGuidesEnabled ? 'income-simulator' : undefined}
-            className={className}>
-            <Card
-                className={cn(
-                    'p-5 lg:p-6',
-                    coachGuidesEnabled && 'border-accent/20 ring-1 ring-accent/10'
-                )}>
-                <div className="flex flex-wrap items-center gap-2">
-                    {coachGuidesEnabled ? <CoachMark size="sm" /> : null}
-                    <Typography as="span" variant="eyebrow" color="primary">
-                        {coachGuidesEnabled ? t('eyebrow') : t('eyebrow_with_mark')}
-                    </Typography>
-                </div>
+        <div className={className}>
+            <Card className="p-5 lg:p-6">
+                <Typography as="span" variant="eyebrow" color="primary">
+                    {t('eyebrow')}
+                </Typography>
+                {targetCents !== null && targetCents > 0 && gapCents !== null ? (
+                    <p className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-accent">
+                        <span className="font-display text-2xl font-semibold tracking-tight">
+                            {t('target_line', { amount: formatMoney(targetCents) })}
+                        </span>
+                        <span className="text-sm font-semibold">
+                            {gapCents > 0
+                                ? t('gap_to_go', { amount: formatMoney(gapCents) })
+                                : gapCents === 0
+                                  ? t('gap_met')
+                                  : t('gap_over', { amount: formatMoney(-gapCents) })}
+                        </span>
+                    </p>
+                ) : null}
                 {clearedName ? (
                     <p className="mt-2 max-w-prose text-sm leading-relaxed text-pretty text-fg-secondary">
                         {t('cleared_intro', { name: clearedName })}{' '}
@@ -276,7 +281,7 @@ export function IncomeSimulator({
                     </p>
                 )}
 
-                <div className="my-5 flex flex-wrap items-center gap-4">
+                <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
                     <input
                         type="range"
                         min={range.min}
@@ -284,15 +289,19 @@ export function IncomeSimulator({
                         step={SIM_STEP_MAJOR}
                         value={simMajor}
                         onChange={event => setSimOverrideMajor(Number(event.target.value))}
-                        className="min-w-0 flex-1 accent-accent"
+                        className="min-w-0 flex-1 basis-48 accent-accent"
                         aria-label={t('aria_simulate_income')}
+                        aria-valuetext={formatMoney(simCents)}
                     />
-                    <span className="shrink-0 font-display text-2xl font-semibold tracking-tight text-accent sm:min-w-36 sm:text-3xl">
-                        {formatMoney(simCents)}
-                    </span>
+                    {/* The target and today's amount are already on screen; show the value only in between. */}
+                    {!atTarget && !atCurrent ? (
+                        <output className="shrink-0 font-mono text-sm font-medium text-fg">
+                            {formatMoney(simCents)}
+                        </output>
+                    ) : null}
                 </div>
 
-                <div className="-mt-3 mb-5 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-xs text-fg-faint">
+                <div className="mt-3 mb-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-xs text-fg-faint">
                     {range.current !== null ? (
                         <button
                             type="button"
@@ -330,34 +339,36 @@ export function IncomeSimulator({
                     ) : null}
                 </div>
 
-                <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
+                <ul className="grid grid-cols-1 gap-x-6 sm:grid-cols-2 lg:grid-cols-3">
                     {jars.map(j => {
                         const color = jarChrome(j.key).color;
                         const now =
                             netCents > 0 ? Math.round((netCents * j.percentage) / 100) : null;
                         const then = Math.round((simCents * j.percentage) / 100);
                         return (
-                            <div
+                            <li
                                 key={j.id}
-                                className="rounded-xl border border-line bg-raised p-3.5">
-                                <div
-                                    className="flex items-center gap-1.5 font-mono text-xs font-medium tracking-wide uppercase"
+                                className="flex items-baseline justify-between gap-3 border-b border-line py-2">
+                                <span
+                                    className="flex min-w-0 items-center gap-1.5 font-mono text-xs font-medium tracking-wide uppercase"
                                     style={{ color: bgClassToCssVar(color) }}>
                                     <JarMark jarKey={j.key} />
-                                    {j.name}
-                                </div>
-                                <div className="mt-2 font-mono text-lg text-fg">
-                                    {formatMoney(then)}
-                                </div>
-                                {now !== null && now !== then ? (
-                                    <div className="mt-0.5 font-mono text-[11px] text-fg-faint">
-                                        {t('jar_now', { amount: formatMoney(now) })}
-                                    </div>
-                                ) : null}
-                            </div>
+                                    <span className="min-w-0 truncate">{j.name}</span>
+                                </span>
+                                <span className="flex shrink-0 items-baseline gap-2 text-right">
+                                    {now !== null && now !== then ? (
+                                        <span className="font-mono text-[11px] text-fg-faint">
+                                            {t('jar_now', { amount: formatMoney(now) })}
+                                        </span>
+                                    ) : null}
+                                    <span className="font-mono text-sm text-fg">
+                                        {formatMoney(then)}
+                                    </span>
+                                </span>
+                            </li>
                         );
                     })}
-                </div>
+                </ul>
 
                 <div className="mt-6 border-t border-line pt-5">
                     {goals.length > 0 ? (

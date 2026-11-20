@@ -4,10 +4,6 @@ const soul = {
         eyebrow: 'Soul · the why',
         title: 'The why under the numbers.',
         line: 'Grip on your why — stillness, gratitude, intention.',
-        fallback_coach_kind: 'START SMALL',
-        fallback_coach_text:
-            'One minute of stillness or one line of gratitude — both protect the jars.',
-        fallback_coach_cta: 'Open stillness',
         cards: {
             stillness: {
                 name: 'Stillness',
@@ -194,7 +190,6 @@ const soul = {
         check_4_title: 'Room for more',
         check_4_body:
             'A clear answer to “what would an extra amount do?” If they cannot say, the money sits.',
-        coach_tip_title: 'Why this is in a money app',
         coach_tip_1:
             'It does not have to be much. Five percent, transferred automatically, to a place you chose on purpose. The amount is not the point — the habit is.',
         coach_tip_2:

@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { api } from '@/app/_lib/api';
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
@@ -42,7 +41,6 @@ import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
-import { SETTINGS_HREF } from '@/app/_lib/settings-tabs';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { formRoute } from '@/app/_lib/form-route-meta';
@@ -50,7 +48,7 @@ import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { useMergeHouseholdAudiences } from '@/app/_lib/use-merge-household-audiences';
 import { partyMark } from '@/app/_lib/vendor-brands';
 import { GivingFinder } from '@/components/features/money/giving-finder';
-import { CoachTipCard, useHelpersEnabled } from '@/components/features/helpers';
+import { useHelpersEnabled } from '@/components/features/helpers';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
@@ -1113,27 +1111,15 @@ export function FixedCostForm({
                         </Button>
                     </div>
                 ) : (
-                    <CoachTipCard
-                        title={tProfile('filter_tip_title')}
-                        actions={
-                            <>
-                                <Button
-                                    type="button"
-                                    size="sm"
-                                    onClick={() => setShowAllPresets(true)}>
-                                    {tProfile('show_all')}
-                                </Button>
-                                <Button
-                                    as={Link}
-                                    href={SETTINGS_HREF.household}
-                                    size="sm"
-                                    variant="secondary">
-                                    {tProfile('open_settings')}
-                                </Button>
-                            </>
-                        }>
-                        {tProfile('filter_tip_body')}
-                    </CoachTipCard>
+                    <div className="flex flex-wrap items-center gap-x-2 text-xs text-fg-muted">
+                        <p className="min-w-0 text-pretty">{tProfile('filter_hint')}</p>
+                        <button
+                            type="button"
+                            onClick={() => setShowAllPresets(true)}
+                            className="min-h-11 rounded-md px-1 font-semibold text-accent underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+                            {tProfile('show_all')}
+                        </button>
+                    </div>
                 )
             ) : null}
 

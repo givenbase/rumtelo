@@ -35,7 +35,7 @@ import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
-import { CoachMark, CoachTipCard, HelperGate } from '@/components/features/helpers';
+import { CoachMark, HelperGate } from '@/components/features/helpers';
 import { GivingFinder } from '@/components/features/money/giving-finder';
 import { MetaChip, formatDueDay } from '@/components/features/money/jar-badge';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
@@ -562,9 +562,10 @@ export function GivingPageClient() {
                 </section>
             </HelperGate>
 
-            <CoachTipCard title={t('coach_tip_title')}>
+            {/* A static explanation has no next move, so it is a plain note, not a Coach line. */}
+            <p className="text-sm leading-relaxed text-pretty text-fg-muted">
                 {t('coach_tip_1')} {t('coach_tip_2')}
-            </CoachTipCard>
+            </p>
         </div>
     );
 }

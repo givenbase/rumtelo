@@ -784,15 +784,22 @@
                 "voice_discard": "Weggooien",
                 "voice_unavailable": "Stem is niet beschikbaar in deze browser"
             },
+            "line": {
+                "label": "The Coach",
+                "hide": "Hide this tip",
+                "hidden": "Tip hidden.",
+                "undo": "Undo",
+                "locked_suffix": "Plus"
+            },
             "verdict": {
                 "eyebrow": "✦ De Coach",
-                "kind_nudge": "Let op",
+                "kind_nudge": "Next move",
                 "kind_win": "Winnen",
-                "kind_warning": "Waarschuwing",
+                "kind_warning": "Worth a look",
                 "kind_insight": "Inzicht",
                 "kind_week_check": "Weekcheck",
                 "kind_on_track": "Op schema",
-                "kind_alert": "Waarschuwing",
+                "kind_alert": "Act this week",
                 "share": "Delen",
                 "open": "Openen",
                 "detail": "Details",
@@ -831,6 +838,7 @@
                 "why_aria": "De Coach"
             },
             "jar_guide": {
+                "summary": "What is {jar} for?",
                 "aria": "De Coach voor dit potje",
                 "heading": "Waar kan ik dit voor gebruiken?",
                 "allowed": "Dit zou kunnen gaan naar",
@@ -854,9 +862,35 @@
                     "text": "{count} transacties wachten om gesorteerd te worden. Sorteer ze in potjes, dan blijft het beeld eerlijk.",
                     "cta": "Transacties sorteren"
                 },
+                "fixed_costs": {
+                    "over_necessities": {
+                        "cta": "Add income",
+                        "cta_secondary": "Open the biggest fixed cost"
+                    },
+                    "business_leak": {
+                        "cta": "See linked bills"
+                    },
+                    "subscription_review": {
+                        "cta": "Review subscriptions"
+                    }
+                },
                 "necessities_share": {
                     "text": "Noodzakelijk staat op {pct}% — het doel is 55%. Prima voor nu; om het gat te dichten, schrap je vaste kosten of verhoog je je inkomen, en laat je Vrijheid met rust.",
                     "cta": "Bekijk potjes"
+                },
+                "over_necessities": {
+                    "text": "Rekeningen uit {jar} zijn {amount} per maand meer dan het potje krijgt.",
+                    "cta": "Inkomen toevoegen",
+                    "cta_secondary": "Open de grootste vaste kosten"
+                },
+                "business_leak": {
+                    "text": "{amount} per maand aan zakelijke kosten betaal je vanuit je huishouden.",
+                    "cta": "Bekijk deze rekeningen"
+                },
+                "subscription_review": {
+                    "text_one": "1 abonnement kost {amount} per maand. Gebruik je het nog?",
+                    "text_other": "{count} abonnementen kosten {amount} per maand. Gebruik je ze nog allemaal?",
+                    "cta": "Abonnementen bekijken"
                 }
             },
             "time_coach": {
@@ -1536,9 +1570,7 @@
                     "add_expense": "+ Eenmalig",
                     "open_in_money": "Openen in Geld →",
                     "money_note": "Rekeningen en inkomsten blijven in hun eigen potje. Deze pagina laat alleen zien wat bij dit bezit hoort.",
-                    "delete_linked_warning": "Verwijderen ontkoppelt {income} inkomsten, {bills} rekeningen en {transactions} transacties. Ze blijven in Geld staan.",
-                    "coach_business_title": "Zakelijke kosten in je potjes",
-                    "coach_business_body": "{amount} p/m voor dit bezit loopt via je huishouden. Betaal ze vanuit het bedrijf of verhoog je onttrekking — dan blijft alleen de onttrekking in de potjes."
+                    "delete_linked_warning": "Verwijderen ontkoppelt {income} inkomsten, {bills} rekeningen en {transactions} transacties. Ze blijven in Geld staan."
                 },
                 "setup": {
                     "eyebrow": "Registreer de stroom",
@@ -2320,6 +2352,10 @@
                 }
             },
             "jars": {
+                "coach_line": {
+                    "necessities_over": "{jar} needs {amount} more than it gets this month.",
+                    "open_fixed": "Open fixed costs"
+                },
                 "eyebrow": "DE ZES POTJES",
                 "title": "Elke munt krijgt een taak vóór hij binnenkomt.",
                 "lead": "Zodra je inkomsten binnenkomen, wordt het bedrag direct verdeeld. Financiële vrijheid wordt nooit uitgegeven — alleen geïnvesteerd.",
@@ -2562,15 +2598,7 @@
                 "detail_status_skipped": "Deze periode overgeslagen",
                 "detail_status_rolled": "Meegenomen naar een latere maand",
                 "detail_status_planned": "Gepland",
-                "coach_subscription_title": "Controle van het abonnement",
-                "coach_subscription_body": "Controleer elk kwartaal of alles hier nog steeds van toepassing is. Kleine bedragen lopen op — een abonnement dat je niet gebruikt, is geld dat je elke maand weggooit. Gezond: minder dan 20% van de noodzakelijke uitgaven gaat naar terugkerende diensten.",
-                "coach_enough_title": "Is dit genoeg?",
-                "coach_enough_ratio_line": "De vaste kosten bedragen {ratio}% — dat is",
-                "coach_enough_comfortable": "comfortabel",
-                "coach_enough_edge": "op de rand van het doel van Noodzakelijk",
-                "coach_enough_above": "boven de doelstelling van 55% voor basisbehoeften",
-                "coach_enough_simplify": "Vereenvoudig je rekeningen en/of verhoog je inkomen — maak geen inbreuk op je financiële vrijheid.",
-                "coach_enough_room": "Als het percentage onder de 55% ligt, is er ruimte om te groeien. Het echte plafond wordt bepaald door de inkomsten, niet alleen door kostenbesparingen.",
+                "could_cancel": "Could cancel?",
                 "toast_active": "Rekening is weer actief",
                 "toast_ended": "Rekening beëindigd",
                 "toast_paused": "Rekening tijdelijk opgeschort",
@@ -3383,22 +3411,8 @@
                     "interest_left": "{rate}% rente · {balance} resterend"
                 }
             },
-            "necessities_pressure": {
-                "title": "Eerste levensbehoeften onder druk",
-                "shortfall_line": "De uitgaven voor eerste levensbehoeften bedragen {amount} per maand, wat onder het budget van {pct}% ligt.",
-                "commitment_line": "De vaste kosten bedragen {ratio}% van het inkomen — meer dan de doelstelling van {pct}% voor eerste levensbehoeften.",
-                "meta": "Enveloppe {envelope}/maand · vast bedrag {ratio}% van het inkomen",
-                "body": "Dat komt in het begin vaak voor — {pct}% is een doel om naartoe te werken. Vereenvoudig je rekeningen en/of zorg voor meer inkomen. Haal geen geld uit je spaarpotje voor financiële vrijheid om de huur te kunnen betalen.",
-                "review_fixed": "Vaste kosten herzien",
-                "open_jar": "Open het potje met basisbenodigdheden",
-                "raise_income": "+ Het inkomen verhogen"
-            },
             "business_household_leak": {
-                "title": "Zakelijke kosten in je potjes",
-                "body": "{amount} p/m aan bedrijfskosten lopen via je huishouden. Betaal ze vanuit het bedrijf of verhoog je onttrekking — dan blijft alleen de onttrekking in de potjes.",
-                "body_named": "{amount} p/m voor {name} loopt via je huishouden. Betaal ze vanuit het bedrijf of verhoog je onttrekking — dan blijft alleen de onttrekking in de potjes.",
-                "meta": "{count, plural, =1 {1 gekoppelde rekening} other {{count} gekoppelde rekeningen}}",
-                "open_holding": "Open bezit",
+                "line": "{amount} a month in business costs is paid from your household.",
                 "review_bills": "Bekijk gekoppelde rekeningen"
             },
             "household_profile": {

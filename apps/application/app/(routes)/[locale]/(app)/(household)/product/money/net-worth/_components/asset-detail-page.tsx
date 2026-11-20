@@ -50,7 +50,7 @@ import {
 } from '@/components/features/money/jar-badge';
 import { MetricStrip } from '@/components/features/money/metric-strip';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
-import { CoachTipCard } from '@/components/features/helpers';
+import { CoachLine } from '@/components/features/helpers';
 import { EntityNotFoundState } from '@/components/features/helpers/entity-not-found-state';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -135,6 +135,7 @@ function LinkedSection({
 export function AssetDetailPageClient({ assetId }: { assetId: string }) {
     const t = useTranslations('features.growth.net_worth');
     const tChips = useTranslations('features.money.chips');
+    const tLeak = useTranslations('features.money.business_household_leak');
     const tAction = useTranslations('common.action');
     const appLocale = useLocale();
     const searchParams = useSearchParams();
@@ -588,12 +589,24 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                         {t('detail.money_note')}
                     </Typography>
 
+                    {/* Same wording as the Fixed costs feed tip; scoped to this holding's bills. */}
                     {asset.kindKey === 'BUSINESS' && flow.monthlyOut > 0 ? (
-                        <CoachTipCard title={t('detail.coach_business_title')} tone="warning">
-                            {t('detail.coach_business_body', {
-                                amount: formatMoney(flow.monthlyOut),
-                            })}
-                        </CoachTipCard>
+                        <CoachLine
+                            candidates={[
+                                {
+                                    id: `holding.business_costs:${asset.id}`,
+                                    text: tLeak('line', { amount: formatMoney(flow.monthlyOut) }),
+                                    cta: {
+                                        label: tLeak('review_bills'),
+                                        href: fixedCostsForAssetHref(asset.id),
+                                    },
+                                    dismiss: {
+                                        kind: 'local',
+                                        fingerprint: String(flow.monthlyOut),
+                                    },
+                                },
+                            ]}
+                        />
                     ) : null}
                 </>
             ) : null}

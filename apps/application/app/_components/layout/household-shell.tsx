@@ -22,7 +22,7 @@ import { PendingPracticeInviteRedeem } from '@/components/features/shell/pending
 import { usePracticePreview } from '@/components/features/shell/practice-preview';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
 import { ViewerPortalRouteGuard } from '@/components/features/shell/viewer-portal-route-guard';
-import { FeatureHelpersProvider, WhyCaption } from '@/components/features/helpers';
+import { FeatureHelpersProvider } from '@/components/features/helpers';
 import { PageHelpButton, PageTourProvider, usePageTour } from '@/components/features/tour';
 import { PageContentWidthProvider } from '@/components/layout/page-content-width';
 
@@ -206,9 +206,6 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                             {t('pages.shell.viewer.start_own_cta')}
                         </Link>
                     </aside>
-                ) : null}
-                {capabilities.showWhyCaption ? (
-                    <WhyCaption pathname={pathname} locked={access.locked} />
                 ) : null}
                 <main className="min-w-0">
                     <StageNote

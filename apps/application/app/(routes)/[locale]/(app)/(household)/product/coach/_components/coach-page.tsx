@@ -16,6 +16,7 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { coachKindDisplay } from '@/app/_lib/coach-kind-label';
 import { resolveCoachMessage } from '@/app/_lib/coach-message-copy';
 import { isProductEnabled } from '@/app/_lib/launch-products';
+import { useCoachCopyContext } from '@/app/_lib/use-coach-copy-context';
 import { isLiveData } from '@/app/_lib/preview';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { CloseMonthFlow } from '@/components/features/home/close-month-flow';
@@ -37,6 +38,7 @@ export function CoachPageClient() {
     const tSession = useTranslations('features.coach.session');
     const tKind = useTranslations('features.coach.verdict');
     const tRoot = useTranslations();
+    const copyContext = useCoachCopyContext();
     const queryClient = useQueryClient();
     const searchParams = useSearchParams();
     const stepParam = searchParams.get('step');
@@ -210,7 +212,7 @@ export function CoachPageClient() {
                     </div>
                     <ul className="grid gap-0 divide-y divide-line">
                         {messages.map(message => {
-                            const copy = resolveCoachMessage(message, t, tRoot);
+                            const copy = resolveCoachMessage(message, t, tRoot, copyContext);
                             return (
                                 <li key={message.id} className="grid gap-2.5 py-4 first:pt-0">
                                     <div className="flex flex-wrap items-center justify-between gap-2">

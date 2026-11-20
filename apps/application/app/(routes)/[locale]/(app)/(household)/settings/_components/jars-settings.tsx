@@ -14,7 +14,7 @@ import { cn, formatIban, formatPercent, sumMonthly } from '@rumtelo/utils';
 
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { isLiveData } from '@/app/_lib/preview';
-import { evaluateSplitCoach, pctByJarKey } from '@/app/_lib/split-coach';
+import { evaluateSplitCoach, orderSplitTips, pctByJarKey } from '@/app/_lib/split-coach';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { HelperGate } from '@/components/features/helpers';
 import { BankAccountRow } from '@/components/features/money/bank-account-row';
@@ -102,6 +102,7 @@ export function JarsSettings() {
     }, [form, jars.length, serverPct, serverJarSeats]);
 
     const [dismissedTips, setDismissedTips] = useState<Record<string, true>>({});
+    const [showAllTips, setShowAllTips] = useState(false);
     const [editingJarId, setEditingJarId] = useState<string | null>(null);
 
     const total = Object.values(pct).reduce((running, value) => running + value, 0);
@@ -119,7 +120,7 @@ export function JarsSettings() {
 
     const coachTips = (() => {
         const spendingStyle = accountSettingsQuery.data?.spendingStyle ?? SpendingStyle.UNKNOWN;
-        const tips = evaluateSplitCoach(pctByJarKey(jars, pct), spendingStyle);
+        const tips = orderSplitTips(evaluateSplitCoach(pctByJarKey(jars, pct), spendingStyle));
         return tips.filter(tip => !dismissedTips[tip.id]);
     })();
 
@@ -359,22 +360,20 @@ export function JarsSettings() {
                         );
                     })}
 
+                    {/* Decision help stays at the decision, small: the top tip, the rest on request. */}
                     <HelperGate>
                         {coachTips.length > 0 ? (
                             <div className="grid gap-1.5 border-t border-line py-2">
-                                <p className="font-mono text-[9px] tracking-[0.14em] text-accent uppercase">
-                                    {t('features.coach.helpers.mark_label')}
-                                </p>
-                                {coachTips.map(tip => (
+                                {(showAllTips ? coachTips : coachTips.slice(0, 1)).map(tip => (
                                     <div
                                         key={tip.id}
                                         className={cn(
                                             'flex items-start justify-between gap-2 rounded-md border px-2.5 py-1.5',
                                             tip.severity === 'warn'
-                                                ? 'border-amber-500/40 bg-amber-500/5'
+                                                ? 'border-warning bg-warning/5'
                                                 : 'border-line bg-raised/40'
                                         )}>
-                                        <p className="text-xs leading-snug text-fg">
+                                        <p className="min-w-0 text-xs leading-snug text-fg">
                                             {t(`features.coach.split_tips.${tip.id}`)}
                                         </p>
                                         <Button
@@ -391,6 +390,17 @@ export function JarsSettings() {
                                         </Button>
                                     </div>
                                 ))}
+                                {!showAllTips && coachTips.length > 1 ? (
+                                    <button
+                                        type="button"
+                                        aria-expanded={false}
+                                        onClick={() => setShowAllTips(true)}
+                                        className="min-h-11 justify-self-start rounded-md px-1 text-left text-xs font-semibold text-accent underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+                                        {t('features.coach.split_more', {
+                                            count: coachTips.length - 1,
+                                        })}
+                                    </button>
+                                ) : null}
                             </div>
                         ) : null}
                     </HelperGate>

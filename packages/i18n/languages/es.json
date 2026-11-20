@@ -784,15 +784,22 @@
                 "voice_discard": "Descartar",
                 "voice_unavailable": "La función de voz no está disponible en este navegador"
             },
+            "line": {
+                "label": "The Coach",
+                "hide": "Hide this tip",
+                "hidden": "Tip hidden.",
+                "undo": "Undo",
+                "locked_suffix": "Plus"
+            },
             "verdict": {
                 "eyebrow": "✦ El entrenador",
-                "kind_nudge": "Atención",
+                "kind_nudge": "Next move",
                 "kind_win": "Ganar",
-                "kind_warning": "Advertencia",
+                "kind_warning": "Worth a look",
                 "kind_insight": "Perspectiva",
                 "kind_week_check": "Resumen semanal",
                 "kind_on_track": "Por buen camino",
-                "kind_alert": "Alerta",
+                "kind_alert": "Act this week",
                 "share": "Compartir",
                 "open": "Abrir",
                 "detail": "Detalle",
@@ -831,6 +838,7 @@
                 "why_aria": "El entrenador"
             },
             "jar_guide": {
+                "summary": "What is {jar} for?",
                 "aria": "El entrenador de este equipo",
                 "heading": "¿Para qué puedo utilizar esto?",
                 "allowed": "Esto podría ir a",
@@ -854,9 +862,35 @@
                     "text": "{count} transactions are waiting to be sorted. Sort them into jars so the picture stays honest.",
                     "cta": "Sort transactions"
                 },
+                "fixed_costs": {
+                    "over_necessities": {
+                        "cta": "Add income",
+                        "cta_secondary": "Open the biggest fixed cost"
+                    },
+                    "business_leak": {
+                        "cta": "See linked bills"
+                    },
+                    "subscription_review": {
+                        "cta": "Review subscriptions"
+                    }
+                },
                 "necessities_share": {
                     "text": "El porcentaje de «Necesidades» es del {pct} %; el objetivo es el 55 %. Por ahora está bien; para reducir la diferencia, recorta los gastos fijos o aumenta los ingresos y no toques la categoría «Libertad».",
                     "cta": "Frascos de reseñas"
+                },
+                "over_necessities": {
+                    "text": "{jar} bills come to {amount} a month more than the jar gets.",
+                    "cta": "Add income",
+                    "cta_secondary": "Open the biggest fixed cost"
+                },
+                "business_leak": {
+                    "text": "{amount} a month in business costs is paid from your household.",
+                    "cta": "Review these bills"
+                },
+                "subscription_review": {
+                    "text_one": "1 subscription costs {amount} a month. Still using it?",
+                    "text_other": "{count} subscriptions cost {amount} a month. Still using all of them?",
+                    "cta": "Review subscriptions"
                 }
             },
             "time_coach": {
@@ -1536,9 +1570,7 @@
                     "add_expense": "+ Único",
                     "open_in_money": "Abrir en Money →",
                     "money_note": "Las facturas y los ingresos se guardan en su tarro. En esta página solo se muestra lo que pertenece a este fondo.",
-                    "delete_linked_warning": "Al eliminar los vínculos, se eliminan {income} ingresos, {bills} facturas y {transactions} transacciones. Estos datos permanecen en Money.",
-                    "coach_business_title": "Los gastos de la empresa en tus tarros",
-                    "coach_business_body": "{amount} al mes de esta participación se destina a los gastos del hogar. Págales con dinero de la empresa o aumenta tu retirada mensual; así, solo la retirada mensual se quedará en los tarros."
+                    "delete_linked_warning": "Al eliminar los vínculos, se eliminan {income} ingresos, {bills} facturas y {transactions} transacciones. Estos datos permanecen en Money."
                 },
                 "setup": {
                     "eyebrow": "Registrar el flujo",
@@ -2320,6 +2352,10 @@
                 }
             },
             "jars": {
+                "coach_line": {
+                    "necessities_over": "{jar} needs {amount} more than it gets this month.",
+                    "open_fixed": "Open fixed costs"
+                },
                 "eyebrow": "LOS SEIS FRASCOS",
                 "title": "Cada moneda tiene una función asignada antes de llegar.",
                 "lead": "En el caso de los ingresos procedentes de propiedades inmobiliarias, la distribución se produce en el mismo instante. La libertad financiera nunca se gasta, solo se invierte.",
@@ -2562,15 +2598,7 @@
                 "detail_status_skipped": "Me he saltado este periodo",
                 "detail_status_rolled": "Trasladado a un mes posterior",
                 "detail_status_planned": "Previsto",
-                "coach_subscription_title": "Comprobación de la suscripción",
-                "coach_subscription_body": "Comprueba cada trimestre que todo lo que aquí se indica siga siendo válido. Las pequeñas cantidades se van sumando: una suscripción que no utilizas es dinero que tiras a la basura cada mes. Lo ideal es que menos del 20 % de los gastos de primera necesidad se destine a servicios recurrentes.",
-                "coach_enough_title": "¿Es esto suficiente?",
-                "coach_enough_ratio_line": "Los costes fijos representan el {ratio} %; es decir,",
-                "coach_enough_comfortable": "cómodo",
-                "coach_enough_edge": "a un paso de alcanzar el objetivo de Necessities",
-                "coach_enough_above": "por encima del objetivo del 55 % de gastos básicos",
-                "coach_enough_simplify": "Simplifica tus gastos y/o aumenta tus ingresos: no eches mano de tu «libertad financiera».",
-                "coach_enough_room": "Por debajo del 55 % hay margen para crecer. El verdadero límite son los ingresos, no solo la reducción de costes.",
+                "could_cancel": "Could cancel?",
                 "toast_active": "Bill ha vuelto a la actividad",
                 "toast_ended": "Fin del proyecto de ley",
                 "toast_paused": "Bill hizo una pausa",
@@ -3383,22 +3411,8 @@
                     "interest_left": "{rate} % de interés · quedan {balance}"
                 }
             },
-            "necessities_pressure": {
-                "title": "Lo imprescindible bajo presión",
-                "shortfall_line": "Los gastos básicos están {amount} por debajo de su presupuesto del {pct} %.",
-                "commitment_line": "Los costes fijos representan el {ratio} % de los ingresos, por encima del objetivo del {pct} % destinado a necesidades básicas.",
-                "meta": "Presupuesto mensual de {envelope} · gasto fijo del {ratio} % de los ingresos",
-                "body": "Es algo habitual al principio: el {pct} % es un objetivo al que aspirar. Simplifica los gastos y/o aumenta tus ingresos. No recurras a tus ahorros para la libertad financiera para cubrir el alquiler.",
-                "review_fixed": "Revisar los costes fijos",
-                "open_jar": "Abre el tarro de «Necessities»",
-                "raise_income": "+ Aumentar los ingresos"
-            },
             "business_household_leak": {
-                "title": "Los gastos de la empresa en tus tarros",
-                "body": "{amount} al mes de gastos de la empresa pasan por tu hogar. Págalos con fondos de la empresa o aumenta tu retirada mensual; así, solo la retirada mensual se quedará en los tarros.",
-                "body_named": "{amount} p/m por {name} se destina a los gastos del hogar. Págales con dinero de la empresa o aumenta tu retirada mensual; así, solo la retirada mensual se quedará en los tarros.",
-                "meta": "{count, plural, =1 {1 linked bill} other {{count} linked bills}}",
-                "open_holding": "Participación abierta",
+                "line": "{amount} a month in business costs is paid from your household.",
                 "review_bills": "Ver los proyectos de ley adjuntos"
             },
             "household_profile": {
