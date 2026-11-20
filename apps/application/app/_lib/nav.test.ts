@@ -71,10 +71,10 @@ test('Plus OWNER: Home · Money · Growth · You; Money and Growth carry their o
     assert.equal(nav.tabs.find(tab => tab.key === 'growth')?.href, '/product/growth/course');
     assert.equal(nav.tabs.find(tab => tab.key === 'you')?.href, null);
     assert.deepEqual(describeSubnav(nav.moneySubnav), [
-        'jars',
-        'transactions',
-        'fixed_costs',
         'income',
+        'jars',
+        'fixed_costs',
+        'transactions',
         'debt',
         'net_worth:locked',
     ]);
@@ -98,10 +98,10 @@ test('Basic OWNER: Course and the paid Money pages show a lock; Goals is the lan
     const nav = buildNav(ctx({ plan: PlanKey.BASIC }));
     assert.equal(nav.tabs.find(tab => tab.key === 'growth')?.href, '/product/growth/goals');
     assert.deepEqual(describeSubnav(nav.moneySubnav), [
-        'jars',
-        'transactions',
-        'fixed_costs',
         'income',
+        'jars',
+        'fixed_costs',
+        'transactions',
         'debt:locked',
         'net_worth:locked',
     ]);
@@ -115,10 +115,10 @@ test('Max OWNER: every Money and Growth page is open, no locks', () => {
     env.NODE_ENV = 'production';
     const nav = buildNav(ctx({ plan: PlanKey.MAX }));
     assert.deepEqual(describeSubnav(nav.moneySubnav), [
-        'jars',
-        'transactions',
-        'fixed_costs',
         'income',
+        'jars',
+        'fixed_costs',
+        'transactions',
         'debt',
         'net_worth',
     ]);
@@ -140,8 +140,8 @@ test('VIEWER: no Growth tab, no Income, no Coach, no locks; keeps Debt and Net w
     assert.deepEqual(tabKeys(nav), ['home', 'money', 'you']);
     assert.deepEqual(describeSubnav(nav.moneySubnav), [
         'jars',
-        'transactions',
         'fixed_costs',
+        'transactions',
         'debt',
         'net_worth',
     ]);
@@ -211,10 +211,10 @@ test('while the plan loads: Growth links to the redirect and nothing plan-depend
     const nav = buildNav(ctx({ planReady: false, plan: PlanKey.BASIC }));
     assert.equal(nav.tabs.find(tab => tab.key === 'growth')?.href, '/product/growth');
     assert.deepEqual(describeSubnav(nav.moneySubnav), [
-        'jars',
-        'transactions',
-        'fixed_costs',
         'income',
+        'jars',
+        'fixed_costs',
+        'transactions',
     ]);
     assert.deepEqual(nav.growthSubnav, []);
     assert.deepEqual(describeYou(nav), ['coach', 'why', 'settings', 'help']);
@@ -292,10 +292,10 @@ test('Basic OWNER in week 1: Home · Money · You; no locks, no upsell; Coming u
         const nav = buildNav(ctx({ plan: PlanKey.BASIC, stage }));
         assert.deepEqual(tabKeys(nav), ['home', 'money', 'you']);
         assert.deepEqual(describeSubnav(nav.moneySubnav), [
-            'jars',
-            'transactions',
-            'fixed_costs',
             'income',
+            'jars',
+            'fixed_costs',
+            'transactions',
         ]);
         // No Coach in week 1; Coming up points at the first stage that adds something.
         assert.deepEqual(describeYou(nav), ['why', 'settings', 'help', 'coming_up:routine']);
@@ -306,10 +306,10 @@ test('Plus OWNER in week 1: Debt waits in Money, muted until the first closed mo
     env.NODE_ENV = 'production';
     const nav = buildNav(ctx({ plan: PlanKey.PLUS, stage: BoardStage.SPLIT }));
     assert.deepEqual(describeSubnav(nav.moneySubnav), [
-        'jars',
-        'transactions',
-        'fixed_costs',
         'income',
+        'jars',
+        'fixed_costs',
+        'transactions',
         'debt:later:month_close',
     ]);
     assert.deepEqual(tabKeys(nav), ['home', 'money', 'you']);
@@ -327,10 +327,10 @@ test('Plus OWNER at ROUTINE: Debt and Learn are muted until the month closes; Co
     env.NODE_ENV = 'production';
     const nav = buildNav(ctx({ plan: PlanKey.PLUS, stage: BoardStage.ROUTINE }));
     assert.deepEqual(describeSubnav(nav.moneySubnav), [
-        'jars',
-        'transactions',
-        'fixed_costs',
         'income',
+        'jars',
+        'fixed_costs',
+        'transactions',
         'debt:later:month_close',
         'net_worth:locked',
     ]);
@@ -363,8 +363,8 @@ test('VIEWER and MEMBER: stage applies, Coming up only for writers', () => {
     assert.deepEqual(describeYou(viewer), ['why', 'settings']);
     assert.deepEqual(describeSubnav(viewer.moneySubnav), [
         'jars',
-        'transactions',
         'fixed_costs',
+        'transactions',
         'debt:later:month_close',
         'net_worth:later:month_close',
     ]);

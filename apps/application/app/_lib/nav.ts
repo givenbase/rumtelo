@@ -207,11 +207,26 @@ interface SubnavDefinition<Key extends SubnavKey> {
 
 const { MONEY, GROWTH } = HouseholdPermissionSection;
 
+// Left to right = how money moves: it comes in, is split over the jars, fixed costs go
+// out, spending gets sorted. Then the longer view (debt, net worth).
 const MONEY_DEFINITIONS: SubnavDefinition<MoneySubnavKey>[] = [
+    // Income keeps its Growth role section, so a VIEWER (Growth = none) does not see it.
+    {
+        key: 'income',
+        href: productPath('money/income'),
+        labelKey: 'pages.nav.children.income',
+        section: GROWTH,
+    },
     {
         key: 'jars',
         href: productPath('money'),
         labelKey: 'pages.nav.children.jars',
+        section: MONEY,
+    },
+    {
+        key: 'fixed_costs',
+        href: productPath('money/fixed-costs'),
+        labelKey: 'pages.nav.children.fixed_costs',
         section: MONEY,
     },
     {
@@ -220,19 +235,6 @@ const MONEY_DEFINITIONS: SubnavDefinition<MoneySubnavKey>[] = [
         labelKey: 'pages.nav.children.transactions',
         section: MONEY,
         badge: 'to_sort',
-    },
-    {
-        key: 'fixed_costs',
-        href: productPath('money/fixed-costs'),
-        labelKey: 'pages.nav.children.fixed_costs',
-        section: MONEY,
-    },
-    // Income keeps its Growth role section, so a VIEWER (Growth = none) does not see it.
-    {
-        key: 'income',
-        href: productPath('money/income'),
-        labelKey: 'pages.nav.children.income',
-        section: GROWTH,
     },
     {
         key: 'debt',

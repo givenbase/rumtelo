@@ -60,7 +60,7 @@ export function ProductSubnav({
                             'flex min-h-11 min-w-0 flex-1 snap-start items-center justify-center gap-1.5 rounded-full border px-2.5 text-center text-[13px] font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent/40 sm:flex-none sm:px-3.5 sm:py-1.5 sm:font-mono sm:text-xs sm:tracking-wide sm:uppercase',
                             active
                                 ? 'border-accent-hover bg-accent-soft text-accent'
-                                : 'border-line text-fg-muted hover:border-accent-hover hover:text-accent',
+                                : 'border-line text-fg-muted hover:bg-raised hover:text-fg',
                             muted && 'border-dashed text-fg-faint'
                         )}>
                         <span className="truncate">{t(item.labelKey)}</span>
