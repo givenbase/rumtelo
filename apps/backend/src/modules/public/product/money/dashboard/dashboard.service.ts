@@ -71,7 +71,6 @@ export class DashboardService {
             debtPlan,
             debtList,
             goalList,
-            progress,
         ] = await Promise.all([
             this.jars.balances(currentKey),
             this.monthScores.current(period),
@@ -83,8 +82,11 @@ export class DashboardService {
             this.debts.plan(),
             this.debts.list(),
             this.goals.list(),
-            this.progress(),
         ]);
+        // Not in the Promise.all above: progress reads the same household-settings row and may
+        // raise the stage floor (a write). Running it alongside the other reads on the one
+        // request EntityManager made `dashboard.get` fail while `progress.get` alone worked.
+        const progress = await this.progress();
 
         const horizon = meta.horizon;
         const stackedMode = meta.mode === 'stacked';
