@@ -22,6 +22,12 @@ export { CoachKind } from '../enums';
  */
 export const TIME_COACH_KEY_PREFIX = 'energy.time.';
 export const MONEY_COACH_KEY_PREFIX = 'money.';
+/**
+ * Fixed-cost tips (`money.fixed_costs.<rule>:<period or quarter>`). Unlike the other money
+ * tips these are household-wide (`accountId` null): hiding one hides it for everyone on the board.
+ * Rules: `over_necessities`, `business_leak`, `subscription_review`.
+ */
+export const FIXED_COSTS_COACH_KEY_PREFIX = 'money.fixed_costs.';
 /** Course tips (`growth.course.rhythm_quiet:<rhythmId>`); copy lives in client i18n. */
 export const COURSE_COACH_KEY_PREFIX = 'growth.course.';
 
@@ -38,6 +44,13 @@ export const CoachMessage = z.object({
     /** The single action this message asks for; null when purely informational. */
     ctaLabel: z.string().max(60).nullable(),
     ctaHref: z.string().max(200).nullable(),
+    /**
+     * Optional second move, shown quieter than the first. Only a few rules carry one
+     * (fixed costs over the Necessities split: "Add income" + "Open the biggest fixed cost").
+     * Null on every other message.
+     */
+    ctaSecondaryLabel: z.string().max(60).nullable().default(null),
+    ctaSecondaryHref: z.string().max(200).nullable().default(null),
     dismissedAt: z.iso.datetime().nullable(),
     createdAt: z.iso.datetime(),
 });

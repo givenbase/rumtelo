@@ -2,7 +2,7 @@ import type { MerchantSeed } from '../types';
 import { necessities } from '../types';
 
 /** Telco / ISP — internet & mobile bills. */
-const TELCO_MERCHANTS: readonly MerchantSeed[] = [
+export const TELCO_MERCHANTS: readonly MerchantSeed[] = [
     {
         key: 'VODAFONE',
         name: 'Vodafone',

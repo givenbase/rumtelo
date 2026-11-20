@@ -1,27 +1,41 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { OnModuleInit } from '@nestjs/common';
 import {
+    CAPABILITIES,
     CoachFeatureId,
     CoachKind,
     DEFAULT_JAR_SPLIT,
+    FIXED_COSTS_COACH_KEY_PREFIX,
     FlowDirection,
     FixedCostPeriodStatus,
     JarKey,
     MONEY_COACH_KEY_PREFIX,
     SPLIT_SOFT_CEILING,
+    hasCapability,
     isCoachFeatureEnabledAtLaunch,
 } from '@rumtelo/contracts';
-import { fixedCostPeriodStatus } from '@rumtelo/utils';
+import { evaluateBusinessHouseholdLeak, fixedCostPeriodStatus, formatMoney } from '@rumtelo/utils';
 
+import { PlanAccessService } from '../../../../../common/capability';
+import { currentHouseholdId } from '../../../../../common/household/household.context';
+import { HouseholdSettingsService } from '../../../../auth/household/household-settings/household-settings.service';
 import { AccountService } from '../../../../auth/user/account/account.service';
 import { currentPeriod } from '../../../../../common/utils/period.util';
+import { AssetService } from '../../growth/asset/asset.service';
 import { CoachService } from '../../../platform/coach/coach.service';
 import type { CoachDraft } from '../../../platform/coach/coach.service';
 import { TransactionService } from '../ledger/transaction/transaction.service';
 import { FixedCostService } from '../plan/fixed-cost/fixed-cost.service';
 import { JarService } from '../plan/jar/jar.service';
+import {
+    type CoachBill,
+    evaluateOverNecessities,
+    evaluateSubscriptionReview,
+    quarterKeyOf,
+} from './fixed-cost-coach.util';
 
 const FIXED_HREF = '/product/money/fixed-costs';
+const INCOME_CREATE_HREF = '/product/money/income/create';
 const INBOX_HREF = '/product/money/transactions';
 const JARS_HREF = '/product/money';
 const INBOX_TIP_MIN = 3;
@@ -30,7 +44,9 @@ const NECESSITIES_SOFT_CEILING = SPLIT_SOFT_CEILING[JarKey.NECESSITIES];
 const NECESSITIES_GOAL = DEFAULT_JAR_SPLIT[JarKey.NECESSITIES];
 
 /**
- * Money inbox tip producers — due bills, unsorted inbox, soft Necessities share.
+ * Money inbox tip producers — due bills, unsorted inbox, soft Necessities share, and the
+ * household-wide fixed-cost tips (over the Necessities split, business costs paid from the
+ * household, a quarterly subscription review).
  * Rule-based; pairs with on-screen jar helpers (informatie, nooit schaamte).
  */
 @Injectable()
@@ -40,7 +56,11 @@ export class MoneyCoachService implements OnModuleInit {
         @Inject(CoachService) private readonly coach: CoachService,
         @Inject(FixedCostService) private readonly fixedCosts: FixedCostService,
         @Inject(TransactionService) private readonly transactions: TransactionService,
-        @Inject(JarService) private readonly jars: JarService
+        @Inject(JarService) private readonly jars: JarService,
+        @Inject(AssetService) private readonly assets: AssetService,
+        @Inject(PlanAccessService) private readonly planAccess: PlanAccessService,
+        @Inject(HouseholdSettingsService)
+        private readonly householdSettings: HouseholdSettingsService
     ) {}
 
     onModuleInit(): void {
@@ -60,13 +80,17 @@ export class MoneyCoachService implements OnModuleInit {
             return;
         }
         const { account } = await this.accounts.ensureCurrentAccount();
-        const drafts = await this.evaluate();
+        const jars = await this.jars.list();
+        const drafts = await this.evaluate(jars);
         await this.coach.sync(account.id, MONEY_COACH_KEY_PREFIX, drafts);
+        // Household-wide (no account): one dismissal hides the tip for everyone on the board.
+        const fixedCostDrafts = await this.evaluateFixedCosts(jars);
+        await this.coach.sync(null, FIXED_COSTS_COACH_KEY_PREFIX, fixedCostDrafts);
     }
 
     // Private
 
-    private async evaluate(): Promise<CoachDraft[]> {
+    private async evaluate(jars: Awaited<ReturnType<JarService['list']>>): Promise<CoachDraft[]> {
         const period = currentPeriod();
         const drafts: CoachDraft[] = [];
 
@@ -95,7 +119,6 @@ export class MoneyCoachService implements OnModuleInit {
             });
         }
 
-        const jars = await this.jars.list();
         const necessities = jars.find(jar => jar.key === JarKey.NECESSITIES);
         const necPct = necessities ? necessities.percentage : null;
         if (necPct !== null && Number.isFinite(necPct) && necPct > NECESSITIES_SOFT_CEILING) {
@@ -109,6 +132,104 @@ export class MoneyCoachService implements OnModuleInit {
         }
 
         return drafts;
+    }
+
+    /**
+     * Household-wide fixed-cost tips. Keys are `rule:<period or quarter>:<numbers>` and carry an
+     * `identity` (the part before the numbers), so a hidden tip stays hidden while the amounts
+     * move. The numbers in the key let the client localise the sentence.
+     */
+    private async evaluateFixedCosts(
+        jars: Awaited<ReturnType<JarService['list']>>
+    ): Promise<CoachDraft[]> {
+        const now = new Date();
+        const today = now.toISOString().slice(0, 10);
+        const period = currentPeriod(now);
+        const quarter = quarterKeyOf(now);
+        const drafts: CoachDraft[] = [];
+
+        const [bills, netMonthlyCents] = await Promise.all([
+            this.fixedCosts.list(FlowDirection.OUT),
+            this.jars.monthlyNetIncome(today),
+        ]);
+        const { currency } = await this.householdSettings.get(currentHouseholdId());
+        const money = (cents: number) => formatMoney(cents, { currency });
+
+        const over = evaluateOverNecessities({
+            netMonthlyCents,
+            jars: jars.map(jar => ({
+                id: jar.id,
+                key: jar.key,
+                name: jar.name,
+                percentage: jar.percentage,
+            })),
+            bills,
+            asOf: today,
+        });
+        if (over) {
+            const identity = `${FIXED_COSTS_COACH_KEY_PREFIX}over_necessities:${period}`;
+            drafts.push({
+                key: `${identity}:${over.shortfallCents}`,
+                identity,
+                kind: CoachKind.NUDGE,
+                text: `${over.jarName} bills come to ${money(over.shortfallCents)} a month more than the jar gets.`,
+                ctaLabel: 'Add income',
+                ctaHref: INCOME_CREATE_HREF,
+                ctaSecondaryLabel: 'Open the biggest fixed cost',
+                ctaSecondaryHref: `${FIXED_HREF}/${over.biggestBillId}`,
+            });
+        }
+
+        const leak = await this.businessLeak(bills, today);
+        if (leak) {
+            const identity = `${FIXED_COSTS_COACH_KEY_PREFIX}business_leak:${period}`;
+            const amount = money(leak.monthlyOutCents);
+            drafts.push({
+                key: `${identity}:${leak.monthlyOutCents}:${leak.billCount}`,
+                identity,
+                kind: CoachKind.NUDGE,
+                text: leak.primaryName
+                    ? `${amount} a month for ${leak.primaryName} is paid from your household.`
+                    : `${amount} a month in business costs is paid from your household.`,
+                ctaLabel: 'Review these bills',
+                // One business: open its bills. Several: the whole list, so none is left out.
+                ctaHref:
+                    leak.assetIds.length === 1
+                        ? `${FIXED_HREF}?assetId=${leak.assetIds[0]}`
+                        : FIXED_HREF,
+            });
+        }
+
+        const review = evaluateSubscriptionReview({ bills, asOf: today });
+        if (review) {
+            // Quarter in the identity: a dismissal holds until the next quarter starts.
+            const identity = `${FIXED_COSTS_COACH_KEY_PREFIX}subscription_review:${quarter}`;
+            drafts.push({
+                key: `${identity}:${review.count}:${review.monthlyCents}`,
+                identity,
+                kind: CoachKind.INSIGHT,
+                text:
+                    review.count === 1
+                        ? `1 subscription costs ${money(review.monthlyCents)} a month. Still using it?`
+                        : `${review.count} subscriptions cost ${money(review.monthlyCents)} a month. Still using all of them?`,
+                ctaLabel: 'Review subscriptions',
+                ctaHref: FIXED_HREF,
+            });
+        }
+
+        return drafts;
+    }
+
+    /** Business holdings whose bills still run through the household jars (needs net worth). */
+    private async businessLeak(bills: readonly CoachBill[], asOf: string) {
+        const planKey = await this.planAccess.planKeyForCurrentHousehold();
+        if (!hasCapability(CAPABILITIES.growthNetWorth, planKey)) return null;
+        const leak = evaluateBusinessHouseholdLeak({
+            assets: await this.assets.list(),
+            bills,
+            asOf,
+        });
+        return leak.active ? leak : null;
     }
 
     private async countDueBills(period: string): Promise<number> {

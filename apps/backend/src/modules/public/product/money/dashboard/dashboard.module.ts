@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { HouseholdSettingsModule } from '../../../../auth/household/household-settings/household-settings.module';
 import { AccountModule } from '../../../../auth/user/account/account.module';
 import { CoachModule } from '../../../platform/coach/coach.module';
+import { AssetModule } from '../../growth/asset/asset.module';
 import { TransactionModule } from '../ledger/transaction/transaction.module';
 import { FixedCostModule } from '../plan/fixed-cost/fixed-cost.module';
 import { JarModule } from '../plan/jar/jar.module';
@@ -22,6 +23,7 @@ import { MoneyCoachService } from './money-coach.service';
         JarModule,
         MonthScoreModule,
         CoachModule,
+        AssetModule,
         TransactionModule,
         HouseholdSettingsModule,
         FixedCostModule,

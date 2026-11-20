@@ -34,6 +34,7 @@ import { JarService } from '../jar/jar.service';
 import { type CounterpartyPatch, PartyService } from '../party/party.service';
 import { assertPeriodOpen } from '../../month-score/period-lock.util';
 import { applyFixedCostLinkChange } from './fixed-cost-link.util';
+import { isCancellableFixedCost } from './fixed-cost-cancellable.util';
 import { FixedCost } from './fixed-cost.entity';
 import { FixedCostSettlement } from './fixed-cost-settlement.entity';
 
@@ -554,6 +555,7 @@ export function toDto(fixedCost: FixedCost) {
         startedOn: fixedCost.startedOn,
         endsOn: fixedCost.endsOn,
         note: fixedCost.note,
+        isCancellable: isCancellableFixedCost(fixedCost),
     };
 }
 

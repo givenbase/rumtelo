@@ -20,11 +20,11 @@ Promote `preview` → `ship` only after the checklist boxes for that row are don
 | `session` | Coach smart-fill | Up to 3 next-move steps, writes via product APIs | [x] Steps wired |
 | `split_coach` | Settings → Jars | Soft % tips vs Eker floors; spending style aware | [x] Phase A/B |
 | `debt_strategy` | Money → Debts | Avalanche / snowball / minimal compare | [x] Real numbers |
-| `necessities_pressure` | Money → Fixed costs | Clear “bills vs 55%” coaching | [x] Card + doctrine |
-| `jar_guide` | Jar detail | Per-jar “what can I use this for?” | [x] Guide card |
-| `why_caption` | App shell | One calm why-line under header | [x] Path map |
-| `period_travel` | Money Looking Ahead/Back | Honest horizon copy | [x] Shared util |
-| `money_tip_producers` | Inbox via `MoneyCoachService` | Due bills, inbox unsorted, Necessities % | [x] Refresher + i18n keys |
+| `necessities_pressure` | Coach line on Money overview + Fixed costs | Clear “bills vs 55%” coaching, two moves (add income, open the biggest fixed cost) | [x] Feed producer + doctrine |
+| `jar_guide` | Jar detail disclosure | Per-jar “what can I use this for?” | [x] Guide card |
+| `coach_line` | Home, Money overview, Fixed costs, holding detail | One Coach line per page, after your data | [ ] Built by the frontend engineer |
+| `period_travel` | Home month-score note | Honest horizon copy | [x] Shared util |
+| `money_tip_producers` | Inbox via `MoneyCoachService` | Due bills, inbox unsorted, Necessities %, fixed costs over the Necessities split, business costs paid from the household, quarterly subscription review | [x] Refresher + i18n keys |
 
 ---
 
@@ -45,12 +45,17 @@ Promote `preview` → `ship` only after the checklist boxes for that row are don
 | Id | Intent | Notes |
 |---|---|---|
 | `split_coach_b2` | Infer spending style from behavior | See `apps/application/app/_lib/split-coach/README.md` |
-| `split_coach_c` | Weekly Home / Jars tip card | Same README |
+| `split_coach_c` | Weekly split tip as a feed producer (shows in the Home Coach line) | Same README |
 | `growth_tip_producers` | Growth inbox tips | — |
 | `soul_tip_producers` | Soul inbox tips | — |
 | `household_coach_toggle` | Wire `isCoachEnabled` | Schema exists; unused by UI / service |
-| `coach_guide_surface` | Adopt `CoachGuideSurface` | Prefer over ad-hoc mark + gate |
 | `feed_key_i18n` | Localize remaining non–time/money keys | `energy.time.*` + `money.*` localize; other prefixes still English fallback |
+
+---
+
+## Placement rule
+
+One Coach line per page, after the household's own data, with a concrete next move and no warning colours. New surfaces never add a second line or a card above data. See [`coach-redesign.md` §2](./coach-redesign.md#2-the-rule-set).
 
 ---
 
