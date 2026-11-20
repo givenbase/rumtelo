@@ -109,6 +109,12 @@ type FixedCostFormProps = {
     linkTransactionId?: string | null;
     /** Opened from a holding (`?assetId=`): the holding is shown, not editable. */
     lockAsset?: boolean;
+    /**
+     * Which way the money flows. Fixed costs create OUT; Income › Other regular income
+     * creates IN. Edit never changes it — pass the row's direction so copy and the
+     * post-delete landing page match the list the row lives in.
+     */
+    direction?: FlowDirection;
     embedded?: boolean;
     mode?: 'create' | 'edit';
     entityId?: string;
@@ -122,6 +128,7 @@ export function FixedCostForm({
     defaultMerchantKey = null,
     linkTransactionId = null,
     lockAsset = false,
+    direction = FlowDirection.OUT,
     embedded = true,
     mode = 'create',
     entityId,
@@ -174,8 +181,9 @@ export function FixedCostForm({
     const { showToast, period } = useHouseholdShell();
     const periodDefaultDate = viewedPeriodDefaultIso(period);
     const apiError = useApiError();
+    const incoming = direction === FlowDirection.IN;
     const { dismiss, dismissAfterRemove } = useFormDismiss(onSuccess, {
-        listHref: formRoute('fixedUpdate').closeHref,
+        listHref: formRoute(incoming ? 'fixedIncomeCreate' : 'fixedUpdate').closeHref,
     });
     const live = isLiveData(householdId);
     const { mergeImplied } = useMergeHouseholdAudiences();
@@ -796,7 +804,7 @@ export function FixedCostForm({
                 cadence: values.cadence,
                 dueDay,
                 dueMonth,
-                direction: FlowDirection.OUT,
+                direction,
                 isActive: true,
                 startedOn,
                 endsOn,
@@ -1008,7 +1016,9 @@ export function FixedCostForm({
                             ? tForm('working')
                             : mode === 'edit'
                               ? tForm('save_changes')
-                              : tFixed('save')}
+                              : incoming
+                                ? tFixed('save_income')
+                                : tFixed('save')}
                     </Button>
                     {mode === 'edit' && entityId ? (
                         <ConfirmActionButton
@@ -1251,7 +1261,13 @@ export function FixedCostForm({
                 name="counterparty"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>{isGive ? tFixed('to_whom') : tFixed('paid_to')}</FormLabel>
+                        <FormLabel>
+                            {isGive
+                                ? tFixed('to_whom')
+                                : incoming
+                                  ? tFixed('received_from')
+                                  : tFixed('paid_to')}
+                        </FormLabel>
                         {isGive ? (
                             <div className="grid gap-3">
                                 <div

@@ -1699,6 +1699,9 @@
                 "page_eyebrow": "✦ MIS INGRESOS",
                 "page_title": "Lo que entra cada mes.",
                 "add_income": "+ Añadir ingresos",
+                "add_other_income": "+ Other regular income",
+                "other_heading": "✦ Other regular income",
+                "other_hint": "Allowances, contributions and other money that arrives on a schedule.",
                 "through_then": "Hasta entonces",
                 "then_label": "Entonces",
                 "now": "Ahora",
@@ -2492,22 +2495,19 @@
                 }
             },
             "fixed": {
-                "eyebrow": "GASTOS FIJOS E INGRESOS",
+                "eyebrow": "FIXED COSTS",
                 "title": "Configúralo una vez. Después se ejecuta automáticamente.",
                 "travel_lead": "En {months} meses, eso supone {outTotal} de salida y {netTotal} de entrada. Cada fila corresponde a la cantidad mensual.",
                 "add_fixed": "+ Añadir coste fijo",
-                "add_income": "+ Añadir ingresos",
+                "out_total_line": "{amount} goes out every month.",
                 "leftover": "{amount} restantes después de gastos",
                 "leftover_travel": "Quedan {amount} tras deducir los gastos · {horizon} en {months} meses",
-                "tab_out": "Fuera",
-                "tab_in": "En",
                 "every_month_out": "Cada mes sale",
-                "every_month_in": "Cada mes en",
                 "filter_label": "Filtro",
                 "filter_all": "Todos",
                 "filter_jar_aria": "Filtrar por tarro",
                 "search_placeholder": "Buscar nombre o beneficiario…",
-                "search_aria": "Buscar costes fijos e ingresos",
+                "search_aria": "Search fixed costs",
                 "empty_search_title": "No se han encontrado resultados.",
                 "empty_search_body": "Prueba con otro nombre o borra la búsqueda para ver la lista completa.",
                 "empty_jar_title": "No hay nada en este frasco.",
@@ -2515,7 +2515,6 @@
                 "empty_all_title": "Aún no hay gastos fijos.",
                 "empty_all_body": "Añade un gasto recurrente para que aparezca en esta lista.",
                 "paused_ended": "En pausa y finalizado",
-                "how_split": "Cómo se distribuye esto",
                 "status_taken": "Pagado",
                 "status_due": "Pendiente",
                 "status_skipped": "Omitido",
@@ -3098,6 +3097,7 @@
             },
             "fixed_form": {
                 "save": "Guardar coste fijo",
+                "save_income": "Save income",
                 "name_placeholder": "p. ej., Netflix, alquiler",
                 "name_free_placeholder": "Escribe un nombre personalizado para la factura…",
                 "name_edit_placeholder": "p. ej., alquiler",
@@ -3123,6 +3123,7 @@
                 "category_auto": "Automático a partir del nombre / preajuste",
                 "category_from_preset": "Desde el valor predeterminado ({name})",
                 "paid_to": "Constante del pagador (opcional)",
+                "received_from": "Received from (optional)",
                 "to_whom": "A quién (organización)",
                 "give_known": "Sé quién",
                 "give_coach": "Ayúdame a elegir",
@@ -3822,8 +3823,8 @@
                             "body": "«OUT» son los gastos recurrentes vinculados a los «jars». «IN» son las mismas fuentes de ingresos que alimentan la distribución. Configúralas una vez y la cobertura de los «jars» y el saldo restante se actualizarán automáticamente."
                         },
                         "out_vs_in": {
-                            "heading": "FUERA frente a DENTRO",
-                            "body": "En «OUT» se enumeran los gastos fijos corrientes (alquiler, seguros, suscripciones). En «IN» se enumeran los ingresos que se perciben cada período. El saldo restante tras deducir los gastos es el ingreso neto mensual menos los gastos fijos de «OUT»."
+                            "heading": "What goes out",
+                            "body": "This list holds your active fixed costs (rent, insurance, subscriptions). Income has its own page: Money → Income. Leftover after costs is monthly net minus fixed costs."
                         },
                         "jars_use": {
                             "heading": "Cómo lo utilizan los jars",
@@ -3836,12 +3837,12 @@
                     },
                     "steps": {
                         "tabs": {
-                            "title": "Fuera vs. Dentro",
-                            "content": "Cambia entre los gastos mensuales (Salidas) y las fuentes de ingresos (Entradas). El saldo restante tras deducir los gastos aparece junto a «+ Añadir gasto fijo» / «+ Añadir ingreso»."
+                            "title": "Add and leftover",
+                            "content": "Add a fixed cost here. Leftover after costs shows next to it. Your income lives under Money → Income."
                         },
                         "list": {
                             "title": "La lista",
-                            "content": "Salida: costes fijos por hucha. Entrada: pago que financia el reparto. Toca una fila para editarla."
+                            "content": "Your fixed costs by jar. Tap a row to open it."
                         },
                         "status": {
                             "title": "Mark pagó",
@@ -6741,6 +6742,10 @@
                 "fixed_create": {
                     "title": "Nuevo coste fijo",
                     "description": "¿Qué se va del tarro cada mes?"
+                },
+                "fixed_income_create": {
+                    "title": "Add other regular income",
+                    "description": "What arrives on a schedule, besides your income sources?"
                 },
                 "fixed_update": {
                     "title": "Editar coste fijo"

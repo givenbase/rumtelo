@@ -5,7 +5,7 @@
  * Catalog identity: prefer stable keys (`orgKey` / `merchantKey` / `categoryKey`).
  * `counterparty` is a display-name fallback for manual / legacy links only.
  */
-import { GoalKind } from '@rumtelo/contracts';
+import { FlowDirection, GoalKind } from '@rumtelo/contracts';
 
 type ParamSource = { get(name: string): string | null };
 
@@ -25,6 +25,9 @@ export function fixedCostPrefillFromParams(params: ParamSource) {
     const dueDay = due !== null && due >= 1 && due <= 31 ? String(due) : undefined;
     const transactionId = params.get('transactionId')?.trim();
     const assetId = assetIdFromParams(params);
+    // Only Income › Other regular income sends `direction=in`; everything else is a cost.
+    const direction =
+        params.get('direction')?.trim().toLowerCase() === 'in' ? FlowDirection.IN : undefined;
     const payeeModeRaw = params.get('payeeMode')?.trim();
     const payeeMode =
         payeeModeRaw && (GIVE_PAYEE_MODES as readonly string[]).includes(payeeModeRaw)
@@ -41,13 +44,15 @@ export function fixedCostPrefillFromParams(params: ParamSource) {
         !categoryId &&
         !dueDay &&
         !transactionId &&
-        !assetId
+        !assetId &&
+        !direction
     ) {
         return undefined;
     }
     return {
         ...(jarId ? { jarId } : {}),
         ...(assetId ? { assetId } : {}),
+        ...(direction ? { direction } : {}),
         ...(counterparty ? { counterparty } : {}),
         ...(name ? { name } : {}),
         ...(payeeMode ? { payeeMode } : {}),

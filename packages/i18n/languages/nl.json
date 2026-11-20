@@ -1699,6 +1699,9 @@
                 "page_eyebrow": "✦ MIJN INKOMSTEN",
                 "page_title": "Wat er elke maand binnenkomt.",
                 "add_income": "+ Inkomsten toevoegen",
+                "add_other_income": "+ Overige vaste inkomsten",
+                "other_heading": "✦ Overige vaste inkomsten",
+                "other_hint": "Zakgeld, bijdragen en ander geld dat op vaste momenten binnenkomt.",
                 "through_then": "Tot dan",
                 "then_label": "Vervolgens",
                 "now": "Nu",
@@ -2492,22 +2495,19 @@
                 }
             },
             "fixed": {
-                "eyebrow": "VASTE KOSTEN & INKOMSTEN",
+                "eyebrow": "VASTE KOSTEN",
                 "title": "Stel het één keer in. Daarna werkt het vanzelf.",
                 "travel_lead": "Over {months} maanden is dat {outTotal} eruit en {netTotal} erin. Elke rij blijft het maandbedrag.",
                 "add_fixed": "+ Vaste kosten toevoegen",
-                "add_income": "+ Inkomsten toevoegen",
+                "out_total_line": "Er gaat {amount} per maand uit.",
                 "leftover": "{amount} over na aftrek van kosten",
                 "leftover_travel": "{amount} overblijft na aftrek van kosten · {horizon} over {months} maanden",
-                "tab_out": "Uit",
-                "tab_in": "In",
                 "every_month_out": "Elke maand verschijnt er een nieuwe uitgave",
-                "every_month_in": "Elke maand in",
                 "filter_label": "Filteren",
                 "filter_all": "Alles",
                 "filter_jar_aria": "Filteren op potje",
                 "search_placeholder": "Zoek op naam of begunstigde…",
-                "search_aria": "Zoek naar vaste kosten en inkomsten",
+                "search_aria": "Zoek in je vaste kosten",
                 "empty_search_title": "Geen resultaten gevonden.",
                 "empty_search_body": "Probeer een andere naam, of wis de zoekopdracht om de volledige lijst te bekijken.",
                 "empty_jar_title": "Er zit niets in dit potje.",
@@ -2515,7 +2515,6 @@
                 "empty_all_title": "Er zijn nog geen vaste kosten.",
                 "empty_all_body": "Voeg een terugkerende uitgave toe om deze in deze lijst te zien.",
                 "paused_ended": "Onderbroken & beëindigd",
-                "how_split": "Hoe dit wordt verdeeld",
                 "status_taken": "Betaald",
                 "status_due": "Te betalen",
                 "status_skipped": "Overgeslagen",
@@ -3098,6 +3097,7 @@
             },
             "fixed_form": {
                 "save": "Vaste kosten opslaan",
+                "save_income": "Inkomen opslaan",
                 "name_placeholder": "bijv. Netflix, huren",
                 "name_free_placeholder": "Typ een eigen naam voor de factuur in…",
                 "name_edit_placeholder": "bijv. huur",
@@ -3123,6 +3123,7 @@
                 "category_auto": "Automatisch op basis van naam / voorinstelling",
                 "category_from_preset": "Vanuit de standaardinstelling ({name})",
                 "paid_to": "Betaald aan (optioneel)",
+                "received_from": "Ontvangen van (optioneel)",
                 "to_whom": "Aan wie (organisatie)",
                 "give_known": "Ik weet wie",
                 "give_coach": "Help me kiezen",
@@ -3822,8 +3823,8 @@
                             "body": "OUT zijn terugkerende uitgaven die aan potjes zijn gekoppeld. IN zijn dezelfde inkomstenbronnen die de verdeling voeden. Stel ze één keer in; de dekking van de potjes en het resterende bedrag worden automatisch bijgewerkt."
                         },
                         "out_vs_in": {
-                            "heading": "UIT vs. IN",
-                            "body": "Onder ‘OUT’ staan de lopende vaste kosten (huur, verzekeringen, abonnementen). Onder ‘IN’ staat het loon dat elke periode wordt uitbetaald. Wat er na aftrek van de kosten overblijft, is het maandelijkse nettobedrag minus de vaste kosten onder ‘OUT’."
+                            "heading": "Wat eruit gaat",
+                            "body": "Deze lijst bevat je actieve vaste kosten (huur, verzekeringen, abonnementen). Inkomen heeft een eigen pagina: Geld → Inkomen. Wat er na de kosten overblijft is je maandelijkse netto min de vaste kosten."
                         },
                         "jars_use": {
                             "heading": "Hoe potjes hiervan gebruikmaken",
@@ -3836,12 +3837,12 @@
                     },
                     "steps": {
                         "tabs": {
-                            "title": "Buiten vs. Binnen",
-                            "content": "Schakel tussen maandelijkse uitgaven (Uit) en inkomstenbronnen (In). Het resterende bedrag na aftrek van de kosten wordt weergegeven naast + Vaste kosten toevoegen / + Inkomsten toevoegen."
+                            "title": "Toevoegen en wat overblijft",
+                            "content": "Voeg hier een vaste kost toe. Wat er na de kosten overblijft, staat ernaast. Je inkomen vind je onder Geld → Inkomen."
                         },
                         "list": {
                             "title": "De lijst",
-                            "content": "Uit: vaste kosten per potje. In: bedrag waarmee de verdeling wordt gefinancierd. Tik op een rij om deze te bewerken."
+                            "content": "Je vaste kosten per potje. Tik op een rij om hem te openen."
                         },
                         "status": {
                             "title": "Als betaald markeren",
@@ -6741,6 +6742,10 @@
                 "fixed_create": {
                     "title": "Nieuwe vaste kosten",
                     "description": "Wat verdwijnt er elke maand uit het potje?"
+                },
+                "fixed_income_create": {
+                    "title": "Overige vaste inkomsten toevoegen",
+                    "description": "Wat komt er op vaste momenten binnen, naast je inkomstenbronnen?"
                 },
                 "fixed_update": {
                     "title": "Vaste kosten bewerken"

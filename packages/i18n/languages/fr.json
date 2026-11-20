@@ -1699,6 +1699,9 @@
                 "page_eyebrow": "✦ MES REVENUS",
                 "page_title": "Ce qui arrive chaque mois.",
                 "add_income": "+ Ajouter des revenus",
+                "add_other_income": "+ Other regular income",
+                "other_heading": "✦ Other regular income",
+                "other_hint": "Allowances, contributions and other money that arrives on a schedule.",
                 "through_then": "Jusqu'à ce moment-là",
                 "then_label": "Ensuite",
                 "now": "Maintenant",
@@ -2492,22 +2495,19 @@
                 }
             },
             "fixed": {
-                "eyebrow": "COÛTS FIXES ET REVENUS",
+                "eyebrow": "FIXED COSTS",
                 "title": "Configurez-le une seule fois. Ensuite, il fonctionne automatiquement.",
                 "travel_lead": "Sur {months} mois, cela représente {outTotal} de dépenses et {netTotal} de recettes. Chaque ligne correspond au montant mensuel.",
                 "add_fixed": "+ Ajouter un coût fixe",
-                "add_income": "+ Ajouter un revenu",
+                "out_total_line": "{amount} goes out every month.",
                 "leftover": "{amount} restant après déduction des frais",
                 "leftover_travel": "{amount} restant après déduction des frais · {horizon} sur {months} mois",
-                "tab_out": "Sortie",
-                "tab_in": "Dans",
                 "every_month_out": "Chaque mois, en sortie",
-                "every_month_in": "Chaque mois dans",
                 "filter_label": "Filtre",
                 "filter_all": "Tout",
                 "filter_jar_aria": "Filtrer par bocal",
                 "search_placeholder": "Rechercher un nom ou un bénéficiaire…",
-                "search_aria": "Rechercher les coûts fixes et les revenus",
+                "search_aria": "Search fixed costs",
                 "empty_search_title": "Aucun résultat.",
                 "empty_search_body": "Essayez un autre nom ou effacez votre recherche pour afficher la liste complète.",
                 "empty_jar_title": "Il n'y a rien dans ce bocal.",
@@ -2515,7 +2515,6 @@
                 "empty_all_title": "Il n'y a pas encore de coûts fixes.",
                 "empty_all_body": "Ajoutez une dépense récurrente pour qu'elle apparaisse dans cette liste.",
                 "paused_ended": "Suspendu et terminé",
-                "how_split": "Comment cela est-il réparti ?",
                 "status_taken": "Payé",
                 "status_due": "À payer",
                 "status_skipped": "Ignoré",
@@ -3098,6 +3097,7 @@
             },
             "fixed_form": {
                 "save": "Enregistrer le coût fixe",
+                "save_income": "Save income",
                 "name_placeholder": "par exemple : Netflix, location",
                 "name_free_placeholder": "Saisissez un nom personnalisé pour la facture…",
                 "name_edit_placeholder": "par exemple : loyer",
@@ -3123,6 +3123,7 @@
                 "category_auto": "Automatique à partir du nom / d'un préréglage",
                 "category_from_preset": "À partir du préréglage ({name})",
                 "paid_to": "Versé à (facultatif)",
+                "received_from": "Received from (optional)",
                 "to_whom": "À qui (organisme)",
                 "give_known": "Je sais qui",
                 "give_coach": "Aide-moi à choisir",
@@ -3822,8 +3823,8 @@
                             "body": "La colonne « OUT » correspond aux dépenses récurrentes liées aux « bocaux ». La colonne « IN » correspond aux mêmes sources de revenus qui alimentent la répartition. Il suffit de les configurer une seule fois : la couverture des « bocaux » et le solde restant sont mis à jour automatiquement."
                         },
                         "out_vs_in": {
-                            "heading": "OUT vs IN",
-                            "body": "La colonne « OUT » répertorie les coûts fixes courants (loyer, assurances, abonnements). La colonne « IN » répertorie les rémunérations perçues à chaque période. Le solde après déduction des coûts correspond au revenu net mensuel, moins les coûts fixes de la colonne « OUT »."
+                            "heading": "What goes out",
+                            "body": "This list holds your active fixed costs (rent, insurance, subscriptions). Income has its own page: Money → Income. Leftover after costs is monthly net minus fixed costs."
                         },
                         "jars_use": {
                             "heading": "Comment les « jars » utilisent cette fonctionnalité",
@@ -3836,12 +3837,12 @@
                     },
                     "steps": {
                         "tabs": {
-                            "title": "« Out » vs « In »",
-                            "content": "Passez des dépenses mensuelles (Sorties) aux sources de revenus (Entrées). Le solde restant après déduction des dépenses s'affiche à côté des boutons « + Ajouter une dépense fixe » et « + Ajouter un revenu »."
+                            "title": "Add and leftover",
+                            "content": "Add a fixed cost here. Leftover after costs shows next to it. Your income lives under Money → Income."
                         },
                         "list": {
                             "title": "La liste",
-                            "content": "Sorties : coûts fixes par pot. Entrées : versement servant à financer le partage. Appuyez sur une ligne pour la modifier."
+                            "content": "Your fixed costs by jar. Tap a row to open it."
                         },
                         "status": {
                             "title": "Mark a payé",
@@ -6741,6 +6742,10 @@
                 "fixed_create": {
                     "title": "Nouveau coût fixe",
                     "description": "Qu'est-ce qui sort du bocal chaque mois ?"
+                },
+                "fixed_income_create": {
+                    "title": "Add other regular income",
+                    "description": "What arrives on a schedule, besides your income sources?"
                 },
                 "fixed_update": {
                     "title": "Modifier les coûts fixes"

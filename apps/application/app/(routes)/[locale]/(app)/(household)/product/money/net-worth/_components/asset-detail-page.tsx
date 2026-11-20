@@ -27,6 +27,7 @@ import {
     createTxHref,
     assetDetailHref,
     fixedCostsForAssetHref,
+    incomeForAssetHref,
     fixedDetailHref,
     transactionsForAssetHref,
     txDetailHref,
@@ -420,7 +421,7 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                         count={linkedIncome.length}
                         addHref={createIncomeHref({ assetId: asset.id })}
                         addLabel={t('detail.add_income')}
-                        openHref={fixedCostsForAssetHref(asset.id, 'in')}
+                        openHref={incomeForAssetHref(asset.id)}
                         openLabel={t('detail.open_in_money')}
                         empty={t('detail.linked_empty_income')}>
                         {linkedIncome.map(source => {
@@ -471,7 +472,7 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                         count={linkedBills.length}
                         addHref={createFixedHref({ assetId: asset.id })}
                         addLabel={t('detail.add_bill')}
-                        openHref={fixedCostsForAssetHref(asset.id, 'out')}
+                        openHref={fixedCostsForAssetHref(asset.id)}
                         openLabel={t('detail.open_in_money')}
                         empty={t('detail.linked_empty_bills')}>
                         {linkedBills.map(bill => {

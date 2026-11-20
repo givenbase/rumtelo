@@ -204,8 +204,8 @@ const tour = {
                     body: 'OUT is recurring bills linked to jars. IN is the same income sources that feed the split. Set them once; jar coverage and leftover update automatically.',
                 },
                 out_vs_in: {
-                    heading: 'OUT vs IN',
-                    body: 'OUT lists active fixed costs (rent, insurance, subscriptions). IN lists pay that lands every period. Leftover after costs is monthly net minus fixed OUT.',
+                    heading: 'What goes out',
+                    body: 'This list holds your active fixed costs (rent, insurance, subscriptions). Income has its own page: Money → Income. Leftover after costs is monthly net minus fixed costs.',
                 },
                 jars_use: {
                     heading: 'How jars use this',
@@ -218,14 +218,13 @@ const tour = {
             },
             steps: {
                 tabs: {
-                    title: 'Out vs In',
+                    title: 'Add and leftover',
                     content:
-                        'Switch between monthly bills (Out) and income sources (In). Leftover after costs shows next to + Add fixed cost / + Add income.',
+                        'Add a fixed cost here. Leftover after costs shows next to it. Your income lives under Money → Income.',
                 },
                 list: {
                     title: 'The list',
-                    content:
-                        'Out: fixed costs by jar. In: pay that funds the split. Tap a row to edit.',
+                    content: 'Your fixed costs by jar. Tap a row to open it.',
                 },
                 status: {
                     title: 'Mark paid',

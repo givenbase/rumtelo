@@ -18,7 +18,7 @@ import {
     ExpenseCreatePage,
     ExpenseUpdatePage,
 } from '@/product/money/transactions/_components/expense-pages';
-import type { GoalKind } from '@rumtelo/contracts';
+import { FlowDirection, type GoalKind } from '@rumtelo/contracts';
 
 import { formRoute, moveCreateMeta } from '@/app/_lib/form-route-meta';
 import { MoveMoneyForm } from '@/components/features/forms/move-money-form';
@@ -76,7 +76,9 @@ export function FixedCostCreateModalShell({
     closeHref,
     defaultValues,
 }: ShellProps & { defaultValues?: FixedCostCreatePrefill }) {
-    const meta = formRoute('fixedCreate');
+    const meta = formRoute(
+        defaultValues?.direction === FlowDirection.IN ? 'fixedIncomeCreate' : 'fixedCreate'
+    );
     return (
         <RouteModalShell closeHref={closeHref} meta={meta}>
             <FixedCostCreatePage embedded defaultValues={defaultValues} />

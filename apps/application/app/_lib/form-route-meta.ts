@@ -36,6 +36,12 @@ export const FORM_ROUTE = {
         descriptionKey: 'pages.shell.forms.fixed_create.description',
         closeHref: productPath('money/fixed-costs'),
     },
+    /** Income › Other regular income: a fixed-cost row with direction IN. */
+    fixedIncomeCreate: {
+        titleKey: 'pages.shell.forms.fixed_income_create.title',
+        descriptionKey: 'pages.shell.forms.fixed_income_create.description',
+        closeHref: productPath('money/income'),
+    },
     fixedUpdate: {
         titleKey: 'pages.shell.forms.fixed_update.title',
         closeHref: productPath('money/fixed-costs'),

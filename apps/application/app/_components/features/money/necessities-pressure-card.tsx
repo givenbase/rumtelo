@@ -19,10 +19,13 @@ import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 export function NecessitiesPressureCard({
     pressure,
     variant = 'plan',
+    compact = false,
 }: {
     pressure: NecessitiesPressure;
     /** `plan` = fixed-costs overview; `jar` = jars list (envelope already known). */
     variant?: 'plan' | 'jar';
+    /** One-line card for placement under a list. */
+    compact?: boolean;
 }) {
     const t = useTranslations('features.money.necessities_pressure');
     const { formatMoney } = useHouseholdCurrency();
@@ -44,6 +47,7 @@ export function NecessitiesPressureCard({
         <CoachTipCard
             title={t('title')}
             tone="warning"
+            compact={compact}
             meta={
                 variant === 'plan' && pressure.envelopeCents > 0 ? (
                     <>

@@ -1133,7 +1133,13 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.tour.pages.fixed.sections.jars_use.body':
             'Een vast bedrag aan OUT vermindert het beschikbare saldo in dat potje. Zodra er geld binnenkomt, wordt het inkomen procentueel over de potjes verdeeld — dit scherm geeft het plan weer, niet de boekhouding.',
         'features.tour.pages.fixed.steps.list.content':
-            'Uit: vaste kosten per potje. In: bedrag waarmee de verdeling wordt gefinancierd. Tik op een rij om deze te bewerken.',
+            'Je vaste kosten per potje. Tik op een rij om hem te openen.',
+        'features.tour.pages.fixed.steps.tabs.title': 'Toevoegen en wat overblijft',
+        'features.tour.pages.fixed.steps.tabs.content':
+            'Voeg hier een vaste kost toe. Wat er na de kosten overblijft, staat ernaast. Je inkomen vind je onder Geld → Inkomen.',
+        'features.tour.pages.fixed.sections.out_vs_in.heading': 'Wat eruit gaat',
+        'features.tour.pages.fixed.sections.out_vs_in.body':
+            'Deze lijst bevat je actieve vaste kosten (huur, verzekeringen, abonnementen). Inkomen heeft een eigen pagina: Geld → Inkomen. Wat er na de kosten overblijft is je maandelijkse netto min de vaste kosten.',
         'features.tour.pages.jars.sections.what_for.heading': 'Waar de potjes voor dienen',
         'features.tour.pages.jars.sections.how.body':
             'Je voert je inkomsten zelf in. Aan de hand van je vaste percentages zie je hoeveel er in elk potje hoort — wat je kunt uitgeven of voor dat doel opzij kunt zetten. Werk vervolgens de ‘Money pills’ van links naar rechts af: Vaste kosten → Transacties → Schulden → Nettovermogen. Rumtelo verplaatst nooit geld op je bankrekening.',
@@ -1168,6 +1174,18 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.shell.forms.tx_update.description':
             'Pas de richting, het bedrag, het potje of de notitie aan.',
         'pages.shell.forms.fixed_create.description': 'Wat verdwijnt er elke maand uit het potje?',
+        'pages.shell.forms.fixed_income_create.title': 'Overige vaste inkomsten toevoegen',
+        'pages.shell.forms.fixed_income_create.description':
+            'Wat komt er op vaste momenten binnen, naast je inkomstenbronnen?',
+        'features.money.fixed.eyebrow': 'VASTE KOSTEN',
+        'features.money.fixed.out_total_line': 'Er gaat {amount} per maand uit.',
+        'features.money.fixed.search_aria': 'Zoek in je vaste kosten',
+        'features.money.fixed_form.save_income': 'Inkomen opslaan',
+        'features.money.fixed_form.received_from': 'Ontvangen van (optioneel)',
+        'features.growth.income.add_other_income': '+ Overige vaste inkomsten',
+        'features.growth.income.other_heading': '✦ Overige vaste inkomsten',
+        'features.growth.income.other_hint':
+            'Zakgeld, bijdragen en ander geld dat op vaste momenten binnenkomt.',
         'pages.shell.forms.move_create.description_from_jar':
             'Kies zelf waar het naartoe gaat — dit potje is al de bron.',
         'pages.shell.gates.maintenance_api_down_body':

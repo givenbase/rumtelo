@@ -1,5 +1,7 @@
 'use client';
 
+import { FlowDirection } from '@rumtelo/contracts';
+
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { minorUnitsToAmountInput } from '@/app/_lib/money-input';
 import { productPath } from '@/app/_lib/routes';
@@ -18,6 +20,8 @@ export type FixedCostCreatePrefill = Partial<FixedCostFormValues> & {
     merchantKey?: string;
     /** Link this ledger row after create (settlement for the booked month). */
     transactionId?: string;
+    /** IN = Income › Other regular income. Omitted = a cost (OUT). */
+    direction?: FlowDirection;
 };
 
 export function FixedCostCreatePage({
@@ -27,7 +31,8 @@ export function FixedCostCreatePage({
     embedded?: boolean;
     defaultValues?: FixedCostCreatePrefill;
 }) {
-    const { payeeMode, orgKey, merchantKey, transactionId, ...formDefaults } = defaultValues ?? {};
+    const { payeeMode, orgKey, merchantKey, transactionId, direction, ...formDefaults } =
+        defaultValues ?? {};
     return (
         <FixedCostForm
             mode="create"
@@ -38,6 +43,7 @@ export function FixedCostCreatePage({
             defaultMerchantKey={merchantKey ?? null}
             linkTransactionId={transactionId ?? null}
             lockAsset={Boolean(formDefaults.assetId)}
+            direction={direction ?? FlowDirection.OUT}
         />
     );
 }
@@ -75,6 +81,7 @@ export function FixedCostUpdatePage({ id, embedded = false }: { id: string; embe
         <FixedCostForm
             mode="edit"
             entityId={loaded.row.id}
+            direction={loaded.row.direction}
             embedded={embedded}
             defaultValues={loaded.values}
         />

@@ -110,6 +110,10 @@ const shell = {
             title: 'New fixed cost',
             description: 'What leaves a jar every month?',
         },
+        fixed_income_create: {
+            title: 'Add other regular income',
+            description: 'What arrives on a schedule, besides your income sources?',
+        },
         fixed_update: {
             title: 'Edit fixed cost',
         },

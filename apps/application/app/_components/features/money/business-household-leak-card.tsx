@@ -14,7 +14,14 @@ import { CoachTipCard } from '@/components/features/helpers';
  * Coach tip when BUSINESS holding costs still run through household jars.
  * Never blocks — visibility only (Eker: pay from the business or raise the draw).
  */
-export function BusinessHouseholdLeakCard({ leak }: { leak: BusinessHouseholdLeak }) {
+export function BusinessHouseholdLeakCard({
+    leak,
+    compact = false,
+}: {
+    leak: BusinessHouseholdLeak;
+    /** One-line card for placement under a list. */
+    compact?: boolean;
+}) {
     const t = useTranslations('features.money.business_household_leak');
     const { formatMoney } = useHouseholdCurrency();
     if (!leak.active) return null;
@@ -26,6 +33,7 @@ export function BusinessHouseholdLeakCard({ leak }: { leak: BusinessHouseholdLea
         <CoachTipCard
             title={t('title')}
             tone="warning"
+            compact={compact}
             meta={t('meta', { count: leak.billCount })}
             actions={
                 primaryId ? (
