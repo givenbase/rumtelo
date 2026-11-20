@@ -1,5 +1,5 @@
 import { EntityManager } from '@mikro-orm/postgresql';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CoachKind } from '@rumtelo/contracts';
 
 import { currentPeriod } from '../../../../common/utils/period.util';
@@ -29,6 +29,7 @@ type CoachRefresher = (period: string) => Promise<void>;
 
 @Injectable()
 export class CoachService {
+    private readonly logger = new Logger(CoachService.name);
     private readonly repo: HouseholdScopedRepository<CoachMessage>;
     private readonly refreshers: CoachRefresher[] = [];
 
@@ -102,7 +103,18 @@ export class CoachService {
 
     async feed(period: string) {
         if (period === currentPeriod()) {
-            await Promise.all(this.refreshers.map(refresh => refresh(period)));
+            // One failing producer must not take the whole feed (and Home) down with it.
+            const results = await Promise.allSettled(
+                this.refreshers.map(refresh => refresh(period))
+            );
+            for (const result of results) {
+                if (result.status === 'rejected') {
+                    const reason = result.reason as { name?: string; message?: string };
+                    this.logger.warn(
+                        `Coach refresher failed: ${reason?.name ?? 'Error'} ${reason?.message ?? ''}`
+                    );
+                }
+            }
         }
 
         const { account } = await this.accounts.ensureCurrentAccount();
