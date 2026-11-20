@@ -214,55 +214,6 @@ export function IncomePageClient() {
                 ) : null}
             </div>
 
-            <div data-tour="income-summary" className="min-w-0">
-                <AccentCard tint="var(--color-accent)" className="h-full overflow-hidden p-0">
-                    <MetricStrip
-                        size="lg"
-                        className="border-t-0"
-                        items={[
-                            {
-                                label: nowLabel,
-                                value: traveling ? (
-                                    <>
-                                        <span className="text-fg-faint">
-                                            {formatMoney(monthlyNet)}
-                                        </span>
-                                        <span className="mx-1 text-fg-faint">→</span>
-                                        <span className="text-success">{formatMoney(spanNet)}</span>
-                                    </>
-                                ) : (
-                                    formatMoney(monthlyNet)
-                                ),
-                                hint: (
-                                    <>
-                                        {traveling
-                                            ? t('subline_travel', {
-                                                  amount: formatMoney(monthlyNet),
-                                                  months: horizon,
-                                              })
-                                            : t('subline_annual', {
-                                                  amount: formatMoney(monthlyNet * 12),
-                                              })}
-                                        {delta && delta.absolute !== 0 && !traveling ? (
-                                            <span
-                                                className={cn(
-                                                    'mt-0.5 block',
-                                                    delta.absolute > 0
-                                                        ? 'text-success'
-                                                        : 'text-warning'
-                                                )}>
-                                                {delta.absolute > 0 ? '+' : ''}
-                                                {formatMoney(delta.absolute)}
-                                            </span>
-                                        ) : null}
-                                    </>
-                                ),
-                            },
-                        ]}
-                    />
-                </AccentCard>
-            </div>
-
             {assetFilter ? (
                 <div className="flex flex-wrap items-center gap-3 rounded-xl border border-accent/40 bg-accent-soft px-4 py-3">
                     <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
@@ -278,16 +229,60 @@ export function IncomePageClient() {
             ) : null}
 
             {/* 2. What the household entered: income sources, then other regular income. */}
+            {/* One card: the monthly total is the header of the list it adds up — no separate
+                summary card repeating the same number. */}
             <div data-tour="income-sources" className="grid gap-4">
-                <Card className="p-0">
-                    <div className="grid gap-3 border-b border-line px-4 py-2.5 sm:px-5">
-                        <div className="flex items-center justify-between gap-3">
-                            <Typography as="span" variant="eyebrow" color="primary">
-                                {t('sources_heading')}
-                            </Typography>
-                            <span className="font-mono text-sm text-success">
-                                {formatMoney(monthlyNet)}
-                            </span>
+                <Card data-tour="income-summary" className="p-0">
+                    <div className="grid gap-3 border-b border-line px-4 py-3 sm:px-5">
+                        <div className="flex flex-wrap items-end justify-between gap-3">
+                            <div className="min-w-0">
+                                <Typography as="span" variant="eyebrow" color="primary">
+                                    {t('sources_heading')}
+                                </Typography>
+                                <p className="mt-1 text-xs text-fg-muted">{nowLabel}</p>
+                            </div>
+                            <div className="text-right">
+                                <p className="font-display text-3xl leading-none font-semibold tracking-tight tabular-nums">
+                                    {traveling ? (
+                                        <>
+                                            <span className="text-fg-faint">
+                                                {formatMoney(monthlyNet)}
+                                            </span>
+                                            <span className="mx-1 text-fg-faint">→</span>
+                                            <span className="text-success">
+                                                {formatMoney(spanNet)}
+                                            </span>
+                                        </>
+                                    ) : (
+                                        formatMoney(monthlyNet)
+                                    )}
+                                </p>
+                                <p className="mt-1 font-mono text-xs text-fg-muted">
+                                    {traveling
+                                        ? t('subline_travel', {
+                                              amount: formatMoney(monthlyNet),
+                                              months: horizon,
+                                          })
+                                        : t('subline_annual', {
+                                              amount: formatMoney(monthlyNet * 12),
+                                          })}
+                                    {/* Only a real change: when every source is new, the "change"
+                                        equals the total and says nothing. */}
+                                    {delta &&
+                                    delta.absolute !== 0 &&
+                                    delta.absolute !== monthlyNet &&
+                                    !traveling ? (
+                                        <span
+                                            className={cn(
+                                                'ml-2',
+                                                delta.absolute > 0 ? 'text-success' : 'text-warning'
+                                            )}>
+                                            {delta.absolute > 0 ? '+' : ''}
+                                            {formatMoney(delta.absolute)}
+                                        </span>
+                                    ) : null}
+                                </p>
+                            </div>
                         </div>
                         {sources.length > 0 || otherIncome.length > 0 ? (
                             <ListSearchField
