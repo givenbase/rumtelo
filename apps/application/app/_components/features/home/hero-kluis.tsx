@@ -157,19 +157,24 @@ export function HeroKluis({
                     </Typography>
                 </Link>
 
-                {/* Side metrics: 2×2 on mobile, 4-col aligned strip on lg */}
-                <div className="grid grid-cols-2 gap-x-4 gap-y-4 sm:gap-x-5 lg:grid-cols-4 lg:gap-0 lg:border-l lg:border-line lg:pl-5">
-                    {sideMetrics.map((metric, index) => (
-                        <SideMetric
-                            key={metric.label}
-                            {...metric}
-                            className={cn(
-                                'min-w-0',
-                                index > 0 && 'lg:border-l lg:border-line lg:pl-4',
-                                index < sideMetrics.length - 1 && 'lg:pr-4'
-                            )}
-                        />
-                    ))}
+                {/* Side metrics: 2×2 until the strip itself is wide enough for four columns.
+                    A container query, not a viewport breakpoint: on Home the card shares the row
+                    with the side column, so at lg four columns were too narrow and amounts
+                    such as "€10,421.60" ran into each other. */}
+                <div className="@container min-w-0 lg:border-l lg:border-line lg:pl-5">
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-4 sm:gap-x-5 @2xl:grid-cols-4 @2xl:gap-0">
+                        {sideMetrics.map((metric, index) => (
+                            <SideMetric
+                                key={metric.label}
+                                {...metric}
+                                className={cn(
+                                    'min-w-0',
+                                    index > 0 && '@2xl:border-l @2xl:border-line @2xl:pl-4',
+                                    index < sideMetrics.length - 1 && '@2xl:pr-4'
+                                )}
+                            />
+                        ))}
+                    </div>
                 </div>
             </div>
 
